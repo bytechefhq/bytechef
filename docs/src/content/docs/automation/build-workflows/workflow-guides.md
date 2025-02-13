@@ -55,6 +55,31 @@ description: "Learn how to create, edit, and manage workflows effectively."
 <iframe src="https://www.guidejar.com/embed/b6afQMMbdVz0ZR5s6ano?type=1&controls=on" width="100%" height="100%" style="height:100%;position:absolute;inset:0" allowfullscreen frameborder="0"></iframe>
 </div>
 
+### Output
+
+Each component in a workflow can be tested individually to verify its output. In the Configuration Panel, you can explore the output structure of an action through the **Output** tab.
+
+1. Click on the component you want to test within your workflow.
+2. Go to the **Output** tab to view the output of the component.
+3. The output schema is displayed here, illustrating the structure of the output data. For example, the output of the **Addition** action is represented as a number, indicated by hashtag icons.
+4. Note that the value `23.34` shown in the output schema is a placeholder and not the actual result of the action.
+5. Click on the **Define** button. You have three options: **Use Predefined Output Schema**, **Test Component**, and **Upload Sample Output Data**.
+6. If you click on **Use Predefined Output Schema**, the structure of the output data will be shown with sample values.
+7. If you click on **Test Action**, the action will be executed, and you will see the real output of the action. In this case, it is `5`.
+8. If you click on **Upload Sample Output Data**, you can upload your own sample output data.
+
+To summarize:
+
+- **Use Predefined Output Schema**: Displays the structure of the output data with sample values.
+- **Test Component**: Executes the action and displays the real output.
+- **Upload Sample Output Data**: Allows you to upload your own sample output data.
+
+**Note:** Some components does not have predefined output schema because their output is dynamic. In that case you have to test the component to see the output.
+
+<div style="position:relative;height:0;width:100%;overflow:hidden;z-index:99999;box-sizing:border-box;padding-bottom:calc(51.63511188% + 32px)">
+<iframe src="https://www.guidejar.com/embed/NhmzjBGbRTI9BApvBlSn?type=1&controls=on" width="100%" height="100%" style="height:100%;position:absolute;inset:0" allowfullscreen frameborder="0"></iframe>
+</div>
+
 ### Edit Component
 
 1. Click on the component you want to edit.
@@ -101,4 +126,17 @@ description: "Learn how to create, edit, and manage workflows effectively."
 
 <div style="position:relative;height:0;width:100%;overflow:hidden;z-index:99999;box-sizing:border-box;padding-bottom:calc(51.63511188% + 32px)">
 <iframe src="https://www.guidejar.com/embed/6zdgSLvtHX3QAwnwQote?type=1&controls=on" width="100%" height="100%" style="height:100%;position:absolute;inset:0" allowfullscreen frameborder="0"></iframe>
+</div>
+
+## Code Editor
+
+Every workflow is represented as a JSON file, allowing you to edit it using the code editor. Changes made in the code editor are reflected in the UI and vice versa. This feature is particularly useful for resolving UI issues or making bulk changes to the workflow.
+
+### Access the Code Editor
+
+1. Click on the code icon in the right panel.
+2. The code editor will open, displaying the JSON representation of the workflow. Review this structure to understand how the workflow is organized.
+
+<div style="position:relative;height:0;width:100%;overflow:hidden;z-index:99999;box-sizing:border-box;padding-bottom:calc(51.63511188% + 32px)">
+<iframe src="https://www.guidejar.com/embed/MgaBP4rztEOu6IoD7OSx?type=1&controls=on" width="100%" height="100%" style="height:100%;position:absolute;inset:0" allowfullscreen frameborder="0"></iframe>
 </div>
