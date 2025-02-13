@@ -42,7 +42,7 @@ public class VarSetAction {
 
     private enum ValueType {
 
-        ARRAY, BOOLEAN, DATE, DATE_TIME, INTEGER, /*NULL,*/ NUMBER, OBJECT, STRING, TIME;
+        ARRAY, BOOLEAN, DATE, DATE_TIME, INTEGER, /* NULL, */ NUMBER, OBJECT, STRING, TIME;
     }
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("set")
