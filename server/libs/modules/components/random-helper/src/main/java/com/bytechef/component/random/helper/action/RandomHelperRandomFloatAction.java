@@ -34,7 +34,7 @@ import com.bytechef.component.random.helper.constant.RandomHelperConstants;
 public class RandomHelperRandomFloatAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("randomFloat")
-        .title("Float")
+        .title("Random Float")
         .description("Generates a random float value.")
         .properties(
             integer(START_INCLUSIVE)

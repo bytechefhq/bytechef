@@ -33,7 +33,7 @@ import com.bytechef.component.random.helper.constant.RandomHelperConstants;
 public class RandomHelperRandomIntAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("randomInt")
-        .title("Int")
+        .title("Random Integer")
         .description("Generates a random integer value.")
         .properties(
             integer(START_INCLUSIVE)
