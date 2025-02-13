@@ -65,6 +65,7 @@ const SettingsMenu = ({project, updateWorkflowMutation, workflow}: ProjectHeader
                             className="cursor-pointer [&[data-state=open]]:bg-surface-brand-secondary [&[data-state=open]]:text-content-brand-primary-pressed"
                         >
                             <Button
+                                aria-label="Settings"
                                 className="hover:bg-surface-neutral-primary-hover active:bg-surface-brand-secondary active:text-content-brand-primary-pressed [&_svg]:size-5"
                                 size="icon"
                                 variant="ghost"
@@ -81,6 +82,7 @@ const SettingsMenu = ({project, updateWorkflowMutation, workflow}: ProjectHeader
                     <Tabs defaultValue="workflow">
                         <TabsList className="rounded-none">
                             <TabsTrigger
+                                aria-label="Workflow tab"
                                 className="w-1/2 rounded-sm px-9 py-1 data-[state=active]:shadow-none"
                                 value="workflow"
                             >
@@ -88,6 +90,7 @@ const SettingsMenu = ({project, updateWorkflowMutation, workflow}: ProjectHeader
                             </TabsTrigger>
 
                             <TabsTrigger
+                                aria-label="Project tab"
                                 className="w-1/2 rounded-sm px-9 py-1 data-[state=active]:shadow-none"
                                 value="project"
                             >
