@@ -81,6 +81,7 @@ const PublishPopover = ({
 
                         <div className="flex justify-end">
                             <Button
+                                aria-label="Publish button"
                                 className="bg-surface-brand-primary shadow-none hover:bg-surface-brand-primary-hover active:bg-surface-brand-primary-pressed"
                                 disabled={isPending}
                                 size="sm"

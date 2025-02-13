@@ -5,7 +5,10 @@ import {twMerge} from 'tailwind-merge';
 const LoaderNotification = ({isFetching, isOnline}: {isFetching: number; isOnline: boolean}) => {
     return (
         <Tooltip>
-            <TooltipTrigger className="inline-flex size-9 cursor-pointer items-center justify-center rounded-md hover:bg-surface-neutral-primary-hover focus:outline focus:outline-ring">
+            <TooltipTrigger
+                aria-label="Loader notification indicator"
+                className="inline-flex size-9 cursor-pointer items-center justify-center rounded-md hover:bg-surface-neutral-primary-hover focus:outline focus:outline-ring"
+            >
                 {isOnline && isFetching ? (
                     <LoaderCircleIcon className="size-3 animate-spin text-content-warning" />
                 ) : (
