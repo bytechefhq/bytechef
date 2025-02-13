@@ -12,7 +12,7 @@ import {
     DynamicPropertiesProperty,
     FileEntryProperty,
     IntegerProperty,
-    NullProperty,
+    // NullProperty,
     NumberProperty,
     ObjectProperty,
     Property,
@@ -227,7 +227,7 @@ type PropertyTypeAllType = ArrayProperty &
     FileEntryProperty &
     IntegerProperty &
     NumberProperty &
-    NullProperty &
+    // NullProperty &
     ObjectProperty &
     Property &
     StringProperty &
