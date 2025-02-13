@@ -127,7 +127,7 @@ const DataPillPanelBodyPropertiesItem = ({
                     </>
                 ) : (
                     <div className="flex flex-col gap-3">
-                        <span className="font-semibold">Test component</span>
+                        <span className="font-semibold">Test Action</span>
 
                         <p className="text-sm">
                             <span className="font-semibold">{currentComponentAction?.workflowNodeName} </span>
@@ -135,7 +135,7 @@ const DataPillPanelBodyPropertiesItem = ({
                             <span className="font-semibold"> &quot;Output&quot; </span>
                             tab of the
                             <span className="font-semibold"> {currentComponentAction?.workflowNodeName} </span>
-                            component.
+                            action.
                         </p>
 
                         <Button onClick={handleOutputTabRedirectClick} variant="secondary">

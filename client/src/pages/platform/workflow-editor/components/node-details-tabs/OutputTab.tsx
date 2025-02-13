@@ -142,7 +142,7 @@ const OutputTab = ({connectionMissing, currentNode, outputDefined = false, workf
                                         disabled={connectionMissing}
                                         onClick={handleTestComponentClick}
                                     >
-                                        Test Component
+                                        {`Test ${currentNode.trigger ? 'Trigger' : 'Action'}`}
                                     </DropdownMenuItem>
                                 )}
 
@@ -212,7 +212,8 @@ const OutputTab = ({connectionMissing, currentNode, outputDefined = false, workf
                                             </>
                                         )}
 
-                                        {!saveWorkflowNodeTestOutputMutation.isPending && <>Test component</>}
+                                        {!saveWorkflowNodeTestOutputMutation.isPending &&
+                                            `Test ${currentNode.trigger ? 'Trigger' : 'Action'}`}
                                     </Button>
 
                                     <span className="text-center">or</span>
