@@ -68,6 +68,7 @@ export default defineConfig({
                 {
                     label: 'Developer Guide',
                     items: [
+                        {label: 'Overview', link: '/developer-guide/overview'},
                         {
                             label: 'Build Component',
                             items: [
