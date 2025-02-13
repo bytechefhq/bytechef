@@ -41,6 +41,8 @@ Version: 1
 
 
 ### Send SMS
+Name: sendSMS
+
 Send a new SMS message
 
 #### Properties
@@ -72,6 +74,8 @@ Type: OBJECT
 
 
 ### Send Whatsapp Text Message
+Name: sendWhatsappTextMessage
+
 Send a new SMS message
 
 #### Properties

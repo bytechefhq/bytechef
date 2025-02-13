@@ -40,6 +40,8 @@ Version: 1
 
 
 ### Create Contact
+Name: createContact
+
 Creates new contact. A contact may represent a single individual or an organization.
 
 #### Properties
@@ -75,6 +77,8 @@ Type: OBJECT
 
 
 ### Create Task
+Name: createTask
+
 Creates new task.
 
 #### Properties

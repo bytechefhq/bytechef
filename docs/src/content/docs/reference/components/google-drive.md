@@ -41,6 +41,8 @@ Version: 1
 
 
 ### Copy File
+Name: copyFile
+
 Copy a selected file to a different location within Google Drive.
 
 #### Properties
@@ -74,6 +76,8 @@ Type: OBJECT
 
 
 ### Create New Folder
+Name: createNewFolder
+
 Creates a new empty folder in Google Drive.
 
 #### Properties
@@ -110,6 +114,8 @@ Type: OBJECT
 
 
 ### Create New Text File
+Name: createNewTextFile
+
 Creates a new text file in Google Drive.
 
 #### Properties
@@ -148,6 +154,8 @@ Type: OBJECT
 
 
 ### Delete File
+Name: deleteFile
+
 Delete a selected file from Google Drive.
 
 #### Properties
@@ -160,6 +168,8 @@ Delete a selected file from Google Drive.
 
 
 ### Download File
+Name: downloadFile
+
 Download selected file from Google Drive.
 
 #### Properties
@@ -191,6 +201,8 @@ Type: FILE_ENTRY
 
 
 ### Get File
+Name: getFile
+
 Retrieve a specified file from your Google Drive.
 
 #### Properties
@@ -222,6 +234,8 @@ Type: OBJECT
 
 
 ### Upload File
+Name: uploadFile
+
 Uploads a file in your Google Drive.
 
 #### Properties

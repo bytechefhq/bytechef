@@ -20,6 +20,8 @@ Type: script/v1
 
 
 ### JavaScript
+Name: javascript
+
 Executes custom JavaScript code.
 
 #### Properties
@@ -33,6 +35,8 @@ Executes custom JavaScript code.
 
 
 ### Python
+Name: python
+
 Executes custom Python code.
 
 #### Properties
@@ -46,6 +50,8 @@ Executes custom Python code.
 
 
 ### Ruby
+Name: ruby
+
 Executes custom Ruby code.
 
 #### Properties

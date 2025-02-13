@@ -20,6 +20,8 @@ Type: var/v1
 
 
 ### Set Value
+Name: set
+
 Assign value to a variable that can be used in the following steps.
 
 #### Properties
@@ -32,7 +34,6 @@ Assign value to a variable that can be used in the following steps.
 | value | Value | DATE | DATE  |  Value of any type to set.  |  true  |
 | value | Value | DATE_TIME | DATE_TIME  |  Value of any type to set.  |  true  |
 | value | Value | INTEGER | INTEGER  |  Value of any type to set.  |  true  |
-| value | Value | NULL | NULL  |  Value of any type to set.  |  true  |
 | value | Value | NUMBER | NUMBER  |  Value of any type to set.  |  true  |
 | value | Value | {} | OBJECT_BUILDER  |  Value of any type to set.  |  true  |
 | value | Value | STRING | TEXT  |  Value of any type to set.  |  true  |

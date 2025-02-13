@@ -41,6 +41,8 @@ Version: 1
 
 
 ### Get All Responses
+Name: getAllResponses
+
 Get all responses of a form.
 
 #### Properties
@@ -53,6 +55,8 @@ Get all responses of a form.
 
 
 ### Get Form
+Name: getForm
+
 Get the information about a form.
 
 #### Properties
@@ -65,6 +69,8 @@ Get the information about a form.
 
 
 ### Get Response
+Name: getResponse
+
 Get the response of a form.
 
 #### Properties

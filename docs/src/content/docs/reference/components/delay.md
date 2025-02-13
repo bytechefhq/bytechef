@@ -20,6 +20,8 @@ Type: delay/v1
 
 
 ### Sleep
+Name: sleep
+
 Delay action execution.
 
 #### Properties

@@ -41,6 +41,8 @@ Version: 1
 
 
 ### Create Contact
+Name: createContact
+
 Create new contact
 
 #### Properties
@@ -78,6 +80,8 @@ Type: OBJECT
 
 
 ### Get Contact
+Name: getContact
+
 Get a single Contact
 
 #### Properties
@@ -111,6 +115,8 @@ Type: OBJECT
 
 
 ### Send Message
+Name: sendMessage
+
 Send a new message
 
 #### Properties

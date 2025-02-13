@@ -41,6 +41,8 @@ Version: 1
 
 
 ### Create Task
+Name: createTask
+
 Creates a new task on the specified task list.
 
 #### Properties
@@ -75,6 +77,8 @@ Type: OBJECT
 
 
 ### List Tasks
+Name: listTasks
+
 Returns all tasks in the specified task list.
 
 #### Properties
@@ -104,6 +108,8 @@ Type: ARRAY
 
 
 ### Update Task
+Name: updateTask
+
 Updates a specific task on the specified task list.
 
 #### Properties

@@ -41,6 +41,8 @@ Version: 1
 
 
 ### Add Labels
+Name: addLabels
+
 Add labels to an email in your Gmail account.
 
 #### Properties
@@ -72,6 +74,8 @@ Type: OBJECT
 
 
 ### Delete Mail
+Name: deleteMail
+
 Delete an email from your Gmail account permanently via Id
 
 #### Properties
@@ -84,6 +88,8 @@ Delete an email from your Gmail account permanently via Id
 
 
 ### Get Mail
+Name: getMail
+
 Get an email from your Gmail account via Id
 
 #### Properties
@@ -98,6 +104,8 @@ Get an email from your Gmail account via Id
 
 
 ### Get Thread
+Name: getThread
+
 Gets the specified thread.
 
 #### Properties
@@ -112,6 +120,8 @@ Gets the specified thread.
 
 
 ### Reply to Email
+Name: replyToEmail
+
 Send a reply to an email message.
 
 #### Properties
@@ -147,6 +157,8 @@ Type: OBJECT
 
 
 ### Search Email
+Name: searchEmail
+
 Lists the messages in the user's mailbox.
 
 #### Properties
@@ -184,6 +196,8 @@ Type: OBJECT
 
 
 ### Send Email
+Name: sendEmail
+
 Sends the specified message to the recipients in the To, Cc, and Bcc headers.
 
 #### Properties

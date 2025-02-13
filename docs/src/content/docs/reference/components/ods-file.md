@@ -20,6 +20,8 @@ Type: odsFile/v1
 
 
 ### Read from File
+Name: read
+
 Reads data from a ODS file.
 
 #### Properties
@@ -38,6 +40,8 @@ Reads data from a ODS file.
 
 
 ### Write to File
+Name: write
+
 Writes the data to a ODS file.
 
 #### Properties

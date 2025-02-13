@@ -20,6 +20,8 @@ Type: objectHelper/v1
 
 
 ### Add Value to the Object by Key
+Name: addValueByKey
+
 Add value to the object by key if it exists. Otherwise, update the value
 
 #### Properties
@@ -44,6 +46,8 @@ Add value to the object by key if it exists. Otherwise, update the value
 
 
 ### Add Key-Value Pairs to Object or Array
+Name: addKeyValuePairs
+
 Add values from list to object or array. If the source is object, the items in the list will be treated as Key-value pairs. If the value is array of objects, key-value pairs will be added to every object in the array.
 
 #### Properties
@@ -59,6 +63,8 @@ Add values from list to object or array. If the source is object, the items in t
 
 
 ### Contains
+Name: contains
+
 Checks if the given key exists in the given object.
 
 #### Properties
@@ -82,6 +88,8 @@ Type: BOOLEAN
 
 
 ### Delete Key-Value Pair
+Name: deleteKeyValuePair
+
 Deletes a key-value pair in the given object by the specified key. Returns the modified object.
 
 #### Properties
@@ -95,6 +103,8 @@ Deletes a key-value pair in the given object by the specified key. Returns the m
 
 
 ### Equals
+Name: equals
+
 Compares two objects and returns true if they are equal.
 
 #### Properties
@@ -118,6 +128,8 @@ Type: BOOLEAN
 
 
 ### Merge Two Objects
+Name: mergeTwoObjects
+
 Merge two objects into one. If there is any property with the same name, the source value will be used.
 
 #### Properties

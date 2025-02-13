@@ -50,6 +50,8 @@ Version: 1
 
 
 ### Add a new pet to the store
+Name: addPet
+
 Add a new pet to the store
 
 #### Properties
@@ -83,6 +85,8 @@ Type: OBJECT
 
 
 ### Update an existing pet
+Name: updatePet
+
 Update an existing pet by Id
 
 #### Properties
@@ -116,6 +120,8 @@ Type: OBJECT
 
 
 ### Finds Pets by status
+Name: findPetsByStatus
+
 Multiple status values can be provided with comma separated strings
 
 #### Properties
@@ -144,6 +150,8 @@ Type: ARRAY
 
 
 ### Finds Pets by tags
+Name: findPetsByTags
+
 Multiple tags can be provided with comma separated strings. Use tag1, tag2, tag3 for testing.
 
 #### Properties
@@ -172,6 +180,8 @@ Type: ARRAY
 
 
 ### Deletes a pet
+Name: deletePet
+
 delete a pet
 
 #### Properties
@@ -185,6 +195,8 @@ delete a pet
 
 
 ### Find pet by ID
+Name: getPetById
+
 Returns a single pet
 
 #### Properties
@@ -218,6 +230,8 @@ Type: OBJECT
 
 
 ### Updates a pet in the store with form data
+Name: updatePetWithForm
+
 
 
 #### Properties
@@ -232,6 +246,8 @@ Type: OBJECT
 
 
 ### uploads an image
+Name: uploadFile
+
 
 
 #### Properties
@@ -264,6 +280,8 @@ Type: OBJECT
 
 
 ### Returns pet inventories by status
+Name: getInventory
+
 Returns a map of status codes to quantities
 
 #### Properties
@@ -286,6 +304,8 @@ Type: OBJECT
 
 
 ### Place an order for a pet
+Name: placeOrder
+
 Place a new order in the store
 
 #### Properties
@@ -319,6 +339,8 @@ Type: OBJECT
 
 
 ### Delete purchase order by ID
+Name: deleteOrder
+
 For valid response try integer IDs with value < 1000. Anything above 1000 or nonintegers will generate API errors
 
 #### Properties
@@ -331,6 +353,8 @@ For valid response try integer IDs with value < 1000. Anything above 1000 or non
 
 
 ### Find purchase order by ID
+Name: getOrderById
+
 For valid response try integer IDs with value <= 5 or > 10. Other values will generate exceptions.
 
 #### Properties
@@ -364,6 +388,8 @@ Type: OBJECT
 
 
 ### Create user
+Name: createUser
+
 This can only be done by the logged in user.
 
 #### Properties
@@ -399,6 +425,8 @@ Type: OBJECT
 
 
 ### Creates list of users with given input array
+Name: createUsersWithListInput
+
 Creates list of users with given input array
 
 #### Properties
@@ -427,6 +455,8 @@ Type: ARRAY
 
 
 ### Delete user
+Name: deleteUser
+
 This can only be done by the logged in user.
 
 #### Properties
@@ -439,6 +469,8 @@ This can only be done by the logged in user.
 
 
 ### Get user by user name
+Name: getUserByName
+
 
 
 #### Properties
@@ -474,6 +506,8 @@ Type: OBJECT
 
 
 ### Update user
+Name: updateUser
+
 This can only be done by the logged in user.
 
 #### Properties

@@ -20,6 +20,8 @@ Type: dataMapper/v1
 
 
 ### Map Objects to Array
+Name: mapObjectsToArray
+
 Transform an object or array of objects into an array of key-value pairs.
 
 #### Properties
@@ -36,6 +38,8 @@ Transform an object or array of objects into an array of key-value pairs.
 
 
 ### Map Objects to Object
+Name: mapObjectsToObject
+
 Creates a new object with the chosen input properties. You can also rename the property keys.
 
 #### Properties
@@ -54,6 +58,8 @@ Creates a new object with the chosen input properties. You can also rename the p
 
 
 ### Merge and Pivot Properties by Key
+Name: mergeAndPivotPropertiesByKey
+
 Creates a new object out of all objects that have the same key as the specified field kay and an object as value. That value of the new object contains values of all properties that share the specified field key as keys and the they all have the specified field value as a value.
 
 #### Properties
@@ -68,6 +74,8 @@ Creates a new object out of all objects that have the same key as the specified 
 
 
 ### Rename Keys
+Name: renameKeys
+
 The action renames keys of an input object defined by mappings.
 
 #### Properties
@@ -81,6 +89,8 @@ The action renames keys of an input object defined by mappings.
 
 
 ### Replace All Specified Values
+Name: replaceAllSpecifiedValues
+
 Goes through all object parameters and replaces all specified input parameter values.
 
 #### Properties
@@ -105,6 +115,8 @@ Goes through all object parameters and replaces all specified input parameter va
 
 
 ### Replace Multiple Values by Key
+Name: replaceMultipleValuesByKey
+
 Replaces all values specified by the keys in the input object with the values specified by keys in the output object.
 
 #### Properties
@@ -119,6 +131,8 @@ Replaces all values specified by the keys in the input object with the values sp
 
 
 ### Replace Value
+Name: replaceValue
+
 Replaces a given value with the specified value defined in mappings. In case there is no mapping specified for the value, it returns the default value, and if there is no default defined, it returns null. You can also change a string value with regex.
 
 #### Properties

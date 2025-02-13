@@ -41,6 +41,8 @@ Version: 1
 
 
 ### Create Document
+Name: createDocument
+
 Create a document on Google Docs.
 
 #### Properties
@@ -54,6 +56,8 @@ Create a document on Google Docs.
 
 
 ### Create Document From Template
+Name: createDocumentFromTemplate
+
 Creates a new document based on an existing one and can replace any placeholder variables found in your template document, like [[name]], [[email]], etc.
 
 #### Properties
@@ -70,6 +74,8 @@ Creates a new document based on an existing one and can replace any placeholder 
 
 
 ### Get Document
+Name: getDocument
+
 Retrieve a specified document from your Google Drive.
 
 #### Properties

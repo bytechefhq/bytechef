@@ -41,6 +41,8 @@ Version: 1
 
 
 ### Copy
+Name: copy
+
 Copy a file or folder to a different location in the user's Dropbox. If the source path is a folder all its contents will be copied.
 
 #### Properties
@@ -71,6 +73,8 @@ Type: OBJECT
 
 
 ### Create New Folder
+Name: createFolder
+
 Create a folder at a given path.
 
 #### Properties
@@ -99,6 +103,8 @@ Type: OBJECT
 
 
 ### Create New Paper File
+Name: createTextFile
+
 Create a new .paper file on which you can write at a given path
 
 #### Properties
@@ -135,6 +141,8 @@ Type: OBJECT
 
 
 ### Delete
+Name: delete
+
 Delete the file or folder at a given path. If the path is a folder, all its contents will be deleted too.
 
 #### Properties
@@ -164,6 +172,8 @@ Type: OBJECT
 
 
 ### Get File Link
+Name: getFileLink
+
 Get a temporary link to stream content of a file. This link will expire in four hours and afterwards you will get 410 Gone. This URL should not be used to display content directly in the browser. The Content-Type of the link is determined automatically by the file's mime type.
 
 #### Properties
@@ -194,6 +204,8 @@ Type: OBJECT
 
 
 ### List Folder
+Name: listFolder
+
 List the contents of a folder.
 
 #### Properties
@@ -222,6 +234,8 @@ Type: OBJECT
 
 
 ### Move
+Name: move
+
 Move a file or folder to a different location in the user's Dropbox. If the source path is a folder all its contents will be moved. Note that we do not currently support case-only renaming.
 
 #### Properties
@@ -252,6 +266,8 @@ Type: OBJECT
 
 
 ### Search
+Name: search
+
 Searches for files and folders. Can only be used to retrieve a maximum of 10,000 matches. Recent changes may not immediately be reflected in search results due to a short delay in indexing. Duplicate results may be returned across pages. Some results may not be returned.
 
 #### Properties
@@ -280,6 +296,8 @@ Type: OBJECT
 
 
 ### Upload File
+Name: uploadFile
+
 Create a new file up to a size of 150MB with the contents provided in the request.
 
 #### Properties

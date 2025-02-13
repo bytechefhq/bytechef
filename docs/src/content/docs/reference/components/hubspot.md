@@ -42,6 +42,8 @@ Version: 1
 
 
 ### Create Contact
+Name: createContact
+
 Create a contact with the given properties.
 
 #### Properties
@@ -70,6 +72,8 @@ Type: OBJECT
 
 
 ### Delete Contact
+Name: deleteContact
+
 Move Contact to the recycling bin.
 
 #### Properties
@@ -82,6 +86,8 @@ Move Contact to the recycling bin.
 
 
 ### Get Contact
+Name: getContact
+
 Get contact details.
 
 #### Properties
@@ -110,6 +116,8 @@ Type: OBJECT
 
 
 ### Update Contact
+Name: updateContact
+
 Update Contact properties.
 
 #### Properties
@@ -139,6 +147,8 @@ Type: OBJECT
 
 
 ### Create Deal
+Name: createDeal
+
 Creates a new deal.
 
 #### Properties
@@ -167,6 +177,8 @@ Type: OBJECT
 
 
 ### Get Ticket
+Name: getTicket
+
 Gets ticket details.
 
 #### Properties

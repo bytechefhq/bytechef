@@ -41,6 +41,8 @@ Version: 1
 
 
 ### Create List
+Name: createList
+
 Creates a new List in specified Folder.
 
 #### Properties
@@ -72,6 +74,8 @@ Type: OBJECT
 
 
 ### Create Task
+Name: createTask
+
 Create a new task in a ClickUp workspace and list.
 
 #### Properties
@@ -104,6 +108,8 @@ Type: OBJECT
 
 
 ### Create Folder
+Name: createFolder
+
 Creates a new folder in a ClickUp workspace.
 
 #### Properties

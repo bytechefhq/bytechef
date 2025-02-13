@@ -20,19 +20,23 @@ Type: textHelper/v1
 
 
 ### Base64 Decode
+Name: base64Decode
+
 Decodes base64 encoded text into human readable plain text.
 
 #### Properties
 
 |      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
 |:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
-| encodingSchema | Encoding Scheme | STRING | SELECT  |  | null  |
+| encodingSchema | Encoding Scheme | STRING | SELECT  |  | true  |
 | content | Base64 Content | STRING | TEXT_AREA  |  The Base64 encoded content that needs to be decoded.  |  true  |
 
 
 
 
 ### Concatenate
+Name: concatenate
+
 Concatenate two or more texts.
 
 #### Properties
@@ -56,6 +60,8 @@ Type: STRING
 
 
 ### Extract Content from HTML
+Name: extractContentFromHtml
+
 Extract content from the HTML content.
 
 #### Properties
@@ -72,6 +78,8 @@ Extract content from the HTML content.
 
 
 ### Find
+Name: find
+
 Find substring
 
 #### Properties
@@ -95,6 +103,8 @@ Type: BOOLEAN
 
 
 ### HTML to Markdown
+Name: HTMLToMarkdown
+
 Converts HTML to markdown.
 
 #### Properties
@@ -117,6 +127,8 @@ Type: STRING
 
 
 ### Markdown to HTML
+Name: markdownToHTML
+
 Converts markdown to HTML.
 
 #### Properties
@@ -139,6 +151,8 @@ Type: STRING
 
 
 ### Replace
+Name: replace
+
 Replace all instances of any word, character, or phrase in text with another.
 
 #### Properties
@@ -164,6 +178,8 @@ Type: STRING
 
 
 ### Split
+Name: split
+
 Split the text by delimiter.
 
 #### Properties

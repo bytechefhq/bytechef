@@ -20,6 +20,8 @@ Type: filesystem/v1
 
 
 ### Read File
+Name: readFile
+
 Reads all data from a specified file path and outputs it in file entry format.
 
 #### Properties
@@ -51,6 +53,8 @@ Type: FILE_ENTRY
 
 
 ### Write to File
+Name: writeFile
+
 null
 
 #### Properties
@@ -85,6 +89,8 @@ Type: OBJECT
 
 
 ### Create Temp Directory
+Name: createTempDir
+
 Creates a file in the temporary directory on the filesystem. Returns the created directory's full path.
 
 #### Properties
@@ -112,6 +118,8 @@ Type: STRING
 
 
 ### Get Parent Folder
+Name: getFilePath
+
 Gets the path of the parent folder of the file. If the file doesn't exist, it throws an error.
 
 #### Properties
@@ -139,6 +147,8 @@ Type: STRING
 
 
 ### List
+Name: ls
+
 Lists the content of a directory for the given path.
 
 #### Properties
@@ -168,6 +178,8 @@ Type: ARRAY
 
 
 ### Create
+Name: mkdir
+
 Creates a directory.
 
 #### Properties
@@ -195,6 +207,8 @@ Type: STRING
 
 
 ### Remove
+Name: rm
+
 Permanently removes the content of a directory.
 
 #### Properties

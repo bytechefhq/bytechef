@@ -41,6 +41,8 @@ Version: 1
 
 
 ### Create Presentation Based on Template
+Name: createPresentationBasedOnTemplate
+
 Creates a new presentation based on an existing one and can replace any placeholder variables found in your template presentation, like [[name]], [[email]], etc.
 
 #### Properties

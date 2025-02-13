@@ -41,6 +41,8 @@ Version: 1
 
 
 ### Clear Sheet
+Name: clearSheet
+
 Clear a sheet of all values while preserving formats.
 
 #### Properties
@@ -55,6 +57,8 @@ Clear a sheet of all values while preserving formats.
 
 
 ### Create Column
+Name: createColumn
+
 Append a new column to the end of the sheet.
 
 #### Properties
@@ -87,6 +91,8 @@ Type: OBJECT
 
 
 ### Create Sheet
+Name: createSheet
+
 Create a blank sheet with title. Optionally, provide headers.
 
 #### Properties
@@ -119,6 +125,8 @@ Type: OBJECT
 
 
 ### Delete Column
+Name: deleteColumn
+
 Delete column on an existing sheet.
 
 #### Properties
@@ -133,6 +141,8 @@ Delete column on an existing sheet.
 
 
 ### Create Spreadsheet
+Name: createSpreadsheet
+
 Create a new spreadsheet in a specified folder.
 
 #### Properties
@@ -146,6 +156,8 @@ Create a new spreadsheet in a specified folder.
 
 
 ### Delete Row
+Name: deleteRow
+
 Delete row on an existing sheet.
 
 #### Properties
@@ -160,6 +172,8 @@ Delete row on an existing sheet.
 
 
 ### Delete Sheet
+Name: deleteSheet
+
 Delete a specified sheet from a spreadsheet.
 
 #### Properties
@@ -173,6 +187,8 @@ Delete a specified sheet from a spreadsheet.
 
 
 ### Find Row by Number
+Name: findRowByNum
+
 Get a row in a Google Sheet by row number.
 
 #### Properties
@@ -188,6 +204,8 @@ Get a row in a Google Sheet by row number.
 
 
 ### Insert Multiple Rows
+Name: insertMultipleRows
+
 Append rows to the end of the spreadsheet.
 
 #### Properties
@@ -204,6 +222,8 @@ Append rows to the end of the spreadsheet.
 
 
 ### Insert Row
+Name: insertRow
+
 Append a row of values to an existing sheet.
 
 #### Properties
@@ -220,6 +240,8 @@ Append a row of values to an existing sheet.
 
 
 ### List Sheets
+Name: listSheets
+
 Get all sheets from the spreadsheet.
 
 #### Properties
@@ -250,6 +272,8 @@ Type: OBJECT
 
 
 ### Update Row
+Name: updateRow
+
 Overwrite values in an existing row.
 
 #### Properties

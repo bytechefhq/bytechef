@@ -41,6 +41,8 @@ Version: 1
 
 
 ### Create Activity
+Name: createActivity
+
 Creates a new activity.
 
 #### Properties
@@ -75,6 +77,8 @@ Type: OBJECT
 
 
 ### Create Company
+Name: createCompany
+
 Creates a new company.
 
 #### Properties
@@ -122,6 +126,8 @@ Type: OBJECT
 
 
 ### Create Person
+Name: createPerson
+
 Creates a new person.
 
 #### Properties
@@ -173,6 +179,8 @@ Type: OBJECT
 
 
 ### Create Task
+Name: createTask
+
 Creates a new task in Copper.
 
 #### Properties

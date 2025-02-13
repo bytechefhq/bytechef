@@ -41,6 +41,8 @@ Version: 1
 
 
 ### Create Contact
+Name: createContact
+
 Creates a new contact.
 
 #### Properties
@@ -78,6 +80,8 @@ Type: OBJECT
 
 
 ### Create Group
+Name: createGroup
+
 Creates a new group.
 
 #### Properties
@@ -106,6 +110,8 @@ Type: OBJECT
 
 
 ### Update Contact
+Name: updateContact
+
 Modifies an existing contact.
 
 #### Properties
@@ -144,6 +150,8 @@ Type: OBJECT
 
 
 ### Search Contacts
+Name: searchContacts
+
 Searches the contacts in Google Contacts account.
 
 #### Properties

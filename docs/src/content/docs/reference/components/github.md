@@ -41,6 +41,8 @@ Version: 1
 
 
 ### Add Assignee to Issue
+Name: addAssigneesToIssue
+
 Adds an assignees to the specified issue.
 
 #### Properties
@@ -79,6 +81,8 @@ Type: OBJECT
 
 
 ### Add Labels to Issue
+Name: addLabelsToIssue
+
 Adds labels to the specified issue.
 
 #### Properties
@@ -109,6 +113,8 @@ Type: ARRAY
 
 
 ### Create Comment on Issue
+Name: createCommentOnIssue
+
 Adds a comment to the specified issue.
 
 #### Properties
@@ -147,6 +153,8 @@ Type: OBJECT
 
 
 ### Create Issue
+Name: createIssue
+
 Create Issue in GitHub Repository
 
 #### Properties
@@ -185,6 +193,8 @@ Type: OBJECT
 
 
 ### Get Issue
+Name: getIssue
+
 Get information from a specific issue
 
 #### Properties
@@ -222,6 +232,8 @@ Type: OBJECT
 
 
 ### List Issues
+Name: listIssues
+
 Retrieve issues assigned to the authenticated user across all accessible repositories.
 
 #### Properties
@@ -251,6 +263,8 @@ Type: ARRAY
 
 
 ### List Repository Issues
+Name: listRepositoryIssues
+
 Lists issues in a repository. Only open issues will be listed.
 
 #### Properties
@@ -279,6 +293,8 @@ Type: ARRAY
 
 
 ### Star Repository
+Name: starRepository
+
 Stars a repository for the authenticated user.
 
 #### Properties

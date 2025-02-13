@@ -40,6 +40,8 @@ Version: 1
 
 
 ### Currency Converter
+Name: currencyConverter
+
 Convert currency from one to another.
 
 #### Properties
@@ -74,6 +76,8 @@ Type: OBJECT
 
 
 ### URL Shortener
+Name: urlShortener
+
 Shorten your desired URL
 
 #### Properties
@@ -106,6 +110,8 @@ Type: OBJECT
 
 
 ### Web Page Information
+Name: webInformation
+
 Get information about a certain webpage
 
 #### Properties

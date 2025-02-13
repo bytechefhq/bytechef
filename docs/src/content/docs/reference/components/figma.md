@@ -41,6 +41,8 @@ Version: 1
 
 
 ### Get Comments
+Name: getComments
+
 Gets a list of comments left on the file.
 
 #### Properties
@@ -69,6 +71,8 @@ Type: OBJECT
 
 
 ### Post Comment
+Name: postComment
+
 Posts a new comment on the file.
 
 #### Properties

@@ -41,6 +41,8 @@ Version: 1
 
 
 ### Add Attendees to Event
+Name: addAttendeesToEvent
+
 Invites one or more person to an existing event.
 
 #### Properties
@@ -84,6 +86,8 @@ Type: OBJECT
 
 
 ### Create Event
+Name: createEvent
+
 Creates an event
 
 #### Properties
@@ -141,6 +145,8 @@ Type: OBJECT
 
 
 ### Create Quick Event
+Name: createQuickEvent
+
 Add Quick Calendar Event
 
 #### Properties
@@ -184,6 +190,8 @@ Type: OBJECT
 
 
 ### Delete Event
+Name: deleteEvent
+
 Deletes an event from Google Calendar.
 
 #### Properties
@@ -197,6 +205,8 @@ Deletes an event from Google Calendar.
 
 
 ### Get Events
+Name: getEvents
+
 List events from the specified Google Calendar.
 
 #### Properties
@@ -229,6 +239,8 @@ Type: ARRAY
 
 
 ### Get Free Time Slots
+Name: getFreeTimeSlots
+
 Get free time slots from Google Calendar.
 
 #### Properties
@@ -258,6 +270,8 @@ Type: ARRAY
 
 
 ### Update Event
+Name: updateEvent
+
 Updates event in Google Calendar.
 
 #### Properties

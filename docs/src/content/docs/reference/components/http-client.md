@@ -117,6 +117,8 @@ Version: 1
 
 
 ### GET
+Name: get
+
 The request method to use.
 
 #### Properties
@@ -140,6 +142,8 @@ The request method to use.
 
 
 ### POST
+Name: post
+
 The request method to use.
 
 #### Properties
@@ -164,6 +168,8 @@ The request method to use.
 
 
 ### PUT
+Name: put
+
 The request method to use.
 
 #### Properties
@@ -188,6 +194,8 @@ The request method to use.
 
 
 ### PATCH
+Name: patch
+
 The request method to use.
 
 #### Properties
@@ -212,6 +220,8 @@ The request method to use.
 
 
 ### DELETE
+Name: delete
+
 The request method to use.
 
 #### Properties
@@ -235,6 +245,8 @@ The request method to use.
 
 
 ### HEAD
+Name: head
+
 The request method to use.
 
 #### Properties

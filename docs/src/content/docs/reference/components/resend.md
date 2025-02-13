@@ -40,6 +40,8 @@ Version: 1
 
 
 ### Send Email
+Name: sendEmail
+
 Send an email
 
 #### Properties

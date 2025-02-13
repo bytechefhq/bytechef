@@ -20,6 +20,8 @@ Type: chat/v1
 
 
 ### Response to Chat Request
+Name: responseToRequest
+
 Converts the response to chat request.
 
 #### Properties

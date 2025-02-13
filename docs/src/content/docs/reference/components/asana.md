@@ -41,6 +41,8 @@ Version: 1
 
 
 ### Create Project
+Name: createProject
+
 Creates a new project in a workspace or team.
 
 #### Properties
@@ -69,6 +71,8 @@ Type: OBJECT
 
 
 ### Create Task
+Name: createTask
+
 Creates a new task
 
 #### Properties

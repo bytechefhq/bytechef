@@ -41,6 +41,8 @@ Version: 1
 
 
 ### Get Deals
+Name: getDeals
+
 Returns all deals.
 
 #### Properties
@@ -73,6 +75,8 @@ Type: OBJECT
 
 
 ### Add Deal
+Name: addDeal
+
 Adds a new deal.
 
 #### Properties
@@ -101,6 +105,8 @@ Type: OBJECT
 
 
 ### Search Deals
+Name: searchDeals
+
 Searches all deals by title, notes and/or custom fields.
 
 #### Properties
@@ -135,6 +141,8 @@ Type: OBJECT
 
 
 ### Delete Deal
+Name: deleteDeal
+
 Marks a deal as deleted. After 30 days, the deal will be permanently deleted.
 
 #### Properties
@@ -163,6 +171,8 @@ Type: OBJECT
 
 
 ### Get Details of Deal
+Name: getDealDetails
+
 Returns the details of a specific deal.
 
 #### Properties
@@ -191,6 +201,8 @@ Type: OBJECT
 
 
 ### Get Leads
+Name: getLeads
+
 Returns multiple leads. Leads are sorted by the time they were created, from oldest to newest.
 
 #### Properties
@@ -224,6 +236,8 @@ Type: OBJECT
 
 
 ### Add Lead
+Name: addLead
+
 Creates a lead. A lead always has to be linked to a person or an organization or both.
 
 #### Properties
@@ -252,6 +266,8 @@ Type: OBJECT
 
 
 ### Delete Lead
+Name: deleteLead
+
 Deletes a specific lead.
 
 #### Properties
@@ -280,6 +296,8 @@ Type: OBJECT
 
 
 ### Get Lead Details
+Name: getLeadDetails
+
 Returns details of a specific lead. 
 
 #### Properties
@@ -308,6 +326,8 @@ Type: OBJECT
 
 
 ### Search Leads
+Name: searchLeads
+
 Searches all leads by title, notes and/or custom fields.
 
 #### Properties
@@ -341,6 +361,8 @@ Type: OBJECT
 
 
 ### Get All Organizations
+Name: getOrganizations
+
 Returns all organizations.
 
 #### Properties
@@ -372,6 +394,8 @@ Type: OBJECT
 
 
 ### Add Organization
+Name: addOrganization
+
 Adds a new organization.
 
 #### Properties
@@ -400,6 +424,8 @@ Type: OBJECT
 
 
 ### Search Organizations
+Name: searchOrganization
+
 Searches all organizations by name, address, notes and/or custom fields. This endpoint is a wrapper of <a href="https://developers.pipedrive.com/docs/api/v1/ItemSearch#searchItem">/v1/itemSearch</a> with a narrower OAuth scope.
 
 #### Properties
@@ -430,6 +456,8 @@ Type: OBJECT
 
 
 ### Delete Organization
+Name: deleteOrganization
+
 Marks an organization as deleted. After 30 days, the organization will be permanently deleted.
 
 #### Properties
@@ -458,6 +486,8 @@ Type: OBJECT
 
 
 ### Get Details of Organization
+Name: getOrganizationDetails
+
 Returns the details of an organization.
 
 #### Properties
@@ -486,6 +516,8 @@ Type: OBJECT
 
 
 ### Get Persons
+Name: getPersons
+
 Returns all persons.
 
 #### Properties
@@ -517,6 +549,8 @@ Type: OBJECT
 
 
 ### Add Person
+Name: addPerson
+
 Adds a new person.
 
 #### Properties
@@ -545,6 +579,8 @@ Type: OBJECT
 
 
 ### Search Persons
+Name: searchPersons
+
 Searches all persons by name, email, phone, notes and/or custom fields.
 
 #### Properties
@@ -576,6 +612,8 @@ Type: OBJECT
 
 
 ### Delete Person
+Name: deletePerson
+
 Marks a person as deleted. After 30 days, the person will be permanently deleted.
 
 #### Properties
@@ -604,6 +642,8 @@ Type: OBJECT
 
 
 ### Get Details of Person
+Name: getPersonDetails
+
 Returns the details of a person. This also returns some additional fields which are not present when asking for all persons.
 
 #### Properties

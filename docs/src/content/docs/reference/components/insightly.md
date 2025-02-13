@@ -41,6 +41,8 @@ Version: 1
 
 
 ### Create Contact
+Name: createContact
+
 Creates new contact.
 
 #### Properties
@@ -74,6 +76,8 @@ Type: OBJECT
 
 
 ### Create Organization
+Name: createOrganization
+
 Creates new organization.
 
 #### Properties
@@ -105,6 +109,8 @@ Type: OBJECT
 
 
 ### Create Task
+Name: createTask
+
 Creates new task.
 
 #### Properties

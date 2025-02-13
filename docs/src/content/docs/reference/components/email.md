@@ -41,6 +41,8 @@ Version: 1
 
 
 ### Send
+Name: send
+
 Send an email to any address.
 
 #### Properties

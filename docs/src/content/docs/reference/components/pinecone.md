@@ -42,6 +42,8 @@ Version: 1
 
 
 ### Data Query
+Name: dataQuery
+
 Query data from a Pinecone vector store using OpenAI embeddings.
 
 #### Properties
@@ -54,6 +56,8 @@ Query data from a Pinecone vector store using OpenAI embeddings.
 
 
 ### Load Data
+Name: loadData
+
 Loads data into a Pinecone vector store using OpenAI embeddings.
 
 #### Properties

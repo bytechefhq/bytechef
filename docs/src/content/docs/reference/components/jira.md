@@ -42,6 +42,8 @@ Version: 1
 
 
 ### Create Issue
+Name: createIssue
+
 Creates a new issue.
 
 #### Properties
@@ -78,6 +80,8 @@ Type: OBJECT
 
 
 ### Create Issue Comment
+Name: createIssueComment
+
 Adds a comment to an issue.
 
 #### Properties
@@ -115,6 +119,8 @@ Type: OBJECT
 
 
 ### Get Issue
+Name: getIssue
+
 Get issue details in selected project.
 
 #### Properties
@@ -146,6 +152,8 @@ Type: OBJECT
 
 
 ### Search Issues
+Name: searchForIssuesUsingJql
+
 Search for issues using JQL
 
 #### Properties

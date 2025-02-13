@@ -31,6 +31,8 @@ Version: 1
 
 
 ### Title
+Name: dummyAction
+
 Description
 
 #### Properties

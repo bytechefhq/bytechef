@@ -42,6 +42,8 @@ Version: 1
 
 
 ### Create Contact
+Name: createContact
+
 Creates a new contact.
 
 #### Properties
@@ -72,6 +74,8 @@ Type: OBJECT
 
 
 ### Create Product
+Name: createProduct
+
 Creates a new product for your CRM.
 
 #### Properties
@@ -101,6 +105,8 @@ Type: OBJECT
 
 
 ### Get Me
+Name: getMe
+
 Get more information about yourself.
 
 #### Properties

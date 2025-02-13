@@ -42,6 +42,8 @@ Version: 1
 
 
 ### Get Form Submissions
+Name: getFormSubmissions
+
 Get all submissions for a specific form.
 
 #### Properties

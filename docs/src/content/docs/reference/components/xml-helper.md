@@ -20,6 +20,8 @@ Type: xmlHelper/v1
 
 
 ### Convert from XML String
+Name: parse
+
 Converts the XML string to object/array.
 
 #### Properties
@@ -42,6 +44,8 @@ Type: OBJECT
 
 
 ### Convert to XML String
+Name: stringify
+
 Writes the object/array to a XML string.
 
 #### Properties

@@ -42,6 +42,8 @@ Version: 1
 
 
 ### Ask Anthropic3
+Name: askAnthropic3
+
 Ask anything you want.
 
 #### Properties
@@ -61,6 +63,8 @@ Ask anything you want.
 
 
 ### Ask Anthropic2
+Name: askAnthropic2
+
 Ask anything you want.
 
 #### Properties
@@ -80,6 +84,8 @@ Ask anything you want.
 
 
 ### Ask Cohere
+Name: askCohere
+
 Ask anything you want.
 
 #### Properties
@@ -103,6 +109,8 @@ Ask anything you want.
 
 
 ### Ask Jurassic2
+Name: askJurassic2
+
 Ask anything you want.
 
 #### Properties
@@ -128,6 +136,8 @@ Ask anything you want.
 
 
 ### Ask Llama
+Name: askLlama
+
 Ask anything you want.
 
 #### Properties
@@ -145,6 +155,8 @@ Ask anything you want.
 
 
 ### Ask Titan
+Name: askTitan
+
 Ask anything you want.
 
 #### Properties

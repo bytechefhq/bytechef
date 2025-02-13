@@ -41,6 +41,8 @@ Version: 1
 
 
 ### Send Message
+Name: sendMessage
+
 Send a message via WhatsApp
 
 #### Properties

@@ -42,6 +42,8 @@ Version: 1
 
 
 ### Create Event
+Name: createEvent
+
 Creates an event in the specified calendar.
 
 #### Properties
@@ -87,6 +89,8 @@ Type: OBJECT
 
 
 ### Delete Event
+Name: deleteEvent
+
 Deletes an event from the specified calendar.
 
 #### Properties
@@ -100,6 +104,8 @@ Deletes an event from the specified calendar.
 
 
 ### Get Events
+Name: getEvents
+
 Gets a list of events in specified calendar.
 
 #### Properties
@@ -129,6 +135,8 @@ Type: ARRAY
 
 
 ### Get Free Time Slots
+Name: getFreeTimeSlots
+
 Get free time slots from the Microsoft Outlook 365 calendar.
 
 #### Properties
@@ -158,6 +166,8 @@ Type: ARRAY
 
 
 ### Get Mail
+Name: getMail
+
 Get a specific message
 
 #### Properties
@@ -190,6 +200,8 @@ Type: OBJECT
 
 
 ### Reply to Email
+Name: replyToEmail
+
 Creates a new reply to email.
 
 #### Properties
@@ -203,6 +215,8 @@ Creates a new reply to email.
 
 
 ### Search Email
+Name: searchEmail
+
 Get the messages in the signed-in user's mailbox
 
 #### Properties
@@ -234,6 +248,8 @@ Type: ARRAY
 
 
 ### Send Email
+Name: sendEmail
+
 Send the message.
 
 #### Properties

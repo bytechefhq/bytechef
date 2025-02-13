@@ -43,6 +43,8 @@ Version: 1
 
 
 ### Create Category
+Name: createCategory
+
 Creates a new category.
 
 #### Properties
@@ -71,6 +73,8 @@ Type: OBJECT
 
 
 ### Create Customer
+Name: createCustomer
+
 Creates a new customer.
 
 #### Properties
@@ -104,6 +108,8 @@ Type: OBJECT
 
 
 ### Create Item
+Name: createItem
+
 Creates a new item.
 
 #### Properties
@@ -136,6 +142,8 @@ Type: OBJECT
 
 
 ### Create Payment
+Name: createPayment
+
 Creates a new payment.
 
 #### Properties
@@ -165,6 +173,8 @@ Type: OBJECT
 
 
 ### Get Customer
+Name: getCustomer
+
 Gets details about a specific customer.
 
 #### Properties
@@ -193,6 +203,8 @@ Type: OBJECT
 
 
 ### Get Invoice
+Name: getInvoice
+
 Gets details about a specific invoice.
 
 #### Properties
@@ -221,6 +233,8 @@ Type: OBJECT
 
 
 ### Get Item
+Name: getItem
+
 Gets details about a specific item.
 
 #### Properties
@@ -249,6 +263,8 @@ Type: OBJECT
 
 
 ### Get Payment
+Name: getPayment
+
 Gets details about a specific payment.
 
 #### Properties

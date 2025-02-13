@@ -20,6 +20,8 @@ Type: xmlFile/v1
 
 
 ### Read from File
+Name: read
+
 Reads data from a XML file.
 
 #### Properties
@@ -36,6 +38,8 @@ Reads data from a XML file.
 
 
 ### Write to File
+Name: write
+
 Writes the data to a XML file.
 
 #### Properties

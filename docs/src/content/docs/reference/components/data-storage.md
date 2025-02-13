@@ -20,6 +20,8 @@ Type: dataStorage/v1
 
 
 ### Append Value to List
+Name: appendValueToList
+
 Append value to the end of a list. If the list does not exist, it will be created.
 
 #### Properties
@@ -45,6 +47,8 @@ Append value to the end of a list. If the list does not exist, it will be create
 
 
 ### Atomic Increment
+Name: atomicIncrement
+
 The numeric value can be incremented atomically, and the action can be used concurrently from multiple executions.
 
 #### Properties
@@ -69,6 +73,8 @@ Type: INTEGER
 
 
 ### Await Get Value
+Name: awaitGetValue
+
 Wait for a value under a specified key, until it's available.
 
 #### Properties
@@ -94,6 +100,8 @@ Wait for a value under a specified key, until it's available.
 
 
 ### Delete Value
+Name: deleteValue
+
 Remove a value associated with a key in the specified scope.
 
 #### Properties
@@ -107,6 +115,8 @@ Remove a value associated with a key in the specified scope.
 
 
 ### Delete Value from List
+Name: deleteValueFromlist
+
 Delete a value from the given index in a list.
 
 #### Properties
@@ -121,6 +131,8 @@ Delete a value from the given index in a list.
 
 
 ### Get All Entries(Keys and Values)
+Name: getAllEntries
+
 Retrieve all the currently existing keys from storage, along with their values within the provided scope.
 
 #### Properties
@@ -149,6 +161,8 @@ Type: ARRAY
 
 
 ### Get Value
+Name: getValue
+
 Retrieve a previously assigned value within the specified scope using its corresponding key.
 
 #### Properties
@@ -173,6 +187,8 @@ Retrieve a previously assigned value within the specified scope using its corres
 
 
 ### Set Value
+Name: setValue
+
 Set a value under a key, in the specified scope.
 
 #### Properties
@@ -197,6 +213,8 @@ Set a value under a key, in the specified scope.
 
 
 ### Set Value in List
+Name: setValueInList
+
 Set value under a specified index in a list.
 
 #### Properties
