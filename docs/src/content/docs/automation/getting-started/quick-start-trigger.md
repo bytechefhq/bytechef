@@ -101,3 +101,63 @@ component, publish the project, create a deployment, and monitor the workflow ex
 <div style="position:relative;height:0;width:100%;overflow:hidden;z-index:99999;box-sizing:border-box;padding-bottom:calc(51.63511188% + 32px)">
 <iframe src="https://www.guidejar.com/embed/HUIB9dVjnNfEYp0DH60i?type=1&controls=on" width="100%" height="100%" style="height:100%;position:absolute;inset:0" allowfullscreen frameborder="0"></iframe>
 </div>
+
+## Additional Instructions
+
+### Create OAuth 2.0 Application
+
+1. Go to the [Google Cloud Console](https://console.cloud.google.com/).
+2. Click on the project dropdown in the top navigation bar.
+3. Click **New Project**.
+4. Enter a project name and click **Create**.
+5. Click on the project dropdown again.
+6. Select the project you just created.
+7. Go to the **APIs & Services**.
+8. Go to the **OAuth consent screen**.
+9. Click **Get Started**.
+10. Enter an App name and add user support email. Click **Next**.
+11. Select your Audience and click **Next**.
+12. Add email addresses and click **Next**.
+13. Agree to the terms and click **Create**.
+14. Go to **Data Access**.
+15. Click on **Add or Remove Scopes**.
+16. Select all necessary scopes.
+17. Click **Update**.
+18. Click **Save**.
+19. Go to the **Clients**.
+20. Click on **Create Client**.
+21. Click on application type dropdown.
+22. Choose **Web application** as the application type.
+23. Click on **Add Uri**.
+24. Enter a redirect URI, e.g., `https://app.bytechef.io/callback`, `http://127.0.0.1:5173/callback`. Click **Create**.
+25. Click on the client you just created.
+26. Copy the **Client ID** and **Client Secret**. Use these credentials to create a connection in ByteChef.
+
+<div style="position:relative;height:0;width:100%;overflow:hidden;z-index:99999;box-sizing:border-box;padding-bottom:calc(51.63511188% + 32px)">
+<iframe src="https://www.guidejar.com/embed/fec74020-26bb-43dd-814c-f8b907f6f45b?type=1&controls=on" width="100%" height="100%" style="height:100%;position:absolute;inset:0" allowfullscreen frameborder="0"></iframe>
+</div>
+
+### Enable Google Calendar API
+
+1. In the [Google Cloud Console](https://console.cloud.google.com/), select your project.
+2. Go to the **APIs & Services**.
+3. Click on **ENABLE APIS AND SERVICES**.
+4. Search for "calendar" in the search bar.
+5. Click on **Google Calendar API**.
+6. Click **Enable**.
+
+<div style="position:relative;height:0;width:100%;overflow:hidden;z-index:99999;box-sizing:border-box;padding-bottom:calc(50.05219207% + 32px)">
+<iframe src="https://www.guidejar.com/embed/c1fe8158-a72f-45ed-942e-c1bab5802afa?type=1&controls=on" width="100%" height="100%" style="height:100%;position:absolute;inset:0" allowfullscreen frameborder="0"></iframe>
+</div>
+
+### Create OpenAI Connection
+
+1. Go to the [OpenAI API](https://platform.openai.com/settings/organization/general).
+2. In the left sidebar, click on **API Keys**.
+3. Click **Create new secret key**.
+4. Enter a name and select the project for the key and click **Create secret key**.
+5. Copy the API key and use it to create a connection in ByteChef.
+
+<div style="position:relative;height:0;width:100%;overflow:hidden;z-index:99999;box-sizing:border-box;padding-bottom:calc(50.05219207% + 32px)">
+<iframe src="https://www.guidejar.com/embed/coPV2tDXMJmcpVHubS0J?type=1&controls=on" width="100%" height="100%" style="height:100%;position:absolute;inset:0" allowfullscreen frameborder="0"></iframe>
+</div>
