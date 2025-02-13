@@ -140,3 +140,38 @@ Every workflow is represented as a JSON file, allowing you to edit it using the 
 <div style="position:relative;height:0;width:100%;overflow:hidden;z-index:99999;box-sizing:border-box;padding-bottom:calc(51.63511188% + 32px)">
 <iframe src="https://www.guidejar.com/embed/MgaBP4rztEOu6IoD7OSx?type=1&controls=on" width="100%" height="100%" style="height:100%;position:absolute;inset:0" allowfullscreen frameborder="0"></iframe>
 </div>
+
+### Add Component
+
+Adding components to your workflow allows you to extend its functionality and tailor it to your specific needs. Each component comes with detailed documentation that guides you through its features and actions. By following these steps, you can seamlessly integrate new components into your workflow.
+
+1. Go to the [Component Reference](../../../reference/overview) page.
+2. Search for the component you want to add. For this example, we'll add the **Random Helper** component.
+3. Click on the **Random Helper** component to view its documentation.
+4. In the Actions section, find the list of available actions. We'll choose the **Random Integer** action.
+5. Let's write code to add the **Random Integer** action to the workflow.
+6. Under the `tasks` key, add a new object for the **Random Integer** action.
+7. Enter the `label` for the UI display, e.g., `Generate Integer`.
+8. Set the `name` as the action key, e.g., `generatedInt`.
+9. Under `parameters`, specify the required properties. Here, we need `startInclusive` and `endInclusive` to generate a random integer between two numbers. Set `startInclusive` to `1` and `endInclusive` to `100`.
+10. Add the `type` for this task: `randomHelper/v1/randomInt`. The `randomHelper/v1` is the component type, and `randomInt` is the action name.
+
+This part of code will look like this:
+
+ ```json
+  {
+    "label": "Generate Integer",
+    "name": "generatedInt",
+    "parameters": {
+        "startInclusive": 1,
+        "endInclusive": 100
+    },
+    "type": "randomHelper/v1/randomInt"
+}
+ ```
+
+11. Click on save icon to add the component to your workflow.
+
+<div style="position:relative;height:0;width:100%;overflow:hidden;z-index:99999;box-sizing:border-box;padding-bottom:calc(51.63511188% + 32px)">
+<iframe src="https://www.guidejar.com/embed/hYc7cWhjM3WmFAzwzQLs?type=1&controls=on" width="100%" height="100%" style="height:100%;position:absolute;inset:0" allowfullscreen frameborder="0"></iframe>
+</div>
