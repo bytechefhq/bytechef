@@ -120,7 +120,7 @@ const OutputTab = ({connectionMissing, currentNode, outputDefined = false, workf
                                     {!saveWorkflowNodeTestOutputMutation.isPending &&
                                         !uploadSampleOutputRequestMutation.isPending && (
                                             <>
-                                                Regenerate <CaretDownIcon className="ml-0.5" />
+                                                Define <CaretDownIcon className="ml-0.5" />
                                             </>
                                         )}
                                 </Button>
@@ -187,46 +187,54 @@ const OutputTab = ({connectionMissing, currentNode, outputDefined = false, workf
                 </>
             ) : (
                 <div className="flex size-full items-center justify-center">
-                    <div className="flex flex-col items-center gap-4">
-                        <span className="self-center">Generate Schema</span>
+                    <div className="flex flex-col items-center gap-8">
+                        <div className="flex w-full flex-col gap-1">
+                            <div className="self-center">Define Output Schema</div>
 
-                        {!currentNode.trigger && (
-                            <div className="flex w-full flex-col gap-3">
-                                <Button
-                                    disabled={saveWorkflowNodeTestOutputMutation.isPending}
-                                    onClick={handleTestComponentClick}
-                                    type="button"
-                                >
-                                    {saveWorkflowNodeTestOutputMutation.isPending && (
-                                        <>
-                                            <LoadingIcon />
+                            <p className="text-sm text-muted-foreground">
+                                Define the expected output schema with one of the methods
+                            </p>
+                        </div>
 
-                                            <span>Testing...</span>
-                                        </>
-                                    )}
+                        <div className="flex flex-col gap-4">
+                            {!currentNode.trigger && (
+                                <div className="flex w-full flex-col gap-3">
+                                    <Button
+                                        disabled={saveWorkflowNodeTestOutputMutation.isPending}
+                                        onClick={handleTestComponentClick}
+                                        type="button"
+                                    >
+                                        {saveWorkflowNodeTestOutputMutation.isPending && (
+                                            <>
+                                                <LoadingIcon />
 
-                                    {!saveWorkflowNodeTestOutputMutation.isPending && <>Test component</>}
-                                </Button>
+                                                <span>Testing...</span>
+                                            </>
+                                        )}
 
-                                <span className="text-center">or</span>
-                            </div>
-                        )}
+                                        {!saveWorkflowNodeTestOutputMutation.isPending && <>Test component</>}
+                                    </Button>
 
-                        <Button
-                            disabled={uploadSampleOutputRequestMutation.isPending}
-                            onClick={() => setShowUploadDialog(true)}
-                            type="button"
-                        >
-                            {uploadSampleOutputRequestMutation.isPending && (
-                                <>
-                                    <LoadingIcon />
-
-                                    <span>Uploading...</span>
-                                </>
+                                    <span className="text-center">or</span>
+                                </div>
                             )}
 
-                            {!uploadSampleOutputRequestMutation.isPending && <span>Upload Sample Output Data</span>}
-                        </Button>
+                            <Button
+                                disabled={uploadSampleOutputRequestMutation.isPending}
+                                onClick={() => setShowUploadDialog(true)}
+                                type="button"
+                            >
+                                {uploadSampleOutputRequestMutation.isPending && (
+                                    <>
+                                        <LoadingIcon />
+
+                                        <span>Uploading...</span>
+                                    </>
+                                )}
+
+                                {!uploadSampleOutputRequestMutation.isPending && <span>Upload Sample Output Data</span>}
+                            </Button>
+                        </div>
                     </div>
                 </div>
             )}
