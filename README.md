@@ -110,8 +110,8 @@ Use browser and open http://localhost:8080/login (please take care about port - 
 Documentation is available at [docs.bytechef.io](https://docs.bytechef.io?utm_source=github&utm_medium=organic&utm_campaign=readme). It covers all the necessary information to get started with ByteChef, including installation, configuration, and usage.
 
 - [Getting Started](https://docs.bytechef.io/automation/getting-started/introduction?utm_source=github&utm_medium=organic&utm_campaign=readme)
-- [Developer Guide](https://docs.bytechef.io/developing_guide/components/connectors_manual?utm_source=github&utm_medium=organic&utm_campaign=readme)
-- [Component Reference](https://docs.bytechef.io/reference/components/accelo?utm_source=github&utm_medium=organic&utm_campaign=readme)
+- [Developer Guide](https://docs.bytechef.io/developer-guide/overview/)
+- [Component Reference](https://docs.bytechef.io/reference/overview/)
 
 [//]: # (- [Architecture]&#40;https://docs.bytechef.io/architecture?utm_source=github&utm_medium=organic&utm_campaign=readme&#41;)
 [//]: # (- [Components Reference]&#40;https://docs.bytechef.io/components&#41;)
