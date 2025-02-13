@@ -22,7 +22,6 @@ import static com.bytechef.component.definition.ComponentDsl.bool;
 import static com.bytechef.component.definition.ComponentDsl.date;
 import static com.bytechef.component.definition.ComponentDsl.dateTime;
 import static com.bytechef.component.definition.ComponentDsl.integer;
-import static com.bytechef.component.definition.ComponentDsl.nullable;
 import static com.bytechef.component.definition.ComponentDsl.number;
 import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.option;
@@ -43,7 +42,7 @@ public class VarSetAction {
 
     private enum ValueType {
 
-        ARRAY, BOOLEAN, DATE, DATE_TIME, INTEGER, NULL, NUMBER, OBJECT, STRING, TIME;
+        ARRAY, BOOLEAN, DATE, DATE_TIME, INTEGER, /*NULL,*/ NUMBER, OBJECT, STRING, TIME;
     }
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("set")
@@ -59,7 +58,7 @@ public class VarSetAction {
                     option("Date", ValueType.DATE.name()),
                     option("Date Time", ValueType.DATE_TIME.name()),
                     option("Integer", ValueType.INTEGER.name()),
-                    option("Nullable", ValueType.NULL.name()),
+//                    option("Nullable", ValueType.NULL.name()),
                     option("Number", ValueType.NUMBER.name()),
                     option("Object", ValueType.OBJECT.name()),
                     option("String", ValueType.STRING.name()),
@@ -89,11 +88,11 @@ public class VarSetAction {
                 .description("Value of any type to set.")
                 .displayCondition("type == '%s'".formatted(ValueType.INTEGER))
                 .required(true),
-            nullable(VALUE)
-                .label("Value")
-                .description("Value of any type to set.")
-                .displayCondition("type == '%s'".formatted(ValueType.NULL))
-                .required(true),
+//            nullable(VALUE)
+//                .label("Value")
+//                .description("Value of any type to set.")
+//                .displayCondition("type == '%s'".formatted(ValueType.NULL))
+//                .required(true),
             number(VALUE)
                 .label("Value")
                 .description("Value of any type to set.")
