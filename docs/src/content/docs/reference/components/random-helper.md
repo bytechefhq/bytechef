@@ -19,7 +19,7 @@ Type: randomHelper/v1
 ## Actions
 
 
-### Int
+### Random Integer
 Name: randomInt
 
 Generates a random integer value.
@@ -44,7 +44,7 @@ Type: INTEGER
 
 
 
-### Float
+### Random Float
 Name: randomFloat
 
 Generates a random float value.
