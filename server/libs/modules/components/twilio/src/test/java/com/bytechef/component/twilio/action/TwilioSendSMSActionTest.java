@@ -16,15 +16,13 @@
 
 package com.bytechef.component.twilio.action;
 
-import static com.bytechef.component.twilio.constant.TwilioConstants.ACCOUNT_SID;
-import static com.bytechef.component.twilio.constant.TwilioConstants.AUTH_TOKEN;
+import static com.bytechef.component.definition.Authorization.PASSWORD;
+import static com.bytechef.component.definition.Authorization.USERNAME;
 import static com.bytechef.component.twilio.constant.TwilioConstants.BODY;
 import static com.bytechef.component.twilio.constant.TwilioConstants.FROM;
 import static com.bytechef.component.twilio.constant.TwilioConstants.TO;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyMap;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -32,75 +30,44 @@ import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
-import java.util.HashMap;
+import com.bytechef.component.test.definition.MockParametersFactory;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 
+/**
+ * @author Monika Kušter
+ */
 class TwilioSendSMSActionTest {
 
-    private final ActionContext mockedContext = mock(ActionContext.class);
+    private final ArgumentCaptor<Http.Body> bodyArgumentCaptor = ArgumentCaptor.forClass(Http.Body.class);
+    private final ActionContext mockedActionContext = mock(ActionContext.class);
     private final Http.Executor mockedExecutor = mock(Http.Executor.class);
-    private final Parameters mockedParameters = mock(Parameters.class);
+    private final Parameters mockedParameters = MockParametersFactory.create(
+        Map.of(
+            BODY, "body", FROM, "from", TO, "to", USERNAME, "accountSid", PASSWORD, "AuthToken"));
     private final Http.Response mockedResponse = mock(Http.Response.class);
-    private final Map<String, Object> responeseMap = Map.of("key", "value");
-    private final Parameters mockedConnectionParameters = mock(Parameters.class);
-    private final ArgumentCaptor<Http.Body> bodyCaptor = ArgumentCaptor.forClass(Http.Body.class);
+    private final Object mockedObject = mock(Object.class);
 
     @Test
     void testPerform() {
-
-        when(mockedContext.http(any()))
+        when(mockedActionContext.http(any()))
             .thenReturn(mockedExecutor);
-        when(mockedExecutor.headers(anyMap())) // Make sure this returns mockedExecutor
-            .thenReturn(mockedExecutor);
-        when(mockedExecutor.header(anyString(), anyString()))
-            .thenReturn(mockedExecutor);
-        when(mockedExecutor.body(bodyCaptor.capture()))
+        when(mockedExecutor.body(bodyArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
         when(mockedExecutor.configuration(any()))
             .thenReturn(mockedExecutor);
         when(mockedExecutor.execute())
             .thenReturn(mockedResponse);
         when(mockedResponse.getBody(any(TypeReference.class)))
-            .thenReturn(responeseMap);
+            .thenReturn(mockedObject);
 
-        Map<String, Object> propertyStubsMap = createPropertyStubsMap();
+        Object result = TwilioSendSMSAction.perform(mockedParameters, mockedParameters, mockedActionContext);
 
-        when(mockedParameters.getRequiredString(BODY))
-            .thenReturn((String) propertyStubsMap.get(BODY));
-        when(mockedParameters.getString(FROM))
-            .thenReturn((String) propertyStubsMap.get(FROM));
-        when(mockedParameters.getString(TO))
-            .thenReturn((String) propertyStubsMap.get(TO));
-        when(mockedParameters.getString(ACCOUNT_SID))
-            .thenReturn((String) propertyStubsMap.get(ACCOUNT_SID));
-        when(mockedParameters.getString(AUTH_TOKEN))
-            .thenReturn((String) propertyStubsMap.get(AUTH_TOKEN));
+        assertEquals(mockedObject, result);
 
-        when(mockedConnectionParameters.getRequiredString(ACCOUNT_SID))
-            .thenReturn((String) propertyStubsMap.get(ACCOUNT_SID));
-        when(mockedConnectionParameters.getRequiredString(AUTH_TOKEN))
-            .thenReturn((String) propertyStubsMap.get(AUTH_TOKEN));
+        Http.Body body = bodyArgumentCaptor.getValue();
 
-        Object result = TwilioSendSMSAction.perform(mockedParameters, mockedConnectionParameters, mockedContext);
-
-        assertEquals(responeseMap, result);
-
-        Http.Body body = bodyCaptor.getValue();
-        Map<String, Object> expectedBodyContent = Map.of("body", "body");
-        assertEquals(expectedBodyContent, body.getContent());
-    }
-
-    private static Map<String, Object> createPropertyStubsMap() {
-        Map<String, Object> propertyStubsMap = new HashMap<>();
-
-        propertyStubsMap.put(BODY, "body");
-        propertyStubsMap.put(FROM, "from");
-        propertyStubsMap.put(TO, "to");
-        propertyStubsMap.put(ACCOUNT_SID, "accountSid");
-        propertyStubsMap.put(AUTH_TOKEN, "AuthToken");
-
-        return propertyStubsMap;
+        assertEquals(Map.of(BODY, "body", FROM, "from", TO, "to"), body.getContent());
     }
 }
