@@ -199,6 +199,7 @@ include("server:libs:platform:platform-workflow:platform-workflow-execution:plat
 
 include("server:libs:modules:components:accelo")
 include("server:libs:modules:components:active-campaign")
+include("server:libs:modules:components:acumbamail")
 include("server:libs:modules:components:affinity")
 include("server:libs:modules:components:ai:ai-agent")
 include("server:libs:modules:components:ai:ai-image")
