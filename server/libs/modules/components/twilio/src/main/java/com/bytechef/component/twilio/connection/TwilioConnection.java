@@ -43,6 +43,8 @@ public class TwilioConnection {
                     string(USERNAME)
                         .label("Account SID")
                         .description("The Account SID from your Twilio account.")
+                        .minLength(34)
+                        .maxLength(34)
                         .required(true),
                     string(PASSWORD)
                         .label("Auth Token")
