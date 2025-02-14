@@ -1,0 +1,52 @@
+extract_api_task:
+  description: >
+    Extract API details from the OpenAPI (Swagger JSON) file, including endpoints, authentication,
+    request parameters, and response formats.
+  agent: api_researcher
+  expected_output: >
+    A structured list of API endpoints, request parameters, authentication methods,
+    and response formats extracted from Swagger JSON.
+
+generate_connection_task:
+  description: >
+    Generate a connection class for the API using Freshdesk's Component DSL format.
+    This class should handle authentication and set up the base API URL.
+  agent: sdk_generator
+  context: extract_api_task
+  requirements: >
+    - Use `connection()` to define the API base URL.
+    - Implement authentication using `authorization()`.
+    - Ensure credentials are securely handled.
+    - Follow Freshdesk's Component DSL structure.
+  expected_output: >
+    A Java class implementing the API connection using Freshdesk Component DSL,
+    including authentication handling and base URL setup.
+
+generate_actions_task:
+  description: >
+    Generate API action classes using Component DSL.
+    Each class should map to an API endpoint and handle request-response logic.
+  agent: sdk_generator
+  context: extract_api_task
+  requirements: >
+    - Define actions using `action()`, `metadata()`, and `properties()`.
+    - Ensure all API parameters are included in `properties()`.
+    - Use `outputSchema()` to correctly structure API responses.
+    - Validate JSON responses and handle errors properly.
+  expected_output: >
+    Java classes that map API endpoints to Component DSL actions,
+    correctly handling requests, responses, and error handling.
+
+validate_dsl_task:
+  description: >
+    Review all generated SDK classes and verify they strictly follow the Freshdesk Component DSL format.
+  agent: dsl_validator
+  context: [generate_connection_task, generate_actions_task]
+  requirements: >
+    - Ensure all classes use `connection()`, `action()`, and `metadata()` correctly.
+    - Verify `properties()` are correctly mapped to API parameters.
+    - Check `outputSchema()` for response structure compliance.
+    - Reject any output that does not fully match the Freshdesk DSL.
+  expected_output: >
+    A validation report confirming whether the generated SDK classes adhere to the Freshdesk Component DSL.
+    If there are errors, the report should include a list of violations and necessary fixes.
