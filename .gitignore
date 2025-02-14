@@ -178,3 +178,4 @@ rebel.xml
 ######################
 **/local.env
 /sdk_agent/.venv/**/
+sdk_agent/.env
