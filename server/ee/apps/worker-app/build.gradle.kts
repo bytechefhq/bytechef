@@ -142,6 +142,7 @@ dependencies {
     implementation(project(":server:libs:modules:components:resend"))
     implementation(project(":server:libs:modules:components:request"))
     implementation(project(":server:libs:modules:components:salesflare"))
+    implementation(project(":server:libs:modules:components:salesforce"))
     implementation(project(":server:libs:modules:components:schedule"))
     implementation(project(":server:libs:modules:components:script"))
     implementation(project(":server:libs:modules:components:sendgrid"))
