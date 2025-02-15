@@ -21,7 +21,7 @@ import static com.bytechef.component.definition.Authorization.CLIENT_SECRET;
 import static com.bytechef.component.definition.ComponentDsl.authorization;
 import static com.bytechef.component.definition.ComponentDsl.connection;
 import static com.bytechef.component.definition.ComponentDsl.string;
-import static com.bytechef.component.salesforce.constant.SalesforceConstants.ENVIRONMENT;
+import static com.bytechef.component.salesforce.constant.SalesforceConstants.SUBDOMAIN;
 
 import com.bytechef.component.definition.Authorization;
 import com.bytechef.component.definition.ComponentDsl.ModifiableConnectionDefinition;
@@ -34,13 +34,15 @@ import java.util.List;
 public class SalesforceConnection {
 
     public static final ModifiableConnectionDefinition CONNECTION_DEFINITION = connection()
-        .baseUri((connectionParameters, context) -> getUrl(connectionParameters, "services/data/v63.0"))
+        .baseUri((connectionParameters, context) -> getUrl(connectionParameters, "data/v63.0"))
         .authorizations(authorization(
             Authorization.AuthorizationType.OAUTH2_AUTHORIZATION_CODE)
                 .title("OAuth2 Authorization Code")
                 .properties(
-                    string(ENVIRONMENT)
-                        .label("Environment")
+                    string(SUBDOMAIN)
+                        .label("Subdomain")
+                        .description("The subdomain of your Salesforce instance.")
+                        .exampleValue("MyDomainName")
                         .required(true),
                     string(CLIENT_ID)
                         .label("Client Id")
@@ -49,17 +51,17 @@ public class SalesforceConnection {
                         .label("Client Secret")
                         .required(true))
                 .authorizationUrl(
-                    (connectionParameters, context) -> getUrl(connectionParameters, "services/oauth2/authorize"))
-                .refreshUrl((connectionParameters, context) -> getUrl(connectionParameters, "services/oauth2/token"))
+                    (connectionParameters, context) -> getUrl(connectionParameters, "oauth2/authorize"))
+                .refreshUrl((connectionParameters, context) -> getUrl(connectionParameters, "oauth2/token"))
                 .scopes((connectionParameters, context) -> List.of("full", "refresh_token", "offline_access"))
-                .tokenUrl((connectionParameters, context) -> getUrl(connectionParameters, "services/oauth2/token")));
+                .tokenUrl((connectionParameters, context) -> getUrl(connectionParameters, "oauth2/token")));
 
     private SalesforceConnection() {
     }
 
     private static String getUrl(Parameters connectionParameters, String path) {
-        String environment = connectionParameters.getRequiredString(ENVIRONMENT);
+        String subdomain = connectionParameters.getRequiredString(SUBDOMAIN);
 
-        return "https://%s/%s".formatted(environment, path);
+        return "https://%s.my.salesforce.com/services/%s".formatted(subdomain, path);
     }
 }
