@@ -37,7 +37,6 @@ import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.Property.ControlType;
 import com.bytechef.component.definition.Property.ValueProperty;
 import com.bytechef.component.definition.TypeReference;
-import com.bytechef.component.salesforce.constant.FieldType;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -74,13 +73,14 @@ public class SalesforceUtils {
         Map<String, Object> body = getSObjectDesribe(actionContext, object);
 
         if (body.get(FIELDS) instanceof List<?> fields) {
-            for (Object o : fields) {
-                if (o instanceof Map<?, ?> map) {
+            for (Object field : fields) {
+                if (field instanceof Map<?, ?> map) {
                     String name = (String) map.get("name");
                     String label = (String) map.get("label");
                     String type = (String) map.get("type");
 
                     FieldType fieldType = FieldType.getFieldType(type);
+
                     if (fieldType != null) {
                         switch (fieldType) {
                             case BOOLEAN -> list.add(
@@ -126,13 +126,15 @@ public class SalesforceUtils {
 
                                 if (map.get("picklistValues") instanceof List<?> picklistValues) {
                                     for (Object picklistValue : picklistValues) {
-                                        if (picklistValue instanceof Map<?, ?> picklistValueMap &&
-                                            picklistValueMap.get("active")
-                                                .equals(true)) {
-                                            options.add(
-                                                option(
-                                                    (String) picklistValueMap.get("label"),
-                                                    (String) picklistValueMap.get("value")));
+                                        if (picklistValue instanceof Map<?, ?> picklistValueMap) {
+                                            Object active = picklistValueMap.get("active");
+
+                                            if (active.equals(true)) {
+                                                options.add(
+                                                    option(
+                                                        (String) picklistValueMap.get("label"),
+                                                        (String) picklistValueMap.get("value")));
+                                            }
                                         }
                                     }
                                 }
@@ -170,12 +172,11 @@ public class SalesforceUtils {
     }
 
     private static Map<String, Object> getSObjectDesribe(ActionContext actionContext, String object) {
-        Map<String, Object> body = actionContext
+        return actionContext
             .http(http -> http.get("/sobjects/" + object + "/describe"))
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});
-        return body;
     }
 
     public static List<Option<String>> getRecordIdOptions(
@@ -186,8 +187,7 @@ public class SalesforceUtils {
 
         String encodedQuery = URLEncoder.encode(query, StandardCharsets.UTF_8);
 
-        Map<String, ?> body = actionContext
-            .http(http -> http.get("/query"))
+        Map<String, ?> body = actionContext.http(http -> http.get("/query"))
             .queryParameter("q", encodedQuery)
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute()
@@ -196,8 +196,8 @@ public class SalesforceUtils {
         List<Option<String>> options = new ArrayList<>();
 
         if (body.get("records") instanceof List<?> list) {
-            for (Object o : list) {
-                if (o instanceof Map<?, ?> map) {
+            for (Object item : list) {
+                if (item instanceof Map<?, ?> map) {
                     String id = (String) map.get("Id");
 
                     options.add(option(id, id));
@@ -212,16 +212,16 @@ public class SalesforceUtils {
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
         String searchText, ActionContext actionContext) {
 
-        Map<String, ?> body = actionContext
-            .http(http -> http.get("/sobjects"))
+        Map<String, ?> body = actionContext.http(http -> http.get("/sobjects"))
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});
 
         List<Option<String>> options = new ArrayList<>();
+
         if (body.get("sobjects") instanceof List<?> list) {
-            for (Object o : list) {
-                if (o instanceof Map<?, ?> map) {
+            for (Object item : list) {
+                if (item instanceof Map<?, ?> map) {
                     options.add(option((String) map.get("label"), (String) map.get("name")));
                 }
             }
