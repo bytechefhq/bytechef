@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.component.salesforce.constant;
+package com.bytechef.component.salesforce.util;
 
 /**
  * @author Monika Kušter
