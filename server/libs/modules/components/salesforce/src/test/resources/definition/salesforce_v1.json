@@ -255,8 +255,8 @@
     } ],
     "title" : "Create Record",
     "perform" : { },
-    "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "processErrorResponse" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -314,8 +314,46 @@
     } ],
     "title" : "Delete Record",
     "perform" : { },
-    "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "processErrorResponse" : null
+  }, {
+    "batch" : null,
+    "deprecated" : null,
+    "description" : "Executes a raw SOQL query to  extract data from Salesforce.",
+    "help" : null,
+    "metadata" : null,
+    "name" : "soqlQuery",
+    "outputDefinition" : {
+      "output" : null,
+      "outputResponse" : null,
+      "outputSchema" : null,
+      "sampleOutput" : null
+    },
+    "properties" : [ {
+      "advancedOption" : null,
+      "description" : "SOQL query to execute.",
+      "displayCondition" : null,
+      "expressionEnabled" : null,
+      "hidden" : null,
+      "metadata" : { },
+      "required" : true,
+      "name" : "q",
+      "type" : "STRING",
+      "defaultValue" : null,
+      "exampleValue" : null,
+      "label" : "Query",
+      "placeholder" : null,
+      "controlType" : "TEXT_AREA",
+      "languageId" : null,
+      "maxLength" : null,
+      "minLength" : null,
+      "options" : null,
+      "optionsDataSource" : null
+    } ],
+    "title" : "SOQL Query",
+    "perform" : { },
+    "workflowNodeDescription" : null,
+    "processErrorResponse" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -493,8 +531,8 @@
     } ],
     "title" : "Update Record",
     "perform" : { },
-    "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "processErrorResponse" : null
   } ],
   "connection" : {
     "authorizations" : [ {
@@ -503,17 +541,17 @@
       "name" : "oauth2_authorization_code",
       "properties" : [ {
         "advancedOption" : null,
-        "description" : null,
+        "description" : "The subdomain of your Salesforce instance.",
         "displayCondition" : null,
         "expressionEnabled" : null,
         "hidden" : null,
         "metadata" : { },
         "required" : true,
-        "name" : "environment",
+        "name" : "subdomain",
         "type" : "STRING",
         "defaultValue" : null,
-        "exampleValue" : null,
-        "label" : "Environment",
+        "exampleValue" : "MyDomainName",
+        "label" : "Subdomain",
         "placeholder" : null,
         "controlType" : "TEXT",
         "languageId" : null,
