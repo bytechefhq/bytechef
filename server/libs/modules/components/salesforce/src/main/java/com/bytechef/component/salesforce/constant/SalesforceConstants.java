@@ -21,11 +21,11 @@ package com.bytechef.component.salesforce.constant;
  */
 public class SalesforceConstants {
 
-    public static final String ENVIRONMENT = "environment";
+    public static final String CUSTOM_FIELDS = "customFields";
     public static final String FIELDS = "fields";
     public static final String ID = "id";
     public static final String OBJECT = "object";
-    public static final String CUSTOM_FIELDS = "customFields";
+    public static final String SUBDOMAIN = "subdomain";
 
     private SalesforceConstants() {
     }
