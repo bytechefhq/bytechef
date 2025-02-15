@@ -28,6 +28,7 @@ import static com.bytechef.component.definition.ComponentDsl.time;
 import static com.bytechef.component.salesforce.constant.SalesforceConstants.CUSTOM_FIELDS;
 import static com.bytechef.component.salesforce.constant.SalesforceConstants.FIELDS;
 import static com.bytechef.component.salesforce.constant.SalesforceConstants.OBJECT;
+import static com.bytechef.component.salesforce.constant.SalesforceConstants.Q;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.Context.Http;
@@ -171,9 +172,11 @@ public class SalesforceUtils {
         return list;
     }
 
-    private static Map<String, Object> getSObjectDesribe(ActionContext actionContext, String object) {
-        return actionContext
-            .http(http -> http.get("/sobjects/" + object + "/describe"))
+    public static Map<String, ?> executeSOQLQuery(ActionContext actionContext, String query) {
+        String encodedQuery = URLEncoder.encode(query, StandardCharsets.UTF_8);
+
+        return actionContext.http(http -> http.get("/query"))
+            .queryParameter(Q, encodedQuery)
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});
@@ -185,13 +188,7 @@ public class SalesforceUtils {
 
         String query = "SELECT Id FROM " + inputParameters.getRequiredString(OBJECT);
 
-        String encodedQuery = URLEncoder.encode(query, StandardCharsets.UTF_8);
-
-        Map<String, ?> body = actionContext.http(http -> http.get("/query"))
-            .queryParameter("q", encodedQuery)
-            .configuration(Http.responseType(Http.ResponseType.JSON))
-            .execute()
-            .getBody(new TypeReference<>() {});
+        Map<String, ?> body = executeSOQLQuery(actionContext, query);
 
         List<Option<String>> options = new ArrayList<>();
 
@@ -230,4 +227,11 @@ public class SalesforceUtils {
         return options;
     }
 
+    private static Map<String, Object> getSObjectDesribe(ActionContext actionContext, String object) {
+        return actionContext
+            .http(http -> http.get("/sobjects/" + object + "/describe"))
+            .configuration(Http.responseType(Http.ResponseType.JSON))
+            .execute()
+            .getBody(new TypeReference<>() {});
+    }
 }

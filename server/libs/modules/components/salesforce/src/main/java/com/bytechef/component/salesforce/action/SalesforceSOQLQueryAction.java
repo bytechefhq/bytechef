@@ -19,15 +19,12 @@ package com.bytechef.component.salesforce.action;
 import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.salesforce.constant.SalesforceConstants.Q;
+import static com.bytechef.component.salesforce.util.SalesforceUtils.executeSOQLQuery;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
-import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.Property.ControlType;
-import com.bytechef.component.definition.TypeReference;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
 
 /**
  * @author Monika Kušter
@@ -52,12 +49,6 @@ public class SalesforceSOQLQueryAction {
     protected static Object perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) {
 
-        String encodedQuery = URLEncoder.encode(inputParameters.getRequiredString(Q), StandardCharsets.UTF_8);
-
-        return actionContext.http(http -> http.get("/query"))
-            .queryParameter(Q, encodedQuery)
-            .configuration(Http.responseType(Http.ResponseType.JSON))
-            .execute()
-            .getBody(new TypeReference<>() {});
+        return executeSOQLQuery(actionContext, inputParameters.getRequiredString(Q));
     }
 }
