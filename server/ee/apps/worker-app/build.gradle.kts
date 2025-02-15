@@ -122,6 +122,7 @@ dependencies {
     implementation(project(":server:libs:modules:components:microsoft:microsoft-outlook-365"))
     implementation(project(":server:libs:modules:components:microsoft:microsoft-share-point"))
     implementation(project(":server:libs:modules:components:microsoft:microsoft-teams"))
+    implementation(project(":server:libs:modules:components:microsoft:microsoft-to-do"))
     implementation(project(":server:libs:modules:components:monday"))
     implementation(project(":server:libs:modules:components:myob"))
     implementation(project(":server:libs:modules:components:mysql"))
