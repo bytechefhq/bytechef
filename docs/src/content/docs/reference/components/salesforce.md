@@ -26,7 +26,7 @@ Version: 1
 
 |      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
 |:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
-| environment | Environment | STRING | TEXT  |  | true  |
+| subdomain | Subdomain | STRING | TEXT  |  The subdomain of your Salesforce instance.  |  true  |
 | clientId | Client Id | STRING | TEXT  |  | true  |
 | clientSecret | Client Secret | STRING | TEXT  |  | true  |
 
@@ -84,6 +84,20 @@ Deletes an existing record of a specified Salesforce object.
 |:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
 | object | Salesforce Object | STRING | SELECT  |  | true  |
 | id | Record ID | STRING | SELECT  |  ID of the object to delete.  |  true  |
+
+
+
+
+### SOQL Query
+Name: soqlQuery
+
+Executes a raw SOQL query to  extract data from Salesforce.
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
+|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
+| q | Query | STRING | TEXT_AREA  |  SOQL query to execute.  |  true  |
 
 
 
