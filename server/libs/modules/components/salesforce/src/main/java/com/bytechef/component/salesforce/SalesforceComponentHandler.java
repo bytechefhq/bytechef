@@ -23,6 +23,7 @@ import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.component.salesforce.action.SalesforceCreateRecordAction;
 import com.bytechef.component.salesforce.action.SalesforceDeleteRecordAction;
+import com.bytechef.component.salesforce.action.SalesforceSOQLQueryAction;
 import com.bytechef.component.salesforce.action.SalesforceUpdateRecordAction;
 import com.bytechef.component.salesforce.connection.SalesforceConnection;
 import com.google.auto.service.AutoService;
@@ -45,6 +46,7 @@ public class SalesforceComponentHandler implements ComponentHandler {
         .actions(
             SalesforceCreateRecordAction.ACTION_DEFINITION,
             SalesforceDeleteRecordAction.ACTION_DEFINITION,
+            SalesforceSOQLQueryAction.ACTION_DEFINITION,
             SalesforceUpdateRecordAction.ACTION_DEFINITION);
 
     @Override

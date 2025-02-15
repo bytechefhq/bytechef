@@ -25,6 +25,7 @@ public class SalesforceConstants {
     public static final String FIELDS = "fields";
     public static final String ID = "id";
     public static final String OBJECT = "object";
+    public static final String Q = "q";
     public static final String SUBDOMAIN = "subdomain";
 
     private SalesforceConstants() {
