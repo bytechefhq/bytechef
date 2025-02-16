@@ -26,6 +26,8 @@ import com.bytechef.component.salesforce.action.SalesforceDeleteRecordAction;
 import com.bytechef.component.salesforce.action.SalesforceSOQLQueryAction;
 import com.bytechef.component.salesforce.action.SalesforceUpdateRecordAction;
 import com.bytechef.component.salesforce.connection.SalesforceConnection;
+import com.bytechef.component.salesforce.trigger.SalesforceNewRecordTrigger;
+import com.bytechef.component.salesforce.trigger.SalesforceUpdatedRecordTrigger;
 import com.google.auto.service.AutoService;
 
 /**
@@ -47,7 +49,10 @@ public class SalesforceComponentHandler implements ComponentHandler {
             SalesforceCreateRecordAction.ACTION_DEFINITION,
             SalesforceDeleteRecordAction.ACTION_DEFINITION,
             SalesforceSOQLQueryAction.ACTION_DEFINITION,
-            SalesforceUpdateRecordAction.ACTION_DEFINITION);
+            SalesforceUpdateRecordAction.ACTION_DEFINITION)
+        .triggers(
+            SalesforceNewRecordTrigger.TRIGGER_DEFINITION,
+            SalesforceUpdatedRecordTrigger.TRIGGER_DEFINITION);
 
     @Override
     public ComponentDefinition getDefinition() {
