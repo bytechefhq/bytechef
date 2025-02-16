@@ -121,3 +121,36 @@ Updates an existing record for a specified Salesforce object.
 
 
 
+## Triggers
+
+
+### New Record
+Triggers when there is new record in Salesforce.
+
+Type: POLLING
+#### Properties
+
+|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
+|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
+| object | Salesforce Object | STRING | SELECT  |  | true  |
+
+
+
+
+
+### Updated Record
+Triggers when record is updated.
+
+Type: POLLING
+#### Properties
+
+|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
+|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
+| object | Salesforce Object | STRING | SELECT  |  | true  |
+
+
+
+
+
+<hr />
+
