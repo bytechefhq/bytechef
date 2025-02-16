@@ -17,8 +17,11 @@
 package com.bytechef.component.salesforce.util;
 
 import static com.bytechef.component.definition.ComponentDsl.option;
+import static com.bytechef.component.salesforce.constant.SalesforceConstants.LAST_TIME_CHECKED;
 import static com.bytechef.component.salesforce.constant.SalesforceConstants.OBJECT;
+import static com.bytechef.component.salesforce.constant.SalesforceConstants.Q;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -27,10 +30,13 @@ import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Parameters;
+import com.bytechef.component.definition.TriggerContext;
+import com.bytechef.component.definition.TriggerDefinition.PollOutput;
 import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.test.definition.MockParametersFactory;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
@@ -45,6 +51,7 @@ class SalesforceUtilsTest {
     private final ActionContext mockedActionContext = mock(ActionContext.class);
     private final Http.Executor mockedExecutor = mock(Http.Executor.class);
     private final Http.Response mockedResponse = mock(Http.Response.class);
+    private final TriggerContext mockedTriggerContext = mock(TriggerContext.class);
 
     @Test
     void testExecuteSOQLQuery() {
@@ -70,6 +77,38 @@ class SalesforceUtilsTest {
     }
 
     @Test
+    void testGetPollOutput() {
+        List<Map<String, String>> records = List.of(Map.of("Id", "123"));
+        LocalDateTime startDate = LocalDateTime.of(2000, 1, 1, 1, 1, 1);
+
+        Parameters mockedParameters =
+            MockParametersFactory.create(Map.of(LAST_TIME_CHECKED, startDate, OBJECT, "Account"));
+
+        when(mockedTriggerContext.http(any()))
+            .thenReturn(mockedExecutor);
+        when(mockedExecutor.queryParameter(stringArgumentCaptor.capture(), stringArgumentCaptor.capture()))
+            .thenReturn(mockedExecutor);
+        when(mockedExecutor.configuration(any()))
+            .thenReturn(mockedExecutor);
+        when(mockedExecutor.execute())
+            .thenReturn(mockedResponse);
+        when(mockedResponse.getBody(any(TypeReference.class)))
+            .thenReturn(Map.of("records", records));
+
+        PollOutput pollOutput = SalesforceUtils.getPollOutput(
+            mockedParameters, mockedParameters, mockedTriggerContext, "CreatedDate");
+
+        assertEquals(records, pollOutput.records());
+        assertFalse(pollOutput.pollImmediately());
+
+        String query =
+            "SELECT FIELDS(ALL) FROM Account WHERE CreatedDate > 2000-01-01T01:01:01Z ORDER BY CreatedDate ASC LIMIT 200 OFFSET 0";
+        assertEquals(
+            List.of(Q, URLEncoder.encode(query, StandardCharsets.UTF_8)),
+            stringArgumentCaptor.getAllValues());
+    }
+
+    @Test
     void testGetRecordIdOptions() {
         Parameters parameters = MockParametersFactory.create(Map.of(OBJECT, "Account"));
 
@@ -90,7 +129,7 @@ class SalesforceUtilsTest {
         assertEquals(List.of(option("123", "123")), result);
 
         assertEquals(
-            List.of("q", URLEncoder.encode("SELECT Id FROM Account", StandardCharsets.UTF_8)),
+            List.of(Q, URLEncoder.encode("SELECT Id FROM Account", StandardCharsets.UTF_8)),
             stringArgumentCaptor.getAllValues());
     }
 

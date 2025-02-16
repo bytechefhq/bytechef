@@ -27,19 +27,27 @@ import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.ComponentDsl.time;
 import static com.bytechef.component.salesforce.constant.SalesforceConstants.CUSTOM_FIELDS;
 import static com.bytechef.component.salesforce.constant.SalesforceConstants.FIELDS;
+import static com.bytechef.component.salesforce.constant.SalesforceConstants.LAST_TIME_CHECKED;
 import static com.bytechef.component.salesforce.constant.SalesforceConstants.OBJECT;
 import static com.bytechef.component.salesforce.constant.SalesforceConstants.Q;
 
 import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.FileEntry;
 import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.Property.ControlType;
 import com.bytechef.component.definition.Property.ValueProperty;
+import com.bytechef.component.definition.TriggerContext;
+import com.bytechef.component.definition.TriggerDefinition.PollOutput;
 import com.bytechef.component.definition.TypeReference;
+import com.bytechef.component.exception.ProviderException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -172,14 +180,36 @@ public class SalesforceUtils {
         return list;
     }
 
-    public static Map<String, ?> executeSOQLQuery(ActionContext actionContext, String query) {
+    public static Map<String, ?> executeSOQLQuery(Context context, String query) {
         String encodedQuery = URLEncoder.encode(query, StandardCharsets.UTF_8);
 
-        return actionContext.http(http -> http.get("/query"))
+        return context.http(http -> http.get("/query"))
             .queryParameter(Q, encodedQuery)
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});
+    }
+
+    public static PollOutput getPollOutput(
+        Parameters inputParameters, Parameters closureParameters, TriggerContext triggerContext, String dateFieldName) {
+
+        ZoneId zoneId = ZoneId.of("UTC");
+        LocalDateTime startDate = closureParameters.getLocalDateTime(LAST_TIME_CHECKED, LocalDateTime.now(zoneId));
+        LocalDateTime endDate = LocalDateTime.now(zoneId);
+
+        String formattedStartDate = startDate.format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss'Z'")
+            .withZone(zoneId));
+        String query = String.format(
+            "SELECT FIELDS(ALL) FROM %s WHERE %s > %s ORDER BY %s ASC LIMIT 200 OFFSET 0",
+            inputParameters.getRequiredString(OBJECT), dateFieldName, formattedStartDate, dateFieldName);
+
+        Map<String, ?> resposeBody = executeSOQLQuery(triggerContext, query);
+
+        if (resposeBody.get("records") instanceof List<?> records) {
+            return new PollOutput(records, Map.of(LAST_TIME_CHECKED, endDate), false);
+        }
+
+        throw new ProviderException("Failed to fetch records from Salesforce.");
     }
 
     public static List<Option<String>> getRecordIdOptions(
@@ -207,9 +237,9 @@ public class SalesforceUtils {
 
     public static List<Option<String>> getSalesforceObjectOptions(
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
-        String searchText, ActionContext actionContext) {
+        String searchText, Context context) {
 
-        Map<String, ?> body = actionContext.http(http -> http.get("/sobjects"))
+        Map<String, ?> body = context.http(http -> http.get("/sobjects"))
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});
