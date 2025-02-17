@@ -1,0 +1,339 @@
+---
+openapi: "3.0.2"
+info:
+  title: "Apollo"
+  description: "Apollo.io is a sales intelligence and engagement platform that provides tools for prospecting, lead generation, and sales automation to help businesses improve their sales processes and outreach efforts."
+  version: "v1"
+servers:
+  - url: "https://api.apollo.io/api/v1"
+paths:
+  /opportunities:
+    post:
+      summary: "Create Deal"
+      description: "Creates new deal for an Apollo account."
+      operationId: "createDeal"
+      parameters:
+        - name: "name"
+          description: "Name the deal you are creating."
+          in: "query"
+          required: true
+          schema:
+            type: "string"
+            title: "Name"
+        - name: "owner_id"
+          description: "The ID for the deal owner within your team's Apollo account."
+          in: "query"
+          required: false
+          schema:
+            type: "string"
+            title: "Owner ID"
+        - name: "account_id"
+          description: "The ID for the account within your Apollo instance. This is the company that you are targeting as part of the deal being created."
+          in: "query"
+          required: false
+          schema:
+            type: "string"
+            title: "Account ID"
+        - name: "amount"
+          description: "The monetary value of the deal being created. Do not enter commas or currency symbols for the value. "
+          in: "query"
+          required: false
+          schema:
+            type: "string"
+            example: "55123478"
+            title: "Amount"
+        - name: "closed_date"
+          description: "The estimated close date for the deal. This can be a future or past date."
+          in: "query"
+          required: false
+          schema:
+            type: "string"
+            format: "date"
+            title: "Close Date"
+      responses:
+        200:
+          description: "Successful operation"
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  body:
+                    type: "object"
+                    properties:
+                      opportunity:
+                        type: "object"
+                        properties:
+                          id:
+                            type: "string"
+                          team_id:
+                            type: "string"
+                          owner_id:
+                            type: "string"
+                          amount:
+                            type: "number"
+                          closed_date:
+                            type: "string"
+                            format: "date"
+                          account_id:
+                            type: "string"
+                          description:
+                            type: "string"
+                          name:
+                            type: "string"
+                          currency:
+                            type: "object"
+                            properties:
+                              name:
+                                type: "string"
+                              iso_code:
+                                type: "string"
+                              symbol:
+                                type: "string"
+    patch:
+      summary: "Update Deal"
+      description: "Updates the details of existing deals within your team's Apollo account."
+      operationId: "updateDeal"
+      parameters:
+        - name: "opportunity_id"
+          description: "The ID for the deal you want to update."
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+            title: "Opportunity Id"
+        - name: "owner_id"
+          description: "The ID for the deal owner within your team's Apollo account."
+          in: "query"
+          required: false
+          schema:
+            type: "string"
+            title: "Owner ID"
+        - name: "name"
+          description: "New name for the deal."
+          in: "query"
+          required: false
+          schema:
+            type: "string"
+            title: "Name"
+        - name: "closed_date"
+          description: "Updated estimated close date for the deal. This can be a future or past date."
+          in: "query"
+          required: false
+          schema:
+            type: "string"
+            format: "date"
+            title: "Close Date"
+        - name: "account_id"
+          description: "The ID for the account within your Apollo instance. This is the company that you are targeting as part of the deal being created."
+          in: "query"
+          required: false
+          schema:
+            type: "string"
+            title: "Account ID"
+      responses:
+        200:
+          description: "Successful operation"
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  body:
+                    type: "object"
+                    properties:
+                      opportunity:
+                        type: "object"
+                        properties:
+                          id:
+                            type: "string"
+                          team_id:
+                            type: "string"
+                          owner_id:
+                            type: "string"
+                          amount:
+                            type: "number"
+                          closed_date:
+                            type: "string"
+                            format: "date"
+                          account_id:
+                            type: "string"
+                          description:
+                            type: "string"
+                          name:
+                            type: "string"
+                          currency:
+                            type: "object"
+                            properties:
+                              name:
+                                type: "string"
+                              iso_code:
+                                type: "string"
+                              symbol:
+                                type: "string"
+  /people/match:
+    post:
+      summary: "Enrich Person"
+      description: "Enriches data for a person."
+      operationId: "enrichPerson"
+      parameters:
+        - name: "first_name"
+          description: "The first name of the person."
+          in: "query"
+          required: false
+          schema:
+            type: "string"
+            title: "First Name"
+        - name: "last_name"
+          description: "The lst name of the person."
+          in: "query"
+          required: false
+          schema:
+            type: "string"
+            title: "Last Name"
+        - name: "name"
+          description: "The full name of the person."
+          in: "query"
+          required: false
+          schema:
+            type: "string"
+            title: "Name"
+        - name: "email"
+          description: "The email address of the person."
+          in: "query"
+          required: false
+          schema:
+            type: "string"
+            title: "Email"
+        - name: "organization_name"
+          description: "The name of the person's employer."
+          in: "query"
+          required: false
+          schema:
+            type: "string"
+            title: "Organization Name"
+        - name: "domain"
+          description: "The domain name for the person's employer. This can be the current employer or a previous employer. Do not include www., the @ symbol, or similar."
+          in: "query"
+          required: false
+          schema:
+            type: "string"
+            example: "apollo.io"
+            title: "Domain"
+        - name: "linkedin_url"
+          description: "The URL for the person's LinkedIn profile."
+          in: "query"
+          required: false
+          schema:
+            type: "string"
+            format: "url"
+            title: "LinkedIn URL"
+      responses:
+        200:
+          description: "Successful operation"
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  body:
+                    type: "object"
+                    properties:
+                      person:
+                        type: "object"
+                        properties:
+                          id:
+                            type: "string"
+                          first_name:
+                            type: "string"
+                          last_name:
+                            type: "string"
+                          name:
+                            type: "string"
+                          linkedin_url:
+                            type: "string"
+                          title:
+                            type: "string"
+                          email_status:
+                            type: "string"
+                          photo_url:
+                            type: "string"
+                          twitter_url:
+                            type: "string"
+                          github_url:
+                            type: "string"
+                          facebook_url:
+                            type: "string"
+                          headline:
+                            type: "string"
+                          email:
+                            type: "string"
+                          organization_id:
+                            type: "string"
+  /organizations/enrich:
+    get:
+      summary: "Enrich Company"
+      description: "Enriches data for company."
+      operationId: "enrichCompany"
+      parameters:
+        - name: "domain"
+          description: "The domain of the company that you want to enrich. Do not include www., the @ symbol, or similar."
+          in: "query"
+          required: true
+          schema:
+            type: "string"
+            title: "Domain"
+            example: "apollo.io"
+      responses:
+        200:
+          description: "Successful operation"
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  body:
+                    type: "object"
+                    properties:
+                      organization:
+                        type: "object"
+                        properties:
+                          id:
+                            type: "string"
+                          name:
+                            type: "string"
+                          website_url:
+                            type: "string"
+                          blog_url:
+                            type: "string"
+                          linkedin_url:
+                            type: "string"
+                          twitter_url:
+                            type: "string"
+                          facebook_url:
+                            type: "string"
+                          phone:
+                            type: "string"
+                          logo_url:
+                            type: "string"
+                          primary_domain:
+                            type: "string"
+                          industry:
+                            type: "string"
+                          keywords:
+                            type: "array"
+                            items:
+                              type: "string"
+components:
+  securitySchemes:
+    ApiKeyAuth:
+      type: "apiKey"
+      in: "header"
+      name: "X-API-KEY"
+    oauth2:
+      type: "oauth2"
+      flows:
+        authorizationCode:
+          authorizationUrl: "https://app.apollo.io/v1/oauth/authorize"
+          tokenUrl: "https://app.apollo.io/api/v1/oauth/token"
+          refreshUrl: "https://app.apollo.io/api/v1/oauth/token"
