@@ -16,8 +16,15 @@
 
 package com.bytechef.component.acumbamail.action;
 
+import static com.bytechef.component.acumbamail.constant.AcumbamailConstants.ADDRESS;
+import static com.bytechef.component.acumbamail.constant.AcumbamailConstants.CITY;
+import static com.bytechef.component.acumbamail.constant.AcumbamailConstants.COMPANY;
+import static com.bytechef.component.acumbamail.constant.AcumbamailConstants.COUNTRY;
 import static com.bytechef.component.acumbamail.constant.AcumbamailConstants.EMAIL;
 import static com.bytechef.component.acumbamail.constant.AcumbamailConstants.LIST_ID;
+import static com.bytechef.component.acumbamail.constant.AcumbamailConstants.NAME;
+import static com.bytechef.component.acumbamail.constant.AcumbamailConstants.PHONE;
+import static com.bytechef.component.definition.Authorization.ACCESS_TOKEN;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import com.bytechef.component.definition.Parameters;
@@ -33,16 +40,15 @@ import org.junit.jupiter.api.Test;
 class AcumbamailCreateSubscriberListActionTest extends AbstractAcumbamailActionTest {
 
     private final Parameters mockedParameters = MockParametersFactory.create(
-        Map.of(
-            "access_token", "test-token",
+        Map.of(ACCESS_TOKEN, "test-token",
             LIST_ID, "test",
             EMAIL, "test@test.com",
-            "name", "test-name",
-            "company", "test-company",
-            "country", "test-country",
-            "city", "test-city",
-            "address", "test-address",
-            "phone", "test-phone"));
+            NAME, "test-name",
+            COMPANY, "test-company",
+            COUNTRY, "test-country",
+            CITY, "test-city",
+            ADDRESS, "test-address",
+            PHONE, "test-phone"));
 
     @Test
     void testPerform() {
@@ -56,12 +62,12 @@ class AcumbamailCreateSubscriberListActionTest extends AbstractAcumbamailActionT
             List.of(
                 "auth_token", "test-token",
                 "sender_email", "test@test.com",
-                "name", "test-name",
-                "company", "test-company",
-                "country", "test-country",
-                "city", "test-city",
-                "address", "test-address",
-                "phone", "test-phone"),
+                NAME, "test-name",
+                COMPANY, "test-company",
+                COUNTRY, "test-country",
+                CITY, "test-city",
+                ADDRESS, "test-address",
+                PHONE, "test-phone"),
             Arrays.asList(query));
     }
 }

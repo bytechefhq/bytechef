@@ -16,8 +16,17 @@
 
 package com.bytechef.component.acumbamail.action;
 
+import static com.bytechef.component.acumbamail.constant.AcumbamailConstants.ADDRESS;
+import static com.bytechef.component.acumbamail.constant.AcumbamailConstants.CITY;
+import static com.bytechef.component.acumbamail.constant.AcumbamailConstants.COMPANY;
+import static com.bytechef.component.acumbamail.constant.AcumbamailConstants.COUNTRY;
 import static com.bytechef.component.acumbamail.constant.AcumbamailConstants.EMAIL;
+import static com.bytechef.component.acumbamail.constant.AcumbamailConstants.NAME;
+import static com.bytechef.component.acumbamail.constant.AcumbamailConstants.PHONE;
+import static com.bytechef.component.definition.Authorization.ACCESS_TOKEN;
 import static com.bytechef.component.definition.ComponentDsl.action;
+import static com.bytechef.component.definition.ComponentDsl.integer;
+import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.Context.Http.responseType;
 
@@ -40,31 +49,31 @@ public class AcumbamailCreateSubscriberListAction {
                 .label("Email")
                 .description("Email address that will be used for list notifications.")
                 .required(true),
-            string("name")
+            string(NAME)
                 .label("Name")
                 .description("List name")
                 .required(true),
-            string("company")
+            string(COMPANY)
                 .label("Company")
                 .description("Company that the list belongs to")
                 .required(false),
-            string("country")
+            string(COUNTRY)
                 .label("Country")
                 .description("Country where the list comes from")
                 .required(false),
-            string("city")
+            string(CITY)
                 .label("City")
                 .description("City of the company")
                 .required(false),
-            string("address")
+            string(ADDRESS)
                 .label("Address")
                 .description("Address of the company")
                 .required(false),
-            string("phone")
+            string(PHONE)
                 .label("Phone")
                 .description("Phone number of the company")
                 .required(false))
-        .output()
+        .output(outputSchema(integer()))
         .perform(AcumbamailCreateSubscriberListAction::perform);
 
     private AcumbamailCreateSubscriberListAction() {
@@ -76,15 +85,15 @@ public class AcumbamailCreateSubscriberListAction {
         return actionContext
             .http(http -> http.post("/createList/"))
             .queryParameters(
-                "auth_token", connectionParameters.getString("access_token")
+                "auth_token", connectionParameters.getString(ACCESS_TOKEN)
                     .strip(),
-                "sender_email", inputParameters.getRequiredString("email"),
-                "name", inputParameters.getRequiredString("name"),
-                "company", inputParameters.getString("company"),
-                "country", inputParameters.getString("country"),
-                "city", inputParameters.getString("city"),
-                "address", inputParameters.getString("address"),
-                "phone", inputParameters.getString("phone"))
+                "sender_email", inputParameters.getRequiredString(EMAIL),
+                NAME, inputParameters.getRequiredString(NAME),
+                COMPANY, inputParameters.getString(COMPANY),
+                COUNTRY, inputParameters.getString(COUNTRY),
+                CITY, inputParameters.getString(CITY),
+                ADDRESS, inputParameters.getString(ADDRESS),
+                PHONE, inputParameters.getString(PHONE))
             .configuration(responseType(Http.ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});

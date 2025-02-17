@@ -40,6 +40,8 @@ Version: 1
 
 
 ### Add Subscriber
+Name: addSubscriber
+
 Add a subscriber to a list.
 
 #### Properties
@@ -47,12 +49,23 @@ Add a subscriber to a list.
 |      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
 |:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
 | list_id | List Id | INTEGER | SELECT  |  List identifier.  |  true  |
-| email | Email | STRING | TEXT  |  Subscriber email address.  |  true  |
+
+
+#### Output
+
+
+
+Type: INTEGER
+
+
+
 
 
 
 
 ### Delete Subscriber
+Name: deleteSubscriber
+
 Removes a subscriber from a list.
 
 #### Properties
@@ -66,6 +79,8 @@ Removes a subscriber from a list.
 
 
 ### Create Subscriber List
+Name: createSubscriberList
+
 Creates a new subscribers list.
 
 #### Properties
@@ -81,9 +96,21 @@ Creates a new subscribers list.
 | phone | Phone | STRING | TEXT  |  Phone number of the company  |  false  |
 
 
+#### Output
+
+
+
+Type: INTEGER
+
+
+
+
+
 
 
 ### Delete Subscriber List
+Name: deleteSubscriberList
+
 Deletes a list of subscribers.
 
 #### Properties
