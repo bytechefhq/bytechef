@@ -17,9 +17,14 @@
 package com.bytechef.component.apollo;
 
 import com.bytechef.component.OpenApiComponentHandler;
+import com.bytechef.component.apollo.util.ApolloUtils;
+import com.bytechef.component.definition.ActionDefinition;
 import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDsl.ModifiableComponentDefinition;
+import com.bytechef.component.definition.ComponentDsl.ModifiableProperty;
+import com.bytechef.component.definition.ComponentDsl.ModifiableStringProperty;
 import com.google.auto.service.AutoService;
+import java.util.Objects;
 
 /**
  * @author Monika Kušter
@@ -33,5 +38,23 @@ public class ApolloComponentHandler extends AbstractApolloComponentHandler {
             .customAction(true)
             .icon("path:assets/apollo.svg")
             .categories(ComponentCategory.CRM);
+    }
+
+    @Override
+    public ModifiableProperty<?> modifyProperty(
+        ActionDefinition actionDefinition, ModifiableProperty<?> modifiableProperty) {
+
+        if (Objects.equals(modifiableProperty.getName(), "opportunity_id")) {
+            ((ModifiableStringProperty) modifiableProperty)
+                .options(ApolloUtils.getOptions("/opportunities/search", "opportunities"));
+        } else if (Objects.equals(modifiableProperty.getName(), "owner_id")) {
+            ((ModifiableStringProperty) modifiableProperty)
+                .options(ApolloUtils.getOptions("/users/search", "users"));
+        } else if (Objects.equals(modifiableProperty.getName(), "account_id")) {
+            ((ModifiableStringProperty) modifiableProperty)
+                .options(ApolloUtils.getOptions("/mixed_companies/search", "organizations"));
+        }
+
+        return modifiableProperty;
     }
 }
