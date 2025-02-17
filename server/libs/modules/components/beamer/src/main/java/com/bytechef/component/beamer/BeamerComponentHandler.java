@@ -37,7 +37,7 @@ public class BeamerComponentHandler implements ComponentHandler {
         .description(
             "Beamer is a customer engagement platform that helps businesses communicate updates, collect feedback, and boost user engagement through in-app notifications, changelogs, and announcements.")
         .icon("path:assets/beamer.svg")
-        .categories(ComponentCategory.HELPERS)
+        .categories(ComponentCategory.PRODUCTIVITY_AND_COLLABORATION)
         .connection(BeamerConnection.CONNECTION_DEFINITION)
         .actions(
             BeamerCreateFeatureRequestAction.ACTION_DEFINITION,
