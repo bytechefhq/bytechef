@@ -6,7 +6,7 @@ import {
     WorkflowTask,
 } from '@/shared/middleware/platform/configuration';
 import {NodeDataType} from '@/shared/types';
-import Dagre from '@dagrejs/dagre';
+import dagre from '@dagrejs/dagre';
 import {Edge, Node} from '@xyflow/react';
 import {ComponentIcon} from 'lucide-react';
 import {useEffect} from 'react';
@@ -34,6 +34,50 @@ const TASK_DISPATCHER_NAMES = [
     'parallel',
     'subflow',
 ];
+
+const calculateNodeHeight = (node: Node, nodes: Node[], index: number) => {
+    let height = NODE_HEIGHT;
+
+    if (node.id.includes('condition')) {
+        if (node.id.includes('placeholder')) {
+            height = PLACEHOLDER_NODE_HEIGHT * 2;
+
+            if (node.id.includes('placeholder-0')) {
+                const hasOtherConditionCaseNodes = filterConditionCaseNodes(nodes, node);
+
+                if (hasOtherConditionCaseNodes.length) {
+                    height = 0;
+                } else {
+                    height = PLACEHOLDER_NODE_HEIGHT * 2;
+                }
+            } else {
+                height = PLACEHOLDER_NODE_HEIGHT;
+            }
+
+            if (node.id.includes('bottom')) {
+                height = PLACEHOLDER_NODE_HEIGHT;
+            }
+        }
+    } else if (node.id.includes('loop')) {
+        if (node.id.includes('placeholder')) {
+            height = PLACEHOLDER_NODE_HEIGHT;
+        }
+    } else if (!node.data.conditionData) {
+        height = NODE_HEIGHT * 1.2;
+    }
+
+    if (index === nodes.length - 1) {
+        height = 20;
+
+        const penultimateNode = nodes[nodes.length - 2];
+
+        if (penultimateNode.id.includes('bottom-placeholder')) {
+            height = 90;
+        }
+    }
+
+    return height;
+};
 
 const convertTaskToNode = (
     task: WorkflowTask,
@@ -80,6 +124,81 @@ const filterConditionCaseNodes = (nodes: Node[], node: Node) => {
             nodeItem.id !== node.id
         );
     });
+};
+
+const getNodePosition = (node: Node, canvasWidth: number, nodes: Node[], dagreGraph: dagre.graphlib.Graph) => {
+    let x = dagreGraph.node(node.id).x + (canvasWidth / 2 - dagreGraph.node(nodes[0].id).x - 72 / 2);
+    let y = dagreGraph.node(node.id).y;
+
+    if (node.id.includes('condition')) {
+        if (node.id.includes('placeholder-0') && !node.id.includes('bottom')) {
+            const hasOtherConditionCaseNodes = filterConditionCaseNodes(nodes, node);
+
+            if (hasOtherConditionCaseNodes.length) {
+                y += 35;
+            }
+        } else if (node.id.includes('bottom-placeholder')) {
+            y += 35;
+        }
+    }
+
+    if (node.data.loopId || node.data.loopData) {
+        x += 150;
+        y += 35;
+    }
+
+    if (node.id.includes('loop-bottom-placeholder')) {
+        y += 35;
+    }
+
+    return {x, y};
+};
+
+const getLayoutedElements = (nodes: Node[], edges: Edge[], canvasWidth: number) => {
+    const dagreGraph = new dagre.graphlib.Graph().setDefaultEdgeLabel(() => ({}));
+
+    dagreGraph.setGraph({rankdir: DIRECTION});
+
+    nodes.forEach((node, index) => {
+        const height = calculateNodeHeight(node, nodes, index);
+
+        dagreGraph.setNode(node.id, {height, width: NODE_WIDTH});
+    });
+
+    edges.forEach((edge) => {
+        dagreGraph.setEdge(edge.source, edge.target);
+    });
+
+    dagre.layout(dagreGraph);
+
+    const newNodes = nodes.map((node) => {
+        const position = getNodePosition(node, canvasWidth, nodes, dagreGraph);
+
+        return {
+            ...node,
+            position: {
+                x: position.x,
+                y: position.y,
+            },
+        };
+    });
+
+    edges = edges.reduce(
+        (uniqueEdges: {edges: Edge[]; map: Map<string, boolean>}, edge: Edge) => {
+            const edgeKey = `${edge.source}=>${edge.target}`;
+
+            if (!uniqueEdges.map.has(edgeKey)) {
+                uniqueEdges.map.set(edgeKey, true);
+
+                uniqueEdges.edges.push(edge);
+            }
+
+            return uniqueEdges;
+        },
+        {edges: [], map: new Map<string, boolean>()}
+    ).edges;
+
+    return {edges, nodes: newNodes};
 };
 
 export default function useLayout({
@@ -576,118 +695,17 @@ export default function useLayout({
     });
 
     useEffect(() => {
-        const dagreGraph = new Dagre.graphlib.Graph().setDefaultEdgeLabel(() => ({}));
-
-        dagreGraph.setGraph({rankdir: DIRECTION});
-
         let layoutNodes: Node[] = nodes;
-        let edges: Edge[] = taskEdges;
+        const edges: Edge[] = taskEdges;
 
         if (triggerAndTaskNodes.length) {
             layoutNodes = taskNodes?.length ? [...triggerAndTaskNodes] : [triggerNode, finalPlaceholderNode];
         }
 
-        layoutNodes.forEach((node, index) => {
-            let height = NODE_HEIGHT;
+        const elements = getLayoutedElements(layoutNodes, edges, canvasWidth);
 
-            if (node.id.includes('condition')) {
-                if (node.id.includes('placeholder')) {
-                    height = PLACEHOLDER_NODE_HEIGHT * 2;
-
-                    if (node.id.includes('placeholder-0')) {
-                        const hasOtherConditionCaseNodes = filterConditionCaseNodes(layoutNodes, node);
-
-                        if (hasOtherConditionCaseNodes.length) {
-                            height = 0;
-                        } else {
-                            height = PLACEHOLDER_NODE_HEIGHT * 2;
-                        }
-                    } else {
-                        height = PLACEHOLDER_NODE_HEIGHT;
-                    }
-
-                    if (node.id.includes('bottom')) {
-                        height = PLACEHOLDER_NODE_HEIGHT;
-                    }
-                }
-            } else if (node.id.includes('loop')) {
-                if (node.id.includes('placeholder')) {
-                    height = PLACEHOLDER_NODE_HEIGHT;
-                }
-            } else if (!node.data.conditionData) {
-                height = NODE_HEIGHT * 1.2;
-            }
-
-            if (index === layoutNodes.length - 1) {
-                height = 20;
-
-                const penultimateNode = layoutNodes[layoutNodes.length - 2];
-
-                if (penultimateNode.id.includes('bottom-placeholder')) {
-                    height = 90;
-                }
-            }
-
-            dagreGraph.setNode(node.id, {height, width: NODE_WIDTH});
-        });
-
-        edges.forEach((edge) => {
-            dagreGraph.setEdge(edge.source, edge.target);
-        });
-
-        Dagre.layout(dagreGraph);
-
-        layoutNodes = layoutNodes.map((node) => {
-            let positionY = dagreGraph.node(node.id).y;
-            let positionX = dagreGraph.node(node.id).x + (canvasWidth / 2 - dagreGraph.node(nodes[0].id).x - 72 / 2);
-
-            if (node.id.includes('condition')) {
-                if (node.id.includes('placeholder-0') && !node.id.includes('bottom')) {
-                    const hasOtherConditionCaseNodes = filterConditionCaseNodes(layoutNodes, node);
-
-                    if (hasOtherConditionCaseNodes.length) {
-                        positionY += 35;
-                    }
-                } else if (node.id.includes('bottom-placeholder')) {
-                    positionY += 35;
-                }
-            }
-
-            if (node.data.loopId || node.data.loopData) {
-                positionX += 150;
-                positionY += 35;
-            }
-
-            if (node.id.includes('loop-bottom-placeholder')) {
-                positionY += 35;
-            }
-
-            return {
-                ...node,
-                position: {
-                    x: positionX,
-                    y: positionY,
-                },
-            };
-        });
-
-        edges = edges.reduce(
-            (uniqueEdges: {edges: Edge[]; map: Map<string, boolean>}, edge: Edge) => {
-                const edgeKey = `${edge.source}=>${edge.target}`;
-
-                if (!uniqueEdges.map.has(edgeKey)) {
-                    uniqueEdges.map.set(edgeKey, true);
-
-                    uniqueEdges.edges.push(edge);
-                }
-
-                return uniqueEdges;
-            },
-            {edges: [], map: new Map<string, boolean>()}
-        ).edges;
-
-        setNodes(layoutNodes);
-        setEdges(edges);
+        setNodes(elements.nodes);
+        setEdges(elements.edges);
 
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [canvasWidth, tasks, triggers]);
