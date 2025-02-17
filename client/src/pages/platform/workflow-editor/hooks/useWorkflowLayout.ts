@@ -88,7 +88,7 @@ export const useWorkflowLayout = () => {
         isLoading: taskDispatcherDefinitionsLoading,
     } = useGetTaskDispatcherDefinitionsQuery();
 
-    const {data: workflowNodeOutputs, refetch: refetchWorkflowNodeOutputs} = useGetPreviousWorkflowNodeOutputsQuery(
+    const {data: workflowNodeOutputs} = useGetPreviousWorkflowNodeOutputsQuery(
         {
             id: workflow.id!,
             lastWorkflowNodeName: currentNode?.name,
@@ -156,16 +156,6 @@ export const useWorkflowLayout = () => {
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [taskDispatcherDefinitions?.length]);
-
-    // refetch workflowNodeOutputs when a task is opened
-    useEffect(() => {
-        if (!currentNode || currentNode?.trigger || workflowNodeOutputs || !workflow?.nodeNames) {
-            return;
-        }
-
-        refetchWorkflowNodeOutputs();
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [currentNode?.name, workflow?.nodeNames.length]);
 
     return {
         componentDefinitions,
