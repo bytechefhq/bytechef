@@ -18,6 +18,7 @@ package com.bytechef.component.acumbamail.util;
 
 import static com.bytechef.component.definition.ComponentDsl.option;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -27,10 +28,9 @@ import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
-import com.bytechef.component.test.definition.MockParametersFactory;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import org.hamcrest.Matchers;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -40,26 +40,22 @@ import org.mockito.ArgumentCaptor;
  */
 class AcumbamailUtilsTest {
 
-    private final ActionContext mockedActionContext = mock(ActionContext.class);
-    private final Http.Executor mockedExecutor = mock(Http.Executor.class);
-    private final Parameters mockedParameters = MockParametersFactory.create(
-        Map.of("access_token", "test-token"));
-    private final Http.Response mockedResponse = mock(Http.Response.class);
-
     private final List<Option<String>> expectedOptions = List.of(
         option("List 1", "list1"), option("List 2", "list2"));
+    private final ActionContext mockedActionContext = mock(ActionContext.class);
+    private final Http.Executor mockedExecutor = mock(Http.Executor.class);
+    private final Parameters mockedParameters = mock(Parameters.class);
+    private final Http.Response mockedResponse = mock(Http.Response.class);
     private final Map<String, Object> responseMap = Map.of(
         "list1", Map.of("name", "List 1"),
         "list2", Map.of("name", "List 2"));
-    private final ArgumentCaptor<String> queryKeyCaptor = ArgumentCaptor.forClass(String.class);
-    private final ArgumentCaptor<Object> queryValueCaptor = ArgumentCaptor.forClass(Object.class);
+    private final ArgumentCaptor<String> stringArgumentCaptor = ArgumentCaptor.forClass(String.class);
 
     @BeforeEach
     void beforeEach() {
-
         when(mockedActionContext.http(any()))
             .thenReturn(mockedExecutor);
-        when(mockedExecutor.queryParameters(queryKeyCaptor.capture(), queryValueCaptor.capture()))
+        when(mockedExecutor.queryParameters(stringArgumentCaptor.capture(), stringArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
         when(mockedExecutor.configuration(any()))
             .thenReturn(mockedExecutor);
@@ -70,22 +66,20 @@ class AcumbamailUtilsTest {
     }
 
     @Test
-    void getListsIdOptions() {
+    void testGetListsIdOptions() {
         List<Option<String>> result = AcumbamailUtils.getListsIdOptions(
             mockedParameters, mockedParameters, Map.of(), "", mockedActionContext);
 
-        assertEquals(new HashSet<>(expectedOptions), new HashSet<>(result));
-        assertEquals("auth_token", queryKeyCaptor.getValue());
-        assertEquals("test-token", queryValueCaptor.getValue());
+        assertThat(result, Matchers.containsInAnyOrder(expectedOptions.toArray()));
+        assertEquals(List.of("auth_token", "test-token"), stringArgumentCaptor.getAllValues());
     }
 
     @Test
-    void getSubscriberOptions() {
+    void testGetSubscriberOptions() {
         List<Option<String>> result = AcumbamailUtils.getSubscriberOptions(
             mockedParameters, mockedParameters, Map.of(), "", mockedActionContext);
 
-        assertEquals(new HashSet<>(expectedOptions), new HashSet<>(result));
-        assertEquals("auth_token", queryKeyCaptor.getValue());
-        assertEquals("test-token", queryValueCaptor.getValue());
+        assertThat(result, Matchers.containsInAnyOrder(expectedOptions.toArray()));
+        assertEquals(List.of("auth_token", "test-token"), stringArgumentCaptor.getAllValues());
     }
 }

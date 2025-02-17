@@ -21,12 +21,12 @@ package com.bytechef.component.acumbamail.constant;
  */
 public class AcumbamailConstants {
 
-    public static final String LIST_ID = "list_id";
-    public static final String EMAIL = "email";
-    public static final String NAME = "name";
+    public static final String ADDRESS = "address";
+    public static final String CITY = "city";
     public static final String COMPANY = "company";
     public static final String COUNTRY = "country";
-    public static final String CITY = "city";
-    public static final String ADDRESS = "address";
+    public static final String EMAIL = "email";
+    public static final String LIST_ID = "list_id";
+    public static final String NAME = "name";
     public static final String PHONE = "phone";
 }

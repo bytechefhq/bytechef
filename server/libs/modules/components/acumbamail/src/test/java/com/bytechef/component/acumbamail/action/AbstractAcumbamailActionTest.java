@@ -21,7 +21,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.component.definition.ActionContext;
-import com.bytechef.component.definition.Context;
+import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.TypeReference;
 import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
@@ -33,8 +33,8 @@ import org.mockito.ArgumentCaptor;
 abstract class AbstractAcumbamailActionTest {
 
     protected ActionContext mockedActionContext = mock(ActionContext.class);
-    protected Context.Http.Executor mockedExecutor = mock(Context.Http.Executor.class);
-    protected Context.Http.Response mockedResponse = mock(Context.Http.Response.class);
+    protected Http.Executor mockedExecutor = mock(Http.Executor.class);
+    protected Http.Response mockedResponse = mock(Http.Response.class);
     protected Map<String, Object> responseMap = Map.of("list1", Map.of("name", "List 1"));
     protected ArgumentCaptor<Object[]> queryArgumentCaptor = ArgumentCaptor.forClass(Object[].class);
 

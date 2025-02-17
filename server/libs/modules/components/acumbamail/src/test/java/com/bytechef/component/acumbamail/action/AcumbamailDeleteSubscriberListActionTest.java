@@ -37,8 +37,8 @@ class AcumbamailDeleteSubscriberListActionTest extends AbstractAcumbamailActionT
 
     @Test
     void testPerform() {
-        Object result =
-            AcumbamailDeleteSubscriberListAction.perform(mockedParameters, mockedParameters, mockedActionContext);
+        Object result = AcumbamailDeleteSubscriberListAction.perform(
+            mockedParameters, mockedParameters, mockedActionContext);
 
         assertEquals(responseMap, result);
 

@@ -85,7 +85,7 @@ public class AcumbamailCreateSubscriberListAction {
         return actionContext
             .http(http -> http.post("/createList/"))
             .queryParameters(
-                "auth_token", connectionParameters.getString(ACCESS_TOKEN)
+                "auth_token", connectionParameters.getRequiredString(ACCESS_TOKEN)
                     .strip(),
                 "sender_email", inputParameters.getRequiredString(EMAIL),
                 NAME, inputParameters.getRequiredString(NAME),
