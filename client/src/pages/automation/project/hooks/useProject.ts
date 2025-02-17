@@ -5,6 +5,7 @@ import useWorkflowEditorStore from '@/pages/platform/workflow-editor/stores/useW
 import useWorkflowNodeDetailsPanelStore from '@/pages/platform/workflow-editor/stores/useWorkflowNodeDetailsPanelStore';
 import useWorkflowTestChatStore from '@/pages/platform/workflow-editor/stores/useWorkflowTestChatStore';
 import {RequestI} from '@/shared/components/connection/providers/connectionReactQueryProvider';
+import {useCopilotStore} from '@/shared/components/copilot/stores/useCopilotStore';
 import {useUpdateWorkflowMutation} from '@/shared/mutations/automation/workflows.mutations';
 import {
     useDeleteWorkflowNodeParameterMutation,
@@ -25,6 +26,7 @@ import {useNavigate, useParams, useSearchParams} from 'react-router-dom';
 export const useProject = () => {
     const {setWorkflow, workflow} = useWorkflowDataStore();
 
+    const {setCopilotPanelOpen} = useCopilotStore();
     const {setShowBottomPanelOpen, setShowEditWorkflowDialog} = useWorkflowEditorStore();
     const {setWorkflowNodeDetailsPanelOpen} = useWorkflowNodeDetailsPanelStore();
     const {setWorkflowTestChatPanelOpen} = useWorkflowTestChatStore();
@@ -154,6 +156,7 @@ export const useProject = () => {
 
         // Reset state when component unmounts
         return () => {
+            setCopilotPanelOpen(false);
             setWorkflow({});
         };
 
