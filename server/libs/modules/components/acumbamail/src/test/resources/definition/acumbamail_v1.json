@@ -91,9 +91,9 @@
       }
     } ],
     "title" : "Add Subscriber",
-    "processErrorResponse" : null,
     "perform" : { },
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "processErrorResponse" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -149,9 +149,9 @@
       }
     } ],
     "title" : "Delete Subscriber",
-    "processErrorResponse" : null,
     "perform" : { },
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "processErrorResponse" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -348,9 +348,9 @@
       "optionsDataSource" : null
     } ],
     "title" : "Create Subscriber List",
-    "processErrorResponse" : null,
     "perform" : { },
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "processErrorResponse" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -383,9 +383,9 @@
       }
     } ],
     "title" : "Delete Subscriber List",
-    "processErrorResponse" : null,
     "perform" : { },
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "processErrorResponse" : null
   } ],
   "connection" : {
     "authorizations" : [ {
@@ -400,7 +400,7 @@
         "hidden" : null,
         "metadata" : { },
         "required" : true,
-        "name" : "access_token",
+        "name" : "auth_token",
         "type" : "STRING",
         "defaultValue" : null,
         "exampleValue" : null,
@@ -417,7 +417,7 @@
       "title" : "Authorization token",
       "type" : "CUSTOM",
       "acquire" : null,
-      "apply" : null,
+      "apply" : { },
       "authorizationCallback" : null,
       "authorizationUrl" : null,
       "clientId" : null,
