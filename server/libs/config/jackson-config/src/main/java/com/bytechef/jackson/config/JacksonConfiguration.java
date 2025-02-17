@@ -16,7 +16,9 @@
 
 package com.bytechef.jackson.config;
 
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.PropertyAccessor;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
@@ -62,6 +64,7 @@ public class JacksonConfiguration {
             .featuresToDisable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
             .serializationInclusion(JsonInclude.Include.NON_NULL)
             .modules(new JavaTimeModule(), new Jdk8Module(), new JsonNullableModule(), jsonComponentModule)
+            .visibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY)
             .build();
     }
 }

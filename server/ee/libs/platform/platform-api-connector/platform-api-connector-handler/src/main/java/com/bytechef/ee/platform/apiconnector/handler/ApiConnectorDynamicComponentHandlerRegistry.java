@@ -10,7 +10,7 @@ package com.bytechef.ee.platform.apiconnector.handler;
 import com.bytechef.component.ComponentHandler;
 import com.bytechef.ee.platform.apiconnector.configuration.domain.ApiConnector;
 import com.bytechef.ee.platform.apiconnector.configuration.service.ApiConnectorService;
-import com.bytechef.ee.platform.apiconnector.handler.helper.ComponentDefinitionHelper;
+import com.bytechef.ee.platform.apiconnector.handler.util.ComponentDefinitionHelper;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.component.handler.DynamicComponentHandlerRegistry;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;

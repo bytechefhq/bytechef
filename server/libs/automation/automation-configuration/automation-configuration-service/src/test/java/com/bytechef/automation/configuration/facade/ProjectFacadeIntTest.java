@@ -16,9 +16,9 @@
 
 package com.bytechef.automation.configuration.facade;
 
-import static com.bytechef.automation.configuration.ProjectDeploymentFacadeHelper.PREFIX_CATEGORY;
-import static com.bytechef.automation.configuration.ProjectDeploymentFacadeHelper.PREFIX_PROJECT_DESCRIPTION;
-import static com.bytechef.automation.configuration.ProjectDeploymentFacadeHelper.PREFIX_PROJECT_NAME;
+import static com.bytechef.automation.configuration.util.ProjectDeploymentFacadeHelper.PREFIX_CATEGORY;
+import static com.bytechef.automation.configuration.util.ProjectDeploymentFacadeHelper.PREFIX_PROJECT_DESCRIPTION;
+import static com.bytechef.automation.configuration.util.ProjectDeploymentFacadeHelper.PREFIX_PROJECT_NAME;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.bytechef.atlas.configuration.domain.Workflow;
@@ -26,7 +26,6 @@ import com.bytechef.atlas.configuration.repository.WorkflowCrudRepository;
 import com.bytechef.atlas.configuration.repository.WorkflowRepository;
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.atlas.configuration.service.WorkflowServiceImpl;
-import com.bytechef.automation.configuration.ProjectDeploymentFacadeHelper;
 import com.bytechef.automation.configuration.config.ProjectIntTestConfiguration;
 import com.bytechef.automation.configuration.config.ProjectIntTestConfigurationSharedMocks;
 import com.bytechef.automation.configuration.domain.Project;
@@ -38,6 +37,7 @@ import com.bytechef.automation.configuration.repository.ProjectRepository;
 import com.bytechef.automation.configuration.repository.ProjectWorkflowRepository;
 import com.bytechef.automation.configuration.repository.WorkspaceRepository;
 import com.bytechef.automation.configuration.service.ProjectWorkflowServiceImpl;
+import com.bytechef.automation.configuration.util.ProjectDeploymentFacadeHelper;
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.platform.category.domain.Category;
 import com.bytechef.platform.category.repository.CategoryRepository;

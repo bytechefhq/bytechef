@@ -29,6 +29,7 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 /**
  * @author Ivica Cardic
  */
+@Deprecated
 public class ObjectMapperConstants {
 
     public static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();

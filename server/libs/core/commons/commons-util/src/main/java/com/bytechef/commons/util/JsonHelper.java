@@ -16,8 +16,6 @@
 
 package com.bytechef.commons.util;
 
-import static com.bytechef.commons.util.constant.ObjectMapperConstants.OBJECT_MAPPER;
-
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -33,6 +31,7 @@ import com.jayway.jsonpath.Option;
 import com.jayway.jsonpath.TypeRef;
 import com.jayway.jsonpath.spi.json.JacksonJsonProvider;
 import com.jayway.jsonpath.spi.mapper.JacksonMappingProvider;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Type;
@@ -40,233 +39,236 @@ import java.util.EnumSet;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
+import org.springframework.stereotype.Component;
 
 /**
- * @deprecated Use JsonHelper instead.
- *
  * @author Ivica Cardic
  */
-@Deprecated
-public class JsonUtils {
+@Component
+public class JsonHelper {
 
-    private static final Configuration CONFIGURATION;
+    private final Configuration configuration;
+    private final ObjectMapper objectMapper;
 
-    static {
-        CONFIGURATION = Configuration.builder()
-            .jsonProvider(new JacksonJsonProvider(OBJECT_MAPPER))
-            .mappingProvider(new JacksonMappingProvider(OBJECT_MAPPER))
+    @SuppressFBWarnings("EI")
+    public JsonHelper(ObjectMapper objectMapper) {
+        this.objectMapper = objectMapper;
+
+        configuration = Configuration.builder()
+            .jsonProvider(new JacksonJsonProvider(objectMapper))
+            .mappingProvider(new JacksonMappingProvider(objectMapper))
             .options(EnumSet.noneOf(Option.class))
             .build();
     }
 
-    public static Object read(InputStream inputStream) {
+    public Object read(InputStream inputStream) {
         try {
-            return OBJECT_MAPPER.readValue(inputStream, Object.class);
+            return objectMapper.readValue(inputStream, Object.class);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
 
-    public static <T> T read(InputStream inputStream, Class<T> valueType) {
+    public <T> T read(InputStream inputStream, Class<T> valueType) {
         try {
-            return OBJECT_MAPPER.readValue(inputStream, valueType);
+            return objectMapper.readValue(inputStream, valueType);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
 
-    public static <T> T read(InputStream inputStream, Type type) {
-        TypeFactory typeFactory = OBJECT_MAPPER.getTypeFactory();
+    public <T> T read(InputStream inputStream, Type type) {
+        TypeFactory typeFactory = objectMapper.getTypeFactory();
 
         try {
-            return OBJECT_MAPPER.readValue(inputStream, typeFactory.constructType(type));
+            return objectMapper.readValue(inputStream, typeFactory.constructType(type));
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
 
-    public static <T> T read(InputStream inputStream, TypeReference<T> typeReference) {
+    public <T> T read(InputStream inputStream, TypeReference<T> typeReference) {
         try {
-            return OBJECT_MAPPER.readValue(inputStream, typeReference);
+            return objectMapper.readValue(inputStream, typeReference);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
 
-    public static Object read(InputStream inputStream, String path) {
-        DocumentContext documentContext = JsonPath.parse(inputStream, CONFIGURATION);
+    public Object read(InputStream inputStream, String path) {
+        DocumentContext documentContext = JsonPath.parse(inputStream, configuration);
 
         return documentContext.read(path, Object.class);
     }
 
-    public static <T> T read(InputStream inputStream, String path, Class<T> valueType) {
-        DocumentContext documentContext = JsonPath.parse(inputStream, CONFIGURATION);
+    public <T> T read(InputStream inputStream, String path, Class<T> valueType) {
+        DocumentContext documentContext = JsonPath.parse(inputStream, configuration);
 
         return documentContext.read(path, valueType);
     }
 
-    public static <T> T read(InputStream inputStream, String path, Type type) {
-        DocumentContext documentContext = JsonPath.parse(inputStream, CONFIGURATION);
+    public <T> T read(InputStream inputStream, String path, Type type) {
+        DocumentContext documentContext = JsonPath.parse(inputStream, configuration);
 
         return documentContext.read(path, new TypeTypeRef<>(type));
     }
 
-    public static <T> T read(InputStream inputStream, String path, TypeRef<T> typeRef) {
-        DocumentContext documentContext = JsonPath.parse(inputStream, CONFIGURATION);
+    public <T> T read(InputStream inputStream, String path, TypeRef<T> typeRef) {
+        DocumentContext documentContext = JsonPath.parse(inputStream, configuration);
 
         return documentContext.read(path, typeRef);
     }
 
-    public static Object read(String json) {
+    public Object read(String json) {
         try {
-            return OBJECT_MAPPER.readValue(json, Object.class);
+            return objectMapper.readValue(json, Object.class);
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }
     }
 
-    public static <T> T read(String json, Class<T> valueType) {
+    public <T> T read(String json, Class<T> valueType) {
         try {
-            return OBJECT_MAPPER.readValue(json, valueType);
+            return objectMapper.readValue(json, valueType);
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }
     }
 
-    public static <T> T read(String json, TypeReference<T> typeReference) {
+    public <T> T read(String json, TypeReference<T> typeReference) {
         try {
-            return OBJECT_MAPPER.readValue(json, typeReference);
+            return objectMapper.readValue(json, typeReference);
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }
     }
 
-    public static <T> T read(String json, Type type) {
-        TypeFactory typeFactory = OBJECT_MAPPER.getTypeFactory();
+    public <T> T read(String json, Type type) {
+        TypeFactory typeFactory = objectMapper.getTypeFactory();
 
         try {
-            return OBJECT_MAPPER.readValue(json, typeFactory.constructType(type));
+            return objectMapper.readValue(json, typeFactory.constructType(type));
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }
     }
 
-    public static Object read(String json, String path) {
-        DocumentContext documentContext = JsonPath.parse(json, CONFIGURATION);
+    public Object read(String json, String path) {
+        DocumentContext documentContext = JsonPath.parse(json, configuration);
 
         return documentContext.read(path, Object.class);
     }
 
-    public static <T> T read(String json, String path, Class<T> valueType) {
-        DocumentContext documentContext = JsonPath.parse(json, CONFIGURATION);
+    public <T> T read(String json, String path, Class<T> valueType) {
+        DocumentContext documentContext = JsonPath.parse(json, configuration);
 
         return documentContext.read(path, valueType);
     }
 
-    public static <T> T read(String json, String path, Type type) {
-        DocumentContext documentContext = JsonPath.parse(json, CONFIGURATION);
+    public <T> T read(String json, String path, Type type) {
+        DocumentContext documentContext = JsonPath.parse(json, configuration);
 
         return documentContext.read(path, new TypeTypeRef<>(type));
     }
 
-    public static <T> T read(String json, String path, TypeRef<T> typeRef) {
-        DocumentContext documentContext = JsonPath.parse(json, CONFIGURATION);
+    public <T> T read(String json, String path, TypeRef<T> typeRef) {
+        DocumentContext documentContext = JsonPath.parse(json, configuration);
 
         return documentContext.read(path, typeRef);
     }
 
-    public static List<?> readList(InputStream inputStream) {
+    public List<?> readList(InputStream inputStream) {
         return readList(inputStream, Object.class);
     }
 
-    public static <T> List<T> readList(InputStream inputStream, Class<T> elementType) {
-        TypeFactory typeFactory = OBJECT_MAPPER.getTypeFactory();
+    public <T> List<T> readList(InputStream inputStream, Class<T> elementType) {
+        TypeFactory typeFactory = objectMapper.getTypeFactory();
 
         try {
-            return OBJECT_MAPPER.readValue(inputStream, typeFactory.constructCollectionType(List.class, elementType));
+            return objectMapper.readValue(inputStream, typeFactory.constructCollectionType(List.class, elementType));
         } catch (Exception exception) {
             throw new RuntimeException(exception);
         }
     }
 
-    public static List<?> readList(InputStream inputStream, String path) {
-        DocumentContext documentContext = JsonPath.parse(inputStream, CONFIGURATION);
+    public List<?> readList(InputStream inputStream, String path) {
+        DocumentContext documentContext = JsonPath.parse(inputStream, configuration);
 
         return documentContext.read(path, new TypeRef<>() {});
     }
 
-    public static <T> List<T> readList(
+    public <T> List<T> readList(
         InputStream inputStream, String path, Class<T> elementType) {
 
-        DocumentContext documentContext = JsonPath.parse(inputStream, CONFIGURATION);
-        TypeFactory typeFactory = OBJECT_MAPPER.getTypeFactory();
+        DocumentContext documentContext = JsonPath.parse(inputStream, configuration);
+        TypeFactory typeFactory = objectMapper.getTypeFactory();
 
         return documentContext.read(
             path, new TypeTypeRef<>(typeFactory.constructCollectionType(List.class, elementType)));
     }
 
-    public static List<?> readList(String json) {
+    public List<?> readList(String json) {
         return readList(json, Object.class);
     }
 
-    public static <T> List<T> readList(String json, Class<T> elementType) {
-        TypeFactory typeFactory = OBJECT_MAPPER.getTypeFactory();
+    public <T> List<T> readList(String json, Class<T> elementType) {
+        TypeFactory typeFactory = objectMapper.getTypeFactory();
 
         try {
-            return OBJECT_MAPPER.readValue(json, typeFactory.constructCollectionType(List.class, elementType));
+            return objectMapper.readValue(json, typeFactory.constructCollectionType(List.class, elementType));
         } catch (Exception exception) {
             throw new RuntimeException(exception);
         }
     }
 
-    public static List<?> readList(String json, String path) {
-        DocumentContext documentContext = JsonPath.parse(json, CONFIGURATION);
+    public List<?> readList(String json, String path) {
+        DocumentContext documentContext = JsonPath.parse(json, configuration);
 
         return documentContext.read(path, new TypeRef<>() {});
     }
 
-    public static <T> List<T> readList(String json, String path, Class<T> elementType) {
-        DocumentContext documentContext = JsonPath.parse(json, CONFIGURATION);
-        TypeFactory typeFactory = OBJECT_MAPPER.getTypeFactory();
+    public <T> List<T> readList(String json, String path, Class<T> elementType) {
+        DocumentContext documentContext = JsonPath.parse(json, configuration);
+        TypeFactory typeFactory = objectMapper.getTypeFactory();
 
         return documentContext.read(
             path, new TypeTypeRef<>(typeFactory.constructCollectionType(List.class, elementType)));
     }
 
-    public static <V> Map<String, V> readMap(InputStream inputStream, Class<V> valueType) {
-        TypeFactory typeFactory = OBJECT_MAPPER.getTypeFactory();
+    public <V> Map<String, V> readMap(InputStream inputStream, Class<V> valueType) {
+        TypeFactory typeFactory = objectMapper.getTypeFactory();
 
         try {
-            return OBJECT_MAPPER.readValue(
+            return objectMapper.readValue(
                 inputStream, typeFactory.constructMapType(Map.class, String.class, valueType));
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
 
-    public static Map<String, ?> readMap(InputStream inputStream, String path) {
-        DocumentContext documentContext = JsonPath.parse(inputStream, CONFIGURATION);
-        TypeFactory typeFactory = OBJECT_MAPPER.getTypeFactory();
+    public Map<String, ?> readMap(InputStream inputStream, String path) {
+        DocumentContext documentContext = JsonPath.parse(inputStream, configuration);
+        TypeFactory typeFactory = objectMapper.getTypeFactory();
 
         return documentContext.read(
             path, new TypeTypeRef<>(typeFactory.constructMapType(Map.class, String.class, Object.class)));
     }
 
-    public static <V> Map<String, V> readMap(
+    public <V> Map<String, V> readMap(
         InputStream inputStream, String path, Class<V> valueType) {
 
-        DocumentContext documentContext = JsonPath.parse(inputStream, CONFIGURATION);
-        TypeFactory typeFactory = OBJECT_MAPPER.getTypeFactory();
+        DocumentContext documentContext = JsonPath.parse(inputStream, configuration);
+        TypeFactory typeFactory = objectMapper.getTypeFactory();
 
         return documentContext.read(
             path, new TypeTypeRef<>(typeFactory.constructMapType(Map.class, String.class, valueType)));
     }
 
-    public static Map<String, ?> readMap(String json) {
-        TypeFactory typeFactory = OBJECT_MAPPER.getTypeFactory();
+    public Map<String, ?> readMap(String json) {
+        TypeFactory typeFactory = objectMapper.getTypeFactory();
 
         try {
-            return OBJECT_MAPPER.readValue(
+            return objectMapper.readValue(
                 json, typeFactory.constructMapType(
                     Map.class, typeFactory.constructType(String.class), typeFactory.constructType(Object.class)));
         } catch (JsonProcessingException e) {
@@ -274,11 +276,11 @@ public class JsonUtils {
         }
     }
 
-    public static <V> Map<String, V> readMap(String json, Class<V> valueType) {
-        TypeFactory typeFactory = OBJECT_MAPPER.getTypeFactory();
+    public <V> Map<String, V> readMap(String json, Class<V> valueType) {
+        TypeFactory typeFactory = objectMapper.getTypeFactory();
 
         try {
-            return OBJECT_MAPPER.readValue(
+            return objectMapper.readValue(
                 json,
                 typeFactory.constructMapType(
                     Map.class, typeFactory.constructType(String.class), typeFactory.constructType(valueType)));
@@ -287,9 +289,9 @@ public class JsonUtils {
         }
     }
 
-    public static Map<String, ?> readMap(String json, String path) {
-        DocumentContext documentContext = JsonPath.parse(json, CONFIGURATION);
-        TypeFactory typeFactory = OBJECT_MAPPER.getTypeFactory();
+    public Map<String, ?> readMap(String json, String path) {
+        DocumentContext documentContext = JsonPath.parse(json, configuration);
+        TypeFactory typeFactory = objectMapper.getTypeFactory();
 
         return documentContext.read(
             path, new TypeTypeRef<>(
@@ -297,9 +299,9 @@ public class JsonUtils {
                     Map.class, typeFactory.constructType(String.class), typeFactory.constructType(Object.class))));
     }
 
-    public static <V> Map<String, V> readMap(String json, String path, Class<V> valueType) {
-        DocumentContext documentContext = JsonPath.parse(json, CONFIGURATION);
-        TypeFactory typeFactory = OBJECT_MAPPER.getTypeFactory();
+    public <V> Map<String, V> readMap(String json, String path, Class<V> valueType) {
+        DocumentContext documentContext = JsonPath.parse(json, configuration);
+        TypeFactory typeFactory = objectMapper.getTypeFactory();
 
         return documentContext.read(
             path, new TypeTypeRef<>(
@@ -307,32 +309,32 @@ public class JsonUtils {
                     Map.class, typeFactory.constructType(String.class), typeFactory.constructType(valueType))));
     }
 
-    public static JsonNode readTree(String json) {
+    public JsonNode readTree(String json) {
         try {
-            return OBJECT_MAPPER.readTree(json);
+            return objectMapper.readTree(json);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
 
-    public static Stream<Map<String, ?>> stream(InputStream inputStream) {
+    public Stream<Map<String, ?>> stream(InputStream inputStream) {
         try {
-            return new JsonParserStream(inputStream, OBJECT_MAPPER);
+            return new JsonParserStream(inputStream, objectMapper);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }
 
-    public static String write(Object object) {
+    public String write(Object object) {
         try {
-            return OBJECT_MAPPER.writeValueAsString(object);
+            return objectMapper.writeValueAsString(object);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }
 
-    public static String write(Object object, boolean includeNulls) {
-        ObjectMapper currentObjectMapper = OBJECT_MAPPER;
+    public String write(Object object, boolean includeNulls) {
+        ObjectMapper currentObjectMapper = objectMapper;
 
         if (includeNulls) {
             currentObjectMapper = currentObjectMapper.copy()
@@ -346,20 +348,20 @@ public class JsonUtils {
         }
     }
 
-    public static String writeWithDefaultPrettyPrinter(Object object) {
+    public String writeWithDefaultPrettyPrinter(Object object) {
         try {
             DefaultPrettyPrinter printer = new DefaultPrettyPrinter()
                 .withObjectIndenter(new DefaultIndenter("    ", "\n"));
 
-            return OBJECT_MAPPER.writer(printer)
+            return objectMapper.writer(printer)
                 .writeValueAsString(object);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }
 
-    public static String writeWithDefaultPrettyPrinter(Object object, boolean includeNulls) {
-        ObjectMapper currentObjectMapper = OBJECT_MAPPER;
+    public String writeWithDefaultPrettyPrinter(Object object, boolean includeNulls) {
+        ObjectMapper currentObjectMapper = objectMapper;
 
         if (includeNulls) {
             currentObjectMapper = currentObjectMapper.copy()

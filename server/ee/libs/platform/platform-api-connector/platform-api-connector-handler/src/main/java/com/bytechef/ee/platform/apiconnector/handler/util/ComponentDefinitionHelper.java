@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.ee.platform.apiconnector.handler.helper;
+package com.bytechef.ee.platform.apiconnector.handler.util;
 
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.component.definition.ActionDefinition;

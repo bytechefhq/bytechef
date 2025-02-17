@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.platform.component.helper;
+package com.bytechef.platform.component.util;
 
 import static com.bytechef.component.definition.Authorization.ACCESS_TOKEN;
 import static com.bytechef.component.definition.Authorization.EXPIRES_IN;
@@ -26,8 +26,6 @@ import com.bytechef.component.exception.ProviderException;
 import com.bytechef.exception.ErrorType;
 import com.bytechef.platform.component.domain.ComponentConnection;
 import com.bytechef.platform.component.service.ConnectionDefinitionService;
-import com.bytechef.platform.component.util.AuthorizationUtils;
-import com.bytechef.platform.component.util.RefreshCredentialsUtils;
 import com.bytechef.platform.connection.domain.Connection;
 import com.bytechef.platform.connection.service.ConnectionService;
 import com.bytechef.platform.exception.ConfigurationException;

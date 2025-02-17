@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.automation.configuration;
+package com.bytechef.automation.configuration.util;
 
 import com.bytechef.automation.configuration.domain.Project;
 import com.bytechef.automation.configuration.domain.ProjectVersion;

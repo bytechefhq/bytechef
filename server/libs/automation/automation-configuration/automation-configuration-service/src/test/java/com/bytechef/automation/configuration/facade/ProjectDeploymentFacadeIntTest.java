@@ -18,7 +18,6 @@ package com.bytechef.automation.configuration.facade;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.bytechef.automation.configuration.ProjectDeploymentFacadeHelper;
 import com.bytechef.automation.configuration.config.ProjectIntTestConfiguration;
 import com.bytechef.automation.configuration.config.ProjectIntTestConfigurationSharedMocks;
 import com.bytechef.automation.configuration.domain.Workspace;
@@ -27,6 +26,7 @@ import com.bytechef.automation.configuration.dto.ProjectDeploymentDTO;
 import com.bytechef.automation.configuration.repository.ProjectRepository;
 import com.bytechef.automation.configuration.repository.ProjectWorkflowRepository;
 import com.bytechef.automation.configuration.repository.WorkspaceRepository;
+import com.bytechef.automation.configuration.util.ProjectDeploymentFacadeHelper;
 import com.bytechef.platform.category.repository.CategoryRepository;
 import com.bytechef.platform.constant.Environment;
 import com.bytechef.platform.tag.repository.TagRepository;

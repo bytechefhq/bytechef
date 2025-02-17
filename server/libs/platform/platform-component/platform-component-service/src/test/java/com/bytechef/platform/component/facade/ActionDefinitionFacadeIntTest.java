@@ -22,9 +22,9 @@ import com.bytechef.platform.component.config.ComponentDefinitionIntTestConfigur
 import com.bytechef.platform.component.config.ComponentRegistryConfigurationSharedMocks;
 import com.bytechef.platform.component.config.JacksonConfiguration;
 import com.bytechef.platform.component.definition.ContextFactory;
-import com.bytechef.platform.component.helper.TokenRefreshHelper;
 import com.bytechef.platform.component.service.ActionDefinitionService;
 import com.bytechef.platform.component.service.ConnectionDefinitionService;
+import com.bytechef.platform.component.util.TokenRefreshHelper;
 import com.bytechef.platform.connection.service.ConnectionService;
 import com.bytechef.platform.constant.ModeType;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;

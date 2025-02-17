@@ -16,32 +16,37 @@
 
 package com.bytechef.commons.util;
 
-import static com.bytechef.commons.util.constant.ObjectMapperConstants.OBJECT_MAPPER;
-
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.type.TypeFactory;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.lang.reflect.Type;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeParseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
 
 /**
- * @deprecated Use ConvertHelper instead.
- *
  * @author Ivica Cardic
  */
-@Deprecated
-public class ConvertUtils {
+@Component
+public class ConvertHelper {
 
-    private static final Logger logger = LoggerFactory.getLogger(ConvertUtils.class);
+    private static final Logger logger = LoggerFactory.getLogger(ConvertHelper.class);
 
-    public static boolean canConvert(Object fromValue, Class<?> toValueType) {
+    private final ObjectMapper objectMapper;
+
+    @SuppressFBWarnings("EI")
+    public ConvertHelper(ObjectMapper objectMapper) {
+        this.objectMapper = objectMapper;
+    }
+
+    public boolean canConvert(Object fromValue, Class<?> toValueType) {
         try {
-            OBJECT_MAPPER.convertValue(fromValue, toValueType);
+            objectMapper.convertValue(fromValue, toValueType);
         } catch (Exception e) {
             // ignore
             return false;
@@ -50,12 +55,12 @@ public class ConvertUtils {
         return true;
     }
 
-    public static <T> T convertValue(Object fromValue, Class<T> toValueType) {
-        return OBJECT_MAPPER.convertValue(fromValue, toValueType);
+    public <T> T convertValue(Object fromValue, Class<T> toValueType) {
+        return objectMapper.convertValue(fromValue, toValueType);
     }
 
-    public static <T> T convertValue(Object fromValue, Class<T> toValueType, boolean includeNulls) {
-        ObjectMapper currentObjectMapper = OBJECT_MAPPER;
+    public <T> T convertValue(Object fromValue, Class<T> toValueType, boolean includeNulls) {
+        ObjectMapper currentObjectMapper = objectMapper;
 
         if (includeNulls) {
             currentObjectMapper = currentObjectMapper.copy()
@@ -65,17 +70,17 @@ public class ConvertUtils {
         return currentObjectMapper.convertValue(fromValue, toValueType);
     }
 
-    public static <T> T convertValue(Object fromValue, Type type) {
-        TypeFactory typeFactory = OBJECT_MAPPER.getTypeFactory();
+    public <T> T convertValue(Object fromValue, Type type) {
+        TypeFactory typeFactory = objectMapper.getTypeFactory();
 
-        return OBJECT_MAPPER.convertValue(fromValue, typeFactory.constructType(type));
+        return objectMapper.convertValue(fromValue, typeFactory.constructType(type));
     }
 
-    public static <T> T convertValue(Object fromValue, TypeReference<T> toValueTypeRef) {
-        return OBJECT_MAPPER.convertValue(fromValue, toValueTypeRef);
+    public <T> T convertValue(Object fromValue, TypeReference<T> toValueTypeRef) {
+        return objectMapper.convertValue(fromValue, toValueTypeRef);
     }
 
-    public static Object convertString(String str) {
+    public Object convertString(String str) {
         try {
             return Integer.parseInt(str);
         } catch (NumberFormatException e) {
