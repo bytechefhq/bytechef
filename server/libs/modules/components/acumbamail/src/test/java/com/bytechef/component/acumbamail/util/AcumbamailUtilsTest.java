@@ -17,7 +17,6 @@
 package com.bytechef.component.acumbamail.util;
 
 import static com.bytechef.component.definition.ComponentDsl.option;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
@@ -33,7 +32,6 @@ import java.util.Map;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.ArgumentCaptor;
 
 /**
  * @author Marija Horvat
@@ -49,13 +47,10 @@ class AcumbamailUtilsTest {
     private final Map<String, Object> responseMap = Map.of(
         "list1", Map.of("name", "List 1"),
         "list2", Map.of("name", "List 2"));
-    private final ArgumentCaptor<String> stringArgumentCaptor = ArgumentCaptor.forClass(String.class);
 
     @BeforeEach
     void beforeEach() {
         when(mockedActionContext.http(any()))
-            .thenReturn(mockedExecutor);
-        when(mockedExecutor.queryParameters(stringArgumentCaptor.capture(), stringArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
         when(mockedExecutor.configuration(any()))
             .thenReturn(mockedExecutor);
@@ -71,7 +66,6 @@ class AcumbamailUtilsTest {
             mockedParameters, mockedParameters, Map.of(), "", mockedActionContext);
 
         assertThat(result, Matchers.containsInAnyOrder(expectedOptions.toArray()));
-        assertEquals(List.of("auth_token", "test-token"), stringArgumentCaptor.getAllValues());
     }
 
     @Test
@@ -80,6 +74,5 @@ class AcumbamailUtilsTest {
             mockedParameters, mockedParameters, Map.of(), "", mockedActionContext);
 
         assertThat(result, Matchers.containsInAnyOrder(expectedOptions.toArray()));
-        assertEquals(List.of("auth_token", "test-token"), stringArgumentCaptor.getAllValues());
     }
 }

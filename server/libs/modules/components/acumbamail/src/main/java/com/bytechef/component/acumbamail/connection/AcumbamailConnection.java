@@ -16,13 +16,16 @@
 
 package com.bytechef.component.acumbamail.connection;
 
-import static com.bytechef.component.definition.Authorization.ACCESS_TOKEN;
+import static com.bytechef.component.acumbamail.constant.AcumbamailConstants.AUTH_TOKEN;
 import static com.bytechef.component.definition.ComponentDsl.authorization;
 import static com.bytechef.component.definition.ComponentDsl.connection;
 import static com.bytechef.component.definition.ComponentDsl.string;
 
+import com.bytechef.component.definition.Authorization.ApplyResponse;
 import com.bytechef.component.definition.Authorization.AuthorizationType;
 import com.bytechef.component.definition.ComponentDsl.ModifiableConnectionDefinition;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author Marija Horvat
@@ -35,9 +38,11 @@ public class AcumbamailConnection {
             authorization(AuthorizationType.CUSTOM)
                 .title("Authorization token")
                 .properties(
-                    string(ACCESS_TOKEN)
+                    string(AUTH_TOKEN)
                         .label("Access token")
-                        .required(true)));
+                        .required(true))
+                .apply((connectionParameters, context) -> ApplyResponse.ofQueryParameters(
+                    Map.of(AUTH_TOKEN, List.of(connectionParameters.getRequiredString(AUTH_TOKEN))))));
 
     private AcumbamailConnection() {
     }

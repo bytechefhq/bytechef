@@ -22,6 +22,7 @@ package com.bytechef.component.acumbamail.constant;
 public class AcumbamailConstants {
 
     public static final String ADDRESS = "address";
+    public static final String AUTH_TOKEN = "auth_token";
     public static final String CITY = "city";
     public static final String COMPANY = "company";
     public static final String COUNTRY = "country";

@@ -18,7 +18,6 @@ package com.bytechef.component.acumbamail.action;
 
 import static com.bytechef.component.acumbamail.constant.AcumbamailConstants.EMAIL;
 import static com.bytechef.component.acumbamail.constant.AcumbamailConstants.LIST_ID;
-import static com.bytechef.component.definition.Authorization.ACCESS_TOKEN;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import com.bytechef.component.definition.Parameters;
@@ -34,7 +33,7 @@ import org.junit.jupiter.api.Test;
 class AcumbamailDeleteSubscriberActionTest extends AbstractAcumbamailActionTest {
 
     private final Parameters mockedParameters = MockParametersFactory.create(
-        Map.of(ACCESS_TOKEN, "test-token", LIST_ID, "test", EMAIL, "test@test.com"));
+        Map.of(LIST_ID, "test", EMAIL, "test@test.com"));
 
     @Test
     void testPerform() {
@@ -44,7 +43,6 @@ class AcumbamailDeleteSubscriberActionTest extends AbstractAcumbamailActionTest 
         assertEquals(responseMap, result);
 
         Object[] query = queryArgumentCaptor.getValue();
-        assertEquals(List.of("auth_token", "test-token", LIST_ID, "test", EMAIL, "test@test.com"),
-            Arrays.asList(query));
+        assertEquals(List.of(LIST_ID, "test", EMAIL, "test@test.com"), Arrays.asList(query));
     }
 }
