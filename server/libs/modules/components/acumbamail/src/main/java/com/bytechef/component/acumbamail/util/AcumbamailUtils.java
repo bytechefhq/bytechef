@@ -16,7 +16,6 @@
 
 package com.bytechef.component.acumbamail.util;
 
-import static com.bytechef.component.definition.Authorization.ACCESS_TOKEN;
 import static com.bytechef.component.definition.ComponentDsl.option;
 import static com.bytechef.component.definition.Context.Http.responseType;
 
@@ -43,8 +42,6 @@ public class AcumbamailUtils {
 
         Map<String, Map<String, String>> response = actionContext
             .http(http -> http.get("/getLists/"))
-            .queryParameters("auth_token", connectionParameters.getRequiredString(ACCESS_TOKEN)
-                .strip())
             .configuration(responseType(Http.ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});
@@ -58,8 +55,6 @@ public class AcumbamailUtils {
 
         Map<String, Map<String, String>> response = actionContext
             .http(http -> http.get("/getSubscribers/"))
-            .queryParameters("auth_token", connectionParameters.getRequiredString(ACCESS_TOKEN)
-                .strip())
             .configuration(responseType(Http.ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});

@@ -37,10 +37,13 @@ abstract class AbstractAcumbamailActionTest {
     protected Http.Response mockedResponse = mock(Http.Response.class);
     protected Map<String, Object> responseMap = Map.of("list1", Map.of("name", "List 1"));
     protected ArgumentCaptor<Object[]> queryArgumentCaptor = ArgumentCaptor.forClass(Object[].class);
+    protected ArgumentCaptor<String> stringArgumentCaptor = ArgumentCaptor.forClass(String.class);
 
     @BeforeEach
     void beforeEach() {
         when(mockedActionContext.http(any()))
+            .thenReturn(mockedExecutor);
+        when(mockedExecutor.queryParameter(stringArgumentCaptor.capture(), stringArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
         when(mockedExecutor.queryParameters(queryArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);

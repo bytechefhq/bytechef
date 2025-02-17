@@ -17,7 +17,6 @@
 package com.bytechef.component.acumbamail.action;
 
 import static com.bytechef.component.acumbamail.constant.AcumbamailConstants.LIST_ID;
-import static com.bytechef.component.definition.Authorization.ACCESS_TOKEN;
 import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.integer;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
@@ -56,10 +55,7 @@ public class AcumbamailAddSubscriberAction {
 
         return actionContext
             .http(http -> http.post("/addSubscriber/"))
-            .queryParameters(
-                "auth_token", connectionParameters.getRequiredString(ACCESS_TOKEN)
-                    .strip(),
-                LIST_ID, inputParameters.getRequiredString(LIST_ID))
+            .queryParameter(LIST_ID, inputParameters.getRequiredString(LIST_ID))
             .configuration(responseType(Http.ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});

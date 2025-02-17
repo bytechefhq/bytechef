@@ -24,7 +24,6 @@ import static com.bytechef.component.acumbamail.constant.AcumbamailConstants.EMA
 import static com.bytechef.component.acumbamail.constant.AcumbamailConstants.LIST_ID;
 import static com.bytechef.component.acumbamail.constant.AcumbamailConstants.NAME;
 import static com.bytechef.component.acumbamail.constant.AcumbamailConstants.PHONE;
-import static com.bytechef.component.definition.Authorization.ACCESS_TOKEN;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import com.bytechef.component.definition.Parameters;
@@ -40,15 +39,9 @@ import org.junit.jupiter.api.Test;
 class AcumbamailCreateSubscriberListActionTest extends AbstractAcumbamailActionTest {
 
     private final Parameters mockedParameters = MockParametersFactory.create(
-        Map.of(ACCESS_TOKEN, "test-token",
-            LIST_ID, "test",
-            EMAIL, "test@test.com",
-            NAME, "test-name",
-            COMPANY, "test-company",
-            COUNTRY, "test-country",
-            CITY, "test-city",
-            ADDRESS, "test-address",
-            PHONE, "test-phone"));
+        Map.of(
+            LIST_ID, "test", EMAIL, "test@test.com", NAME, "test-name", COMPANY, "test-company",
+            COUNTRY, "test-country", CITY, "test-city", ADDRESS, "test-address", PHONE, "test-phone"));
 
     @Test
     void testPerform() {
@@ -60,14 +53,8 @@ class AcumbamailCreateSubscriberListActionTest extends AbstractAcumbamailActionT
         Object[] query = queryArgumentCaptor.getValue();
         assertEquals(
             List.of(
-                "auth_token", "test-token",
-                "sender_email", "test@test.com",
-                NAME, "test-name",
-                COMPANY, "test-company",
-                COUNTRY, "test-country",
-                CITY, "test-city",
-                ADDRESS, "test-address",
-                PHONE, "test-phone"),
+                "sender_email", "test@test.com", NAME, "test-name", COMPANY, "test-company",
+                COUNTRY, "test-country", CITY, "test-city", ADDRESS, "test-address", PHONE, "test-phone"),
             Arrays.asList(query));
     }
 }

@@ -23,7 +23,6 @@ import static com.bytechef.component.acumbamail.constant.AcumbamailConstants.COU
 import static com.bytechef.component.acumbamail.constant.AcumbamailConstants.EMAIL;
 import static com.bytechef.component.acumbamail.constant.AcumbamailConstants.NAME;
 import static com.bytechef.component.acumbamail.constant.AcumbamailConstants.PHONE;
-import static com.bytechef.component.definition.Authorization.ACCESS_TOKEN;
 import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.integer;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
@@ -85,8 +84,6 @@ public class AcumbamailCreateSubscriberListAction {
         return actionContext
             .http(http -> http.post("/createList/"))
             .queryParameters(
-                "auth_token", connectionParameters.getRequiredString(ACCESS_TOKEN)
-                    .strip(),
                 "sender_email", inputParameters.getRequiredString(EMAIL),
                 NAME, inputParameters.getRequiredString(NAME),
                 COMPANY, inputParameters.getString(COMPANY),
