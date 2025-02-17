@@ -68,6 +68,7 @@ dependencies {
     implementation(project(":server:libs:modules:components:ai:vector-store:weaviate"))
     implementation(project(":server:libs:modules:components:airtable"))
     implementation(project(":server:libs:modules:components:aitable"))
+    implementation(project(":server:libs:modules:components:apollo"))
     implementation(project(":server:libs:modules:components:app-event"))
     implementation(project(":server:libs:modules:components:asana"))
     implementation(project(":server:libs:modules:components:aws:aws-s3"))
