@@ -47,8 +47,9 @@ import org.springframework.data.jdbc.repository.config.EnableJdbcRepositories;
  */
 @ComponentScan(
     basePackages = {
-        "com.bytechef.atlas.configuration.repository.jdbc", "com.bytechef.platform.category",
-        "com.bytechef.automation.configuration", "com.bytechef.platform.connection", "com.bytechef.platform.tag"
+        "com.bytechef.atlas.configuration.repository.jdbc", "com.bytechef.commons.util", "com.bytechef.jackson.config",
+        "com.bytechef.platform.category", "com.bytechef.automation.configuration", "com.bytechef.platform.connection",
+        "com.bytechef.platform.tag"
     })
 @EnableAutoConfiguration
 @EnableCaching
@@ -64,14 +65,6 @@ public class ProjectIntTestConfiguration {
     @Bean
     WorkflowFacade workflowFacade(WorkflowService workflowService) {
         return new WorkflowFacadeImpl(componentConnectionFacade, workflowService);
-    }
-
-    @Bean
-    ObjectMapper objectMapper() {
-        return new ObjectMapper()
-            .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
-            .registerModule(new JavaTimeModule())
-            .registerModule(new Jdk8Module());
     }
 
     @EnableJdbcRepositories(
