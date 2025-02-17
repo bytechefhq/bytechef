@@ -124,7 +124,7 @@ export const useWorkflowLayout = () => {
     };
 
     const handleCopilotClick = () => {
-        setContext({parameters: {}, source: Source.WORKFLOW_EDITOR, workflowId: workflow.id!});
+        setContext({parameters: {}, source: Source.WORKFLOW_EDITOR});
 
         if (!copilotPanelOpen) {
             setCopilotPanelOpen(!copilotPanelOpen);

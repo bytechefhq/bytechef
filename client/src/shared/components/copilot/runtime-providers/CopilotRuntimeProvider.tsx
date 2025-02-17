@@ -1,3 +1,4 @@
+import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWorkflowDataStore';
 import {useCopilotStore} from '@/shared/components/copilot/stores/useCopilotStore';
 import {AppendMessage, AssistantRuntimeProvider, ThreadMessageLike, useExternalStoreRuntime} from '@assistant-ui/react';
 import {ReactNode, useState} from 'react';
@@ -14,6 +15,7 @@ export function CopilotRuntimeProvider({
     const [isRunning, setIsRunning] = useState(false);
 
     const {addMessage, context, conversationId, messages} = useCopilotStore();
+    const {workflow} = useWorkflowDataStore();
 
     const onNew = async (message: AppendMessage) => {
         if (message.content[0]?.type !== 'text') {
@@ -27,7 +29,10 @@ export function CopilotRuntimeProvider({
 
         const result = await fetch('/api/platform/internal/ai/chat', {
             body: JSON.stringify({
-                context,
+                context: {
+                    ...context,
+                    workflowId: workflow.id,
+                },
                 message: input,
             }),
             headers: {

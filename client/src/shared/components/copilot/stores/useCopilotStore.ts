@@ -15,7 +15,6 @@ export type ContextType = {
     source: Source;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     parameters: Record<string, any>;
-    workflowId: string;
 };
 
 interface CopilotStateI {

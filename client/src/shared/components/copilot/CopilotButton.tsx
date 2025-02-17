@@ -1,6 +1,5 @@
 import {Button} from '@/components/ui/button';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
-import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWorkflowDataStore';
 import {Source, useCopilotStore} from '@/shared/components/copilot/stores/useCopilotStore';
 import {useApplicationInfoStore} from '@/shared/stores/useApplicationInfoStore';
 import {useFeatureFlagsStore} from '@/shared/stores/useFeatureFlagsStore';
@@ -15,12 +14,11 @@ export interface CopilotButtonProps {
 const CopilotButton = ({parameters = {}, source}: CopilotButtonProps) => {
     const {ai} = useApplicationInfoStore();
     const {copilotPanelOpen, setContext, setCopilotPanelOpen} = useCopilotStore();
-    const {workflow} = useWorkflowDataStore();
 
     const ff_1570 = useFeatureFlagsStore()('ff-1570');
 
     const handleClick = () => {
-        setContext({parameters, source, workflowId: workflow.id!});
+        setContext({parameters, source});
 
         if (!copilotPanelOpen) {
             setCopilotPanelOpen(!copilotPanelOpen);
