@@ -21,16 +21,16 @@ import static com.bytechef.component.beamer.constant.BeamerConstants.TITLE;
 import static com.bytechef.component.definition.ComponentDsl.option;
 import static com.bytechef.component.definition.Context.Http.responseType;
 
-import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * @author Nikolina Spehar
@@ -46,7 +46,7 @@ public class BeamerUtils {
             .execute()
             .getBody(new TypeReference<>() {});
 
-        return getOptions(body, TITLE, ID);
+        return getOptions(body);
     }
 
     public static List<Option<String>> getFeatureRequestsOptions(
@@ -58,36 +58,26 @@ public class BeamerUtils {
             .execute()
             .getBody(new TypeReference<>() {});
 
-        return getOptions(body, TITLE, ID);
+        return getOptions(body);
     }
 
-    private static List<Option<String>> getOptions(List<Map<String, Object>> body, String label, String value) {
+    private static List<Option<String>> getOptions(List<Map<String, Object>> body) {
         List<Option<String>> options = new ArrayList<>();
 
         for (Object item : body) {
-            if (item instanceof Map<?, ?> map) {
-                options
-                    .add(option(getTitleofPost((LinkedHashMap) map, label), String.valueOf(map.get(value))));
+            if (item instanceof Map<?, ?> map && map.get("translations") instanceof List<?> translations &&
+                translations.getFirst() instanceof Map<?, ?> translationMap) {
+
+                options.add(option((String) translationMap.get(TITLE), String.valueOf(map.get(ID))));
             }
         }
+
         return options;
     }
 
-    private static String getTitleofPost(LinkedHashMap post, String label) {
-        ArrayList postMap = (ArrayList) post.get("translations");
-        LinkedHashMap<String, String> translations = (LinkedHashMap<String, String>) postMap.getFirst();
-        return translations.get(label);
-    }
-
-    public static List<Option<String>> getPostCategoryOptions(
-        Parameters parameters, Parameters parameters1, Map<String, String> stringStringMap, String s,
-        ActionContext context) {
-        List<Option<String>> options = new ArrayList<>();
-
-        for (BeamerPostCategory category : BeamerPostCategory.values()) {
-            options.add(option(category.name(), category.getCategoryName()));
-        }
-
-        return options;
+    public static List<Option<String>> getPostCategoryOptions() {
+        return Arrays.stream(BeamerPostCategory.values())
+            .map(category -> option(category.getLabel(), category.getValue()))
+            .collect(Collectors.toList());
     }
 }

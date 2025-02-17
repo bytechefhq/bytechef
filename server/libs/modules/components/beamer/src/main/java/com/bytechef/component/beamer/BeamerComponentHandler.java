@@ -29,13 +29,17 @@ import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDefinition;
 import com.google.auto.service.AutoService;
 
+/**
+ * @author Nikolina Spehar
+ */
 @AutoService(ComponentHandler.class)
 public class BeamerComponentHandler implements ComponentHandler {
 
     private static final ComponentDefinition COMPONENT_DEFINITION = component("beamer")
         .title("Beamer")
         .description(
-            "Beamer is a customer engagement platform that helps businesses communicate updates, collect feedback, and boost user engagement through in-app notifications, changelogs, and announcements.")
+            "Beamer is a customer engagement platform that helps businesses communicate updates, collect feedback, " +
+                "and boost user engagement through in-app notifications, changelogs, and announcements.")
         .icon("path:assets/beamer.svg")
         .categories(ComponentCategory.PRODUCTIVITY_AND_COLLABORATION)
         .connection(BeamerConnection.CONNECTION_DEFINITION)

@@ -16,7 +16,7 @@
 
 package com.bytechef.component.beamer.action;
 
-import static com.bytechef.component.beamer.constant.BeamerConstants.COMMENT_OUTPUT;
+import static com.bytechef.component.beamer.constant.BeamerConstants.ID;
 import static com.bytechef.component.beamer.constant.BeamerConstants.POST_ID;
 import static com.bytechef.component.beamer.constant.BeamerConstants.TEXT;
 import static com.bytechef.component.beamer.constant.BeamerConstants.USER_EMAIL;
@@ -24,6 +24,7 @@ import static com.bytechef.component.beamer.constant.BeamerConstants.USER_FIRST_
 import static com.bytechef.component.beamer.constant.BeamerConstants.USER_ID;
 import static com.bytechef.component.beamer.constant.BeamerConstants.USER_LAST_NAME;
 import static com.bytechef.component.definition.ComponentDsl.action;
+import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.Context.Http.responseType;
@@ -73,18 +74,29 @@ public class BeamerNewCommentAction {
                 .description("Last name of the user that is creating the new comment.")
                 .required(false))
         .output(
-            outputSchema(COMMENT_OUTPUT))
+            outputSchema(
+                object()
+                    .properties(
+                        string(ID),
+                        string("date"),
+                        string(TEXT),
+                        string("postTitle"),
+                        string(USER_ID),
+                        string(USER_EMAIL),
+                        string(USER_FIRST_NAME),
+                        string(USER_LAST_NAME),
+                        string("url"),
+                        string("userCustomAttributes"))))
         .perform(BeamerNewCommentAction::perform);
 
     private BeamerNewCommentAction() {
     }
 
     protected static Map<String, Object> perform(
-        Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
+        Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) {
 
-        return context
-            .http(http -> http.post(
-                "/posts/" + inputParameters.getRequiredString(POST_ID) + "/comments"))
+        return actionContext
+            .http(http -> http.post("/posts/" + inputParameters.getRequiredString(POST_ID) + "/comments"))
             .body(
                 Body.of(
                     TEXT, inputParameters.getRequiredString(TEXT),

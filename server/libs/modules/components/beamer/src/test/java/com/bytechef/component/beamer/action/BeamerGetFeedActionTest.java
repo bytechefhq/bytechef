@@ -23,41 +23,37 @@ import static org.mockito.Mockito.when;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.Context.Http;
-import com.bytechef.component.definition.Context.Http.Body;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
-import com.bytechef.component.test.definition.MockParametersFactory;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
-import org.mockito.ArgumentCaptor;
 
+/**
+ * @author Nikolina Spehar
+ */
 class BeamerGetFeedActionTest {
 
-    private final Parameters mockedParameters = MockParametersFactory.create(
-        Map.of());
-
-    private final ArgumentCaptor<Body> bodyArgumentCaptor = ArgumentCaptor.forClass(Http.Body.class);
-    private final ActionContext mockedContext = mock(ActionContext.class);
+    private final ActionContext mockedActionContext = mock(ActionContext.class);
     private final Http.Executor mockedExecutor = mock(Http.Executor.class);
+    private final Parameters mockedParameters = mock(Parameters.class);
     private final Http.Response mockedResponse = mock(Http.Response.class);
-    private final Map<String, Object> mockedMap = Map.of("url", "testUrl");
+    private final Map<String, Object> responseMap = Map.of();
 
     @Test
     void testPerform() {
-        when(mockedContext.http(any()))
+        when(mockedActionContext.http(any()))
             .thenReturn(mockedExecutor);
         when(mockedExecutor.configuration(any()))
-            .thenReturn(mockedExecutor);
-        when(mockedExecutor.body(bodyArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
         when(mockedExecutor.execute())
             .thenReturn(mockedResponse);
         when(mockedResponse.getBody(any(TypeReference.class)))
-            .thenReturn(mockedMap);
+            .thenReturn(responseMap);
 
-        Map<String, Object> result = BeamerGetFeedAction.perform(mockedParameters, mockedParameters, mockedContext);
+        Map<String, Object> result = BeamerGetFeedAction.perform(
+            mockedParameters, mockedParameters, mockedActionContext);
 
-        assertEquals(mockedMap.get("url"), result.get("url"));
+        assertEquals(responseMap, result);
     }
 
 }
