@@ -21,7 +21,7 @@ import static com.bytechef.component.definition.ComponentDsl.authorization;
 import static com.bytechef.component.definition.ComponentDsl.connection;
 import static com.bytechef.component.definition.ComponentDsl.string;
 
-import com.bytechef.component.definition.Authorization;
+import com.bytechef.component.definition.Authorization.AuthorizationType;
 import com.bytechef.component.definition.ComponentDsl.ModifiableConnectionDefinition;
 
 /**
@@ -32,7 +32,7 @@ public class AcumbamailConnection {
     public static final ModifiableConnectionDefinition CONNECTION_DEFINITION = connection()
         .baseUri((connectionParameters, context) -> "https://acumbamail.com/api/1")
         .authorizations(
-            authorization(Authorization.AuthorizationType.CUSTOM)
+            authorization(AuthorizationType.CUSTOM)
                 .title("Authorization token")
                 .properties(
                     string(ACCESS_TOKEN)

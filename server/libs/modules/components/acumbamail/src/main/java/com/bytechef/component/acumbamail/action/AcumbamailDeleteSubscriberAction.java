@@ -26,9 +26,9 @@ import static com.bytechef.component.definition.Context.Http.responseType;
 
 import com.bytechef.component.acumbamail.util.AcumbamailUtils;
 import com.bytechef.component.definition.ActionContext;
-import com.bytechef.component.definition.ComponentDsl;
+import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context.Http;
-import com.bytechef.component.definition.OptionsDataSource;
+import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
 
@@ -37,19 +37,19 @@ import com.bytechef.component.definition.TypeReference;
  */
 public class AcumbamailDeleteSubscriberAction {
 
-    public static final ComponentDsl.ModifiableActionDefinition ACTION_DEFINITION = action("deleteSubscriber")
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action("deleteSubscriber")
         .title("Delete Subscriber")
         .description("Removes a subscriber from a list.")
         .properties(
             integer(LIST_ID)
                 .label("List Id")
                 .description("List identifier.")
-                .options((OptionsDataSource.ActionOptionsFunction<String>) AcumbamailUtils::getListsIdOptions)
+                .options((ActionOptionsFunction<String>) AcumbamailUtils::getListsIdOptions)
                 .required(true),
             string(EMAIL)
                 .label("Email")
                 .description("Subscriber email address.")
-                .options((OptionsDataSource.ActionOptionsFunction<String>) AcumbamailUtils::getSubscriberOptions)
+                .options((ActionOptionsFunction<String>) AcumbamailUtils::getSubscriberOptions)
                 .optionsLookupDependsOn(LIST_ID)
                 .required(true))
         .perform(AcumbamailDeleteSubscriberAction::perform);
@@ -63,7 +63,7 @@ public class AcumbamailDeleteSubscriberAction {
         return actionContext
             .http(http -> http.post("/deleteSubscriber/"))
             .queryParameters(
-                "auth_token", connectionParameters.getString(ACCESS_TOKEN)
+                "auth_token", connectionParameters.getRequiredString(ACCESS_TOKEN)
                     .strip(),
                 LIST_ID, inputParameters.getRequiredString(LIST_ID),
                 EMAIL, inputParameters.getRequiredString(EMAIL))

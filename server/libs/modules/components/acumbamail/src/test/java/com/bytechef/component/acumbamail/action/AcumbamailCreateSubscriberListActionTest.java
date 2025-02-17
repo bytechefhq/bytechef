@@ -52,8 +52,8 @@ class AcumbamailCreateSubscriberListActionTest extends AbstractAcumbamailActionT
 
     @Test
     void testPerform() {
-        Object result =
-            AcumbamailCreateSubscriberListAction.perform(mockedParameters, mockedParameters, mockedActionContext);
+        Object result = AcumbamailCreateSubscriberListAction.perform(
+            mockedParameters, mockedParameters, mockedActionContext);
 
         assertEquals(responseMap, result);
 
