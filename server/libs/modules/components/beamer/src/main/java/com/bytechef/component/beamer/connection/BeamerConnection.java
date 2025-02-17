@@ -27,6 +27,9 @@ import com.bytechef.component.definition.ComponentDsl.ModifiableConnectionDefini
 import java.util.List;
 import java.util.Map;
 
+/**
+ * @author Nikolina Spehar
+ */
 public class BeamerConnection {
 
     public static final ModifiableConnectionDefinition CONNECTION_DEFINITION = connection()
@@ -39,9 +42,7 @@ public class BeamerConnection {
                         .label("API key")
                         .required(true))
                 .apply((connectionParameters, context) -> ApplyResponse.ofHeaders(
-                    Map.of("Beamer-Api-Key", List.of(connectionParameters.getRequired(API_TOKEN)
-                        .toString())))))
-        .baseUri((connectionParameters, context) -> "https://api.getbeamer.com/v0");
+                    Map.of("Beamer-Api-Key", List.of(connectionParameters.getRequiredString(API_TOKEN))))));
 
     private BeamerConnection() {
     }

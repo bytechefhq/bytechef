@@ -20,20 +20,27 @@ package com.bytechef.component.beamer.util;
  * @author Nikolina Spehar
  */
 public enum BeamerPostCategory {
-    NEW("new"),
-    IMPROVEMENT("improvement"),
-    FIX("fix"),
-    COMING_SOON("comingsoon"),
-    ANNOUNCEMENT("announcement"),
-    OTHER("other");
 
-    private final String categoryName;
+    NEW("New", "new"),
+    IMPROVEMENT("Improvement", "improvement"),
+    FIX("Fix", "fix"),
+    COMING_SOON("Coming soon", "comingsoon"),
+    ANNOUNCEMENT("Announcement", "announcement"),
+    OTHER("Other", "other");
 
-    BeamerPostCategory(String categoryName) {
-        this.categoryName = categoryName;
+    private final String label;
+    private final String value;
+
+    BeamerPostCategory(String label, String value) {
+        this.label = label;
+        this.value = value;
     }
 
-    public String getCategoryName() {
-        return categoryName;
+    public String getLabel() {
+        return label;
+    }
+
+    public String getValue() {
+        return value;
     }
 }

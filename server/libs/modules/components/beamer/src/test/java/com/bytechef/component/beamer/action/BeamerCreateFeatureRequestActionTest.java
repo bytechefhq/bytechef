@@ -30,6 +30,7 @@ import com.bytechef.component.definition.Context.Http.Body;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.test.definition.MockParametersFactory;
+import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -39,19 +40,17 @@ import org.mockito.ArgumentCaptor;
  */
 class BeamerCreateFeatureRequestActionTest {
 
+    private final ArgumentCaptor<Body> bodyArgumentCaptor = ArgumentCaptor.forClass(Http.Body.class);
+    private final ActionContext mockedActionContext = mock(ActionContext.class);
+    private final Http.Executor mockedExecutor = mock(Http.Executor.class);
     private final Parameters mockedParameters = MockParametersFactory.create(
         Map.of(TITLE, "testTitle", CONTENT, "testContent", USER_EMAIL, "testUserEmail"));
-
-    private final ArgumentCaptor<Body> bodyArgumentCaptor = ArgumentCaptor.forClass(Http.Body.class);
-    private final ActionContext mockedContext = mock(ActionContext.class);
-    private final Http.Executor mockedExecutor = mock(Http.Executor.class);
     private final Http.Response mockedResponse = mock(Http.Response.class);
-    private final Map<String, Object> mockedMap =
-        Map.of(TITLE, "testTitle", CONTENT, "testContent", USER_EMAIL, "testUserEmail");
+    private final Map<String, Object> responseMap = Map.of();
 
     @Test
     void perform() {
-        when(mockedContext.http(any()))
+        when(mockedActionContext.http(any()))
             .thenReturn(mockedExecutor);
         when(mockedExecutor.configuration(any()))
             .thenReturn(mockedExecutor);
@@ -60,14 +59,16 @@ class BeamerCreateFeatureRequestActionTest {
         when(mockedExecutor.execute())
             .thenReturn(mockedResponse);
         when(mockedResponse.getBody(any(TypeReference.class)))
-            .thenReturn(mockedMap);
+            .thenReturn(responseMap);
 
-        Map<String, Object> result =
-            BeamerCreateFeatureRequestAction.perform(mockedParameters, mockedParameters, mockedContext);
+        Map<String, Object> result = BeamerCreateFeatureRequestAction.perform(
+            mockedParameters, mockedParameters, mockedActionContext);
 
-        assertEquals(mockedMap.get(TITLE), result.get(TITLE));
-        assertEquals(mockedMap.get(CONTENT), result.get(CONTENT));
-        assertEquals(mockedMap.get(USER_EMAIL), result.get(USER_EMAIL));
+        assertEquals(responseMap, result);
 
+        Body body = bodyArgumentCaptor.getValue();
+        assertEquals(
+            Map.of(TITLE, List.of("testTitle"), CONTENT, List.of("testContent"), USER_EMAIL, "testUserEmail"),
+            body.getContent());
     }
 }

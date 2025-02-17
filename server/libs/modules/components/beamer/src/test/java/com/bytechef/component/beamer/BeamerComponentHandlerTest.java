@@ -19,6 +19,9 @@ package com.bytechef.component.beamer;
 import com.bytechef.test.jsonasssert.JsonFileAssert;
 import org.junit.jupiter.api.Test;
 
+/**
+ * @author Nikolina Spehar
+ */
 class BeamerComponentHandlerTest {
 
     @Test

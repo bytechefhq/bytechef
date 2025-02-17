@@ -17,12 +17,13 @@
 package com.bytechef.component.beamer.action;
 
 import static com.bytechef.component.beamer.constant.BeamerConstants.FEATURE_REQUEST_ID;
-import static com.bytechef.component.beamer.constant.BeamerConstants.FEATURE_REQUEST_VOTE_OUTPUT;
+import static com.bytechef.component.beamer.constant.BeamerConstants.ID;
 import static com.bytechef.component.beamer.constant.BeamerConstants.USER_EMAIL;
 import static com.bytechef.component.beamer.constant.BeamerConstants.USER_FIRST_NAME;
 import static com.bytechef.component.beamer.constant.BeamerConstants.USER_ID;
 import static com.bytechef.component.beamer.constant.BeamerConstants.USER_LAST_NAME;
 import static com.bytechef.component.definition.ComponentDsl.action;
+import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.Context.Http.responseType;
@@ -67,28 +68,37 @@ public class BeamerNewVoteAction {
                 .label("User Last Name")
                 .description("Last name of the user that is creating the new vote.")
                 .required(false))
-        .output(outputSchema(FEATURE_REQUEST_VOTE_OUTPUT))
+        .output(
+            outputSchema(
+                object()
+                    .properties(
+                        string(ID),
+                        string("date"),
+                        string("featureRequestTitle"),
+                        string(USER_ID),
+                        string(USER_EMAIL),
+                        string(USER_FIRST_NAME),
+                        string(USER_LAST_NAME),
+                        string("userCustomAttributes"),
+                        string("url"))))
         .perform(BeamerNewVoteAction::perform);
 
     private BeamerNewVoteAction() {
     }
 
     protected static Map<String, Object> perform(
-        Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
+        Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) {
 
-        return context
-            .http(http -> http.post(
-                "/requests/" + inputParameters.getRequiredString(FEATURE_REQUEST_ID) + "/votes"))
+        return actionContext
+            .http(http -> http.post("/requests/" + inputParameters.getRequiredString(FEATURE_REQUEST_ID) + "/votes"))
             .body(
                 Body.of(
                     USER_ID, inputParameters.getRequiredString(USER_ID),
-                    USER_EMAIL, inputParameters.getRequiredString(USER_EMAIL),
-                    USER_FIRST_NAME, inputParameters.getRequiredString(USER_FIRST_NAME),
-                    USER_LAST_NAME, inputParameters.getRequiredString(USER_LAST_NAME)))
+                    USER_EMAIL, inputParameters.getString(USER_EMAIL),
+                    USER_FIRST_NAME, inputParameters.getString(USER_FIRST_NAME),
+                    USER_LAST_NAME, inputParameters.getString(USER_LAST_NAME)))
             .configuration(responseType(ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});
-
     }
-
 }

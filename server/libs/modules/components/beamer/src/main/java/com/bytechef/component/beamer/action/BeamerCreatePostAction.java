@@ -18,10 +18,12 @@ package com.bytechef.component.beamer.action;
 
 import static com.bytechef.component.beamer.constant.BeamerConstants.CATEGORY;
 import static com.bytechef.component.beamer.constant.BeamerConstants.CONTENT;
-import static com.bytechef.component.beamer.constant.BeamerConstants.POST_OUTPUT;
+import static com.bytechef.component.beamer.constant.BeamerConstants.ID;
 import static com.bytechef.component.beamer.constant.BeamerConstants.TITLE;
 import static com.bytechef.component.beamer.constant.BeamerConstants.USER_EMAIL;
 import static com.bytechef.component.definition.ComponentDsl.action;
+import static com.bytechef.component.definition.ComponentDsl.array;
+import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.Context.Http.responseType;
@@ -31,7 +33,6 @@ import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context.Http.Body;
 import com.bytechef.component.definition.Context.Http.ResponseType;
-import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
 import java.util.List;
@@ -57,24 +58,42 @@ public class BeamerCreatePostAction {
             string(CATEGORY)
                 .label("Category")
                 .description("Category of the new Post")
-                .options((ActionOptionsFunction<String>) BeamerUtils::getPostCategoryOptions)
+                .options(BeamerUtils.getPostCategoryOptions())
                 .required(true),
             string(USER_EMAIL)
                 .label("User Email")
                 .description("Email of the user that is creating the new Post")
                 .required(false))
-        .output(outputSchema(POST_OUTPUT))
+        .output(outputSchema(
+            object()
+                .properties(
+                    array("root")
+                        .items(
+                            string("autoOpen"),
+                            string(CATEGORY),
+                            string("date"),
+                            string("feedbackEnabled"),
+                            string(ID),
+                            string("published"),
+                            string("reactionsEnabled"),
+                            array("translations")
+                                .items(
+                                    string(CATEGORY),
+                                    string(CONTENT),
+                                    string("contentHtml"),
+                                    string("language"),
+                                    string("postUrl"),
+                                    string(TITLE))))))
         .perform(BeamerCreatePostAction::perform);
 
     private BeamerCreatePostAction() {
     }
 
     protected static Map<String, Object> perform(
-        Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
+        Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) {
 
-        return context
-            .http(http -> http.post(
-                "/posts"))
+        return actionContext
+            .http(http -> http.post("/posts"))
             .body(
                 Body.of(
                     TITLE, List.of(inputParameters.getRequiredString(TITLE)),
@@ -84,6 +103,5 @@ public class BeamerCreatePostAction {
             .configuration(responseType(ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});
-
     }
 }

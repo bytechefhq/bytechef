@@ -42,21 +42,18 @@ import org.mockito.ArgumentCaptor;
  */
 class BeamerNewCommentActionTest {
 
-    private final Parameters mockedParameters = MockParametersFactory.create(
-        Map.of(POST_ID, 2, TEXT, "testText", USER_ID, 1010, USER_EMAIL, "testUserEmail",
-            USER_FIRST_NAME, "Jane", USER_LAST_NAME, "Doe"));
-
     private final ArgumentCaptor<Body> bodyArgumentCaptor = ArgumentCaptor.forClass(Http.Body.class);
-    private final ActionContext mockedContext = mock(ActionContext.class);
+    private final ActionContext mockedActionContext = mock(ActionContext.class);
     private final Http.Executor mockedExecutor = mock(Http.Executor.class);
+    private final Parameters mockedParameters = MockParametersFactory.create(Map.of(
+        POST_ID, 2, TEXT, "testText", USER_ID, 1010, USER_EMAIL, "testUserEmail",
+        USER_FIRST_NAME, "Jane", USER_LAST_NAME, "Doe"));
     private final Http.Response mockedResponse = mock(Http.Response.class);
-    private final Map<String, Object> mockedMap =
-        Map.of(POST_ID, 2, TEXT, "testText", USER_ID, 1010, USER_EMAIL, "testUserEmail",
-            USER_FIRST_NAME, "Jane", USER_LAST_NAME, "Doe");
+    private final Map<String, Object> responseMap = Map.of();
 
     @Test
     void perform() {
-        when(mockedContext.http(any()))
+        when(mockedActionContext.http(any()))
             .thenReturn(mockedExecutor);
         when(mockedExecutor.configuration(any()))
             .thenReturn(mockedExecutor);
@@ -65,15 +62,19 @@ class BeamerNewCommentActionTest {
         when(mockedExecutor.execute())
             .thenReturn(mockedResponse);
         when(mockedResponse.getBody(any(TypeReference.class)))
-            .thenReturn(mockedMap);
+            .thenReturn(responseMap);
 
-        Map<String, Object> result = BeamerNewCommentAction.perform(mockedParameters, mockedParameters, mockedContext);
+        Map<String, Object> result = BeamerNewCommentAction.perform(
+            mockedParameters, mockedParameters, mockedActionContext);
 
-        assertEquals(mockedMap.get(POST_ID), result.get(POST_ID));
-        assertEquals(mockedMap.get(TEXT), result.get(TEXT));
-        assertEquals(mockedMap.get(USER_ID), result.get(USER_ID));
-        assertEquals(mockedMap.get(USER_EMAIL), result.get(USER_EMAIL));
-        assertEquals(mockedMap.get(USER_FIRST_NAME), result.get(USER_FIRST_NAME));
-        assertEquals(mockedMap.get(USER_LAST_NAME), result.get(USER_LAST_NAME));
+        assertEquals(responseMap, result);
+
+        Body body = bodyArgumentCaptor.getValue();
+
+        assertEquals(
+            Map.of(
+                TEXT, "testText", USER_ID, "1010", USER_EMAIL, "testUserEmail", USER_FIRST_NAME, "Jane",
+                USER_LAST_NAME, "Doe"),
+            body.getContent());
     }
 }

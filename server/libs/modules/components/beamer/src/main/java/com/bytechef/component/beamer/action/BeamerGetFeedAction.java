@@ -28,26 +28,25 @@ import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
 import java.util.Map;
 
+/**
+ * @author Nikolina Spehar
+ */
 public class BeamerGetFeedAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("getFeed")
         .title("Get Feed")
         .description("Get the URL for your feed.")
-        .properties()
-        .output(
-            outputSchema(
-                string()))
+        .output(outputSchema(string()))
         .perform(BeamerGetFeedAction::perform);
 
     private BeamerGetFeedAction() {
     }
 
     protected static Map<String, Object> perform(
-        Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
+        Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) {
 
-        return context
-            .http(http -> http.get(
-                "/url"))
+        return actionContext
+            .http(http -> http.get("/url"))
             .configuration(responseType(ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});
