@@ -548,7 +548,9 @@ const WorkflowNodeDetailsPanel = ({
 
     // Update currentNode with connection data, operationName and type
     useEffect(() => {
-        if (!currentNode) return;
+        if (!currentNode) {
+            return;
+        }
 
         let updatedNode = {...currentNode};
 
@@ -560,10 +562,12 @@ const WorkflowNodeDetailsPanel = ({
             };
         }
 
-        if (currentWorkflowNodeConnections.length && workflowTestConfigurationConnections?.length) {
+        if (currentWorkflowNodeConnections.length) {
             updatedNode = {
                 ...updatedNode,
-                connectionId: workflowTestConfigurationConnections[0]?.connectionId,
+                connectionId: workflowTestConfigurationConnections
+                    ? workflowTestConfigurationConnections[0]?.connectionId
+                    : undefined,
                 connections: currentWorkflowNodeConnections,
             };
         }
