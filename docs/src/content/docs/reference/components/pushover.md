@@ -1,0 +1,110 @@
+---
+title: "Pushover"
+description: "Pushover is a notification service that sends real-time alerts to mobile and desktop devices, integrating with apps, scripts, and services."
+---
+
+Pushover is a notification service that sends real-time alerts to mobile and desktop devices, integrating with apps, scripts, and services.
+
+
+Categories: communication
+
+
+Type: pushover/v1
+
+<hr />
+
+
+
+## Connections
+
+Version: 1
+
+
+### custom
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| token | Applications API Token | STRING | Applications API Token can be found in your applications dashboard. | true |
+| user | User Key | STRING | User Key can be found in main dashboard. | true |
+
+
+
+
+
+<hr />
+
+
+
+## Actions
+
+
+### Send Notification
+Name: sendNotification
+
+Sends a notification.
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| title | Message Title | STRING | The title of the message that will be sent. | false |
+| message | Message | STRING | The message to send. | true |
+| priority | Priority | STRING <details> <summary> Options </summary> -2, -1, 0, 1, 2 </details> | The priority of the message. | false |
+| retry | Retry | INTEGER | How often will the notification be sent to the user. Must have a value of at least 30 seconds | true |
+| expire | Expire | INTEGER | If the notification has not be acknowledged in expire seconds, it will be marked as expired and will stop being sent to the user. | true |
+| url | URL | STRING | Clickable URL link in the message to send. | false |
+| url_title | Url Title | STRING | When the user taps on the notification in Pushover to expand it, the URL will be shown as the supplied url_title | false |
+| attachment | Attachment | FILE_ENTRY | The attachment to send. | false |
+
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |
+|:------------:|:------------:|
+| status | INTEGER |
+| request | STRING |
+
+
+
+
+#### JSON Example
+```json
+{
+  "label" : "Send Notification",
+  "name" : "sendNotification",
+  "parameters" : {
+    "title" : "",
+    "message" : "",
+    "priority" : "",
+    "retry" : 1,
+    "expire" : 1,
+    "url" : "",
+    "url_title" : "",
+    "attachment" : {
+      "extension" : "",
+      "mimeType" : "",
+      "name" : "",
+      "url" : ""
+    }
+  },
+  "type" : "pushover/v1/sendNotification"
+}
+```
+
+
+
+
+<hr />
+
+# Additional instructions
+<hr />
+
