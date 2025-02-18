@@ -1,9 +1,12 @@
 {
-  "categories" : null,
-  "customAction" : null,
+  "categories" : [ {
+    "key" : "crm",
+    "label" : "crm"
+  } ],
+  "customAction" : true,
   "customActionHelp" : null,
   "description" : "Apollo.io is a sales intelligence and engagement platform that provides tools for prospecting, lead generation, and sales automation to help businesses improve their sales processes and outreach efforts.",
-  "icon" : null,
+  "icon" : "path:assets/apollo.svg",
   "tags" : null,
   "metadata" : null,
   "name" : "apollo",
@@ -647,12 +650,15 @@
       "exampleValue" : null,
       "label" : "Opportunity Id",
       "placeholder" : null,
-      "controlType" : "TEXT",
+      "controlType" : "SELECT",
       "languageId" : null,
       "maxLength" : null,
       "minLength" : null,
       "options" : null,
-      "optionsDataSource" : null
+      "optionsDataSource" : {
+        "optionsLookupDependsOn" : null,
+        "options" : { }
+      }
     }, {
       "advancedOption" : null,
       "description" : "The ID for the deal owner within your team's Apollo account.",
@@ -669,12 +675,15 @@
       "exampleValue" : null,
       "label" : "Owner ID",
       "placeholder" : null,
-      "controlType" : "TEXT",
+      "controlType" : "SELECT",
       "languageId" : null,
       "maxLength" : null,
       "minLength" : null,
       "options" : null,
-      "optionsDataSource" : null
+      "optionsDataSource" : {
+        "optionsLookupDependsOn" : null,
+        "options" : { }
+      }
     }, {
       "advancedOption" : null,
       "description" : "New name for the deal.",
@@ -732,17 +741,20 @@
       "exampleValue" : null,
       "label" : "Account ID",
       "placeholder" : null,
-      "controlType" : "TEXT",
+      "controlType" : "SELECT",
       "languageId" : null,
       "maxLength" : null,
       "minLength" : null,
       "options" : null,
-      "optionsDataSource" : null
+      "optionsDataSource" : {
+        "optionsLookupDependsOn" : null,
+        "options" : { }
+      }
     } ],
     "title" : "Update Deal",
-    "processErrorResponse" : null,
     "perform" : null,
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "processErrorResponse" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -1402,12 +1414,15 @@
       "exampleValue" : null,
       "label" : "Owner ID",
       "placeholder" : null,
-      "controlType" : "TEXT",
+      "controlType" : "SELECT",
       "languageId" : null,
       "maxLength" : null,
       "minLength" : null,
       "options" : null,
-      "optionsDataSource" : null
+      "optionsDataSource" : {
+        "optionsLookupDependsOn" : null,
+        "options" : { }
+      }
     }, {
       "advancedOption" : null,
       "description" : "The ID for the account within your Apollo instance. This is the company that you are targeting as part of the deal being created.",
@@ -1424,12 +1439,15 @@
       "exampleValue" : null,
       "label" : "Account ID",
       "placeholder" : null,
-      "controlType" : "TEXT",
+      "controlType" : "SELECT",
       "languageId" : null,
       "maxLength" : null,
       "minLength" : null,
       "options" : null,
-      "optionsDataSource" : null
+      "optionsDataSource" : {
+        "optionsLookupDependsOn" : null,
+        "options" : { }
+      }
     }, {
       "advancedOption" : null,
       "description" : "The monetary value of the deal being created. Do not enter commas or currency symbols for the value. ",
@@ -1473,9 +1491,9 @@
       "optionsDataSource" : null
     } ],
     "title" : "Create Deal",
-    "processErrorResponse" : null,
     "perform" : null,
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "processErrorResponse" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -2335,9 +2353,9 @@
       "optionsDataSource" : null
     } ],
     "title" : "Enrich Person",
-    "processErrorResponse" : null,
     "perform" : null,
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "processErrorResponse" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -3027,11 +3045,10 @@
       "optionsDataSource" : null
     } ],
     "title" : "Enrich Company",
-    "processErrorResponse" : null,
     "perform" : null,
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "processErrorResponse" : null
   } ],
-  "triggers" : [ ],
   "connection" : {
     "authorizations" : [ {
       "detectOn" : null,
@@ -3082,18 +3099,18 @@
       "title" : "API Key",
       "type" : "API_KEY",
       "acquire" : null,
-      "scopes" : null,
-      "authorizationUrl" : null,
-      "tokenUrl" : null,
-      "refreshUrl" : null,
       "apply" : null,
       "authorizationCallback" : null,
+      "authorizationUrl" : null,
       "clientId" : null,
       "clientSecret" : null,
       "oauth2AuthorizationExtraQueryParameters" : null,
       "pkce" : null,
       "refresh" : null,
-      "refreshToken" : null
+      "refreshUrl" : null,
+      "scopes" : null,
+      "refreshToken" : null,
+      "tokenUrl" : null
     }, {
       "detectOn" : null,
       "description" : null,
@@ -3143,18 +3160,18 @@
       "title" : "OAuth2 Authorization Code",
       "type" : "OAUTH2_AUTHORIZATION_CODE",
       "acquire" : null,
-      "scopes" : null,
-      "authorizationUrl" : { },
-      "tokenUrl" : { },
-      "refreshUrl" : { },
       "apply" : null,
       "authorizationCallback" : null,
+      "authorizationUrl" : { },
       "clientId" : null,
       "clientSecret" : null,
       "oauth2AuthorizationExtraQueryParameters" : null,
       "pkce" : null,
       "refresh" : null,
-      "refreshToken" : null
+      "refreshUrl" : { },
+      "scopes" : null,
+      "refreshToken" : null,
+      "tokenUrl" : { }
     } ],
     "properties" : null,
     "version" : 1,
@@ -3162,6 +3179,7 @@
     "baseUri" : { },
     "test" : null
   },
-  "dataStream" : null,
-  "unifiedApi" : null
+  "triggers" : [ ],
+  "unifiedApi" : null,
+  "dataStream" : null
 }
