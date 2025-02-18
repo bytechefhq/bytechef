@@ -153,11 +153,15 @@ const PropertyComboBox = ({
     }, [lookupDependsOnValues, options]);
 
     const memoizedPlaceholder = useMemo(() => {
+        if (options.length) {
+            return placeholder;
+        }
+
         if ((lookupDependsOnValues?.length || lookupDependsOnPaths?.length) && !options.length) {
             return `${lookupDependsOnPaths} is not defined`;
         }
 
-        if (missingConnection || !connectionRequirementMet) {
+        if (!!missingConnection && !connectionRequirementMet) {
             return 'Connection missing...';
         }
 
@@ -184,8 +188,9 @@ const PropertyComboBox = ({
 
     const placeholderClassName = twMerge(
         leadingIcon && 'ml-9',
-        ((lookupDependsOnValues?.length && !options.length) || missingConnection || !connectionRequirementMet) &&
-            'text-destructive'
+        (!!(lookupDependsOnValues?.length && !options.length) || !!missingConnection || !connectionRequirementMet) &&
+            'text-destructive',
+        options.length && 'text-normal'
     );
 
     return (
