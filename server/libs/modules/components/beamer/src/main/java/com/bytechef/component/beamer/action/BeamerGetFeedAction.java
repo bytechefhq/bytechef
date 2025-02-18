@@ -17,6 +17,7 @@
 package com.bytechef.component.beamer.action;
 
 import static com.bytechef.component.definition.ComponentDsl.action;
+import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.Context.Http.responseType;
@@ -36,7 +37,7 @@ public class BeamerGetFeedAction {
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("getFeed")
         .title("Get Feed")
         .description("Get the URL for your feed.")
-        .output(outputSchema(string()))
+        .output(outputSchema(object().properties(string("url"))))
         .perform(BeamerGetFeedAction::perform);
 
     private BeamerGetFeedAction() {

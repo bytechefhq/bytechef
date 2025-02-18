@@ -45,16 +45,16 @@ public class BeamerNewVoteAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("newVote")
         .title("New Vote")
-        .description("Create a new vote on selected feature request.")
+        .description("Creates a new vote on selected feature request.")
         .properties(
             string(FEATURE_REQUEST_ID)
-                .label("Feature Request")
-                .description("The id of the feature request that will have the new vote.")
+                .label("Feature Request ID")
+                .description("ID of the feature request that will have the new vote.")
                 .options((ActionOptionsFunction<String>) BeamerUtils::getFeatureRequestsOptions)
                 .required(true),
             string(USER_ID)
                 .label("User ID")
-                .description("The id of the user that is creating the new vote.")
+                .description("ID of the user that is creating the new vote.")
                 .required(false),
             string(USER_EMAIL)
                 .label("User Email")
@@ -79,7 +79,6 @@ public class BeamerNewVoteAction {
                         string(USER_EMAIL),
                         string(USER_FIRST_NAME),
                         string(USER_LAST_NAME),
-                        string("userCustomAttributes"),
                         string("url"))))
         .perform(BeamerNewVoteAction::perform);
 
