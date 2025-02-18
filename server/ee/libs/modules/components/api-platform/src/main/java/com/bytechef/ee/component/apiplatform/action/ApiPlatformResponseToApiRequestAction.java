@@ -78,11 +78,21 @@ public class ApiPlatformResponseToApiRequestAction {
     protected OutputResponse output(
         Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) {
 
-        return new OutputResponse(getResponse(inputParameters));
+        Object response = getResponse(inputParameters);
+
+        if (response == null) {
+            return null;
+        }
+
+        return new OutputResponse(response);
     }
 
     protected Object perform(Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) {
         Object response = getResponse(inputParameters);
+
+        if (response == null) {
+            return null;
+        }
 
         return switch (inputParameters.get(RESPONSE_TYPE, ResponseType.class)) {
             case SUCCESS -> WebhookResponse.json(response);
@@ -126,8 +136,8 @@ public class ApiPlatformResponseToApiRequestAction {
             case ResponseType.INVALID_INPUT -> getJsonSchemaProperty(INVALID_INPUT, responseMap, actionContext);
             case ResponseType.INTERNAL_ERROR -> getJsonSchemaProperty(INTERNAL_ERROR, responseMap, actionContext);
             case ResponseType.FORBIDDEN -> getJsonSchemaProperty(FORBIDDEN, responseMap, actionContext);
-            default ->
-                throw new IllegalStateException("Unexpected value: " + inputParameters.getInteger(RESPONSE_TYPE));
+            default -> throw new IllegalStateException(
+                "Unexpected value: " + inputParameters.getInteger(RESPONSE_TYPE));
         };
     }
 
@@ -147,13 +157,17 @@ public class ApiPlatformResponseToApiRequestAction {
     private static Object getResponse(Parameters inputParameters) {
         Map<String, ?> responseMap = MapUtils.getMap(inputParameters, RESPONSE, Map.of());
 
+        if (!inputParameters.containsKey(RESPONSE_TYPE) || inputParameters.get(RESPONSE_TYPE) == null) {
+            return null;
+        }
+
         String propertyName = switch (inputParameters.get(RESPONSE_TYPE, ResponseType.class)) {
             case ResponseType.SUCCESS -> SUCCESS;
             case ResponseType.INVALID_INPUT -> INVALID_INPUT;
             case ResponseType.INTERNAL_ERROR -> INTERNAL_ERROR;
             case ResponseType.FORBIDDEN -> FORBIDDEN;
-            default ->
-                throw new IllegalStateException("Unexpected value: " + inputParameters.getInteger(RESPONSE_TYPE));
+            default -> throw new IllegalStateException(
+                "Unexpected value: " + inputParameters.getInteger(RESPONSE_TYPE));
         };
 
         return responseMap.containsKey(propertyName) ? responseMap.get(propertyName) : Map.of();
