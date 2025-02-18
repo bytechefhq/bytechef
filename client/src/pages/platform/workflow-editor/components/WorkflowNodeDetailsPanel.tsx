@@ -142,7 +142,7 @@ const WorkflowNodeDetailsPanel = ({
 
     const {data: currentActionDefinition, isFetched: currentActionFetched} = useGetComponentActionDefinitionQuery(
         {
-            actionName: currentNode?.operationName ?? currentOperationName,
+            actionName: currentOperationName ?? currentNode?.operationName,
             componentName: currentComponentDefinition?.name as string,
             componentVersion: currentComponentDefinition?.version as number,
         },
