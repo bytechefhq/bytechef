@@ -46,7 +46,7 @@ public class BeamerNewCommentAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("newComment")
         .title("New Comment")
-        .description("Create a new comment on selected post.")
+        .description("Creates a new comment on selected post.")
         .properties(
             string(POST_ID)
                 .label("Post")
@@ -58,19 +58,19 @@ public class BeamerNewCommentAction {
                 .description("Text of the comment.")
                 .required(false),
             string(USER_ID)
-                .label("User id")
+                .label("User ID")
                 .description("ID of the user that is creating the new comment.")
                 .required(false),
             string(USER_EMAIL)
-                .label("User email")
+                .label("User Email")
                 .description("Email of the user that is creating the new comment.")
                 .required(false),
             string(USER_FIRST_NAME)
-                .label("User first name")
+                .label("User First Name")
                 .description("First name of the user that is creating the new comment.")
                 .required(false),
             string(USER_LAST_NAME)
-                .label("User last name")
+                .label("User Last Name")
                 .description("Last name of the user that is creating the new comment.")
                 .required(false))
         .output(
@@ -85,8 +85,7 @@ public class BeamerNewCommentAction {
                         string(USER_EMAIL),
                         string(USER_FIRST_NAME),
                         string(USER_LAST_NAME),
-                        string("url"),
-                        string("userCustomAttributes"))))
+                        string("url"))))
         .perform(BeamerNewCommentAction::perform);
 
     private BeamerNewCommentAction() {

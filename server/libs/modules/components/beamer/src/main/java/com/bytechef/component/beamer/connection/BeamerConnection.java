@@ -16,7 +16,7 @@
 
 package com.bytechef.component.beamer.connection;
 
-import static com.bytechef.component.definition.Authorization.API_TOKEN;
+import static com.bytechef.component.definition.Authorization.KEY;
 import static com.bytechef.component.definition.ComponentDsl.authorization;
 import static com.bytechef.component.definition.ComponentDsl.connection;
 import static com.bytechef.component.definition.ComponentDsl.string;
@@ -36,13 +36,13 @@ public class BeamerConnection {
         .baseUri((connectionParameters, context) -> "https://api.getbeamer.com/v0")
         .authorizations(
             authorization(AuthorizationType.API_KEY)
-                .title("OAuth2 Authorization Code")
+                .title("API Key")
                 .properties(
-                    string(API_TOKEN)
+                    string(KEY)
                         .label("API key")
                         .required(true))
                 .apply((connectionParameters, context) -> ApplyResponse.ofHeaders(
-                    Map.of("Beamer-Api-Key", List.of(connectionParameters.getRequiredString(API_TOKEN))))));
+                    Map.of("Beamer-Api-Key", List.of(connectionParameters.getRequiredString(KEY))))));
 
     private BeamerConnection() {
     }

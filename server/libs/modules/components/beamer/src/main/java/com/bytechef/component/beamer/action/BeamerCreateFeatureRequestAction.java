@@ -26,6 +26,7 @@ import static com.bytechef.component.beamer.constant.BeamerConstants.USER_ID;
 import static com.bytechef.component.beamer.constant.BeamerConstants.USER_LAST_NAME;
 import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.array;
+import static com.bytechef.component.definition.ComponentDsl.integer;
 import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
@@ -47,19 +48,19 @@ public class BeamerCreateFeatureRequestAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("createFeatureRequest")
         .title("Create Feature Request")
-        .description("Create a new Feature Request")
+        .description("Creates a new feature request.")
         .properties(
             string(TITLE)
                 .label("Feature Request Title")
-                .description("The name of the new feature request")
+                .description("The name of the new feature request.")
                 .required(true),
             string(CONTENT)
                 .label("Feature Request Content")
-                .description("The content of the new feature request")
+                .description("The content of the new feature request.")
                 .required(false),
             string(USER_EMAIL)
                 .label("User Email")
-                .description("The email of the user that is creating the new feature request")
+                .description("The email of the user that is creating the new feature request.")
                 .required(false))
         .output(
             outputSchema(
@@ -72,13 +73,15 @@ public class BeamerCreateFeatureRequestAction {
                         string("status"),
                         array("translations")
                             .items(
-                                string(TITLE),
-                                string(CONTENT),
-                                string("contentHtml"),
-                                string("language"),
-                                string("permalink"),
-                                string("images")),
-                        string("votesCount"),
+                                object()
+                                    .properties(
+                                        string(TITLE),
+                                        string(CONTENT),
+                                        string("contentHtml"),
+                                        string("language"),
+                                        string("permalink"),
+                                        array("images").items(string()))),
+                        integer("votesCount"),
                         string("commentsCount"),
                         string("notes"),
                         string("filters"),
@@ -88,8 +91,7 @@ public class BeamerCreateFeatureRequestAction {
                         string(USER_ID),
                         string(USER_EMAIL),
                         string(USER_FIRST_NAME),
-                        string(USER_LAST_NAME),
-                        string("userCustomAttributes"))))
+                        string(USER_LAST_NAME))))
         .perform(BeamerCreateFeatureRequestAction::perform);
 
     private BeamerCreateFeatureRequestAction() {

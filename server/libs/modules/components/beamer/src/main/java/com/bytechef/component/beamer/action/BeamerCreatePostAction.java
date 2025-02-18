@@ -44,46 +44,46 @@ import java.util.Map;
 public class BeamerCreatePostAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("createPost")
-        .title("Create New Post")
-        .description("Create a new Post")
+        .title("Create Post")
+        .description("Creates a new post.")
         .properties(
             string(TITLE)
                 .label("Title")
-                .description("Title of the new Post")
+                .description("Title of the new post.")
                 .required(true),
             string(CONTENT)
                 .label("Content")
-                .description("Content of the new Post")
+                .description("Content of the new post.")
                 .required(true),
             string(CATEGORY)
                 .label("Category")
-                .description("Category of the new Post")
+                .description("Category of the new post.")
                 .options(BeamerUtils.getPostCategoryOptions())
                 .required(true),
             string(USER_EMAIL)
                 .label("User Email")
-                .description("Email of the user that is creating the new Post")
+                .description("Email of the user that is creating the new post.")
                 .required(false))
         .output(outputSchema(
             object()
                 .properties(
-                    array("root")
+                    string(ID),
+                    string("date"),
+                    string("dueDate"),
+                    string("published"),
+                    string(CATEGORY),
+                    string("feedbackEnabled"),
+                    string("reactionsEnabled"),
+                    array("translations")
                         .items(
-                            string("autoOpen"),
-                            string(CATEGORY),
-                            string("date"),
-                            string("feedbackEnabled"),
-                            string(ID),
-                            string("published"),
-                            string("reactionsEnabled"),
-                            array("translations")
-                                .items(
-                                    string(CATEGORY),
+                            object()
+                                .properties(
+                                    string(TITLE),
                                     string(CONTENT),
+                                    string(CATEGORY),
                                     string("contentHtml"),
                                     string("language"),
-                                    string("postUrl"),
-                                    string(TITLE))))))
+                                    string("postUrl"))))))
         .perform(BeamerCreatePostAction::perform);
 
     private BeamerCreatePostAction() {
