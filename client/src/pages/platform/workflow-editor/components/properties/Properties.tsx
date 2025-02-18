@@ -38,16 +38,30 @@ const Properties = ({
     const advancedProperties = properties.filter((property) => {
         const {advancedOption, hidden, name} = property;
 
-        if (!name || !advancedOption || hidden) {
+        if (!name || !advancedOption) {
+            return false;
+        }
+
+        if (!control && hidden) {
             return false;
         }
 
         return true;
     });
 
-    const simpleProperties = properties.filter(
-        (property) => property.name && !property.advancedOption && !property.hidden
-    );
+    const simpleProperties = properties.filter((property) => {
+        const {advancedOption, hidden, name} = property;
+
+        if (!name || advancedOption) {
+            return false;
+        }
+
+        if (!control && hidden) {
+            return false;
+        }
+
+        return true;
+    });
 
     return (
         <>

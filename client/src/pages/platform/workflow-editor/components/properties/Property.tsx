@@ -775,7 +775,7 @@ const Property = ({
         }
     }, [displayCondition, currentComponent?.displayConditions, isDisplayConditionsFetched]);
 
-    if (hidden) {
+    if (hidden && !control) {
         return <></>;
     }
 
@@ -813,7 +813,7 @@ const Property = ({
         <li
             className={twMerge(
                 'w-full',
-                hidden && 'mb-0',
+                hidden && 'hidden',
                 controlType === 'OBJECT_BUILDER' && 'flex-col',
                 controlType === 'ARRAY_BUILDER' && 'flex-col',
                 customClassName
@@ -916,28 +916,26 @@ const Property = ({
                     )}
 
                     {control && (isValidControlType || isNumericalInput) && path && (
-                        <>
-                            <Controller
-                                control={control}
-                                defaultValue={defaultValue}
-                                key={`${currentNode?.name}_${currentComponent?.operationName}_${name}`}
-                                name={path}
-                                render={({field}) => (
-                                    <PropertyInput
-                                        description={description}
-                                        error={hasError}
-                                        errorMessage={errorMessage}
-                                        label={label || name}
-                                        leadingIcon={typeIcon}
-                                        placeholder={placeholder}
-                                        required={required}
-                                        type={hidden ? 'hidden' : getInputHTMLType(controlType)}
-                                        {...field}
-                                    />
-                                )}
-                                rules={{required}}
-                            />
-                        </>
+                        <Controller
+                            control={control}
+                            defaultValue={defaultValue}
+                            key={`${currentNode?.name}_${currentComponent?.operationName}_${name}`}
+                            name={path}
+                            render={({field}) => (
+                                <PropertyInput
+                                    description={description}
+                                    error={hasError}
+                                    errorMessage={errorMessage}
+                                    label={label || name}
+                                    leadingIcon={typeIcon}
+                                    placeholder={placeholder}
+                                    required={required}
+                                    type={hidden ? 'hidden' : getInputHTMLType(controlType)}
+                                    {...field}
+                                />
+                            )}
+                            rules={{required}}
+                        />
                     )}
 
                     {control && controlType === 'SELECT' && type !== 'BOOLEAN' && path && (
