@@ -16,7 +16,7 @@ import {NodeDataType, PropertyAllType} from '@/shared/types';
 import {CaretDownIcon} from '@radix-ui/react-icons';
 import {useQueryClient} from '@tanstack/react-query';
 import {useCopyToClipboard} from '@uidotdev/usehooks';
-import {useState} from 'react';
+import {useCallback, useState} from 'react';
 
 import PropertyField from '../PropertyField';
 import SchemaProperties from '../SchemaProperties';
@@ -67,29 +67,32 @@ const OutputTab = ({connectionMissing, currentNode, outputDefined = false, workf
         },
     });
 
-    const handlePredefinedOutputSchemaClick = () => {
+    const handlePredefinedOutputSchemaClick = useCallback(() => {
         deleteWorkflowNodeTestOutputMutation.mutate({
             id: workflowId,
             workflowNodeName: currentNode.name,
         });
-    };
+    }, [currentNode.name, deleteWorkflowNodeTestOutputMutation, workflowId]);
 
-    const handleTestComponentClick = () => {
+    const handleTestComponentClick = useCallback(() => {
         saveWorkflowNodeTestOutputMutation.mutate({
             id: workflowId,
             workflowNodeName: currentNode.name,
         });
-    };
+    }, [currentNode.name, saveWorkflowNodeTestOutputMutation, workflowId]);
 
-    const handleSampleDataDialogUpload = (value: string) => {
-        uploadSampleOutputRequestMutation.mutate({
-            body: JSON.parse(value),
-            id: workflowId,
-            workflowNodeName: currentNode.name,
-        });
+    const handleSampleDataDialogUpload = useCallback(
+        (value: string) => {
+            uploadSampleOutputRequestMutation.mutate({
+                body: JSON.parse(value),
+                id: workflowId,
+                workflowNodeName: currentNode.name,
+            });
 
-        setShowUploadDialog(false);
-    };
+            setShowUploadDialog(false);
+        },
+        [currentNode.name, uploadSampleOutputRequestMutation, workflowId]
+    );
 
     if (workflowNodeOutputIsFetching) {
         return (
@@ -101,14 +104,18 @@ const OutputTab = ({connectionMissing, currentNode, outputDefined = false, workf
 
     return (
         <div className="h-full p-4">
-            {outputSchema ? (
+            {outputSchema && (
                 <>
                     <div className="mb-2 flex items-center justify-between">
-                        <div className="text-sm font-semibold">Output Schema</div>
+                        <h3 className="text-sm text-gray-500">Output Schema</h3>
 
                         <DropdownMenu>
                             <DropdownMenuTrigger asChild>
-                                <Button disabled={saveWorkflowNodeTestOutputMutation.isPending} variant="outline">
+                                <Button
+                                    disabled={saveWorkflowNodeTestOutputMutation.isPending}
+                                    size="sm"
+                                    variant="outline"
+                                >
                                     {(saveWorkflowNodeTestOutputMutation.isPending ||
                                         uploadSampleOutputRequestMutation.isPending) && (
                                         <>
@@ -142,7 +149,7 @@ const OutputTab = ({connectionMissing, currentNode, outputDefined = false, workf
                                         disabled={connectionMissing}
                                         onClick={handleTestComponentClick}
                                     >
-                                        {`Test ${currentNode.trigger ? 'Trigger' : 'Action'}`}
+                                        Test Action
                                     </DropdownMenuItem>
                                 )}
 
@@ -185,7 +192,9 @@ const OutputTab = ({connectionMissing, currentNode, outputDefined = false, workf
                         </div>
                     )}
                 </>
-            ) : (
+            )}
+
+            {!outputSchema && (
                 <div className="flex size-full items-center justify-center">
                     <div className="flex flex-col items-center gap-8">
                         <div className="flex w-full flex-col gap-1">
