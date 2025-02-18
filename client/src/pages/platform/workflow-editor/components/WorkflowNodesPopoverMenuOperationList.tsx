@@ -221,6 +221,10 @@ const WorkflowNodesPopoverMenuOperationList = ({
                         const nextNode = nodes[sourceNodeIndex + 1];
 
                         taskNodeIndex = workflow.tasks?.findIndex((task) => task.name === nextNode.id);
+
+                        if (taskNodeIndex && taskNodeIndex > 1) {
+                            taskNodeIndex -= 1;
+                        }
                     }
 
                     saveNodeToDefinition(newWorkflowNodeData, taskNodeIndex);
