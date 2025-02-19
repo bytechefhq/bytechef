@@ -72,7 +72,7 @@ const PropertyComboBox = ({
     workflowNodeName,
 }: PropertyComboBoxProps) => {
     const [open, setOpen] = useState(false);
-    const [value, setValue] = useState(initialValue ?? defaultValue);
+    const [value, setValue] = useState(initialValue !== undefined ? initialValue.toString() : defaultValue);
 
     const {currentNode} = useWorkflowNodeDetailsPanelStore();
 
@@ -188,18 +188,18 @@ const PropertyComboBox = ({
         placeholder,
     ]);
 
-    useEffect(() => {
-        if (initialValue !== undefined) {
-            setValue(initialValue);
-        }
-    }, [initialValue]);
-
     const placeholderClassName = twMerge(
         leadingIcon && 'ml-9',
         (!!(lookupDependsOnValues?.length && !options.length) || !!missingConnection || !connectionRequirementMet) &&
             'text-destructive',
         options.length && 'text-normal'
     );
+
+    useEffect(() => {
+        if (initialValue !== undefined) {
+            setValue(initialValue.toString());
+        }
+    }, [initialValue]);
 
     return (
         <fieldset className="w-full space-y-1">
@@ -323,17 +323,17 @@ const PropertyComboBox = ({
                                 {(options as Array<ComboBoxItemType>)?.map((option) => (
                                     <CommandItem
                                         className="cursor-pointer font-normal hover:bg-muted"
-                                        key={option.value}
+                                        key={option.value.toString()}
                                         onSelect={() => {
                                             setOpen(false);
 
-                                            setValue(option.value);
+                                            setValue(option.value.toString());
 
                                             if (onValueChange) {
-                                                onValueChange(option.value);
+                                                onValueChange(option.value.toString());
                                             }
                                         }}
-                                        value={option.value}
+                                        value={option.value.toString()}
                                     >
                                         {option.icon && (
                                             <InlineSVG className="mr-2 size-6 flex-none" src={option.icon} />
