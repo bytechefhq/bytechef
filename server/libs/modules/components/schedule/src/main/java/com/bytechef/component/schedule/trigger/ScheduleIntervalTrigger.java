@@ -80,20 +80,21 @@ public class ScheduleIntervalTrigger {
 
     protected void listenerDisable(
         Parameters inputParameters, Parameters connectionParameters, String workflowExecutionId,
-        TriggerContext context) {
+        TriggerContext contriggerContextext) {
 
         triggerScheduler.cancelScheduleTrigger(workflowExecutionId);
     }
 
     protected void listenerEnable(
         Parameters inputParameters, Parameters connectionParameters, String workflowExecutionId,
-        ListenerEmitter listenerEmitter, TriggerContext context) {
+        ListenerEmitter listenerEmitter, TriggerContext triggerContext) {
 
-        int interval = inputParameters.getInteger(INTERVAL);
+        int interval = inputParameters.getRequiredInteger(INTERVAL);
+        int timeUnit = inputParameters.getRequiredInteger(TIME_UNIT);
         ZoneId zoneId = ZoneId.systemDefault();
 
         triggerScheduler.scheduleScheduleTrigger(
-            switch (inputParameters.getInteger(TIME_UNIT)) {
+            switch (timeUnit) {
                 case 1 -> "0 */%s * ? * *".formatted(interval);
                 case 2 -> "0 0 */%s ? * *".formatted(interval);
                 case 3 -> "0 0 0 */%s * ?".formatted(interval);
@@ -101,10 +102,7 @@ public class ScheduleIntervalTrigger {
                 default -> throw new IllegalArgumentException("Unexpected time unit value.");
             },
             zoneId.getId(),
-            Map.of(
-                INTERVAL, inputParameters.getInteger(INTERVAL),
-                TIME_UNIT, inputParameters.getInteger(TIME_UNIT)),
+            Map.of(INTERVAL, interval, TIME_UNIT, timeUnit),
             WorkflowExecutionId.parse(workflowExecutionId));
-
     }
 }

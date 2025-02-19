@@ -30,8 +30,8 @@ import static com.bytechef.component.schedule.constant.ScheduleConstants.TIMEZON
 import com.bytechef.component.definition.ComponentDsl.ModifiableTriggerDefinition;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TriggerContext;
-import com.bytechef.component.definition.TriggerDefinition;
 import com.bytechef.component.definition.TriggerDefinition.ListenerEmitter;
+import com.bytechef.component.definition.TriggerDefinition.TriggerType;
 import com.bytechef.component.schedule.util.ScheduleUtils;
 import com.bytechef.platform.scheduler.TriggerScheduler;
 import com.bytechef.platform.workflow.execution.WorkflowExecutionId;
@@ -45,7 +45,7 @@ public class ScheduleEveryMonthTrigger {
     public final ModifiableTriggerDefinition triggerDefinition = trigger("everyMonth")
         .title("Every Month")
         .description("Trigger off at a specific time in month.")
-        .type(TriggerDefinition.TriggerType.LISTENER)
+        .type(TriggerType.LISTENER)
         .properties(
             integer(HOUR)
                 .label("Hour")
@@ -100,16 +100,15 @@ public class ScheduleEveryMonthTrigger {
         Parameters inputParameters, Parameters connectionParameters, String workflowExecutionId,
         ListenerEmitter listenerEmitter, TriggerContext context) {
 
+        int minute = inputParameters.getRequiredInteger(MINUTE);
+        int hour = inputParameters.getRequiredInteger(HOUR);
+        int dayOfMonth = inputParameters.getRequiredInteger(DAY_OF_MONTH);
+        String timezone = inputParameters.getString(TIMEZONE);
+
         triggerScheduler.scheduleScheduleTrigger(
-            "0 %s %s %s * ?".formatted(
-                inputParameters.getInteger(MINUTE), inputParameters.getInteger(HOUR),
-                inputParameters.getInteger(DAY_OF_MONTH)),
-            inputParameters.getString(TIMEZONE),
-            Map.of(
-                HOUR, inputParameters.getInteger(HOUR),
-                MINUTE, inputParameters.getInteger(MINUTE),
-                DAY_OF_MONTH, inputParameters.getInteger(DAY_OF_MONTH),
-                TIMEZONE, inputParameters.getString(TIMEZONE)),
+            "0 %s %s %s * ?".formatted(minute, hour, dayOfMonth),
+            timezone,
+            Map.of(HOUR, hour, MINUTE, minute, DAY_OF_MONTH, dayOfMonth, TIMEZONE, timezone),
             WorkflowExecutionId.parse(workflowExecutionId));
     }
 }

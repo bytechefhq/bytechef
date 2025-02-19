@@ -18,7 +18,6 @@ package com.bytechef.component.schedule.trigger;
 
 import static com.bytechef.component.definition.ComponentDsl.integer;
 import static com.bytechef.component.definition.ComponentDsl.object;
-import static com.bytechef.component.definition.ComponentDsl.option;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.ComponentDsl.trigger;
@@ -31,8 +30,8 @@ import static com.bytechef.component.schedule.constant.ScheduleConstants.TIMEZON
 import com.bytechef.component.definition.ComponentDsl.ModifiableTriggerDefinition;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TriggerContext;
-import com.bytechef.component.definition.TriggerDefinition;
 import com.bytechef.component.definition.TriggerDefinition.ListenerEmitter;
+import com.bytechef.component.definition.TriggerDefinition.TriggerType;
 import com.bytechef.component.schedule.util.ScheduleUtils;
 import com.bytechef.platform.scheduler.TriggerScheduler;
 import com.bytechef.platform.workflow.execution.WorkflowExecutionId;
@@ -45,9 +44,8 @@ public class ScheduleEveryWeekTrigger {
 
     public final ModifiableTriggerDefinition triggerDefinition = trigger("everyWeek")
         .title("Every Week")
-        .description(
-            "Trigger off at a specific day of the week.")
-        .type(TriggerDefinition.TriggerType.LISTENER)
+        .description("Trigger off at a specific day of the week.")
+        .type(TriggerType.LISTENER)
         .properties(
             integer(HOUR)
                 .label("Hour")
@@ -66,14 +64,7 @@ public class ScheduleEveryWeekTrigger {
             integer(DAY_OF_WEEK)
                 .label("Day of Week")
                 .description("Days at which a workflow will be triggered.")
-                .options(
-                    option("Monday", 1),
-                    option("Tuesday", 2),
-                    option("Wednesday", 3),
-                    option("Thursday", 4),
-                    option("Friday", 5),
-                    option("Saturday", 6),
-                    option("Sunday", 7))
+                .options(ScheduleUtils.getDayOfWeekOptions())
                 .required(true),
             string(TIMEZONE)
                 .label("Timezone")
@@ -108,16 +99,15 @@ public class ScheduleEveryWeekTrigger {
         Parameters inputParameters, Parameters connectionParameters, String workflowExecutionId,
         ListenerEmitter listenerEmitter, TriggerContext context) {
 
+        int dayOfWeek = inputParameters.getRequiredInteger(DAY_OF_WEEK);
+        int minute = inputParameters.getRequiredInteger(MINUTE);
+        int hour = inputParameters.getRequiredInteger(HOUR);
+        String timezone = inputParameters.getString(TIMEZONE);
+
         triggerScheduler.scheduleScheduleTrigger(
-            "0 %s %s ? * %s".formatted(
-                inputParameters.getInteger(MINUTE), inputParameters.getInteger(HOUR),
-                inputParameters.getInteger(DAY_OF_WEEK)),
-            inputParameters.getString(TIMEZONE),
-            Map.of(
-                HOUR, inputParameters.getInteger(HOUR),
-                MINUTE, inputParameters.getInteger(MINUTE),
-                DAY_OF_WEEK, inputParameters.getInteger(DAY_OF_WEEK),
-                TIMEZONE, inputParameters.getString(TIMEZONE)),
+            "0 %s %s ? * %s".formatted(minute, hour, dayOfWeek),
+            timezone,
+            Map.of(HOUR, hour, MINUTE, minute, DAY_OF_WEEK, dayOfWeek, TIMEZONE, timezone),
             WorkflowExecutionId.parse(workflowExecutionId));
     }
 }
