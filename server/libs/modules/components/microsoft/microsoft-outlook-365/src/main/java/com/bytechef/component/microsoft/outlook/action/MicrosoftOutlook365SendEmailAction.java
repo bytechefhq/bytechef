@@ -20,13 +20,17 @@ import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.array;
 import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.string;
+import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.ADDRESS;
 import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.BCC_RECIPIENTS;
 import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.BODY;
 import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.CC_RECIPIENTS;
 import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.CONTENT_PROPERTY_HTML;
 import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.CONTENT_PROPERTY_TEXT;
 import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.CONTENT_TYPE_PROPERTY;
+import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.EMAIL_ADDRESS;
 import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.FROM;
+import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.NAME;
+import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.RECIPIENT;
 import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.RECIPIENT_PROPERTY;
 import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.REPLY_TO;
 import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.SUBJECT;
@@ -52,7 +56,20 @@ public class MicrosoftOutlook365SendEmailAction {
                     "The owner of the mailbox from which the message is sent. In most cases, this value is " +
                         "the same as the sender property, except for sharing or delegation scenarios. The " +
                         "value must correspond to the actual mailbox used.")
-                .properties(RECIPIENT_PROPERTY),
+                .properties(
+                    object(RECIPIENT)
+                        .label("Recipient")
+                        .properties(
+                            object(EMAIL_ADDRESS)
+                                .properties(
+                                    string(ADDRESS)
+                                        .label("Address")
+                                        .description("The email address of the person or entity.")
+                                        .required(false),
+                                    string(NAME)
+                                        .label("Name")
+                                        .description("The display name of the person or entity.")
+                                        .required(false)))),
             array(TO_RECIPIENTS)
                 .label("To Recipients")
                 .description("The To: recipients for the message.")

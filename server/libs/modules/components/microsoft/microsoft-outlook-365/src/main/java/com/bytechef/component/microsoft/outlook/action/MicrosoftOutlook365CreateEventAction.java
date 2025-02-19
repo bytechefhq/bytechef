@@ -94,7 +94,7 @@ public class MicrosoftOutlook365CreateEventAction {
                 .label("Attendees")
                 .description("The attendees of the event.")
                 .items(
-                    string(EMAIL_ADDRESS)
+                    string()
                         .label("Email")
                         .description("The attendee's email address."))
                 .required(false),

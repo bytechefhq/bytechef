@@ -123,7 +123,7 @@ public class MicrosoftOutlook365Constants {
                             string(NAME),
                             string(ADDRESS))));
 
-    public static final ModifiableObjectProperty RECIPIENT_PROPERTY = object(RECIPIENT)
+    public static final ModifiableObjectProperty RECIPIENT_PROPERTY = object()
         .label("Recipient")
         .properties(
             object(EMAIL_ADDRESS)

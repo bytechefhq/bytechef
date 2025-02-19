@@ -33,7 +33,6 @@ import static com.bytechef.component.google.calendar.constant.GoogleCalendarCons
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.CALENDAR_ID;
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.CALENDAR_ID_PROPERTY;
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.DESCRIPTION;
-import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.EMAIL;
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.END;
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.EVENT_OUTPUT_PROPERTY;
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.GUEST_CAN_INVITE_OTHERS;
@@ -124,7 +123,7 @@ public class GoogleCalendarCreateEventAction {
                 .label("Attendees")
                 .description("The attendees of the event.")
                 .items(
-                    string(EMAIL)
+                    string()
                         .label("Email")
                         .description("The attendee's email address."))
                 .required(false),

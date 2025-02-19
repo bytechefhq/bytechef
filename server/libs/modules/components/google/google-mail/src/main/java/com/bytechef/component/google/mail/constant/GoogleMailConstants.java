@@ -73,7 +73,7 @@ public class GoogleMailConstants {
     public static final String TOPIC_NAME = "topicName";
     public static final String VALUE = "value";
 
-    public static final ModifiableStringProperty EMAIL_PROPERTY = string("email")
+    public static final ModifiableStringProperty EMAIL_PROPERTY = string()
         .label("Email address")
         .controlType(Property.ControlType.EMAIL);
 
