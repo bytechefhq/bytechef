@@ -80,7 +80,7 @@ open class FindJsonFilesTask : DefaultTask() {
         var type: String? = null
 
         private fun getPropertiesString(): String {
-            return if (properties != null) {
+            return if (!properties.isNullOrEmpty()) {
                 """
 #### Properties
 
@@ -88,7 +88,7 @@ open class FindJsonFilesTask : DefaultTask() {
 |:------------:|:------------:|:--------------------:|
 ${properties?.joinToString("\n")}
 """
-            } else if (items != null) {
+            } else if (!items.isNullOrEmpty()) {
                 """
 #### Properties
 
@@ -303,7 +303,7 @@ $connection
         }
 
         private fun getTriggerString(): String {
-            if (triggers == null) {
+            if (triggers.isNullOrEmpty()) {
                 return ""
             }
 
@@ -317,7 +317,7 @@ ${triggers?.joinToString("\n")}
         }
 
         private fun getActionsString(): String {
-            if (actions == null) {
+            if (actions.isNullOrEmpty()) {
                 return ""
             }
 
