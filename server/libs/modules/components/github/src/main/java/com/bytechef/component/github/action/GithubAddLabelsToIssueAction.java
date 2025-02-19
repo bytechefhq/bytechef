@@ -59,12 +59,9 @@ public class GithubAddLabelsToIssueAction {
             array(LABELS)
                 .label("Labels")
                 .description("The list of labels to add to the issue.")
-                .items(
-                    string("label")
-                        .label("Label")
-                        .options((ActionOptionsFunction<String>) GithubUtils::getLabels)
-                        .optionsLookupDependsOn(REPOSITORY)
-                        .required(true))
+                .items(string())
+                .options((ActionOptionsFunction<String>) GithubUtils::getLabels)
+                .optionsLookupDependsOn(REPOSITORY)
                 .required(true))
         .output(outputSchema(
             array()

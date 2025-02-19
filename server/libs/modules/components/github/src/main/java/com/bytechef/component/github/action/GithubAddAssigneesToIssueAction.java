@@ -58,13 +58,10 @@ public class GithubAddAssigneesToIssueAction {
             array(ASSIGNEES)
                 .label("Assignees")
                 .description("The list of assignees to add to the issue.")
-                .items(
-                    string("assignee")
-                        .label("Assignee")
-                        .options((ActionOptionsFunction<String>) GithubUtils::getCollaborators)
-                        .optionsLookupDependsOn(REPOSITORY)
-                        .required(true))
+                .items(string())
                 .maxItems(10)
+                .options((ActionOptionsFunction<String>) GithubUtils::getCollaborators)
+                .optionsLookupDependsOn(REPOSITORY)
                 .required(true))
         .output(outputSchema(ISSUE_OUTPUT_PROPERTY))
         .perform(GithubAddAssigneesToIssueAction::perform);

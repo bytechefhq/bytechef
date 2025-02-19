@@ -50,18 +50,16 @@ public class AITableFindRecordsAction {
             array(FIELDS)
                 .label("Field Names")
                 .description("The returned record results are limited to the specified fields.")
-                .items(
-                    string()
-                        .options((ActionOptionsFunction<String>) AITableUtils::getFieldNamesOptions)
-                        .optionsLookupDependsOn(DATASHEET_ID))
+                .items(string())
+                .options((ActionOptionsFunction<String>) AITableUtils::getFieldNamesOptions)
+                .optionsLookupDependsOn(DATASHEET_ID)
                 .required(false),
             array(RECORD_IDS)
                 .label("Record IDs")
                 .description("The IDs of the records to find.")
-                .items(
-                    string()
-                        .options((ActionOptionsFunction<String>) AITableUtils::getDatasheetRecordIdOptions)
-                        .optionsLookupDependsOn(DATASHEET_ID))
+                .items(string())
+                .options((ActionOptionsFunction<String>) AITableUtils::getDatasheetRecordIdOptions)
+                .optionsLookupDependsOn(DATASHEET_ID)
                 .required(false),
             integer(MAX_RECORDS)
                 .label("Max Records")
