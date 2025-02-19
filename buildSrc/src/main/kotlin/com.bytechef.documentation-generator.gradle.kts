@@ -1,5 +1,6 @@
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.databind.SerializationFeature
 
 plugins {
     application
@@ -96,30 +97,60 @@ open class FindJsonFilesTask : DefaultTask() {
 
         fun toJsonKeyValuePair(): String {
             val key = name;
-            val value = when (type) {
-                "STRING" -> "\"\""
-                "INTEGER" -> 1
-                "NUMBER" -> 0
-                "BOOLEAN" -> false
-                "OBJECT" -> getJsonObject()
-                "ARRAY" -> "[]"  // TODO: Add json array
-                else -> "TODO" // TODO: Add more types
-            }
-
+            val value = getJsonValue(type, properties)
             return "\"$key\": $value"
         }
 
-        private fun getJsonObject(): String? {
+        private fun getJsonValue(type: String?, properties: Array<Properties>?): Any {
+            return when (type) {
+                "ARRAY" -> getJsonArray()
+                "BOOLEAN" -> false
+                "DATE" -> "\"2021-01-01\""
+                "DATE_TIME" -> "\"2021-01-01T00:00:00\""
+                "FILE_ENTRY" -> getJsonObject(properties)
+                "INTEGER" -> 1
+                "NUMBER" -> 0.0
+                "OBJECT" -> getJsonObject(properties)
+                "STRING" -> "\"\""
+                "TIME" -> "\"00:00:00\""
+                else -> {
+                    "\"\""
+                }
+            }
+        }
+
+        private fun getJsonObject(properties: Array<Properties>?): String {
             val sb = StringBuilder()
             sb.append("{\n")
             if (properties != null) {
-                for (property: Properties in properties!!) {
+                for (property: Properties in properties) {
                     sb.append(property.toJsonKeyValuePair())
                     sb.append(",\n")
                 }
-                if (sb.length > 2) sb.replace(sb.length - 2, sb.length, "")
+
+                if (sb.length > 2) {
+                    sb.setLength(sb.length - 2)
+                }
             }
-            return sb.append("}\n").toString()
+
+            return sb.append("}").toString()
+        }
+
+        private fun getJsonArray(): String {
+            val sb = StringBuilder()
+            sb.append("[\n")
+            if (items != null) {
+                for (property: Properties in items!!) {
+                    sb.append(getJsonValue(property.type, property.properties))
+                    sb.append(",\n")
+                }
+
+                if (sb.length > 2) {
+                    sb.setLength(sb.length - 2)
+                }
+            }
+
+            return sb.append("]\n").toString()
         }
     }
 
@@ -218,15 +249,9 @@ $outputSchema
         }
 
         override fun toString(): String {
-            val propertiesSection = if (!properties.isNullOrEmpty()) {
-                """
-#### Properties
-
-|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
-|:---------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
-${properties?.joinToString("\n")}
-"""
-            } else ""
+            val jsonExample = createJsonExample()
+            val formattedJson = formatJson(jsonExample)
+            val propertiesSection = createPropertiesSection()
 
             return """
 ### $title
@@ -237,16 +262,45 @@ $propertiesSection
 ${getOutputDefinitionString()}
 #### JSON Example
 ```json
-{
-    "label": "$title",
-    "name": "$name",
-    "parameters": {
-        ${properties?.joinToString(",\n") { it.toJsonKeyValuePair() }}
-    },
-    "type" : "TODO/$name"
-}
+$formattedJson
 ```
 """
+        }
+
+        private fun createJsonExample(): String {
+            return if (properties.isNullOrEmpty()) {
+                """ {
+                    "label": "$title",
+                    "name": "$name",
+                    "type": "TODO/$name"
+                    }
+               """.trimIndent()
+            } else {
+                """ {
+                    "label": "$title",
+                    "name": "$name",
+                    "parameters": { ${properties?.joinToString(",\n") { it.toJsonKeyValuePair() }} },
+                    "type": "TODO/$name" }
+                """.trimIndent()
+            }
+        }
+
+        private fun formatJson(json: String): String {
+            val mapper = ObjectMapper().enable(SerializationFeature.INDENT_OUTPUT)
+            val jsonNode = mapper.readTree(json)
+            return mapper.writeValueAsString(jsonNode)
+        }
+
+        private fun createPropertiesSection(): String {
+            return if (!properties.isNullOrEmpty()) {
+                """
+#### Properties
+
+|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
+|:---------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
+${properties?.joinToString("\n")}
+"""
+            } else ""
         }
     }
 
@@ -268,15 +322,9 @@ ${getOutputDefinitionString()}
         }
 
         override fun toString(): String {
-            val propertiesSection = if (!properties.isNullOrEmpty()) {
-                """
-#### Properties
-
-|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
-|:---------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
-${properties?.joinToString("\n")}
-"""
-            } else ""
+            val jsonExample = createJsonExample()
+            val formattedJson = formatJson(jsonExample)
+            val propertiesSection = createPropertiesSection()
 
             return """
 ### $title
@@ -287,7 +335,47 @@ $description
 Type: $type
 $propertiesSection
 ${getOutputResponseString()}
+#### JSON Example
+```json
+$formattedJson
+```
 """
+        }
+
+        private fun createJsonExample(): String {
+            return if (properties.isNullOrEmpty()) {
+                """ {
+                    "label": "$title",
+                    "name": "$name",
+                    "type": "TODO/$name"
+                    }
+               """.trimIndent()
+            } else {
+                """ {
+                    "label": "$title",
+                    "name": "$name",
+                    "parameters": { ${properties?.joinToString(",\n") { it.toJsonKeyValuePair() }} },
+                    "type": "TODO/$name" }
+                """.trimIndent()
+            }
+        }
+
+        private fun formatJson(json: String): String {
+            val mapper = ObjectMapper().enable(SerializationFeature.INDENT_OUTPUT)
+            val jsonNode = mapper.readTree(json)
+            return mapper.writeValueAsString(jsonNode)
+        }
+
+        private fun createPropertiesSection(): String {
+            return if (!properties.isNullOrEmpty()) {
+                """
+#### Properties
+
+|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
+|:---------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
+${properties?.joinToString("\n")}
+"""
+            } else ""
         }
     }
 
