@@ -93,6 +93,34 @@ open class FindJsonFilesTask : DefaultTask() {
         private fun formatFull(name: String?, label: String?, typeDetails: String, description: String?): String {
             return "| $name | $label | $typeDetails | $controlType | $description | $required |"
         }
+
+        fun toJsonKeyValuePair(): String {
+            val key = name;
+            val value = when (type) {
+                "STRING" -> "\"\""
+                "INTEGER" -> 1
+                "NUMBER" -> 0
+                "BOOLEAN" -> false
+                "OBJECT" -> getJsonObject()
+                "ARRAY" -> "[]"  // TODO: Add json array
+                else -> "TODO" // TODO: Add more types
+            }
+
+            return "\"$key\": $value"
+        }
+
+        private fun getJsonObject(): String? {
+            val sb = StringBuilder()
+            sb.append("{\n")
+            if (properties != null) {
+                for (property: Properties in properties!!) {
+                    sb.append(property.toJsonKeyValuePair())
+                    sb.append(",\n")
+                }
+                if (sb.length > 2) sb.replace(sb.length - 2, sb.length, "")
+            }
+            return sb.append("}\n").toString()
+        }
     }
 
     @JsonIgnoreProperties(ignoreUnknown = true)
@@ -205,10 +233,19 @@ ${properties?.joinToString("\n")}
 Name: $name
 
 $description
-
 $propertiesSection
-
 ${getOutputDefinitionString()}
+#### JSON Example
+```json
+{
+    "label": "$title",
+    "name": "$name",
+    "parameters": {
+        ${properties?.joinToString(",\n") { it.toJsonKeyValuePair() }}
+    },
+    "type" : "TODO/$name"
+}
+```
 """
         }
     }
@@ -249,7 +286,6 @@ $description
 
 Type: $type
 $propertiesSection
-
 ${getOutputResponseString()}
 """
         }
