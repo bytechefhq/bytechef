@@ -790,6 +790,7 @@ const Property = ({
     }
 
     if (
+        displayConditionsQuery &&
         displayCondition &&
         currentComponent?.displayConditions?.[displayCondition] &&
         (isFetchingCurrentDisplayCondition || isDisplayConditionsPending) &&
