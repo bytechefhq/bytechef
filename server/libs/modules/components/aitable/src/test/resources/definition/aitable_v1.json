@@ -90,8 +90,8 @@
     } ],
     "title" : "Create Record",
     "perform" : { },
-    "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "processErrorResponse" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -179,22 +179,22 @@
         "exampleValue" : null,
         "label" : null,
         "placeholder" : null,
-        "controlType" : "SELECT",
+        "controlType" : "TEXT",
         "languageId" : null,
         "maxLength" : null,
         "minLength" : null,
         "options" : null,
-        "optionsDataSource" : {
-          "optionsLookupDependsOn" : [ "datasheetId" ],
-          "options" : { }
-        }
+        "optionsDataSource" : null
       } ],
       "maxItems" : null,
       "minItems" : null,
       "multipleValues" : null,
       "options" : null,
-      "controlType" : "ARRAY_BUILDER",
-      "optionsDataSource" : null
+      "controlType" : "MULTI_SELECT",
+      "optionsDataSource" : {
+        "optionsLookupDependsOn" : [ "datasheetId" ],
+        "options" : { }
+      }
     }, {
       "advancedOption" : null,
       "description" : "The IDs of the records to find.",
@@ -223,22 +223,22 @@
         "exampleValue" : null,
         "label" : null,
         "placeholder" : null,
-        "controlType" : "SELECT",
+        "controlType" : "TEXT",
         "languageId" : null,
         "maxLength" : null,
         "minLength" : null,
         "options" : null,
-        "optionsDataSource" : {
-          "optionsLookupDependsOn" : [ "datasheetId" ],
-          "options" : { }
-        }
+        "optionsDataSource" : null
       } ],
       "maxItems" : null,
       "minItems" : null,
       "multipleValues" : null,
       "options" : null,
-      "controlType" : "ARRAY_BUILDER",
-      "optionsDataSource" : null
+      "controlType" : "MULTI_SELECT",
+      "optionsDataSource" : {
+        "optionsLookupDependsOn" : [ "datasheetId" ],
+        "options" : { }
+      }
     }, {
       "advancedOption" : null,
       "description" : "How many records are returned in total",
@@ -261,8 +261,8 @@
     } ],
     "title" : "Find Records",
     "perform" : { },
-    "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "processErrorResponse" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -363,8 +363,8 @@
     } ],
     "title" : "Update Record",
     "perform" : { },
-    "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "processErrorResponse" : null
   } ],
   "connection" : {
     "authorizations" : [ {
@@ -415,7 +415,7 @@
     "baseUri" : { },
     "test" : null
   },
-  "dataStream" : null,
   "triggers" : null,
+  "dataStream" : null,
   "unifiedApi" : null
 }

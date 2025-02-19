@@ -107,184 +107,36 @@
             "metadata" : { },
             "required" : null,
             "name" : "dayOfWeek",
-            "type" : "OBJECT",
+            "type" : "ARRAY",
             "defaultValue" : null,
             "exampleValue" : null,
             "label" : null,
             "placeholder" : null,
-            "additionalProperties" : null,
+            "items" : [ {
+              "advancedOption" : null,
+              "description" : null,
+              "displayCondition" : null,
+              "expressionEnabled" : null,
+              "hidden" : null,
+              "metadata" : { },
+              "required" : null,
+              "name" : null,
+              "type" : "INTEGER",
+              "defaultValue" : null,
+              "exampleValue" : null,
+              "label" : null,
+              "placeholder" : null,
+              "maxValue" : null,
+              "minValue" : null,
+              "options" : null,
+              "controlType" : "INTEGER",
+              "optionsDataSource" : null
+            } ],
+            "maxItems" : null,
+            "minItems" : null,
             "multipleValues" : null,
             "options" : null,
-            "properties" : [ {
-              "advancedOption" : null,
-              "description" : null,
-              "displayCondition" : null,
-              "expressionEnabled" : null,
-              "hidden" : null,
-              "metadata" : { },
-              "required" : null,
-              "name" : "1",
-              "type" : "BOOLEAN",
-              "defaultValue" : null,
-              "exampleValue" : null,
-              "label" : null,
-              "placeholder" : null,
-              "options" : [ {
-                "description" : null,
-                "label" : "True",
-                "value" : true
-              }, {
-                "description" : null,
-                "label" : "False",
-                "value" : false
-              } ],
-              "controlType" : "SELECT"
-            }, {
-              "advancedOption" : null,
-              "description" : null,
-              "displayCondition" : null,
-              "expressionEnabled" : null,
-              "hidden" : null,
-              "metadata" : { },
-              "required" : null,
-              "name" : "2",
-              "type" : "BOOLEAN",
-              "defaultValue" : null,
-              "exampleValue" : null,
-              "label" : null,
-              "placeholder" : null,
-              "options" : [ {
-                "description" : null,
-                "label" : "True",
-                "value" : true
-              }, {
-                "description" : null,
-                "label" : "False",
-                "value" : false
-              } ],
-              "controlType" : "SELECT"
-            }, {
-              "advancedOption" : null,
-              "description" : null,
-              "displayCondition" : null,
-              "expressionEnabled" : null,
-              "hidden" : null,
-              "metadata" : { },
-              "required" : null,
-              "name" : "3",
-              "type" : "BOOLEAN",
-              "defaultValue" : null,
-              "exampleValue" : null,
-              "label" : null,
-              "placeholder" : null,
-              "options" : [ {
-                "description" : null,
-                "label" : "True",
-                "value" : true
-              }, {
-                "description" : null,
-                "label" : "False",
-                "value" : false
-              } ],
-              "controlType" : "SELECT"
-            }, {
-              "advancedOption" : null,
-              "description" : null,
-              "displayCondition" : null,
-              "expressionEnabled" : null,
-              "hidden" : null,
-              "metadata" : { },
-              "required" : null,
-              "name" : "4",
-              "type" : "BOOLEAN",
-              "defaultValue" : null,
-              "exampleValue" : null,
-              "label" : null,
-              "placeholder" : null,
-              "options" : [ {
-                "description" : null,
-                "label" : "True",
-                "value" : true
-              }, {
-                "description" : null,
-                "label" : "False",
-                "value" : false
-              } ],
-              "controlType" : "SELECT"
-            }, {
-              "advancedOption" : null,
-              "description" : null,
-              "displayCondition" : null,
-              "expressionEnabled" : null,
-              "hidden" : null,
-              "metadata" : { },
-              "required" : null,
-              "name" : "5",
-              "type" : "BOOLEAN",
-              "defaultValue" : null,
-              "exampleValue" : null,
-              "label" : null,
-              "placeholder" : null,
-              "options" : [ {
-                "description" : null,
-                "label" : "True",
-                "value" : true
-              }, {
-                "description" : null,
-                "label" : "False",
-                "value" : false
-              } ],
-              "controlType" : "SELECT"
-            }, {
-              "advancedOption" : null,
-              "description" : null,
-              "displayCondition" : null,
-              "expressionEnabled" : null,
-              "hidden" : null,
-              "metadata" : { },
-              "required" : null,
-              "name" : "6",
-              "type" : "BOOLEAN",
-              "defaultValue" : null,
-              "exampleValue" : null,
-              "label" : null,
-              "placeholder" : null,
-              "options" : [ {
-                "description" : null,
-                "label" : "True",
-                "value" : true
-              }, {
-                "description" : null,
-                "label" : "False",
-                "value" : false
-              } ],
-              "controlType" : "SELECT"
-            }, {
-              "advancedOption" : null,
-              "description" : null,
-              "displayCondition" : null,
-              "expressionEnabled" : null,
-              "hidden" : null,
-              "metadata" : { },
-              "required" : null,
-              "name" : "7",
-              "type" : "BOOLEAN",
-              "defaultValue" : null,
-              "exampleValue" : null,
-              "label" : null,
-              "placeholder" : null,
-              "options" : [ {
-                "description" : null,
-                "label" : "True",
-                "value" : true
-              }, {
-                "description" : null,
-                "label" : "False",
-                "value" : false
-              } ],
-              "controlType" : "SELECT"
-            } ],
-            "controlType" : "OBJECT_BUILDER",
+            "controlType" : "ARRAY_BUILDER",
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
@@ -396,184 +248,36 @@
           "metadata" : { },
           "required" : null,
           "name" : "dayOfWeek",
-          "type" : "OBJECT",
+          "type" : "ARRAY",
           "defaultValue" : null,
           "exampleValue" : null,
           "label" : null,
           "placeholder" : null,
-          "additionalProperties" : null,
+          "items" : [ {
+            "advancedOption" : null,
+            "description" : null,
+            "displayCondition" : null,
+            "expressionEnabled" : null,
+            "hidden" : null,
+            "metadata" : { },
+            "required" : null,
+            "name" : null,
+            "type" : "INTEGER",
+            "defaultValue" : null,
+            "exampleValue" : null,
+            "label" : null,
+            "placeholder" : null,
+            "maxValue" : null,
+            "minValue" : null,
+            "options" : null,
+            "controlType" : "INTEGER",
+            "optionsDataSource" : null
+          } ],
+          "maxItems" : null,
+          "minItems" : null,
           "multipleValues" : null,
           "options" : null,
-          "properties" : [ {
-            "advancedOption" : null,
-            "description" : null,
-            "displayCondition" : null,
-            "expressionEnabled" : null,
-            "hidden" : null,
-            "metadata" : { },
-            "required" : null,
-            "name" : "1",
-            "type" : "BOOLEAN",
-            "defaultValue" : null,
-            "exampleValue" : null,
-            "label" : null,
-            "placeholder" : null,
-            "options" : [ {
-              "description" : null,
-              "label" : "True",
-              "value" : true
-            }, {
-              "description" : null,
-              "label" : "False",
-              "value" : false
-            } ],
-            "controlType" : "SELECT"
-          }, {
-            "advancedOption" : null,
-            "description" : null,
-            "displayCondition" : null,
-            "expressionEnabled" : null,
-            "hidden" : null,
-            "metadata" : { },
-            "required" : null,
-            "name" : "2",
-            "type" : "BOOLEAN",
-            "defaultValue" : null,
-            "exampleValue" : null,
-            "label" : null,
-            "placeholder" : null,
-            "options" : [ {
-              "description" : null,
-              "label" : "True",
-              "value" : true
-            }, {
-              "description" : null,
-              "label" : "False",
-              "value" : false
-            } ],
-            "controlType" : "SELECT"
-          }, {
-            "advancedOption" : null,
-            "description" : null,
-            "displayCondition" : null,
-            "expressionEnabled" : null,
-            "hidden" : null,
-            "metadata" : { },
-            "required" : null,
-            "name" : "3",
-            "type" : "BOOLEAN",
-            "defaultValue" : null,
-            "exampleValue" : null,
-            "label" : null,
-            "placeholder" : null,
-            "options" : [ {
-              "description" : null,
-              "label" : "True",
-              "value" : true
-            }, {
-              "description" : null,
-              "label" : "False",
-              "value" : false
-            } ],
-            "controlType" : "SELECT"
-          }, {
-            "advancedOption" : null,
-            "description" : null,
-            "displayCondition" : null,
-            "expressionEnabled" : null,
-            "hidden" : null,
-            "metadata" : { },
-            "required" : null,
-            "name" : "4",
-            "type" : "BOOLEAN",
-            "defaultValue" : null,
-            "exampleValue" : null,
-            "label" : null,
-            "placeholder" : null,
-            "options" : [ {
-              "description" : null,
-              "label" : "True",
-              "value" : true
-            }, {
-              "description" : null,
-              "label" : "False",
-              "value" : false
-            } ],
-            "controlType" : "SELECT"
-          }, {
-            "advancedOption" : null,
-            "description" : null,
-            "displayCondition" : null,
-            "expressionEnabled" : null,
-            "hidden" : null,
-            "metadata" : { },
-            "required" : null,
-            "name" : "5",
-            "type" : "BOOLEAN",
-            "defaultValue" : null,
-            "exampleValue" : null,
-            "label" : null,
-            "placeholder" : null,
-            "options" : [ {
-              "description" : null,
-              "label" : "True",
-              "value" : true
-            }, {
-              "description" : null,
-              "label" : "False",
-              "value" : false
-            } ],
-            "controlType" : "SELECT"
-          }, {
-            "advancedOption" : null,
-            "description" : null,
-            "displayCondition" : null,
-            "expressionEnabled" : null,
-            "hidden" : null,
-            "metadata" : { },
-            "required" : null,
-            "name" : "6",
-            "type" : "BOOLEAN",
-            "defaultValue" : null,
-            "exampleValue" : null,
-            "label" : null,
-            "placeholder" : null,
-            "options" : [ {
-              "description" : null,
-              "label" : "True",
-              "value" : true
-            }, {
-              "description" : null,
-              "label" : "False",
-              "value" : false
-            } ],
-            "controlType" : "SELECT"
-          }, {
-            "advancedOption" : null,
-            "description" : null,
-            "displayCondition" : null,
-            "expressionEnabled" : null,
-            "hidden" : null,
-            "metadata" : { },
-            "required" : null,
-            "name" : "7",
-            "type" : "BOOLEAN",
-            "defaultValue" : null,
-            "exampleValue" : null,
-            "label" : null,
-            "placeholder" : null,
-            "options" : [ {
-              "description" : null,
-              "label" : "True",
-              "value" : true
-            }, {
-              "description" : null,
-              "label" : "False",
-              "value" : false
-            } ],
-            "controlType" : "SELECT"
-          } ],
-          "controlType" : "OBJECT_BUILDER",
+          "controlType" : "ARRAY_BUILDER",
           "optionsDataSource" : null
         }, {
           "advancedOption" : null,
@@ -648,15 +352,12 @@
       "metadata" : { },
       "required" : null,
       "name" : "dayOfWeek",
-      "type" : "OBJECT",
+      "type" : "ARRAY",
       "defaultValue" : null,
       "exampleValue" : null,
       "label" : "Day of Week",
       "placeholder" : null,
-      "additionalProperties" : null,
-      "multipleValues" : null,
-      "options" : null,
-      "properties" : [ {
+      "items" : [ {
         "advancedOption" : null,
         "description" : null,
         "displayCondition" : null,
@@ -664,168 +365,51 @@
         "hidden" : null,
         "metadata" : { },
         "required" : null,
-        "name" : "1",
-        "type" : "BOOLEAN",
-        "defaultValue" : true,
+        "name" : null,
+        "type" : "INTEGER",
+        "defaultValue" : null,
         "exampleValue" : null,
-        "label" : "Monday",
+        "label" : null,
         "placeholder" : null,
-        "options" : [ {
-          "description" : null,
-          "label" : "True",
-          "value" : true
-        }, {
-          "description" : null,
-          "label" : "False",
-          "value" : false
-        } ],
-        "controlType" : "SELECT"
-      }, {
-        "advancedOption" : null,
-        "description" : null,
-        "displayCondition" : null,
-        "expressionEnabled" : null,
-        "hidden" : null,
-        "metadata" : { },
-        "required" : null,
-        "name" : "2",
-        "type" : "BOOLEAN",
-        "defaultValue" : true,
-        "exampleValue" : null,
-        "label" : "Tuesday",
-        "placeholder" : null,
-        "options" : [ {
-          "description" : null,
-          "label" : "True",
-          "value" : true
-        }, {
-          "description" : null,
-          "label" : "False",
-          "value" : false
-        } ],
-        "controlType" : "SELECT"
-      }, {
-        "advancedOption" : null,
-        "description" : null,
-        "displayCondition" : null,
-        "expressionEnabled" : null,
-        "hidden" : null,
-        "metadata" : { },
-        "required" : null,
-        "name" : "3",
-        "type" : "BOOLEAN",
-        "defaultValue" : true,
-        "exampleValue" : null,
-        "label" : "Wednesday",
-        "placeholder" : null,
-        "options" : [ {
-          "description" : null,
-          "label" : "True",
-          "value" : true
-        }, {
-          "description" : null,
-          "label" : "False",
-          "value" : false
-        } ],
-        "controlType" : "SELECT"
-      }, {
-        "advancedOption" : null,
-        "description" : null,
-        "displayCondition" : null,
-        "expressionEnabled" : null,
-        "hidden" : null,
-        "metadata" : { },
-        "required" : null,
-        "name" : "4",
-        "type" : "BOOLEAN",
-        "defaultValue" : true,
-        "exampleValue" : null,
-        "label" : "Thursday",
-        "placeholder" : null,
-        "options" : [ {
-          "description" : null,
-          "label" : "True",
-          "value" : true
-        }, {
-          "description" : null,
-          "label" : "False",
-          "value" : false
-        } ],
-        "controlType" : "SELECT"
-      }, {
-        "advancedOption" : null,
-        "description" : null,
-        "displayCondition" : null,
-        "expressionEnabled" : null,
-        "hidden" : null,
-        "metadata" : { },
-        "required" : null,
-        "name" : "5",
-        "type" : "BOOLEAN",
-        "defaultValue" : true,
-        "exampleValue" : null,
-        "label" : "Friday",
-        "placeholder" : null,
-        "options" : [ {
-          "description" : null,
-          "label" : "True",
-          "value" : true
-        }, {
-          "description" : null,
-          "label" : "False",
-          "value" : false
-        } ],
-        "controlType" : "SELECT"
-      }, {
-        "advancedOption" : null,
-        "description" : null,
-        "displayCondition" : null,
-        "expressionEnabled" : null,
-        "hidden" : null,
-        "metadata" : { },
-        "required" : null,
-        "name" : "6",
-        "type" : "BOOLEAN",
-        "defaultValue" : true,
-        "exampleValue" : null,
-        "label" : "Saturday",
-        "placeholder" : null,
-        "options" : [ {
-          "description" : null,
-          "label" : "True",
-          "value" : true
-        }, {
-          "description" : null,
-          "label" : "False",
-          "value" : false
-        } ],
-        "controlType" : "SELECT"
-      }, {
-        "advancedOption" : null,
-        "description" : null,
-        "displayCondition" : null,
-        "expressionEnabled" : null,
-        "hidden" : null,
-        "metadata" : { },
-        "required" : null,
-        "name" : "7",
-        "type" : "BOOLEAN",
-        "defaultValue" : true,
-        "exampleValue" : null,
-        "label" : "Sunday",
-        "placeholder" : null,
-        "options" : [ {
-          "description" : null,
-          "label" : "True",
-          "value" : true
-        }, {
-          "description" : null,
-          "label" : "False",
-          "value" : false
-        } ],
-        "controlType" : "SELECT"
+        "maxValue" : null,
+        "minValue" : null,
+        "options" : null,
+        "controlType" : "INTEGER",
+        "optionsDataSource" : null
       } ],
-      "controlType" : "OBJECT_BUILDER",
+      "maxItems" : null,
+      "minItems" : null,
+      "multipleValues" : null,
+      "options" : [ {
+        "description" : null,
+        "label" : "Monday",
+        "value" : 1
+      }, {
+        "description" : null,
+        "label" : "Tuesday",
+        "value" : 2
+      }, {
+        "description" : null,
+        "label" : "Wednesday",
+        "value" : 3
+      }, {
+        "description" : null,
+        "label" : "Thursday",
+        "value" : 4
+      }, {
+        "description" : null,
+        "label" : "Friday",
+        "value" : 5
+      }, {
+        "description" : null,
+        "label" : "Saturday",
+        "value" : 6
+      }, {
+        "description" : null,
+        "label" : "Sunday",
+        "value" : 7
+      } ],
+      "controlType" : "MULTI_SELECT",
       "optionsDataSource" : null
     }, {
       "advancedOption" : null,
@@ -960,13 +544,13 @@
     "type" : "LISTENER",
     "webhookRawBody" : null,
     "workflowSyncExecution" : null,
-    "deduplicate" : null,
-    "webhookDisable" : null,
     "webhookEnable" : null,
     "dynamicWebhookRefresh" : null,
     "webhookRequest" : null,
     "listenerDisable" : { },
     "listenerEnable" : { },
+    "deduplicate" : null,
+    "webhookDisable" : null,
     "poll" : null,
     "processErrorResponse" : null,
     "webhookValidate" : null,
@@ -1439,13 +1023,13 @@
     "type" : "LISTENER",
     "webhookRawBody" : null,
     "workflowSyncExecution" : null,
-    "deduplicate" : null,
-    "webhookDisable" : null,
     "webhookEnable" : null,
     "dynamicWebhookRefresh" : null,
     "webhookRequest" : null,
     "listenerDisable" : { },
     "listenerEnable" : { },
+    "deduplicate" : null,
+    "webhookDisable" : null,
     "poll" : null,
     "processErrorResponse" : null,
     "webhookValidate" : null,
@@ -1890,13 +1474,13 @@
     "type" : "LISTENER",
     "webhookRawBody" : null,
     "workflowSyncExecution" : null,
-    "deduplicate" : null,
-    "webhookDisable" : null,
     "webhookEnable" : null,
     "dynamicWebhookRefresh" : null,
     "webhookRequest" : null,
     "listenerDisable" : { },
     "listenerEnable" : { },
+    "deduplicate" : null,
+    "webhookDisable" : null,
     "poll" : null,
     "processErrorResponse" : null,
     "webhookValidate" : null,
@@ -2132,13 +1716,13 @@
     "type" : "LISTENER",
     "webhookRawBody" : null,
     "workflowSyncExecution" : null,
-    "deduplicate" : null,
-    "webhookDisable" : null,
     "webhookEnable" : null,
     "dynamicWebhookRefresh" : null,
     "webhookRequest" : null,
     "listenerDisable" : { },
     "listenerEnable" : { },
+    "deduplicate" : null,
+    "webhookDisable" : null,
     "poll" : null,
     "processErrorResponse" : null,
     "webhookValidate" : null,
@@ -2472,13 +2056,13 @@
     "type" : "LISTENER",
     "webhookRawBody" : null,
     "workflowSyncExecution" : null,
-    "deduplicate" : null,
-    "webhookDisable" : null,
     "webhookEnable" : null,
     "dynamicWebhookRefresh" : null,
     "webhookRequest" : null,
     "listenerDisable" : { },
     "listenerEnable" : { },
+    "deduplicate" : null,
+    "webhookDisable" : null,
     "poll" : null,
     "processErrorResponse" : null,
     "webhookValidate" : null,
