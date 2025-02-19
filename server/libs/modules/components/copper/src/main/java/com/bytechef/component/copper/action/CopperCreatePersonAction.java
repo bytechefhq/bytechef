@@ -199,9 +199,8 @@ public class CopperCreatePersonAction {
             array(TAGS)
                 .label("Tags")
                 .description("Tags associated with the person.")
-                .items(
-                    string()
-                        .options((ActionOptionsFunction<String>) CopperOptionUtils::getTagsOptions))
+                .items(string())
+                .options((ActionOptionsFunction<String>) CopperOptionUtils::getTagsOptions)
                 .required(false))
         .output(outputSchema(
             object()

@@ -137,8 +137,8 @@ public class PipedriveComponentHandler extends AbstractPipedriveComponentHandler
                         .displayCondition("%s == '%s'".formatted("status", "lost"));
                 } else if (Objects.equals(baseProperty.getName(), "label_ids")) {
                     ((ModifiableArrayProperty) baseProperty)
-                        .items(string()
-                            .options(PipedriveUtils.getOptions("/leadLabels", null)));
+                        .items(string())
+                        .options(PipedriveUtils.getOptions("/dealLabels", null));
                 } else if (Objects.equals(baseProperty.getName(), "value")
                     && Objects.equals(actionDefinition.getName(), "addLead")) {
                     Optional<List<? extends ValueProperty<?>>> propertiesOptional1 =

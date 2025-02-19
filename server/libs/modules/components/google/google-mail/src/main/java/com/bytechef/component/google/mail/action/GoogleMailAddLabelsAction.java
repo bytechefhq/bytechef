@@ -54,11 +54,8 @@ public class GoogleMailAddLabelsAction {
             array(LABEL_IDS)
                 .label("Labels")
                 .description("Labels to add to this message. You can add up to 100 labels with each update.")
-                .items(
-                    string("label")
-                        .label("Label ID")
-                        .description("ID of the label to add to this message.")
-                        .options((ActionOptionsFunction<String>) GoogleMailUtils::getLabelOptions))
+                .items(string())
+                .options((ActionOptionsFunction<String>) GoogleMailUtils::getLabelOptions)
                 .maxItems(100)
                 .required(true))
         .output(
