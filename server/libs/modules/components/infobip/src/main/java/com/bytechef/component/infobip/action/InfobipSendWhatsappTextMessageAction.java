@@ -80,7 +80,8 @@ public class InfobipSendWhatsappTextMessageAction {
                                 string(GROUP_NAME),
                                 integer(ID),
                                 string(NAME),
-                                string(DESCRIPTION)))))
+                                string(DESCRIPTION),
+                                string("action")))))
         .perform(InfobipSendWhatsappTextMessageAction::perform);
 
     private InfobipSendWhatsappTextMessageAction() {

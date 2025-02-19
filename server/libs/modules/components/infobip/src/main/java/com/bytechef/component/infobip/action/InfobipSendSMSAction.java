@@ -30,10 +30,10 @@ import static com.bytechef.component.infobip.constant.InfobipConstants.GROUP_ID;
 import static com.bytechef.component.infobip.constant.InfobipConstants.GROUP_NAME;
 import static com.bytechef.component.infobip.constant.InfobipConstants.ID;
 import static com.bytechef.component.infobip.constant.InfobipConstants.MESSAGES;
+import static com.bytechef.component.infobip.constant.InfobipConstants.MESSAGE_COUNT;
 import static com.bytechef.component.infobip.constant.InfobipConstants.MESSAGE_ID;
 import static com.bytechef.component.infobip.constant.InfobipConstants.NAME;
 import static com.bytechef.component.infobip.constant.InfobipConstants.SENDER;
-import static com.bytechef.component.infobip.constant.InfobipConstants.SMS_COUNT;
 import static com.bytechef.component.infobip.constant.InfobipConstants.STATUS;
 import static com.bytechef.component.infobip.constant.InfobipConstants.TEXT;
 import static com.bytechef.component.infobip.constant.InfobipConstants.TO;
@@ -75,16 +75,20 @@ public class InfobipSendSMSAction {
                         string(BULK_ID),
                         array(MESSAGES)
                             .items(
-                                string(MESSAGE_ID),
-                                object(STATUS)
+                                object()
                                     .properties(
-                                        integer(GROUP_ID),
-                                        string(GROUP_NAME),
-                                        integer(ID),
-                                        string(NAME),
-                                        string(DESCRIPTION)),
-                                string(TO),
-                                integer(SMS_COUNT)))))
+                                        string(MESSAGE_ID),
+                                        object(STATUS)
+                                            .properties(
+                                                integer(GROUP_ID),
+                                                string(GROUP_NAME),
+                                                integer(ID),
+                                                string(NAME),
+                                                string(DESCRIPTION),
+                                                string("action")),
+                                        string("destination"),
+                                        object("details")
+                                            .properties(integer(MESSAGE_COUNT)))))))
         .perform(InfobipSendSMSAction::perform);
 
     private InfobipSendSMSAction() {
