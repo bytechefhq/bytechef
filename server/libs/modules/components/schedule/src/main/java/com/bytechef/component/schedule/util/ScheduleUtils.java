@@ -16,20 +16,33 @@
 
 package com.bytechef.component.schedule.util;
 
-import com.bytechef.component.definition.ComponentDsl;
+import static com.bytechef.component.definition.ComponentDsl.option;
+
 import com.bytechef.component.definition.Option;
+import java.time.DayOfWeek;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
+import java.time.format.TextStyle;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * @author Ivica Cardic
  */
 public class ScheduleUtils {
+
+    public static List<Option<Long>> getDayOfWeekOptions() {
+        return Arrays.stream(DayOfWeek.values())
+            .map(dayOfWeek -> option(dayOfWeek.getDisplayName(TextStyle.FULL, Locale.getDefault()),
+                dayOfWeek.getValue()))
+            .collect(Collectors.toList());
+    }
 
     public static List<Option<String>> getTimeZoneOptions() {
         List<Option<String>> options = new ArrayList<>();
@@ -44,7 +57,7 @@ public class ScheduleUtils {
 
                 String zoneOffsetId = zoneOffset.getId();
 
-                options.add(ComponentDsl.option("GMT" + zoneOffsetId.replace("Z", "+00:00"), zoneId));
+                options.add(option("GMT" + zoneOffsetId.replace("Z", "+00:00"), zoneId));
             }
         }
 
