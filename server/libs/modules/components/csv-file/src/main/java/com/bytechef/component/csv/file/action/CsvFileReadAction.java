@@ -25,12 +25,9 @@ import static com.bytechef.component.csv.file.constant.CsvFileConstants.PAGE_NUM
 import static com.bytechef.component.csv.file.constant.CsvFileConstants.PAGE_SIZE;
 import static com.bytechef.component.csv.file.constant.CsvFileConstants.READ_AS_STRING;
 import static com.bytechef.component.definition.ComponentDsl.action;
-import static com.bytechef.component.definition.ComponentDsl.array;
 import static com.bytechef.component.definition.ComponentDsl.bool;
 import static com.bytechef.component.definition.ComponentDsl.fileEntry;
 import static com.bytechef.component.definition.ComponentDsl.integer;
-import static com.bytechef.component.definition.ComponentDsl.object;
-import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
 
 import com.bytechef.component.csv.file.util.CsvFileReadUtils;
@@ -100,7 +97,7 @@ public class CsvFileReadAction {
                         "otherwise some special characters are interpreted the wrong way.")
                 .defaultValue(false)
                 .advancedOption(true))
-        .output(outputSchema(array().items(object())))
+        .output()
         .perform(CsvFileReadAction::perform);
 
     protected static List<Map<String, Object>> perform(
