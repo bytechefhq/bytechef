@@ -1089,6 +1089,7 @@ const Property = ({
                             name={name}
                             onValueChange={(value: string) => handleSelectChange(value, name!)}
                             options={(formattedOptions as Array<Option>) || undefined || []}
+                            optionsDataSource={optionsDataSource}
                             path={path}
                             required={required}
                             showInputTypeSwitchButton={showInputTypeSwitchButton}
@@ -1145,6 +1146,7 @@ const Property = ({
                         !!(currentNode?.connectionId && currentNode?.connections) ||
                         currentNode?.connections?.length === 0
                     }
+                    lookupDependsOnPaths={propertiesDataSource?.propertiesLookupDependsOn}
                     lookupDependsOnValues={lookupDependsOnValues}
                     name={name}
                     parameterValue={propertyParameterValue}

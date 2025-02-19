@@ -3,13 +3,14 @@ import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWor
 import useWorkflowNodeDetailsPanelStore from '@/pages/platform/workflow-editor/stores/useWorkflowNodeDetailsPanelStore';
 import {Property as PropertyModel} from '@/shared/middleware/platform/configuration';
 import {useGetWorkflowNodeDynamicPropertiesQuery} from '@/shared/queries/platform/workflowNodeDynamicProperties.queries';
-import {useEffect, useState} from 'react';
+import {useEffect, useMemo, useState} from 'react';
 
 import Property from '../Property';
 
 interface PropertyDynamicPropertiesProps {
     currentOperationName?: string;
     enabled: boolean;
+    lookupDependsOnPaths?: Array<string>;
     lookupDependsOnValues?: Array<string>;
     name?: string;
     path?: string;
@@ -20,6 +21,7 @@ interface PropertyDynamicPropertiesProps {
 const PropertyDynamicProperties = ({
     currentOperationName,
     enabled,
+    lookupDependsOnPaths,
     lookupDependsOnValues,
     name,
     parameterValue,
@@ -30,21 +32,27 @@ const PropertyDynamicProperties = ({
     const {workflow} = useWorkflowDataStore();
     const {currentNode} = useWorkflowNodeDetailsPanelStore();
 
-    const {data: properties, isLoading} = useGetWorkflowNodeDynamicPropertiesQuery(
-        {
+    const queryOptions = useMemo(
+        () => ({
             lookupDependsOnValuesKey: (lookupDependsOnValues ?? []).join(','),
             request: {
                 id: workflow.id!,
                 propertyName: name!,
                 workflowNodeName: currentNode?.name ?? '',
             },
-        },
-        !!(lookupDependsOnValues ?? []).length &&
-            (lookupDependsOnValues
-                ? lookupDependsOnValues.every((loadDependencyValue) => !!loadDependencyValue)
-                : false) &&
-            enabled
+        }),
+        [lookupDependsOnValues, name, workflow.id, currentNode]
     );
+
+    const queryEnabled = useMemo(
+        () =>
+            (lookupDependsOnPaths?.length
+                ? lookupDependsOnValues?.every((loadDependencyValue) => !!loadDependencyValue)
+                : true) && enabled,
+        [lookupDependsOnPaths?.length, lookupDependsOnValues, enabled]
+    );
+
+    const {data: properties, isLoading} = useGetWorkflowNodeDynamicPropertiesQuery(queryOptions, Boolean(queryEnabled));
 
     useEffect(() => {
         setSubProperties(properties);

@@ -14,7 +14,7 @@ import {twMerge} from 'tailwind-merge';
 import useWorkflowNodeDetailsPanelStore from '../../../stores/useWorkflowNodeDetailsPanelStore';
 import InputTypeSwitchButton from './InputTypeSwitchButton';
 
-import type {Option} from '@/shared/middleware/platform/configuration';
+import type {Option, OptionsDataSource} from '@/shared/middleware/platform/configuration';
 
 type ComboBoxItemType = {
     description?: string;
@@ -39,6 +39,7 @@ interface PropertyComboBoxProps {
     onBlur?: FocusEventHandler;
     onValueChange?: (value: string) => void;
     options: Array<Option>;
+    optionsDataSource?: OptionsDataSource;
     path?: string;
     placeholder?: string;
     required?: boolean;
@@ -63,6 +64,7 @@ const PropertyComboBox = ({
     onBlur,
     onValueChange,
     options: initialOptions,
+    optionsDataSource,
     path: initialPath,
     placeholder = 'Select...',
     required,
@@ -118,8 +120,9 @@ const PropertyComboBox = ({
             (lookupDependsOnPaths?.length
                 ? lookupDependsOnValues?.every((loadDependencyValue) => !!loadDependencyValue)
                 : true) &&
-            !!connectionRequirementMet,
-        [connectionRequirementMet, currentNode, lookupDependsOnPaths?.length, lookupDependsOnValues]
+            !!connectionRequirementMet &&
+            optionsDataSource,
+        [connectionRequirementMet, currentNode, lookupDependsOnPaths?.length, lookupDependsOnValues, optionsDataSource]
     );
 
     const {
