@@ -239,6 +239,8 @@ $outputSchema
         var outputDefinition: OutputDefinition? = null
         var properties: Array<Properties>? = null
         var title: String? = null
+        var componentName: String? = null
+        var componentVersion: Int? = null
 
         private fun getOutputDefinitionString(): String {
             if (outputDefinition == null) {
@@ -272,7 +274,7 @@ $formattedJson
                 """ {
                     "label": "$title",
                     "name": "$name",
-                    "type": "TODO/$name"
+                    "type": "$componentName/v$componentVersion/$name"
                     }
                """.trimIndent()
             } else {
@@ -280,7 +282,7 @@ $formattedJson
                     "label": "$title",
                     "name": "$name",
                     "parameters": { ${properties?.joinToString(",\n") { it.toJsonKeyValuePair() }} },
-                    "type": "TODO/$name" }
+                    "type": "$componentName/v$componentVersion/$name" }
                 """.trimIndent()
             }
         }
@@ -312,6 +314,8 @@ ${properties?.joinToString("\n")}
         var properties: Array<Properties>? = null
         var title: String? = null
         var type: String? = null
+        var componentName: String? = null
+        var componentVersion: Int? = null
 
         private fun getOutputResponseString(): String {
             if (outputDefinition == null) {
@@ -347,7 +351,7 @@ $formattedJson
                 """ {
                     "label": "$title",
                     "name": "$name",
-                    "type": "TODO/$name"
+                    "type": "$componentName/v$componentVersion/$name"
                     }
                """.trimIndent()
             } else {
@@ -355,7 +359,7 @@ $formattedJson
                     "label": "$title",
                     "name": "$name",
                     "parameters": { ${properties?.joinToString(",\n") { it.toJsonKeyValuePair() }} },
-                    "type": "TODO/$name" }
+                    "type": "$componentName/v$componentVersion/$name" }
                 """.trimIndent()
             }
         }
@@ -489,6 +493,15 @@ ${actions?.joinToString("\n")}
         }
 
         override fun toString(): String {
+            actions?.forEach { action ->
+                action.componentName = name
+                action.componentVersion = version
+            }
+            triggers?.forEach { trigger ->
+                trigger.componentName = name
+                trigger.componentVersion = version
+            }
+
             return """---
 title: "$title"
 description: "$description"
