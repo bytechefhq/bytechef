@@ -71,10 +71,8 @@ public class CsvFileReadAction {
             string(ENCLOSING_CHARACTER)
                 .label("Enclosing Character")
                 .description(
-                    """
-                            Character used to wrap/enclose values. It is usually applied to complex CSV files where
-                            values may include delimiter characters.
-                        """)
+                    "Character used to wrap/enclose values. It is usually applied to complex CSV files where values " +
+                        "may include delimiter characters.")
                 .placeholder("\" ' / ")
                 .advancedOption(true),
             bool(HEADER_ROW)
