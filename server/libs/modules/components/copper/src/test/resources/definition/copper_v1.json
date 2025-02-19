@@ -494,8 +494,8 @@
     } ],
     "title" : "Create Activity",
     "perform" : { },
-    "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "processErrorResponse" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -2176,8 +2176,8 @@
     } ],
     "title" : "Create Company",
     "perform" : { },
-    "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "processErrorResponse" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -4157,27 +4157,27 @@
         "exampleValue" : null,
         "label" : null,
         "placeholder" : null,
-        "controlType" : "SELECT",
+        "controlType" : "TEXT",
         "languageId" : null,
         "maxLength" : null,
         "minLength" : null,
         "options" : null,
-        "optionsDataSource" : {
-          "optionsLookupDependsOn" : null,
-          "options" : { }
-        }
+        "optionsDataSource" : null
       } ],
       "maxItems" : null,
       "minItems" : null,
       "multipleValues" : null,
       "options" : null,
-      "controlType" : "ARRAY_BUILDER",
-      "optionsDataSource" : null
+      "controlType" : "MULTI_SELECT",
+      "optionsDataSource" : {
+        "optionsLookupDependsOn" : null,
+        "options" : { }
+      }
     } ],
     "title" : "Create Person",
     "perform" : { },
-    "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "processErrorResponse" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -5126,12 +5126,9 @@
     } ],
     "title" : "Create Task",
     "perform" : { },
-    "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "processErrorResponse" : null
   } ],
-  "dataStream" : null,
-  "triggers" : null,
-  "unifiedApi" : null,
   "connection" : {
     "authorizations" : [ {
       "detectOn" : null,
@@ -5200,5 +5197,8 @@
     "authorizationRequired" : null,
     "baseUri" : { },
     "test" : null
-  }
+  },
+  "triggers" : null,
+  "dataStream" : null,
+  "unifiedApi" : null
 }

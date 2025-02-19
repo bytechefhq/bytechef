@@ -270,39 +270,39 @@
       "placeholder" : null,
       "items" : [ {
         "advancedOption" : null,
-        "description" : "ID of the label to add to this message.",
+        "description" : null,
         "displayCondition" : null,
         "expressionEnabled" : null,
         "hidden" : null,
         "metadata" : { },
         "required" : null,
-        "name" : "label",
+        "name" : null,
         "type" : "STRING",
         "defaultValue" : null,
         "exampleValue" : null,
-        "label" : "Label ID",
+        "label" : null,
         "placeholder" : null,
-        "controlType" : "SELECT",
+        "controlType" : "TEXT",
         "languageId" : null,
         "maxLength" : null,
         "minLength" : null,
         "options" : null,
-        "optionsDataSource" : {
-          "optionsLookupDependsOn" : null,
-          "options" : { }
-        }
+        "optionsDataSource" : null
       } ],
       "maxItems" : 100,
       "minItems" : null,
       "multipleValues" : null,
       "options" : null,
-      "controlType" : "ARRAY_BUILDER",
-      "optionsDataSource" : null
+      "controlType" : "MULTI_SELECT",
+      "optionsDataSource" : {
+        "optionsLookupDependsOn" : null,
+        "options" : { }
+      }
     } ],
     "title" : "Add Labels",
-    "processErrorResponse" : null,
     "workflowNodeDescription" : null,
-    "perform" : { }
+    "perform" : { },
+    "processErrorResponse" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -336,9 +336,9 @@
       }
     } ],
     "title" : "Delete Mail",
-    "processErrorResponse" : null,
     "workflowNodeDescription" : null,
-    "perform" : { }
+    "perform" : { },
+    "processErrorResponse" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -458,9 +458,9 @@
       "optionsDataSource" : null
     } ],
     "title" : "Get Mail",
-    "processErrorResponse" : null,
     "workflowNodeDescription" : null,
-    "perform" : { }
+    "perform" : { },
+    "processErrorResponse" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -580,9 +580,9 @@
       "optionsDataSource" : null
     } ],
     "title" : "Get Thread",
-    "processErrorResponse" : null,
     "workflowNodeDescription" : null,
-    "perform" : { }
+    "perform" : { },
+    "processErrorResponse" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -846,7 +846,7 @@
         "hidden" : null,
         "metadata" : { },
         "required" : null,
-        "name" : "email",
+        "name" : null,
         "type" : "STRING",
         "defaultValue" : null,
         "exampleValue" : null,
@@ -887,7 +887,7 @@
         "hidden" : null,
         "metadata" : { },
         "required" : null,
-        "name" : "email",
+        "name" : null,
         "type" : "STRING",
         "defaultValue" : null,
         "exampleValue" : null,
@@ -928,7 +928,7 @@
         "hidden" : null,
         "metadata" : { },
         "required" : null,
-        "name" : "email",
+        "name" : null,
         "type" : "STRING",
         "defaultValue" : null,
         "exampleValue" : null,
@@ -1086,9 +1086,9 @@
       "optionsDataSource" : null
     } ],
     "title" : "Reply to Email",
-    "processErrorResponse" : null,
     "workflowNodeDescription" : null,
-    "perform" : { }
+    "perform" : { },
+    "processErrorResponse" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -1611,9 +1611,9 @@
       "controlType" : "SELECT"
     } ],
     "title" : "Search Email",
-    "processErrorResponse" : null,
     "workflowNodeDescription" : null,
-    "perform" : { }
+    "perform" : { },
+    "processErrorResponse" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -1854,7 +1854,7 @@
         "hidden" : null,
         "metadata" : { },
         "required" : null,
-        "name" : "email",
+        "name" : null,
         "type" : "STRING",
         "defaultValue" : null,
         "exampleValue" : null,
@@ -1915,7 +1915,7 @@
         "hidden" : null,
         "metadata" : { },
         "required" : null,
-        "name" : "email",
+        "name" : null,
         "type" : "STRING",
         "defaultValue" : null,
         "exampleValue" : null,
@@ -1956,7 +1956,7 @@
         "hidden" : null,
         "metadata" : { },
         "required" : null,
-        "name" : "email",
+        "name" : null,
         "type" : "STRING",
         "defaultValue" : null,
         "exampleValue" : null,
@@ -1997,7 +1997,7 @@
         "hidden" : null,
         "metadata" : { },
         "required" : null,
-        "name" : "email",
+        "name" : null,
         "type" : "STRING",
         "defaultValue" : null,
         "exampleValue" : null,
@@ -2155,9 +2155,9 @@
       "optionsDataSource" : null
     } ],
     "title" : "Send Email",
-    "processErrorResponse" : null,
     "workflowNodeDescription" : null,
-    "perform" : { }
+    "perform" : { },
+    "processErrorResponse" : null
   } ],
   "connection" : {
     "authorizations" : [ {
@@ -2210,15 +2210,15 @@
       "type" : "OAUTH2_AUTHORIZATION_CODE",
       "acquire" : null,
       "apply" : null,
+      "pkce" : null,
+      "refresh" : null,
+      "scopes" : { },
       "authorizationCallback" : null,
       "authorizationUrl" : { },
       "clientId" : null,
       "clientSecret" : null,
       "oauth2AuthorizationExtraQueryParameters" : { },
-      "pkce" : null,
-      "refresh" : null,
       "refreshUrl" : { },
-      "scopes" : { },
       "refreshToken" : null,
       "tokenUrl" : { }
     } ],
@@ -2228,7 +2228,6 @@
     "baseUri" : null,
     "test" : null
   },
-  "dataStream" : null,
   "triggers" : [ {
     "batch" : null,
     "deprecated" : null,
@@ -3214,7 +3213,7 @@
     },
     "properties" : [ {
       "advancedOption" : null,
-      "description" : "Must be 3-255 characters, start with a letter, and contain only the following characters:\nletters, numbers, dashes (-), periods (.), underscores (_), tildes (~), percents (%) or\nplus signs (+). Cannot start with goog.",
+      "description" : "Must be 3-255 characters, start with a letter, and contain only the following characters: letters, numbers, dashes (-), periods (.), underscores (_), tildes (~), percents (%) or plus signs (+). Cannot start with goog.",
       "displayCondition" : null,
       "expressionEnabled" : null,
       "hidden" : null,
@@ -3242,10 +3241,10 @@
     "webhookDisable" : { },
     "webhookEnable" : { },
     "dynamicWebhookRefresh" : null,
+    "workflowNodeDescription" : null,
+    "processErrorResponse" : null,
     "webhookRequest" : { },
     "listenerDisable" : null,
-    "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
     "listenerEnable" : null,
     "webhookValidate" : null,
     "webhookValidateOnEnable" : null
@@ -3436,13 +3435,14 @@
     "webhookDisable" : null,
     "webhookEnable" : null,
     "dynamicWebhookRefresh" : null,
+    "workflowNodeDescription" : null,
+    "processErrorResponse" : null,
     "webhookRequest" : null,
     "listenerDisable" : null,
-    "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
     "listenerEnable" : null,
     "webhookValidate" : null,
     "webhookValidateOnEnable" : null
   } ],
+  "dataStream" : null,
   "unifiedApi" : null
 }

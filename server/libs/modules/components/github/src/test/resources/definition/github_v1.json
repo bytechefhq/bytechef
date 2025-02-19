@@ -862,29 +862,29 @@
         "expressionEnabled" : null,
         "hidden" : null,
         "metadata" : { },
-        "required" : true,
-        "name" : "assignee",
+        "required" : null,
+        "name" : null,
         "type" : "STRING",
         "defaultValue" : null,
         "exampleValue" : null,
-        "label" : "Assignee",
+        "label" : null,
         "placeholder" : null,
-        "controlType" : "SELECT",
+        "controlType" : "TEXT",
         "languageId" : null,
         "maxLength" : null,
         "minLength" : null,
         "options" : null,
-        "optionsDataSource" : {
-          "optionsLookupDependsOn" : [ "repository" ],
-          "options" : { }
-        }
+        "optionsDataSource" : null
       } ],
       "maxItems" : 10,
       "minItems" : null,
       "multipleValues" : null,
       "options" : null,
-      "controlType" : "ARRAY_BUILDER",
-      "optionsDataSource" : null
+      "controlType" : "MULTI_SELECT",
+      "optionsDataSource" : {
+        "optionsLookupDependsOn" : [ "repository" ],
+        "options" : { }
+      }
     } ],
     "title" : "Add Assignee to Issue",
     "perform" : { },
@@ -1175,29 +1175,29 @@
         "expressionEnabled" : null,
         "hidden" : null,
         "metadata" : { },
-        "required" : true,
-        "name" : "label",
+        "required" : null,
+        "name" : null,
         "type" : "STRING",
         "defaultValue" : null,
         "exampleValue" : null,
-        "label" : "Label",
+        "label" : null,
         "placeholder" : null,
-        "controlType" : "SELECT",
+        "controlType" : "TEXT",
         "languageId" : null,
         "maxLength" : null,
         "minLength" : null,
         "options" : null,
-        "optionsDataSource" : {
-          "optionsLookupDependsOn" : [ "repository" ],
-          "options" : { }
-        }
+        "optionsDataSource" : null
       } ],
       "maxItems" : null,
       "minItems" : null,
       "multipleValues" : null,
       "options" : null,
-      "controlType" : "ARRAY_BUILDER",
-      "optionsDataSource" : null
+      "controlType" : "MULTI_SELECT",
+      "optionsDataSource" : {
+        "optionsLookupDependsOn" : [ "repository" ],
+        "options" : { }
+      }
     } ],
     "title" : "Add Labels to Issue",
     "perform" : { },

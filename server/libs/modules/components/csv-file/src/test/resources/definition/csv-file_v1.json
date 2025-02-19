@@ -22,93 +22,8 @@
     "name" : "read",
     "outputDefinition" : {
       "output" : null,
-      "outputResponse" : {
-        "outputSchema" : {
-          "advancedOption" : null,
-          "description" : null,
-          "displayCondition" : null,
-          "expressionEnabled" : null,
-          "hidden" : null,
-          "metadata" : { },
-          "required" : null,
-          "name" : null,
-          "type" : "ARRAY",
-          "defaultValue" : null,
-          "exampleValue" : null,
-          "label" : null,
-          "placeholder" : null,
-          "items" : [ {
-            "advancedOption" : null,
-            "description" : null,
-            "displayCondition" : null,
-            "expressionEnabled" : null,
-            "hidden" : null,
-            "metadata" : { },
-            "required" : null,
-            "name" : null,
-            "type" : "OBJECT",
-            "defaultValue" : null,
-            "exampleValue" : null,
-            "label" : null,
-            "placeholder" : null,
-            "additionalProperties" : null,
-            "multipleValues" : null,
-            "options" : null,
-            "properties" : null,
-            "controlType" : "OBJECT_BUILDER",
-            "optionsDataSource" : null
-          } ],
-          "maxItems" : null,
-          "minItems" : null,
-          "multipleValues" : null,
-          "options" : null,
-          "controlType" : "ARRAY_BUILDER",
-          "optionsDataSource" : null
-        },
-        "sampleOutput" : null
-      },
-      "outputSchema" : {
-        "advancedOption" : null,
-        "description" : null,
-        "displayCondition" : null,
-        "expressionEnabled" : null,
-        "hidden" : null,
-        "metadata" : { },
-        "required" : null,
-        "name" : null,
-        "type" : "ARRAY",
-        "defaultValue" : null,
-        "exampleValue" : null,
-        "label" : null,
-        "placeholder" : null,
-        "items" : [ {
-          "advancedOption" : null,
-          "description" : null,
-          "displayCondition" : null,
-          "expressionEnabled" : null,
-          "hidden" : null,
-          "metadata" : { },
-          "required" : null,
-          "name" : null,
-          "type" : "OBJECT",
-          "defaultValue" : null,
-          "exampleValue" : null,
-          "label" : null,
-          "placeholder" : null,
-          "additionalProperties" : null,
-          "multipleValues" : null,
-          "options" : null,
-          "properties" : null,
-          "controlType" : "OBJECT_BUILDER",
-          "optionsDataSource" : null
-        } ],
-        "maxItems" : null,
-        "minItems" : null,
-        "multipleValues" : null,
-        "options" : null,
-        "controlType" : "ARRAY_BUILDER",
-        "optionsDataSource" : null
-      },
+      "outputResponse" : null,
+      "outputSchema" : null,
       "sampleOutput" : null
     },
     "properties" : [ {
@@ -229,7 +144,7 @@
       "optionsDataSource" : null
     }, {
       "advancedOption" : true,
-      "description" : "    Character used to wrap/enclose values. It is usually applied to complex CSV files where\n    values may include delimiter characters.\n",
+      "description" : "Character used to wrap/enclose values. It is usually applied to complex CSV files where values may include delimiter characters.",
       "displayCondition" : null,
       "expressionEnabled" : null,
       "hidden" : null,
@@ -721,6 +636,7 @@
     "workflowNodeDescription" : null
   } ],
   "connection" : null,
+  "triggers" : null,
   "dataStream" : {
     "reader" : {
       "properties" : null,
@@ -732,6 +648,5 @@
       "dataStreamItemWriter" : { }
     }
   },
-  "triggers" : null,
   "unifiedApi" : null
 }
