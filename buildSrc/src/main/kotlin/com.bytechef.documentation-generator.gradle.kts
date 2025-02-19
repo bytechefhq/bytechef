@@ -62,13 +62,36 @@ open class FindJsonFilesTask : DefaultTask() {
         }
 
         override fun toString(): String {
-            val typeFull = getFullType(type)
+            val typeDetails = getTypeDetails()
 
-            return if (label == null) {
-                if (name == null) "|  | $typeFull | $controlType  |"
-                else "| $name | $typeFull | $controlType  |"
-            } else if (description == null) "| $name | $label | $typeFull | $controlType  |  | $required  |"
-            else "| $name | $label | $typeFull | $controlType  |  $description  |  $required  |"
+            return when {
+                label == null -> formatWithoutLabel(name, typeDetails)
+                description == null -> formatWithoutDescription(name, label, typeDetails)
+                else -> formatFull(name, label, typeDetails, description)
+            }
+        }
+
+        private fun getTypeDetails(): String {
+            val typeFull = getFullType(type)
+            return if (type == "OBJECT" || type == "ARRAY") {
+                val detailsSummary = if (type == "OBJECT") "Properties" else "Items"
+                "$type <details> <summary> $detailsSummary </summary> $typeFull </details>"
+            } else {
+                type.toString()
+            }
+        }
+
+        private fun formatWithoutLabel(name: String?, typeDetails: String): String {
+            return if (name == null) "|  | $typeDetails | $controlType |"
+            else "| $name | $typeDetails | $controlType |"
+        }
+
+        private fun formatWithoutDescription(name: String?, label: String?, typeDetails: String): String {
+            return "| $name | $label | $typeDetails | $controlType |  | $required |"
+        }
+
+        private fun formatFull(name: String?, label: String?, typeDetails: String, description: String?): String {
+            return "| $name | $label | $typeDetails | $controlType | $description | $required |"
         }
     }
 
