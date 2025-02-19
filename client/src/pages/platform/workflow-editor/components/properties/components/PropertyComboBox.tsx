@@ -149,8 +149,12 @@ const PropertyComboBox = ({
     );
 
     const missingConnection = useMemo(
-        () => currentNode?.connections?.length && !currentNode.connectionId,
-        [currentNode]
+        () =>
+            currentNode?.connections?.length &&
+            !currentNode.connectionId &&
+            lookupDependsOnPaths?.length === 0 &&
+            lookupDependsOnValues?.length === 0,
+        [currentNode?.connectionId, currentNode?.connections?.length, lookupDependsOnPaths, lookupDependsOnValues]
     );
 
     const noOptionsAvailable = useMemo(() => {
@@ -163,31 +167,50 @@ const PropertyComboBox = ({
         return !lookupDependsOnValues || !hasValidLookupValues;
     }, [lookupDependsOnValues, options]);
 
+    const dependencyMissing = useMemo(
+        () => lookupDependsOnPaths?.length && lookupDependsOnValues?.every((value) => value === undefined),
+        [lookupDependsOnPaths, lookupDependsOnValues]
+    );
+
     const memoizedPlaceholder = useMemo(() => {
-        if (options.length) {
-            return placeholder;
-        }
+        const conditions = [
+            {
+                condition: !!missingConnection && !connectionRequirementMet && !options.length,
+                placeholder: 'Connection missing...',
+            },
+            {
+                condition: !missingConnection && dependencyMissing,
+                placeholder: `${lookupDependsOnPaths} is not defined`,
+            },
+            {
+                condition: !!missingConnection && (!lookupDependsOnValues?.length || !lookupDependsOnPaths?.length),
+                placeholder: `${lookupDependsOnPaths} is not defined`,
+            },
+            {
+                condition: lookupDependsOnValues?.length && lookupDependsOnPaths?.length && !options.length,
+                placeholder: placeholder,
+            },
+            {
+                condition: options.length,
+                placeholder: placeholder,
+            },
+            {
+                condition: noOptionsAvailable,
+                placeholder: 'No options available',
+            },
+        ];
 
-        if ((lookupDependsOnValues?.length || lookupDependsOnPaths?.length) && !options.length) {
-            return `${lookupDependsOnPaths} is not defined`;
-        }
+        const matchingCondition = conditions.find(({condition}) => condition);
 
-        if (!!missingConnection && !connectionRequirementMet) {
-            return 'Connection missing...';
-        }
-
-        if (noOptionsAvailable) {
-            return 'No options available';
-        }
-
-        return placeholder;
+        return matchingCondition ? matchingCondition.placeholder : placeholder;
     }, [
-        lookupDependsOnValues?.length,
-        lookupDependsOnPaths,
-        options.length,
-        missingConnection,
         connectionRequirementMet,
+        dependencyMissing,
+        lookupDependsOnPaths,
+        lookupDependsOnValues?.length,
+        missingConnection,
         noOptionsAvailable,
+        options.length,
         placeholder,
     ]);
 
@@ -195,7 +218,9 @@ const PropertyComboBox = ({
         leadingIcon && 'ml-9',
         (!!(lookupDependsOnValues?.length && !options.length) || !!missingConnection || !connectionRequirementMet) &&
             'text-destructive',
-        options.length && 'text-normal'
+        options.length && 'text-normal',
+        lookupDependsOnValues?.length && lookupDependsOnPaths?.length && !options.length && 'text-normal',
+        dependencyMissing && 'text-destructive'
     );
 
     useEffect(() => {
