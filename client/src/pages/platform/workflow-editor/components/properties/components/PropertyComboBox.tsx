@@ -109,20 +109,24 @@ const PropertyComboBox = ({
                 workflowNodeName,
             },
         }),
-        [lookupDependsOnValues, workflowId, lookupDependsOnPaths, path, workflowNodeName]
+        [lookupDependsOnPaths, lookupDependsOnValues, path, workflowId, workflowNodeName]
     );
 
     const queryEnabled = useMemo(
         () =>
             !!currentNode &&
-            (lookupDependsOnValues
-                ? lookupDependsOnValues.every((loadDependencyValue) => !!loadDependencyValue)
-                : false) &&
+            (lookupDependsOnPaths?.length
+                ? lookupDependsOnValues?.every((loadDependencyValue) => !!loadDependencyValue)
+                : true) &&
             !!connectionRequirementMet,
-        [currentNode, lookupDependsOnValues, connectionRequirementMet]
+        [connectionRequirementMet, currentNode, lookupDependsOnPaths?.length, lookupDependsOnValues]
     );
 
-    const {data: optionsData, isLoading, isRefetching} = useGetWorkflowNodeOptionsQuery(queryOptions, queryEnabled);
+    const {
+        data: optionsData,
+        isLoading,
+        isRefetching,
+    } = useGetWorkflowNodeOptionsQuery(queryOptions, Boolean(queryEnabled));
 
     const options = useMemo(() => {
         if (optionsData) {
@@ -149,7 +153,11 @@ const PropertyComboBox = ({
     const noOptionsAvailable = useMemo(() => {
         const hasValidLookupValues = lookupDependsOnValues?.every((value) => value !== undefined);
 
-        return (!lookupDependsOnValues || !hasValidLookupValues) && !options.length;
+        if (options.length) {
+            return false;
+        }
+
+        return !lookupDependsOnValues || !hasValidLookupValues;
     }, [lookupDependsOnValues, options]);
 
     const memoizedPlaceholder = useMemo(() => {
