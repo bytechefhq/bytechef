@@ -190,17 +190,23 @@ $outputSchema
         }
 
         override fun toString(): String {
+            val propertiesSection = if (!properties.isNullOrEmpty()) {
+                """
+#### Properties
+
+|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
+|:---------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
+${properties?.joinToString("\n")}
+"""
+            } else ""
+
             return """
 ### $title
 Name: $name
 
 $description
 
-#### Properties
-
-|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
-|:---------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
-${properties?.joinToString("\n")}
+$propertiesSection
 
 ${getOutputDefinitionString()}
 """
@@ -225,19 +231,26 @@ ${getOutputDefinitionString()}
         }
 
         override fun toString(): String {
-            return """
-### $title
-$description
-
-Type: $type
+            val propertiesSection = if (!properties.isNullOrEmpty()) {
+                """
 #### Properties
 
 |      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
 |:---------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
 ${properties?.joinToString("\n")}
+"""
+            } else ""
+
+            return """
+### $title
+Name: $name
+
+$description
+
+Type: $type
+$propertiesSection
 
 ${getOutputResponseString()}
-
 """
         }
     }
