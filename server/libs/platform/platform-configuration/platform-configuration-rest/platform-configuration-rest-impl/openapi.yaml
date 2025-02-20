@@ -1091,8 +1091,11 @@ components:
         \ the task inside the workflow."
       type: "object"
       required:
+      - "componentName"
+      - "componentVersion"
       - "name"
       - "outputDefined"
+      - "outputFunctionDefined"
       properties:
         componentName:
           description: "The component name."
@@ -1133,8 +1136,18 @@ components:
         \ the task inside the workflow."
       type: "object"
       required:
+      - "componentName"
+      - "componentVersion"
       - "name"
+      - "outputDefined"
+      - "outputFunctionDefined"
       properties:
+        componentName:
+          description: "The component name."
+          type: "string"
+        componentVersion:
+          description: "The component version."
+          type: "integer"
         description:
           description: "The description."
           type: "string"
@@ -1143,6 +1156,12 @@ components:
         name:
           description: "The action name."
           type: "string"
+        outputDefined:
+          description: "Does action define output schema."
+          type: "boolean"
+        outputFunctionDefined:
+          description: "Does action define output function."
+          type: "boolean"
         title:
           description: "The title"
           type: "string"
@@ -1843,6 +1862,7 @@ components:
       type: "object"
       required:
       - "name"
+      - "outputDefined"
       - "version"
       properties:
         description:
@@ -1854,6 +1874,9 @@ components:
         name:
           description: "The task dispatcher name.."
           type: "string"
+        outputDefined:
+          description: "Does task dispatcher define output schema."
+          type: "boolean"
         resources:
           $ref: "#/components/schemas/Resources"
         title:
@@ -1910,6 +1933,7 @@ components:
       required:
       - "name"
       - "outputDefined"
+      - "outputFunctionDefined"
       - "type"
       properties:
         componentName:
@@ -1950,9 +1974,19 @@ components:
         \ outside services."
       type: "object"
       required:
+      - "componentName"
+      - "componentVersion"
       - "name"
+      - "outputDefined"
+      - "outputFunctionDefined"
       - "type"
       properties:
+        componentName:
+          description: "The component name."
+          type: "string"
+        componentVersion:
+          description: "The component version."
+          type: "integer"
         description:
           description: "The description."
           type: "string"
@@ -1961,6 +1995,12 @@ components:
         name:
           description: "The action name."
           type: "string"
+        outputDefined:
+          description: "Does trigger define output schema."
+          type: "boolean"
+        outputFunctionDefined:
+          description: "Does trigger define output function."
+          type: "boolean"
         title:
           description: "The title"
           type: "string"
@@ -2205,16 +2245,16 @@ components:
         - workflowNodeName
       properties:
         actionDefinition:
-          $ref: '#/components/schemas/ActionDefinition'
+          $ref: '#/components/schemas/ActionDefinitionBasic'
         outputSchema:
           $ref: "#/components/schemas/Property"
         sampleOutput:
           description: "The sample value of an output."
           type: "object"
         taskDispatcherDefinition:
-          $ref: '#/components/schemas/TaskDispatcherDefinition'
+          $ref: '#/components/schemas/TaskDispatcherDefinitionBasic'
         triggerDefinition:
-          $ref: '#/components/schemas/TriggerDefinition'
+          $ref: '#/components/schemas/TriggerDefinitionBasic'
         workflowNodeName:
           description: The workflow node name
           type: "string"
