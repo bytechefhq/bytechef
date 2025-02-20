@@ -92,8 +92,7 @@ public class ConditionTaskDispatcherDefinitionFactory implements TaskDispatcherD
                                         .options(
                                             option("Equals", Operation.EQUALS.name()),
                                             option("Not Equals", Operation.NOT_EQUALS.name()))
-                                        .required(true)
-                                        .defaultValue(Operation.EQUALS.name()),
+                                        .required(true),
                                     bool(VALUE_2)
                                         .label("Value 2")
                                         .description("The boolean value to compare with the first one.")
@@ -117,8 +116,7 @@ public class ConditionTaskDispatcherDefinitionFactory implements TaskDispatcherD
                                         .options(
                                             option("After", Operation.AFTER.name()),
                                             option("Before", Operation.BEFORE.name()))
-                                        .required(true)
-                                        .defaultValue(Operation.AFTER.name()),
+                                        .required(true),
                                     dateTime(VALUE_2)
                                         .label("Value 2")
                                         .description("The date & time value to compare with the first one.")
@@ -147,8 +145,7 @@ public class ConditionTaskDispatcherDefinitionFactory implements TaskDispatcherD
                                             option("Greater", Operation.GREATER.name()),
                                             option("Greater or Equals", Operation.GREATER_EQUALS.name()),
                                             option("Empty", Operation.EMPTY.name()))
-                                        .required(true)
-                                        .defaultValue(Operation.LESS.name()),
+                                        .required(true),
                                     number(VALUE_2)
                                         .label("Value 2")
                                         .description("The number value to compare with the first one.")
@@ -181,8 +178,7 @@ public class ConditionTaskDispatcherDefinitionFactory implements TaskDispatcherD
                                             option("Ends With", Operation.ENDS_WITH.name()),
                                             option("Regex", Operation.REGEX.name()),
                                             option("Empty", Operation.EMPTY.name()))
-                                        .required(true)
-                                        .defaultValue(Operation.EQUALS.name()),
+                                        .required(true),
                                     string(VALUE_2)
                                         .label("Value 2")
                                         .description("The string value to compare with the first one.")
