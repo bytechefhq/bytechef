@@ -113,7 +113,7 @@ const PropertyCodeEditorSheet = ({
                                 </Button>
                             )}
 
-                            <CopilotButton source={Source.CODE_EDITOR} />
+                            <CopilotButton parameters={{language}} source={Source.CODE_EDITOR} />
 
                             <SheetCloseButton />
                         </div>
