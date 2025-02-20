@@ -26,7 +26,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "ProjectBasic", description = "A group of workflows that make one logical project.")
 @JsonTypeName("ProjectBasic")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-02-06T20:41:20.695288+01:00[Europe/Zagreb]", comments = "Generator version: 7.11.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-02-19T09:54:17.282414+01:00[Europe/Zagreb]", comments = "Generator version: 7.11.0")
 public class ProjectBasicModel {
 
   private @Nullable String createdBy;
@@ -50,7 +50,7 @@ public class ProjectBasicModel {
 
   private @Nullable ProjectStatusModel lastStatus;
 
-  private @Nullable Integer lastProjectVersion;
+  private @Nullable Integer lastVersion;
 
   public ProjectBasicModel() {
     super();
@@ -243,24 +243,24 @@ public class ProjectBasicModel {
     this.lastStatus = lastStatus;
   }
 
-  public ProjectBasicModel lastProjectVersion(Integer lastProjectVersion) {
-    this.lastProjectVersion = lastProjectVersion;
+  public ProjectBasicModel lastVersion(Integer lastVersion) {
+    this.lastVersion = lastVersion;
     return this;
   }
 
   /**
    * The last version of a project.
-   * @return lastProjectVersion
+   * @return lastVersion
    */
   
-  @Schema(name = "lastProjectVersion", accessMode = Schema.AccessMode.READ_ONLY, description = "The last version of a project.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  @JsonProperty("lastProjectVersion")
-  public Integer getLastProjectVersion() {
-    return lastProjectVersion;
+  @Schema(name = "lastVersion", accessMode = Schema.AccessMode.READ_ONLY, description = "The last version of a project.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("lastVersion")
+  public Integer getLastVersion() {
+    return lastVersion;
   }
 
-  public void setLastProjectVersion(Integer lastProjectVersion) {
-    this.lastProjectVersion = lastProjectVersion;
+  public void setLastVersion(Integer lastVersion) {
+    this.lastVersion = lastVersion;
   }
 
   @Override
@@ -281,12 +281,12 @@ public class ProjectBasicModel {
         Objects.equals(this.name, projectBasic.name) &&
         Objects.equals(this.lastPublishedDate, projectBasic.lastPublishedDate) &&
         Objects.equals(this.lastStatus, projectBasic.lastStatus) &&
-        Objects.equals(this.lastProjectVersion, projectBasic.lastProjectVersion);
+        Objects.equals(this.lastVersion, projectBasic.lastVersion);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(createdBy, createdDate, description, id, lastModifiedBy, lastModifiedDate, name, lastPublishedDate, lastStatus, lastProjectVersion);
+    return Objects.hash(createdBy, createdDate, description, id, lastModifiedBy, lastModifiedDate, name, lastPublishedDate, lastStatus, lastVersion);
   }
 
   @Override
@@ -302,7 +302,7 @@ public class ProjectBasicModel {
     sb.append("    name: ").append(toIndentedString(name)).append("\n");
     sb.append("    lastPublishedDate: ").append(toIndentedString(lastPublishedDate)).append("\n");
     sb.append("    lastStatus: ").append(toIndentedString(lastStatus)).append("\n");
-    sb.append("    lastProjectVersion: ").append(toIndentedString(lastProjectVersion)).append("\n");
+    sb.append("    lastVersion: ").append(toIndentedString(lastVersion)).append("\n");
     sb.append("}");
     return sb.toString();
   }
