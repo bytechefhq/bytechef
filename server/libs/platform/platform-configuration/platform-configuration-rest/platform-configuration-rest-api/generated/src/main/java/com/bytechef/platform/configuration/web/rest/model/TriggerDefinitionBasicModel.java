@@ -25,14 +25,22 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "TriggerDefinitionBasic", description = "A trigger definition defines ways to trigger workflows from the outside services.")
 @JsonTypeName("TriggerDefinitionBasic")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-02-19T09:54:18.872660+01:00[Europe/Zagreb]", comments = "Generator version: 7.11.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-02-20T13:40:58.825899+01:00[Europe/Zagreb]", comments = "Generator version: 7.11.0")
 public class TriggerDefinitionBasicModel {
+
+  private String componentName;
+
+  private Integer componentVersion;
 
   private @Nullable String description;
 
   private @Nullable HelpModel help;
 
   private String name;
+
+  private Boolean outputDefined;
+
+  private Boolean outputFunctionDefined;
 
   private @Nullable String title;
 
@@ -45,9 +53,53 @@ public class TriggerDefinitionBasicModel {
   /**
    * Constructor with only required parameters
    */
-  public TriggerDefinitionBasicModel(String name, TriggerTypeModel type) {
+  public TriggerDefinitionBasicModel(String componentName, Integer componentVersion, String name, Boolean outputDefined, Boolean outputFunctionDefined, TriggerTypeModel type) {
+    this.componentName = componentName;
+    this.componentVersion = componentVersion;
     this.name = name;
+    this.outputDefined = outputDefined;
+    this.outputFunctionDefined = outputFunctionDefined;
     this.type = type;
+  }
+
+  public TriggerDefinitionBasicModel componentName(String componentName) {
+    this.componentName = componentName;
+    return this;
+  }
+
+  /**
+   * The component name.
+   * @return componentName
+   */
+  @NotNull 
+  @Schema(name = "componentName", description = "The component name.", requiredMode = Schema.RequiredMode.REQUIRED)
+  @JsonProperty("componentName")
+  public String getComponentName() {
+    return componentName;
+  }
+
+  public void setComponentName(String componentName) {
+    this.componentName = componentName;
+  }
+
+  public TriggerDefinitionBasicModel componentVersion(Integer componentVersion) {
+    this.componentVersion = componentVersion;
+    return this;
+  }
+
+  /**
+   * The component version.
+   * @return componentVersion
+   */
+  @NotNull 
+  @Schema(name = "componentVersion", description = "The component version.", requiredMode = Schema.RequiredMode.REQUIRED)
+  @JsonProperty("componentVersion")
+  public Integer getComponentVersion() {
+    return componentVersion;
+  }
+
+  public void setComponentVersion(Integer componentVersion) {
+    this.componentVersion = componentVersion;
   }
 
   public TriggerDefinitionBasicModel description(String description) {
@@ -110,6 +162,46 @@ public class TriggerDefinitionBasicModel {
     this.name = name;
   }
 
+  public TriggerDefinitionBasicModel outputDefined(Boolean outputDefined) {
+    this.outputDefined = outputDefined;
+    return this;
+  }
+
+  /**
+   * Does trigger define output schema.
+   * @return outputDefined
+   */
+  @NotNull 
+  @Schema(name = "outputDefined", description = "Does trigger define output schema.", requiredMode = Schema.RequiredMode.REQUIRED)
+  @JsonProperty("outputDefined")
+  public Boolean getOutputDefined() {
+    return outputDefined;
+  }
+
+  public void setOutputDefined(Boolean outputDefined) {
+    this.outputDefined = outputDefined;
+  }
+
+  public TriggerDefinitionBasicModel outputFunctionDefined(Boolean outputFunctionDefined) {
+    this.outputFunctionDefined = outputFunctionDefined;
+    return this;
+  }
+
+  /**
+   * Does trigger define output function.
+   * @return outputFunctionDefined
+   */
+  @NotNull 
+  @Schema(name = "outputFunctionDefined", description = "Does trigger define output function.", requiredMode = Schema.RequiredMode.REQUIRED)
+  @JsonProperty("outputFunctionDefined")
+  public Boolean getOutputFunctionDefined() {
+    return outputFunctionDefined;
+  }
+
+  public void setOutputFunctionDefined(Boolean outputFunctionDefined) {
+    this.outputFunctionDefined = outputFunctionDefined;
+  }
+
   public TriggerDefinitionBasicModel title(String title) {
     this.title = title;
     return this;
@@ -159,25 +251,33 @@ public class TriggerDefinitionBasicModel {
       return false;
     }
     TriggerDefinitionBasicModel triggerDefinitionBasic = (TriggerDefinitionBasicModel) o;
-    return Objects.equals(this.description, triggerDefinitionBasic.description) &&
+    return Objects.equals(this.componentName, triggerDefinitionBasic.componentName) &&
+        Objects.equals(this.componentVersion, triggerDefinitionBasic.componentVersion) &&
+        Objects.equals(this.description, triggerDefinitionBasic.description) &&
         Objects.equals(this.help, triggerDefinitionBasic.help) &&
         Objects.equals(this.name, triggerDefinitionBasic.name) &&
+        Objects.equals(this.outputDefined, triggerDefinitionBasic.outputDefined) &&
+        Objects.equals(this.outputFunctionDefined, triggerDefinitionBasic.outputFunctionDefined) &&
         Objects.equals(this.title, triggerDefinitionBasic.title) &&
         Objects.equals(this.type, triggerDefinitionBasic.type);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(description, help, name, title, type);
+    return Objects.hash(componentName, componentVersion, description, help, name, outputDefined, outputFunctionDefined, title, type);
   }
 
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
     sb.append("class TriggerDefinitionBasicModel {\n");
+    sb.append("    componentName: ").append(toIndentedString(componentName)).append("\n");
+    sb.append("    componentVersion: ").append(toIndentedString(componentVersion)).append("\n");
     sb.append("    description: ").append(toIndentedString(description)).append("\n");
     sb.append("    help: ").append(toIndentedString(help)).append("\n");
     sb.append("    name: ").append(toIndentedString(name)).append("\n");
+    sb.append("    outputDefined: ").append(toIndentedString(outputDefined)).append("\n");
+    sb.append("    outputFunctionDefined: ").append(toIndentedString(outputFunctionDefined)).append("\n");
     sb.append("    title: ").append(toIndentedString(title)).append("\n");
     sb.append("    type: ").append(toIndentedString(type)).append("\n");
     sb.append("}");

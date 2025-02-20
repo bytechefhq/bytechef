@@ -23,7 +23,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "TaskDispatcherDefinitionBasic", description = "A task dispatcher defines a strategy for dispatching tasks to be executed.")
 @JsonTypeName("TaskDispatcherDefinitionBasic")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-02-19T09:54:18.872660+01:00[Europe/Zagreb]", comments = "Generator version: 7.11.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-02-20T13:40:58.825899+01:00[Europe/Zagreb]", comments = "Generator version: 7.11.0")
 public class TaskDispatcherDefinitionBasicModel {
 
   private @Nullable String description;
@@ -31,6 +31,8 @@ public class TaskDispatcherDefinitionBasicModel {
   private @Nullable String icon;
 
   private String name;
+
+  private Boolean outputDefined;
 
   private @Nullable ResourcesModel resources;
 
@@ -45,8 +47,9 @@ public class TaskDispatcherDefinitionBasicModel {
   /**
    * Constructor with only required parameters
    */
-  public TaskDispatcherDefinitionBasicModel(String name, Integer version) {
+  public TaskDispatcherDefinitionBasicModel(String name, Boolean outputDefined, Integer version) {
     this.name = name;
+    this.outputDefined = outputDefined;
     this.version = version;
   }
 
@@ -108,6 +111,26 @@ public class TaskDispatcherDefinitionBasicModel {
 
   public void setName(String name) {
     this.name = name;
+  }
+
+  public TaskDispatcherDefinitionBasicModel outputDefined(Boolean outputDefined) {
+    this.outputDefined = outputDefined;
+    return this;
+  }
+
+  /**
+   * Does task dispatcher define output schema.
+   * @return outputDefined
+   */
+  @NotNull 
+  @Schema(name = "outputDefined", description = "Does task dispatcher define output schema.", requiredMode = Schema.RequiredMode.REQUIRED)
+  @JsonProperty("outputDefined")
+  public Boolean getOutputDefined() {
+    return outputDefined;
+  }
+
+  public void setOutputDefined(Boolean outputDefined) {
+    this.outputDefined = outputDefined;
   }
 
   public TaskDispatcherDefinitionBasicModel resources(ResourcesModel resources) {
@@ -182,6 +205,7 @@ public class TaskDispatcherDefinitionBasicModel {
     return Objects.equals(this.description, taskDispatcherDefinitionBasic.description) &&
         Objects.equals(this.icon, taskDispatcherDefinitionBasic.icon) &&
         Objects.equals(this.name, taskDispatcherDefinitionBasic.name) &&
+        Objects.equals(this.outputDefined, taskDispatcherDefinitionBasic.outputDefined) &&
         Objects.equals(this.resources, taskDispatcherDefinitionBasic.resources) &&
         Objects.equals(this.title, taskDispatcherDefinitionBasic.title) &&
         Objects.equals(this.version, taskDispatcherDefinitionBasic.version);
@@ -189,7 +213,7 @@ public class TaskDispatcherDefinitionBasicModel {
 
   @Override
   public int hashCode() {
-    return Objects.hash(description, icon, name, resources, title, version);
+    return Objects.hash(description, icon, name, outputDefined, resources, title, version);
   }
 
   @Override
@@ -199,6 +223,7 @@ public class TaskDispatcherDefinitionBasicModel {
     sb.append("    description: ").append(toIndentedString(description)).append("\n");
     sb.append("    icon: ").append(toIndentedString(icon)).append("\n");
     sb.append("    name: ").append(toIndentedString(name)).append("\n");
+    sb.append("    outputDefined: ").append(toIndentedString(outputDefined)).append("\n");
     sb.append("    resources: ").append(toIndentedString(resources)).append("\n");
     sb.append("    title: ").append(toIndentedString(title)).append("\n");
     sb.append("    version: ").append(toIndentedString(version)).append("\n");

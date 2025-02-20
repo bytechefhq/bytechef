@@ -27,12 +27,12 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "ActionDefinition", description = "An action is a portion of reusable code that accomplish a specific task. When building a workflow, each action is represented as a task inside the workflow. The task 'type' property is defined as [component name]/v[component version]/[action name]. Action properties are used to set properties of the task inside the workflow.")
 @JsonTypeName("ActionDefinition")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-02-19T09:54:18.872660+01:00[Europe/Zagreb]", comments = "Generator version: 7.11.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-02-20T13:40:58.825899+01:00[Europe/Zagreb]", comments = "Generator version: 7.11.0")
 public class ActionDefinitionModel {
 
-  private @Nullable String componentName;
+  private String componentName;
 
-  private @Nullable Integer componentVersion;
+  private Integer componentVersion;
 
   private @Nullable String description;
 
@@ -42,7 +42,7 @@ public class ActionDefinitionModel {
 
   private Boolean outputDefined;
 
-  private @Nullable Boolean outputFunctionDefined;
+  private Boolean outputFunctionDefined;
 
   @Valid
   private List<@Valid PropertyModel> properties = new ArrayList<>();
@@ -58,9 +58,12 @@ public class ActionDefinitionModel {
   /**
    * Constructor with only required parameters
    */
-  public ActionDefinitionModel(String name, Boolean outputDefined) {
+  public ActionDefinitionModel(String componentName, Integer componentVersion, String name, Boolean outputDefined, Boolean outputFunctionDefined) {
+    this.componentName = componentName;
+    this.componentVersion = componentVersion;
     this.name = name;
     this.outputDefined = outputDefined;
+    this.outputFunctionDefined = outputFunctionDefined;
   }
 
   public ActionDefinitionModel componentName(String componentName) {
@@ -72,8 +75,8 @@ public class ActionDefinitionModel {
    * The component name.
    * @return componentName
    */
-  
-  @Schema(name = "componentName", description = "The component name.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @NotNull 
+  @Schema(name = "componentName", description = "The component name.", requiredMode = Schema.RequiredMode.REQUIRED)
   @JsonProperty("componentName")
   public String getComponentName() {
     return componentName;
@@ -92,8 +95,8 @@ public class ActionDefinitionModel {
    * The component version.
    * @return componentVersion
    */
-  
-  @Schema(name = "componentVersion", description = "The component version.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @NotNull 
+  @Schema(name = "componentVersion", description = "The component version.", requiredMode = Schema.RequiredMode.REQUIRED)
   @JsonProperty("componentVersion")
   public Integer getComponentVersion() {
     return componentVersion;
@@ -192,8 +195,8 @@ public class ActionDefinitionModel {
    * Does action define output function.
    * @return outputFunctionDefined
    */
-  
-  @Schema(name = "outputFunctionDefined", description = "Does action define output function.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @NotNull 
+  @Schema(name = "outputFunctionDefined", description = "Does action define output function.", requiredMode = Schema.RequiredMode.REQUIRED)
   @JsonProperty("outputFunctionDefined")
   public Boolean getOutputFunctionDefined() {
     return outputFunctionDefined;

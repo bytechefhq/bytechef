@@ -2,10 +2,10 @@ package com.bytechef.platform.configuration.web.rest.model;
 
 import java.net.URI;
 import java.util.Objects;
-import com.bytechef.platform.configuration.web.rest.model.ActionDefinitionModel;
+import com.bytechef.platform.configuration.web.rest.model.ActionDefinitionBasicModel;
 import com.bytechef.platform.configuration.web.rest.model.PropertyModel;
-import com.bytechef.platform.configuration.web.rest.model.TaskDispatcherDefinitionModel;
-import com.bytechef.platform.configuration.web.rest.model.TriggerDefinitionModel;
+import com.bytechef.platform.configuration.web.rest.model.TaskDispatcherDefinitionBasicModel;
+import com.bytechef.platform.configuration.web.rest.model.TriggerDefinitionBasicModel;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonTypeName;
@@ -26,18 +26,18 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "WorkflowNodeOutput", description = "The workflow node output")
 @JsonTypeName("WorkflowNodeOutput")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-02-19T09:54:18.872660+01:00[Europe/Zagreb]", comments = "Generator version: 7.11.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-02-20T13:40:58.825899+01:00[Europe/Zagreb]", comments = "Generator version: 7.11.0")
 public class WorkflowNodeOutputModel {
 
-  private @Nullable ActionDefinitionModel actionDefinition;
+  private @Nullable ActionDefinitionBasicModel actionDefinition;
 
   private PropertyModel outputSchema;
 
   private @Nullable Object sampleOutput;
 
-  private @Nullable TaskDispatcherDefinitionModel taskDispatcherDefinition;
+  private @Nullable TaskDispatcherDefinitionBasicModel taskDispatcherDefinition;
 
-  private @Nullable TriggerDefinitionModel triggerDefinition;
+  private @Nullable TriggerDefinitionBasicModel triggerDefinition;
 
   private String workflowNodeName;
 
@@ -53,7 +53,7 @@ public class WorkflowNodeOutputModel {
     this.workflowNodeName = workflowNodeName;
   }
 
-  public WorkflowNodeOutputModel actionDefinition(ActionDefinitionModel actionDefinition) {
+  public WorkflowNodeOutputModel actionDefinition(ActionDefinitionBasicModel actionDefinition) {
     this.actionDefinition = actionDefinition;
     return this;
   }
@@ -65,11 +65,11 @@ public class WorkflowNodeOutputModel {
   @Valid 
   @Schema(name = "actionDefinition", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("actionDefinition")
-  public ActionDefinitionModel getActionDefinition() {
+  public ActionDefinitionBasicModel getActionDefinition() {
     return actionDefinition;
   }
 
-  public void setActionDefinition(ActionDefinitionModel actionDefinition) {
+  public void setActionDefinition(ActionDefinitionBasicModel actionDefinition) {
     this.actionDefinition = actionDefinition;
   }
 
@@ -113,7 +113,7 @@ public class WorkflowNodeOutputModel {
     this.sampleOutput = sampleOutput;
   }
 
-  public WorkflowNodeOutputModel taskDispatcherDefinition(TaskDispatcherDefinitionModel taskDispatcherDefinition) {
+  public WorkflowNodeOutputModel taskDispatcherDefinition(TaskDispatcherDefinitionBasicModel taskDispatcherDefinition) {
     this.taskDispatcherDefinition = taskDispatcherDefinition;
     return this;
   }
@@ -125,15 +125,15 @@ public class WorkflowNodeOutputModel {
   @Valid 
   @Schema(name = "taskDispatcherDefinition", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("taskDispatcherDefinition")
-  public TaskDispatcherDefinitionModel getTaskDispatcherDefinition() {
+  public TaskDispatcherDefinitionBasicModel getTaskDispatcherDefinition() {
     return taskDispatcherDefinition;
   }
 
-  public void setTaskDispatcherDefinition(TaskDispatcherDefinitionModel taskDispatcherDefinition) {
+  public void setTaskDispatcherDefinition(TaskDispatcherDefinitionBasicModel taskDispatcherDefinition) {
     this.taskDispatcherDefinition = taskDispatcherDefinition;
   }
 
-  public WorkflowNodeOutputModel triggerDefinition(TriggerDefinitionModel triggerDefinition) {
+  public WorkflowNodeOutputModel triggerDefinition(TriggerDefinitionBasicModel triggerDefinition) {
     this.triggerDefinition = triggerDefinition;
     return this;
   }
@@ -145,11 +145,11 @@ public class WorkflowNodeOutputModel {
   @Valid 
   @Schema(name = "triggerDefinition", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("triggerDefinition")
-  public TriggerDefinitionModel getTriggerDefinition() {
+  public TriggerDefinitionBasicModel getTriggerDefinition() {
     return triggerDefinition;
   }
 
-  public void setTriggerDefinition(TriggerDefinitionModel triggerDefinition) {
+  public void setTriggerDefinition(TriggerDefinitionBasicModel triggerDefinition) {
     this.triggerDefinition = triggerDefinition;
   }
 

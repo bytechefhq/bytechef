@@ -29,7 +29,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "TriggerDefinition", description = "A trigger definition defines ways to trigger workflows from the outside services.")
 @JsonTypeName("TriggerDefinition")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-02-19T09:54:18.872660+01:00[Europe/Zagreb]", comments = "Generator version: 7.11.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-02-20T13:40:58.825899+01:00[Europe/Zagreb]", comments = "Generator version: 7.11.0")
 public class TriggerDefinitionModel {
 
   private @Nullable String componentName;
@@ -44,7 +44,7 @@ public class TriggerDefinitionModel {
 
   private Boolean outputDefined;
 
-  private @Nullable Boolean outputFunctionDefined;
+  private Boolean outputFunctionDefined;
 
   @Valid
   private List<@Valid PropertyModel> properties = new ArrayList<>();
@@ -62,9 +62,10 @@ public class TriggerDefinitionModel {
   /**
    * Constructor with only required parameters
    */
-  public TriggerDefinitionModel(String name, Boolean outputDefined, TriggerTypeModel type) {
+  public TriggerDefinitionModel(String name, Boolean outputDefined, Boolean outputFunctionDefined, TriggerTypeModel type) {
     this.name = name;
     this.outputDefined = outputDefined;
+    this.outputFunctionDefined = outputFunctionDefined;
     this.type = type;
   }
 
@@ -197,8 +198,8 @@ public class TriggerDefinitionModel {
    * Does trigger define output function.
    * @return outputFunctionDefined
    */
-  
-  @Schema(name = "outputFunctionDefined", description = "Does trigger define output function.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @NotNull 
+  @Schema(name = "outputFunctionDefined", description = "Does trigger define output function.", requiredMode = Schema.RequiredMode.REQUIRED)
   @JsonProperty("outputFunctionDefined")
   public Boolean getOutputFunctionDefined() {
     return outputFunctionDefined;

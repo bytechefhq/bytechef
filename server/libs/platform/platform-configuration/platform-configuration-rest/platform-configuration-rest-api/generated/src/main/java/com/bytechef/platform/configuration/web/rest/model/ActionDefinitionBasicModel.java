@@ -23,14 +23,22 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "ActionDefinitionBasic", description = "An action is a portion of reusable code that accomplish a specific task. When building a workflow, each action is represented as a task inside the workflow. The task 'type' property is defined as [component name]/v[component version]/[action name]. Action properties are used to set properties of the task inside the workflow.")
 @JsonTypeName("ActionDefinitionBasic")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-02-19T09:54:18.872660+01:00[Europe/Zagreb]", comments = "Generator version: 7.11.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-02-20T13:40:58.825899+01:00[Europe/Zagreb]", comments = "Generator version: 7.11.0")
 public class ActionDefinitionBasicModel {
+
+  private String componentName;
+
+  private Integer componentVersion;
 
   private @Nullable String description;
 
   private @Nullable HelpModel help;
 
   private String name;
+
+  private Boolean outputDefined;
+
+  private Boolean outputFunctionDefined;
 
   private @Nullable String title;
 
@@ -41,8 +49,52 @@ public class ActionDefinitionBasicModel {
   /**
    * Constructor with only required parameters
    */
-  public ActionDefinitionBasicModel(String name) {
+  public ActionDefinitionBasicModel(String componentName, Integer componentVersion, String name, Boolean outputDefined, Boolean outputFunctionDefined) {
+    this.componentName = componentName;
+    this.componentVersion = componentVersion;
     this.name = name;
+    this.outputDefined = outputDefined;
+    this.outputFunctionDefined = outputFunctionDefined;
+  }
+
+  public ActionDefinitionBasicModel componentName(String componentName) {
+    this.componentName = componentName;
+    return this;
+  }
+
+  /**
+   * The component name.
+   * @return componentName
+   */
+  @NotNull 
+  @Schema(name = "componentName", description = "The component name.", requiredMode = Schema.RequiredMode.REQUIRED)
+  @JsonProperty("componentName")
+  public String getComponentName() {
+    return componentName;
+  }
+
+  public void setComponentName(String componentName) {
+    this.componentName = componentName;
+  }
+
+  public ActionDefinitionBasicModel componentVersion(Integer componentVersion) {
+    this.componentVersion = componentVersion;
+    return this;
+  }
+
+  /**
+   * The component version.
+   * @return componentVersion
+   */
+  @NotNull 
+  @Schema(name = "componentVersion", description = "The component version.", requiredMode = Schema.RequiredMode.REQUIRED)
+  @JsonProperty("componentVersion")
+  public Integer getComponentVersion() {
+    return componentVersion;
+  }
+
+  public void setComponentVersion(Integer componentVersion) {
+    this.componentVersion = componentVersion;
   }
 
   public ActionDefinitionBasicModel description(String description) {
@@ -105,6 +157,46 @@ public class ActionDefinitionBasicModel {
     this.name = name;
   }
 
+  public ActionDefinitionBasicModel outputDefined(Boolean outputDefined) {
+    this.outputDefined = outputDefined;
+    return this;
+  }
+
+  /**
+   * Does action define output schema.
+   * @return outputDefined
+   */
+  @NotNull 
+  @Schema(name = "outputDefined", description = "Does action define output schema.", requiredMode = Schema.RequiredMode.REQUIRED)
+  @JsonProperty("outputDefined")
+  public Boolean getOutputDefined() {
+    return outputDefined;
+  }
+
+  public void setOutputDefined(Boolean outputDefined) {
+    this.outputDefined = outputDefined;
+  }
+
+  public ActionDefinitionBasicModel outputFunctionDefined(Boolean outputFunctionDefined) {
+    this.outputFunctionDefined = outputFunctionDefined;
+    return this;
+  }
+
+  /**
+   * Does action define output function.
+   * @return outputFunctionDefined
+   */
+  @NotNull 
+  @Schema(name = "outputFunctionDefined", description = "Does action define output function.", requiredMode = Schema.RequiredMode.REQUIRED)
+  @JsonProperty("outputFunctionDefined")
+  public Boolean getOutputFunctionDefined() {
+    return outputFunctionDefined;
+  }
+
+  public void setOutputFunctionDefined(Boolean outputFunctionDefined) {
+    this.outputFunctionDefined = outputFunctionDefined;
+  }
+
   public ActionDefinitionBasicModel title(String title) {
     this.title = title;
     return this;
@@ -134,24 +226,32 @@ public class ActionDefinitionBasicModel {
       return false;
     }
     ActionDefinitionBasicModel actionDefinitionBasic = (ActionDefinitionBasicModel) o;
-    return Objects.equals(this.description, actionDefinitionBasic.description) &&
+    return Objects.equals(this.componentName, actionDefinitionBasic.componentName) &&
+        Objects.equals(this.componentVersion, actionDefinitionBasic.componentVersion) &&
+        Objects.equals(this.description, actionDefinitionBasic.description) &&
         Objects.equals(this.help, actionDefinitionBasic.help) &&
         Objects.equals(this.name, actionDefinitionBasic.name) &&
+        Objects.equals(this.outputDefined, actionDefinitionBasic.outputDefined) &&
+        Objects.equals(this.outputFunctionDefined, actionDefinitionBasic.outputFunctionDefined) &&
         Objects.equals(this.title, actionDefinitionBasic.title);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(description, help, name, title);
+    return Objects.hash(componentName, componentVersion, description, help, name, outputDefined, outputFunctionDefined, title);
   }
 
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
     sb.append("class ActionDefinitionBasicModel {\n");
+    sb.append("    componentName: ").append(toIndentedString(componentName)).append("\n");
+    sb.append("    componentVersion: ").append(toIndentedString(componentVersion)).append("\n");
     sb.append("    description: ").append(toIndentedString(description)).append("\n");
     sb.append("    help: ").append(toIndentedString(help)).append("\n");
     sb.append("    name: ").append(toIndentedString(name)).append("\n");
+    sb.append("    outputDefined: ").append(toIndentedString(outputDefined)).append("\n");
+    sb.append("    outputFunctionDefined: ").append(toIndentedString(outputFunctionDefined)).append("\n");
     sb.append("    title: ").append(toIndentedString(title)).append("\n");
     sb.append("}");
     return sb.toString();
