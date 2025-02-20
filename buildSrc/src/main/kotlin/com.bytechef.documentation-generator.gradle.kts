@@ -24,7 +24,9 @@ open class FindJsonFilesTask : DefaultTask() {
         var label: String? = null
         var type: String? = null
         var required: Boolean? = false
-        var options: Array<Option> ? = null
+        var options: Array<Option>? = null
+        var optionsDataSource: OptionsDataSource? = null
+        var dynamicPropertiesDataSource: DynamicPropertyDataSource? = null;
 
         private fun getFullTypeObject(): String? {
             val sb = StringBuilder()
@@ -63,11 +65,16 @@ open class FindJsonFilesTask : DefaultTask() {
             } else type;
         }
 
+        fun getOutputString(): String {
+            val typeDetails = getTypeDetails()
+
+            return formatWithoutLabel(name, typeDetails)
+        }
+
         override fun toString(): String {
             val typeDetails = getTypeDetails()
 
             return when {
-                label == null -> formatWithoutLabel(name, typeDetails)
                 description == null -> formatWithoutDescription(name, label, typeDetails)
                 else -> formatFull(name, label, typeDetails, description)
             }
@@ -78,9 +85,20 @@ open class FindJsonFilesTask : DefaultTask() {
             return if (type == "OBJECT" || type == "ARRAY") {
                 val detailsSummary = if (type == "OBJECT") "Properties" else "Items"
                 "$type <details> <summary> $detailsSummary </summary> $typeFull </details>"
+            } else if (type == "DYNAMIC_PROPERTIES") {
+                if (dynamicPropertiesDataSource?.propertiesLookupDependsOn.isNullOrEmpty()) {
+                    type.toString()
+                } else {
+                    val propertiesLookupDependsOn =
+                        dynamicPropertiesDataSource?.propertiesLookupDependsOn?.joinToString(", ")
+                    "$type <details> <summary> Depends On </summary> $propertiesLookupDependsOn </details>"
+                }
             } else if (!options.isNullOrEmpty()) {
                 val optionsString = options?.joinToString(", ") { it.value.toString() }
                 "$type <details> <summary> Options </summary> $optionsString </details>"
+            } else if (!optionsDataSource?.optionsLookupDependsOn.isNullOrEmpty()) {
+                val optionsString = optionsDataSource?.optionsLookupDependsOn?.joinToString(", ")
+                "$type <details> <summary> Depends On </summary> $optionsString </details>"
             } else {
                 type.toString()
             }
@@ -92,7 +110,11 @@ open class FindJsonFilesTask : DefaultTask() {
         }
 
         private fun formatWithoutDescription(name: String?, label: String?, typeDetails: String): String {
-            return "| $name | $label | $typeDetails | $controlType |  | $required |"
+            return if (label == null) {
+                "| $name | | $typeDetails | $controlType |  | $required |"
+            } else {
+                "| $name | $label | $typeDetails | $controlType |  | $required |"
+            }
         }
 
         private fun formatFull(name: String?, label: String?, typeDetails: String, description: String?): String {
@@ -111,6 +133,7 @@ open class FindJsonFilesTask : DefaultTask() {
                 "BOOLEAN" -> false
                 "DATE" -> "\"2021-01-01\""
                 "DATE_TIME" -> "\"2021-01-01T00:00:00\""
+                "DYNAMIC_PROPERTIES" -> "{}" // TODO
                 "FILE_ENTRY" -> getJsonObject(properties)
                 "INTEGER" -> 1
                 "NUMBER" -> 0.0
@@ -158,12 +181,22 @@ open class FindJsonFilesTask : DefaultTask() {
         }
     }
 
+    @JsonIgnoreProperties(ignoreUnknown = true)
     class Option {
         var description: String? = null
         var label: String? = null
         var value: String? = null
     }
 
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    class OptionsDataSource {
+        var optionsLookupDependsOn: Array<String>? = null
+    }
+
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    class DynamicPropertyDataSource {
+        var propertiesLookupDependsOn: Array<String>? = null
+    }
 
     @JsonIgnoreProperties(ignoreUnknown = true)
     class OutputSchema {
@@ -179,7 +212,7 @@ open class FindJsonFilesTask : DefaultTask() {
 
 |     Name     |     Type     |    Control Type     |
 |:------------:|:------------:|:-------------------:|
-${properties?.joinToString("\n")}
+${properties?.joinToString("\n") { it.getOutputString() }}
 """
             } else if (!items.isNullOrEmpty()) {
                 """
@@ -187,7 +220,7 @@ ${properties?.joinToString("\n")}
 
 |     Name     |     Type     |    Control Type     |
 |:------------:|:------------:|:-------------------:|
-${items?.joinToString("\n")}
+${items?.joinToString("\n") { it.getOutputString() }}
 """
             } else ""
         }
