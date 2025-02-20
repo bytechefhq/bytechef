@@ -39,13 +39,13 @@ export interface ActionDefinition {
      * @type {string}
      * @memberof ActionDefinition
      */
-    componentName?: string;
+    componentName: string;
     /**
      * The component version.
      * @type {number}
      * @memberof ActionDefinition
      */
-    componentVersion?: number;
+    componentVersion: number;
     /**
      * The description.
      * @type {string}
@@ -75,7 +75,7 @@ export interface ActionDefinition {
      * @type {boolean}
      * @memberof ActionDefinition
      */
-    outputFunctionDefined?: boolean;
+    outputFunctionDefined: boolean;
     /**
      * The list of action properties.
      * @type {Array<Property>}
@@ -100,8 +100,11 @@ export interface ActionDefinition {
  * Check if a given object implements the ActionDefinition interface.
  */
 export function instanceOfActionDefinition(value: object): value is ActionDefinition {
+    if (!('componentName' in value) || value['componentName'] === undefined) return false;
+    if (!('componentVersion' in value) || value['componentVersion'] === undefined) return false;
     if (!('name' in value) || value['name'] === undefined) return false;
     if (!('outputDefined' in value) || value['outputDefined'] === undefined) return false;
+    if (!('outputFunctionDefined' in value) || value['outputFunctionDefined'] === undefined) return false;
     return true;
 }
 
@@ -115,13 +118,13 @@ export function ActionDefinitionFromJSONTyped(json: any, ignoreDiscriminator: bo
     }
     return {
         
-        'componentName': json['componentName'] == null ? undefined : json['componentName'],
-        'componentVersion': json['componentVersion'] == null ? undefined : json['componentVersion'],
+        'componentName': json['componentName'],
+        'componentVersion': json['componentVersion'],
         'description': json['description'] == null ? undefined : json['description'],
         'help': json['help'] == null ? undefined : HelpFromJSON(json['help']),
         'name': json['name'],
         'outputDefined': json['outputDefined'],
-        'outputFunctionDefined': json['outputFunctionDefined'] == null ? undefined : json['outputFunctionDefined'],
+        'outputFunctionDefined': json['outputFunctionDefined'],
         'properties': json['properties'] == null ? undefined : ((json['properties'] as Array<any>).map(PropertyFromJSON)),
         'title': json['title'] == null ? undefined : json['title'],
         'workflowNodeDescriptionDefined': json['workflowNodeDescriptionDefined'] == null ? undefined : json['workflowNodeDescriptionDefined'],

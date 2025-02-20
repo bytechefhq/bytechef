@@ -46,6 +46,12 @@ export interface TaskDispatcherDefinitionBasic {
      */
     name: string;
     /**
+     * Does task dispatcher define output schema.
+     * @type {boolean}
+     * @memberof TaskDispatcherDefinitionBasic
+     */
+    outputDefined: boolean;
+    /**
      * 
      * @type {Resources}
      * @memberof TaskDispatcherDefinitionBasic
@@ -70,6 +76,7 @@ export interface TaskDispatcherDefinitionBasic {
  */
 export function instanceOfTaskDispatcherDefinitionBasic(value: object): value is TaskDispatcherDefinitionBasic {
     if (!('name' in value) || value['name'] === undefined) return false;
+    if (!('outputDefined' in value) || value['outputDefined'] === undefined) return false;
     if (!('version' in value) || value['version'] === undefined) return false;
     return true;
 }
@@ -87,6 +94,7 @@ export function TaskDispatcherDefinitionBasicFromJSONTyped(json: any, ignoreDisc
         'description': json['description'] == null ? undefined : json['description'],
         'icon': json['icon'] == null ? undefined : json['icon'],
         'name': json['name'],
+        'outputDefined': json['outputDefined'],
         'resources': json['resources'] == null ? undefined : ResourcesFromJSON(json['resources']),
         'title': json['title'] == null ? undefined : json['title'],
         'version': json['version'],
@@ -107,6 +115,7 @@ export function TaskDispatcherDefinitionBasicToJSONTyped(value?: TaskDispatcherD
         'description': value['description'],
         'icon': value['icon'],
         'name': value['name'],
+        'outputDefined': value['outputDefined'],
         'resources': ResourcesToJSON(value['resources']),
         'title': value['title'],
         'version': value['version'],

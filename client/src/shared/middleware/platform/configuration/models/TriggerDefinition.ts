@@ -82,7 +82,7 @@ export interface TriggerDefinition {
      * @type {boolean}
      * @memberof TriggerDefinition
      */
-    outputFunctionDefined?: boolean;
+    outputFunctionDefined: boolean;
     /**
      * The list of action properties.
      * @type {Array<Property>}
@@ -117,6 +117,7 @@ export interface TriggerDefinition {
 export function instanceOfTriggerDefinition(value: object): value is TriggerDefinition {
     if (!('name' in value) || value['name'] === undefined) return false;
     if (!('outputDefined' in value) || value['outputDefined'] === undefined) return false;
+    if (!('outputFunctionDefined' in value) || value['outputFunctionDefined'] === undefined) return false;
     if (!('type' in value) || value['type'] === undefined) return false;
     return true;
 }
@@ -137,7 +138,7 @@ export function TriggerDefinitionFromJSONTyped(json: any, ignoreDiscriminator: b
         'help': json['help'] == null ? undefined : HelpFromJSON(json['help']),
         'name': json['name'],
         'outputDefined': json['outputDefined'],
-        'outputFunctionDefined': json['outputFunctionDefined'] == null ? undefined : json['outputFunctionDefined'],
+        'outputFunctionDefined': json['outputFunctionDefined'],
         'properties': json['properties'] == null ? undefined : ((json['properties'] as Array<any>).map(PropertyFromJSON)),
         'title': json['title'] == null ? undefined : json['title'],
         'type': TriggerTypeFromJSON(json['type']),

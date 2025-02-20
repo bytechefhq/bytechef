@@ -28,6 +28,18 @@ import {
  */
 export interface ActionDefinitionBasic {
     /**
+     * The component name.
+     * @type {string}
+     * @memberof ActionDefinitionBasic
+     */
+    componentName: string;
+    /**
+     * The component version.
+     * @type {number}
+     * @memberof ActionDefinitionBasic
+     */
+    componentVersion: number;
+    /**
      * The description.
      * @type {string}
      * @memberof ActionDefinitionBasic
@@ -46,6 +58,18 @@ export interface ActionDefinitionBasic {
      */
     name: string;
     /**
+     * Does action define output schema.
+     * @type {boolean}
+     * @memberof ActionDefinitionBasic
+     */
+    outputDefined: boolean;
+    /**
+     * Does action define output function.
+     * @type {boolean}
+     * @memberof ActionDefinitionBasic
+     */
+    outputFunctionDefined: boolean;
+    /**
      * The title
      * @type {string}
      * @memberof ActionDefinitionBasic
@@ -57,7 +81,11 @@ export interface ActionDefinitionBasic {
  * Check if a given object implements the ActionDefinitionBasic interface.
  */
 export function instanceOfActionDefinitionBasic(value: object): value is ActionDefinitionBasic {
+    if (!('componentName' in value) || value['componentName'] === undefined) return false;
+    if (!('componentVersion' in value) || value['componentVersion'] === undefined) return false;
     if (!('name' in value) || value['name'] === undefined) return false;
+    if (!('outputDefined' in value) || value['outputDefined'] === undefined) return false;
+    if (!('outputFunctionDefined' in value) || value['outputFunctionDefined'] === undefined) return false;
     return true;
 }
 
@@ -71,9 +99,13 @@ export function ActionDefinitionBasicFromJSONTyped(json: any, ignoreDiscriminato
     }
     return {
         
+        'componentName': json['componentName'],
+        'componentVersion': json['componentVersion'],
         'description': json['description'] == null ? undefined : json['description'],
         'help': json['help'] == null ? undefined : HelpFromJSON(json['help']),
         'name': json['name'],
+        'outputDefined': json['outputDefined'],
+        'outputFunctionDefined': json['outputFunctionDefined'],
         'title': json['title'] == null ? undefined : json['title'],
     };
 }
@@ -89,9 +121,13 @@ export function ActionDefinitionBasicToJSONTyped(value?: ActionDefinitionBasic |
 
     return {
         
+        'componentName': value['componentName'],
+        'componentVersion': value['componentVersion'],
         'description': value['description'],
         'help': HelpToJSON(value['help']),
         'name': value['name'],
+        'outputDefined': value['outputDefined'],
+        'outputFunctionDefined': value['outputFunctionDefined'],
         'title': value['title'],
     };
 }

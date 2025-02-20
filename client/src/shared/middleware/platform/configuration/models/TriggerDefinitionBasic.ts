@@ -35,6 +35,18 @@ import {
  */
 export interface TriggerDefinitionBasic {
     /**
+     * The component name.
+     * @type {string}
+     * @memberof TriggerDefinitionBasic
+     */
+    componentName: string;
+    /**
+     * The component version.
+     * @type {number}
+     * @memberof TriggerDefinitionBasic
+     */
+    componentVersion: number;
+    /**
      * The description.
      * @type {string}
      * @memberof TriggerDefinitionBasic
@@ -52,6 +64,18 @@ export interface TriggerDefinitionBasic {
      * @memberof TriggerDefinitionBasic
      */
     name: string;
+    /**
+     * Does trigger define output schema.
+     * @type {boolean}
+     * @memberof TriggerDefinitionBasic
+     */
+    outputDefined: boolean;
+    /**
+     * Does trigger define output function.
+     * @type {boolean}
+     * @memberof TriggerDefinitionBasic
+     */
+    outputFunctionDefined: boolean;
     /**
      * The title
      * @type {string}
@@ -72,7 +96,11 @@ export interface TriggerDefinitionBasic {
  * Check if a given object implements the TriggerDefinitionBasic interface.
  */
 export function instanceOfTriggerDefinitionBasic(value: object): value is TriggerDefinitionBasic {
+    if (!('componentName' in value) || value['componentName'] === undefined) return false;
+    if (!('componentVersion' in value) || value['componentVersion'] === undefined) return false;
     if (!('name' in value) || value['name'] === undefined) return false;
+    if (!('outputDefined' in value) || value['outputDefined'] === undefined) return false;
+    if (!('outputFunctionDefined' in value) || value['outputFunctionDefined'] === undefined) return false;
     if (!('type' in value) || value['type'] === undefined) return false;
     return true;
 }
@@ -87,9 +115,13 @@ export function TriggerDefinitionBasicFromJSONTyped(json: any, ignoreDiscriminat
     }
     return {
         
+        'componentName': json['componentName'],
+        'componentVersion': json['componentVersion'],
         'description': json['description'] == null ? undefined : json['description'],
         'help': json['help'] == null ? undefined : HelpFromJSON(json['help']),
         'name': json['name'],
+        'outputDefined': json['outputDefined'],
+        'outputFunctionDefined': json['outputFunctionDefined'],
         'title': json['title'] == null ? undefined : json['title'],
         'type': TriggerTypeFromJSON(json['type']),
     };
@@ -106,9 +138,13 @@ export function TriggerDefinitionBasicToJSONTyped(value?: TriggerDefinitionBasic
 
     return {
         
+        'componentName': value['componentName'],
+        'componentVersion': value['componentVersion'],
         'description': value['description'],
         'help': HelpToJSON(value['help']),
         'name': value['name'],
+        'outputDefined': value['outputDefined'],
+        'outputFunctionDefined': value['outputFunctionDefined'],
         'title': value['title'],
         'type': TriggerTypeToJSON(value['type']),
     };
