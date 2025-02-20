@@ -1,5 +1,7 @@
 import PropertyMentionsInputBubbleMenu from '@/pages/platform/workflow-editor/components/properties/components/property-mentions-input/PropertyMentionsInputBubbleMenu';
 import {getSuggestionOptions} from '@/pages/platform/workflow-editor/components/properties/components/property-mentions-input/propertyMentionsInputEditorSuggestionOptions';
+import {useWorkflowNodeParameterMutation} from '@/pages/platform/workflow-editor/providers/workflowNodeParameterMutationProvider';
+import saveProperty from '@/pages/platform/workflow-editor/utils/saveProperty';
 import {ComponentDefinitionBasic, Workflow} from '@/shared/middleware/platform/configuration';
 import {DataPillType} from '@/shared/types';
 import Document from '@tiptap/extension-document';
@@ -9,9 +11,12 @@ import Placeholder from '@tiptap/extension-placeholder';
 import Text from '@tiptap/extension-text';
 import {Editor, EditorContent, Extension, mergeAttributes, useEditor} from '@tiptap/react';
 import {StarterKit} from '@tiptap/starter-kit';
+import {decode} from 'html-entities';
 import {EditorView} from 'prosemirror-view';
 import {ForwardedRef, MutableRefObject, forwardRef, useCallback, useEffect, useMemo, useState} from 'react';
+import sanitizeHtml from 'sanitize-html';
 import {twMerge} from 'tailwind-merge';
+import {useDebouncedCallback} from 'use-debounce';
 
 const defaultIcon =
     '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V8Z"/><path d="M15 3v4a2 2 0 0 0 2 2h4"/></svg>';
@@ -23,7 +28,6 @@ interface PropertyMentionsInputEditorProps {
     dataPills: DataPillType[];
     elementId?: string;
     path?: string;
-    onChange: (value: string) => void;
     onClose?: () => void;
     onFocus?: (editor: Editor) => void;
     placeholder?: string;
@@ -40,7 +44,6 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
             controlType,
             dataPills,
             elementId,
-            onChange,
             onFocus,
             path,
             placeholder,
@@ -50,6 +53,7 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
         },
         ref: ForwardedRef<Editor>
     ) => {
+        const [editorValue, setEditorValue] = useState(value);
         const [mentionOccurences, setMentionOccurences] = useState(0);
 
         const getComponentIcon = useCallback(
@@ -134,6 +138,43 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
             return extensions;
         }, [controlType, dataPills, getComponentIcon, placeholder]);
 
+        const {updateWorkflowNodeParameterMutation} = useWorkflowNodeParameterMutation();
+
+        const saveMentionInputValue = useDebouncedCallback(() => {
+            if (!workflow.id || !updateWorkflowNodeParameterMutation || !path) {
+                return;
+            }
+
+            // const sanitizedCurrentValue = sanitizeHtml(editorValue, {allowedTags: []});
+
+            // if (propertyParameterValue === sanitizedCurrentValue) {
+            //     return;
+            // }
+
+            let value: string | number = editorValue;
+
+            if ((type === 'INTEGER' || type === 'NUMBER') && !value.startsWith('${')) {
+                value = parseInt(value);
+            }
+
+            if (typeof value === 'string') {
+                if (controlType !== 'RICH_TEXT') {
+                    value = sanitizeHtml(value, {allowedTags: []});
+                } else {
+                    value = decode(value);
+                }
+            }
+
+            saveProperty({
+                includeInMetadata: true,
+                path,
+                type,
+                updateWorkflowNodeParameterMutation,
+                value: value || null,
+                workflowId: workflow.id,
+            });
+        }, 1000);
+
         const onUpdate = useCallback(
             ({editor}: {editor: Editor}) => {
                 let value = editor.getHTML();
@@ -161,13 +202,15 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
                     });
                 }
 
-                onChange(value);
+                setEditorValue(value);
 
                 const propertyMentions = value.match(/property-mention/g);
 
                 setMentionOccurences(propertyMentions?.length || 0);
+
+                saveMentionInputValue();
             },
-            [onChange]
+            [saveMentionInputValue]
         );
 
         const getContent = useCallback((value?: string) => {
@@ -244,9 +287,19 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
             }
         }, [editor, getContent, value]);
 
+        // Cleanup function to save mention input value on unmount
+        useEffect(() => {
+            return () => saveMentionInputValue.flush();
+        }, [saveMentionInputValue]);
+
         return (
             <>
-                <EditorContent editor={editor} id={elementId} />
+                <EditorContent
+                    editor={editor}
+                    id={elementId}
+                    onChange={(event) => setEditorValue(event.target.value)}
+                    value={editorValue}
+                />
 
                 {controlType === 'RICH_TEXT' && editor && <PropertyMentionsInputBubbleMenu editor={editor} />}
             </>

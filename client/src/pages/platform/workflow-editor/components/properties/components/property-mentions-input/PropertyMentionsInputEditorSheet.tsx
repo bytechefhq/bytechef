@@ -11,7 +11,6 @@ export interface PropertyMentionsInputEditorSheetProps {
     controlType?: string;
     dataPills: DataPillType[];
     path?: string;
-    onChange: (value: string) => void;
     onClose?: () => void;
     onFocus?: (editor: Editor) => void;
     placeholder?: string;
@@ -25,7 +24,6 @@ const PropertyMentionsInputEditorSheet = ({
     componentDefinitions,
     controlType,
     dataPills,
-    onChange,
     onClose,
     placeholder,
     title,
@@ -59,7 +57,6 @@ const PropertyMentionsInputEditorSheet = ({
                         componentDefinitions={componentDefinitions}
                         controlType={controlType}
                         dataPills={dataPills}
-                        onChange={onChange}
                         placeholder={placeholder}
                         type={type}
                         value={value}
