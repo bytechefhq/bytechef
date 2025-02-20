@@ -24,10 +24,10 @@ Version: 1
 
 #### Properties
 
-|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
-|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
-| clientId | Client id | STRING | TEXT  |  | true  |
-| clientSecret | Client secret | STRING | TEXT  |  | true  |
+|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
+| clientId | Client id | STRING | TEXT |  | true |
+| clientSecret | Client secret | STRING | TEXT |  | true |
 
 
 
@@ -47,11 +47,11 @@ Adds an assignees to the specified issue.
 
 #### Properties
 
-|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
-|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
-| repository | Repository | STRING | SELECT  |  | true  |
-| issue | Issue | STRING | SELECT  |  The issue to add assignee to.  |  true  |
-| assignees | Assignees | [STRING\($assignee)] | ARRAY_BUILDER  |  The list of assignees to add to the issue.  |  true  |
+|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
+| repository | Repository | STRING | SELECT |  | true |
+| issue | Issue | STRING <details> <summary> Depends On </summary> repository </details> | SELECT | The issue to add assignee to. | true |
+| assignees | Assignees | ARRAY <details> <summary> Items </summary> [STRING] </details> | MULTI_SELECT | The list of assignees to add to the issue. | true |
 
 
 #### Output
@@ -63,21 +63,34 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |     Control Type     |
-|:------------:|:------------:|:--------------------:|
-| url | STRING | TEXT  |
-| repository_url | STRING | TEXT  |
-| id | NUMBER | NUMBER  |
-| number | INTEGER | INTEGER  |
-| title | STRING | TEXT  |
-| state | STRING | TEXT  |
-| assignees | [{STRING\(login), STRING\(id), STRING\(html_url), STRING\(type)}] | ARRAY_BUILDER  |
-| labels | [{STRING\(id), STRING\(name), STRING\(description)}] | ARRAY_BUILDER  |
-| body | STRING | TEXT  |
+|     Name     |     Type     |    Control Type     |
+|:------------:|:------------:|:-------------------:|
+| url | STRING | TEXT |
+| repository_url | STRING | TEXT |
+| id | NUMBER | NUMBER |
+| number | INTEGER | INTEGER |
+| title | STRING | TEXT |
+| state | STRING | TEXT |
+| assignees | ARRAY <details> <summary> Items </summary> [{STRING\(login), STRING\(id), STRING\(html_url), STRING\(type)}] </details> | ARRAY_BUILDER |
+| labels | ARRAY <details> <summary> Items </summary> [{STRING\(id), STRING\(name), STRING\(description)}] </details> | ARRAY_BUILDER |
+| body | STRING | TEXT |
 
 
 
 
+#### JSON Example
+```json
+{
+  "label" : "Add Assignee to Issue",
+  "name" : "addAssigneesToIssue",
+  "parameters" : {
+    "repository" : "",
+    "issue" : "",
+    "assignees" : [ "" ]
+  },
+  "type" : "github/v1/addAssigneesToIssue"
+}
+```
 
 
 ### Add Labels to Issue
@@ -87,11 +100,11 @@ Adds labels to the specified issue.
 
 #### Properties
 
-|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
-|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
-| repository | Repository | STRING | SELECT  |  | true  |
-| issue | Issue | STRING | SELECT  |  The issue to add labels to.  |  true  |
-| labels | Labels | [STRING\($label)] | ARRAY_BUILDER  |  The list of labels to add to the issue.  |  true  |
+|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
+| repository | Repository | STRING | SELECT |  | true |
+| issue | Issue | STRING <details> <summary> Depends On </summary> repository </details> | SELECT | The issue to add labels to. | true |
+| labels | Labels | ARRAY <details> <summary> Items </summary> [STRING] </details> | MULTI_SELECT | The list of labels to add to the issue. | true |
 
 
 #### Output
@@ -103,13 +116,26 @@ Type: ARRAY
 
 #### Properties
 
-|     Name     |     Type     |     Control Type     |
-|:------------:|:------------:|:--------------------:|
-|  | {STRING\(id), STRING\(name), STRING\(description)} | OBJECT_BUILDER  |
+|     Name     |     Type     |    Control Type     |
+|:------------:|:------------:|:-------------------:|
+|  | OBJECT <details> <summary> Properties </summary> {STRING\(id), STRING\(name), STRING\(description)} </details> | OBJECT_BUILDER |
 
 
 
 
+#### JSON Example
+```json
+{
+  "label" : "Add Labels to Issue",
+  "name" : "addLabelsToIssue",
+  "parameters" : {
+    "repository" : "",
+    "issue" : "",
+    "labels" : [ "" ]
+  },
+  "type" : "github/v1/addLabelsToIssue"
+}
+```
 
 
 ### Create Comment on Issue
@@ -119,11 +145,11 @@ Adds a comment to the specified issue.
 
 #### Properties
 
-|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
-|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
-| repository | Repository | STRING | SELECT  |  | true  |
-| issue | Issue | STRING | SELECT  |  The issue to comment on.  |  true  |
-| body | Comment | STRING | TEXT  |  The comment to add to the issue.  |  true  |
+|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
+| repository | Repository | STRING | SELECT |  | true |
+| issue | Issue | STRING <details> <summary> Depends On </summary> repository </details> | SELECT | The issue to comment on. | true |
+| body | Comment | STRING | TEXT | The comment to add to the issue. | true |
 
 
 #### Output
@@ -135,21 +161,34 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |     Control Type     |
-|:------------:|:------------:|:--------------------:|
-| url | STRING | TEXT  |
-| repository_url | STRING | TEXT  |
-| id | NUMBER | NUMBER  |
-| number | INTEGER | INTEGER  |
-| title | STRING | TEXT  |
-| state | STRING | TEXT  |
-| assignees | [{STRING\(login), STRING\(id), STRING\(html_url), STRING\(type)}] | ARRAY_BUILDER  |
-| labels | [{STRING\(id), STRING\(name), STRING\(description)}] | ARRAY_BUILDER  |
-| body | STRING | TEXT  |
+|     Name     |     Type     |    Control Type     |
+|:------------:|:------------:|:-------------------:|
+| url | STRING | TEXT |
+| repository_url | STRING | TEXT |
+| id | NUMBER | NUMBER |
+| number | INTEGER | INTEGER |
+| title | STRING | TEXT |
+| state | STRING | TEXT |
+| assignees | ARRAY <details> <summary> Items </summary> [{STRING\(login), STRING\(id), STRING\(html_url), STRING\(type)}] </details> | ARRAY_BUILDER |
+| labels | ARRAY <details> <summary> Items </summary> [{STRING\(id), STRING\(name), STRING\(description)}] </details> | ARRAY_BUILDER |
+| body | STRING | TEXT |
 
 
 
 
+#### JSON Example
+```json
+{
+  "label" : "Create Comment on Issue",
+  "name" : "createCommentOnIssue",
+  "parameters" : {
+    "repository" : "",
+    "issue" : "",
+    "body" : ""
+  },
+  "type" : "github/v1/createCommentOnIssue"
+}
+```
 
 
 ### Create Issue
@@ -159,11 +198,11 @@ Create Issue in GitHub Repository
 
 #### Properties
 
-|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
-|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
-| repository | Repository | STRING | SELECT  |  Repository where new issue will be created.  |  true  |
-| title | Title | STRING | TEXT  |  Title of the issue.  |  false  |
-| body | Description | STRING | TEXT  |  The description of the issue.  |  false  |
+|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
+| repository | Repository | STRING | SELECT | Repository where new issue will be created. | true |
+| title | Title | STRING | TEXT | Title of the issue. | false |
+| body | Description | STRING | TEXT | The description of the issue. | false |
 
 
 #### Output
@@ -175,21 +214,34 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |     Control Type     |
-|:------------:|:------------:|:--------------------:|
-| url | STRING | TEXT  |
-| repository_url | STRING | TEXT  |
-| id | NUMBER | NUMBER  |
-| number | INTEGER | INTEGER  |
-| title | STRING | TEXT  |
-| state | STRING | TEXT  |
-| assignees | [{STRING\(login), STRING\(id), STRING\(html_url), STRING\(type)}] | ARRAY_BUILDER  |
-| labels | [{STRING\(id), STRING\(name), STRING\(description)}] | ARRAY_BUILDER  |
-| body | STRING | TEXT  |
+|     Name     |     Type     |    Control Type     |
+|:------------:|:------------:|:-------------------:|
+| url | STRING | TEXT |
+| repository_url | STRING | TEXT |
+| id | NUMBER | NUMBER |
+| number | INTEGER | INTEGER |
+| title | STRING | TEXT |
+| state | STRING | TEXT |
+| assignees | ARRAY <details> <summary> Items </summary> [{STRING\(login), STRING\(id), STRING\(html_url), STRING\(type)}] </details> | ARRAY_BUILDER |
+| labels | ARRAY <details> <summary> Items </summary> [{STRING\(id), STRING\(name), STRING\(description)}] </details> | ARRAY_BUILDER |
+| body | STRING | TEXT |
 
 
 
 
+#### JSON Example
+```json
+{
+  "label" : "Create Issue",
+  "name" : "createIssue",
+  "parameters" : {
+    "repository" : "",
+    "title" : "",
+    "body" : ""
+  },
+  "type" : "github/v1/createIssue"
+}
+```
 
 
 ### Get Issue
@@ -199,10 +251,10 @@ Get information from a specific issue
 
 #### Properties
 
-|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
-|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
-| repository | Repository | STRING | SELECT  |  | true  |
-| issue | Issue | STRING | SELECT  |  The issue you want to get details from.  |  true  |
+|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
+| repository | Repository | STRING | SELECT |  | true |
+| issue | Issue | STRING <details> <summary> Depends On </summary> repository </details> | SELECT | The issue you want to get details from. | true |
 
 
 #### Output
@@ -214,21 +266,33 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |     Control Type     |
-|:------------:|:------------:|:--------------------:|
-| url | STRING | TEXT  |
-| repository_url | STRING | TEXT  |
-| id | NUMBER | NUMBER  |
-| number | INTEGER | INTEGER  |
-| title | STRING | TEXT  |
-| state | STRING | TEXT  |
-| assignees | [{STRING\(login), STRING\(id), STRING\(html_url), STRING\(type)}] | ARRAY_BUILDER  |
-| labels | [{STRING\(id), STRING\(name), STRING\(description)}] | ARRAY_BUILDER  |
-| body | STRING | TEXT  |
+|     Name     |     Type     |    Control Type     |
+|:------------:|:------------:|:-------------------:|
+| url | STRING | TEXT |
+| repository_url | STRING | TEXT |
+| id | NUMBER | NUMBER |
+| number | INTEGER | INTEGER |
+| title | STRING | TEXT |
+| state | STRING | TEXT |
+| assignees | ARRAY <details> <summary> Items </summary> [{STRING\(login), STRING\(id), STRING\(html_url), STRING\(type)}] </details> | ARRAY_BUILDER |
+| labels | ARRAY <details> <summary> Items </summary> [{STRING\(id), STRING\(name), STRING\(description)}] </details> | ARRAY_BUILDER |
+| body | STRING | TEXT |
 
 
 
 
+#### JSON Example
+```json
+{
+  "label" : "Get Issue",
+  "name" : "getIssue",
+  "parameters" : {
+    "repository" : "",
+    "issue" : ""
+  },
+  "type" : "github/v1/getIssue"
+}
+```
 
 
 ### List Issues
@@ -238,10 +302,10 @@ Retrieve issues assigned to the authenticated user across all accessible reposit
 
 #### Properties
 
-|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
-|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
-| filter | Filter | STRING | SELECT  |  Specifies the types of issues to return.  |  true  |
-| state | State | STRING | SELECT  |  Indicates the state of the issues to return.  |  true  |
+|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
+| filter | Filter | STRING <details> <summary> Options </summary> assigned, created, mentioned, subscribed, repos, all </details> | SELECT | Specifies the types of issues to return. | true |
+| state | State | STRING <details> <summary> Options </summary> open, closed, all </details> | SELECT | Indicates the state of the issues to return. | true |
 
 
 #### Output
@@ -253,13 +317,25 @@ Type: ARRAY
 
 #### Properties
 
-|     Name     |     Type     |     Control Type     |
-|:------------:|:------------:|:--------------------:|
-|  | {STRING\(url), STRING\(repository_url), NUMBER\(id), INTEGER\(number), STRING\(title), STRING\(state), [{STRING\(login), STRING\(id), STRING\(html_url), STRING\(type)}]\(assignees), [{STRING\(id), STRING\(name), STRING\(description)}]\(labels), STRING\(body)} | OBJECT_BUILDER  |
+|     Name     |     Type     |    Control Type     |
+|:------------:|:------------:|:-------------------:|
+|  | OBJECT <details> <summary> Properties </summary> {STRING\(url), STRING\(repository_url), NUMBER\(id), INTEGER\(number), STRING\(title), STRING\(state), [{STRING\(login), STRING\(id), STRING\(html_url), STRING\(type)}]\(assignees), [{STRING\(id), STRING\(name), STRING\(description)}]\(labels), STRING\(body)} </details> | OBJECT_BUILDER |
 
 
 
 
+#### JSON Example
+```json
+{
+  "label" : "List Issues",
+  "name" : "listIssues",
+  "parameters" : {
+    "filter" : "",
+    "state" : ""
+  },
+  "type" : "github/v1/listIssues"
+}
+```
 
 
 ### List Repository Issues
@@ -269,9 +345,9 @@ Lists issues in a repository. Only open issues will be listed.
 
 #### Properties
 
-|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
-|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
-| repository | Repository | STRING | SELECT  |  The name of the repository  |  true  |
+|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
+| repository | Repository | STRING | SELECT | The name of the repository | true |
 
 
 #### Output
@@ -283,13 +359,24 @@ Type: ARRAY
 
 #### Properties
 
-|     Name     |     Type     |     Control Type     |
-|:------------:|:------------:|:--------------------:|
-|  | {STRING\(url), STRING\(repository_url), NUMBER\(id), INTEGER\(number), STRING\(title), STRING\(state), [{STRING\(login), STRING\(id), STRING\(html_url), STRING\(type)}]\(assignees), [{STRING\(id), STRING\(name), STRING\(description)}]\(labels), STRING\(body)} | OBJECT_BUILDER  |
+|     Name     |     Type     |    Control Type     |
+|:------------:|:------------:|:-------------------:|
+|  | OBJECT <details> <summary> Properties </summary> {STRING\(url), STRING\(repository_url), NUMBER\(id), INTEGER\(number), STRING\(title), STRING\(state), [{STRING\(login), STRING\(id), STRING\(html_url), STRING\(type)}]\(assignees), [{STRING\(id), STRING\(name), STRING\(description)}]\(labels), STRING\(body)} </details> | OBJECT_BUILDER |
 
 
 
 
+#### JSON Example
+```json
+{
+  "label" : "List Repository Issues",
+  "name" : "listRepositoryIssues",
+  "parameters" : {
+    "repository" : ""
+  },
+  "type" : "github/v1/listRepositoryIssues"
+}
+```
 
 
 ### Star Repository
@@ -299,12 +386,24 @@ Stars a repository for the authenticated user.
 
 #### Properties
 
-|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
-|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
-| owner | Owner | STRING | TEXT  |  The account owner of the repository. The name is not case sensitive.  |  true  |
-| repository | Repository | STRING | TEXT  |  The name of the repository including owner without the .git extension. The name is not case sensitive.  |  true  |
+|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
+| owner | Owner | STRING | TEXT | The account owner of the repository. The name is not case sensitive. | true |
+| repository | Repository | STRING | TEXT | The name of the repository including owner without the .git extension. The name is not case sensitive. | true |
 
 
+#### JSON Example
+```json
+{
+  "label" : "Star Repository",
+  "name" : "starRepository",
+  "parameters" : {
+    "owner" : "",
+    "repository" : ""
+  },
+  "type" : "github/v1/starRepository"
+}
+```
 
 
 
@@ -313,14 +412,17 @@ Stars a repository for the authenticated user.
 
 
 ### New Issue
+Name: newIssue
+
 Triggers when a new issue is created.
 
 Type: DYNAMIC_WEBHOOK
+
 #### Properties
 
-|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
-|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
-| repository | Repository | STRING | SELECT  |  | true  |
+|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
+| repository | Repository | STRING | SELECT |  | true |
 
 
 #### Output
@@ -332,29 +434,42 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |     Control Type     |
-|:------------:|:------------:|:--------------------:|
-| issue | {STRING\(url), STRING\(repository_url), NUMBER\(id), INTEGER\(number), STRING\(title), STRING\(state), STRING\(body)} | OBJECT_BUILDER  |
-| sender | {STRING\(login), INTEGER\(id)} | OBJECT_BUILDER  |
-| action | STRING | TEXT  |
-| starred_at | STRING | TEXT  |
-| repository | {INTEGER\(id), STRING\(name), STRING\(full_name), {STRING\(login), INTEGER\(id)}\(owner), STRING\(visibility), INTEGER\(forks), INTEGER\(open_issues), STRING\(default_branch)} | OBJECT_BUILDER  |
+|     Name     |     Type     |    Control Type     |
+|:------------:|:------------:|:-------------------:|
+| issue | OBJECT <details> <summary> Properties </summary> {STRING\(url), STRING\(repository_url), NUMBER\(id), INTEGER\(number), STRING\(title), STRING\(state), STRING\(body)} </details> | OBJECT_BUILDER |
+| sender | OBJECT <details> <summary> Properties </summary> {STRING\(login), INTEGER\(id)} </details> | OBJECT_BUILDER |
+| action | STRING | TEXT |
+| starred_at | STRING | TEXT |
+| repository | OBJECT <details> <summary> Properties </summary> {INTEGER\(id), STRING\(name), STRING\(full_name), {STRING\(login), INTEGER\(id)}\(owner), STRING\(visibility), INTEGER\(forks), INTEGER\(open_issues), STRING\(default_branch)} </details> | OBJECT_BUILDER |
 
 
 
 
-
+#### JSON Example
+```json
+{
+  "label" : "New Issue",
+  "name" : "newIssue",
+  "parameters" : {
+    "repository" : ""
+  },
+  "type" : "github/v1/newIssue"
+}
+```
 
 
 ### New Pull Request
+Name: newPullRequest
+
 Triggers when a new pull request is created.
 
 Type: DYNAMIC_WEBHOOK
+
 #### Properties
 
-|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
-|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
-| repository | Repository | STRING | SELECT  |  | true  |
+|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
+| repository | Repository | STRING | SELECT |  | true |
 
 
 #### Output
@@ -366,18 +481,28 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |     Control Type     |
-|:------------:|:------------:|:--------------------:|
-| number | INTEGER | INTEGER  |
-| pull_request | {INTEGER\(id), STRING\(state), STRING\(title), STRING\(body), INTEGER\(commits)} | OBJECT_BUILDER  |
-| sender | {STRING\(login), INTEGER\(id)} | OBJECT_BUILDER  |
-| action | STRING | TEXT  |
-| repository | {INTEGER\(id), STRING\(name), STRING\(full_name), {STRING\(login), INTEGER\(id)}\(owner), STRING\(visibility), INTEGER\(forks), INTEGER\(open_issues), STRING\(default_branch)} | OBJECT_BUILDER  |
+|     Name     |     Type     |    Control Type     |
+|:------------:|:------------:|:-------------------:|
+| number | INTEGER | INTEGER |
+| pull_request | OBJECT <details> <summary> Properties </summary> {INTEGER\(id), STRING\(state), STRING\(title), STRING\(body), INTEGER\(commits)} </details> | OBJECT_BUILDER |
+| sender | OBJECT <details> <summary> Properties </summary> {STRING\(login), INTEGER\(id)} </details> | OBJECT_BUILDER |
+| action | STRING | TEXT |
+| repository | OBJECT <details> <summary> Properties </summary> {INTEGER\(id), STRING\(name), STRING\(full_name), {STRING\(login), INTEGER\(id)}\(owner), STRING\(visibility), INTEGER\(forks), INTEGER\(open_issues), STRING\(default_branch)} </details> | OBJECT_BUILDER |
 
 
 
 
-
+#### JSON Example
+```json
+{
+  "label" : "New Pull Request",
+  "name" : "newPullRequest",
+  "parameters" : {
+    "repository" : ""
+  },
+  "type" : "github/v1/newPullRequest"
+}
+```
 
 
 <hr />

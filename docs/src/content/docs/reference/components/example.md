@@ -35,12 +35,6 @@ Name: dummyAction
 
 Description
 
-#### Properties
-
-|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
-|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
-
-
 
 #### Output
 
@@ -52,6 +46,14 @@ Type: STRING
 
 
 
+#### JSON Example
+```json
+{
+  "label" : "Title",
+  "name" : "dummyAction",
+  "type" : "example/v1/dummyAction"
+}
+```
 
 
 
@@ -60,14 +62,11 @@ Type: STRING
 
 
 ### Updated Issue
+Name: dummyTrigger
+
 Triggers when an issue is updated.
 
 Type: DYNAMIC_WEBHOOK
-#### Properties
-
-|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
-|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
-
 
 
 #### Output
@@ -80,7 +79,14 @@ Type: STRING
 
 
 
-
+#### JSON Example
+```json
+{
+  "label" : "Updated Issue",
+  "name" : "dummyTrigger",
+  "type" : "example/v1/dummyTrigger"
+}
+```
 
 
 <hr />

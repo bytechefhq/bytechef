@@ -26,16 +26,16 @@ Add time to the date.
 
 #### Properties
 
-|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
-|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
-| inputDate | Date | DATE_TIME | DATE_TIME  |  | true  |
-| dateFormat | Date Format | STRING | SELECT  |  Here's what each part of the format (eg. YYYY) means: yyyy : Year (4 digits) yy : Year (2 digits) MMMM : Month (full name) MMM : Month (short name) MM : Month (2 digits) EEE : Day (short name) dd : Day (2 digits) HH : Hour (2 digits) mm : Minute (2 digits) ss : Second (2 digits).  |  true  |
-| year | Year | INTEGER | INTEGER  |  Years to add.  |  false  |
-| month | Month | INTEGER | INTEGER  |  Months to add.  |  false  |
-| day | Day | INTEGER | INTEGER  |  Days to add.  |  false  |
-| hour | Hour | INTEGER | INTEGER  |  Hours to add.  |  false  |
-| minute | Minute | INTEGER | INTEGER  |  Minutes to add.  |  false  |
-| second | Second | INTEGER | INTEGER  |  Seconds to add.  |  false  |
+|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
+| inputDate | Date | DATE_TIME | DATE_TIME |  | true |
+| dateFormat | Date Format | STRING <details> <summary> Options </summary> EEE MMM dd yyyy HH:mm:ss, EEE MMM dd HH:mm:ss yyyy, MMMM dd yyyy HH:mm:ss, MMMM dd yyyy, MMM dd yyyy, yyyy-MM-dd'T'HH:mm:ss, yyyy-MM-dd HH:mm:ss, yyyy-MM-dd, MM-dd-yyyy, MM/dd/yyyy, MM/dd/yy, dd-MM-yyyy, dd/MM/yyyy, dd/MM/yy, UnixTimestamp </details> | SELECT | Here's what each part of the format (eg. YYYY) means: yyyy : Year (4 digits) yy : Year (2 digits) MMMM : Month (full name) MMM : Month (short name) MM : Month (2 digits) EEE : Day (short name) dd : Day (2 digits) HH : Hour (2 digits) mm : Minute (2 digits) ss : Second (2 digits). | true |
+| year | Year | INTEGER | INTEGER | Years to add. | false |
+| month | Month | INTEGER | INTEGER | Months to add. | false |
+| day | Day | INTEGER | INTEGER | Days to add. | false |
+| hour | Hour | INTEGER | INTEGER | Hours to add. | false |
+| minute | Minute | INTEGER | INTEGER | Minutes to add. | false |
+| second | Second | INTEGER | INTEGER | Seconds to add. | false |
 
 
 #### Output
@@ -48,6 +48,24 @@ Type: STRING
 
 
 
+#### JSON Example
+```json
+{
+  "label" : "Add Time",
+  "name" : "addTime",
+  "parameters" : {
+    "inputDate" : "2021-01-01T00:00:00",
+    "dateFormat" : "",
+    "year" : 1,
+    "month" : 1,
+    "day" : 1,
+    "hour" : 1,
+    "minute" : 1,
+    "second" : 1
+  },
+  "type" : "dateHelper/v1/addTime"
+}
+```
 
 
 ### Convert Date Timestamp
@@ -57,10 +75,10 @@ Converts UNIX timestamp to ISO8601 format.
 
 #### Properties
 
-|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
-|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
-| dateTimestamp | UNIX Timestamp | NUMBER | NUMBER  |  UNIX Timestamp in seconds (10 digits) or milliseconds (13 digits)  |  true  |
-| dateFormat | Date Format | STRING | SELECT  |  Formatting that should be applied the text representation of date.  |  true  |
+|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
+| dateTimestamp | UNIX Timestamp | NUMBER | NUMBER | UNIX Timestamp in seconds (10 digits) or milliseconds (13 digits) | true |
+| dateFormat | Date Format | STRING <details> <summary> Options </summary> yyyy-MM-dd'T'HH:mm:ss.SSSZ, yyyy-MM-dd </details> | SELECT | Formatting that should be applied the text representation of date. | true |
 
 
 #### Output
@@ -73,6 +91,18 @@ Type: STRING
 
 
 
+#### JSON Example
+```json
+{
+  "label" : "Convert Date Timestamp",
+  "name" : "convertUnixTimestampToIso8601",
+  "parameters" : {
+    "dateTimestamp" : 0.0,
+    "dateFormat" : ""
+  },
+  "type" : "dateHelper/v1/convertUnixTimestampToIso8601"
+}
+```
 
 
 ### Date Difference
@@ -82,11 +112,11 @@ Get the difference between two dates.
 
 #### Properties
 
-|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
-|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
-| startDate | Start Date | DATE_TIME | DATE_TIME  |  | true  |
-| endDate | End Date | DATE_TIME | DATE_TIME  |  | true  |
-| unit | Unit | STRING | SELECT  |  The unit of difference between the two dates.  |  true  |
+|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
+| startDate | Start Date | DATE_TIME | DATE_TIME |  | true |
+| endDate | End Date | DATE_TIME | DATE_TIME |  | true |
+| unit | Unit | STRING <details> <summary> Options </summary> year, month, day, hour, minute, second </details> | SELECT | The unit of difference between the two dates. | true |
 
 
 #### Output
@@ -99,6 +129,19 @@ Type: NUMBER
 
 
 
+#### JSON Example
+```json
+{
+  "label" : "Date Difference",
+  "name" : "dateDifference",
+  "parameters" : {
+    "startDate" : "2021-01-01T00:00:00",
+    "endDate" : "2021-01-01T00:00:00",
+    "unit" : ""
+  },
+  "type" : "dateHelper/v1/dateDifference"
+}
+```
 
 
 ### Extract Date Units
@@ -108,10 +151,10 @@ Extract date units (year/month/day/hour/minute/second/day of week/month name) fr
 
 #### Properties
 
-|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
-|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
-| inputDate | Date | DATE_TIME | DATE_TIME  |  | true  |
-| unit | Unit to Extract | STRING | SELECT  |  Unit to extract from date.  |  true  |
+|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
+| inputDate | Date | DATE_TIME | DATE_TIME |  | true |
+| unit | Unit to Extract | STRING <details> <summary> Options </summary> year, month, day, hour, minute, second, dayOfWeek, monthName </details> | SELECT | Unit to extract from date. | true |
 
 
 #### Output
@@ -124,6 +167,18 @@ Type: STRING
 
 
 
+#### JSON Example
+```json
+{
+  "label" : "Extract Date Units",
+  "name" : "extractDateUnits",
+  "parameters" : {
+    "inputDate" : "2021-01-01T00:00:00",
+    "unit" : ""
+  },
+  "type" : "dateHelper/v1/extractDateUnits"
+}
+```
 
 
 ### Get Current Date
@@ -133,10 +188,10 @@ Get current date in the specified format.
 
 #### Properties
 
-|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
-|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
-| timeZone | Time Zone | STRING | SELECT  |  Time zone to use when formatting date.  |  true  |
-| dateFormat | Date Format | STRING | SELECT  |  Here's what each part of the format (eg. YYYY) means: yyyy : Year (4 digits) yy : Year (2 digits) MMMM : Month (full name) MMM : Month (short name) MM : Month (2 digits) EEE : Day (short name) dd : Day (2 digits) HH : Hour (2 digits) mm : Minute (2 digits) ss : Second (2 digits).  |  true  |
+|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
+| timeZone | Time Zone | STRING | SELECT | Time zone to use when formatting date. | true |
+| dateFormat | Date Format | STRING <details> <summary> Options </summary> EEE MMM dd yyyy HH:mm:ss, EEE MMM dd HH:mm:ss yyyy, MMMM dd yyyy HH:mm:ss, MMMM dd yyyy, MMM dd yyyy, yyyy-MM-dd'T'HH:mm:ss, yyyy-MM-dd HH:mm:ss, yyyy-MM-dd, MM-dd-yyyy, MM/dd/yyyy, MM/dd/yy, dd-MM-yyyy, dd/MM/yyyy, dd/MM/yy, UnixTimestamp </details> | SELECT | Here's what each part of the format (eg. YYYY) means: yyyy : Year (4 digits) yy : Year (2 digits) MMMM : Month (full name) MMM : Month (short name) MM : Month (2 digits) EEE : Day (short name) dd : Day (2 digits) HH : Hour (2 digits) mm : Minute (2 digits) ss : Second (2 digits). | true |
 
 
 #### Output
@@ -149,6 +204,18 @@ Type: STRING
 
 
 
+#### JSON Example
+```json
+{
+  "label" : "Get Current Date",
+  "name" : "getCurrentDate",
+  "parameters" : {
+    "timeZone" : "",
+    "dateFormat" : ""
+  },
+  "type" : "dateHelper/v1/getCurrentDate"
+}
+```
 
 
 ### Subtract Time
@@ -158,16 +225,16 @@ Subtract time from date
 
 #### Properties
 
-|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
-|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
-| inputDate | Date | DATE_TIME | DATE_TIME  |  | true  |
-| dateFormat | Date Format | STRING | SELECT  |  Here's what each part of the format (eg. YYYY) means: yyyy : Year (4 digits) yy : Year (2 digits) MMMM : Month (full name) MMM : Month (short name) MM : Month (2 digits) EEE : Day (short name) dd : Day (2 digits) HH : Hour (2 digits) mm : Minute (2 digits) ss : Second (2 digits).  |  true  |
-| year | Year | INTEGER | INTEGER  |  Years to subtract.  |  false  |
-| month | Month | INTEGER | INTEGER  |  Months to subtract.  |  false  |
-| day | Day | INTEGER | INTEGER  |  Days to subtract.  |  false  |
-| hour | Hour | INTEGER | INTEGER  |  Hours to subtract.  |  false  |
-| minute | Minute | INTEGER | INTEGER  |  Minutes to subtract.  |  false  |
-| second | Second | INTEGER | INTEGER  |  Seconds to subtract.  |  false  |
+|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
+| inputDate | Date | DATE_TIME | DATE_TIME |  | true |
+| dateFormat | Date Format | STRING <details> <summary> Options </summary> EEE MMM dd yyyy HH:mm:ss, EEE MMM dd HH:mm:ss yyyy, MMMM dd yyyy HH:mm:ss, MMMM dd yyyy, MMM dd yyyy, yyyy-MM-dd'T'HH:mm:ss, yyyy-MM-dd HH:mm:ss, yyyy-MM-dd, MM-dd-yyyy, MM/dd/yyyy, MM/dd/yy, dd-MM-yyyy, dd/MM/yyyy, dd/MM/yy, UnixTimestamp </details> | SELECT | Here's what each part of the format (eg. YYYY) means: yyyy : Year (4 digits) yy : Year (2 digits) MMMM : Month (full name) MMM : Month (short name) MM : Month (2 digits) EEE : Day (short name) dd : Day (2 digits) HH : Hour (2 digits) mm : Minute (2 digits) ss : Second (2 digits). | true |
+| year | Year | INTEGER | INTEGER | Years to subtract. | false |
+| month | Month | INTEGER | INTEGER | Months to subtract. | false |
+| day | Day | INTEGER | INTEGER | Days to subtract. | false |
+| hour | Hour | INTEGER | INTEGER | Hours to subtract. | false |
+| minute | Minute | INTEGER | INTEGER | Minutes to subtract. | false |
+| second | Second | INTEGER | INTEGER | Seconds to subtract. | false |
 
 
 #### Output
@@ -180,6 +247,24 @@ Type: DATE_TIME
 
 
 
+#### JSON Example
+```json
+{
+  "label" : "Subtract Time",
+  "name" : "subtractTime",
+  "parameters" : {
+    "inputDate" : "2021-01-01T00:00:00",
+    "dateFormat" : "",
+    "year" : 1,
+    "month" : 1,
+    "day" : 1,
+    "hour" : 1,
+    "minute" : 1,
+    "second" : 1
+  },
+  "type" : "dateHelper/v1/subtractTime"
+}
+```
 
 
 

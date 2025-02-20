@@ -24,9 +24,9 @@ Version: 1
 
 #### Properties
 
-|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
-|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
-| token | Token | STRING | TEXT  |  | true  |
+|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
+| token | Token | STRING | TEXT |  | true |
 
 
 
@@ -46,13 +46,26 @@ Creates a new record in datasheet.
 
 #### Properties
 
-|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
-|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
-| spaceId | Space ID | STRING | SELECT  |  | true  |
-| datasheetId | Datasheet ID | STRING | SELECT  |  AITable Datasheet ID  |  true  |
-| fields | DYNAMIC_PROPERTIES | null  |
+|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
+| spaceId | Space ID | STRING | SELECT |  | true |
+| datasheetId | Datasheet ID | STRING <details> <summary> Depends On </summary> spaceId </details> | SELECT | AITable Datasheet ID | true |
+| fields | | DYNAMIC_PROPERTIES <details> <summary> Depends On </summary> datasheetId </details> | null |  | null |
 
 
+#### JSON Example
+```json
+{
+  "label" : "Create Record",
+  "name" : "createRecord",
+  "parameters" : {
+    "spaceId" : "",
+    "datasheetId" : "",
+    "fields" : { }
+  },
+  "type" : "aitable/v1/createRecord"
+}
+```
 
 
 ### Find Records
@@ -62,15 +75,30 @@ Find records in datasheet
 
 #### Properties
 
-|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
-|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
-| spaceId | Space ID | STRING | SELECT  |  | true  |
-| datasheetId | Datasheet ID | STRING | SELECT  |  AITable Datasheet ID  |  true  |
-| fields | Field Names | [STRING] | ARRAY_BUILDER  |  The returned record results are limited to the specified fields.  |  false  |
-| recordIds | Record IDs | [STRING] | ARRAY_BUILDER  |  The IDs of the records to find.  |  false  |
-| maxRecords | Max Records | INTEGER | INTEGER  |  How many records are returned in total  |  false  |
+|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
+| spaceId | Space ID | STRING | SELECT |  | true |
+| datasheetId | Datasheet ID | STRING <details> <summary> Depends On </summary> spaceId </details> | SELECT | AITable Datasheet ID | true |
+| fields | Field Names | ARRAY <details> <summary> Items </summary> [STRING] </details> | MULTI_SELECT | The returned record results are limited to the specified fields. | false |
+| recordIds | Record IDs | ARRAY <details> <summary> Items </summary> [STRING] </details> | MULTI_SELECT | The IDs of the records to find. | false |
+| maxRecords | Max Records | INTEGER | INTEGER | How many records are returned in total | false |
 
 
+#### JSON Example
+```json
+{
+  "label" : "Find Records",
+  "name" : "findRecords",
+  "parameters" : {
+    "spaceId" : "",
+    "datasheetId" : "",
+    "fields" : [ "" ],
+    "recordIds" : [ "" ],
+    "maxRecords" : 1
+  },
+  "type" : "aitable/v1/findRecords"
+}
+```
 
 
 ### Update Record
@@ -80,14 +108,28 @@ Update record in datasheet
 
 #### Properties
 
-|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
-|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
-| spaceId | Space ID | STRING | SELECT  |  | true  |
-| datasheetId | Datasheet ID | STRING | SELECT  |  AITable Datasheet ID  |  true  |
-| recordId | Record ID | STRING | SELECT  |  ID of the record to update.  |  true  |
-| fields | DYNAMIC_PROPERTIES | null  |
+|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
+| spaceId | Space ID | STRING | SELECT |  | true |
+| datasheetId | Datasheet ID | STRING <details> <summary> Depends On </summary> spaceId </details> | SELECT | AITable Datasheet ID | true |
+| recordId | Record ID | STRING <details> <summary> Depends On </summary> datasheetId </details> | SELECT | ID of the record to update. | true |
+| fields | | DYNAMIC_PROPERTIES <details> <summary> Depends On </summary> datasheetId </details> | null |  | null |
 
 
+#### JSON Example
+```json
+{
+  "label" : "Update Record",
+  "name" : "updateRecord",
+  "parameters" : {
+    "spaceId" : "",
+    "datasheetId" : "",
+    "recordId" : "",
+    "fields" : { }
+  },
+  "type" : "aitable/v1/updateRecord"
+}
+```
 
 
 

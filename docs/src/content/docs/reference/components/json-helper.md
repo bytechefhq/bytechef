@@ -26,11 +26,22 @@ Converts the JSON string to object/array.
 
 #### Properties
 
-|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
-|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
-| source | Source | STRING | TEXT  |  The JSON string to convert to the data.  |  true  |
+|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
+| source | Source | STRING | TEXT | The JSON string to convert to the data. | true |
 
 
+#### JSON Example
+```json
+{
+  "label" : "Convert from JSON String",
+  "name" : "parse",
+  "parameters" : {
+    "source" : ""
+  },
+  "type" : "jsonHelper/v1/parse"
+}
+```
 
 
 ### Convert to JSON String
@@ -40,13 +51,25 @@ Writes the object/array to a JSON string.
 
 #### Properties
 
-|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
-|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
-| type | Type | STRING | SELECT  |  The value type.  |  null  |
-| source | Source | {} | OBJECT_BUILDER  |  The data to convert to JSON string.  |  true  |
-| source | Source | [] | ARRAY_BUILDER  |  The data to convert to JSON string.  |  true  |
+|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
+| type | Type | STRING <details> <summary> Options </summary> OBJECT, ARRAY </details> | SELECT | The value type. | null |
+| source | Source | OBJECT <details> <summary> Properties </summary> {} </details> | OBJECT_BUILDER | The data to convert to JSON string. | true |
+| source | Source | ARRAY <details> <summary> Items </summary> [] </details> | ARRAY_BUILDER | The data to convert to JSON string. | true |
 
 
+#### JSON Example
+```json
+{
+  "label" : "Convert to JSON String",
+  "name" : "stringify",
+  "parameters" : {
+    "type" : "",
+    "source" : [ ]
+  },
+  "type" : "jsonHelper/v1/stringify"
+}
+```
 
 
 

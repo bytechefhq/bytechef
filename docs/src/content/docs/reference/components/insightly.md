@@ -24,10 +24,10 @@ Version: 1
 
 #### Properties
 
-|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
-|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
-| pod | Pod | STRING | TEXT  |  Your instances pod can be found under your API URL, e.g. https://api.{pod}.insightly.com/v3.1  |  true  |
-| username | API Key | STRING | TEXT  |  | true  |
+|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
+| pod | Pod | STRING | TEXT | Your instances pod can be found under your API URL, e.g. https://api.{pod}.insightly.com/v3.1 | true |
+| username | API Key | STRING | TEXT |  | true |
 
 
 
@@ -47,9 +47,9 @@ Creates new contact.
 
 #### Properties
 
-|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
-|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
-| __item | Contact | {STRING\(FIRST_NAME), STRING\(LAST_NAME), STRING\(EMAIL_ADDRESS), STRING\(PHONE), STRING\(TITLE)} | OBJECT_BUILDER  |  | true  |
+|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
+| __item | Contact | OBJECT <details> <summary> Properties </summary> {STRING\(FIRST_NAME), STRING\(LAST_NAME), STRING\(EMAIL_ADDRESS), STRING\(PHONE), STRING\(TITLE)} </details> | OBJECT_BUILDER |  | true |
 
 
 #### Output
@@ -61,18 +61,35 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |     Control Type     |
-|:------------:|:------------:|:--------------------:|
-| CONTACT_ID | INTEGER | INTEGER  |
-| FIRST_NAME | STRING | TEXT  |
-| LAST_NAME | STRING | TEXT  |
-| EMAIL_ADDRESS | STRING | TEXT  |
-| PHONE | STRING | TEXT  |
-| TITLE | STRING | TEXT  |
+|     Name     |     Type     |    Control Type     |
+|:------------:|:------------:|:-------------------:|
+| CONTACT_ID | INTEGER | INTEGER |
+| FIRST_NAME | STRING | TEXT |
+| LAST_NAME | STRING | TEXT |
+| EMAIL_ADDRESS | STRING | TEXT |
+| PHONE | STRING | TEXT |
+| TITLE | STRING | TEXT |
 
 
 
 
+#### JSON Example
+```json
+{
+  "label" : "Create Contact",
+  "name" : "createContact",
+  "parameters" : {
+    "__item" : {
+      "FIRST_NAME" : "",
+      "LAST_NAME" : "",
+      "EMAIL_ADDRESS" : "",
+      "PHONE" : "",
+      "TITLE" : ""
+    }
+  },
+  "type" : "insightly/v1/createContact"
+}
+```
 
 
 ### Create Organization
@@ -82,9 +99,9 @@ Creates new organization.
 
 #### Properties
 
-|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
-|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
-| __item | Organization | {STRING\(ORGANISATION_NAME), STRING\(PHONE), STRING\(WEBSITE)} | OBJECT_BUILDER  |  | true  |
+|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
+| __item | Organization | OBJECT <details> <summary> Properties </summary> {STRING\(ORGANISATION_NAME), STRING\(PHONE), STRING\(WEBSITE)} </details> | OBJECT_BUILDER |  | true |
 
 
 #### Output
@@ -96,16 +113,31 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |     Control Type     |
-|:------------:|:------------:|:--------------------:|
-| ORGANISATION_ID | INTEGER | INTEGER  |
-| ORGANISATION_NAME | STRING | TEXT  |
-| PHONE | STRING | TEXT  |
-| WEBSITE | STRING | TEXT  |
+|     Name     |     Type     |    Control Type     |
+|:------------:|:------------:|:-------------------:|
+| ORGANISATION_ID | INTEGER | INTEGER |
+| ORGANISATION_NAME | STRING | TEXT |
+| PHONE | STRING | TEXT |
+| WEBSITE | STRING | TEXT |
 
 
 
 
+#### JSON Example
+```json
+{
+  "label" : "Create Organization",
+  "name" : "createOrganization",
+  "parameters" : {
+    "__item" : {
+      "ORGANISATION_NAME" : "",
+      "PHONE" : "",
+      "WEBSITE" : ""
+    }
+  },
+  "type" : "insightly/v1/createOrganization"
+}
+```
 
 
 ### Create Task
@@ -115,9 +147,9 @@ Creates new task.
 
 #### Properties
 
-|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
-|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
-| __item | Task | {STRING\(TITLE), STRING\(STATUS)} | OBJECT_BUILDER  |  | true  |
+|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
+| __item | Task | OBJECT <details> <summary> Properties </summary> {STRING\(TITLE), STRING\(STATUS)} </details> | OBJECT_BUILDER |  | true |
 
 
 #### Output
@@ -129,24 +161,32 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |     Control Type     |
-|:------------:|:------------:|:--------------------:|
-| TASK_ID | INTEGER | INTEGER  |
-| TITLE | STRING | TEXT  |
-| STATUS | STRING | TEXT  |
+|     Name     |     Type     |    Control Type     |
+|:------------:|:------------:|:-------------------:|
+| TASK_ID | INTEGER | INTEGER |
+| TITLE | STRING | TEXT |
+| STATUS | STRING | TEXT |
 
 
 
 
+#### JSON Example
+```json
+{
+  "label" : "Create Task",
+  "name" : "createTask",
+  "parameters" : {
+    "__item" : {
+      "TITLE" : "",
+      "STATUS" : ""
+    }
+  },
+  "type" : "insightly/v1/createTask"
+}
+```
 
 
 
-
-## Triggers
-
-
-
-<hr />
 
 <hr />
 

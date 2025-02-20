@@ -26,12 +26,24 @@ Executes custom JavaScript code.
 
 #### Properties
 
-|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
-|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
-| input | Input | {} | OBJECT_BUILDER  |  Initialize parameter values used in the custom code.  |  null  |
-| script | JavaScript Code | STRING | CODE_EDITOR  |  Add your JavaScript custom logic here.  |  true  |
+|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
+| input | Input | OBJECT <details> <summary> Properties </summary> {} </details> | OBJECT_BUILDER | Initialize parameter values used in the custom code. | null |
+| script | JavaScript Code | STRING | CODE_EDITOR | Add your JavaScript custom logic here. | true |
 
 
+#### JSON Example
+```json
+{
+  "label" : "JavaScript",
+  "name" : "javascript",
+  "parameters" : {
+    "input" : { },
+    "script" : ""
+  },
+  "type" : "script/v1/javascript"
+}
+```
 
 
 ### Python
@@ -41,12 +53,24 @@ Executes custom Python code.
 
 #### Properties
 
-|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
-|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
-| input | Input | {} | OBJECT_BUILDER  |  Initialize parameter values used in the custom code.  |  null  |
-| script | Python Code | STRING | CODE_EDITOR  |  Add your Python custom logic here.  |  true  |
+|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
+| input | Input | OBJECT <details> <summary> Properties </summary> {} </details> | OBJECT_BUILDER | Initialize parameter values used in the custom code. | null |
+| script | Python Code | STRING | CODE_EDITOR | Add your Python custom logic here. | true |
 
 
+#### JSON Example
+```json
+{
+  "label" : "Python",
+  "name" : "python",
+  "parameters" : {
+    "input" : { },
+    "script" : ""
+  },
+  "type" : "script/v1/python"
+}
+```
 
 
 ### Ruby
@@ -56,12 +80,24 @@ Executes custom Ruby code.
 
 #### Properties
 
-|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
-|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
-| input | Input | {} | OBJECT_BUILDER  |  Initialize parameter values used in the custom code.  |  null  |
-| script | Ruby Code | STRING | CODE_EDITOR  |  Add your Ruby custom logic here.  |  true  |
+|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
+| input | Input | OBJECT <details> <summary> Properties </summary> {} </details> | OBJECT_BUILDER | Initialize parameter values used in the custom code. | null |
+| script | Ruby Code | STRING | CODE_EDITOR | Add your Ruby custom logic here. | true |
 
 
+#### JSON Example
+```json
+{
+  "label" : "Ruby",
+  "name" : "ruby",
+  "parameters" : {
+    "input" : { },
+    "script" : ""
+  },
+  "type" : "script/v1/ruby"
+}
+```
 
 
 

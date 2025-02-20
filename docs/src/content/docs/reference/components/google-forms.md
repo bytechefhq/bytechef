@@ -24,10 +24,10 @@ Version: 1
 
 #### Properties
 
-|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
-|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
-| clientId | Client Id | STRING | TEXT  |  | true  |
-| clientSecret | Client Secret | STRING | TEXT  |  | true  |
+|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
+| clientId | Client Id | STRING | TEXT |  | true |
+| clientSecret | Client Secret | STRING | TEXT |  | true |
 
 
 
@@ -47,11 +47,22 @@ Get all responses of a form.
 
 #### Properties
 
-|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
-|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
-| formId | Form ID | STRING | SELECT  |  ID of the form whose responses to retrieve.  |  true  |
+|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
+| formId | Form ID | STRING | SELECT | ID of the form whose responses to retrieve. | true |
 
 
+#### JSON Example
+```json
+{
+  "label" : "Get All Responses",
+  "name" : "getAllResponses",
+  "parameters" : {
+    "formId" : ""
+  },
+  "type" : "googleForms/v1/getAllResponses"
+}
+```
 
 
 ### Get Form
@@ -61,11 +72,22 @@ Get the information about a form.
 
 #### Properties
 
-|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
-|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
-| formId | Form ID | STRING | SELECT  |  ID of the form to retrieve.  |  true  |
+|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
+| formId | Form ID | STRING | SELECT | ID of the form to retrieve. | true |
 
 
+#### JSON Example
+```json
+{
+  "label" : "Get Form",
+  "name" : "getForm",
+  "parameters" : {
+    "formId" : ""
+  },
+  "type" : "googleForms/v1/getForm"
+}
+```
 
 
 ### Get Response
@@ -75,12 +97,24 @@ Get the response of a form.
 
 #### Properties
 
-|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
-|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
-| formId | Form ID | STRING | SELECT  |  ID of the form whose response to retrieve.  |  true  |
-| responseId | Response ID | STRING | SELECT  |  ID of the response to retrieve.  |  true  |
+|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
+| formId | Form ID | STRING | SELECT | ID of the form whose response to retrieve. | true |
+| responseId | Response ID | STRING <details> <summary> Depends On </summary> formId </details> | SELECT | ID of the response to retrieve. | true |
 
 
+#### JSON Example
+```json
+{
+  "label" : "Get Response",
+  "name" : "getResponse",
+  "parameters" : {
+    "formId" : "",
+    "responseId" : ""
+  },
+  "type" : "googleForms/v1/getResponse"
+}
+```
 
 
 
@@ -89,17 +123,30 @@ Get the response of a form.
 
 
 ### New Response
+Name: newResponse
+
 Triggers when response is submitted to Google Form.
 
 Type: POLLING
+
 #### Properties
 
-|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
-|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
-| formId | Form | STRING | SELECT  |  Form to watch for new responses.  |  true  |
+|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
+| formId | Form | STRING | SELECT | Form to watch for new responses. | true |
 
 
-
+#### JSON Example
+```json
+{
+  "label" : "New Response",
+  "name" : "newResponse",
+  "parameters" : {
+    "formId" : ""
+  },
+  "type" : "googleForms/v1/newResponse"
+}
+```
 
 
 <hr />

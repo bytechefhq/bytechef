@@ -24,10 +24,10 @@ Version: 1
 
 #### Properties
 
-|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
-|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
-| clientId | Client Id | STRING | TEXT  |  | true  |
-| clientSecret | Client Secret | STRING | TEXT  |  | true  |
+|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
+| clientId | Client Id | STRING | TEXT |  | true |
+| clientSecret | Client Secret | STRING | TEXT |  | true |
 
 
 
@@ -47,10 +47,10 @@ Creates a new empty folder within the specified parent folder.
 
 #### Properties
 
-|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
-|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
-| name | Folder Name | STRING | TEXT  |  The name for the new folder.  |  true  |
-| id | Parent Folder ID | STRING | SELECT  |  ID of the folder where the new folder will be created; if no folder is selected, the folder will be created in the root folder.  |  true  |
+|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
+| name | Folder Name | STRING | TEXT | The name for the new folder. | true |
+| id | Parent Folder ID | STRING | SELECT | ID of the folder where the new folder will be created; if no folder is selected, the folder will be created in the root folder. | true |
 
 
 #### Output
@@ -62,16 +62,28 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |     Control Type     |
-|:------------:|:------------:|:--------------------:|
-| type | STRING | TEXT  |
-| id | STRING | TEXT  |
-| name | STRING | TEXT  |
-| parent | {STRING\(type), STRING\(id), STRING\(name)} | OBJECT_BUILDER  |
+|     Name     |     Type     |    Control Type     |
+|:------------:|:------------:|:-------------------:|
+| type | STRING | TEXT |
+| id | STRING | TEXT |
+| name | STRING | TEXT |
+| parent | OBJECT <details> <summary> Properties </summary> {STRING\(type), STRING\(id), STRING\(name)} </details> | OBJECT_BUILDER |
 
 
 
 
+#### JSON Example
+```json
+{
+  "label" : "Create Folder",
+  "name" : "createFolder",
+  "parameters" : {
+    "name" : "",
+    "id" : ""
+  },
+  "type" : "box/v1/createFolder"
+}
+```
 
 
 ### Download File
@@ -81,10 +93,10 @@ Download a selected file.
 
 #### Properties
 
-|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
-|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
-| id | Parent Folder ID | STRING | SELECT  |  ID of the folder from which you want to download the file.  |  true  |
-| fileId | File ID | STRING | SELECT  |  ID of the file to download.  |  true  |
+|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
+| id | Parent Folder ID | STRING | SELECT | ID of the folder from which you want to download the file. | true |
+| fileId | File ID | STRING <details> <summary> Depends On </summary> id </details> | SELECT | ID of the file to download. | true |
 
 
 #### Output
@@ -96,16 +108,28 @@ Type: FILE_ENTRY
 
 #### Properties
 
-|     Name     |     Type     |     Control Type     |
-|:------------:|:------------:|:--------------------:|
-| extension | STRING | TEXT  |
-| mimeType | STRING | TEXT  |
-| name | STRING | TEXT  |
-| url | STRING | TEXT  |
+|     Name     |     Type     |    Control Type     |
+|:------------:|:------------:|:-------------------:|
+| extension | STRING | TEXT |
+| mimeType | STRING | TEXT |
+| name | STRING | TEXT |
+| url | STRING | TEXT |
 
 
 
 
+#### JSON Example
+```json
+{
+  "label" : "Download File",
+  "name" : "downloadFile",
+  "parameters" : {
+    "id" : "",
+    "fileId" : ""
+  },
+  "type" : "box/v1/downloadFile"
+}
+```
 
 
 ### Upload File
@@ -115,10 +139,10 @@ Uploads a small file to Box.
 
 #### Properties
 
-|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
-|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
-| id | Parent Folder ID | STRING | SELECT  |  ID of the folder where the file should be uploaded; if no folder is selected, the file will be uploaded in the root folder.  |  true  |
-| file | File | FILE_ENTRY | FILE_ENTRY  |  | true  |
+|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
+| id | Parent Folder ID | STRING | SELECT | ID of the folder where the file should be uploaded; if no folder is selected, the file will be uploaded in the root folder. | true |
+| file | File | FILE_ENTRY | FILE_ENTRY |  | true |
 
 
 #### Output
@@ -130,13 +154,30 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |     Control Type     |
-|:------------:|:------------:|:--------------------:|
-| entries | [{STRING\(type), STRING\(id), STRING\(name), {STRING\(type), STRING\(id), STRING\(name)}\(parent)}] | ARRAY_BUILDER  |
+|     Name     |     Type     |    Control Type     |
+|:------------:|:------------:|:-------------------:|
+| entries | ARRAY <details> <summary> Items </summary> [{STRING\(type), STRING\(id), STRING\(name), {STRING\(type), STRING\(id), STRING\(name)}\(parent)}] </details> | ARRAY_BUILDER |
 
 
 
 
+#### JSON Example
+```json
+{
+  "label" : "Upload File",
+  "name" : "uploadFile",
+  "parameters" : {
+    "id" : "",
+    "file" : {
+      "extension" : "",
+      "mimeType" : "",
+      "name" : "",
+      "url" : ""
+    }
+  },
+  "type" : "box/v1/uploadFile"
+}
+```
 
 
 
@@ -145,14 +186,17 @@ Type: OBJECT
 
 
 ### New File
+Name: newFile
+
 Triggers when file is uploaded to folder.
 
 Type: DYNAMIC_WEBHOOK
+
 #### Properties
 
-|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
-|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
-| folderId | Folder ID | STRING | SELECT  |  ID of the folder in which file uploads will trigger this webhook.  |  true  |
+|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
+| folderId | Folder ID | STRING | SELECT | ID of the folder in which file uploads will trigger this webhook. | true |
 
 
 #### Output
@@ -164,28 +208,41 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |     Control Type     |
-|:------------:|:------------:|:--------------------:|
-| type | STRING | TEXT  |
-| id | STRING | TEXT  |
-| name | STRING | TEXT  |
-| parent | {STRING\(type), STRING\(id), STRING\(name)} | OBJECT_BUILDER  |
+|     Name     |     Type     |    Control Type     |
+|:------------:|:------------:|:-------------------:|
+| type | STRING | TEXT |
+| id | STRING | TEXT |
+| name | STRING | TEXT |
+| parent | OBJECT <details> <summary> Properties </summary> {STRING\(type), STRING\(id), STRING\(name)} </details> | OBJECT_BUILDER |
 
 
 
 
-
+#### JSON Example
+```json
+{
+  "label" : "New File",
+  "name" : "newFile",
+  "parameters" : {
+    "folderId" : ""
+  },
+  "type" : "box/v1/newFile"
+}
+```
 
 
 ### New Folder
+Name: newFolder
+
 Triggers when folder is created.
 
 Type: DYNAMIC_WEBHOOK
+
 #### Properties
 
-|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
-|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
-| folderId | Folder ID | STRING | SELECT  |  ID of the folder in which new folder will trigger this webhook.  |  true  |
+|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
+| folderId | Folder ID | STRING | SELECT | ID of the folder in which new folder will trigger this webhook. | true |
 
 
 #### Output
@@ -197,17 +254,27 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |     Control Type     |
-|:------------:|:------------:|:--------------------:|
-| type | STRING | TEXT  |
-| id | STRING | TEXT  |
-| name | STRING | TEXT  |
-| parent | {STRING\(type), STRING\(id), STRING\(name)} | OBJECT_BUILDER  |
+|     Name     |     Type     |    Control Type     |
+|:------------:|:------------:|:-------------------:|
+| type | STRING | TEXT |
+| id | STRING | TEXT |
+| name | STRING | TEXT |
+| parent | OBJECT <details> <summary> Properties </summary> {STRING\(type), STRING\(id), STRING\(name)} </details> | OBJECT_BUILDER |
 
 
 
 
-
+#### JSON Example
+```json
+{
+  "label" : "New Folder",
+  "name" : "newFolder",
+  "parameters" : {
+    "folderId" : ""
+  },
+  "type" : "box/v1/newFolder"
+}
+```
 
 
 <hr />

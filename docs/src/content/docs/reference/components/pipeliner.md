@@ -24,12 +24,12 @@ Version: 1
 
 #### Properties
 
-|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
-|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
-| spaceId | Space Id | STRING | TEXT  |  Your Space ID  |  true  |
-| serverUrl | Server URL | STRING | SELECT  |  | true  |
-| username | Username | STRING | TEXT  |  | true  |
-| password | Password | STRING | TEXT  |  | true  |
+|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
+| spaceId | Space Id | STRING | TEXT | Your Space ID | true |
+| serverUrl | Server URL | STRING <details> <summary> Options </summary> https://us-east.api.pipelinersales.com/api/v100/rest/spaces/, https://eu-central.api.pipelinersales.com/api/v100/rest/spaces/, https://ca-central.api.pipelinersales.com/api/v100/rest/spaces/, https://ap-southeast.api.pipelinersales.com/api/v100/rest/spaces/ </details> | SELECT |  | true |
+| username | Username | STRING | TEXT |  | true |
+| password | Password | STRING | TEXT |  | true |
 
 
 
@@ -49,9 +49,9 @@ Creates new account.
 
 #### Properties
 
-|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
-|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
-| __item | Account | {STRING\(owner_id), STRING\(name)} | OBJECT_BUILDER  |  | true  |
+|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
+| __item | Account | OBJECT <details> <summary> Properties </summary> {STRING\(owner_id), STRING\(name)} </details> | OBJECT_BUILDER |  | true |
 
 
 #### Output
@@ -63,14 +63,28 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |     Control Type     |
-|:------------:|:------------:|:--------------------:|
-| success | BOOLEAN | SELECT  |
-| data | {STRING\(id), STRING\(owner_id), STRING\(name)} | OBJECT_BUILDER  |
+|     Name     |     Type     |    Control Type     |
+|:------------:|:------------:|:-------------------:|
+| success | BOOLEAN <details> <summary> Options </summary> true, false </details> | SELECT |
+| data | OBJECT <details> <summary> Properties </summary> {STRING\(id), STRING\(owner_id), STRING\(name)} </details> | OBJECT_BUILDER |
 
 
 
 
+#### JSON Example
+```json
+{
+  "label" : "Create Account",
+  "name" : "createAccount",
+  "parameters" : {
+    "__item" : {
+      "owner_id" : "",
+      "name" : ""
+    }
+  },
+  "type" : "pipeliner/v1/createAccount"
+}
+```
 
 
 ### Create Contact
@@ -80,9 +94,9 @@ Creates new Contact
 
 #### Properties
 
-|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
-|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
-| __item | Contact | {STRING\(owner_id), STRING\(first_name), STRING\(last_name)} | OBJECT_BUILDER  |  | true  |
+|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
+| __item | Contact | OBJECT <details> <summary> Properties </summary> {STRING\(owner_id), STRING\(first_name), STRING\(last_name)} </details> | OBJECT_BUILDER |  | true |
 
 
 #### Output
@@ -94,14 +108,29 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |     Control Type     |
-|:------------:|:------------:|:--------------------:|
-| success | BOOLEAN | SELECT  |
-| data | {STRING\(id), STRING\(owner_id), STRING\(first_name), STRING\(last_name)} | OBJECT_BUILDER  |
+|     Name     |     Type     |    Control Type     |
+|:------------:|:------------:|:-------------------:|
+| success | BOOLEAN <details> <summary> Options </summary> true, false </details> | SELECT |
+| data | OBJECT <details> <summary> Properties </summary> {STRING\(id), STRING\(owner_id), STRING\(first_name), STRING\(last_name)} </details> | OBJECT_BUILDER |
 
 
 
 
+#### JSON Example
+```json
+{
+  "label" : "Create Contact",
+  "name" : "createContact",
+  "parameters" : {
+    "__item" : {
+      "owner_id" : "",
+      "first_name" : "",
+      "last_name" : ""
+    }
+  },
+  "type" : "pipeliner/v1/createContact"
+}
+```
 
 
 ### Create Task
@@ -111,9 +140,9 @@ Creates new Task
 
 #### Properties
 
-|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
-|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
-| __item | Task | {STRING\(subject), STRING\(activity_type_id), STRING\(unit_id), STRING\(owner_id)} | OBJECT_BUILDER  |  | true  |
+|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
+| __item | Task | OBJECT <details> <summary> Properties </summary> {STRING\(subject), STRING\(activity_type_id), STRING\(unit_id), STRING\(owner_id)} </details> | OBJECT_BUILDER |  | true |
 
 
 #### Output
@@ -125,21 +154,31 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |     Control Type     |
-|:------------:|:------------:|:--------------------:|
-| success | BOOLEAN | SELECT  |
-| data | {STRING\(id), STRING\(subject), STRING\(activity_type_id), STRING\(unit_id), STRING\(owner_id)} | OBJECT_BUILDER  |
+|     Name     |     Type     |    Control Type     |
+|:------------:|:------------:|:-------------------:|
+| success | BOOLEAN <details> <summary> Options </summary> true, false </details> | SELECT |
+| data | OBJECT <details> <summary> Properties </summary> {STRING\(id), STRING\(subject), STRING\(activity_type_id), STRING\(unit_id), STRING\(owner_id)} </details> | OBJECT_BUILDER |
 
 
 
 
+#### JSON Example
+```json
+{
+  "label" : "Create Task",
+  "name" : "createTask",
+  "parameters" : {
+    "__item" : {
+      "subject" : "",
+      "activity_type_id" : "",
+      "unit_id" : "",
+      "owner_id" : ""
+    }
+  },
+  "type" : "pipeliner/v1/createTask"
+}
+```
 
 
 
-
-## Triggers
-
-
-
-<hr />
 

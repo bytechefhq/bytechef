@@ -24,9 +24,9 @@ Version: 1
 
 #### Properties
 
-|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
-|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
-| token | Token | STRING | TEXT  |  | true  |
+|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
+| token | Token | STRING | TEXT |  | true |
 
 
 
@@ -46,11 +46,11 @@ Adds a record into an Airtable table.
 
 #### Properties
 
-|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
-|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
-| baseId | Base ID | STRING | SELECT  |  ID of the base where table is located.  |  true  |
-| tableId | Table ID | STRING | SELECT  |  The table where the record will be created.  |  true  |
-| __item | DYNAMIC_PROPERTIES | null  |
+|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
+| baseId | Base ID | STRING | SELECT | ID of the base where table is located. | true |
+| tableId | Table ID | STRING <details> <summary> Depends On </summary> baseId </details> | SELECT | The table where the record will be created. | true |
+| __item | | DYNAMIC_PROPERTIES <details> <summary> Depends On </summary> baseId, tableId </details> | null |  | null |
 
 
 #### Output
@@ -62,14 +62,27 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |     Control Type     |
-|:------------:|:------------:|:--------------------:|
-| createdTime | DATE_TIME | DATE_TIME  |
-| fields | {} | OBJECT_BUILDER  |
+|     Name     |     Type     |    Control Type     |
+|:------------:|:------------:|:-------------------:|
+| createdTime | DATE_TIME | DATE_TIME |
+| fields | OBJECT <details> <summary> Properties </summary> {} </details> | OBJECT_BUILDER |
 
 
 
 
+#### JSON Example
+```json
+{
+  "label" : "Create Record",
+  "name" : "createRecord",
+  "parameters" : {
+    "baseId" : "",
+    "tableId" : "",
+    "__item" : { }
+  },
+  "type" : "airtable/v1/createRecord"
+}
+```
 
 
 ### Delete Record
@@ -79,11 +92,11 @@ Deletes a single record from a table.
 
 #### Properties
 
-|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
-|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
-| baseId | Base ID | STRING | SELECT  |  ID of the base where table is located.  |  true  |
-| tableId | Table ID | STRING | SELECT  |  ID of the table where the record is located.  |  true  |
-| recordId | Record ID | STRING | SELECT  |  ID of the record that will be deleted.  |  true  |
+|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
+| baseId | Base ID | STRING | SELECT | ID of the base where table is located. | true |
+| tableId | Table ID | STRING <details> <summary> Depends On </summary> baseId </details> | SELECT | ID of the table where the record is located. | true |
+| recordId | Record ID | STRING <details> <summary> Depends On </summary> tableId, baseId </details> | SELECT | ID of the record that will be deleted. | true |
 
 
 #### Output
@@ -95,14 +108,27 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |     Control Type     |
-|:------------:|:------------:|:--------------------:|
-| id | STRING | TEXT  |
-| deleted | BOOLEAN | SELECT  |
+|     Name     |     Type     |    Control Type     |
+|:------------:|:------------:|:-------------------:|
+| id | STRING | TEXT |
+| deleted | BOOLEAN <details> <summary> Options </summary> true, false </details> | SELECT |
 
 
 
 
+#### JSON Example
+```json
+{
+  "label" : "Delete Record",
+  "name" : "deleteRecord",
+  "parameters" : {
+    "baseId" : "",
+    "tableId" : "",
+    "recordId" : ""
+  },
+  "type" : "airtable/v1/deleteRecord"
+}
+```
 
 
 ### Get Record
@@ -112,11 +138,11 @@ Retrieves a single record.
 
 #### Properties
 
-|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
-|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
-| baseId | Base ID | STRING | SELECT  |  ID of the base where table is located.  |  true  |
-| tableId | Table ID | STRING | SELECT  |  ID of the table where the record is located.  |  true  |
-| recordId | Record ID | STRING | SELECT  |  ID of the record that will be deleted.  |  true  |
+|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
+| baseId | Base ID | STRING | SELECT | ID of the base where table is located. | true |
+| tableId | Table ID | STRING <details> <summary> Depends On </summary> baseId </details> | SELECT | ID of the table where the record is located. | true |
+| recordId | Record ID | STRING <details> <summary> Depends On </summary> tableId, baseId </details> | SELECT | ID of the record that will be deleted. | true |
 
 
 #### Output
@@ -128,15 +154,28 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |     Control Type     |
-|:------------:|:------------:|:--------------------:|
-| id | STRING | TEXT  |
-| createdTime | DATE_TIME | DATE_TIME  |
-| fields | {} | OBJECT_BUILDER  |
+|     Name     |     Type     |    Control Type     |
+|:------------:|:------------:|:-------------------:|
+| id | STRING | TEXT |
+| createdTime | DATE_TIME | DATE_TIME |
+| fields | OBJECT <details> <summary> Properties </summary> {} </details> | OBJECT_BUILDER |
 
 
 
 
+#### JSON Example
+```json
+{
+  "label" : "Get Record",
+  "name" : "getRecord",
+  "parameters" : {
+    "baseId" : "",
+    "tableId" : "",
+    "recordId" : ""
+  },
+  "type" : "airtable/v1/getRecord"
+}
+```
 
 
 
@@ -145,19 +184,34 @@ Type: OBJECT
 
 
 ### New Record
+Name: newRecord
+
 Trigger off when a new entry is added to the table that you have selected.
 
 Type: POLLING
+
 #### Properties
 
-|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
-|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
-| baseId | Base ID | STRING | SELECT  |  ID of the base which contains the table that you want to monitor.  |  true  |
-| tableId | Table | STRING | SELECT  |  The table to monitor for new records.  |  true  |
-| triggerField | Trigger Field | STRING | TEXT  |  It is essential to have a field for Created Time or Last Modified Time in your schema since this field is used to sort records, and the trigger will not function correctly without it. Therefore, if you don't have such a field in your schema, please create one.  |  true  |
+|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
+| baseId | Base ID | STRING | SELECT | ID of the base which contains the table that you want to monitor. | true |
+| tableId | Table | STRING <details> <summary> Depends On </summary> baseId </details> | SELECT | The table to monitor for new records. | true |
+| triggerField | Trigger Field | STRING | TEXT | It is essential to have a field for Created Time or Last Modified Time in your schema since this field is used to sort records, and the trigger will not function correctly without it. Therefore, if you don't have such a field in your schema, please create one. | true |
 
 
-
+#### JSON Example
+```json
+{
+  "label" : "New Record",
+  "name" : "newRecord",
+  "parameters" : {
+    "baseId" : "",
+    "tableId" : "",
+    "triggerField" : ""
+  },
+  "type" : "airtable/v1/newRecord"
+}
+```
 
 
 <hr />

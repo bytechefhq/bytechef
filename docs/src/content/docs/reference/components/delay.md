@@ -26,11 +26,22 @@ Delay action execution.
 
 #### Properties
 
-|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
-|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
-| millis | Millis | INTEGER | INTEGER  |  Time in milliseconds.  |  true  |
+|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
+| millis | Millis | INTEGER | INTEGER | Time in milliseconds. | true |
 
 
+#### JSON Example
+```json
+{
+  "label" : "Sleep",
+  "name" : "sleep",
+  "parameters" : {
+    "millis" : 1
+  },
+  "type" : "delay/v1/sleep"
+}
+```
 
 
 

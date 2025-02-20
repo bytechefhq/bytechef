@@ -24,10 +24,10 @@ Version: 1
 
 #### Properties
 
-|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
-|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
-| clientId | Client Id | STRING | TEXT  |  | true  |
-| clientSecret | Client Secret | STRING | TEXT  |  | true  |
+|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
+| clientId | Client Id | STRING | TEXT |  | true |
+| clientSecret | Client Secret | STRING | TEXT |  | true |
 
 
 
@@ -47,9 +47,9 @@ Creates a new task.
 
 #### Properties
 
-|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
-|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
-| __item | Contact | {STRING\(content), STRING\(description), STRING\(project_id), INTEGER\(priority)} | OBJECT_BUILDER  |  | null  |
+|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
+| __item | Contact | OBJECT <details> <summary> Properties </summary> {STRING\(content), STRING\(description), STRING\(project_id), INTEGER\(priority)} </details> | OBJECT_BUILDER |  | null |
 
 
 #### Output
@@ -61,13 +61,29 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |     Control Type     |
-|:------------:|:------------:|:--------------------:|
-| body | {STRING\(id), STRING\(project_id), STRING\(content), STRING\(description), INTEGER\(priority)} | OBJECT_BUILDER  |
+|     Name     |     Type     |    Control Type     |
+|:------------:|:------------:|:-------------------:|
+| body | OBJECT <details> <summary> Properties </summary> {STRING\(id), STRING\(project_id), STRING\(content), STRING\(description), INTEGER\(priority)} </details> | OBJECT_BUILDER |
 
 
 
 
+#### JSON Example
+```json
+{
+  "label" : "Create Task",
+  "name" : "createTask",
+  "parameters" : {
+    "__item" : {
+      "content" : "",
+      "description" : "",
+      "project_id" : "",
+      "priority" : 1
+    }
+  },
+  "type" : "todoist/v1/createTask"
+}
+```
 
 
 ### Mark Task as Completed
@@ -77,11 +93,22 @@ Mark a tas as being completed.
 
 #### Properties
 
-|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
-|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
-| taskId | Task ID | STRING | SELECT  |  ID of the task to be closed.  |  true  |
+|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
+| taskId | Task ID | STRING | SELECT | ID of the task to be closed. | true |
 
 
+#### JSON Example
+```json
+{
+  "label" : "Mark Task as Completed",
+  "name" : "markTaskCompleted",
+  "parameters" : {
+    "taskId" : ""
+  },
+  "type" : "todoist/v1/markTaskCompleted"
+}
+```
 
 
 ### Create Project
@@ -91,9 +118,9 @@ Creates a new project.
 
 #### Properties
 
-|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
-|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
-| __item | Project | {STRING\(name), STRING\(color), BOOLEAN\(is_favorite)} | OBJECT_BUILDER  |  | null  |
+|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
+| __item | Project | OBJECT <details> <summary> Properties </summary> {STRING\(name), STRING\(color), BOOLEAN\(is_favorite)} </details> | OBJECT_BUILDER |  | null |
 
 
 #### Output
@@ -105,20 +132,29 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |     Control Type     |
-|:------------:|:------------:|:--------------------:|
-| body | {STRING\(id), STRING\(name), STRING\(color), STRING\(is_favorite), STRING\(url)} | OBJECT_BUILDER  |
+|     Name     |     Type     |    Control Type     |
+|:------------:|:------------:|:-------------------:|
+| body | OBJECT <details> <summary> Properties </summary> {STRING\(id), STRING\(name), STRING\(color), STRING\(is_favorite), STRING\(url)} </details> | OBJECT_BUILDER |
 
 
 
 
+#### JSON Example
+```json
+{
+  "label" : "Create Project",
+  "name" : "createProject",
+  "parameters" : {
+    "__item" : {
+      "name" : "",
+      "color" : "",
+      "is_favorite" : false
+    }
+  },
+  "type" : "todoist/v1/createProject"
+}
+```
 
 
 
-
-## Triggers
-
-
-
-<hr />
 

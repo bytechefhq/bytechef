@@ -24,10 +24,10 @@ Version: 1
 
 #### Properties
 
-|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
-|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
-| siteName | Your site name | STRING | TEXT  |  e.g. https://{yourSiteName}.teamwork.com  |  true  |
-| username | API Key | STRING | TEXT  |  | true  |
+|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
+| siteName | Your site name | STRING | TEXT | e.g. https://{yourSiteName}.teamwork.com | true |
+| username | API Key | STRING | TEXT |  | true |
 
 
 
@@ -47,9 +47,9 @@ Creates a new company.
 
 #### Properties
 
-|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
-|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
-| __item | Company | {{STRING\(name), STRING\(emailOne), STRING\(phone), STRING\(website)}\(company)} | OBJECT_BUILDER  |  | null  |
+|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
+| __item | Company | OBJECT <details> <summary> Properties </summary> {{STRING\(name), STRING\(emailOne), STRING\(phone), STRING\(website)}\(company)} </details> | OBJECT_BUILDER |  | null |
 
 
 #### Output
@@ -61,13 +61,31 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |     Control Type     |
-|:------------:|:------------:|:--------------------:|
-| body | {STRING\(name), STRING\(emailOne), STRING\(phone), STRING\(website)} | OBJECT_BUILDER  |
+|     Name     |     Type     |    Control Type     |
+|:------------:|:------------:|:-------------------:|
+| body | OBJECT <details> <summary> Properties </summary> {STRING\(name), STRING\(emailOne), STRING\(phone), STRING\(website)} </details> | OBJECT_BUILDER |
 
 
 
 
+#### JSON Example
+```json
+{
+  "label" : "Create Company",
+  "name" : "createCompany",
+  "parameters" : {
+    "__item" : {
+      "company" : {
+        "name" : "",
+        "emailOne" : "",
+        "phone" : "",
+        "website" : ""
+      }
+    }
+  },
+  "type" : "teamwork/v1/createCompany"
+}
+```
 
 
 ### Create Task
@@ -77,10 +95,10 @@ Create a new task
 
 #### Properties
 
-|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
-|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
-| tasklistId | Task List ID | INTEGER | SELECT  |  Task list where new task is added  |  true  |
-| __item | Task | {{STRING\(name), STRING\(description), DATE\(dueAt)}\(task)} | OBJECT_BUILDER  |  | null  |
+|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
+| tasklistId | Task List ID | INTEGER | SELECT | Task list where new task is added | true |
+| __item | Task | OBJECT <details> <summary> Properties </summary> {{STRING\(name), STRING\(description), DATE\(dueAt)}\(task)} </details> | OBJECT_BUILDER |  | null |
 
 
 #### Output
@@ -92,20 +110,32 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |     Control Type     |
-|:------------:|:------------:|:--------------------:|
-| body | {STRING\(name), STRING\(description), STRING\(dueAt)} | OBJECT_BUILDER  |
+|     Name     |     Type     |    Control Type     |
+|:------------:|:------------:|:-------------------:|
+| body | OBJECT <details> <summary> Properties </summary> {STRING\(name), STRING\(description), STRING\(dueAt)} </details> | OBJECT_BUILDER |
 
 
 
 
+#### JSON Example
+```json
+{
+  "label" : "Create Task",
+  "name" : "createTask",
+  "parameters" : {
+    "tasklistId" : 1,
+    "__item" : {
+      "task" : {
+        "name" : "",
+        "description" : "",
+        "dueAt" : "2021-01-01"
+      }
+    }
+  },
+  "type" : "teamwork/v1/createTask"
+}
+```
 
 
 
-
-## Triggers
-
-
-
-<hr />
 

@@ -26,9 +26,9 @@ Reads all data from a specified file path and outputs it in file entry format.
 
 #### Properties
 
-|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
-|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
-| filename | File path | STRING | TEXT  |  The path of the file to read.  |  true  |
+|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
+| filename | File path | STRING | TEXT | The path of the file to read. | true |
 
 
 #### Output
@@ -40,16 +40,27 @@ Type: FILE_ENTRY
 
 #### Properties
 
-|     Name     |     Type     |     Control Type     |
-|:------------:|:------------:|:--------------------:|
-| extension | STRING | TEXT  |
-| mimeType | STRING | TEXT  |
-| name | STRING | TEXT  |
-| url | STRING | TEXT  |
+|     Name     |     Type     |    Control Type     |
+|:------------:|:------------:|:-------------------:|
+| extension | STRING | TEXT |
+| mimeType | STRING | TEXT |
+| name | STRING | TEXT |
+| url | STRING | TEXT |
 
 
 
 
+#### JSON Example
+```json
+{
+  "label" : "Read File",
+  "name" : "readFile",
+  "parameters" : {
+    "filename" : ""
+  },
+  "type" : "filesystem/v1/readFile"
+}
+```
 
 
 ### Write to File
@@ -59,10 +70,10 @@ null
 
 #### Properties
 
-|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
-|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
-| fileEntry | File | FILE_ENTRY | FILE_ENTRY  |  File entry object to be written.  |  true  |
-| filename | File path | STRING | TEXT  |  The path to which the file should be written.  |  true  |
+|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
+| fileEntry | File | FILE_ENTRY | FILE_ENTRY | File entry object to be written. | true |
+| filename | File path | STRING | TEXT | The path to which the file should be written. | true |
 
 
 #### Output
@@ -79,25 +90,36 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |     Control Type     |
-|:------------:|:------------:|:--------------------:|
-| bytes | INTEGER | INTEGER  |
+|     Name     |     Type     |    Control Type     |
+|:------------:|:------------:|:-------------------:|
+| bytes | INTEGER | INTEGER |
 
 
 
 
+#### JSON Example
+```json
+{
+  "label" : "Write to File",
+  "name" : "writeFile",
+  "parameters" : {
+    "fileEntry" : {
+      "extension" : "",
+      "mimeType" : "",
+      "name" : "",
+      "url" : ""
+    },
+    "filename" : ""
+  },
+  "type" : "filesystem/v1/writeFile"
+}
+```
 
 
 ### Create Temp Directory
 Name: createTempDir
 
 Creates a file in the temporary directory on the filesystem. Returns the created directory's full path.
-
-#### Properties
-
-|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
-|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
-null
 
 
 #### Output
@@ -115,6 +137,14 @@ Type: STRING
 
 
 
+#### JSON Example
+```json
+{
+  "label" : "Create Temp Directory",
+  "name" : "createTempDir",
+  "type" : "filesystem/v1/createTempDir"
+}
+```
 
 
 ### Get Parent Folder
@@ -124,9 +154,9 @@ Gets the path of the parent folder of the file. If the file doesn't exist, it th
 
 #### Properties
 
-|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
-|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
-| filename | File path | STRING | TEXT  |  The path to full filename.  |  true  |
+|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
+| filename | File path | STRING | TEXT | The path to full filename. | true |
 
 
 #### Output
@@ -144,6 +174,17 @@ Type: STRING
 
 
 
+#### JSON Example
+```json
+{
+  "label" : "Get Parent Folder",
+  "name" : "getFilePath",
+  "parameters" : {
+    "filename" : ""
+  },
+  "type" : "filesystem/v1/getFilePath"
+}
+```
 
 
 ### List
@@ -153,10 +194,10 @@ Lists the content of a directory for the given path.
 
 #### Properties
 
-|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
-|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
-| path | Path | STRING | TEXT  |  The path of a directory.  |  true  |
-| recursive | Recursive | BOOLEAN | SELECT  |  Should the subdirectories be included?  |  null  |
+|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
+| path | Path | STRING | TEXT | The path of a directory. | true |
+| recursive | Recursive | BOOLEAN <details> <summary> Options </summary> true, false </details> | SELECT | Should the subdirectories be included? | null |
 
 
 #### Output
@@ -168,13 +209,25 @@ Type: ARRAY
 
 #### Properties
 
-|     Name     |     Type     |     Control Type     |
-|:------------:|:------------:|:--------------------:|
-|  | {STRING\(fileName), STRING\(relativePath), INTEGER\(size)} | OBJECT_BUILDER  |
+|     Name     |     Type     |    Control Type     |
+|:------------:|:------------:|:-------------------:|
+|  | OBJECT <details> <summary> Properties </summary> {STRING\(fileName), STRING\(relativePath), INTEGER\(size)} </details> | OBJECT_BUILDER |
 
 
 
 
+#### JSON Example
+```json
+{
+  "label" : "List",
+  "name" : "ls",
+  "parameters" : {
+    "path" : "",
+    "recursive" : false
+  },
+  "type" : "filesystem/v1/ls"
+}
+```
 
 
 ### Create
@@ -184,9 +237,9 @@ Creates a directory.
 
 #### Properties
 
-|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
-|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
-| path | Path | STRING | TEXT  |  The path of a directory.  |  true  |
+|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
+| path | Path | STRING | TEXT | The path of a directory. | true |
 
 
 #### Output
@@ -204,6 +257,17 @@ Type: STRING
 
 
 
+#### JSON Example
+```json
+{
+  "label" : "Create",
+  "name" : "mkdir",
+  "parameters" : {
+    "path" : ""
+  },
+  "type" : "filesystem/v1/mkdir"
+}
+```
 
 
 ### Remove
@@ -213,9 +277,9 @@ Permanently removes the content of a directory.
 
 #### Properties
 
-|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
-|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
-| path | Path | STRING | TEXT  |  The path of a directory.  |  true  |
+|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
+| path | Path | STRING | TEXT | The path of a directory. | true |
 
 
 #### Output
@@ -233,6 +297,17 @@ Type: BOOLEAN
 
 
 
+#### JSON Example
+```json
+{
+  "label" : "Remove",
+  "name" : "rm",
+  "parameters" : {
+    "path" : ""
+  },
+  "type" : "filesystem/v1/rm"
+}
+```
 
 
 

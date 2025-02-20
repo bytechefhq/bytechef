@@ -24,9 +24,9 @@ Creates a temporary script that executes bash commands. The script is afterwards
 
 #### Properties
 
-|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
-|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
-| script | Script | STRING | TEXT  |  Script written in bash. Multiple commands are possible with the ';' separator.  |  true  |
+|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
+| script | Script | STRING | TEXT | Script written in bash. Multiple commands are possible with the ';' separator. | true |
 
 
 #### Output
@@ -44,6 +44,17 @@ Type: STRING
 
 
 
+#### JSON Example
+```json
+{
+  "label" : "Execute",
+  "name" : "execute",
+  "parameters" : {
+    "script" : ""
+  },
+  "type" : "bash/v1/execute"
+}
+```
 
 
 

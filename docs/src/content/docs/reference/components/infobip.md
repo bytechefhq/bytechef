@@ -24,10 +24,10 @@ Version: 1
 
 #### Properties
 
-|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
-|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
-| key | API Key | STRING | TEXT  |  | true  |
-| baseUrl | Base URL | STRING | TEXT  |  Personalized base URL for API requests.  |  true  |
+|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
+| key | API Key | STRING | TEXT |  | true |
+| baseUrl | Base URL | STRING | TEXT | Personalized base URL for API requests. | true |
 
 
 
@@ -47,11 +47,11 @@ Send a new SMS message
 
 #### Properties
 
-|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
-|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
-| sender | From | STRING | TEXT  |  The sender ID. It can be alphanumeric or numeric (e.g., CompanyName).  |  true  |
-| to | To | [STRING] | ARRAY_BUILDER  |  Message recipient numbers.  |  true  |
-| text | Text | STRING | TEXT  |  Content of the message being sent.  |  true  |
+|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
+| sender | From | STRING | TEXT | The sender ID. It can be alphanumeric or numeric (e.g., CompanyName). | true |
+| to | To | ARRAY <details> <summary> Items </summary> [STRING] </details> | ARRAY_BUILDER | Message recipient numbers. | true |
+| text | Text | STRING | TEXT | Content of the message being sent. | true |
 
 
 #### Output
@@ -63,14 +63,27 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |     Control Type     |
-|:------------:|:------------:|:--------------------:|
-| bulkId | STRING | TEXT  |
-| messages | [STRING\($messageId), {INTEGER\(groupId), STRING\(groupName), INTEGER\(id), STRING\(name), STRING\(description)}\($status), STRING\($to), INTEGER\($smsCount)] | ARRAY_BUILDER  |
+|     Name     |     Type     |    Control Type     |
+|:------------:|:------------:|:-------------------:|
+| bulkId | STRING | TEXT |
+| messages | ARRAY <details> <summary> Items </summary> [{STRING\(messageId), {INTEGER\(groupId), STRING\(groupName), INTEGER\(id), STRING\(name), STRING\(description), STRING\(action)}\(status), STRING\(destination), {INTEGER\(messageCount)}\(details)}] </details> | ARRAY_BUILDER |
 
 
 
 
+#### JSON Example
+```json
+{
+  "label" : "Send SMS",
+  "name" : "sendSMS",
+  "parameters" : {
+    "sender" : "",
+    "to" : [ "" ],
+    "text" : ""
+  },
+  "type" : "infobip/v1/sendSMS"
+}
+```
 
 
 ### Send Whatsapp Text Message
@@ -80,11 +93,11 @@ Send a new SMS message
 
 #### Properties
 
-|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
-|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
-| from | From | STRING | TEXT  |  Registered WhatsApp sender number. Must be in international format and comply with WhatsApp's requirements.  |  true  |
-| to | To | STRING | TEXT  |  Message recipient number. Must be in international format.  |  true  |
-| text | Text | STRING | TEXT  |  Content of the message being sent.  |  true  |
+|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
+| from | From | STRING | TEXT | Registered WhatsApp sender number. Must be in international format and comply with WhatsApp's requirements. | true |
+| to | To | STRING | TEXT | Message recipient number. Must be in international format. | true |
+| text | Text | STRING | TEXT | Content of the message being sent. | true |
 
 
 #### Output
@@ -96,16 +109,29 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |     Control Type     |
-|:------------:|:------------:|:--------------------:|
-| to | STRING | TEXT  |
-| messageCount | INTEGER | INTEGER  |
-| messageId | STRING | TEXT  |
-| status | {INTEGER\(groupId), STRING\(groupName), INTEGER\(id), STRING\(name), STRING\(description)} | OBJECT_BUILDER  |
+|     Name     |     Type     |    Control Type     |
+|:------------:|:------------:|:-------------------:|
+| to | STRING | TEXT |
+| messageCount | INTEGER | INTEGER |
+| messageId | STRING | TEXT |
+| status | OBJECT <details> <summary> Properties </summary> {INTEGER\(groupId), STRING\(groupName), INTEGER\(id), STRING\(name), STRING\(description), STRING\(action)} </details> | OBJECT_BUILDER |
 
 
 
 
+#### JSON Example
+```json
+{
+  "label" : "Send Whatsapp Text Message",
+  "name" : "sendWhatsappTextMessage",
+  "parameters" : {
+    "from" : "",
+    "to" : "",
+    "text" : ""
+  },
+  "type" : "infobip/v1/sendWhatsappTextMessage"
+}
+```
 
 
 

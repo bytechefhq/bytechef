@@ -24,10 +24,10 @@ Version: 1
 
 #### Properties
 
-|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
-|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
-| clientId | Client Id | STRING | TEXT  |  | true  |
-| clientSecret | Client Secret | STRING | TEXT  |  | true  |
+|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
+| clientId | Client Id | STRING | TEXT |  | true |
+| clientSecret | Client Secret | STRING | TEXT |  | true |
 
 
 
@@ -47,10 +47,10 @@ Creates a new contact.
 
 #### Properties
 
-|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
-|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
-| bookId | Book ID | STRING | SELECT  |  ID of the book where new contact will be created.  |  true  |
-| __item | Contact | {STRING\(name)} | OBJECT_BUILDER  |  | null  |
+|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
+| bookId | Book ID | STRING | SELECT | ID of the book where new contact will be created. | true |
+| __item | Contact | OBJECT <details> <summary> Properties </summary> {STRING\(name)} </details> | OBJECT_BUILDER |  | null |
 
 
 #### Output
@@ -62,13 +62,27 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |     Control Type     |
-|:------------:|:------------:|:--------------------:|
-| body | {STRING\(id)} | OBJECT_BUILDER  |
+|     Name     |     Type     |    Control Type     |
+|:------------:|:------------:|:-------------------:|
+| body | OBJECT <details> <summary> Properties </summary> {STRING\(id)} </details> | OBJECT_BUILDER |
 
 
 
 
+#### JSON Example
+```json
+{
+  "label" : "Create Contact",
+  "name" : "createContact",
+  "parameters" : {
+    "bookId" : "",
+    "__item" : {
+      "name" : ""
+    }
+  },
+  "type" : "reckon/v1/createContact"
+}
+```
 
 
 ### Create Invoice
@@ -78,10 +92,10 @@ Creates a new invoice.
 
 #### Properties
 
-|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
-|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
-| bookId | Book ID | STRING | SELECT  |  ID of the book where new invoice will be created.  |  true  |
-| __item | Invoice | {STRING\(customer), DATE\(invoiceDate), STRING\(amountTaxStatus), [{INTEGER\(lineNumber)}]\(lineItems)} | OBJECT_BUILDER  |  | null  |
+|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
+| bookId | Book ID | STRING | SELECT | ID of the book where new invoice will be created. | true |
+| __item | Invoice | OBJECT <details> <summary> Properties </summary> {STRING\(customer), DATE\(invoiceDate), STRING\(amountTaxStatus), [{INTEGER\(lineNumber)}]\(lineItems)} </details> | OBJECT_BUILDER |  | null |
 
 
 #### Output
@@ -93,13 +107,32 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |     Control Type     |
-|:------------:|:------------:|:--------------------:|
-| body | {STRING\(id)} | OBJECT_BUILDER  |
+|     Name     |     Type     |    Control Type     |
+|:------------:|:------------:|:-------------------:|
+| body | OBJECT <details> <summary> Properties </summary> {STRING\(id)} </details> | OBJECT_BUILDER |
 
 
 
 
+#### JSON Example
+```json
+{
+  "label" : "Create Invoice",
+  "name" : "createInvoice",
+  "parameters" : {
+    "bookId" : "",
+    "__item" : {
+      "customer" : "",
+      "invoiceDate" : "2021-01-01",
+      "amountTaxStatus" : "",
+      "lineItems" : [ {
+        "lineNumber" : 1
+      } ]
+    }
+  },
+  "type" : "reckon/v1/createInvoice"
+}
+```
 
 
 ### Create Payment
@@ -109,10 +142,10 @@ Creates a new payment.
 
 #### Properties
 
-|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
-|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
-| bookId | Book ID | STRING | SELECT  |  ID of the book where new payment will be created.  |  true  |
-| __item | Payment | {STRING\(supplier), DATE\(paymentDate), NUMBER\(totalAmount)} | OBJECT_BUILDER  |  | null  |
+|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
+| bookId | Book ID | STRING | SELECT | ID of the book where new payment will be created. | true |
+| __item | Payment | OBJECT <details> <summary> Properties </summary> {STRING\(supplier), DATE\(paymentDate), NUMBER\(totalAmount)} </details> | OBJECT_BUILDER |  | null |
 
 
 #### Output
@@ -124,13 +157,29 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |     Control Type     |
-|:------------:|:------------:|:--------------------:|
-| body | {STRING\(id)} | OBJECT_BUILDER  |
+|     Name     |     Type     |    Control Type     |
+|:------------:|:------------:|:-------------------:|
+| body | OBJECT <details> <summary> Properties </summary> {STRING\(id)} </details> | OBJECT_BUILDER |
 
 
 
 
+#### JSON Example
+```json
+{
+  "label" : "Create Payment",
+  "name" : "createPayment",
+  "parameters" : {
+    "bookId" : "",
+    "__item" : {
+      "supplier" : "",
+      "paymentDate" : "2021-01-01",
+      "totalAmount" : 0.0
+    }
+  },
+  "type" : "reckon/v1/createPayment"
+}
+```
 
 
 
@@ -139,14 +188,17 @@ Type: OBJECT
 
 
 ### New Invoice
+Name: newInvoice
+
 Triggers when a new invoice is created.
 
 Type: POLLING
+
 #### Properties
 
-|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
-|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
-| bookId | Book | STRING | SELECT  |  | true  |
+|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
+| bookId | Book | STRING | SELECT |  | true |
 
 
 #### Output
@@ -158,25 +210,38 @@ Type: ARRAY
 
 #### Properties
 
-|     Name     |     Type     |     Control Type     |
-|:------------:|:------------:|:--------------------:|
-|  | {STRING\(id), STRING\(invoiceNumber), {STRING\(id), STRING\(name)}\(customer), DATE\(invoiceDate), STRING\(amountTaxStatus), [{INTEGER\(lineNumber)}]\(lineItems)} | OBJECT_BUILDER  |
+|     Name     |     Type     |    Control Type     |
+|:------------:|:------------:|:-------------------:|
+|  | OBJECT <details> <summary> Properties </summary> {STRING\(id), STRING\(invoiceNumber), {STRING\(id), STRING\(name)}\(customer), DATE\(invoiceDate), STRING\(amountTaxStatus), [{INTEGER\(lineNumber)}]\(lineItems)} </details> | OBJECT_BUILDER |
 
 
 
 
-
+#### JSON Example
+```json
+{
+  "label" : "New Invoice",
+  "name" : "newInvoice",
+  "parameters" : {
+    "bookId" : ""
+  },
+  "type" : "reckon/v1/newInvoice"
+}
+```
 
 
 ### New Payment
+Name: newPayment
+
 Triggers when a new payment is created.
 
 Type: POLLING
+
 #### Properties
 
-|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
-|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
-| bookId | Book | STRING | SELECT  |  | true  |
+|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
+| bookId | Book | STRING | SELECT |  | true |
 
 
 #### Output
@@ -188,14 +253,24 @@ Type: ARRAY
 
 #### Properties
 
-|     Name     |     Type     |     Control Type     |
-|:------------:|:------------:|:--------------------:|
-|  | {STRING\(id), STRING\(paymentNumber), {STRING\(id), STRING\(name)}\(supplier), DATE\(paymentDate), NUMBER\(totalAmount)} | OBJECT_BUILDER  |
+|     Name     |     Type     |    Control Type     |
+|:------------:|:------------:|:-------------------:|
+|  | OBJECT <details> <summary> Properties </summary> {STRING\(id), STRING\(paymentNumber), {STRING\(id), STRING\(name)}\(supplier), DATE\(paymentDate), NUMBER\(totalAmount)} </details> | OBJECT_BUILDER |
 
 
 
 
-
+#### JSON Example
+```json
+{
+  "label" : "New Payment",
+  "name" : "newPayment",
+  "parameters" : {
+    "bookId" : ""
+  },
+  "type" : "reckon/v1/newPayment"
+}
+```
 
 
 <hr />

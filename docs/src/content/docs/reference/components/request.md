@@ -22,31 +22,48 @@ Type: request/v1
 
 
 ### Auto Respond with HTTP 200 Status
+Name: autoRespondWithHTTP200
+
 The request trigger always replies immediately with an HTTP 200 status code in response to any incoming workflow request request. This guarantees execution of the request trigger, but does not involve any validation of the received request.
 
 Type: STATIC_WEBHOOK
-#### Properties
-
-|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
-|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
-null
 
 
-
+#### JSON Example
+```json
+{
+  "label" : "Auto Respond with HTTP 200 Status",
+  "name" : "autoRespondWithHTTP200",
+  "type" : "request/v1/autoRespondWithHTTP200"
+}
+```
 
 
 ### Await Workflow and Respond
+Name: awaitWorkflowAndRespond
+
 You have the flexibility to set up your preferred response. After a workflow request is received, the request trigger enters a waiting state for the workflow's response.
 
 Type: STATIC_WEBHOOK
+
 #### Properties
 
-|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
-|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
-| timeout | Timeout (ms) | INTEGER | INTEGER  |  The incoming request will time out after the specified number of milliseconds. The max wait time before a timeout is 5 minutes.  |  null  |
+|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
+| timeout | Timeout (ms) | INTEGER | INTEGER | The incoming request will time out after the specified number of milliseconds. The max wait time before a timeout is 5 minutes. | null |
 
 
-
+#### JSON Example
+```json
+{
+  "label" : "Await Workflow and Respond",
+  "name" : "awaitWorkflowAndRespond",
+  "parameters" : {
+    "timeout" : 1
+  },
+  "type" : "request/v1/awaitWorkflowAndRespond"
+}
+```
 
 
 <hr />
