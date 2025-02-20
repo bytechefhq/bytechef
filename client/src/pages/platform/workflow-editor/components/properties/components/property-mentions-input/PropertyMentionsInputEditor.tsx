@@ -1,6 +1,8 @@
 import PropertyMentionsInputBubbleMenu from '@/pages/platform/workflow-editor/components/properties/components/property-mentions-input/PropertyMentionsInputBubbleMenu';
 import {getSuggestionOptions} from '@/pages/platform/workflow-editor/components/properties/components/property-mentions-input/propertyMentionsInputEditorSuggestionOptions';
 import {useWorkflowNodeParameterMutation} from '@/pages/platform/workflow-editor/providers/workflowNodeParameterMutationProvider';
+import useWorkflowNodeDetailsPanelStore from '@/pages/platform/workflow-editor/stores/useWorkflowNodeDetailsPanelStore';
+import {encodeParameters, encodePath} from '@/pages/platform/workflow-editor/utils/encodingUtils';
 import saveProperty from '@/pages/platform/workflow-editor/utils/saveProperty';
 import {ComponentDefinitionBasic, Workflow} from '@/shared/middleware/platform/configuration';
 import {DataPillType} from '@/shared/types';
@@ -12,6 +14,7 @@ import Text from '@tiptap/extension-text';
 import {Editor, EditorContent, Extension, mergeAttributes, useEditor} from '@tiptap/react';
 import {StarterKit} from '@tiptap/starter-kit';
 import {decode} from 'html-entities';
+import resolvePath from 'object-resolve-path';
 import {EditorView} from 'prosemirror-view';
 import {ForwardedRef, MutableRefObject, forwardRef, useCallback, useEffect, useMemo, useState} from 'react';
 import sanitizeHtml from 'sanitize-html';
@@ -32,7 +35,7 @@ interface PropertyMentionsInputEditorProps {
     onFocus?: (editor: Editor) => void;
     placeholder?: string;
     type: string;
-    value?: string;
+    value?: string | number;
     workflow: Workflow;
 }
 
@@ -53,8 +56,10 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
         },
         ref: ForwardedRef<Editor>
     ) => {
-        const [editorValue, setEditorValue] = useState(value);
+        const [editorValue, setEditorValue] = useState<string | number | undefined>(value);
         const [mentionOccurences, setMentionOccurences] = useState(0);
+
+        const {currentNode} = useWorkflowNodeDetailsPanelStore();
 
         const getComponentIcon = useCallback(
             (mentionValue: string) => {
@@ -68,6 +73,12 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
             },
             [componentDefinitions, workflow.workflowTriggerComponentNames]
         );
+
+        const memoizedWorkflowTask = useMemo(() => {
+            return [...(workflow.triggers ?? []), ...(workflow.tasks ?? [])].find(
+                (node) => node.name === currentNode?.name
+            );
+        }, [workflow.triggers, workflow.tasks, currentNode?.name]);
 
         const extensions = useMemo(() => {
             const extensions = [
@@ -145,15 +156,9 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
                 return;
             }
 
-            // const sanitizedCurrentValue = sanitizeHtml(editorValue, {allowedTags: []});
+            let value = editorValue;
 
-            // if (propertyParameterValue === sanitizedCurrentValue) {
-            //     return;
-            // }
-
-            let value: string | number = editorValue;
-
-            if ((type === 'INTEGER' || type === 'NUMBER') && !value.startsWith('${')) {
+            if ((type === 'INTEGER' || type === 'NUMBER') && typeof value === 'string' && !value.startsWith('${')) {
                 value = parseInt(value);
             }
 
@@ -280,12 +285,26 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
         }
 
         useEffect(() => {
-            if (value && editor) {
-                editor.commands.setContent(getContent(value)!, false, {
+            if (editor) {
+                editor.commands.setContent(getContent(editorValue as string)!, false, {
                     preserveWhitespace: 'full',
                 });
             }
-        }, [editor, getContent, value]);
+        }, [editor, getContent, editorValue]);
+
+        // set propertyParameterValue on workflow definition change
+        useEffect(() => {
+            if (!workflow.definition || !currentNode?.name || !path) {
+                return;
+            }
+
+            const encodedParameters = encodeParameters(memoizedWorkflowTask?.parameters ?? {});
+            const encodedPath = encodePath(path);
+
+            const propertyValue = resolvePath(encodedParameters, encodedPath);
+
+            setEditorValue(propertyValue);
+        }, [currentNode?.name, memoizedWorkflowTask?.parameters, path, workflow.definition]);
 
         // Cleanup function to save mention input value on unmount
         useEffect(() => {
@@ -297,7 +316,7 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
                 <EditorContent
                     editor={editor}
                     id={elementId}
-                    onChange={(event) => setEditorValue(event.target.value)}
+                    onChange={(event) => setEditorValue((event.target as HTMLInputElement).value)}
                     value={editorValue}
                 />
 

@@ -18,9 +18,8 @@ import {Workflow, WorkflowInput} from '@/shared/middleware/platform/configuratio
 import {WorkflowDefinitionType} from '@/shared/types';
 import {zodResolver} from '@hookform/resolvers/zod';
 import {Editor} from '@tiptap/react';
-import React, {ReactNode, useRef, useState} from 'react';
+import {ReactNode, useRef, useState} from 'react';
 import {useForm} from 'react-hook-form';
-import sanitizeHtml from 'sanitize-html';
 import {z} from 'zod';
 
 const SPACE = 4;
@@ -102,14 +101,6 @@ const WorkflowOutputsSheetDialog = ({
         );
     }
 
-    const handleMentionInputValueChange = (value: string) => {
-        setMentionInputValue(value);
-
-        const sanitizedValue = sanitizeHtml(value, {allowedTags: []});
-
-        form.setValue('value', sanitizedValue);
-    };
-
     return (
         <Dialog
             onOpenChange={(isOpen) => {
@@ -171,7 +162,6 @@ const WorkflowOutputsSheetDialog = ({
                                         <PropertyMentionsInput
                                             className="rounded-md border"
                                             {...field}
-                                            onChange={(value) => handleMentionInputValueChange(value)}
                                             ref={editorRef}
                                             value={mentionInputValue}
                                         />

@@ -13,7 +13,6 @@ describe('PropertyMentionsInput', () => {
                 handleInputTypeSwitchButtonClick={mockFunction}
                 label="PropertyMentionsInput Label"
                 leadingIcon="📄"
-                onChange={mockFunction}
                 placeholder=""
                 type="STRING"
                 value=""

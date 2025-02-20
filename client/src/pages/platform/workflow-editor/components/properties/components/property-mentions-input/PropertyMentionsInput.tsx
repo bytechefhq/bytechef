@@ -108,11 +108,6 @@ const PropertyMentionsInput = forwardRef<Editor, PropertyMentionsInputProps>(
                                     componentDefinitions={componentDefinitions}
                                     controlType={controlType}
                                     dataPills={dataPills}
-                                    onChange={(value) => {
-                                        if (onChange) {
-                                            onChange(value);
-                                        }
-                                    }}
                                     placeholder={placeholder}
                                     title={label ?? ''}
                                     type={type}
