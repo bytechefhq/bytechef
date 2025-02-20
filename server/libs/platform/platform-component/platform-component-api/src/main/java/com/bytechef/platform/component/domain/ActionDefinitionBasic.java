@@ -34,6 +34,8 @@ public class ActionDefinitionBasic {
     protected String description;
     protected Help help;
     protected String name;
+    protected boolean outputDefined;
+    protected boolean outputFunctionDefined;
     protected String title;
 
     protected ActionDefinitionBasic() {
@@ -48,7 +50,29 @@ public class ActionDefinitionBasic {
         this.description = Validate.notNull(getDescription(actionDefinition), "description");
         this.help = OptionalUtils.mapOrElse(actionDefinition.getHelp(), Help::new, null);
         this.name = Validate.notNull(actionDefinition.getName(), "name");
+        this.outputDefined = OptionalUtils.mapOrElse(
+            actionDefinition.getOutputDefinition(), outputDefinition -> true, false);
+        this.outputFunctionDefined = OptionalUtils.mapOrElse(
+            actionDefinition.getOutputDefinition(),
+            outputDefinition -> OptionalUtils.mapOrElse(outputDefinition.getOutput(), output -> true, false), false);
         this.title = Validate.notNull(getTitle(actionDefinition), "title");
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
+        ActionDefinitionBasic that = (ActionDefinitionBasic) o;
+        return batch == that.batch && Objects.equals(description, that.description) &&
+            Objects.equals(help, that.help) && Objects.equals(name, that.name) && outputDefined == that.outputDefined &&
+            outputFunctionDefined == that.outputFunctionDefined && Objects.equals(title, that.title);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(batch, description, help, outputDefined, outputFunctionDefined, name, title);
     }
 
     public String getComponentName() {
@@ -75,24 +99,16 @@ public class ActionDefinitionBasic {
         return title;
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o)
-            return true;
-        if (o == null || getClass() != o.getClass())
-            return false;
-        ActionDefinitionBasic that = (ActionDefinitionBasic) o;
-        return batch == that.batch && Objects.equals(description, that.description) && Objects.equals(help, that.help)
-            && Objects.equals(name, that.name) && Objects.equals(title, that.title);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(batch, description, help, name, title);
-    }
-
     public boolean isBatch() {
         return batch;
+    }
+
+    public boolean isOutputDefined() {
+        return outputDefined;
+    }
+
+    public boolean isOutputFunctionDefined() {
+        return outputFunctionDefined;
     }
 
     @Override

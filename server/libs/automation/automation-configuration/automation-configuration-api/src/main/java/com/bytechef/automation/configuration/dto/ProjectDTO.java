@@ -83,7 +83,7 @@ public record ProjectDTO(
         private Instant lastModifiedDate;
         private Instant lastPublishedDate;
         private Status lastStatus = Status.DRAFT;
-        private int lastProjectVersion;
+        private int lastVersion;
         private List<Tag> tags;
         private int version;
         private List<ProjectVersion> projectVersions;
@@ -141,8 +141,8 @@ public record ProjectDTO(
             return this;
         }
 
-        public Builder lastProjectVersion(int lastProjectVersion) {
-            this.lastProjectVersion = lastProjectVersion;
+        public Builder lastVersion(int lastVersion) {
+            this.lastVersion = lastVersion;
 
             return this;
         }
@@ -192,7 +192,7 @@ public record ProjectDTO(
         public ProjectDTO build() {
             return new ProjectDTO(
                 category, createdBy, createdDate, description, id, name, lastModifiedBy, lastModifiedDate,
-                lastPublishedDate, lastStatus, lastProjectVersion, projectVersions, projectWorkflowIds, tags, version,
+                lastPublishedDate, lastStatus, lastVersion, projectVersions, projectWorkflowIds, tags, version,
                 workspaceId);
         }
     }

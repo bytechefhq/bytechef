@@ -32,8 +32,6 @@ import org.springframework.lang.Nullable;
 @SuppressFBWarnings("EI")
 public class TriggerDefinition extends TriggerDefinitionBasic {
 
-    private boolean outputFunctionDefined;
-    private boolean outputDefined;
     private OutputResponse outputResponse;
     private List<? extends Property> properties;
     private boolean webhookRawBody;
@@ -51,11 +49,6 @@ public class TriggerDefinition extends TriggerDefinitionBasic {
 
         super(triggerDefinition, componentName, componentVersion);
 
-        this.outputDefined = OptionalUtils.mapOrElse(
-            triggerDefinition.getOutputDefinition(), outputDefinition -> true, false);
-        this.outputFunctionDefined = OptionalUtils.mapOrElse(
-            triggerDefinition.getOutputDefinition(),
-            outputDefinition -> OptionalUtils.mapOrElse(outputDefinition.getOutput(), output -> true, false), false);
         this.outputResponse = OptionalUtils.mapOrElse(
             triggerDefinition.getOutputDefinition(), TriggerDefinition::toOutputResponse, null);
         this.properties = CollectionUtils.map(
@@ -83,8 +76,9 @@ public class TriggerDefinition extends TriggerDefinitionBasic {
             return false;
         }
 
-        return outputDefined == that.outputDefined && Objects.equals(outputResponse, that.outputResponse) &&
-            Objects.equals(properties, that.properties) && webhookRawBody == that.webhookRawBody &&
+        return outputDefined == that.outputDefined && outputFunctionDefined == that.outputFunctionDefined &&
+            Objects.equals(outputResponse, that.outputResponse) && Objects.equals(properties, that.properties) &&
+            webhookRawBody == that.webhookRawBody &&
             workflowNodeDescriptionDefined == that.workflowNodeDescriptionDefined &&
             workflowSyncExecution == that.workflowSyncExecution &&
             workflowSyncValidation == that.workflowSyncValidation &&
@@ -94,17 +88,18 @@ public class TriggerDefinition extends TriggerDefinitionBasic {
     @Override
     public int hashCode() {
         return Objects.hash(
-            super.hashCode(), outputDefined, outputResponse, properties, webhookRawBody,
+            super.hashCode(), outputDefined, outputFunctionDefined, outputResponse, properties, webhookRawBody,
             workflowNodeDescriptionDefined, workflowSyncExecution, workflowSyncValidation,
             workflowSyncOnEnableValidation);
     }
 
-    public boolean isOutputDefined() {
-        return outputDefined;
+    @Nullable
+    public OutputResponse getOutputResponse() {
+        return outputResponse;
     }
 
-    public boolean isOutputFunctionDefined() {
-        return outputFunctionDefined;
+    public List<? extends Property> getProperties() {
+        return properties;
     }
 
     public boolean isWebhookRawBody() {
@@ -125,15 +120,6 @@ public class TriggerDefinition extends TriggerDefinitionBasic {
 
     public boolean isWorkflowSyncOnEnableValidation() {
         return workflowSyncOnEnableValidation;
-    }
-
-    @Nullable
-    public OutputResponse getOutputResponse() {
-        return outputResponse;
-    }
-
-    public List<? extends Property> getProperties() {
-        return properties;
     }
 
     @Override

@@ -35,6 +35,8 @@ public class TriggerDefinitionBasic {
     protected int componentVersion;
     protected Help help;
     protected String name;
+    protected boolean outputFunctionDefined;
+    protected boolean outputDefined;
     protected String title;
     protected TriggerType type;
 
@@ -50,6 +52,11 @@ public class TriggerDefinitionBasic {
         this.description = Validate.notNull(getDescription(triggerDefinition), "description");
         this.help = OptionalUtils.mapOrElse(triggerDefinition.getHelp(), Help::new, null);
         this.name = Validate.notNull(triggerDefinition.getName(), "name");
+        this.outputDefined = OptionalUtils.mapOrElse(
+            triggerDefinition.getOutputDefinition(), outputDefinition -> true, false);
+        this.outputFunctionDefined = OptionalUtils.mapOrElse(
+            triggerDefinition.getOutputDefinition(),
+            outputDefinition -> OptionalUtils.mapOrElse(outputDefinition.getOutput(), output -> true, false), false);
         this.title = Validate.notNull(getTitle(triggerDefinition), "title");
         this.type = Validate.notNull(triggerDefinition.getType(), "type");
     }
@@ -82,19 +89,29 @@ public class TriggerDefinitionBasic {
         return type;
     }
 
+    public boolean isOutputDefined() {
+        return outputDefined;
+    }
+
+    public boolean isOutputFunctionDefined() {
+        return outputFunctionDefined;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o)
             return true;
         if (!(o instanceof TriggerDefinitionBasic that))
             return false;
-        return batch == that.batch && Objects.equals(description, that.description) && Objects.equals(help, that.help)
-            && Objects.equals(name, that.name) && Objects.equals(title, that.title) && type == that.type;
+        return batch == that.batch && Objects.equals(description, that.description) &&
+            Objects.equals(help, that.help) && Objects.equals(name, that.name) && outputDefined == that.outputDefined &&
+            outputFunctionDefined == that.outputFunctionDefined && Objects.equals(title, that.title) &&
+            type == that.type;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(batch, description, help, name, title, type);
+        return Objects.hash(batch, description, help, name, outputDefined, outputFunctionDefined, title, type);
     }
 
     public boolean isBatch() {

@@ -60,7 +60,8 @@ public class TaskDispatcherDefinitionServiceImpl implements TaskDispatcherDefini
                     return SchemaUtils.toOutput(
                         outputDefinition,
                         (property, sampleOutput) -> new OutputResponse(
-                            Property.toProperty((com.bytechef.platform.workflow.task.dispatcher.definition.Property) property),
+                            Property.toProperty(
+                                (com.bytechef.platform.workflow.task.dispatcher.definition.Property) property),
                             sampleOutput),
                         PropertyFactory.PROPERTY_FACTORY);
                 } catch (Exception e) {

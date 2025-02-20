@@ -97,7 +97,7 @@ public record IntegrationDTO(
         private Instant lastModifiedDate;
         private Instant lastPublishedDate;
         private Status lastStatus = Status.DRAFT;
-        private int lastIntegrationVersion;
+        private int lastVersion;
         private String name;
         private List<Tag> tags;
         private int version;
@@ -183,8 +183,8 @@ public record IntegrationDTO(
             return this;
         }
 
-        public Builder lastIntegrationVersion(int lastIntegrationVersion) {
-            this.lastIntegrationVersion = lastIntegrationVersion;
+        public Builder lastVersion(int lastVersion) {
+            this.lastVersion = lastVersion;
 
             return this;
         }
@@ -211,7 +211,7 @@ public record IntegrationDTO(
             return new IntegrationDTO(
                 allowMultipleInstances, category, componentName, createdBy, createdDate, description, null, id,
                 integrationVersions, integrationWorkflowIds, lastModifiedBy, lastModifiedDate, lastPublishedDate,
-                lastStatus, lastIntegrationVersion, name, tags, null, version);
+                lastStatus, lastVersion, name, tags, null, version);
         }
     }
 

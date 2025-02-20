@@ -32,8 +32,6 @@ import org.springframework.lang.Nullable;
 @SuppressFBWarnings("EI")
 public class ActionDefinition extends ActionDefinitionBasic {
 
-    private boolean outputDefined;
-    private boolean outputFunctionDefined;
     private OutputResponse outputResponse;
     private List<? extends Property> properties;
     private boolean workflowNodeDescriptionDefined;
@@ -47,11 +45,6 @@ public class ActionDefinition extends ActionDefinitionBasic {
 
         super(actionDefinition, componentName, componentVersion);
 
-        this.outputDefined = OptionalUtils.mapOrElse(
-            actionDefinition.getOutputDefinition(), outputDefinition -> true, false);
-        this.outputFunctionDefined = OptionalUtils.mapOrElse(
-            actionDefinition.getOutputDefinition(),
-            outputDefinition -> OptionalUtils.mapOrElse(outputDefinition.getOutput(), output -> true, false), false);
         this.outputResponse = OptionalUtils.mapOrElse(
             actionDefinition.getOutputDefinition(), ActionDefinition::toOutputResponse, null);
         this.properties = CollectionUtils.map(
@@ -74,27 +67,16 @@ public class ActionDefinition extends ActionDefinitionBasic {
             return false;
         }
 
-        return outputDefined == that.outputDefined && Objects.equals(outputResponse, that.outputResponse) &&
-            Objects.equals(properties, that.properties) &&
+        return outputDefined == that.outputDefined && outputFunctionDefined == that.outputFunctionDefined &&
+            Objects.equals(outputResponse, that.outputResponse) && Objects.equals(properties, that.properties) &&
             workflowNodeDescriptionDefined == that.workflowNodeDescriptionDefined;
     }
 
     @Override
     public int hashCode() {
         return Objects.hash(
-            super.hashCode(), outputDefined, outputResponse, properties, workflowNodeDescriptionDefined);
-    }
-
-    public boolean isOutputDefined() {
-        return outputDefined;
-    }
-
-    public boolean isOutputFunctionDefined() {
-        return outputFunctionDefined;
-    }
-
-    public boolean isWorkflowNodeDescriptionDefined() {
-        return workflowNodeDescriptionDefined;
+            super.hashCode(), outputDefined, outputFunctionDefined, outputResponse, properties,
+            workflowNodeDescriptionDefined);
     }
 
     @Nullable
@@ -104,6 +86,10 @@ public class ActionDefinition extends ActionDefinitionBasic {
 
     public List<? extends Property> getProperties() {
         return properties;
+    }
+
+    public boolean isWorkflowNodeDescriptionDefined() {
+        return workflowNodeDescriptionDefined;
     }
 
     @Override
