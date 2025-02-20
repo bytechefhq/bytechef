@@ -16,6 +16,9 @@
 
 package com.bytechef.jackson.config;
 
+import com.bytechef.commons.util.ConvertHelper;
+import com.bytechef.commons.util.JsonHelper;
+import com.bytechef.commons.util.XmlHelper;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.PropertyAccessor;
@@ -47,6 +50,16 @@ public class JacksonConfiguration {
     }
 
     @Bean
+    ConvertHelper convertHelper(ObjectMapper objectMapper) {
+        return new ConvertHelper(objectMapper);
+    }
+
+    @Bean
+    JsonHelper jsonHelper(ObjectMapper objectMapper) {
+        return new JsonHelper(objectMapper);
+    }
+
+    @Bean
     @Primary
     public ObjectMapper objectMapper() {
         return buildMapper(Jackson2ObjectMapperBuilder.json());
@@ -55,6 +68,11 @@ public class JacksonConfiguration {
     @Bean
     XmlMapper xmlMapper() {
         return buildMapper(Jackson2ObjectMapperBuilder.xml());
+    }
+
+    @Bean
+    XmlHelper xmlHelper(XmlMapper xmlMapper) {
+        return new XmlHelper(xmlMapper);
     }
 
     private <T extends ObjectMapper> T buildMapper(Jackson2ObjectMapperBuilder objectMapperBuilder) {

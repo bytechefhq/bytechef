@@ -4,7 +4,6 @@ dependencies {
     api("com.jayway.jsonpath:json-path")
 
     implementation("org.apache.commons:commons-lang3")
-    implementation("org.springframework:spring-context")
     implementation("com.fasterxml.jackson.datatype:jackson-datatype-jdk8")
     implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310")
     implementation("org.slf4j:slf4j-api")
