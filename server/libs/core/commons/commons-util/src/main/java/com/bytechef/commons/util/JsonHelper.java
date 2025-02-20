@@ -39,12 +39,10 @@ import java.util.EnumSet;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
-import org.springframework.stereotype.Component;
 
 /**
  * @author Ivica Cardic
  */
-@Component
 public class JsonHelper {
 
     private final Configuration configuration;

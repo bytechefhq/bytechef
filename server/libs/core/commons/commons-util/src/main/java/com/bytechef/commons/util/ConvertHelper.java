@@ -27,12 +27,10 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeParseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Component;
 
 /**
  * @author Ivica Cardic
  */
-@Component
 public class ConvertHelper {
 
     private static final Logger logger = LoggerFactory.getLogger(ConvertHelper.class);
