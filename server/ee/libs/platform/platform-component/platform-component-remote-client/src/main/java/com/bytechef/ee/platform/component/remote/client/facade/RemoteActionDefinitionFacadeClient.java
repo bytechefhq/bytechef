@@ -82,15 +82,16 @@ public class RemoteActionDefinitionFacadeClient extends AbstractWorkerClient
 
     @Override
     public Map<String, ?> executePerform(
-        @NonNull String componentName, int componentVersion, @NonNull String actionName, ModeType type, Long instanceId,
-        Long instanceWorkflowId, Long jobId, String workflowId, @NonNull Map<String, ?> inputParameters,
+        @NonNull String componentName, int componentVersion, @NonNull String actionName, ModeType type,
+        Long principalId,
+        Long principalWorkflowId, Long jobId, String workflowId, @NonNull Map<String, ?> inputParameters,
         @NonNull Map<String, Long> connectionIds, Map<String, ?> extensions, boolean editorEnvironment) {
 
         return defaultRestClient.post(
             uriBuilder -> toUri(
                 uriBuilder, componentName, ACTION_DEFINITION_FACADE + "/execute-perform"),
             new PerformRequest(
-                componentName, componentVersion, actionName, type, instanceId, instanceWorkflowId, jobId,
+                componentName, componentVersion, actionName, type, principalId, principalWorkflowId, jobId,
                 inputParameters, connectionIds),
             new ParameterizedTypeReference<>() {});
     }
@@ -140,8 +141,8 @@ public class RemoteActionDefinitionFacadeClient extends AbstractWorkerClient
     }
 
     private record PerformRequest(
-        String componentName, int componentVersion, String actionName, ModeType type, Long instanceId,
-        Long instanceWorkflowId,
+        String componentName, int componentVersion, String actionName, ModeType type, Long principalId,
+        Long principalWorkflowId,
         long jobId, Map<String, ?> inputParameters, Map<String, Long> connectionIds) {
     }
 

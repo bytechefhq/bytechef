@@ -153,14 +153,14 @@ public class TriggerDefinitionFacadeImpl implements TriggerDefinitionFacade {
     @Override
     public TriggerOutput executeTrigger(
         @NonNull String componentName, int componentVersion, @NonNull String triggerName,
-        ModeType type, Long instanceId, String workflowReferenceCode,
+        ModeType type, Long principalId, String workflowReferenceCode,
         @NonNull Map<String, ?> inputParameters, Object triggerState, WebhookRequest webhookRequest,
         Long connectionId, boolean editorEnvironment) {
 
         ComponentConnection componentConnection = getComponentConnection(connectionId);
 
         TriggerContext triggerContext = contextFactory.createTriggerContext(
-            componentName, componentVersion, triggerName, null, instanceId, workflowReferenceCode, componentConnection,
+            componentName, componentVersion, triggerName, null, principalId, workflowReferenceCode, componentConnection,
             true);
 
         return tokenRefreshHelper.executeSingleConnectionFunction(
@@ -169,7 +169,7 @@ public class TriggerDefinitionFacadeImpl implements TriggerDefinitionFacade {
                 componentName, componentVersion, triggerName, inputParameters, triggerState, webhookRequest,
                 componentConnection1, triggerContext1),
             componentConnection1 -> contextFactory.createTriggerContext(
-                componentName, componentVersion, triggerName, null, instanceId, workflowReferenceCode,
+                componentName, componentVersion, triggerName, null, principalId, workflowReferenceCode,
                 componentConnection1, true));
     }
 

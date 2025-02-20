@@ -20,9 +20,9 @@ import static com.bytechef.component.datastream.constant.DataStreamConstants.CON
 import static com.bytechef.component.datastream.constant.DataStreamConstants.DESTINATION;
 import static com.bytechef.component.datastream.constant.DataStreamConstants.EDITOR_ENVIRONMENT;
 import static com.bytechef.component.datastream.constant.DataStreamConstants.INPUT_PARAMETERS;
-import static com.bytechef.component.datastream.constant.DataStreamConstants.INSTANCE_ID;
-import static com.bytechef.component.datastream.constant.DataStreamConstants.INSTANCE_WORKFLOW_ID;
 import static com.bytechef.component.datastream.constant.DataStreamConstants.JOB_ID;
+import static com.bytechef.component.datastream.constant.DataStreamConstants.PRINCIPAL_ID;
+import static com.bytechef.component.datastream.constant.DataStreamConstants.PRINCIPAL_WORKFLOW_ID;
 import static com.bytechef.component.datastream.constant.DataStreamConstants.SOURCE;
 import static com.bytechef.component.datastream.constant.DataStreamConstants.TENANT_ID;
 import static com.bytechef.component.datastream.constant.DataStreamConstants.TYPE;
@@ -76,14 +76,14 @@ public class SyncActionDefinition extends AbstractActionDefinitionWrapper {
                     put(DESTINATION, new JobParameter<>(extensions.getMap(DESTINATION), Map.class));
                     put(INPUT_PARAMETERS, new JobParameter<>(inputParameters, Map.class));
 
-                    if (actionContextAware.getInstanceId() != null) {
-                        put(INSTANCE_ID, new JobParameter<>(actionContextAware.getInstanceId(), Long.class));
+                    if (actionContextAware.getPrincipalId() != null) {
+                        put(PRINCIPAL_ID, new JobParameter<>(actionContextAware.getPrincipalId(), Long.class));
                     }
 
-                    if (actionContextAware.getInstanceWorkflowId() != null) {
+                    if (actionContextAware.getPrincipalWorkflowId() != null) {
                         put(
-                            INSTANCE_WORKFLOW_ID,
-                            new JobParameter<>(actionContextAware.getInstanceWorkflowId(), Long.class));
+                            PRINCIPAL_WORKFLOW_ID,
+                            new JobParameter<>(actionContextAware.getPrincipalWorkflowId(), Long.class));
                     }
 
                     put(JOB_ID, new JobParameter<>(actionContextAware.getJobId(), Long.class));

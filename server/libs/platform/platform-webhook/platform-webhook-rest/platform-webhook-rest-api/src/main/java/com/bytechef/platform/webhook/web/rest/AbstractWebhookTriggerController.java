@@ -174,7 +174,7 @@ public abstract class AbstractWebhookTriggerController {
             jobPrincipalAccessorRegistry.getJobPrincipalAccessor(workflowExecutionId.getType());
 
         return !jobPrincipalAccessor.isWorkflowEnabled(
-            workflowExecutionId.getInstanceId(), workflowExecutionId.getWorkflowReferenceCode());
+            workflowExecutionId.getPrincipalId(), workflowExecutionId.getWorkflowReferenceCode());
     }
 
     private Object checkBody(Object body) {
@@ -325,7 +325,7 @@ public abstract class AbstractWebhookTriggerController {
             jobPrincipalAccessorRegistry.getJobPrincipalAccessor(workflowExecutionId.getType());
 
         return jobPrincipalAccessor.getWorkflowId(
-            workflowExecutionId.getInstanceId(), workflowExecutionId.getWorkflowReferenceCode());
+            workflowExecutionId.getPrincipalId(), workflowExecutionId.getWorkflowReferenceCode());
     }
 
     @SuppressWarnings("unchecked")

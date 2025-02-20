@@ -36,15 +36,15 @@ public class RemotePrincipalJobServiceController {
 
     @RequestMapping(
         method = RequestMethod.GET,
-        value = "/fetch-last-job-id/{instanceId}/{type}",
+        value = "/fetch-last-job-id/{principalId}/{type}",
         consumes = {
             "application/json"
         },
         produces = {
             "application/json"
         })
-    public ResponseEntity<Long> fetchLastJobId(@PathVariable long instanceId, @PathVariable ModeType type) {
-        return principalJobService.fetchLastJobId(instanceId, type)
+    public ResponseEntity<Long> fetchLastJobId(@PathVariable long principalId, @PathVariable ModeType type) {
+        return principalJobService.fetchLastJobId(principalId, type)
             .map(ResponseEntity::ok)
             .orElse(
                 ResponseEntity.noContent()

@@ -42,9 +42,9 @@ public interface JobService {
 
     Job getTaskExecutionJob(long taskExecutionId);
 
-    List<Job> getWorkflowJobs(@NonNull String workflowId);
-
     Job resumeToStatusStarted(long id);
+
+    Job setStatusToCompleted(long id);
 
     Job setStatusToStarted(long id);
 

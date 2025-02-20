@@ -91,7 +91,7 @@ public class PrincipalJob {
     public String toString() {
         return "JobInstance{" +
             "id=" + id +
-            ", instanceId=" + principalId +
+            ", principalId=" + principalId +
             ", jobId=" + jobId +
             ", type=" + type +
             '}';

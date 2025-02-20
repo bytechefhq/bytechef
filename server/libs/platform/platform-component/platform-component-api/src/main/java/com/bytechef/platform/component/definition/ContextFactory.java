@@ -30,7 +30,7 @@ public interface ContextFactory {
 
     ActionContext createActionContext(
         @NonNull String componentName, int componentVersion, @NonNull String actionName, ModeType type,
-        Long instanceId, Long instanceWorkflowId, String workflowId, Long jobId, ComponentConnection connection,
+        Long principalId, Long principalWorkflowId, String workflowId, Long jobId, ComponentConnection connection,
         boolean editorEnvironment);
 
     Context createContext(
@@ -38,5 +38,5 @@ public interface ContextFactory {
 
     TriggerContext createTriggerContext(
         @NonNull String componentName, int componentVersion, @NonNull String triggerName, ModeType type,
-        Long instanceId, String workflowReferenceCode, ComponentConnection connection, boolean editorEnvironment);
+        Long principalId, String workflowReferenceCode, ComponentConnection connection, boolean editorEnvironment);
 }

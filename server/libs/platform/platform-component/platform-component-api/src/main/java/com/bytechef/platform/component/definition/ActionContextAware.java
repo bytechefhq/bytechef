@@ -28,9 +28,9 @@ public interface ActionContextAware extends ActionContext {
 
     ModeType getType();
 
-    Long getInstanceId();
+    Long getPrincipalId();
 
-    Long getInstanceWorkflowId();
+    Long getPrincipalWorkflowId();
 
     Long getJobId();
 

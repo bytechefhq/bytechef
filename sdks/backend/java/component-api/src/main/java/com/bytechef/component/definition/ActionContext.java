@@ -73,7 +73,7 @@ public interface ActionContext extends Context {
         enum Scope {
             CURRENT_EXECUTION("Current Execution"),
             WORKFLOW("Workflow"),
-            INSTANCE("Instance"),
+            PRINCIPAL("Principal"), // ProjectDeployment or IntegrationInstanceConfiguration
             ACCOUNT("Account");
 
             private final String label;
