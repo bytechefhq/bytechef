@@ -39,6 +39,7 @@ import com.bytechef.platform.webhook.executor.WorkflowExecutor;
 import com.bytechef.platform.webhook.executor.WorkflowExecutorImpl;
 import com.bytechef.platform.webhook.executor.WorkflowSyncExecutor;
 import com.bytechef.platform.workflow.execution.facade.PrincipalJobFacade;
+import com.bytechef.task.dispatcher.approval.ApprovalTaskDispatcher;
 import com.bytechef.task.dispatcher.branch.BranchTaskDispatcher;
 import com.bytechef.task.dispatcher.branch.completion.BranchTaskCompletionHandler;
 import com.bytechef.task.dispatcher.condition.ConditionTaskDispatcher;
@@ -141,6 +142,7 @@ public class WebhookConfiguration {
         ApplicationEventPublisher eventPublisher = getEventPublisher(syncMessageBroker);
 
         return List.of(
+            (taskDispatcher) -> new ApprovalTaskDispatcher(eventPublisher, taskExecutionService),
             (taskDispatcher) -> new BranchTaskDispatcher(
                 eventPublisher, contextService, taskDispatcher, taskExecutionService,
                 taskFileStorage),

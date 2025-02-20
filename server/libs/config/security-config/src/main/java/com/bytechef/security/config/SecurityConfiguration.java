@@ -114,6 +114,7 @@ public class SecurityConfiguration {
                 .ignoringRequestMatchers(
                     RegexRequestMatcher.regexMatcher("^/api/(automation|embedded|platform)/v[0-9]+/.+"))
                 .ignoringRequestMatchers("/api/o/**")
+                .ignoringRequestMatchers("/approvals/**")
                 .ignoringRequestMatchers("/file-entries/**")
                 .ignoringRequestMatchers("/webhooks/**"));
 
@@ -168,6 +169,8 @@ public class SecurityConfiguration {
                     .permitAll()
                     .requestMatchers(mvc.pattern("/api/**"))
                     .authenticated()
+                    .requestMatchers(mvc.pattern("/approvals/**"))
+                    .permitAll()
                     .requestMatchers(mvc.pattern("/assets/**"))
                     .permitAll()
                     .requestMatchers(mvc.pattern("/file-entries/**"))

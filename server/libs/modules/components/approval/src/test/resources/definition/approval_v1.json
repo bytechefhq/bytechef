@@ -1,0 +1,42 @@
+{
+  "categories" : [ {
+    "key" : "developer-tools",
+    "label" : "developer-tools"
+  }, {
+    "key" : "file-storage",
+    "label" : "file-storage"
+  } ],
+  "customAction" : null,
+  "customActionHelp" : null,
+  "description" : "The Approval component allows a person to review and either approve or reject requests.",
+  "icon" : "path:assets/approval.svg",
+  "tags" : null,
+  "metadata" : null,
+  "name" : "approval",
+  "resources" : null,
+  "version" : 1,
+  "title" : "Approval",
+  "connection" : null,
+  "actions" : [ {
+    "batch" : null,
+    "deprecated" : null,
+    "description" : "Creates approval/disapproval links.",
+    "help" : null,
+    "metadata" : null,
+    "name" : "createApprovalLinks",
+    "outputDefinition" : {
+      "output" : { },
+      "outputResponse" : null,
+      "outputSchema" : null,
+      "sampleOutput" : null
+    },
+    "properties" : [ ],
+    "title" : "Create Approval Links",
+    "perform" : { },
+    "processErrorResponse" : null,
+    "workflowNodeDescription" : null
+  } ],
+  "dataStream" : null,
+  "triggers" : null,
+  "unifiedApi" : null
+}

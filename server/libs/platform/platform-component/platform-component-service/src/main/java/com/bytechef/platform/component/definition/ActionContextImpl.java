@@ -18,11 +18,13 @@ package com.bytechef.platform.component.definition;
 
 import com.bytechef.atlas.coordinator.event.TaskProgressedApplicationEvent;
 import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.ActionContext.Approval.ApprovalLinks;
 import com.bytechef.platform.component.domain.ComponentConnection;
 import com.bytechef.platform.constant.ModeType;
 import com.bytechef.platform.data.storage.DataStorage;
 import com.bytechef.platform.data.storage.domain.DataStorageScope;
 import com.bytechef.platform.file.storage.FilesFileStorage;
+import com.bytechef.platform.workflow.execution.ApprovalId;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Map;
 import java.util.Optional;
@@ -36,10 +38,11 @@ import org.springframework.context.ApplicationEventPublisher;
 class ActionContextImpl extends ContextImpl implements ActionContext, ActionContextAware {
 
     private final String actionName;
+    private Approval approval;
     private final Data data;
     private final Event event;
-    private final Long instanceId;
-    private final Long instanceWorkflowId;
+    private final Long principalId;
+    private final Long principalWorkflowId;
     private final Long jobId;
     private final boolean editorEnvironment;
     private final ModeType type;
@@ -47,23 +50,37 @@ class ActionContextImpl extends ContextImpl implements ActionContext, ActionCont
 
     @SuppressFBWarnings("EI")
     public ActionContextImpl(
-        String componentName, int componentVersion, String actionName, ModeType type, Long instanceId,
-        Long instanceWorkflowId, String workflowId, Long jobId, ComponentConnection connection,
-        boolean editorEnvironment, DataStorage dataStorage, ApplicationEventPublisher eventPublisher,
-        FilesFileStorage filesFileStorage, HttpClientExecutor httpClientExecutor) {
+        String componentName, int componentVersion, String actionName, ModeType type, Long principalId,
+        Long principalWorkflowId, String workflowId, Long jobId, ComponentConnection connection,
+        String publicUrl, DataStorage dataStorage, ApplicationEventPublisher eventPublisher,
+        FilesFileStorage filesFileStorage, HttpClientExecutor httpClientExecutor, boolean editorEnvironment) {
 
         super(componentName, componentVersion, actionName, filesFileStorage, connection, httpClientExecutor);
 
         this.actionName = actionName;
+
+        if (jobId != null) {
+            this.approval = new ApprovalImpl(type, jobId, actionName, publicUrl);
+        }
+
         this.data = new DataImpl(
-            componentName, componentVersion, actionName, type, instanceId, instanceWorkflowId, jobId, dataStorage);
+            componentName, componentVersion, actionName, type, principalId, principalWorkflowId, jobId, dataStorage);
         this.editorEnvironment = editorEnvironment;
         this.event = jobId == null ? progress -> {} : new EventImpl(eventPublisher, jobId);
-        this.instanceId = instanceId;
-        this.instanceWorkflowId = instanceWorkflowId;
+        this.principalId = principalId;
+        this.principalWorkflowId = principalWorkflowId;
         this.jobId = jobId;
         this.type = type;
         this.workflowId = workflowId;
+    }
+
+    @Override
+    public ApprovalLinks approval(ContextFunction<Approval, ApprovalLinks> approvalFunction) {
+        try {
+            return approvalFunction.apply(approval);
+        } catch (Exception e) {
+            throw new RuntimeException(e.getMessage(), e);
+        }
     }
 
     @Override
@@ -91,13 +108,13 @@ class ActionContextImpl extends ContextImpl implements ActionContext, ActionCont
     }
 
     @Override
-    public Long getInstanceId() {
-        return instanceId;
+    public Long getPrincipalId() {
+        return principalId;
     }
 
     @Override
-    public Long getInstanceWorkflowId() {
-        return instanceWorkflowId;
+    public Long getPrincipalWorkflowId() {
+        return principalWorkflowId;
     }
 
     @Override
@@ -115,9 +132,21 @@ class ActionContextImpl extends ContextImpl implements ActionContext, ActionCont
         return editorEnvironment;
     }
 
+    private record ApprovalImpl(ModeType type, long jobId, String actionName, String publicUrl) implements Approval {
+
+        @Override
+        public ApprovalLinks generateLinks() {
+            String url = "%s/approvals/%s";
+
+            return new ApprovalLinks(
+                url.formatted(publicUrl, ApprovalId.of(type, jobId, actionName, true)),
+                url.formatted(publicUrl, ApprovalId.of(type, jobId, actionName, false)));
+        }
+    }
+
     private record DataImpl(
-        String componentName, Integer componentVersion, String actionName, ModeType type, Long instanceId,
-        Long instanceWorkflowId, Long jobId, DataStorage dataStorage) implements Data {
+        String componentName, Integer componentVersion, String actionName, ModeType type, Long principalId,
+        Long principalWorkflowId, Long jobId, DataStorage dataStorage) implements Data {
 
         @Override
         public <T> Optional<T> fetch(Scope scope, String key) {
@@ -152,7 +181,7 @@ class ActionContextImpl extends ContextImpl implements ActionContext, ActionCont
             return switch (scope) {
                 case CURRENT_EXECUTION -> DataStorageScope.CURRENT_EXECUTION;
                 case WORKFLOW -> DataStorageScope.WORKFLOW;
-                case INSTANCE -> DataStorageScope.INSTANCE;
+                case PRINCIPAL -> DataStorageScope.PRINCIPAL;
                 case ACCOUNT -> DataStorageScope.ACCOUNT;
             };
         }
@@ -161,8 +190,8 @@ class ActionContextImpl extends ContextImpl implements ActionContext, ActionCont
             return Validate.notNull(
                 switch (scope) {
                     case CURRENT_EXECUTION -> String.valueOf(jobId);
-                    case WORKFLOW -> String.valueOf(instanceWorkflowId);
-                    case INSTANCE -> String.valueOf(instanceId);
+                    case WORKFLOW -> String.valueOf(principalWorkflowId);
+                    case PRINCIPAL -> String.valueOf(principalId);
                     case ACCOUNT -> "";
                 }, "scope");
         }

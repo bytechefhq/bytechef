@@ -16,6 +16,7 @@
 
 package com.bytechef.component.definition;
 
+import com.bytechef.component.definition.ActionContext.Approval.ApprovalLinks;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Consumer;
@@ -24,6 +25,11 @@ import java.util.function.Consumer;
  * @author Ivica Cardic
  */
 public interface ActionContext extends Context {
+
+    /**
+     * @param approvalFunction
+     */
+    ApprovalLinks approval(ContextFunction<Approval, ApprovalLinks> approvalFunction);
 
     /**
      * @param dataFunction
@@ -36,6 +42,18 @@ public interface ActionContext extends Context {
      * @param eventConsumer
      */
     void event(Consumer<Event> eventConsumer);
+
+    /**
+     *
+     */
+    interface Approval {
+        /**
+         */
+        ApprovalLinks generateLinks();
+
+        record ApprovalLinks(String approvalLink, String disapprovalLink) {
+        }
+    }
 
     /**
      *
