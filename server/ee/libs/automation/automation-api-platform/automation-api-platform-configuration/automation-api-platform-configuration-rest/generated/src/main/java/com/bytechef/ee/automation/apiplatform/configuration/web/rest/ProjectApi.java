@@ -31,7 +31,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-02-06T15:10:26.179492+01:00[Europe/Zagreb]", comments = "Generator version: 7.11.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-02-19T09:54:20.465364+01:00[Europe/Zagreb]", comments = "Generator version: 7.11.0")
 @Validated
 @Tag(name = "project", description = "The Automation Project Internal API")
 public interface ProjectApi {
@@ -70,7 +70,7 @@ public interface ProjectApi {
         getRequest().ifPresent(request -> {
             for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
                 if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
-                    String exampleString = "[ { \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"lastPublishedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"createdBy\" : \"createdBy\", \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"lastModifiedBy\" : \"lastModifiedBy\", \"lastProjectVersion\" : 3, \"name\" : \"name\", \"description\" : \"description\", \"id\" : 9, \"lastStatus\" : \"DRAFT\" }, { \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"lastPublishedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"createdBy\" : \"createdBy\", \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"lastModifiedBy\" : \"lastModifiedBy\", \"lastProjectVersion\" : 3, \"name\" : \"name\", \"description\" : \"description\", \"id\" : 9, \"lastStatus\" : \"DRAFT\" } ]";
+                    String exampleString = "[ { \"lastVersion\" : 3, \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"lastPublishedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"createdBy\" : \"createdBy\", \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"lastModifiedBy\" : \"lastModifiedBy\", \"name\" : \"name\", \"description\" : \"description\", \"id\" : 9, \"lastStatus\" : \"DRAFT\" }, { \"lastVersion\" : 3, \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"lastPublishedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"createdBy\" : \"createdBy\", \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"lastModifiedBy\" : \"lastModifiedBy\", \"name\" : \"name\", \"description\" : \"description\", \"id\" : 9, \"lastStatus\" : \"DRAFT\" } ]";
                     ApiUtil.setExampleResponse(request, "application/json", exampleString);
                     break;
                 }

@@ -31,7 +31,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-02-07T10:42:12.012955+01:00[Europe/Zagreb]", comments = "Generator version: 7.11.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-02-19T09:54:16.997775+01:00[Europe/Zagreb]", comments = "Generator version: 7.11.0")
 @Validated
 @Tag(name = "project-code-workflow", description = "The Automation Project Code Workflow Public API")
 public interface ProjectCodeWorkflowApi {
