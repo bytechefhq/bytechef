@@ -24,9 +24,9 @@ Version: 1
 
 #### Properties
 
-|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
-|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
-| token | Bot token | STRING | TEXT  |  | true  |
+|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
+| token | Bot token | STRING | TEXT |  | true |
 
 
 
@@ -46,11 +46,11 @@ Post a new message to a specific #channel you choose.
 
 #### Properties
 
-|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
-|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
-| guildId | Guild ID | STRING | SELECT  |  | true  |
-| channelId | Channel ID | STRING | SELECT  |  ID of the channel where to send the message.  |  true  |
-| __item | Message | {STRING\(content), BOOLEAN\(tts)} | OBJECT_BUILDER  |  | null  |
+|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
+| guildId | Guild ID | STRING | SELECT |  | true |
+| channelId | Channel ID | STRING <details> <summary> Depends On </summary> guildId </details> | SELECT | ID of the channel where to send the message. | true |
+| __item | Message | OBJECT <details> <summary> Properties </summary> {STRING\(content), BOOLEAN\(tts)} </details> | OBJECT_BUILDER |  | null |
 
 
 #### Output
@@ -62,13 +62,29 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |     Control Type     |
-|:------------:|:------------:|:--------------------:|
-| body | {STRING\(id), STRING\(content), BOOLEAN\(tts)} | OBJECT_BUILDER  |
+|     Name     |     Type     |    Control Type     |
+|:------------:|:------------:|:-------------------:|
+| body | OBJECT <details> <summary> Properties </summary> {STRING\(id), STRING\(content), BOOLEAN\(tts)} </details> | OBJECT_BUILDER |
 
 
 
 
+#### JSON Example
+```json
+{
+  "label" : "Send Channel Message",
+  "name" : "sendChannelMessage",
+  "parameters" : {
+    "guildId" : "",
+    "channelId" : "",
+    "__item" : {
+      "content" : "",
+      "tts" : false
+    }
+  },
+  "type" : "discord/v1/sendChannelMessage"
+}
+```
 
 
 ### Create Channel
@@ -78,10 +94,10 @@ Create a new channel
 
 #### Properties
 
-|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
-|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
-| guildId | Guild ID | STRING | SELECT  |  | true  |
-| __item | Channel | {STRING\(name), INTEGER\(type)} | OBJECT_BUILDER  |  | null  |
+|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
+| guildId | Guild ID | STRING | SELECT |  | true |
+| __item | Channel | OBJECT <details> <summary> Properties </summary> {STRING\(name), INTEGER\(type)} </details> | OBJECT_BUILDER |  | null |
 
 
 #### Output
@@ -93,13 +109,28 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |     Control Type     |
-|:------------:|:------------:|:--------------------:|
-| body | {STRING\(id), INTEGER\(type), STRING\(name)} | OBJECT_BUILDER  |
+|     Name     |     Type     |    Control Type     |
+|:------------:|:------------:|:-------------------:|
+| body | OBJECT <details> <summary> Properties </summary> {STRING\(id), INTEGER\(type), STRING\(name)} </details> | OBJECT_BUILDER |
 
 
 
 
+#### JSON Example
+```json
+{
+  "label" : "Create Channel",
+  "name" : "createChannel",
+  "parameters" : {
+    "guildId" : "",
+    "__item" : {
+      "name" : "",
+      "type" : 1
+    }
+  },
+  "type" : "discord/v1/createChannel"
+}
+```
 
 
 ### Send Direct Message
@@ -109,12 +140,12 @@ Send direct message guild member.
 
 #### Properties
 
-|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
-|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
-| guildId | Guild ID | STRING | SELECT  |  | true  |
-| recipient_id | Recipient | STRING | SELECT  |  The recipient to open a DM channel with.  |  true  |
-| content | Message Text | STRING | TEXT  |  Message contents (up to 2000 characters)  |  true  |
-| tts | Text to Speech | BOOLEAN | SELECT  |  True if this is a TTS message  |  false  |
+|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
+| guildId | Guild ID | STRING | SELECT |  | true |
+| recipient_id | Recipient | STRING <details> <summary> Depends On </summary> guildId </details> | SELECT | The recipient to open a DM channel with. | true |
+| content | Message Text | STRING | TEXT | Message contents (up to 2000 characters) | true |
+| tts | Text to Speech | BOOLEAN <details> <summary> Options </summary> true, false </details> | SELECT | True if this is a TTS message | false |
 
 
 #### Output
@@ -126,22 +157,30 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |     Control Type     |
-|:------------:|:------------:|:--------------------:|
-| body | {STRING\(id)} | OBJECT_BUILDER  |
+|     Name     |     Type     |    Control Type     |
+|:------------:|:------------:|:-------------------:|
+| body | OBJECT <details> <summary> Properties </summary> {STRING\(id)} </details> | OBJECT_BUILDER |
 
 
 
 
+#### JSON Example
+```json
+{
+  "label" : "Send Direct Message",
+  "name" : "sendDirectMessage",
+  "parameters" : {
+    "guildId" : "",
+    "recipient_id" : "",
+    "content" : "",
+    "tts" : false
+  },
+  "type" : "discord/v1/sendDirectMessage"
+}
+```
 
 
 
-
-## Triggers
-
-
-
-<hr />
 
 <hr />
 

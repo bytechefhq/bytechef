@@ -26,10 +26,10 @@ Generates a random integer value.
 
 #### Properties
 
-|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
-|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
-| startInclusive | Start Inclusive | INTEGER | INTEGER  |  The minimum possible generated value.  |  true  |
-| endInclusive | End Inclusive | INTEGER | INTEGER  |  The maximum possible generated value.  |  true  |
+|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
+| startInclusive | Start Inclusive | INTEGER | INTEGER | The minimum possible generated value. | true |
+| endInclusive | End Inclusive | INTEGER | INTEGER | The maximum possible generated value. | true |
 
 
 #### Output
@@ -42,6 +42,18 @@ Type: INTEGER
 
 
 
+#### JSON Example
+```json
+{
+  "label" : "Random Integer",
+  "name" : "randomInt",
+  "parameters" : {
+    "startInclusive" : 1,
+    "endInclusive" : 1
+  },
+  "type" : "randomHelper/v1/randomInt"
+}
+```
 
 
 ### Random Float
@@ -51,10 +63,10 @@ Generates a random float value.
 
 #### Properties
 
-|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
-|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
-| startInclusive | Start Inclusive | INTEGER | INTEGER  |  The minimum possible generated value.  |  true  |
-| endInclusive | End Inclusive | INTEGER | INTEGER  |  The maximum possible generated value.  |  true  |
+|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
+| startInclusive | Start Inclusive | INTEGER | INTEGER | The minimum possible generated value. | true |
+| endInclusive | End Inclusive | INTEGER | INTEGER | The maximum possible generated value. | true |
 
 
 #### Output
@@ -67,6 +79,18 @@ Type: NUMBER
 
 
 
+#### JSON Example
+```json
+{
+  "label" : "Random Float",
+  "name" : "randomFloat",
+  "parameters" : {
+    "startInclusive" : 1,
+    "endInclusive" : 1
+  },
+  "type" : "randomHelper/v1/randomFloat"
+}
+```
 
 
 

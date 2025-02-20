@@ -24,9 +24,9 @@ Version: 1
 
 #### Properties
 
-|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
-|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
-| token | Token | STRING | TEXT  |  | true  |
+|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
+| token | Token | STRING | TEXT |  | true |
 
 
 
@@ -46,22 +46,56 @@ Ask anything you want.
 
 #### Properties
 
-|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
-|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
-| model | Model | STRING | SELECT  |  ID of the model to use.  |  true  |
-| messages | Messages | [{STRING\(role), STRING\(content), [FILE_ENTRY]\(attachments)}] | ARRAY_BUILDER  |  A list of messages comprising the conversation so far.  |  true  |
-| response | Response | {STRING\(responseFormat), STRING\(responseSchema)} | OBJECT_BUILDER  |  The response from the API.  |  false  |
-| maxTokens | Max Tokens | INTEGER | INTEGER  |  The maximum number of tokens to generate in the chat completion.  |  null  |
-| n | Number of Chat Completion Choices | INTEGER | INTEGER  |  How many chat completion choices to generate for each input message.  |  null  |
-| temperature | Temperature | NUMBER | NUMBER  |  Controls randomness:  Higher values will make the output more random, while lower values like will make it more focused and deterministic.  |  null  |
-| topP | Top P | NUMBER | NUMBER  |  An alternative to sampling with temperature, called nucleus sampling,  where the model considers the results of the tokens with top_p probability mass. So 0.1 means only the tokens comprising the top 10% probability mass are considered.  |  null  |
-| frequencyPenalty | Frequency Penalty | NUMBER | NUMBER  |  Number between -2.0 and 2.0. Positive values penalize new tokens based on their existing frequency in the text so far, decreasing the model's likelihood to repeat the same line verbatim.  |  null  |
-| presencePenalty | Presence Penalty | NUMBER | NUMBER  |  Number between -2.0 and 2.0. Positive values penalize new tokens based on whether they appear in the text so far, increasing the model's likelihood to talk about new topics.  |  null  |
-| logitBias | Logit Bias | {} | OBJECT_BUILDER  |  Modify the likelihood of specified tokens appearing in the completion.  |  null  |
-| stop | Stop | [STRING] | ARRAY_BUILDER  |  Up to 4 sequences where the API will stop generating further tokens.  |  null  |
-| user | User | STRING | TEXT  |  A unique identifier representing your end-user, which can help admins to monitor and detect abuse.  |  false  |
+|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
+| model | Model | STRING <details> <summary> Options </summary> gpt-3.5-turbo, gpt-3.5-turbo-0125, gpt-3.5-turbo-1106, gpt-4, gpt-4-0125-preview, gpt-4-turbo, gpt-4-turbo-2024-04-09, gpt-4-turbo-preview, gpt-4o, gpt-4o-audio-preview, gpt-4o-mini, o1-mini, o1-mini-2024-09-12, o1-preview, o1-preview-2024-09-12 </details> | SELECT | ID of the model to use. | true |
+| messages | Messages | ARRAY <details> <summary> Items </summary> [{STRING\(role), STRING\(content), [FILE_ENTRY]\(attachments)}] </details> | ARRAY_BUILDER | A list of messages comprising the conversation so far. | true |
+| response | Response | OBJECT <details> <summary> Properties </summary> {STRING\(responseFormat), STRING\(responseSchema)} </details> | OBJECT_BUILDER | The response from the API. | false |
+| maxTokens | Max Tokens | INTEGER | INTEGER | The maximum number of tokens to generate in the chat completion. | null |
+| n | Number of Chat Completion Choices | INTEGER | INTEGER | How many chat completion choices to generate for each input message. | null |
+| temperature | Temperature | NUMBER | NUMBER | Controls randomness:  Higher values will make the output more random, while lower values like will make it more focused and deterministic. | null |
+| topP | Top P | NUMBER | NUMBER | An alternative to sampling with temperature, called nucleus sampling,  where the model considers the results of the tokens with top_p probability mass. So 0.1 means only the tokens comprising the top 10% probability mass are considered. | null |
+| frequencyPenalty | Frequency Penalty | NUMBER | NUMBER | Number between -2.0 and 2.0. Positive values penalize new tokens based on their existing frequency in the text so far, decreasing the model's likelihood to repeat the same line verbatim. | null |
+| presencePenalty | Presence Penalty | NUMBER | NUMBER | Number between -2.0 and 2.0. Positive values penalize new tokens based on whether they appear in the text so far, increasing the model's likelihood to talk about new topics. | null |
+| logitBias | Logit Bias | OBJECT <details> <summary> Properties </summary> {} </details> | OBJECT_BUILDER | Modify the likelihood of specified tokens appearing in the completion. | null |
+| stop | Stop | ARRAY <details> <summary> Items </summary> [STRING] </details> | ARRAY_BUILDER | Up to 4 sequences where the API will stop generating further tokens. | null |
+| user | User | STRING | TEXT | A unique identifier representing your end-user, which can help admins to monitor and detect abuse. | false |
 
 
+#### JSON Example
+```json
+{
+  "label" : "Ask",
+  "name" : "ask",
+  "parameters" : {
+    "model" : "",
+    "messages" : [ {
+      "role" : "",
+      "content" : "",
+      "attachments" : [ {
+        "extension" : "",
+        "mimeType" : "",
+        "name" : "",
+        "url" : ""
+      } ]
+    } ],
+    "response" : {
+      "responseFormat" : "",
+      "responseSchema" : ""
+    },
+    "maxTokens" : 1,
+    "n" : 1,
+    "temperature" : 0.0,
+    "topP" : 0.0,
+    "frequencyPenalty" : 0.0,
+    "presencePenalty" : 0.0,
+    "logitBias" : { },
+    "stop" : [ "" ],
+    "user" : ""
+  },
+  "type" : "openAi/v1/ask"
+}
+```
 
 
 ### Create Image
@@ -71,16 +105,16 @@ Create an image using text-to-image models
 
 #### Properties
 
-|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
-|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
-| model | Model | STRING | SELECT  |  The model to use for image generation.  |  true  |
-| imageMessages | Messages | [{STRING\(content), NUMBER\(weight)}] | ARRAY_BUILDER  |  A list of messages comprising the conversation so far.  |  true  |
-| size | Size | STRING | SELECT  |  The size of the generated images.  |  true  |
-| n | Number of Responses | INTEGER | INTEGER  |  The number of images to generate. Must be between 1 and 10. For dall-e-3, only n=1 is supported..  |  null  |
-| responseFormat | Response format | STRING | SELECT  |  The format in which the generated images are returned.  |  null  |
-| quality | Quality | STRING | SELECT  |  The quality of the image that will be generated.  |  null  |
-| style | Style | STRING | SELECT  |  The style of the generated images. Must be one of vivid or natural. Vivid causes the model to lean towards generating hyper-real and dramatic images. Natural causes the model to produce more natural, less hyper-real looking images. This parameter is only supported for dall-e-3.  |  null  |
-| user | User | STRING | TEXT  |  A unique identifier representing your end-user, which can help admins to monitor and detect abuse.  |  false  |
+|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
+| model | Model | STRING <details> <summary> Options </summary> dall-e-2, dall-e-3 </details> | SELECT | The model to use for image generation. | true |
+| imageMessages | Messages | ARRAY <details> <summary> Items </summary> [{STRING\(content), NUMBER\(weight)}] </details> | ARRAY_BUILDER | A list of messages comprising the conversation so far. | true |
+| size | Size | STRING <details> <summary> Options </summary> DALL_E_2_256x256, DALL_E_2_512x512, _1024x1024, DALL_E_3_1792x1024, DALL_E_3_1024x1792 </details> | SELECT | The size of the generated images. | true |
+| n | Number of Responses | INTEGER | INTEGER | The number of images to generate. Must be between 1 and 10. For dall-e-3, only n=1 is supported.. | null |
+| responseFormat | Response format | STRING <details> <summary> Options </summary> URL, B64_JSON </details> | SELECT | The format in which the generated images are returned. | null |
+| quality | Quality | STRING <details> <summary> Options </summary> STANDARD, HD </details> | SELECT | The quality of the image that will be generated. | null |
+| style | Style | STRING <details> <summary> Options </summary> VIVID, NATURAL </details> | SELECT | The style of the generated images. Must be one of vivid or natural. Vivid causes the model to lean towards generating hyper-real and dramatic images. Natural causes the model to produce more natural, less hyper-real looking images. This parameter is only supported for dall-e-3. | null |
+| user | User | STRING | TEXT | A unique identifier representing your end-user, which can help admins to monitor and detect abuse. | false |
 
 
 #### Output
@@ -92,14 +126,35 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |     Control Type     |
-|:------------:|:------------:|:--------------------:|
-| url | STRING | TEXT  |
-| b64Json | STRING | TEXT  |
+|     Name     |     Type     |    Control Type     |
+|:------------:|:------------:|:-------------------:|
+| url | STRING | TEXT |
+| b64Json | STRING | TEXT |
 
 
 
 
+#### JSON Example
+```json
+{
+  "label" : "Create Image",
+  "name" : "createImage",
+  "parameters" : {
+    "model" : "",
+    "imageMessages" : [ {
+      "content" : "",
+      "weight" : 0.0
+    } ],
+    "size" : "",
+    "n" : 1,
+    "responseFormat" : "",
+    "quality" : "",
+    "style" : "",
+    "user" : ""
+  },
+  "type" : "openAi/v1/createImage"
+}
+```
 
 
 ### Text-To-Speech
@@ -109,13 +164,13 @@ Generate an audio recording from the input text
 
 #### Properties
 
-|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
-|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
-| model | Model | STRING | SELECT  |  Text-to-Speech model which will generate the audio.  |  true  |
-| input | Input | STRING | TEXT  |  The text to generate audio for.  |  true  |
-| voice | Voice | STRING | SELECT  |  The voice to use when generating the audio.  |  true  |
-| responseFormat | Response format | STRING | SELECT  |  The format to audio in.  |  false  |
-| speed | Speed | NUMBER | NUMBER  |  The speed of the generated audio.  |  false  |
+|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
+| model | Model | STRING <details> <summary> Options </summary> tts-1, tts-1-hd </details> | SELECT | Text-to-Speech model which will generate the audio. | true |
+| input | Input | STRING | TEXT | The text to generate audio for. | true |
+| voice | Voice | STRING <details> <summary> Options </summary> ALLOY, ECHO, FABLE, NOVA, ONYX, SHIMMER </details> | SELECT | The voice to use when generating the audio. | true |
+| responseFormat | Response format | STRING <details> <summary> Options </summary> AAC, FLAC, MP3, OPUS </details> | SELECT | The format to audio in. | false |
+| speed | Speed | NUMBER | NUMBER | The speed of the generated audio. | false |
 
 
 #### Output
@@ -127,16 +182,31 @@ Type: FILE_ENTRY
 
 #### Properties
 
-|     Name     |     Type     |     Control Type     |
-|:------------:|:------------:|:--------------------:|
-| extension | STRING | TEXT  |
-| mimeType | STRING | TEXT  |
-| name | STRING | TEXT  |
-| url | STRING | TEXT  |
+|     Name     |     Type     |    Control Type     |
+|:------------:|:------------:|:-------------------:|
+| extension | STRING | TEXT |
+| mimeType | STRING | TEXT |
+| name | STRING | TEXT |
+| url | STRING | TEXT |
 
 
 
 
+#### JSON Example
+```json
+{
+  "label" : "Text-To-Speech",
+  "name" : "createSpeech",
+  "parameters" : {
+    "model" : "",
+    "input" : "",
+    "voice" : "",
+    "responseFormat" : "",
+    "speed" : 0.0
+  },
+  "type" : "openAi/v1/createSpeech"
+}
+```
 
 
 ### Create Transcriptions
@@ -146,16 +216,37 @@ Transcribes audio into the input language.
 
 #### Properties
 
-|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
-|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
-| file | File | FILE_ENTRY | FILE_ENTRY  |  The audio file object to transcribe, in one of these formats: flac, mp3, mp4, mpeg, mpga, m4a, ogg, wav, or webm.  |  true  |
-| model | Model | STRING | SELECT  |  ID of the model to use.  |  true  |
-| language | Language | STRING | SELECT  |  The language of the input audio.  |  false  |
-| prompt | Prompt | STRING | TEXT  |  An optional text to guide the model's style or continue a previous audio segment. The prompt should match the audio language.  |  false  |
-| responseFormat | Response format | STRING | SELECT  |  The format of the transcript output  |  true  |
-| temperature | Temperature | NUMBER | NUMBER  |  The sampling temperature, between 0 and 1. Higher values like will make the output more random, while lower values will make it more focused and deterministic.   |  false  |
+|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
+| file | File | FILE_ENTRY | FILE_ENTRY | The audio file object to transcribe, in one of these formats: flac, mp3, mp4, mpeg, mpga, m4a, ogg, wav, or webm. | true |
+| model | Model | STRING <details> <summary> Options </summary> whisper-1 </details> | SELECT | ID of the model to use. | true |
+| language | Language | STRING <details> <summary> Options </summary> AF, AR, HY, AZ, BE, BS, BG, CA, ZH, HR, CS, DA, NL, EL, ET, EN, FI, FR, GL, DE, HE, HI, HU, IS, ID, IT, JA, KK, KN, KO, LT, LV, MA, MK, MR, MS, NE, NO, FA, PL, PT, RO, RU, SK, SL, SR, ES, SV, SW, TA, TL, TH, TR, UK, UR, VI, CY </details> | SELECT | The language of the input audio. | false |
+| prompt | Prompt | STRING | TEXT | An optional text to guide the model's style or continue a previous audio segment. The prompt should match the audio language. | false |
+| responseFormat | Response format | STRING <details> <summary> Options </summary> JSON, SRT, TEXT, VERBOSE_JSON, VTT </details> | SELECT | The format of the transcript output | true |
+| temperature | Temperature | NUMBER | NUMBER | The sampling temperature, between 0 and 1. Higher values like will make the output more random, while lower values will make it more focused and deterministic.  | false |
 
 
+#### JSON Example
+```json
+{
+  "label" : "Create Transcriptions",
+  "name" : "createTranscription",
+  "parameters" : {
+    "file" : {
+      "extension" : "",
+      "mimeType" : "",
+      "name" : "",
+      "url" : ""
+    },
+    "model" : "",
+    "language" : "",
+    "prompt" : "",
+    "responseFormat" : "",
+    "temperature" : 0.0
+  },
+  "type" : "openAi/v1/createTranscription"
+}
+```
 
 
 

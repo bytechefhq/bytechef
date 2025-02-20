@@ -24,9 +24,9 @@ Version: 1
 
 #### Properties
 
-|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
-|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
-| token | Token | STRING | TEXT  |  | true  |
+|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
+| token | Token | STRING | TEXT |  | true |
 
 
 
@@ -46,9 +46,9 @@ Creates a new opportunity.
 
 #### Properties
 
-|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
-|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
-| __item | Opportunity | {STRING\(name)} | OBJECT_BUILDER  |  | null  |
+|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
+| __item | Opportunity | OBJECT <details> <summary> Properties </summary> {STRING\(name)} </details> | OBJECT_BUILDER |  | null |
 
 
 #### Output
@@ -60,13 +60,26 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |     Control Type     |
-|:------------:|:------------:|:--------------------:|
-| body | {STRING\(id), STRING\(name)} | OBJECT_BUILDER  |
+|     Name     |     Type     |    Control Type     |
+|:------------:|:------------:|:-------------------:|
+| body | OBJECT <details> <summary> Properties </summary> {STRING\(id), STRING\(name)} </details> | OBJECT_BUILDER |
 
 
 
 
+#### JSON Example
+```json
+{
+  "label" : "Create Opportunity",
+  "name" : "createOpportunity",
+  "parameters" : {
+    "__item" : {
+      "name" : ""
+    }
+  },
+  "type" : "affinity/v1/createOpportunity"
+}
+```
 
 
 ### Create Organization
@@ -76,9 +89,9 @@ Creates a new organization.
 
 #### Properties
 
-|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
-|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
-| __item | Organization | {STRING\(name), STRING\(domain)} | OBJECT_BUILDER  |  | null  |
+|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
+| __item | Organization | OBJECT <details> <summary> Properties </summary> {STRING\(name), STRING\(domain)} </details> | OBJECT_BUILDER |  | null |
 
 
 #### Output
@@ -90,13 +103,27 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |     Control Type     |
-|:------------:|:------------:|:--------------------:|
-| body | {STRING\(id), STRING\(name), STRING\(domain)} | OBJECT_BUILDER  |
+|     Name     |     Type     |    Control Type     |
+|:------------:|:------------:|:-------------------:|
+| body | OBJECT <details> <summary> Properties </summary> {STRING\(id), STRING\(name), STRING\(domain)} </details> | OBJECT_BUILDER |
 
 
 
 
+#### JSON Example
+```json
+{
+  "label" : "Create Organization",
+  "name" : "createOrganization",
+  "parameters" : {
+    "__item" : {
+      "name" : "",
+      "domain" : ""
+    }
+  },
+  "type" : "affinity/v1/createOrganization"
+}
+```
 
 
 ### Create Person
@@ -106,9 +133,9 @@ Creates a new person.
 
 #### Properties
 
-|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
-|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
-| __item | Person | {STRING\(first_name), STRING\(last_name), [STRING]\(emails)} | OBJECT_BUILDER  |  | null  |
+|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
+| __item | Person | OBJECT <details> <summary> Properties </summary> {STRING\(first_name), STRING\(last_name), [STRING]\(emails)} </details> | OBJECT_BUILDER |  | null |
 
 
 #### Output
@@ -120,20 +147,29 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |     Control Type     |
-|:------------:|:------------:|:--------------------:|
-| body | {STRING\(id), STRING\(first_name), STRING\(last_name), [STRING]\(emails)} | OBJECT_BUILDER  |
+|     Name     |     Type     |    Control Type     |
+|:------------:|:------------:|:-------------------:|
+| body | OBJECT <details> <summary> Properties </summary> {STRING\(id), STRING\(first_name), STRING\(last_name), [STRING]\(emails)} </details> | OBJECT_BUILDER |
 
 
 
 
+#### JSON Example
+```json
+{
+  "label" : "Create Person",
+  "name" : "createPerson",
+  "parameters" : {
+    "__item" : {
+      "first_name" : "",
+      "last_name" : "",
+      "emails" : [ "" ]
+    }
+  },
+  "type" : "affinity/v1/createPerson"
+}
+```
 
 
 
-
-## Triggers
-
-
-
-<hr />
 

@@ -26,10 +26,10 @@ Add two numbers.
 
 #### Properties
 
-|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
-|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
-| firstNumber | First Number | NUMBER | NUMBER  |  | true  |
-| secondNumber | Second Number | NUMBER | NUMBER  |  | true  |
+|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
+| firstNumber | First Number | NUMBER | NUMBER |  | true |
+| secondNumber | Second Number | NUMBER | NUMBER |  | true |
 
 
 #### Output
@@ -42,6 +42,18 @@ Type: NUMBER
 
 
 
+#### JSON Example
+```json
+{
+  "label" : "Addition",
+  "name" : "addition",
+  "parameters" : {
+    "firstNumber" : 0.0,
+    "secondNumber" : 0.0
+  },
+  "type" : "mathHelper/v1/addition"
+}
+```
 
 
 ### Division
@@ -51,10 +63,10 @@ Divide two numbers.
 
 #### Properties
 
-|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
-|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
-| firstNumber | First Number | NUMBER | NUMBER  |  Number to be divided.  |  true  |
-| secondNumber | Second Number | NUMBER | NUMBER  |  Number to divide by.  |  true  |
+|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
+| firstNumber | First Number | NUMBER | NUMBER | Number to be divided. | true |
+| secondNumber | Second Number | NUMBER | NUMBER | Number to divide by. | true |
 
 
 #### Output
@@ -67,6 +79,18 @@ Type: NUMBER
 
 
 
+#### JSON Example
+```json
+{
+  "label" : "Division",
+  "name" : "division",
+  "parameters" : {
+    "firstNumber" : 0.0,
+    "secondNumber" : 0.0
+  },
+  "type" : "mathHelper/v1/division"
+}
+```
 
 
 ### Modulo
@@ -76,10 +100,10 @@ Get the remainder of the division of two numbers.
 
 #### Properties
 
-|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
-|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
-| firstNumber | First Number | NUMBER | NUMBER  |  Number to be divided.  |  true  |
-| secondNumber | Second Number | NUMBER | NUMBER  |  Number to divide by.  |  true  |
+|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
+| firstNumber | First Number | NUMBER | NUMBER | Number to be divided. | true |
+| secondNumber | Second Number | NUMBER | NUMBER | Number to divide by. | true |
 
 
 #### Output
@@ -92,6 +116,18 @@ Type: NUMBER
 
 
 
+#### JSON Example
+```json
+{
+  "label" : "Modulo",
+  "name" : "modulo",
+  "parameters" : {
+    "firstNumber" : 0.0,
+    "secondNumber" : 0.0
+  },
+  "type" : "mathHelper/v1/modulo"
+}
+```
 
 
 ### Multiplication
@@ -101,10 +137,10 @@ Multiply two numbers.
 
 #### Properties
 
-|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
-|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
-| firstNumber | First Number | NUMBER | NUMBER  |  | true  |
-| secondNumber | Second Number | NUMBER | NUMBER  |  | true  |
+|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
+| firstNumber | First Number | NUMBER | NUMBER |  | true |
+| secondNumber | Second Number | NUMBER | NUMBER |  | true |
 
 
 #### Output
@@ -117,6 +153,18 @@ Type: NUMBER
 
 
 
+#### JSON Example
+```json
+{
+  "label" : "Multiplication",
+  "name" : "multiplication",
+  "parameters" : {
+    "firstNumber" : 0.0,
+    "secondNumber" : 0.0
+  },
+  "type" : "mathHelper/v1/multiplication"
+}
+```
 
 
 ### Subtraction
@@ -126,10 +174,10 @@ Subtract two numbers.
 
 #### Properties
 
-|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
-|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
-| firstNumber | First Number | NUMBER | NUMBER  |  Number to subtract from.  |  true  |
-| secondNumber | Second Number | NUMBER | NUMBER  |  Number to subtract.  |  true  |
+|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
+| firstNumber | First Number | NUMBER | NUMBER | Number to subtract from. | true |
+| secondNumber | Second Number | NUMBER | NUMBER | Number to subtract. | true |
 
 
 #### Output
@@ -142,6 +190,18 @@ Type: NUMBER
 
 
 
+#### JSON Example
+```json
+{
+  "label" : "Subtraction",
+  "name" : "subtraction",
+  "parameters" : {
+    "firstNumber" : 0.0,
+    "secondNumber" : 0.0
+  },
+  "type" : "mathHelper/v1/subtraction"
+}
+```
 
 
 

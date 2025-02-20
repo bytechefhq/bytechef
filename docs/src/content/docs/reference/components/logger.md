@@ -26,11 +26,22 @@ null
 
 #### Properties
 
-|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
-|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
-| text | STRING | TEXT  |
+|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
+| text | | STRING | TEXT |  | null |
 
 
+#### JSON Example
+```json
+{
+  "label" : "Debug",
+  "name" : "debug",
+  "parameters" : {
+    "text" : ""
+  },
+  "type" : "logger/v1/debug"
+}
+```
 
 
 ### Error
@@ -40,11 +51,22 @@ null
 
 #### Properties
 
-|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
-|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
-| text | STRING | TEXT  |
+|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
+| text | | STRING | TEXT |  | null |
 
 
+#### JSON Example
+```json
+{
+  "label" : "Error",
+  "name" : "error",
+  "parameters" : {
+    "text" : ""
+  },
+  "type" : "logger/v1/error"
+}
+```
 
 
 ### Info
@@ -54,11 +76,22 @@ null
 
 #### Properties
 
-|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
-|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
-| text | STRING | TEXT  |
+|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
+| text | | STRING | TEXT |  | null |
 
 
+#### JSON Example
+```json
+{
+  "label" : "Info",
+  "name" : "info",
+  "parameters" : {
+    "text" : ""
+  },
+  "type" : "logger/v1/info"
+}
+```
 
 
 ### Warn
@@ -68,11 +101,22 @@ null
 
 #### Properties
 
-|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
-|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
-| text | STRING | TEXT  |
+|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
+| text | | STRING | TEXT |  | null |
 
 
+#### JSON Example
+```json
+{
+  "label" : "Warn",
+  "name" : "warn",
+  "parameters" : {
+    "text" : ""
+  },
+  "type" : "logger/v1/warn"
+}
+```
 
 
 

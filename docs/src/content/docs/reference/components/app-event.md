@@ -16,27 +16,36 @@ Type: appEvent/v1
 
 
 
-## Actions
-
-
-
 
 
 ## Triggers
 
 
 ### New Event
+Name: newEvent
+
 Triggers when new app event is sent.
 
 Type: STATIC_WEBHOOK
+
 #### Properties
 
-|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
-|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
-| appEventId | App Event Id | INTEGER | SELECT  |  The Id of an app event.  |  null  |
+|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
+| appEventId | App Event Id | INTEGER | SELECT | The Id of an app event. | null |
 
 
-
+#### JSON Example
+```json
+{
+  "label" : "New Event",
+  "name" : "newEvent",
+  "parameters" : {
+    "appEventId" : 1
+  },
+  "type" : "appEvent/v1/newEvent"
+}
+```
 
 
 <hr />

@@ -26,15 +26,29 @@ Transform an object or array of objects into an array of key-value pairs.
 
 #### Properties
 
-|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
-|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
-| inputType | Input Type | STRING | SELECT  |  Type of the input. Cam be an object or an array of objects.  |  true  |
-| input | Input | {} | OBJECT_BUILDER  |  An input object containing one or more properties.  |  true  |
-| input | Input | [{}] | ARRAY_BUILDER  |  An input array containing one or more objects.  |  true  |
-| fieldKey | Field Key | STRING | TEXT  |  Property key of each newly created object in the array. Its property value will be a property key from the input.  |  true  |
-| valueKey | Value Key | STRING | TEXT  |  Property key of each newly created object in the array. Its property value will be a property value from the input.  |  true  |
+|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
+| inputType | Input Type | STRING <details> <summary> Options </summary> OBJECT, ARRAY </details> | SELECT | Type of the input. Cam be an object or an array of objects. | true |
+| input | Input | OBJECT <details> <summary> Properties </summary> {} </details> | OBJECT_BUILDER | An input object containing one or more properties. | true |
+| input | Input | ARRAY <details> <summary> Items </summary> [{}] </details> | ARRAY_BUILDER | An input array containing one or more objects. | true |
+| fieldKey | Field Key | STRING | TEXT | Property key of each newly created object in the array. Its property value will be a property key from the input. | true |
+| valueKey | Value Key | STRING | TEXT | Property key of each newly created object in the array. Its property value will be a property value from the input. | true |
 
 
+#### JSON Example
+```json
+{
+  "label" : "Map Objects to Array",
+  "name" : "mapObjectsToArray",
+  "parameters" : {
+    "inputType" : "",
+    "input" : [ { } ],
+    "fieldKey" : "",
+    "valueKey" : ""
+  },
+  "type" : "dataMapper/v1/mapObjectsToArray"
+}
+```
 
 
 ### Map Objects to Object
@@ -44,17 +58,37 @@ Creates a new object with the chosen input properties. You can also rename the p
 
 #### Properties
 
-|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
-|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
-| inputType | Input Type | STRING | SELECT  |  The input type.  |  true  |
-| input | Input | {} | OBJECT_BUILDER  |  An object containing one or more properties.  |  true  |
-| input | Input | [{}] | ARRAY_BUILDER  |  An array containing one or more objects.  |  true  |
-| mappings | Mapping | [{STRING\(from), STRING\(to), BOOLEAN\(requiredField)}] | ARRAY_BUILDER  |  An array of objects that contains properties 'from', 'to' and 'requiredField'. For nested keys, it supports dot notation, where the new mapped path can be used for nested mapping.  |  true  |
-| includeUnmapped | Include Unmapped | BOOLEAN | SELECT  |  Should fields from the original object that do not have mappings be included in the new object?  |  null  |
-| includeNulls | Include Nulls | BOOLEAN | SELECT  |  Should fields that have null values be included in the new object?  |  null  |
-| includeEmptyStrings | Include Empty strings | BOOLEAN | SELECT  |  Should fields with empty string values be included in the new object?  |  null  |
+|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
+| inputType | Input Type | STRING <details> <summary> Options </summary> OBJECT, ARRAY </details> | SELECT | The input type. | true |
+| input | Input | OBJECT <details> <summary> Properties </summary> {} </details> | OBJECT_BUILDER | An object containing one or more properties. | true |
+| input | Input | ARRAY <details> <summary> Items </summary> [{}] </details> | ARRAY_BUILDER | An array containing one or more objects. | true |
+| mappings | Mapping | ARRAY <details> <summary> Items </summary> [{STRING\(from), STRING\(to), BOOLEAN\(requiredField)}] </details> | ARRAY_BUILDER | An array of objects that contains properties 'from', 'to' and 'requiredField'. For nested keys, it supports dot notation, where the new mapped path can be used for nested mapping. | true |
+| includeUnmapped | Include Unmapped | BOOLEAN <details> <summary> Options </summary> true, false </details> | SELECT | Should fields from the original object that do not have mappings be included in the new object? | null |
+| includeNulls | Include Nulls | BOOLEAN <details> <summary> Options </summary> true, false </details> | SELECT | Should fields that have null values be included in the new object? | null |
+| includeEmptyStrings | Include Empty strings | BOOLEAN <details> <summary> Options </summary> true, false </details> | SELECT | Should fields with empty string values be included in the new object? | null |
 
 
+#### JSON Example
+```json
+{
+  "label" : "Map Objects to Object",
+  "name" : "mapObjectsToObject",
+  "parameters" : {
+    "inputType" : "",
+    "input" : [ { } ],
+    "mappings" : [ {
+      "from" : "",
+      "to" : "",
+      "requiredField" : false
+    } ],
+    "includeUnmapped" : false,
+    "includeNulls" : false,
+    "includeEmptyStrings" : false
+  },
+  "type" : "dataMapper/v1/mapObjectsToObject"
+}
+```
 
 
 ### Merge and Pivot Properties by Key
@@ -64,13 +98,26 @@ Creates a new object out of all objects that have the same key as the specified 
 
 #### Properties
 
-|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
-|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
-| input | Input | [{}] | ARRAY_BUILDER  |  An array that contains objects with key-value properties that need do be merged.  |  true  |
-| fieldKey | Field Key | STRING | TEXT  |  The key of the newly created object.  |  true  |
-| fieldValue | Field Value | STRING | TEXT  |  The value of each property in the newly created objects value.  |  true  |
+|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
+| input | Input | ARRAY <details> <summary> Items </summary> [{}] </details> | ARRAY_BUILDER | An array that contains objects with key-value properties that need do be merged. | true |
+| fieldKey | Field Key | STRING | TEXT | The key of the newly created object. | true |
+| fieldValue | Field Value | STRING | TEXT | The value of each property in the newly created objects value. | true |
 
 
+#### JSON Example
+```json
+{
+  "label" : "Merge and Pivot Properties by Key",
+  "name" : "mergeAndPivotPropertiesByKey",
+  "parameters" : {
+    "input" : [ { } ],
+    "fieldKey" : "",
+    "fieldValue" : ""
+  },
+  "type" : "dataMapper/v1/mergeAndPivotPropertiesByKey"
+}
+```
 
 
 ### Rename Keys
@@ -80,12 +127,27 @@ The action renames keys of an input object defined by mappings.
 
 #### Properties
 
-|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
-|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
-| input | Input | {} | OBJECT_BUILDER  |  The input object that contains property keys and values.  |  true  |
-| mappings | Mappings | [{STRING\(from), STRING\(to)}] | ARRAY_BUILDER  |  An array of objects that contains properties 'From Path' and 'To'.  |  true  |
+|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
+| input | Input | OBJECT <details> <summary> Properties </summary> {} </details> | OBJECT_BUILDER | The input object that contains property keys and values. | true |
+| mappings | Mappings | ARRAY <details> <summary> Items </summary> [{STRING\(from), STRING\(to)}] </details> | ARRAY_BUILDER | An array of objects that contains properties 'From Path' and 'To'. | true |
 
 
+#### JSON Example
+```json
+{
+  "label" : "Rename Keys",
+  "name" : "renameKeys",
+  "parameters" : {
+    "input" : { },
+    "mappings" : [ {
+      "from" : "",
+      "to" : ""
+    } ]
+  },
+  "type" : "dataMapper/v1/renameKeys"
+}
+```
 
 
 ### Replace All Specified Values
@@ -95,23 +157,40 @@ Goes through all object parameters and replaces all specified input parameter va
 
 #### Properties
 
-|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
-|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
-| inputType | Input Type | STRING | SELECT  |  The input type.  |  true  |
-| input | Input | {} | OBJECT_BUILDER  |  An object containing one or more properties.  |  true  |
-| input | Input | [{}] | ARRAY_BUILDER  |  An array containing one or more objects.  |  true  |
-| type | Value Type | STRING | SELECT  |  The value type of 'from' and 'to' property values.  |  true  |
-| mappings | Mappings | [{[]\(from), []\(to)}] | ARRAY_BUILDER  |  An array of objects that contains properties 'from' and 'to'.  |  null  |
-| mappings | Mappings | [{BOOLEAN\(from), BOOLEAN\(to)}] | ARRAY_BUILDER  |  An array of objects that contains properties 'from' and 'to'.  |  null  |
-| mappings | Mappings | [{DATE\(from), DATE\(to)}] | ARRAY_BUILDER  |  An array of objects that contains properties 'from' and 'to'.  |  null  |
-| mappings | Mappings | [{DATE_TIME\(from), DATE_TIME\(to)}] | ARRAY_BUILDER  |  An array of objects that contains properties 'from' and 'to'.  |  null  |
-| mappings | Mappings | [{INTEGER\(from), INTEGER\(to)}] | ARRAY_BUILDER  |  An array of objects that contains properties 'from' and 'to'.  |  null  |
-| mappings | Mappings | [{NUMBER\(from), NUMBER\(to)}] | ARRAY_BUILDER  |  An array of objects that contains properties 'from' and 'to'.  |  null  |
-| mappings | Mappings | [{{}\(from), {}\(to)}] | ARRAY_BUILDER  |  An array of objects that contains properties 'from' and 'to'.  |  null  |
-| mappings | Mappings | [{STRING\(from), STRING\(to)}] | ARRAY_BUILDER  |  An array of objects that contains properties 'from' and 'to'.  |  null  |
-| mappings | Mappings | [{TIME\(from), TIME\(to)}] | ARRAY_BUILDER  |  An array of objects that contains properties 'from' and 'to'.  |  null  |
+|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
+| inputType | Input Type | STRING <details> <summary> Options </summary> OBJECT, ARRAY </details> | SELECT | The input type. | true |
+| input | Input | OBJECT <details> <summary> Properties </summary> {} </details> | OBJECT_BUILDER | An object containing one or more properties. | true |
+| input | Input | ARRAY <details> <summary> Items </summary> [{}] </details> | ARRAY_BUILDER | An array containing one or more objects. | true |
+| type | Value Type | STRING <details> <summary> Options </summary> ARRAY, BOOLEAN, DATE, DATE_TIME, INTEGER, NUMBER, OBJECT, STRING, TIME </details> | SELECT | The value type of 'from' and 'to' property values. | true |
+| mappings | Mappings | ARRAY <details> <summary> Items </summary> [{[]\(from), []\(to)}] </details> | ARRAY_BUILDER | An array of objects that contains properties 'from' and 'to'. | null |
+| mappings | Mappings | ARRAY <details> <summary> Items </summary> [{BOOLEAN\(from), BOOLEAN\(to)}] </details> | ARRAY_BUILDER | An array of objects that contains properties 'from' and 'to'. | null |
+| mappings | Mappings | ARRAY <details> <summary> Items </summary> [{DATE\(from), DATE\(to)}] </details> | ARRAY_BUILDER | An array of objects that contains properties 'from' and 'to'. | null |
+| mappings | Mappings | ARRAY <details> <summary> Items </summary> [{DATE_TIME\(from), DATE_TIME\(to)}] </details> | ARRAY_BUILDER | An array of objects that contains properties 'from' and 'to'. | null |
+| mappings | Mappings | ARRAY <details> <summary> Items </summary> [{INTEGER\(from), INTEGER\(to)}] </details> | ARRAY_BUILDER | An array of objects that contains properties 'from' and 'to'. | null |
+| mappings | Mappings | ARRAY <details> <summary> Items </summary> [{NUMBER\(from), NUMBER\(to)}] </details> | ARRAY_BUILDER | An array of objects that contains properties 'from' and 'to'. | null |
+| mappings | Mappings | ARRAY <details> <summary> Items </summary> [{{}\(from), {}\(to)}] </details> | ARRAY_BUILDER | An array of objects that contains properties 'from' and 'to'. | null |
+| mappings | Mappings | ARRAY <details> <summary> Items </summary> [{STRING\(from), STRING\(to)}] </details> | ARRAY_BUILDER | An array of objects that contains properties 'from' and 'to'. | null |
+| mappings | Mappings | ARRAY <details> <summary> Items </summary> [{TIME\(from), TIME\(to)}] </details> | ARRAY_BUILDER | An array of objects that contains properties 'from' and 'to'. | null |
 
 
+#### JSON Example
+```json
+{
+  "label" : "Replace All Specified Values",
+  "name" : "replaceAllSpecifiedValues",
+  "parameters" : {
+    "inputType" : "",
+    "input" : [ { } ],
+    "type" : "",
+    "mappings" : [ {
+      "from" : "00:00:00",
+      "to" : "00:00:00"
+    } ]
+  },
+  "type" : "dataMapper/v1/replaceAllSpecifiedValues"
+}
+```
 
 
 ### Replace Multiple Values by Key
@@ -121,13 +200,29 @@ Replaces all values specified by the keys in the input object with the values sp
 
 #### Properties
 
-|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
-|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
-| input | Input | {} | OBJECT_BUILDER  |  An object containing one or more properties.  |  true  |
-| output | Output | {} | OBJECT_BUILDER  |  An object containing one or more properties.  |  true  |
-| mappings | Mappings | [{STRING\(from), STRING\(to)}] | ARRAY_BUILDER  |  Object that contains properties 'from' and 'to'.  |  true  |
+|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
+| input | Input | OBJECT <details> <summary> Properties </summary> {} </details> | OBJECT_BUILDER | An object containing one or more properties. | true |
+| output | Output | OBJECT <details> <summary> Properties </summary> {} </details> | OBJECT_BUILDER | An object containing one or more properties. | true |
+| mappings | Mappings | ARRAY <details> <summary> Items </summary> [{STRING\(from), STRING\(to)}] </details> | ARRAY_BUILDER | Object that contains properties 'from' and 'to'. | true |
 
 
+#### JSON Example
+```json
+{
+  "label" : "Replace Multiple Values by Key",
+  "name" : "replaceMultipleValuesByKey",
+  "parameters" : {
+    "input" : { },
+    "output" : { },
+    "mappings" : [ {
+      "from" : "",
+      "to" : ""
+    } ]
+  },
+  "type" : "dataMapper/v1/replaceMultipleValuesByKey"
+}
+```
 
 
 ### Replace Value
@@ -137,39 +232,56 @@ Replaces a given value with the specified value defined in mappings. In case the
 
 #### Properties
 
-|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
-|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
-| type | Value Type | STRING | SELECT  |  The value type.  |  true  |
-| value | Value | [] | ARRAY_BUILDER  |  The value you want to replace.  |  true  |
-| value | Value | BOOLEAN | SELECT  |  The value you want to replace.  |  true  |
-| value | Value | DATE | DATE  |  The value you want to replace.  |  true  |
-| value | Value | DATE_TIME | DATE_TIME  |  The value you want to replace.  |  true  |
-| value | Value | INTEGER | INTEGER  |  The value you want to replace.  |  true  |
-| value | Value | NUMBER | NUMBER  |  The value you want to replace.  |  true  |
-| value | Value | {} | OBJECT_BUILDER  |  The value you want to replace.  |  true  |
-| value | Value | STRING | TEXT  |  The value you want to replace.  |  true  |
-| value | Value | TIME | TIME  |  The value you want to replace.  |  true  |
-| defaultValue | Default Value | [] | ARRAY_BUILDER  |  If there is no existing mapping, assign this value as default.  |  true  |
-| defaultValue | Default Value | BOOLEAN | SELECT  |  If there is no existing mapping, assign this value as default.  |  true  |
-| defaultValue | Default Value | DATE | DATE  |  If there is no existing mapping, assign this value as default.  |  true  |
-| defaultValue | Default Value | DATE_TIME | DATE_TIME  |  If there is no existing mapping, assign this value as default.  |  true  |
-| defaultValue | Default Value | INTEGER | INTEGER  |  If there is no existing mapping, assign this value as default.  |  true  |
-| defaultValue | Default Value | NULL | NULL  |  If there is no existing mapping, assign this value as default.  |  true  |
-| defaultValue | Default Value | NUMBER | NUMBER  |  If there is no existing mapping, assign this value as default.  |  true  |
-| defaultValue | Default Value | {} | OBJECT_BUILDER  |  If there is no existing mapping, assign this value as default.  |  true  |
-| defaultValue | Default Value | STRING | TEXT  |  If there is no existing mapping, assign this value as default.  |  true  |
-| defaultValue | Default Value | TIME | TIME  |  If there is no existing mapping, assign this value as default.  |  true  |
-| mappings | Mappings | [{[]\(from), []\(to)}] | ARRAY_BUILDER  |  An array of objects that contains properties 'from' and 'to'.  |  null  |
-| mappings | Mappings | [{BOOLEAN\(from), BOOLEAN\(to)}] | ARRAY_BUILDER  |  An array of objects that contains properties 'from' and 'to'.  |  null  |
-| mappings | Mappings | [{DATE\(from), DATE\(to)}] | ARRAY_BUILDER  |  An array of objects that contains properties 'from' and 'to'.  |  null  |
-| mappings | Mappings | [{DATE_TIME\(from), DATE_TIME\(to)}] | ARRAY_BUILDER  |  An array of objects that contains properties 'from' and 'to'.  |  null  |
-| mappings | Mappings | [{INTEGER\(from), INTEGER\(to)}] | ARRAY_BUILDER  |  An array of objects that contains properties 'from' and 'to'.  |  null  |
-| mappings | Mappings | [{NUMBER\(from), NUMBER\(to)}] | ARRAY_BUILDER  |  An array of objects that contains properties 'from' and 'to'.  |  null  |
-| mappings | Mappings | [{{}\(from), {}\(to)}] | ARRAY_BUILDER  |  An array of objects that contains properties 'from' and 'to'.  |  null  |
-| mappings | Mappings | [{STRING\(from), STRING\(to)}] | ARRAY_BUILDER  |  An array of objects that contains properties 'from' and 'to'.  |  null  |
-| mappings | Mappings | [{TIME\(from), TIME\(to)}] | ARRAY_BUILDER  |  An array of objects that contains properties 'from' and 'to'.  |  null  |
+|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
+| type | Value Type | STRING <details> <summary> Options </summary> ARRAY, BOOLEAN, DATE, DATE_TIME, INTEGER, NUMBER, OBJECT, STRING, TIME </details> | SELECT | The value type. | true |
+| value | Value | ARRAY <details> <summary> Items </summary> [] </details> | ARRAY_BUILDER | The value you want to replace. | true |
+| value | Value | BOOLEAN <details> <summary> Options </summary> true, false </details> | SELECT | The value you want to replace. | true |
+| value | Value | DATE | DATE | The value you want to replace. | true |
+| value | Value | DATE_TIME | DATE_TIME | The value you want to replace. | true |
+| value | Value | INTEGER | INTEGER | The value you want to replace. | true |
+| value | Value | NUMBER | NUMBER | The value you want to replace. | true |
+| value | Value | OBJECT <details> <summary> Properties </summary> {} </details> | OBJECT_BUILDER | The value you want to replace. | true |
+| value | Value | STRING | TEXT | The value you want to replace. | true |
+| value | Value | TIME | TIME | The value you want to replace. | true |
+| defaultValue | Default Value | ARRAY <details> <summary> Items </summary> [] </details> | ARRAY_BUILDER | If there is no existing mapping, assign this value as default. | true |
+| defaultValue | Default Value | BOOLEAN <details> <summary> Options </summary> true, false </details> | SELECT | If there is no existing mapping, assign this value as default. | true |
+| defaultValue | Default Value | DATE | DATE | If there is no existing mapping, assign this value as default. | true |
+| defaultValue | Default Value | DATE_TIME | DATE_TIME | If there is no existing mapping, assign this value as default. | true |
+| defaultValue | Default Value | INTEGER | INTEGER | If there is no existing mapping, assign this value as default. | true |
+| defaultValue | Default Value | NULL | NULL | If there is no existing mapping, assign this value as default. | true |
+| defaultValue | Default Value | NUMBER | NUMBER | If there is no existing mapping, assign this value as default. | true |
+| defaultValue | Default Value | OBJECT <details> <summary> Properties </summary> {} </details> | OBJECT_BUILDER | If there is no existing mapping, assign this value as default. | true |
+| defaultValue | Default Value | STRING | TEXT | If there is no existing mapping, assign this value as default. | true |
+| defaultValue | Default Value | TIME | TIME | If there is no existing mapping, assign this value as default. | true |
+| mappings | Mappings | ARRAY <details> <summary> Items </summary> [{[]\(from), []\(to)}] </details> | ARRAY_BUILDER | An array of objects that contains properties 'from' and 'to'. | null |
+| mappings | Mappings | ARRAY <details> <summary> Items </summary> [{BOOLEAN\(from), BOOLEAN\(to)}] </details> | ARRAY_BUILDER | An array of objects that contains properties 'from' and 'to'. | null |
+| mappings | Mappings | ARRAY <details> <summary> Items </summary> [{DATE\(from), DATE\(to)}] </details> | ARRAY_BUILDER | An array of objects that contains properties 'from' and 'to'. | null |
+| mappings | Mappings | ARRAY <details> <summary> Items </summary> [{DATE_TIME\(from), DATE_TIME\(to)}] </details> | ARRAY_BUILDER | An array of objects that contains properties 'from' and 'to'. | null |
+| mappings | Mappings | ARRAY <details> <summary> Items </summary> [{INTEGER\(from), INTEGER\(to)}] </details> | ARRAY_BUILDER | An array of objects that contains properties 'from' and 'to'. | null |
+| mappings | Mappings | ARRAY <details> <summary> Items </summary> [{NUMBER\(from), NUMBER\(to)}] </details> | ARRAY_BUILDER | An array of objects that contains properties 'from' and 'to'. | null |
+| mappings | Mappings | ARRAY <details> <summary> Items </summary> [{{}\(from), {}\(to)}] </details> | ARRAY_BUILDER | An array of objects that contains properties 'from' and 'to'. | null |
+| mappings | Mappings | ARRAY <details> <summary> Items </summary> [{STRING\(from), STRING\(to)}] </details> | ARRAY_BUILDER | An array of objects that contains properties 'from' and 'to'. | null |
+| mappings | Mappings | ARRAY <details> <summary> Items </summary> [{TIME\(from), TIME\(to)}] </details> | ARRAY_BUILDER | An array of objects that contains properties 'from' and 'to'. | null |
 
 
+#### JSON Example
+```json
+{
+  "label" : "Replace Value",
+  "name" : "replaceValue",
+  "parameters" : {
+    "type" : "",
+    "value" : "00:00:00",
+    "defaultValue" : "00:00:00",
+    "mappings" : [ {
+      "from" : "00:00:00",
+      "to" : "00:00:00"
+    } ]
+  },
+  "type" : "dataMapper/v1/replaceValue"
+}
+```
 
 
 

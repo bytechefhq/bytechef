@@ -24,10 +24,10 @@ Version: 1
 
 #### Properties
 
-|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
-|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
-| clientId | Client Id | STRING | TEXT  |  | true  |
-| clientSecret | Client Secret | STRING | TEXT  |  | true  |
+|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
+| clientId | Client Id | STRING | TEXT |  | true |
+| clientSecret | Client Secret | STRING | TEXT |  | true |
 
 
 
@@ -47,11 +47,11 @@ Creates a new form
 
 #### Properties
 
-|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
-|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
-| title | Title | STRING | TEXT  |  Title to use for the form.  |  true  |
-| type | Type | STRING | SELECT  |  Form type for the typeform.  |  false  |
-| workspace | Workspace | STRING | SELECT  |  Workspace where the form will be created.  |  false  |
+|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
+| title | Title | STRING | TEXT | Title to use for the form. | true |
+| type | Type | STRING <details> <summary> Options </summary> quiz, classification, score, branching, classification_branching, score_branching </details> | SELECT | Form type for the typeform. | false |
+| workspace | Workspace | STRING | SELECT | Workspace where the form will be created. | false |
 
 
 #### Output
@@ -64,6 +64,19 @@ Type: OBJECT
 
 
 
+#### JSON Example
+```json
+{
+  "label" : "Create Form",
+  "name" : "createForm",
+  "parameters" : {
+    "title" : "",
+    "type" : "",
+    "workspace" : ""
+  },
+  "type" : "typeform/v1/createForm"
+}
+```
 
 
 
@@ -72,14 +85,17 @@ Type: OBJECT
 
 
 ### New Submission
+Name: newSubmission
+
 Triggers when form is submitted.
 
 Type: DYNAMIC_WEBHOOK
+
 #### Properties
 
-|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
-|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
-| form | Form Name | STRING | SELECT  |  | true  |
+|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
+| form | Form Name | STRING | SELECT |  | true |
 
 
 #### Output
@@ -92,7 +108,17 @@ Type: OBJECT
 
 
 
-
+#### JSON Example
+```json
+{
+  "label" : "New Submission",
+  "name" : "newSubmission",
+  "parameters" : {
+    "form" : ""
+  },
+  "type" : "typeform/v1/newSubmission"
+}
+```
 
 
 <hr />

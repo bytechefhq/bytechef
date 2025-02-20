@@ -24,11 +24,11 @@ Version: 1
 
 #### Properties
 
-|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
-|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
-| shopName | Shop name | STRING | TEXT  |  | true  |
-| key | Access token | STRING | TEXT  |  | true  |
-| value | Access Token | STRING | TEXT  |  | true  |
+|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
+| shopName | Shop name | STRING | TEXT |  | true |
+| key | Access token | STRING | TEXT |  | true |
+| value | Access Token | STRING | TEXT |  | true |
 
 
 
@@ -48,9 +48,9 @@ Adds an order into a Shopify store.
 
 #### Properties
 
-|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
-|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
-| __item | Order | {{[{STRING\(fulfillment_status), STRING\(grams), NUMBER\(price), INTEGER\(product_id), INTEGER\(variant_id), INTEGER\(quantity), STRING\(title)}]\(line_items), STRING\(total_tax), STRING\(currency)}\(order)} | OBJECT_BUILDER  |  | null  |
+|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
+| __item | Order | OBJECT <details> <summary> Properties </summary> {{[{STRING\(fulfillment_status), STRING\(grams), NUMBER\(price), INTEGER\(product_id), INTEGER\(variant_id), INTEGER\(quantity), STRING\(title)}]\(line_items), STRING\(total_tax), STRING\(currency)}\(order)} </details> | OBJECT_BUILDER |  | null |
 
 
 #### Output
@@ -62,20 +62,45 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |     Control Type     |
-|:------------:|:------------:|:--------------------:|
-| id | Id | INTEGER | INTEGER  |  | false  |
-| currency | Currency | STRING | TEXT  |  | false  |
-| note | Note | STRING | TEXT  |  | false  |
-| email | Email | STRING | TEXT  |  | false  |
-| name | Name | STRING | TEXT  |  | false  |
-| phone | Phone | STRING | TEXT  |  | false  |
-| tags | Tags | STRING | TEXT  |  | false  |
-| line_items | Line Items | [{STRING\(fulfillment_status), STRING\(grams), NUMBER\(price), INTEGER\(product_id), INTEGER\(variant_id), INTEGER\(quantity), STRING\(title)}] | ARRAY_BUILDER  |  | false  |
+|     Name     |     Type     |    Control Type     |
+|:------------:|:------------:|:-------------------:|
+| id | INTEGER | INTEGER |
+| currency | STRING | TEXT |
+| note | STRING | TEXT |
+| email | STRING | TEXT |
+| name | STRING | TEXT |
+| phone | STRING | TEXT |
+| tags | STRING | TEXT |
+| line_items | ARRAY <details> <summary> Items </summary> [{STRING\(fulfillment_status), STRING\(grams), NUMBER\(price), INTEGER\(product_id), INTEGER\(variant_id), INTEGER\(quantity), STRING\(title)}] </details> | ARRAY_BUILDER |
 
 
 
 
+#### JSON Example
+```json
+{
+  "label" : "Create Order",
+  "name" : "createOrder",
+  "parameters" : {
+    "__item" : {
+      "order" : {
+        "line_items" : [ {
+          "fulfillment_status" : "",
+          "grams" : "",
+          "price" : 0.0,
+          "product_id" : 1,
+          "variant_id" : 1,
+          "quantity" : 1,
+          "title" : ""
+        } ],
+        "total_tax" : "",
+        "currency" : ""
+      }
+    }
+  },
+  "type" : "shopify/v1/createOrder"
+}
+```
 
 
 ### Delete Order
@@ -85,11 +110,22 @@ Deletes an order. Orders that interact with an online gateway can't be deleted.
 
 #### Properties
 
-|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
-|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
-| orderId | Order ID | INTEGER | SELECT  |  ID of the order to delete.  |  true  |
+|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
+| orderId | Order ID | INTEGER | SELECT | ID of the order to delete. | true |
 
 
+#### JSON Example
+```json
+{
+  "label" : "Delete Order",
+  "name" : "deleteOrder",
+  "parameters" : {
+    "orderId" : 1
+  },
+  "type" : "shopify/v1/deleteOrder"
+}
+```
 
 
 ### Cancel an order
@@ -99,9 +135,9 @@ Cancels an order. Orders that are paid and have fulfillments can't be canceled.
 
 #### Properties
 
-|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
-|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
-| orderId | Order ID | INTEGER | SELECT  |  ID of the order to cancel.  |  true  |
+|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
+| orderId | Order ID | INTEGER | SELECT | ID of the order to cancel. | true |
 
 
 #### Output
@@ -113,20 +149,31 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |     Control Type     |
-|:------------:|:------------:|:--------------------:|
-| id | Id | INTEGER | INTEGER  |  | false  |
-| currency | Currency | STRING | TEXT  |  | false  |
-| note | Note | STRING | TEXT  |  | false  |
-| email | Email | STRING | TEXT  |  | false  |
-| name | Name | STRING | TEXT  |  | false  |
-| phone | Phone | STRING | TEXT  |  | false  |
-| tags | Tags | STRING | TEXT  |  | false  |
-| line_items | Line Items | [{STRING\(fulfillment_status), STRING\(grams), NUMBER\(price), INTEGER\(product_id), INTEGER\(variant_id), INTEGER\(quantity), STRING\(title)}] | ARRAY_BUILDER  |  | false  |
+|     Name     |     Type     |    Control Type     |
+|:------------:|:------------:|:-------------------:|
+| id | INTEGER | INTEGER |
+| currency | STRING | TEXT |
+| note | STRING | TEXT |
+| email | STRING | TEXT |
+| name | STRING | TEXT |
+| phone | STRING | TEXT |
+| tags | STRING | TEXT |
+| line_items | ARRAY <details> <summary> Items </summary> [{STRING\(fulfillment_status), STRING\(grams), NUMBER\(price), INTEGER\(product_id), INTEGER\(variant_id), INTEGER\(quantity), STRING\(title)}] </details> | ARRAY_BUILDER |
 
 
 
 
+#### JSON Example
+```json
+{
+  "label" : "Cancel an order",
+  "name" : "cancelOrder",
+  "parameters" : {
+    "orderId" : 1
+  },
+  "type" : "shopify/v1/cancelOrder"
+}
+```
 
 
 ### Update Order
@@ -136,10 +183,10 @@ Update an existing order.
 
 #### Properties
 
-|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
-|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
-| orderId | Order ID | INTEGER | SELECT  |  ID of the order to update.  |  true  |
-| __item | Order | {{STRING\(note), STRING\(email), STRING\(phone), STRING\(tags)}\(order)} | OBJECT_BUILDER  |  | null  |
+|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
+| orderId | Order ID | INTEGER | SELECT | ID of the order to update. | true |
+| __item | Order | OBJECT <details> <summary> Properties </summary> {{STRING\(note), STRING\(email), STRING\(phone), STRING\(tags)}\(order)} </details> | OBJECT_BUILDER |  | null |
 
 
 #### Output
@@ -151,20 +198,39 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |     Control Type     |
-|:------------:|:------------:|:--------------------:|
-| id | Id | INTEGER | INTEGER  |  | false  |
-| currency | Currency | STRING | TEXT  |  | false  |
-| note | Note | STRING | TEXT  |  | false  |
-| email | Email | STRING | TEXT  |  | false  |
-| name | Name | STRING | TEXT  |  | false  |
-| phone | Phone | STRING | TEXT  |  | false  |
-| tags | Tags | STRING | TEXT  |  | false  |
-| line_items | Line Items | [{STRING\(fulfillment_status), STRING\(grams), NUMBER\(price), INTEGER\(product_id), INTEGER\(variant_id), INTEGER\(quantity), STRING\(title)}] | ARRAY_BUILDER  |  | false  |
+|     Name     |     Type     |    Control Type     |
+|:------------:|:------------:|:-------------------:|
+| id | INTEGER | INTEGER |
+| currency | STRING | TEXT |
+| note | STRING | TEXT |
+| email | STRING | TEXT |
+| name | STRING | TEXT |
+| phone | STRING | TEXT |
+| tags | STRING | TEXT |
+| line_items | ARRAY <details> <summary> Items </summary> [{STRING\(fulfillment_status), STRING\(grams), NUMBER\(price), INTEGER\(product_id), INTEGER\(variant_id), INTEGER\(quantity), STRING\(title)}] </details> | ARRAY_BUILDER |
 
 
 
 
+#### JSON Example
+```json
+{
+  "label" : "Update Order",
+  "name" : "updateOrder",
+  "parameters" : {
+    "orderId" : 1,
+    "__item" : {
+      "order" : {
+        "note" : "",
+        "email" : "",
+        "phone" : "",
+        "tags" : ""
+      }
+    }
+  },
+  "type" : "shopify/v1/updateOrder"
+}
+```
 
 
 ### Close Order
@@ -174,9 +240,9 @@ Closes an order. A closed order is one that has no more work to be done. All ite
 
 #### Properties
 
-|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
-|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
-| orderId | Order ID | INTEGER | SELECT  |  ID of the order to close.  |  true  |
+|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
+| orderId | Order ID | INTEGER | SELECT | ID of the order to close. | true |
 
 
 #### Output
@@ -188,20 +254,31 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |     Control Type     |
-|:------------:|:------------:|:--------------------:|
-| id | Id | INTEGER | INTEGER  |  | false  |
-| currency | Currency | STRING | TEXT  |  | false  |
-| note | Note | STRING | TEXT  |  | false  |
-| email | Email | STRING | TEXT  |  | false  |
-| name | Name | STRING | TEXT  |  | false  |
-| phone | Phone | STRING | TEXT  |  | false  |
-| tags | Tags | STRING | TEXT  |  | false  |
-| line_items | Line Items | [{STRING\(fulfillment_status), STRING\(grams), NUMBER\(price), INTEGER\(product_id), INTEGER\(variant_id), INTEGER\(quantity), STRING\(title)}] | ARRAY_BUILDER  |  | false  |
+|     Name     |     Type     |    Control Type     |
+|:------------:|:------------:|:-------------------:|
+| id | INTEGER | INTEGER |
+| currency | STRING | TEXT |
+| note | STRING | TEXT |
+| email | STRING | TEXT |
+| name | STRING | TEXT |
+| phone | STRING | TEXT |
+| tags | STRING | TEXT |
+| line_items | ARRAY <details> <summary> Items </summary> [{STRING\(fulfillment_status), STRING\(grams), NUMBER\(price), INTEGER\(product_id), INTEGER\(variant_id), INTEGER\(quantity), STRING\(title)}] </details> | ARRAY_BUILDER |
 
 
 
 
+#### JSON Example
+```json
+{
+  "label" : "Close Order",
+  "name" : "closeOrder",
+  "parameters" : {
+    "orderId" : 1
+  },
+  "type" : "shopify/v1/closeOrder"
+}
+```
 
 
 
@@ -210,14 +287,11 @@ Type: OBJECT
 
 
 ### New Cancelled Order
+Name: newCancelledOrder
+
 Triggers when order is cancelled.
 
 Type: DYNAMIC_WEBHOOK
-#### Properties
-
-|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
-|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
-null
 
 
 #### Output
@@ -229,32 +303,36 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |     Control Type     |
-|:------------:|:------------:|:--------------------:|
-| id | Id | INTEGER | INTEGER  |  | false  |
-| currency | Currency | STRING | TEXT  |  | false  |
-| note | Note | STRING | TEXT  |  | false  |
-| email | Email | STRING | TEXT  |  | false  |
-| name | Name | STRING | TEXT  |  | false  |
-| phone | Phone | STRING | TEXT  |  | false  |
-| tags | Tags | STRING | TEXT  |  | false  |
-| line_items | Line Items | [{STRING\(fulfillment_status), STRING\(grams), NUMBER\(price), INTEGER\(product_id), INTEGER\(variant_id), INTEGER\(quantity), STRING\(title)}] | ARRAY_BUILDER  |  | false  |
+|     Name     |     Type     |    Control Type     |
+|:------------:|:------------:|:-------------------:|
+| id | INTEGER | INTEGER |
+| currency | STRING | TEXT |
+| note | STRING | TEXT |
+| email | STRING | TEXT |
+| name | STRING | TEXT |
+| phone | STRING | TEXT |
+| tags | STRING | TEXT |
+| line_items | ARRAY <details> <summary> Items </summary> [{STRING\(fulfillment_status), STRING\(grams), NUMBER\(price), INTEGER\(product_id), INTEGER\(variant_id), INTEGER\(quantity), STRING\(title)}] </details> | ARRAY_BUILDER |
 
 
 
 
-
+#### JSON Example
+```json
+{
+  "label" : "New Cancelled Order",
+  "name" : "newCancelledOrder",
+  "type" : "shopify/v1/newCancelledOrder"
+}
+```
 
 
 ### New Order
+Name: newOrder
+
 Triggers when new order is created.
 
 Type: DYNAMIC_WEBHOOK
-#### Properties
-
-|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
-|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
-null
 
 
 #### Output
@@ -266,32 +344,36 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |     Control Type     |
-|:------------:|:------------:|:--------------------:|
-| id | Id | INTEGER | INTEGER  |  | false  |
-| currency | Currency | STRING | TEXT  |  | false  |
-| note | Note | STRING | TEXT  |  | false  |
-| email | Email | STRING | TEXT  |  | false  |
-| name | Name | STRING | TEXT  |  | false  |
-| phone | Phone | STRING | TEXT  |  | false  |
-| tags | Tags | STRING | TEXT  |  | false  |
-| line_items | Line Items | [{STRING\(fulfillment_status), STRING\(grams), NUMBER\(price), INTEGER\(product_id), INTEGER\(variant_id), INTEGER\(quantity), STRING\(title)}] | ARRAY_BUILDER  |  | false  |
+|     Name     |     Type     |    Control Type     |
+|:------------:|:------------:|:-------------------:|
+| id | INTEGER | INTEGER |
+| currency | STRING | TEXT |
+| note | STRING | TEXT |
+| email | STRING | TEXT |
+| name | STRING | TEXT |
+| phone | STRING | TEXT |
+| tags | STRING | TEXT |
+| line_items | ARRAY <details> <summary> Items </summary> [{STRING\(fulfillment_status), STRING\(grams), NUMBER\(price), INTEGER\(product_id), INTEGER\(variant_id), INTEGER\(quantity), STRING\(title)}] </details> | ARRAY_BUILDER |
 
 
 
 
-
+#### JSON Example
+```json
+{
+  "label" : "New Order",
+  "name" : "newOrder",
+  "type" : "shopify/v1/newOrder"
+}
+```
 
 
 ### New Paid Order
+Name: newPaidOrder
+
 Triggers when paid order is created.
 
 Type: DYNAMIC_WEBHOOK
-#### Properties
-
-|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
-|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
-null
 
 
 #### Output
@@ -303,21 +385,28 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |     Control Type     |
-|:------------:|:------------:|:--------------------:|
-| id | Id | INTEGER | INTEGER  |  | false  |
-| currency | Currency | STRING | TEXT  |  | false  |
-| note | Note | STRING | TEXT  |  | false  |
-| email | Email | STRING | TEXT  |  | false  |
-| name | Name | STRING | TEXT  |  | false  |
-| phone | Phone | STRING | TEXT  |  | false  |
-| tags | Tags | STRING | TEXT  |  | false  |
-| line_items | Line Items | [{STRING\(fulfillment_status), STRING\(grams), NUMBER\(price), INTEGER\(product_id), INTEGER\(variant_id), INTEGER\(quantity), STRING\(title)}] | ARRAY_BUILDER  |  | false  |
+|     Name     |     Type     |    Control Type     |
+|:------------:|:------------:|:-------------------:|
+| id | INTEGER | INTEGER |
+| currency | STRING | TEXT |
+| note | STRING | TEXT |
+| email | STRING | TEXT |
+| name | STRING | TEXT |
+| phone | STRING | TEXT |
+| tags | STRING | TEXT |
+| line_items | ARRAY <details> <summary> Items </summary> [{STRING\(fulfillment_status), STRING\(grams), NUMBER\(price), INTEGER\(product_id), INTEGER\(variant_id), INTEGER\(quantity), STRING\(title)}] </details> | ARRAY_BUILDER |
 
 
 
 
-
+#### JSON Example
+```json
+{
+  "label" : "New Paid Order",
+  "name" : "newPaidOrder",
+  "type" : "shopify/v1/newPaidOrder"
+}
+```
 
 
 <hr />

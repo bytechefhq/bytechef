@@ -24,11 +24,11 @@ Version: 1
 
 #### Properties
 
-|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
-|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
-| username | Account name | STRING | TEXT  |  Your account name, e.g. https://{youraccountname}.api-us1.com  |  true  |
-| key | Key | STRING | TEXT  |  | true  |
-| value | API Key | STRING | TEXT  |  | true  |
+|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
+| username | Account name | STRING | TEXT | Your account name, e.g. https://{youraccountname}.api-us1.com | true |
+| key | Key | STRING | TEXT |  | true |
+| value | API Key | STRING | TEXT |  | true |
 
 
 
@@ -48,9 +48,9 @@ Creates a new account.
 
 #### Properties
 
-|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
-|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
-| __item | Account | {{STRING\(name), STRING\(accountUrl)}\(account)} | OBJECT_BUILDER  |  | null  |
+|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
+| __item | Account | OBJECT <details> <summary> Properties </summary> {{STRING\(name), STRING\(accountUrl)}\(account)} </details> | OBJECT_BUILDER |  | null |
 
 
 #### Output
@@ -62,13 +62,29 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |     Control Type     |
-|:------------:|:------------:|:--------------------:|
-| body | {{STRING\(name), STRING\(accountUrl)}\(account)} | OBJECT_BUILDER  |
+|     Name     |     Type     |    Control Type     |
+|:------------:|:------------:|:-------------------:|
+| body | OBJECT <details> <summary> Properties </summary> {{STRING\(name), STRING\(accountUrl)}\(account)} </details> | OBJECT_BUILDER |
 
 
 
 
+#### JSON Example
+```json
+{
+  "label" : "Create Account",
+  "name" : "createAccount",
+  "parameters" : {
+    "__item" : {
+      "account" : {
+        "name" : "",
+        "accountUrl" : ""
+      }
+    }
+  },
+  "type" : "active-campaign/v1/createAccount"
+}
+```
 
 
 ### Create Contact
@@ -78,9 +94,9 @@ Creates a new contact.
 
 #### Properties
 
-|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
-|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
-| __item | Contact | {{STRING\(email), STRING\(firstName), STRING\(lastName), STRING\(phone)}\(contact)} | OBJECT_BUILDER  |  | null  |
+|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
+| __item | Contact | OBJECT <details> <summary> Properties </summary> {{STRING\(email), STRING\(firstName), STRING\(lastName), STRING\(phone)}\(contact)} </details> | OBJECT_BUILDER |  | null |
 
 
 #### Output
@@ -92,13 +108,31 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |     Control Type     |
-|:------------:|:------------:|:--------------------:|
-| body | {{STRING\(email), STRING\(firstName), STRING\(lastName), STRING\(phone)}\(contact)} | OBJECT_BUILDER  |
+|     Name     |     Type     |    Control Type     |
+|:------------:|:------------:|:-------------------:|
+| body | OBJECT <details> <summary> Properties </summary> {{STRING\(email), STRING\(firstName), STRING\(lastName), STRING\(phone)}\(contact)} </details> | OBJECT_BUILDER |
 
 
 
 
+#### JSON Example
+```json
+{
+  "label" : "Create Contact",
+  "name" : "createContact",
+  "parameters" : {
+    "__item" : {
+      "contact" : {
+        "email" : "",
+        "firstName" : "",
+        "lastName" : "",
+        "phone" : ""
+      }
+    }
+  },
+  "type" : "active-campaign/v1/createContact"
+}
+```
 
 
 ### Create Task
@@ -108,9 +142,9 @@ Creates a new task.
 
 #### Properties
 
-|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
-|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
-| __item | Task | {{STRING\(title), INTEGER\(relid), DATE\(duedate), INTEGER\(dealTasktype)}\(dealTask)} | OBJECT_BUILDER  |  | null  |
+|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
+| __item | Task | OBJECT <details> <summary> Properties </summary> {{STRING\(title), INTEGER\(relid), DATE\(duedate), INTEGER\(dealTasktype)}\(dealTask)} </details> | OBJECT_BUILDER |  | null |
 
 
 #### Output
@@ -122,20 +156,32 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |     Control Type     |
-|:------------:|:------------:|:--------------------:|
-| body | {{STRING\(id), STRING\(title), INTEGER\(relid), DATE\(duedate), INTEGER\(dealTasktype)}\(dealTask)} | OBJECT_BUILDER  |
+|     Name     |     Type     |    Control Type     |
+|:------------:|:------------:|:-------------------:|
+| body | OBJECT <details> <summary> Properties </summary> {{STRING\(id), STRING\(title), INTEGER\(relid), DATE\(duedate), INTEGER\(dealTasktype)}\(dealTask)} </details> | OBJECT_BUILDER |
 
 
 
 
+#### JSON Example
+```json
+{
+  "label" : "Create Task",
+  "name" : "createTask",
+  "parameters" : {
+    "__item" : {
+      "dealTask" : {
+        "title" : "",
+        "relid" : 1,
+        "duedate" : "2021-01-01",
+        "dealTasktype" : 1
+      }
+    }
+  },
+  "type" : "active-campaign/v1/createTask"
+}
+```
 
 
 
-
-## Triggers
-
-
-
-<hr />
 

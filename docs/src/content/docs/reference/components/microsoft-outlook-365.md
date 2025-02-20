@@ -24,11 +24,11 @@ Version: 1
 
 #### Properties
 
-|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
-|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
-| clientId | Client Id | STRING | TEXT  |  | true  |
-| clientSecret | Client Secret | STRING | TEXT  |  | true  |
-| tenantId | Tenant Id | STRING | TEXT  |  | true  |
+|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
+| clientId | Client Id | STRING | TEXT |  | true |
+| clientSecret | Client Secret | STRING | TEXT |  | true |
+| tenantId | Tenant Id | STRING | TEXT |  | true |
 
 
 
@@ -48,18 +48,18 @@ Creates an event in the specified calendar.
 
 #### Properties
 
-|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
-|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
-| calendar | Calendar ID | STRING | SELECT  |  | true  |
-| subject | Subject | STRING | TEXT  |  The subject of the event.  |  false  |
-| allDay | All Day Event? | BOOLEAN | SELECT  |  | true  |
-| start | Start Date | DATE | DATE  |  The start date of the event.  |  true  |
-| end | End Date | DATE | DATE  |  The end date of the event.  |  true  |
-| start | Start Date Time | DATE_TIME | DATE_TIME  |  The start time of the event.  |  true  |
-| end | End Date Time | DATE_TIME | DATE_TIME  |  The end time of the event.  |  true  |
-| attendees | Attendees | [STRING\($emailAddress)] | ARRAY_BUILDER  |  The attendees of the event.  |  false  |
-| isOnlineMeeting | Is Online Meeting? | BOOLEAN | SELECT  |  Is the event an online meeting?  |  false  |
-| reminderMinutesBeforeStart | Reminder Minutes Before Start | INTEGER | INTEGER  |  The number of minutes before the event start time that the reminder alert occurs.  |  false  |
+|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
+| calendar | Calendar ID | STRING | SELECT |  | true |
+| subject | Subject | STRING | TEXT | The subject of the event. | false |
+| allDay | All Day Event? | BOOLEAN <details> <summary> Options </summary> true, false </details> | SELECT |  | true |
+| start | Start Date | DATE | DATE | The start date of the event. | true |
+| end | End Date | DATE | DATE | The end date of the event. | true |
+| start | Start Date Time | DATE_TIME | DATE_TIME | The start time of the event. | true |
+| end | End Date Time | DATE_TIME | DATE_TIME | The end time of the event. | true |
+| attendees | Attendees | ARRAY <details> <summary> Items </summary> [STRING] </details> | ARRAY_BUILDER | The attendees of the event. | false |
+| isOnlineMeeting | Is Online Meeting? | BOOLEAN <details> <summary> Options </summary> true, false </details> | SELECT | Is the event an online meeting? | false |
+| reminderMinutesBeforeStart | Reminder Minutes Before Start | INTEGER | INTEGER | The number of minutes before the event start time that the reminder alert occurs. | false |
 
 
 #### Output
@@ -71,21 +71,39 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |     Control Type     |
-|:------------:|:------------:|:--------------------:|
-| iCalUId | STRING | TEXT  |
-| id | STRING | TEXT  |
-| subject | STRING | TEXT  |
-| startTime | DATE_TIME | DATE_TIME  |
-| endTime | DATE_TIME | DATE_TIME  |
-| attendees | [STRING] | ARRAY_BUILDER  |
-| isOnlineMeeting | BOOLEAN | SELECT  |
-| onlineMeetingUrl | STRING | TEXT  |
-| reminderMinutesBeforeStart | BOOLEAN | SELECT  |
+|     Name     |     Type     |    Control Type     |
+|:------------:|:------------:|:-------------------:|
+| iCalUId | STRING | TEXT |
+| id | STRING | TEXT |
+| subject | STRING | TEXT |
+| startTime | DATE_TIME | DATE_TIME |
+| endTime | DATE_TIME | DATE_TIME |
+| attendees | ARRAY <details> <summary> Items </summary> [STRING] </details> | ARRAY_BUILDER |
+| isOnlineMeeting | BOOLEAN <details> <summary> Options </summary> true, false </details> | SELECT |
+| onlineMeetingUrl | STRING | TEXT |
+| reminderMinutesBeforeStart | BOOLEAN <details> <summary> Options </summary> true, false </details> | SELECT |
 
 
 
 
+#### JSON Example
+```json
+{
+  "label" : "Create Event",
+  "name" : "createEvent",
+  "parameters" : {
+    "calendar" : "",
+    "subject" : "",
+    "allDay" : false,
+    "start" : "2021-01-01T00:00:00",
+    "end" : "2021-01-01T00:00:00",
+    "attendees" : [ "" ],
+    "isOnlineMeeting" : false,
+    "reminderMinutesBeforeStart" : 1
+  },
+  "type" : "microsoftOutlook365/v1/createEvent"
+}
+```
 
 
 ### Delete Event
@@ -95,12 +113,24 @@ Deletes an event from the specified calendar.
 
 #### Properties
 
-|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
-|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
-| calendar | Calendar ID | STRING | SELECT  |  | true  |
-| event | Event ID | STRING | SELECT  |  Id of the event to delete.  |  true  |
+|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
+| calendar | Calendar ID | STRING | SELECT |  | true |
+| event | Event ID | STRING <details> <summary> Depends On </summary> calendar </details> | SELECT | Id of the event to delete. | true |
 
 
+#### JSON Example
+```json
+{
+  "label" : "Delete Event",
+  "name" : "deleteEvent",
+  "parameters" : {
+    "calendar" : "",
+    "event" : ""
+  },
+  "type" : "microsoftOutlook365/v1/deleteEvent"
+}
+```
 
 
 ### Get Events
@@ -110,10 +140,10 @@ Gets a list of events in specified calendar.
 
 #### Properties
 
-|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
-|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
-| calendar | Calendar ID | STRING | SELECT  |  | true  |
-| dateRange | Date Range | {DATE_TIME\(from), DATE_TIME\(to)} | OBJECT_BUILDER  |  Date range to find events that exist in this range.  |  false  |
+|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
+| calendar | Calendar ID | STRING | SELECT |  | true |
+| dateRange | Date Range | OBJECT <details> <summary> Properties </summary> {DATE_TIME\(from), DATE_TIME\(to)} </details> | OBJECT_BUILDER | Date range to find events that exist in this range. | false |
 
 
 #### Output
@@ -125,13 +155,28 @@ Type: ARRAY
 
 #### Properties
 
-|     Name     |     Type     |     Control Type     |
-|:------------:|:------------:|:--------------------:|
-|  | {STRING\(iCalUId), STRING\(id), STRING\(subject), DATE_TIME\(startTime), DATE_TIME\(endTime), [STRING]\(attendees), BOOLEAN\(isOnlineMeeting), STRING\(onlineMeetingUrl), BOOLEAN\(reminderMinutesBeforeStart)} | OBJECT_BUILDER  |
+|     Name     |     Type     |    Control Type     |
+|:------------:|:------------:|:-------------------:|
+|  | OBJECT <details> <summary> Properties </summary> {STRING\(iCalUId), STRING\(id), STRING\(subject), DATE_TIME\(startTime), DATE_TIME\(endTime), [STRING]\(attendees), BOOLEAN\(isOnlineMeeting), STRING\(onlineMeetingUrl), BOOLEAN\(reminderMinutesBeforeStart)} </details> | OBJECT_BUILDER |
 
 
 
 
+#### JSON Example
+```json
+{
+  "label" : "Get Events",
+  "name" : "getEvents",
+  "parameters" : {
+    "calendar" : "",
+    "dateRange" : {
+      "from" : "2021-01-01T00:00:00",
+      "to" : "2021-01-01T00:00:00"
+    }
+  },
+  "type" : "microsoftOutlook365/v1/getEvents"
+}
+```
 
 
 ### Get Free Time Slots
@@ -141,10 +186,10 @@ Get free time slots from the Microsoft Outlook 365 calendar.
 
 #### Properties
 
-|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
-|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
-| calendar | Calendar ID | STRING | SELECT  |  | true  |
-| dateRange | Date Range | {DATE_TIME\(from), DATE_TIME\(to)} | OBJECT_BUILDER  |  Date range to find free time.  |  true  |
+|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
+| calendar | Calendar ID | STRING | SELECT |  | true |
+| dateRange | Date Range | OBJECT <details> <summary> Properties </summary> {DATE_TIME\(from), DATE_TIME\(to)} </details> | OBJECT_BUILDER | Date range to find free time. | true |
 
 
 #### Output
@@ -156,13 +201,28 @@ Type: ARRAY
 
 #### Properties
 
-|     Name     |     Type     |     Control Type     |
-|:------------:|:------------:|:--------------------:|
-|  | {DATE_TIME\(startTime), DATE_TIME\(endTime)} | OBJECT_BUILDER  |
+|     Name     |     Type     |    Control Type     |
+|:------------:|:------------:|:-------------------:|
+|  | OBJECT <details> <summary> Properties </summary> {DATE_TIME\(startTime), DATE_TIME\(endTime)} </details> | OBJECT_BUILDER |
 
 
 
 
+#### JSON Example
+```json
+{
+  "label" : "Get Free Time Slots",
+  "name" : "getFreeTimeSlots",
+  "parameters" : {
+    "calendar" : "",
+    "dateRange" : {
+      "from" : "2021-01-01T00:00:00",
+      "to" : "2021-01-01T00:00:00"
+    }
+  },
+  "type" : "microsoftOutlook365/v1/getFreeTimeSlots"
+}
+```
 
 
 ### Get Mail
@@ -172,9 +232,9 @@ Get a specific message
 
 #### Properties
 
-|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
-|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
-| id | Message Id | STRING | SELECT  |  Id of the message.  |  true  |
+|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
+| id | Message Id | STRING | SELECT | Id of the message. | true |
 
 
 #### Output
@@ -186,17 +246,28 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |     Control Type     |
-|:------------:|:------------:|:--------------------:|
-| id | STRING | TEXT  |
-| subject | STRING | TEXT  |
-| bodyPreview | STRING | TEXT  |
-| body | {STRING\(contentType), STRING\(content)} | OBJECT_BUILDER  |
-| from | {{STRING\(name), STRING\(address)}\(emailAddress)} | OBJECT_BUILDER  |
+|     Name     |     Type     |    Control Type     |
+|:------------:|:------------:|:-------------------:|
+| id | STRING | TEXT |
+| subject | STRING | TEXT |
+| bodyPreview | STRING | TEXT |
+| body | OBJECT <details> <summary> Properties </summary> {STRING\(contentType), STRING\(content)} </details> | OBJECT_BUILDER |
+| from | OBJECT <details> <summary> Properties </summary> {{STRING\(name), STRING\(address)}\(emailAddress)} </details> | OBJECT_BUILDER |
 
 
 
 
+#### JSON Example
+```json
+{
+  "label" : "Get Mail",
+  "name" : "getMail",
+  "parameters" : {
+    "id" : ""
+  },
+  "type" : "microsoftOutlook365/v1/getMail"
+}
+```
 
 
 ### Reply to Email
@@ -206,12 +277,24 @@ Creates a new reply to email.
 
 #### Properties
 
-|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
-|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
-| id | Message ID | STRING | SELECT  |  Id of the message to reply to.  |  true  |
-| comment | Comment | STRING | TEXT  |  Content of the reply to the email.  |  true  |
+|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
+| id | Message ID | STRING | SELECT | Id of the message to reply to. | true |
+| comment | Comment | STRING | TEXT | Content of the reply to the email. | true |
 
 
+#### JSON Example
+```json
+{
+  "label" : "Reply to Email",
+  "name" : "replyToEmail",
+  "parameters" : {
+    "id" : "",
+    "comment" : ""
+  },
+  "type" : "microsoftOutlook365/v1/replyToEmail"
+}
+```
 
 
 ### Search Email
@@ -221,12 +304,12 @@ Get the messages in the signed-in user's mailbox
 
 #### Properties
 
-|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
-|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
-| from | From | STRING | TEXT  |  The address sending the mail  |  false  |
-| to | To | STRING | TEXT  |  The address receiving the new mail  |  false  |
-| subject | Subject | STRING | TEXT  |  Words in the subject line  |  false  |
-| category | Category | STRING | SELECT  |  Messages in a certain category  |  false  |
+|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
+| from | From | STRING | TEXT | The address sending the mail | false |
+| to | To | STRING | TEXT | The address receiving the new mail | false |
+| subject | Subject | STRING | TEXT | Words in the subject line | false |
+| category | Category | STRING | SELECT | Messages in a certain category | false |
 
 
 #### Output
@@ -238,13 +321,27 @@ Type: ARRAY
 
 #### Properties
 
-|     Name     |     Type     |     Control Type     |
-|:------------:|:------------:|:--------------------:|
-|  | {STRING\(id), STRING\(subject), STRING\(bodyPreview), {STRING\(contentType), STRING\(content)}\(body), {{STRING\(name), STRING\(address)}\(emailAddress)}\(from)} | OBJECT_BUILDER  |
+|     Name     |     Type     |    Control Type     |
+|:------------:|:------------:|:-------------------:|
+|  | OBJECT <details> <summary> Properties </summary> {STRING\(id), STRING\(subject), STRING\(bodyPreview), {STRING\(contentType), STRING\(content)}\(body), {{STRING\(name), STRING\(address)}\(emailAddress)}\(from)} </details> | OBJECT_BUILDER |
 
 
 
 
+#### JSON Example
+```json
+{
+  "label" : "Search Email",
+  "name" : "searchEmail",
+  "parameters" : {
+    "from" : "",
+    "to" : "",
+    "subject" : "",
+    "category" : ""
+  },
+  "type" : "microsoftOutlook365/v1/searchEmail"
+}
+```
 
 
 ### Send Email
@@ -254,17 +351,64 @@ Send the message.
 
 #### Properties
 
-|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
-|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
-| from | From | {{{STRING\(address), STRING\(name)}\(emailAddress)}\(recipient)} | OBJECT_BUILDER  |  The owner of the mailbox from which the message is sent. In most cases, this value is the same as the sender property, except for sharing or delegation scenarios. The value must correspond to the actual mailbox used.  |  null  |
-| toRecipients | To Recipients | [{{STRING\(address), STRING\(name)}\(emailAddress)}\($recipient)] | ARRAY_BUILDER  |  The To: recipients for the message.  |  true  |
-| subject | Subject | STRING | TEXT  |  The subject of the message.  |  true  |
-| bccRecipients | Bcc Recipients | [{{STRING\(address), STRING\(name)}\(emailAddress)}\($recipient)] | ARRAY_BUILDER  |  The Bcc recipients for the message.  |  false  |
-| ccRecipients | Cc Recipients | [{{STRING\(address), STRING\(name)}\(emailAddress)}\($recipient)] | ARRAY_BUILDER  |  The Cc recipients for the message.  |  false  |
-| replyTo | Reply To | [{{STRING\(address), STRING\(name)}\(emailAddress)}\($recipient)] | ARRAY_BUILDER  |  The email addresses to use when replying.  |  false  |
-| body | Body | {STRING\(contentType), STRING\(content), STRING\(content)} | OBJECT_BUILDER  |  The body of the message. It can be in HTML or text format.  |  true  |
+|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
+| from | From | OBJECT <details> <summary> Properties </summary> {{{STRING\(address), STRING\(name)}\(emailAddress)}\(recipient)} </details> | OBJECT_BUILDER | The owner of the mailbox from which the message is sent. In most cases, this value is the same as the sender property, except for sharing or delegation scenarios. The value must correspond to the actual mailbox used. | null |
+| toRecipients | To Recipients | ARRAY <details> <summary> Items </summary> [{{STRING\(address), STRING\(name)}\(emailAddress)}] </details> | ARRAY_BUILDER | The To: recipients for the message. | true |
+| subject | Subject | STRING | TEXT | The subject of the message. | true |
+| bccRecipients | Bcc Recipients | ARRAY <details> <summary> Items </summary> [{{STRING\(address), STRING\(name)}\(emailAddress)}] </details> | ARRAY_BUILDER | The Bcc recipients for the message. | false |
+| ccRecipients | Cc Recipients | ARRAY <details> <summary> Items </summary> [{{STRING\(address), STRING\(name)}\(emailAddress)}] </details> | ARRAY_BUILDER | The Cc recipients for the message. | false |
+| replyTo | Reply To | ARRAY <details> <summary> Items </summary> [{{STRING\(address), STRING\(name)}\(emailAddress)}] </details> | ARRAY_BUILDER | The email addresses to use when replying. | false |
+| body | Body | OBJECT <details> <summary> Properties </summary> {STRING\(contentType), STRING\(content), STRING\(content)} </details> | OBJECT_BUILDER | The body of the message. It can be in HTML or text format. | true |
 
 
+#### JSON Example
+```json
+{
+  "label" : "Send Email",
+  "name" : "sendEmail",
+  "parameters" : {
+    "from" : {
+      "recipient" : {
+        "emailAddress" : {
+          "address" : "",
+          "name" : ""
+        }
+      }
+    },
+    "toRecipients" : [ {
+      "emailAddress" : {
+        "address" : "",
+        "name" : ""
+      }
+    } ],
+    "subject" : "",
+    "bccRecipients" : [ {
+      "emailAddress" : {
+        "address" : "",
+        "name" : ""
+      }
+    } ],
+    "ccRecipients" : [ {
+      "emailAddress" : {
+        "address" : "",
+        "name" : ""
+      }
+    } ],
+    "replyTo" : [ {
+      "emailAddress" : {
+        "address" : "",
+        "name" : ""
+      }
+    } ],
+    "body" : {
+      "contentType" : "",
+      "content" : ""
+    }
+  },
+  "type" : "microsoftOutlook365/v1/sendEmail"
+}
+```
 
 
 
@@ -273,14 +417,11 @@ Send the message.
 
 
 ### New Email
+Name: newEmail
+
 Triggers when new mail is received.
 
 Type: POLLING
-#### Properties
-
-|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
-|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
-null
 
 
 #### Output
@@ -292,14 +433,21 @@ Type: ARRAY
 
 #### Properties
 
-|     Name     |     Type     |     Control Type     |
-|:------------:|:------------:|:--------------------:|
-|  | {STRING\(id), STRING\(subject), STRING\(bodyPreview), {STRING\(contentType), STRING\(content)}\(body), {{STRING\(name), STRING\(address)}\(emailAddress)}\(from)} | OBJECT_BUILDER  |
+|     Name     |     Type     |    Control Type     |
+|:------------:|:------------:|:-------------------:|
+|  | OBJECT <details> <summary> Properties </summary> {STRING\(id), STRING\(subject), STRING\(bodyPreview), {STRING\(contentType), STRING\(content)}\(body), {{STRING\(name), STRING\(address)}\(emailAddress)}\(from)} </details> | OBJECT_BUILDER |
 
 
 
 
-
+#### JSON Example
+```json
+{
+  "label" : "New Email",
+  "name" : "newEmail",
+  "type" : "microsoftOutlook365/v1/newEmail"
+}
+```
 
 
 <hr />

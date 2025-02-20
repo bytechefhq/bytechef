@@ -35,12 +35,24 @@ Send a new RabbitMQ message.
 
 #### Properties
 
-|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
-|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
-| queue | STRING | TEXT  |
-| message | {} | OBJECT_BUILDER  |
+|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
+| queue | null | STRING | TEXT | The name of the queue to read from | true |
+| message | null | OBJECT <details> <summary> Properties </summary> {} </details> | OBJECT_BUILDER | The name of the queue to read from | true |
 
 
+#### JSON Example
+```json
+{
+  "label" : "Send Message",
+  "name" : "sendMessage",
+  "parameters" : {
+    "queue" : "",
+    "message" : { }
+  },
+  "type" : "rabbitMQ/v1/sendMessage"
+}
+```
 
 
 
@@ -49,17 +61,30 @@ Send a new RabbitMQ message.
 
 
 ### New Message
+Name: newMessage
+
 Triggers on new RabbitMQ messages.
 
 Type: LISTENER
+
 #### Properties
 
-|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
-|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
-| queue | STRING | TEXT  |
+|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
+| queue | null | STRING | TEXT | The name of the queue to read from | true |
 
 
-
+#### JSON Example
+```json
+{
+  "label" : "New Message",
+  "name" : "newMessage",
+  "parameters" : {
+    "queue" : ""
+  },
+  "type" : "rabbitMQ/v1/newMessage"
+}
+```
 
 
 <hr />

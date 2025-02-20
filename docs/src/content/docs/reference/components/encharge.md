@@ -24,10 +24,10 @@ Version: 1
 
 #### Properties
 
-|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
-|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
-| key | Key | STRING | TEXT  |  | true  |
-| value | Value | STRING | TEXT  |  | true  |
+|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
+| key | Key | STRING | TEXT |  | true |
+| value | Value | STRING | TEXT |  | true |
 
 
 
@@ -47,9 +47,9 @@ Create email template
 
 #### Properties
 
-|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
-|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
-| __item | Email Template | {STRING\(name), STRING\(subject), STRING\(fromEmail), STRING\(replyEmail)} | OBJECT_BUILDER  |  | true  |
+|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
+| __item | Email Template | OBJECT <details> <summary> Properties </summary> {STRING\(name), STRING\(subject), STRING\(fromEmail), STRING\(replyEmail)} </details> | OBJECT_BUILDER |  | true |
 
 
 #### Output
@@ -61,13 +61,29 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |     Control Type     |
-|:------------:|:------------:|:--------------------:|
-| body | {{INTEGER\(id), STRING\(name), STRING\(subject), STRING\(fromEmail), STRING\(replyEmail)}\(email)} | OBJECT_BUILDER  |
+|     Name     |     Type     |    Control Type     |
+|:------------:|:------------:|:-------------------:|
+| body | OBJECT <details> <summary> Properties </summary> {{INTEGER\(id), STRING\(name), STRING\(subject), STRING\(fromEmail), STRING\(replyEmail)}\(email)} </details> | OBJECT_BUILDER |
 
 
 
 
+#### JSON Example
+```json
+{
+  "label" : "Create Email Template",
+  "name" : "createEmail",
+  "parameters" : {
+    "__item" : {
+      "name" : "",
+      "subject" : "",
+      "fromEmail" : "",
+      "replyEmail" : ""
+    }
+  },
+  "type" : "encharge/v1/createEmail"
+}
+```
 
 
 ### Create People
@@ -77,9 +93,9 @@ Creates new People
 
 #### Properties
 
-|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
-|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
-| __items | People | [{STRING\(email), STRING\(firstName), STRING\(lastName), STRING\(website), STRING\(title), STRING\(phone)}] | ARRAY_BUILDER  |  | true  |
+|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
+| __items | People | ARRAY <details> <summary> Items </summary> [{STRING\(email), STRING\(firstName), STRING\(lastName), STRING\(website), STRING\(title), STRING\(phone)}] </details> | ARRAY_BUILDER |  | true |
 
 
 #### Output
@@ -91,13 +107,31 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |     Control Type     |
-|:------------:|:------------:|:--------------------:|
-| body | {[{STRING\(email), STRING\(firstName), STRING\(lastName), STRING\(website), STRING\(title), STRING\(id), STRING\(phone)}]\(users)} | OBJECT_BUILDER  |
+|     Name     |     Type     |    Control Type     |
+|:------------:|:------------:|:-------------------:|
+| body | OBJECT <details> <summary> Properties </summary> {[{STRING\(email), STRING\(firstName), STRING\(lastName), STRING\(website), STRING\(title), STRING\(id), STRING\(phone)}]\(users)} </details> | OBJECT_BUILDER |
 
 
 
 
+#### JSON Example
+```json
+{
+  "label" : "Create People",
+  "name" : "createPeople",
+  "parameters" : {
+    "__items" : [ {
+      "email" : "",
+      "firstName" : "",
+      "lastName" : "",
+      "website" : "",
+      "title" : "",
+      "phone" : ""
+    } ]
+  },
+  "type" : "encharge/v1/createPeople"
+}
+```
 
 
 ### Add Tag
@@ -107,20 +141,28 @@ Add tag(s) to an existing user.
 
 #### Properties
 
-|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
-|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
-| __item | Tag | {STRING\(tag), STRING\(email)} | OBJECT_BUILDER  |  | true  |
+|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
+| __item | Tag | OBJECT <details> <summary> Properties </summary> {STRING\(tag), STRING\(email)} </details> | OBJECT_BUILDER |  | true |
+
+
+#### JSON Example
+```json
+{
+  "label" : "Add Tag",
+  "name" : "addTag",
+  "parameters" : {
+    "__item" : {
+      "tag" : "",
+      "email" : ""
+    }
+  },
+  "type" : "encharge/v1/addTag"
+}
+```
 
 
 
-
-
-
-## Triggers
-
-
-
-<hr />
 
 <hr />
 
