@@ -30,11 +30,9 @@ import {TooltipPortal} from '@radix-ui/react-tooltip';
 import {UseQueryResult} from '@tanstack/react-query';
 import {Editor} from '@tiptap/react';
 import {usePrevious} from '@uidotdev/usehooks';
-import {decode} from 'html-entities';
 import resolvePath from 'object-resolve-path';
 import {ChangeEvent, ReactNode, useCallback, useEffect, useMemo, useRef, useState} from 'react';
 import {Control, Controller, FieldValues, FormState} from 'react-hook-form';
-import sanitizeHtml from 'sanitize-html';
 import {TYPE_ICONS} from 'shared/typeIcons';
 import {twMerge} from 'tailwind-merge';
 import {useDebouncedCallback} from 'use-debounce';
@@ -240,47 +238,6 @@ const Property = ({
         });
     }, 200);
 
-    const saveMentionInputValue = useDebouncedCallback(() => {
-        if (!currentComponent || !workflow.id || !updateWorkflowNodeParameterMutation || !name || !path) {
-            return;
-        }
-
-        const sanitizedCurrentValue = sanitizeHtml(mentionInputValue, {allowedTags: []});
-
-        if (propertyParameterValue === sanitizedCurrentValue) {
-            return;
-        }
-
-        const {parameters} = currentComponent;
-
-        if (!parameters) {
-            return;
-        }
-
-        let value: string | number = mentionInputValue;
-
-        if ((type === 'INTEGER' || type === 'NUMBER') && !mentionInputValue.startsWith('${')) {
-            value = parseInt(value);
-        }
-
-        if (typeof value === 'string' && controlType !== 'RICH_TEXT') {
-            value = sanitizeHtml(value, {allowedTags: []});
-        }
-
-        if (typeof value === 'string') {
-            value = decode(value);
-        }
-
-        saveProperty({
-            includeInMetadata: custom,
-            path,
-            type,
-            updateWorkflowNodeParameterMutation,
-            value: value || null,
-            workflowId: workflow.id,
-        });
-    }, 200);
-
     const handleCodeEditorChange = useDebouncedCallback((value?: string) => {
         if (!currentComponent || !name || !path || !updateWorkflowNodeParameterMutation || !workflow.id) {
             return;
@@ -367,14 +324,6 @@ const Property = ({
         }
 
         saveInputValue();
-    };
-
-    const handleMentionsInputChange = (value: string) => {
-        setMentionInputValue(value);
-
-        latestValueRef.current = value;
-
-        saveMentionInputValue();
     };
 
     const handleInputTypeSwitchButtonClick = () => {
@@ -533,11 +482,7 @@ const Property = ({
 
     // set propertyParameterValue on initial render
     useEffect(() => {
-        if (!name) {
-            return;
-        }
-
-        if (!currentComponent || !currentComponent.parameters) {
+        if (!name || !currentComponent || !currentComponent.parameters) {
             return;
         }
 
@@ -601,10 +546,6 @@ const Property = ({
 
                 setPropertyParameterValue('');
             }
-        }
-
-        if (mentionInput && propertyParameterValue && !mentionInputValue) {
-            setMentionInputValue(propertyParameterValue);
         }
 
         if (
@@ -732,7 +673,6 @@ const Property = ({
             setInputValue(parameterDefaultValue);
             setMentionInputValue(parameterDefaultValue);
             setSelectValue(parameterDefaultValue.toString());
-            setPropertyParameterValue(parameterDefaultValue);
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [currentNode?.operationName, previousOperationName, property.defaultValue]);
@@ -830,7 +770,6 @@ const Property = ({
                     key={`${currentNode?.name}_${currentComponent?.operationName}_${name}`}
                     label={label || name}
                     leadingIcon={typeIcon}
-                    onChange={handleMentionsInputChange}
                     path={path}
                     placeholder={placeholder}
                     ref={editorRef}

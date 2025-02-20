@@ -26,7 +26,6 @@ interface PropertyMentionsInputProps {
     handleInputTypeSwitchButtonClick?: () => void;
     label?: string;
     leadingIcon?: ReactNode;
-    onChange: (value: string) => void;
     path?: string;
     placeholder?: string;
     required?: boolean;
@@ -46,7 +45,6 @@ const PropertyMentionsInput = forwardRef<Editor, PropertyMentionsInputProps>(
             handleInputTypeSwitchButtonClick,
             label,
             leadingIcon,
-            onChange,
             path,
             placeholder,
             required = false,
@@ -110,7 +108,11 @@ const PropertyMentionsInput = forwardRef<Editor, PropertyMentionsInputProps>(
                                     componentDefinitions={componentDefinitions}
                                     controlType={controlType}
                                     dataPills={dataPills}
-                                    onChange={onChange}
+                                    onChange={(value) => {
+                                        if (onChange) {
+                                            onChange(value);
+                                        }
+                                    }}
                                     placeholder={placeholder}
                                     title={label ?? ''}
                                     type={type}
@@ -156,7 +158,6 @@ const PropertyMentionsInput = forwardRef<Editor, PropertyMentionsInputProps>(
                             controlType={controlType}
                             dataPills={dataPills}
                             elementId={elementId}
-                            onChange={onChange}
                             onFocus={onFocus}
                             path={path}
                             placeholder={placeholder}
