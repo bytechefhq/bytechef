@@ -30,7 +30,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -56,7 +55,7 @@ public class ApiConnectorFacadeImpl implements ApiConnectorFacade {
     }
 
     @Override
-    public ApiConnector importOpenApiSpecification(@NonNull String name, @NonNull String specification) {
+    public ApiConnector importOpenApiSpecification(String name, String specification) {
         name = convertComponentName(name);
 
         try {

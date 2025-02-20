@@ -12,7 +12,6 @@ import com.bytechef.ee.automation.apiplatform.configuration.domain.ApiCollection
 import com.bytechef.ee.automation.apiplatform.configuration.repository.ApiEndpointRepository;
 import java.util.List;
 import org.apache.commons.lang3.Validate;
-import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -32,7 +31,7 @@ public class ApiCollectionEndpointServiceImpl implements ApiCollectionEndpointSe
     }
 
     @Override
-    public ApiCollectionEndpoint create(@NonNull ApiCollectionEndpoint apiCollectionEndpoint) {
+    public ApiCollectionEndpoint create(ApiCollectionEndpoint apiCollectionEndpoint) {
         Validate.notNull(apiCollectionEndpoint, "'apiCollectionEndpoint' must not be null");
         Validate.notNull(apiCollectionEndpoint.getApiCollectionId(), "'apiCollectionId' must not be null");
         Validate.notNull(apiCollectionEndpoint.getHttpMethod(), "'httpMethod' must not be null");
@@ -61,7 +60,7 @@ public class ApiCollectionEndpointServiceImpl implements ApiCollectionEndpointSe
     }
 
     @Override
-    public ApiCollectionEndpoint update(@NonNull ApiCollectionEndpoint apiCollectionEndpoint) {
+    public ApiCollectionEndpoint update(ApiCollectionEndpoint apiCollectionEndpoint) {
         Validate.notNull(apiCollectionEndpoint, "'apiCollectionEndpoint' must not be null");
 
         ApiCollectionEndpoint curApiCollectionEndpoint =

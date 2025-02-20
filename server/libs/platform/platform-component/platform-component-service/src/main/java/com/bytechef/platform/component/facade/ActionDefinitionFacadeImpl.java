@@ -36,7 +36,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
-import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 
 /**
@@ -65,8 +64,8 @@ public class ActionDefinitionFacadeImpl implements ActionDefinitionFacade {
 
     @Override
     public List<Property> executeDynamicProperties(
-        @NonNull String componentName, int componentVersion, @NonNull String actionName, @NonNull String propertyName,
-        String workflowId, Map<String, ?> inputParameters, @NonNull List<String> lookupDependsOnPaths,
+        String componentName, int componentVersion, String actionName, String propertyName,
+        String workflowId, Map<String, ?> inputParameters, List<String> lookupDependsOnPaths,
         Long connectionId) {
 
         ComponentConnection componentConnection = getComponentConnection(connectionId);
@@ -86,8 +85,8 @@ public class ActionDefinitionFacadeImpl implements ActionDefinitionFacade {
 
     @Override
     public List<Option> executeOptions(
-        @NonNull String componentName, int componentVersion, @NonNull String actionName, @NonNull String propertyName,
-        @NonNull Map<String, ?> inputParameters, @NonNull List<String> lookupDependsOnPaths, String searchText,
+        String componentName, int componentVersion, String actionName, String propertyName,
+        Map<String, ?> inputParameters, List<String> lookupDependsOnPaths, String searchText,
         Long connectionId) {
 
         ComponentConnection componentConnection = getComponentConnection(connectionId);
@@ -107,8 +106,8 @@ public class ActionDefinitionFacadeImpl implements ActionDefinitionFacade {
 
     @Override
     public OutputResponse executeOutput(
-        @NonNull String componentName, int componentVersion, @NonNull String actionName,
-        @NonNull Map<String, ?> inputParameters, @NonNull Map<String, Long> connectionIds) {
+        String componentName, int componentVersion, String actionName,
+        Map<String, ?> inputParameters, Map<String, Long> connectionIds) {
 
         ExecuteFunctionData executeFunctionData = getExecuteFunctionData(
             componentName, componentVersion, actionName, connectionIds);
@@ -136,9 +135,9 @@ public class ActionDefinitionFacadeImpl implements ActionDefinitionFacade {
 
     @Override
     public Object executePerform(
-        @NonNull String componentName, int componentVersion, @NonNull String actionName, @NonNull ModeType type,
+        String componentName, int componentVersion, String actionName, ModeType type,
         Long principalId, Long principalWorkflowId, Long jobId, String workflowId,
-        @NonNull Map<String, ?> inputParameters, @NonNull Map<String, Long> connectionIds, Map<String, ?> extensions,
+        Map<String, ?> inputParameters, Map<String, Long> connectionIds, Map<String, ?> extensions,
         boolean editorEnvironment) {
 
         ExecuteFunctionData executeFunctionData = getExecuteFunctionData(
@@ -168,9 +167,9 @@ public class ActionDefinitionFacadeImpl implements ActionDefinitionFacade {
 
     @Override
     public Object executePerformForPolyglot(
-        @NonNull String componentName, int componentVersion, @NonNull String actionName,
-        @NonNull Map<String, ?> inputParameters, ComponentConnection componentConnection,
-        @NonNull ActionContext actionContext) {
+        String componentName, int componentVersion, String actionName,
+        Map<String, ?> inputParameters, ComponentConnection componentConnection,
+        ActionContext actionContext) {
 
         ActionContextAware actionContextAware = (ActionContextAware) actionContext;
 
@@ -188,7 +187,7 @@ public class ActionDefinitionFacadeImpl implements ActionDefinitionFacade {
 
     @Override
     public ProviderException executeProcessErrorResponse(
-        @NonNull String componentName, int componentVersion, @NonNull String actionName, int statusCode,
+        String componentName, int componentVersion, String actionName, int statusCode,
         Object body) {
 
         ActionContext actionContext = contextFactory.createActionContext(
@@ -200,8 +199,8 @@ public class ActionDefinitionFacadeImpl implements ActionDefinitionFacade {
 
     @Override
     public String executeWorkflowNodeDescription(
-        @NonNull String componentName, int componentVersion, @NonNull String actionName,
-        @NonNull Map<String, ?> inputParameters) {
+        String componentName, int componentVersion, String actionName,
+        Map<String, ?> inputParameters) {
 
         return actionDefinitionService.executeWorkflowNodeDescription(
             componentName, componentVersion, actionName, inputParameters,

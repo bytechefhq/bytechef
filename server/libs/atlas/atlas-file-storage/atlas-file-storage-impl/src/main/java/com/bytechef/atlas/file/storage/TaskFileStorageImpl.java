@@ -24,7 +24,6 @@ import com.bytechef.file.storage.service.FileStorageService;
 import com.fasterxml.jackson.core.type.TypeReference;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Map;
-import org.springframework.lang.NonNull;
 
 /**
  * @author Ivica Cardic
@@ -43,21 +42,21 @@ public class TaskFileStorageImpl implements TaskFileStorage {
     }
 
     @Override
-    public Map<String, ?> readContextValue(@NonNull FileEntry fileEntry) {
+    public Map<String, ?> readContextValue(FileEntry fileEntry) {
         return JsonUtils.read(
             CompressionUtils.decompressToString(fileStorageService.readFileToBytes(CONTEXT_FILES_DIR, fileEntry)),
             new TypeReference<>() {});
     }
 
     @Override
-    public Map<String, ?> readJobOutputs(@NonNull FileEntry fileEntry) {
+    public Map<String, ?> readJobOutputs(FileEntry fileEntry) {
         return JsonUtils.read(
             CompressionUtils.decompressToString(fileStorageService.readFileToBytes(JOB_FILES_DIR, fileEntry)),
             new TypeReference<>() {});
     }
 
     @Override
-    public Object readTaskExecutionOutput(@NonNull FileEntry fileEntry) {
+    public Object readTaskExecutionOutput(FileEntry fileEntry) {
         return JsonUtils.read(
             CompressionUtils.decompressToString(
                 fileStorageService.readFileToBytes(TASK_EXECUTION_FILES_DIR, fileEntry)),
@@ -66,7 +65,7 @@ public class TaskFileStorageImpl implements TaskFileStorage {
 
     @Override
     public FileEntry storeContextValue(
-        long stackId, @NonNull Context.Classname classname, @NonNull Map<String, ?> value) {
+        long stackId, Context.Classname classname, Map<String, ?> value) {
 
         return fileStorageService.storeFileContent(
             CONTEXT_FILES_DIR, classname + "_" + stackId + ".json", CompressionUtils.compress(JsonUtils.write(value)));
@@ -74,7 +73,7 @@ public class TaskFileStorageImpl implements TaskFileStorage {
 
     @Override
     public FileEntry storeContextValue(
-        long stackId, int subStackId, @NonNull Context.Classname classname, @NonNull Map<String, ?> value) {
+        long stackId, int subStackId, Context.Classname classname, Map<String, ?> value) {
 
         return fileStorageService.storeFileContent(
             CONTEXT_FILES_DIR, classname + "_" + stackId + "_" + subStackId + ".json",
@@ -82,13 +81,13 @@ public class TaskFileStorageImpl implements TaskFileStorage {
     }
 
     @Override
-    public FileEntry storeJobOutputs(long jobId, @NonNull Map<String, ?> outputs) {
+    public FileEntry storeJobOutputs(long jobId, Map<String, ?> outputs) {
         return fileStorageService.storeFileContent(
             JOB_FILES_DIR, jobId + ".json", CompressionUtils.compress(JsonUtils.write(outputs)));
     }
 
     @Override
-    public FileEntry storeTaskExecutionOutput(long taskExecutionId, @NonNull Object output) {
+    public FileEntry storeTaskExecutionOutput(long taskExecutionId, Object output) {
         return fileStorageService.storeFileContent(
             TASK_EXECUTION_FILES_DIR, taskExecutionId + ".json",
             CompressionUtils.compress(JsonUtils.write(output)));

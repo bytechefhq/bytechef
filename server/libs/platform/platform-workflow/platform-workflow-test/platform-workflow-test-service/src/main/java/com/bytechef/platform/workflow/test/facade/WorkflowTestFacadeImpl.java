@@ -45,7 +45,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Random;
-import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 
 /**
@@ -76,7 +75,7 @@ public class WorkflowTestFacadeImpl implements WorkflowTestFacade {
     }
 
     @SuppressWarnings("unchecked")
-    public WorkflowTestExecutionDTO testWorkflow(@NonNull String workflowId, @NonNull Map<String, Object> inputs) {
+    public WorkflowTestExecutionDTO testWorkflow(String workflowId, Map<String, Object> inputs) {
         Optional<WorkflowTestConfiguration> workflowTestConfigurationOptional =
             workflowTestConfigurationService.fetchWorkflowTestConfiguration(workflowId);
 

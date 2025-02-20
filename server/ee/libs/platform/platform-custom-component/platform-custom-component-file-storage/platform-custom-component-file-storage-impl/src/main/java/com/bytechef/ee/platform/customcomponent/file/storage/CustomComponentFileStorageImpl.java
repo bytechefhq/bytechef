@@ -11,7 +11,6 @@ import com.bytechef.file.storage.domain.FileEntry;
 import com.bytechef.file.storage.service.FileStorageService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.net.URL;
-import org.springframework.lang.NonNull;
 
 /**
  * @version ee
@@ -30,17 +29,17 @@ public class CustomComponentFileStorageImpl implements CustomComponentFileStorag
     }
 
     @Override
-    public void deleteCustomComponentFile(@NonNull FileEntry componentFile) {
+    public void deleteCustomComponentFile(FileEntry componentFile) {
         fileStorageService.deleteFile(CUSTOM_COMPONENTS_FILES_DIR, componentFile);
     }
 
     @Override
-    public URL getCustomComponentFileURL(@NonNull FileEntry componentFile) {
+    public URL getCustomComponentFileURL(FileEntry componentFile) {
         return fileStorageService.getFileEntryURL(CUSTOM_COMPONENTS_FILES_DIR, componentFile);
     }
 
     @Override
-    public FileEntry storeCustomComponentFile(@NonNull String filename, @NonNull byte[] bytes) {
+    public FileEntry storeCustomComponentFile(String filename, byte[] bytes) {
         return fileStorageService.storeFileContent(CUSTOM_COMPONENTS_FILES_DIR, filename, bytes, false);
     }
 }

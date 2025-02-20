@@ -21,7 +21,6 @@ package com.bytechef.atlas.configuration.repository.git.operations;
 import com.bytechef.atlas.configuration.workflow.mapper.WorkflowResource;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
-import org.springframework.lang.NonNull;
 
 /**
  * @author Arik Cohen
@@ -32,7 +31,7 @@ public interface GitWorkflowOperations {
 
     WorkflowResource getFile(String fileId);
 
-    String write(@NonNull List<WorkflowResource> workflowResources, @NonNull String commitMessage);
+    String write(List<WorkflowResource> workflowResources, String commitMessage);
 
     @SuppressFBWarnings("EI")
     record HeadFiles(List<WorkflowResource> workflowResources, GitInfo gitInfo) {

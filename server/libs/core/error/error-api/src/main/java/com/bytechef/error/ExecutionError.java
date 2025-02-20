@@ -29,10 +29,12 @@ import java.util.List;
  */
 public class ExecutionError {
 
-    private String message;
-    private List<String> stackTrace;
+    private final String message;
+    private final List<String> stackTrace;
 
     public ExecutionError() {
+        this.message = "Error occurred during execution";
+        this.stackTrace = List.of();
     }
 
     public ExecutionError(String message, List<String> stackTrace) {

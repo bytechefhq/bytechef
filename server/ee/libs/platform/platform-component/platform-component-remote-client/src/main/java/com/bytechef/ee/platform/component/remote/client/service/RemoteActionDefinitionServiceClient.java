@@ -23,7 +23,6 @@ import java.util.List;
 import java.util.Map;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
 import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
 
 /**
@@ -44,28 +43,28 @@ public class RemoteActionDefinitionServiceClient extends AbstractWorkerClient im
 
     @Override
     public List<Property> executeDynamicProperties(
-        @NonNull String componentName, int componentVersion, @NonNull String actionName, @NonNull String propertyName,
-        @NonNull Map<String, ?> inputParameters, @NonNull List<String> lookupDependsOnPaths,
-        ComponentConnection connection, @NonNull ActionContext context) {
+        String componentName, int componentVersion, String actionName, String propertyName,
+        Map<String, ?> inputParameters, List<String> lookupDependsOnPaths,
+        ComponentConnection connection, ActionContext context) {
 
         throw new UnsupportedOperationException();
     }
 
     @Override
     public OutputResponse executeMultipleConnectionsOutput(
-        @NonNull String componentName, int componentVersion, @NonNull String actionName,
-        @NonNull Map<String, ?> inputParameters,
-        @NonNull Map<String, ComponentConnection> connections, @NonNull Map<String, ?> extensions,
-        @NonNull ActionContext context) {
+        String componentName, int componentVersion, String actionName,
+        Map<String, ?> inputParameters,
+        Map<String, ComponentConnection> connections, Map<String, ?> extensions,
+        ActionContext context) {
 
         throw new UnsupportedOperationException();
     }
 
     @Override
     public List<Option> executeOptions(
-        @NonNull String componentName, int componentVersion, @NonNull String actionName, @NonNull String propertyName,
-        @NonNull Map<String, ?> inputParameters, @NonNull List<String> lookupDependsOnPaths, String searchText,
-        ComponentConnection connection, @NonNull ActionContext context) {
+        String componentName, int componentVersion, String actionName, String propertyName,
+        Map<String, ?> inputParameters, List<String> lookupDependsOnPaths, String searchText,
+        ComponentConnection connection, ActionContext context) {
 
         throw new UnsupportedOperationException();
     }
@@ -80,41 +79,41 @@ public class RemoteActionDefinitionServiceClient extends AbstractWorkerClient im
 
     @Override
     public OutputResponse executeSingleConnectionOutput(
-        @NonNull String componentName, int componentVersion, @NonNull String actionName,
-        @NonNull Map<String, ?> inputParameters,
-        ComponentConnection connection, @NonNull ActionContext context) {
+        String componentName, int componentVersion, String actionName,
+        Map<String, ?> inputParameters,
+        ComponentConnection connection, ActionContext context) {
 
         throw new UnsupportedOperationException();
     }
 
     @Override
     public Object executeSingleConnectionPerform(
-        @NonNull String componentName, int componentVersion, @NonNull String actionName,
-        @NonNull Map<String, ?> inputParameters, ComponentConnection connection, @NonNull ActionContext context) {
+        String componentName, int componentVersion, String actionName,
+        Map<String, ?> inputParameters, ComponentConnection connection, ActionContext context) {
 
         throw new UnsupportedOperationException();
     }
 
     @Override
     public Object executeMultipleConnectionsPerform(
-        @NonNull String componentName, int componentVersion, @NonNull String actionName,
-        @NonNull Map<String, ?> inputParameters, @NonNull Map<String, ComponentConnection> connections,
-        @NonNull Map<String, ?> extensions, @NonNull ActionContext context) {
+        String componentName, int componentVersion, String actionName,
+        Map<String, ?> inputParameters, Map<String, ComponentConnection> connections,
+        Map<String, ?> extensions, ActionContext context) {
 
         throw new UnsupportedOperationException();
     }
 
     @Override
     public String executeWorkflowNodeDescription(
-        @NonNull String componentName, int componentVersion, @NonNull String actionName,
-        @NonNull Map<String, ?> inputParameters, @NonNull ActionContext context) {
+        String componentName, int componentVersion, String actionName,
+        Map<String, ?> inputParameters, ActionContext context) {
 
         throw new UnsupportedOperationException();
     }
 
     @Override
     public ActionDefinition getActionDefinition(
-        @NonNull String componentName, int componentVersion, @NonNull String actionName) {
+        String componentName, int componentVersion, String actionName) {
 
         return defaultRestClient.get(
             uriBuilder -> toUri(
@@ -125,7 +124,7 @@ public class RemoteActionDefinitionServiceClient extends AbstractWorkerClient im
     }
 
     @Override
-    public List<ActionDefinition> getActionDefinitions(@NonNull String componentName, int componentVersion) {
+    public List<ActionDefinition> getActionDefinitions(String componentName, int componentVersion) {
         return defaultRestClient.get(
             uriBuilder -> toUri(
                 uriBuilder, componentName,
@@ -136,7 +135,7 @@ public class RemoteActionDefinitionServiceClient extends AbstractWorkerClient im
 
     @Override
     public boolean isSingleConnectionPerform(
-        @NonNull String componentName, int componentVersion, @NonNull String actionName) {
+        String componentName, int componentVersion, String actionName) {
 
         throw new UnsupportedOperationException();
     }

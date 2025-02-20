@@ -73,7 +73,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 import org.apache.commons.lang3.Validate;
-import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -289,7 +288,7 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
 
     @Override
     public IntegrationInstanceConfigurationDTO getEnabledIntegrationInstanceConfigurationIntegration(
-        long integrationId, @NonNull Environment environment) {
+        long integrationId, Environment environment) {
 
         return getEnabledIntegrationInstanceConfigurationIntegrations(environment)
             .stream()

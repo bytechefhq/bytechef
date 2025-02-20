@@ -68,7 +68,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
-import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 
 /**
@@ -87,8 +86,8 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
 
     @Override
     public Map<String, ?> executeAcquire(
-        @NonNull String componentName, int connectionVersion, @NonNull String authorizationName,
-        @NonNull Map<String, ?> connectionParameters, @NonNull Context context) {
+        String componentName, int connectionVersion, String authorizationName,
+        Map<String, ?> connectionParameters, Context context) {
 
         Authorization authorization = componentDefinitionRegistry.getAuthorization(
             componentName, connectionVersion, authorizationName);
@@ -103,8 +102,8 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
 
     @Override
     public ApplyResponse executeAuthorizationApply(
-        @NonNull String componentName, int connectionVersion, @NonNull String authorizationName,
-        @NonNull Map<String, ?> connectionParameters, @NonNull Context context) {
+        String componentName, int connectionVersion, String authorizationName,
+        Map<String, ?> connectionParameters, Context context) {
 
         Authorization authorization = componentDefinitionRegistry.getAuthorization(
             componentName, connectionVersion, authorizationName);
@@ -121,8 +120,8 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
 
     @Override
     public AuthorizationCallbackResponse executeAuthorizationCallback(
-        @NonNull String componentName, int connectionVersion, @NonNull String authorizationName,
-        @NonNull Map<String, ?> connectionParameters, @NonNull Context context, @NonNull String redirectUri) {
+        String componentName, int connectionVersion, String authorizationName,
+        Map<String, ?> connectionParameters, Context context, String redirectUri) {
 
         Authorization authorization = componentDefinitionRegistry.getAuthorization(
             componentName, connectionVersion, authorizationName);
@@ -173,7 +172,7 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
 
     @Override
     public Optional<String> executeBaseUri(
-        @NonNull String componentName, @NonNull ComponentConnection connection, @NonNull Context context) {
+        String componentName, ComponentConnection connection, Context context) {
 
         com.bytechef.component.definition.ConnectionDefinition connectionDefinition =
             componentDefinitionRegistry.getConnectionDefinition(componentName, connection.getVersion());
@@ -189,8 +188,8 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
 
     @Override
     public RefreshTokenResponse executeRefresh(
-        @NonNull String componentName, int connectionVersion, @NonNull String authorizationName,
-        @NonNull Map<String, ?> connectionParameters, @NonNull Context context) {
+        String componentName, int connectionVersion, String authorizationName,
+        Map<String, ?> connectionParameters, Context context) {
 
         Authorization authorization = componentDefinitionRegistry.getAuthorization(
             componentName, connectionVersion, authorizationName);
@@ -228,7 +227,7 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
 
     @Override
     public List<String> getAuthorizationDetectOn(
-        @NonNull String componentName, int connectionVersion, @NonNull String authorizationName) {
+        String componentName, int connectionVersion, String authorizationName) {
 
         Authorization authorization = componentDefinitionRegistry.getAuthorization(
             componentName, connectionVersion, authorizationName);
@@ -238,7 +237,7 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
 
     @Override
     public List<Object> getAuthorizationRefreshOn(
-        @NonNull String componentName, int connectionVersion, @NonNull String authorizationName) {
+        String componentName, int connectionVersion, String authorizationName) {
 
         Authorization authorization = componentDefinitionRegistry.getAuthorization(
             componentName, connectionVersion, authorizationName);
@@ -248,7 +247,7 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
 
     @Override
     public AuthorizationType getAuthorizationType(
-        @NonNull String componentName, int connectionVersion, @NonNull String authorizationName) {
+        String componentName, int connectionVersion, String authorizationName) {
 
         Authorization authorization = componentDefinitionRegistry.getAuthorization(
             componentName, connectionVersion, authorizationName);
@@ -258,7 +257,7 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
 
     @Override
     public ConnectionDefinition getConnectionConnectionDefinition(
-        @NonNull String componentName, int connectionVersion) {
+        String componentName, int connectionVersion) {
 
         return toConnectionDefinition(
             componentDefinitionRegistry.getComponentDefinitions(componentName)
@@ -275,7 +274,7 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
     }
 
     @Override
-    public ConnectionDefinition getConnectionDefinition(@NonNull String componentName, Integer componentVersion) {
+    public ConnectionDefinition getConnectionDefinition(String componentName, Integer componentVersion) {
         return toConnectionDefinition(
             componentDefinitionRegistry.getComponentDefinition(componentName, componentVersion));
     }
@@ -291,7 +290,7 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
 
     @Override
     public List<ConnectionDefinition> getConnectionDefinitions(
-        @NonNull String componentName, Integer componentVersion) {
+        String componentName, Integer componentVersion) {
 
         return getConnectableComponentDefinitions(componentName, componentVersion)
             .stream()
@@ -301,8 +300,8 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
 
     @Override
     public OAuth2AuthorizationParameters getOAuth2AuthorizationParameters(
-        @NonNull String componentName, int connectionVersion, @NonNull String authorizationName,
-        @NonNull Map<String, ?> authorizationParams, @NonNull Context context) {
+        String componentName, int connectionVersion, String authorizationName,
+        Map<String, ?> authorizationParams, Context context) {
 
         Authorization authorization = componentDefinitionRegistry.getAuthorization(
             componentName, connectionVersion, authorizationName);

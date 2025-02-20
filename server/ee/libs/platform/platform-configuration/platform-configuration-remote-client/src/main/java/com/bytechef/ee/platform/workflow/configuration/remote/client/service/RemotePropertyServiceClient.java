@@ -12,7 +12,7 @@ import com.bytechef.platform.configuration.service.PropertyService;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import org.springframework.lang.NonNull;
+import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Component;
 
 /**
@@ -24,32 +24,32 @@ import org.springframework.stereotype.Component;
 public class RemotePropertyServiceClient implements PropertyService {
 
     @Override
-    public void delete(@NonNull String key, Property.Scope scope, Long scopeId) {
+    public void delete(String key, Property.Scope scope, Long scopeId) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public Optional<Property> fetchProperty(@NonNull String key, Property.Scope scope, Long scopeId) {
+    public Optional<Property> fetchProperty(String key, Property.Scope scope, @Nullable Long scopeId) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public Property getProperty(@NonNull String key, Property.Scope scope, Long scopeId) {
+    public Property getProperty(String key, Property.Scope scope, @Nullable Long scopeId) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public List<Property> getProperties(@NonNull List<String> keys, Property.Scope scope, Long scopeId) {
+    public List<Property> getProperties(List<String> keys, Property.Scope scope, @Nullable Long scopeId) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public void save(@NonNull String key, @NonNull Map<String, ?> value, Property.Scope scope, Long scopeId) {
+    public void save(String key, Map<String, ?> value, Property.Scope scope, @Nullable Long scopeId) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public void update(@NonNull String key, boolean enabled, Property.Scope scope, Long scopeID) {
+    public void update(String key, boolean enabled, Property.Scope scope, @Nullable Long scopeID) {
         throw new UnsupportedOperationException();
     }
 }

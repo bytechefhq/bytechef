@@ -21,20 +21,19 @@ import com.bytechef.atlas.execution.domain.Job;
 import com.bytechef.atlas.execution.dto.JobParametersDTO;
 import java.util.Optional;
 import org.springframework.data.domain.Page;
-import org.springframework.lang.NonNull;
 
 /**
  * @author Ivica Cardic
  */
 public interface JobService {
 
-    Job create(@NonNull JobParametersDTO jobParametersDTO, @NonNull Workflow workflow);
+    Job create(JobParametersDTO jobParametersDTO, Workflow workflow);
 
     void deleteJob(long id);
 
     Optional<Job> fetchLastJob();
 
-    Optional<Job> fetchLastWorkflowJob(@NonNull String workflowId);
+    Optional<Job> fetchLastWorkflowJob(String workflowId);
 
     Job getJob(long id);
 
@@ -50,5 +49,5 @@ public interface JobService {
 
     Job setStatusToStopped(long id);
 
-    Job update(@NonNull Job job);
+    Job update(Job job);
 }

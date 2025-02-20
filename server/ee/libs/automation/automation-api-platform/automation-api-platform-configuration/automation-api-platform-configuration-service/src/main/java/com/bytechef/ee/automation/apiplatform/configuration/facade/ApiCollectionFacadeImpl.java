@@ -54,7 +54,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -96,7 +95,7 @@ public class ApiCollectionFacadeImpl implements ApiCollectionFacade {
     }
 
     @Override
-    public ApiCollectionDTO createApiCollection(@NonNull ApiCollectionDTO apiCollectionDTO) {
+    public ApiCollectionDTO createApiCollection(ApiCollectionDTO apiCollectionDTO) {
         ApiCollection apiCollection = apiCollectionDTO.toApiCollection();
 
         ProjectDeployment projectDeployment = new ProjectDeployment();
@@ -116,7 +115,7 @@ public class ApiCollectionFacadeImpl implements ApiCollectionFacade {
 
     @Override
     public ApiCollectionEndpointDTO createApiCollectionEndpoint(
-        @NonNull ApiCollectionEndpointDTO apiCollectionEndpointDTO) {
+        ApiCollectionEndpointDTO apiCollectionEndpointDTO) {
 
         ApiCollectionEndpoint apiCollectionEndpoint = apiCollectionEndpointDTO.toApiCollectionEndpoint();
 
@@ -237,7 +236,7 @@ public class ApiCollectionFacadeImpl implements ApiCollectionFacade {
     }
 
     @Override
-    public ApiCollectionDTO updateApiCollection(@NonNull ApiCollectionDTO apiCollectionDTO) {
+    public ApiCollectionDTO updateApiCollection(ApiCollectionDTO apiCollectionDTO) {
         ApiCollection apiCollection = apiCollectionDTO.toApiCollection();
 
         List<Tag> tags = checkTags(apiCollectionDTO.tags());

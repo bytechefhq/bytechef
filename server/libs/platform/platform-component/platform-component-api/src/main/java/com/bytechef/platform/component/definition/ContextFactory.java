@@ -21,7 +21,6 @@ import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.TriggerContext;
 import com.bytechef.platform.component.domain.ComponentConnection;
 import com.bytechef.platform.constant.ModeType;
-import org.springframework.lang.NonNull;
 
 /**
  * @author Ivica Cardic
@@ -29,14 +28,13 @@ import org.springframework.lang.NonNull;
 public interface ContextFactory {
 
     ActionContext createActionContext(
-        @NonNull String componentName, int componentVersion, @NonNull String actionName, ModeType type,
-        Long principalId, Long principalWorkflowId, String workflowId, Long jobId, ComponentConnection connection,
+        String componentName, int componentVersion, String actionName, ModeType type, Long principalId,
+        Long principalWorkflowId, String workflowId, Long jobId, ComponentConnection connection,
         boolean editorEnvironment);
 
-    Context createContext(
-        @NonNull String componentName, ComponentConnection connection);
+    Context createContext(String componentName, ComponentConnection connection);
 
     TriggerContext createTriggerContext(
-        @NonNull String componentName, int componentVersion, @NonNull String triggerName, ModeType type,
-        Long principalId, String workflowReferenceCode, ComponentConnection connection, boolean editorEnvironment);
+        String componentName, int componentVersion, String triggerName, ModeType type, Long principalId,
+        String workflowReferenceCode, ComponentConnection connection, boolean editorEnvironment);
 }

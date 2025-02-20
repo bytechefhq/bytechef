@@ -27,7 +27,6 @@ import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Objects;
-import org.springframework.lang.NonNull;
 
 /**
  * @author Ivica Cardic
@@ -51,12 +50,12 @@ public final class TempFilesFileStorage implements FilesFileStorage {
     }
 
     @Override
-    public InputStream getFileStream(@NonNull FileEntry fileEntry) {
+    public InputStream getFileStream(FileEntry fileEntry) {
         return filesFileStorage.getFileStream(fileEntry);
     }
 
     @Override
-    public String readFileToString(@NonNull FileEntry fileEntry) {
+    public String readFileToString(FileEntry fileEntry) {
         if (Objects.equals(fileEntry.getUrl(), PlatformConstants.FILE_ENTRY_SAMPLE_URL)) {
             return "This is a sample file content";
         }
@@ -65,12 +64,12 @@ public final class TempFilesFileStorage implements FilesFileStorage {
     }
 
     @Override
-    public FileEntry storeFileContent(@NonNull String fileName, @NonNull String data) {
+    public FileEntry storeFileContent(String fileName, String data) {
         return filesFileStorage.storeFileContent(fileName, data);
     }
 
     @Override
-    public FileEntry storeFileContent(@NonNull String fileName, @NonNull InputStream inputStream) {
+    public FileEntry storeFileContent(String fileName, InputStream inputStream) {
         return filesFileStorage.storeFileContent(fileName, inputStream);
     }
 }

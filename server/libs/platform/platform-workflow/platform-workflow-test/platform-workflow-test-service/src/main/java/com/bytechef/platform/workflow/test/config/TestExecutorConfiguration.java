@@ -19,8 +19,6 @@ package com.bytechef.platform.workflow.test.config;
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.atlas.coordinator.task.completion.TaskCompletionHandlerFactory;
 import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcherResolverFactory;
-import com.bytechef.atlas.execution.facade.JobFacade;
-import com.bytechef.atlas.execution.facade.JobFacadeImpl;
 import com.bytechef.atlas.execution.repository.memory.InMemoryContextRepository;
 import com.bytechef.atlas.execution.repository.memory.InMemoryCounterRepository;
 import com.bytechef.atlas.execution.repository.memory.InMemoryJobRepository;
@@ -94,10 +92,6 @@ public class TestExecutorConfiguration {
 
         TaskFileStorage taskFileStorage = new TaskFileStorageImpl(new Base64FileStorageService());
 
-        JobFacade jobFacade = new JobFacadeImpl(
-            getEventPublisher(syncMessageBroker), contextService, jobService, taskExecutionService, taskFileStorage,
-            workflowService);
-
         return new JobTestExecutor(
             componentDefinitionService, contextService,
             new JobSyncExecutor(
@@ -106,7 +100,7 @@ public class TestExecutorConfiguration {
                     contextService, counterService, taskExecutionService, taskFileStorage),
                 getTaskDispatcherAdapterFactories(), List.of(new TestTaskDispatcherPreSendProcessor(jobService)),
                 getTaskDispatcherResolverFactories(
-                    syncMessageBroker, contextService, counterService, jobFacade, taskExecutionService,
+                    syncMessageBroker, contextService, counterService, taskExecutionService,
                     taskFileStorage),
                 taskExecutionService, taskHandlerRegistry, taskFileStorage, workflowService),
             taskDispatcherDefinitionService, taskExecutionService, taskFileStorage);
@@ -156,12 +150,12 @@ public class TestExecutorConfiguration {
 
     private List<TaskDispatcherResolverFactory> getTaskDispatcherResolverFactories(
         SyncMessageBroker syncMessageBroker, ContextService contextService, CounterService counterService,
-        JobFacade jobFacade, TaskExecutionService taskExecutionService, TaskFileStorage taskFileStorage) {
+        TaskExecutionService taskExecutionService, TaskFileStorage taskFileStorage) {
 
         ApplicationEventPublisher eventPublisher = getEventPublisher(syncMessageBroker);
 
         return List.of(
-            (taskDispatcher) -> new ApprovalTaskDispatcher(eventPublisher, jobFacade, taskExecutionService),
+            (taskDispatcher) -> new ApprovalTaskDispatcher(eventPublisher, taskExecutionService),
             (taskDispatcher) -> new BranchTaskDispatcher(
                 eventPublisher, contextService, taskDispatcher, taskExecutionService, taskFileStorage),
             (taskDispatcher) -> new ConditionTaskDispatcher(

@@ -21,7 +21,6 @@ import com.bytechef.embedded.configuration.dto.IntegrationInstanceConfigurationD
 import com.bytechef.platform.constant.Environment;
 import com.bytechef.platform.tag.domain.Tag;
 import java.util.List;
-import org.springframework.lang.NonNull;
 
 /**
  * @author Ivica Cardic
@@ -41,7 +40,7 @@ public interface IntegrationInstanceConfigurationFacade {
         long integrationInstanceConfigurationId, String workflowId, boolean enable);
 
     IntegrationInstanceConfigurationDTO getEnabledIntegrationInstanceConfigurationIntegration(
-        long integrationId, @NonNull Environment environment);
+        long integrationId, Environment environment);
 
     List<IntegrationInstanceConfigurationDTO> getEnabledIntegrationInstanceConfigurationIntegrations(
         Environment environment);

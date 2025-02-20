@@ -54,7 +54,6 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
 
@@ -73,9 +72,9 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
 
     @Override
     public List<Property> executeDynamicProperties(
-        @NonNull String componentName, int componentVersion, @NonNull String actionName, @NonNull String propertyName,
-        @NonNull Map<String, ?> inputParameters, @NonNull List<String> lookupDependsOnPaths,
-        ComponentConnection connection, @NonNull ActionContext context) {
+        String componentName, int componentVersion, String actionName, String propertyName,
+        Map<String, ?> inputParameters, List<String> lookupDependsOnPaths,
+        ComponentConnection connection, ActionContext context) {
 
         WrapResult wrapResult = wrap(inputParameters, lookupDependsOnPaths, connection);
 
@@ -103,9 +102,8 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
 
     @Override
     public OutputResponse executeMultipleConnectionsOutput(
-        @NonNull String componentName, int componentVersion, @NonNull String actionName,
-        @NonNull Map<String, ?> inputParameters, @NonNull Map<String, ComponentConnection> connections,
-        @NonNull Map<String, ?> extensions, @NonNull ActionContext context) {
+        String componentName, int componentVersion, String actionName, Map<String, ?> inputParameters,
+        Map<String, ComponentConnection> connections, Map<String, ?> extensions, ActionContext context) {
 
         com.bytechef.component.definition.ActionDefinition actionDefinition =
             componentDefinitionRegistry.getActionDefinition(componentName, componentVersion, actionName);
@@ -130,9 +128,9 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
 
     @Override
     public Object executeMultipleConnectionsPerform(
-        @NonNull String componentName, int componentVersion, @NonNull String actionName,
-        @NonNull Map<String, ?> inputParameters, @NonNull Map<String, ComponentConnection> connections,
-        Map<String, ?> extensions, @NonNull ActionContext context) {
+        String componentName, int componentVersion, String actionName,
+        Map<String, ?> inputParameters, Map<String, ComponentConnection> connections,
+        Map<String, ?> extensions, ActionContext context) {
 
         com.bytechef.component.definition.ActionDefinition actionDefinition =
             componentDefinitionRegistry.getActionDefinition(componentName, componentVersion, actionName);
@@ -151,9 +149,9 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
 
     @Override
     public List<Option> executeOptions(
-        @NonNull String componentName, int componentVersion, @NonNull String actionName, @NonNull String propertyName,
-        @NonNull Map<String, ?> inputParameters, @NonNull List<String> lookupDependsOnPaths, String searchText,
-        ComponentConnection connection, @NonNull ActionContext context) {
+        String componentName, int componentVersion, String actionName, String propertyName,
+        Map<String, ?> inputParameters, List<String> lookupDependsOnPaths, String searchText,
+        ComponentConnection connection, ActionContext context) {
 
         try {
             WrapResult wrapResult = wrap(inputParameters, lookupDependsOnPaths, connection);
@@ -202,8 +200,8 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
 
     @Override
     public OutputResponse executeSingleConnectionOutput(
-        @NonNull String componentName, int componentVersion, @NonNull String actionName,
-        @NonNull Map<String, ?> inputParameters, ComponentConnection connection, @NonNull ActionContext context) {
+        String componentName, int componentVersion, String actionName,
+        Map<String, ?> inputParameters, ComponentConnection connection, ActionContext context) {
 
         com.bytechef.component.definition.ActionDefinition actionDefinition =
             componentDefinitionRegistry.getActionDefinition(componentName, componentVersion, actionName);
@@ -234,9 +232,9 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
 
     @Override
     public Object executeSingleConnectionPerform(
-        @NonNull String componentName, int componentVersion, @NonNull String actionName,
-        @NonNull Map<String, ?> inputParameters, @Nullable ComponentConnection connection,
-        @NonNull ActionContext context) {
+        String componentName, int componentVersion, String actionName,
+        Map<String, ?> inputParameters, @Nullable ComponentConnection connection,
+        ActionContext context) {
 
         com.bytechef.component.definition.ActionDefinition actionDefinition =
             componentDefinitionRegistry.getActionDefinition(componentName, componentVersion, actionName);
@@ -261,8 +259,8 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
 
     @Override
     public String executeWorkflowNodeDescription(
-        @NonNull String componentName, int componentVersion, @NonNull String actionName,
-        @NonNull Map<String, ?> inputParameters, @NonNull ActionContext context) {
+        String componentName, int componentVersion, String actionName,
+        Map<String, ?> inputParameters, ActionContext context) {
 
         ActionWorkflowNodeDescriptionFunction workflowNodeDescriptionFunction = getWorkflowNodeDescriptionFunction(
             componentName, componentVersion, actionName);
@@ -277,7 +275,7 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
 
     @Override
     public ActionDefinition getActionDefinition(
-        @NonNull String componentName, int componentVersion, @NonNull String actionName) {
+        String componentName, int componentVersion, String actionName) {
         if (componentDefinitionRegistry.hasComponentDefinition(componentName, componentVersion)) {
             return new ActionDefinition(
                 componentDefinitionRegistry.getActionDefinition(componentName, componentVersion, actionName),
@@ -291,7 +289,7 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
     }
 
     @Override
-    public List<ActionDefinition> getActionDefinitions(@NonNull String componentName, int componentVersion) {
+    public List<ActionDefinition> getActionDefinitions(String componentName, int componentVersion) {
         return componentDefinitionRegistry.getActionDefinitions(componentName, componentVersion)
             .stream()
             .map(actionDefinition -> new ActionDefinition(actionDefinition, componentName, componentVersion))
@@ -300,7 +298,7 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
 
     @Override
     public boolean isSingleConnectionPerform(
-        @NonNull String componentName, int componentVersion, @NonNull String actionName) {
+        String componentName, int componentVersion, String actionName) {
 
         com.bytechef.component.definition.ActionDefinition actionDefinition =
             componentDefinitionRegistry.getActionDefinition(componentName, componentVersion, actionName);

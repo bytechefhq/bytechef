@@ -26,7 +26,6 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Map;
 import java.util.Objects;
-import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
 
 /**
@@ -34,8 +33,8 @@ import org.springframework.lang.Nullable;
  */
 @SuppressFBWarnings("EI")
 public record ComponentConnection(
-    String componentName, int version, long connectionId, @NonNull Map<String, ?> parameters,
-    @Nullable String authorizationName) implements ParameterConnection {
+    String componentName, int version, long connectionId, Map<String, ?> parameters, @Nullable String authorizationName)
+    implements ParameterConnection {
 
     public ComponentConnection {
         if (authorizationName != null) {

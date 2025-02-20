@@ -22,20 +22,20 @@ import com.bytechef.embedded.configuration.dto.IntegrationWorkflowDTO;
 import com.bytechef.platform.category.domain.Category;
 import com.bytechef.platform.tag.domain.Tag;
 import java.util.List;
-import org.springframework.lang.NonNull;
+import org.springframework.lang.Nullable;
 
 /**
  * @author Ivica Cardic
  */
 public interface IntegrationFacade {
 
-    long addWorkflow(long id, @NonNull String definition);
+    long addWorkflow(long id, String definition);
 
-    long createIntegration(@NonNull IntegrationDTO integrationDTO);
+    long createIntegration(IntegrationDTO integrationDTO);
 
     void deleteIntegration(long id);
 
-    void deleteWorkflow(@NonNull String workflowId);
+    void deleteWorkflow(String workflowId);
 
     IntegrationDTO getIntegration(long id);
 
@@ -55,14 +55,15 @@ public interface IntegrationFacade {
     List<IntegrationWorkflowDTO> getIntegrationWorkflows(long id);
 
     List<IntegrationDTO> getIntegrations(
-        Long categoryId, boolean integrationInstanceConfigurations, Long tagId, Status status,
+        @Nullable Long categoryId, boolean integrationInstanceConfigurations, @Nullable Long tagId,
+        @Nullable Status status,
         boolean includeAllFields);
 
-    void publishIntegration(long id, String description);
+    void publishIntegration(long id, @Nullable String description);
 
-    void updateIntegration(@NonNull IntegrationDTO integration);
+    void updateIntegration(IntegrationDTO integration);
 
-    void updateIntegrationTags(long id, @NonNull List<Tag> tags);
+    void updateIntegrationTags(long id, List<Tag> tags);
 
     void updateWorkflow(String workflowId, String definition, int version);
 }

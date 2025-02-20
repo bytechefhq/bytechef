@@ -17,22 +17,21 @@
 package com.bytechef.platform.apiconnector.file.storage;
 
 import com.bytechef.file.storage.domain.FileEntry;
-import org.springframework.lang.NonNull;
 
 /**
  * @author Ivica Cardic
  */
 public interface ApiConnectorFileStorage {
 
-    void deleteApiConnectorDefinition(@NonNull FileEntry componentFile);
+    void deleteApiConnectorDefinition(FileEntry componentFile);
 
-    void deleteApiConnectorSpecification(@NonNull FileEntry specificationFile);
+    void deleteApiConnectorSpecification(FileEntry specificationFile);
 
-    String readApiConnectorDefinition(@NonNull FileEntry componentFile);
+    String readApiConnectorDefinition(FileEntry componentFile);
 
-    String readApiConnectorSpecification(@NonNull FileEntry specificationFile);
+    String readApiConnectorSpecification(FileEntry specificationFile);
 
-    FileEntry storeApiConnectorDefinition(String filename, @NonNull String definition);
+    FileEntry storeApiConnectorDefinition(String filename, String definition);
 
-    FileEntry storeApiConnectorSpecification(@NonNull String filename, @NonNull String specification);
+    FileEntry storeApiConnectorSpecification(String filename, String specification);
 }

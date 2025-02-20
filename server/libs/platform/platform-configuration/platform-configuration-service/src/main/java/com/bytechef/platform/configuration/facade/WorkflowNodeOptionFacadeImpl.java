@@ -29,7 +29,7 @@ import com.bytechef.platform.definition.WorkflowNodeType;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Map;
-import org.springframework.lang.NonNull;
+import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
 
 /**
@@ -60,8 +60,8 @@ public class WorkflowNodeOptionFacadeImpl implements WorkflowNodeOptionFacade {
     @Override
     @SuppressWarnings("unchecked")
     public List<Option> getWorkflowNodeOptions(
-        @NonNull String workflowId, @NonNull String workflowNodeName, @NonNull String propertyName,
-        @NonNull List<String> lookupDependsOnPaths, String searchText) {
+        String workflowId, String workflowNodeName, String propertyName, List<String> lookupDependsOnPaths,
+        @Nullable String searchText) {
 
         Long connectionId = workflowTestConfigurationService
             .fetchWorkflowTestConfigurationConnectionId(workflowId, workflowNodeName)

@@ -21,6 +21,7 @@ import com.bytechef.automation.configuration.domain.ProjectVersion;
 import com.bytechef.automation.configuration.domain.ProjectVersion.Status;
 import java.util.List;
 import java.util.Optional;
+import org.springframework.lang.Nullable;
 
 /**
  * @author Ivica Cardic
@@ -45,11 +46,13 @@ public interface ProjectService {
 
     List<Project> getProjects(List<Long> ids);
 
-    List<Project> getProjects(Long workspaceId, List<Long> ids, Long categoryId, Long tagId, Status status);
+    List<Project> getProjects(
+        @Nullable Long workspaceId, List<Long> ids, @Nullable Long categoryId, @Nullable Long tagId,
+        @Nullable Status status);
 
     Project getWorkflowProject(String workflowId);
 
-    int publishProject(long id, String description, boolean syncWithGit);
+    int publishProject(long id, @Nullable String description, boolean syncWithGit);
 
     Project update(long id, List<Long> tagIds);
 

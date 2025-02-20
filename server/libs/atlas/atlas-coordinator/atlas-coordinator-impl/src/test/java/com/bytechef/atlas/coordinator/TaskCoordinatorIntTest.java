@@ -63,6 +63,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -74,6 +75,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.core.io.support.ResourcePatternResolver;
 import org.springframework.data.jdbc.repository.config.EnableJdbcRepositories;
+import org.springframework.lang.Nullable;
 
 /**
  * @author Arik Cohen
@@ -89,15 +91,19 @@ public class TaskCoordinatorIntTest {
     private static final TaskFileStorage TASK_FILE_STORAGE = new TaskFileStorageImpl(new Base64FileStorageService());
 
     @Autowired
+    @Nullable
     private ContextService contextService;
 
     @Autowired
+    @Nullable
     private JobService jobService;
 
     @Autowired
+    @Nullable
     private TaskExecutionService taskExecutionService;
 
     @Autowired
+    @Nullable
     private WorkflowService workflowService;
 
     @Test
@@ -120,8 +126,9 @@ public class TaskCoordinatorIntTest {
         taskHandlerMap.put("randomHelper/v1/randomInt", taskExecution -> null);
 
         JobSyncExecutor jobSyncExecutor = new JobSyncExecutor(
-            contextService, jobService, List.of(), taskExecutionService, taskHandlerMap::get, TASK_FILE_STORAGE,
-            workflowService);
+            Objects.requireNonNull(contextService), Objects.requireNonNull(jobService), List.of(),
+            Objects.requireNonNull(taskExecutionService), taskHandlerMap::get, TASK_FILE_STORAGE,
+            Objects.requireNonNull(workflowService));
 
         return jobSyncExecutor.execute(new JobParametersDTO(workflowId, Collections.singletonMap("yourName", "me")));
     }

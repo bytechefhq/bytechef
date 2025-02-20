@@ -15,7 +15,6 @@ import java.util.List;
 import java.util.Optional;
 import org.apache.commons.lang3.Validate;
 import org.springframework.data.domain.Sort;
-import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -36,7 +35,7 @@ public class CustomComponentServiceImpl implements CustomComponentService {
     }
 
     @Override
-    public CustomComponent create(@NonNull CustomComponent customComponent) {
+    public CustomComponent create(CustomComponent customComponent) {
         Validate.notNull(customComponent, "'customComponent' must not be null");
         Validate.isTrue(customComponent.getId() == null, "'id' must be null");
         Validate.notNull(customComponent.getName(), "'componentName' must not be null");
@@ -76,7 +75,7 @@ public class CustomComponentServiceImpl implements CustomComponentService {
     }
 
     @Override
-    public CustomComponent update(@NonNull CustomComponent customComponent) {
+    public CustomComponent update(CustomComponent customComponent) {
         Validate.notNull(customComponent, "'customComponent' must not be null");
 
         CustomComponent curCustomComponent = getCustomComponent(Validate.notNull(customComponent.getId(), "id"));

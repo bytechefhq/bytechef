@@ -13,7 +13,6 @@ import com.bytechef.ee.automation.apiplatform.configuration.repository.ApiCollec
 import com.bytechef.platform.constant.Environment;
 import java.util.List;
 import org.apache.commons.lang3.Validate;
-import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -33,7 +32,7 @@ public class ApiCollectionServiceImpl implements ApiCollectionService {
     }
 
     @Override
-    public ApiCollection create(@NonNull ApiCollection apiCollection) {
+    public ApiCollection create(ApiCollection apiCollection) {
         Validate.notNull(apiCollection, "'openApiCollection' must not be null");
         Validate.notNull(apiCollection.getCollectionVersion(), "'collectionVersion' must not be null");
         Validate.isTrue(apiCollection.getId() == null, "'id' must be null");
@@ -74,7 +73,7 @@ public class ApiCollectionServiceImpl implements ApiCollectionService {
     }
 
     @Override
-    public ApiCollection update(@NonNull ApiCollection apiCollection) {
+    public ApiCollection update(ApiCollection apiCollection) {
         Validate.notNull(apiCollection, "'openApiCollection' must not be null");
         Validate.notNull(apiCollection.getCollectionVersion(), "'collectionVersion' must not be null");
         Validate.notNull(apiCollection.getName(), "name");
@@ -91,7 +90,7 @@ public class ApiCollectionServiceImpl implements ApiCollectionService {
     }
 
     @Override
-    public ApiCollection update(long id, @NonNull List<Long> tagIds) {
+    public ApiCollection update(long id, List<Long> tagIds) {
         ApiCollection connection = getApiCollection(id);
 
         connection.setTagIds(tagIds);

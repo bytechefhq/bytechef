@@ -22,7 +22,6 @@ import com.bytechef.embedded.configuration.repository.IntegrationWorkflowReposit
 import java.util.List;
 import java.util.UUID;
 import org.apache.commons.lang3.Validate;
-import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -57,14 +56,14 @@ public class IntegrationWorkflowServiceImpl implements IntegrationWorkflowServic
     }
 
     @Override
-    public void delete(long integrationId, int integrationVersion, @NonNull String workflowId) {
+    public void delete(long integrationId, int integrationVersion, String workflowId) {
         integrationWorkflowRepository
             .findByIntegrationIdAndIntegrationVersionAndWorkflowId(integrationId, integrationVersion, workflowId)
             .ifPresent(IntegrationWorkflow -> integrationWorkflowRepository.deleteById(IntegrationWorkflow.getId()));
     }
 
     @Override
-    public void delete(@NonNull List<Long> ids) {
+    public void delete(List<Long> ids) {
         integrationWorkflowRepository.deleteAllById(ids);
     }
 

@@ -41,9 +41,8 @@ class TriggerContextImpl extends ContextImpl implements TriggerContext, TriggerC
     @SuppressFBWarnings("EI")
     public TriggerContextImpl(
         String componentName, int componentVersion, String triggerName, ModeType type, Long principalId,
-        String workflowReferenceCode, ComponentConnection connection, boolean editorEnvironment,
-        DataStorage dataStorage,
-        FilesFileStorage filesFileStorage, HttpClientExecutor httpClientExecutor) {
+        String workflowReferenceCode, ComponentConnection connection, DataStorage dataStorage,
+        FilesFileStorage filesFileStorage, HttpClientExecutor httpClientExecutor, boolean editorEnvironment) {
 
         super(componentName, componentVersion, triggerName, filesFileStorage, connection, httpClientExecutor);
 

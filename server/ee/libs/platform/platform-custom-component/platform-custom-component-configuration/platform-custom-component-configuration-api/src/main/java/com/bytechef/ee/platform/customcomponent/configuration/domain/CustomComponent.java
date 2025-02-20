@@ -18,7 +18,6 @@ import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.annotation.Version;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
-import org.springframework.lang.NonNull;
 
 /**
  * @version ee
@@ -37,7 +36,7 @@ public class CustomComponent {
             this.extension = extension;
         }
 
-        public static Language of(@NonNull String filename) {
+        public static Language of(String filename) {
             if (filename.endsWith(".jar")) {
                 return JAVA;
             } else if (filename.endsWith(".js")) {

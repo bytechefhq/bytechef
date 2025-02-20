@@ -9,7 +9,6 @@ package com.bytechef.ee.platform.customcomponent.file.storage;
 
 import com.bytechef.file.storage.domain.FileEntry;
 import java.net.URL;
-import org.springframework.lang.NonNull;
 
 /**
  * @version ee
@@ -18,9 +17,9 @@ import org.springframework.lang.NonNull;
  */
 public interface CustomComponentFileStorage {
 
-    void deleteCustomComponentFile(@NonNull FileEntry componentFile);
+    void deleteCustomComponentFile(FileEntry componentFile);
 
-    URL getCustomComponentFileURL(@NonNull FileEntry componentFile);
+    URL getCustomComponentFileURL(FileEntry componentFile);
 
-    FileEntry storeCustomComponentFile(@NonNull String filename, @NonNull byte[] bytes);
+    FileEntry storeCustomComponentFile(String filename, byte[] bytes);
 }

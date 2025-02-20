@@ -21,7 +21,6 @@ import com.bytechef.platform.configuration.domain.WorkflowNodeTestOutput;
 import com.bytechef.platform.definition.WorkflowNodeType;
 import com.bytechef.platform.domain.OutputResponse;
 import java.util.Optional;
-import org.springframework.lang.NonNull;
 
 /**
  * @author Ivica Cardic
@@ -35,8 +34,7 @@ public interface WorkflowNodeTestOutputService {
     void removeUnusedNodeTestOutputs(Workflow workflow);
 
     WorkflowNodeTestOutput save(
-        @NonNull String workflowId, @NonNull String workflowNodeName, @NonNull WorkflowNodeType workflowNodeType,
-        @NonNull OutputResponse outputResponse);
+        String workflowId, String workflowNodeName, WorkflowNodeType workflowNodeType, OutputResponse outputResponse);
 
     void updateWorkflowId(String oldWorkflowId, String newWorkflowId);
 }

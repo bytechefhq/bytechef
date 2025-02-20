@@ -14,11 +14,9 @@ import com.bytechef.platform.constant.ModeType;
 import com.bytechef.platform.domain.OutputResponse;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotNull;
 import java.util.List;
 import java.util.Map;
 import org.springframework.http.ResponseEntity;
-import org.springframework.lang.NonNull;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -117,34 +115,31 @@ public class RemoteActionDefinitionFacadeController {
 
     @SuppressFBWarnings("EI")
     public record NodeDescriptionRequest(
-        @NotNull String componentName, int componentVersion, @NotNull String actionName,
-        Map<String, Object> inputParameters) {
+        String componentName, int componentVersion, String actionName, Map<String, Object> inputParameters) {
     }
 
     @SuppressFBWarnings("EI")
     public record OptionsRequest(
-        @NotNull String componentName, int componentVersion, @NotNull String actionName, @NotNull String propertyName,
+        String componentName, int componentVersion, String actionName, String propertyName,
         Map<String, Object> inputParameters, Long connectionId, List<String> lookupDependsOnPaths, String searchText) {
     }
 
     @SuppressFBWarnings("EI")
     public record OutputRequest(
-        @NotNull String componentName, int componentVersion, @NotNull String actionName,
-        Map<String, Object> inputParameters, @NotNull Map<String, Long> connectionIds) {
+        String componentName, int componentVersion, String actionName, Map<String, Object> inputParameters,
+        Map<String, Long> connectionIds) {
     }
 
     @SuppressFBWarnings("EI")
     public record PropertiesRequest(
-        @NotNull String componentName, int componentVersion, @NotNull String actionName,
-        @NotNull String propertyName, @NonNull String workflowId, Map<String, Object> inputParameters,
-        Long connectionId, List<String> lookupDependsOnPaths) {
+        String componentName, int componentVersion, String actionName, String propertyName, String workflowId,
+        Map<String, Object> inputParameters, Long connectionId, List<String> lookupDependsOnPaths) {
     }
 
     @SuppressFBWarnings("EI")
     public record PerformRequest(
-        @NotNull String componentName, int componentVersion, @NotNull String actionName, ModeType type,
-        Long principalId, Long principalWorkflowId, long jobId, @NonNull String workflowId,
-        @NotNull Map<String, ?> inputParameters, @NotNull Map<String, Long> connectionIds,
-        @NotNull Map<String, Long> extensions) {
+        String componentName, int componentVersion, String actionName, ModeType type, Long principalId,
+        Long principalWorkflowId, long jobId, String workflowId, Map<String, ?> inputParameters,
+        Map<String, Long> connectionIds, Map<String, Long> extensions) {
     }
 }

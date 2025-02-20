@@ -20,7 +20,6 @@ import java.time.Instant;
 import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.lang.NonNull;
 
 /**
  * @author Ivica Cardic
@@ -28,6 +27,6 @@ import org.springframework.lang.NonNull;
 public interface CustomPrincipalJobRepository {
 
     Page<Long> findAllJobIds(
-        Integer status, Instant startDate, Instant endDate, List<Long> instanceIds, int type,
-        @NonNull List<String> workflowIds, Pageable pageable);
+        Integer status, Instant startDate, Instant endDate, List<Long> instanceIds, int type, List<String> workflowIds,
+        Pageable pageable);
 }

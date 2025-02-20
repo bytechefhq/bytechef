@@ -14,7 +14,6 @@ import com.bytechef.file.storage.domain.FileEntry;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Map;
 import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
 
 /**
@@ -36,7 +35,7 @@ public class RemoteContextServiceClient implements ContextService {
     }
 
     @Override
-    public FileEntry peek(long stackId, @NonNull Classname classname) {
+    public FileEntry peek(long stackId, Classname classname) {
         return loadBalancedRestClient.get(
             uriBuilder -> uriBuilder
                 .host(EXECUTION_APP)
@@ -46,7 +45,7 @@ public class RemoteContextServiceClient implements ContextService {
     }
 
     @Override
-    public FileEntry peek(long stackId, int subStackId, @NonNull Classname classname) {
+    public FileEntry peek(long stackId, int subStackId, Classname classname) {
         return loadBalancedRestClient.get(
             uriBuilder -> uriBuilder
                 .host(EXECUTION_APP)
@@ -56,7 +55,7 @@ public class RemoteContextServiceClient implements ContextService {
     }
 
     @Override
-    public void push(long stackId, @NonNull Classname classname, @NonNull FileEntry value) {
+    public void push(long stackId, Classname classname, FileEntry value) {
         loadBalancedRestClient.post(
             uriBuilder -> uriBuilder
                 .host(EXECUTION_APP)
@@ -66,7 +65,7 @@ public class RemoteContextServiceClient implements ContextService {
     }
 
     @Override
-    public void push(long stackId, int subStackId, @NonNull Classname classname, @NonNull FileEntry value) {
+    public void push(long stackId, int subStackId, Classname classname, FileEntry value) {
         loadBalancedRestClient.post(
             uriBuilder -> uriBuilder
                 .host(EXECUTION_APP)

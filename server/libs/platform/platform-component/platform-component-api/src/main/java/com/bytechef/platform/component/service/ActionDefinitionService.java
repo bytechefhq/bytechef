@@ -26,7 +26,6 @@ import com.bytechef.platform.component.domain.Property;
 import com.bytechef.platform.domain.OutputResponse;
 import java.util.List;
 import java.util.Map;
-import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
 
 /**
@@ -57,14 +56,13 @@ public interface ActionDefinitionService {
      *                call to it results in errors
      */
     List<Property> executeDynamicProperties(
-        @NonNull String componentName, int componentVersion, @NonNull String actionName, @NonNull String propertyName,
-        @NonNull Map<String, ?> inputParameters, @NonNull List<String> lookupDependsOnPaths,
-        @Nullable ComponentConnection connection, @NonNull ActionContext context);
+        String componentName, int componentVersion, String actionName, String propertyName,
+        Map<String, ?> inputParameters, List<String> lookupDependsOnPaths, @Nullable ComponentConnection connection,
+        ActionContext context);
 
     OutputResponse executeMultipleConnectionsOutput(
-        @NonNull String componentName, int componentVersion, @NonNull String actionName,
-        @NonNull Map<String, ?> inputParameters, @NonNull Map<String, ComponentConnection> connections,
-        @NonNull Map<String, ?> extensions, @NonNull ActionContext context);
+        String componentName, int componentVersion, String actionName, Map<String, ?> inputParameters,
+        Map<String, ComponentConnection> connections, Map<String, ?> extensions, ActionContext context);
 
     /**
      * Executes the action of particular component version which define perform function via
@@ -84,22 +82,22 @@ public interface ActionDefinitionService {
      *                call to it results in errors
      */
     Object executeMultipleConnectionsPerform(
-        @NonNull String componentName, int componentVersion, @NonNull String actionName,
-        @NonNull Map<String, ?> inputParameters, @NonNull Map<String, ComponentConnection> connections,
-        Map<String, ?> extensions, @NonNull ActionContext context);
+        String componentName, int componentVersion, String actionName,
+        Map<String, ?> inputParameters, Map<String, ComponentConnection> connections, Map<String, ?> extensions,
+        ActionContext context);
 
     List<Option> executeOptions(
-        @NonNull String componentName, int componentVersion, @NonNull String actionName, @NonNull String propertyName,
-        @NonNull Map<String, ?> inputParameters, @NonNull List<String> lookupDependsOnPaths, String searchText,
-        @Nullable ComponentConnection connection, @NonNull ActionContext context);
+        String componentName, int componentVersion, String actionName, String propertyName,
+        Map<String, ?> inputParameters, List<String> lookupDependsOnPaths, String searchText,
+        @Nullable ComponentConnection connection, ActionContext context);
 
     ProviderException executeProcessErrorResponse(
         String componentName, int componentVersion, String actionName, int statusCode, Object body,
         Context actionContext);
 
     OutputResponse executeSingleConnectionOutput(
-        @NonNull String componentName, int componentVersion, @NonNull String actionName,
-        @NonNull Map<String, ?> inputParameters, ComponentConnection connection, @NonNull ActionContext context);
+        String componentName, int componentVersion, String actionName, Map<String, ?> inputParameters,
+        ComponentConnection connection, ActionContext context);
 
     /**
      * Executes the action of particular component version which define perform function via
@@ -118,19 +116,16 @@ public interface ActionDefinitionService {
      *                call to it results in errors
      */
     Object executeSingleConnectionPerform(
-        @NonNull String componentName, int componentVersion, @NonNull String actionName,
-        @NonNull Map<String, ?> inputParameters, @Nullable ComponentConnection connection,
-        @NonNull ActionContext context);
+        String componentName, int componentVersion, String actionName, Map<String, ?> inputParameters,
+        @Nullable ComponentConnection connection, ActionContext context);
 
     String executeWorkflowNodeDescription(
-        @NonNull String componentName, int componentVersion, @NonNull String actionName,
-        @NonNull Map<String, ?> inputParameters, @NonNull ActionContext context);
+        String componentName, int componentVersion, String actionName, Map<String, ?> inputParameters,
+        ActionContext context);
 
-    ActionDefinition getActionDefinition(
-        @NonNull String componentName, int componentVersion, @NonNull String actionName);
+    ActionDefinition getActionDefinition(String componentName, int componentVersion, String actionName);
 
-    List<ActionDefinition> getActionDefinitions(@NonNull String componentName, int componentVersion);
+    List<ActionDefinition> getActionDefinitions(String componentName, int componentVersion);
 
-    boolean isSingleConnectionPerform(
-        @NonNull String componentName, int componentVersion, @NonNull String actionName);
+    boolean isSingleConnectionPerform(String componentName, int componentVersion, String actionName);
 }

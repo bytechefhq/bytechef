@@ -20,28 +20,27 @@ import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.domain.Workflow.Format;
 import com.bytechef.atlas.configuration.domain.Workflow.SourceType;
 import java.util.List;
-import org.springframework.lang.NonNull;
 
 /**
  * @author Ivica Cardic
  */
 public interface WorkflowService {
 
-    Workflow create(@NonNull String definition, @NonNull Format format, @NonNull SourceType sourceType);
+    Workflow create(String definition, Format format, SourceType sourceType);
 
-    void delete(@NonNull String id);
+    void delete(String id);
 
-    void delete(@NonNull List<String> ids);
+    void delete(List<String> ids);
 
-    Workflow duplicateWorkflow(@NonNull String id);
+    Workflow duplicateWorkflow(String id);
 
     List<Workflow> getWorkflows();
 
-    Workflow getWorkflow(@NonNull String id);
+    Workflow getWorkflow(String id);
 
-    List<Workflow> getWorkflows(@NonNull List<String> workflowIds);
+    List<Workflow> getWorkflows(List<String> workflowIds);
 
-    void refreshCache(@NonNull String id);
+    void refreshCache(String id);
 
-    Workflow update(@NonNull String id, @NonNull String definition, int version);
+    Workflow update(String id, String definition, int version);
 }

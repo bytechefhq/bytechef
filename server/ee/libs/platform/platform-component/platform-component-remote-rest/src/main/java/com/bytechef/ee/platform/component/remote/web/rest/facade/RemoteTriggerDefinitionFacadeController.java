@@ -18,11 +18,9 @@ import com.bytechef.platform.constant.ModeType;
 import com.bytechef.platform.domain.OutputResponse;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotNull;
 import java.util.List;
 import java.util.Map;
 import org.springframework.http.ResponseEntity;
-import org.springframework.lang.NonNull;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -234,71 +232,71 @@ public class RemoteTriggerDefinitionFacadeController {
 
     @SuppressFBWarnings("EI")
     public record DynamicWebhookDisableRequest(
-        @NotNull String componentName, int componentVersion, @NotNull String triggerName,
-        @NotNull Map<String, Object> inputParameters, @NotNull Map<String, ?> outputParameters,
-        @NotNull String workflowExecutionId, Long connectionId) {
+        String componentName, int componentVersion, String triggerName,
+        Map<String, Object> inputParameters, Map<String, ?> outputParameters,
+        String workflowExecutionId, Long connectionId) {
     }
 
     @SuppressFBWarnings("EI")
     public record DynamicWebhookEnableRequest(
-        @NotNull String componentName, int componentVersion, @NotNull String triggerName,
-        @NotNull Map<String, Object> inputParameters, @NotNull String workflowExecutionId, @NotNull String webhookUrl,
+        String componentName, int componentVersion, String triggerName,
+        Map<String, Object> inputParameters, String workflowExecutionId, String webhookUrl,
         Long connectionId) {
     }
 
     @SuppressFBWarnings("EI")
     public record DynamicWebhookRefreshRequest(
-        @NotNull String componentName, int componentVersion, @NotNull String triggerName,
-        @NotNull Map<String, Long> outputParameters, Long connectionId) {
+        String componentName, int componentVersion, String triggerName,
+        Map<String, Long> outputParameters, Long connectionId) {
     }
 
     @SuppressFBWarnings("EI")
     public record NodeDescriptionRequest(
-        @NotNull String componentName, String triggerName, int componentVersion, Map<String, ?> inputParameters) {
+        String componentName, String triggerName, int componentVersion, Map<String, ?> inputParameters) {
     }
 
     @SuppressFBWarnings("EI")
     public record ListenerDisableRequest(
-        @NotNull String componentName, int componentVersion, @NotNull String triggerName,
-        @NotNull Map<String, ?> inputParameters, @NotNull String workflowExecutionId, Long connectionId) {
+        String componentName, int componentVersion, String triggerName,
+        Map<String, ?> inputParameters, String workflowExecutionId, Long connectionId) {
     }
 
     @SuppressFBWarnings("EI")
     public record ListenerEnableRequest(
-        @NotNull String componentName, int componentVersion, @NotNull String triggerName,
-        @NotNull Map<String, ?> inputParameters, @NotNull String workflowExecutionId, Long connectionId) {
+        String componentName, int componentVersion, String triggerName,
+        Map<String, ?> inputParameters, String workflowExecutionId, Long connectionId) {
     }
 
     @SuppressFBWarnings("EI")
     public record OptionsRequest(
-        @NotNull String componentName, int componentVersion, @NotNull String triggerName, @NotNull String propertyName,
-        @NotNull Map<String, ?> inputParameters, Long connectionId, List<String> lookupDependsOnPaths,
+        String componentName, int componentVersion, String triggerName, String propertyName,
+        Map<String, ?> inputParameters, Long connectionId, List<String> lookupDependsOnPaths,
         String searchText) {
     }
 
     @SuppressFBWarnings("EI")
     public record OutputRequest(
-        @NotNull String componentName, int componentVersion, @NotNull String triggerName,
-        @NotNull Map<String, ?> inputParameters, Long connectionId) {
+        String componentName, int componentVersion, String triggerName,
+        Map<String, ?> inputParameters, Long connectionId) {
     }
 
     @SuppressFBWarnings("EI")
     public record PropertiesRequest(
-        @NotNull String componentName, int componentVersion, @NotNull String triggerName, @NotNull String propertyName,
-        @NotNull Map<String, Object> inputParameters, Long connectionId, List<String> lookupDependsOnPaths) {
+        String componentName, int componentVersion, String triggerName, String propertyName,
+        Map<String, Object> inputParameters, Long connectionId, List<String> lookupDependsOnPaths) {
     }
 
     @SuppressFBWarnings("EI")
     public record TriggerRequest(
         String componentName, int componentVersion, String triggerName,
-        @NonNull ModeType type, Long principalId, @NonNull String workflowReferenceCode,
-        @NotNull Map<String, ?> inputParameters, Object state, @NotNull WebhookRequest webhookRequest,
+        ModeType type, Long principalId, String workflowReferenceCode,
+        Map<String, ?> inputParameters, Object state, WebhookRequest webhookRequest,
         Long connectionId) {
     }
 
     @SuppressFBWarnings("EI")
     public record WebhookValidateRequest(
-        @NotNull String componentName, int componentVersion, @NotNull String triggerName,
-        @NotNull Map<String, ?> inputParameters, @NotNull WebhookRequest webhookRequest, Long connectionId) {
+        String componentName, int componentVersion, String triggerName,
+        Map<String, ?> inputParameters, WebhookRequest webhookRequest, Long connectionId) {
     }
 }

@@ -12,7 +12,6 @@ import com.bytechef.embedded.configuration.domain.AppEvent;
 import com.bytechef.embedded.configuration.service.AppEventService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
-import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
 
 /**
@@ -34,7 +33,7 @@ public class RemoteAppEventServiceClient implements AppEventService {
     }
 
     @Override
-    public AppEvent create(@NonNull AppEvent appEvent) {
+    public AppEvent create(AppEvent appEvent) {
         throw new UnsupportedOperationException();
     }
 
@@ -59,7 +58,7 @@ public class RemoteAppEventServiceClient implements AppEventService {
     }
 
     @Override
-    public AppEvent update(@NonNull AppEvent appEvent) {
+    public AppEvent update(AppEvent appEvent) {
         throw new UnsupportedOperationException();
     }
 }

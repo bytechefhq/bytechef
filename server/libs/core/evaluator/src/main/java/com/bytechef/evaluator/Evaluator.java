@@ -37,6 +37,7 @@ import org.springframework.expression.spel.SpelEvaluationException;
 import org.springframework.expression.spel.standard.SpelExpression;
 import org.springframework.expression.spel.standard.SpelExpressionParser;
 import org.springframework.expression.spel.support.StandardEvaluationContext;
+import org.springframework.lang.Nullable;
 
 /**
  * Task evaluator implementation which is based on Spring Expression Language for resolving expressions.
@@ -113,6 +114,7 @@ public class Evaluator {
         return stringBuilder.toString();
     }
 
+    @Nullable
     private static Object evaluate(Object value, Map<String, ?> context) {
         if (value instanceof String) {
             Expression expression = EXPRESSION_PARSER.parseExpression(

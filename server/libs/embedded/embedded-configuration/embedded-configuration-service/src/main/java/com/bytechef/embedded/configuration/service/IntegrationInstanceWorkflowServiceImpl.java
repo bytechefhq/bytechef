@@ -22,7 +22,6 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -69,7 +68,7 @@ public class IntegrationInstanceWorkflowServiceImpl implements IntegrationInstan
 
     @Override
     public Optional<IntegrationInstanceWorkflow> fetchIntegrationInstanceWorkflow(
-        long integrationInstanceId, @NonNull String workflowId) {
+        long integrationInstanceId, String workflowId) {
 
         return integrationInstanceWorkflowRepository.findByIntegrationInstanceIdAndWorkflowId(
             integrationInstanceId, workflowId);
@@ -77,7 +76,7 @@ public class IntegrationInstanceWorkflowServiceImpl implements IntegrationInstan
 
     @Override
     public IntegrationInstanceWorkflow
-        getIntegrationInstanceWorkflow(long integrationInstanceId, @NonNull String workflowId) {
+        getIntegrationInstanceWorkflow(long integrationInstanceId, String workflowId) {
         return integrationInstanceWorkflowRepository
             .findByIntegrationInstanceIdAndWorkflowId(integrationInstanceId, workflowId)
             .orElseThrow(() -> new IllegalArgumentException("Integration instance workflow not found"));
@@ -89,7 +88,7 @@ public class IntegrationInstanceWorkflowServiceImpl implements IntegrationInstan
     }
 
     @Override
-    public void update(@NonNull IntegrationInstanceWorkflow integrationInstanceWorkflow) {
+    public void update(IntegrationInstanceWorkflow integrationInstanceWorkflow) {
         IntegrationInstanceWorkflow curIntegrationInstanceWorkflow = integrationInstanceWorkflowRepository
             .findById(integrationInstanceWorkflow.getId())
             .orElseThrow(() -> new IllegalArgumentException(

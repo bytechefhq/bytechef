@@ -22,7 +22,7 @@ import com.bytechef.platform.configuration.repository.PropertyRepository;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import org.springframework.lang.NonNull;
+import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
 
 /**
@@ -38,7 +38,7 @@ public class PropertyServiceImpl implements PropertyService {
     }
 
     @Override
-    public void delete(@NonNull String key, Property.Scope scope, Long scopeId) {
+    public void delete(String key, Property.Scope scope, Long scopeId) {
         if (scopeId == null) {
             propertyRepository.findByKeyAndScope(key, scope.ordinal())
                 .ifPresent(propertyRepository::delete);
@@ -49,7 +49,7 @@ public class PropertyServiceImpl implements PropertyService {
     }
 
     @Override
-    public Optional<Property> fetchProperty(@NonNull String key, Property.Scope scope, Long scopeId) {
+    public Optional<Property> fetchProperty(String key, Property.Scope scope, @Nullable Long scopeId) {
         if (scopeId == null) {
             return propertyRepository.findByKeyAndScope(key, scope.ordinal());
         } else {
@@ -58,12 +58,12 @@ public class PropertyServiceImpl implements PropertyService {
     }
 
     @Override
-    public Property getProperty(@NonNull String key, Property.Scope scope, Long scopeId) {
+    public Property getProperty(String key, Property.Scope scope, @Nullable Long scopeId) {
         return OptionalUtils.get(fetchProperty(key, scope, scopeId));
     }
 
     @Override
-    public List<Property> getProperties(@NonNull List<String> keys, Property.Scope scope, Long scopeId) {
+    public List<Property> getProperties(List<String> keys, Property.Scope scope, @Nullable Long scopeId) {
         if (scopeId == null) {
             return propertyRepository.findAllByKeyInAndScope(keys, scope.ordinal());
         } else {
@@ -72,7 +72,7 @@ public class PropertyServiceImpl implements PropertyService {
     }
 
     @Override
-    public void save(@NonNull String key, @NonNull Map<String, ?> value, Property.Scope scope, Long scopeId) {
+    public void save(String key, Map<String, ?> value, Property.Scope scope, @Nullable Long scopeId) {
         fetchProperty(key, scope, scopeId)
             .ifPresentOrElse(property -> {
                 property.setValue(value);
@@ -92,7 +92,7 @@ public class PropertyServiceImpl implements PropertyService {
     }
 
     @Override
-    public void update(@NonNull String key, boolean enabled, Property.Scope scope, Long scopeId) {
+    public void update(String key, boolean enabled, Property.Scope scope, @Nullable Long scopeId) {
         fetchProperty(key, scope, scopeId)
             .ifPresent(properties -> {
                 properties.setEnabled(enabled);

@@ -49,7 +49,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import org.apache.commons.lang3.Validate;
-import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -98,7 +97,7 @@ public class ProjectFacadeImpl implements ProjectFacade {
     }
 
     @Override
-    public long addWorkflow(long id, @NonNull String definition) {
+    public long addWorkflow(long id, String definition) {
         Project project = projectService.getProject(id);
 
         Workflow workflow = workflowService.create(definition, Format.JSON, SourceType.JDBC);
@@ -110,7 +109,7 @@ public class ProjectFacadeImpl implements ProjectFacade {
     }
 
     @Override
-    public long createProject(@NonNull ProjectDTO projectDTO) {
+    public long createProject(ProjectDTO projectDTO) {
         Project project = projectDTO.toProject();
         Category category = projectDTO.category();
 
@@ -164,7 +163,7 @@ public class ProjectFacadeImpl implements ProjectFacade {
     }
 
     @Override
-    public void deleteWorkflow(@NonNull String workflowId) {
+    public void deleteWorkflow(String workflowId) {
         Project project = projectService.getWorkflowProject(workflowId);
 
         List<ProjectDeployment> projectDeployments = projectDeploymentService.getProjectDeployments(project.getId());
@@ -218,7 +217,7 @@ public class ProjectFacadeImpl implements ProjectFacade {
     }
 
     @Override
-    public String duplicateWorkflow(long id, @NonNull String workflowId) {
+    public String duplicateWorkflow(long id, String workflowId) {
         Project project = projectService.getWorkflowProject(workflowId);
 
         Workflow workflow = workflowService.duplicateWorkflow(workflowId);
@@ -368,7 +367,7 @@ public class ProjectFacadeImpl implements ProjectFacade {
     }
 
     @Override
-    public void updateProject(@NonNull ProjectDTO projectDTO) {
+    public void updateProject(ProjectDTO projectDTO) {
         List<Tag> tags = checkTags(projectDTO.tags());
 
         Project project = projectDTO.toProject();
@@ -386,7 +385,7 @@ public class ProjectFacadeImpl implements ProjectFacade {
     }
 
     @Override
-    public void updateProjectTags(long id, @NonNull List<Tag> tags) {
+    public void updateProjectTags(long id, List<Tag> tags) {
         tags = checkTags(tags);
 
         projectService.update(id, CollectionUtils.map(tags, Tag::getId));
@@ -436,8 +435,8 @@ public class ProjectFacadeImpl implements ProjectFacade {
     }
 
     private List<ProjectDTO> getProjects(
-        Long workspaceId, boolean projectDeployments, Long categoryId, Long tagId,
-        Status status, List<Long> projectIds, boolean includeAllFields) {
+        Long workspaceId, boolean projectDeployments, Long categoryId, Long tagId, Status status, List<Long> projectIds,
+        boolean includeAllFields) {
 
         projectIds = new ArrayList<>(projectIds);
 

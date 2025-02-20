@@ -20,6 +20,7 @@ import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
 import com.bytechef.atlas.execution.facade.JobFacade;
 import com.bytechef.platform.workflow.execution.ApprovalId;
 import com.bytechef.tenant.util.TenantUtils;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -37,6 +38,7 @@ public class ApprovalController {
 
     private final JobFacade jobFacade;
 
+    @SuppressFBWarnings("EI")
     public ApprovalController(JobFacade jobFacade) {
         this.jobFacade = jobFacade;
     }

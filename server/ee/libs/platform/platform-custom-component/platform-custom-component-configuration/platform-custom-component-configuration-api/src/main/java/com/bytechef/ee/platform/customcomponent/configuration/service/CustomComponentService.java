@@ -10,7 +10,6 @@ package com.bytechef.ee.platform.customcomponent.configuration.service;
 import com.bytechef.ee.platform.customcomponent.configuration.domain.CustomComponent;
 import java.util.List;
 import java.util.Optional;
-import org.springframework.lang.NonNull;
 
 /**
  * @version ee
@@ -19,7 +18,7 @@ import org.springframework.lang.NonNull;
  */
 public interface CustomComponentService {
 
-    CustomComponent create(@NonNull CustomComponent customComponent);
+    CustomComponent create(CustomComponent customComponent);
 
     void delete(long id);
 
@@ -31,5 +30,5 @@ public interface CustomComponentService {
 
     List<CustomComponent> getCustomComponents();
 
-    CustomComponent update(@NonNull CustomComponent customComponent);
+    CustomComponent update(CustomComponent customComponent);
 }

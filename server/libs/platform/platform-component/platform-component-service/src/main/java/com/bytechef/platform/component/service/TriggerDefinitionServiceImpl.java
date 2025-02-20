@@ -74,7 +74,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
 
@@ -98,9 +97,9 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
 
     @Override
     public List<Property> executeDynamicProperties(
-        @NonNull String componentName, int componentVersion, @NonNull String triggerName,
-        @NonNull Map<String, ?> inputParameters, @NonNull String propertyName,
-        List<String> lookupDependsOnPaths, @Nullable ComponentConnection connection, @NonNull TriggerContext context) {
+        String componentName, int componentVersion, String triggerName, Map<String, ?> inputParameters,
+        String propertyName, List<String> lookupDependsOnPaths, @Nullable ComponentConnection connection,
+        TriggerContext context) {
 
         try {
             WrapResult wrapResult = wrap(inputParameters, lookupDependsOnPaths, connection);
@@ -122,8 +121,8 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
 
     @Override
     public WebhookEnableOutput executeDynamicWebhookRefresh(
-        @NonNull String componentName, int componentVersion, @NonNull String triggerName,
-        ComponentConnection connection, @NonNull Map<String, ?> outputParameters, @NonNull TriggerContext context) {
+        String componentName, int componentVersion, String triggerName, ComponentConnection connection,
+        Map<String, ?> outputParameters, TriggerContext context) {
 
         DynamicWebhookRefreshFunction dynamicWebhookRefreshFunction = getDynamicWebhookRefreshFunction(
             componentName, componentVersion, triggerName);
@@ -135,9 +134,8 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
 
     @Override
     public void executeListenerDisable(
-        @NonNull String componentName, int componentVersion, @NonNull String triggerName,
-        @NonNull Map<String, ?> inputParameters, @NonNull String workflowExecutionId, ComponentConnection connection,
-        @NonNull TriggerContext context) {
+        String componentName, int componentVersion, String triggerName, Map<String, ?> inputParameters,
+        String workflowExecutionId, ComponentConnection connection, TriggerContext context) {
 
         ListenerDisableConsumer listenerDisableConsumer = getListenerDisableConsumer(
             componentName, componentVersion, triggerName);
@@ -156,9 +154,8 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
 
     @Override
     public void executeListenerEnable(
-        @NonNull String componentName, int componentVersion, @NonNull String triggerName,
-        @NonNull Map<String, ?> inputParameters, @NonNull String workflowExecutionId, ComponentConnection connection,
-        @NonNull TriggerContext context) {
+        String componentName, int componentVersion, String triggerName, Map<String, ?> inputParameters,
+        String workflowExecutionId, ComponentConnection connection, TriggerContext context) {
 
         ListenerEnableConsumer listenerEnableConsumer = getListenerEnableConsumer(
             componentName, componentVersion, triggerName);
@@ -181,10 +178,10 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
 
     @Override
     public List<Option> executeOptions(
-        @NonNull String componentName, int componentVersion, @NonNull String triggerName,
-        @NonNull Map<String, ?> inputParameters, @NonNull String propertyName,
-        @NonNull List<String> lookupDependsOnPaths,
-        String searchText, ComponentConnection connection, @NonNull TriggerContext context) {
+        String componentName, int componentVersion, String triggerName,
+        Map<String, ?> inputParameters, String propertyName,
+        List<String> lookupDependsOnPaths,
+        String searchText, ComponentConnection connection, TriggerContext context) {
 
         try {
             WrapResult wrapResult = wrap(inputParameters, lookupDependsOnPaths, connection);
@@ -205,8 +202,8 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
 
     @Override
     public OutputResponse executeOutput(
-        @NonNull String componentName, int componentVersion, @NonNull String triggerName,
-        @NonNull Map<String, ?> inputParameters, ComponentConnection connection, @NonNull TriggerContext context) {
+        String componentName, int componentVersion, String triggerName, Map<String, ?> inputParameters,
+        ComponentConnection connection, TriggerContext context) {
 
         com.bytechef.component.definition.TriggerDefinition triggerDefinition =
             componentDefinitionRegistry.getTriggerDefinition(componentName, componentVersion, triggerName);
@@ -247,9 +244,8 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
     @Override
     @SuppressWarnings("unchecked")
     public TriggerOutput executeTrigger(
-        @NonNull String componentName, int componentVersion, @NonNull String triggerName,
-        @NonNull Map<String, ?> inputParameters, Object triggerState, WebhookRequest webhookRequest,
-        ComponentConnection connection, @NonNull TriggerContext context) {
+        String componentName, int componentVersion, String triggerName, Map<String, ?> inputParameters,
+        Object triggerState, WebhookRequest webhookRequest, ComponentConnection connection, TriggerContext context) {
 
         TriggerOutput triggerOutput;
         com.bytechef.component.definition.TriggerDefinition triggerDefinition =
@@ -287,9 +283,9 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
 
     @Override
     public void executeWebhookDisable(
-        @NonNull String componentName, int componentVersion, @NonNull String triggerName,
-        @NonNull Map<String, ?> inputParameters, @NonNull String workflowExecutionId,
-        @NonNull Map<String, ?> outputParameters, ComponentConnection connection, @NonNull TriggerContext context) {
+        String componentName, int componentVersion, String triggerName, Map<String, ?> inputParameters,
+        String workflowExecutionId, Map<String, ?> outputParameters, ComponentConnection connection,
+        TriggerContext context) {
 
         WebhookDisableConsumer webhookDisableConsumer = getWebhookDisableConsumer(
             componentName, componentVersion, triggerName);
@@ -311,9 +307,9 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
 
     @Override
     public WebhookEnableOutput executeWebhookEnable(
-        @NonNull String componentName, int componentVersion, @NonNull String triggerName,
-        @NonNull Map<String, ?> inputParameters, @NonNull String webhookUrl, @NonNull String workflowExecutionId,
-        ComponentConnection connection, @NonNull TriggerContext context) {
+        String componentName, int componentVersion, String triggerName,
+        Map<String, ?> inputParameters, String webhookUrl, String workflowExecutionId,
+        ComponentConnection connection, TriggerContext context) {
 
         WebhookEnableFunction webhookEnableFunction = getWebhookEnableFunction(
             componentName, componentVersion, triggerName);
@@ -335,9 +331,9 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
 
     @Override
     public WebhookValidateResponse executeWebhookValidate(
-        @NonNull String componentName, int componentVersion, @NonNull String triggerName,
-        @NonNull Map<String, ?> inputParameters, @NonNull WebhookRequest webhookRequest,
-        ComponentConnection connection, @NonNull TriggerContext context) {
+        String componentName, int componentVersion, String triggerName,
+        Map<String, ?> inputParameters, WebhookRequest webhookRequest,
+        ComponentConnection connection, TriggerContext context) {
 
         com.bytechef.component.definition.TriggerDefinition triggerDefinition =
             componentDefinitionRegistry.getTriggerDefinition(componentName, componentVersion, triggerName);
@@ -349,9 +345,9 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
 
     @Override
     public WebhookValidateResponse executeWebhookValidateOnEnable(
-        @NonNull String componentName, int componentVersion, @NonNull String triggerName,
-        @NonNull Map<String, ?> inputParameters, @NonNull WebhookRequest webhookRequest,
-        ComponentConnection connection, @NonNull TriggerContext context) {
+        String componentName, int componentVersion, String triggerName,
+        Map<String, ?> inputParameters, WebhookRequest webhookRequest,
+        ComponentConnection connection, TriggerContext context) {
 
         com.bytechef.component.definition.TriggerDefinition triggerDefinition =
             componentDefinitionRegistry.getTriggerDefinition(componentName, componentVersion, triggerName);
@@ -362,8 +358,8 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
 
     @Override
     public String executeWorkflowNodeDescription(
-        @NonNull String componentName, int componentVersion, @NonNull String triggerName,
-        @NonNull Map<String, ?> inputParameters, @NonNull TriggerContext context) {
+        String componentName, int componentVersion, String triggerName,
+        Map<String, ?> inputParameters, TriggerContext context) {
 
         TriggerWorkflowNodeDescriptionFunction workflowNodeDescriptionFunction = getWorkflowNodeDescriptionFunction(
             componentName, componentVersion, triggerName);
@@ -378,7 +374,7 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
 
     @Override
     public TriggerDefinition getTriggerDefinition(
-        @NonNull String componentName, int componentVersion, @NonNull String triggerName) {
+        String componentName, int componentVersion, String triggerName) {
 
         return new TriggerDefinition(
             componentDefinitionRegistry.getTriggerDefinition(componentName, componentVersion, triggerName),
@@ -386,7 +382,7 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
     }
 
     @Override
-    public List<TriggerDefinition> getTriggerDefinitions(@NonNull String componentName, int componentVersion) {
+    public List<TriggerDefinition> getTriggerDefinitions(String componentName, int componentVersion) {
         return componentDefinitionRegistry.getTriggerDefinitions(componentName, componentVersion)
             .stream()
             .map(triggerDefinition -> new TriggerDefinition(triggerDefinition, componentName, componentVersion))
@@ -395,7 +391,7 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
 
     @Override
     public WebhookTriggerFlags getWebhookTriggerFlags(
-        @NonNull String componentName, int componentVersion, @NonNull String triggerName) {
+        String componentName, int componentVersion, String triggerName) {
 
         TriggerDefinition triggerDefinition = getTriggerDefinition(componentName, componentVersion, triggerName);
 

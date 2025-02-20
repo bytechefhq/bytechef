@@ -28,7 +28,6 @@ import com.bytechef.platform.file.storage.FilesFileStorage;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
 
 /**
@@ -60,7 +59,7 @@ class ContextFactoryImpl implements ContextFactory {
 
     @Override
     public ActionContext createActionContext(
-        @NonNull String componentName, int componentVersion, @NonNull String actionName, ModeType type,
+        String componentName, int componentVersion, String actionName, ModeType type,
         Long principalId, Long principalWorkflowId, String workflowId, Long jobId, ComponentConnection connection,
         boolean editorEnvironment) {
 
@@ -71,14 +70,14 @@ class ContextFactoryImpl implements ContextFactory {
     }
 
     @Override
-    public Context createContext(@NonNull String componentName, ComponentConnection connection) {
+    public Context createContext(String componentName, ComponentConnection connection) {
         return new ContextImpl(
             componentName, -1, null, filesFileStorage, connection, getHttpClientExecutor(false));
     }
 
     @Override
     public TriggerContext createTriggerContext(
-        @NonNull String componentName, int componentVersion, @NonNull String triggerName, ModeType type,
+        String componentName, int componentVersion, String triggerName, ModeType type,
         Long principalId, String workflowReferenceCode, ComponentConnection connection, boolean editorEnvironment) {
 
         return new TriggerContextImpl(

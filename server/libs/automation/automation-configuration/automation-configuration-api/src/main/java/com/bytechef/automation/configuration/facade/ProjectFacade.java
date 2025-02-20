@@ -22,24 +22,24 @@ import com.bytechef.automation.configuration.dto.ProjectWorkflowDTO;
 import com.bytechef.platform.category.domain.Category;
 import com.bytechef.platform.tag.domain.Tag;
 import java.util.List;
-import org.springframework.lang.NonNull;
+import org.springframework.lang.Nullable;
 
 /**
  * @author Ivica Cardic
  */
 public interface ProjectFacade {
 
-    long addWorkflow(long id, @NonNull String definition);
+    long addWorkflow(long id, String definition);
 
-    long createProject(@NonNull ProjectDTO projectDTO);
+    long createProject(ProjectDTO projectDTO);
 
     void deleteProject(long id);
 
-    void deleteWorkflow(@NonNull String workflowId);
+    void deleteWorkflow(String workflowId);
 
     ProjectDTO duplicateProject(long id);
 
-    String duplicateWorkflow(long id, @NonNull String workflowId);
+    String duplicateWorkflow(long id, String workflowId);
 
     ProjectDTO getProject(long id);
 
@@ -57,17 +57,18 @@ public interface ProjectFacade {
 
     List<ProjectWorkflowDTO> getProjectVersionWorkflows(long id, int projectVersion, boolean includeAllFields);
 
-    List<ProjectDTO> getProjects(Long categoryId, boolean projectDeployments, Long tagId, Status status);
+    List<ProjectDTO> getProjects(
+        @Nullable Long categoryId, boolean projectDeployments, @Nullable Long tagId, @Nullable Status status);
 
     List<ProjectDTO> getWorkspaceProjects(
-        long workspaceId, boolean projectDeployments, Long categoryId, Long tagId,
-        Status status, List<Long> projectIds, boolean includeAllFields);
+        long workspaceId, boolean projectDeployments, @Nullable Long categoryId, @Nullable Long tagId,
+        @Nullable Status status, List<Long> projectIds, boolean includeAllFields);
 
-    void publishProject(long id, String description, boolean syncWithGit);
+    void publishProject(long id, @Nullable String description, boolean syncWithGit);
 
-    void updateProject(@NonNull ProjectDTO projectDTO);
+    void updateProject(ProjectDTO projectDTO);
 
-    void updateProjectTags(long id, @NonNull List<Tag> tags);
+    void updateProjectTags(long id, List<Tag> tags);
 
     void updateWorkflow(String workflowId, String definition, int version);
 }

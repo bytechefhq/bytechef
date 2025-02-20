@@ -50,7 +50,6 @@ import org.eclipse.jgit.treewalk.TreeWalk;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.io.ByteArrayResource;
-import org.springframework.lang.NonNull;
 
 /**
  * @author Arik Cohen
@@ -128,7 +127,7 @@ public class JGitWorkflowOperations implements GitWorkflowOperations {
 
     @Override
     @SuppressFBWarnings("REC_CATCH_EXCEPTION")
-    public synchronized String write(@NonNull List<WorkflowResource> workflowResources, @NonNull String commitMessage) {
+    public synchronized String write(List<WorkflowResource> workflowResources, String commitMessage) {
         Repository repository = getRepository();
 
         Git git = new Git(repository);

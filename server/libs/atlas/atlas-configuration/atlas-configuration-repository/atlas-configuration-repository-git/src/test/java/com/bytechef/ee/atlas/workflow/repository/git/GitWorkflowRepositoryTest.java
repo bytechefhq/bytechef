@@ -19,7 +19,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.core.io.support.ResourcePatternResolver;
-import org.springframework.lang.NonNull;
 
 /**
  * @version ee
@@ -62,7 +61,7 @@ public class GitWorkflowRepositoryTest {
         }
 
         @Override
-        public String write(@NonNull List<WorkflowResource> workflowResources, @NonNull String commitMessage) {
+        public String write(List<WorkflowResource> workflowResources, String commitMessage) {
             return "aGVsbG8vMTIz";
         }
     }

@@ -19,22 +19,21 @@ package com.bytechef.platform.user.service;
 import com.bytechef.platform.user.domain.ApiKey;
 import java.util.List;
 import java.util.Optional;
-import org.springframework.lang.NonNull;
 
 /**
  * @author Ivica Cardic
  */
 public interface ApiKeyService {
 
-    String create(@NonNull ApiKey apiKey);
+    String create(ApiKey apiKey);
 
     void delete(long id);
 
-    Optional<ApiKey> fetchApiKey(@NonNull String secretKey);
+    Optional<ApiKey> fetchApiKey(String secretKey);
 
     ApiKey getApiKey(long id);
 
     List<ApiKey> getApiKeys();
 
-    ApiKey update(@NonNull ApiKey apiKey);
+    ApiKey update(ApiKey apiKey);
 }

@@ -27,7 +27,6 @@ import java.util.List;
 import java.util.Objects;
 import org.apache.commons.lang3.Validate;
 import org.springframework.data.domain.Sort;
-import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -72,7 +71,7 @@ public class TagServiceImpl implements TagService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<Tag> getTags(@NonNull List<Long> ids) {
+    public List<Tag> getTags(List<Long> ids) {
         Validate.notNull(ids, "'ids' must not be null");
 
         if (ids.isEmpty()) {
@@ -86,7 +85,7 @@ public class TagServiceImpl implements TagService {
     }
 
     @Override
-    public List<Tag> save(@NonNull List<Tag> tags) {
+    public List<Tag> save(List<Tag> tags) {
         Validate.notNull(tags, "'tags' must not be null");
 
         List<Tag> resultTags = new ArrayList<>();

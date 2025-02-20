@@ -13,7 +13,6 @@ import com.bytechef.platform.constant.Environment;
 import java.time.LocalDate;
 import java.util.Optional;
 import org.springframework.data.domain.Page;
-import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
 
 /**
@@ -25,7 +24,7 @@ import org.springframework.stereotype.Component;
 public class RemoteConnectedUserServiceClient implements ConnectedUserService {
 
     @Override
-    public ConnectedUser createConnectedUser(@NonNull Environment environment, @NonNull String externalId) {
+    public ConnectedUser createConnectedUser(Environment environment, String externalId) {
         return null;
     }
 
@@ -40,12 +39,12 @@ public class RemoteConnectedUserServiceClient implements ConnectedUserService {
     }
 
     @Override
-    public Optional<ConnectedUser> fetchConnectedUser(@NonNull Environment environment, @NonNull String externalId) {
+    public Optional<ConnectedUser> fetchConnectedUser(Environment environment, String externalId) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public ConnectedUser getConnectedUser(@NonNull Environment environment, @NonNull String externalId) {
+    public ConnectedUser getConnectedUser(Environment environment, String externalId) {
         throw new UnsupportedOperationException();
     }
 

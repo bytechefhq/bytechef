@@ -48,7 +48,6 @@ import java.util.Objects;
 import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.lang.NonNull;
 
 /**
  * @author Ivica Cardic
@@ -58,13 +57,13 @@ public class SchemaUtils {
     private static final Logger logger = LoggerFactory.getLogger(SchemaUtils.class);
 
     public static BaseProperty getOutputSchema(
-        @NonNull Object value, @NonNull SchemaPropertyFactory propertyFactoryFunction) {
+        Object value, SchemaPropertyFactory propertyFactoryFunction) {
 
         return getOutputSchema(null, value, propertyFactoryFunction);
     }
 
     public static BaseProperty getOutputSchema(
-        String name, Object value, @NonNull SchemaPropertyFactory propertyFactory) {
+        String name, Object value, SchemaPropertyFactory propertyFactory) {
 
         Validate.notNull(propertyFactory, "propertyFactory must not be null");
 
@@ -108,9 +107,9 @@ public class SchemaUtils {
     }
 
     public static OutputResponse toOutput(
-        @NonNull com.bytechef.definition.BaseOutputDefinition.OutputResponse outputResponse,
-        @NonNull OutputFactoryFunction outputFactoryFunction,
-        @NonNull SchemaPropertyFactory propertyFactoryFunction) {
+        com.bytechef.definition.BaseOutputDefinition.OutputResponse outputResponse,
+        OutputFactoryFunction outputFactoryFunction,
+        SchemaPropertyFactory propertyFactoryFunction) {
 
         Object sampleOutput = outputResponse.sampleOutput();
 

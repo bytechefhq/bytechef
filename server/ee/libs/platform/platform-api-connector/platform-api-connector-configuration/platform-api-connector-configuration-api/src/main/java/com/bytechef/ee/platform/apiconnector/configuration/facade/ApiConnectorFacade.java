@@ -10,7 +10,6 @@ package com.bytechef.ee.platform.apiconnector.configuration.facade;
 import com.bytechef.ee.platform.apiconnector.configuration.domain.ApiConnector;
 import com.bytechef.ee.platform.apiconnector.configuration.dto.ApiConnectorDTO;
 import java.util.List;
-import org.springframework.lang.NonNull;
 
 /**
  * @version ee
@@ -19,7 +18,7 @@ import org.springframework.lang.NonNull;
  */
 public interface ApiConnectorFacade {
 
-    ApiConnector importOpenApiSpecification(@NonNull String componentName, @NonNull String specification);
+    ApiConnector importOpenApiSpecification(String componentName, String specification);
 
     List<ApiConnectorDTO> getApiConnectors();
 }

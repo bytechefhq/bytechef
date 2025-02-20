@@ -22,7 +22,6 @@ import com.bytechef.platform.user.domain.User;
 import com.bytechef.platform.user.service.ApiKeyService;
 import com.bytechef.platform.user.service.UserService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -43,7 +42,7 @@ public class ApiKeyFacadeImpl implements ApiKeyFacade {
     }
 
     @Override
-    public String create(@NonNull ApiKey apiKey, ModeType type) {
+    public String create(ApiKey apiKey, ModeType type) {
         User user = userService.getCurrentUser();
 
         apiKey.setType(type);

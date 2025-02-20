@@ -22,7 +22,6 @@ import com.bytechef.embedded.configuration.repository.AppEventRepository;
 import java.util.List;
 import org.apache.commons.lang3.Validate;
 import org.springframework.data.domain.Sort;
-import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -40,7 +39,7 @@ public class AppEventServiceImpl implements AppEventService {
     }
 
     @Override
-    public AppEvent create(@NonNull AppEvent appEvent) {
+    public AppEvent create(AppEvent appEvent) {
         Validate.notNull(appEvent, "'appEvent' must not be null");
         Validate.isTrue(appEvent.getId() == null, "'id' must be null");
         Validate.notNull(appEvent.getName(), "'name' must not be null");
@@ -67,7 +66,7 @@ public class AppEventServiceImpl implements AppEventService {
     }
 
     @Override
-    public AppEvent update(@NonNull AppEvent appEvent) {
+    public AppEvent update(AppEvent appEvent) {
         Validate.notNull(appEvent, "'appEvent' must not be null");
 
         AppEvent curAppEvent = getAppEvent(Validate.notNull(appEvent.getId(), "id"));

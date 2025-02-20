@@ -46,7 +46,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import org.apache.commons.lang3.Validate;
-import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -96,7 +95,7 @@ public class IntegrationFacadeImpl implements IntegrationFacade {
     }
 
     @Override
-    public long addWorkflow(long id, @NonNull String definition) {
+    public long addWorkflow(long id, String definition) {
         Integration integration = integrationService.getIntegration(id);
 
         Workflow workflow = workflowService.create(definition, Format.JSON, SourceType.JDBC);
@@ -108,7 +107,7 @@ public class IntegrationFacadeImpl implements IntegrationFacade {
     }
 
     @Override
-    public long createIntegration(@NonNull IntegrationDTO integrationDTO) {
+    public long createIntegration(IntegrationDTO integrationDTO) {
         Integration integration = integrationDTO.toIntegration();
         Category category = integrationDTO.category();
 
@@ -164,7 +163,7 @@ public class IntegrationFacadeImpl implements IntegrationFacade {
     }
 
     @Override
-    public void deleteWorkflow(@NonNull String workflowId) {
+    public void deleteWorkflow(String workflowId) {
         Integration integration = integrationService.getWorkflowIntegration(workflowId);
 
         List<IntegrationInstanceConfiguration> integrationInstanceConfigurations =
@@ -375,7 +374,7 @@ public class IntegrationFacadeImpl implements IntegrationFacade {
     }
 
     @Override
-    public void updateIntegration(@NonNull IntegrationDTO integrationDTO) {
+    public void updateIntegration(IntegrationDTO integrationDTO) {
         List<Tag> tags = CollectionUtils.isEmpty(integrationDTO.tags())
             ? Collections.emptyList()
             : tagService.save(integrationDTO.tags());
@@ -395,7 +394,7 @@ public class IntegrationFacadeImpl implements IntegrationFacade {
     }
 
     @Override
-    public void updateIntegrationTags(long id, @NonNull List<Tag> tags) {
+    public void updateIntegrationTags(long id, List<Tag> tags) {
         tags = CollectionUtils.isEmpty(tags) ? Collections.emptyList() : tagService.save(tags);
 
         integrationService.update(id, CollectionUtils.map(tags, Tag::getId));

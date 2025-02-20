@@ -36,6 +36,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.lang.Nullable;
 
 /**
  * @author Ivica Cardic
@@ -71,6 +72,7 @@ public class WorkflowExecutorImpl implements WorkflowExecutor {
     }
 
     @Override
+    @Nullable
     public Object executeSync(WorkflowExecutionId workflowExecutionId, WebhookRequest webhookRequest) {
         Object outputs;
 
@@ -91,7 +93,7 @@ public class WorkflowExecutorImpl implements WorkflowExecutor {
                 outputsList.add(taskFileStorage.readJobOutputs(job.getOutputs()));
             }
 
-            return outputsList;
+            outputs = outputsList;
         } else {
             Job job = jobSyncExecutor.execute(
                 createJobParameters(workflowExecutionId, workflowId, inputMap, triggerOutput.value()),

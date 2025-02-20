@@ -13,7 +13,6 @@ import com.bytechef.ee.remote.client.LoadBalancedRestClient;
 import com.bytechef.platform.constant.Environment;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
-import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
 
 /**
@@ -78,7 +77,7 @@ public class RemoteProjectDeploymentServiceClient implements ProjectDeploymentSe
     public List<ProjectDeployment>
         getProjectDeployments(
             Long workspaceId, Environment environment, Long projectId, Long tagId,
-            @NonNull List<Long> excludeProjectDeploymentIds) {
+            List<Long> excludeProjectDeploymentIds) {
         throw new UnsupportedOperationException();
     }
 

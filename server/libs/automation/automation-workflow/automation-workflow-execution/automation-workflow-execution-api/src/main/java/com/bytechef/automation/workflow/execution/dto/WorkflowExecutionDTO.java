@@ -22,13 +22,12 @@ import com.bytechef.automation.configuration.domain.ProjectDeployment;
 import com.bytechef.platform.workflow.execution.dto.JobDTO;
 import com.bytechef.platform.workflow.execution.dto.TriggerExecutionDTO;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import org.springframework.lang.NonNull;
 
 /**
  * @author Ivica Cardic
  */
 @SuppressFBWarnings("EI")
 public record WorkflowExecutionDTO(
-    long id, Project project, ProjectDeployment projectDeployment, @NonNull JobDTO job, @NonNull Workflow workflow,
+    long id, Project project, ProjectDeployment projectDeployment, JobDTO job, Workflow workflow,
     TriggerExecutionDTO triggerExecution) {
 }

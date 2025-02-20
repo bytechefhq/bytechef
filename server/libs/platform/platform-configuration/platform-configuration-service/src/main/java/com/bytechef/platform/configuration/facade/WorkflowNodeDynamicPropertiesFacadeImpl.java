@@ -29,7 +29,6 @@ import com.bytechef.platform.definition.WorkflowNodeType;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Map;
-import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 
 /**
@@ -60,8 +59,7 @@ public class WorkflowNodeDynamicPropertiesFacadeImpl implements WorkflowNodeDyna
     @Override
     @SuppressWarnings("unchecked")
     public List<Property> getWorkflowNodeDynamicProperties(
-        @NonNull String workflowId, @NonNull String workflowNodeName, @NonNull String propertyName,
-        @NonNull List<String> lookupDependsOnPaths) {
+        String workflowId, String workflowNodeName, String propertyName, List<String> lookupDependsOnPaths) {
 
         Long connectionId = workflowTestConfigurationService
             .fetchWorkflowTestConfigurationConnectionId(workflowId, workflowNodeName)

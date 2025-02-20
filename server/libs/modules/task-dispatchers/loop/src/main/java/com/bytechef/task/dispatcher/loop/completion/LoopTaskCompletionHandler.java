@@ -41,7 +41,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.apache.commons.lang3.Validate;
-import org.springframework.lang.NonNull;
 
 /**
  * @author Ivica Cardic
@@ -133,8 +132,7 @@ public class LoopTaskCompletionHandler implements TaskCompletionHandler {
     }
 
     private void handleNewIterationFirstChildTaskExecution(
-        @NonNull TaskExecution parentTaskExecution, List<WorkflowTask> iterateeWorkflowTasks, List<?> items,
-        Integer index) {
+        TaskExecution parentTaskExecution, List<WorkflowTask> iterateeWorkflowTasks, List<?> items, Integer index) {
 
         TaskExecution firstChildTaskExecution = TaskExecution.builder()
             .jobId(parentTaskExecution.getJobId())

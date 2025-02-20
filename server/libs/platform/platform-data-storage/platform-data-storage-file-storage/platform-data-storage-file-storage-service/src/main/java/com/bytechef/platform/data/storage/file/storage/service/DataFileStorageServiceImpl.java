@@ -44,8 +44,8 @@ public class DataFileStorageServiceImpl implements DataFileStorageService {
 
     @Override
     public void delete(
-        @NonNull String componentName, @NonNull DataStorageScope scope, @NonNull String scopeId, @NonNull String key,
-        @NonNull ModeType type) {
+        String componentName, DataStorageScope scope, String scopeId, String key,
+        ModeType type) {
 
         String directoryPath = getDirectoryPath(type);
 
@@ -58,8 +58,8 @@ public class DataFileStorageServiceImpl implements DataFileStorageService {
     @Override
     @SuppressWarnings("unchecked")
     public <T> Optional<T> fetch(
-        @NonNull String componentName, @NonNull DataStorageScope scope, @NonNull String scopeId, @NonNull String key,
-        @NonNull ModeType type) {
+        String componentName, DataStorageScope scope, String scopeId, String key,
+        ModeType type) {
 
         String directoryPath = getDirectoryPath(type);
 
@@ -79,8 +79,8 @@ public class DataFileStorageServiceImpl implements DataFileStorageService {
     @NonNull
     @Override
     public <T> T get(
-        @NonNull String componentName, @NonNull DataStorageScope scope, @NonNull String scopeId, @NonNull String key,
-        @NonNull ModeType type) {
+        String componentName, DataStorageScope scope, String scopeId, String key,
+        ModeType type) {
 
         return OptionalUtils.get(fetch(componentName, scope, scopeId, key, type));
     }
@@ -88,8 +88,8 @@ public class DataFileStorageServiceImpl implements DataFileStorageService {
     @NonNull
     @Override
     public <T> Map<String, T> getAll(
-        @NonNull String componentName, @NonNull DataStorageScope scope, @NonNull String scopeId,
-        @NonNull ModeType type) {
+        String componentName, DataStorageScope scope, String scopeId,
+        ModeType type) {
 
         return fileStorageService.getFileEntries(getDirectoryPath(type))
             .stream()
@@ -100,8 +100,8 @@ public class DataFileStorageServiceImpl implements DataFileStorageService {
 
     @Override
     public void put(
-        @NonNull String componentName, @NonNull DataStorageScope scope, @NonNull String scopeId, @NonNull String key,
-        @NonNull ModeType type, @NonNull Object value) {
+        String componentName, DataStorageScope scope, String scopeId, String key,
+        ModeType type, Object value) {
 
         ValueWrapper valueWrapper = new ValueWrapper(value);
 

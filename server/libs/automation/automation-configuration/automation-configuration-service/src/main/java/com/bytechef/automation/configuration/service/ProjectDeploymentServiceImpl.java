@@ -22,7 +22,6 @@ import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.platform.constant.Environment;
 import java.util.List;
 import org.apache.commons.lang3.Validate;
-import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -84,8 +83,7 @@ public class ProjectDeploymentServiceImpl implements ProjectDeploymentService {
     @Override
     @Transactional(readOnly = true)
     public List<ProjectDeployment> getProjectDeployments(
-        Long workspaceId, Environment environment, Long projectId, Long tagId,
-        @NonNull List<Long> excludeProjectDeploymentIds) {
+        Long workspaceId, Environment environment, Long projectId, Long tagId, List<Long> excludeProjectDeploymentIds) {
 
         return projectDeploymentRepository.findAllProjectDeployments(
             workspaceId, environment == null ? null : environment.ordinal(), projectId, tagId,
@@ -96,7 +94,7 @@ public class ProjectDeploymentServiceImpl implements ProjectDeploymentService {
     @Transactional(readOnly = true)
     public boolean isProjectDeploymentEnabled(long projectDeploymentId) {
         return projectDeploymentRepository.findById(projectDeploymentId)
-            .map(projectDeployment -> projectDeployment.isEnabled())
+            .map(ProjectDeployment::isEnabled)
             .orElse(false);
     }
 

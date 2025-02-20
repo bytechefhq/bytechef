@@ -27,7 +27,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.Set;
-import org.springframework.lang.NonNull;
 
 /**
  * @author Ivica Cardic
@@ -40,47 +39,47 @@ public class Base64FileStorageService implements FileStorageService {
     }
 
     @Override
-    public void deleteFile(@NonNull String directoryPath, @NonNull FileEntry fileEntry) {
+    public void deleteFile(String directoryPath, FileEntry fileEntry) {
     }
 
     @Override
-    public boolean fileExists(@NonNull String directoryPath, @NonNull FileEntry fileEntry) throws FileStorageException {
+    public boolean fileExists(String directoryPath, FileEntry fileEntry) throws FileStorageException {
         return true;
     }
 
     @Override
-    public boolean fileExists(@NonNull String directoryPath, @NonNull String nonRandomFilename)
+    public boolean fileExists(String directoryPath, String nonRandomFilename)
         throws FileStorageException {
 
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public FileEntry getFileEntry(@NonNull String directoryPath, @NonNull String nonRandomFilename)
+    public FileEntry getFileEntry(String directoryPath, String nonRandomFilename)
         throws FileStorageException {
 
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public Set<FileEntry> getFileEntries(@NonNull String directoryPath) throws FileStorageException {
+    public Set<FileEntry> getFileEntries(String directoryPath) throws FileStorageException {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public InputStream getFileStream(@NonNull String directoryPath, @NonNull FileEntry fileEntry) {
+    public InputStream getFileStream(String directoryPath, FileEntry fileEntry) {
         String url = fileEntry.getUrl();
 
         return new ByteArrayInputStream(EncodingUtils.base64Decode(url.replace(URL_PREFIX, "")));
     }
 
     @Override
-    public URL getFileEntryURL(@NonNull String directoryPath, @NonNull FileEntry fileEntry) {
+    public URL getFileEntryURL(String directoryPath, FileEntry fileEntry) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public byte[] readFileToBytes(@NonNull String directoryPath, @NonNull FileEntry fileEntry)
+    public byte[] readFileToBytes(String directoryPath, FileEntry fileEntry)
         throws FileStorageException {
 
         String url = fileEntry.getUrl();
@@ -89,7 +88,7 @@ public class Base64FileStorageService implements FileStorageService {
     }
 
     @Override
-    public String readFileToString(@NonNull String directoryPath, @NonNull FileEntry fileEntry)
+    public String readFileToString(String directoryPath, FileEntry fileEntry)
         throws FileStorageException {
 
         String url = fileEntry.getUrl();
@@ -103,7 +102,7 @@ public class Base64FileStorageService implements FileStorageService {
     }
 
     @Override
-    public FileEntry storeFileContent(@NonNull String directoryPath, @NonNull String filename, byte[] data)
+    public FileEntry storeFileContent(String directoryPath, String filename, byte[] data)
         throws FileStorageException {
 
         return new FileEntry(filename, URL_PREFIX + EncodingUtils.base64EncodeToString(data));
@@ -111,14 +110,14 @@ public class Base64FileStorageService implements FileStorageService {
 
     @Override
     public FileEntry storeFileContent(
-        @NonNull String directoryPath, @NonNull String filename, byte[] data, boolean randomFilename)
+        String directoryPath, String filename, byte[] data, boolean randomFilename)
         throws FileStorageException {
 
         return storeFileContent(directoryPath, filename, data);
     }
 
     @Override
-    public FileEntry storeFileContent(@NonNull String directoryPath, @NonNull String filename, @NonNull String data)
+    public FileEntry storeFileContent(String directoryPath, String filename, String data)
         throws FileStorageException {
 
         return new FileEntry(filename, URL_PREFIX + EncodingUtils.base64EncodeToString(data));
@@ -126,7 +125,7 @@ public class Base64FileStorageService implements FileStorageService {
 
     @Override
     public FileEntry storeFileContent(
-        @NonNull String directoryPath, @NonNull String filename, @NonNull String data, boolean randomFilename)
+        String directoryPath, String filename, String data, boolean randomFilename)
         throws FileStorageException {
 
         return storeFileContent(directoryPath, filename, data);
@@ -134,7 +133,7 @@ public class Base64FileStorageService implements FileStorageService {
 
     @Override
     public FileEntry storeFileContent(
-        @NonNull String directoryPath, @NonNull String filename, @NonNull InputStream inputStream) {
+        String directoryPath, String filename, InputStream inputStream) {
 
         try {
             return new FileEntry(filename, URL_PREFIX + EncodingUtils.base64EncodeToString(toByteArray(inputStream)));
@@ -145,7 +144,7 @@ public class Base64FileStorageService implements FileStorageService {
 
     @Override
     public FileEntry storeFileContent(
-        @NonNull String directoryPath, @NonNull String filename, @NonNull InputStream inputStream,
+        String directoryPath, String filename, InputStream inputStream,
         boolean randomFilename) throws FileStorageException {
 
         return storeFileContent(directoryPath, filename, inputStream);

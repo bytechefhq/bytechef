@@ -15,7 +15,6 @@ import com.bytechef.platform.component.facade.ConnectionDefinitionFacade;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.Map;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
-import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
 
 /**
@@ -37,8 +36,8 @@ public class RemoteConnectionDefinitionFacadeClient extends AbstractWorkerClient
 
     @Override
     public Authorization.AuthorizationCallbackResponse executeAuthorizationCallback(
-        @NonNull String componentName, int connectionVersion, @NonNull String authorizationName,
-        @NonNull Map<String, ?> authorizationParams, @NonNull String redirectUri) {
+        String componentName, int connectionVersion, String authorizationName,
+        Map<String, ?> authorizationParams, String redirectUri) {
 
         return defaultRestClient.post(
             uriBuilder -> toUri(
@@ -50,8 +49,8 @@ public class RemoteConnectionDefinitionFacadeClient extends AbstractWorkerClient
 
     @Override
     public OAuth2AuthorizationParameters getOAuth2AuthorizationParameters(
-        @NonNull String componentName, int connectionVersion, @NonNull String authorizationName,
-        @NonNull Map<String, ?> authorizationParams) {
+        String componentName, int connectionVersion, String authorizationName,
+        Map<String, ?> authorizationParams) {
 
         return defaultRestClient.post(
             uriBuilder -> toUri(

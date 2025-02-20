@@ -21,22 +21,22 @@ import com.bytechef.platform.configuration.domain.Property.Scope;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import org.springframework.lang.NonNull;
+import org.springframework.lang.Nullable;
 
 /**
  * @author Ivica Cardic
  */
 public interface PropertyService {
 
-    void delete(@NonNull String key, Scope scope, Long scopeId);
+    void delete(String key, Scope scope, @Nullable Long scopeId);
 
-    Optional<Property> fetchProperty(@NonNull String key, Scope scope, Long scopeId);
+    Optional<Property> fetchProperty(String key, Scope scope, @Nullable Long scopeId);
 
-    Property getProperty(@NonNull String key, Scope scope, Long scopeId);
+    Property getProperty(String key, Scope scope, @Nullable Long scopeId);
 
-    List<Property> getProperties(@NonNull List<String> keys, Scope scope, Long scopeId);
+    List<Property> getProperties(List<String> keys, Scope scope, @Nullable Long scopeId);
 
-    void save(@NonNull String key, @NonNull Map<String, ?> value, Scope scope, Long scopeId);
+    void save(String key, Map<String, ?> value, Scope scope, @Nullable Long scopeId);
 
-    void update(@NonNull String key, boolean enabled, Scope scope, Long scopeId);
+    void update(String key, boolean enabled, Scope scope, @Nullable Long scopeId);
 }

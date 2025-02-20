@@ -10,7 +10,6 @@ package com.bytechef.ee.automation.configuration.remote.client.service;
 import com.bytechef.automation.configuration.domain.ProjectWorkflow;
 import com.bytechef.automation.configuration.service.ProjectWorkflowService;
 import java.util.List;
-import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
 
 /**
@@ -34,7 +33,7 @@ public class RemoteProjectWorkflowServiceClient implements ProjectWorkflowServic
     }
 
     @Override
-    public void delete(@NonNull List<Long> ids) {
+    public void delete(List<Long> ids) {
         throw new UnsupportedOperationException();
     }
 
@@ -85,7 +84,7 @@ public class RemoteProjectWorkflowServiceClient implements ProjectWorkflowServic
     }
 
     @Override
-    public void delete(long projectId, int projectVersion, @NonNull String workflowId) {
+    public void delete(long projectId, int projectVersion, String workflowId) {
         throw new UnsupportedOperationException();
     }
 

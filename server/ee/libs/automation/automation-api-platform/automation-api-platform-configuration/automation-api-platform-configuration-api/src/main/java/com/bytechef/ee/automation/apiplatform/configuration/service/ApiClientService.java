@@ -10,7 +10,6 @@ package com.bytechef.ee.automation.apiplatform.configuration.service;
 import com.bytechef.ee.automation.apiplatform.configuration.domain.ApiClient;
 import java.util.List;
 import java.util.Optional;
-import org.springframework.lang.NonNull;
 
 /**
  * @version ee
@@ -19,15 +18,15 @@ import org.springframework.lang.NonNull;
  */
 public interface ApiClientService {
 
-    String create(@NonNull ApiClient apiKey);
+    String create(ApiClient apiKey);
 
     void delete(long id);
 
-    Optional<ApiClient> fetchApiClient(@NonNull String secretKey);
+    Optional<ApiClient> fetchApiClient(String secretKey);
 
     ApiClient getApiClient(long id);
 
     List<ApiClient> getApiClients();
 
-    ApiClient update(@NonNull ApiClient apiClient);
+    ApiClient update(ApiClient apiClient);
 }

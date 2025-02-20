@@ -558,7 +558,7 @@ public final class ParametersImpl implements Parameters {
     }
 
     @Override
-    public void putAll(@NonNull Map<? extends String, ?> m) {
+    public void putAll(Map<? extends String, ?> m) {
         throw new UnsupportedOperationException();
     }
 

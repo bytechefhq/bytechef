@@ -24,7 +24,7 @@ import org.springframework.expression.AccessException;
 import org.springframework.expression.EvaluationContext;
 import org.springframework.expression.PropertyAccessor;
 import org.springframework.expression.TypedValue;
-import org.springframework.lang.NonNull;
+import org.springframework.lang.Nullable;
 
 /**
  * Simple {@link PropertyAccessor} that can access {@link Map} properties.
@@ -42,29 +42,38 @@ class MapPropertyAccessor implements PropertyAccessor {
     }
 
     @Override
-    public boolean canRead(EvaluationContext evaluationContext, Object target, String name) throws AccessException {
+    public boolean canRead(EvaluationContext evaluationContext, @Nullable Object target, String name) {
         if (!(target instanceof Map)) {
             return false;
         }
-        return ((Map) target).containsKey(name);
+        return ((Map<?, ?>) target).containsKey(name);
     }
 
     @Override
-    public TypedValue read(EvaluationContext evaluationContext, @NonNull Object target, String name)
+    public TypedValue read(EvaluationContext evaluationContext, @Nullable Object target, String name)
         throws AccessException {
-        Map<String, Object> map = (Map<String, Object>) target;
+
+        if (target == null) {
+            throw new AccessException("Cannot read property of null target");
+        }
+
+        Map<?, ?> map = (Map<?, ?>) target;
+
         Object value = map.get(name);
+
         return new TypedValue(value, TypeDescriptor.forObject(value));
     }
 
     @Override
-    public boolean canWrite(EvaluationContext evaluationContext, Object target, String name) throws AccessException {
+    public boolean canWrite(EvaluationContext evaluationContext, @Nullable Object target, String name) {
         return false;
     }
 
     @Override
-    public void write(EvaluationContext evaluationContext, Object target, String name, Object aNewValue)
+    public void write(
+        EvaluationContext evaluationContext, @Nullable Object target, String name, @Nullable Object aNewValue)
         throws AccessException {
+
         throw new UnsupportedOperationException();
     }
 }

@@ -21,7 +21,6 @@ import com.bytechef.platform.configuration.web.rest.mapper.config.PlatformConfig
 import com.bytechef.platform.configuration.web.rest.model.AuthorizationModel;
 import org.mapstruct.Mapper;
 import org.springframework.core.convert.converter.Converter;
-import org.springframework.lang.NonNull;
 
 /**
  * @author Ivica Cardic
@@ -30,5 +29,5 @@ import org.springframework.lang.NonNull;
 public interface AuthorizationMapper extends Converter<Authorization, AuthorizationModel> {
 
     @Override
-    AuthorizationModel convert(@NonNull Authorization authorization);
+    AuthorizationModel convert(Authorization authorization);
 }

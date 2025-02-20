@@ -18,11 +18,10 @@ package com.bytechef.embedded.configuration.service;
 
 import com.bytechef.embedded.configuration.domain.AppEvent;
 import java.util.List;
-import org.springframework.lang.NonNull;
 
 public interface AppEventService {
 
-    AppEvent create(@NonNull AppEvent appEvent);
+    AppEvent create(AppEvent appEvent);
 
     void delete(long id);
 
@@ -30,5 +29,5 @@ public interface AppEventService {
 
     List<AppEvent> getAppEvents();
 
-    AppEvent update(@NonNull AppEvent appEvent);
+    AppEvent update(AppEvent appEvent);
 }
