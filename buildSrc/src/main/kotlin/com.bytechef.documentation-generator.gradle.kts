@@ -24,6 +24,7 @@ open class FindJsonFilesTask : DefaultTask() {
         var label: String? = null
         var type: String? = null
         var required: Boolean? = false
+        var options: Array<Option> ? = null
 
         private fun getFullTypeObject(): String? {
             val sb = StringBuilder()
@@ -77,6 +78,9 @@ open class FindJsonFilesTask : DefaultTask() {
             return if (type == "OBJECT" || type == "ARRAY") {
                 val detailsSummary = if (type == "OBJECT") "Properties" else "Items"
                 "$type <details> <summary> $detailsSummary </summary> $typeFull </details>"
+            } else if (!options.isNullOrEmpty()) {
+                val optionsString = options?.joinToString(", ") { it.value.toString() }
+                "$type <details> <summary> Options </summary> $optionsString </details>"
             } else {
                 type.toString()
             }
@@ -153,6 +157,13 @@ open class FindJsonFilesTask : DefaultTask() {
             return sb.append("]\n").toString()
         }
     }
+
+    class Option {
+        var description: String? = null
+        var label: String? = null
+        var value: String? = null
+    }
+
 
     @JsonIgnoreProperties(ignoreUnknown = true)
     class OutputSchema {
