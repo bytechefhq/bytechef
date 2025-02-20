@@ -882,7 +882,7 @@ components:
           readOnly: true
         lastStatus:
           $ref: '#/components/schemas/ProjectStatus'
-        lastProjectVersion:
+        lastVersion:
           description: "The last version of a project."
           type: "integer"
           readOnly: true
