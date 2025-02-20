@@ -86,7 +86,7 @@ export interface ProjectBasic {
      * @type {number}
      * @memberof ProjectBasic
      */
-    readonly lastProjectVersion?: number;
+    readonly lastVersion?: number;
 }
 
 
@@ -118,7 +118,7 @@ export function ProjectBasicFromJSONTyped(json: any, ignoreDiscriminator: boolea
         'name': json['name'],
         'lastPublishedDate': json['lastPublishedDate'] == null ? undefined : (new Date(json['lastPublishedDate'])),
         'lastStatus': json['lastStatus'] == null ? undefined : ProjectStatusFromJSON(json['lastStatus']),
-        'lastProjectVersion': json['lastProjectVersion'] == null ? undefined : json['lastProjectVersion'],
+        'lastVersion': json['lastVersion'] == null ? undefined : json['lastVersion'],
     };
 }
 
@@ -126,7 +126,7 @@ export function ProjectBasicToJSON(json: any): ProjectBasic {
     return ProjectBasicToJSONTyped(json, false);
 }
 
-export function ProjectBasicToJSONTyped(value?: Omit<ProjectBasic, 'createdBy'|'createdDate'|'id'|'lastModifiedBy'|'lastModifiedDate'|'lastPublishedDate'|'lastProjectVersion'> | null, ignoreDiscriminator: boolean = false): any {
+export function ProjectBasicToJSONTyped(value?: Omit<ProjectBasic, 'createdBy'|'createdDate'|'id'|'lastModifiedBy'|'lastModifiedDate'|'lastPublishedDate'|'lastVersion'> | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
