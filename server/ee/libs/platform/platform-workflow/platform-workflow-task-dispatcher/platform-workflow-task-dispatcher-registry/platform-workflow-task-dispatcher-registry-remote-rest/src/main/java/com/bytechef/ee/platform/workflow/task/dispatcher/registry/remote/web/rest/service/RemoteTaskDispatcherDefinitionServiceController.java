@@ -49,7 +49,7 @@ public class RemoteTaskDispatcherDefinitionServiceController {
         })
     public ResponseEntity<OutputResponse> executeOutputSchema(@Valid @RequestBody OutputRequest outputRequest) {
         return ResponseEntity.ok(
-            taskDispatcherDefinitionService.executeOutputSchema(
+            taskDispatcherDefinitionService.executeOutput(
                 outputRequest.name, outputRequest.version, outputRequest.taskDispatcherParameters));
     }
 

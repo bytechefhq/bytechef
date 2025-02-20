@@ -45,7 +45,7 @@ public class TaskDispatcherDefinitionServiceImpl implements TaskDispatcherDefini
     }
 
     @Override
-    public OutputResponse executeOutputSchema(String name, int version, Map<String, ?> inputParameters) {
+    public OutputResponse executeOutput(String name, int version, Map<String, ?> inputParameters) {
         OutputFunction outputFunction = getOutputSchemaFunction(name, version);
 
         try {

@@ -36,7 +36,7 @@ public class RemoteTaskDispatcherDefinitionServiceClient implements TaskDispatch
     }
 
     @Override
-    public OutputResponse executeOutputSchema(
+    public OutputResponse executeOutput(
         String name, int version, Map<String, ?> inputParameters) {
 
         return loadBalancedRestClient.post(
