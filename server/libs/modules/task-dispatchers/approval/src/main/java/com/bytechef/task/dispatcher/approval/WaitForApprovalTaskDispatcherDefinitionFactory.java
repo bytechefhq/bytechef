@@ -16,22 +16,29 @@
 
 package com.bytechef.task.dispatcher.approval;
 
+import static com.bytechef.platform.workflow.task.dispatcher.definition.TaskDispatcherDsl.bool;
+import static com.bytechef.platform.workflow.task.dispatcher.definition.TaskDispatcherDsl.object;
+import static com.bytechef.platform.workflow.task.dispatcher.definition.TaskDispatcherDsl.outputSchema;
+import static com.bytechef.platform.workflow.task.dispatcher.definition.TaskDispatcherDsl.sampleOutput;
 import static com.bytechef.platform.workflow.task.dispatcher.definition.TaskDispatcherDsl.taskDispatcher;
 
 import com.bytechef.platform.workflow.task.dispatcher.TaskDispatcherDefinitionFactory;
 import com.bytechef.platform.workflow.task.dispatcher.definition.TaskDispatcherDefinition;
+import java.util.Map;
 import org.springframework.stereotype.Component;
 
 /**
  * @author Ivica Cardic
  */
 @Component
-public class ApprovalTaskDispatcherDefinitionFactory implements TaskDispatcherDefinitionFactory {
+public class WaitForApprovalTaskDispatcherDefinitionFactory implements TaskDispatcherDefinitionFactory {
 
-    private static final TaskDispatcherDefinition TASK_DISPATCHER_DEFINITION = taskDispatcher("approval")
-        .title("Approval")
+    private static final TaskDispatcherDefinition TASK_DISPATCHER_DEFINITION = taskDispatcher("waitForApproval")
+        .title("Wait for Approval")
         .description("Allows a person to review and either approve or reject requests.")
-        .icon("path:assets/approval.svg");
+        .icon("path:assets/wait-for-approval.svg")
+        .output(
+            outputSchema(object().properties(bool("approved"))), sampleOutput(Map.of("approved", true)));
 
     @Override
     public TaskDispatcherDefinition getDefinition() {

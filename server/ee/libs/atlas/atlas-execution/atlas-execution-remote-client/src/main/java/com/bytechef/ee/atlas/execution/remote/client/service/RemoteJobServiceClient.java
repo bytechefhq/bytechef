@@ -101,11 +101,6 @@ public class RemoteJobServiceClient implements JobService {
     }
 
     @Override
-    public Job setStatusToCompleted(long id) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
     public Job setStatusToStarted(long id) {
         return loadBalancedRestClient.put(
             uriBuilder -> uriBuilder

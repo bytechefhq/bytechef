@@ -27,14 +27,14 @@ import java.util.Map;
 /**
  * @author Ivica Cardic
  */
-public class ApprovalCreateApprovalLinksAction {
+public class ApprovalLinkCreateApprovalLinksAction {
 
     public static final ActionDefinition ACTION_DEFINITION = action("createApprovalLinks")
         .title("Create Approval Links")
         .description("Creates approval/disapproval links.")
         .properties()
-        .output(ApprovalCreateApprovalLinksAction::output)
-        .perform(ApprovalCreateApprovalLinksAction::perform);
+        .output(ApprovalLinkCreateApprovalLinksAction::output)
+        .perform(ApprovalLinkCreateApprovalLinksAction::perform);
 
     protected static Object perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) {

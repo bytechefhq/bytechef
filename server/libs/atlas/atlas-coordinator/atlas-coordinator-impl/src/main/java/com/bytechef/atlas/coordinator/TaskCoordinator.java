@@ -122,11 +122,11 @@ public class TaskCoordinator {
 
         Job job = jobService.resumeToStatusStarted(resumeJobEvent.getJobId());
 
-        jobExecutor.execute(job);
-
         if (logger.isDebugEnabled()) {
             logger.debug("Job id={} resumed", resumeJobEvent.getJobId());
         }
+
+        jobExecutor.execute(job);
     }
 
     /**

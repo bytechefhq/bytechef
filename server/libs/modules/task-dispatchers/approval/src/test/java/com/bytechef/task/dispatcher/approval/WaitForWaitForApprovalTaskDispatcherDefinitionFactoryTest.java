@@ -22,11 +22,11 @@ import org.junit.jupiter.api.Test;
 /**
  * @author Ivica Cardic
  */
-public class ApprovalTaskDispatcherDefinitionFactoryTest {
+public class WaitForWaitForApprovalTaskDispatcherDefinitionFactoryTest {
 
     @Test
     public void testGetTaskDispatcherDefinition() {
-        JsonFileAssert.assertEquals("definition/approval_v1.json",
-            new ApprovalTaskDispatcherDefinitionFactory().getDefinition());
+        JsonFileAssert.assertEquals("definition/wait-for-approval_v1.json",
+            new WaitForApprovalTaskDispatcherDefinitionFactory().getDefinition());
     }
 }

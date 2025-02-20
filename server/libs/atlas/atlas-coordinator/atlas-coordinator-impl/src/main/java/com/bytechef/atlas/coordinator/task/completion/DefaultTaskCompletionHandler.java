@@ -38,6 +38,7 @@ import java.time.Instant;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -106,10 +107,11 @@ public class DefaultTaskCompletionHandler implements TaskCompletionHandler {
                 newContext.put(
                     taskExecution.getName(), taskFileStorage.readTaskExecutionOutput(taskExecution.getOutput()));
 
+                long jobId = Objects.requireNonNull(job.getId());
+
                 contextService.push(
-                    Validate.notNull(job.getId(), "id"), Context.Classname.JOB,
-                    taskFileStorage.storeContextValue(
-                        Validate.notNull(job.getId(), "id"), Context.Classname.JOB, newContext));
+                    jobId, Context.Classname.JOB,
+                    taskFileStorage.storeContextValue(jobId, Context.Classname.JOB, newContext));
             }
 
             logger.debug(

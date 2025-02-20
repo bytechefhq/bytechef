@@ -14,12 +14,20 @@
  * limitations under the License.
  */
 
-package com.bytechef.task.dispatcher.approval.constant;
+package com.bytechef.component.asana;
+
+import com.bytechef.component.approval.ApprovalLinkComponentHandler;
+import com.bytechef.test.jsonasssert.JsonFileAssert;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Ivica Cardic
  */
-public class ApprovalTaskDispatcherConstants {
+public class ApprovalLinkComponentHandlerTest {
 
-    public static final String APPROVAL = "approval";
+    @Test
+    public void testGetDefinition() {
+        JsonFileAssert.assertEquals("definition/approval-link_v1.json",
+            new ApprovalLinkComponentHandler().getDefinition());
+    }
 }

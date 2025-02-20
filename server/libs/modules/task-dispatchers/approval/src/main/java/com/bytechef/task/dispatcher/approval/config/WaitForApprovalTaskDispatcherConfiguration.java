@@ -17,8 +17,9 @@
 package com.bytechef.task.dispatcher.approval.config;
 
 import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcherResolverFactory;
+import com.bytechef.atlas.execution.service.JobService;
 import com.bytechef.atlas.execution.service.TaskExecutionService;
-import com.bytechef.task.dispatcher.approval.ApprovalTaskDispatcher;
+import com.bytechef.task.dispatcher.approval.WaitForApprovalTaskDispatcher;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Bean;
@@ -28,21 +29,23 @@ import org.springframework.context.annotation.Configuration;
  * @author Ivica Cardic
  */
 @Configuration
-public class ApprovalTaskDispatcherConfiguration {
+public class WaitForApprovalTaskDispatcherConfiguration {
 
     private final ApplicationEventPublisher eventPublisher;
+    private final JobService jobService;
     private final TaskExecutionService taskExecutionService;
 
     @SuppressFBWarnings("EI")
-    public ApprovalTaskDispatcherConfiguration(
-        ApplicationEventPublisher eventPublisher, TaskExecutionService taskExecutionService) {
+    public WaitForApprovalTaskDispatcherConfiguration(
+        ApplicationEventPublisher eventPublisher, JobService jobService, TaskExecutionService taskExecutionService) {
 
         this.eventPublisher = eventPublisher;
+        this.jobService = jobService;
         this.taskExecutionService = taskExecutionService;
     }
 
-    @Bean("approvalTaskDispatcherResolverFactory_v1")
-    TaskDispatcherResolverFactory approvalTaskDispatcherResolverFactory() {
-        return (taskDispatcher) -> new ApprovalTaskDispatcher(eventPublisher, taskExecutionService);
+    @Bean("waitForApprovalTaskDispatcherResolverFactory_v1")
+    TaskDispatcherResolverFactory waitForApprovalTaskDispatcherResolverFactory() {
+        return (taskDispatcher) -> new WaitForApprovalTaskDispatcher(eventPublisher, jobService, taskExecutionService);
     }
 }

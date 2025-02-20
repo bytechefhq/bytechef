@@ -60,7 +60,7 @@ class ActionContextImpl extends ContextImpl implements ActionContext, ActionCont
         this.actionName = actionName;
 
         if (jobId != null) {
-            this.approval = new ApprovalImpl(type, jobId, actionName, publicUrl);
+            this.approval = new ApprovalImpl(jobId, publicUrl);
         }
 
         this.data = new DataImpl(
@@ -132,15 +132,15 @@ class ActionContextImpl extends ContextImpl implements ActionContext, ActionCont
         return editorEnvironment;
     }
 
-    private record ApprovalImpl(ModeType type, long jobId, String actionName, String publicUrl) implements Approval {
+    private record ApprovalImpl(long jobId, String publicUrl) implements Approval {
 
         @Override
         public ApprovalLinks generateLinks() {
             String url = "%s/approvals/%s";
 
             return new ApprovalLinks(
-                url.formatted(publicUrl, ApprovalId.of(type, jobId, actionName, true)),
-                url.formatted(publicUrl, ApprovalId.of(type, jobId, actionName, false)));
+                url.formatted(publicUrl, ApprovalId.of(jobId, true)),
+                url.formatted(publicUrl, ApprovalId.of(jobId, false)));
         }
     }
 

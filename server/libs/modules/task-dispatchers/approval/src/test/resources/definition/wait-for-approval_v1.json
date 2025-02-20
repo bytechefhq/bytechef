@@ -1,0 +1,111 @@
+{
+  "description" : "Allows a person to review and either approve or reject requests.",
+  "help" : null,
+  "icon" : "path:assets/wait-for-approval.svg",
+  "name" : "waitForApproval",
+  "outputDefinition" : {
+    "output" : null,
+    "outputResponse" : {
+      "outputSchema" : {
+        "advancedOption" : null,
+        "displayCondition" : null,
+        "expressionEnabled" : null,
+        "hidden" : null,
+        "metadata" : { },
+        "required" : null,
+        "name" : null,
+        "type" : "OBJECT",
+        "defaultValue" : null,
+        "description" : null,
+        "exampleValue" : null,
+        "label" : null,
+        "placeholder" : null,
+        "options" : null,
+        "additionalProperties" : null,
+        "multipleValues" : null,
+        "properties" : [ {
+          "advancedOption" : null,
+          "displayCondition" : null,
+          "expressionEnabled" : null,
+          "hidden" : null,
+          "metadata" : { },
+          "required" : null,
+          "name" : "approved",
+          "type" : "BOOLEAN",
+          "defaultValue" : null,
+          "description" : null,
+          "exampleValue" : null,
+          "label" : null,
+          "placeholder" : null,
+          "options" : [ {
+            "description" : null,
+            "label" : "True",
+            "value" : true
+          }, {
+            "description" : null,
+            "label" : "False",
+            "value" : true
+          } ],
+          "controlType" : "SELECT"
+        } ],
+        "controlType" : "OBJECT_BUILDER"
+      },
+      "sampleOutput" : {
+        "approved" : true
+      }
+    },
+    "outputSchema" : {
+      "advancedOption" : null,
+      "displayCondition" : null,
+      "expressionEnabled" : null,
+      "hidden" : null,
+      "metadata" : { },
+      "required" : null,
+      "name" : null,
+      "type" : "OBJECT",
+      "defaultValue" : null,
+      "description" : null,
+      "exampleValue" : null,
+      "label" : null,
+      "placeholder" : null,
+      "options" : null,
+      "additionalProperties" : null,
+      "multipleValues" : null,
+      "properties" : [ {
+        "advancedOption" : null,
+        "displayCondition" : null,
+        "expressionEnabled" : null,
+        "hidden" : null,
+        "metadata" : { },
+        "required" : null,
+        "name" : "approved",
+        "type" : "BOOLEAN",
+        "defaultValue" : null,
+        "description" : null,
+        "exampleValue" : null,
+        "label" : null,
+        "placeholder" : null,
+        "options" : [ {
+          "description" : null,
+          "label" : "True",
+          "value" : true
+        }, {
+          "description" : null,
+          "label" : "False",
+          "value" : true
+        } ],
+        "controlType" : "SELECT"
+      } ],
+      "controlType" : "OBJECT_BUILDER"
+    },
+    "sampleOutput" : {
+      "approved" : true
+    }
+  },
+  "properties" : null,
+  "resources" : null,
+  "taskProperties" : null,
+  "title" : "Wait for Approval",
+  "version" : 1,
+  "variableProperties" : null
+}

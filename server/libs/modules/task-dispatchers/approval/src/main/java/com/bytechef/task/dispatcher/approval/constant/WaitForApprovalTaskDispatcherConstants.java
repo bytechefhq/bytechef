@@ -14,19 +14,12 @@
  * limitations under the License.
  */
 
-package com.bytechef.component.asana;
-
-import com.bytechef.component.approval.ApprovalComponentHandler;
-import com.bytechef.test.jsonasssert.JsonFileAssert;
-import org.junit.jupiter.api.Test;
+package com.bytechef.task.dispatcher.approval.constant;
 
 /**
  * @author Ivica Cardic
  */
-public class ApprovalComponentHandlerTest {
+public class WaitForApprovalTaskDispatcherConstants {
 
-    @Test
-    public void testGetDefinition() {
-        JsonFileAssert.assertEquals("definition/approval_v1.json", new ApprovalComponentHandler().getDefinition());
-    }
+    public static final String WAIT_FOR_APPROVAL = "waitForApproval";
 }

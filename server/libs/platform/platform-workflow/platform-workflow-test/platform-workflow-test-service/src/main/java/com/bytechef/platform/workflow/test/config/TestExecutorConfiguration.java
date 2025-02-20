@@ -47,7 +47,7 @@ import com.bytechef.platform.coordinator.job.JobSyncExecutor;
 import com.bytechef.platform.workflow.task.dispatcher.service.TaskDispatcherDefinitionService;
 import com.bytechef.platform.workflow.test.coordinator.task.dispatcher.TestTaskDispatcherPreSendProcessor;
 import com.bytechef.platform.workflow.test.executor.JobTestExecutor;
-import com.bytechef.task.dispatcher.approval.ApprovalTaskDispatcher;
+import com.bytechef.task.dispatcher.approval.WaitForApprovalTaskDispatcher;
 import com.bytechef.task.dispatcher.branch.BranchTaskDispatcher;
 import com.bytechef.task.dispatcher.branch.completion.BranchTaskCompletionHandler;
 import com.bytechef.task.dispatcher.condition.ConditionTaskDispatcher;
@@ -100,8 +100,8 @@ public class TestExecutorConfiguration {
                     contextService, counterService, taskExecutionService, taskFileStorage),
                 getTaskDispatcherAdapterFactories(), List.of(new TestTaskDispatcherPreSendProcessor(jobService)),
                 getTaskDispatcherResolverFactories(
-                    syncMessageBroker, contextService, counterService, taskExecutionService,
-                    taskFileStorage),
+                    contextService, counterService, jobService, syncMessageBroker,
+                    taskExecutionService, taskFileStorage),
                 taskExecutionService, taskHandlerRegistry, taskFileStorage, workflowService),
             taskDispatcherDefinitionService, taskExecutionService, taskFileStorage);
     }
@@ -149,13 +149,14 @@ public class TestExecutorConfiguration {
     }
 
     private List<TaskDispatcherResolverFactory> getTaskDispatcherResolverFactories(
-        SyncMessageBroker syncMessageBroker, ContextService contextService, CounterService counterService,
-        TaskExecutionService taskExecutionService, TaskFileStorage taskFileStorage) {
+        ContextService contextService, CounterService counterService, JobService jobService,
+        SyncMessageBroker syncMessageBroker, TaskExecutionService taskExecutionService,
+        TaskFileStorage taskFileStorage) {
 
         ApplicationEventPublisher eventPublisher = getEventPublisher(syncMessageBroker);
 
         return List.of(
-            (taskDispatcher) -> new ApprovalTaskDispatcher(eventPublisher, taskExecutionService),
+            (taskDispatcher) -> new WaitForApprovalTaskDispatcher(eventPublisher, jobService, taskExecutionService),
             (taskDispatcher) -> new BranchTaskDispatcher(
                 eventPublisher, contextService, taskDispatcher, taskExecutionService, taskFileStorage),
             (taskDispatcher) -> new ConditionTaskDispatcher(

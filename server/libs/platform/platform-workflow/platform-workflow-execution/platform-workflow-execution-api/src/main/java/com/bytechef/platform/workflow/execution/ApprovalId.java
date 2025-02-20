@@ -17,46 +17,27 @@
 package com.bytechef.platform.workflow.execution;
 
 import com.bytechef.commons.util.EncodingUtils;
-import com.bytechef.platform.constant.ModeType;
 import com.bytechef.tenant.TenantContext;
 import java.io.Serializable;
 import java.util.Objects;
-import org.apache.commons.lang3.Validate;
-import org.springframework.lang.Nullable;
 
 /**
  * @author Ivica Cardic
  */
 public class ApprovalId implements Serializable {
 
-    @Nullable
-    private String approvalName;
+    private final boolean approved;
+    private final long jobId;
+    private final String tenantId;
 
-    private boolean approved;
-    private long jobId;
-
-    @Nullable
-    private String tenantId;
-
-    @Nullable
-    private ModeType type;
-
-    private ApprovalId() {
-        // Required by Jackson deserialization
-    }
-
-    private ApprovalId(String tenantId, ModeType type, long jobId, String approvalName, boolean approved) {
-        this.approvalName = approvalName;
+    private ApprovalId(String tenantId, long jobId, boolean approved) {
         this.approved = approved;
         this.jobId = jobId;
         this.tenantId = tenantId;
-        this.type = type;
     }
 
-    public static ApprovalId of(ModeType type, long jobId, String approvalName, boolean approved) {
-        Validate.notBlank(approvalName, "'approvalName' must not be blank");
-
-        return new ApprovalId(TenantContext.getCurrentTenantId(), type, jobId, approvalName, approved);
+    public static ApprovalId of(long jobId, boolean approved) {
+        return new ApprovalId(TenantContext.getCurrentTenantId(), jobId, approved);
     }
 
     public static ApprovalId parse(String id) {
@@ -64,21 +45,11 @@ public class ApprovalId implements Serializable {
 
         String[] items = id.split(":");
 
-        return new ApprovalId(
-            items[0], ModeType.values()[Integer.parseInt(items[1])], Long.parseLong(items[2]), items[3],
-            Boolean.parseBoolean(items[4]));
-    }
-
-    public String getApprovalName() {
-        return Objects.requireNonNull(approvalName);
+        return new ApprovalId(items[0], Long.parseLong(items[1]), Boolean.parseBoolean(items[2]));
     }
 
     public long getJobId() {
         return jobId;
-    }
-
-    public ModeType getType() {
-        return Objects.requireNonNull(type);
     }
 
     public String getTenantId() {
@@ -91,17 +62,10 @@ public class ApprovalId implements Serializable {
 
     @Override
     public String toString() {
-        ModeType type1 = Objects.requireNonNull(type);
-
         return EncodingUtils.base64EncodeToString(
             tenantId +
                 ":" +
-                type1.ordinal()
-                +
-                ":" +
                 jobId +
-                ":" +
-                approvalName +
                 ":" +
                 approved);
     }
