@@ -35,8 +35,8 @@ public record IntegrationDTO(
     boolean allowMultipleInstances, Category category, String componentName, String createdBy,
     Instant createdDate, String description, String icon, Long id, List<IntegrationVersion> integrationVersions,
     List<Long> integrationWorkflowIds, String lastModifiedBy, Instant lastModifiedDate,
-    Instant lastPublishedDate, Status lastStatus, Integer lastIntegrationVersion, String name, List<Tag> tags,
-    String title, int version) {
+    Instant lastPublishedDate, Status lastStatus, Integer lastVersion, String name, List<Tag> tags, String title,
+    int version) {
 
     public IntegrationDTO(Integration integration) {
         this(
