@@ -248,15 +248,15 @@ const ProjectListItem = ({project, projectGitConfiguration, remainingTags}: Proj
 
                     <div className="flex items-center justify-end gap-x-6">
                         <div className="flex flex-col items-end gap-y-4">
-                            {project.lastPublishedDate && project.lastProjectVersion ? (
+                            {project.lastPublishedDate && project.lastVersion ? (
                                 <Badge className="flex space-x-1" variant="success">
-                                    <span>V{project.lastProjectVersion - 1}</span>
+                                    <span>V{project.lastVersion - 1}</span>
 
                                     <span>PUBLISHED</span>
                                 </Badge>
                             ) : (
                                 <Badge className="flex space-x-1" variant="secondary">
-                                    <span>V{project.lastProjectVersion}</span>
+                                    <span>V{project.lastVersion}</span>
 
                                     <span>{project.lastStatus}</span>
                                 </Badge>

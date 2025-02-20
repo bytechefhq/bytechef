@@ -43,15 +43,15 @@ const ProjectsSidebar = ({
                             </div>
                         </div>
 
-                        {curProject.lastPublishedDate && curProject.lastProjectVersion ? (
+                        {curProject.lastPublishedDate && curProject.lastVersion ? (
                             <Badge className="flex space-x-1" variant="success">
-                                <span>V{curProject.lastProjectVersion - 1}</span>
+                                <span>V{curProject.lastVersion - 1}</span>
 
                                 <span>PUBLISHED</span>
                             </Badge>
                         ) : (
                             <Badge className="flex space-x-1" variant="outline">
-                                <span>V{curProject.lastProjectVersion}</span>
+                                <span>V{curProject.lastVersion}</span>
 
                                 <span>{curProject.lastStatus}</span>
                             </Badge>
