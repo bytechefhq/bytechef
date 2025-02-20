@@ -29,6 +29,7 @@ import com.bytechef.platform.component.domain.NumberProperty;
 import com.bytechef.platform.component.domain.ObjectProperty;
 import com.bytechef.platform.component.domain.OptionsDataSource;
 import com.bytechef.platform.component.domain.Property;
+import com.bytechef.platform.component.domain.Property.PropertyVisitor;
 import com.bytechef.platform.component.domain.StringProperty;
 import com.bytechef.platform.component.domain.TimeProperty;
 import com.bytechef.platform.configuration.web.rest.mapper.config.PlatformConfigurationMapperSpringConfig;
@@ -47,11 +48,13 @@ import com.bytechef.platform.configuration.web.rest.model.PropertyModel;
 import com.bytechef.platform.configuration.web.rest.model.StringPropertyModel;
 import com.bytechef.platform.configuration.web.rest.model.TaskPropertyModel;
 import com.bytechef.platform.configuration.web.rest.model.TimePropertyModel;
+import com.bytechef.platform.domain.BaseProperty;
 import com.bytechef.platform.workflow.task.dispatcher.domain.TaskProperty;
 import java.util.Collections;
 import java.util.List;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.convert.converter.Converter;
 
 /**
@@ -59,10 +62,30 @@ import org.springframework.core.convert.converter.Converter;
  */
 public class PropertyMapper {
 
+    @Mapper(config = PlatformConfigurationMapperSpringConfig.class)
+    public static abstract class BasePropertyMapper implements Converter<BaseProperty, PropertyModel>, PropertyVisitor {
+
+        @Autowired
+        private ComponentPropertyMapper componentPropertyMapper;
+
+        @Autowired
+        private TaskDispatcherPropertyMapper taskDispatcherPropertyMapper;
+
+        @Override
+        public PropertyModel convert(BaseProperty baseProperty) {
+            if (baseProperty instanceof Property property) {
+                return componentPropertyMapper.convert(property);
+            } else {
+                return taskDispatcherPropertyMapper.convert(
+                    (com.bytechef.platform.workflow.task.dispatcher.domain.Property) baseProperty);
+            }
+        }
+    }
+
     @Mapper(config = PlatformConfigurationMapperSpringConfig.class, uses = {
         JsonNullableMapper.class
     })
-    public interface ComponentPropertyMapper extends Converter<Property, PropertyModel>, Property.PropertyVisitor {
+    public interface ComponentPropertyMapper extends Converter<Property, PropertyModel>, PropertyVisitor {
 
         @Override
         default PropertyModel convert(Property property) {
