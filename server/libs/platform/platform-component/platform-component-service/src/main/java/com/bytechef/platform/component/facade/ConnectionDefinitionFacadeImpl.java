@@ -21,7 +21,6 @@ import com.bytechef.platform.component.definition.ContextFactory;
 import com.bytechef.platform.component.domain.OAuth2AuthorizationParameters;
 import com.bytechef.platform.component.service.ConnectionDefinitionService;
 import java.util.Map;
-import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 
 /**
@@ -42,8 +41,8 @@ public class ConnectionDefinitionFacadeImpl implements ConnectionDefinitionFacad
 
     @Override
     public AuthorizationCallbackResponse executeAuthorizationCallback(
-        @NonNull String componentName, int connectionVersion, @NonNull String authorizationName,
-        @NonNull Map<String, ?> authorizationParams, @NonNull String redirectUri) {
+        String componentName, int connectionVersion, String authorizationName,
+        Map<String, ?> authorizationParams, String redirectUri) {
 
         return connectionDefinitionService.executeAuthorizationCallback(
             componentName, connectionVersion, authorizationName, authorizationParams,
@@ -52,8 +51,8 @@ public class ConnectionDefinitionFacadeImpl implements ConnectionDefinitionFacad
 
     @Override
     public OAuth2AuthorizationParameters getOAuth2AuthorizationParameters(
-        @NonNull String componentName, int connectionVersion, @NonNull String authorizationName,
-        @NonNull Map<String, ?> authorizationParams) {
+        String componentName, int connectionVersion, String authorizationName,
+        Map<String, ?> authorizationParams) {
 
         return connectionDefinitionService.getOAuth2AuthorizationParameters(
             componentName, connectionVersion, authorizationName, authorizationParams,

@@ -28,7 +28,6 @@ import java.util.Optional;
 import org.apache.commons.lang3.Validate;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.lang.NonNull;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
@@ -47,7 +46,7 @@ public class JobServiceImpl implements JobService {
     }
 
     @Override
-    public Job create(@NonNull JobParametersDTO jobParametersDTO, @NonNull Workflow workflow) {
+    public Job create(JobParametersDTO jobParametersDTO, Workflow workflow) {
         Validate.notNull(jobParametersDTO, "'jobParameters' must not be null");
 
         String workflowId = jobParametersDTO.getWorkflowId();
@@ -76,7 +75,7 @@ public class JobServiceImpl implements JobService {
 
     @Override
     @Transactional(readOnly = true)
-    public Optional<Job> fetchLastWorkflowJob(@NonNull String workflowId) {
+    public Optional<Job> fetchLastWorkflowJob(String workflowId) {
         return jobRepository.findTop1ByWorkflowIdOrderByIdDesc(workflowId);
     }
 
@@ -157,7 +156,7 @@ public class JobServiceImpl implements JobService {
     }
 
     @Override
-    public Job update(@NonNull Job job) {
+    public Job update(Job job) {
         return jobRepository.save(job);
     }
 

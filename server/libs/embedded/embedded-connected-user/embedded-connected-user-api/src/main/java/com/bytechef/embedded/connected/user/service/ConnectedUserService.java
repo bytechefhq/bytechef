@@ -21,22 +21,21 @@ import com.bytechef.platform.constant.Environment;
 import java.time.LocalDate;
 import java.util.Optional;
 import org.springframework.data.domain.Page;
-import org.springframework.lang.NonNull;
 
 /**
  * @author Ivica Cardic
  */
 public interface ConnectedUserService {
 
-    ConnectedUser createConnectedUser(@NonNull Environment environment, @NonNull String externalId);
+    ConnectedUser createConnectedUser(Environment environment, String externalId);
 
     void deleteConnectedUser(long id);
 
     void enableConnectedUser(long id, boolean enable);
 
-    Optional<ConnectedUser> fetchConnectedUser(@NonNull Environment environment, @NonNull String externalId);
+    Optional<ConnectedUser> fetchConnectedUser(Environment environment, String externalId);
 
-    ConnectedUser getConnectedUser(@NonNull Environment environment, @NonNull String externalId);
+    ConnectedUser getConnectedUser(Environment environment, String externalId);
 
     ConnectedUser getConnectedUser(long id);
 

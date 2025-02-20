@@ -18,7 +18,6 @@ package com.bytechef.automation.configuration.service;
 
 import com.bytechef.automation.configuration.domain.ProjectWorkflow;
 import java.util.List;
-import org.springframework.lang.NonNull;
 
 /**
  * @author Ivica Cardic
@@ -29,9 +28,9 @@ public interface ProjectWorkflowService {
 
     ProjectWorkflow addWorkflow(long projectId, int projectVersion, String workflowId, String workflowReferenceCode);
 
-    void delete(@NonNull List<Long> ids);
+    void delete(List<Long> ids);
 
-    void delete(long projectId, int projectVersion, @NonNull String workflowId);
+    void delete(long projectId, int projectVersion, String workflowId);
 
     ProjectWorkflow getProjectDeploymentProjectWorkflow(long id);
 

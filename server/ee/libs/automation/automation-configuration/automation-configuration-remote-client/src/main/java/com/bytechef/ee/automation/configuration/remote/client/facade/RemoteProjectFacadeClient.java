@@ -14,7 +14,6 @@ import com.bytechef.automation.configuration.facade.ProjectFacade;
 import com.bytechef.platform.category.domain.Category;
 import com.bytechef.platform.tag.domain.Tag;
 import java.util.List;
-import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
 
 /**
@@ -26,12 +25,12 @@ import org.springframework.stereotype.Component;
 public class RemoteProjectFacadeClient implements ProjectFacade {
 
     @Override
-    public long addWorkflow(long id, @NonNull String definition) {
+    public long addWorkflow(long id, String definition) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public long createProject(@NonNull ProjectDTO projectDTO) {
+    public long createProject(ProjectDTO projectDTO) {
         throw new UnsupportedOperationException();
     }
 
@@ -41,7 +40,7 @@ public class RemoteProjectFacadeClient implements ProjectFacade {
     }
 
     @Override
-    public void deleteWorkflow(@NonNull String workflowId) {
+    public void deleteWorkflow(String workflowId) {
         throw new UnsupportedOperationException();
     }
 
@@ -51,7 +50,7 @@ public class RemoteProjectFacadeClient implements ProjectFacade {
     }
 
     @Override
-    public String duplicateWorkflow(long id, @NonNull String workflowId) {
+    public String duplicateWorkflow(long id, String workflowId) {
         throw new UnsupportedOperationException();
     }
 
@@ -114,12 +113,12 @@ public class RemoteProjectFacadeClient implements ProjectFacade {
     }
 
     @Override
-    public void updateProject(@NonNull ProjectDTO projectDTO) {
+    public void updateProject(ProjectDTO projectDTO) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public void updateProjectTags(long id, @NonNull List<Tag> tags) {
+    public void updateProjectTags(long id, List<Tag> tags) {
         throw new UnsupportedOperationException();
     }
 

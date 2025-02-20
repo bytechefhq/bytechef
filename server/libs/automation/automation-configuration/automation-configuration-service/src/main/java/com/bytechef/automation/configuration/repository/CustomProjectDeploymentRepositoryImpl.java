@@ -21,7 +21,6 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.ArrayList;
 import java.util.List;
 import org.springframework.jdbc.core.simple.JdbcClient;
-import org.springframework.lang.NonNull;
 
 /**
  * @author Ivica Cardic
@@ -37,8 +36,7 @@ public class CustomProjectDeploymentRepositoryImpl implements CustomProjectDeplo
 
     @Override
     public List<ProjectDeployment> findAllProjectDeployments(
-        Long workspaceId, Integer environment, Long projectId, Long tagId,
-        @NonNull List<Long> excludeProjectDeploymentIds) {
+        Long workspaceId, Integer environment, Long projectId, Long tagId, List<Long> excludeProjectDeploymentIds) {
 
         List<Object> arguments = new ArrayList<>();
 

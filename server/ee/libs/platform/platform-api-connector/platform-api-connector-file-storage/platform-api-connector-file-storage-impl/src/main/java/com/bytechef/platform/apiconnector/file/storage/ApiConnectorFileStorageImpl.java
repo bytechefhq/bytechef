@@ -20,7 +20,6 @@ import com.bytechef.commons.util.CompressionUtils;
 import com.bytechef.file.storage.domain.FileEntry;
 import com.bytechef.file.storage.service.FileStorageService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import org.springframework.lang.NonNull;
 
 /**
  * @author Ivica Cardic
@@ -38,35 +37,35 @@ public class ApiConnectorFileStorageImpl implements ApiConnectorFileStorage {
     }
 
     @Override
-    public void deleteApiConnectorDefinition(@NonNull FileEntry componentFile) {
+    public void deleteApiConnectorDefinition(FileEntry componentFile) {
         fileStorageService.deleteFile(API_CONNECTORS_DEFINITIONS_DIR, componentFile);
     }
 
     @Override
-    public void deleteApiConnectorSpecification(@NonNull FileEntry specificationFile) {
+    public void deleteApiConnectorSpecification(FileEntry specificationFile) {
         fileStorageService.deleteFile(API_CONNECTORS_SPECIFICATIONS_DIR, specificationFile);
     }
 
     @Override
-    public String readApiConnectorDefinition(@NonNull FileEntry componentFile) {
+    public String readApiConnectorDefinition(FileEntry componentFile) {
         return CompressionUtils.decompressToString(
             fileStorageService.readFileToBytes(API_CONNECTORS_DEFINITIONS_DIR, componentFile));
     }
 
     @Override
-    public String readApiConnectorSpecification(@NonNull FileEntry specificationFile) {
+    public String readApiConnectorSpecification(FileEntry specificationFile) {
         return CompressionUtils.decompressToString(
             fileStorageService.readFileToBytes(API_CONNECTORS_SPECIFICATIONS_DIR, specificationFile));
     }
 
     @Override
-    public FileEntry storeApiConnectorDefinition(String filename, @NonNull String definition) {
+    public FileEntry storeApiConnectorDefinition(String filename, String definition) {
         return fileStorageService.storeFileContent(
             API_CONNECTORS_DEFINITIONS_DIR, filename, CompressionUtils.compress(definition));
     }
 
     @Override
-    public FileEntry storeApiConnectorSpecification(@NonNull String filename, @NonNull String definition) {
+    public FileEntry storeApiConnectorSpecification(String filename, String definition) {
         return fileStorageService.storeFileContent(
             API_CONNECTORS_SPECIFICATIONS_DIR, filename, CompressionUtils.compress(definition));
     }

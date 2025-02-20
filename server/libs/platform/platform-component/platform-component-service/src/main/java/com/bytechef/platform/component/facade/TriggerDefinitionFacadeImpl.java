@@ -35,7 +35,6 @@ import com.bytechef.platform.domain.OutputResponse;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Map;
-import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 
 /**
@@ -62,8 +61,8 @@ public class TriggerDefinitionFacadeImpl implements TriggerDefinitionFacade {
 
     @Override
     public List<Property> executeDynamicProperties(
-        @NonNull String componentName, int componentVersion, @NonNull String triggerName, @NonNull String propertyName,
-        @NonNull Map<String, ?> inputParameters, @NonNull List<String> lookupDependsOnPaths, Long connectionId) {
+        String componentName, int componentVersion, String triggerName, String propertyName,
+        Map<String, ?> inputParameters, List<String> lookupDependsOnPaths, Long connectionId) {
 
         ComponentConnection componentConnection = getComponentConnection(connectionId);
 
@@ -75,8 +74,8 @@ public class TriggerDefinitionFacadeImpl implements TriggerDefinitionFacade {
 
     @Override
     public WebhookEnableOutput executeDynamicWebhookRefresh(
-        @NonNull String componentName, int componentVersion, @NonNull String triggerName,
-        @NonNull Map<String, ?> outputParameters, Long connectionId) {
+        String componentName, int componentVersion, String triggerName, Map<String, ?> outputParameters,
+        Long connectionId) {
 
         ComponentConnection componentConnection = getComponentConnection(connectionId);
 
@@ -88,8 +87,8 @@ public class TriggerDefinitionFacadeImpl implements TriggerDefinitionFacade {
 
     @Override
     public void executeListenerDisable(
-        @NonNull String componentName, int componentVersion, @NonNull String triggerName,
-        @NonNull Map<String, ?> inputParameters, @NonNull String workflowExecutionId, Long connectionId) {
+        String componentName, int componentVersion, String triggerName, Map<String, ?> inputParameters,
+        String workflowExecutionId, Long connectionId) {
 
         ComponentConnection componentConnection = getComponentConnection(connectionId);
 
@@ -101,8 +100,8 @@ public class TriggerDefinitionFacadeImpl implements TriggerDefinitionFacade {
 
     @Override
     public void executeListenerEnable(
-        @NonNull String componentName, int componentVersion, @NonNull String triggerName,
-        @NonNull Map<String, ?> inputParameters, @NonNull String workflowExecutionId, Long connectionId) {
+        String componentName, int componentVersion, String triggerName, Map<String, ?> inputParameters,
+        String workflowExecutionId, Long connectionId) {
 
         ComponentConnection componentConnection = getComponentConnection(connectionId);
 
@@ -114,9 +113,8 @@ public class TriggerDefinitionFacadeImpl implements TriggerDefinitionFacade {
 
     @Override
     public List<Option> executeOptions(
-        @NonNull String componentName, int componentVersion, @NonNull String triggerName, @NonNull String propertyName,
-        @NonNull Map<String, ?> inputParameters, @NonNull List<String> lookupDependsOnPaths, String searchText,
-        Long connectionId) {
+        String componentName, int componentVersion, String triggerName, String propertyName,
+        Map<String, ?> inputParameters, List<String> lookupDependsOnPaths, String searchText, Long connectionId) {
 
         ComponentConnection componentConnection = getComponentConnection(connectionId);
 
@@ -134,8 +132,8 @@ public class TriggerDefinitionFacadeImpl implements TriggerDefinitionFacade {
 
     @Override
     public OutputResponse executeOutput(
-        @NonNull String componentName, int componentVersion, @NonNull String triggerName,
-        @NonNull Map<String, ?> inputParameters, Long connectionId) {
+        String componentName, int componentVersion, String triggerName, Map<String, ?> inputParameters,
+        Long connectionId) {
 
         ComponentConnection componentConnection = getComponentConnection(connectionId);
 
@@ -152,10 +150,9 @@ public class TriggerDefinitionFacadeImpl implements TriggerDefinitionFacade {
 
     @Override
     public TriggerOutput executeTrigger(
-        @NonNull String componentName, int componentVersion, @NonNull String triggerName,
-        ModeType type, Long principalId, String workflowReferenceCode,
-        @NonNull Map<String, ?> inputParameters, Object triggerState, WebhookRequest webhookRequest,
-        Long connectionId, boolean editorEnvironment) {
+        String componentName, int componentVersion, String triggerName, ModeType type, Long principalId,
+        String workflowReferenceCode, Map<String, ?> inputParameters, Object triggerState,
+        WebhookRequest webhookRequest, Long connectionId, boolean editorEnvironment) {
 
         ComponentConnection componentConnection = getComponentConnection(connectionId);
 
@@ -175,9 +172,8 @@ public class TriggerDefinitionFacadeImpl implements TriggerDefinitionFacade {
 
     @Override
     public void executeWebhookDisable(
-        @NonNull String componentName, int componentVersion, @NonNull String triggerName,
-        @NonNull Map<String, ?> inputParameters, @NonNull String workflowExecutionId,
-        @NonNull Map<String, ?> outputParameters, Long connectionId) {
+        String componentName, int componentVersion, String triggerName, Map<String, ?> inputParameters,
+        String workflowExecutionId, Map<String, ?> outputParameters, Long connectionId) {
 
         ComponentConnection componentConnection = getComponentConnection(connectionId);
 
@@ -199,9 +195,8 @@ public class TriggerDefinitionFacadeImpl implements TriggerDefinitionFacade {
 
     @Override
     public WebhookEnableOutput executeWebhookEnable(
-        @NonNull String componentName, int componentVersion, @NonNull String triggerName,
-        @NonNull Map<String, ?> inputParameters, @NonNull String workflowExecutionId, Long connectionId,
-        @NonNull String webhookUrl) {
+        String componentName, int componentVersion, String triggerName, Map<String, ?> inputParameters,
+        String workflowExecutionId, Long connectionId, String webhookUrl) {
 
         ComponentConnection componentConnection = getComponentConnection(connectionId);
 
@@ -219,8 +214,8 @@ public class TriggerDefinitionFacadeImpl implements TriggerDefinitionFacade {
 
     @Override
     public WebhookValidateResponse executeWebhookValidate(
-        @NonNull String componentName, int componentVersion, @NonNull String triggerName,
-        @NonNull Map<String, ?> inputParameters, @NonNull WebhookRequest webhookRequest, Long connectionId) {
+        String componentName, int componentVersion, String triggerName, Map<String, ?> inputParameters,
+        WebhookRequest webhookRequest, Long connectionId) {
 
         ComponentConnection componentConnection = getComponentConnection(connectionId);
 
@@ -238,8 +233,8 @@ public class TriggerDefinitionFacadeImpl implements TriggerDefinitionFacade {
 
     @Override
     public WebhookValidateResponse executeWebhookValidateOnEnable(
-        @NonNull String componentName, int componentVersion, @NonNull String triggerName,
-        @NonNull Map<String, ?> inputParameters, @NonNull WebhookRequest webhookRequest, Long connectionId) {
+        String componentName, int componentVersion, String triggerName, Map<String, ?> inputParameters,
+        WebhookRequest webhookRequest, Long connectionId) {
 
         ComponentConnection componentConnection = getComponentConnection(connectionId);
 
@@ -251,8 +246,7 @@ public class TriggerDefinitionFacadeImpl implements TriggerDefinitionFacade {
 
     @Override
     public String executeWorkflowNodeDescription(
-        @NonNull String componentName, int componentVersion, @NonNull String triggerName,
-        @NonNull Map<String, ?> inputParameters) {
+        String componentName, int componentVersion, String triggerName, Map<String, ?> inputParameters) {
 
         return triggerDefinitionService.executeWorkflowNodeDescription(
             componentName, componentVersion, triggerName, inputParameters,
@@ -262,8 +256,7 @@ public class TriggerDefinitionFacadeImpl implements TriggerDefinitionFacade {
 
     @Override
     public ProviderException executeProcessErrorResponse(
-        @NonNull String componentName, int componentVersion, @NonNull String triggerName, int statusCode,
-        Object body) {
+        String componentName, int componentVersion, String triggerName, int statusCode, Object body) {
 
         TriggerContext actionContext = contextFactory.createTriggerContext(
             componentName, componentVersion, triggerName, null, null, null, null, false);

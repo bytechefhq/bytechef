@@ -20,6 +20,7 @@ import com.bytechef.embedded.configuration.domain.Integration;
 import com.bytechef.embedded.configuration.domain.IntegrationVersion;
 import com.bytechef.embedded.configuration.domain.IntegrationVersion.Status;
 import java.util.List;
+import org.springframework.lang.Nullable;
 
 /**
  * @author Ivica Cardic
@@ -42,11 +43,12 @@ public interface IntegrationService {
 
     List<IntegrationVersion> getIntegrationVersions(Long id);
 
-    List<Integration> getIntegrations(Long categoryId, List<Long> ids, Long tagId, Status status);
+    List<Integration> getIntegrations(
+        @Nullable Long categoryId, List<Long> ids, @Nullable Long tagId, @Nullable Status status);
 
     Integration getWorkflowIntegration(String workflowId);
 
-    int publishIntegration(long id, String description);
+    int publishIntegration(long id, @Nullable String description);
 
     Integration update(long id, List<Long> tagIds);
 

@@ -21,7 +21,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import org.apache.commons.lang3.Validate;
-import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
 
 /**
@@ -38,7 +37,7 @@ public class JobPrincipalAccessorRegistry {
                 Collectors.toMap(JobPrincipalAccessor::getType, instanceWorkflowAccessor -> instanceWorkflowAccessor));
     }
 
-    public JobPrincipalAccessor getJobPrincipalAccessor(@NonNull ModeType type) {
+    public JobPrincipalAccessor getJobPrincipalAccessor(ModeType type) {
         return Validate.notNull(joPrincipalAccessorMap.get(type), "joPrincipalAccessor");
     }
 }

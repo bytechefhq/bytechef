@@ -29,7 +29,6 @@ import com.bytechef.platform.workflow.task.dispatcher.domain.TaskDispatcherDefin
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Map;
-import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 
 /**
@@ -46,9 +45,7 @@ public class TaskDispatcherDefinitionServiceImpl implements TaskDispatcherDefini
     }
 
     @Override
-    public OutputResponse executeOutputSchema(
-        @NonNull String name, int version, @NonNull Map<String, ?> inputParameters) {
-
+    public OutputResponse executeOutputSchema(String name, int version, Map<String, ?> inputParameters) {
         OutputFunction outputFunction = getOutputSchemaFunction(name, version);
 
         try {

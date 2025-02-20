@@ -43,8 +43,7 @@ public class JdbcDataStorageServiceImpl implements JdbcDataStorageService {
 
     @Override
     public void delete(
-        @NonNull String componentName, @NonNull DataStorageScope scope, @NonNull String scopeId, @NonNull String key,
-        @NonNull ModeType type) {
+        String componentName, DataStorageScope scope, String scopeId, String key, ModeType type) {
 
         dataStorageRepository
             .findByComponentNameAndScopeAndScopeIdAndKeyAndType(componentName, scope.ordinal(), scopeId, key,
@@ -57,8 +56,7 @@ public class JdbcDataStorageServiceImpl implements JdbcDataStorageService {
     @SuppressWarnings("unchecked")
     @Transactional
     public <T> Optional<T> fetch(
-        @NonNull String componentName, @NonNull DataStorageScope scope, @NonNull String scopeId, @NonNull String key,
-        @NonNull ModeType type) {
+        String componentName, DataStorageScope scope, String scopeId, String key, ModeType type) {
 
         return dataStorageRepository
             .findByComponentNameAndScopeAndScopeIdAndKeyAndType(
@@ -69,8 +67,7 @@ public class JdbcDataStorageServiceImpl implements JdbcDataStorageService {
     @NonNull
     @Override
     public <T> T get(
-        @NonNull String componentName, @NonNull DataStorageScope scope, @NonNull String scopeId, @NonNull String key,
-        @NonNull ModeType type) {
+        String componentName, DataStorageScope scope, String scopeId, String key, ModeType type) {
 
         return OptionalUtils.get(fetch(componentName, scope, scopeId, key, type));
     }
@@ -79,8 +76,7 @@ public class JdbcDataStorageServiceImpl implements JdbcDataStorageService {
     @Override
     @SuppressWarnings("unchecked")
     public <T> Map<String, T> getAll(
-        @NonNull String componentName, @NonNull DataStorageScope scope, @NonNull String scopeId,
-        @NonNull ModeType type) {
+        String componentName, DataStorageScope scope, String scopeId, ModeType type) {
 
         return OptionalUtils
             .get(
@@ -93,8 +89,7 @@ public class JdbcDataStorageServiceImpl implements JdbcDataStorageService {
 
     @Override
     public void put(
-        @NonNull String componentName, @NonNull DataStorageScope scope, @NonNull String scopeId, @NonNull String key,
-        @NonNull ModeType type, @NonNull Object value) {
+        String componentName, DataStorageScope scope, String scopeId, String key, ModeType type, Object value) {
 
         dataStorageRepository
             .findByComponentNameAndScopeAndScopeIdAndKeyAndType(

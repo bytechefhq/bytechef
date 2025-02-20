@@ -41,7 +41,7 @@ import com.bytechef.config.ApplicationProperties.Component.Registry;
 import com.bytechef.platform.component.handler.ComponentHandlerRegistry;
 import com.bytechef.platform.component.handler.DynamicComponentHandlerRegistry;
 import com.bytechef.platform.util.PropertyUtils;
-import edu.umd.cs.findbugs.annotations.NonNull;
+import edu.umd.cs.findbugs.annotations.Nullable;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Arrays;
 import java.util.Collections;
@@ -115,8 +115,7 @@ public class ComponentDefinitionRegistry {
                 .put(componentDefinition.getVersion(), componentDefinition);
         }
 
-        this.dynamicComponentHandlerListFactories = dynamicComponentHandlerRegistries == null
-            ? List.of() : dynamicComponentHandlerRegistries;
+        this.dynamicComponentHandlerListFactories = dynamicComponentHandlerRegistries;
     }
 
     public ActionDefinition getActionDefinition(String componentName, int componentVersion, String actionName) {
@@ -164,19 +163,19 @@ public class ComponentDefinitionRegistry {
             .orElseThrow(IllegalArgumentException::new);
     }
 
-    public ComponentDefinition getComponentDefinition(@NonNull String name, Integer version) {
+    public ComponentDefinition getComponentDefinition(String name, Integer version) {
         return fetchComponentDefinition(name, version)
             .orElseThrow(() -> new IllegalArgumentException("The component '%s' does not exist.".formatted(name)));
     }
 
-    public boolean hasComponentDefinition(String name, Integer version) {
+    public boolean hasComponentDefinition(String name, @Nullable Integer version) {
         List<ComponentDefinition> componentDefinitions = getComponentDefinitions(name);
 
         return componentDefinitions.stream()
             .anyMatch(curComponentDefinition -> (version == null) || (version == curComponentDefinition.getVersion()));
     }
 
-    public Optional<ComponentDefinition> fetchComponentDefinition(@NonNull String name, Integer version) {
+    public Optional<ComponentDefinition> fetchComponentDefinition(String name, @Nullable Integer version) {
         ComponentDefinition componentDefinition = null;
 
         if (version == null) {

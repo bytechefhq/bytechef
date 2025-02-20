@@ -43,7 +43,7 @@ public class ChatModelActionTest extends AbstractActionTest {
     @Test
     public void testGetResponse() {
         when(mockedParameters.getList(eq(MESSAGES), any(TypeReference.class)))
-            .thenReturn(List.of(new ChatModel.Message("QUESTION", null, ChatModel.Role.USER)));
+            .thenReturn(List.of(new ChatModel.Message("QUESTION", List.of(), ChatModel.Role.USER)));
         when(mockedParameters.getFromPath(any(), eq(ChatModel.ResponseFormat.class), eq(ChatModel.ResponseFormat.TEXT)))
             .thenReturn(ChatModel.ResponseFormat.TEXT);
 
@@ -67,7 +67,7 @@ public class ChatModelActionTest extends AbstractActionTest {
         public org.springframework.ai.chat.model.ChatModel createChatModel(
             Parameters inputParameters, Parameters connectionParameters) {
 
-            return null;
+            return prompt -> new ChatResponse(List.of(new Generation(new AssistantMessage(ANSWER))));
         }
     }
 }

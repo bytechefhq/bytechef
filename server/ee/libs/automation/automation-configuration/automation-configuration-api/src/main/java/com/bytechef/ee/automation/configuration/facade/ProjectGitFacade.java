@@ -7,8 +7,6 @@
 
 package com.bytechef.ee.automation.configuration.facade;
 
-import org.springframework.lang.NonNull;
-
 /**
  * @version ee
  *
@@ -18,5 +16,5 @@ public interface ProjectGitFacade {
 
     void pullProjectFromGit(long projectId);
 
-    String pushProjectToGit(long projectId, @NonNull String commitMessage);
+    String pushProjectToGit(long projectId, String commitMessage);
 }

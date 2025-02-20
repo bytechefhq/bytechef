@@ -10,7 +10,6 @@ package com.bytechef.ee.automation.apiplatform.configuration.service;
 import com.bytechef.ee.automation.apiplatform.configuration.domain.ApiCollection;
 import com.bytechef.platform.constant.Environment;
 import java.util.List;
-import org.springframework.lang.NonNull;
 
 /**
  * @version ee
@@ -19,7 +18,7 @@ import org.springframework.lang.NonNull;
  */
 public interface ApiCollectionService {
 
-    ApiCollection create(@NonNull ApiCollection apiCollection);
+    ApiCollection create(ApiCollection apiCollection);
 
     void delete(long id);
 
@@ -31,7 +30,7 @@ public interface ApiCollectionService {
 
     List<ApiCollection> getApiCollections(Long workspaceId, Environment environment, Long projectId, Long tagId);
 
-    ApiCollection update(@NonNull ApiCollection apiCollection);
+    ApiCollection update(ApiCollection apiCollection);
 
-    ApiCollection update(long id, @NonNull List<Long> tagIds);
+    ApiCollection update(long id, List<Long> tagIds);
 }

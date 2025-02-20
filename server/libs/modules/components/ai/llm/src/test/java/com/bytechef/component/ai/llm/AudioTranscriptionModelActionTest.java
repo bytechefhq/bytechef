@@ -88,7 +88,9 @@ public class AudioTranscriptionModelActionTest extends AbstractActionTest {
         @Override
         public Model<AudioTranscriptionPrompt, AudioTranscriptionResponse> createAudioTranscriptionModel(
             Parameters inputParameters, Parameters connectionParameters) {
-            return null;
+
+            return request -> new AudioTranscriptionResponse(
+                new org.springframework.ai.audio.transcription.AudioTranscription(ANSWER));
         }
     }
 }

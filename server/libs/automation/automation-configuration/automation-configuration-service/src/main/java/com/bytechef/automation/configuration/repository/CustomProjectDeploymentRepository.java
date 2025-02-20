@@ -18,7 +18,6 @@ package com.bytechef.automation.configuration.repository;
 
 import com.bytechef.automation.configuration.domain.ProjectDeployment;
 import java.util.List;
-import org.springframework.lang.NonNull;
 
 /**
  * @author Ivica Cardic
@@ -26,6 +25,5 @@ import org.springframework.lang.NonNull;
 public interface CustomProjectDeploymentRepository {
 
     List<ProjectDeployment> findAllProjectDeployments(
-        Long workspaceId, Integer environment, Long projectId, Long tagId,
-        @NonNull List<Long> excludeProjectDeploymentIds);
+        Long workspaceId, Integer environment, Long projectId, Long tagId, List<Long> excludeProjectDeploymentIds);
 }

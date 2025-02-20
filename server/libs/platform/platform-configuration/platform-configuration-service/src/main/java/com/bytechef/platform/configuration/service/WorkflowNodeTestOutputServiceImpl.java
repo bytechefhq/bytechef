@@ -29,7 +29,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import org.apache.commons.lang3.Validate;
-import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -110,8 +109,7 @@ public class WorkflowNodeTestOutputServiceImpl implements WorkflowNodeTestOutput
 
     @Override
     public WorkflowNodeTestOutput save(
-        @NonNull String workflowId, @NonNull String workflowNodeName, @NonNull WorkflowNodeType workflowNodeType,
-        @NonNull OutputResponse outputResponse) {
+        String workflowId, String workflowNodeName, WorkflowNodeType workflowNodeType, OutputResponse outputResponse) {
 
         return save(
             workflowId, workflowNodeName, workflowNodeType, (Property) outputResponse.outputSchema(),

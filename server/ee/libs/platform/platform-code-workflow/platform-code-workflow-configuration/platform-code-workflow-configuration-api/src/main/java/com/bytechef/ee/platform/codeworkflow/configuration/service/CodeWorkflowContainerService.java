@@ -8,7 +8,6 @@
 package com.bytechef.ee.platform.codeworkflow.configuration.service;
 
 import com.bytechef.ee.platform.codeworkflow.configuration.domain.CodeWorkflowContainer;
-import org.springframework.lang.NonNull;
 
 /**
  * @version ee
@@ -17,7 +16,7 @@ import org.springframework.lang.NonNull;
  */
 public interface CodeWorkflowContainerService {
 
-    CodeWorkflowContainer create(@NonNull CodeWorkflowContainer codeWorkflowContainer);
+    CodeWorkflowContainer create(CodeWorkflowContainer codeWorkflowContainer);
 
     CodeWorkflowContainer getCodeWorkflowContainer(String codeWorkflowContainerReference);
 }

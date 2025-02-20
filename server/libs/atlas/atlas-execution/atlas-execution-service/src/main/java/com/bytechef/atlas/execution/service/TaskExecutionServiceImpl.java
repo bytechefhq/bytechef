@@ -23,7 +23,6 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Optional;
 import org.apache.commons.lang3.Validate;
-import org.springframework.lang.NonNull;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
@@ -86,7 +85,7 @@ public class TaskExecutionServiceImpl implements TaskExecutionService {
     }
 
     @Override
-    public TaskExecution update(@NonNull TaskExecution taskExecution) {
+    public TaskExecution update(TaskExecution taskExecution) {
         Validate.notNull(taskExecution, "'taskExecution' must not be null");
 
         TaskExecution currentTaskExecution = OptionalUtils.get(

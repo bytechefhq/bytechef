@@ -12,7 +12,6 @@ import com.bytechef.ee.automation.apiplatform.configuration.dto.ApiCollectionEnd
 import com.bytechef.platform.constant.Environment;
 import com.bytechef.platform.tag.domain.Tag;
 import java.util.List;
-import org.springframework.lang.NonNull;
 
 /**
  * @version ee
@@ -21,9 +20,9 @@ import org.springframework.lang.NonNull;
  */
 public interface ApiCollectionFacade {
 
-    ApiCollectionDTO createApiCollection(@NonNull ApiCollectionDTO apiCollectionDTO);
+    ApiCollectionDTO createApiCollection(ApiCollectionDTO apiCollectionDTO);
 
-    ApiCollectionEndpointDTO createApiCollectionEndpoint(@NonNull ApiCollectionEndpointDTO apiCollectionEndpoint);
+    ApiCollectionEndpointDTO createApiCollectionEndpoint(ApiCollectionEndpointDTO apiCollectionEndpoint);
 
     void deleteApiCollection(long id);
 
@@ -35,7 +34,7 @@ public interface ApiCollectionFacade {
 
     String getOpenApiSpecification(long id);
 
-    ApiCollectionDTO updateApiCollection(@NonNull ApiCollectionDTO apiCollectionDTO);
+    ApiCollectionDTO updateApiCollection(ApiCollectionDTO apiCollectionDTO);
 
     void updateApiCollectionTags(long id, List<Tag> tags);
 

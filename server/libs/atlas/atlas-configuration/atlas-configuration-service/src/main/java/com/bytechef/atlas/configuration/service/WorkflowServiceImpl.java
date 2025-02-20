@@ -37,7 +37,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
 import org.springframework.dao.OptimisticLockingFailureException;
-import org.springframework.lang.NonNull;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
@@ -67,7 +66,7 @@ public class WorkflowServiceImpl implements WorkflowService {
 
     @Override
     public Workflow create(
-        @NonNull String definition, @NonNull Format format, @NonNull SourceType sourceType) {
+        String definition, Format format, SourceType sourceType) {
 
         Validate.notNull(definition, "'definition' must not be null");
         Validate.notNull(format, "'format' must not be null");
@@ -89,7 +88,7 @@ public class WorkflowServiceImpl implements WorkflowService {
     }
 
     @Override
-    public void delete(@NonNull String id) {
+    public void delete(String id) {
         Validate.notNull(id, "'id' must not be null");
 
         workflowCrudRepositories
@@ -100,14 +99,14 @@ public class WorkflowServiceImpl implements WorkflowService {
     }
 
     @Override
-    public void delete(@NonNull List<String> ids) {
+    public void delete(List<String> ids) {
         for (String id : ids) {
             delete(id);
         }
     }
 
     @Override
-    public Workflow duplicateWorkflow(@NonNull String id) {
+    public Workflow duplicateWorkflow(String id) {
         Workflow workflow = getWorkflow(id);
 
         return create(workflow.getDefinition(), workflow.getFormat(), workflow.getSourceType());
@@ -115,7 +114,7 @@ public class WorkflowServiceImpl implements WorkflowService {
 
     @Override
     @Transactional(readOnly = true)
-    public Workflow getWorkflow(@NonNull String id) {
+    public Workflow getWorkflow(String id) {
         Validate.notNull(id, "'id' must not be null");
 
         Cache cacheOne = Validate.notNull(cacheManager.getCache(CACHE_ONE), "cacheOne");
@@ -192,7 +191,7 @@ public class WorkflowServiceImpl implements WorkflowService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<Workflow> getWorkflows(@NonNull List<String> workflowIds) {
+    public List<Workflow> getWorkflows(List<String> workflowIds) {
         List<Workflow> workflows = new ArrayList<>();
 
         for (String workflowId : workflowIds) {
@@ -207,7 +206,7 @@ public class WorkflowServiceImpl implements WorkflowService {
     }
 
     @Override
-    public void refreshCache(@NonNull String id) {
+    public void refreshCache(String id) {
         Validate.notNull(id, "'id' must not be null");
 
         Workflow workflow = null;
@@ -265,7 +264,7 @@ public class WorkflowServiceImpl implements WorkflowService {
     }
 
     @Override
-    public Workflow update(@NonNull String id, @NonNull String definition, int version) {
+    public Workflow update(String id, String definition, int version) {
         Validate.notNull(id, "'id' must not be null");
         Validate.notNull(definition, "'definition' must not be null");
 

@@ -40,7 +40,6 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Predicate;
-import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 
 /**
@@ -57,13 +56,13 @@ public class ComponentDefinitionServiceImpl implements ComponentDefinitionServic
     }
 
     @Override
-    public Optional<ComponentDefinition> fetchComponentDefinition(@NonNull String name, Integer version) {
+    public Optional<ComponentDefinition> fetchComponentDefinition(String name, Integer version) {
         return componentDefinitionRegistry.fetchComponentDefinition(name, version)
             .map(ComponentDefinition::new);
     }
 
     @Override
-    public ComponentDefinition getComponentDefinition(@NonNull String name, Integer version) {
+    public ComponentDefinition getComponentDefinition(String name, Integer version) {
         com.bytechef.component.definition.ComponentDefinition componentDefinition =
             componentDefinitionRegistry.getComponentDefinition(name, version);
 
@@ -98,7 +97,7 @@ public class ComponentDefinitionServiceImpl implements ComponentDefinitionServic
     }
 
     @Override
-    public List<ComponentDefinition> getComponentDefinitionVersions(@NonNull String name) {
+    public List<ComponentDefinition> getComponentDefinitionVersions(String name) {
         return componentDefinitionRegistry.getComponentDefinitions(name)
             .stream()
             .map(ComponentDefinition::new)
@@ -106,7 +105,7 @@ public class ComponentDefinitionServiceImpl implements ComponentDefinitionServic
     }
 
     @Override
-    public ComponentDefinition getConnectionComponentDefinition(@NonNull String name, int connectionVersion) {
+    public ComponentDefinition getConnectionComponentDefinition(String name, int connectionVersion) {
         return componentDefinitionRegistry.getComponentDefinitions()
             .stream()
             .filter(componentDefinition -> {
@@ -132,7 +131,7 @@ public class ComponentDefinitionServiceImpl implements ComponentDefinitionServic
     }
 
     @Override
-    public List<ComponentDefinition> getDataStreamComponentDefinitions(@NonNull ComponentType componentType) {
+    public List<ComponentDefinition> getDataStreamComponentDefinitions(ComponentType componentType) {
         return componentDefinitionRegistry.getComponentDefinitions()
             .stream()
             .filter(componentDefinition -> {
@@ -151,7 +150,7 @@ public class ComponentDefinitionServiceImpl implements ComponentDefinitionServic
     }
 
     @Override
-    public DataStreamItemReader getDataStreamItemReader(@NonNull String componentName, int componentVersion) {
+    public DataStreamItemReader getDataStreamItemReader(String componentName, int componentVersion) {
         com.bytechef.component.definition.ComponentDefinition componentDefinition =
             componentDefinitionRegistry.getComponentDefinition(componentName, componentVersion);
 
@@ -165,7 +164,7 @@ public class ComponentDefinitionServiceImpl implements ComponentDefinitionServic
     }
 
     @Override
-    public DataStreamItemWriter getDataStreamItemWriter(@NonNull String componentName, int componentVersion) {
+    public DataStreamItemWriter getDataStreamItemWriter(String componentName, int componentVersion) {
         com.bytechef.component.definition.ComponentDefinition componentDefinition =
             componentDefinitionRegistry.getComponentDefinition(componentName, componentVersion);
 
@@ -192,7 +191,7 @@ public class ComponentDefinitionServiceImpl implements ComponentDefinitionServic
     public
         ProviderModelMapper<? super UnifiedInputModel, ? extends UnifiedOutputModel, ? extends ProviderInputModel, ? super ProviderOutputModel>
         getUnifiedApiProviderModelMapper(
-            @NonNull String componentName, @NonNull Category category, @NonNull ModelType modelType) {
+            String componentName, Category category, ModelType modelType) {
 
         return (ProviderModelMapper<? super UnifiedInputModel, ? extends UnifiedOutputModel, ? extends ProviderInputModel, ? super ProviderOutputModel>) componentDefinitionRegistry
             .getComponentDefinitions()
@@ -218,7 +217,7 @@ public class ComponentDefinitionServiceImpl implements ComponentDefinitionServic
     @SuppressWarnings("unchecked")
     public ProviderModelAdapter<? super ProviderInputModel, ? extends ProviderOutputModel>
         getUnifiedApiProviderModelAdapter(
-            @NonNull String componentName, @NonNull Category category, @NonNull ModelType modelType) {
+            String componentName, Category category, ModelType modelType) {
 
         return (ProviderModelAdapter<? super ProviderInputModel, ? extends ProviderOutputModel>) componentDefinitionRegistry
             .getComponentDefinitions()
@@ -241,7 +240,7 @@ public class ComponentDefinitionServiceImpl implements ComponentDefinitionServic
     }
 
     @Override
-    public boolean hasComponentDefinition(@NonNull String name, Integer version) {
+    public boolean hasComponentDefinition(String name, Integer version) {
         return componentDefinitionRegistry.hasComponentDefinition(name, version);
     }
 

@@ -13,7 +13,6 @@ import com.bytechef.embedded.configuration.service.IntegrationInstanceWorkflowSe
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Optional;
-import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
 
 /**
@@ -53,14 +52,14 @@ public class RemoteIntegrationInstanceWorkflowServiceClient implements Integrati
 
     @Override
     public Optional<IntegrationInstanceWorkflow> fetchIntegrationInstanceWorkflow(
-        long integrationInstanceId, @NonNull String workflowId) {
+        long integrationInstanceId, String workflowId) {
 
         throw new UnsupportedOperationException();
     }
 
     @Override
     public IntegrationInstanceWorkflow getIntegrationInstanceWorkflow(
-        long integrationInstanceId, @NonNull String workflowId) {
+        long integrationInstanceId, String workflowId) {
 
         return loadBalancedRestClient.get(
             uriBuilder -> uriBuilder
@@ -76,7 +75,7 @@ public class RemoteIntegrationInstanceWorkflowServiceClient implements Integrati
     }
 
     @Override
-    public void update(@NonNull IntegrationInstanceWorkflow integrationInstanceWorkflow) {
+    public void update(IntegrationInstanceWorkflow integrationInstanceWorkflow) {
         throw new UnsupportedOperationException();
     }
 

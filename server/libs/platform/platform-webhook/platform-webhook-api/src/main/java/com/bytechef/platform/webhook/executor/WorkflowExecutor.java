@@ -19,6 +19,7 @@ package com.bytechef.platform.webhook.executor;
 import com.bytechef.component.definition.TriggerDefinition.WebhookValidateResponse;
 import com.bytechef.platform.component.trigger.WebhookRequest;
 import com.bytechef.platform.workflow.execution.WorkflowExecutionId;
+import org.springframework.lang.Nullable;
 
 /**
  * @author Ivica Cardic
@@ -27,6 +28,7 @@ public interface WorkflowExecutor {
 
     void execute(WorkflowExecutionId workflowExecutionId, WebhookRequest webhookRequest);
 
+    @Nullable
     Object executeSync(WorkflowExecutionId workflowExecutionId, WebhookRequest webhookRequest);
 
     WebhookValidateResponse validateAndExecuteAsync(

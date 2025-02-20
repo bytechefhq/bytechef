@@ -19,6 +19,7 @@ package com.bytechef.task.dispatcher.approval.config;
 import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcherResolverFactory;
 import com.bytechef.atlas.execution.service.TaskExecutionService;
 import com.bytechef.task.dispatcher.approval.ApprovalTaskDispatcher;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -32,6 +33,7 @@ public class ApprovalTaskDispatcherConfiguration {
     private final ApplicationEventPublisher eventPublisher;
     private final TaskExecutionService taskExecutionService;
 
+    @SuppressFBWarnings("EI")
     public ApprovalTaskDispatcherConfiguration(
         ApplicationEventPublisher eventPublisher, TaskExecutionService taskExecutionService) {
 

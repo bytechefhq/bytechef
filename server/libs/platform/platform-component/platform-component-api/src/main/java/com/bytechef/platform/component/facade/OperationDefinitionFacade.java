@@ -17,7 +17,6 @@
 package com.bytechef.platform.component.facade;
 
 import com.bytechef.component.exception.ProviderException;
-import org.springframework.lang.NonNull;
 
 /**
  * @author Marko Kriskovic
@@ -25,6 +24,5 @@ import org.springframework.lang.NonNull;
 public interface OperationDefinitionFacade {
 
     ProviderException executeProcessErrorResponse(
-        @NonNull String componentName, int componentVersion, @NonNull String actionName, int statusCode,
-        Object body);
+        String componentName, int componentVersion, String actionName, int statusCode, Object body);
 }

@@ -23,7 +23,6 @@ import com.bytechef.component.definition.unified.base.model.UnifiedOutputModel;
 import com.bytechef.embedded.unified.pagination.CursorPageSlice;
 import com.bytechef.embedded.unified.pagination.CursorPageable;
 import com.bytechef.platform.constant.Environment;
-import org.springframework.lang.NonNull;
 
 /**
  * @author Ivica Cardic
@@ -31,22 +30,22 @@ import org.springframework.lang.NonNull;
 public interface UnifiedApiFacade {
 
     String create(
-        @NonNull UnifiedInputModel unifiedInputModel, @NonNull Category category, @NonNull ModelType modelType,
-        @NonNull Environment environment, Long instanceId);
+        UnifiedInputModel unifiedInputModel, Category category, ModelType modelType,
+        Environment environment, Long instanceId);
 
     void delete(
-        @NonNull String id, @NonNull Category category, @NonNull ModelType modelType, @NonNull Environment environment,
+        String id, Category category, ModelType modelType, Environment environment,
         Long instanceId);
 
     UnifiedOutputModel get(
-        @NonNull String id, @NonNull Category category, @NonNull ModelType modelType, @NonNull Environment environment,
+        String id, Category category, ModelType modelType, Environment environment,
         Long instanceId);
 
     CursorPageSlice<? extends UnifiedOutputModel> getPage(
-        @NonNull CursorPageable cursorPageable, @NonNull Category category, @NonNull ModelType modelType,
-        @NonNull Environment environment, Long instanceId);
+        CursorPageable cursorPageable, Category category, ModelType modelType,
+        Environment environment, Long instanceId);
 
     void update(
-        @NonNull String id, @NonNull UnifiedInputModel unifiedInputModel, @NonNull Category category,
-        @NonNull ModelType modelType, @NonNull Environment environment, Long instanceId);
+        String id, UnifiedInputModel unifiedInputModel, Category category,
+        ModelType modelType, Environment environment, Long instanceId);
 }

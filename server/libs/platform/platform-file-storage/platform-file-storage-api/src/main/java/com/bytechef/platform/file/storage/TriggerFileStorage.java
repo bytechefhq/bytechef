@@ -17,14 +17,13 @@
 package com.bytechef.platform.file.storage;
 
 import com.bytechef.file.storage.domain.FileEntry;
-import org.springframework.lang.NonNull;
 
 /**
  * @author Ivica Cardic
  */
 public interface TriggerFileStorage {
 
-    Object readTriggerExecutionOutput(@NonNull FileEntry fileEntry);
+    Object readTriggerExecutionOutput(FileEntry fileEntry);
 
-    FileEntry storeTriggerExecutionOutput(long triggerExecutionId, @NonNull Object output);
+    FileEntry storeTriggerExecutionOutput(long triggerExecutionId, Object output);
 }

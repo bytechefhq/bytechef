@@ -21,7 +21,6 @@ import com.bytechef.component.exception.ProviderException;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import javax.annotation.Nonnull;
 
 /**
  * @author Igor Beslic
@@ -65,7 +64,7 @@ public class RefreshCredentialsUtils {
      * @param message the content of exception message
      * @return true if the exception message matches against any pattern
      */
-    public static boolean matches(@Nonnull String message, @Nonnull List<String> patterns) {
+    public static boolean matches(String message, List<String> patterns) {
         for (String pattern : patterns) {
             Pattern compiledPattern = Pattern.compile(pattern, Pattern.DOTALL);
 

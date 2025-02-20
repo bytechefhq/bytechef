@@ -18,12 +18,11 @@ package com.bytechef.platform.user.facade;
 
 import com.bytechef.platform.constant.ModeType;
 import com.bytechef.platform.user.domain.ApiKey;
-import org.springframework.lang.NonNull;
 
 /**
  * @author Ivica Cardic
  */
 public interface ApiKeyFacade {
 
-    String create(@NonNull ApiKey apiKey, ModeType type);
+    String create(ApiKey apiKey, ModeType type);
 }

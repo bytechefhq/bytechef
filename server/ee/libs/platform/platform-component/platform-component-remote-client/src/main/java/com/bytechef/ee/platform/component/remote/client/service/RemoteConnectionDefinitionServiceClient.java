@@ -28,7 +28,6 @@ import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
 import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
 
 /**
@@ -50,68 +49,64 @@ public class RemoteConnectionDefinitionServiceClient extends AbstractWorkerClien
 
     @Override
     public Map<String, ?> executeAcquire(
-        @NonNull String componentName, int connectionVersion, @NonNull String authorizationName,
-        @NonNull Map<String, ?> connectionParameters, @NonNull Context context) {
+        String componentName, int connectionVersion, String authorizationName, Map<String, ?> connectionParameters,
+        Context context) {
 
         throw new UnsupportedOperationException();
     }
 
     @Override
     public ApplyResponse executeAuthorizationApply(
-        @NonNull String componentName, int connectionVersion, @NonNull String authorizationName,
-        @NonNull Map<String, ?> connectionParameters, @NonNull Context context) {
+        String componentName, int connectionVersion, String authorizationName, Map<String, ?> connectionParameters,
+        Context context) {
 
         throw new UnsupportedOperationException();
     }
 
     @Override
     public AuthorizationCallbackResponse executeAuthorizationCallback(
-        @NonNull String componentName, int connectionVersion, @NonNull String authorizationName,
-        @NonNull Map<String, ?> connectionParameters, @NonNull Context context, @NonNull String redirectUri) {
+        String componentName, int connectionVersion, String authorizationName, Map<String, ?> connectionParameters,
+        Context context, String redirectUri) {
 
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public Optional<String> executeBaseUri(
-        @NonNull String componentName, @NonNull ComponentConnection connection, @NonNull Context context) {
-
+    public Optional<String> executeBaseUri(String componentName, ComponentConnection connection, Context context) {
         throw new UnsupportedOperationException();
     }
 
     @Override
     public RefreshTokenResponse executeRefresh(
-        @NonNull String componentName, int connectionVersion, @NonNull String authorizationName,
-        @NonNull Map<String, ?> connectionParameters, @NonNull Context context) {
+        String componentName, int connectionVersion, String authorizationName, Map<String, ?> connectionParameters,
+        Context context) {
 
         throw new UnsupportedOperationException();
     }
 
     @Override
     public OAuth2AuthorizationParameters getOAuth2AuthorizationParameters(
-        @NonNull String componentName, int connectionVersion, @NonNull String authorizationName,
-        @NonNull Map<String, ?> connectionParameters, @NonNull Context context) {
+        String componentName, int connectionVersion, String authorizationName, Map<String, ?> connectionParameters,
+        Context context) {
 
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public List<String> getAuthorizationDetectOn(
-        @NonNull String componentName, int componentVersion, @NonNull String authorizationName) {
-
+    public List<String> getAuthorizationDetectOn(String componentName, int componentVersion, String authorizationName) {
         throw new UnsupportedOperationException();
     }
 
     @Override
     public List<Object> getAuthorizationRefreshOn(
-        @NonNull String componentName, int componentVersion, @NonNull String authorizationName) {
+        String componentName, int componentVersion, String authorizationName) {
 
         throw new UnsupportedOperationException();
     }
 
     @Override
     public AuthorizationType getAuthorizationType(
-        @NonNull String componentName, int connectionVersion, @NonNull String authorizationName) {
+        String componentName, int connectionVersion, String authorizationName) {
 
         return defaultRestClient.get(
             uriBuilder -> toUri(
@@ -124,13 +119,13 @@ public class RemoteConnectionDefinitionServiceClient extends AbstractWorkerClien
 
     @Override
     public ConnectionDefinition getConnectionConnectionDefinition(
-        @NonNull String componentName, int connectionVersion) {
+        String componentName, int connectionVersion) {
 
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public ConnectionDefinition getConnectionDefinition(@NonNull String componentName, Integer componentVersion) {
+    public ConnectionDefinition getConnectionDefinition(String componentName, Integer componentVersion) {
         return defaultRestClient.get(
             uriBuilder -> toUri(
                 uriBuilder, componentName,
@@ -141,7 +136,7 @@ public class RemoteConnectionDefinitionServiceClient extends AbstractWorkerClien
 
     @Override
     public List<ConnectionDefinition> getConnectionDefinitions(
-        @NonNull String componentName, Integer componentVersion) {
+        String componentName, Integer componentVersion) {
 
         List<CompletableFuture<List<ConnectionDefinition>>> completableFutures = CollectionUtils.map(
             WorkerDiscoveryUtils.filterServiceInstances(discoveryClient.getInstances(WORKER_APP)),

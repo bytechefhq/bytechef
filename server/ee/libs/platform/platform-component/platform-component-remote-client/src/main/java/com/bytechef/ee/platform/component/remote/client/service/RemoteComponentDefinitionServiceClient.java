@@ -32,7 +32,6 @@ import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
 import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
 import org.springframework.util.LinkedMultiValueMap;
 
@@ -59,7 +58,7 @@ public class RemoteComponentDefinitionServiceClient extends AbstractWorkerClient
     }
 
     @Override
-    public ComponentDefinition getComponentDefinition(@NonNull String name, Integer version) {
+    public ComponentDefinition getComponentDefinition(String name, Integer version) {
         return defaultRestClient.get(
             uriBuilder -> toUri(
                 uriBuilder, name, COMPONENT_DEFINITION_SERVICE + "/get-component-definition/{name}/{version}", name,
@@ -97,7 +96,7 @@ public class RemoteComponentDefinitionServiceClient extends AbstractWorkerClient
     }
 
     @Override
-    public List<ComponentDefinition> getComponentDefinitionVersions(@NonNull String name) {
+    public List<ComponentDefinition> getComponentDefinitionVersions(String name) {
         List<CompletableFuture<List<ComponentDefinition>>> completableFutures = CollectionUtils.map(
             WorkerDiscoveryUtils.filterServiceInstances(discoveryClient.getInstances(WORKER_APP)),
             serviceInstance -> CompletableFuture.supplyAsync(() -> defaultRestClient.get(
@@ -110,24 +109,24 @@ public class RemoteComponentDefinitionServiceClient extends AbstractWorkerClient
     }
 
     @Override
-    public ComponentDefinition getConnectionComponentDefinition(@NonNull String name, int connectionVersion) {
+    public ComponentDefinition getConnectionComponentDefinition(String name, int connectionVersion) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public List<ComponentDefinition> getDataStreamComponentDefinitions(@NonNull ComponentType componentType) {
+    public List<ComponentDefinition> getDataStreamComponentDefinitions(ComponentType componentType) {
         // TODO
 
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public DataStreamItemReader getDataStreamItemReader(@NonNull String componentName, int componentVersion) {
+    public DataStreamItemReader getDataStreamItemReader(String componentName, int componentVersion) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public DataStreamItemWriter getDataStreamItemWriter(@NonNull String componentName, int componentVersion) {
+    public DataStreamItemWriter getDataStreamItemWriter(String componentName, int componentVersion) {
         throw new UnsupportedOperationException();
     }
 
@@ -139,7 +138,7 @@ public class RemoteComponentDefinitionServiceClient extends AbstractWorkerClient
     @Override
     public ProviderModelAdapter<? super ProviderInputModel, ? extends ProviderOutputModel>
         getUnifiedApiProviderModelAdapter(
-            @NonNull String componentName, @NonNull Category category, @NonNull ModelType modelType) {
+            String componentName, Category category, ModelType modelType) {
 
         throw new UnsupportedOperationException();
     }
@@ -148,13 +147,13 @@ public class RemoteComponentDefinitionServiceClient extends AbstractWorkerClient
     public
         ProviderModelMapper<? super UnifiedInputModel, ? extends UnifiedOutputModel, ? extends ProviderInputModel, ? super ProviderOutputModel>
         getUnifiedApiProviderModelMapper(
-            @NonNull String componentName, @NonNull Category category, @NonNull ModelType modelTyp) {
+            String componentName, Category category, ModelType modelTyp) {
 
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public boolean hasComponentDefinition(@NonNull String name, Integer version) {
+    public boolean hasComponentDefinition(String name, Integer version) {
         throw new UnsupportedOperationException();
     }
 

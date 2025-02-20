@@ -24,7 +24,6 @@ import java.util.List;
 import java.util.Map;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
 import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
 
 /**
@@ -45,8 +44,8 @@ public class RemoteTriggerDefinitionFacadeClient extends AbstractWorkerClient im
 
     @Override
     public List<Property> executeDynamicProperties(
-        @NonNull String componentName, int componentVersion, @NonNull String triggerName, @NonNull String propertyName,
-        @NonNull Map<String, ?> inputParameters, @NonNull List<String> lookupDependsOnPaths, Long connectionId) {
+        String componentName, int componentVersion, String triggerName, String propertyName,
+        Map<String, ?> inputParameters, List<String> lookupDependsOnPaths, Long connectionId) {
 
         return defaultRestClient.post(
             uriBuilder -> toUri(uriBuilder, componentName, TRIGGER_DEFINITION_FACADE + "/execute-properties"),
@@ -58,8 +57,8 @@ public class RemoteTriggerDefinitionFacadeClient extends AbstractWorkerClient im
 
     @Override
     public WebhookEnableOutput executeDynamicWebhookRefresh(
-        @NonNull String componentName, int componentVersion, @NonNull String triggerName,
-        @NonNull Map<String, ?> outputParameters, Long connectionId) {
+        String componentName, int componentVersion, String triggerName,
+        Map<String, ?> outputParameters, Long connectionId) {
 
         return defaultRestClient.post(
             uriBuilder -> toUri(
@@ -70,8 +69,8 @@ public class RemoteTriggerDefinitionFacadeClient extends AbstractWorkerClient im
 
     @Override
     public void executeListenerDisable(
-        @NonNull String componentName, int componentVersion, @NonNull String triggerName,
-        @NonNull Map<String, ?> inputParameters, @NonNull String workflowExecutionId, Long connectionId) {
+        String componentName, int componentVersion, String triggerName,
+        Map<String, ?> inputParameters, String workflowExecutionId, Long connectionId) {
 
         defaultRestClient.post(
             uriBuilder -> toUri(
@@ -82,8 +81,8 @@ public class RemoteTriggerDefinitionFacadeClient extends AbstractWorkerClient im
 
     @Override
     public void executeListenerEnable(
-        @NonNull String componentName, int componentVersion, @NonNull String triggerName,
-        @NonNull Map<String, ?> inputParameters, @NonNull String workflowExecutionId, Long connectionId) {
+        String componentName, int componentVersion, String triggerName,
+        Map<String, ?> inputParameters, String workflowExecutionId, Long connectionId) {
 
         defaultRestClient.post(
             uriBuilder -> toUri(
@@ -94,8 +93,8 @@ public class RemoteTriggerDefinitionFacadeClient extends AbstractWorkerClient im
 
     @Override
     public List<Option> executeOptions(
-        @NonNull String componentName, int componentVersion, @NonNull String triggerName, @NonNull String propertyName,
-        @NonNull Map<String, ?> inputParameters, @NonNull List<String> lookupDependsOnPaths, String searchText,
+        String componentName, int componentVersion, String triggerName, String propertyName,
+        Map<String, ?> inputParameters, List<String> lookupDependsOnPaths, String searchText,
         Long connectionId) {
 
         return defaultRestClient.post(
@@ -108,8 +107,8 @@ public class RemoteTriggerDefinitionFacadeClient extends AbstractWorkerClient im
 
     @Override
     public OutputResponse executeOutput(
-        @NonNull String componentName, int componentVersion, @NonNull String triggerName,
-        @NonNull Map<String, ?> inputParameters, Long connectionId) {
+        String componentName, int componentVersion, String triggerName,
+        Map<String, ?> inputParameters, Long connectionId) {
 
         return defaultRestClient.post(
             uriBuilder -> toUri(uriBuilder, componentName, TRIGGER_DEFINITION_FACADE + "/execute-output"),
@@ -119,8 +118,8 @@ public class RemoteTriggerDefinitionFacadeClient extends AbstractWorkerClient im
 
     @Override
     public TriggerOutput executeTrigger(
-        @NonNull String componentName, int componentVersion, @NonNull String triggerName, ModeType type,
-        Long principalId, String workflowReferenceCode, @NonNull Map<String, ?> inputParameters,
+        String componentName, int componentVersion, String triggerName, ModeType type,
+        Long principalId, String workflowReferenceCode, Map<String, ?> inputParameters,
         Object triggerState, WebhookRequest webhookRequest, Long connectionId, boolean editorEnvironment) {
 
         return defaultRestClient.post(
@@ -134,9 +133,9 @@ public class RemoteTriggerDefinitionFacadeClient extends AbstractWorkerClient im
 
     @Override
     public void executeWebhookDisable(
-        @NonNull String componentName, int componentVersion, @NonNull String triggerName,
-        @NonNull Map<String, ?> inputParameters, @NonNull String workflowExecutionId,
-        @NonNull Map<String, ?> outputParameters,
+        String componentName, int componentVersion, String triggerName,
+        Map<String, ?> inputParameters, String workflowExecutionId,
+        Map<String, ?> outputParameters,
         Long connectionId) {
 
         defaultRestClient.post(
@@ -149,9 +148,9 @@ public class RemoteTriggerDefinitionFacadeClient extends AbstractWorkerClient im
 
     @Override
     public WebhookEnableOutput executeWebhookEnable(
-        @NonNull String componentName, int componentVersion, @NonNull String triggerName,
-        @NonNull Map<String, ?> inputParameters, @NonNull String workflowExecutionId, Long connectionId,
-        @NonNull String webhookUrl) {
+        String componentName, int componentVersion, String triggerName,
+        Map<String, ?> inputParameters, String workflowExecutionId, Long connectionId,
+        String webhookUrl) {
 
         return defaultRestClient.post(
             uriBuilder -> toUri(
@@ -164,8 +163,8 @@ public class RemoteTriggerDefinitionFacadeClient extends AbstractWorkerClient im
 
     @Override
     public WebhookValidateResponse executeWebhookValidate(
-        @NonNull String componentName, int componentVersion, @NonNull String triggerName,
-        @NonNull Map<String, ?> inputParameters, @NonNull WebhookRequest webhookRequest, Long connectionId) {
+        String componentName, int componentVersion, String triggerName,
+        Map<String, ?> inputParameters, WebhookRequest webhookRequest, Long connectionId) {
 
         return defaultRestClient.post(
             uriBuilder -> toUri(
@@ -178,16 +177,16 @@ public class RemoteTriggerDefinitionFacadeClient extends AbstractWorkerClient im
 
     @Override
     public WebhookValidateResponse executeWebhookValidateOnEnable(
-        @NonNull String componentName, int componentVersion, @NonNull String triggerName,
-        @NonNull Map<String, ?> inputParameters, @NonNull WebhookRequest webhookRequest, Long connectionId) {
+        String componentName, int componentVersion, String triggerName,
+        Map<String, ?> inputParameters, WebhookRequest webhookRequest, Long connectionId) {
 
         throw new UnsupportedOperationException();
     }
 
     @Override
     public String executeWorkflowNodeDescription(
-        @NonNull String componentName, int componentVersion, @NonNull String triggerName,
-        @NonNull Map<String, ?> inputParameters) {
+        String componentName, int componentVersion, String triggerName,
+        Map<String, ?> inputParameters) {
 
         return defaultRestClient.post(
             uriBuilder -> toUri(
@@ -199,7 +198,7 @@ public class RemoteTriggerDefinitionFacadeClient extends AbstractWorkerClient im
 
     @Override
     public ProviderException executeProcessErrorResponse(
-        @NonNull String componentName, int componentVersion, @NonNull String actionName, int statusCode, Object body) {
+        String componentName, int componentVersion, String actionName, int statusCode, Object body) {
         throw new UnsupportedOperationException();
     }
 

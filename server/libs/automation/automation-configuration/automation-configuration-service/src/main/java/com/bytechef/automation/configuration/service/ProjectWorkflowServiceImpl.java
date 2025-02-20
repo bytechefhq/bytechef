@@ -24,7 +24,6 @@ import com.bytechef.platform.exception.ConfigurationException;
 import java.util.List;
 import java.util.UUID;
 import org.apache.commons.lang3.Validate;
-import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -58,7 +57,7 @@ public class ProjectWorkflowServiceImpl implements ProjectWorkflowService {
     }
 
     @Override
-    public void delete(@NonNull List<Long> ids) {
+    public void delete(List<Long> ids) {
         projectWorkflowRepository.deleteAllById(ids);
     }
 
@@ -121,7 +120,7 @@ public class ProjectWorkflowServiceImpl implements ProjectWorkflowService {
     }
 
     @Override
-    public void delete(long projectId, int projectVersion, @NonNull String workflowId) {
+    public void delete(long projectId, int projectVersion, String workflowId) {
         if (projectWorkflowRepository.countByProjectIdAndProjectVersion(projectId, projectVersion) == 1) {
             throw new ConfigurationException(
                 "The last workflow id=%s cannot be deleted".formatted(workflowId),

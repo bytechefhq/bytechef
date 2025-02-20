@@ -10,7 +10,6 @@ package com.bytechef.ee.platform.apiconnector.configuration.service;
 import com.bytechef.ee.platform.apiconnector.configuration.domain.ApiConnector;
 import java.util.List;
 import java.util.Optional;
-import org.springframework.lang.NonNull;
 
 /**
  * @version ee
@@ -19,7 +18,7 @@ import org.springframework.lang.NonNull;
  */
 public interface ApiConnectorService {
 
-    ApiConnector create(@NonNull ApiConnector apiConnector);
+    ApiConnector create(ApiConnector apiConnector);
 
     void delete(long id);
 
@@ -29,7 +28,7 @@ public interface ApiConnectorService {
 
     List<ApiConnector> getApiConnectors();
 
-    ApiConnector update(@NonNull ApiConnector apiConnector);
+    ApiConnector update(ApiConnector apiConnector);
 
     ApiConnector enableApiConnector(Long id, boolean enable);
 }

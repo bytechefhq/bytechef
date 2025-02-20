@@ -24,7 +24,6 @@ import java.time.LocalDate;
 import java.util.Optional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -43,7 +42,7 @@ public class ConnectedUserServiceImpl implements ConnectedUserService {
     }
 
     @Override
-    public ConnectedUser createConnectedUser(@NonNull Environment environment, @NonNull String externalId) {
+    public ConnectedUser createConnectedUser(Environment environment, String externalId) {
         ConnectedUser connectedUser = new ConnectedUser();
 
         connectedUser.setEnabled(true);
@@ -69,12 +68,12 @@ public class ConnectedUserServiceImpl implements ConnectedUserService {
 
     @Override
     @Transactional(readOnly = true)
-    public Optional<ConnectedUser> fetchConnectedUser(@NonNull Environment environment, @NonNull String externalId) {
+    public Optional<ConnectedUser> fetchConnectedUser(Environment environment, String externalId) {
         return connectedUserRepository.findByExternalIdAndEnvironment(externalId, environment.ordinal());
     }
 
     @Override
-    public ConnectedUser getConnectedUser(@NonNull Environment environment, @NonNull String externalId) {
+    public ConnectedUser getConnectedUser(Environment environment, String externalId) {
         return fetchConnectedUser(environment, externalId)
             .orElseThrow(() -> new IllegalArgumentException("Connected user not found"));
     }

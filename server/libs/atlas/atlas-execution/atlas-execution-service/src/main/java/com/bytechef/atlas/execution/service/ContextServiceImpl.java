@@ -21,7 +21,6 @@ import com.bytechef.atlas.execution.repository.ContextRepository;
 import com.bytechef.file.storage.domain.FileEntry;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.apache.commons.lang3.Validate;
-import org.springframework.lang.NonNull;
 import org.springframework.transaction.annotation.Transactional;
 
 @Transactional
@@ -35,7 +34,7 @@ public class ContextServiceImpl implements ContextService {
     }
 
     @Override
-    public void push(long stackId, @NonNull Context.Classname classname, @NonNull FileEntry value) {
+    public void push(long stackId, Context.Classname classname, FileEntry value) {
         Validate.notNull(classname, "'classname' must not be null");
         Validate.notNull(value, "'value' must not be null");
 
@@ -45,7 +44,7 @@ public class ContextServiceImpl implements ContextService {
     }
 
     @Override
-    public void push(long stackId, int subStackId, @NonNull Context.Classname classname, @NonNull FileEntry value) {
+    public void push(long stackId, int subStackId, Context.Classname classname, FileEntry value) {
         Validate.notNull(classname, "'classname' must not be null");
         Validate.notNull(value, "'value' must not be null");
 
@@ -56,7 +55,7 @@ public class ContextServiceImpl implements ContextService {
 
     @Override
     @Transactional(readOnly = true)
-    public FileEntry peek(long stackId, @NonNull Context.Classname classname) {
+    public FileEntry peek(long stackId, Context.Classname classname) {
         Context context = contextRepository
             .findTop1ByStackIdAndClassnameIdOrderByCreatedDateDesc(stackId, classname.ordinal())
             .orElseThrow(
@@ -66,7 +65,7 @@ public class ContextServiceImpl implements ContextService {
     }
 
     @Override
-    public FileEntry peek(long stackId, int subStackId, @NonNull Context.Classname classname) {
+    public FileEntry peek(long stackId, int subStackId, Context.Classname classname) {
         Context context = contextRepository
             .findTop1ByStackIdAndSubStackIdAndClassnameIdOrderByCreatedDateDesc(
                 stackId, subStackId, classname.ordinal())

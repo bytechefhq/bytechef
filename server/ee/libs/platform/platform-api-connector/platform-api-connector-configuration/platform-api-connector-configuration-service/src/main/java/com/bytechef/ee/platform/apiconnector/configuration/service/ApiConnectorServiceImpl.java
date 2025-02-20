@@ -15,7 +15,6 @@ import java.util.List;
 import java.util.Optional;
 import org.apache.commons.lang3.Validate;
 import org.springframework.data.domain.Sort;
-import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -36,7 +35,7 @@ public class ApiConnectorServiceImpl implements ApiConnectorService {
     }
 
     @Override
-    public ApiConnector create(@NonNull ApiConnector apiConnector) {
+    public ApiConnector create(ApiConnector apiConnector) {
         Validate.notNull(apiConnector, "'openApiConnector' must not be null");
         Validate.notNull(apiConnector.getDefinition(), "'definition' must not be null");
         Validate.isTrue(apiConnector.getId() == null, "'id' must be null");
@@ -69,7 +68,7 @@ public class ApiConnectorServiceImpl implements ApiConnectorService {
     }
 
     @Override
-    public ApiConnector update(@NonNull ApiConnector apiConnector) {
+    public ApiConnector update(ApiConnector apiConnector) {
         Validate.notNull(apiConnector, "'openApiConnector' must not be null");
 
         ApiConnector curApiConnector = getApiConnector(Validate.notNull(apiConnector.getId(), "id"));

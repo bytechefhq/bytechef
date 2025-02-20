@@ -26,7 +26,6 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.lang.NonNull;
 
 /**
  * @version ee
@@ -48,7 +47,7 @@ public class AwsFileStorageServiceImpl implements AwsFileStorageService {
     }
 
     @Override
-    public void deleteFile(@NonNull String directoryPath, @NonNull FileEntry fileEntry) {
+    public void deleteFile(String directoryPath, FileEntry fileEntry) {
         if (!bucketExists()) {
             throw new FileStorageException("Bucket %s doesn't exist.".formatted(bucketName));
         }
@@ -63,12 +62,12 @@ public class AwsFileStorageServiceImpl implements AwsFileStorageService {
     }
 
     @Override
-    public boolean fileExists(@NonNull String directoryPath, @NonNull FileEntry fileEntry) throws FileStorageException {
+    public boolean fileExists(String directoryPath, FileEntry fileEntry) throws FileStorageException {
         return fileExists(directoryPath, fileEntry.getName());
     }
 
     @Override
-    public boolean fileExists(@NonNull String directoryPath, @NonNull String key) throws FileStorageException {
+    public boolean fileExists(String directoryPath, String key) throws FileStorageException {
         if (!bucketExists()) {
             throw new FileStorageException("Bucket %s doesn't exist.".formatted(bucketName));
         }
@@ -82,7 +81,7 @@ public class AwsFileStorageServiceImpl implements AwsFileStorageService {
     }
 
     @Override
-    public FileEntry getFileEntry(@NonNull String directoryPath, @NonNull String key) {
+    public FileEntry getFileEntry(String directoryPath, String key) {
         if (!fileExists(directoryPath, key)) {
             throw new FileStorageException("File %s doesn't exist".formatted(key));
         }
@@ -93,7 +92,7 @@ public class AwsFileStorageServiceImpl implements AwsFileStorageService {
     }
 
     @Override
-    public Set<FileEntry> getFileEntries(@NonNull String directoryPath) throws FileStorageException {
+    public Set<FileEntry> getFileEntries(String directoryPath) throws FileStorageException {
         if (!bucketExists()) {
             throw new FileStorageException("Bucket %s doesn't exist.".formatted(bucketName));
         }
@@ -109,7 +108,7 @@ public class AwsFileStorageServiceImpl implements AwsFileStorageService {
     }
 
     @Override
-    public InputStream getFileStream(@NonNull String directoryPath, @NonNull FileEntry fileEntry) {
+    public InputStream getFileStream(String directoryPath, FileEntry fileEntry) {
         if (!fileExists(directoryPath, fileEntry.getName())) {
             throw new FileStorageException("File %s doesn't exist".formatted(fileEntry.getName()));
         }
@@ -118,7 +117,7 @@ public class AwsFileStorageServiceImpl implements AwsFileStorageService {
     }
 
     @Override
-    public URL getFileEntryURL(@NonNull String directoryPath, @NonNull FileEntry fileEntry) {
+    public URL getFileEntryURL(String directoryPath, FileEntry fileEntry) {
         if (!fileExists(directoryPath, fileEntry.getName())) {
             throw new FileStorageException("File %s doesn't exist".formatted(fileEntry.getName()));
         }
@@ -133,7 +132,7 @@ public class AwsFileStorageServiceImpl implements AwsFileStorageService {
     }
 
     @Override
-    public byte[] readFileToBytes(@NonNull String directoryPath, @NonNull FileEntry fileEntry)
+    public byte[] readFileToBytes(String directoryPath, FileEntry fileEntry)
         throws FileStorageException {
 
         if (!fileExists(directoryPath, fileEntry.getName())) {
@@ -154,7 +153,7 @@ public class AwsFileStorageServiceImpl implements AwsFileStorageService {
     }
 
     @Override
-    public String readFileToString(@NonNull String directoryPath, @NonNull FileEntry fileEntry)
+    public String readFileToString(String directoryPath, FileEntry fileEntry)
         throws FileStorageException {
 
         byte[] bytes = readFileToBytes(directoryPath, fileEntry);
@@ -168,7 +167,7 @@ public class AwsFileStorageServiceImpl implements AwsFileStorageService {
     }
 
     @Override
-    public FileEntry storeFileContent(@NonNull String directoryPath, @NonNull String key, byte[] data)
+    public FileEntry storeFileContent(String directoryPath, String key, byte[] data)
         throws FileStorageException {
 
         if (!bucketExists()) {
@@ -184,20 +183,20 @@ public class AwsFileStorageServiceImpl implements AwsFileStorageService {
 
     @Override
     public FileEntry storeFileContent(
-        @NonNull String directoryPath, @NonNull String filename, byte[] data, boolean randomFilename)
+        String directoryPath, String filename, byte[] data, boolean randomFilename)
         throws FileStorageException {
 
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public FileEntry storeFileContent(@NonNull String directoryPath, @NonNull String key, @NonNull String data) {
+    public FileEntry storeFileContent(String directoryPath, String key, String data) {
         return storeFileContent(directoryPath, key, data.getBytes(StandardCharsets.UTF_8));
     }
 
     @Override
     public FileEntry storeFileContent(
-        @NonNull String directoryPath, @NonNull String key, @NonNull String data, boolean randomFilename)
+        String directoryPath, String key, String data, boolean randomFilename)
         throws FileStorageException {
 
         throw new UnsupportedOperationException();
@@ -205,7 +204,7 @@ public class AwsFileStorageServiceImpl implements AwsFileStorageService {
 
     @Override
     public FileEntry storeFileContent(
-        @NonNull String directoryPath, @NonNull String key, @NonNull InputStream inputStream)
+        String directoryPath, String key, InputStream inputStream)
         throws FileStorageException {
 
         try {
@@ -217,7 +216,7 @@ public class AwsFileStorageServiceImpl implements AwsFileStorageService {
 
     @Override
     public FileEntry storeFileContent(
-        @NonNull String directoryPath, @NonNull String filename, @NonNull InputStream inputStream,
+        String directoryPath, String filename, InputStream inputStream,
         boolean randomFilename) throws FileStorageException {
 
         throw new UnsupportedOperationException();

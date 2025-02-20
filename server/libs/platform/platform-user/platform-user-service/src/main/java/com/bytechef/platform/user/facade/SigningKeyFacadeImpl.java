@@ -22,7 +22,6 @@ import com.bytechef.platform.user.domain.User;
 import com.bytechef.platform.user.service.SigningKeyService;
 import com.bytechef.platform.user.service.UserService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -43,7 +42,7 @@ public class SigningKeyFacadeImpl implements SigningKeyFacade {
     }
 
     @Override
-    public String create(@NonNull SigningKey signingKey, @NonNull ModeType type) {
+    public String create(SigningKey signingKey, ModeType type) {
         User user = userService.getCurrentUser();
 
         signingKey.setType(type);

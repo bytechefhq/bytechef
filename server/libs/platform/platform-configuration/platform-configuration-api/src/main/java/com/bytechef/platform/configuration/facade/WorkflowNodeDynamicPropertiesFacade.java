@@ -18,7 +18,6 @@ package com.bytechef.platform.configuration.facade;
 
 import com.bytechef.platform.component.domain.Property;
 import java.util.List;
-import org.springframework.lang.NonNull;
 
 /**
  * @author Ivica Cardic
@@ -26,6 +25,5 @@ import org.springframework.lang.NonNull;
 public interface WorkflowNodeDynamicPropertiesFacade {
 
     List<Property> getWorkflowNodeDynamicProperties(
-        @NonNull String workflowId, @NonNull String workflowNodeName, @NonNull String propertyName,
-        @NonNull List<String> lookupDependsOnPaths);
+        String workflowId, String workflowNodeName, String propertyName, List<String> lookupDependsOnPaths);
 }

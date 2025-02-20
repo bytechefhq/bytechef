@@ -20,7 +20,6 @@ import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.atlas.coordinator.task.completion.TaskCompletionHandlerFactory;
 import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcherPreSendProcessor;
 import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcherResolverFactory;
-import com.bytechef.atlas.execution.facade.JobFacade;
 import com.bytechef.atlas.execution.service.ContextService;
 import com.bytechef.atlas.execution.service.CounterService;
 import com.bytechef.atlas.execution.service.JobService;
@@ -71,10 +70,9 @@ public class WebhookConfiguration {
     WorkflowExecutor webhookExecutor(
         ApplicationEventPublisher eventPublisher, ContextService contextService, CounterService counterService,
         JobPrincipalAccessorRegistry jobPrincipalAccessorRegistry, PrincipalJobFacade principalJobFacade,
-        JobFacade jobFacade, JobService jobService,
-        List<TaskDispatcherPreSendProcessor> taskDispatcherPreSendProcessors, TaskExecutionService taskExecutionService,
-        TaskHandlerRegistry taskHandlerRegistry, WorkflowSyncExecutor triggerSyncExecutor,
-        TaskFileStorage taskFileStorage, WorkflowService workflowService) {
+        JobService jobService, List<TaskDispatcherPreSendProcessor> taskDispatcherPreSendProcessors,
+        TaskExecutionService taskExecutionService, TaskHandlerRegistry taskHandlerRegistry,
+        WorkflowSyncExecutor triggerSyncExecutor, TaskFileStorage taskFileStorage, WorkflowService workflowService) {
 
         SyncMessageBroker syncMessageBroker = new SyncMessageBroker();
 
@@ -87,8 +85,7 @@ public class WebhookConfiguration {
                     contextService, counterService, taskExecutionService, taskFileStorage),
                 getTaskDispatcherAdapterFactories(), taskDispatcherPreSendProcessors,
                 getTaskDispatcherResolverFactories(
-                    contextService, counterService, jobFacade, syncMessageBroker, taskExecutionService,
-                    taskFileStorage),
+                    contextService, counterService, syncMessageBroker, taskExecutionService, taskFileStorage),
                 taskExecutionService, taskHandlerRegistry, taskFileStorage,
                 workflowService),
             triggerSyncExecutor, taskFileStorage);
@@ -138,14 +135,14 @@ public class WebhookConfiguration {
     }
 
     private List<TaskDispatcherResolverFactory> getTaskDispatcherResolverFactories(
-        ContextService contextService, CounterService counterService, JobFacade jobFacade,
+        ContextService contextService, CounterService counterService,
         SyncMessageBroker syncMessageBroker, TaskExecutionService taskExecutionService,
         TaskFileStorage taskFileStorage) {
 
         ApplicationEventPublisher eventPublisher = getEventPublisher(syncMessageBroker);
 
         return List.of(
-            (taskDispatcher) -> new ApprovalTaskDispatcher(eventPublisher, jobFacade, taskExecutionService),
+            (taskDispatcher) -> new ApprovalTaskDispatcher(eventPublisher, taskExecutionService),
             (taskDispatcher) -> new BranchTaskDispatcher(
                 eventPublisher, contextService, taskDispatcher, taskExecutionService,
                 taskFileStorage),

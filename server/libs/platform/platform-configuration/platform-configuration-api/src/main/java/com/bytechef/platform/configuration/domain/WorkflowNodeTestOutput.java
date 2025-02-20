@@ -31,7 +31,6 @@ import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.annotation.Version;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
-import org.springframework.lang.NonNull;
 
 /**
  * @author Ivica Cardic
@@ -173,11 +172,11 @@ public class WorkflowNodeTestOutput {
         this.id = id;
     }
 
-    public void setOutputSchema(@NonNull Property outputSchema) {
+    public void setOutputSchema(Property outputSchema) {
         this.outputSchema = new MapWrapper(Map.of("outputSchema", outputSchema));
     }
 
-    public void setSampleOutput(@NonNull Object sampleOutput) {
+    public void setSampleOutput(Object sampleOutput) {
         this.sampleOutput = new MapWrapper(Map.of("sampleOutput", sampleOutput));
     }
 

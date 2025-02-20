@@ -12,7 +12,6 @@ import com.bytechef.platform.component.domain.OAuth2AuthorizationParameters;
 import com.bytechef.platform.component.facade.ConnectionDefinitionFacade;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotNull;
 import java.util.Map;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.ResponseEntity;
@@ -88,7 +87,7 @@ public class RemoteConnectionDefinitionFacadeController {
 
     @SuppressFBWarnings("EI")
     public record ConnectionRequest(
-        @NotNull String componentName, int connectionVersion, @NotNull String authorizationName,
-        @NotNull Map<String, ?> authorizationParams) {
+        String componentName, int connectionVersion, String authorizationName,
+        Map<String, ?> authorizationParams) {
     }
 }

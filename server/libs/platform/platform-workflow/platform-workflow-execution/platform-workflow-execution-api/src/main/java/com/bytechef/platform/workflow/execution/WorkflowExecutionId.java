@@ -20,7 +20,9 @@ import com.bytechef.commons.util.EncodingUtils;
 import com.bytechef.platform.constant.ModeType;
 import com.bytechef.tenant.TenantContext;
 import java.io.Serializable;
+import java.util.Objects;
 import org.apache.commons.lang3.Validate;
+import org.springframework.lang.Nullable;
 
 /**
  * @author Ivica Cardic
@@ -28,12 +30,21 @@ import org.apache.commons.lang3.Validate;
 public class WorkflowExecutionId implements Serializable {
 
     private long principalId;
+
+    @Nullable
     private ModeType type;
+
+    @Nullable
     private String workflowReferenceCode;
+
+    @Nullable
     private String tenantId;
+
+    @Nullable
     private String triggerName;
 
     private WorkflowExecutionId() {
+        // Required by Jackson deserialization
     }
 
     private WorkflowExecutionId(
@@ -49,8 +60,8 @@ public class WorkflowExecutionId implements Serializable {
     public static WorkflowExecutionId of(
         ModeType type, long principalId, String workflowReferenceCode, String triggerName) {
 
-        Validate.notBlank(workflowReferenceCode, "'workflowReferenceCode' must not be null");
-        Validate.notBlank(triggerName, "'workflowTriggerName' must not be null");
+        Validate.notBlank(workflowReferenceCode, "'workflowReferenceCode' must not be blank");
+        Validate.notBlank(triggerName, "'triggerName' must not be blank");
 
         return new WorkflowExecutionId(
             TenantContext.getCurrentTenantId(), type, principalId, workflowReferenceCode, triggerName);
@@ -70,27 +81,30 @@ public class WorkflowExecutionId implements Serializable {
     }
 
     public ModeType getType() {
-        return type;
+        return Objects.requireNonNull(type);
     }
 
     public String getWorkflowReferenceCode() {
-        return workflowReferenceCode;
+        return Objects.requireNonNull(workflowReferenceCode);
     }
 
     public String getTenantId() {
-        return tenantId;
+        return Objects.requireNonNull(tenantId);
     }
 
     public String getTriggerName() {
-        return triggerName;
+        return Objects.requireNonNull(triggerName);
     }
 
     @Override
     public String toString() {
+        ModeType type1 = Objects.requireNonNull(type);
+
         return EncodingUtils.base64EncodeToString(
             tenantId +
                 ":" +
-                type.ordinal() +
+                type1.ordinal()
+                +
                 ":" +
                 principalId +
                 ":" +

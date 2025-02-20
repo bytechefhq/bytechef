@@ -42,7 +42,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.lang.NonNull;
 
 /**
  * @author Ivica Cardic
@@ -84,7 +83,7 @@ public class LoopTaskDispatcherIntTest {
             testVarTaskHandler.get("sumVar1"));
     }
 
-    private void assertNoTaskErrors(@NonNull Job job) {
+    private void assertNoTaskErrors(Job job) {
         if (job.getId() == null) {
             Assertions.fail("Job must not be null");
 

@@ -18,12 +18,11 @@ package com.bytechef.platform.user.facade;
 
 import com.bytechef.platform.constant.ModeType;
 import com.bytechef.platform.user.domain.SigningKey;
-import org.springframework.lang.NonNull;
 
 /**
  * @author Ivica Cardic
  */
 public interface SigningKeyFacade {
 
-    String create(@NonNull SigningKey signingKey, @NonNull ModeType type);
+    String create(SigningKey signingKey, ModeType type);
 }

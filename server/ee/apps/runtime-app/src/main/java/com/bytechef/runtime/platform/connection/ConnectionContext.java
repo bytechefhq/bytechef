@@ -10,7 +10,6 @@ package com.bytechef.runtime.platform.connection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicLong;
-import org.springframework.lang.NonNull;
 
 /**
  * @version ee
@@ -30,7 +29,7 @@ public class ConnectionContext {
         return parameterMap.get(id).parameters;
     }
 
-    public static long putConnectionParameters(@NonNull String name, @NonNull Map<String, ?> parameters) {
+    public static long putConnectionParameters(String name, Map<String, ?> parameters) {
         Map<Long, Connection> parameterMap = CURRENT_CONNECTION_MAP.get();
 
         long connectionId = -1;

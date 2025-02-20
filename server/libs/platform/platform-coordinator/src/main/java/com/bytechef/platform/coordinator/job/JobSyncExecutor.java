@@ -74,7 +74,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.core.task.AsyncTaskExecutor;
 import org.springframework.data.domain.Page;
-import org.springframework.lang.NonNull;
 
 /**
  * @author Ivica Cardic
@@ -281,7 +280,7 @@ public class JobSyncExecutor {
         }
 
         @Override
-        public Job create(@NonNull JobParametersDTO jobParametersDTO, @NonNull Workflow workflow) {
+        public Job create(JobParametersDTO jobParametersDTO, Workflow workflow) {
             return jobFactoryFunction.apply(jobParametersDTO);
         }
 
@@ -296,7 +295,7 @@ public class JobSyncExecutor {
         }
 
         @Override
-        public Optional<Job> fetchLastWorkflowJob(@NonNull String workflowId) {
+        public Optional<Job> fetchLastWorkflowJob(String workflowId) {
             throw new UnsupportedOperationException();
         }
 
@@ -321,7 +320,7 @@ public class JobSyncExecutor {
         }
 
         @Override
-        public Job update(@NonNull Job job) {
+        public Job update(Job job) {
             throw new UnsupportedOperationException();
         }
     }
@@ -331,7 +330,7 @@ public class JobSyncExecutor {
         private static final Executor executor = Executors.newCachedThreadPool();
 
         @Override
-        public void execute(@NonNull Runnable task) {
+        public void execute(Runnable task) {
             String tenantId = TenantContext.getCurrentTenantId();
 
             executor.execute(

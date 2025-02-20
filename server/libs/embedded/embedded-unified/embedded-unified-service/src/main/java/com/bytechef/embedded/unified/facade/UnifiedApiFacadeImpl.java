@@ -52,7 +52,6 @@ import java.util.Objects;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Sort;
-import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 import org.springframework.util.DigestUtils;
 import org.springframework.util.StringUtils;
@@ -86,8 +85,8 @@ public class UnifiedApiFacadeImpl implements UnifiedApiFacade {
 
     @Override
     public String create(
-        @NonNull UnifiedInputModel unifiedInputModel, @NonNull Category category, @NonNull ModelType modelType,
-        @NonNull Environment environment, Long instanceId) {
+        UnifiedInputModel unifiedInputModel, Category category, ModelType modelType,
+        Environment environment, Long instanceId) {
 
         ComponentConnection connection = getComponentConnection(environment, category, instanceId);
 
@@ -109,8 +108,7 @@ public class UnifiedApiFacadeImpl implements UnifiedApiFacade {
 
     @Override
     public void delete(
-        @NonNull String id, @NonNull Category category, @NonNull ModelType modelType, @NonNull Environment environment,
-        Long instanceId) {
+        String id, Category category, ModelType modelType, Environment environment, Long instanceId) {
 
         ComponentConnection connection = getComponentConnection(environment, category, instanceId);
 
@@ -127,7 +125,7 @@ public class UnifiedApiFacadeImpl implements UnifiedApiFacade {
 
     @Override
     public UnifiedOutputModel get(
-        @NonNull String id, @NonNull Category category, @NonNull ModelType modelType, @NonNull Environment environment,
+        String id, Category category, ModelType modelType, Environment environment,
         Long instanceId) {
 
         ComponentConnection connection = getComponentConnection(environment, category, instanceId);
@@ -150,8 +148,8 @@ public class UnifiedApiFacadeImpl implements UnifiedApiFacade {
 
     @Override
     public CursorPageSlice<? extends UnifiedOutputModel> getPage(
-        @NonNull CursorPageable cursorPageable, @NonNull Category category, @NonNull ModelType modelType,
-        @NonNull Environment environment, Long instanceId) {
+        CursorPageable cursorPageable, Category category, ModelType modelType,
+        Environment environment, Long instanceId) {
 
         boolean isSorted = StringUtils.hasText(cursorPageable.getSort());
 
@@ -233,8 +231,8 @@ public class UnifiedApiFacadeImpl implements UnifiedApiFacade {
 
     @Override
     public void update(
-        @NonNull String id, @NonNull UnifiedInputModel unifiedInputModel, @NonNull Category category,
-        @NonNull ModelType modelType, @NonNull Environment environment, Long instanceId) {
+        String id, UnifiedInputModel unifiedInputModel, Category category,
+        ModelType modelType, Environment environment, Long instanceId) {
 
         ComponentConnection connection = getComponentConnection(environment, category, instanceId);
 

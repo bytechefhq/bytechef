@@ -27,7 +27,6 @@ import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Objects;
-import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -122,7 +121,7 @@ public class ProjectGitFacadeImpl implements ProjectGitFacade {
     }
 
     @Override
-    public String pushProjectToGit(long projectId, @NonNull String commitMessage) {
+    public String pushProjectToGit(long projectId, String commitMessage) {
         Project project = projectService.getProject(projectId);
 
         List<ProjectWorkflow> projectWorkflows = projectWorkflowService.getProjectWorkflows(

@@ -24,7 +24,6 @@ import com.bytechef.platform.constant.ModeType;
 import com.bytechef.platform.domain.OutputResponse;
 import java.util.List;
 import java.util.Map;
-import org.springframework.lang.NonNull;
 
 /**
  * @author Ivica Cardic
@@ -32,31 +31,28 @@ import org.springframework.lang.NonNull;
 public interface ActionDefinitionFacade extends OperationDefinitionFacade {
 
     List<Property> executeDynamicProperties(
-        @NonNull String componentName, int componentVersion, @NonNull String actionName, @NonNull String propertyName,
-        String workflowId, Map<String, ?> inputParameters, @NonNull List<String> lookupDependsOnPaths,
+        String componentName, int componentVersion, String actionName, String propertyName,
+        String workflowId, Map<String, ?> inputParameters, List<String> lookupDependsOnPaths,
         Long connectionId);
 
     List<Option> executeOptions(
-        @NonNull String componentName, int componentVersion, @NonNull String actionName, @NonNull String propertyName,
-        @NonNull Map<String, ?> inputParameters, @NonNull List<String> lookupDependsOnPaths, String searchText,
-        Long connectionId);
+        String componentName, int componentVersion, String actionName, String propertyName,
+        Map<String, ?> inputParameters, List<String> lookupDependsOnPaths, String searchText, Long connectionId);
 
     OutputResponse executeOutput(
-        @NonNull String componentName, int componentVersion, @NonNull String actionName,
-        @NonNull Map<String, ?> inputParameters, @NonNull Map<String, Long> connectionIds);
+        String componentName, int componentVersion, String actionName, Map<String, ?> inputParameters,
+        Map<String, Long> connectionIds);
 
     Object executePerform(
-        @NonNull String componentName, int componentVersion, @NonNull String actionName, ModeType type,
-        Long principalId,
-        Long principalWorkflowId, Long jobId, String workflowId, @NonNull Map<String, ?> inputParameters,
-        @NonNull Map<String, Long> connectionIds, Map<String, ?> extensions, boolean editorEnvironment);
+        String componentName, int componentVersion, String actionName, ModeType type,
+        Long principalId, Long principalWorkflowId, Long jobId, String workflowId, Map<String, ?> inputParameters,
+        Map<String, Long> connectionIds, Map<String, ?> extensions, boolean editorEnvironment);
 
     Object executePerformForPolyglot(
-        @NonNull String componentName, int componentVersion, @NonNull String actionName,
-        @NonNull Map<String, ?> inputParameters, ComponentConnection componentConnection,
-        @NonNull ActionContext actionContext);
+        String componentName, int componentVersion, String actionName,
+        Map<String, ?> inputParameters, ComponentConnection componentConnection,
+        ActionContext actionContext);
 
     String executeWorkflowNodeDescription(
-        @NonNull String componentName, int componentVersion, @NonNull String actionName,
-        @NonNull Map<String, ?> inputParameters);
+        String componentName, int componentVersion, String actionName, Map<String, ?> inputParameters);
 }

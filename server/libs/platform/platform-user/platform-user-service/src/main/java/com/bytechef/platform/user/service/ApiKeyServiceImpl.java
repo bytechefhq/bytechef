@@ -23,7 +23,6 @@ import com.bytechef.tenant.domain.TenantKey;
 import java.util.List;
 import java.util.Optional;
 import org.apache.commons.lang3.Validate;
-import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -41,7 +40,7 @@ public class ApiKeyServiceImpl implements ApiKeyService {
     }
 
     @Override
-    public String create(@NonNull ApiKey apiKey) {
+    public String create(ApiKey apiKey) {
         Validate.notNull(apiKey, "'apiKey' must not be null");
         Validate.isTrue(apiKey.getId() == null, "'id' must be null");
         Validate.notNull(apiKey.getName(), "'name' must not be null");
@@ -60,7 +59,7 @@ public class ApiKeyServiceImpl implements ApiKeyService {
 
     @Override
     @Transactional(readOnly = true)
-    public Optional<ApiKey> fetchApiKey(@NonNull String secretKey) {
+    public Optional<ApiKey> fetchApiKey(String secretKey) {
         return apiKeyRepository.findBySecretKey(secretKey);
     }
 
@@ -77,7 +76,7 @@ public class ApiKeyServiceImpl implements ApiKeyService {
     }
 
     @Override
-    public ApiKey update(@NonNull ApiKey apiKey) {
+    public ApiKey update(ApiKey apiKey) {
         Validate.notNull(apiKey, "'apiKey' must not be null");
 
         ApiKey curApiKey = getApiKey(Validate.notNull(apiKey.getId(), "id"));

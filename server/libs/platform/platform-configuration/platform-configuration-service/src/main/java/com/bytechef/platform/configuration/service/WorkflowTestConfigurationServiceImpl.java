@@ -27,7 +27,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import org.apache.commons.lang3.Validate;
-import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -50,13 +49,13 @@ public class WorkflowTestConfigurationServiceImpl implements WorkflowTestConfigu
     }
 
     @Override
-    public void delete(@NonNull String workflowId) {
+    public void delete(String workflowId) {
         workflowTestConfigurationRepository.findByWorkflowId(workflowId)
             .ifPresent(workflowTestConfigurationRepository::delete);
     }
 
     @Override
-    public void delete(@NonNull List<String> workflowIds) {
+    public void delete(List<String> workflowIds) {
         for (String workflowId : workflowIds) {
             delete(workflowId);
         }

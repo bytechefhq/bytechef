@@ -69,7 +69,8 @@ public class ImageModelActionTest extends AbstractActionTest {
         @Override
         public org.springframework.ai.image.ImageModel
             createImageModel(Parameters inputParameters, Parameters connectionParameters) {
-            return null;
+
+            return prompt -> new ImageResponse(List.of(new ImageGeneration(ANSWER)));
         }
     }
 }

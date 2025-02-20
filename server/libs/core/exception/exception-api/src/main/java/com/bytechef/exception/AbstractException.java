@@ -20,6 +20,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.lang.Nullable;
 
 /**
  * @author Ivica Cardic
@@ -28,7 +29,11 @@ public abstract class AbstractException extends RuntimeException {
 
     protected final Class<?> entityClass;
     protected final int errorKey;
+
+    @Nullable
     protected List<?> errorMessageArguments;
+
+    @Nullable
     protected Map<String, ?> inputParameters;
 
     public AbstractException(String message, ErrorType errorType) {

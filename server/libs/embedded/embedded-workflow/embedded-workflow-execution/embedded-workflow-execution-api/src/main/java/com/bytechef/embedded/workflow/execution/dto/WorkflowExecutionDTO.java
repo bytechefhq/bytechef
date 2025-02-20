@@ -23,14 +23,12 @@ import com.bytechef.embedded.configuration.domain.IntegrationInstanceConfigurati
 import com.bytechef.platform.workflow.execution.dto.JobDTO;
 import com.bytechef.platform.workflow.execution.dto.TriggerExecutionDTO;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import org.springframework.lang.NonNull;
 
 /**
  * @author Ivica Cardic
  */
 @SuppressFBWarnings("EI")
 public record WorkflowExecutionDTO(
-    long id, Integration integration, @NonNull IntegrationInstanceConfiguration integrationInstanceConfiguration,
-    @NonNull IntegrationInstance integrationInstance, @NonNull JobDTO job, @NonNull Workflow workflow,
-    TriggerExecutionDTO triggerExecution) {
+    long id, Integration integration, IntegrationInstanceConfiguration integrationInstanceConfiguration,
+    IntegrationInstance integrationInstance, JobDTO job, Workflow workflow, TriggerExecutionDTO triggerExecution) {
 }

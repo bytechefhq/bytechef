@@ -41,7 +41,6 @@ import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.io.ByteArrayResource;
-import org.springframework.lang.NonNull;
 
 /**
  * @author Arik Cohen
@@ -141,7 +140,7 @@ public class GitWorkflowRepository implements WorkflowRepository {
         return workflow;
     }
 
-    public String save(@NonNull List<Workflow> workflows, @NonNull String commitMessage) {
+    public String save(List<Workflow> workflows, String commitMessage) {
         return gitWorkflowOperations.write(
             workflows.stream()
                 .map(workflow -> new WorkflowResource(

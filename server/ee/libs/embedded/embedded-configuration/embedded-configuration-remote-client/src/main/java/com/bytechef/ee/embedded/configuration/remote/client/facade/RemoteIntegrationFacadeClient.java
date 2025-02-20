@@ -14,7 +14,6 @@ import com.bytechef.embedded.configuration.facade.IntegrationFacade;
 import com.bytechef.platform.category.domain.Category;
 import com.bytechef.platform.tag.domain.Tag;
 import java.util.List;
-import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
 
 /**
@@ -26,12 +25,12 @@ import org.springframework.stereotype.Component;
 public class RemoteIntegrationFacadeClient implements IntegrationFacade {
 
     @Override
-    public long addWorkflow(long id, @NonNull String definition) {
+    public long addWorkflow(long id, String definition) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public long createIntegration(@NonNull IntegrationDTO integrationDTO) {
+    public long createIntegration(IntegrationDTO integrationDTO) {
         throw new UnsupportedOperationException();
     }
 
@@ -41,7 +40,7 @@ public class RemoteIntegrationFacadeClient implements IntegrationFacade {
     }
 
     @Override
-    public void deleteWorkflow(@NonNull String workflowId) {
+    public void deleteWorkflow(String workflowId) {
         throw new UnsupportedOperationException();
     }
 
@@ -100,12 +99,12 @@ public class RemoteIntegrationFacadeClient implements IntegrationFacade {
     }
 
     @Override
-    public void updateIntegration(@NonNull IntegrationDTO integration) {
+    public void updateIntegration(IntegrationDTO integration) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public void updateIntegrationTags(long id, @NonNull List<Tag> tags) {
+    public void updateIntegrationTags(long id, List<Tag> tags) {
         throw new UnsupportedOperationException();
     }
 

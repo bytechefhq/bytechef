@@ -78,7 +78,6 @@ import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
-import org.springframework.lang.NonNull;
 
 /**
  * @author Ivica Cardic
@@ -316,7 +315,7 @@ class HttpClientExecutor {
         }
     }
 
-    private URI createURI(String urlString, @NonNull Map<String, List<String>> queryParameters) {
+    private URI createURI(String urlString, Map<String, List<String>> queryParameters) {
         URI uri;
 
         if (queryParameters.isEmpty()) {

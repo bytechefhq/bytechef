@@ -12,7 +12,6 @@ import com.bytechef.ee.platform.codeworkflow.configuration.domain.CodeWorkflowCo
 import com.bytechef.ee.platform.codeworkflow.configuration.repository.CodeWorkflowContainerRepository;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import org.apache.commons.lang3.Validate;
-import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -33,7 +32,7 @@ public class CodeWorkflowContainerServiceImpl implements CodeWorkflowContainerSe
     }
 
     @Override
-    public CodeWorkflowContainer create(@NonNull CodeWorkflowContainer codeWorkflowContainer) {
+    public CodeWorkflowContainer create(CodeWorkflowContainer codeWorkflowContainer) {
         Validate.notNull(codeWorkflowContainer, "'codeWorkflow' must not be null");
         Validate.notNull(codeWorkflowContainer.getWorkflowsFile(), "'workflowsFile' must not be null");
         Validate.isTrue(codeWorkflowContainer.getId() == null, "'id' must be null");

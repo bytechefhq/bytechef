@@ -37,7 +37,7 @@ public class FileStorageServiceRegistry {
     }
 
     @NonNull
-    public FileStorageService getFileStorageService(@NonNull String type) {
+    public FileStorageService getFileStorageService(String type) {
         return fileStorageServiceMap.get(type);
     }
 }

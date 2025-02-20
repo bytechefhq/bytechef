@@ -33,7 +33,6 @@ import java.security.spec.X509EncodedKeySpec;
 import java.util.Base64;
 import java.util.List;
 import org.apache.commons.lang3.Validate;
-import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -66,7 +65,7 @@ public class SigningKeyServiceImpl implements SigningKeyService {
     }
 
     @Override
-    public String create(@NonNull SigningKey signingKey) {
+    public String create(SigningKey signingKey) {
         Validate.notNull(signingKey, "'signingKey' must not be null");
         Validate.isTrue(signingKey.getId() == null, "'id' must be null");
         Validate.notNull(signingKey.getName(), "'name' must not be null");
@@ -94,7 +93,7 @@ public class SigningKeyServiceImpl implements SigningKeyService {
 
     @Override
     @Transactional(readOnly = true)
-    public PublicKey getPublicKey(@NonNull String keyId) {
+    public PublicKey getPublicKey(String keyId) {
         SigningKey signingKey = OptionalUtils.get(signingKeyRepository.findByKeyId(keyId), "Signing key not found");
 
         return stringToPublicKey(signingKey.getPublicKey());
@@ -108,12 +107,12 @@ public class SigningKeyServiceImpl implements SigningKeyService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<SigningKey> getSigningKeys(@NonNull ModeType type) {
+    public List<SigningKey> getSigningKeys(ModeType type) {
         return signingKeyRepository.findAllByType(type.ordinal());
     }
 
     @Override
-    public SigningKey update(@NonNull SigningKey signingKey) {
+    public SigningKey update(SigningKey signingKey) {
         Validate.notNull(signingKey, "'signingKey' must not be null");
 
         SigningKey curSigningKey = getSigningKey(Validate.notNull(signingKey.getId(), "id"));

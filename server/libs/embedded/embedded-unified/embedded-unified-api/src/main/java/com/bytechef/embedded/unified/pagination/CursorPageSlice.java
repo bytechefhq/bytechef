@@ -23,7 +23,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
@@ -47,7 +46,7 @@ public class CursorPageSlice<T> {
      * @param size              the size of the {@link CursorPageSlice} to be returned.
      * @param continuationToken continuationToken to access the next {@link CursorPageSlice}. Can be {@literal null}.
      */
-    public CursorPageSlice(@NonNull List<T> content, int size, @Nullable String continuationToken) {
+    public CursorPageSlice(List<T> content, int size, @Nullable String continuationToken) {
         Assert.notNull(content, "Content must not be null!");
 
         this.content.addAll(content);

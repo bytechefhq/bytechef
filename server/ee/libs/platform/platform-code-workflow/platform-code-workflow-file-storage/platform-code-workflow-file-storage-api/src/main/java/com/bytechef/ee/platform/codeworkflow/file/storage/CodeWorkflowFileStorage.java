@@ -18,22 +18,21 @@ package com.bytechef.ee.platform.codeworkflow.file.storage;
 
 import com.bytechef.file.storage.domain.FileEntry;
 import java.net.URL;
-import org.springframework.lang.NonNull;
 
 /**
  * @author Ivica Cardic
  */
 public interface CodeWorkflowFileStorage {
 
-    void deleteCodeWorkflowDefinition(@NonNull FileEntry definitionFile);
+    void deleteCodeWorkflowDefinition(FileEntry definitionFile);
 
-    void deleteCodeWorkflowFile(@NonNull FileEntry codeFile);
+    void deleteCodeWorkflowFile(FileEntry codeFile);
 
-    String readCodeWorkflowDefinition(@NonNull FileEntry definitionFile);
+    String readCodeWorkflowDefinition(FileEntry definitionFile);
 
-    URL getCodeWorkflowFileURL(@NonNull FileEntry codeFile);
+    URL getCodeWorkflowFileURL(FileEntry codeFile);
 
-    FileEntry storeCodeWorkflowDefinition(@NonNull String filename, @NonNull String definition);
+    FileEntry storeCodeWorkflowDefinition(String filename, String definition);
 
-    FileEntry storeCodeWorkflowFile(@NonNull String filename, @NonNull byte[] bytes);
+    FileEntry storeCodeWorkflowFile(String filename, byte[] bytes);
 }

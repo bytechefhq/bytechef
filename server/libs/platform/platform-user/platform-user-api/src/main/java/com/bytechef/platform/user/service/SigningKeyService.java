@@ -20,22 +20,21 @@ import com.bytechef.platform.constant.ModeType;
 import com.bytechef.platform.user.domain.SigningKey;
 import java.security.PublicKey;
 import java.util.List;
-import org.springframework.lang.NonNull;
 
 /**
  * @author Ivica Cardic
  */
 public interface SigningKeyService {
 
-    String create(@NonNull SigningKey signingKey);
+    String create(SigningKey signingKey);
 
     void delete(long id);
 
-    PublicKey getPublicKey(@NonNull String keyId);
+    PublicKey getPublicKey(String keyId);
 
     SigningKey getSigningKey(long id);
 
-    List<SigningKey> getSigningKeys(@NonNull ModeType type);
+    List<SigningKey> getSigningKeys(ModeType type);
 
-    SigningKey update(@NonNull SigningKey signingKey);
+    SigningKey update(SigningKey signingKey);
 }

@@ -30,40 +30,39 @@ import com.bytechef.platform.component.definition.DataStreamComponentDefinition.
 import com.bytechef.platform.component.domain.ComponentDefinition;
 import java.util.List;
 import java.util.Optional;
-import org.springframework.lang.NonNull;
 
 /**
  * @author Ivica Cardic
  */
 public interface ComponentDefinitionService {
 
-    Optional<ComponentDefinition> fetchComponentDefinition(@NonNull String name, Integer version);
+    Optional<ComponentDefinition> fetchComponentDefinition(String name, Integer version);
 
-    ComponentDefinition getComponentDefinition(@NonNull String name, Integer version);
+    ComponentDefinition getComponentDefinition(String name, Integer version);
 
     List<ComponentDefinition> getComponentDefinitions();
 
     List<ComponentDefinition> getComponentDefinitions(
         Boolean actionDefinitions, Boolean connectionDefinitions, Boolean triggerDefinitions, List<String> include);
 
-    List<ComponentDefinition> getComponentDefinitionVersions(@NonNull String name);
+    List<ComponentDefinition> getComponentDefinitionVersions(String name);
 
-    ComponentDefinition getConnectionComponentDefinition(@NonNull String name, int connectionVersion);
+    ComponentDefinition getConnectionComponentDefinition(String name, int connectionVersion);
 
-    List<ComponentDefinition> getDataStreamComponentDefinitions(@NonNull ComponentType componentType);
+    List<ComponentDefinition> getDataStreamComponentDefinitions(ComponentType componentType);
 
-    DataStreamItemReader getDataStreamItemReader(@NonNull String componentName, int componentVersion);
+    DataStreamItemReader getDataStreamItemReader(String componentName, int componentVersion);
 
-    DataStreamItemWriter getDataStreamItemWriter(@NonNull String componentName, int componentVersion);
+    DataStreamItemWriter getDataStreamItemWriter(String componentName, int componentVersion);
 
     List<ComponentDefinition> getUnifiedApiComponentDefinitions(Category category);
 
     ProviderModelAdapter<? super ProviderInputModel, ? extends ProviderOutputModel> getUnifiedApiProviderModelAdapter(
-        @NonNull String componentName, @NonNull Category category, @NonNull ModelType modelType);
+        String componentName, Category category, ModelType modelType);
 
     ProviderModelMapper<? super UnifiedInputModel, ? extends UnifiedOutputModel, ? extends ProviderInputModel, ? super ProviderOutputModel>
         getUnifiedApiProviderModelMapper(
-            @NonNull String componentName, @NonNull Category category, @NonNull ModelType modelType);
+            String componentName, Category category, ModelType modelType);
 
-    boolean hasComponentDefinition(@NonNull String name, Integer version);
+    boolean hasComponentDefinition(String name, Integer version);
 }

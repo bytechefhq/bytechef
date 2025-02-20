@@ -45,9 +45,7 @@ class InMemoryDataStorage implements DataStorage {
     }
 
     @Override
-    public void delete(
-        @NonNull String componentName, @NonNull DataStorageScope scope, @NonNull String scopeId, @NonNull String key,
-        @NonNull ModeType type) {
+    public void delete(String componentName, DataStorageScope scope, String scopeId, String key, ModeType type) {
         Map<String, Object> map = getValueMap(componentName, scope, scopeId, type);
 
         map.remove(key);
@@ -56,8 +54,8 @@ class InMemoryDataStorage implements DataStorage {
     @NonNull
     @Override
     public <T> Optional<T> fetch(
-        @NonNull String componentName, @NonNull DataStorageScope scope, @NonNull String scopeId, @NonNull String key,
-        @NonNull ModeType type) {
+        String componentName, DataStorageScope scope, String scopeId, String key,
+        ModeType type) {
 
         Map<String, Object> map = getValueMap(componentName, scope, scopeId, type);
 
@@ -66,9 +64,7 @@ class InMemoryDataStorage implements DataStorage {
 
     @NonNull
     @Override
-    public <T> T get(
-        @NonNull String componentName, @NonNull DataStorageScope scope, @NonNull String scopeId, @NonNull String key,
-        @NonNull ModeType type) {
+    public <T> T get(String componentName, DataStorageScope scope, String scopeId, String key, ModeType type) {
         Map<String, Object> map = getValueMap(componentName, scope, scopeId, type);
 
         return (T) map.get(key);
@@ -78,15 +74,14 @@ class InMemoryDataStorage implements DataStorage {
     @Override
     @SuppressWarnings("unchecked")
     public <T> Map<String, T> getAll(
-        @NonNull String componentName, @NonNull DataStorageScope scope, @NonNull String scopeId,
-        @NonNull ModeType type) {
+        String componentName, DataStorageScope scope, String scopeId,
+        ModeType type) {
         return (Map<String, T>) getValueMap(componentName, scope, scopeId, type);
     }
 
     @Override
     public void put(
-        @NonNull String componentName, @NonNull DataStorageScope scope, @NonNull String scopeId, @NonNull String key,
-        @NonNull ModeType type, @NonNull Object value) {
+        String componentName, DataStorageScope scope, String scopeId, String key, ModeType type, Object value) {
 
         Map<String, Object> map = getValueMap(componentName, scope, scopeId, type);
 

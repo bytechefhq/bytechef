@@ -22,7 +22,6 @@ import java.util.List;
 import java.util.Map;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
 import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
 
 /**
@@ -44,8 +43,8 @@ public class RemoteActionDefinitionFacadeClient extends AbstractWorkerClient
 
     @Override
     public List<Property> executeDynamicProperties(
-        @NonNull String componentName, int componentVersion, @NonNull String actionName, @NonNull String propertyName,
-        String workflowId, Map<String, ?> inputParameters, @NonNull List<String> lookupDependsOnPaths,
+        String componentName, int componentVersion, String actionName, String propertyName,
+        String workflowId, Map<String, ?> inputParameters, List<String> lookupDependsOnPaths,
         Long connectionId) {
 
         return defaultRestClient.post(
@@ -57,8 +56,8 @@ public class RemoteActionDefinitionFacadeClient extends AbstractWorkerClient
 
     @Override
     public List<Option> executeOptions(
-        @NonNull String componentName, int componentVersion, @NonNull String actionName, @NonNull String propertyName,
-        @NonNull Map<String, ?> inputParameters, @NonNull List<String> lookupDependsOnPaths, String searchText,
+        String componentName, int componentVersion, String actionName, String propertyName,
+        Map<String, ?> inputParameters, List<String> lookupDependsOnPaths, String searchText,
         Long connectionId) {
 
         return defaultRestClient.post(
@@ -71,8 +70,8 @@ public class RemoteActionDefinitionFacadeClient extends AbstractWorkerClient
 
     @Override
     public OutputResponse executeOutput(
-        @NonNull String componentName, int componentVersion, @NonNull String actionName,
-        @NonNull Map<String, ?> inputParameters, @NonNull Map<String, Long> connectionIds) {
+        String componentName, int componentVersion, String actionName,
+        Map<String, ?> inputParameters, Map<String, Long> connectionIds) {
 
         return defaultRestClient.post(
             uriBuilder -> toUri(uriBuilder, componentName, ACTION_DEFINITION_FACADE + "/execute-output-schema"),
@@ -82,10 +81,10 @@ public class RemoteActionDefinitionFacadeClient extends AbstractWorkerClient
 
     @Override
     public Map<String, ?> executePerform(
-        @NonNull String componentName, int componentVersion, @NonNull String actionName, ModeType type,
+        String componentName, int componentVersion, String actionName, ModeType type,
         Long principalId,
-        Long principalWorkflowId, Long jobId, String workflowId, @NonNull Map<String, ?> inputParameters,
-        @NonNull Map<String, Long> connectionIds, Map<String, ?> extensions, boolean editorEnvironment) {
+        Long principalWorkflowId, Long jobId, String workflowId, Map<String, ?> inputParameters,
+        Map<String, Long> connectionIds, Map<String, ?> extensions, boolean editorEnvironment) {
 
         return defaultRestClient.post(
             uriBuilder -> toUri(
@@ -98,16 +97,16 @@ public class RemoteActionDefinitionFacadeClient extends AbstractWorkerClient
 
     @Override
     public Object executePerformForPolyglot(
-        @NonNull String componentName, int componentVersion, @NonNull String actionName,
-        @NonNull Map<String, ?> inputParameters,
-        ComponentConnection componentConnection, @NonNull ActionContext actionContext) {
+        String componentName, int componentVersion, String actionName,
+        Map<String, ?> inputParameters,
+        ComponentConnection componentConnection, ActionContext actionContext) {
 
         throw new UnsupportedOperationException();
     }
 
     @Override
     public ProviderException executeProcessErrorResponse(
-        @NonNull String componentName, int componentVersion, @NonNull String actionName, int statusCode,
+        String componentName, int componentVersion, String actionName, int statusCode,
         Object body) {
 
         throw new UnsupportedOperationException();
@@ -115,8 +114,8 @@ public class RemoteActionDefinitionFacadeClient extends AbstractWorkerClient
 
     @Override
     public String executeWorkflowNodeDescription(
-        @NonNull String componentName, int componentVersion, @NonNull String actionName,
-        @NonNull Map<String, ?> inputParameters) {
+        String componentName, int componentVersion, String actionName,
+        Map<String, ?> inputParameters) {
 
         return defaultRestClient.post(
             uriBuilder -> toUri(
