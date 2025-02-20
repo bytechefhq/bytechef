@@ -32,7 +32,7 @@ import java.util.List;
 public record ProjectDTO(
     Category category, String createdBy, Instant createdDate, String description, Long id, String name,
     String lastModifiedBy, Instant lastModifiedDate, Instant lastPublishedDate, Status lastStatus,
-    int lastProjectVersion, List<ProjectVersion> projectVersions, List<Long> projectWorkflowIds,
+    int lastVersion, List<ProjectVersion> projectVersions, List<Long> projectWorkflowIds,
     List<Tag> tags, int version, Long workspaceId) {
 
     public ProjectDTO(Category category, Project project, List<Long> projectWorkflowIds, List<Tag> tags) {
