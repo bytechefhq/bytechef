@@ -177,16 +177,16 @@ open class FindJsonFilesTask : DefaultTask() {
                 """
 #### Properties
 
-|     Name     |     Type     |     Control Type     |
-|:------------:|:------------:|:--------------------:|
+|     Name     |     Type     |    Control Type     |
+|:------------:|:------------:|:-------------------:|
 ${properties?.joinToString("\n")}
 """
             } else if (!items.isNullOrEmpty()) {
                 """
 #### Properties
 
-|     Name     |     Type     |     Control Type     |
-|:------------:|:------------:|:--------------------:|
+|     Name     |     Type     |    Control Type     |
+|:------------:|:------------:|:-------------------:|
 ${items?.joinToString("\n")}
 """
             } else ""
@@ -309,8 +309,8 @@ $formattedJson
                 """
 #### Properties
 
-|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
-|:---------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
+|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
 ${properties?.joinToString("\n")}
 """
             } else ""
@@ -386,8 +386,8 @@ $formattedJson
                 """
 #### Properties
 
-|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
-|:---------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
+|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
 ${properties?.joinToString("\n")}
 """
             } else ""
@@ -407,8 +407,8 @@ ${properties?.joinToString("\n")}
 
 #### Properties
 
-|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
-|:---------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
+|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
 ${properties?.joinToString("\n")}
 
 """
