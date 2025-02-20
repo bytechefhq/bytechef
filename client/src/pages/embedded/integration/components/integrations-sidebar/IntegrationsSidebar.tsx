@@ -61,15 +61,15 @@ const IntegrationsSidebar = ({integrationId}: {integrationId: number}) => {
                                 </div>
                             </div>
 
-                            {curIntegration.lastPublishedDate && curIntegration.lastIntegrationVersion ? (
+                            {curIntegration.lastPublishedDate && curIntegration.lastVersion ? (
                                 <Badge className="flex space-x-1" variant="success">
-                                    <span>V{curIntegration.lastIntegrationVersion - 1}</span>
+                                    <span>V{curIntegration.lastVersion - 1}</span>
 
                                     <span>PUBLISHED</span>
                                 </Badge>
                             ) : (
                                 <Badge className="flex space-x-1" variant="outline">
-                                    <span>V{curIntegration.lastIntegrationVersion}</span>
+                                    <span>V{curIntegration.lastVersion}</span>
 
                                     <span>{curIntegration.lastStatus}</span>
                                 </Badge>
