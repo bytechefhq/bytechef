@@ -7,6 +7,7 @@ import DataStreamComponentsTab from '@/pages/platform/workflow-editor/components
 import Properties from '@/pages/platform/workflow-editor/components/properties/Properties';
 import {CONDITION_CASE_FALSE, CONDITION_CASE_TRUE} from '@/shared/constants';
 import {
+    ActionDefinition,
     ActionDefinitionApi,
     ComponentConnection,
     ComponentDefinition,
@@ -17,10 +18,7 @@ import {
     WorkflowNodeOutput,
     WorkflowTask,
 } from '@/shared/middleware/platform/configuration';
-import {
-    ActionDefinitionKeys,
-    useGetComponentActionDefinitionQuery,
-} from '@/shared/queries/platform/actionDefinitions.queries';
+import {ActionDefinitionKeys} from '@/shared/queries/platform/actionDefinitions.queries';
 import {useGetComponentDefinitionQuery} from '@/shared/queries/platform/componentDefinitions.queries';
 import {useGetTaskDispatcherDefinitionQuery} from '@/shared/queries/platform/taskDispatcherDefinitions.queries';
 import {
@@ -93,6 +91,8 @@ const WorkflowNodeDetailsPanel = ({
     const [currentNodeName, setCurrentNodeName] = useState<string | undefined>();
     const [currentOperationName, setCurrentOperationName] = useState('');
     const [currentOperationProperties, setCurrentOperationProperties] = useState<Array<PropertyAllType>>([]);
+    const [currentActionDefinition, setCurrentActionDefinition] = useState<ActionDefinition | undefined>();
+    const [currentActionFetched, setCurrentActionFetched] = useState(false);
 
     const {
         activeTab,
@@ -138,15 +138,6 @@ const WorkflowNodeDetailsPanel = ({
                 (action) => action.name === currentOperationName
             ),
         [currentComponentDefinition, currentOperationName]
-    );
-
-    const {data: currentActionDefinition, isFetched: currentActionFetched} = useGetComponentActionDefinitionQuery(
-        {
-            actionName: currentOperationName ?? currentNode?.operationName,
-            componentName: currentComponentDefinition?.name as string,
-            componentVersion: currentComponentDefinition?.version as number,
-        },
-        !!currentComponentDefinition?.actions && !currentNode?.trigger && !!matchingOperation
     );
 
     const getTriggerName = useCallback((): string => {
@@ -590,6 +581,7 @@ const WorkflowNodeDetailsPanel = ({
         if (!componentActions?.length) {
             return;
         }
+
         const currentComponentAction = componentActions.find(
             (action) => action.workflowNodeName === currentNode?.workflowNodeName
         );
@@ -619,6 +611,38 @@ const WorkflowNodeDetailsPanel = ({
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [workflowNodeParameterDisplayConditions?.displayConditions, currentNode?.name]);
+
+    // Fetch current action definition when operation changes
+    useEffect(() => {
+        if (!currentOperationName || !currentComponentDefinition) {
+            return;
+        }
+
+        const fetchActionDefinition = async () => {
+            const actionDefinitionRequest: GetComponentActionDefinitionRequest = {
+                actionName: currentOperationName ?? currentNode?.operationName,
+                componentName: currentComponentDefinition?.name as string,
+                componentVersion: currentComponentDefinition?.version as number,
+            };
+
+            const actionDefinition = await queryClient.fetchQuery({
+                queryFn: () => new ActionDefinitionApi().getComponentActionDefinition(actionDefinitionRequest),
+                queryKey: ActionDefinitionKeys.actionDefinition(actionDefinitionRequest),
+            });
+
+            if (actionDefinition) {
+                setCurrentActionDefinition(actionDefinition);
+
+                setCurrentActionFetched(true);
+            }
+        };
+
+        if (!!currentComponentDefinition?.actions && !currentNode?.trigger && !!matchingOperation) {
+            fetchActionDefinition();
+        }
+
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [currentComponentDefinition, currentNodeName, currentOperationName, matchingOperation, queryClient]);
 
     if (!workflowNodeDetailsPanelOpen) {
         return <></>;
