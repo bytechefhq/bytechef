@@ -43,8 +43,6 @@ public interface JobService {
 
     Job resumeToStatusStarted(long id);
 
-    Job setStatusToCompleted(long id);
-
     Job setStatusToStarted(long id);
 
     Job setStatusToStopped(long id);

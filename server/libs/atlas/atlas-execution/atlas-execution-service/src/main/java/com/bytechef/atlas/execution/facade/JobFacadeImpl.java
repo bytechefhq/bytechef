@@ -21,14 +21,20 @@ import com.bytechef.atlas.coordinator.event.JobStatusApplicationEvent;
 import com.bytechef.atlas.coordinator.event.ResumeJobEvent;
 import com.bytechef.atlas.coordinator.event.StartJobEvent;
 import com.bytechef.atlas.coordinator.event.StopJobEvent;
+import com.bytechef.atlas.coordinator.event.TaskExecutionCompleteEvent;
 import com.bytechef.atlas.execution.domain.Context;
 import com.bytechef.atlas.execution.domain.Job;
+import com.bytechef.atlas.execution.domain.TaskExecution;
 import com.bytechef.atlas.execution.dto.JobParametersDTO;
 import com.bytechef.atlas.execution.service.ContextService;
 import com.bytechef.atlas.execution.service.JobService;
 import com.bytechef.atlas.execution.service.TaskExecutionService;
 import com.bytechef.atlas.file.storage.TaskFileStorage;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.time.Instant;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -63,11 +69,6 @@ public class JobFacadeImpl implements JobFacade {
         this.workflowService = workflowService;
     }
 
-    @Override
-    public void completeJob(long jobId) {
-        jobService.setStatusToCompleted(jobId);
-    }
-
     // Propagation.NEVER is set because of sending job messages via queue in monolith mode, where it can happen
     // the case where a job is finished and the completion task executed, but the transaction is not yet committed and
     // the job id is missing.
@@ -96,6 +97,25 @@ public class JobFacadeImpl implements JobFacade {
         taskExecutionService.deleteJobTaskExecutions(id);
 
         jobService.deleteJob(id);
+    }
+
+    @Override
+    public void resumeApproval(long jobId, boolean approved) {
+        jobService.resumeToStatusStarted(jobId);
+
+        List<TaskExecution> taskExecutions = taskExecutionService.getJobTaskExecutions(jobId);
+
+        if (!taskExecutions.isEmpty()) {
+            TaskExecution currentTaskExecution = taskExecutions.getLast();
+
+            currentTaskExecution.setEndDate(Instant.now());
+
+            currentTaskExecution.setOutput(
+                taskFileStorage.storeTaskExecutionOutput(
+                    Objects.requireNonNull(currentTaskExecution.getId()), Map.of("approved", approved)));
+
+            eventPublisher.publishEvent(new TaskExecutionCompleteEvent(currentTaskExecution));
+        }
     }
 
     @Override

@@ -115,20 +115,6 @@ public class JobServiceImpl implements JobService {
     }
 
     @Override
-    public Job setStatusToCompleted(long id) {
-        Job job = OptionalUtils.get(jobRepository.findById(id), String.format("Unknown job %s", id));
-
-        Validate.isTrue(
-            job.getStatus() == Job.Status.STOPPED, "Job id=" + id + " can not be stopped as it is " + job.getStatus());
-
-        job.setStatus(Job.Status.COMPLETED);
-
-        jobRepository.save(job);
-
-        return job;
-    }
-
-    @Override
     public Job setStatusToStarted(long id) {
         Job job = OptionalUtils.get(jobRepository.findById(id), String.format("Unknown job %s", id));
 

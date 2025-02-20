@@ -23,11 +23,11 @@ import com.bytechef.atlas.execution.dto.JobParametersDTO;
  */
 public interface JobFacade {
 
-    void completeJob(long jobId);
-
     long createJob(JobParametersDTO jobParametersDTO);
 
     void deleteJob(long id);
+
+    void resumeApproval(long jobId, boolean approved);
 
     void resumeJob(long id);
 

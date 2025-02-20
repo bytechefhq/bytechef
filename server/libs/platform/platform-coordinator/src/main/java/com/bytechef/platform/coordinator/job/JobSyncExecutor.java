@@ -305,11 +305,6 @@ public class JobSyncExecutor {
         }
 
         @Override
-        public Job setStatusToCompleted(long id) {
-            throw new UnsupportedOperationException();
-        }
-
-        @Override
         public Job setStatusToStarted(long id) {
             throw new UnsupportedOperationException();
         }

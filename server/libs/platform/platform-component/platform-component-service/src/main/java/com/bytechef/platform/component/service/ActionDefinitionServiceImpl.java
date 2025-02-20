@@ -232,9 +232,8 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
 
     @Override
     public Object executeSingleConnectionPerform(
-        String componentName, int componentVersion, String actionName,
-        Map<String, ?> inputParameters, @Nullable ComponentConnection connection,
-        ActionContext context) {
+        String componentName, int componentVersion, String actionName, Map<String, ?> inputParameters,
+        @Nullable ComponentConnection connection, ActionContext context) {
 
         com.bytechef.component.definition.ActionDefinition actionDefinition =
             componentDefinitionRegistry.getActionDefinition(componentName, componentVersion, actionName);

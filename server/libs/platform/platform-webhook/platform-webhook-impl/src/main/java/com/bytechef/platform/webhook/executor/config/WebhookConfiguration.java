@@ -39,7 +39,7 @@ import com.bytechef.platform.webhook.executor.WorkflowExecutor;
 import com.bytechef.platform.webhook.executor.WorkflowExecutorImpl;
 import com.bytechef.platform.webhook.executor.WorkflowSyncExecutor;
 import com.bytechef.platform.workflow.execution.facade.PrincipalJobFacade;
-import com.bytechef.task.dispatcher.approval.ApprovalTaskDispatcher;
+import com.bytechef.task.dispatcher.approval.WaitForApprovalTaskDispatcher;
 import com.bytechef.task.dispatcher.branch.BranchTaskDispatcher;
 import com.bytechef.task.dispatcher.branch.completion.BranchTaskCompletionHandler;
 import com.bytechef.task.dispatcher.condition.ConditionTaskDispatcher;
@@ -85,7 +85,8 @@ public class WebhookConfiguration {
                     contextService, counterService, taskExecutionService, taskFileStorage),
                 getTaskDispatcherAdapterFactories(), taskDispatcherPreSendProcessors,
                 getTaskDispatcherResolverFactories(
-                    contextService, counterService, syncMessageBroker, taskExecutionService, taskFileStorage),
+                    contextService, counterService, jobService, syncMessageBroker, taskExecutionService,
+                    taskFileStorage),
                 taskExecutionService, taskHandlerRegistry, taskFileStorage,
                 workflowService),
             triggerSyncExecutor, taskFileStorage);
@@ -135,14 +136,14 @@ public class WebhookConfiguration {
     }
 
     private List<TaskDispatcherResolverFactory> getTaskDispatcherResolverFactories(
-        ContextService contextService, CounterService counterService,
+        ContextService contextService, CounterService counterService, JobService jobService,
         SyncMessageBroker syncMessageBroker, TaskExecutionService taskExecutionService,
         TaskFileStorage taskFileStorage) {
 
         ApplicationEventPublisher eventPublisher = getEventPublisher(syncMessageBroker);
 
         return List.of(
-            (taskDispatcher) -> new ApprovalTaskDispatcher(eventPublisher, taskExecutionService),
+            (taskDispatcher) -> new WaitForApprovalTaskDispatcher(eventPublisher, jobService, taskExecutionService),
             (taskDispatcher) -> new BranchTaskDispatcher(
                 eventPublisher, contextService, taskDispatcher, taskExecutionService,
                 taskFileStorage),

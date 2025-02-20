@@ -17,8 +17,8 @@
 package com.bytechef.platform.configuration.dto;
 
 import com.bytechef.platform.component.domain.ActionDefinition;
-import com.bytechef.platform.component.domain.Property;
 import com.bytechef.platform.component.domain.TriggerDefinition;
+import com.bytechef.platform.domain.BaseProperty;
 import com.bytechef.platform.domain.OutputResponse;
 import com.bytechef.platform.workflow.task.dispatcher.domain.TaskDispatcherDefinition;
 
@@ -26,16 +26,15 @@ import com.bytechef.platform.workflow.task.dispatcher.domain.TaskDispatcherDefin
  * @author Ivica Cardic
  */
 public record WorkflowNodeOutputDTO(
-    String workflowNodeName, Property outputSchema, Object sampleOutput, TriggerDefinition triggerDefinition,
-    ActionDefinition actionDefinition,
-    TaskDispatcherDefinition taskDispatcherDefinition) {
+    String workflowNodeName, BaseProperty outputSchema, Object sampleOutput, TriggerDefinition triggerDefinition,
+    ActionDefinition actionDefinition, TaskDispatcherDefinition taskDispatcherDefinition) {
 
     public WorkflowNodeOutputDTO(
         String workflowNodeName, OutputResponse outputResponse, TriggerDefinition triggerDefinition,
         ActionDefinition actionDefinition, TaskDispatcherDefinition taskDispatcherDefinition) {
 
         this(
-            workflowNodeName, outputResponse == null ? null : (Property) outputResponse.outputSchema(),
+            workflowNodeName, outputResponse == null ? null : outputResponse.outputSchema(),
             outputResponse == null ? null : outputResponse.sampleOutput(), triggerDefinition, actionDefinition,
             taskDispatcherDefinition);
     }

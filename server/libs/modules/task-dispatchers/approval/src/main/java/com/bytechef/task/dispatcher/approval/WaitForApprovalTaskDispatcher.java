@@ -16,13 +16,16 @@
 
 package com.bytechef.task.dispatcher.approval;
 
-import static com.bytechef.task.dispatcher.approval.constant.ApprovalTaskDispatcherConstants.APPROVAL;
+import static com.bytechef.task.dispatcher.approval.constant.WaitForApprovalTaskDispatcherConstants.WAIT_FOR_APPROVAL;
 
 import com.bytechef.atlas.configuration.domain.Task;
-import com.bytechef.atlas.coordinator.event.StopJobEvent;
+import com.bytechef.atlas.coordinator.event.JobStatusApplicationEvent;
 import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcher;
 import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcherResolver;
+import com.bytechef.atlas.execution.domain.Job;
 import com.bytechef.atlas.execution.domain.TaskExecution;
+import com.bytechef.atlas.execution.domain.TaskExecution.Status;
+import com.bytechef.atlas.execution.service.JobService;
 import com.bytechef.atlas.execution.service.TaskExecutionService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.Instant;
@@ -34,38 +37,45 @@ import org.springframework.context.ApplicationEventPublisher;
 /**
  * @author Ivica Cardic
  */
-public class ApprovalTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDispatcherResolver {
+public class WaitForApprovalTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDispatcherResolver {
 
-    private static final Logger logger = LoggerFactory.getLogger(ApprovalTaskDispatcher.class);
+    private static final Logger logger = LoggerFactory.getLogger(WaitForApprovalTaskDispatcher.class);
 
     private final ApplicationEventPublisher eventPublisher;
+    private final JobService jobService;
     private final TaskExecutionService taskExecutionService;
 
     @SuppressFBWarnings("EI")
-    public ApprovalTaskDispatcher(
-        ApplicationEventPublisher eventPublisher, TaskExecutionService taskExecutionService) {
+    public WaitForApprovalTaskDispatcher(
+        ApplicationEventPublisher eventPublisher, JobService jobService, TaskExecutionService taskExecutionService) {
 
         this.eventPublisher = eventPublisher;
+        this.jobService = jobService;
         this.taskExecutionService = taskExecutionService;
     }
 
     @Override
     public void dispatch(TaskExecution taskExecution) {
-        taskExecution.setEndDate(Instant.now());
-        taskExecution.setStatus(TaskExecution.Status.COMPLETED);
+        taskExecution.setStartDate(Instant.now());
+        taskExecution.setStatus(Status.STARTED);
 
         taskExecution = taskExecutionService.update(taskExecution);
 
-        eventPublisher.publishEvent(new StopJobEvent(Objects.requireNonNull(taskExecution.getJobId())));
+        Job job = jobService.getJob(Objects.requireNonNull(taskExecution.getJobId()));
+
+        job = jobService.setStatusToStopped(Objects.requireNonNull(job.getId()));
+
+        eventPublisher.publishEvent(
+            new JobStatusApplicationEvent(Objects.requireNonNull(job.getId()), job.getStatus()));
 
         if (logger.isDebugEnabled()) {
-            logger.debug("Approval task execution completed: {}", taskExecution);
+            logger.debug("Wait for Approval task execution completed: {}", taskExecution);
         }
     }
 
     @Override
     public TaskDispatcher<? extends Task> resolve(Task task) {
-        if (Objects.equals(task.getType(), APPROVAL + "/v1")) {
+        if (Objects.equals(task.getType(), WAIT_FOR_APPROVAL + "/v1")) {
             return this;
         }
 

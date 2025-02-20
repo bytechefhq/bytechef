@@ -19,7 +19,7 @@ package com.bytechef.component.approval;
 import static com.bytechef.component.definition.ComponentDsl.component;
 
 import com.bytechef.component.ComponentHandler;
-import com.bytechef.component.approval.action.ApprovalCreateApprovalLinksAction;
+import com.bytechef.component.approval.action.ApprovalLinkCreateApprovalLinksAction;
 import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDefinition;
 import com.google.auto.service.AutoService;
@@ -28,14 +28,14 @@ import com.google.auto.service.AutoService;
  * @author Ivica Cardic
  */
 @AutoService(ComponentHandler.class)
-public class ApprovalComponentHandler implements ComponentHandler {
+public class ApprovalLinkComponentHandler implements ComponentHandler {
 
-    private static final ComponentDefinition COMPONENT_DEFINITION = component("approval")
-        .title("Approval")
-        .description("The Approval component allows a person to review and either approve or reject requests.")
-        .icon("path:assets/approval.svg")
+    private static final ComponentDefinition COMPONENT_DEFINITION = component("approvalLink")
+        .title("Approval Link")
+        .description("The Approval Link component that create approval/disapproval links.")
+        .icon("path:assets/approval-link.svg")
         .categories(ComponentCategory.DEVELOPER_TOOLS, ComponentCategory.FILE_STORAGE)
-        .actions(ApprovalCreateApprovalLinksAction.ACTION_DEFINITION);
+        .actions(ApprovalLinkCreateApprovalLinksAction.ACTION_DEFINITION);
 
     @Override
     public ComponentDefinition getDefinition() {

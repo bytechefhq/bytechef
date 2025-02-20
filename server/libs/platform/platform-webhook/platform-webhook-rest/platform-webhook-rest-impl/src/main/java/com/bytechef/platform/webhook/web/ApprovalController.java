@@ -48,11 +48,7 @@ public class ApprovalController {
         ApprovalId approvalId = ApprovalId.parse(id);
 
         return TenantUtils.callWithTenantId(approvalId.getTenantId(), () -> {
-            if (approvalId.isApproved()) {
-                jobFacade.resumeJob(approvalId.getJobId());
-            } else {
-                jobFacade.completeJob(approvalId.getJobId());
-            }
+            jobFacade.resumeApproval(approvalId.getJobId(), approvalId.isApproved());
 
             return ResponseEntity.noContent()
                 .build();
