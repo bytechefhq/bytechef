@@ -29,11 +29,11 @@ import org.springframework.data.domain.Page;
  */
 public interface PrincipalJobService {
 
-    PrincipalJob create(long jobId, long instanceId, ModeType type);
+    PrincipalJob create(long jobId, long principalId, ModeType type);
 
     void deletePrincipalJobs(long jobId, ModeType type);
 
-    Optional<Long> fetchLastJobId(long instanceId, ModeType type);
+    Optional<Long> fetchLastJobId(long principalId, ModeType type);
 
     Optional<Long> fetchJobPrincipalId(long jobId, ModeType type);
 

@@ -45,8 +45,8 @@ public class PrincipalJobServiceImpl implements PrincipalJobService {
     }
 
     @Override
-    public PrincipalJob create(long jobId, long instanceId, ModeType type) {
-        return principalJobRepository.save(new PrincipalJob(instanceId, jobId, type));
+    public PrincipalJob create(long jobId, long principalId, ModeType type) {
+        return principalJobRepository.save(new PrincipalJob(principalId, jobId, type));
     }
 
     @Override
@@ -56,9 +56,9 @@ public class PrincipalJobServiceImpl implements PrincipalJobService {
     }
 
     @Override
-    public Optional<Long> fetchLastJobId(long instanceId, ModeType type) {
+    public Optional<Long> fetchLastJobId(long principalId, ModeType type) {
         return principalJobRepository
-            .findTop1ByPrincipalIdAndTypeOrderByJobIdDesc(instanceId, type.ordinal())
+            .findTop1ByPrincipalIdAndTypeOrderByJobIdDesc(principalId, type.ordinal())
             .map(PrincipalJob::getJobId);
     }
 

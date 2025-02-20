@@ -219,7 +219,7 @@ public class TriggerCoordinator {
         triggerExecution = triggerExecutionService.create(
             triggerExecution.evaluate(
                 jobPrincipalAccessor.getInputMap(
-                    workflowExecutionId.getInstanceId(), workflowExecutionId.getWorkflowReferenceCode())));
+                    workflowExecutionId.getPrincipalId(), workflowExecutionId.getWorkflowReferenceCode())));
 
         triggerExecution.setState(OptionalUtils.orElse(triggerStateService.fetchValue(workflowExecutionId), null));
 
@@ -257,6 +257,6 @@ public class TriggerCoordinator {
             jobPrincipalAccessorRegistry.getJobPrincipalAccessor(workflowExecutionId.getType());
 
         return jobPrincipalAccessor.getWorkflowId(
-            workflowExecutionId.getInstanceId(), workflowExecutionId.getWorkflowReferenceCode());
+            workflowExecutionId.getPrincipalId(), workflowExecutionId.getWorkflowReferenceCode());
     }
 }

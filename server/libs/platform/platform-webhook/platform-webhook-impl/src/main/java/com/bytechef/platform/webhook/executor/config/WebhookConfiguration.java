@@ -20,6 +20,7 @@ import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.atlas.coordinator.task.completion.TaskCompletionHandlerFactory;
 import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcherPreSendProcessor;
 import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcherResolverFactory;
+import com.bytechef.atlas.execution.facade.JobFacade;
 import com.bytechef.atlas.execution.service.ContextService;
 import com.bytechef.atlas.execution.service.CounterService;
 import com.bytechef.atlas.execution.service.JobService;
@@ -70,7 +71,7 @@ public class WebhookConfiguration {
     WorkflowExecutor webhookExecutor(
         ApplicationEventPublisher eventPublisher, ContextService contextService, CounterService counterService,
         JobPrincipalAccessorRegistry jobPrincipalAccessorRegistry, PrincipalJobFacade principalJobFacade,
-        JobService jobService,
+        JobFacade jobFacade, JobService jobService,
         List<TaskDispatcherPreSendProcessor> taskDispatcherPreSendProcessors, TaskExecutionService taskExecutionService,
         TaskHandlerRegistry taskHandlerRegistry, WorkflowSyncExecutor triggerSyncExecutor,
         TaskFileStorage taskFileStorage, WorkflowService workflowService) {
@@ -86,7 +87,8 @@ public class WebhookConfiguration {
                     contextService, counterService, taskExecutionService, taskFileStorage),
                 getTaskDispatcherAdapterFactories(), taskDispatcherPreSendProcessors,
                 getTaskDispatcherResolverFactories(
-                    contextService, counterService, syncMessageBroker, taskExecutionService, taskFileStorage),
+                    contextService, counterService, jobFacade, syncMessageBroker, taskExecutionService,
+                    taskFileStorage),
                 taskExecutionService, taskHandlerRegistry, taskFileStorage,
                 workflowService),
             triggerSyncExecutor, taskFileStorage);
@@ -136,13 +138,14 @@ public class WebhookConfiguration {
     }
 
     private List<TaskDispatcherResolverFactory> getTaskDispatcherResolverFactories(
-        ContextService contextService, CounterService counterService, SyncMessageBroker syncMessageBroker,
-        TaskExecutionService taskExecutionService, TaskFileStorage taskFileStorage) {
+        ContextService contextService, CounterService counterService, JobFacade jobFacade,
+        SyncMessageBroker syncMessageBroker, TaskExecutionService taskExecutionService,
+        TaskFileStorage taskFileStorage) {
 
         ApplicationEventPublisher eventPublisher = getEventPublisher(syncMessageBroker);
 
         return List.of(
-            (taskDispatcher) -> new ApprovalTaskDispatcher(eventPublisher, taskExecutionService),
+            (taskDispatcher) -> new ApprovalTaskDispatcher(eventPublisher, jobFacade, taskExecutionService),
             (taskDispatcher) -> new BranchTaskDispatcher(
                 eventPublisher, contextService, taskDispatcher, taskExecutionService,
                 taskFileStorage),

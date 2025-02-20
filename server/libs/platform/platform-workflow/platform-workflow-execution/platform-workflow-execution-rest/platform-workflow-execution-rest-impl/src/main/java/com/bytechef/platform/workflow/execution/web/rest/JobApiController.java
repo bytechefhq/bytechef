@@ -72,7 +72,7 @@ public class JobApiController implements JobApi {
 
     @Override
     public ResponseEntity<Void> restartJob(Long id) {
-        jobFacade.restartJob(id);
+        jobFacade.resumeJob(id);
 
         return ResponseEntity.noContent()
             .build();

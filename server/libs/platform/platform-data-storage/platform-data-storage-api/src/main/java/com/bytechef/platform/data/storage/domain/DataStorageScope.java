@@ -23,7 +23,7 @@ public enum DataStorageScope {
 
     CURRENT_EXECUTION("Current Execution"),
     WORKFLOW("Workflow"),
-    INSTANCE("Instance"),
+    PRINCIPAL("Principal"),
     ACCOUNT("Account");
 
     private final String label;

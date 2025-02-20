@@ -29,6 +29,11 @@ public class RemoteJobFacadeClient implements JobFacade {
     }
 
     @Override
+    public void completeJob(long jobId) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public long createJob(JobParametersDTO jobParametersDTO) {
         return loadBalancedRestClient.post(
             uriBuilder -> uriBuilder
@@ -44,7 +49,7 @@ public class RemoteJobFacadeClient implements JobFacade {
     }
 
     @Override
-    public void restartJob(long id) {
+    public void resumeJob(long id) {
         throw new UnsupportedOperationException();
     }
 

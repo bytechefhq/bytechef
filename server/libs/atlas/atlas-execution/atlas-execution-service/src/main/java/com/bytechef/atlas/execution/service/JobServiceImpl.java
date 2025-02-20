@@ -102,11 +102,6 @@ public class JobServiceImpl implements JobService {
     }
 
     @Override
-    public List<Job> getWorkflowJobs(@NonNull String workflowId) {
-        return jobRepository.findAllByWorkflowId(workflowId);
-    }
-
-    @Override
     public Job resumeToStatusStarted(long id) {
         Job job = OptionalUtils.get(jobRepository.findById(id), String.format("Unknown job %s", id));
 
@@ -114,6 +109,20 @@ public class JobServiceImpl implements JobService {
         Validate.isTrue(isRestartable(job), "can't resume job " + id + " as it is " + job.getStatus());
 
         job.setStatus(Job.Status.STARTED);
+
+        jobRepository.save(job);
+
+        return job;
+    }
+
+    @Override
+    public Job setStatusToCompleted(long id) {
+        Job job = OptionalUtils.get(jobRepository.findById(id), String.format("Unknown job %s", id));
+
+        Validate.isTrue(
+            job.getStatus() == Job.Status.STOPPED, "Job id=" + id + " can not be stopped as it is " + job.getStatus());
+
+        job.setStatus(Job.Status.COMPLETED);
 
         jobRepository.save(job);
 

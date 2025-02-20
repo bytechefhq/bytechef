@@ -281,11 +281,6 @@ public class JobSyncExecutor {
         }
 
         @Override
-        public List<Job> getWorkflowJobs(@NonNull String workflowId) {
-            throw new UnsupportedOperationException();
-        }
-
-        @Override
         public Job create(@NonNull JobParametersDTO jobParametersDTO, @NonNull Workflow workflow) {
             return jobFactoryFunction.apply(jobParametersDTO);
         }

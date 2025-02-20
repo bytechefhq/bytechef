@@ -54,6 +54,6 @@ public class RemotePrincipalJobFacadeClient implements PrincipalJobFacade {
     }
 
     @SuppressFBWarnings("EI")
-    public record CreateJobRequest(JobParametersDTO jobParameters, long instanceId, ModeType type) {
+    public record CreateJobRequest(JobParametersDTO jobParameters, long principalId, ModeType type) {
     }
 }

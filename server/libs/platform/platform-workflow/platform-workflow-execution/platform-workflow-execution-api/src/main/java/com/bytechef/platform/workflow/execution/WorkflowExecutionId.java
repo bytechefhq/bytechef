@@ -27,7 +27,7 @@ import org.apache.commons.lang3.Validate;
  */
 public class WorkflowExecutionId implements Serializable {
 
-    private long instanceId;
+    private long principalId;
     private ModeType type;
     private String workflowReferenceCode;
     private String tenantId;
@@ -37,9 +37,9 @@ public class WorkflowExecutionId implements Serializable {
     }
 
     private WorkflowExecutionId(
-        String tenantId, ModeType type, long instanceId, String workflowReferenceCode, String triggerName) {
+        String tenantId, ModeType type, long principalId, String workflowReferenceCode, String triggerName) {
 
-        this.instanceId = instanceId;
+        this.principalId = principalId;
         this.tenantId = tenantId;
         this.triggerName = triggerName;
         this.type = type;
@@ -47,13 +47,13 @@ public class WorkflowExecutionId implements Serializable {
     }
 
     public static WorkflowExecutionId of(
-        ModeType type, long instanceId, String workflowReferenceCode, String triggerName) {
+        ModeType type, long principalId, String workflowReferenceCode, String triggerName) {
 
         Validate.notBlank(workflowReferenceCode, "'workflowReferenceCode' must not be null");
         Validate.notBlank(triggerName, "'workflowTriggerName' must not be null");
 
         return new WorkflowExecutionId(
-            TenantContext.getCurrentTenantId(), type, instanceId, workflowReferenceCode, triggerName);
+            TenantContext.getCurrentTenantId(), type, principalId, workflowReferenceCode, triggerName);
     }
 
     public static WorkflowExecutionId parse(String id) {
@@ -65,8 +65,8 @@ public class WorkflowExecutionId implements Serializable {
             items[0], ModeType.values()[Integer.parseInt(items[1])], Long.parseLong(items[2]), items[3], items[4]);
     }
 
-    public long getInstanceId() {
-        return instanceId;
+    public long getPrincipalId() {
+        return principalId;
     }
 
     public ModeType getType() {
@@ -92,7 +92,7 @@ public class WorkflowExecutionId implements Serializable {
                 ":" +
                 type.ordinal() +
                 ":" +
-                instanceId +
+                principalId +
                 ":" +
                 workflowReferenceCode +
                 ":" +

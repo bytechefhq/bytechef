@@ -19,9 +19,9 @@ package com.bytechef.component.datastream.item;
 import static com.bytechef.component.datastream.constant.DataStreamConstants.CONNECTION_PARAMETERS;
 import static com.bytechef.component.datastream.constant.DataStreamConstants.EDITOR_ENVIRONMENT;
 import static com.bytechef.component.datastream.constant.DataStreamConstants.INPUT_PARAMETERS;
-import static com.bytechef.component.datastream.constant.DataStreamConstants.INSTANCE_ID;
-import static com.bytechef.component.datastream.constant.DataStreamConstants.INSTANCE_WORKFLOW_ID;
 import static com.bytechef.component.datastream.constant.DataStreamConstants.JOB_ID;
+import static com.bytechef.component.datastream.constant.DataStreamConstants.PRINCIPAL_ID;
+import static com.bytechef.component.datastream.constant.DataStreamConstants.PRINCIPAL_WORKFLOW_ID;
 import static com.bytechef.component.datastream.constant.DataStreamConstants.STREAM;
 import static com.bytechef.component.datastream.constant.DataStreamConstants.TENANT_ID;
 import static com.bytechef.component.datastream.constant.DataStreamConstants.TYPE;
@@ -82,20 +82,20 @@ public abstract class AbstractDataStreamItemDelegate {
         inputParameters = ParametersFactory.createParameters(
             MapUtils.getMap(getParameterMap(jobParameters, INPUT_PARAMETERS), componentTypeName, Map.of()));
 
-        JobParameter<?> jobParameter = jobParameters.getParameter(INSTANCE_ID);
+        JobParameter<?> jobParameter = jobParameters.getParameter(PRINCIPAL_ID);
 
-        Long instanceId = null;
+        Long principalId = null;
 
         if (jobParameter != null) {
-            instanceId = (Long) jobParameter.getValue();
+            principalId = (Long) jobParameter.getValue();
         }
 
-        jobParameter = jobParameters.getParameter(INSTANCE_WORKFLOW_ID);
+        jobParameter = jobParameters.getParameter(PRINCIPAL_WORKFLOW_ID);
 
-        Long instanceWorkflowId = null;
+        Long principalWorkflowId = null;
 
         if (jobParameter != null) {
-            instanceWorkflowId = (Long) jobParameter.getValue();
+            principalWorkflowId = (Long) jobParameter.getValue();
         }
 
         jobParameter = jobParameters.getParameter(JOB_ID);
@@ -123,7 +123,7 @@ public abstract class AbstractDataStreamItemDelegate {
 
         context = new DataStreamContextImpl(
             contextFactory.createActionContext(
-                componentName, componentVersion, STREAM, type, instanceId, instanceWorkflowId,
+                componentName, componentVersion, STREAM, type, principalId, principalWorkflowId,
                 null, jobId, null, editorEnvironment));
 
         doBeforeStep(stepExecution);

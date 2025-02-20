@@ -38,7 +38,7 @@ public class RemotePrincipalJobServiceClient implements PrincipalJobService {
     }
 
     @Override
-    public PrincipalJob create(long jobId, long instanceId, ModeType type) {
+    public PrincipalJob create(long jobId, long principalId, ModeType type) {
         throw new UnsupportedOperationException();
     }
 
@@ -48,13 +48,13 @@ public class RemotePrincipalJobServiceClient implements PrincipalJobService {
     }
 
     @Override
-    public Optional<Long> fetchLastJobId(long instanceId, ModeType type) {
+    public Optional<Long> fetchLastJobId(long principalId, ModeType type) {
         return Optional.ofNullable(
             loadBalancedRestClient.get(
                 uriBuilder -> uriBuilder
                     .host(EXECUTION_APP)
-                    .path(PRINCIPAL_JOB_SERVICE + "/fetch-last-job-id/{instanceId}/{type}")
-                    .build(instanceId, type),
+                    .path(PRINCIPAL_JOB_SERVICE + "/fetch-last-job-id/{principalId}/{type}")
+                    .build(principalId, type),
                 Long.class));
     }
 

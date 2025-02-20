@@ -63,6 +63,11 @@ public class JobFacadeImpl implements JobFacade {
         this.workflowService = workflowService;
     }
 
+    @Override
+    public void completeJob(long jobId) {
+        jobService.setStatusToCompleted(jobId);
+    }
+
     // Propagation.NEVER is set because of sending job messages via queue in monolith mode, where it can happen
     // the case where a job is finished and the completion task executed, but the transaction is not yet committed and
     // the job id is missing.
@@ -94,7 +99,7 @@ public class JobFacadeImpl implements JobFacade {
     }
 
     @Override
-    public void restartJob(long id) {
+    public void resumeJob(long id) {
         eventPublisher.publishEvent(new ResumeJobEvent(id));
     }
 
