@@ -47,6 +47,7 @@ import com.bytechef.platform.coordinator.job.JobSyncExecutor;
 import com.bytechef.platform.workflow.task.dispatcher.service.TaskDispatcherDefinitionService;
 import com.bytechef.platform.workflow.test.coordinator.task.dispatcher.TestTaskDispatcherPreSendProcessor;
 import com.bytechef.platform.workflow.test.executor.JobTestExecutor;
+import com.bytechef.task.dispatcher.approval.ApprovalTaskDispatcher;
 import com.bytechef.task.dispatcher.branch.BranchTaskDispatcher;
 import com.bytechef.task.dispatcher.branch.completion.BranchTaskCompletionHandler;
 import com.bytechef.task.dispatcher.condition.ConditionTaskDispatcher;
@@ -153,6 +154,7 @@ public class TestExecutorConfiguration {
         ApplicationEventPublisher eventPublisher = getEventPublisher(syncMessageBroker);
 
         return List.of(
+            (taskDispatcher) -> new ApprovalTaskDispatcher(eventPublisher, taskExecutionService),
             (taskDispatcher) -> new BranchTaskDispatcher(
                 eventPublisher, contextService, taskDispatcher, taskExecutionService, taskFileStorage),
             (taskDispatcher) -> new ConditionTaskDispatcher(

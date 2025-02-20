@@ -19,6 +19,7 @@ package com.bytechef.platform.component.definition;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.TriggerContext;
+import com.bytechef.config.ApplicationProperties;
 import com.bytechef.platform.component.domain.ComponentConnection;
 import com.bytechef.platform.component.service.ConnectionDefinitionService;
 import com.bytechef.platform.constant.ModeType;
@@ -41,29 +42,32 @@ class ContextFactoryImpl implements ContextFactory {
     private final DataStorage dataStorage;
     private final ApplicationEventPublisher eventPublisher;
     private final FilesFileStorage filesFileStorage;
+    private final String publicUrl;
 
     @SuppressFBWarnings("EI")
     public ContextFactoryImpl(
-        ApplicationContext applicationContext, ConnectionDefinitionService connectionDefinitionService,
-        DataStorage dataStorage, ApplicationEventPublisher eventPublisher, FilesFileStorage filesFileStorage) {
+        ApplicationContext applicationContext, ApplicationProperties applicationProperties,
+        ConnectionDefinitionService connectionDefinitionService, DataStorage dataStorage,
+        ApplicationEventPublisher eventPublisher, FilesFileStorage filesFileStorage) {
 
         this.applicationContext = applicationContext;
         this.connectionDefinitionService = connectionDefinitionService;
         this.dataStorage = dataStorage;
         this.eventPublisher = eventPublisher;
         this.filesFileStorage = filesFileStorage;
+        this.publicUrl = applicationProperties.getPublicUrl();
     }
 
     @Override
     public ActionContext createActionContext(
         @NonNull String componentName, int componentVersion, @NonNull String actionName, ModeType type,
-        Long instanceId, Long instanceWorkflowId, String workflowId, Long jobId, ComponentConnection connection,
+        Long principalId, Long principalWorkflowId, String workflowId, Long jobId, ComponentConnection connection,
         boolean editorEnvironment) {
 
         return new ActionContextImpl(
-            componentName, componentVersion, actionName, type, instanceId, instanceWorkflowId, workflowId, jobId,
-            connection, editorEnvironment, getDataStorage(workflowId, editorEnvironment), eventPublisher,
-            getFilesFileStorage(editorEnvironment), getHttpClientExecutor(editorEnvironment));
+            componentName, componentVersion, actionName, type, principalId, principalWorkflowId, workflowId, jobId,
+            connection, publicUrl, getDataStorage(workflowId, editorEnvironment), eventPublisher,
+            getFilesFileStorage(editorEnvironment), getHttpClientExecutor(editorEnvironment), editorEnvironment);
     }
 
     @Override
@@ -75,12 +79,12 @@ class ContextFactoryImpl implements ContextFactory {
     @Override
     public TriggerContext createTriggerContext(
         @NonNull String componentName, int componentVersion, @NonNull String triggerName, ModeType type,
-        Long instanceId, String workflowReferenceCode, ComponentConnection connection, boolean editorEnvironment) {
+        Long principalId, String workflowReferenceCode, ComponentConnection connection, boolean editorEnvironment) {
 
         return new TriggerContextImpl(
-            componentName, componentVersion, triggerName, type, instanceId, workflowReferenceCode, connection,
-            editorEnvironment, getDataStorage(workflowReferenceCode, editorEnvironment),
-            getFilesFileStorage(editorEnvironment), getHttpClientExecutor(editorEnvironment));
+            componentName, componentVersion, triggerName, type, principalId, workflowReferenceCode, connection,
+            getDataStorage(workflowReferenceCode, editorEnvironment), getFilesFileStorage(editorEnvironment),
+            getHttpClientExecutor(editorEnvironment), editorEnvironment);
     }
 
     private DataStorage getDataStorage(String workflowReference, boolean editorEnvironment) {

@@ -136,6 +136,7 @@ dependencies {
     implementation(project(":server:libs:modules:components:aitable"))
     implementation(project(":server:libs:modules:components:apollo"))
     implementation(project(":server:libs:modules:components:app-event"))
+    implementation(project(":server:libs:modules:components:approval"))
     implementation(project(":server:libs:modules:components:asana"))
     implementation(project(":server:libs:modules:components:aws:aws-s3"))
     implementation(project(":server:libs:modules:components:baserow"))
@@ -240,6 +241,7 @@ dependencies {
     implementation(project(":server:libs:modules:components:zeplin"))
     implementation(project(":server:libs:modules:components:zoho:zoho-crm"))
 
+    implementation(project(":server:libs:modules:task-dispatchers:approval"))
     implementation(project(":server:libs:modules:task-dispatchers:branch"))
     implementation(project(":server:libs:modules:task-dispatchers:condition"))
     implementation(project(":server:libs:modules:task-dispatchers:each"))

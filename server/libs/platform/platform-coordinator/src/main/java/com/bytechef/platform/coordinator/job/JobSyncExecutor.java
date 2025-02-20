@@ -135,6 +135,8 @@ public class JobSyncExecutor {
                 logger.error(error.getMessage());
             });
 
+        syncMessageBroker.receive(TaskCoordinatorMessageRoute.JOB_STOP_EVENTS, event -> {});
+
         TaskHandlerResolverChain taskHandlerResolverChain = new TaskHandlerResolverChain();
 
         taskHandlerResolverChain.setTaskHandlerResolvers(
@@ -279,12 +281,12 @@ public class JobSyncExecutor {
         }
 
         @Override
-        public List<Job> getWorkflowJobs(String workflowId) {
+        public List<Job> getWorkflowJobs(@NonNull String workflowId) {
             throw new UnsupportedOperationException();
         }
 
         @Override
-        public Job create(JobParametersDTO jobParametersDTO, Workflow workflow) {
+        public Job create(@NonNull JobParametersDTO jobParametersDTO, @NonNull Workflow workflow) {
             return jobFactoryFunction.apply(jobParametersDTO);
         }
 
@@ -299,12 +301,17 @@ public class JobSyncExecutor {
         }
 
         @Override
-        public Optional<Job> fetchLastWorkflowJob(String workflowId) {
+        public Optional<Job> fetchLastWorkflowJob(@NonNull String workflowId) {
             throw new UnsupportedOperationException();
         }
 
         @Override
         public Job resumeToStatusStarted(long id) {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public Job setStatusToCompleted(long id) {
             throw new UnsupportedOperationException();
         }
 
@@ -319,7 +326,7 @@ public class JobSyncExecutor {
         }
 
         @Override
-        public Job update(Job job) {
+        public Job update(@NonNull Job job) {
             throw new UnsupportedOperationException();
         }
     }
