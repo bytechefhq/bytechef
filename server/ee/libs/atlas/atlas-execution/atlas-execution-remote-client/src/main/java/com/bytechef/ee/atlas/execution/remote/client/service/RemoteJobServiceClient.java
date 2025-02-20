@@ -13,9 +13,9 @@ import com.bytechef.atlas.execution.dto.JobParametersDTO;
 import com.bytechef.atlas.execution.service.JobService;
 import com.bytechef.ee.remote.client.LoadBalancedRestClient;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import java.util.List;
 import java.util.Optional;
 import org.springframework.data.domain.Page;
+import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
 
 /**
@@ -36,7 +36,7 @@ public class RemoteJobServiceClient implements JobService {
     }
 
     @Override
-    public Job create(JobParametersDTO jobParametersDTO, Workflow workflow) {
+    public Job create(@NonNull JobParametersDTO jobParametersDTO, @NonNull Workflow workflow) {
         return loadBalancedRestClient.post(
             uriBuilder -> uriBuilder
                 .host(EXECUTION_APP)
@@ -56,7 +56,7 @@ public class RemoteJobServiceClient implements JobService {
     }
 
     @Override
-    public Optional<Job> fetchLastWorkflowJob(String workflowId) {
+    public Optional<Job> fetchLastWorkflowJob(@NonNull String workflowId) {
         return Optional.ofNullable(
             loadBalancedRestClient.get(
                 uriBuilder -> uriBuilder
@@ -92,7 +92,7 @@ public class RemoteJobServiceClient implements JobService {
     }
 
     @Override
-    public List<Job> getWorkflowJobs(String workflowId) {
+    public List<Job> getWorkflowJobs(@NonNull String workflowId) {
         throw new UnsupportedOperationException();
     }
 
@@ -127,7 +127,7 @@ public class RemoteJobServiceClient implements JobService {
     }
 
     @Override
-    public Job update(Job job) {
+    public Job update(@NonNull Job job) {
         return loadBalancedRestClient.put(
             uriBuilder -> uriBuilder
                 .host(EXECUTION_APP)

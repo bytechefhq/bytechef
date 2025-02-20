@@ -23,7 +23,6 @@ import com.bytechef.atlas.execution.repository.JobRepository;
 import com.bytechef.commons.util.OptionalUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.Instant;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import org.apache.commons.lang3.Validate;
@@ -48,7 +47,7 @@ public class JobServiceImpl implements JobService {
     }
 
     @Override
-    public Job create(@NonNull JobParametersDTO jobParametersDTO, Workflow workflow) {
+    public Job create(@NonNull JobParametersDTO jobParametersDTO, @NonNull Workflow workflow) {
         Validate.notNull(jobParametersDTO, "'jobParameters' must not be null");
 
         String workflowId = jobParametersDTO.getWorkflowId();
@@ -77,7 +76,7 @@ public class JobServiceImpl implements JobService {
 
     @Override
     @Transactional(readOnly = true)
-    public Optional<Job> fetchLastWorkflowJob(String workflowId) {
+    public Optional<Job> fetchLastWorkflowJob(@NonNull String workflowId) {
         return jobRepository.findTop1ByWorkflowIdOrderByIdDesc(workflowId);
     }
 
@@ -103,15 +102,14 @@ public class JobServiceImpl implements JobService {
     }
 
     @Override
-    public List<Job> getWorkflowJobs(String workflowId) {
+    public List<Job> getWorkflowJobs(@NonNull String workflowId) {
         return jobRepository.findAllByWorkflowId(workflowId);
     }
 
     @Override
     public Job resumeToStatusStarted(long id) {
-        Job job = OptionalUtils.get(jobRepository.findById(id));
+        Job job = OptionalUtils.get(jobRepository.findById(id), String.format("Unknown job %s", id));
 
-        Validate.notNull(job, String.format("Unknown job %s", id));
         Validate.isTrue(job.getParentTaskExecutionId() == null, "Can't resume a subflow");
         Validate.isTrue(isRestartable(job), "can't resume job " + id + " as it is " + job.getStatus());
 
@@ -124,7 +122,7 @@ public class JobServiceImpl implements JobService {
 
     @Override
     public Job setStatusToStarted(long id) {
-        Job job = OptionalUtils.get(jobRepository.findById(id));
+        Job job = OptionalUtils.get(jobRepository.findById(id), String.format("Unknown job %s", id));
 
         job.setCurrentTask(0);
         job.setStartDate(Instant.now());
@@ -137,11 +135,10 @@ public class JobServiceImpl implements JobService {
 
     @Override
     public Job setStatusToStopped(long id) {
-        Job job = OptionalUtils.get(jobRepository.findById(id));
+        Job job = OptionalUtils.get(jobRepository.findById(id), String.format("Unknown job %s", id));
 
         Validate.isTrue(
-            job.getStatus() == Job.Status.STARTED,
-            "Job id=" + id + " can not be stopped as it is " + job.getStatus());
+            job.getStatus() == Job.Status.STARTED, "Job id=" + id + " can not be stopped as it is " + job.getStatus());
 
         job.setStatus(Job.Status.STOPPED);
 
@@ -152,8 +149,6 @@ public class JobServiceImpl implements JobService {
 
     @Override
     public Job update(@NonNull Job job) {
-        Validate.notNull(job, "'job' must not be null");
-
         return jobRepository.save(job);
     }
 
