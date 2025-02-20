@@ -46,20 +46,28 @@ public class TaskDispatcherDefinitionServiceImpl implements TaskDispatcherDefini
 
     @Override
     public OutputResponse executeOutput(String name, int version, Map<String, ?> inputParameters) {
-        OutputFunction outputFunction = getOutputSchemaFunction(name, version);
+        com.bytechef.platform.workflow.task.dispatcher.definition.TaskDispatcherDefinition taskDispatcherDefinition =
+            taskDispatcherDefinitionRegistry.getTaskDispatcherDefinition(name, version);
 
-        try {
-            BaseOutputDefinition.OutputResponse outputDefinition = outputFunction.apply(inputParameters);
+        return taskDispatcherDefinition
+            .getOutputDefinition()
+            .flatMap(com.bytechef.platform.workflow.task.dispatcher.definition.OutputDefinition::getOutput)
+            .map(f -> (OutputFunction) f)
+            .map(outputFunction -> {
+                try {
+                    BaseOutputDefinition.OutputResponse outputDefinition = outputFunction.apply(inputParameters);
 
-            return SchemaUtils.toOutput(
-                outputDefinition,
-                (property, sampleOutput) -> new OutputResponse(
-                    Property.toProperty((com.bytechef.platform.workflow.task.dispatcher.definition.Property) property),
-                    sampleOutput),
-                PropertyFactory.PROPERTY_FACTORY);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+                    return SchemaUtils.toOutput(
+                        outputDefinition,
+                        (property, sampleOutput) -> new OutputResponse(
+                            Property.toProperty((com.bytechef.platform.workflow.task.dispatcher.definition.Property) property),
+                            sampleOutput),
+                        PropertyFactory.PROPERTY_FACTORY);
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
+                }
+            })
+            .orElse(null);
     }
 
     @Override
@@ -92,15 +100,5 @@ public class TaskDispatcherDefinitionServiceImpl implements TaskDispatcherDefini
             .stream()
             .map(TaskDispatcherDefinition::new)
             .toList();
-    }
-
-    private OutputFunction getOutputSchemaFunction(String name, int version) {
-        com.bytechef.platform.workflow.task.dispatcher.definition.TaskDispatcherDefinition taskDispatcherDefinition =
-            taskDispatcherDefinitionRegistry.getTaskDispatcherDefinition(name, version);
-
-        return (OutputFunction) taskDispatcherDefinition
-            .getOutputDefinition()
-            .flatMap(com.bytechef.platform.workflow.task.dispatcher.definition.OutputDefinition::getOutput)
-            .orElseThrow(() -> new IllegalStateException("Output function not found"));
     }
 }

@@ -37,6 +37,8 @@ import com.bytechef.platform.configuration.service.WorkflowTestConfigurationServ
 import com.bytechef.platform.definition.WorkflowNodeType;
 import com.bytechef.platform.domain.BaseProperty;
 import com.bytechef.platform.domain.OutputResponse;
+import com.bytechef.platform.workflow.task.dispatcher.definition.TaskDispatcherDsl;
+import com.bytechef.platform.workflow.task.dispatcher.domain.ObjectProperty;
 import com.bytechef.platform.workflow.task.dispatcher.domain.TaskDispatcherDefinition;
 import com.bytechef.platform.workflow.task.dispatcher.service.TaskDispatcherDefinitionService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -180,10 +182,6 @@ public class WorkflowNodeOutputFacadeImpl implements WorkflowNodeOutputFacade {
         } else {
             WorkflowNodeType workflowNodeType = WorkflowNodeType.ofType(workflowTask.getType());
 
-            if (workflowNodeType.componentOperationName() == null) {
-                return null;
-            }
-
             Map<String, ?> outputs = getPreviousWorkflowNodeSampleOutputs(workflowId, workflowTask.getName());
 
             Map<String, ?> inputParameters = workflowTask.evaluateParameters(
@@ -195,9 +193,18 @@ public class WorkflowNodeOutputFacadeImpl implements WorkflowNodeOutputFacade {
                 WorkflowTestConfigurationConnection::getWorkflowConnectionKey,
                 WorkflowTestConfigurationConnection::getConnectionId);
 
-            outputResponse = actionDefinitionFacade.executeOutput(
-                workflowNodeType.componentName(), workflowNodeType.componentVersion(),
-                workflowNodeType.componentOperationName(), inputParameters, connectionIds);
+            if (workflowNodeType.componentOperationName() == null) {
+                if (Objects.equals(workflowNodeType.componentName(), "loop")) {
+                    outputResponse = new OutputResponse(new ObjectProperty(TaskDispatcherDsl.object("item")));
+                } else {
+                    outputResponse = taskDispatcherDefinitionService.executeOutput(
+                        workflowNodeType.componentName(), workflowNodeType.componentVersion(), inputParameters);
+                }
+            } else {
+                outputResponse = actionDefinitionFacade.executeOutput(
+                    workflowNodeType.componentName(), workflowNodeType.componentVersion(),
+                    workflowNodeType.componentOperationName(), inputParameters, connectionIds);
+            }
         }
 
         return outputResponse;
