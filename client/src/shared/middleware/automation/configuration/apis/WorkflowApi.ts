@@ -345,6 +345,34 @@ export class WorkflowApi extends runtime.BaseAPI {
     }
 
     /**
+     * Get all workflows.
+     * Get all workflows.
+     */
+    async getWorkflowsRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<Workflow>>> {
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        const response = await this.request({
+            path: `/workflows`,
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => jsonValue.map(WorkflowFromJSON));
+    }
+
+    /**
+     * Get all workflows.
+     * Get all workflows.
+     */
+    async getWorkflows(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<Workflow>> {
+        const response = await this.getWorkflowsRaw(initOverrides);
+        return await response.value();
+    }
+
+    /**
      * Update an existing workflow.
      * Update an existing workflow
      */
