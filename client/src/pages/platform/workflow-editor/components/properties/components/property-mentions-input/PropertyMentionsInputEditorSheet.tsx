@@ -51,18 +51,17 @@ const PropertyMentionsInputEditorSheet = ({
                 <SheetCloseButton />
             </SheetHeader>
 
-            <div className="size-full pt-3">
-                <div className="property-mentions-editor flex size-full overflow-y-auto rounded-md bg-white">
-                    <PropertyMentionsInputEditor
-                        componentDefinitions={componentDefinitions}
-                        controlType={controlType}
-                        dataPills={dataPills}
-                        placeholder={placeholder}
-                        type={type}
-                        value={value}
-                        workflow={workflow}
-                    />
-                </div>
+            <div className="property-mentions-editor flex size-full overflow-y-auto rounded-md pt-3">
+                <PropertyMentionsInputEditor
+                    className="size-full"
+                    componentDefinitions={componentDefinitions}
+                    controlType={controlType}
+                    dataPills={dataPills}
+                    placeholder={placeholder}
+                    type={type}
+                    value={value}
+                    workflow={workflow}
+                />
             </div>
         </SheetContent>
     </Sheet>
