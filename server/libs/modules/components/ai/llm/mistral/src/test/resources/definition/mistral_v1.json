@@ -43,8 +43,8 @@
       "title" : "Bearer Token",
       "type" : "BEARER_TOKEN",
       "acquire" : null,
-      "oauth2AuthorizationExtraQueryParameters" : null,
       "authorizationCallback" : null,
+      "oauth2AuthorizationExtraQueryParameters" : null,
       "authorizationUrl" : null,
       "clientSecret" : null,
       "refreshToken" : null,
@@ -95,20 +95,36 @@
       "minLength" : null,
       "options" : [ {
         "description" : null,
-        "label" : "mistral-large-latest",
-        "value" : "mistral-large-latest"
+        "label" : "codestral-latest",
+        "value" : "codestral-latest"
       }, {
         "description" : null,
-        "label" : "mistral-medium-latest",
-        "value" : "mistral-medium-latest"
+        "label" : "ministral-3b-latest",
+        "value" : "ministral-3b-latest"
+      }, {
+        "description" : null,
+        "label" : "ministral-8b-latest",
+        "value" : "ministral-8b-latest"
+      }, {
+        "description" : null,
+        "label" : "mistral-large-latest",
+        "value" : "mistral-large-latest"
       }, {
         "description" : null,
         "label" : "mistral-small-latest",
         "value" : "mistral-small-latest"
       }, {
         "description" : null,
+        "label" : "open-codestral-mamba",
+        "value" : "open-codestral-mamba"
+      }, {
+        "description" : null,
         "label" : "open-mistral-7b",
         "value" : "open-mistral-7b"
+      }, {
+        "description" : null,
+        "label" : "open-mistral-nemo",
+        "value" : "open-mistral-nemo"
       }, {
         "description" : null,
         "label" : "open-mixtral-8x22b",

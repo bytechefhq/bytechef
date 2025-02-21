@@ -109,8 +109,8 @@
       "maxValue" : 10,
       "minValue" : 1,
       "options" : null,
-      "controlType" : "INTEGER",
-      "optionsDataSource" : null
+      "optionsDataSource" : null,
+      "controlType" : "INTEGER"
     }, {
       "advancedOption" : null,
       "description" : "The size of the generated images.",
@@ -168,8 +168,8 @@
       "maxValue" : null,
       "minValue" : null,
       "options" : null,
-      "controlType" : "INTEGER",
-      "optionsDataSource" : null
+      "optionsDataSource" : null,
+      "controlType" : "INTEGER"
     }, {
       "advancedOption" : null,
       "description" : "Width of the image to generate, in pixels, in an increment divisible by 64. Engine-specific dimension validation applies.",
@@ -187,8 +187,8 @@
       "maxValue" : null,
       "minValue" : null,
       "options" : null,
-      "controlType" : "INTEGER",
-      "optionsDataSource" : null
+      "optionsDataSource" : null,
+      "controlType" : "INTEGER"
     }, {
       "advancedOption" : true,
       "description" : "The format in which the generated images are returned.",
@@ -221,6 +221,7 @@
     "title" : "Generate Image",
     "perform" : { },
     "processErrorResponse" : null,
+    "workflowNodeDescription" : null,
     "outputDefinition" : {
       "output" : null,
       "outputResponse" : {
@@ -282,8 +283,8 @@
             "options" : null,
             "optionsDataSource" : null
           } ],
-          "controlType" : "OBJECT_BUILDER",
-          "optionsDataSource" : null
+          "optionsDataSource" : null,
+          "controlType" : "OBJECT_BUILDER"
         },
         "sampleOutput" : null
       },
@@ -345,12 +346,11 @@
           "options" : null,
           "optionsDataSource" : null
         } ],
-        "controlType" : "OBJECT_BUILDER",
-        "optionsDataSource" : null
+        "optionsDataSource" : null,
+        "controlType" : "OBJECT_BUILDER"
       },
       "sampleOutput" : null
-    },
-    "workflowNodeDescription" : null
+    }
   } ],
   "categories" : [ {
     "key" : "artificial-intelligence",

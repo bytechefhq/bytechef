@@ -45,16 +45,16 @@
       "acquire" : null,
       "oauth2AuthorizationExtraQueryParameters" : null,
       "authorizationCallback" : null,
-      "authorizationUrl" : null,
-      "clientSecret" : null,
-      "refreshToken" : null,
       "apply" : null,
       "clientId" : null,
       "pkce" : null,
       "refresh" : null,
       "refreshUrl" : null,
       "scopes" : null,
-      "tokenUrl" : null
+      "tokenUrl" : null,
+      "authorizationUrl" : null,
+      "clientSecret" : null,
+      "refreshToken" : null
     } ],
     "properties" : null,
     "version" : 1,
@@ -72,8 +72,8 @@
     "outputDefinition" : {
       "output" : { },
       "outputResponse" : null,
-      "sampleOutput" : null,
-      "outputSchema" : null
+      "outputSchema" : null,
+      "sampleOutput" : null
     },
     "properties" : [ {
       "advancedOption" : null,
@@ -95,16 +95,16 @@
       "minLength" : null,
       "options" : [ {
         "description" : null,
+        "label" : "chatgpt-4o-latest",
+        "value" : "chatgpt-4o-latest"
+      }, {
+        "description" : null,
         "label" : "gpt-3.5-turbo",
         "value" : "gpt-3.5-turbo"
       }, {
         "description" : null,
-        "label" : "gpt-3.5-turbo-0125",
-        "value" : "gpt-3.5-turbo-0125"
-      }, {
-        "description" : null,
-        "label" : "gpt-3.5-turbo-1106",
-        "value" : "gpt-3.5-turbo-1106"
+        "label" : "gpt-3.5-turbo-instruct",
+        "value" : "gpt-3.5-turbo-instruct"
       }, {
         "description" : null,
         "label" : "gpt-4",
@@ -115,12 +115,20 @@
         "value" : "gpt-4-0125-preview"
       }, {
         "description" : null,
-        "label" : "gpt-4-turbo",
-        "value" : "gpt-4-turbo"
+        "label" : "gpt-4-0314",
+        "value" : "gpt-4-0314"
       }, {
         "description" : null,
-        "label" : "gpt-4-turbo-2024-04-09",
-        "value" : "gpt-4-turbo-2024-04-09"
+        "label" : "gpt-4-0613",
+        "value" : "gpt-4-0613"
+      }, {
+        "description" : null,
+        "label" : "gpt-4-1106-preview",
+        "value" : "gpt-4-1106-preview"
+      }, {
+        "description" : null,
+        "label" : "gpt-4-turbo",
+        "value" : "gpt-4-turbo"
       }, {
         "description" : null,
         "label" : "gpt-4-turbo-preview",
@@ -139,20 +147,24 @@
         "value" : "gpt-4o-mini"
       }, {
         "description" : null,
-        "label" : "o1-mini",
-        "value" : "o1-mini"
+        "label" : "gpt-4o-mini-audio-preview",
+        "value" : "gpt-4o-mini-audio-preview"
       }, {
         "description" : null,
-        "label" : "o1-mini-2024-09-12",
-        "value" : "o1-mini-2024-09-12"
+        "label" : "o1",
+        "value" : "o1"
+      }, {
+        "description" : null,
+        "label" : "o1-mini",
+        "value" : "o1-mini"
       }, {
         "description" : null,
         "label" : "o1-preview",
         "value" : "o1-preview"
       }, {
         "description" : null,
-        "label" : "o1-preview-2024-09-12",
-        "value" : "o1-preview-2024-09-12"
+        "label" : "o3-mini",
+        "value" : "o3-mini"
       } ],
       "optionsDataSource" : null
     }, {
@@ -357,18 +369,18 @@
           "minItems" : null,
           "multipleValues" : null,
           "options" : null,
-          "optionsDataSource" : null,
-          "controlType" : "ARRAY_BUILDER"
+          "controlType" : "ARRAY_BUILDER",
+          "optionsDataSource" : null
         } ],
-        "optionsDataSource" : null,
-        "controlType" : "OBJECT_BUILDER"
+        "controlType" : "OBJECT_BUILDER",
+        "optionsDataSource" : null
       } ],
       "maxItems" : null,
       "minItems" : null,
       "multipleValues" : null,
       "options" : null,
-      "optionsDataSource" : null,
-      "controlType" : "ARRAY_BUILDER"
+      "controlType" : "ARRAY_BUILDER",
+      "optionsDataSource" : null
     }, {
       "advancedOption" : null,
       "description" : "The response from the API.",
@@ -435,8 +447,8 @@
         "options" : null,
         "optionsDataSource" : null
       } ],
-      "optionsDataSource" : null,
-      "controlType" : "OBJECT_BUILDER"
+      "controlType" : "OBJECT_BUILDER",
+      "optionsDataSource" : null
     }, {
       "advancedOption" : true,
       "description" : "The maximum number of tokens to generate in the chat completion.",
@@ -454,8 +466,8 @@
       "maxValue" : null,
       "minValue" : null,
       "options" : null,
-      "optionsDataSource" : null,
-      "controlType" : "INTEGER"
+      "controlType" : "INTEGER",
+      "optionsDataSource" : null
     }, {
       "advancedOption" : true,
       "description" : "How many chat completion choices to generate for each input message.",
@@ -473,8 +485,8 @@
       "maxValue" : null,
       "minValue" : null,
       "options" : null,
-      "optionsDataSource" : null,
-      "controlType" : "INTEGER"
+      "controlType" : "INTEGER",
+      "optionsDataSource" : null
     }, {
       "advancedOption" : true,
       "description" : "Controls randomness:  Higher values will make the output more random, while lower values like will make it more focused and deterministic.",
@@ -495,8 +507,8 @@
       "minValue" : 0.0,
       "numberPrecision" : null,
       "options" : null,
-      "optionsDataSource" : null,
-      "controlType" : "NUMBER"
+      "controlType" : "NUMBER",
+      "optionsDataSource" : null
     }, {
       "advancedOption" : true,
       "description" : "An alternative to sampling with temperature, called nucleus sampling,  where the model considers the results of the tokens with top_p probability mass. So 0.1 means only the tokens comprising the top 10% probability mass are considered.",
@@ -517,8 +529,8 @@
       "minValue" : null,
       "numberPrecision" : null,
       "options" : null,
-      "optionsDataSource" : null,
-      "controlType" : "NUMBER"
+      "controlType" : "NUMBER",
+      "optionsDataSource" : null
     }, {
       "advancedOption" : true,
       "description" : "Number between -2.0 and 2.0. Positive values penalize new tokens based on their existing frequency in the text so far, decreasing the model's likelihood to repeat the same line verbatim.",
@@ -539,8 +551,8 @@
       "minValue" : -2.0,
       "numberPrecision" : null,
       "options" : null,
-      "optionsDataSource" : null,
-      "controlType" : "NUMBER"
+      "controlType" : "NUMBER",
+      "optionsDataSource" : null
     }, {
       "advancedOption" : true,
       "description" : "Number between -2.0 and 2.0. Positive values penalize new tokens based on whether they appear in the text so far, increasing the model's likelihood to talk about new topics.",
@@ -561,8 +573,8 @@
       "minValue" : -2.0,
       "numberPrecision" : null,
       "options" : null,
-      "optionsDataSource" : null,
-      "controlType" : "NUMBER"
+      "controlType" : "NUMBER",
+      "optionsDataSource" : null
     }, {
       "advancedOption" : true,
       "description" : "Modify the likelihood of specified tokens appearing in the completion.",
@@ -597,14 +609,14 @@
         "minValue" : null,
         "numberPrecision" : null,
         "options" : null,
-        "optionsDataSource" : null,
-        "controlType" : "NUMBER"
+        "controlType" : "NUMBER",
+        "optionsDataSource" : null
       } ],
       "multipleValues" : null,
       "options" : null,
       "properties" : null,
-      "optionsDataSource" : null,
-      "controlType" : "OBJECT_BUILDER"
+      "controlType" : "OBJECT_BUILDER",
+      "optionsDataSource" : null
     }, {
       "advancedOption" : true,
       "description" : "Up to 4 sequences where the API will stop generating further tokens.",
@@ -644,8 +656,8 @@
       "minItems" : null,
       "multipleValues" : null,
       "options" : null,
-      "optionsDataSource" : null,
-      "controlType" : "ARRAY_BUILDER"
+      "controlType" : "ARRAY_BUILDER",
+      "optionsDataSource" : null
     }, {
       "advancedOption" : true,
       "description" : "A unique identifier representing your end-user, which can help admins to monitor and detect abuse.",
@@ -739,12 +751,11 @@
             "options" : null,
             "optionsDataSource" : null
           } ],
-          "optionsDataSource" : null,
-          "controlType" : "OBJECT_BUILDER"
+          "controlType" : "OBJECT_BUILDER",
+          "optionsDataSource" : null
         },
         "sampleOutput" : null
       },
-      "sampleOutput" : null,
       "outputSchema" : {
         "advancedOption" : null,
         "description" : null,
@@ -803,9 +814,10 @@
           "options" : null,
           "optionsDataSource" : null
         } ],
-        "optionsDataSource" : null,
-        "controlType" : "OBJECT_BUILDER"
-      }
+        "controlType" : "OBJECT_BUILDER",
+        "optionsDataSource" : null
+      },
+      "sampleOutput" : null
     },
     "properties" : [ {
       "advancedOption" : null,
@@ -906,18 +918,18 @@
           "minValue" : null,
           "numberPrecision" : null,
           "options" : null,
-          "optionsDataSource" : null,
-          "controlType" : "NUMBER"
+          "controlType" : "NUMBER",
+          "optionsDataSource" : null
         } ],
-        "optionsDataSource" : null,
-        "controlType" : "OBJECT_BUILDER"
+        "controlType" : "OBJECT_BUILDER",
+        "optionsDataSource" : null
       } ],
       "maxItems" : null,
       "minItems" : null,
       "multipleValues" : null,
       "options" : null,
-      "optionsDataSource" : null,
-      "controlType" : "ARRAY_BUILDER"
+      "controlType" : "ARRAY_BUILDER",
+      "optionsDataSource" : null
     }, {
       "advancedOption" : null,
       "description" : "The size of the generated images.",
@@ -975,8 +987,8 @@
       "maxValue" : 10,
       "minValue" : 1,
       "options" : null,
-      "optionsDataSource" : null,
-      "controlType" : "INTEGER"
+      "controlType" : "INTEGER",
+      "optionsDataSource" : null
     }, {
       "advancedOption" : true,
       "description" : "The format in which the generated images are returned.",
@@ -1195,7 +1207,6 @@
         },
         "sampleOutput" : null
       },
-      "sampleOutput" : null,
       "outputSchema" : {
         "advancedOption" : null,
         "description" : null,
@@ -1292,7 +1303,8 @@
           "optionsDataSource" : null
         } ],
         "controlType" : "FILE_ENTRY"
-      }
+      },
+      "sampleOutput" : null
     },
     "properties" : [ {
       "advancedOption" : null,
@@ -1366,6 +1378,14 @@
         "value" : "ALLOY"
       }, {
         "description" : null,
+        "label" : "ash",
+        "value" : "ASH"
+      }, {
+        "description" : null,
+        "label" : "coral",
+        "value" : "CORAL"
+      }, {
+        "description" : null,
         "label" : "echo",
         "value" : "ECHO"
       }, {
@@ -1380,6 +1400,10 @@
         "description" : null,
         "label" : "onyx",
         "value" : "ONYX"
+      }, {
+        "description" : null,
+        "label" : "sage",
+        "value" : "SAGE"
       }, {
         "description" : null,
         "label" : "shimmer",
@@ -1442,8 +1466,8 @@
       "minValue" : 0.25,
       "numberPrecision" : null,
       "options" : null,
-      "optionsDataSource" : null,
-      "controlType" : "NUMBER"
+      "controlType" : "NUMBER",
+      "optionsDataSource" : null
     } ],
     "title" : "Text-To-Speech",
     "processErrorResponse" : null,
@@ -1459,8 +1483,8 @@
     "outputDefinition" : {
       "output" : null,
       "outputResponse" : null,
-      "sampleOutput" : null,
-      "outputSchema" : null
+      "outputSchema" : null,
+      "sampleOutput" : null
     },
     "properties" : [ {
       "advancedOption" : null,
@@ -1910,8 +1934,8 @@
       "minValue" : 0.0,
       "numberPrecision" : null,
       "options" : null,
-      "optionsDataSource" : null,
-      "controlType" : "NUMBER"
+      "controlType" : "NUMBER",
+      "optionsDataSource" : null
     } ],
     "title" : "Create Transcriptions",
     "processErrorResponse" : null,
