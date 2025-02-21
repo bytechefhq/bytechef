@@ -67,6 +67,7 @@ public class AcumbamailUtils {
 
         for (Map.Entry<String, Map<String, String>> entry : response.entrySet()) {
             Map<String, String> valueMap = entry.getValue();
+
             options.add(option(valueMap.get("name"), entry.getKey()));
         }
 
