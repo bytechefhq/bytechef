@@ -281,7 +281,10 @@ export default function useLayout({
 
     // Prepare auxiliary nodes
     taskNodes.forEach((taskNode) => {
-        if (taskNode.data.componentName === 'condition') {
+        const conditionNode = taskNode.data.componentName === 'condition';
+        const loopNode = taskNode.data.componentName === 'loop';
+
+        if (conditionNode) {
             caseTrueTaskNames = (taskNode.data as NodeDataType)?.parameters?.caseTrue?.map(
                 (task: WorkflowTask) => task.name
             );
@@ -362,7 +365,9 @@ export default function useLayout({
             return;
         }
 
-        if (taskNode.data.componentName === 'loop' && (taskNode.data as NodeDataType).parameters?.iteratee?.length) {
+        const loopNodeSubtasks = (taskNode.data as NodeDataType).parameters?.iteratee;
+
+        if (loopNode && loopNodeSubtasks?.length) {
             loopTaskNames = (taskNode.data as NodeDataType).parameters?.iteratee.map((task: WorkflowTask) => task.name);
 
             loopChildTasks[taskNode.id] = {
@@ -418,11 +423,11 @@ export default function useLayout({
         allNodes.push(taskNode);
 
         // Create left, right, and bottom placeholder nodes when the task node is a Condition
-        if (taskNode.data.componentName === 'condition') {
+        if (conditionNode) {
             allNodes = createConditionNode({allNodes, taskNode});
         }
 
-        if (taskNode.data.componentName === 'loop') {
+        if (loopNode) {
             allNodes = createLoopNode({allNodes, taskNode});
         }
 
@@ -448,12 +453,18 @@ export default function useLayout({
 
     // Create edges based on nodes
     triggerAndTaskNodes.forEach((taskNode, index) => {
+        const conditionNode = taskNode.data.componentName === 'condition';
+        const loopNode = taskNode.data.componentName === 'loop';
+
+        const conditionChildTask = taskNode.data.conditionData;
+        const loopChildTask = taskNode.data.loopData;
+
         const nextNode = triggerAndTaskNodes[index + 1];
 
         const conditionRelatedTaskNode =
-            taskNode.data.conditionData || taskNode.data.conditionId || taskNode.id.includes('condition');
+            conditionChildTask || taskNode.data.conditionId || taskNode.id.includes('condition');
 
-        const loopRelatedTaskNode = taskNode.data.loopData || taskNode.data.loopId || taskNode.id.includes('loop');
+        const loopRelatedTaskNode = loopChildTask || taskNode.data.loopId || taskNode.id.includes('loop');
 
         const parentConditionId = Object.keys(conditionChildTasks).find((key) => {
             const conditionCases = conditionChildTasks[key];
@@ -466,7 +477,7 @@ export default function useLayout({
 
         if (conditionRelatedTaskNode) {
             // Create initial edges for the Condition node
-            if (taskNode.data.componentName === 'condition') {
+            if (conditionNode) {
                 const leftPlaceholderEdge = {
                     id: `${taskNode.id}=>${taskNode.id}-left-placeholder-0`,
                     source: taskNode.id,
@@ -488,7 +499,7 @@ export default function useLayout({
 
             // Create the bottom Condition edge
             if (
-                taskNode.data.conditionData &&
+                conditionChildTask &&
                 taskNode.id.includes('placeholder') &&
                 !taskNode.id.includes('bottom') &&
                 !taskNode.id.includes('condition')
@@ -561,7 +572,7 @@ export default function useLayout({
             }
 
             // Create edges for the Condition child node
-            if (taskNode.data.conditionData && !taskNode.id.includes('placeholder')) {
+            if (conditionChildTask && !taskNode.id.includes('placeholder')) {
                 const {conditionCase, conditionId, index} = (taskNode.data as NodeDataType).conditionData!;
 
                 const sourcePlaceholderId = `${conditionId}-${
@@ -596,7 +607,7 @@ export default function useLayout({
 
         if (loopRelatedTaskNode) {
             // Create initial edges for the Loop node
-            if (taskNode.data.componentName === 'loop') {
+            if (loopNode) {
                 const loopPlaceholderEdge = {
                     id: `${taskNode.id}=>${taskNode.id}-loop-placeholder-0`,
                     source: taskNode.id,
@@ -617,7 +628,7 @@ export default function useLayout({
             }
 
             // Create edges for the Loop child node
-            if (taskNode.data.loopData && !taskNode.id.includes('placeholder')) {
+            if (loopChildTask && !taskNode.id.includes('placeholder')) {
                 const {index, loopId} = (taskNode.data as NodeDataType).loopData!;
 
                 const sourcePlaceholderId = `${loopId}-loop-placeholder-${index}`;
