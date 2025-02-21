@@ -25,6 +25,7 @@ const PropertyMentionsInputEditorSheet = ({
     controlType,
     dataPills,
     onClose,
+    path,
     placeholder,
     title,
     type,
@@ -57,6 +58,7 @@ const PropertyMentionsInputEditorSheet = ({
                     componentDefinitions={componentDefinitions}
                     controlType={controlType}
                     dataPills={dataPills}
+                    path={path}
                     placeholder={placeholder}
                     type={type}
                     value={value}
