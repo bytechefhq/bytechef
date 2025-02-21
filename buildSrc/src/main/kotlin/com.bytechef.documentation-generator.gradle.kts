@@ -105,20 +105,20 @@ open class FindJsonFilesTask : DefaultTask() {
         }
 
         private fun formatWithoutLabel(name: String?, typeDetails: String): String {
-            return if (name == null) "|  | $typeDetails | $controlType |"
-            else "| $name | $typeDetails | $controlType |"
+            return if (name == null) "|  | $typeDetails |"
+            else "| $name | $typeDetails |"
         }
 
         private fun formatWithoutDescription(name: String?, label: String?, typeDetails: String): String {
             return if (label == null) {
-                "| $name | | $typeDetails | $controlType |  | $required |"
+                "| $name | | $typeDetails |  | $required |"
             } else {
-                "| $name | $label | $typeDetails | $controlType |  | $required |"
+                "| $name | $label | $typeDetails |  | $required |"
             }
         }
 
         private fun formatFull(name: String?, label: String?, typeDetails: String, description: String?): String {
-            return "| $name | $label | $typeDetails | $controlType | $description | $required |"
+            return "| $name | $label | $typeDetails | $description | $required |"
         }
 
         fun toJsonKeyValuePair(): String {
@@ -210,16 +210,16 @@ open class FindJsonFilesTask : DefaultTask() {
                 """
 #### Properties
 
-|     Name     |     Type     |    Control Type     |
-|:------------:|:------------:|:-------------------:|
+|     Name     |     Type     |
+|:------------:|:------------:|
 ${properties?.joinToString("\n") { it.getOutputString() }}
 """
             } else if (!items.isNullOrEmpty()) {
                 """
 #### Properties
 
-|     Name     |     Type     |    Control Type     |
-|:------------:|:------------:|:-------------------:|
+|     Name     |     Type     |
+|:------------:|:------------:|
 ${items?.joinToString("\n") { it.getOutputString() }}
 """
             } else ""
@@ -342,8 +342,8 @@ $formattedJson
                 """
 #### Properties
 
-|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 ${properties?.joinToString("\n")}
 """
             } else ""
@@ -419,8 +419,8 @@ $formattedJson
                 """
 #### Properties
 
-|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 ${properties?.joinToString("\n")}
 """
             } else ""
@@ -440,8 +440,8 @@ ${properties?.joinToString("\n")}
 
 #### Properties
 
-|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 ${properties?.joinToString("\n")}
 
 """
