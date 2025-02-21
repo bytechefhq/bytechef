@@ -26,7 +26,7 @@ interface PropertyMentionsInputProps {
     handleInputTypeSwitchButtonClick?: () => void;
     label?: string;
     leadingIcon?: ReactNode;
-    path?: string;
+    path: string;
     placeholder?: string;
     required?: boolean;
     showInputTypeSwitchButton?: boolean;
@@ -108,6 +108,7 @@ const PropertyMentionsInput = forwardRef<Editor, PropertyMentionsInputProps>(
                                     componentDefinitions={componentDefinitions}
                                     controlType={controlType}
                                     dataPills={dataPills}
+                                    path={path}
                                     placeholder={placeholder}
                                     title={label ?? ''}
                                     type={type}
