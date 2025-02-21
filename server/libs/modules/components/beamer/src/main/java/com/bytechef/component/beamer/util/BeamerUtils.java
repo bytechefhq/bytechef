@@ -22,7 +22,9 @@ import static com.bytechef.component.definition.ComponentDsl.option;
 import static com.bytechef.component.definition.Context.Http.responseType;
 
 import com.bytechef.component.definition.Context;
+import com.bytechef.component.definition.Context.ContextFunction;
 import com.bytechef.component.definition.Context.Http;
+import com.bytechef.component.definition.Context.Http.Executor;
 import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
@@ -37,11 +39,17 @@ import java.util.stream.Collectors;
  */
 public class BeamerUtils {
 
+    protected static final ContextFunction<Http, Executor> GET_POSTS_CONTEXT_FUNCTION =
+        http -> http.get("/posts");
+
+    protected static final ContextFunction<Http, Executor> GET_FEATURE_REQUESTS_CONTEXT_FUNCTION =
+        http -> http.get("/requests");
+
     public static List<Option<String>> getPostsOptions(
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> stringStringMap, String s,
         Context context) {
 
-        List<Map<String, Object>> body = context.http(http -> http.get("/posts"))
+        List<Map<String, Object>> body = context.http(GET_POSTS_CONTEXT_FUNCTION)
             .configuration(responseType(Http.ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});
@@ -53,7 +61,7 @@ public class BeamerUtils {
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> stringStringMap, String s,
         Context context) {
 
-        List<Map<String, Object>> body = context.http(http -> http.get("/requests"))
+        List<Map<String, Object>> body = context.http(GET_FEATURE_REQUESTS_CONTEXT_FUNCTION)
             .configuration(responseType(Http.ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});
