@@ -435,8 +435,9 @@ ${properties?.joinToString("\n")}
         var type: String? = null
 
         override fun toString(): String {
+            val label = if(title == null) name else title;
             return """
-### $title
+### $label
 
 #### Properties
 
