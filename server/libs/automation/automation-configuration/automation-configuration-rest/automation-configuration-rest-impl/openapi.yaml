@@ -531,7 +531,7 @@ paths:
           format: "int64"
       responses:
         "200":
-          description: "The array project workflows."
+          description: "The array of project workflows."
           content:
             application/json:
               schema:
@@ -618,6 +618,22 @@ paths:
                 type: "array"
                 items:
                   $ref: "#/components/schemas/Workspace"
+  /workflows:
+    get:
+      description: "Get all workflows."
+      summary: "Get all workflows."
+      tags:
+        - "workflow"
+      operationId: "getWorkflows"
+      responses:
+        "200":
+          description: "The array of workflows."
+          content:
+            application/json:
+              schema:
+                type: "array"
+                items:
+                  $ref: "#/components/schemas/Workflow"
   /workflows/{id}:
     delete:
       description: "Delete a workflow."
