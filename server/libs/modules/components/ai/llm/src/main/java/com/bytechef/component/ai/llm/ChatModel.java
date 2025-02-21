@@ -33,6 +33,7 @@ import java.util.List;
 import java.util.Objects;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.messages.SystemMessage;
+import org.springframework.lang.Nullable;
 
 /**
  * @author Marko Kriskovic
@@ -50,6 +51,7 @@ public interface ChatModel {
     org.springframework.ai.chat.model.ChatModel createChatModel(
         Parameters inputParameters, Parameters connectionParameters);
 
+    @Nullable
     default Object getResponse(
         Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) {
 
@@ -85,6 +87,7 @@ public interface ChatModel {
     }
 
     @SuppressFBWarnings("NP")
+    @Nullable
     private Object returnChatEntity(
         Parameters parameters, ChatClient.CallResponseSpec call, ActionContext actionContext) {
 
@@ -96,7 +99,7 @@ public interface ChatModel {
                 return Objects.requireNonNull(call.chatResponse())
                     .getResult()
                     .getOutput()
-                    .getContent();
+                    .getText();
             } catch (org.springframework.ai.retry.NonTransientAiException e) {
                 String message = e.getMessage();
 
