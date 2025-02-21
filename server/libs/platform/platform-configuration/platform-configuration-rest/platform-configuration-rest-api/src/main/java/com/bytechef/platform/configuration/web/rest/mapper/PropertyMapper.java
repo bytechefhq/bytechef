@@ -63,7 +63,7 @@ import org.springframework.core.convert.converter.Converter;
 public class PropertyMapper {
 
     @Mapper(config = PlatformConfigurationMapperSpringConfig.class)
-    public static abstract class BasePropertyMapper implements Converter<BaseProperty, PropertyModel>, PropertyVisitor {
+    public abstract static class BasePropertyMapper implements Converter<BaseProperty, PropertyModel>, PropertyVisitor {
 
         @Autowired
         private ComponentPropertyMapper componentPropertyMapper;
