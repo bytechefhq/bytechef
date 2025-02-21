@@ -33,7 +33,6 @@ import static com.bytechef.component.ai.llm.constant.Provider.VERTEX_GEMINI;
 import static com.bytechef.component.ai.text.constant.AiTextConstants.PROVIDER;
 import static com.bytechef.component.definition.ComponentDsl.option;
 
-import com.bytechef.component.ai.llm.amazon.bedrock.constant.AmazonBedrockConstants;
 import com.bytechef.component.ai.llm.anthropic.constant.AnthropicConstants;
 import com.bytechef.component.ai.llm.azure.openai.constant.AzureOpenAiConstants;
 import com.bytechef.component.ai.llm.constant.LLMConstants;
@@ -75,12 +74,12 @@ public class AiTextUtils {
         Provider provider = Provider.valueOf(inputParameters.getRequiredString(PROVIDER));
 
         return switch (provider) {
-            case AMAZON_BEDROCK_ANTHROPIC2 -> AmazonBedrockConstants.ANTHROPIC2_MODELS;
-            case AMAZON_BEDROCK_ANTHROPIC3 -> AmazonBedrockConstants.ANTHROPIC3_MODELS;
-            case AMAZON_BEDROCK_COHERE -> AmazonBedrockConstants.COHERE_MODELS;
-            case AMAZON_BEDROCK_JURASSIC2 -> AmazonBedrockConstants.JURASSIC2_MODELS;
-            case AMAZON_BEDROCK_LLAMA -> AmazonBedrockConstants.LLAMA_MODELS;
-            case AMAZON_BEDROCK_TITAN -> AmazonBedrockConstants.TITAN_MODELS;
+//            case AMAZON_BEDROCK_ANTHROPIC2 -> AmazonBedrockConstants.ANTHROPIC2_MODELS;
+//            case AMAZON_BEDROCK_ANTHROPIC3 -> AmazonBedrockConstants.ANTHROPIC3_MODELS;
+//            case AMAZON_BEDROCK_COHERE -> AmazonBedrockConstants.COHERE_MODELS;
+//            case AMAZON_BEDROCK_JURASSIC2 -> AmazonBedrockConstants.JURASSIC2_MODELS;
+//            case AMAZON_BEDROCK_LLAMA -> AmazonBedrockConstants.LLAMA_MODELS;
+//            case AMAZON_BEDROCK_TITAN -> AmazonBedrockConstants.TITAN_MODELS;
             case ANTHROPIC -> AnthropicConstants.MODELS;
             case AZURE_OPEN_AI -> AzureOpenAiConstants.IMAGE_MODELS;
             case MISTRAL -> MistralConstants.MODELS;

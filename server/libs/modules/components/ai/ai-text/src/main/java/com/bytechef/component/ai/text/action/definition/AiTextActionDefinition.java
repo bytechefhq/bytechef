@@ -16,12 +16,6 @@
 
 package com.bytechef.component.ai.text.action.definition;
 
-import static com.bytechef.component.ai.llm.constant.Provider.AMAZON_BEDROCK_ANTHROPIC2;
-import static com.bytechef.component.ai.llm.constant.Provider.AMAZON_BEDROCK_ANTHROPIC3;
-import static com.bytechef.component.ai.llm.constant.Provider.AMAZON_BEDROCK_COHERE;
-import static com.bytechef.component.ai.llm.constant.Provider.AMAZON_BEDROCK_JURASSIC2;
-import static com.bytechef.component.ai.llm.constant.Provider.AMAZON_BEDROCK_LLAMA;
-import static com.bytechef.component.ai.llm.constant.Provider.AMAZON_BEDROCK_TITAN;
 import static com.bytechef.component.ai.llm.constant.Provider.ANTHROPIC;
 import static com.bytechef.component.ai.llm.constant.Provider.AZURE_OPEN_AI;
 import static com.bytechef.component.ai.llm.constant.Provider.GROQ;
@@ -34,12 +28,6 @@ import static com.bytechef.component.ai.text.constant.AiTextConstants.PROVIDER;
 import static com.bytechef.component.definition.Authorization.TOKEN;
 
 import com.bytechef.component.ai.llm.ChatModel;
-import com.bytechef.component.ai.llm.amazon.bedrock.action.AmazonBedrockAnthropic2ChatAction;
-import com.bytechef.component.ai.llm.amazon.bedrock.action.AmazonBedrockAnthropic3ChatAction;
-import com.bytechef.component.ai.llm.amazon.bedrock.action.AmazonBedrockCohereChatAction;
-import com.bytechef.component.ai.llm.amazon.bedrock.action.AmazonBedrockJurassic2ChatAction;
-import com.bytechef.component.ai.llm.amazon.bedrock.action.AmazonBedrockLlamaChatAction;
-import com.bytechef.component.ai.llm.amazon.bedrock.action.AmazonBedrockTitanChatAction;
 import com.bytechef.component.ai.llm.anthropic.action.AnthropicChatAction;
 import com.bytechef.component.ai.llm.azure.openai.action.AzureOpenAiChatAction;
 import com.bytechef.component.ai.llm.constant.LLMConstants;
@@ -55,12 +43,6 @@ import com.bytechef.component.definition.ActionDefinition;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.openai.action.OpenAiChatAction;
 import com.bytechef.config.ApplicationProperties;
-import com.bytechef.config.ApplicationProperties.Ai.Provider.AmazonBedrockAnthropic2;
-import com.bytechef.config.ApplicationProperties.Ai.Provider.AmazonBedrockAnthropic3;
-import com.bytechef.config.ApplicationProperties.Ai.Provider.AmazonBedrockCohere;
-import com.bytechef.config.ApplicationProperties.Ai.Provider.AmazonBedrockJurassic2;
-import com.bytechef.config.ApplicationProperties.Ai.Provider.AmazonBedrockLlama;
-import com.bytechef.config.ApplicationProperties.Ai.Provider.AmazonBedrockTitan;
 import com.bytechef.config.ApplicationProperties.Ai.Provider.Anthropic;
 import com.bytechef.config.ApplicationProperties.Ai.Provider.AzureOpenAi;
 import com.bytechef.config.ApplicationProperties.Ai.Provider.Groq;
@@ -128,7 +110,7 @@ public class AiTextActionDefinition extends AbstractActionDefinitionWrapper {
 
         Object response = chatModel.getResponse(modelInputParameters, modelConnectionParameters, context);
 
-        return response.toString();
+        return response != null ? response.toString() : null;
     }
 
     private String getAiProviderToken(String key, List<String> activeProviderKeys) {
@@ -144,18 +126,18 @@ public class AiTextActionDefinition extends AbstractActionDefinitionWrapper {
         Parameters inputParameters, List<String> activeProviderKeys, Map<String, String> modelConnectionParametersMap) {
 
         return switch (Provider.valueOf(inputParameters.getRequiredString(PROVIDER))) {
-            case AMAZON_BEDROCK_ANTHROPIC2 -> getAmazonBedrockAnthropic2ChatModel(
-                activeProviderKeys, modelConnectionParametersMap);
-            case AMAZON_BEDROCK_ANTHROPIC3 -> getAmazonBedrockAnthropic3ChatModel(
-                activeProviderKeys, modelConnectionParametersMap);
-            case AMAZON_BEDROCK_COHERE -> getAmazonBedrockCohereChatModel(
-                activeProviderKeys, modelConnectionParametersMap);
-            case AMAZON_BEDROCK_JURASSIC2 -> getAmazonBedrockJurassic2ChatModel(
-                activeProviderKeys, modelConnectionParametersMap);
-            case AMAZON_BEDROCK_LLAMA -> getAmazonBedrockLlamaChatModel(
-                activeProviderKeys, modelConnectionParametersMap);
-            case AMAZON_BEDROCK_TITAN -> getAmazonBedrockTitanChatModel(
-                activeProviderKeys, modelConnectionParametersMap);
+//            case AMAZON_BEDROCK_ANTHROPIC2 -> getAmazonBedrockAnthropic2ChatModel(
+//                activeProviderKeys, modelConnectionParametersMap);
+//            case AMAZON_BEDROCK_ANTHROPIC3 -> getAmazonBedrockAnthropic3ChatModel(
+//                activeProviderKeys, modelConnectionParametersMap);
+//            case AMAZON_BEDROCK_COHERE -> getAmazonBedrockCohereChatModel(
+//                activeProviderKeys, modelConnectionParametersMap);
+//            case AMAZON_BEDROCK_JURASSIC2 -> getAmazonBedrockJurassic2ChatModel(
+//                activeProviderKeys, modelConnectionParametersMap);
+//            case AMAZON_BEDROCK_LLAMA -> getAmazonBedrockLlamaChatModel(
+//                activeProviderKeys, modelConnectionParametersMap);
+//            case AMAZON_BEDROCK_TITAN -> getAmazonBedrockTitanChatModel(
+//                activeProviderKeys, modelConnectionParametersMap);
             case ANTHROPIC -> getAnthropicChatModel(activeProviderKeys, modelConnectionParametersMap);
             case AZURE_OPEN_AI -> getAzureOpenAiChatModel(activeProviderKeys, modelConnectionParametersMap);
             case GROQ -> getGroqChatModel(activeProviderKeys, modelConnectionParametersMap);
@@ -168,101 +150,101 @@ public class AiTextActionDefinition extends AbstractActionDefinitionWrapper {
         };
     }
 
-    private ChatModel getAmazonBedrockAnthropic2ChatModel(
-        List<String> activeProviderKeys, Map<String, String> modelConnectionParametersMap) {
-
-        String token = getAiProviderToken(AMAZON_BEDROCK_ANTHROPIC2.getKey(), activeProviderKeys);
-
-        if (token == null) {
-            AmazonBedrockAnthropic2 amazonBedrockAnthropic2 = aiProvider.getAmazonBedrockAnthropic2();
-
-            token = amazonBedrockAnthropic2.getApiKey();
-        }
-
-        modelConnectionParametersMap.put(TOKEN, token);
-
-        return AmazonBedrockAnthropic2ChatAction.CHAT_MODEL;
-    }
-
-    private ChatModel getAmazonBedrockAnthropic3ChatModel(
-        List<String> activeProviderKeys, Map<String, String> modelConnectionParametersMap) {
-
-        String token = getAiProviderToken(AMAZON_BEDROCK_ANTHROPIC3.getKey(), activeProviderKeys);
-
-        if (token == null) {
-            AmazonBedrockAnthropic3 amazonBedrockAnthropic3 = aiProvider.getAmazonBedrockAnthropic3();
-
-            token = amazonBedrockAnthropic3.getApiKey();
-        }
-
-        modelConnectionParametersMap.put(TOKEN, token);
-
-        return AmazonBedrockAnthropic3ChatAction.CHAT_MODEL;
-    }
-
-    private ChatModel getAmazonBedrockCohereChatModel(
-        List<String> activeProviderKeys, Map<String, String> modelConnectionParametersMap) {
-
-        String token = getAiProviderToken(AMAZON_BEDROCK_COHERE.getKey(), activeProviderKeys);
-
-        if (token == null) {
-            AmazonBedrockCohere amazonBedrockCohere = aiProvider.getAmazonBedrockCohere();
-
-            token = amazonBedrockCohere.getApiKey();
-        }
-
-        modelConnectionParametersMap.put(TOKEN, token);
-
-        return AmazonBedrockCohereChatAction.CHAT_MODEL;
-    }
-
-    private ChatModel getAmazonBedrockJurassic2ChatModel(
-        List<String> activeProviderKeys, Map<String, String> modelConnectionParametersMap) {
-
-        String token = getAiProviderToken(AMAZON_BEDROCK_JURASSIC2.getKey(), activeProviderKeys);
-
-        if (token == null) {
-            AmazonBedrockJurassic2 amazonBedrockJurassic2 = aiProvider.getAmazonBedrockJurassic2();
-
-            token = amazonBedrockJurassic2.getApiKey();
-        }
-
-        modelConnectionParametersMap.put(TOKEN, token);
-
-        return AmazonBedrockJurassic2ChatAction.CHAT_MODEL;
-    }
-
-    private ChatModel getAmazonBedrockLlamaChatModel(
-        List<String> activeProviderKeys, Map<String, String> modelConnectionParametersMap) {
-
-        String token = getAiProviderToken(AMAZON_BEDROCK_LLAMA.getKey(), activeProviderKeys);
-
-        if (token == null) {
-            AmazonBedrockLlama amazonBedrockLlama = aiProvider.getAmazonBedrockLlama();
-
-            token = amazonBedrockLlama.getApiKey();
-        }
-
-        modelConnectionParametersMap.put(TOKEN, token);
-
-        return AmazonBedrockLlamaChatAction.CHAT_MODEL;
-    }
-
-    private ChatModel getAmazonBedrockTitanChatModel(
-        List<String> activeProviderKeys, Map<String, String> modelConnectionParametersMap) {
-
-        String token = getAiProviderToken(AMAZON_BEDROCK_TITAN.getKey(), activeProviderKeys);
-
-        if (token == null) {
-            AmazonBedrockTitan amazonBedrockTitan = aiProvider.getAmazonBedrockTitan();
-
-            token = amazonBedrockTitan.getApiKey();
-        }
-
-        modelConnectionParametersMap.put(TOKEN, token);
-
-        return AmazonBedrockTitanChatAction.CHAT_MODEL;
-    }
+//    private ChatModel getAmazonBedrockAnthropic2ChatModel(
+//        List<String> activeProviderKeys, Map<String, String> modelConnectionParametersMap) {
+//
+//        String token = getAiProviderToken(AMAZON_BEDROCK_ANTHROPIC2.getKey(), activeProviderKeys);
+//
+//        if (token == null) {
+//            AmazonBedrockAnthropic2 amazonBedrockAnthropic2 = aiProvider.getAmazonBedrockAnthropic2();
+//
+//            token = amazonBedrockAnthropic2.getApiKey();
+//        }
+//
+//        modelConnectionParametersMap.put(TOKEN, token);
+//
+//        return AmazonBedrockAnthropic2ChatAction.CHAT_MODEL;
+//    }
+//
+//    private ChatModel getAmazonBedrockAnthropic3ChatModel(
+//        List<String> activeProviderKeys, Map<String, String> modelConnectionParametersMap) {
+//
+//        String token = getAiProviderToken(AMAZON_BEDROCK_ANTHROPIC3.getKey(), activeProviderKeys);
+//
+//        if (token == null) {
+//            AmazonBedrockAnthropic3 amazonBedrockAnthropic3 = aiProvider.getAmazonBedrockAnthropic3();
+//
+//            token = amazonBedrockAnthropic3.getApiKey();
+//        }
+//
+//        modelConnectionParametersMap.put(TOKEN, token);
+//
+//        return AmazonBedrockAnthropic3ChatAction.CHAT_MODEL;
+//    }
+//
+//    private ChatModel getAmazonBedrockCohereChatModel(
+//        List<String> activeProviderKeys, Map<String, String> modelConnectionParametersMap) {
+//
+//        String token = getAiProviderToken(AMAZON_BEDROCK_COHERE.getKey(), activeProviderKeys);
+//
+//        if (token == null) {
+//            AmazonBedrockCohere amazonBedrockCohere = aiProvider.getAmazonBedrockCohere();
+//
+//            token = amazonBedrockCohere.getApiKey();
+//        }
+//
+//        modelConnectionParametersMap.put(TOKEN, token);
+//
+//        return AmazonBedrockCohereChatAction.CHAT_MODEL;
+//    }
+//
+//    private ChatModel getAmazonBedrockJurassic2ChatModel(
+//        List<String> activeProviderKeys, Map<String, String> modelConnectionParametersMap) {
+//
+//        String token = getAiProviderToken(AMAZON_BEDROCK_JURASSIC2.getKey(), activeProviderKeys);
+//
+//        if (token == null) {
+//            AmazonBedrockJurassic2 amazonBedrockJurassic2 = aiProvider.getAmazonBedrockJurassic2();
+//
+//            token = amazonBedrockJurassic2.getApiKey();
+//        }
+//
+//        modelConnectionParametersMap.put(TOKEN, token);
+//
+//        return AmazonBedrockJurassic2ChatAction.CHAT_MODEL;
+//    }
+//
+//    private ChatModel getAmazonBedrockLlamaChatModel(
+//        List<String> activeProviderKeys, Map<String, String> modelConnectionParametersMap) {
+//
+//        String token = getAiProviderToken(AMAZON_BEDROCK_LLAMA.getKey(), activeProviderKeys);
+//
+//        if (token == null) {
+//            AmazonBedrockLlama amazonBedrockLlama = aiProvider.getAmazonBedrockLlama();
+//
+//            token = amazonBedrockLlama.getApiKey();
+//        }
+//
+//        modelConnectionParametersMap.put(TOKEN, token);
+//
+//        return AmazonBedrockLlamaChatAction.CHAT_MODEL;
+//    }
+//
+//    private ChatModel getAmazonBedrockTitanChatModel(
+//        List<String> activeProviderKeys, Map<String, String> modelConnectionParametersMap) {
+//
+//        String token = getAiProviderToken(AMAZON_BEDROCK_TITAN.getKey(), activeProviderKeys);
+//
+//        if (token == null) {
+//            AmazonBedrockTitan amazonBedrockTitan = aiProvider.getAmazonBedrockTitan();
+//
+//            token = amazonBedrockTitan.getApiKey();
+//        }
+//
+//        modelConnectionParametersMap.put(TOKEN, token);
+//
+//        return AmazonBedrockTitanChatAction.CHAT_MODEL;
+//    }
 
     private ChatModel getAnthropicChatModel(
         List<String> activeProviderKeys, Map<String, String> modelConnectionParametersMap) {
