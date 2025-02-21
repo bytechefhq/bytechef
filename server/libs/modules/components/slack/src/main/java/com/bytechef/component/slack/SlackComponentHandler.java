@@ -21,6 +21,7 @@ import static com.bytechef.component.definition.ComponentDsl.component;
 import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDefinition;
+import com.bytechef.component.slack.action.SlackRequestApprovalMessageAction;
 import com.bytechef.component.slack.action.SlackSendDirectMessageAction;
 import com.bytechef.component.slack.action.SlackSendMessageAction;
 import com.bytechef.component.slack.connection.SlackConnection;
@@ -40,6 +41,7 @@ public final class SlackComponentHandler implements ComponentHandler {
         .categories(ComponentCategory.COMMUNICATION, ComponentCategory.DEVELOPER_TOOLS)
         .connection(SlackConnection.CONNECTION_DEFINITION)
         .actions(
+            SlackRequestApprovalMessageAction.ACTION_DEFINITION,
             SlackSendMessageAction.ACTION_DEFINITION,
             SlackSendDirectMessageAction.ACTION_DEFINITION);
 
