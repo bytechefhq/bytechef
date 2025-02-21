@@ -110,6 +110,14 @@ public class WorkflowApiController extends AbstractWorkflowApiController impleme
     }
 
     @Override
+    public ResponseEntity<List<WorkflowModel>> getWorkflows() {
+        return ResponseEntity.ok(
+            CollectionUtils.map(
+                projectFacade.getProjectWorkflows(),
+                workflow -> conversionService.convert(workflow, WorkflowModel.class)));
+    }
+
+    @Override
     public ResponseEntity<Void> updateWorkflow(String id, WorkflowModel workflowModel) {
         // TODO Add check regarding platform type
 
