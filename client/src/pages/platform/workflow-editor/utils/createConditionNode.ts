@@ -1,6 +1,11 @@
 import {CONDITION_CASE_FALSE, CONDITION_CASE_TRUE} from '@/shared/constants';
 import {Node} from '@xyflow/react';
 
+const baseNode = {
+    position: {x: 0, y: 0},
+    type: 'placeholder',
+};
+
 export default function createConditionNode({
     allNodes,
     belowPlaceholderNode,
@@ -13,17 +18,15 @@ export default function createConditionNode({
     taskNode: Node;
 }): Array<Node> {
     const leftPlaceholderNode: Node = {
+        ...baseNode,
         data: {conditionCase: CONDITION_CASE_TRUE, conditionId: taskNode.id, label: '+'},
         id: `${taskNode.id}-left-placeholder-0`,
-        position: {x: 0, y: 0},
-        type: 'placeholder',
     };
 
     const rightPlaceholderNode: Node = {
+        ...baseNode,
         data: {conditionCase: CONDITION_CASE_FALSE, conditionId: taskNode.id, label: '+'},
         id: `${taskNode.id}-right-placeholder-0`,
-        position: {x: 0, y: 0},
-        type: 'placeholder',
     };
 
     if (taskNode.data.conditionData && belowPlaceholderNode && sourcePlaceholderIndex) {
@@ -33,10 +36,9 @@ export default function createConditionNode({
     }
 
     const bottomPlaceholderNode: Node = {
+        ...baseNode,
         data: {label: '+'},
         id: `${taskNode.id}-bottom-placeholder`,
-        position: {x: 0, y: 0},
-        type: 'placeholder',
     };
 
     const insertIndex = allNodes.findIndex((node) => node.id === taskNode.id) + 1;
