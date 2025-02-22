@@ -24,23 +24,13 @@ import static com.bytechef.component.definition.ComponentDsl.string;
 
 import com.bytechef.component.OpenApiComponentHandler;
 import com.bytechef.component.accelo.action.AcceloCreateTaskAction;
-import com.bytechef.component.accelo.util.AcceloUtils;
-import com.bytechef.component.definition.ActionDefinition;
 import com.bytechef.component.definition.Authorization;
 import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.ComponentDsl.ModifiableComponentDefinition;
 import com.bytechef.component.definition.ComponentDsl.ModifiableConnectionDefinition;
-import com.bytechef.component.definition.ComponentDsl.ModifiableObjectProperty;
-import com.bytechef.component.definition.ComponentDsl.ModifiableProperty;
-import com.bytechef.component.definition.ComponentDsl.ModifiableStringProperty;
-import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
-import com.bytechef.component.definition.Property;
-import com.bytechef.definition.BaseProperty;
 import com.google.auto.service.AutoService;
 import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
 
 /**
  * @author Monika Kušter
@@ -89,24 +79,5 @@ public class AcceloComponentHandler extends AbstractAcceloComponentHandler {
                     .scopes((connection, context) -> List.of("write(all)"))
                     .tokenUrl((connection, context) -> "https://" + connection.getRequiredString(DEPLOYMENT) +
                         ".api.accelo.com/oauth2/v0/token"));
-    }
-
-    @Override
-    public ModifiableProperty<?> modifyProperty(
-        ActionDefinition actionDefinition, ModifiableProperty<?> modifiableProperty) {
-
-        if (Objects.equals(modifiableProperty.getName(), "__item")) {
-            Optional<List<? extends Property.ValueProperty<?>>> propertiesOptional =
-                ((ModifiableObjectProperty) modifiableProperty).getProperties();
-
-            for (BaseProperty baseProperty : propertiesOptional.get()) {
-                if (Objects.equals(baseProperty.getName(), "company_id")) {
-                    ((ModifiableStringProperty) baseProperty)
-                        .options((ActionOptionsFunction<String>) AcceloUtils::getCompanyIdOptions);
-                }
-            }
-        }
-
-        return modifiableProperty;
     }
 }
