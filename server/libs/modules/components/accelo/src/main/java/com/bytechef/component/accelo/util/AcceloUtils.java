@@ -22,6 +22,7 @@ import static com.bytechef.component.accelo.constant.AcceloConstants.TITLE;
 import static com.bytechef.component.definition.ComponentDsl.option;
 
 import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Parameters;
@@ -34,7 +35,7 @@ import java.util.Objects;
 /**
  * @author Monika Kušter
  */
-public class AcceloUtils {
+public class AcceloUtils extends AbstractAcceloUtils {
 
     private AcceloUtils() {
     }
@@ -70,7 +71,7 @@ public class AcceloUtils {
 
     public static List<Option<String>> getCompanyIdOptions(
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
-        String searchText, ActionContext context) {
+        String searchText, Context context) {
 
         Map<String, ?> body = context
             .http(http -> http.get("companies"))
