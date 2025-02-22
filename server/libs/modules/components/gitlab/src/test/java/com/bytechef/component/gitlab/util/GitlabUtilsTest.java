@@ -39,7 +39,6 @@ import org.mockito.ArgumentCaptor;
  */
 class GitlabUtilsTest {
 
-    private final List<Option<String>> expectedOptions = List.of(option("some name", "123"));
     private final ActionContext mockedActionContext = mock(ActionContext.class);
     private final Http.Executor mockedExecutor = mock(Http.Executor.class);
     private final Parameters mockedParameters = mock(Parameters.class);
@@ -63,8 +62,9 @@ class GitlabUtilsTest {
         when(mockedResponse.getBody(any(TypeReference.class)))
             .thenReturn(List.of(Map.of("name", "some name", ID, 123)));
 
+        List<Option<String>> expectedOptions = List.of(option("some name", "123"));
         assertEquals(expectedOptions,
-            GitlabUtils.getProjectOptions(mockedParameters, mockedParameters, Map.of(), "", mockedActionContext));
+            GitlabUtils.getProjectIdOptions(mockedParameters, mockedParameters, Map.of(), "", mockedActionContext));
 
         Map<String, List<String>> query = queryArgumentCaptor.getValue();
 
@@ -76,9 +76,10 @@ class GitlabUtilsTest {
         when(mockedResponse.getBody(any(TypeReference.class)))
             .thenReturn(List.of(Map.of("title", "some name", "iid", 123)));
 
-        assertEquals(expectedOptions,
-            GitlabUtils.getIssueOptions(mockedParameters, mockedParameters, Map.of(), "", mockedActionContext));
+        List<Option<Long>> expectedOptions = List.of(option("some name", 123));
 
+        assertEquals(expectedOptions,
+            GitlabUtils.getIssueIdOptions(mockedParameters, mockedParameters, Map.of(), "", mockedActionContext));
     }
 
 }

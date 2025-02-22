@@ -25,6 +25,8 @@ import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.Context.Http.ResponseType;
 
 import com.bytechef.component.definition.ComponentDsl;
+import com.bytechef.component.definition.OptionsDataSource;
+import com.bytechef.component.gitlab.util.GitlabUtils;
 import java.util.Map;
 
 /**
@@ -45,6 +47,7 @@ public class GitlabCreateIssueAction {
         .properties(string("projectId").label("Project ID")
             .description("ID of the project where new issue will be created.")
             .required(true)
+            .options((OptionsDataSource.ActionOptionsFunction<String>) GitlabUtils::getProjectIdOptions)
             .metadata(
                 Map.of(
                     "type", PropertyType.PATH)),

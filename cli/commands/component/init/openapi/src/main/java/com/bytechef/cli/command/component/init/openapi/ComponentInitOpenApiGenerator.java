@@ -17,6 +17,8 @@
 package com.bytechef.cli.command.component.init.openapi;
 
 import com.bytechef.component.OpenApiComponentHandler;
+import com.bytechef.component.definition.Context;
+import com.bytechef.component.definition.Parameters;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -33,6 +35,7 @@ import com.squareup.javapoet.CodeBlock;
 import com.squareup.javapoet.FieldSpec;
 import com.squareup.javapoet.JavaFile;
 import com.squareup.javapoet.MethodSpec;
+import com.squareup.javapoet.ParameterSpec;
 import com.squareup.javapoet.ParameterizedTypeName;
 import com.squareup.javapoet.TypeSpec;
 import com.squareup.javapoet.WildcardTypeName;
@@ -132,6 +135,7 @@ public class ComponentInitOpenApiGenerator {
     private final boolean internalComponent;
     private final int version;
     private final Set<String> oAuth2Scopes = new HashSet<>();
+    private final Map<String, String> dynamicOptionsMap = new HashMap<>();
 
     @SuppressFBWarnings("CT_CONSTRUCTOR_THROW")
     public ComponentInitOpenApiGenerator(
@@ -183,6 +187,11 @@ public class ComponentInitOpenApiGenerator {
             writeAbstractComponentHandlerTest(sourceTestJavaDirPath);
             writeComponentHandlerTest(sourceTestJavaDirPath);
             writeComponentHandlerDefinition(componentHandlerSourcePath, getPackageName(), version);
+        }
+
+        if (!dynamicOptionsMap.isEmpty()) {
+            writeAbstractUtils(sourceMainJavaDirPath);
+            writeUtils(sourceMainJavaDirPath);
         }
     }
 
@@ -372,6 +381,8 @@ public class ComponentInitOpenApiGenerator {
         String simpleClassName = getComponentHandlerClassName(componentName);
 
         javacOpts.add(sourcePath.getParent() + "/Abstract" + simpleClassName + ".java");
+        javacOpts
+            .add(sourcePath.getParent() + "/utils/" + "Abstract" + getComponentClassName(componentName) + "Utils.java");
         javacOpts.add(sourcePath.getParent() + "/" + simpleClassName + ".java");
         javacOpts.add(
             sourcePath.getParent() + "/connection/" + getComponentClassName(componentName) + "Connection.java");
@@ -507,6 +518,8 @@ public class ComponentInitOpenApiGenerator {
                 builder.add(".output(outputSchema($L), sampleOutput($L))", outputSchemaCodeBlock,
                     sampleOutputCodeBlock);
             }
+        } else if (outputEntry != null && outputEntry.isDynamic()) {
+            builder.add(".output()");
         }
 
         return builder.build();
@@ -1278,19 +1291,29 @@ public class ComponentInitOpenApiGenerator {
             }
         }
 
-        if (apiResponse != null && apiResponse.getContent() != null) {
-            Content content = apiResponse.getContent();
+        if (apiResponse != null) {
+            if (apiResponse.getContent() != null) {
+                Content content = apiResponse.getContent();
 
-            Set<Map.Entry<String, MediaType>> entries = content.entrySet();
+                Set<Map.Entry<String, MediaType>> entries = content.entrySet();
 
-            if (!entries.isEmpty()) {
-                String mimeType = getMimeType(entries);
+                if (!entries.isEmpty()) {
+                    String mimeType = getMimeType(entries);
 
-                MediaType mediaType = content.get(mimeType);
+                    MediaType mediaType = content.get(mimeType);
 
-                outputEntry = new OutputEntry(
-                    getOutputSchemaCodeBlock(mimeType, mediaType),
-                    getSampleOutputCodeBlock(mediaType.getExample()));
+                    outputEntry = new OutputEntry(
+                        getOutputSchemaCodeBlock(mimeType, mediaType),
+                        getSampleOutputCodeBlock(mediaType.getExample()),
+                        false);
+                }
+            } else if (apiResponse.getContent() == null && apiResponse.getExtensions() != null) {
+                Map<String, Object> extensions = apiResponse.getExtensions();
+
+                if (extensions != null && extensions.get("x-dynamic-output")
+                    .equals(true)) {
+                    outputEntry = new OutputEntry(null, null, true);
+                }
             }
         }
 
@@ -1663,7 +1686,7 @@ public class ComponentInitOpenApiGenerator {
 
         Map<String, Object> extensionMap = schema.getExtensions();
 
-        if (extensionMap == null) {
+        if (extensionMap == null || !extensionMap.containsKey("x-property-type")) {
             if (StringUtils.isEmpty(schema.get$ref())) {
                 String type = StringUtils.isEmpty(schema.getType()) ? "object" : schema.getType();
 
@@ -1778,6 +1801,37 @@ public class ComponentInitOpenApiGenerator {
                 builder.add(
                     getRefCodeBlock(propertyName, required, schema, excludePropertyNameIfEmpty, outputSchema, openAPI));
             }
+
+            if (extensionMap != null && Boolean.TRUE.equals(extensionMap.get("x-dynamic-options"))) {
+                String type = StringUtils.isEmpty(schema.getType()) ? "object" : schema.getType();
+                String optionType;
+
+                if (Objects.equals(type, "integer")) {
+                    optionType = "Long";
+                } else if (Objects.equals(type, "string")) {
+                    optionType = "String";
+                } else {
+                    throw new IllegalArgumentException("Parameter type %s is not supported yet.".formatted(type));
+                }
+
+                dynamicOptionsMap.put(buildOptionsFunctionsName(propertyName), type);
+
+                builder.add(
+                    ".options(($T.ActionOptionsFunction<" + optionType + ">)$T::get"
+                        + buildOptionsFunctionsName(propertyName) + "Options)",
+                    ClassName.get("com.bytechef.component.definition", "OptionsDataSource"),
+                    ClassName.get("com.bytechef.component." + componentName + ".util",
+                        getComponentClassName(componentName) + "Utils"));
+
+                if (extensionMap.get("x-dynamic-options-dependency") instanceof List<?> dependencies) {
+                    List<String> allDependencies = dependencies.stream()
+                        .map(object -> "\"" + object + "\"")
+                        .toList();
+
+                    builder.add(".optionsLookupDependsOn($L)", String.join(",", allDependencies));
+                }
+            }
+
         } else {
             builder.add(
                 getExtensionsCodeBlock(
@@ -1785,6 +1839,13 @@ public class ComponentInitOpenApiGenerator {
         }
 
         return builder.build();
+    }
+
+    private static String buildOptionsFunctionsName(String propertyName) {
+        return Arrays.stream(StringUtils.split(propertyName, '_'))
+            .flatMap(item -> Arrays.stream(StringUtils.splitByCharacterTypeCamelCase(item)))
+            .map(StringUtils::capitalize)
+            .collect(Collectors.joining(""));
     }
 
     private OpenAPI parseOpenAPIFile(String openApiPath) {
@@ -2077,13 +2138,101 @@ public class ComponentInitOpenApiGenerator {
         }
     }
 
+    private void writeAbstractUtils(Path sourceDirPath) throws IOException {
+        TypeSpec.Builder builder = TypeSpec.classBuilder("Abstract" + getComponentClassName(componentName) + "Utils")
+            .addJavadoc("""
+                Provides methods for retrieving dynamic options for various properties within the component.
+
+                @generated
+                """)
+            .addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT);
+
+        dynamicOptionsMap.forEach((propertyName, type) -> {
+            ClassName returnType = getReturnTypeForOption(type);
+            if (returnType != null) {
+                builder.addMethod(createOptionsMethod(propertyName, returnType));
+            }
+        });
+
+        JavaFile javaFile = addStaticImport(
+            JavaFile.builder(
+                getPackageName() + ".util",
+                builder.build()))
+                    .build();
+
+        javaFile.writeToPath(sourceDirPath);
+    }
+
+    private MethodSpec createOptionsMethod(String propertyName, ClassName returnType) {
+        return MethodSpec.methodBuilder("get" + propertyName + "Options")
+            .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
+            .addParameter(ParameterSpec.builder(Parameters.class, "inputParameters")
+                .build())
+            .addParameter(ParameterSpec.builder(Parameters.class, "connectionParameters")
+                .build())
+            .addParameter(ParameterSpec.builder(
+                ParameterizedTypeName.get(ClassName.get(Map.class), ClassName.get(String.class),
+                    ClassName.get(String.class)),
+                "dependencyPaths")
+                .build())
+            .addParameter(ParameterSpec.builder(String.class, "searchText")
+                .build())
+            .addParameter(ParameterSpec.builder(Context.class, "context")
+                .build())
+            .returns(ParameterizedTypeName.get(
+                ClassName.get("java.util", "List"),
+                ParameterizedTypeName.get(
+                    ClassName.get("com.bytechef.component.definition", "Option"),
+                    returnType)))
+            .addStatement("\n return List.of()")
+            .build();
+    }
+
+    private ClassName getReturnTypeForOption(String type) {
+        return switch (type) {
+            case "integer" -> ClassName.get(Long.class);
+            case "string" -> ClassName.get(String.class);
+            default ->
+                throw new IllegalArgumentException("Type %s is not supported for dynamic options.".formatted(type));
+        };
+    }
+
+    private void writeUtils(Path sourceDirPath) throws IOException {
+        String packageName = getPackageName() + ".util";
+
+        String filename = sourceDirPath
+            .resolve(packageName.replace(".", File.separator))
+            .resolve(getComponentClassName(componentName) + "Utils.java")
+            .toFile()
+            .getAbsolutePath();
+
+        if (!new File(filename).exists()) {
+            JavaFile javaFile = JavaFile.builder(
+                getPackageName() + ".util",
+                TypeSpec.classBuilder(getComponentClassName(componentName) + "Utils")
+                    .addJavadoc("This class will not be overwritten on the subsequent calls of the generator.")
+                    .addModifiers(Modifier.PUBLIC)
+                    .superclass(
+                        ClassName.get(getPackageName() + ".util",
+                            "Abstract" + getComponentClassName(componentName) + "Utils"))
+                    .addMethod(
+                        MethodSpec.constructorBuilder()
+                            .addModifiers(Modifier.PRIVATE)
+                            .build())
+                    .build())
+                .build();
+
+            javaFile.writeToPath(sourceDirPath);
+        }
+    }
+
     private record OperationItem(Operation operation, String method, String path) {
         public String getOperationId() {
             return operation.getOperationId();
         }
     }
 
-    private record OutputEntry(CodeBlock outputSchemaCodeBlock, CodeBlock sampleOutputCodeBlock) {
+    private record OutputEntry(CodeBlock outputSchemaCodeBlock, CodeBlock sampleOutputCodeBlock, boolean isDynamic) {
     }
 
     private record PropertiesEntry(CodeBlock propertiesCodeBlock, String bodyContentType, String mimeType) {

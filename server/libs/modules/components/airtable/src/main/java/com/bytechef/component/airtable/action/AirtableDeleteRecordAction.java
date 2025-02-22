@@ -24,7 +24,9 @@ import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.Context.Http.ResponseType;
 
+import com.bytechef.component.airtable.util.AirtableUtils;
 import com.bytechef.component.definition.ComponentDsl;
+import com.bytechef.component.definition.OptionsDataSource;
 import java.util.Map;
 
 /**
@@ -45,18 +47,23 @@ public class AirtableDeleteRecordAction {
         .properties(string("baseId").label("Base ID")
             .description("ID of the base where table is located.")
             .required(true)
+            .options((OptionsDataSource.ActionOptionsFunction<String>) AirtableUtils::getBaseIdOptions)
             .metadata(
                 Map.of(
                     "type", PropertyType.PATH)),
             string("tableId").label("Table ID")
                 .description("ID of the table where the record is located.")
                 .required(true)
+                .options((OptionsDataSource.ActionOptionsFunction<String>) AirtableUtils::getTableIdOptions)
+                .optionsLookupDependsOn("baseId")
                 .metadata(
                     Map.of(
                         "type", PropertyType.PATH)),
             string("recordId").label("Record ID")
                 .description("ID of the record that will be deleted.")
                 .required(true)
+                .options((OptionsDataSource.ActionOptionsFunction<String>) AirtableUtils::getRecordIdOptions)
+                .optionsLookupDependsOn("tableId", "baseId")
                 .metadata(
                     Map.of(
                         "type", PropertyType.PATH)))
