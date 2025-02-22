@@ -54,7 +54,7 @@ public class GitlabNewIssueTrigger {
         .properties(
             string(PROJECT_ID)
                 .label("Project")
-                .options((TriggerOptionsFunction<String>) GitlabUtils::getProjectOptions)
+                .options((TriggerOptionsFunction<String>) GitlabUtils::getProjectIdOptions)
                 .required(true))
         .output(
             outputSchema(
