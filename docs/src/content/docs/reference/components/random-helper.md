@@ -26,10 +26,10 @@ Generates a random integer value.
 
 #### Properties
 
-|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
-| startInclusive | Start Inclusive | INTEGER | INTEGER | The minimum possible generated value. | true |
-| endInclusive | End Inclusive | INTEGER | INTEGER | The maximum possible generated value. | true |
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| startInclusive | Start Inclusive | INTEGER | The minimum possible generated value. | true |
+| endInclusive | End Inclusive | INTEGER | The maximum possible generated value. | true |
 
 
 #### Output
@@ -63,10 +63,10 @@ Generates a random float value.
 
 #### Properties
 
-|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
-| startInclusive | Start Inclusive | INTEGER | INTEGER | The minimum possible generated value. | true |
-| endInclusive | End Inclusive | INTEGER | INTEGER | The maximum possible generated value. | true |
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| startInclusive | Start Inclusive | INTEGER | The minimum possible generated value. | true |
+| endInclusive | End Inclusive | INTEGER | The maximum possible generated value. | true |
 
 
 #### Output

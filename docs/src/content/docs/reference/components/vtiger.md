@@ -24,11 +24,11 @@ Version: 1
 
 #### Properties
 
-|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
-| username | Username | STRING | TEXT | Enter your username/email. | true |
-| password | Access Key | STRING | TEXT |  | true |
-| instance_url | VTiger Instance URL | STRING | TEXT | For the instance URL, add the url without the endpoint. | true |
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| username | Username | STRING | Enter your username/email. | true |
+| password | Access Key | STRING |  | true |
+| instance_url | VTiger Instance URL | STRING | For the instance URL, add the url without the endpoint. | true |
 
 
 
@@ -48,11 +48,11 @@ Creates a new contact.
 
 #### Properties
 
-|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
-| firstname | First Name | STRING | TEXT | First name of the contact. | true |
-| lastname | Last Name | STRING | TEXT | Last name of the contact. | true |
-| email | Email | STRING | TEXT | Email address of the contact. | true |
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| firstname | First Name | STRING | First name of the contact. | true |
+| lastname | Last Name | STRING | Last name of the contact. | true |
+| email | Email | STRING | Email address of the contact. | true |
 
 
 #### Output
@@ -64,9 +64,9 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |    Control Type     |
-|:------------:|:------------:|:-------------------:|
-| result | OBJECT <details> <summary> Properties </summary> {STRING\(firstname), STRING\(lastname), STRING\(email), STRING\(phone), STRING\(assigned_user_id), STRING\(id)} </details> | OBJECT_BUILDER |
+|     Name     |     Type     |
+|:------------:|:------------:|
+| result | OBJECT <details> <summary> Properties </summary> {STRING\(firstname), STRING\(lastname), STRING\(email), STRING\(phone), STRING\(assigned_user_id), STRING\(id)} </details> |
 
 
 
@@ -93,10 +93,10 @@ Creates a new product for your CRM.
 
 #### Properties
 
-|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
-| productname | Product Name | STRING | TEXT | Name of the product. | true |
-| product_type | Product Type | STRING <details> <summary> Options </summary> Solo, Fixed Bundle </details> | SELECT | Type of the product. | true |
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| productname | Product Name | STRING | Name of the product. | true |
+| product_type | Product Type | STRING <details> <summary> Options </summary> Solo, Fixed Bundle </details> | Type of the product. | true |
 
 
 #### Output
@@ -108,9 +108,9 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |    Control Type     |
-|:------------:|:------------:|:-------------------:|
-| results | OBJECT <details> <summary> Properties </summary> {STRING\(productname), STRING\(product_type), STRING\(assigned_user_id), STRING\(id)} </details> | OBJECT_BUILDER |
+|     Name     |     Type     |
+|:------------:|:------------:|
+| results | OBJECT <details> <summary> Properties </summary> {STRING\(productname), STRING\(product_type), STRING\(assigned_user_id), STRING\(id)} </details> |
 
 
 
@@ -144,9 +144,9 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |    Control Type     |
-|:------------:|:------------:|:-------------------:|
-| result | OBJECT <details> <summary> Properties </summary> {STRING\(id), STRING\(user_name), STRING\(user_type), STRING\(email), STRING\(phone_home), STRING\(phone_work), STRING\(phone_mobile), STRING\(userlable), STRING\(address_street), STRING\(address_city), STRING\(address_state), STRING\(address_country), STRING\(roleid), STRING\(language), STRING\(is_admin), STRING\(is_owner), STRING\(status)} </details> | OBJECT_BUILDER |
+|     Name     |     Type     |
+|:------------:|:------------:|
+| result | OBJECT <details> <summary> Properties </summary> {STRING\(id), STRING\(user_name), STRING\(user_type), STRING\(email), STRING\(phone_home), STRING\(phone_work), STRING\(phone_mobile), STRING\(userlable), STRING\(address_street), STRING\(address_city), STRING\(address_state), STRING\(address_country), STRING\(roleid), STRING\(language), STRING\(is_admin), STRING\(is_owner), STRING\(status)} </details> |
 
 
 

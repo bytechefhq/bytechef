@@ -24,11 +24,11 @@ Version: 1
 
 #### Properties
 
-|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
-| shopName | Shop name | STRING | TEXT |  | true |
-| key | Access token | STRING | TEXT |  | true |
-| value | Access Token | STRING | TEXT |  | true |
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| shopName | Shop name | STRING |  | true |
+| key | Access token | STRING |  | true |
+| value | Access Token | STRING |  | true |
 
 
 
@@ -48,9 +48,9 @@ Adds an order into a Shopify store.
 
 #### Properties
 
-|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
-| __item | Order | OBJECT <details> <summary> Properties </summary> {{[{STRING\(fulfillment_status), STRING\(grams), NUMBER\(price), INTEGER\(product_id), INTEGER\(variant_id), INTEGER\(quantity), STRING\(title)}]\(line_items), STRING\(total_tax), STRING\(currency)}\(order)} </details> | OBJECT_BUILDER |  | null |
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| __item | Order | OBJECT <details> <summary> Properties </summary> {{[{STRING\(fulfillment_status), STRING\(grams), NUMBER\(price), INTEGER\(product_id), INTEGER\(variant_id), INTEGER\(quantity), STRING\(title)}]\(line_items), STRING\(total_tax), STRING\(currency)}\(order)} </details> |  | null |
 
 
 #### Output
@@ -62,16 +62,16 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |    Control Type     |
-|:------------:|:------------:|:-------------------:|
-| id | INTEGER | INTEGER |
-| currency | STRING | TEXT |
-| note | STRING | TEXT |
-| email | STRING | TEXT |
-| name | STRING | TEXT |
-| phone | STRING | TEXT |
-| tags | STRING | TEXT |
-| line_items | ARRAY <details> <summary> Items </summary> [{STRING\(fulfillment_status), STRING\(grams), NUMBER\(price), INTEGER\(product_id), INTEGER\(variant_id), INTEGER\(quantity), STRING\(title)}] </details> | ARRAY_BUILDER |
+|     Name     |     Type     |
+|:------------:|:------------:|
+| id | INTEGER |
+| currency | STRING |
+| note | STRING |
+| email | STRING |
+| name | STRING |
+| phone | STRING |
+| tags | STRING |
+| line_items | ARRAY <details> <summary> Items </summary> [{STRING\(fulfillment_status), STRING\(grams), NUMBER\(price), INTEGER\(product_id), INTEGER\(variant_id), INTEGER\(quantity), STRING\(title)}] </details> |
 
 
 
@@ -110,9 +110,9 @@ Deletes an order. Orders that interact with an online gateway can't be deleted.
 
 #### Properties
 
-|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
-| orderId | Order ID | INTEGER | SELECT | ID of the order to delete. | true |
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| orderId | Order ID | INTEGER | ID of the order to delete. | true |
 
 
 #### JSON Example
@@ -135,9 +135,9 @@ Cancels an order. Orders that are paid and have fulfillments can't be canceled.
 
 #### Properties
 
-|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
-| orderId | Order ID | INTEGER | SELECT | ID of the order to cancel. | true |
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| orderId | Order ID | INTEGER | ID of the order to cancel. | true |
 
 
 #### Output
@@ -149,16 +149,16 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |    Control Type     |
-|:------------:|:------------:|:-------------------:|
-| id | INTEGER | INTEGER |
-| currency | STRING | TEXT |
-| note | STRING | TEXT |
-| email | STRING | TEXT |
-| name | STRING | TEXT |
-| phone | STRING | TEXT |
-| tags | STRING | TEXT |
-| line_items | ARRAY <details> <summary> Items </summary> [{STRING\(fulfillment_status), STRING\(grams), NUMBER\(price), INTEGER\(product_id), INTEGER\(variant_id), INTEGER\(quantity), STRING\(title)}] </details> | ARRAY_BUILDER |
+|     Name     |     Type     |
+|:------------:|:------------:|
+| id | INTEGER |
+| currency | STRING |
+| note | STRING |
+| email | STRING |
+| name | STRING |
+| phone | STRING |
+| tags | STRING |
+| line_items | ARRAY <details> <summary> Items </summary> [{STRING\(fulfillment_status), STRING\(grams), NUMBER\(price), INTEGER\(product_id), INTEGER\(variant_id), INTEGER\(quantity), STRING\(title)}] </details> |
 
 
 
@@ -183,10 +183,10 @@ Update an existing order.
 
 #### Properties
 
-|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
-| orderId | Order ID | INTEGER | SELECT | ID of the order to update. | true |
-| __item | Order | OBJECT <details> <summary> Properties </summary> {{STRING\(note), STRING\(email), STRING\(phone), STRING\(tags)}\(order)} </details> | OBJECT_BUILDER |  | null |
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| orderId | Order ID | INTEGER | ID of the order to update. | true |
+| __item | Order | OBJECT <details> <summary> Properties </summary> {{STRING\(note), STRING\(email), STRING\(phone), STRING\(tags)}\(order)} </details> |  | null |
 
 
 #### Output
@@ -198,16 +198,16 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |    Control Type     |
-|:------------:|:------------:|:-------------------:|
-| id | INTEGER | INTEGER |
-| currency | STRING | TEXT |
-| note | STRING | TEXT |
-| email | STRING | TEXT |
-| name | STRING | TEXT |
-| phone | STRING | TEXT |
-| tags | STRING | TEXT |
-| line_items | ARRAY <details> <summary> Items </summary> [{STRING\(fulfillment_status), STRING\(grams), NUMBER\(price), INTEGER\(product_id), INTEGER\(variant_id), INTEGER\(quantity), STRING\(title)}] </details> | ARRAY_BUILDER |
+|     Name     |     Type     |
+|:------------:|:------------:|
+| id | INTEGER |
+| currency | STRING |
+| note | STRING |
+| email | STRING |
+| name | STRING |
+| phone | STRING |
+| tags | STRING |
+| line_items | ARRAY <details> <summary> Items </summary> [{STRING\(fulfillment_status), STRING\(grams), NUMBER\(price), INTEGER\(product_id), INTEGER\(variant_id), INTEGER\(quantity), STRING\(title)}] </details> |
 
 
 
@@ -240,9 +240,9 @@ Closes an order. A closed order is one that has no more work to be done. All ite
 
 #### Properties
 
-|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
-| orderId | Order ID | INTEGER | SELECT | ID of the order to close. | true |
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| orderId | Order ID | INTEGER | ID of the order to close. | true |
 
 
 #### Output
@@ -254,16 +254,16 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |    Control Type     |
-|:------------:|:------------:|:-------------------:|
-| id | INTEGER | INTEGER |
-| currency | STRING | TEXT |
-| note | STRING | TEXT |
-| email | STRING | TEXT |
-| name | STRING | TEXT |
-| phone | STRING | TEXT |
-| tags | STRING | TEXT |
-| line_items | ARRAY <details> <summary> Items </summary> [{STRING\(fulfillment_status), STRING\(grams), NUMBER\(price), INTEGER\(product_id), INTEGER\(variant_id), INTEGER\(quantity), STRING\(title)}] </details> | ARRAY_BUILDER |
+|     Name     |     Type     |
+|:------------:|:------------:|
+| id | INTEGER |
+| currency | STRING |
+| note | STRING |
+| email | STRING |
+| name | STRING |
+| phone | STRING |
+| tags | STRING |
+| line_items | ARRAY <details> <summary> Items </summary> [{STRING\(fulfillment_status), STRING\(grams), NUMBER\(price), INTEGER\(product_id), INTEGER\(variant_id), INTEGER\(quantity), STRING\(title)}] </details> |
 
 
 
@@ -303,16 +303,16 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |    Control Type     |
-|:------------:|:------------:|:-------------------:|
-| id | INTEGER | INTEGER |
-| currency | STRING | TEXT |
-| note | STRING | TEXT |
-| email | STRING | TEXT |
-| name | STRING | TEXT |
-| phone | STRING | TEXT |
-| tags | STRING | TEXT |
-| line_items | ARRAY <details> <summary> Items </summary> [{STRING\(fulfillment_status), STRING\(grams), NUMBER\(price), INTEGER\(product_id), INTEGER\(variant_id), INTEGER\(quantity), STRING\(title)}] </details> | ARRAY_BUILDER |
+|     Name     |     Type     |
+|:------------:|:------------:|
+| id | INTEGER |
+| currency | STRING |
+| note | STRING |
+| email | STRING |
+| name | STRING |
+| phone | STRING |
+| tags | STRING |
+| line_items | ARRAY <details> <summary> Items </summary> [{STRING\(fulfillment_status), STRING\(grams), NUMBER\(price), INTEGER\(product_id), INTEGER\(variant_id), INTEGER\(quantity), STRING\(title)}] </details> |
 
 
 
@@ -344,16 +344,16 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |    Control Type     |
-|:------------:|:------------:|:-------------------:|
-| id | INTEGER | INTEGER |
-| currency | STRING | TEXT |
-| note | STRING | TEXT |
-| email | STRING | TEXT |
-| name | STRING | TEXT |
-| phone | STRING | TEXT |
-| tags | STRING | TEXT |
-| line_items | ARRAY <details> <summary> Items </summary> [{STRING\(fulfillment_status), STRING\(grams), NUMBER\(price), INTEGER\(product_id), INTEGER\(variant_id), INTEGER\(quantity), STRING\(title)}] </details> | ARRAY_BUILDER |
+|     Name     |     Type     |
+|:------------:|:------------:|
+| id | INTEGER |
+| currency | STRING |
+| note | STRING |
+| email | STRING |
+| name | STRING |
+| phone | STRING |
+| tags | STRING |
+| line_items | ARRAY <details> <summary> Items </summary> [{STRING\(fulfillment_status), STRING\(grams), NUMBER\(price), INTEGER\(product_id), INTEGER\(variant_id), INTEGER\(quantity), STRING\(title)}] </details> |
 
 
 
@@ -385,16 +385,16 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |    Control Type     |
-|:------------:|:------------:|:-------------------:|
-| id | INTEGER | INTEGER |
-| currency | STRING | TEXT |
-| note | STRING | TEXT |
-| email | STRING | TEXT |
-| name | STRING | TEXT |
-| phone | STRING | TEXT |
-| tags | STRING | TEXT |
-| line_items | ARRAY <details> <summary> Items </summary> [{STRING\(fulfillment_status), STRING\(grams), NUMBER\(price), INTEGER\(product_id), INTEGER\(variant_id), INTEGER\(quantity), STRING\(title)}] </details> | ARRAY_BUILDER |
+|     Name     |     Type     |
+|:------------:|:------------:|
+| id | INTEGER |
+| currency | STRING |
+| note | STRING |
+| email | STRING |
+| name | STRING |
+| phone | STRING |
+| tags | STRING |
+| line_items | ARRAY <details> <summary> Items </summary> [{STRING\(fulfillment_status), STRING\(grams), NUMBER\(price), INTEGER\(product_id), INTEGER\(variant_id), INTEGER\(quantity), STRING\(title)}] </details> |
 
 
 

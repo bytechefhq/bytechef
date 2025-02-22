@@ -35,10 +35,10 @@ Send a new RabbitMQ message.
 
 #### Properties
 
-|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
-| queue | null | STRING | TEXT | The name of the queue to read from | true |
-| message | null | OBJECT <details> <summary> Properties </summary> {} </details> | OBJECT_BUILDER | The name of the queue to read from | true |
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| queue | null | STRING | The name of the queue to read from | true |
+| message | null | OBJECT <details> <summary> Properties </summary> {} </details> | The name of the queue to read from | true |
 
 
 #### JSON Example
@@ -69,9 +69,9 @@ Type: LISTENER
 
 #### Properties
 
-|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
-| queue | null | STRING | TEXT | The name of the queue to read from | true |
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| queue | null | STRING | The name of the queue to read from | true |
 
 
 #### JSON Example

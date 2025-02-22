@@ -24,11 +24,11 @@ Version: 1
 
 #### Properties
 
-|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
-| subdomain | Subdomain | STRING | TEXT | The subdomain of your Salesforce instance. | true |
-| clientId | Client Id | STRING | TEXT |  | true |
-| clientSecret | Client Secret | STRING | TEXT |  | true |
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| subdomain | Subdomain | STRING | The subdomain of your Salesforce instance. | true |
+| clientId | Client Id | STRING |  | true |
+| clientSecret | Client Secret | STRING |  | true |
 
 
 
@@ -48,11 +48,11 @@ Creates a new record of a specified Salesforce object.
 
 #### Properties
 
-|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
-| object | Salesforce Object | STRING | SELECT |  | true |
-| fields | | DYNAMIC_PROPERTIES <details> <summary> Depends On </summary> object </details> | null |  | true |
-| customFields | Custom Fields | OBJECT <details> <summary> Properties </summary> {} </details> | OBJECT_BUILDER |  | false |
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| object | Salesforce Object | STRING |  | true |
+| fields | | DYNAMIC_PROPERTIES <details> <summary> Depends On </summary> object </details> |  | true |
+| customFields | Custom Fields | OBJECT <details> <summary> Properties </summary> {} </details> |  | false |
 
 
 #### Output
@@ -64,9 +64,9 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |    Control Type     |
-|:------------:|:------------:|:-------------------:|
-| id | STRING | TEXT |
+|     Name     |     Type     |
+|:------------:|:------------:|
+| id | STRING |
 
 
 
@@ -93,10 +93,10 @@ Deletes an existing record of a specified Salesforce object.
 
 #### Properties
 
-|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
-| object | Salesforce Object | STRING | SELECT |  | true |
-| id | Record ID | STRING <details> <summary> Depends On </summary> object </details> | SELECT | ID of the object to delete. | true |
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| object | Salesforce Object | STRING |  | true |
+| id | Record ID | STRING <details> <summary> Depends On </summary> object </details> | ID of the object to delete. | true |
 
 
 #### JSON Example
@@ -120,9 +120,9 @@ Executes a raw SOQL query to  extract data from Salesforce.
 
 #### Properties
 
-|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
-| q | Query | STRING | TEXT_AREA | SOQL query to execute. | true |
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| q | Query | STRING | SOQL query to execute. | true |
 
 
 #### JSON Example
@@ -145,12 +145,12 @@ Updates an existing record for a specified Salesforce object.
 
 #### Properties
 
-|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
-| object | Salesforce Object | STRING | SELECT |  | true |
-| id | Record ID | STRING <details> <summary> Depends On </summary> object </details> | SELECT | ID of the record to update. | true |
-| fields | | DYNAMIC_PROPERTIES <details> <summary> Depends On </summary> object </details> | null |  | true |
-| customFields | Custom Fields | OBJECT <details> <summary> Properties </summary> {} </details> | OBJECT_BUILDER |  | false |
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| object | Salesforce Object | STRING |  | true |
+| id | Record ID | STRING <details> <summary> Depends On </summary> object </details> | ID of the record to update. | true |
+| fields | | DYNAMIC_PROPERTIES <details> <summary> Depends On </summary> object </details> |  | true |
+| customFields | Custom Fields | OBJECT <details> <summary> Properties </summary> {} </details> |  | false |
 
 
 #### JSON Example
@@ -183,9 +183,9 @@ Type: POLLING
 
 #### Properties
 
-|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
-| object | Salesforce Object | STRING | SELECT |  | true |
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| object | Salesforce Object | STRING |  | true |
 
 
 #### JSON Example
@@ -210,9 +210,9 @@ Type: POLLING
 
 #### Properties
 
-|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
-| object | Salesforce Object | STRING | SELECT |  | true |
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| object | Salesforce Object | STRING |  | true |
 
 
 #### JSON Example

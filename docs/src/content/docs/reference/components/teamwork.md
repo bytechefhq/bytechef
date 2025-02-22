@@ -24,10 +24,10 @@ Version: 1
 
 #### Properties
 
-|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
-| siteName | Your site name | STRING | TEXT | e.g. https://{yourSiteName}.teamwork.com | true |
-| username | API Key | STRING | TEXT |  | true |
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| siteName | Your site name | STRING | e.g. https://{yourSiteName}.teamwork.com | true |
+| username | API Key | STRING |  | true |
 
 
 
@@ -47,9 +47,9 @@ Creates a new company.
 
 #### Properties
 
-|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
-| __item | Company | OBJECT <details> <summary> Properties </summary> {{STRING\(name), STRING\(emailOne), STRING\(phone), STRING\(website)}\(company)} </details> | OBJECT_BUILDER |  | null |
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| __item | Company | OBJECT <details> <summary> Properties </summary> {{STRING\(name), STRING\(emailOne), STRING\(phone), STRING\(website)}\(company)} </details> |  | null |
 
 
 #### Output
@@ -61,9 +61,9 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |    Control Type     |
-|:------------:|:------------:|:-------------------:|
-| body | OBJECT <details> <summary> Properties </summary> {STRING\(name), STRING\(emailOne), STRING\(phone), STRING\(website)} </details> | OBJECT_BUILDER |
+|     Name     |     Type     |
+|:------------:|:------------:|
+| body | OBJECT <details> <summary> Properties </summary> {STRING\(name), STRING\(emailOne), STRING\(phone), STRING\(website)} </details> |
 
 
 
@@ -95,10 +95,10 @@ Create a new task
 
 #### Properties
 
-|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
-| tasklistId | Task List ID | INTEGER | SELECT | Task list where new task is added | true |
-| __item | Task | OBJECT <details> <summary> Properties </summary> {{STRING\(name), STRING\(description), DATE\(dueAt)}\(task)} </details> | OBJECT_BUILDER |  | null |
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| tasklistId | Task List ID | INTEGER | Task list where new task is added | true |
+| __item | Task | OBJECT <details> <summary> Properties </summary> {{STRING\(name), STRING\(description), DATE\(dueAt)}\(task)} </details> |  | null |
 
 
 #### Output
@@ -110,9 +110,9 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |    Control Type     |
-|:------------:|:------------:|:-------------------:|
-| body | OBJECT <details> <summary> Properties </summary> {STRING\(name), STRING\(description), STRING\(dueAt)} </details> | OBJECT_BUILDER |
+|     Name     |     Type     |
+|:------------:|:------------:|
+| body | OBJECT <details> <summary> Properties </summary> {STRING\(name), STRING\(description), STRING\(dueAt)} </details> |
 
 
 

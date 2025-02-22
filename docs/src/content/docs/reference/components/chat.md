@@ -26,10 +26,10 @@ Converts the response to chat request.
 
 #### Properties
 
-|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
-| message | Message | STRING | TEXT | The message of the response. | null |
-| attachments | Attachments | ARRAY <details> <summary> Items </summary> [FILE_ENTRY] </details> | ARRAY_BUILDER | The attachments of the response. | null |
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| message | Message | STRING | The message of the response. | null |
+| attachments | Attachments | ARRAY <details> <summary> Items </summary> [FILE_ENTRY] </details> | The attachments of the response. | null |
 
 
 #### JSON Example
@@ -65,9 +65,9 @@ Type: STATIC_WEBHOOK
 
 #### Properties
 
-|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
-| mode | | INTEGER <details> <summary> Options </summary> 1, 2 </details> | SELECT |  | true |
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| mode | | INTEGER <details> <summary> Options </summary> 1, 2 </details> |  | true |
 
 
 #### Output
@@ -79,11 +79,11 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |    Control Type     |
-|:------------:|:------------:|:-------------------:|
-| conversationId | STRING | TEXT |
-| message | STRING | TEXT |
-| attachments | ARRAY <details> <summary> Items </summary> [FILE_ENTRY] </details> | ARRAY_BUILDER |
+|     Name     |     Type     |
+|:------------:|:------------:|
+| conversationId | STRING |
+| message | STRING |
+| attachments | ARRAY <details> <summary> Items </summary> [FILE_ENTRY] </details> |
 
 
 

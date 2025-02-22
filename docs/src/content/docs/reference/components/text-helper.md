@@ -26,10 +26,10 @@ Decodes base64 encoded text into human readable plain text.
 
 #### Properties
 
-|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
-| encodingSchema | Encoding Scheme | STRING <details> <summary> Options </summary> base64, base64Url </details> | SELECT |  | true |
-| content | Base64 Content | STRING | TEXT_AREA | The Base64 encoded content that needs to be decoded. | true |
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| encodingSchema | Encoding Scheme | STRING <details> <summary> Options </summary> base64, base64Url </details> |  | true |
+| content | Base64 Content | STRING | The Base64 encoded content that needs to be decoded. | true |
 
 
 #### JSON Example
@@ -53,10 +53,10 @@ Concatenate two or more texts.
 
 #### Properties
 
-|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
-| texts | Texts | ARRAY <details> <summary> Items </summary> [STRING\($text)] </details> | ARRAY_BUILDER |  | true |
-| separator | Separator | STRING | TEXT | The text that separates the texts you want to concatenate. | false |
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| texts | Texts | ARRAY <details> <summary> Items </summary> [STRING\($text)] </details> |  | true |
+| separator | Separator | STRING | The text that separates the texts you want to concatenate. | false |
 
 
 #### Output
@@ -90,13 +90,13 @@ Extract content from the HTML content.
 
 #### Properties
 
-|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
-| content | HTML Content | STRING | TEXT_AREA | HTML content to extract content from. | true |
-| querySelector | CSS Selector | STRING | TEXT | The CSS selector to search for. | true |
-| returnValue | Return Value | STRING <details> <summary> Options </summary> ATTRIBUTE, HTML, TEXT </details> | SELECT | The data to return. | true |
-| attribute | Attribute | STRING | TEXT | The name of the attribute to return the value of | true |
-| returnArray | Return Array | BOOLEAN <details> <summary> Options </summary> true, false </details> | SELECT | If selected, then extracted individual items are returned as an array. If you don't set this, all values are returned as a single string. | null |
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| content | HTML Content | STRING | HTML content to extract content from. | true |
+| querySelector | CSS Selector | STRING | The CSS selector to search for. | true |
+| returnValue | Return Value | STRING <details> <summary> Options </summary> ATTRIBUTE, HTML, TEXT </details> | The data to return. | true |
+| attribute | Attribute | STRING | The name of the attribute to return the value of | true |
+| returnArray | Return Array | BOOLEAN <details> <summary> Options </summary> true, false </details> | If selected, then extracted individual items are returned as an array. If you don't set this, all values are returned as a single string. | null |
 
 
 #### JSON Example
@@ -123,10 +123,10 @@ Find substring
 
 #### Properties
 
-|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
-| text | Text | STRING | TEXT_AREA |  | true |
-| expression | Expression | STRING | TEXT | Text to search for. | true |
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| text | Text | STRING |  | true |
+| expression | Expression | STRING | Text to search for. | true |
 
 
 #### Output
@@ -160,9 +160,9 @@ Converts HTML to markdown.
 
 #### Properties
 
-|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
-| html | HTML Content | STRING | TEXT_AREA | HTML content to be converted to markdown. | true |
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| html | HTML Content | STRING | HTML content to be converted to markdown. | true |
 
 
 #### Output
@@ -195,9 +195,9 @@ Converts markdown to HTML.
 
 #### Properties
 
-|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
-| markdown | Markdown content | STRING | TEXT_AREA | Markdown content to convert to HTML. | true |
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| markdown | Markdown content | STRING | Markdown content to convert to HTML. | true |
 
 
 #### Output
@@ -230,12 +230,12 @@ Replace all instances of any word, character, or phrase in text with another.
 
 #### Properties
 
-|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
-| text | Text | STRING | TEXT_AREA |  | true |
-| searchValue | Search Value | STRING | TEXT | Can be plain text or a regex expression. | true |
-| replaceValue | Replace Value | STRING | TEXT | Leave blank to remove the search value. | false |
-| replaceOnlyFirst | Replace Only First Match | BOOLEAN <details> <summary> Options </summary> true, false </details> | SELECT |  | true |
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| text | Text | STRING |  | true |
+| searchValue | Search Value | STRING | Can be plain text or a regex expression. | true |
+| replaceValue | Replace Value | STRING | Leave blank to remove the search value. | false |
+| replaceOnlyFirst | Replace Only First Match | BOOLEAN <details> <summary> Options </summary> true, false </details> |  | true |
 
 
 #### Output
@@ -271,10 +271,10 @@ Split the text by delimiter.
 
 #### Properties
 
-|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
-| text | Text | STRING | TEXT_AREA |  | true |
-| delimiter | Delimiter | STRING | TEXT | Delimiter used for splitting the text. | true |
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| text | Text | STRING |  | true |
+| delimiter | Delimiter | STRING | Delimiter used for splitting the text. | true |
 
 
 #### Output
@@ -286,9 +286,9 @@ Type: ARRAY
 
 #### Properties
 
-|     Name     |     Type     |    Control Type     |
-|:------------:|:------------:|:-------------------:|
-|  | STRING | TEXT |
+|     Name     |     Type     |
+|:------------:|:------------:|
+|  | STRING |
 
 
 

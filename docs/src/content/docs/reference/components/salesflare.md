@@ -24,9 +24,9 @@ Version: 1
 
 #### Properties
 
-|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
-| token | Token | STRING | TEXT |  | true |
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| token | Token | STRING |  | true |
 
 
 
@@ -46,9 +46,9 @@ Creates new account.
 
 #### Properties
 
-|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
-| __item | Account | OBJECT <details> <summary> Properties </summary> {STRING\(name), STRING\(website), STRING\(description), STRING\(email), STRING\(phone_number), [STRING]\(social_profiles)} </details> | OBJECT_BUILDER |  | true |
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| __item | Account | OBJECT <details> <summary> Properties </summary> {STRING\(name), STRING\(website), STRING\(description), STRING\(email), STRING\(phone_number), [STRING]\(social_profiles)} </details> |  | true |
 
 
 #### JSON Example
@@ -78,9 +78,9 @@ Creates new contacts.
 
 #### Properties
 
-|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
-| __items | Contacts | ARRAY <details> <summary> Items </summary> [{STRING\(email), STRING\(firstname), STRING\(lastname), STRING\(phone_number), STRING\(mobile_phone_number), STRING\(home_phone_number), STRING\(fax_number), [STRING]\(social_profiles)}] </details> | ARRAY_BUILDER |  | true |
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| __items | Contacts | ARRAY <details> <summary> Items </summary> [{STRING\(email), STRING\(firstname), STRING\(lastname), STRING\(phone_number), STRING\(mobile_phone_number), STRING\(home_phone_number), STRING\(fax_number), [STRING]\(social_profiles)}] </details> |  | true |
 
 
 #### Output
@@ -92,9 +92,9 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |    Control Type     |
-|:------------:|:------------:|:-------------------:|
-| body | ARRAY <details> <summary> Items </summary> [{INTEGER\(id)}] </details> | ARRAY_BUILDER |
+|     Name     |     Type     |
+|:------------:|:------------:|
+| body | ARRAY <details> <summary> Items </summary> [{INTEGER\(id)}] </details> |
 
 
 
@@ -128,9 +128,9 @@ Creates new tasks.
 
 #### Properties
 
-|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
-| __items | Tasks | ARRAY <details> <summary> Items </summary> [{STRING\(description), DATE\(reminder_date)}] </details> | ARRAY_BUILDER |  | true |
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| __items | Tasks | ARRAY <details> <summary> Items </summary> [{STRING\(description), DATE\(reminder_date)}] </details> |  | true |
 
 
 #### Output
@@ -142,9 +142,9 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |    Control Type     |
-|:------------:|:------------:|:-------------------:|
-| body | ARRAY <details> <summary> Items </summary> [{INTEGER\(id)}] </details> | ARRAY_BUILDER |
+|     Name     |     Type     |
+|:------------:|:------------:|
+| body | ARRAY <details> <summary> Items </summary> [{INTEGER\(id)}] </details> |
 
 
 

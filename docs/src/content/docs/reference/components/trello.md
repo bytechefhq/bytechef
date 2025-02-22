@@ -20,14 +20,14 @@ Type: trello/v1
 Version: 1
 
 
-### null
+### custom
 
 #### Properties
 
-|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
-| key | Key | STRING | TEXT |  | true |
-| token | Token | STRING | TEXT |  | true |
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| key | Key | STRING |  | true |
+| token | Token | STRING |  | true |
 
 
 
@@ -47,10 +47,10 @@ Creates a new board.
 
 #### Properties
 
-|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
-| name | Name | STRING | TEXT | The new name for the board. | true |
-| desc | Description | STRING | TEXT | A new description for the board. | false |
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| name | Name | STRING | The new name for the board. | true |
+| desc | Description | STRING | A new description for the board. | false |
 
 
 #### JSON Example
@@ -74,12 +74,12 @@ Creates a new card.
 
 #### Properties
 
-|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
-| idBoard | Board ID | STRING | SELECT | ID of the board. | true |
-| idList | List ID | STRING <details> <summary> Depends On </summary> idBoard </details> | SELECT | ID of the list where the card should be created in. | true |
-| name | Name | STRING | TEXT | The name for the card. | false |
-| desc | Description | STRING | TEXT | The description for the card. | false |
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| idBoard | Board ID | STRING | ID of the board. | true |
+| idList | List ID | STRING <details> <summary> Depends On </summary> idBoard </details> | ID of the list where the card should be created in. | true |
+| name | Name | STRING | The name for the card. | false |
+| desc | Description | STRING | The description for the card. | false |
 
 
 #### Output
@@ -91,13 +91,13 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |    Control Type     |
-|:------------:|:------------:|:-------------------:|
-| id | STRING | TEXT |
-| desc | STRING | TEXT |
-| idBoard | STRING | TEXT |
-| idList | STRING | TEXT |
-| name | STRING | TEXT |
+|     Name     |     Type     |
+|:------------:|:------------:|
+| id | STRING |
+| desc | STRING |
+| idBoard | STRING |
+| idList | STRING |
+| name | STRING |
 
 
 
@@ -125,10 +125,10 @@ Gets a card details.
 
 #### Properties
 
-|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
-| idBoard | Board ID | STRING | SELECT | ID of the board where card is located. | true |
-| id | Card ID | STRING <details> <summary> Depends On </summary> idBoard </details> | SELECT |  | true |
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| idBoard | Board ID | STRING | ID of the board where card is located. | true |
+| id | Card ID | STRING <details> <summary> Depends On </summary> idBoard </details> |  | true |
 
 
 #### Output
@@ -140,13 +140,13 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |    Control Type     |
-|:------------:|:------------:|:-------------------:|
-| id | STRING | TEXT |
-| desc | STRING | TEXT |
-| idBoard | STRING | TEXT |
-| idList | STRING | TEXT |
-| name | STRING | TEXT |
+|     Name     |     Type     |
+|:------------:|:------------:|
+| id | STRING |
+| desc | STRING |
+| idBoard | STRING |
+| idList | STRING |
+| name | STRING |
 
 
 
@@ -179,10 +179,10 @@ Type: DYNAMIC_WEBHOOK
 
 #### Properties
 
-|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
-| idBoard | Board ID | STRING | SELECT |  | true |
-| idList | List ID | STRING <details> <summary> Depends On </summary> idBoard </details> | SELECT |  | false |
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| idBoard | Board ID | STRING |  | true |
+| idList | List ID | STRING <details> <summary> Depends On </summary> idBoard </details> |  | false |
 
 
 #### Output
@@ -194,13 +194,13 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |    Control Type     |
-|:------------:|:------------:|:-------------------:|
-| id | STRING | TEXT |
-| desc | STRING | TEXT |
-| idBoard | STRING | TEXT |
-| idList | STRING | TEXT |
-| name | STRING | TEXT |
+|     Name     |     Type     |
+|:------------:|:------------:|
+| id | STRING |
+| desc | STRING |
+| idBoard | STRING |
+| idList | STRING |
+| name | STRING |
 
 
 

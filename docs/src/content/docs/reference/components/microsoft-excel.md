@@ -24,11 +24,11 @@ Version: 1
 
 #### Properties
 
-|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
-| clientId | Client Id | STRING | TEXT |  | true |
-| clientSecret | Client Secret | STRING | TEXT |  | true |
-| tenantId | Tenant Id | STRING | TEXT |  | true |
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| clientId | Client Id | STRING |  | true |
+| clientSecret | Client Secret | STRING |  | true |
+| tenantId | Tenant Id | STRING |  | true |
 
 
 
@@ -48,12 +48,12 @@ Append a row of values to an existing worksheet.
 
 #### Properties
 
-|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
-| workbookId | Workbook ID | STRING | SELECT |  | true |
-| worksheetName | Worksheet | STRING <details> <summary> Depends On </summary> workbookId </details> | SELECT |  | true |
-| isTheFirstRowHeader | Is the First Row Header? | BOOLEAN <details> <summary> Options </summary> true, false </details> | SELECT | If the first row is header. | true |
-| row | | DYNAMIC_PROPERTIES <details> <summary> Depends On </summary> isTheFirstRowHeader, worksheetName, workbookId </details> | null |  | true |
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| workbookId | Workbook ID | STRING |  | true |
+| worksheetName | Worksheet | STRING <details> <summary> Depends On </summary> workbookId </details> |  | true |
+| isTheFirstRowHeader | Is the First Row Header? | BOOLEAN <details> <summary> Options </summary> true, false </details> | If the first row is header. | true |
+| row | | DYNAMIC_PROPERTIES <details> <summary> Depends On </summary> isTheFirstRowHeader, worksheetName, workbookId </details> |  | true |
 
 
 #### JSON Example
@@ -79,11 +79,11 @@ Clear a worksheet of all values.
 
 #### Properties
 
-|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
-| workbookId | Workbook ID | STRING | SELECT |  | true |
-| worksheetName | Worksheet | STRING <details> <summary> Depends On </summary> workbookId </details> | SELECT |  | true |
-| isTheFirstRowHeader | Is the First Row Header? | BOOLEAN <details> <summary> Options </summary> true, false </details> | SELECT | If the first row is header. | true |
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| workbookId | Workbook ID | STRING |  | true |
+| worksheetName | Worksheet | STRING <details> <summary> Depends On </summary> workbookId </details> |  | true |
+| isTheFirstRowHeader | Is the First Row Header? | BOOLEAN <details> <summary> Options </summary> true, false </details> | If the first row is header. | true |
 
 
 #### JSON Example
@@ -108,11 +108,11 @@ Delete row on an existing sheet.
 
 #### Properties
 
-|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
-| workbookId | Workbook ID | STRING | SELECT |  | true |
-| worksheetName | Worksheet | STRING <details> <summary> Depends On </summary> workbookId </details> | SELECT |  | true |
-| rowNumber | Row Number | INTEGER | INTEGER | The row number to delete. | true |
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| workbookId | Workbook ID | STRING |  | true |
+| worksheetName | Worksheet | STRING <details> <summary> Depends On </summary> workbookId </details> |  | true |
+| rowNumber | Row Number | INTEGER | The row number to delete. | true |
 
 
 #### JSON Example
@@ -137,12 +137,12 @@ Get row values from the worksheet by the row number.
 
 #### Properties
 
-|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
-| workbookId | Workbook ID | STRING | SELECT |  | true |
-| worksheetName | Worksheet | STRING <details> <summary> Depends On </summary> workbookId </details> | SELECT |  | true |
-| isTheFirstRowHeader | Is the First Row Header? | BOOLEAN <details> <summary> Options </summary> true, false </details> | SELECT | If the first row is header. | true |
-| rowNumber | Row Number | INTEGER | INTEGER | The row number to get the values from. | true |
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| workbookId | Workbook ID | STRING |  | true |
+| worksheetName | Worksheet | STRING <details> <summary> Depends On </summary> workbookId </details> |  | true |
+| isTheFirstRowHeader | Is the First Row Header? | BOOLEAN <details> <summary> Options </summary> true, false </details> | If the first row is header. | true |
+| rowNumber | Row Number | INTEGER | The row number to get the values from. | true |
 
 
 #### JSON Example
@@ -168,13 +168,13 @@ Update a row in a worksheet.
 
 #### Properties
 
-|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
-| workbookId | Workbook ID | STRING | SELECT |  | true |
-| worksheetName | Worksheet | STRING <details> <summary> Depends On </summary> workbookId </details> | SELECT |  | true |
-| rowNumber | Row Number | INTEGER | INTEGER | The row number to update. | true |
-| isTheFirstRowHeader | Is the First Row Header? | BOOLEAN <details> <summary> Options </summary> true, false </details> | SELECT | If the first row is header. | true |
-| row | | DYNAMIC_PROPERTIES <details> <summary> Depends On </summary> isTheFirstRowHeader, worksheetName, workbookId </details> | null |  | true |
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| workbookId | Workbook ID | STRING |  | true |
+| worksheetName | Worksheet | STRING <details> <summary> Depends On </summary> workbookId </details> |  | true |
+| rowNumber | Row Number | INTEGER | The row number to update. | true |
+| isTheFirstRowHeader | Is the First Row Header? | BOOLEAN <details> <summary> Options </summary> true, false </details> | If the first row is header. | true |
+| row | | DYNAMIC_PROPERTIES <details> <summary> Depends On </summary> isTheFirstRowHeader, worksheetName, workbookId </details> |  | true |
 
 
 #### JSON Example
