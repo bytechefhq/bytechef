@@ -20,6 +20,7 @@ paths:
           schema:
             title: "Project ID"
             type: "string"
+            x-dynamic-options: true
         - name: "title"
           description: "The title of an issue."
           in: "query"
@@ -68,6 +69,7 @@ paths:
           schema:
             title: "Project ID"
             type: "string"
+            x-dynamic-options: true
         - name: "issueId"
           description: "ID of the issue to comment on."
           in: "path"
@@ -75,6 +77,9 @@ paths:
           schema:
             title: "Issue ID"
             type: "integer"
+            x-dynamic-options: true
+            x-dynamic-options-dependency:
+              - "projectId"
         - name: "body"
           description: "The comment to add to the issue."
           in: "query"
