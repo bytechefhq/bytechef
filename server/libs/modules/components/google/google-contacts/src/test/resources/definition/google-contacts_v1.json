@@ -819,9 +819,9 @@
       "optionsDataSource" : null
     } ],
     "title" : "Create Contact",
-    "processErrorResponse" : null,
     "workflowNodeDescription" : null,
-    "perform" : { }
+    "perform" : { },
+    "processErrorResponse" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -940,9 +940,9 @@
       "optionsDataSource" : null
     } ],
     "title" : "Create Group",
-    "processErrorResponse" : null,
     "workflowNodeDescription" : null,
-    "perform" : { }
+    "perform" : { },
+    "processErrorResponse" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -1769,9 +1769,9 @@
       "optionsDataSource" : null
     } ],
     "title" : "Update Contact",
-    "processErrorResponse" : null,
     "workflowNodeDescription" : null,
-    "perform" : { }
+    "perform" : { },
+    "processErrorResponse" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -2480,7 +2480,7 @@
     },
     "properties" : [ {
       "advancedOption" : null,
-      "description" : "The plain-text query.",
+      "description" : "The plain-text query for the request.The query is used to match prefix phrases of the fields on a person. For example, a person with name \"foo name\" matches queries such as \"f\", \"fo\", \"foo\", \"foo n\", \"nam\", etc., but not \"oo n\".",
       "displayCondition" : null,
       "expressionEnabled" : null,
       "hidden" : null,
@@ -2498,15 +2498,188 @@
       "minLength" : null,
       "options" : null,
       "optionsDataSource" : null
+    }, {
+      "advancedOption" : null,
+      "description" : "A field mask to restrict which fields on each person are returned..",
+      "displayCondition" : null,
+      "expressionEnabled" : null,
+      "hidden" : null,
+      "metadata" : { },
+      "required" : true,
+      "name" : "readMask",
+      "type" : "ARRAY",
+      "defaultValue" : [ "names", "emailAddresses" ],
+      "exampleValue" : null,
+      "label" : "Read Mask",
+      "placeholder" : null,
+      "items" : [ {
+        "advancedOption" : null,
+        "description" : null,
+        "displayCondition" : null,
+        "expressionEnabled" : null,
+        "hidden" : null,
+        "metadata" : { },
+        "required" : null,
+        "name" : null,
+        "type" : "STRING",
+        "defaultValue" : null,
+        "exampleValue" : null,
+        "label" : null,
+        "placeholder" : null,
+        "controlType" : "TEXT",
+        "languageId" : null,
+        "maxLength" : null,
+        "minLength" : null,
+        "options" : null,
+        "optionsDataSource" : null
+      } ],
+      "maxItems" : null,
+      "minItems" : null,
+      "multipleValues" : null,
+      "options" : [ {
+        "description" : null,
+        "label" : "Addresses",
+        "value" : "addresses"
+      }, {
+        "description" : null,
+        "label" : "Age Ranges",
+        "value" : "ageRanges"
+      }, {
+        "description" : null,
+        "label" : "Biographies",
+        "value" : "biographies"
+      }, {
+        "description" : null,
+        "label" : "Birthdays",
+        "value" : "birthdays"
+      }, {
+        "description" : null,
+        "label" : "Calendar Urls",
+        "value" : "calendarUrls"
+      }, {
+        "description" : null,
+        "label" : "Client Data",
+        "value" : "clientData"
+      }, {
+        "description" : null,
+        "label" : "Cover Photos",
+        "value" : "coverPhotos"
+      }, {
+        "description" : null,
+        "label" : "Email Addresses",
+        "value" : "emailAddresses"
+      }, {
+        "description" : null,
+        "label" : "Events",
+        "value" : "events"
+      }, {
+        "description" : null,
+        "label" : "External Ids",
+        "value" : "externalIds"
+      }, {
+        "description" : null,
+        "label" : "Genders",
+        "value" : "genders"
+      }, {
+        "description" : null,
+        "label" : "Im Clients",
+        "value" : "imClients"
+      }, {
+        "description" : null,
+        "label" : "Interests",
+        "value" : "interests"
+      }, {
+        "description" : null,
+        "label" : "Locales",
+        "value" : "locales"
+      }, {
+        "description" : null,
+        "label" : "Locations",
+        "value" : "locations"
+      }, {
+        "description" : null,
+        "label" : "Memberships",
+        "value" : "memberships"
+      }, {
+        "description" : null,
+        "label" : "Metadata",
+        "value" : "metadata"
+      }, {
+        "description" : null,
+        "label" : "Misc Keywords",
+        "value" : "miscKeywords"
+      }, {
+        "description" : null,
+        "label" : "Names",
+        "value" : "names"
+      }, {
+        "description" : null,
+        "label" : "Nicknames",
+        "value" : "nicknames"
+      }, {
+        "description" : null,
+        "label" : "Occupations",
+        "value" : "occupations"
+      }, {
+        "description" : null,
+        "label" : "Organizations",
+        "value" : "organizations"
+      }, {
+        "description" : null,
+        "label" : "Phone Numbers",
+        "value" : "phoneNumbers"
+      }, {
+        "description" : null,
+        "label" : "Photos",
+        "value" : "photos"
+      }, {
+        "description" : null,
+        "label" : "Relations",
+        "value" : "relations"
+      }, {
+        "description" : null,
+        "label" : "Sip Addresses",
+        "value" : "sipAddresses"
+      }, {
+        "description" : null,
+        "label" : "Skills",
+        "value" : "skills"
+      }, {
+        "description" : null,
+        "label" : "Urls",
+        "value" : "urls"
+      }, {
+        "description" : null,
+        "label" : "User Defined",
+        "value" : "userDefined"
+      } ],
+      "controlType" : "MULTI_SELECT",
+      "optionsDataSource" : null
+    }, {
+      "advancedOption" : null,
+      "description" : "The number of results to return per page.",
+      "displayCondition" : null,
+      "expressionEnabled" : null,
+      "hidden" : null,
+      "metadata" : { },
+      "required" : true,
+      "name" : "pageSize",
+      "type" : "INTEGER",
+      "defaultValue" : 10,
+      "exampleValue" : null,
+      "label" : "Page Size",
+      "placeholder" : null,
+      "maxValue" : 30,
+      "minValue" : null,
+      "options" : null,
+      "controlType" : "INTEGER",
+      "optionsDataSource" : null
     } ],
     "title" : "Search Contacts",
-    "processErrorResponse" : null,
     "workflowNodeDescription" : null,
-    "perform" : { }
+    "perform" : { },
+    "processErrorResponse" : null
   } ],
-  "dataStream" : null,
-  "triggers" : null,
-  "unifiedApi" : null,
   "connection" : {
     "authorizations" : [ {
       "detectOn" : null,
@@ -2575,5 +2748,8 @@
     "authorizationRequired" : null,
     "baseUri" : null,
     "test" : null
-  }
+  },
+  "triggers" : null,
+  "dataStream" : null,
+  "unifiedApi" : null
 }

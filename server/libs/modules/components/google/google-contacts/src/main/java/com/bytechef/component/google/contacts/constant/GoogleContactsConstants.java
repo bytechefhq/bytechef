@@ -32,8 +32,10 @@ public class GoogleContactsConstants {
     public static final String GIVEN_NAME = "givenName";
     public static final String MIDDLE_NAME = "middleName";
     public static final String NAME = "name";
+    public static final String PAGE_SIZE = "pageSize";
     public static final String PHONE_NUMBER = "phoneNumber";
     public static final String QUERY = "query";
+    public static final String READ_MASK = "readMask";
     public static final String RESOURCE_NAME = "resourceName";
     public static final String TITLE = "title";
 
