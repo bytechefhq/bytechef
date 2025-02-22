@@ -24,10 +24,10 @@ Version: 1
 
 #### Properties
 
-|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
-| clientId | Client Id | STRING | TEXT |  | true |
-| clientSecret | Client Secret | STRING | TEXT |  | true |
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| clientId | Client Id | STRING |  | true |
+| clientSecret | Client Secret | STRING |  | true |
 
 
 
@@ -47,11 +47,11 @@ Adds a new member to the list.
 
 #### Properties
 
-|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
-| listId | List ID | STRING | SELECT | The unique ID for the list. | true |
-| skip_merge_validation | Skip Merge Validation | BOOLEAN <details> <summary> Options </summary> true, false </details> | SELECT | If skip_merge_validation is true, member data will be accepted without merge field values, even if the merge field is usually required. This defaults to false. | false |
-| __item | Item | OBJECT <details> <summary> Properties </summary> {STRING\(email_address), STRING\(status), STRING\(email_type), {}\(merge_fields), {}\(interests), STRING\(language), BOOLEAN\(vip), {NUMBER\(latitude), NUMBER\(longitude)}\(location), [{STRING\(marketing_permission_id), BOOLEAN\(enabled)}]\(marketing_permissions), STRING\(ip_signup), STRING\(timestamp_signup), STRING\(ip_opt), STRING\(timestamp_opt), [STRING]\(tags)} </details> | OBJECT_BUILDER |  | null |
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| listId | List ID | STRING | The unique ID for the list. | true |
+| skip_merge_validation | Skip Merge Validation | BOOLEAN <details> <summary> Options </summary> true, false </details> | If skip_merge_validation is true, member data will be accepted without merge field values, even if the merge field is usually required. This defaults to false. | false |
+| __item | Item | OBJECT <details> <summary> Properties </summary> {STRING\(email_address), STRING\(status), STRING\(email_type), {}\(merge_fields), {}\(interests), STRING\(language), BOOLEAN\(vip), {NUMBER\(latitude), NUMBER\(longitude)}\(location), [{STRING\(marketing_permission_id), BOOLEAN\(enabled)}]\(marketing_permissions), STRING\(ip_signup), STRING\(timestamp_signup), STRING\(ip_opt), STRING\(timestamp_opt), [STRING]\(tags)} </details> |  | null |
 
 
 #### Output
@@ -68,38 +68,38 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |    Control Type     |
-|:------------:|:------------:|:-------------------:|
-| id | STRING | TEXT |
-| email_address | STRING | TEXT |
-| unique_email_id | STRING | TEXT |
-| contact_id | STRING | TEXT |
-| full_name | STRING | TEXT |
-| web_id | STRING | TEXT |
-| email_type | STRING | TEXT |
-| status | STRING <details> <summary> Options </summary> subscribed, unsubscribed, cleaned, pending, transactional </details> | SELECT |
-| unsubscribe_reason | STRING | TEXT |
-| consents_to_one_to_one_messaging | BOOLEAN <details> <summary> Options </summary> true, false </details> | SELECT |
-| merge_fields | OBJECT <details> <summary> Properties </summary> {} </details> | OBJECT_BUILDER |
-| interests | OBJECT <details> <summary> Properties </summary> {} </details> | OBJECT_BUILDER |
-| stats | OBJECT <details> <summary> Properties </summary> {NUMBER\(avg_open_rate), NUMBER\(avg_click_rate), {NUMBER\(total_revenue), NUMBER\(number_of_orders), STRING\(currency_code)}\(ecommerce_data)} </details> | OBJECT_BUILDER |
-| ip_signup | STRING | TEXT |
-| timestamp_signup | STRING | TEXT |
-| ip_opt | STRING | TEXT |
-| timestamp_opt | STRING | TEXT |
-| member_rating | INTEGER | INTEGER |
-| last_changed | STRING | TEXT |
-| language | STRING | TEXT |
-| vip | BOOLEAN <details> <summary> Options </summary> true, false </details> | SELECT |
-| email_client | STRING | TEXT |
-| location | OBJECT <details> <summary> Properties </summary> {NUMBER\(latitude), NUMBER\(longitude), INTEGER\(gmtoff), INTEGER\(dstoff), STRING\(country_code), STRING\(timezone), STRING\(region)} </details> | OBJECT_BUILDER |
-| marketing_permissions | ARRAY <details> <summary> Items </summary> [{STRING\(marketing_permission_id), STRING\(text), BOOLEAN\(enabled)}] </details> | ARRAY_BUILDER |
-| last_note | OBJECT <details> <summary> Properties </summary> {INTEGER\(note_id), STRING\(created_at), STRING\(created_by), STRING\(note)} </details> | OBJECT_BUILDER |
-| source | STRING | TEXT |
-| tags_count | INTEGER | INTEGER |
-| tags | OBJECT <details> <summary> Properties </summary> {INTEGER\(id), STRING\(name)} </details> | OBJECT_BUILDER |
-| list_id | STRING | TEXT |
-| _links | ARRAY <details> <summary> Items </summary> [{STRING\(rel), STRING\(href), STRING\(method), STRING\(targetSchema), STRING\(schema)}] </details> | ARRAY_BUILDER |
+|     Name     |     Type     |
+|:------------:|:------------:|
+| id | STRING |
+| email_address | STRING |
+| unique_email_id | STRING |
+| contact_id | STRING |
+| full_name | STRING |
+| web_id | STRING |
+| email_type | STRING |
+| status | STRING <details> <summary> Options </summary> subscribed, unsubscribed, cleaned, pending, transactional </details> |
+| unsubscribe_reason | STRING |
+| consents_to_one_to_one_messaging | BOOLEAN <details> <summary> Options </summary> true, false </details> |
+| merge_fields | OBJECT <details> <summary> Properties </summary> {} </details> |
+| interests | OBJECT <details> <summary> Properties </summary> {} </details> |
+| stats | OBJECT <details> <summary> Properties </summary> {NUMBER\(avg_open_rate), NUMBER\(avg_click_rate), {NUMBER\(total_revenue), NUMBER\(number_of_orders), STRING\(currency_code)}\(ecommerce_data)} </details> |
+| ip_signup | STRING |
+| timestamp_signup | STRING |
+| ip_opt | STRING |
+| timestamp_opt | STRING |
+| member_rating | INTEGER |
+| last_changed | STRING |
+| language | STRING |
+| vip | BOOLEAN <details> <summary> Options </summary> true, false </details> |
+| email_client | STRING |
+| location | OBJECT <details> <summary> Properties </summary> {NUMBER\(latitude), NUMBER\(longitude), INTEGER\(gmtoff), INTEGER\(dstoff), STRING\(country_code), STRING\(timezone), STRING\(region)} </details> |
+| marketing_permissions | ARRAY <details> <summary> Items </summary> [{STRING\(marketing_permission_id), STRING\(text), BOOLEAN\(enabled)}] </details> |
+| last_note | OBJECT <details> <summary> Properties </summary> {INTEGER\(note_id), STRING\(created_at), STRING\(created_by), STRING\(note)} </details> |
+| source | STRING |
+| tags_count | INTEGER |
+| tags | OBJECT <details> <summary> Properties </summary> {INTEGER\(id), STRING\(name)} </details> |
+| list_id | STRING |
+| _links | ARRAY <details> <summary> Items </summary> [{STRING\(rel), STRING\(href), STRING\(method), STRING\(targetSchema), STRING\(schema)}] </details> |
 
 
 
@@ -154,9 +154,9 @@ Type: DYNAMIC_WEBHOOK
 
 #### Properties
 
-|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
-| listId | List Id | STRING | SELECT | The list id of intended audience to which you would like to add the contact. | true |
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| listId | List Id | STRING | The list id of intended audience to which you would like to add the contact. | true |
 
 
 #### Output
@@ -168,11 +168,11 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |    Control Type     |
-|:------------:|:------------:|:-------------------:|
-| data | OBJECT <details> <summary> Properties </summary> {STRING\(email), STRING\(email_type), STRING\(id), STRING\(ip_opt), STRING\(ip_signup), STRING\(list_id), {STRING\(EMAIL), STRING\(FNAME), STRING\(INTERESTS), STRING\(LNAME)}\(merges)} </details> | OBJECT_BUILDER |
-| fired_at | DATE_TIME | DATE_TIME |
-| type | STRING | TEXT |
+|     Name     |     Type     |
+|:------------:|:------------:|
+| data | OBJECT <details> <summary> Properties </summary> {STRING\(email), STRING\(email_type), STRING\(id), STRING\(ip_opt), STRING\(ip_signup), STRING\(list_id), {STRING\(EMAIL), STRING\(FNAME), STRING\(INTERESTS), STRING\(LNAME)}\(merges)} </details> |
+| fired_at | DATE_TIME |
+| type | STRING |
 
 
 

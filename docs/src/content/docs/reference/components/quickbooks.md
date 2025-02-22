@@ -24,12 +24,12 @@ Version: 1
 
 #### Properties
 
-|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
-| base | Base | STRING <details> <summary> Options </summary> https://sandbox-quickbooks.api.intuit.com, https://quickbooks.api.intuit.com </details> | SELECT | The base URL for Quickbooks. | true |
-| companyId | Company Id | STRING | TEXT | To get the company id, go to your dashboard. On the top right corner press the gear logo and click Additional information. There you will see your company ID. | true |
-| clientId | Client Id | STRING | TEXT |  | true |
-| clientSecret | Client Secret | STRING | TEXT |  | true |
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| base | Base | STRING <details> <summary> Options </summary> https://sandbox-quickbooks.api.intuit.com, https://quickbooks.api.intuit.com </details> | The base URL for Quickbooks. | true |
+| companyId | Company Id | STRING | To get the company id, go to your dashboard. On the top right corner press the gear logo and click Additional information. There you will see your company ID. | true |
+| clientId | Client Id | STRING |  | true |
+| clientSecret | Client Secret | STRING |  | true |
 
 
 
@@ -49,9 +49,9 @@ Creates a new category.
 
 #### Properties
 
-|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
-| name | Name | STRING | TEXT | Name of the category. | true |
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| name | Name | STRING | Name of the category. | true |
 
 
 #### Output
@@ -63,9 +63,9 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |    Control Type     |
-|:------------:|:------------:|:-------------------:|
-| item | OBJECT <details> <summary> Properties </summary> {STRING\(domain), STRING\(id), STRING\(name), STRING\(active), STRING\(fullyQualifiedName), STRING\(type)} </details> | OBJECT_BUILDER |
+|     Name     |     Type     |
+|:------------:|:------------:|
+| item | OBJECT <details> <summary> Properties </summary> {STRING\(domain), STRING\(id), STRING\(name), STRING\(active), STRING\(fullyQualifiedName), STRING\(type)} </details> |
 
 
 
@@ -90,14 +90,14 @@ Creates a new customer.
 
 #### Properties
 
-|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
-| displayName | Display Name | STRING | TEXT | The name of the person or organization as displayed. | true |
-| givenName | First Name | STRING | TEXT | Given name or first name of a person. | false |
-| familyName | Last Name | STRING | TEXT | Family name or the last name of the person. | false |
-| suffix | Suffix | STRING | TEXT | Suffix of the name. | false |
-| title | Title | STRING | TEXT | Title of the person. | false |
-| middleName | Middle Name | STRING | TEXT | Middle name of the person. | false |
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| displayName | Display Name | STRING | The name of the person or organization as displayed. | true |
+| givenName | First Name | STRING | Given name or first name of a person. | false |
+| familyName | Last Name | STRING | Family name or the last name of the person. | false |
+| suffix | Suffix | STRING | Suffix of the name. | false |
+| title | Title | STRING | Title of the person. | false |
+| middleName | Middle Name | STRING | Middle name of the person. | false |
 
 
 #### Output
@@ -109,9 +109,9 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |    Control Type     |
-|:------------:|:------------:|:-------------------:|
-| customer | OBJECT <details> <summary> Properties </summary> {STRING\(domain), STRING\(id), STRING\(title), STRING\(givenName), STRING\(middleName), STRING\(familyName), STRING\(suffix), STRING\(fullyQualifiedName), STRING\(displayName), STRING\(active)} </details> | OBJECT_BUILDER |
+|     Name     |     Type     |
+|:------------:|:------------:|
+| customer | OBJECT <details> <summary> Properties </summary> {STRING\(domain), STRING\(id), STRING\(title), STRING\(givenName), STRING\(middleName), STRING\(familyName), STRING\(suffix), STRING\(fullyQualifiedName), STRING\(displayName), STRING\(active)} </details> |
 
 
 
@@ -141,13 +141,13 @@ Creates a new item.
 
 #### Properties
 
-|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
-| name | Name | STRING | TEXT | Name of the item. | true |
-| type | Type | STRING <details> <summary> Options </summary> INVENTORY, SERVICE, NON_INVENTORY </details> | SELECT | Type of item. | true |
-| account | | DYNAMIC_PROPERTIES <details> <summary> Depends On </summary> type </details> | null |  | null |
-| expenseAccountRef | Expense Account | STRING | SELECT |  | true |
-| qtyOnHand | Quantity on Hand | NUMBER | NUMBER | Current quantity of the inventory items available for sale. | true |
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| name | Name | STRING | Name of the item. | true |
+| type | Type | STRING <details> <summary> Options </summary> INVENTORY, SERVICE, NON_INVENTORY </details> | Type of item. | true |
+| account | | DYNAMIC_PROPERTIES <details> <summary> Depends On </summary> type </details> |  | null |
+| expenseAccountRef | Expense Account | STRING |  | true |
+| qtyOnHand | Quantity on Hand | NUMBER | Current quantity of the inventory items available for sale. | true |
 
 
 #### Output
@@ -159,9 +159,9 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |    Control Type     |
-|:------------:|:------------:|:-------------------:|
-| item | OBJECT <details> <summary> Properties </summary> {STRING\(domain), STRING\(id), STRING\(name), STRING\(active), STRING\(fullyQualifiedName), STRING\(type), {STRING\(name)}\(incomeAccountRef), {STRING\(name)}\(assetAccountRef), {STRING\(name)}\(expenseAccountRef)} </details> | OBJECT_BUILDER |
+|     Name     |     Type     |
+|:------------:|:------------:|
+| item | OBJECT <details> <summary> Properties </summary> {STRING\(domain), STRING\(id), STRING\(name), STRING\(active), STRING\(fullyQualifiedName), STRING\(type), {STRING\(name)}\(incomeAccountRef), {STRING\(name)}\(assetAccountRef), {STRING\(name)}\(expenseAccountRef)} </details> |
 
 
 
@@ -190,10 +190,10 @@ Creates a new payment.
 
 #### Properties
 
-|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
-| customer | Customer | STRING | SELECT |  | true |
-| totalAmt | Total Amount | NUMBER | NUMBER | Total amount of the transaction. | true |
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| customer | Customer | STRING |  | true |
+| totalAmt | Total Amount | NUMBER | Total amount of the transaction. | true |
 
 
 #### Output
@@ -205,9 +205,9 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |    Control Type     |
-|:------------:|:------------:|:-------------------:|
-| payment | OBJECT <details> <summary> Properties </summary> {STRING\(domain), STRING\(id), {STRING\(name)}\(CurrencyRef), {STRING\(name)}\(customerRef), STRING\(totalAmt)} </details> | OBJECT_BUILDER |
+|     Name     |     Type     |
+|:------------:|:------------:|
+| payment | OBJECT <details> <summary> Properties </summary> {STRING\(domain), STRING\(id), {STRING\(name)}\(CurrencyRef), {STRING\(name)}\(customerRef), STRING\(totalAmt)} </details> |
 
 
 
@@ -233,9 +233,9 @@ Gets details about a specific customer.
 
 #### Properties
 
-|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
-| customer | Customer ID | STRING | SELECT | ID of the customer to get. | true |
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| customer | Customer ID | STRING | ID of the customer to get. | true |
 
 
 #### Output
@@ -247,9 +247,9 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |    Control Type     |
-|:------------:|:------------:|:-------------------:|
-| customer | OBJECT <details> <summary> Properties </summary> {STRING\(domain), STRING\(id), STRING\(title), STRING\(givenName), STRING\(middleName), STRING\(familyName), STRING\(suffix), STRING\(fullyQualifiedName), STRING\(displayName), STRING\(active)} </details> | OBJECT_BUILDER |
+|     Name     |     Type     |
+|:------------:|:------------:|
+| customer | OBJECT <details> <summary> Properties </summary> {STRING\(domain), STRING\(id), STRING\(title), STRING\(givenName), STRING\(middleName), STRING\(familyName), STRING\(suffix), STRING\(fullyQualifiedName), STRING\(displayName), STRING\(active)} </details> |
 
 
 
@@ -274,9 +274,9 @@ Gets details about a specific invoice.
 
 #### Properties
 
-|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
-| invoice | Invoice ID | STRING | SELECT | ID of the invoice to get. | true |
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| invoice | Invoice ID | STRING | ID of the invoice to get. | true |
 
 
 #### Output
@@ -288,9 +288,9 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |    Control Type     |
-|:------------:|:------------:|:-------------------:|
-| invoice | OBJECT <details> <summary> Properties </summary> {STRING\(domain), STRING\(id), STRING\(DocNumber), {STRING\(name)}\(customerRef), STRING\(Balance)} </details> | OBJECT_BUILDER |
+|     Name     |     Type     |
+|:------------:|:------------:|
+| invoice | OBJECT <details> <summary> Properties </summary> {STRING\(domain), STRING\(id), STRING\(DocNumber), {STRING\(name)}\(customerRef), STRING\(Balance)} </details> |
 
 
 
@@ -315,9 +315,9 @@ Gets details about a specific item.
 
 #### Properties
 
-|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
-| item | Item ID | STRING | SELECT | ID of the item to get. | true |
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| item | Item ID | STRING | ID of the item to get. | true |
 
 
 #### Output
@@ -329,9 +329,9 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |    Control Type     |
-|:------------:|:------------:|:-------------------:|
-| item | OBJECT <details> <summary> Properties </summary> {STRING\(domain), STRING\(id), STRING\(name), STRING\(active), STRING\(fullyQualifiedName), STRING\(type), {STRING\(name)}\(incomeAccountRef), {STRING\(name)}\(assetAccountRef), {STRING\(name)}\(expenseAccountRef)} </details> | OBJECT_BUILDER |
+|     Name     |     Type     |
+|:------------:|:------------:|
+| item | OBJECT <details> <summary> Properties </summary> {STRING\(domain), STRING\(id), STRING\(name), STRING\(active), STRING\(fullyQualifiedName), STRING\(type), {STRING\(name)}\(incomeAccountRef), {STRING\(name)}\(assetAccountRef), {STRING\(name)}\(expenseAccountRef)} </details> |
 
 
 
@@ -356,9 +356,9 @@ Gets details about a specific payment.
 
 #### Properties
 
-|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
-| payment | Payment ID | STRING | SELECT | ID of the payment to get. | true |
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| payment | Payment ID | STRING | ID of the payment to get. | true |
 
 
 #### Output
@@ -370,9 +370,9 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |    Control Type     |
-|:------------:|:------------:|:-------------------:|
-| payment | OBJECT <details> <summary> Properties </summary> {STRING\(domain), STRING\(id), {STRING\(name)}\(CurrencyRef), {STRING\(name)}\(customerRef), STRING\(totalAmt)} </details> | OBJECT_BUILDER |
+|     Name     |     Type     |
+|:------------:|:------------:|
+| payment | OBJECT <details> <summary> Properties </summary> {STRING\(domain), STRING\(id), {STRING\(name)}\(CurrencyRef), {STRING\(name)}\(customerRef), STRING\(totalAmt)} </details> |
 
 
 

@@ -26,10 +26,10 @@ Add two numbers.
 
 #### Properties
 
-|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
-| firstNumber | First Number | NUMBER | NUMBER |  | true |
-| secondNumber | Second Number | NUMBER | NUMBER |  | true |
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| firstNumber | First Number | NUMBER |  | true |
+| secondNumber | Second Number | NUMBER |  | true |
 
 
 #### Output
@@ -63,10 +63,10 @@ Divide two numbers.
 
 #### Properties
 
-|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
-| firstNumber | First Number | NUMBER | NUMBER | Number to be divided. | true |
-| secondNumber | Second Number | NUMBER | NUMBER | Number to divide by. | true |
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| firstNumber | First Number | NUMBER | Number to be divided. | true |
+| secondNumber | Second Number | NUMBER | Number to divide by. | true |
 
 
 #### Output
@@ -100,10 +100,10 @@ Get the remainder of the division of two numbers.
 
 #### Properties
 
-|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
-| firstNumber | First Number | NUMBER | NUMBER | Number to be divided. | true |
-| secondNumber | Second Number | NUMBER | NUMBER | Number to divide by. | true |
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| firstNumber | First Number | NUMBER | Number to be divided. | true |
+| secondNumber | Second Number | NUMBER | Number to divide by. | true |
 
 
 #### Output
@@ -137,10 +137,10 @@ Multiply two numbers.
 
 #### Properties
 
-|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
-| firstNumber | First Number | NUMBER | NUMBER |  | true |
-| secondNumber | Second Number | NUMBER | NUMBER |  | true |
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| firstNumber | First Number | NUMBER |  | true |
+| secondNumber | Second Number | NUMBER |  | true |
 
 
 #### Output
@@ -174,10 +174,10 @@ Subtract two numbers.
 
 #### Properties
 
-|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
-| firstNumber | First Number | NUMBER | NUMBER | Number to subtract from. | true |
-| secondNumber | Second Number | NUMBER | NUMBER | Number to subtract. | true |
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| firstNumber | First Number | NUMBER | Number to subtract from. | true |
+| secondNumber | Second Number | NUMBER | Number to subtract. | true |
 
 
 #### Output

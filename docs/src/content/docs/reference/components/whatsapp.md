@@ -24,10 +24,10 @@ Version: 1
 
 #### Properties
 
-|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
-| systemUserAccessToken | System user access token | STRING | TEXT |  | true |
-| phoneNumberId | Phone number ID | STRING | TEXT |  | true |
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| systemUserAccessToken | System user access token | STRING |  | true |
+| phoneNumberId | Phone number ID | STRING |  | true |
 
 
 
@@ -47,10 +47,10 @@ Send a message via WhatsApp
 
 #### Properties
 
-|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
-| body | Message | STRING | TEXT | Message to send via WhatsApp | true |
-| to | Send Message To | STRING | TEXT | Phone number to send the message. It must start with "+" sign | true |
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| body | Message | STRING | Message to send via WhatsApp | true |
+| to | Send Message To | STRING | Phone number to send the message. It must start with "+" sign | true |
 
 
 #### Output
@@ -62,11 +62,11 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |    Control Type     |
-|:------------:|:------------:|:-------------------:|
-| messaging_product | STRING | TEXT |
-| contacts | OBJECT <details> <summary> Properties </summary> {STRING\(input), STRING\(wa_id)} </details> | OBJECT_BUILDER |
-| messages | OBJECT <details> <summary> Properties </summary> {STRING\(id)} </details> | OBJECT_BUILDER |
+|     Name     |     Type     |
+|:------------:|:------------:|
+| messaging_product | STRING |
+| contacts | OBJECT <details> <summary> Properties </summary> {STRING\(input), STRING\(wa_id)} </details> |
+| messages | OBJECT <details> <summary> Properties </summary> {STRING\(id)} </details> |
 
 
 
@@ -99,9 +99,9 @@ Type: DYNAMIC_WEBHOOK
 
 #### Properties
 
-|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
-| senderNumber | Sender Number | STRING | TEXT | Type in the number from whom you want to trigger | true |
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| senderNumber | Sender Number | STRING | Type in the number from whom you want to trigger | true |
 
 
 #### Output
@@ -113,10 +113,10 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |    Control Type     |
-|:------------:|:------------:|:-------------------:|
-| object | STRING | TEXT |
-| entry | OBJECT <details> <summary> Properties </summary> {STRING\(id), {{STRING\(messaging_product), {STRING\(display_phone_number), STRING\(phone_number_id)}\(metadata)}\(value), {{STRING\(name)}\(profile), STRING\(wa_id)}\(contacts), {STRING\(from), STRING\(id), STRING\(timestamp), {STRING\(body)}\(text)}\(messages)}\(changes)} </details> | OBJECT_BUILDER |
+|     Name     |     Type     |
+|:------------:|:------------:|
+| object | STRING |
+| entry | OBJECT <details> <summary> Properties </summary> {STRING\(id), {{STRING\(messaging_product), {STRING\(display_phone_number), STRING\(phone_number_id)}\(metadata)}\(value), {{STRING\(name)}\(profile), STRING\(wa_id)}\(contacts), {STRING\(from), STRING\(id), STRING\(timestamp), {STRING\(body)}\(text)}\(messages)}\(changes)} </details> |
 
 
 

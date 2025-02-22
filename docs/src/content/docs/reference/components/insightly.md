@@ -24,10 +24,10 @@ Version: 1
 
 #### Properties
 
-|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
-| pod | Pod | STRING | TEXT | Your instances pod can be found under your API URL, e.g. https://api.{pod}.insightly.com/v3.1 | true |
-| username | API Key | STRING | TEXT |  | true |
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| pod | Pod | STRING | Your instances pod can be found under your API URL, e.g. https://api.{pod}.insightly.com/v3.1 | true |
+| username | API Key | STRING |  | true |
 
 
 
@@ -47,9 +47,9 @@ Creates new contact.
 
 #### Properties
 
-|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
-| __item | Contact | OBJECT <details> <summary> Properties </summary> {STRING\(FIRST_NAME), STRING\(LAST_NAME), STRING\(EMAIL_ADDRESS), STRING\(PHONE), STRING\(TITLE)} </details> | OBJECT_BUILDER |  | true |
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| __item | Contact | OBJECT <details> <summary> Properties </summary> {STRING\(FIRST_NAME), STRING\(LAST_NAME), STRING\(EMAIL_ADDRESS), STRING\(PHONE), STRING\(TITLE)} </details> |  | true |
 
 
 #### Output
@@ -61,14 +61,14 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |    Control Type     |
-|:------------:|:------------:|:-------------------:|
-| CONTACT_ID | INTEGER | INTEGER |
-| FIRST_NAME | STRING | TEXT |
-| LAST_NAME | STRING | TEXT |
-| EMAIL_ADDRESS | STRING | TEXT |
-| PHONE | STRING | TEXT |
-| TITLE | STRING | TEXT |
+|     Name     |     Type     |
+|:------------:|:------------:|
+| CONTACT_ID | INTEGER |
+| FIRST_NAME | STRING |
+| LAST_NAME | STRING |
+| EMAIL_ADDRESS | STRING |
+| PHONE | STRING |
+| TITLE | STRING |
 
 
 
@@ -99,9 +99,9 @@ Creates new organization.
 
 #### Properties
 
-|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
-| __item | Organization | OBJECT <details> <summary> Properties </summary> {STRING\(ORGANISATION_NAME), STRING\(PHONE), STRING\(WEBSITE)} </details> | OBJECT_BUILDER |  | true |
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| __item | Organization | OBJECT <details> <summary> Properties </summary> {STRING\(ORGANISATION_NAME), STRING\(PHONE), STRING\(WEBSITE)} </details> |  | true |
 
 
 #### Output
@@ -113,12 +113,12 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |    Control Type     |
-|:------------:|:------------:|:-------------------:|
-| ORGANISATION_ID | INTEGER | INTEGER |
-| ORGANISATION_NAME | STRING | TEXT |
-| PHONE | STRING | TEXT |
-| WEBSITE | STRING | TEXT |
+|     Name     |     Type     |
+|:------------:|:------------:|
+| ORGANISATION_ID | INTEGER |
+| ORGANISATION_NAME | STRING |
+| PHONE | STRING |
+| WEBSITE | STRING |
 
 
 
@@ -147,9 +147,9 @@ Creates new task.
 
 #### Properties
 
-|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
-| __item | Task | OBJECT <details> <summary> Properties </summary> {STRING\(TITLE), STRING\(STATUS)} </details> | OBJECT_BUILDER |  | true |
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| __item | Task | OBJECT <details> <summary> Properties </summary> {STRING\(TITLE), STRING\(STATUS)} </details> |  | true |
 
 
 #### Output
@@ -161,11 +161,11 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |    Control Type     |
-|:------------:|:------------:|:-------------------:|
-| TASK_ID | INTEGER | INTEGER |
-| TITLE | STRING | TEXT |
-| STATUS | STRING | TEXT |
+|     Name     |     Type     |
+|:------------:|:------------:|
+| TASK_ID | INTEGER |
+| TITLE | STRING |
+| STATUS | STRING |
 
 
 

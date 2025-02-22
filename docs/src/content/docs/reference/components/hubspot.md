@@ -24,11 +24,11 @@ Version: 1
 
 #### Properties
 
-|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
-| clientId | Client Id | STRING | TEXT |  | true |
-| clientSecret | Client Secret | STRING | TEXT |  | true |
-| hapikey | Hubspot API Key | STRING | TEXT | API Key is used for registering webhooks. | false |
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| clientId | Client Id | STRING |  | true |
+| clientSecret | Client Secret | STRING |  | true |
+| hapikey | Hubspot API Key | STRING | API Key is used for registering webhooks. | false |
 
 
 
@@ -48,9 +48,9 @@ Create a contact with the given properties.
 
 #### Properties
 
-|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
-| __item | Contact | OBJECT <details> <summary> Properties </summary> {{STRING\(firstname), STRING\(lastname), STRING\(email), STRING\(phone), STRING\(company), STRING\(website)}\(properties)} </details> | OBJECT_BUILDER |  | null |
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| __item | Contact | OBJECT <details> <summary> Properties </summary> {{STRING\(firstname), STRING\(lastname), STRING\(email), STRING\(phone), STRING\(company), STRING\(website)}\(properties)} </details> |  | null |
 
 
 #### Output
@@ -62,9 +62,9 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |    Control Type     |
-|:------------:|:------------:|:-------------------:|
-| body | OBJECT <details> <summary> Properties </summary> {STRING\(id), {STRING\(firstname), STRING\(lastname), STRING\(email), STRING\(phone), STRING\(company), STRING\(website)}\(properties)} </details> | OBJECT_BUILDER |
+|     Name     |     Type     |
+|:------------:|:------------:|
+| body | OBJECT <details> <summary> Properties </summary> {STRING\(id), {STRING\(firstname), STRING\(lastname), STRING\(email), STRING\(phone), STRING\(company), STRING\(website)}\(properties)} </details> |
 
 
 
@@ -98,9 +98,9 @@ Move Contact to the recycling bin.
 
 #### Properties
 
-|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
-| contactId | Contact ID | STRING | SELECT |  | true |
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| contactId | Contact ID | STRING |  | true |
 
 
 #### JSON Example
@@ -123,9 +123,9 @@ Get contact details.
 
 #### Properties
 
-|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
-| contactId | Contact ID | STRING | SELECT |  | true |
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| contactId | Contact ID | STRING |  | true |
 
 
 #### Output
@@ -137,9 +137,9 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |    Control Type     |
-|:------------:|:------------:|:-------------------:|
-| body | OBJECT <details> <summary> Properties </summary> {STRING\(id), {STRING\(firstname), STRING\(lastname), STRING\(email), STRING\(phone), STRING\(company), STRING\(website)}\(properties)} </details> | OBJECT_BUILDER |
+|     Name     |     Type     |
+|:------------:|:------------:|
+| body | OBJECT <details> <summary> Properties </summary> {STRING\(id), {STRING\(firstname), STRING\(lastname), STRING\(email), STRING\(phone), STRING\(company), STRING\(website)}\(properties)} </details> |
 
 
 
@@ -164,10 +164,10 @@ Update Contact properties.
 
 #### Properties
 
-|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
-| contactId | Contact | STRING | SELECT |  | true |
-| __item | Contact | OBJECT <details> <summary> Properties </summary> {{STRING\(firstname), STRING\(lastname), STRING\(email), STRING\(phone), STRING\(company), STRING\(website)}\(properties)} </details> | OBJECT_BUILDER |  | null |
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| contactId | Contact | STRING |  | true |
+| __item | Contact | OBJECT <details> <summary> Properties </summary> {{STRING\(firstname), STRING\(lastname), STRING\(email), STRING\(phone), STRING\(company), STRING\(website)}\(properties)} </details> |  | null |
 
 
 #### Output
@@ -179,9 +179,9 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |    Control Type     |
-|:------------:|:------------:|:-------------------:|
-| body | OBJECT <details> <summary> Properties </summary> {STRING\(id), {STRING\(firstname), STRING\(lastname), STRING\(email), STRING\(phone), STRING\(company), STRING\(website)}\(properties)} </details> | OBJECT_BUILDER |
+|     Name     |     Type     |
+|:------------:|:------------:|
+| body | OBJECT <details> <summary> Properties </summary> {STRING\(id), {STRING\(firstname), STRING\(lastname), STRING\(email), STRING\(phone), STRING\(company), STRING\(website)}\(properties)} </details> |
 
 
 
@@ -216,9 +216,9 @@ Creates a new deal.
 
 #### Properties
 
-|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
-| __item | Deal | OBJECT <details> <summary> Properties </summary> {{STRING\(dealname), NUMBER\(amount), DATE\(closedate), STRING\(pipeline), STRING\(dealstage), STRING\(hubspot_owner_id)}\(properties)} </details> | OBJECT_BUILDER |  | null |
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| __item | Deal | OBJECT <details> <summary> Properties </summary> {{STRING\(dealname), NUMBER\(amount), DATE\(closedate), STRING\(pipeline), STRING\(dealstage), STRING\(hubspot_owner_id)}\(properties)} </details> |  | null |
 
 
 #### Output
@@ -230,9 +230,9 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |    Control Type     |
-|:------------:|:------------:|:-------------------:|
-| body | OBJECT <details> <summary> Properties </summary> {STRING\(id), {STRING\(dealname), NUMBER\(amount), DATE\(closedate), STRING\(pipeline), STRING\(dealstage), STRING\(hubspot_owner_id)}\(properties)} </details> | OBJECT_BUILDER |
+|     Name     |     Type     |
+|:------------:|:------------:|
+| body | OBJECT <details> <summary> Properties </summary> {STRING\(id), {STRING\(dealname), NUMBER\(amount), DATE\(closedate), STRING\(pipeline), STRING\(dealstage), STRING\(hubspot_owner_id)}\(properties)} </details> |
 
 
 
@@ -266,9 +266,9 @@ Gets ticket details.
 
 #### Properties
 
-|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
-| ticketId | Ticket ID | STRING | SELECT |  | true |
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| ticketId | Ticket ID | STRING |  | true |
 
 
 #### Output
@@ -280,9 +280,9 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |    Control Type     |
-|:------------:|:------------:|:-------------------:|
-| body | OBJECT <details> <summary> Properties </summary> {STRING\(id), {STRING\(content), STRING\(hs_object_id), STRING\(hs_pipeline), STRING\(hs_pipeline_stage), STRING\(hs_ticket_priority), STRING\(subject)}\(properties)} </details> | OBJECT_BUILDER |
+|     Name     |     Type     |
+|:------------:|:------------:|
+| body | OBJECT <details> <summary> Properties </summary> {STRING\(id), {STRING\(content), STRING\(hs_object_id), STRING\(hs_pipeline), STRING\(hs_pipeline_stage), STRING\(hs_ticket_priority), STRING\(subject)}\(properties)} </details> |
 
 
 
@@ -314,9 +314,9 @@ Type: DYNAMIC_WEBHOOK
 
 #### Properties
 
-|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
-| appId | App Id | STRING | TEXT | The id of a Hubspot app used to register this trigger to. | true |
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| appId | App Id | STRING | The id of a Hubspot app used to register this trigger to. | true |
 
 
 #### Output
@@ -328,12 +328,12 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |    Control Type     |
-|:------------:|:------------:|:-------------------:|
-| eventId | STRING | TEXT |
-| subscriptionId | STRING | TEXT |
-| subscriptionType | STRING | TEXT |
-| objectId | STRING | TEXT |
+|     Name     |     Type     |
+|:------------:|:------------:|
+| eventId | STRING |
+| subscriptionId | STRING |
+| subscriptionType | STRING |
+| objectId | STRING |
 
 
 
@@ -360,9 +360,9 @@ Type: DYNAMIC_WEBHOOK
 
 #### Properties
 
-|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
-| appId | App Id | STRING | TEXT | The id of a Hubspot app used to register this trigger to. | true |
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| appId | App Id | STRING | The id of a Hubspot app used to register this trigger to. | true |
 
 
 #### Output
@@ -374,12 +374,12 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |    Control Type     |
-|:------------:|:------------:|:-------------------:|
-| eventId | STRING | TEXT |
-| subscriptionId | STRING | TEXT |
-| subscriptionType | STRING | TEXT |
-| objectId | STRING | TEXT |
+|     Name     |     Type     |
+|:------------:|:------------:|
+| eventId | STRING |
+| subscriptionId | STRING |
+| subscriptionType | STRING |
+| objectId | STRING |
 
 
 
@@ -406,9 +406,9 @@ Type: DYNAMIC_WEBHOOK
 
 #### Properties
 
-|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
-| appId | App Id | STRING | TEXT | The id of a Hubspot app used to register this trigger to. | true |
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| appId | App Id | STRING | The id of a Hubspot app used to register this trigger to. | true |
 
 
 #### Output
@@ -420,12 +420,12 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |    Control Type     |
-|:------------:|:------------:|:-------------------:|
-| eventId | STRING | TEXT |
-| subscriptionId | STRING | TEXT |
-| subscriptionType | STRING | TEXT |
-| objectId | STRING | TEXT |
+|     Name     |     Type     |
+|:------------:|:------------:|
+| eventId | STRING |
+| subscriptionId | STRING |
+| subscriptionType | STRING |
+| objectId | STRING |
 
 
 

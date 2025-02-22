@@ -24,10 +24,10 @@ Version: 1
 
 #### Properties
 
-|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
-| clientId | Client Id | STRING | TEXT |  | true |
-| clientSecret | Client Secret | STRING | TEXT |  | true |
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| clientId | Client Id | STRING |  | true |
+| clientSecret | Client Secret | STRING |  | true |
 
 
 
@@ -47,12 +47,12 @@ Creates a new List in specified Folder.
 
 #### Properties
 
-|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
-| workspaceId | Workspace ID | NUMBER | SELECT |  | true |
-| spaceId | Space ID | NUMBER <details> <summary> Depends On </summary> workspaceId </details> | SELECT |  | true |
-| folderId | Folder ID | NUMBER <details> <summary> Depends On </summary> spaceId, workspaceId </details> | SELECT | ID of the folder where new list will be created. | true |
-| __item | List | OBJECT <details> <summary> Properties </summary> {STRING\(name)} </details> | OBJECT_BUILDER |  | null |
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| workspaceId | Workspace ID | NUMBER |  | true |
+| spaceId | Space ID | NUMBER <details> <summary> Depends On </summary> workspaceId </details> |  | true |
+| folderId | Folder ID | NUMBER <details> <summary> Depends On </summary> spaceId, workspaceId </details> | ID of the folder where new list will be created. | true |
+| __item | List | OBJECT <details> <summary> Properties </summary> {STRING\(name)} </details> |  | null |
 
 
 #### Output
@@ -64,9 +64,9 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |    Control Type     |
-|:------------:|:------------:|:-------------------:|
-| body | OBJECT <details> <summary> Properties </summary> {STRING\(id), STRING\(name), {STRING\(id), STRING\(name)}\(folder), {STRING\(id), STRING\(name)}\(space)} </details> | OBJECT_BUILDER |
+|     Name     |     Type     |
+|:------------:|:------------:|
+| body | OBJECT <details> <summary> Properties </summary> {STRING\(id), STRING\(name), {STRING\(id), STRING\(name)}\(folder), {STRING\(id), STRING\(name)}\(space)} </details> |
 
 
 
@@ -96,13 +96,13 @@ Create a new task in a ClickUp workspace and list.
 
 #### Properties
 
-|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
-| workspaceId | Workspace ID | NUMBER | SELECT |  | true |
-| spaceId | Space ID | NUMBER <details> <summary> Depends On </summary> workspaceId </details> | SELECT |  | true |
-| folderId | Folder ID | NUMBER <details> <summary> Depends On </summary> spaceId, workspaceId </details> | SELECT |  | false |
-| listId | List ID | NUMBER <details> <summary> Depends On </summary> folderId, spaceId, workspaceId </details> | SELECT | ID of the list where new task will be created. | true |
-| __item | Task | OBJECT <details> <summary> Properties </summary> {STRING\(name), STRING\(description)} </details> | OBJECT_BUILDER |  | null |
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| workspaceId | Workspace ID | NUMBER |  | true |
+| spaceId | Space ID | NUMBER <details> <summary> Depends On </summary> workspaceId </details> |  | true |
+| folderId | Folder ID | NUMBER <details> <summary> Depends On </summary> spaceId, workspaceId </details> |  | false |
+| listId | List ID | NUMBER <details> <summary> Depends On </summary> folderId, spaceId, workspaceId </details> | ID of the list where new task will be created. | true |
+| __item | Task | OBJECT <details> <summary> Properties </summary> {STRING\(name), STRING\(description)} </details> |  | null |
 
 
 #### Output
@@ -114,9 +114,9 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |    Control Type     |
-|:------------:|:------------:|:-------------------:|
-| body | OBJECT <details> <summary> Properties </summary> {STRING\(id), STRING\(name), STRING\(description), STRING\(url), {STRING\(id), STRING\(name)}\(list), {STRING\(id), STRING\(name)}\(folder), {STRING\(id)}\(space)} </details> | OBJECT_BUILDER |
+|     Name     |     Type     |
+|:------------:|:------------:|
+| body | OBJECT <details> <summary> Properties </summary> {STRING\(id), STRING\(name), STRING\(description), STRING\(url), {STRING\(id), STRING\(name)}\(list), {STRING\(id), STRING\(name)}\(folder), {STRING\(id)}\(space)} </details> |
 
 
 
@@ -148,11 +148,11 @@ Creates a new folder in a ClickUp workspace.
 
 #### Properties
 
-|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
-| workspaceId | Workspace ID | NUMBER | SELECT |  | true |
-| spaceId | Space ID | NUMBER <details> <summary> Depends On </summary> workspaceId </details> | SELECT | ID of the space where new folder will be created. | true |
-| __item | Folder | OBJECT <details> <summary> Properties </summary> {STRING\(name)} </details> | OBJECT_BUILDER |  | null |
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| workspaceId | Workspace ID | NUMBER |  | true |
+| spaceId | Space ID | NUMBER <details> <summary> Depends On </summary> workspaceId </details> | ID of the space where new folder will be created. | true |
+| __item | Folder | OBJECT <details> <summary> Properties </summary> {STRING\(name)} </details> |  | null |
 
 
 #### Output
@@ -164,9 +164,9 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |    Control Type     |
-|:------------:|:------------:|:-------------------:|
-| body | OBJECT <details> <summary> Properties </summary> {STRING\(id), STRING\(name), {STRING\(id), STRING\(name)}\(space)} </details> | OBJECT_BUILDER |
+|     Name     |     Type     |
+|:------------:|:------------:|
+| body | OBJECT <details> <summary> Properties </summary> {STRING\(id), STRING\(name), {STRING\(id), STRING\(name)}\(space)} </details> |
 
 
 
@@ -202,9 +202,9 @@ Type: DYNAMIC_WEBHOOK
 
 #### Properties
 
-|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
-| workspaceId | Workspace ID | STRING | SELECT |  | true |
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| workspaceId | Workspace ID | STRING |  | true |
 
 
 #### Output
@@ -216,12 +216,12 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |    Control Type     |
-|:------------:|:------------:|:-------------------:|
-| id | STRING | TEXT |
-| name | STRING | TEXT |
-| folder | OBJECT <details> <summary> Properties </summary> {STRING\(id), STRING\(name)} </details> | OBJECT_BUILDER |
-| space | OBJECT <details> <summary> Properties </summary> {STRING\(id), STRING\(name)} </details> | OBJECT_BUILDER |
+|     Name     |     Type     |
+|:------------:|:------------:|
+| id | STRING |
+| name | STRING |
+| folder | OBJECT <details> <summary> Properties </summary> {STRING\(id), STRING\(name)} </details> |
+| space | OBJECT <details> <summary> Properties </summary> {STRING\(id), STRING\(name)} </details> |
 
 
 
@@ -248,9 +248,9 @@ Type: DYNAMIC_WEBHOOK
 
 #### Properties
 
-|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
-| workspaceId | Workspace ID | STRING | SELECT |  | true |
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| workspaceId | Workspace ID | STRING |  | true |
 
 
 #### Output
@@ -262,15 +262,15 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |    Control Type     |
-|:------------:|:------------:|:-------------------:|
-| id | STRING | TEXT |
-| name | STRING | TEXT |
-| description | STRING | TEXT |
-| url | STRING | TEXT |
-| list | OBJECT <details> <summary> Properties </summary> {STRING\(id), STRING\(name)} </details> | OBJECT_BUILDER |
-| folder | OBJECT <details> <summary> Properties </summary> {STRING\(id), STRING\(name)} </details> | OBJECT_BUILDER |
-| space | OBJECT <details> <summary> Properties </summary> {STRING\(id), STRING\(name)} </details> | OBJECT_BUILDER |
+|     Name     |     Type     |
+|:------------:|:------------:|
+| id | STRING |
+| name | STRING |
+| description | STRING |
+| url | STRING |
+| list | OBJECT <details> <summary> Properties </summary> {STRING\(id), STRING\(name)} </details> |
+| folder | OBJECT <details> <summary> Properties </summary> {STRING\(id), STRING\(name)} </details> |
+| space | OBJECT <details> <summary> Properties </summary> {STRING\(id), STRING\(name)} </details> |
 
 
 

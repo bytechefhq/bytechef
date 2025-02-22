@@ -24,11 +24,11 @@ Version: 1
 
 #### Properties
 
-|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
-| yourDomain | Your domain | STRING | TEXT | e.g https://{yourDomain}}.atlassian.net | true |
-| clientId | Client Id | STRING | TEXT |  | true |
-| clientSecret | Client Secret | STRING | TEXT |  | true |
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| yourDomain | Your domain | STRING | e.g https://{yourDomain}}.atlassian.net | true |
+| clientId | Client Id | STRING |  | true |
+| clientSecret | Client Secret | STRING |  | true |
 
 
 
@@ -48,15 +48,15 @@ Creates a new issue.
 
 #### Properties
 
-|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
-| project | Project ID | STRING | SELECT | ID of the project to create the issue in. | true |
-| summary | Summary | STRING | TEXT | A brief summary of the issue. | true |
-| issuetype | Issue Type ID | STRING <details> <summary> Depends On </summary> project </details> | SELECT | Id of the issue type. | true |
-| parent | Parent Issue ID | STRING <details> <summary> Depends On </summary> project </details> | SELECT | ID of the parent issue. | true |
-| assignee | Assignee ID | STRING <details> <summary> Depends On </summary> project </details> | SELECT | ID of the user who will be assigned to the issue. | false |
-| priority | Priority ID | STRING | SELECT | ID of the priority of the issue. | false |
-| description | Description | STRING | TEXT_AREA | Description of the issue. | false |
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| project | Project ID | STRING | ID of the project to create the issue in. | true |
+| summary | Summary | STRING | A brief summary of the issue. | true |
+| issuetype | Issue Type ID | STRING <details> <summary> Depends On </summary> project </details> | Id of the issue type. | true |
+| parent | Parent Issue ID | STRING <details> <summary> Depends On </summary> project </details> | ID of the parent issue. | true |
+| assignee | Assignee ID | STRING <details> <summary> Depends On </summary> project </details> | ID of the user who will be assigned to the issue. | false |
+| priority | Priority ID | STRING | ID of the priority of the issue. | false |
+| description | Description | STRING | Description of the issue. | false |
 
 
 #### Output
@@ -68,11 +68,11 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |    Control Type     |
-|:------------:|:------------:|:-------------------:|
-| id | STRING | TEXT |
-| key | STRING | TEXT |
-| fields | OBJECT <details> <summary> Properties </summary> {{STRING\(id), STRING\(name)}\(issuetype), {STRING\(id), STRING\(name)}\(project), {STRING\(id), STRING\(name)}\(priority), {STRING\(id), STRING\(name)}\(assignee), {STRING\(type), [{[{STRING\(text), STRING\(type)}]\(content), STRING\(type)}]\(content)}\(description)} </details> | OBJECT_BUILDER |
+|     Name     |     Type     |
+|:------------:|:------------:|
+| id | STRING |
+| key | STRING |
+| fields | OBJECT <details> <summary> Properties </summary> {{STRING\(id), STRING\(name)}\(issuetype), {STRING\(id), STRING\(name)}\(project), {STRING\(id), STRING\(name)}\(priority), {STRING\(id), STRING\(name)}\(assignee), {STRING\(type), [{[{STRING\(text), STRING\(type)}]\(content), STRING\(type)}]\(content)}\(description)} </details> |
 
 
 
@@ -103,11 +103,11 @@ Adds a comment to an issue.
 
 #### Properties
 
-|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
-| project | Project ID | STRING | SELECT | ID of the project where the issue is located. | true |
-| issueId | Issue ID | STRING <details> <summary> Depends On </summary> project </details> | SELECT | ID of the issue where the comment will be added. | true |
-| comment | Comment | STRING | TEXT | The text of the comment. | true |
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| project | Project ID | STRING | ID of the project where the issue is located. | true |
+| issueId | Issue ID | STRING <details> <summary> Depends On </summary> project </details> | ID of the issue where the comment will be added. | true |
+| comment | Comment | STRING | The text of the comment. | true |
 
 
 #### Output
@@ -119,16 +119,16 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |    Control Type     |
-|:------------:|:------------:|:-------------------:|
-| self | STRING | TEXT |
-| id | STRING | TEXT |
-| author | OBJECT <details> <summary> Properties </summary> {STRING\(accountId), BOOLEAN\(active), STRING\(displayName), STRING\(self)} </details> | OBJECT_BUILDER |
-| body | STRING | TEXT |
-| updateAuthor | OBJECT <details> <summary> Properties </summary> {STRING\(accountId), BOOLEAN\(active), STRING\(displayName), STRING\(self)} </details> | OBJECT_BUILDER |
-| created | STRING | TEXT |
-| updated | STRING | TEXT |
-| visibility | OBJECT <details> <summary> Properties </summary> {STRING\(identifier), STRING\(type), STRING\(value)} </details> | OBJECT_BUILDER |
+|     Name     |     Type     |
+|:------------:|:------------:|
+| self | STRING |
+| id | STRING |
+| author | OBJECT <details> <summary> Properties </summary> {STRING\(accountId), BOOLEAN\(active), STRING\(displayName), STRING\(self)} </details> |
+| body | STRING |
+| updateAuthor | OBJECT <details> <summary> Properties </summary> {STRING\(accountId), BOOLEAN\(active), STRING\(displayName), STRING\(self)} </details> |
+| created | STRING |
+| updated | STRING |
+| visibility | OBJECT <details> <summary> Properties </summary> {STRING\(identifier), STRING\(type), STRING\(value)} </details> |
 
 
 
@@ -155,10 +155,10 @@ Get issue details in selected project.
 
 #### Properties
 
-|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
-| project | Project ID | STRING | SELECT | ID of the project where the issue is located. | true |
-| issueId | Issue ID | STRING <details> <summary> Depends On </summary> project </details> | SELECT |  | true |
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| project | Project ID | STRING | ID of the project where the issue is located. | true |
+| issueId | Issue ID | STRING <details> <summary> Depends On </summary> project </details> |  | true |
 
 
 #### Output
@@ -170,11 +170,11 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |    Control Type     |
-|:------------:|:------------:|:-------------------:|
-| id | STRING | TEXT |
-| key | STRING | TEXT |
-| fields | OBJECT <details> <summary> Properties </summary> {{STRING\(id), STRING\(name)}\(issuetype), {STRING\(id), STRING\(name)}\(project), {STRING\(id), STRING\(name)}\(priority), {STRING\(id), STRING\(name)}\(assignee), {STRING\(type), [{[{STRING\(text), STRING\(type)}]\(content), STRING\(type)}]\(content)}\(description)} </details> | OBJECT_BUILDER |
+|     Name     |     Type     |
+|:------------:|:------------:|
+| id | STRING |
+| key | STRING |
+| fields | OBJECT <details> <summary> Properties </summary> {{STRING\(id), STRING\(name)}\(issuetype), {STRING\(id), STRING\(name)}\(project), {STRING\(id), STRING\(name)}\(priority), {STRING\(id), STRING\(name)}\(assignee), {STRING\(type), [{[{STRING\(text), STRING\(type)}]\(content), STRING\(type)}]\(content)}\(description)} </details> |
 
 
 
@@ -200,10 +200,10 @@ Search for issues using JQL
 
 #### Properties
 
-|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
-| jql | JQL | STRING | TEXT | The JQL that defines the search. If no JQL expression is provided, all issues are returned | false |
-| maxResults | Max Results | INTEGER | INTEGER | The maximum number of items to return per page. | true |
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| jql | JQL | STRING | The JQL that defines the search. If no JQL expression is provided, all issues are returned | false |
+| maxResults | Max Results | INTEGER | The maximum number of items to return per page. | true |
 
 
 #### Output
@@ -215,9 +215,9 @@ Type: ARRAY
 
 #### Properties
 
-|     Name     |     Type     |    Control Type     |
-|:------------:|:------------:|:-------------------:|
-|  | OBJECT <details> <summary> Properties </summary> {STRING\(id), STRING\(key), {{STRING\(id), STRING\(name)}\(issuetype), {STRING\(id), STRING\(name)}\(project), {STRING\(id), STRING\(name)}\(priority), {STRING\(id), STRING\(name)}\(assignee), {STRING\(type), [{[{STRING\(text), STRING\(type)}]\(content), STRING\(type)}]\(content)}\(description)}\(fields)} </details> | OBJECT_BUILDER |
+|     Name     |     Type     |
+|:------------:|:------------:|
+|  | OBJECT <details> <summary> Properties </summary> {STRING\(id), STRING\(key), {{STRING\(id), STRING\(name)}\(issuetype), {STRING\(id), STRING\(name)}\(project), {STRING\(id), STRING\(name)}\(priority), {STRING\(id), STRING\(name)}\(assignee), {STRING\(type), [{[{STRING\(text), STRING\(type)}]\(content), STRING\(type)}]\(content)}\(description)}\(fields)} </details> |
 
 
 
@@ -250,10 +250,10 @@ Type: DYNAMIC_WEBHOOK
 
 #### Properties
 
-|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
-| project | Project ID | STRING | SELECT | Id of the project where new issue is created. | true |
-| issuetype | Issue Type ID | STRING <details> <summary> Depends On </summary> project </details> | SELECT | ID of the issue type. | false |
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| project | Project ID | STRING | Id of the project where new issue is created. | true |
+| issuetype | Issue Type ID | STRING <details> <summary> Depends On </summary> project </details> | ID of the issue type. | false |
 
 
 #### Output
@@ -265,11 +265,11 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |    Control Type     |
-|:------------:|:------------:|:-------------------:|
-| id | STRING | TEXT |
-| key | STRING | TEXT |
-| fields | OBJECT <details> <summary> Properties </summary> {{STRING\(id), STRING\(name)}\(issuetype), {STRING\(id), STRING\(name)}\(project), {STRING\(id), STRING\(name)}\(priority), {STRING\(id), STRING\(name)}\(assignee), {STRING\(type), [{[{STRING\(text), STRING\(type)}]\(content), STRING\(type)}]\(content)}\(description)} </details> | OBJECT_BUILDER |
+|     Name     |     Type     |
+|:------------:|:------------:|
+| id | STRING |
+| key | STRING |
+| fields | OBJECT <details> <summary> Properties </summary> {{STRING\(id), STRING\(name)}\(issuetype), {STRING\(id), STRING\(name)}\(project), {STRING\(id), STRING\(name)}\(priority), {STRING\(id), STRING\(name)}\(assignee), {STRING\(type), [{[{STRING\(text), STRING\(type)}]\(content), STRING\(type)}]\(content)}\(description)} </details> |
 
 
 
@@ -297,10 +297,10 @@ Type: DYNAMIC_WEBHOOK
 
 #### Properties
 
-|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
-| project | Project ID | STRING | SELECT | ID of the project where issues is updated. | true |
-| issuetype | Issue Type ID | STRING <details> <summary> Depends On </summary> project </details> | SELECT | ID of the issue type. | false |
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| project | Project ID | STRING | ID of the project where issues is updated. | true |
+| issuetype | Issue Type ID | STRING <details> <summary> Depends On </summary> project </details> | ID of the issue type. | false |
 
 
 #### Output
@@ -312,11 +312,11 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |    Control Type     |
-|:------------:|:------------:|:-------------------:|
-| id | STRING | TEXT |
-| key | STRING | TEXT |
-| fields | OBJECT <details> <summary> Properties </summary> {{STRING\(id), STRING\(name)}\(issuetype), {STRING\(id), STRING\(name)}\(project), {STRING\(id), STRING\(name)}\(priority), {STRING\(id), STRING\(name)}\(assignee), {STRING\(type), [{[{STRING\(text), STRING\(type)}]\(content), STRING\(type)}]\(content)}\(description)} </details> | OBJECT_BUILDER |
+|     Name     |     Type     |
+|:------------:|:------------:|
+| id | STRING |
+| key | STRING |
+| fields | OBJECT <details> <summary> Properties </summary> {{STRING\(id), STRING\(name)}\(issuetype), {STRING\(id), STRING\(name)}\(project), {STRING\(id), STRING\(name)}\(priority), {STRING\(id), STRING\(name)}\(assignee), {STRING\(type), [{[{STRING\(text), STRING\(type)}]\(content), STRING\(type)}]\(content)}\(description)} </details> |
 
 
 

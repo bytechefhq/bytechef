@@ -26,16 +26,16 @@ Reads data from a csv file.
 
 #### Properties
 
-|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
-| fileEntry | File | FILE_ENTRY | FILE_ENTRY | The object property which contains a reference to the csv file to read from. | true |
-| delimiter | Delimiter | STRING | TEXT | Character used to separate values within the line red from the CSV file. | null |
-| enclosingCharacter | Enclosing Character | STRING | TEXT | Character used to wrap/enclose values. It is usually applied to complex CSV files where values may include delimiter characters. | null |
-| headerRow | Header Row | BOOLEAN <details> <summary> Options </summary> true, false </details> | SELECT | The first row of the file contains the header names. | null |
-| includeEmptyCells | Include Empty Cells | BOOLEAN <details> <summary> Options </summary> true, false </details> | SELECT | When reading from file the empty cells will be filled with an empty string. | null |
-| pageSize | Page Size | INTEGER | INTEGER | The amount of child elements to return in a page. | null |
-| pageNumber | Page Number | INTEGER | INTEGER | The page number to get. | null |
-| readAsString | Read as String | BOOLEAN <details> <summary> Options </summary> true, false </details> | SELECT | In some cases and file formats, it is necessary to read data specifically as string, otherwise some special characters are interpreted the wrong way. | null |
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| fileEntry | File | FILE_ENTRY | The object property which contains a reference to the csv file to read from. | true |
+| delimiter | Delimiter | STRING | Character used to separate values within the line red from the CSV file. | null |
+| enclosingCharacter | Enclosing Character | STRING | Character used to wrap/enclose values. It is usually applied to complex CSV files where values may include delimiter characters. | null |
+| headerRow | Header Row | BOOLEAN <details> <summary> Options </summary> true, false </details> | The first row of the file contains the header names. | null |
+| includeEmptyCells | Include Empty Cells | BOOLEAN <details> <summary> Options </summary> true, false </details> | When reading from file the empty cells will be filled with an empty string. | null |
+| pageSize | Page Size | INTEGER | The amount of child elements to return in a page. | null |
+| pageNumber | Page Number | INTEGER | The page number to get. | null |
+| readAsString | Read as String | BOOLEAN <details> <summary> Options </summary> true, false </details> | In some cases and file formats, it is necessary to read data specifically as string, otherwise some special characters are interpreted the wrong way. | null |
 
 
 #### JSON Example
@@ -70,10 +70,10 @@ Writes the data records into a CSV file. Record values are assembled into line a
 
 #### Properties
 
-|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
-| rows | Rows | ARRAY <details> <summary> Items </summary> [{}] </details> | ARRAY_BUILDER | The array of rows to write to the file. | true |
-| filename | Filename | STRING | TEXT | Filename to set for binary data. By default, "file.csv" will be used. | null |
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| rows | Rows | ARRAY <details> <summary> Items </summary> [{}] </details> | The array of rows to write to the file. | true |
+| filename | Filename | STRING | Filename to set for binary data. By default, "file.csv" will be used. | null |
 
 
 #### Output
@@ -85,12 +85,12 @@ Type: FILE_ENTRY
 
 #### Properties
 
-|     Name     |     Type     |    Control Type     |
-|:------------:|:------------:|:-------------------:|
-| extension | STRING | TEXT |
-| mimeType | STRING | TEXT |
-| name | STRING | TEXT |
-| url | STRING | TEXT |
+|     Name     |     Type     |
+|:------------:|:------------:|
+| extension | STRING |
+| mimeType | STRING |
+| name | STRING |
+| url | STRING |
 
 
 

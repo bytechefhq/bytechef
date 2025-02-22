@@ -24,10 +24,10 @@ Version: 1
 
 #### Properties
 
-|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
-| clientId | Client id | STRING | TEXT |  | true |
-| clientSecret | Client secret | STRING | TEXT |  | true |
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| clientId | Client id | STRING |  | true |
+| clientSecret | Client secret | STRING |  | true |
 
 
 
@@ -47,13 +47,13 @@ Create new contact
 
 #### Properties
 
-|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
-| role | Contact Role | STRING <details> <summary> Options </summary> user, lead </details> | SELECT | Role of the contact | true |
-| email | Contact Email | STRING | TEXT | Email of the contact | true |
-| name | Contact Name | STRING | TEXT | Name of the contact | false |
-| phone | Contact Phone | STRING | TEXT | Phone of the contact must start with a "+" sign | false |
-| avatar | Contact Image | STRING | TEXT | Image of the contact | false |
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| role | Contact Role | STRING <details> <summary> Options </summary> user, lead </details> | Role of the contact | true |
+| email | Contact Email | STRING | Email of the contact | true |
+| name | Contact Name | STRING | Name of the contact | false |
+| phone | Contact Phone | STRING | Phone of the contact must start with a "+" sign | false |
+| avatar | Contact Image | STRING | Image of the contact | false |
 
 
 #### Output
@@ -65,14 +65,14 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |    Control Type     |
-|:------------:|:------------:|:-------------------:|
-| type | STRING | TEXT |
-| id | STRING | TEXT |
-| role | STRING | TEXT |
-| email | STRING | TEXT |
-| phone | STRING | TEXT |
-| name | STRING | TEXT |
+|     Name     |     Type     |
+|:------------:|:------------:|
+| type | STRING |
+| id | STRING |
+| role | STRING |
+| email | STRING |
+| phone | STRING |
+| name | STRING |
 
 
 
@@ -101,9 +101,9 @@ Get a single Contact
 
 #### Properties
 
-|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
-| id | Contact ID | STRING | SELECT |  | true |
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| id | Contact ID | STRING |  | true |
 
 
 #### Output
@@ -115,14 +115,14 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |    Control Type     |
-|:------------:|:------------:|:-------------------:|
-| type | STRING | TEXT |
-| id | STRING | TEXT |
-| role | STRING | TEXT |
-| email | STRING | TEXT |
-| phone | STRING | TEXT |
-| name | STRING | TEXT |
+|     Name     |     Type     |
+|:------------:|:------------:|
+| type | STRING |
+| id | STRING |
+| role | STRING |
+| email | STRING |
+| phone | STRING |
+| name | STRING |
 
 
 
@@ -147,13 +147,13 @@ Send a new message
 
 #### Properties
 
-|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
-| message_type | Message Type | STRING <details> <summary> Options </summary> inapp, email </details> | SELECT | In app message or email message | true |
-| subject | Title | STRING | TEXT | Title of the Email/Message | true |
-| body | Content | STRING | RICH_TEXT | Content of the message | true |
-| template | Template | STRING <details> <summary> Options </summary> plain, personal </details> | SELECT | The style of the outgoing message | true |
-| to | To | STRING | SELECT | ID of the contact to send the message to. | true |
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| message_type | Message Type | STRING <details> <summary> Options </summary> inapp, email </details> | In app message or email message | true |
+| subject | Title | STRING | Title of the Email/Message | true |
+| body | Content | STRING | Content of the message | true |
+| template | Template | STRING <details> <summary> Options </summary> plain, personal </details> | The style of the outgoing message | true |
+| to | To | STRING | ID of the contact to send the message to. | true |
 
 
 #### Output

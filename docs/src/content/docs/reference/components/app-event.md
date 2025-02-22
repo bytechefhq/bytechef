@@ -30,9 +30,9 @@ Type: STATIC_WEBHOOK
 
 #### Properties
 
-|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
-| appEventId | App Event Id | INTEGER | SELECT | The Id of an app event. | null |
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| appEventId | App Event Id | INTEGER | The Id of an app event. | null |
 
 
 #### JSON Example

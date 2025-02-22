@@ -24,11 +24,11 @@ Version: 1
 
 #### Properties
 
-|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
-| username | Account name | STRING | TEXT | Your account name, e.g. https://{youraccountname}.api-us1.com | true |
-| key | Key | STRING | TEXT |  | true |
-| value | API Key | STRING | TEXT |  | true |
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| username | Account name | STRING | Your account name, e.g. https://{youraccountname}.api-us1.com | true |
+| key | Key | STRING |  | true |
+| value | API Key | STRING |  | true |
 
 
 
@@ -48,9 +48,9 @@ Creates a new account.
 
 #### Properties
 
-|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
-| __item | Account | OBJECT <details> <summary> Properties </summary> {{STRING\(name), STRING\(accountUrl)}\(account)} </details> | OBJECT_BUILDER |  | null |
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| __item | Account | OBJECT <details> <summary> Properties </summary> {{STRING\(name), STRING\(accountUrl)}\(account)} </details> |  | null |
 
 
 #### Output
@@ -62,9 +62,9 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |    Control Type     |
-|:------------:|:------------:|:-------------------:|
-| body | OBJECT <details> <summary> Properties </summary> {{STRING\(name), STRING\(accountUrl)}\(account)} </details> | OBJECT_BUILDER |
+|     Name     |     Type     |
+|:------------:|:------------:|
+| body | OBJECT <details> <summary> Properties </summary> {{STRING\(name), STRING\(accountUrl)}\(account)} </details> |
 
 
 
@@ -94,9 +94,9 @@ Creates a new contact.
 
 #### Properties
 
-|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
-| __item | Contact | OBJECT <details> <summary> Properties </summary> {{STRING\(email), STRING\(firstName), STRING\(lastName), STRING\(phone)}\(contact)} </details> | OBJECT_BUILDER |  | null |
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| __item | Contact | OBJECT <details> <summary> Properties </summary> {{STRING\(email), STRING\(firstName), STRING\(lastName), STRING\(phone)}\(contact)} </details> |  | null |
 
 
 #### Output
@@ -108,9 +108,9 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |    Control Type     |
-|:------------:|:------------:|:-------------------:|
-| body | OBJECT <details> <summary> Properties </summary> {{STRING\(email), STRING\(firstName), STRING\(lastName), STRING\(phone)}\(contact)} </details> | OBJECT_BUILDER |
+|     Name     |     Type     |
+|:------------:|:------------:|
+| body | OBJECT <details> <summary> Properties </summary> {{STRING\(email), STRING\(firstName), STRING\(lastName), STRING\(phone)}\(contact)} </details> |
 
 
 
@@ -142,9 +142,9 @@ Creates a new task.
 
 #### Properties
 
-|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
-| __item | Task | OBJECT <details> <summary> Properties </summary> {{STRING\(title), INTEGER\(relid), DATE\(duedate), INTEGER\(dealTasktype)}\(dealTask)} </details> | OBJECT_BUILDER |  | null |
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| __item | Task | OBJECT <details> <summary> Properties </summary> {{STRING\(title), INTEGER\(relid), DATE\(duedate), INTEGER\(dealTasktype)}\(dealTask)} </details> |  | null |
 
 
 #### Output
@@ -156,9 +156,9 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |    Control Type     |
-|:------------:|:------------:|:-------------------:|
-| body | OBJECT <details> <summary> Properties </summary> {{STRING\(id), STRING\(title), INTEGER\(relid), DATE\(duedate), INTEGER\(dealTasktype)}\(dealTask)} </details> | OBJECT_BUILDER |
+|     Name     |     Type     |
+|:------------:|:------------:|
+| body | OBJECT <details> <summary> Properties </summary> {{STRING\(id), STRING\(title), INTEGER\(relid), DATE\(duedate), INTEGER\(dealTasktype)}\(dealTask)} </details> |
 
 
 

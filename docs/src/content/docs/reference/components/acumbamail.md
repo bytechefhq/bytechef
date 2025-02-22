@@ -24,9 +24,9 @@ Version: 1
 
 #### Properties
 
-|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
-|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
-| access_token | Access token | STRING | TEXT  |  | true  |
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| auth_token | Access token | STRING |  | true |
 
 
 
@@ -46,9 +46,9 @@ Add a subscriber to a list.
 
 #### Properties
 
-|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
-|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
-| list_id | List Id | INTEGER | SELECT  |  List identifier.  |  true  |
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| list_id | List Id | INTEGER | List identifier. | true |
 
 
 #### Output
@@ -61,6 +61,17 @@ Type: INTEGER
 
 
 
+#### JSON Example
+```json
+{
+  "label" : "Add Subscriber",
+  "name" : "addSubscriber",
+  "parameters" : {
+    "list_id" : 1
+  },
+  "type" : "acumbamail/v1/addSubscriber"
+}
+```
 
 
 ### Delete Subscriber
@@ -70,12 +81,24 @@ Removes a subscriber from a list.
 
 #### Properties
 
-|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
-|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
-| list_id | List Id | INTEGER | SELECT  |  List identifier.  |  true  |
-| email | Email | STRING | SELECT  |  Subscriber email address.  |  true  |
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| list_id | List Id | INTEGER | List identifier. | true |
+| email | Email | STRING <details> <summary> Depends On </summary> list_id </details> | Subscriber email address. | true |
 
 
+#### JSON Example
+```json
+{
+  "label" : "Delete Subscriber",
+  "name" : "deleteSubscriber",
+  "parameters" : {
+    "list_id" : 1,
+    "email" : ""
+  },
+  "type" : "acumbamail/v1/deleteSubscriber"
+}
+```
 
 
 ### Create Subscriber List
@@ -85,15 +108,15 @@ Creates a new subscribers list.
 
 #### Properties
 
-|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
-|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
-| email | Email | STRING | TEXT  |  Email address that will be used for list notifications.  |  true  |
-| name | Name | STRING | TEXT  |  List name  |  true  |
-| company | Company | STRING | TEXT  |  Company that the list belongs to  |  false  |
-| country | Country | STRING | TEXT  |  Country where the list comes from  |  false  |
-| city | City | STRING | TEXT  |  City of the company  |  false  |
-| address | Address | STRING | TEXT  |  Address of the company  |  false  |
-| phone | Phone | STRING | TEXT  |  Phone number of the company  |  false  |
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| email | Email | STRING | Email address that will be used for list notifications. | true |
+| name | Name | STRING | List name | true |
+| company | Company | STRING | Company that the list belongs to | false |
+| country | Country | STRING | Country where the list comes from | false |
+| city | City | STRING | City of the company | false |
+| address | Address | STRING | Address of the company | false |
+| phone | Phone | STRING | Phone number of the company | false |
 
 
 #### Output
@@ -106,6 +129,23 @@ Type: INTEGER
 
 
 
+#### JSON Example
+```json
+{
+  "label" : "Create Subscriber List",
+  "name" : "createSubscriberList",
+  "parameters" : {
+    "email" : "",
+    "name" : "",
+    "company" : "",
+    "country" : "",
+    "city" : "",
+    "address" : "",
+    "phone" : ""
+  },
+  "type" : "acumbamail/v1/createSubscriberList"
+}
+```
 
 
 ### Delete Subscriber List
@@ -115,11 +155,22 @@ Deletes a list of subscribers.
 
 #### Properties
 
-|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
-|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
-| list_id | List Id | INTEGER | SELECT  |  List identifier.  |  true  |
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| list_id | List Id | INTEGER | List identifier. | true |
 
 
+#### JSON Example
+```json
+{
+  "label" : "Delete Subscriber List",
+  "name" : "deleteSubscriberList",
+  "parameters" : {
+    "list_id" : 1
+  },
+  "type" : "acumbamail/v1/deleteSubscriberList"
+}
+```
 
 
 

@@ -24,10 +24,10 @@ Version: 1
 
 #### Properties
 
-|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
-| clientId | Client Id | STRING | TEXT |  | true |
-| clientSecret | Client Secret | STRING | TEXT |  | true |
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| clientId | Client Id | STRING |  | true |
+| clientSecret | Client Secret | STRING |  | true |
 
 
 
@@ -47,15 +47,15 @@ Creates a new contact.
 
 #### Properties
 
-|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
-| givenName | First Name | STRING | TEXT | The first name of the contact. | true |
-| middleName | Middle Name | STRING | TEXT | The middle name of the contact. | false |
-| familyName | Last Name | STRING | TEXT | The last name of the contact. | true |
-| title | Job Title | STRING | TEXT | The job title of the contact. | false |
-| name | Company | STRING | TEXT | The company of the contact. | false |
-| email | Email | STRING | EMAIL | The email addresses of the contact. | false |
-| phoneNumber | Phone Number | STRING | PHONE | The phone numbers of the contact. | false |
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| givenName | First Name | STRING | The first name of the contact. | true |
+| middleName | Middle Name | STRING | The middle name of the contact. | false |
+| familyName | Last Name | STRING | The last name of the contact. | true |
+| title | Job Title | STRING | The job title of the contact. | false |
+| name | Company | STRING | The company of the contact. | false |
+| email | Email | STRING | The email addresses of the contact. | false |
+| phoneNumber | Phone Number | STRING | The phone numbers of the contact. | false |
 
 
 #### Output
@@ -67,12 +67,12 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |    Control Type     |
-|:------------:|:------------:|:-------------------:|
-| names | ARRAY <details> <summary> Items </summary> [{STRING\(familyName), STRING\(givenName), STRING\(middleName)}] </details> | ARRAY_BUILDER |
-| organizations | ARRAY <details> <summary> Items </summary> [{STRING\(name), STRING\(title)}] </details> | ARRAY_BUILDER |
-| emailAddresses | ARRAY <details> <summary> Items </summary> [{STRING\(value)}] </details> | ARRAY_BUILDER |
-| phoneNumbers | ARRAY <details> <summary> Items </summary> [{STRING\(value)}] </details> | ARRAY_BUILDER |
+|     Name     |     Type     |
+|:------------:|:------------:|
+| names | ARRAY <details> <summary> Items </summary> [{STRING\(familyName), STRING\(givenName), STRING\(middleName)}] </details> |
+| organizations | ARRAY <details> <summary> Items </summary> [{STRING\(name), STRING\(title)}] </details> |
+| emailAddresses | ARRAY <details> <summary> Items </summary> [{STRING\(value)}] </details> |
+| phoneNumbers | ARRAY <details> <summary> Items </summary> [{STRING\(value)}] </details> |
 
 
 
@@ -103,9 +103,9 @@ Creates a new group.
 
 #### Properties
 
-|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
-| name | Group Name | STRING | TEXT | The name of the group. | true |
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| name | Group Name | STRING | The name of the group. | true |
 
 
 #### Output
@@ -117,9 +117,9 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |    Control Type     |
-|:------------:|:------------:|:-------------------:|
-| name | STRING | TEXT |
+|     Name     |     Type     |
+|:------------:|:------------:|
+| name | STRING |
 
 
 
@@ -144,16 +144,16 @@ Modifies an existing contact.
 
 #### Properties
 
-|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
-| resourceName | Resource Name | STRING | TEXT | Resource name of the contact to be updated. | true |
-| givenName | First Name | STRING | TEXT | New first name of the contact. | true |
-| middleName | Middle Name | STRING | TEXT | New middle name of the contact. | false |
-| familyName | Last Name | STRING | TEXT | Updated last name of the contact. | true |
-| title | Job Title | STRING | TEXT | Updated job title of the contact. | false |
-| name | Company | STRING | TEXT | Updated name of the company where the contact is employed. | false |
-| email | Email Address | STRING | EMAIL | Updated email address of the contact. | false |
-| phoneNumber | Phone Number | STRING | PHONE | Updated phone number of the contact. | false |
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| resourceName | Resource Name | STRING | Resource name of the contact to be updated. | true |
+| givenName | First Name | STRING | New first name of the contact. | true |
+| middleName | Middle Name | STRING | New middle name of the contact. | false |
+| familyName | Last Name | STRING | Updated last name of the contact. | true |
+| title | Job Title | STRING | Updated job title of the contact. | false |
+| name | Company | STRING | Updated name of the company where the contact is employed. | false |
+| email | Email Address | STRING | Updated email address of the contact. | false |
+| phoneNumber | Phone Number | STRING | Updated phone number of the contact. | false |
 
 
 #### Output
@@ -165,12 +165,12 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |    Control Type     |
-|:------------:|:------------:|:-------------------:|
-| names | ARRAY <details> <summary> Items </summary> [{STRING\(familyName), STRING\(givenName), STRING\(middleName)}] </details> | ARRAY_BUILDER |
-| organizations | ARRAY <details> <summary> Items </summary> [{STRING\(name), STRING\(title)}] </details> | ARRAY_BUILDER |
-| emailAddresses | ARRAY <details> <summary> Items </summary> [{STRING\(value)}] </details> | ARRAY_BUILDER |
-| phoneNumbers | ARRAY <details> <summary> Items </summary> [{STRING\(value)}] </details> | ARRAY_BUILDER |
+|     Name     |     Type     |
+|:------------:|:------------:|
+| names | ARRAY <details> <summary> Items </summary> [{STRING\(familyName), STRING\(givenName), STRING\(middleName)}] </details> |
+| organizations | ARRAY <details> <summary> Items </summary> [{STRING\(name), STRING\(title)}] </details> |
+| emailAddresses | ARRAY <details> <summary> Items </summary> [{STRING\(value)}] </details> |
+| phoneNumbers | ARRAY <details> <summary> Items </summary> [{STRING\(value)}] </details> |
 
 
 
@@ -202,9 +202,9 @@ Searches the contacts in Google Contacts account.
 
 #### Properties
 
-|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
-| query | Query | STRING | TEXT | The plain-text query. | true |
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| query | Query | STRING | The plain-text query. | true |
 
 
 #### Output
@@ -216,9 +216,9 @@ Type: ARRAY
 
 #### Properties
 
-|     Name     |     Type     |    Control Type     |
-|:------------:|:------------:|:-------------------:|
-|  | OBJECT <details> <summary> Properties </summary> {[{STRING\(familyName), STRING\(givenName), STRING\(middleName)}]\(names), [{STRING\(name), STRING\(title)}]\(organizations), [{STRING\(value)}]\(emailAddresses), [{STRING\(value)}]\(phoneNumbers)} </details> | OBJECT_BUILDER |
+|     Name     |     Type     |
+|:------------:|:------------:|
+|  | OBJECT <details> <summary> Properties </summary> {[{STRING\(familyName), STRING\(givenName), STRING\(middleName)}]\(names), [{STRING\(name), STRING\(title)}]\(organizations), [{STRING\(value)}]\(emailAddresses), [{STRING\(value)}]\(phoneNumbers)} </details> |
 
 
 

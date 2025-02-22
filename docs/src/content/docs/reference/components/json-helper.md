@@ -26,9 +26,9 @@ Converts the JSON string to object/array.
 
 #### Properties
 
-|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
-| source | Source | STRING | TEXT | The JSON string to convert to the data. | true |
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| source | Source | STRING | The JSON string to convert to the data. | true |
 
 
 #### JSON Example
@@ -51,11 +51,11 @@ Writes the object/array to a JSON string.
 
 #### Properties
 
-|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
-| type | Type | STRING <details> <summary> Options </summary> OBJECT, ARRAY </details> | SELECT | The value type. | null |
-| source | Source | OBJECT <details> <summary> Properties </summary> {} </details> | OBJECT_BUILDER | The data to convert to JSON string. | true |
-| source | Source | ARRAY <details> <summary> Items </summary> [] </details> | ARRAY_BUILDER | The data to convert to JSON string. | true |
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| type | Type | STRING <details> <summary> Options </summary> OBJECT, ARRAY </details> | The value type. | null |
+| source | Source | OBJECT <details> <summary> Properties </summary> {} </details> | The data to convert to JSON string. | true |
+| source | Source | ARRAY <details> <summary> Items </summary> [] </details> | The data to convert to JSON string. | true |
 
 
 #### JSON Example

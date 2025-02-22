@@ -26,15 +26,15 @@ Converts the response to the webhook request.
 
 #### Properties
 
-|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
-| responseType | Response Type | STRING <details> <summary> Options </summary> JSON, RAW, BINARY, REDIRECT, NO_DATA </details> | SELECT | The type of the response. | null |
-| headers | Headers | OBJECT <details> <summary> Properties </summary> {} </details> | OBJECT_BUILDER | The headers of the response. | null |
-| body | Body | OBJECT <details> <summary> Properties </summary> {} </details> | OBJECT_BUILDER | The body of the response. | true |
-| body | Body | STRING | TEXT | The body of the response. | true |
-| body | Redirect URL | STRING | TEXT | The redirect URL. | true |
-| body | Body | FILE_ENTRY | FILE_ENTRY | The body of the response. | true |
-| statusCode | Status Code | INTEGER | INTEGER | The status code of the response. | null |
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| responseType | Response Type | STRING <details> <summary> Options </summary> JSON, RAW, BINARY, REDIRECT, NO_DATA </details> | The type of the response. | null |
+| headers | Headers | OBJECT <details> <summary> Properties </summary> {} </details> | The headers of the response. | null |
+| body | Body | OBJECT <details> <summary> Properties </summary> {} </details> | The body of the response. | true |
+| body | Body | STRING | The body of the response. | true |
+| body | Redirect URL | STRING | The redirect URL. | true |
+| body | Body | FILE_ENTRY | The body of the response. | true |
+| statusCode | Status Code | INTEGER | The status code of the response. | null |
 
 
 #### JSON Example
@@ -100,9 +100,9 @@ Type: STATIC_WEBHOOK
 
 #### Properties
 
-|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
-| csrfToken | CSRF Token | STRING | TEXT | To trigger the workflow successfully, the security token must match the X-Csrf-Token HTTP header value passed by the client. | true |
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| csrfToken | CSRF Token | STRING | To trigger the workflow successfully, the security token must match the X-Csrf-Token HTTP header value passed by the client. | true |
 
 
 #### Output
@@ -137,10 +137,10 @@ Type: STATIC_WEBHOOK
 
 #### Properties
 
-|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
-| csrfToken | CSRF Token | STRING | TEXT | To trigger the workflow successfully, the security token must match the X-Csrf-Token HTTP header value passed by the client. | true |
-| timeout | Timeout (ms) | INTEGER | INTEGER | The incoming request will time out after the specified number of milliseconds. The max wait time before a timeout is 5 minutes. | null |
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| csrfToken | CSRF Token | STRING | To trigger the workflow successfully, the security token must match the X-Csrf-Token HTTP header value passed by the client. | true |
+| timeout | Timeout (ms) | INTEGER | The incoming request will time out after the specified number of milliseconds. The max wait time before a timeout is 5 minutes. | null |
 
 
 #### Output

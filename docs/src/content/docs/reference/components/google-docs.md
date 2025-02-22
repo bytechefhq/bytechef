@@ -24,10 +24,10 @@ Version: 1
 
 #### Properties
 
-|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
-| clientId | Client Id | STRING | TEXT |  | true |
-| clientSecret | Client Secret | STRING | TEXT |  | true |
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| clientId | Client Id | STRING |  | true |
+| clientSecret | Client Secret | STRING |  | true |
 
 
 
@@ -47,10 +47,10 @@ Create a document on Google Docs.
 
 #### Properties
 
-|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
-| title | Title | STRING | TEXT | Document title. | true |
-| body | Content | STRING | TEXT_AREA | Document content. | true |
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| title | Title | STRING | Document title. | true |
+| body | Content | STRING | Document content. | true |
 
 
 #### JSON Example
@@ -74,13 +74,13 @@ Creates a new document based on an existing one and can replace any placeholder 
 
 #### Properties
 
-|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
-| fileId | Template Document ID | STRING | SELECT | The ID of the template document from which the new document will be created. | true |
-| fileName | New Document Name | STRING | TEXT | Name of the new document. | true |
-| folderId | Folder for New Document | STRING | SELECT | Folder ID where the new document will be saved. If not provided, the new document will be saved in the same folder as the template document. | false |
-| values | Variables | OBJECT <details> <summary> Properties </summary> {} </details> | OBJECT_BUILDER | Don't include the "[[]]", only the key name and its value. | false |
-| images | Images | OBJECT <details> <summary> Properties </summary> {} </details> | OBJECT_BUILDER | Key: Image ID (get it manually from the Read File Action), Value: Image URL. | false |
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| fileId | Template Document ID | STRING | The ID of the template document from which the new document will be created. | true |
+| fileName | New Document Name | STRING | Name of the new document. | true |
+| folderId | Folder for New Document | STRING | Folder ID where the new document will be saved. If not provided, the new document will be saved in the same folder as the template document. | false |
+| values | Variables | OBJECT <details> <summary> Properties </summary> {} </details> | Don't include the "[[]]", only the key name and its value. | false |
+| images | Images | OBJECT <details> <summary> Properties </summary> {} </details> | Key: Image ID (get it manually from the Read File Action), Value: Image URL. | false |
 
 
 #### JSON Example
@@ -107,9 +107,9 @@ Retrieve a specified document from your Google Drive.
 
 #### Properties
 
-|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
-| documentId | Document Id | STRING | SELECT | The ID of the document to read. | true |
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| documentId | Document Id | STRING | The ID of the document to read. | true |
 
 
 #### JSON Example

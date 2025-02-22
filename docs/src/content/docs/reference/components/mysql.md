@@ -18,14 +18,14 @@ Type: mysql/v1
 Version: 1
 
 
-### null
+### custom
 
 #### Properties
 
-|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
-| username | Username | STRING | TEXT |  | true |
-| password | Password | STRING | PASSWORD |  | true |
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| username | Username | STRING |  | true |
+| password | Password | STRING |  | true |
 
 
 
@@ -45,10 +45,10 @@ Execute an SQL query.
 
 #### Properties
 
-|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
-| query | Query | STRING | TEXT | The raw SQL query to execute. You can use :property1 and :property2 in conjunction with parameters. | true |
-| parameters | Parameters | OBJECT <details> <summary> Properties </summary> {} </details> | OBJECT_BUILDER | The list of properties which should be used as query parameters. | null |
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| query | Query | STRING | The raw SQL query to execute. You can use :property1 and :property2 in conjunction with parameters. | true |
+| parameters | Parameters | OBJECT <details> <summary> Properties </summary> {} </details> | The list of properties which should be used as query parameters. | null |
 
 
 #### JSON Example
@@ -72,12 +72,12 @@ Insert rows in database.
 
 #### Properties
 
-|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
-| schema | Schema | STRING | TEXT | Name of the schema the table belongs to. | true |
-| table | Table | STRING | TEXT | Name of the table in which to insert data to. | true |
-| columns | Fields | ARRAY <details> <summary> Items </summary> [STRING] </details> | ARRAY_BUILDER | The list of the table field names where corresponding values would be inserted. | null |
-| rows | Values | ARRAY <details> <summary> Items </summary> [{}] </details> | ARRAY_BUILDER | List of field values for corresponding field names | null |
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| schema | Schema | STRING | Name of the schema the table belongs to. | true |
+| table | Table | STRING | Name of the table in which to insert data to. | true |
+| columns | Fields | ARRAY <details> <summary> Items </summary> [STRING] </details> | The list of the table field names where corresponding values would be inserted. | null |
+| rows | Values | ARRAY <details> <summary> Items </summary> [{}] </details> | List of field values for corresponding field names | null |
 
 
 #### JSON Example
@@ -103,13 +103,13 @@ Update rows in database.
 
 #### Properties
 
-|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
-| schema | Schema | STRING | TEXT | Name of the schema the table belongs to. | true |
-| table | Table | STRING | TEXT | Name of the table in which to update data in. | true |
-| columns | Fields | ARRAY <details> <summary> Items </summary> [STRING] </details> | ARRAY_BUILDER | The list of the table field names whose values would be updated. | null |
-| updateKey | Update Key | STRING | TEXT | The field name used as criteria to decide which rows in the database should be updated. | null |
-| rows | Values | ARRAY <details> <summary> Items </summary> [{}] </details> | ARRAY_BUILDER | List of field values for corresponding field names. | null |
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| schema | Schema | STRING | Name of the schema the table belongs to. | true |
+| table | Table | STRING | Name of the table in which to update data in. | true |
+| columns | Fields | ARRAY <details> <summary> Items </summary> [STRING] </details> | The list of the table field names whose values would be updated. | null |
+| updateKey | Update Key | STRING | The field name used as criteria to decide which rows in the database should be updated. | null |
+| rows | Values | ARRAY <details> <summary> Items </summary> [{}] </details> | List of field values for corresponding field names. | null |
 
 
 #### JSON Example
@@ -136,12 +136,12 @@ Delete rows from database.
 
 #### Properties
 
-|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
-| schema | Schema | STRING | TEXT | Name of the schema the table belongs to. | true |
-| table | Table | STRING | TEXT | Name of the table in which to update data in. | true |
-| deleteKey | Delete Key | STRING | TEXT | Name of the field which decides which rows in the database should be deleted. | null |
-| rows | Criteria Values | ARRAY <details> <summary> Items </summary> [{}] </details> | ARRAY_BUILDER | List of values that are used to test delete key. | null |
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| schema | Schema | STRING | Name of the schema the table belongs to. | true |
+| table | Table | STRING | Name of the table in which to update data in. | true |
+| deleteKey | Delete Key | STRING | Name of the field which decides which rows in the database should be deleted. | null |
+| rows | Criteria Values | ARRAY <details> <summary> Items </summary> [{}] </details> | List of values that are used to test delete key. | null |
 
 
 #### JSON Example
@@ -167,11 +167,11 @@ Execute an SQL DML or DML statement.
 
 #### Properties
 
-|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
-| execute | Execute | STRING | TEXT | The raw DML or DDL statement to execute. You can use :property1 and :property2 in conjunction with parameters. | true |
-| columns | Fields to select | ARRAY <details> <summary> Items </summary> [{}] </details> | ARRAY_BUILDER | List of fields to select from. | null |
-| parameters | Parameters | OBJECT <details> <summary> Properties </summary> {} </details> | OBJECT_BUILDER | The list of values which should be used to replace corresponding criteria parameters. | null |
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| execute | Execute | STRING | The raw DML or DDL statement to execute. You can use :property1 and :property2 in conjunction with parameters. | true |
+| columns | Fields to select | ARRAY <details> <summary> Items </summary> [{}] </details> | List of fields to select from. | null |
+| parameters | Parameters | OBJECT <details> <summary> Properties </summary> {} </details> | The list of values which should be used to replace corresponding criteria parameters. | null |
 
 
 #### JSON Example

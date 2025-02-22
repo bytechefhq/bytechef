@@ -24,12 +24,12 @@ Version: 1
 
 #### Properties
 
-|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
-| spaceId | Space Id | STRING | TEXT | Your Space ID | true |
-| serverUrl | Server URL | STRING <details> <summary> Options </summary> https://us-east.api.pipelinersales.com/api/v100/rest/spaces/, https://eu-central.api.pipelinersales.com/api/v100/rest/spaces/, https://ca-central.api.pipelinersales.com/api/v100/rest/spaces/, https://ap-southeast.api.pipelinersales.com/api/v100/rest/spaces/ </details> | SELECT |  | true |
-| username | Username | STRING | TEXT |  | true |
-| password | Password | STRING | TEXT |  | true |
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| spaceId | Space Id | STRING | Your Space ID | true |
+| serverUrl | Server URL | STRING <details> <summary> Options </summary> https://us-east.api.pipelinersales.com/api/v100/rest/spaces/, https://eu-central.api.pipelinersales.com/api/v100/rest/spaces/, https://ca-central.api.pipelinersales.com/api/v100/rest/spaces/, https://ap-southeast.api.pipelinersales.com/api/v100/rest/spaces/ </details> |  | true |
+| username | Username | STRING |  | true |
+| password | Password | STRING |  | true |
 
 
 
@@ -49,9 +49,9 @@ Creates new account.
 
 #### Properties
 
-|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
-| __item | Account | OBJECT <details> <summary> Properties </summary> {STRING\(owner_id), STRING\(name)} </details> | OBJECT_BUILDER |  | true |
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| __item | Account | OBJECT <details> <summary> Properties </summary> {STRING\(owner_id), STRING\(name)} </details> |  | true |
 
 
 #### Output
@@ -63,10 +63,10 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |    Control Type     |
-|:------------:|:------------:|:-------------------:|
-| success | BOOLEAN <details> <summary> Options </summary> true, false </details> | SELECT |
-| data | OBJECT <details> <summary> Properties </summary> {STRING\(id), STRING\(owner_id), STRING\(name)} </details> | OBJECT_BUILDER |
+|     Name     |     Type     |
+|:------------:|:------------:|
+| success | BOOLEAN <details> <summary> Options </summary> true, false </details> |
+| data | OBJECT <details> <summary> Properties </summary> {STRING\(id), STRING\(owner_id), STRING\(name)} </details> |
 
 
 
@@ -94,9 +94,9 @@ Creates new Contact
 
 #### Properties
 
-|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
-| __item | Contact | OBJECT <details> <summary> Properties </summary> {STRING\(owner_id), STRING\(first_name), STRING\(last_name)} </details> | OBJECT_BUILDER |  | true |
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| __item | Contact | OBJECT <details> <summary> Properties </summary> {STRING\(owner_id), STRING\(first_name), STRING\(last_name)} </details> |  | true |
 
 
 #### Output
@@ -108,10 +108,10 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |    Control Type     |
-|:------------:|:------------:|:-------------------:|
-| success | BOOLEAN <details> <summary> Options </summary> true, false </details> | SELECT |
-| data | OBJECT <details> <summary> Properties </summary> {STRING\(id), STRING\(owner_id), STRING\(first_name), STRING\(last_name)} </details> | OBJECT_BUILDER |
+|     Name     |     Type     |
+|:------------:|:------------:|
+| success | BOOLEAN <details> <summary> Options </summary> true, false </details> |
+| data | OBJECT <details> <summary> Properties </summary> {STRING\(id), STRING\(owner_id), STRING\(first_name), STRING\(last_name)} </details> |
 
 
 
@@ -140,9 +140,9 @@ Creates new Task
 
 #### Properties
 
-|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
-| __item | Task | OBJECT <details> <summary> Properties </summary> {STRING\(subject), STRING\(activity_type_id), STRING\(unit_id), STRING\(owner_id)} </details> | OBJECT_BUILDER |  | true |
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| __item | Task | OBJECT <details> <summary> Properties </summary> {STRING\(subject), STRING\(activity_type_id), STRING\(unit_id), STRING\(owner_id)} </details> |  | true |
 
 
 #### Output
@@ -154,10 +154,10 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |    Control Type     |
-|:------------:|:------------:|:-------------------:|
-| success | BOOLEAN <details> <summary> Options </summary> true, false </details> | SELECT |
-| data | OBJECT <details> <summary> Properties </summary> {STRING\(id), STRING\(subject), STRING\(activity_type_id), STRING\(unit_id), STRING\(owner_id)} </details> | OBJECT_BUILDER |
+|     Name     |     Type     |
+|:------------:|:------------:|
+| success | BOOLEAN <details> <summary> Options </summary> true, false </details> |
+| data | OBJECT <details> <summary> Properties </summary> {STRING\(id), STRING\(subject), STRING\(activity_type_id), STRING\(unit_id), STRING\(owner_id)} </details> |
 
 
 

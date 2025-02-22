@@ -24,10 +24,10 @@ Version: 1
 
 #### Properties
 
-|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
-| domain | Domain | STRING | TEXT | Your helpdesk domain name, e.g. https://{your_domain}.freshdesk.com/api/v2 | true |
-| username | API key | STRING | TEXT |  | true |
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| domain | Domain | STRING | Your helpdesk domain name, e.g. https://{your_domain}.freshdesk.com/api/v2 | true |
+| username | API key | STRING |  | true |
 
 
 
@@ -47,9 +47,9 @@ Creates a new company
 
 #### Properties
 
-|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
-| __item | Company | OBJECT <details> <summary> Properties </summary> {STRING\(name), STRING\(description), STRING\(note)} </details> | OBJECT_BUILDER |  | null |
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| __item | Company | OBJECT <details> <summary> Properties </summary> {STRING\(name), STRING\(description), STRING\(note)} </details> |  | null |
 
 
 #### Output
@@ -61,9 +61,9 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |    Control Type     |
-|:------------:|:------------:|:-------------------:|
-| body | OBJECT <details> <summary> Properties </summary> {NUMBER\(id), STRING\(name), STRING\(description), STRING\(note)} </details> | OBJECT_BUILDER |
+|     Name     |     Type     |
+|:------------:|:------------:|
+| body | OBJECT <details> <summary> Properties </summary> {NUMBER\(id), STRING\(name), STRING\(description), STRING\(note)} </details> |
 
 
 
@@ -92,9 +92,9 @@ Creates a new contact
 
 #### Properties
 
-|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
-| __item | Contact | OBJECT <details> <summary> Properties </summary> {STRING\(name), STRING\(email), STRING\(phone), STRING\(mobile), STRING\(description), STRING\(job_title)} </details> | OBJECT_BUILDER |  | null |
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| __item | Contact | OBJECT <details> <summary> Properties </summary> {STRING\(name), STRING\(email), STRING\(phone), STRING\(mobile), STRING\(description), STRING\(job_title)} </details> |  | null |
 
 
 #### Output
@@ -106,9 +106,9 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |    Control Type     |
-|:------------:|:------------:|:-------------------:|
-| body | OBJECT <details> <summary> Properties </summary> {STRING\(description), STRING\(email), NUMBER\(id), STRING\(job_title)} </details> | OBJECT_BUILDER |
+|     Name     |     Type     |
+|:------------:|:------------:|
+| body | OBJECT <details> <summary> Properties </summary> {STRING\(description), STRING\(email), NUMBER\(id), STRING\(job_title)} </details> |
 
 
 
@@ -140,9 +140,9 @@ Creates a new ticket
 
 #### Properties
 
-|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
-| __item | Ticket | OBJECT <details> <summary> Properties </summary> {STRING\(subject), STRING\(email), STRING\(description), INTEGER\(priority), INTEGER\(status)} </details> | OBJECT_BUILDER |  | null |
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| __item | Ticket | OBJECT <details> <summary> Properties </summary> {STRING\(subject), STRING\(email), STRING\(description), INTEGER\(priority), INTEGER\(status)} </details> |  | null |
 
 
 #### Output
@@ -154,9 +154,9 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |    Control Type     |
-|:------------:|:------------:|:-------------------:|
-| body | OBJECT <details> <summary> Properties </summary> {STRING\(subject), STRING\(email), STRING\(description), INTEGER\(priority), INTEGER\(status)} </details> | OBJECT_BUILDER |
+|     Name     |     Type     |
+|:------------:|:------------:|
+| body | OBJECT <details> <summary> Properties </summary> {STRING\(subject), STRING\(email), STRING\(description), INTEGER\(priority), INTEGER\(status)} </details> |
 
 
 

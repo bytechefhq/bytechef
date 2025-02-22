@@ -24,9 +24,9 @@ Version: 1
 
 #### Properties
 
-|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
-| token | Token | STRING | TEXT |  | true |
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| token | Token | STRING |  | true |
 
 
 
@@ -46,15 +46,15 @@ Creates new contact. A contact may represent a single individual or an organizat
 
 #### Properties
 
-|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
-| is_organization | Is Contact Represent an Organization? | BOOLEAN <details> <summary> Options </summary> true, false </details> | SELECT | Is contact represent an organization or a single individual? | true |
-| name | Name | STRING | TEXT | The name of the organisation. | false |
-| first_name | First Name | STRING | TEXT | The first name of the person. | false |
-| last_name | Last Name | STRING | TEXT | The last name of the person. | true |
-| title | Title | STRING | TEXT |  | false |
-| website | Website | STRING | TEXT |  | false |
-| email | Email | STRING | EMAIL |  | false |
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| is_organization | Is Contact Represent an Organization? | BOOLEAN <details> <summary> Options </summary> true, false </details> | Is contact represent an organization or a single individual? | true |
+| name | Name | STRING | The name of the organisation. | false |
+| first_name | First Name | STRING | The first name of the person. | false |
+| last_name | Last Name | STRING | The last name of the person. | true |
+| title | Title | STRING |  | false |
+| website | Website | STRING |  | false |
+| email | Email | STRING |  | false |
 
 
 #### Output
@@ -66,10 +66,10 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |    Control Type     |
-|:------------:|:------------:|:-------------------:|
-| data | OBJECT <details> <summary> Properties </summary> {STRING\(id), BOOLEAN\(is_organization), STRING\(title), STRING\(website), STRING\(email)} </details> | OBJECT_BUILDER |
-| meta | OBJECT <details> <summary> Properties </summary> {INTEGER\(version), STRING\(type)} </details> | OBJECT_BUILDER |
+|     Name     |     Type     |
+|:------------:|:------------:|
+| data | OBJECT <details> <summary> Properties </summary> {STRING\(id), BOOLEAN\(is_organization), STRING\(title), STRING\(website), STRING\(email)} </details> |
+| meta | OBJECT <details> <summary> Properties </summary> {INTEGER\(version), STRING\(type)} </details> |
 
 
 
@@ -100,10 +100,10 @@ Creates new task.
 
 #### Properties
 
-|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
-| content | Task Name | STRING | TEXT |  | true |
-| due_date | Due Date | DATE | DATE |  | false |
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| content | Task Name | STRING |  | true |
+| due_date | Due Date | DATE |  | false |
 
 
 #### Output
@@ -115,10 +115,10 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |    Control Type     |
-|:------------:|:------------:|:-------------------:|
-| data | OBJECT <details> <summary> Properties </summary> {INTEGER\(id), STRING\(content), DATE\(due_date)} </details> | OBJECT_BUILDER |
-| meta | OBJECT <details> <summary> Properties </summary> {STRING\(type)} </details> | OBJECT_BUILDER |
+|     Name     |     Type     |
+|:------------:|:------------:|
+| data | OBJECT <details> <summary> Properties </summary> {INTEGER\(id), STRING\(content), DATE\(due_date)} </details> |
+| meta | OBJECT <details> <summary> Properties </summary> {STRING\(type)} </details> |
 
 
 

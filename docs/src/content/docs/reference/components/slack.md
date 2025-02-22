@@ -24,10 +24,10 @@ Version: 1
 
 #### Properties
 
-|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
-| clientId | Client Id | STRING | TEXT |  | true |
-| clientSecret | Client Secret | STRING | TEXT |  | true |
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| clientId | Client Id | STRING |  | true |
+| clientSecret | Client Secret | STRING |  | true |
 
 
 
@@ -40,17 +40,17 @@ Version: 1
 ## Actions
 
 
-### Send message
-Name: sendMessage
+### Request Approval in a Channel
+Name: requestApprovalMessage
 
-Sends a message to a public channel, private channel, or existing direct message conversation.
+Send approval message to a channel and then wait until the message is approved or disapproved.
 
 #### Properties
 
-|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
-| channel | Channel ID | STRING | SELECT | ID of the channel, private group, or IM channel to send message to. | true |
-| text | Message | STRING | TEXT_AREA | The text of your message. | true |
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| channel | Channel | STRING | Channel, private group, or IM channel to send message to. | true |
+| text | Message | STRING | The text of your message. | true |
 
 
 #### Output
@@ -62,14 +62,62 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |    Control Type     |
-|:------------:|:------------:|:-------------------:|
-| ok | BOOLEAN <details> <summary> Options </summary> true, false </details> | SELECT |
-| channel | STRING | TEXT |
-| ts | STRING | TEXT |
-| message | OBJECT <details> <summary> Properties </summary> {STRING\(user), STRING\(type), STRING\(ts), STRING\(text), STRING\(team), STRING\(subtype)} </details> | OBJECT_BUILDER |
-| warning | STRING | TEXT |
-| responseMetadata | OBJECT <details> <summary> Properties </summary> {[STRING]\(messages)} </details> | OBJECT_BUILDER |
+|     Name     |     Type     |
+|:------------:|:------------:|
+| ok | BOOLEAN <details> <summary> Options </summary> true, false </details> |
+| channel | STRING |
+| ts | STRING |
+| message | OBJECT <details> <summary> Properties </summary> {STRING\(user), STRING\(type), STRING\(ts), STRING\(text), STRING\(team), STRING\(subtype)} </details> |
+| warning | STRING |
+| responseMetadata | OBJECT <details> <summary> Properties </summary> {[STRING]\(messages)} </details> |
+
+
+
+
+#### JSON Example
+```json
+{
+  "label" : "Request Approval in a Channel",
+  "name" : "requestApprovalMessage",
+  "parameters" : {
+    "channel" : "",
+    "text" : ""
+  },
+  "type" : "slack/v1/requestApprovalMessage"
+}
+```
+
+
+### Send message
+Name: sendMessage
+
+Sends a message to a public channel, private channel, or existing direct message conversation.
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| channel | Channel ID | STRING | ID of the channel, private group, or IM channel to send message to. | true |
+| text | Message | STRING | The text of your message. | true |
+
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |
+|:------------:|:------------:|
+| ok | BOOLEAN <details> <summary> Options </summary> true, false </details> |
+| channel | STRING |
+| ts | STRING |
+| message | OBJECT <details> <summary> Properties </summary> {STRING\(user), STRING\(type), STRING\(ts), STRING\(text), STRING\(team), STRING\(subtype)} </details> |
+| warning | STRING |
+| responseMetadata | OBJECT <details> <summary> Properties </summary> {[STRING]\(messages)} </details> |
 
 
 
@@ -95,10 +143,10 @@ Sends a direct message to another user in a workspace. If it hasn't already, a d
 
 #### Properties
 
-|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
-| channel | User ID | STRING | SELECT | ID of the user to send the direct message to. | true |
-| text | Message | STRING | TEXT_AREA | The text of your message. | true |
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| channel | User ID | STRING | ID of the user to send the direct message to. | true |
+| text | Message | STRING | The text of your message. | true |
 
 
 #### Output
@@ -110,14 +158,14 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |    Control Type     |
-|:------------:|:------------:|:-------------------:|
-| ok | BOOLEAN <details> <summary> Options </summary> true, false </details> | SELECT |
-| channel | STRING | TEXT |
-| ts | STRING | TEXT |
-| message | OBJECT <details> <summary> Properties </summary> {STRING\(user), STRING\(type), STRING\(ts), STRING\(text), STRING\(team), STRING\(subtype)} </details> | OBJECT_BUILDER |
-| warning | STRING | TEXT |
-| responseMetadata | OBJECT <details> <summary> Properties </summary> {[STRING]\(messages)} </details> | OBJECT_BUILDER |
+|     Name     |     Type     |
+|:------------:|:------------:|
+| ok | BOOLEAN <details> <summary> Options </summary> true, false </details> |
+| channel | STRING |
+| ts | STRING |
+| message | OBJECT <details> <summary> Properties </summary> {STRING\(user), STRING\(type), STRING\(ts), STRING\(text), STRING\(team), STRING\(subtype)} </details> |
+| warning | STRING |
+| responseMetadata | OBJECT <details> <summary> Properties </summary> {[STRING]\(messages)} </details> |
 
 
 

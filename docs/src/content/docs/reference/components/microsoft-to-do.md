@@ -24,11 +24,11 @@ Version: 1
 
 #### Properties
 
-|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
-| clientId | Client Id | STRING | TEXT |  | true |
-| clientSecret | Client Secret | STRING | TEXT |  | true |
-| tenantId | Tenant Id | STRING | TEXT |  | true |
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| clientId | Client Id | STRING |  | true |
+| clientSecret | Client Secret | STRING |  | true |
+| tenantId | Tenant Id | STRING |  | true |
 
 
 
@@ -48,12 +48,12 @@ Creates a new task.
 
 #### Properties
 
-|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
-| taskListId | Task List ID | STRING | SELECT | ID of the task list where the task will be created. | true |
-| title | Title | STRING | TEXT | Title of the task. | true |
-| importance | Importance | STRING <details> <summary> Options </summary> low, normal, high </details> | SELECT | Importance of the task | false |
-| isReminderOn | Reminder | BOOLEAN <details> <summary> Options </summary> true, false </details> | SELECT | Set to true if an alert is set to remind the user of the task. | false |
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| taskListId | Task List ID | STRING | ID of the task list where the task will be created. | true |
+| title | Title | STRING | Title of the task. | true |
+| importance | Importance | STRING <details> <summary> Options </summary> low, normal, high </details> | Importance of the task | false |
+| isReminderOn | Reminder | BOOLEAN <details> <summary> Options </summary> true, false </details> | Set to true if an alert is set to remind the user of the task. | false |
 
 
 #### Output
@@ -65,17 +65,17 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |    Control Type     |
-|:------------:|:------------:|:-------------------:|
-| @odata.etag | STRING | TEXT |
-| importance | STRING | TEXT |
-| isReminderOn | BOOLEAN <details> <summary> Options </summary> true, false </details> | SELECT |
-| status | STRING | TEXT |
-| title | STRING | TEXT |
-| categories | STRING | TEXT |
-| id | STRING | TEXT |
-| body | OBJECT <details> <summary> Properties </summary> {STRING\(content), STRING\(contentType)} </details> | OBJECT_BUILDER |
-| linkedResources | OBJECT <details> <summary> Properties </summary> {STRING\(id), STRING\(webUrl), STRING\(applicationName), STRING\(displayName)} </details> | OBJECT_BUILDER |
+|     Name     |     Type     |
+|:------------:|:------------:|
+| @odata.etag | STRING |
+| importance | STRING |
+| isReminderOn | BOOLEAN <details> <summary> Options </summary> true, false </details> |
+| status | STRING |
+| title | STRING |
+| categories | STRING |
+| id | STRING |
+| body | OBJECT <details> <summary> Properties </summary> {STRING\(content), STRING\(contentType)} </details> |
+| linkedResources | OBJECT <details> <summary> Properties </summary> {STRING\(id), STRING\(webUrl), STRING\(applicationName), STRING\(displayName)} </details> |
 
 
 
@@ -103,9 +103,9 @@ Creates a new task list.
 
 #### Properties
 
-|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
-| displayName | Title | STRING | TEXT | Title of the task list. | true |
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| displayName | Title | STRING | Title of the task list. | true |
 
 
 #### Output
@@ -117,15 +117,15 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |    Control Type     |
-|:------------:|:------------:|:-------------------:|
-| @odata.context | STRING | TEXT |
-| @odata.etag | STRING | TEXT |
-| id | STRING | TEXT |
-| displayName | STRING | TEXT |
-| isOwner | BOOLEAN <details> <summary> Options </summary> true, false </details> | SELECT |
-| isShared | BOOLEAN <details> <summary> Options </summary> true, false </details> | SELECT |
-| wellKnownListName | STRING | TEXT |
+|     Name     |     Type     |
+|:------------:|:------------:|
+| @odata.context | STRING |
+| @odata.etag | STRING |
+| id | STRING |
+| displayName | STRING |
+| isOwner | BOOLEAN <details> <summary> Options </summary> true, false </details> |
+| isShared | BOOLEAN <details> <summary> Options </summary> true, false </details> |
+| wellKnownListName | STRING |
 
 
 
@@ -150,10 +150,10 @@ Gets task by ID.
 
 #### Properties
 
-|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
-| taskListId | Task List ID | STRING | SELECT | ID of the task list where the task will be created. | true |
-| taskId | Task ID | STRING <details> <summary> Depends On </summary> taskListId </details> | SELECT | ID of the task to retrieve. | true |
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| taskListId | Task List ID | STRING | ID of the task list where the task will be created. | true |
+| taskId | Task ID | STRING <details> <summary> Depends On </summary> taskListId </details> | ID of the task to retrieve. | true |
 
 
 #### Output
@@ -165,17 +165,17 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |    Control Type     |
-|:------------:|:------------:|:-------------------:|
-| @odata.etag | STRING | TEXT |
-| importance | STRING | TEXT |
-| isReminderOn | BOOLEAN <details> <summary> Options </summary> true, false </details> | SELECT |
-| status | STRING | TEXT |
-| title | STRING | TEXT |
-| categories | STRING | TEXT |
-| id | STRING | TEXT |
-| body | OBJECT <details> <summary> Properties </summary> {STRING\(content), STRING\(contentType)} </details> | OBJECT_BUILDER |
-| linkedResources | OBJECT <details> <summary> Properties </summary> {STRING\(id), STRING\(webUrl), STRING\(applicationName), STRING\(displayName)} </details> | OBJECT_BUILDER |
+|     Name     |     Type     |
+|:------------:|:------------:|
+| @odata.etag | STRING |
+| importance | STRING |
+| isReminderOn | BOOLEAN <details> <summary> Options </summary> true, false </details> |
+| status | STRING |
+| title | STRING |
+| categories | STRING |
+| id | STRING |
+| body | OBJECT <details> <summary> Properties </summary> {STRING\(content), STRING\(contentType)} </details> |
+| linkedResources | OBJECT <details> <summary> Properties </summary> {STRING\(id), STRING\(webUrl), STRING\(applicationName), STRING\(displayName)} </details> |
 
 
 

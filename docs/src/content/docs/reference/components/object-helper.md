@@ -26,21 +26,21 @@ Add value to the object by key if it exists. Otherwise, update the value
 
 #### Properties
 
-|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
-| source | Source | OBJECT <details> <summary> Properties </summary> {} </details> | OBJECT_BUILDER | Source object to be added or updated | true |
-| key | Key | STRING | TEXT | Key of the value to be added or updated. | true |
-| type | Type | STRING <details> <summary> Options </summary> ARRAY, BOOLEAN, DATE, DATE_TIME, INTEGER, NULL, NUMBER, OBJECT, STRING, TIME </details> | SELECT | Type of value to be added or updated. | true |
-| value | Value | ARRAY <details> <summary> Items </summary> [] </details> | ARRAY_BUILDER | Value to be added or updated. | true |
-| value | Value | BOOLEAN <details> <summary> Options </summary> true, false </details> | SELECT | Value to be added or updated. | true |
-| value | Value | DATE | DATE | Value to be added or updated. | true |
-| value | Value | DATE_TIME | DATE_TIME | Value to be added or updated. | true |
-| value | Value | INTEGER | INTEGER | Value to be added or updated. | true |
-| value | Value | NULL | NULL | Value to be added or updated. | true |
-| value | Value | NUMBER | NUMBER | Value to be added or updated. | true |
-| value | Value | OBJECT <details> <summary> Properties </summary> {} </details> | OBJECT_BUILDER | Value to be added or updated. | true |
-| value | Value | STRING | TEXT | Value to be added or updated. | true |
-| value | Value | TIME | TIME | Value to be added or updated. | true |
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| source | Source | OBJECT <details> <summary> Properties </summary> {} </details> | Source object to be added or updated | true |
+| key | Key | STRING | Key of the value to be added or updated. | true |
+| type | Type | STRING <details> <summary> Options </summary> ARRAY, BOOLEAN, DATE, DATE_TIME, INTEGER, NULL, NUMBER, OBJECT, STRING, TIME </details> | Type of value to be added or updated. | true |
+| value | Value | ARRAY <details> <summary> Items </summary> [] </details> | Value to be added or updated. | true |
+| value | Value | BOOLEAN <details> <summary> Options </summary> true, false </details> | Value to be added or updated. | true |
+| value | Value | DATE | Value to be added or updated. | true |
+| value | Value | DATE_TIME | Value to be added or updated. | true |
+| value | Value | INTEGER | Value to be added or updated. | true |
+| value | Value | NULL | Value to be added or updated. | true |
+| value | Value | NUMBER | Value to be added or updated. | true |
+| value | Value | OBJECT <details> <summary> Properties </summary> {} </details> | Value to be added or updated. | true |
+| value | Value | STRING | Value to be added or updated. | true |
+| value | Value | TIME | Value to be added or updated. | true |
 
 
 #### JSON Example
@@ -66,12 +66,12 @@ Add values from list to object or array. If the source is object, the items in t
 
 #### Properties
 
-|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
-| sourceType | Type of Initial Object | STRING <details> <summary> Options </summary> ARRAY, OBJECT </details> | SELECT | Type of initial object to be added or updated. | true |
-| source | Source | ARRAY <details> <summary> Items </summary> [{}] </details> | ARRAY_BUILDER | Source object to be added or updated | true |
-| source | Source | OBJECT <details> <summary> Properties </summary> {} </details> | OBJECT_BUILDER | Source object to be added or updated | true |
-| value | Key-Value Pairs | OBJECT <details> <summary> Properties </summary> {} </details> | OBJECT_BUILDER | Key-Value pairs to be added or updated. | true |
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| sourceType | Type of Initial Object | STRING <details> <summary> Options </summary> ARRAY, OBJECT </details> | Type of initial object to be added or updated. | true |
+| source | Source | ARRAY <details> <summary> Items </summary> [{}] </details> | Source object to be added or updated | true |
+| source | Source | OBJECT <details> <summary> Properties </summary> {} </details> | Source object to be added or updated | true |
+| value | Key-Value Pairs | OBJECT <details> <summary> Properties </summary> {} </details> | Key-Value pairs to be added or updated. | true |
 
 
 #### JSON Example
@@ -96,10 +96,10 @@ Checks if the given key exists in the given object.
 
 #### Properties
 
-|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
-| input | Input | OBJECT <details> <summary> Properties </summary> {} </details> | OBJECT_BUILDER | Object that you'd like to check. | true |
-| key | Key | STRING | TEXT | Key to check for existence. | true |
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| input | Input | OBJECT <details> <summary> Properties </summary> {} </details> | Object that you'd like to check. | true |
+| key | Key | STRING | Key to check for existence. | true |
 
 
 #### Output
@@ -133,10 +133,10 @@ Deletes a key-value pair in the given object by the specified key. Returns the m
 
 #### Properties
 
-|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
-| input | Input | OBJECT <details> <summary> Properties </summary> {} </details> | OBJECT_BUILDER | The object from which to delete the key-value pair. | true |
-| key | Key | STRING | TEXT | The key of the key-value pair to delete. | true |
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| input | Input | OBJECT <details> <summary> Properties </summary> {} </details> | The object from which to delete the key-value pair. | true |
+| key | Key | STRING | The key of the key-value pair to delete. | true |
 
 
 #### JSON Example
@@ -160,10 +160,10 @@ Compares two objects and returns true if they are equal.
 
 #### Properties
 
-|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
-| source | Source | OBJECT <details> <summary> Properties </summary> {} </details> | OBJECT_BUILDER | The source object to compare. | true |
-| target | Target | OBJECT <details> <summary> Properties </summary> {} </details> | OBJECT_BUILDER | The target object to compare against. | true |
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| source | Source | OBJECT <details> <summary> Properties </summary> {} </details> | The source object to compare. | true |
+| target | Target | OBJECT <details> <summary> Properties </summary> {} </details> | The target object to compare against. | true |
 
 
 #### Output
@@ -197,10 +197,10 @@ Merge two objects into one. If there is any property with the same name, the sou
 
 #### Properties
 
-|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
-| source | Source | OBJECT <details> <summary> Properties </summary> {} </details> | OBJECT_BUILDER | The source object to merge. | true |
-| target | Target | OBJECT <details> <summary> Properties </summary> {} </details> | OBJECT_BUILDER | The target object to merge into. | true |
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| source | Source | OBJECT <details> <summary> Properties </summary> {} </details> | The source object to merge. | true |
+| target | Target | OBJECT <details> <summary> Properties </summary> {} </details> | The target object to merge into. | true |
 
 
 #### JSON Example

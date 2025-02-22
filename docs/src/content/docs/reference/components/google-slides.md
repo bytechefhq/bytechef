@@ -24,10 +24,10 @@ Version: 1
 
 #### Properties
 
-|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
-| clientId | Client Id | STRING | TEXT |  | true |
-| clientSecret | Client Secret | STRING | TEXT |  | true |
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| clientId | Client Id | STRING |  | true |
+| clientSecret | Client Secret | STRING |  | true |
 
 
 
@@ -47,12 +47,12 @@ Creates a new presentation based on an existing one and can replace any placehol
 
 #### Properties
 
-|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
-| fileId | Template Presentation ID | STRING | SELECT | The ID of the template presentation from which the new presentation will be created. | true |
-| fileName | New Presentation Name | STRING | TEXT | Name of the new presentation. | true |
-| folderId | Folder ID | STRING | SELECT | ID of the folder where the new presentation will be saved. If not provided, the new presentation will be saved in the same folder as the template presentation. | false |
-| values | Values | OBJECT <details> <summary> Properties </summary> {} </details> | OBJECT_BUILDER | Don't include the "[[]]", only the key name and its value. | true |
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| fileId | Template Presentation ID | STRING | The ID of the template presentation from which the new presentation will be created. | true |
+| fileName | New Presentation Name | STRING | Name of the new presentation. | true |
+| folderId | Folder ID | STRING | ID of the folder where the new presentation will be saved. If not provided, the new presentation will be saved in the same folder as the template presentation. | false |
+| values | Values | OBJECT <details> <summary> Properties </summary> {} </details> | Don't include the "[[]]", only the key name and its value. | true |
 
 
 #### JSON Example

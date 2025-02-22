@@ -24,11 +24,11 @@ Version: 1
 
 #### Properties
 
-|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
-| clientId | Client Id | STRING | TEXT |  | true |
-| clientSecret | Client Secret | STRING | TEXT |  | true |
-| tenantId | Tenant Id | STRING | TEXT |  | true |
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| clientId | Client Id | STRING |  | true |
+| clientSecret | Client Secret | STRING |  | true |
+| tenantId | Tenant Id | STRING |  | true |
 
 
 
@@ -48,11 +48,11 @@ Creates a new folder at path you specify.
 
 #### Properties
 
-|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
-| siteId | Site ID | STRING | SELECT |  | true |
-| parentFolder | Parent Folder ID | STRING <details> <summary> Depends On </summary> siteId </details> | SELECT | If no folder is selected, file will be uploaded to root folder. | false |
-| name | Folder Name | STRING | TEXT |  | true |
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| siteId | Site ID | STRING |  | true |
+| parentFolder | Parent Folder ID | STRING <details> <summary> Depends On </summary> siteId </details> | If no folder is selected, file will be uploaded to root folder. | false |
+| name | Folder Name | STRING |  | true |
 
 
 #### Output
@@ -64,10 +64,10 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |    Control Type     |
-|:------------:|:------------:|:-------------------:|
-| id | STRING | TEXT |
-| name | STRING | TEXT |
+|     Name     |     Type     |
+|:------------:|:------------:|
+| id | STRING |
+| name | STRING |
 
 
 
@@ -94,11 +94,11 @@ Creates a new list
 
 #### Properties
 
-|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
-| siteId | Site ID | STRING | SELECT |  | true |
-| displayName | List Name | STRING | TEXT |  | true |
-| description | List Description | STRING | TEXT |  | true |
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| siteId | Site ID | STRING |  | true |
+| displayName | List Name | STRING |  | true |
+| description | List Description | STRING |  | true |
 
 
 #### Output
@@ -110,11 +110,11 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |    Control Type     |
-|:------------:|:------------:|:-------------------:|
-| id | STRING | TEXT |
-| description | STRING | TEXT |
-| displayName | STRING | TEXT |
+|     Name     |     Type     |
+|:------------:|:------------:|
+| id | STRING |
+| description | STRING |
+| displayName | STRING |
 
 
 
@@ -141,11 +141,11 @@ Creates a new item in a list.
 
 #### Properties
 
-|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
-| siteId | Site ID | STRING | SELECT |  | true |
-| listId | List ID | STRING <details> <summary> Depends On </summary> siteId </details> | SELECT |  | true |
-| columns | | DYNAMIC_PROPERTIES <details> <summary> Depends On </summary> siteId, listId </details> | null |  | null |
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| siteId | Site ID | STRING |  | true |
+| listId | List ID | STRING <details> <summary> Depends On </summary> siteId </details> |  | true |
+| columns | | DYNAMIC_PROPERTIES <details> <summary> Depends On </summary> siteId, listId </details> |  | null |
 
 
 #### Output
@@ -157,9 +157,9 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |    Control Type     |
-|:------------:|:------------:|:-------------------:|
-| id | STRING | TEXT |
+|     Name     |     Type     |
+|:------------:|:------------:|
+| id | STRING |
 
 
 
@@ -186,11 +186,11 @@ Upload file to Microsoft SharePoint folder.
 
 #### Properties
 
-|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
-| siteId | Site ID | STRING | SELECT |  | true |
-| parentFolder | Parent Folder ID | STRING <details> <summary> Depends On </summary> siteId </details> | SELECT | If no folder is selected, file will be uploaded to root folder | false |
-| file | File | FILE_ENTRY | FILE_ENTRY | File to upload. | true |
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| siteId | Site ID | STRING |  | true |
+| parentFolder | Parent Folder ID | STRING <details> <summary> Depends On </summary> siteId </details> | If no folder is selected, file will be uploaded to root folder | false |
+| file | File | FILE_ENTRY | File to upload. | true |
 
 
 #### Output
@@ -202,9 +202,9 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |    Control Type     |
-|:------------:|:------------:|:-------------------:|
-| id | STRING | TEXT |
+|     Name     |     Type     |
+|:------------:|:------------:|
+| id | STRING |
 
 
 

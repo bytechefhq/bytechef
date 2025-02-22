@@ -24,11 +24,11 @@ Version: 1
 
 #### Properties
 
-|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
-| region | Region | STRING <details> <summary> Options </summary> us, eu </details> | SELECT |  | true |
-| key | Key | STRING | TEXT |  | true |
-| value | API Key | STRING | TEXT |  | true |
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| region | Region | STRING <details> <summary> Options </summary> us, eu </details> |  | true |
+| key | Key | STRING |  | true |
+| value | API Key | STRING |  | true |
 
 
 
@@ -48,9 +48,9 @@ Get all submissions for a specific form.
 
 #### Properties
 
-|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
-| formId | Form ID | STRING | SELECT | ID of the form to retrieve submissions for. | true |
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| formId | Form ID | STRING | ID of the form to retrieve submissions for. | true |
 
 
 #### Output
@@ -62,9 +62,9 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |    Control Type     |
-|:------------:|:------------:|:-------------------:|
-| body | OBJECT <details> <summary> Properties </summary> {[{STRING\(id), STRING\(form_id), STRING\(status), STRING\(new), STRING\(flag), STRING\(notes)}]\(content)} </details> | OBJECT_BUILDER |
+|     Name     |     Type     |
+|:------------:|:------------:|
+| body | OBJECT <details> <summary> Properties </summary> {[{STRING\(id), STRING\(form_id), STRING\(status), STRING\(new), STRING\(flag), STRING\(notes)}]\(content)} </details> |
 
 
 

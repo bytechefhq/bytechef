@@ -48,9 +48,9 @@ Type: STATIC_WEBHOOK
 
 #### Properties
 
-|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
-| timeout | Timeout (ms) | INTEGER | INTEGER | The incoming request will time out after the specified number of milliseconds. The max wait time before a timeout is 5 minutes. | null |
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| timeout | Timeout (ms) | INTEGER | The incoming request will time out after the specified number of milliseconds. The max wait time before a timeout is 5 minutes. | null |
 
 
 #### JSON Example

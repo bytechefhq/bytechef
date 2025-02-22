@@ -24,10 +24,10 @@ Version: 1
 
 #### Properties
 
-|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
-| clientId | Client Id | STRING | TEXT |  | true |
-| clientSecret | Client Secret | STRING | TEXT |  | true |
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| clientId | Client Id | STRING |  | true |
+| clientSecret | Client Secret | STRING |  | true |
 
 
 
@@ -47,9 +47,9 @@ Creates new project.
 
 #### Properties
 
-|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
-| __item | Project | OBJECT <details> <summary> Properties </summary> {STRING\(name), STRING\(description), STRING\(template_id)} </details> | OBJECT_BUILDER |  | true |
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| __item | Project | OBJECT <details> <summary> Properties </summary> {STRING\(name), STRING\(description), STRING\(template_id)} </details> |  | true |
 
 
 #### Output
@@ -61,9 +61,9 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |    Control Type     |
-|:------------:|:------------:|:-------------------:|
-| body | OBJECT <details> <summary> Properties </summary> {STRING\(id), STRING\(name), STRING\(description), STRING\(template_id)} </details> | OBJECT_BUILDER |
+|     Name     |     Type     |
+|:------------:|:------------:|
+| body | OBJECT <details> <summary> Properties </summary> {STRING\(id), STRING\(name), STRING\(description), STRING\(template_id)} </details> |
 
 
 
@@ -92,10 +92,10 @@ Creates new task
 
 #### Properties
 
-|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
-| project | Project ID | STRING | SELECT | ID of the project within which the task will be created. | true |
-| __item | Task | OBJECT <details> <summary> Properties </summary> {STRING\(task_group_id), STRING\(name), STRING\(description), DATE_TIME\(due_date)} </details> | OBJECT_BUILDER |  | true |
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| project | Project ID | STRING | ID of the project within which the task will be created. | true |
+| __item | Task | OBJECT <details> <summary> Properties </summary> {STRING\(task_group_id), STRING\(name), STRING\(description), DATE_TIME\(due_date)} </details> |  | true |
 
 
 #### Output
@@ -107,9 +107,9 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |    Control Type     |
-|:------------:|:------------:|:-------------------:|
-| body | OBJECT <details> <summary> Properties </summary> {STRING\(id), STRING\(name), STRING\(project), STRING\(description), DATE_TIME\(due_date)} </details> | OBJECT_BUILDER |
+|     Name     |     Type     |
+|:------------:|:------------:|
+| body | OBJECT <details> <summary> Properties </summary> {STRING\(id), STRING\(name), STRING\(project), STRING\(description), DATE_TIME\(due_date)} </details> |
 
 
 
@@ -140,9 +140,9 @@ Gets task details.
 
 #### Properties
 
-|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
-| taskId | Task ID | STRING | SELECT | ID of the task to get details for. | true |
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| taskId | Task ID | STRING | ID of the task to get details for. | true |
 
 
 #### Output
@@ -154,9 +154,9 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |    Control Type     |
-|:------------:|:------------:|:-------------------:|
-| body | OBJECT <details> <summary> Properties </summary> {STRING\(id), STRING\(name), STRING\(project), STRING\(description)} </details> | OBJECT_BUILDER |
+|     Name     |     Type     |
+|:------------:|:------------:|
+| body | OBJECT <details> <summary> Properties </summary> {STRING\(id), STRING\(name), STRING\(project), STRING\(description)} </details> |
 
 
 
@@ -181,9 +181,9 @@ Creates new status
 
 #### Properties
 
-|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
-| __item | Status | OBJECT <details> <summary> Properties </summary> {STRING\(name), STRING\(project_id)} </details> | OBJECT_BUILDER |  | true |
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| __item | Status | OBJECT <details> <summary> Properties </summary> {STRING\(name), STRING\(project_id)} </details> |  | true |
 
 
 #### Output
@@ -195,9 +195,9 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |    Control Type     |
-|:------------:|:------------:|:-------------------:|
-| body | OBJECT <details> <summary> Properties </summary> {STRING\(message), {STRING\(id), STRING\(name), STRING\(color), STRING\(created_by), STRING\(project), INTEGER\(order)}\(task_group)} </details> | OBJECT_BUILDER |
+|     Name     |     Type     |
+|:------------:|:------------:|
+| body | OBJECT <details> <summary> Properties </summary> {STRING\(message), {STRING\(id), STRING\(name), STRING\(color), STRING\(created_by), STRING\(project), INTEGER\(order)}\(task_group)} </details> |
 
 
 
@@ -225,11 +225,11 @@ Gets tracked time report information.
 
 #### Properties
 
-|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
-| project_id | Project ID | STRING | SELECT | Id of the project to get the report for. | true |
-| start_date | Start Date | DATE_TIME | DATE_TIME | Start date for the report. | false |
-| end_date | End Date | DATE_TIME | DATE_TIME | Start date for the report. | false |
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| project_id | Project ID | STRING | Id of the project to get the report for. | true |
+| start_date | Start Date | DATE_TIME | Start date for the report. | false |
+| end_date | End Date | DATE_TIME | Start date for the report. | false |
 
 
 #### Output
@@ -241,9 +241,9 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |    Control Type     |
-|:------------:|:------------:|:-------------------:|
-| body | OBJECT <details> <summary> Properties </summary> {[{STRING\(id), STRING\(project), STRING\(start), BOOLEAN\(manual), STRING\(user), STRING\(task), STRING\(end), BOOLEAN\(active), STRING\(duration)}]\(items)} </details> | OBJECT_BUILDER |
+|     Name     |     Type     |
+|:------------:|:------------:|
+| body | OBJECT <details> <summary> Properties </summary> {[{STRING\(id), STRING\(project), STRING\(start), BOOLEAN\(manual), STRING\(user), STRING\(task), STRING\(end), BOOLEAN\(active), STRING\(duration)}]\(items)} </details> |
 
 
 
@@ -277,9 +277,9 @@ Type: DYNAMIC_WEBHOOK
 
 #### Properties
 
-|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
-| app_id | Application | STRING | SELECT | Application to be used for the trigger. | true |
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| app_id | Application | STRING | Application to be used for the trigger. | true |
 
 
 #### Output
@@ -291,12 +291,12 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |    Control Type     |
-|:------------:|:------------:|:-------------------:|
-| id | STRING | TEXT |
-| project | STRING | TEXT |
-| order | STRING | TEXT |
-| milestone | STRING | TEXT |
+|     Name     |     Type     |
+|:------------:|:------------:|
+| id | STRING |
+| project | STRING |
+| order | STRING |
+| milestone | STRING |
 
 
 

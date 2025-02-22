@@ -24,9 +24,9 @@ Version: 1
 
 #### Properties
 
-|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
-| token | Token | STRING | TEXT |  | true |
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| token | Token | STRING |  | true |
 
 
 
@@ -46,15 +46,15 @@ Sends an email.
 
 #### Properties
 
-|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
-| from | From | STRING | TEXT | Email address from which you want to send. | true |
-| to | To | ARRAY <details> <summary> Items </summary> [STRING] </details> | ARRAY_BUILDER | Email addresses which you want to send to. | true |
-| cc | CC | ARRAY <details> <summary> Items </summary> [STRING] </details> | ARRAY_BUILDER | Email address which receives a copy. | false |
-| subject | Subject | STRING | TEXT | Subject of your email | true |
-| text | Message Body | STRING | RICH_TEXT | This is the message you want to send | true |
-| type | Message Type | STRING <details> <summary> Options </summary> text/plain, text/html </details> | SELECT | Message type for your content | true |
-| attachments | Attachments | ARRAY <details> <summary> Items </summary> [FILE_ENTRY] </details> | ARRAY_BUILDER | A list of attachments you want to include with the email. | false |
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| from | From | STRING | Email address from which you want to send. | true |
+| to | To | ARRAY <details> <summary> Items </summary> [STRING] </details> | Email addresses which you want to send to. | true |
+| cc | CC | ARRAY <details> <summary> Items </summary> [STRING] </details> | Email address which receives a copy. | false |
+| subject | Subject | STRING | Subject of your email | true |
+| text | Message Body | STRING | This is the message you want to send | true |
+| type | Message Type | STRING <details> <summary> Options </summary> text/plain, text/html </details> | Message type for your content | true |
+| attachments | Attachments | ARRAY <details> <summary> Items </summary> [FILE_ENTRY] </details> | A list of attachments you want to include with the email. | false |
 
 
 #### Output
@@ -66,14 +66,14 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |    Control Type     |
-|:------------:|:------------:|:-------------------:|
-| type | STRING | TEXT |
-| from | STRING | TEXT |
-| to | ARRAY <details> <summary> Items </summary> [STRING] </details> | ARRAY_BUILDER |
-| subject | STRING | TEXT |
-| text | STRING | TEXT |
-| attachments | ARRAY <details> <summary> Items </summary> [FILE_ENTRY] </details> | ARRAY_BUILDER |
+|     Name     |     Type     |
+|:------------:|:------------:|
+| type | STRING |
+| from | STRING |
+| to | ARRAY <details> <summary> Items </summary> [STRING] </details> |
+| subject | STRING |
+| text | STRING |
+| attachments | ARRAY <details> <summary> Items </summary> [FILE_ENTRY] </details> |
 
 
 

@@ -24,9 +24,9 @@ Version: 1
 
 #### Properties
 
-|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
-| token | Token | STRING | TEXT |  | true |
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| token | Token | STRING |  | true |
 
 
 
@@ -46,11 +46,11 @@ Adds a record into an Airtable table.
 
 #### Properties
 
-|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
-| baseId | Base ID | STRING | SELECT | ID of the base where table is located. | true |
-| tableId | Table ID | STRING <details> <summary> Depends On </summary> baseId </details> | SELECT | The table where the record will be created. | true |
-| __item | | DYNAMIC_PROPERTIES <details> <summary> Depends On </summary> baseId, tableId </details> | null |  | null |
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| baseId | Base ID | STRING | ID of the base where table is located. | true |
+| tableId | Table ID | STRING <details> <summary> Depends On </summary> baseId </details> | The table where the record will be created. | true |
+| __item | | DYNAMIC_PROPERTIES <details> <summary> Depends On </summary> baseId, tableId </details> |  | null |
 
 
 #### Output
@@ -62,10 +62,10 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |    Control Type     |
-|:------------:|:------------:|:-------------------:|
-| createdTime | DATE_TIME | DATE_TIME |
-| fields | OBJECT <details> <summary> Properties </summary> {} </details> | OBJECT_BUILDER |
+|     Name     |     Type     |
+|:------------:|:------------:|
+| createdTime | DATE_TIME |
+| fields | OBJECT <details> <summary> Properties </summary> {} </details> |
 
 
 
@@ -92,11 +92,11 @@ Deletes a single record from a table.
 
 #### Properties
 
-|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
-| baseId | Base ID | STRING | SELECT | ID of the base where table is located. | true |
-| tableId | Table ID | STRING <details> <summary> Depends On </summary> baseId </details> | SELECT | ID of the table where the record is located. | true |
-| recordId | Record ID | STRING <details> <summary> Depends On </summary> tableId, baseId </details> | SELECT | ID of the record that will be deleted. | true |
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| baseId | Base ID | STRING | ID of the base where table is located. | true |
+| tableId | Table ID | STRING <details> <summary> Depends On </summary> baseId </details> | ID of the table where the record is located. | true |
+| recordId | Record ID | STRING <details> <summary> Depends On </summary> tableId, baseId </details> | ID of the record that will be deleted. | true |
 
 
 #### Output
@@ -108,10 +108,10 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |    Control Type     |
-|:------------:|:------------:|:-------------------:|
-| id | STRING | TEXT |
-| deleted | BOOLEAN <details> <summary> Options </summary> true, false </details> | SELECT |
+|     Name     |     Type     |
+|:------------:|:------------:|
+| id | STRING |
+| deleted | BOOLEAN <details> <summary> Options </summary> true, false </details> |
 
 
 
@@ -138,11 +138,11 @@ Retrieves a single record.
 
 #### Properties
 
-|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
-| baseId | Base ID | STRING | SELECT | ID of the base where table is located. | true |
-| tableId | Table ID | STRING <details> <summary> Depends On </summary> baseId </details> | SELECT | ID of the table where the record is located. | true |
-| recordId | Record ID | STRING <details> <summary> Depends On </summary> tableId, baseId </details> | SELECT | ID of the record that will be deleted. | true |
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| baseId | Base ID | STRING | ID of the base where table is located. | true |
+| tableId | Table ID | STRING <details> <summary> Depends On </summary> baseId </details> | ID of the table where the record is located. | true |
+| recordId | Record ID | STRING <details> <summary> Depends On </summary> tableId, baseId </details> | ID of the record that will be deleted. | true |
 
 
 #### Output
@@ -154,11 +154,11 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |    Control Type     |
-|:------------:|:------------:|:-------------------:|
-| id | STRING | TEXT |
-| createdTime | DATE_TIME | DATE_TIME |
-| fields | OBJECT <details> <summary> Properties </summary> {} </details> | OBJECT_BUILDER |
+|     Name     |     Type     |
+|:------------:|:------------:|
+| id | STRING |
+| createdTime | DATE_TIME |
+| fields | OBJECT <details> <summary> Properties </summary> {} </details> |
 
 
 
@@ -192,11 +192,11 @@ Type: POLLING
 
 #### Properties
 
-|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
-| baseId | Base ID | STRING | SELECT | ID of the base which contains the table that you want to monitor. | true |
-| tableId | Table | STRING <details> <summary> Depends On </summary> baseId </details> | SELECT | The table to monitor for new records. | true |
-| triggerField | Trigger Field | STRING | TEXT | It is essential to have a field for Created Time or Last Modified Time in your schema since this field is used to sort records, and the trigger will not function correctly without it. Therefore, if you don't have such a field in your schema, please create one. | true |
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| baseId | Base ID | STRING | ID of the base which contains the table that you want to monitor. | true |
+| tableId | Table | STRING <details> <summary> Depends On </summary> baseId </details> | The table to monitor for new records. | true |
+| triggerField | Trigger Field | STRING | It is essential to have a field for Created Time or Last Modified Time in your schema since this field is used to sort records, and the trigger will not function correctly without it. Therefore, if you don't have such a field in your schema, please create one. | true |
 
 
 #### JSON Example

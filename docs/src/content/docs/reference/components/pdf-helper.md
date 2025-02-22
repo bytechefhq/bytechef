@@ -26,9 +26,9 @@ Extracts text from a PDF file.
 
 #### Properties
 
-|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
-| file | PDF File | FILE_ENTRY | FILE_ENTRY | The PDF file from which to extract text. | true |
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| file | PDF File | FILE_ENTRY | The PDF file from which to extract text. | true |
 
 
 #### Output

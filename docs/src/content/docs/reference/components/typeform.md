@@ -24,10 +24,10 @@ Version: 1
 
 #### Properties
 
-|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
-| clientId | Client Id | STRING | TEXT |  | true |
-| clientSecret | Client Secret | STRING | TEXT |  | true |
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| clientId | Client Id | STRING |  | true |
+| clientSecret | Client Secret | STRING |  | true |
 
 
 
@@ -47,11 +47,11 @@ Creates a new form
 
 #### Properties
 
-|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
-| title | Title | STRING | TEXT | Title to use for the form. | true |
-| type | Type | STRING <details> <summary> Options </summary> quiz, classification, score, branching, classification_branching, score_branching </details> | SELECT | Form type for the typeform. | false |
-| workspace | Workspace | STRING | SELECT | Workspace where the form will be created. | false |
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| title | Title | STRING | Title to use for the form. | true |
+| type | Type | STRING <details> <summary> Options </summary> quiz, classification, score, branching, classification_branching, score_branching </details> | Form type for the typeform. | false |
+| workspace | Workspace | STRING | Workspace where the form will be created. | false |
 
 
 #### Output
@@ -93,9 +93,9 @@ Type: DYNAMIC_WEBHOOK
 
 #### Properties
 
-|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
-| form | Form Name | STRING | SELECT |  | true |
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| form | Form Name | STRING |  | true |
 
 
 #### Output
