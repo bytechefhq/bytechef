@@ -24,10 +24,10 @@ Version: 1
 
 #### Properties
 
-|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
-| key | Key | STRING | TEXT |  | true |
-| value | Value | STRING | TEXT |  | true |
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| key | Key | STRING |  | true |
+| value | Value | STRING |  | true |
 
 
 
@@ -47,9 +47,9 @@ Create email template
 
 #### Properties
 
-|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
-| __item | Email Template | OBJECT <details> <summary> Properties </summary> {STRING\(name), STRING\(subject), STRING\(fromEmail), STRING\(replyEmail)} </details> | OBJECT_BUILDER |  | true |
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| __item | Email Template | OBJECT <details> <summary> Properties </summary> {STRING\(name), STRING\(subject), STRING\(fromEmail), STRING\(replyEmail)} </details> |  | true |
 
 
 #### Output
@@ -61,9 +61,9 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |    Control Type     |
-|:------------:|:------------:|:-------------------:|
-| body | OBJECT <details> <summary> Properties </summary> {{INTEGER\(id), STRING\(name), STRING\(subject), STRING\(fromEmail), STRING\(replyEmail)}\(email)} </details> | OBJECT_BUILDER |
+|     Name     |     Type     |
+|:------------:|:------------:|
+| body | OBJECT <details> <summary> Properties </summary> {{INTEGER\(id), STRING\(name), STRING\(subject), STRING\(fromEmail), STRING\(replyEmail)}\(email)} </details> |
 
 
 
@@ -93,9 +93,9 @@ Creates new People
 
 #### Properties
 
-|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
-| __items | People | ARRAY <details> <summary> Items </summary> [{STRING\(email), STRING\(firstName), STRING\(lastName), STRING\(website), STRING\(title), STRING\(phone)}] </details> | ARRAY_BUILDER |  | true |
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| __items | People | ARRAY <details> <summary> Items </summary> [{STRING\(email), STRING\(firstName), STRING\(lastName), STRING\(website), STRING\(title), STRING\(phone)}] </details> |  | true |
 
 
 #### Output
@@ -107,9 +107,9 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |    Control Type     |
-|:------------:|:------------:|:-------------------:|
-| body | OBJECT <details> <summary> Properties </summary> {[{STRING\(email), STRING\(firstName), STRING\(lastName), STRING\(website), STRING\(title), STRING\(id), STRING\(phone)}]\(users)} </details> | OBJECT_BUILDER |
+|     Name     |     Type     |
+|:------------:|:------------:|
+| body | OBJECT <details> <summary> Properties </summary> {[{STRING\(email), STRING\(firstName), STRING\(lastName), STRING\(website), STRING\(title), STRING\(id), STRING\(phone)}]\(users)} </details> |
 
 
 
@@ -141,9 +141,9 @@ Add tag(s) to an existing user.
 
 #### Properties
 
-|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
-| __item | Tag | OBJECT <details> <summary> Properties </summary> {STRING\(tag), STRING\(email)} </details> | OBJECT_BUILDER |  | true |
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| __item | Tag | OBJECT <details> <summary> Properties </summary> {STRING\(tag), STRING\(email)} </details> |  | true |
 
 
 #### JSON Example

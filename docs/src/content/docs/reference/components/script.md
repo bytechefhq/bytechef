@@ -26,10 +26,10 @@ Executes custom JavaScript code.
 
 #### Properties
 
-|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
-| input | Input | OBJECT <details> <summary> Properties </summary> {} </details> | OBJECT_BUILDER | Initialize parameter values used in the custom code. | null |
-| script | JavaScript Code | STRING | CODE_EDITOR | Add your JavaScript custom logic here. | true |
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| input | Input | OBJECT <details> <summary> Properties </summary> {} </details> | Initialize parameter values used in the custom code. | null |
+| script | JavaScript Code | STRING | Add your JavaScript custom logic here. | true |
 
 
 #### JSON Example
@@ -53,10 +53,10 @@ Executes custom Python code.
 
 #### Properties
 
-|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
-| input | Input | OBJECT <details> <summary> Properties </summary> {} </details> | OBJECT_BUILDER | Initialize parameter values used in the custom code. | null |
-| script | Python Code | STRING | CODE_EDITOR | Add your Python custom logic here. | true |
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| input | Input | OBJECT <details> <summary> Properties </summary> {} </details> | Initialize parameter values used in the custom code. | null |
+| script | Python Code | STRING | Add your Python custom logic here. | true |
 
 
 #### JSON Example
@@ -80,10 +80,10 @@ Executes custom Ruby code.
 
 #### Properties
 
-|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
-| input | Input | OBJECT <details> <summary> Properties </summary> {} </details> | OBJECT_BUILDER | Initialize parameter values used in the custom code. | null |
-| script | Ruby Code | STRING | CODE_EDITOR | Add your Ruby custom logic here. | true |
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| input | Input | OBJECT <details> <summary> Properties </summary> {} </details> | Initialize parameter values used in the custom code. | null |
+| script | Ruby Code | STRING | Add your Ruby custom logic here. | true |
 
 
 #### JSON Example

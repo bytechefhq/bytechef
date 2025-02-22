@@ -24,9 +24,9 @@ Version: 1
 
 #### Properties
 
-|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
-| token | Token | STRING | TEXT |  | true |
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| token | Token | STRING |  | true |
 
 
 
@@ -46,11 +46,11 @@ Creates a new record in datasheet.
 
 #### Properties
 
-|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
-| spaceId | Space ID | STRING | SELECT |  | true |
-| datasheetId | Datasheet ID | STRING <details> <summary> Depends On </summary> spaceId </details> | SELECT | AITable Datasheet ID | true |
-| fields | | DYNAMIC_PROPERTIES <details> <summary> Depends On </summary> datasheetId </details> | null |  | null |
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| spaceId | Space ID | STRING |  | true |
+| datasheetId | Datasheet ID | STRING <details> <summary> Depends On </summary> spaceId </details> | AITable Datasheet ID | true |
+| fields | | DYNAMIC_PROPERTIES <details> <summary> Depends On </summary> datasheetId </details> |  | null |
 
 
 #### JSON Example
@@ -75,13 +75,13 @@ Find records in datasheet
 
 #### Properties
 
-|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
-| spaceId | Space ID | STRING | SELECT |  | true |
-| datasheetId | Datasheet ID | STRING <details> <summary> Depends On </summary> spaceId </details> | SELECT | AITable Datasheet ID | true |
-| fields | Field Names | ARRAY <details> <summary> Items </summary> [STRING] </details> | MULTI_SELECT | The returned record results are limited to the specified fields. | false |
-| recordIds | Record IDs | ARRAY <details> <summary> Items </summary> [STRING] </details> | MULTI_SELECT | The IDs of the records to find. | false |
-| maxRecords | Max Records | INTEGER | INTEGER | How many records are returned in total | false |
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| spaceId | Space ID | STRING |  | true |
+| datasheetId | Datasheet ID | STRING <details> <summary> Depends On </summary> spaceId </details> | AITable Datasheet ID | true |
+| fields | Field Names | ARRAY <details> <summary> Items </summary> [STRING] </details> | The returned record results are limited to the specified fields. | false |
+| recordIds | Record IDs | ARRAY <details> <summary> Items </summary> [STRING] </details> | The IDs of the records to find. | false |
+| maxRecords | Max Records | INTEGER | How many records are returned in total | false |
 
 
 #### JSON Example
@@ -108,12 +108,12 @@ Update record in datasheet
 
 #### Properties
 
-|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
-| spaceId | Space ID | STRING | SELECT |  | true |
-| datasheetId | Datasheet ID | STRING <details> <summary> Depends On </summary> spaceId </details> | SELECT | AITable Datasheet ID | true |
-| recordId | Record ID | STRING <details> <summary> Depends On </summary> datasheetId </details> | SELECT | ID of the record to update. | true |
-| fields | | DYNAMIC_PROPERTIES <details> <summary> Depends On </summary> datasheetId </details> | null |  | null |
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| spaceId | Space ID | STRING |  | true |
+| datasheetId | Datasheet ID | STRING <details> <summary> Depends On </summary> spaceId </details> | AITable Datasheet ID | true |
+| recordId | Record ID | STRING <details> <summary> Depends On </summary> datasheetId </details> | ID of the record to update. | true |
+| fields | | DYNAMIC_PROPERTIES <details> <summary> Depends On </summary> datasheetId </details> |  | null |
 
 
 #### JSON Example

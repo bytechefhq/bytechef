@@ -24,10 +24,10 @@ Version: 1
 
 #### Properties
 
-|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
-| clientId | Client Id | STRING | TEXT |  | true |
-| clientSecret | Client Secret | STRING | TEXT |  | true |
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| clientId | Client Id | STRING |  | true |
+| clientSecret | Client Secret | STRING |  | true |
 
 
 
@@ -47,10 +47,10 @@ Creates a new contact.
 
 #### Properties
 
-|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
-| bookId | Book ID | STRING | SELECT | ID of the book where new contact will be created. | true |
-| __item | Contact | OBJECT <details> <summary> Properties </summary> {STRING\(name)} </details> | OBJECT_BUILDER |  | null |
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| bookId | Book ID | STRING | ID of the book where new contact will be created. | true |
+| __item | Contact | OBJECT <details> <summary> Properties </summary> {STRING\(name)} </details> |  | null |
 
 
 #### Output
@@ -62,9 +62,9 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |    Control Type     |
-|:------------:|:------------:|:-------------------:|
-| body | OBJECT <details> <summary> Properties </summary> {STRING\(id)} </details> | OBJECT_BUILDER |
+|     Name     |     Type     |
+|:------------:|:------------:|
+| body | OBJECT <details> <summary> Properties </summary> {STRING\(id)} </details> |
 
 
 
@@ -92,10 +92,10 @@ Creates a new invoice.
 
 #### Properties
 
-|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
-| bookId | Book ID | STRING | SELECT | ID of the book where new invoice will be created. | true |
-| __item | Invoice | OBJECT <details> <summary> Properties </summary> {STRING\(customer), DATE\(invoiceDate), STRING\(amountTaxStatus), [{INTEGER\(lineNumber)}]\(lineItems)} </details> | OBJECT_BUILDER |  | null |
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| bookId | Book ID | STRING | ID of the book where new invoice will be created. | true |
+| __item | Invoice | OBJECT <details> <summary> Properties </summary> {STRING\(customer), DATE\(invoiceDate), STRING\(amountTaxStatus), [{INTEGER\(lineNumber)}]\(lineItems)} </details> |  | null |
 
 
 #### Output
@@ -107,9 +107,9 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |    Control Type     |
-|:------------:|:------------:|:-------------------:|
-| body | OBJECT <details> <summary> Properties </summary> {STRING\(id)} </details> | OBJECT_BUILDER |
+|     Name     |     Type     |
+|:------------:|:------------:|
+| body | OBJECT <details> <summary> Properties </summary> {STRING\(id)} </details> |
 
 
 
@@ -142,10 +142,10 @@ Creates a new payment.
 
 #### Properties
 
-|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
-| bookId | Book ID | STRING | SELECT | ID of the book where new payment will be created. | true |
-| __item | Payment | OBJECT <details> <summary> Properties </summary> {STRING\(supplier), DATE\(paymentDate), NUMBER\(totalAmount)} </details> | OBJECT_BUILDER |  | null |
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| bookId | Book ID | STRING | ID of the book where new payment will be created. | true |
+| __item | Payment | OBJECT <details> <summary> Properties </summary> {STRING\(supplier), DATE\(paymentDate), NUMBER\(totalAmount)} </details> |  | null |
 
 
 #### Output
@@ -157,9 +157,9 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |    Control Type     |
-|:------------:|:------------:|:-------------------:|
-| body | OBJECT <details> <summary> Properties </summary> {STRING\(id)} </details> | OBJECT_BUILDER |
+|     Name     |     Type     |
+|:------------:|:------------:|
+| body | OBJECT <details> <summary> Properties </summary> {STRING\(id)} </details> |
 
 
 
@@ -196,9 +196,9 @@ Type: POLLING
 
 #### Properties
 
-|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
-| bookId | Book | STRING | SELECT |  | true |
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| bookId | Book | STRING |  | true |
 
 
 #### Output
@@ -210,9 +210,9 @@ Type: ARRAY
 
 #### Properties
 
-|     Name     |     Type     |    Control Type     |
-|:------------:|:------------:|:-------------------:|
-|  | OBJECT <details> <summary> Properties </summary> {STRING\(id), STRING\(invoiceNumber), {STRING\(id), STRING\(name)}\(customer), DATE\(invoiceDate), STRING\(amountTaxStatus), [{INTEGER\(lineNumber)}]\(lineItems)} </details> | OBJECT_BUILDER |
+|     Name     |     Type     |
+|:------------:|:------------:|
+|  | OBJECT <details> <summary> Properties </summary> {STRING\(id), STRING\(invoiceNumber), {STRING\(id), STRING\(name)}\(customer), DATE\(invoiceDate), STRING\(amountTaxStatus), [{INTEGER\(lineNumber)}]\(lineItems)} </details> |
 
 
 
@@ -239,9 +239,9 @@ Type: POLLING
 
 #### Properties
 
-|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
-| bookId | Book | STRING | SELECT |  | true |
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| bookId | Book | STRING |  | true |
 
 
 #### Output
@@ -253,9 +253,9 @@ Type: ARRAY
 
 #### Properties
 
-|     Name     |     Type     |    Control Type     |
-|:------------:|:------------:|:-------------------:|
-|  | OBJECT <details> <summary> Properties </summary> {STRING\(id), STRING\(paymentNumber), {STRING\(id), STRING\(name)}\(supplier), DATE\(paymentDate), NUMBER\(totalAmount)} </details> | OBJECT_BUILDER |
+|     Name     |     Type     |
+|:------------:|:------------:|
+|  | OBJECT <details> <summary> Properties </summary> {STRING\(id), STRING\(paymentNumber), {STRING\(id), STRING\(name)}\(supplier), DATE\(paymentDate), NUMBER\(totalAmount)} </details> |
 
 
 

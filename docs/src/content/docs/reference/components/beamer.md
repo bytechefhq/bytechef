@@ -24,9 +24,9 @@ Version: 1
 
 #### Properties
 
-|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
-| key | API key | STRING | TEXT |  | true |
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| key | API key | STRING |  | true |
 
 
 
@@ -46,11 +46,11 @@ Creates a new feature request.
 
 #### Properties
 
-|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
-| title | Feature Request Title | STRING | TEXT | The name of the new feature request. | true |
-| content | Feature Request Content | STRING | TEXT | The content of the new feature request. | false |
-| userEmail | User Email | STRING | TEXT | The email of the user that is creating the new feature request. | false |
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| title | Feature Request Title | STRING | The name of the new feature request. | true |
+| content | Feature Request Content | STRING | The content of the new feature request. | false |
+| userEmail | User Email | STRING | The email of the user that is creating the new feature request. | false |
 
 
 #### Output
@@ -62,25 +62,25 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |    Control Type     |
-|:------------:|:------------:|:-------------------:|
-| id | STRING | TEXT |
-| date | STRING | TEXT |
-| visible | STRING | TEXT |
-| category | STRING | TEXT |
-| status | STRING | TEXT |
-| translations | ARRAY <details> <summary> Items </summary> [{STRING\(title), STRING\(content), STRING\(contentHtml), STRING\(language), STRING\(permalink), [STRING]\(images)}] </details> | ARRAY_BUILDER |
-| votesCount | INTEGER | INTEGER |
-| commentsCount | STRING | TEXT |
-| notes | STRING | TEXT |
-| filters | STRING | TEXT |
-| internalUserEmail | STRING | TEXT |
-| internalUserFirstname | STRING | TEXT |
-| internalUserLastname | STRING | TEXT |
-| userId | STRING | TEXT |
-| userEmail | STRING | TEXT |
-| userFirstname | STRING | TEXT |
-| userLastname | STRING | TEXT |
+|     Name     |     Type     |
+|:------------:|:------------:|
+| id | STRING |
+| date | STRING |
+| visible | STRING |
+| category | STRING |
+| status | STRING |
+| translations | ARRAY <details> <summary> Items </summary> [{STRING\(title), STRING\(content), STRING\(contentHtml), STRING\(language), STRING\(permalink), [STRING]\(images)}] </details> |
+| votesCount | INTEGER |
+| commentsCount | STRING |
+| notes | STRING |
+| filters | STRING |
+| internalUserEmail | STRING |
+| internalUserFirstname | STRING |
+| internalUserLastname | STRING |
+| userId | STRING |
+| userEmail | STRING |
+| userFirstname | STRING |
+| userLastname | STRING |
 
 
 
@@ -107,12 +107,12 @@ Creates a new post.
 
 #### Properties
 
-|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
-| title | Title | STRING | TEXT | Title of the new post. | true |
-| content | Content | STRING | TEXT | Content of the new post. | true |
-| category | Category | STRING <details> <summary> Options </summary> new, improvement, fix, comingsoon, announcement, other </details> | SELECT | Category of the new post. | true |
-| userEmail | User Email | STRING | TEXT | Email of the user that is creating the new post. | false |
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| title | Title | STRING | Title of the new post. | true |
+| content | Content | STRING | Content of the new post. | true |
+| category | Category | STRING <details> <summary> Options </summary> new, improvement, fix, comingsoon, announcement, other </details> | Category of the new post. | true |
+| userEmail | User Email | STRING | Email of the user that is creating the new post. | false |
 
 
 #### Output
@@ -124,16 +124,16 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |    Control Type     |
-|:------------:|:------------:|:-------------------:|
-| id | STRING | TEXT |
-| date | STRING | TEXT |
-| dueDate | STRING | TEXT |
-| published | STRING | TEXT |
-| category | STRING | TEXT |
-| feedbackEnabled | STRING | TEXT |
-| reactionsEnabled | STRING | TEXT |
-| translations | ARRAY <details> <summary> Items </summary> [{STRING\(title), STRING\(content), STRING\(category), STRING\(contentHtml), STRING\(language), STRING\(postUrl)}] </details> | ARRAY_BUILDER |
+|     Name     |     Type     |
+|:------------:|:------------:|
+| id | STRING |
+| date | STRING |
+| dueDate | STRING |
+| published | STRING |
+| category | STRING |
+| feedbackEnabled | STRING |
+| reactionsEnabled | STRING |
+| translations | ARRAY <details> <summary> Items </summary> [{STRING\(title), STRING\(content), STRING\(category), STRING\(contentHtml), STRING\(language), STRING\(postUrl)}] </details> |
 
 
 
@@ -169,9 +169,9 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |    Control Type     |
-|:------------:|:------------:|:-------------------:|
-| url | STRING | TEXT |
+|     Name     |     Type     |
+|:------------:|:------------:|
+| url | STRING |
 
 
 
@@ -193,14 +193,14 @@ Creates a new comment on selected post.
 
 #### Properties
 
-|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
-| postId | Post | STRING | SELECT | ID of the post that will have the new comment. | true |
-| text | Text | STRING | TEXT | Text of the comment. | false |
-| userId | User ID | STRING | TEXT | ID of the user that is creating the new comment. | false |
-| userEmail | User Email | STRING | TEXT | Email of the user that is creating the new comment. | false |
-| userFirstname | User First Name | STRING | TEXT | First name of the user that is creating the new comment. | false |
-| userLastname | User Last Name | STRING | TEXT | Last name of the user that is creating the new comment. | false |
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| postId | Post | STRING | ID of the post that will have the new comment. | true |
+| text | Text | STRING | Text of the comment. | false |
+| userId | User ID | STRING | ID of the user that is creating the new comment. | false |
+| userEmail | User Email | STRING | Email of the user that is creating the new comment. | false |
+| userFirstname | User First Name | STRING | First name of the user that is creating the new comment. | false |
+| userLastname | User Last Name | STRING | Last name of the user that is creating the new comment. | false |
 
 
 #### Output
@@ -212,17 +212,17 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |    Control Type     |
-|:------------:|:------------:|:-------------------:|
-| id | STRING | TEXT |
-| date | STRING | TEXT |
-| text | STRING | TEXT |
-| postTitle | STRING | TEXT |
-| userId | STRING | TEXT |
-| userEmail | STRING | TEXT |
-| userFirstname | STRING | TEXT |
-| userLastname | STRING | TEXT |
-| url | STRING | TEXT |
+|     Name     |     Type     |
+|:------------:|:------------:|
+| id | STRING |
+| date | STRING |
+| text | STRING |
+| postTitle | STRING |
+| userId | STRING |
+| userEmail | STRING |
+| userFirstname | STRING |
+| userLastname | STRING |
+| url | STRING |
 
 
 
@@ -252,13 +252,13 @@ Creates a new vote on selected feature request.
 
 #### Properties
 
-|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
-| requestId | Feature Request ID | STRING | SELECT | ID of the feature request that will have the new vote. | true |
-| userId | User ID | STRING | TEXT | ID of the user that is creating the new vote. | false |
-| userEmail | User Email | STRING | TEXT | Email of the user that is creating the new vote. | false |
-| userFirstname | User First Name | STRING | TEXT | First name of the user that is creating the new vote. | false |
-| userLastname | User Last Name | STRING | TEXT | Last name of the user that is creating the new vote. | false |
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| requestId | Feature Request ID | STRING | ID of the feature request that will have the new vote. | true |
+| userId | User ID | STRING | ID of the user that is creating the new vote. | false |
+| userEmail | User Email | STRING | Email of the user that is creating the new vote. | false |
+| userFirstname | User First Name | STRING | First name of the user that is creating the new vote. | false |
+| userLastname | User Last Name | STRING | Last name of the user that is creating the new vote. | false |
 
 
 #### Output
@@ -270,16 +270,16 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |    Control Type     |
-|:------------:|:------------:|:-------------------:|
-| id | STRING | TEXT |
-| date | STRING | TEXT |
-| featureRequestTitle | STRING | TEXT |
-| userId | STRING | TEXT |
-| userEmail | STRING | TEXT |
-| userFirstname | STRING | TEXT |
-| userLastname | STRING | TEXT |
-| url | STRING | TEXT |
+|     Name     |     Type     |
+|:------------:|:------------:|
+| id | STRING |
+| date | STRING |
+| featureRequestTitle | STRING |
+| userId | STRING |
+| userEmail | STRING |
+| userFirstname | STRING |
+| userLastname | STRING |
+| url | STRING |
 
 
 

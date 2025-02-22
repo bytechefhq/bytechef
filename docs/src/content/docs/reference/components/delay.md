@@ -26,9 +26,9 @@ Delay action execution.
 
 #### Properties
 
-|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
-| millis | Millis | INTEGER | INTEGER | Time in milliseconds. | true |
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| millis | Millis | INTEGER | Time in milliseconds. | true |
 
 
 #### JSON Example

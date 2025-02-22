@@ -24,10 +24,10 @@ Version: 1
 
 #### Properties
 
-|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
-| clientId | Client Id | STRING | TEXT |  | true |
-| clientSecret | Client Secret | STRING | TEXT |  | true |
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| clientId | Client Id | STRING |  | true |
+| clientSecret | Client Secret | STRING |  | true |
 
 
 
@@ -47,11 +47,11 @@ Copy a file or folder to a different location in the user's Dropbox. If the sour
 
 #### Properties
 
-|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
-| filename | Filename | STRING | TEXT | Name of the file with the extension. Don't fill in if you want a folder. | false |
-| from_path | Source Path | STRING | TEXT | The path which the file or folder should be copyed from.  Root is /. | true |
-| to_path | Destination Path | STRING | TEXT | The path which the file or folder should be copyed to.  Root is /. | true |
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| filename | Filename | STRING | Name of the file with the extension. Don't fill in if you want a folder. | false |
+| from_path | Source Path | STRING | The path which the file or folder should be copyed from.  Root is /. | true |
+| to_path | Destination Path | STRING | The path which the file or folder should be copyed to.  Root is /. | true |
 
 
 #### Output
@@ -63,9 +63,9 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |    Control Type     |
-|:------------:|:------------:|:-------------------:|
-| metadata | OBJECT <details> <summary> Properties </summary> {STRING\(.tag), STRING\(name), STRING\(path_lower), STRING\(path_display), STRING\(id)} </details> | OBJECT_BUILDER |
+|     Name     |     Type     |
+|:------------:|:------------:|
+| metadata | OBJECT <details> <summary> Properties </summary> {STRING\(.tag), STRING\(name), STRING\(path_lower), STRING\(path_display), STRING\(id)} </details> |
 
 
 
@@ -92,9 +92,9 @@ Create a folder at a given path.
 
 #### Properties
 
-|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
-| path | Folder Path/Name | STRING | TEXT | The path of the new folder. Root is /. | true |
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| path | Folder Path/Name | STRING | The path of the new folder. Root is /. | true |
 
 
 #### Output
@@ -106,9 +106,9 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |    Control Type     |
-|:------------:|:------------:|:-------------------:|
-| metadata | OBJECT <details> <summary> Properties </summary> {STRING\(name), STRING\(path_lower), STRING\(path_display), STRING\(id)} </details> | OBJECT_BUILDER |
+|     Name     |     Type     |
+|:------------:|:------------:|
+| metadata | OBJECT <details> <summary> Properties </summary> {STRING\(name), STRING\(path_lower), STRING\(path_display), STRING\(id)} </details> |
 
 
 
@@ -133,14 +133,14 @@ Create a new .paper file on which you can write at a given path
 
 #### Properties
 
-|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
-| path | Path | STRING | TEXT | The path of the new paper file. Root is /. | true |
-| filename | Filename | STRING | TEXT | Name of the paper file | true |
-| text | Text | STRING | TEXT_AREA | The text to write into the file. | true |
-| autorename | Auto Rename | BOOLEAN <details> <summary> Options </summary> true, false </details> | SELECT | If there's a conflict, as determined by mode, have the Dropbox server try to autorename the file to avoid conflict. | false |
-| mute | Mute | BOOLEAN <details> <summary> Options </summary> true, false </details> | SELECT | Normally, users are made aware of any file modifications in their Dropbox account via notifications in the client software. If true, this tells the clients that this modification shouldn't result in a user notification. | false |
-| strict_conflict | Strict Conflict | BOOLEAN <details> <summary> Options </summary> true, false </details> | SELECT | Be more strict about how each WriteMode detects conflict. For example, always return a conflict error when mode = WriteMode.update and the given "rev" doesn't match the existing file's "rev", even if the existing file has been deleted. | false |
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| path | Path | STRING | The path of the new paper file. Root is /. | true |
+| filename | Filename | STRING | Name of the paper file | true |
+| text | Text | STRING | The text to write into the file. | true |
+| autorename | Auto Rename | BOOLEAN <details> <summary> Options </summary> true, false </details> | If there's a conflict, as determined by mode, have the Dropbox server try to autorename the file to avoid conflict. | false |
+| mute | Mute | BOOLEAN <details> <summary> Options </summary> true, false </details> | Normally, users are made aware of any file modifications in their Dropbox account via notifications in the client software. If true, this tells the clients that this modification shouldn't result in a user notification. | false |
+| strict_conflict | Strict Conflict | BOOLEAN <details> <summary> Options </summary> true, false </details> | Be more strict about how each WriteMode detects conflict. For example, always return a conflict error when mode = WriteMode.update and the given "rev" doesn't match the existing file's "rev", even if the existing file has been deleted. | false |
 
 
 #### Output
@@ -152,12 +152,12 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |    Control Type     |
-|:------------:|:------------:|:-------------------:|
-| url | STRING | TEXT |
-| resultPath | STRING | TEXT |
-| fileId | STRING | TEXT |
-| paperRevision | INTEGER | INTEGER |
+|     Name     |     Type     |
+|:------------:|:------------:|
+| url | STRING |
+| resultPath | STRING |
+| fileId | STRING |
+| paperRevision | INTEGER |
 
 
 
@@ -187,10 +187,10 @@ Delete the file or folder at a given path. If the path is a folder, all its cont
 
 #### Properties
 
-|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
-| path | Path | STRING | TEXT | Path of the file or folder. Root is /. | true |
-| filename | Filename | STRING | TEXT | Name of the file. Leave empty if you want to delete a folder. | false |
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| path | Path | STRING | Path of the file or folder. Root is /. | true |
+| filename | Filename | STRING | Name of the file. Leave empty if you want to delete a folder. | false |
 
 
 #### Output
@@ -202,9 +202,9 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |    Control Type     |
-|:------------:|:------------:|:-------------------:|
-| metadata | OBJECT <details> <summary> Properties </summary> {STRING\(.tag), STRING\(name), STRING\(path_lower), STRING\(path_display), STRING\(id)} </details> | OBJECT_BUILDER |
+|     Name     |     Type     |
+|:------------:|:------------:|
+| metadata | OBJECT <details> <summary> Properties </summary> {STRING\(.tag), STRING\(name), STRING\(path_lower), STRING\(path_display), STRING\(id)} </details> |
 
 
 
@@ -230,10 +230,10 @@ Get a temporary link to stream content of a file. This link will expire in four 
 
 #### Properties
 
-|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
-| path | Namepath to the File | STRING | TEXT | The path to the file you want a temporary link to.  Root is /. | true |
-| filename | Filename | STRING | TEXT | Name of the file with the extension. Needs to have a streamable extension (.mp4, .mov, .webm, ect) | true |
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| path | Namepath to the File | STRING | The path to the file you want a temporary link to.  Root is /. | true |
+| filename | Filename | STRING | Name of the file with the extension. Needs to have a streamable extension (.mp4, .mov, .webm, ect) | true |
 
 
 #### Output
@@ -245,10 +245,10 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |    Control Type     |
-|:------------:|:------------:|:-------------------:|
-| metadata | OBJECT <details> <summary> Properties </summary> {STRING\(name), STRING\(path_lower), STRING\(path_display), STRING\(id)} </details> | OBJECT_BUILDER |
-| link | STRING | TEXT |
+|     Name     |     Type     |
+|:------------:|:------------:|
+| metadata | OBJECT <details> <summary> Properties </summary> {STRING\(name), STRING\(path_lower), STRING\(path_display), STRING\(id)} </details> |
+| link | STRING |
 
 
 
@@ -274,9 +274,9 @@ List the contents of a folder.
 
 #### Properties
 
-|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
-| path | Path | STRING | TEXT | Path of the filename. Inputting nothing searches root. | false |
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| path | Path | STRING | Path of the filename. Inputting nothing searches root. | false |
 
 
 #### Output
@@ -288,9 +288,9 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |    Control Type     |
-|:------------:|:------------:|:-------------------:|
-| entries | ARRAY <details> <summary> Items </summary> [{{STRING\(.tag), STRING\(name), STRING\(path_lower), STRING\(path_Display), STRING\(id)}\(f)}] </details> | ARRAY_BUILDER |
+|     Name     |     Type     |
+|:------------:|:------------:|
+| entries | ARRAY <details> <summary> Items </summary> [{{STRING\(.tag), STRING\(name), STRING\(path_lower), STRING\(path_Display), STRING\(id)}\(f)}] </details> |
 
 
 
@@ -315,11 +315,11 @@ Move a file or folder to a different location in the user's Dropbox. If the sour
 
 #### Properties
 
-|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
-| filename | Filename | STRING | TEXT | Name of the file with the extension. Don't fill in if you want a folder. | false |
-| from_path | Source Path | STRING | TEXT | Path in the user's Dropbox to be moved.  Root is /. | true |
-| to_path | Destination Path | STRING | TEXT | Path in the user's Dropbox that is the destination. Root is /. | true |
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| filename | Filename | STRING | Name of the file with the extension. Don't fill in if you want a folder. | false |
+| from_path | Source Path | STRING | Path in the user's Dropbox to be moved.  Root is /. | true |
+| to_path | Destination Path | STRING | Path in the user's Dropbox that is the destination. Root is /. | true |
 
 
 #### Output
@@ -331,9 +331,9 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |    Control Type     |
-|:------------:|:------------:|:-------------------:|
-| metadata | OBJECT <details> <summary> Properties </summary> {STRING\(.tag), STRING\(name), STRING\(path_lower), STRING\(path_display), STRING\(id)} </details> | OBJECT_BUILDER |
+|     Name     |     Type     |
+|:------------:|:------------:|
+| metadata | OBJECT <details> <summary> Properties </summary> {STRING\(.tag), STRING\(name), STRING\(path_lower), STRING\(path_display), STRING\(id)} </details> |
 
 
 
@@ -360,9 +360,9 @@ Searches for files and folders. Can only be used to retrieve a maximum of 10,000
 
 #### Properties
 
-|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
-| query | Search String | STRING | TEXT | The string to search for. May match across multiple fields based on the request arguments. | true |
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| query | Search String | STRING | The string to search for. May match across multiple fields based on the request arguments. | true |
 
 
 #### Output
@@ -374,9 +374,9 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |    Control Type     |
-|:------------:|:------------:|:-------------------:|
-| matches | ARRAY <details> <summary> Items </summary> [{{STRING\(.tag)}\(match_type), {STRING\(.tag), STRING\(id), STRING\(name), STRING\(path_display), STRING\(path_lower)}\(metadata)}] </details> | ARRAY_BUILDER |
+|     Name     |     Type     |
+|:------------:|:------------:|
+| matches | ARRAY <details> <summary> Items </summary> [{{STRING\(.tag)}\(match_type), {STRING\(.tag), STRING\(id), STRING\(name), STRING\(path_display), STRING\(path_lower)}\(metadata)}] </details> |
 
 
 
@@ -401,14 +401,14 @@ Create a new file up to a size of 150MB with the contents provided in the reques
 
 #### Properties
 
-|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
-| fileEntry | File | FILE_ENTRY | FILE_ENTRY | The object property which contains a reference to the file to be written. | true |
-| path | Destination Path | STRING | TEXT | The path to which the file should be written. | true |
-| filename | Filename | STRING | TEXT | Name of the file. Needs to have the appropriate extension. | true |
-| autorename | Auto Rename | BOOLEAN <details> <summary> Options </summary> true, false </details> | SELECT | If there's a conflict, as determined by mode, have the Dropbox server try to autorename the file to avoid conflict. | false |
-| mute | Mute | BOOLEAN <details> <summary> Options </summary> true, false </details> | SELECT | Normally, users are made aware of any file modifications in their Dropbox account via notifications in the client software. If true, this tells the clients that this modification shouldn't result in a user notification. | false |
-| strict_conflict | Strict Conflict | BOOLEAN <details> <summary> Options </summary> true, false </details> | SELECT | Be more strict about how each WriteMode detects conflict. For example, always return a conflict error when mode = WriteMode.update and the given "rev" doesn't match the existing file's "rev", even if the existing file has been deleted. | false |
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| fileEntry | File | FILE_ENTRY | The object property which contains a reference to the file to be written. | true |
+| path | Destination Path | STRING | The path to which the file should be written. | true |
+| filename | Filename | STRING | Name of the file. Needs to have the appropriate extension. | true |
+| autorename | Auto Rename | BOOLEAN <details> <summary> Options </summary> true, false </details> | If there's a conflict, as determined by mode, have the Dropbox server try to autorename the file to avoid conflict. | false |
+| mute | Mute | BOOLEAN <details> <summary> Options </summary> true, false </details> | Normally, users are made aware of any file modifications in their Dropbox account via notifications in the client software. If true, this tells the clients that this modification shouldn't result in a user notification. | false |
+| strict_conflict | Strict Conflict | BOOLEAN <details> <summary> Options </summary> true, false </details> | Be more strict about how each WriteMode detects conflict. For example, always return a conflict error when mode = WriteMode.update and the given "rev" doesn't match the existing file's "rev", even if the existing file has been deleted. | false |
 
 
 #### Output
@@ -420,21 +420,21 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |    Control Type     |
-|:------------:|:------------:|:-------------------:|
-| id | STRING | TEXT |
-| clientModified | DATE | DATE |
-| serverModified | DATE | DATE |
-| rev | STRING | TEXT |
-| size | INTEGER | INTEGER |
-| symlinkInfo | OBJECT <details> <summary> Properties </summary> {STRING\(target)} </details> | OBJECT_BUILDER |
-| sharingInfo | OBJECT <details> <summary> Properties </summary> {STRING\(parentSharedFolderId), STRING\(modifiedBy)} </details> | OBJECT_BUILDER |
-| isDownloadable | BOOLEAN <details> <summary> Options </summary> true, false </details> | SELECT |
-| exportInfo | OBJECT <details> <summary> Properties </summary> {STRING\(exportAs), [STRING]\(exportOptions)} </details> | OBJECT_BUILDER |
-| propertyGroups | ARRAY <details> <summary> Items </summary> [{STRING\(templateId), [{STRING\(name), STRING\(value)}]\(fields)}] </details> | ARRAY_BUILDER |
-| hasExplicitSharedMembers | BOOLEAN <details> <summary> Options </summary> true, false </details> | SELECT |
-| contentHash | STRING | TEXT |
-| fileLockInfo | OBJECT <details> <summary> Properties </summary> {BOOLEAN\(isLockholder), STRING\(lockholderName), STRING\(lockholderAccountId), DATE\(created)} </details> | OBJECT_BUILDER |
+|     Name     |     Type     |
+|:------------:|:------------:|
+| id | STRING |
+| clientModified | DATE |
+| serverModified | DATE |
+| rev | STRING |
+| size | INTEGER |
+| symlinkInfo | OBJECT <details> <summary> Properties </summary> {STRING\(target)} </details> |
+| sharingInfo | OBJECT <details> <summary> Properties </summary> {STRING\(parentSharedFolderId), STRING\(modifiedBy)} </details> |
+| isDownloadable | BOOLEAN <details> <summary> Options </summary> true, false </details> |
+| exportInfo | OBJECT <details> <summary> Properties </summary> {STRING\(exportAs), [STRING]\(exportOptions)} </details> |
+| propertyGroups | ARRAY <details> <summary> Items </summary> [{STRING\(templateId), [{STRING\(name), STRING\(value)}]\(fields)}] </details> |
+| hasExplicitSharedMembers | BOOLEAN <details> <summary> Options </summary> true, false </details> |
+| contentHash | STRING |
+| fileLockInfo | OBJECT <details> <summary> Properties </summary> {BOOLEAN\(isLockholder), STRING\(lockholderName), STRING\(lockholderAccountId), DATE\(created)} </details> |
 
 
 

@@ -24,10 +24,10 @@ Version: 1
 
 #### Properties
 
-|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
-| clientId | Client Id | STRING | TEXT |  | true |
-| clientSecret | Client Secret | STRING | TEXT |  | true |
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| clientId | Client Id | STRING |  | true |
+| clientSecret | Client Secret | STRING |  | true |
 
 
 
@@ -47,11 +47,11 @@ Invites one or more person to an existing event.
 
 #### Properties
 
-|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
-| calendarId | Calendar Identifier | STRING | SELECT |  | true |
-| eventId | Event ID | STRING <details> <summary> Depends On </summary> calendarId </details> | SELECT | ID of the event to add attendees to. | true |
-| attendees | Attendees | ARRAY <details> <summary> Items </summary> [STRING] </details> | ARRAY_BUILDER | The attendees of the event. | true |
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| calendarId | Calendar Identifier | STRING |  | true |
+| eventId | Event ID | STRING <details> <summary> Depends On </summary> calendarId </details> | ID of the event to add attendees to. | true |
+| attendees | Attendees | ARRAY <details> <summary> Items </summary> [STRING] </details> | The attendees of the event. | true |
 
 
 #### Output
@@ -63,22 +63,22 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |    Control Type     |
-|:------------:|:------------:|:-------------------:|
-| iCalUID | STRING | TEXT |
-| id | STRING | TEXT |
-| summary | STRING | TEXT |
-| startTime | DATE_TIME | DATE_TIME |
-| endTime | DATE_TIME | DATE_TIME |
-| etag | STRING | TEXT |
-| eventType | STRING | TEXT |
-| htmlLink | STRING | TEXT |
-| status | STRING | TEXT |
-| location | STRING | TEXT |
-| hangoutLink | STRING | TEXT |
-| attendees | ARRAY <details> <summary> Items </summary> [{INTEGER\(additionalGuests), STRING\(comment), STRING\(displayName), STRING\(email), STRING\(id), BOOLEAN\(optional), BOOLEAN\(organizer), BOOLEAN\(resource), STRING\(responseStatus), BOOLEAN\(self)}] </details> | ARRAY_BUILDER |
-| attachments | ARRAY <details> <summary> Items </summary> [{STRING\(fileId), STRING\(fileUrl), STRING\(iconLink), STRING\(mimeType), STRING\(title)}] </details> | ARRAY_BUILDER |
-| reminders | OBJECT <details> <summary> Properties </summary> {[{STRING\(method), INTEGER\(minutes)}]\(overrides), BOOLEAN\(useDefault)} </details> | OBJECT_BUILDER |
+|     Name     |     Type     |
+|:------------:|:------------:|
+| iCalUID | STRING |
+| id | STRING |
+| summary | STRING |
+| startTime | DATE_TIME |
+| endTime | DATE_TIME |
+| etag | STRING |
+| eventType | STRING |
+| htmlLink | STRING |
+| status | STRING |
+| location | STRING |
+| hangoutLink | STRING |
+| attendees | ARRAY <details> <summary> Items </summary> [{INTEGER\(additionalGuests), STRING\(comment), STRING\(displayName), STRING\(email), STRING\(id), BOOLEAN\(optional), BOOLEAN\(organizer), BOOLEAN\(resource), STRING\(responseStatus), BOOLEAN\(self)}] </details> |
+| attachments | ARRAY <details> <summary> Items </summary> [{STRING\(fileId), STRING\(fileUrl), STRING\(iconLink), STRING\(mimeType), STRING\(title)}] </details> |
+| reminders | OBJECT <details> <summary> Properties </summary> {[{STRING\(method), INTEGER\(minutes)}]\(overrides), BOOLEAN\(useDefault)} </details> |
 
 
 
@@ -105,25 +105,25 @@ Creates an event
 
 #### Properties
 
-|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
-| calendarId | Calendar Identifier | STRING | SELECT |  | true |
-| summary | Title | STRING | TEXT | Title of the event. | false |
-| allDay | All Day Event? | BOOLEAN <details> <summary> Options </summary> true, false </details> | SELECT |  | true |
-| start | Start Date | DATE | DATE | The start date of the event. | true |
-| end | End Date | DATE | DATE | The end date of the event. | true |
-| start | Start Date Time | DATE_TIME | DATE_TIME | The (inclusive) start time of the event. For a recurring event, this is the start time of the first instance. | true |
-| end | End Date Time | DATE_TIME | DATE_TIME | The (exclusive) end time of the event. For a recurring event, this is the end time of the first instance. | true |
-| description | Description | STRING | TEXT | Description of the event. Can contain HTML. | false |
-| location | Location | STRING | TEXT | Geographic location of the event as free-form text. | false |
-| attachments | Attachments | ARRAY <details> <summary> Items </summary> [FILE_ENTRY] </details> | ARRAY_BUILDER |  | false |
-| attendees | Attendees | ARRAY <details> <summary> Items </summary> [STRING] </details> | ARRAY_BUILDER | The attendees of the event. | false |
-| guestsCanInviteOthers | Guest Can Invite Others | BOOLEAN <details> <summary> Options </summary> true, false </details> | SELECT | Whether attendees other than the organizer can invite others to the event. | false |
-| guestsCanModify | Guest Can Modify | BOOLEAN <details> <summary> Options </summary> true, false </details> | SELECT | Whether attendees other than the organizer can modify the event. | false |
-| guestsCanSeeOtherGuests | Guest Can See Other Guests | BOOLEAN <details> <summary> Options </summary> true, false </details> | SELECT | Whether attendees other than the organizer can see who the event's attendees are. | false |
-| sendUpdates | Send Updates | STRING <details> <summary> Options </summary> all, externalOnly, none </details> | SELECT | Whether to send notifications about the creation of the new event. Note that some emails might still be sent. | false |
-| useDefault | Use Default Reminders | BOOLEAN <details> <summary> Options </summary> true, false </details> | SELECT | Whether the default reminders of the calendar apply to the event. | true |
-| reminders | Reminders | ARRAY <details> <summary> Items </summary> [{STRING\(method), INTEGER\(minutes)}] </details> | ARRAY_BUILDER |  | false |
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| calendarId | Calendar Identifier | STRING |  | true |
+| summary | Title | STRING | Title of the event. | false |
+| allDay | All Day Event? | BOOLEAN <details> <summary> Options </summary> true, false </details> |  | true |
+| start | Start Date | DATE | The start date of the event. | true |
+| end | End Date | DATE | The end date of the event. | true |
+| start | Start Date Time | DATE_TIME | The (inclusive) start time of the event. For a recurring event, this is the start time of the first instance. | true |
+| end | End Date Time | DATE_TIME | The (exclusive) end time of the event. For a recurring event, this is the end time of the first instance. | true |
+| description | Description | STRING | Description of the event. Can contain HTML. | false |
+| location | Location | STRING | Geographic location of the event as free-form text. | false |
+| attachments | Attachments | ARRAY <details> <summary> Items </summary> [FILE_ENTRY] </details> |  | false |
+| attendees | Attendees | ARRAY <details> <summary> Items </summary> [STRING] </details> | The attendees of the event. | false |
+| guestsCanInviteOthers | Guest Can Invite Others | BOOLEAN <details> <summary> Options </summary> true, false </details> | Whether attendees other than the organizer can invite others to the event. | false |
+| guestsCanModify | Guest Can Modify | BOOLEAN <details> <summary> Options </summary> true, false </details> | Whether attendees other than the organizer can modify the event. | false |
+| guestsCanSeeOtherGuests | Guest Can See Other Guests | BOOLEAN <details> <summary> Options </summary> true, false </details> | Whether attendees other than the organizer can see who the event's attendees are. | false |
+| sendUpdates | Send Updates | STRING <details> <summary> Options </summary> all, externalOnly, none </details> | Whether to send notifications about the creation of the new event. Note that some emails might still be sent. | false |
+| useDefault | Use Default Reminders | BOOLEAN <details> <summary> Options </summary> true, false </details> | Whether the default reminders of the calendar apply to the event. | true |
+| reminders | Reminders | ARRAY <details> <summary> Items </summary> [{STRING\(method), INTEGER\(minutes)}] </details> |  | false |
 
 
 #### Output
@@ -135,22 +135,22 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |    Control Type     |
-|:------------:|:------------:|:-------------------:|
-| iCalUID | STRING | TEXT |
-| id | STRING | TEXT |
-| summary | STRING | TEXT |
-| startTime | DATE_TIME | DATE_TIME |
-| endTime | DATE_TIME | DATE_TIME |
-| etag | STRING | TEXT |
-| eventType | STRING | TEXT |
-| htmlLink | STRING | TEXT |
-| status | STRING | TEXT |
-| location | STRING | TEXT |
-| hangoutLink | STRING | TEXT |
-| attendees | ARRAY <details> <summary> Items </summary> [{INTEGER\(additionalGuests), STRING\(comment), STRING\(displayName), STRING\(email), STRING\(id), BOOLEAN\(optional), BOOLEAN\(organizer), BOOLEAN\(resource), STRING\(responseStatus), BOOLEAN\(self)}] </details> | ARRAY_BUILDER |
-| attachments | ARRAY <details> <summary> Items </summary> [{STRING\(fileId), STRING\(fileUrl), STRING\(iconLink), STRING\(mimeType), STRING\(title)}] </details> | ARRAY_BUILDER |
-| reminders | OBJECT <details> <summary> Properties </summary> {[{STRING\(method), INTEGER\(minutes)}]\(overrides), BOOLEAN\(useDefault)} </details> | OBJECT_BUILDER |
+|     Name     |     Type     |
+|:------------:|:------------:|
+| iCalUID | STRING |
+| id | STRING |
+| summary | STRING |
+| startTime | DATE_TIME |
+| endTime | DATE_TIME |
+| etag | STRING |
+| eventType | STRING |
+| htmlLink | STRING |
+| status | STRING |
+| location | STRING |
+| hangoutLink | STRING |
+| attendees | ARRAY <details> <summary> Items </summary> [{INTEGER\(additionalGuests), STRING\(comment), STRING\(displayName), STRING\(email), STRING\(id), BOOLEAN\(optional), BOOLEAN\(organizer), BOOLEAN\(resource), STRING\(responseStatus), BOOLEAN\(self)}] </details> |
+| attachments | ARRAY <details> <summary> Items </summary> [{STRING\(fileId), STRING\(fileUrl), STRING\(iconLink), STRING\(mimeType), STRING\(title)}] </details> |
+| reminders | OBJECT <details> <summary> Properties </summary> {[{STRING\(method), INTEGER\(minutes)}]\(overrides), BOOLEAN\(useDefault)} </details> |
 
 
 
@@ -197,11 +197,11 @@ Add Quick Calendar Event
 
 #### Properties
 
-|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
-| calendarId | Calendar Identifier | STRING | SELECT |  | true |
-| text | Text | STRING | TEXT | The text describing the event to be created. | true |
-| sendUpdates | Send Updates | STRING <details> <summary> Options </summary> all, externalOnly, none </details> | SELECT | Whether to send notifications about the creation of the new event. Note that some emails might still be sent. | false |
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| calendarId | Calendar Identifier | STRING |  | true |
+| text | Text | STRING | The text describing the event to be created. | true |
+| sendUpdates | Send Updates | STRING <details> <summary> Options </summary> all, externalOnly, none </details> | Whether to send notifications about the creation of the new event. Note that some emails might still be sent. | false |
 
 
 #### Output
@@ -213,22 +213,22 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |    Control Type     |
-|:------------:|:------------:|:-------------------:|
-| iCalUID | STRING | TEXT |
-| id | STRING | TEXT |
-| summary | STRING | TEXT |
-| startTime | DATE_TIME | DATE_TIME |
-| endTime | DATE_TIME | DATE_TIME |
-| etag | STRING | TEXT |
-| eventType | STRING | TEXT |
-| htmlLink | STRING | TEXT |
-| status | STRING | TEXT |
-| location | STRING | TEXT |
-| hangoutLink | STRING | TEXT |
-| attendees | ARRAY <details> <summary> Items </summary> [{INTEGER\(additionalGuests), STRING\(comment), STRING\(displayName), STRING\(email), STRING\(id), BOOLEAN\(optional), BOOLEAN\(organizer), BOOLEAN\(resource), STRING\(responseStatus), BOOLEAN\(self)}] </details> | ARRAY_BUILDER |
-| attachments | ARRAY <details> <summary> Items </summary> [{STRING\(fileId), STRING\(fileUrl), STRING\(iconLink), STRING\(mimeType), STRING\(title)}] </details> | ARRAY_BUILDER |
-| reminders | OBJECT <details> <summary> Properties </summary> {[{STRING\(method), INTEGER\(minutes)}]\(overrides), BOOLEAN\(useDefault)} </details> | OBJECT_BUILDER |
+|     Name     |     Type     |
+|:------------:|:------------:|
+| iCalUID | STRING |
+| id | STRING |
+| summary | STRING |
+| startTime | DATE_TIME |
+| endTime | DATE_TIME |
+| etag | STRING |
+| eventType | STRING |
+| htmlLink | STRING |
+| status | STRING |
+| location | STRING |
+| hangoutLink | STRING |
+| attendees | ARRAY <details> <summary> Items </summary> [{INTEGER\(additionalGuests), STRING\(comment), STRING\(displayName), STRING\(email), STRING\(id), BOOLEAN\(optional), BOOLEAN\(organizer), BOOLEAN\(resource), STRING\(responseStatus), BOOLEAN\(self)}] </details> |
+| attachments | ARRAY <details> <summary> Items </summary> [{STRING\(fileId), STRING\(fileUrl), STRING\(iconLink), STRING\(mimeType), STRING\(title)}] </details> |
+| reminders | OBJECT <details> <summary> Properties </summary> {[{STRING\(method), INTEGER\(minutes)}]\(overrides), BOOLEAN\(useDefault)} </details> |
 
 
 
@@ -255,10 +255,10 @@ Deletes an event from Google Calendar.
 
 #### Properties
 
-|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
-| calendarId | Calendar Identifier | STRING | SELECT |  | true |
-| eventId | Event ID | STRING <details> <summary> Depends On </summary> calendarId </details> | SELECT | ID of the event to delete. | true |
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| calendarId | Calendar Identifier | STRING |  | true |
+| eventId | Event ID | STRING <details> <summary> Depends On </summary> calendarId </details> | ID of the event to delete. | true |
 
 
 #### JSON Example
@@ -282,13 +282,13 @@ List events from the specified Google Calendar.
 
 #### Properties
 
-|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
-| calendarId | Calendar Identifier | STRING | SELECT |  | true |
-| eventType | Event Type | ARRAY <details> <summary> Items </summary> [STRING] </details> | ARRAY_BUILDER | Event types to return. | false |
-| maxResults | Max Results | INTEGER | INTEGER | Maximum number of events returned on one result page. The number of events in the resulting page may be less than this value, or none at all, even if there are more events matching the query. Incomplete pages can be detected by a non-empty nextPageToken field in the response. | false |
-| q | Search Terms | STRING | TEXT | Free text search terms to find events that match these terms in the following fields: summary, description, location, attendee's displayName, attendee's email, workingLocationProperties.officeLocation.buildingId, workingLocationProperties.officeLocation.deskId, workingLocationProperties.officeLocation.label and workingLocationProperties.customLocation.label | false |
-| dateRange | Date Range | OBJECT <details> <summary> Properties </summary> {DATE_TIME\(from), DATE_TIME\(to)} </details> | OBJECT_BUILDER | Date range to find events that exist in this range. | false |
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| calendarId | Calendar Identifier | STRING |  | true |
+| eventType | Event Type | ARRAY <details> <summary> Items </summary> [STRING] </details> | Event types to return. | false |
+| maxResults | Max Results | INTEGER | Maximum number of events returned on one result page. The number of events in the resulting page may be less than this value, or none at all, even if there are more events matching the query. Incomplete pages can be detected by a non-empty nextPageToken field in the response. | false |
+| q | Search Terms | STRING | Free text search terms to find events that match these terms in the following fields: summary, description, location, attendee's displayName, attendee's email, workingLocationProperties.officeLocation.buildingId, workingLocationProperties.officeLocation.deskId, workingLocationProperties.officeLocation.label and workingLocationProperties.customLocation.label | false |
+| dateRange | Date Range | OBJECT <details> <summary> Properties </summary> {DATE_TIME\(from), DATE_TIME\(to)} </details> | Date range to find events that exist in this range. | false |
 
 
 #### Output
@@ -300,9 +300,9 @@ Type: ARRAY
 
 #### Properties
 
-|     Name     |     Type     |    Control Type     |
-|:------------:|:------------:|:-------------------:|
-|  | OBJECT <details> <summary> Properties </summary> {STRING\(iCalUID), STRING\(id), STRING\(summary), DATE_TIME\(startTime), DATE_TIME\(endTime), STRING\(etag), STRING\(eventType), STRING\(htmlLink), STRING\(status), STRING\(location), STRING\(hangoutLink), [{INTEGER\(additionalGuests), STRING\(comment), STRING\(displayName), STRING\(email), STRING\(id), BOOLEAN\(optional), BOOLEAN\(organizer), BOOLEAN\(resource), STRING\(responseStatus), BOOLEAN\(self)}]\(attendees), [{STRING\(fileId), STRING\(fileUrl), STRING\(iconLink), STRING\(mimeType), STRING\(title)}]\(attachments), {[{STRING\(method), INTEGER\(minutes)}]\(overrides), BOOLEAN\(useDefault)}\(reminders)} </details> | OBJECT_BUILDER |
+|     Name     |     Type     |
+|:------------:|:------------:|
+|  | OBJECT <details> <summary> Properties </summary> {STRING\(iCalUID), STRING\(id), STRING\(summary), DATE_TIME\(startTime), DATE_TIME\(endTime), STRING\(etag), STRING\(eventType), STRING\(htmlLink), STRING\(status), STRING\(location), STRING\(hangoutLink), [{INTEGER\(additionalGuests), STRING\(comment), STRING\(displayName), STRING\(email), STRING\(id), BOOLEAN\(optional), BOOLEAN\(organizer), BOOLEAN\(resource), STRING\(responseStatus), BOOLEAN\(self)}]\(attendees), [{STRING\(fileId), STRING\(fileUrl), STRING\(iconLink), STRING\(mimeType), STRING\(title)}]\(attachments), {[{STRING\(method), INTEGER\(minutes)}]\(overrides), BOOLEAN\(useDefault)}\(reminders)} </details> |
 
 
 
@@ -334,10 +334,10 @@ Get free time slots from Google Calendar.
 
 #### Properties
 
-|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
-| calendarId | Calendar Identifier | STRING | SELECT |  | true |
-| dateRange | Date Range | OBJECT <details> <summary> Properties </summary> {DATE_TIME\(from), DATE_TIME\(to)} </details> | OBJECT_BUILDER | Date range to find free time. | true |
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| calendarId | Calendar Identifier | STRING |  | true |
+| dateRange | Date Range | OBJECT <details> <summary> Properties </summary> {DATE_TIME\(from), DATE_TIME\(to)} </details> | Date range to find free time. | true |
 
 
 #### Output
@@ -349,9 +349,9 @@ Type: ARRAY
 
 #### Properties
 
-|     Name     |     Type     |    Control Type     |
-|:------------:|:------------:|:-------------------:|
-|  | OBJECT <details> <summary> Properties </summary> {DATE_TIME\(startTime), DATE_TIME\(endTime)} </details> | OBJECT_BUILDER |
+|     Name     |     Type     |
+|:------------:|:------------:|
+|  | OBJECT <details> <summary> Properties </summary> {DATE_TIME\(startTime), DATE_TIME\(endTime)} </details> |
 
 
 
@@ -380,18 +380,18 @@ Updates event in Google Calendar.
 
 #### Properties
 
-|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
-| calendarId | Calendar Identifier | STRING | SELECT |  | true |
-| eventId | Event ID | STRING <details> <summary> Depends On </summary> calendarId </details> | SELECT | ID of the event to update. | true |
-| summary | Title | STRING | TEXT | New title of the event. | false |
-| allDay | All Day Event? | BOOLEAN <details> <summary> Options </summary> true, false </details> | SELECT |  | false |
-| start | Start Date | DATE | DATE | New start date of the event. | true |
-| end | End Date | DATE | DATE | New end date of the event. | true |
-| start | Start Date Time | DATE_TIME | DATE_TIME | New (inclusive) start time of the event. For a recurring event, this is the start time of the first instance. | true |
-| end | End Date Time | DATE_TIME | DATE_TIME | New (exclusive) end time of the event. For a recurring event, this is the end time of the first instance. | true |
-| description | Description | STRING | TEXT | New description of the event. Can contain HTML. | false |
-| attendees | Attendees | ARRAY <details> <summary> Items </summary> [STRING] </details> | ARRAY_BUILDER | New attendees of the event. | false |
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| calendarId | Calendar Identifier | STRING |  | true |
+| eventId | Event ID | STRING <details> <summary> Depends On </summary> calendarId </details> | ID of the event to update. | true |
+| summary | Title | STRING | New title of the event. | false |
+| allDay | All Day Event? | BOOLEAN <details> <summary> Options </summary> true, false </details> |  | false |
+| start | Start Date | DATE | New start date of the event. | true |
+| end | End Date | DATE | New end date of the event. | true |
+| start | Start Date Time | DATE_TIME | New (inclusive) start time of the event. For a recurring event, this is the start time of the first instance. | true |
+| end | End Date Time | DATE_TIME | New (exclusive) end time of the event. For a recurring event, this is the end time of the first instance. | true |
+| description | Description | STRING | New description of the event. Can contain HTML. | false |
+| attendees | Attendees | ARRAY <details> <summary> Items </summary> [STRING] </details> | New attendees of the event. | false |
 
 
 #### Output
@@ -403,22 +403,22 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |    Control Type     |
-|:------------:|:------------:|:-------------------:|
-| iCalUID | STRING | TEXT |
-| id | STRING | TEXT |
-| summary | STRING | TEXT |
-| startTime | DATE_TIME | DATE_TIME |
-| endTime | DATE_TIME | DATE_TIME |
-| etag | STRING | TEXT |
-| eventType | STRING | TEXT |
-| htmlLink | STRING | TEXT |
-| status | STRING | TEXT |
-| location | STRING | TEXT |
-| hangoutLink | STRING | TEXT |
-| attendees | ARRAY <details> <summary> Items </summary> [{INTEGER\(additionalGuests), STRING\(comment), STRING\(displayName), STRING\(email), STRING\(id), BOOLEAN\(optional), BOOLEAN\(organizer), BOOLEAN\(resource), STRING\(responseStatus), BOOLEAN\(self)}] </details> | ARRAY_BUILDER |
-| attachments | ARRAY <details> <summary> Items </summary> [{STRING\(fileId), STRING\(fileUrl), STRING\(iconLink), STRING\(mimeType), STRING\(title)}] </details> | ARRAY_BUILDER |
-| reminders | OBJECT <details> <summary> Properties </summary> {[{STRING\(method), INTEGER\(minutes)}]\(overrides), BOOLEAN\(useDefault)} </details> | OBJECT_BUILDER |
+|     Name     |     Type     |
+|:------------:|:------------:|
+| iCalUID | STRING |
+| id | STRING |
+| summary | STRING |
+| startTime | DATE_TIME |
+| endTime | DATE_TIME |
+| etag | STRING |
+| eventType | STRING |
+| htmlLink | STRING |
+| status | STRING |
+| location | STRING |
+| hangoutLink | STRING |
+| attendees | ARRAY <details> <summary> Items </summary> [{INTEGER\(additionalGuests), STRING\(comment), STRING\(displayName), STRING\(email), STRING\(id), BOOLEAN\(optional), BOOLEAN\(organizer), BOOLEAN\(resource), STRING\(responseStatus), BOOLEAN\(self)}] </details> |
+| attachments | ARRAY <details> <summary> Items </summary> [{STRING\(fileId), STRING\(fileUrl), STRING\(iconLink), STRING\(mimeType), STRING\(title)}] </details> |
+| reminders | OBJECT <details> <summary> Properties </summary> {[{STRING\(method), INTEGER\(minutes)}]\(overrides), BOOLEAN\(useDefault)} </details> |
 
 
 
@@ -457,9 +457,9 @@ Type: DYNAMIC_WEBHOOK
 
 #### Properties
 
-|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
-| calendarId | Calendar Identifier | STRING | SELECT |  | true |
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| calendarId | Calendar Identifier | STRING |  | true |
 
 
 #### Output
@@ -471,22 +471,22 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |    Control Type     |
-|:------------:|:------------:|:-------------------:|
-| iCalUID | STRING | TEXT |
-| id | STRING | TEXT |
-| summary | STRING | TEXT |
-| startTime | DATE_TIME | DATE_TIME |
-| endTime | DATE_TIME | DATE_TIME |
-| etag | STRING | TEXT |
-| eventType | STRING | TEXT |
-| htmlLink | STRING | TEXT |
-| status | STRING | TEXT |
-| location | STRING | TEXT |
-| hangoutLink | STRING | TEXT |
-| attendees | ARRAY <details> <summary> Items </summary> [{INTEGER\(additionalGuests), STRING\(comment), STRING\(displayName), STRING\(email), STRING\(id), BOOLEAN\(optional), BOOLEAN\(organizer), BOOLEAN\(resource), STRING\(responseStatus), BOOLEAN\(self)}] </details> | ARRAY_BUILDER |
-| attachments | ARRAY <details> <summary> Items </summary> [{STRING\(fileId), STRING\(fileUrl), STRING\(iconLink), STRING\(mimeType), STRING\(title)}] </details> | ARRAY_BUILDER |
-| reminders | OBJECT <details> <summary> Properties </summary> {[{STRING\(method), INTEGER\(minutes)}]\(overrides), BOOLEAN\(useDefault)} </details> | OBJECT_BUILDER |
+|     Name     |     Type     |
+|:------------:|:------------:|
+| iCalUID | STRING |
+| id | STRING |
+| summary | STRING |
+| startTime | DATE_TIME |
+| endTime | DATE_TIME |
+| etag | STRING |
+| eventType | STRING |
+| htmlLink | STRING |
+| status | STRING |
+| location | STRING |
+| hangoutLink | STRING |
+| attendees | ARRAY <details> <summary> Items </summary> [{INTEGER\(additionalGuests), STRING\(comment), STRING\(displayName), STRING\(email), STRING\(id), BOOLEAN\(optional), BOOLEAN\(organizer), BOOLEAN\(resource), STRING\(responseStatus), BOOLEAN\(self)}] </details> |
+| attachments | ARRAY <details> <summary> Items </summary> [{STRING\(fileId), STRING\(fileUrl), STRING\(iconLink), STRING\(mimeType), STRING\(title)}] </details> |
+| reminders | OBJECT <details> <summary> Properties </summary> {[{STRING\(method), INTEGER\(minutes)}]\(overrides), BOOLEAN\(useDefault)} </details> |
 
 
 

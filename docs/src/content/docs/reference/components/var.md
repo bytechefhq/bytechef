@@ -26,18 +26,18 @@ Assign value to a variable that can be used in the following steps.
 
 #### Properties
 
-|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
-| type | Type | STRING <details> <summary> Options </summary> ARRAY, BOOLEAN, DATE, DATE_TIME, INTEGER, NUMBER, OBJECT, STRING, TIME </details> | SELECT | The value type. | null |
-| value | Value | ARRAY <details> <summary> Items </summary> [] </details> | ARRAY_BUILDER | Value of any type to set. | true |
-| value | Value | BOOLEAN <details> <summary> Options </summary> true, false </details> | SELECT | Value of any type to set. | true |
-| value | Value | DATE | DATE | Value of any type to set. | true |
-| value | Value | DATE_TIME | DATE_TIME | Value of any type to set. | true |
-| value | Value | INTEGER | INTEGER | Value of any type to set. | true |
-| value | Value | NUMBER | NUMBER | Value of any type to set. | true |
-| value | Value | OBJECT <details> <summary> Properties </summary> {} </details> | OBJECT_BUILDER | Value of any type to set. | true |
-| value | Value | STRING | TEXT | Value of any type to set. | true |
-| value | Value | TIME | TIME | Value of any type to set. | true |
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| type | Type | STRING <details> <summary> Options </summary> ARRAY, BOOLEAN, DATE, DATE_TIME, INTEGER, NUMBER, OBJECT, STRING, TIME </details> | The value type. | null |
+| value | Value | ARRAY <details> <summary> Items </summary> [] </details> | Value of any type to set. | true |
+| value | Value | BOOLEAN <details> <summary> Options </summary> true, false </details> | Value of any type to set. | true |
+| value | Value | DATE | Value of any type to set. | true |
+| value | Value | DATE_TIME | Value of any type to set. | true |
+| value | Value | INTEGER | Value of any type to set. | true |
+| value | Value | NUMBER | Value of any type to set. | true |
+| value | Value | OBJECT <details> <summary> Properties </summary> {} </details> | Value of any type to set. | true |
+| value | Value | STRING | Value of any type to set. | true |
+| value | Value | TIME | Value of any type to set. | true |
 
 
 #### JSON Example

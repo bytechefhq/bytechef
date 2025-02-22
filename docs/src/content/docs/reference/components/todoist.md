@@ -24,10 +24,10 @@ Version: 1
 
 #### Properties
 
-|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
-| clientId | Client Id | STRING | TEXT |  | true |
-| clientSecret | Client Secret | STRING | TEXT |  | true |
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| clientId | Client Id | STRING |  | true |
+| clientSecret | Client Secret | STRING |  | true |
 
 
 
@@ -47,9 +47,9 @@ Creates a new task.
 
 #### Properties
 
-|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
-| __item | Contact | OBJECT <details> <summary> Properties </summary> {STRING\(content), STRING\(description), STRING\(project_id), INTEGER\(priority)} </details> | OBJECT_BUILDER |  | null |
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| __item | Contact | OBJECT <details> <summary> Properties </summary> {STRING\(content), STRING\(description), STRING\(project_id), INTEGER\(priority)} </details> |  | null |
 
 
 #### Output
@@ -61,9 +61,9 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |    Control Type     |
-|:------------:|:------------:|:-------------------:|
-| body | OBJECT <details> <summary> Properties </summary> {STRING\(id), STRING\(project_id), STRING\(content), STRING\(description), INTEGER\(priority)} </details> | OBJECT_BUILDER |
+|     Name     |     Type     |
+|:------------:|:------------:|
+| body | OBJECT <details> <summary> Properties </summary> {STRING\(id), STRING\(project_id), STRING\(content), STRING\(description), INTEGER\(priority)} </details> |
 
 
 
@@ -93,9 +93,9 @@ Mark a tas as being completed.
 
 #### Properties
 
-|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
-| taskId | Task ID | STRING | SELECT | ID of the task to be closed. | true |
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| taskId | Task ID | STRING | ID of the task to be closed. | true |
 
 
 #### JSON Example
@@ -118,9 +118,9 @@ Creates a new project.
 
 #### Properties
 
-|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
-| __item | Project | OBJECT <details> <summary> Properties </summary> {STRING\(name), STRING\(color), BOOLEAN\(is_favorite)} </details> | OBJECT_BUILDER |  | null |
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| __item | Project | OBJECT <details> <summary> Properties </summary> {STRING\(name), STRING\(color), BOOLEAN\(is_favorite)} </details> |  | null |
 
 
 #### Output
@@ -132,9 +132,9 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |    Control Type     |
-|:------------:|:------------:|:-------------------:|
-| body | OBJECT <details> <summary> Properties </summary> {STRING\(id), STRING\(name), STRING\(color), STRING\(is_favorite), STRING\(url)} </details> | OBJECT_BUILDER |
+|     Name     |     Type     |
+|:------------:|:------------:|
+| body | OBJECT <details> <summary> Properties </summary> {STRING\(id), STRING\(name), STRING\(color), STRING\(is_favorite), STRING\(url)} </details> |
 
 
 

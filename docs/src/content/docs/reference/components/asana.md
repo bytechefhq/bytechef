@@ -24,10 +24,10 @@ Version: 1
 
 #### Properties
 
-|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
-| clientId | Client Id | STRING | TEXT |  | true |
-| clientSecret | Client Secret | STRING | TEXT |  | true |
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| clientId | Client Id | STRING |  | true |
+| clientSecret | Client Secret | STRING |  | true |
 
 
 
@@ -47,9 +47,9 @@ Creates a new project in a workspace or team.
 
 #### Properties
 
-|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
-| __item | Project | OBJECT <details> <summary> Properties </summary> {{STRING\(workspace), STRING\(name), STRING\(notes), STRING\(team)}\(data)} </details> | OBJECT_BUILDER |  | null |
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| __item | Project | OBJECT <details> <summary> Properties </summary> {{STRING\(workspace), STRING\(name), STRING\(notes), STRING\(team)}\(data)} </details> |  | null |
 
 
 #### Output
@@ -61,9 +61,9 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |    Control Type     |
-|:------------:|:------------:|:-------------------:|
-| data | OBJECT <details> <summary> Properties </summary> {STRING\(gid), STRING\(name), STRING\(notes), {STRING\(gid), STRING\(name)}\(team), {STRING\(gid), STRING\(name)}\(workspace)} </details> | OBJECT_BUILDER |
+|     Name     |     Type     |
+|:------------:|:------------:|
+| data | OBJECT <details> <summary> Properties </summary> {STRING\(gid), STRING\(name), STRING\(notes), {STRING\(gid), STRING\(name)}\(team), {STRING\(gid), STRING\(name)}\(workspace)} </details> |
 
 
 
@@ -95,9 +95,9 @@ Creates a new task
 
 #### Properties
 
-|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
-| __item | Task | OBJECT <details> <summary> Properties </summary> {{STRING\(workspace), STRING\(project), STRING\(name), STRING\(notes), DATE\(due_on), [STRING]\(tags), STRING\(assignee)}\(data)} </details> | OBJECT_BUILDER |  | null |
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| __item | Task | OBJECT <details> <summary> Properties </summary> {{STRING\(workspace), STRING\(project), STRING\(name), STRING\(notes), DATE\(due_on), [STRING]\(tags), STRING\(assignee)}\(data)} </details> |  | null |
 
 
 #### Output
@@ -109,9 +109,9 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |    Control Type     |
-|:------------:|:------------:|:-------------------:|
-| data | OBJECT <details> <summary> Properties </summary> {STRING\(gid), DATE\(due_on), STRING\(notes), STRING\(name), {STRING\(gid), STRING\(name)}\(workspace), [{STRING\(gid), STRING\(name)}]\(tags), {STRING\(gid), STRING\(name)}\(assignee)} </details> | OBJECT_BUILDER |
+|     Name     |     Type     |
+|:------------:|:------------:|
+| data | OBJECT <details> <summary> Properties </summary> {STRING\(gid), DATE\(due_on), STRING\(notes), STRING\(name), {STRING\(gid), STRING\(name)}\(workspace), [{STRING\(gid), STRING\(name)}]\(tags), {STRING\(gid), STRING\(name)}\(assignee)} </details> |
 
 
 

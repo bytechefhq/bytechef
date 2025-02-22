@@ -26,9 +26,9 @@ Converts the XML string to object/array.
 
 #### Properties
 
-|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
-| source | Source | STRING | TEXT | The XML string to convert to the data. | true |
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| source | Source | STRING | The XML string to convert to the data. | true |
 
 
 #### Output
@@ -61,11 +61,11 @@ Writes the object/array to a XML string.
 
 #### Properties
 
-|      Name       |      Label     |     Type     |    Control Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:-------------------:|:--------:|
-| type | Type | STRING <details> <summary> Options </summary> OBJECT, ARRAY </details> | SELECT | The value type. | null |
-| source | Source | OBJECT <details> <summary> Properties </summary> {} </details> | OBJECT_BUILDER | The object to convert to XML string. | true |
-| source | Source | ARRAY <details> <summary> Items </summary> [] </details> | ARRAY_BUILDER | The array to convert to XML string. | true |
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| type | Type | STRING <details> <summary> Options </summary> OBJECT, ARRAY </details> | The value type. | null |
+| source | Source | OBJECT <details> <summary> Properties </summary> {} </details> | The object to convert to XML string. | true |
+| source | Source | ARRAY <details> <summary> Items </summary> [] </details> | The array to convert to XML string. | true |
 
 
 #### Output
