@@ -90,6 +90,7 @@ paths:
                   type: "string"
                   title: "Company ID"
                   description: "ID of the company  to which the newly affiliated contact will be linked."
+                  x-dynamic-options: true
                 phone:
                   type: "string"
                   title: "Phone"
