@@ -17,7 +17,6 @@
 package com.bytechef.component.airtable;
 
 import static com.bytechef.component.airtable.constant.AirtableConstants.BASE_ID;
-import static com.bytechef.component.airtable.constant.AirtableConstants.RECORD_ID;
 import static com.bytechef.component.airtable.constant.AirtableConstants.TABLE_ID;
 
 import com.bytechef.component.OpenApiComponentHandler;
@@ -30,9 +29,7 @@ import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition
 import com.bytechef.component.definition.ComponentDsl.ModifiableComponentDefinition;
 import com.bytechef.component.definition.ComponentDsl.ModifiableDynamicPropertiesProperty;
 import com.bytechef.component.definition.ComponentDsl.ModifiableProperty;
-import com.bytechef.component.definition.ComponentDsl.ModifiableStringProperty;
 import com.bytechef.component.definition.ComponentDsl.ModifiableTriggerDefinition;
-import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.exception.ProviderException;
 import com.google.auto.service.AutoService;
 import java.util.List;
@@ -81,18 +78,7 @@ public class AirtableComponentHandler extends AbstractAirtableComponentHandler {
     public ModifiableProperty<?> modifyProperty(
         ActionDefinition actionDefinition, ModifiableProperty<?> modifiableProperty) {
 
-        if (Objects.equals(modifiableProperty.getName(), BASE_ID)) {
-            ((ModifiableStringProperty) modifiableProperty).options(
-                (ActionOptionsFunction<String>) AirtableUtils::getBaseIdOptions);
-        } else if (Objects.equals(modifiableProperty.getName(), TABLE_ID)) {
-            ((ModifiableStringProperty) modifiableProperty)
-                .optionsLookupDependsOn(BASE_ID)
-                .options((ActionOptionsFunction<String>) AirtableUtils::getTableIdOptions);
-        } else if (Objects.equals(modifiableProperty.getName(), RECORD_ID)) {
-            ((ModifiableStringProperty) modifiableProperty)
-                .optionsLookupDependsOn(TABLE_ID, BASE_ID)
-                .options((ActionOptionsFunction<String>) AirtableUtils::getRecordIdOptions);
-        } else if (Objects.equals(modifiableProperty.getName(), "__item")) {
+        if (Objects.equals(modifiableProperty.getName(), "__item")) {
             ((ModifiableDynamicPropertiesProperty) modifiableProperty)
                 .propertiesLookupDependsOn(BASE_ID, TABLE_ID)
                 .properties(AirtableUtils.getFieldsProperties());

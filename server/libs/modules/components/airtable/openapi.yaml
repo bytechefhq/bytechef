@@ -22,6 +22,7 @@ paths:
           schema:
             title: "Base ID"
             type: "string"
+            x-dynamic-options: true
         - name: "tableId"
           description: "The table where the record will be created."
           in: "path"
@@ -29,6 +30,9 @@ paths:
           schema:
             title: "Table ID"
             type: "string"
+            x-dynamic-options: true
+            x-dynamic-options-dependency:
+              - "baseId"
       requestBody:
         content:
           application/json:
@@ -66,6 +70,7 @@ paths:
           schema:
             title: "Base ID"
             type: "string"
+            x-dynamic-options: true
         - name: "tableId"
           description: "ID of the table where the record is located."
           in: "path"
@@ -73,6 +78,9 @@ paths:
           schema:
             title: "Table ID"
             type: "string"
+            x-dynamic-options: true
+            x-dynamic-options-dependency:
+              - "baseId"
         - name: "recordId"
           description: "ID of the record that will be deleted."
           in: "path"
@@ -80,6 +88,10 @@ paths:
           schema:
             title: "Record ID"
             type: "string"
+            x-dynamic-options: true
+            x-dynamic-options-dependency:
+              - "tableId"
+              - "baseId"
       responses:
         200:
           description: "Successful operation"
@@ -104,6 +116,7 @@ paths:
           schema:
             title: "Base ID"
             type: "string"
+            x-dynamic-options: true
         - name: "tableId"
           description: "ID of the table where the record is located."
           in: "path"
@@ -111,6 +124,9 @@ paths:
           schema:
             title: "Table ID"
             type: "string"
+            x-dynamic-options: true
+            x-dynamic-options-dependency:
+              - "baseId"
         - name: "recordId"
           description: "ID of the record that will be deleted."
           in: "path"
@@ -118,6 +134,10 @@ paths:
           schema:
             title: "Record ID"
             type: "string"
+            x-dynamic-options: true
+            x-dynamic-options-dependency:
+              - "tableId"
+              - "baseId"
       responses:
         200:
           description: "Successful operation"

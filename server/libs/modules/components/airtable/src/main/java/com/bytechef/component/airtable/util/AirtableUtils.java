@@ -45,8 +45,12 @@ import java.util.Objects;
 
 /**
  * @author Ivica Cardic
+ * @author Monika Kušter
  */
-public class AirtableUtils {
+public class AirtableUtils extends AbstractAirtableUtils {
+
+    private AirtableUtils() {
+    }
 
     private static final List<String> SKIP_FIELDS = List.of("singleCollaborator", "multipleCollaborators");
 
