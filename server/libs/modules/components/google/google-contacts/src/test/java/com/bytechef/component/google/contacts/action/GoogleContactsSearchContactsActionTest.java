@@ -16,7 +16,9 @@
 
 package com.bytechef.component.google.contacts.action;
 
+import static com.bytechef.component.google.contacts.constant.GoogleContactsConstants.PAGE_SIZE;
 import static com.bytechef.component.google.contacts.constant.GoogleContactsConstants.QUERY;
+import static com.bytechef.component.google.contacts.constant.GoogleContactsConstants.READ_MASK;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.mock;
@@ -25,7 +27,7 @@ import static org.mockito.Mockito.when;
 
 import com.bytechef.component.test.definition.MockParametersFactory;
 import com.bytechef.google.commons.GoogleServices;
-import com.google.api.services.people.v1.PeopleService;
+import com.google.api.services.people.v1.PeopleService.People;
 import com.google.api.services.people.v1.model.EmailAddress;
 import com.google.api.services.people.v1.model.Name;
 import com.google.api.services.people.v1.model.Person;
@@ -44,16 +46,16 @@ import org.mockito.MockedStatic;
  */
 class GoogleContactsSearchContactsActionTest extends AbstractGoogleContactsActionTest {
 
-    private final PeopleService.People mockedPeople = mock(PeopleService.People.class);
-    private final PeopleService.People.SearchContacts mockedSearchContacts =
-        mock(PeopleService.People.SearchContacts.class);
-    private final ArgumentCaptor<String> queryArgumentCaptor = ArgumentCaptor.forClass(String.class);
-    private final ArgumentCaptor<String> readMasksArgumentCaptor = ArgumentCaptor.forClass(String.class);
+    private final ArgumentCaptor<Integer> integerArgumentCaptor = ArgumentCaptor.forClass(Integer.class);
+    private final People mockedPeople = mock(People.class);
+    private final People.SearchContacts mockedSearchContacts = mock(People.SearchContacts.class);
     private final SearchResponse mockedSearchResponse = mock(SearchResponse.class);
+    private final ArgumentCaptor<String> stringArgumentCaptor = ArgumentCaptor.forClass(String.class);
 
     @Test
     void testPerform() throws IOException {
-        mockedParameters = MockParametersFactory.create(Map.of(QUERY, "Name"));
+        mockedParameters = MockParametersFactory.create(
+            Map.of(QUERY, "Name", READ_MASK, List.of("names", "organizations"), PAGE_SIZE, 5));
 
         Person person = new Person()
             .setNames(List.of(new Name().setGivenName("Name")))
@@ -70,9 +72,11 @@ class GoogleContactsSearchContactsActionTest extends AbstractGoogleContactsActio
                 .thenReturn(mockedPeople);
             when(mockedPeople.searchContacts())
                 .thenReturn(mockedSearchContacts);
-            when(mockedSearchContacts.setQuery(queryArgumentCaptor.capture()))
+            when(mockedSearchContacts.setQuery(stringArgumentCaptor.capture()))
                 .thenReturn(mockedSearchContacts);
-            when(mockedSearchContacts.setReadMask(readMasksArgumentCaptor.capture()))
+            when(mockedSearchContacts.setReadMask(stringArgumentCaptor.capture()))
+                .thenReturn(mockedSearchContacts);
+            when(mockedSearchContacts.setPageSize(integerArgumentCaptor.capture()))
                 .thenReturn(mockedSearchContacts);
             when(mockedSearchContacts.execute())
                 .thenReturn(mockedSearchResponse);
@@ -85,9 +89,8 @@ class GoogleContactsSearchContactsActionTest extends AbstractGoogleContactsActio
             assertNotNull(result);
             assertEquals(List.of(person), result);
 
-            assertEquals("Name", queryArgumentCaptor.getValue());
-            assertEquals("names,nicknames,emailAddresses,phoneNumbers,organizations",
-                readMasksArgumentCaptor.getValue());
+            assertEquals(List.of("Name", "names,organizations"), stringArgumentCaptor.getAllValues());
+            assertEquals(5, integerArgumentCaptor.getValue());
         }
     }
 }
