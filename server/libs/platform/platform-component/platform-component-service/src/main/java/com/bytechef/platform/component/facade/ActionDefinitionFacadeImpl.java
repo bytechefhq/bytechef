@@ -64,9 +64,8 @@ public class ActionDefinitionFacadeImpl implements ActionDefinitionFacade {
 
     @Override
     public List<Property> executeDynamicProperties(
-        String componentName, int componentVersion, String actionName, String propertyName,
-        String workflowId, Map<String, ?> inputParameters, List<String> lookupDependsOnPaths,
-        Long connectionId) {
+        String componentName, int componentVersion, String actionName, String propertyName, String workflowId,
+        Map<String, ?> inputParameters, List<String> lookupDependsOnPaths, Long connectionId) {
 
         ComponentConnection componentConnection = getComponentConnection(connectionId);
 
@@ -86,8 +85,7 @@ public class ActionDefinitionFacadeImpl implements ActionDefinitionFacade {
     @Override
     public List<Option> executeOptions(
         String componentName, int componentVersion, String actionName, String propertyName,
-        Map<String, ?> inputParameters, List<String> lookupDependsOnPaths, String searchText,
-        Long connectionId) {
+        Map<String, ?> inputParameters, List<String> lookupDependsOnPaths, String searchText, Long connectionId) {
 
         ComponentConnection componentConnection = getComponentConnection(connectionId);
 
@@ -135,10 +133,9 @@ public class ActionDefinitionFacadeImpl implements ActionDefinitionFacade {
 
     @Override
     public Object executePerform(
-        String componentName, int componentVersion, String actionName, ModeType type,
-        Long principalId, Long principalWorkflowId, Long jobId, String workflowId,
-        Map<String, ?> inputParameters, Map<String, Long> connectionIds, Map<String, ?> extensions,
-        boolean editorEnvironment) {
+        String componentName, int componentVersion, String actionName, ModeType type, Long principalId,
+        Long principalWorkflowId, Long jobId, String workflowId, Map<String, ?> inputParameters,
+        Map<String, Long> connectionIds, Map<String, ?> extensions, boolean editorEnvironment) {
 
         ExecuteFunctionData executeFunctionData = getExecuteFunctionData(
             componentName, componentVersion, actionName, connectionIds);
@@ -167,9 +164,8 @@ public class ActionDefinitionFacadeImpl implements ActionDefinitionFacade {
 
     @Override
     public Object executePerformForPolyglot(
-        String componentName, int componentVersion, String actionName,
-        Map<String, ?> inputParameters, ComponentConnection componentConnection,
-        ActionContext actionContext) {
+        String componentName, int componentVersion, String actionName, Map<String, ?> inputParameters,
+        ComponentConnection componentConnection, ActionContext actionContext) {
 
         ActionContextAware actionContextAware = (ActionContextAware) actionContext;
 
@@ -187,8 +183,7 @@ public class ActionDefinitionFacadeImpl implements ActionDefinitionFacade {
 
     @Override
     public ProviderException executeProcessErrorResponse(
-        String componentName, int componentVersion, String actionName, int statusCode,
-        Object body) {
+        String componentName, int componentVersion, String actionName, int statusCode, Object body) {
 
         ActionContext actionContext = contextFactory.createActionContext(
             componentName, componentVersion, actionName, null, null, null, null, null, null, false);
