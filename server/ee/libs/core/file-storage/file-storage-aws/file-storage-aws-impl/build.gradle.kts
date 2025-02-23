@@ -9,8 +9,10 @@ dependencies {
 
     implementation(project(":server:ee:libs:core:file-storage:file-storage-aws:file-storage-aws-api"))
 
+    testImplementation(rootProject.libs.loki.logback.appender)
     testImplementation("io.awspring.cloud:spring-cloud-aws-starter-s3")
     testImplementation("io.awspring.cloud:spring-cloud-aws-dynamodb")
     testImplementation("org.testcontainers:junit-jupiter")
     testImplementation("org.testcontainers:localstack")
+    testImplementation(project(":server:libs:config:jackson-config"))
 }

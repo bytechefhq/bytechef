@@ -7,4 +7,6 @@ dependencies {
     implementation("com.fasterxml.jackson.datatype:jackson-datatype-jdk8")
     implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310")
     implementation("org.slf4j:slf4j-api")
+
+    testImplementation(project(":server:libs:config:jackson-config"))
 }

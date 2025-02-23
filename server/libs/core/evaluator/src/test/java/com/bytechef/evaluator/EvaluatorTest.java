@@ -19,6 +19,7 @@
 package com.bytechef.evaluator;
 
 import com.bytechef.commons.util.MapUtils;
+import com.bytechef.test.extension.ObjectMapperSetupExtension;
 import java.io.File;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
@@ -29,10 +30,12 @@ import java.util.HashMap;
 import java.util.Map;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 
 /**
  * @author Arik Cohen
  */
+@ExtendWith(ObjectMapperSetupExtension.class)
 public class EvaluatorTest {
 
     @Test

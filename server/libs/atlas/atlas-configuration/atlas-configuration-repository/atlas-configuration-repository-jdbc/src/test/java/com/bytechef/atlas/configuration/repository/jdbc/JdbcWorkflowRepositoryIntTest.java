@@ -24,14 +24,11 @@ import com.bytechef.commons.data.jdbc.converter.MapWrapperToStringConverter;
 import com.bytechef.commons.data.jdbc.converter.StringToMapWrapperConverter;
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.OptionalUtils;
+import com.bytechef.jackson.config.JacksonConfiguration;
 import com.bytechef.liquibase.config.LiquibaseConfiguration;
 import com.bytechef.test.config.jdbc.AbstractIntTestJdbcConfiguration;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
-import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Arrays;
 import java.util.List;
@@ -41,7 +38,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.cache.annotation.EnableCaching;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
@@ -51,7 +47,9 @@ import org.springframework.data.jdbc.repository.config.EnableJdbcRepositories;
  * @author Ivica Cardic
  */
 @SpringBootTest(properties = "bytechef.workflow.repository.jdbc.enabled=true")
-@Import(PostgreSQLContainerConfiguration.class)
+@Import({
+    JacksonConfiguration.class, LiquibaseConfiguration.class, PostgreSQLContainerConfiguration.class
+})
 public class JdbcWorkflowRepositoryIntTest {
 
     @Autowired
@@ -87,17 +85,7 @@ public class JdbcWorkflowRepositoryIntTest {
     @EnableAutoConfiguration
     @EnableCaching
     @Configuration
-    @Import(LiquibaseConfiguration.class)
     public static class WorkflowConfigurationRepositoryIntTestConfiguration {
-
-        @Bean
-        ObjectMapper objectMapper() {
-            return new ObjectMapper()
-                .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
-                .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
-                .registerModule(new JavaTimeModule())
-                .registerModule(new Jdk8Module());
-        }
 
         @EnableJdbcRepositories(basePackages = "com.bytechef.atlas.configuration.repository.jdbc")
         public static class WorkflowConfigurationIntJdbcTestConfiguration extends AbstractIntTestJdbcConfiguration {

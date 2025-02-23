@@ -35,9 +35,8 @@ import static com.bytechef.component.object.helper.constant.ObjectHelperConstant
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Parameters;
+import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.object.helper.constant.ValueType;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -47,8 +46,6 @@ import java.util.Map;
  * @author J. Iamsamang
  */
 public class ObjectHelperAddKeyValuePairsAction {
-
-    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("addKeyValuePairs")
         .title("Add Key-Value Pairs to Object or Array")
@@ -100,13 +97,12 @@ public class ObjectHelperAddKeyValuePairsAction {
 
         if (sourceType == ValueType.ARRAY) {
             List<Map<String, Object>> mapList = new ArrayList<>();
-            List<Object> modifiedArray = inputParameters.getRequiredList(SOURCE, Object.class);
-            for (Object sourceObject : modifiedArray) {
-                Map<String, Object> sourceMap =
-                    OBJECT_MAPPER.convertValue(sourceObject, new TypeReference<>() {});
+            List<Map<String, Object>> modifiedArray = inputParameters.getRequiredList(SOURCE, new TypeReference<>() {});
 
+            for (Map<String, Object> sourceMap : modifiedArray) {
                 mapList.add(addKeyValuePairsToObject(sourceMap, keyValuePairs));
             }
+
             return mapList;
         } else {
             Map<String, Object> modifiedObject = inputParameters.getRequiredMap(SOURCE, Object.class);

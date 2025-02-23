@@ -9,4 +9,5 @@ dependencies {
     implementation(project(":server:libs:core:commons:commons-util"))
 
     testImplementation(project(":server:libs:atlas:atlas-coordinator:atlas-coordinator-impl"))
+    testImplementation(project(":server:libs:test:test-support"))
 }

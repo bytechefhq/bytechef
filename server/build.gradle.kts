@@ -31,7 +31,5 @@ subprojects {
     dependencies {
         implementation(platform("io.awspring.cloud:spring-cloud-aws-dependencies:${rootProject.libs.versions.spring.cloud.aws.get()}"))
 //        implementation(platform("org.springframework.ai:spring-ai-bom:${rootProject.libs.versions.spring.ai.get()}"))
-
-        testImplementation(project(":server:ee:libs:config:observability-config"))
     }
 }

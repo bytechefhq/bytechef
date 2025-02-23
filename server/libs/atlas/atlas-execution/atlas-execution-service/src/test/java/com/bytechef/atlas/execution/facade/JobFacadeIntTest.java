@@ -24,10 +24,10 @@ import com.bytechef.atlas.execution.service.JobService;
 import com.bytechef.atlas.execution.service.JobServiceImpl;
 import com.bytechef.atlas.execution.service.TaskExecutionService;
 import com.bytechef.atlas.file.storage.TaskFileStorage;
+import com.bytechef.jackson.config.JacksonConfiguration;
 import com.bytechef.liquibase.config.LiquibaseConfiguration;
 import com.bytechef.test.config.jdbc.AbstractIntTestJdbcConfiguration;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.Collections;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -49,7 +49,9 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
     properties = {
         "bytechef.workflow.repository.jdbc.enabled=true"
     })
-@Import(PostgreSQLContainerConfiguration.class)
+@Import({
+    JacksonConfiguration.class, LiquibaseConfiguration.class, PostgreSQLContainerConfiguration.class
+})
 public class JobFacadeIntTest {
 
     @Autowired
@@ -67,7 +69,6 @@ public class JobFacadeIntTest {
             "com.bytechef.atlas.execution.facade", "com.bytechef.atlas.execution.repository.jdbc"
         })
     @EnableAutoConfiguration
-    @Import(LiquibaseConfiguration.class)
     @Configuration
     public static class WorkflowExecutionIntTestConfiguration {
 
@@ -92,11 +93,6 @@ public class JobFacadeIntTest {
         @Bean
         JobService jobService(JobRepository jobRepository) {
             return new JobServiceImpl(jobRepository);
-        }
-
-        @Bean
-        ObjectMapper objectMapper() {
-            return new ObjectMapper();
         }
 
         @EnableJdbcRepositories(basePackages = "com.bytechef.atlas.execution.repository.jdbc")

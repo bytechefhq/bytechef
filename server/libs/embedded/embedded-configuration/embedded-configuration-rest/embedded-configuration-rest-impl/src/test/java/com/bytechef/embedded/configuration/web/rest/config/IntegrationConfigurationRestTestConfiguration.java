@@ -16,8 +16,10 @@
 
 package com.bytechef.embedded.configuration.web.rest.config;
 
+import com.bytechef.jackson.config.JacksonConfiguration;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Import;
 
 /**
  * @author Ivica Cardic
@@ -35,5 +37,6 @@ import org.springframework.context.annotation.Configuration;
     "com.bytechef.web.rest.mapper"
 })
 @Configuration
+@Import(JacksonConfiguration.class)
 public class IntegrationConfigurationRestTestConfiguration {
 }

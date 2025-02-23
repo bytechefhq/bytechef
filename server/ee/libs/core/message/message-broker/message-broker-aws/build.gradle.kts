@@ -7,9 +7,11 @@ dependencies {
     implementation(project(":server:libs:core:message:message-broker:message-broker-api"))
     implementation(project(":server:libs:config:app-config"))
 
+    testImplementation(rootProject.libs.loki.logback.appender)
     testImplementation("io.awspring.cloud:spring-cloud-aws-starter-sqs")
     testImplementation("io.awspring.cloud:spring-cloud-aws-s3")
     testImplementation("org.testcontainers:junit-jupiter")
     testImplementation("org.testcontainers:localstack")
     testImplementation(project(":server:libs:config:app-config"))
+    testImplementation(project(":server:libs:config:jackson-config"))
 }

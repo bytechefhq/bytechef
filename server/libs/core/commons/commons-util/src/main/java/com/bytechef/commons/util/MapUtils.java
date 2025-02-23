@@ -16,12 +16,12 @@
 
 package com.bytechef.commons.util;
 
-import static com.bytechef.commons.util.constant.ObjectMapperConstants.OBJECT_MAPPER;
-
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jayway.jsonpath.JsonPath;
 import com.jayway.jsonpath.PathNotFoundException;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.lang.reflect.Array;
 import java.lang.reflect.Type;
 import java.time.Duration;
@@ -51,6 +51,8 @@ import org.slf4j.LoggerFactory;
 public class MapUtils {
 
     private static final Logger logger = LoggerFactory.getLogger(MapUtils.class);
+
+    private static ObjectMapper objectMapper;
 
     public static <K> Map<K, ?> append(Map<K, ?> map, K key, Map<K, ?> values) {
         Validate.notNull(key, "'key' must not be null");
@@ -782,6 +784,11 @@ public class MapUtils {
         return value != null ? value : defaultValue;
     }
 
+    @SuppressFBWarnings("EI")
+    public static void setObjectMapper(ObjectMapper objectMapper) {
+        MapUtils.objectMapper = objectMapper;
+    }
+
     public static int size(Map<?, ?> map) {
         Validate.notNull(map, "'map' must not be null");
 
@@ -841,17 +848,17 @@ public class MapUtils {
     }
 
     private static <T> T convert(Object value, Class<T> elementType) {
-        return OBJECT_MAPPER.convertValue(value, elementType);
+        return objectMapper.convertValue(value, elementType);
     }
 
     private static <T> T convert(Object value, TypeReference<T> elementTypeRef) {
-        return OBJECT_MAPPER.convertValue(value, elementTypeRef);
+        return objectMapper.convertValue(value, elementTypeRef);
     }
 
     private static Object convert(Object value, List<Class<?>> elementTypes) {
         for (Class<?> elementType : elementTypes) {
             try {
-                value = OBJECT_MAPPER
+                value = objectMapper
                     .copy()
                     .enable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
                     .convertValue(value, elementType);

@@ -28,13 +28,10 @@ import com.bytechef.atlas.file.storage.TaskFileStorageImpl;
 import com.bytechef.commons.data.jdbc.converter.MapWrapperToStringConverter;
 import com.bytechef.commons.data.jdbc.converter.StringToMapWrapperConverter;
 import com.bytechef.file.storage.base64.service.Base64FileStorageService;
+import com.bytechef.jackson.config.JacksonConfiguration;
 import com.bytechef.liquibase.config.LiquibaseConfiguration;
 import com.bytechef.test.config.jdbc.AbstractIntTestJdbcConfiguration;
-import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Arrays;
 import java.util.List;
@@ -53,18 +50,11 @@ import org.springframework.data.jdbc.repository.config.EnableJdbcRepositories;
         "com.bytechef.atlas.configuration.converter", "com.bytechef.atlas.execution.repository.jdbc"
     })
 @EnableAutoConfiguration
-@Import(LiquibaseConfiguration.class)
+@Import({
+    JacksonConfiguration.class, LiquibaseConfiguration.class
+})
 @Configuration
 public class WorkflowExecutionRepositoryIntTestConfiguration {
-
-    @Bean
-    ObjectMapper objectMapper() {
-        return new ObjectMapper()
-            .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
-            .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
-            .registerModule(new JavaTimeModule())
-            .registerModule(new Jdk8Module());
-    }
 
     @Bean
     TaskFileStorage workflowFileStorage() {

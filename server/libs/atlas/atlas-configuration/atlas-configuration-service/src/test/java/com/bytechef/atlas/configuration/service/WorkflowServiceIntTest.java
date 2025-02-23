@@ -20,10 +20,10 @@ import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.repository.WorkflowCrudRepository;
 import com.bytechef.atlas.configuration.repository.WorkflowRepository;
 import com.bytechef.commons.util.OptionalUtils;
+import com.bytechef.jackson.config.JacksonConfiguration;
 import com.bytechef.liquibase.config.LiquibaseConfiguration;
 import com.bytechef.test.config.jdbc.AbstractIntTestJdbcConfiguration;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.List;
 import org.apache.commons.lang3.Validate;
 import org.junit.jupiter.api.Assertions;
@@ -46,7 +46,9 @@ import org.springframework.data.jdbc.repository.config.EnableJdbcRepositories;
     properties = {
         "bytechef.workflow.repository.jdbc.enabled=true"
     })
-@Import(PostgreSQLContainerConfiguration.class)
+@Import({
+    JacksonConfiguration.class, LiquibaseConfiguration.class, PostgreSQLContainerConfiguration.class
+})
 @EnableCaching
 public class WorkflowServiceIntTest {
 
@@ -106,14 +108,8 @@ public class WorkflowServiceIntTest {
             "com.bytechef.atlas.configuration.repository.jdbc"
         })
     @EnableAutoConfiguration
-    @Import(LiquibaseConfiguration.class)
     @Configuration
     public static class WorkflowConfigurationIntTestConfiguration {
-
-        @Bean
-        ObjectMapper objectMapper() {
-            return new ObjectMapper();
-        }
 
         @Bean
         WorkflowService workflowService(

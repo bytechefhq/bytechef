@@ -14,9 +14,6 @@ dependencies {
     implementation(project(":server:libs:core:commons:commons-util"))
     implementation(project(":server:libs:core:evaluator"))
 
-    testImplementation("com.fasterxml.jackson.core:jackson-databind")
-    testImplementation("com.fasterxml.jackson.datatype:jackson-datatype-jdk8")
-    testImplementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310")
     testImplementation("org.springframework.data:spring-data-jdbc")
     testImplementation(project(":server:libs:atlas:atlas-configuration:atlas-configuration-converter"))
     testImplementation(project(":server:libs:atlas:atlas-configuration:atlas-configuration-repository:atlas-configuration-repository-jdbc"))
@@ -32,4 +29,5 @@ dependencies {
     testImplementation(project(":server:libs:config:liquibase-config"))
     testImplementation(project(":server:libs:platform:platform-coordinator"))
     testImplementation(project(":server:libs:test:test-int-support"))
+    testImplementation(project(":server:libs:test:test-support"))
 }

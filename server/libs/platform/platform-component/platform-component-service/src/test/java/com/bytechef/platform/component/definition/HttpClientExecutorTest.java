@@ -21,11 +21,15 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import com.bytechef.commons.util.ConvertUtils;
+import com.bytechef.commons.util.JsonUtils;
+import com.bytechef.commons.util.XmlUtils;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.Authorization;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.FileEntry;
+import com.bytechef.jackson.config.JacksonConfiguration;
 import com.bytechef.platform.component.domain.ComponentConnection;
 import com.bytechef.platform.component.service.ConnectionDefinitionService;
 import com.bytechef.platform.file.storage.FilesFileStorage;
@@ -56,14 +60,13 @@ import javax.net.ssl.SSLSession;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
+import org.springframework.boot.jackson.JsonComponentModule;
 import org.springframework.context.ApplicationContext;
 
 /**
  * @author Ivica Cardic
  */
 public class HttpClientExecutorTest {
-
-    private static final ObjectMapper objectMapper = new ObjectMapper();
 
     private final ActionContext context = Mockito.mock(ActionContext.class);
     private final Http.Configuration configuration = Http.Configuration.newConfiguration()
@@ -73,6 +76,16 @@ public class HttpClientExecutorTest {
         new HttpClientExecutor(
             Mockito.mock(ApplicationContext.class), Mockito.mock(ConnectionDefinitionService.class),
             Mockito.mock(FilesFileStorage.class));
+
+    static {
+        JacksonConfiguration jacksonConfiguration = new JacksonConfiguration(new JsonComponentModule());
+
+        ObjectMapper objectMapper = jacksonConfiguration.objectMapper();
+
+        ConvertUtils.setObjectMapper(objectMapper);
+        JsonUtils.setObjectMapper(objectMapper);
+        XmlUtils.setXmlMapper(jacksonConfiguration.xmlMapper());
+    }
 
     @Test
     public void testCreateBodyHandler() {
@@ -555,17 +568,17 @@ public class HttpClientExecutorTest {
 
         @Override
         public Object getBody() {
-            return objectMapper.convertValue(body, new TypeReference<>() {});
+            return ConvertUtils.convertValue(body, new TypeReference<>() {});
         }
 
         @Override
         public <T> T getBody(Class<T> valueType) {
-            return objectMapper.convertValue(body, valueType);
+            return ConvertUtils.convertValue(body, valueType);
         }
 
         @Override
         public <T> T getBody(com.bytechef.component.definition.TypeReference<T> valueTypeRef) {
-            return objectMapper.convertValue(body, new TypeReference<>() {
+            return ConvertUtils.convertValue(body, new TypeReference<>() {
 
                 @Override
                 public Type getType() {

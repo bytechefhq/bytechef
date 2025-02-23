@@ -40,6 +40,7 @@ import com.bytechef.commons.util.MapUtils;
 import com.bytechef.file.storage.base64.service.Base64FileStorageService;
 import com.bytechef.message.broker.sync.SyncMessageBroker;
 import com.bytechef.message.event.MessageEvent;
+import com.bytechef.test.extension.ObjectMapperSetupExtension;
 import java.io.File;
 import java.util.List;
 import java.util.Map;
@@ -50,18 +51,19 @@ import java.util.concurrent.TimeUnit;
 import org.apache.commons.lang3.Validate;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 
 /**
  * @author Arik Cohen
  * @author Ivica Cardic
  */
+@ExtendWith(ObjectMapperSetupExtension.class)
 public class TaskWorkerTest {
 
     private static final ExecutorService NEW_FIXED_THREAD_POOL = Executors.newFixedThreadPool(2);
     private static final ExecutorService NEW_SINGLE_THREAD_EXECUTOR = Executors.newSingleThreadExecutor();
 
-    private final TaskFileStorage taskFileStorage = new TaskFileStorageImpl(
-        new Base64FileStorageService());
+    private final TaskFileStorage taskFileStorage = new TaskFileStorageImpl(new Base64FileStorageService());
 
     @Test
     public void test1() {

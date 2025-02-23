@@ -39,6 +39,7 @@ import com.bytechef.commons.util.MapUtils;
 import com.bytechef.file.storage.base64.service.Base64FileStorageService;
 import com.bytechef.message.broker.sync.SyncMessageBroker;
 import com.bytechef.message.event.MessageEvent;
+import com.bytechef.test.extension.ObjectMapperSetupExtension;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -46,22 +47,23 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 
 /**
  * @author Arik Cohen
  */
+@ExtendWith(ObjectMapperSetupExtension.class)
 public class MapTaskDispatcherAdapterTaskHandlerTest {
 
     private static final ExecutorService EXECUTOR_SERVICE = Executors.newSingleThreadExecutor();
 
-    private final TaskFileStorage taskFileStorage = new TaskFileStorageImpl(
-        new Base64FileStorageService());
+    private final TaskFileStorage taskFileStorage = new TaskFileStorageImpl(new Base64FileStorageService());
 
     @Test
     public void test1() {
         TaskHandlerResolver resolver = task -> t -> MapUtils.get(t.getParameters(), "value");
-        MapTaskDispatcherAdapterTaskHandler taskHandler = new MapTaskDispatcherAdapterTaskHandler(
-            resolver);
+
+        MapTaskDispatcherAdapterTaskHandler taskHandler = new MapTaskDispatcherAdapterTaskHandler(resolver);
 
         TaskExecution taskExecution = TaskExecution.builder()
             .workflowTask(

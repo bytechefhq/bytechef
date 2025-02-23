@@ -25,34 +25,37 @@ import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.object.helper.constant.ValueType;
 import com.bytechef.component.test.definition.MockParametersFactory;
-import com.google.gson.Gson;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.Map;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 class ObjectHelperAddKeyValuePairActionTest {
 
-    private static final Gson gson = new Gson();
+    private static final ObjectMapper objectMapper = new ObjectMapper();
 
     @Test
-    void testPerformForObject() {
-        testWith("{'a':1}", "{'b':2}", "{'a':1,'b':2}");
-        testWith("{'a':1}", "{'a':2}", "{'a':2}");
-        testWith("{'a':1}", "{'a':2,'c':3}", "{'a':2,'c':3}");
-        testWith("{'a':1}", "{'b':{'a':[{'c':1}]}}", "{'a':1,'b':{'a':[{'c':1}]}}");
+    void testPerformForObject() throws JsonProcessingException {
+        testWith("{\"a\":1}", "{\"b\":2}", "{\"a\":1,\"b\":2}");
+        testWith("{\"a\":1}", "{\"a\":2}", "{\"a\":2}");
+        testWith("{\"a\":1}", "{\"a\":2,\"c\":3}", "{\"a\":2,\"c\":3}");
+        testWith("{\"a\":1}", "{\"b\":{\"a\":[{\"c\":1}]}}", "{\"a\":1,\"b\":{\"a\":[{\"c\":1}]}}");
     }
 
     @Test
-    void testPerformForArray() {
-        testWith("[{'a':1}]", "{'b':2}", "[{'a':1,'b':2}]");
-        testWith("[{'a':1}, {'b':1}]", "{'a':2}", "[{'a':2},{'a':2,'b':1}]");
-        testWith("[{'a':1}, {'b':1}]", "{'b':{'a':[{'c':1}]}}", "[{'a':1,'b':{'a':[{'c':1}]}},{'b':{'a':[{'c':1}]}}]");
+    void testPerformForArray() throws JsonProcessingException {
+        testWith("[{\"a\":1}]", "{\"b\":2}", "[{\"a\":1,\"b\":2}]");
+        testWith("[{\"a\":1}, {\"b\":1}]", "{\"a\":2}", "[{\"a\":2},{\"a\":2,\"b\":1}]");
+        testWith(
+            "[{\"a\":1}, {\"b\":1}]", "{\"b\":{\"a\":[{\"c\":1}]}}",
+            "[{\"a\":1,\"b\":{\"a\":[{\"c\":1}]}},{\"b\":{\"a\":[{\"c\":1}]}}]");
     }
 
-    private void testWith(String sourceJson, String valueJson, String expectedJson) {
-        Object sourceObject = gson.fromJson(sourceJson, Object.class);
-        Object valueObject = gson.fromJson(valueJson, Object.class);
-        Object expectedObject = gson.fromJson(expectedJson, Object.class);
+    private void testWith(String sourceJson, String valueJson, String expectedJson) throws JsonProcessingException {
+        Object sourceObject = objectMapper.readValue(sourceJson, Object.class);
+        Object valueObject = objectMapper.readValue(valueJson, Object.class);
+        Object expectedObject = objectMapper.readValue(expectedJson, Object.class);
         ValueType sourceType = sourceJson.startsWith("[") ? ValueType.ARRAY : ValueType.OBJECT;
 
         Parameters mockedParameters = MockParametersFactory.create(

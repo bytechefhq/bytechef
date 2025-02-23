@@ -16,7 +16,9 @@
 
 package com.bytechef.platform.component.jdbc.operation.config;
 
+import com.bytechef.jackson.config.JacksonConfiguration;
 import com.bytechef.liquibase.config.LiquibaseConfiguration;
+import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
@@ -29,7 +31,9 @@ import org.springframework.context.annotation.Import;
     "com.bytechef.platform.component.jdbc"
 })
 @EnableAutoConfiguration
-@Import(LiquibaseConfiguration.class)
+@Import({
+    JacksonConfiguration.class, LiquibaseConfiguration.class, PostgreSQLContainerConfiguration.class
+})
 @Configuration
 public class JdbcOperationIntTestConfiguration {
 }
