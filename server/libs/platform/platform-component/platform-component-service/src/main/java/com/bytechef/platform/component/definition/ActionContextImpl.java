@@ -18,7 +18,7 @@ package com.bytechef.platform.component.definition;
 
 import com.bytechef.atlas.coordinator.event.TaskProgressedApplicationEvent;
 import com.bytechef.component.definition.ActionContext;
-import com.bytechef.component.definition.ActionContext.Approval.ApprovalLinks;
+import com.bytechef.component.definition.ActionContext.Approval.Links;
 import com.bytechef.platform.component.domain.ComponentConnection;
 import com.bytechef.platform.constant.ModeType;
 import com.bytechef.platform.data.storage.DataStorage;
@@ -75,7 +75,7 @@ class ActionContextImpl extends ContextImpl implements ActionContext, ActionCont
     }
 
     @Override
-    public ApprovalLinks approval(ContextFunction<Approval, ApprovalLinks> approvalFunction) {
+    public Links approval(ContextFunction<Approval, Links> approvalFunction) {
         try {
             return approvalFunction.apply(approval);
         } catch (Exception e) {
@@ -135,10 +135,10 @@ class ActionContextImpl extends ContextImpl implements ActionContext, ActionCont
     private record ApprovalImpl(long jobId, String publicUrl) implements Approval {
 
         @Override
-        public ApprovalLinks generateLinks() {
+        public Links generateLinks() {
             String url = "%s/approvals/%s";
 
-            return new ApprovalLinks(
+            return new Links(
                 url.formatted(publicUrl, ApprovalId.of(jobId, true)),
                 url.formatted(publicUrl, ApprovalId.of(jobId, false)));
         }
