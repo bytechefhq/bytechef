@@ -54,7 +54,7 @@ public record PropertyFactory() implements SchemaPropertyFactory {
         } else if (baseValueProperty == BaseProperty.BaseNullProperty.class) {
             return TaskDispatcherDsl.nullable(name);
         } else if (baseValueProperty == BaseProperty.BaseObjectProperty.class) {
-            return getObjectProperty(value);
+            return getObjectProperty(name, value);
         } else if (baseValueProperty == BaseProperty.BaseStringProperty.class) {
             return TaskDispatcherDsl.string(name);
         } else if (baseValueProperty == BaseProperty.BaseTimeProperty.class) {
@@ -85,8 +85,8 @@ public record PropertyFactory() implements SchemaPropertyFactory {
         return arrayProperty;
     }
 
-    private ModifiableObjectProperty getObjectProperty(Object value) {
-        ModifiableObjectProperty objectProperty = TaskDispatcherDsl.object();
+    private ModifiableObjectProperty getObjectProperty(String name, Object value) {
+        ModifiableObjectProperty objectProperty = TaskDispatcherDsl.object(name);
 
         List<ModifiableValueProperty<?, ?>> properties = new ArrayList<>();
 
