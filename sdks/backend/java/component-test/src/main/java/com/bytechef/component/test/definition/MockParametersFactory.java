@@ -16,13 +16,20 @@
 
 package com.bytechef.component.test.definition;
 
+import com.bytechef.commons.util.MapUtils;
 import com.bytechef.component.definition.Parameters;
+import com.bytechef.jackson.config.JacksonConfiguration;
 import java.util.Map;
+import org.springframework.boot.jackson.JsonComponentModule;
 
 /**
  * @author Igor Beslic
  */
 public class MockParametersFactory {
+
+    static {
+        MapUtils.setObjectMapper(new JacksonConfiguration(new JsonComponentModule()).objectMapper());
+    }
 
     public static Parameters create(Map<String, Object> map) {
         try {

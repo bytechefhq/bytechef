@@ -19,6 +19,7 @@ package com.bytechef.platform.data.storage.file.storage.service;
 import com.bytechef.file.storage.filesystem.service.FilesystemFileStorageService;
 import com.bytechef.platform.constant.ModeType;
 import com.bytechef.platform.data.storage.domain.DataStorageScope;
+import com.bytechef.test.extension.ObjectMapperSetupExtension;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -27,10 +28,12 @@ import java.util.Map;
 import java.util.Optional;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 
 /**
  * @author Ivica Cardic
  */
+@ExtendWith(ObjectMapperSetupExtension.class)
 public class DataFileStorageServiceTest {
 
     private static final DataFileStorageService FILE_DATA_STORAGE_SERVICE;

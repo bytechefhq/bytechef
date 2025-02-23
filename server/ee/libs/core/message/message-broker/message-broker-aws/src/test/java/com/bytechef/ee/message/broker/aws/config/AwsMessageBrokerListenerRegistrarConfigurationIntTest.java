@@ -12,9 +12,9 @@ import static org.awaitility.Awaitility.await;
 import static org.testcontainers.containers.localstack.LocalStackContainer.Service.SQS;
 
 import com.bytechef.ee.message.broker.aws.AwsMessageBroker;
+import com.bytechef.jackson.config.JacksonConfiguration;
 import com.bytechef.message.broker.config.MessageBrokerConfigurer;
 import com.bytechef.message.route.MessageRoute;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.IOException;
 import java.time.Duration;
@@ -40,6 +40,10 @@ import org.testcontainers.utility.DockerImageName;
  */
 @SpringBootTest(properties = "bytechef.message-broker.provider=aws")
 @Testcontainers
+@Import({
+    AwsMessageBrokerConfiguration.class, AwsMessageBrokerListenerRegistrarConfiguration.class,
+    JacksonConfiguration.class
+})
 class AwsMessageBrokerListenerRegistrarConfigurationIntTest {
 
     private static final String QUEUE_NAME = "awsTest";
@@ -103,9 +107,6 @@ class AwsMessageBrokerListenerRegistrarConfigurationIntTest {
     }
 
     @Configuration
-    @Import({
-        AwsMessageBrokerConfiguration.class, AwsMessageBrokerListenerRegistrarConfiguration.class
-    })
     @EnableAutoConfiguration
     static class AwsMessageBrokerIntTestConfiguration {
 
@@ -113,11 +114,6 @@ class AwsMessageBrokerListenerRegistrarConfigurationIntTest {
         MessageBrokerConfigurer<?> messageBrokerConfigurer() {
             return (listenerEndpointRegistrar, messageBrokerListenerRegistrar) -> messageBrokerListenerRegistrar
                 .registerListenerEndpoint(listenerEndpointRegistrar, MESSAGE_ROUTE, 1, new TestDelegate(), "onEvent");
-        }
-
-        @Bean
-        ObjectMapper objectMapper() {
-            return new ObjectMapper();
         }
     }
 }

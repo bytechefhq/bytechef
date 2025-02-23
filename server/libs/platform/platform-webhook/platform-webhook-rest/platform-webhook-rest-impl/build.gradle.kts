@@ -11,4 +11,5 @@ dependencies {
     implementation(project(":server:libs:platform:platform-webhook:platform-webhook-rest:platform-webhook-rest-api"))
 
     testImplementation("org.springframework.boot:spring-boot-starter-web")
+    testImplementation(project(":server:libs:test:test-int-support"))
 }

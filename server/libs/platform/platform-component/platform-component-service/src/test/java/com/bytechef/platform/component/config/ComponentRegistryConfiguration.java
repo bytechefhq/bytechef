@@ -27,12 +27,14 @@ import com.bytechef.config.ApplicationProperties;
 import com.bytechef.encryption.Encryption;
 import com.bytechef.encryption.EncryptionKey;
 import com.bytechef.file.storage.base64.service.Base64FileStorageService;
+import com.bytechef.jackson.config.JacksonConfiguration;
 import com.bytechef.liquibase.config.LiquibaseConfiguration;
 import com.bytechef.platform.component.oas.handler.loader.OpenApiComponentHandlerLoader;
 import com.bytechef.platform.configuration.accessor.JobPrincipalAccessorRegistry;
 import com.bytechef.platform.file.storage.FilesFileStorage;
 import com.bytechef.platform.file.storage.FilesFileStorageImpl;
 import com.bytechef.test.config.jdbc.AbstractIntTestJdbcConfiguration;
+import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Arrays;
@@ -52,7 +54,9 @@ import org.springframework.data.jdbc.repository.config.EnableJdbcRepositories;
     })
 @EnableAutoConfiguration
 @EnableConfigurationProperties(ApplicationProperties.class)
-@Import(LiquibaseConfiguration.class)
+@Import({
+    JacksonConfiguration.class, LiquibaseConfiguration.class, PostgreSQLContainerConfiguration.class
+})
 @ComponentRegistryConfigurationSharedMocks
 @Configuration
 public class ComponentRegistryConfiguration {

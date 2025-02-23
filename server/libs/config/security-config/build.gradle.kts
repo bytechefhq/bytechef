@@ -12,4 +12,5 @@ dependencies {
 
     testImplementation("org.springframework.boot:spring-boot-starter-web")
     testImplementation("org.springframework.security:spring-security-test")
+    testImplementation(project(":server:libs:test:test-int-support"))
 }

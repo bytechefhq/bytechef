@@ -61,4 +61,5 @@ dependencies {
 
     testImplementation("org.springframework:spring-webflux")
     testImplementation("org.springframework.boot:spring-boot-starter-web")
+    testImplementation(project(":server:libs:test:test-int-support"))
 }

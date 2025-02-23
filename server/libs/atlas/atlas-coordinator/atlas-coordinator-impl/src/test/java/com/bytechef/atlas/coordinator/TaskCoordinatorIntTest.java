@@ -48,15 +48,12 @@ import com.bytechef.atlas.worker.task.handler.TaskHandler;
 import com.bytechef.commons.data.jdbc.converter.MapWrapperToStringConverter;
 import com.bytechef.commons.data.jdbc.converter.StringToMapWrapperConverter;
 import com.bytechef.file.storage.base64.service.Base64FileStorageService;
+import com.bytechef.jackson.config.JacksonConfiguration;
 import com.bytechef.liquibase.config.LiquibaseConfiguration;
 import com.bytechef.platform.coordinator.job.JobSyncExecutor;
 import com.bytechef.test.config.jdbc.AbstractIntTestJdbcConfiguration;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
-import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Arrays;
 import java.util.Collections;
@@ -85,7 +82,9 @@ import org.springframework.lang.Nullable;
     properties = {
         "bytechef.workflow.repository.classpath.enabled=true"
     })
-@Import(PostgreSQLContainerConfiguration.class)
+@Import({
+    JacksonConfiguration.class, PostgreSQLContainerConfiguration.class
+})
 public class TaskCoordinatorIntTest {
 
     private static final TaskFileStorage TASK_FILE_STORAGE = new TaskFileStorageImpl(new Base64FileStorageService());
@@ -155,15 +154,6 @@ public class TaskCoordinatorIntTest {
         @Bean
         JobService jobService(JdbcJobRepository jdbcJobRepository) {
             return new JobServiceImpl(jdbcJobRepository);
-        }
-
-        @Bean
-        ObjectMapper objectMapper() {
-            return new ObjectMapper()
-                .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
-                .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
-                .registerModule(new JavaTimeModule())
-                .registerModule(new Jdk8Module());
         }
 
         @Bean

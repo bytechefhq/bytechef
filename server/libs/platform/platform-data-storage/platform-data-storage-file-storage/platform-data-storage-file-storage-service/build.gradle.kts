@@ -7,4 +7,5 @@ dependencies {
 
     testImplementation(project(":server:libs:core:file-storage:file-storage-filesystem-service"))
     testImplementation(project(":server:libs:test:test-int-support"))
+    testImplementation(project(":server:libs:test:test-support"))
 }

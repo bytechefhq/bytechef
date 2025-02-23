@@ -34,7 +34,6 @@ public class ObservabilityEnvironmentPostProcessor implements EnvironmentPostPro
         Map<String, Object> source = new HashMap<>();
 
         if (!environment.getProperty("bytechef.observability.enabled", Boolean.class, false)) {
-
             source.put(
                 "spring.autoconfigure.exclude",
                 environment.getProperty("spring.autoconfigure.exclude") +

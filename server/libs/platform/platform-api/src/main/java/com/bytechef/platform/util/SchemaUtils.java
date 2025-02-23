@@ -101,8 +101,8 @@ public class SchemaUtils {
     }
 
     public static OutputResponse toOutput(
-        com.bytechef.definition.BaseOutputDefinition.OutputResponse outputResponse,
-        OutputFactoryFunction outputFactoryFunction, SchemaPropertyFactory propertyFactoryFunction) {
+        BaseOutputDefinition.OutputResponse outputResponse, OutputFactoryFunction outputFactoryFunction,
+        SchemaPropertyFactory propertyFactoryFunction) {
 
         Object sampleOutput = outputResponse.sampleOutput();
 
@@ -132,8 +132,8 @@ public class SchemaUtils {
         SchemaPropertyFactory propertyFactoryFunction) {
 
         return toOutput(
-            new BaseOutputDefinition.OutputResponse((BaseProperty.BaseValueProperty<?>) SchemaUtils
-                .getOutputSchema(name, sampleOutput, propertyFactoryFunction), sampleOutput),
+            new BaseOutputDefinition.OutputResponse((BaseProperty.BaseValueProperty<?>) getOutputSchema(
+                name, sampleOutput, propertyFactoryFunction), sampleOutput),
             outputFactoryFunction, propertyFactoryFunction);
     }
 

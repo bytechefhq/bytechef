@@ -16,9 +16,10 @@
 
 package com.bytechef.jackson.config;
 
-import com.bytechef.commons.util.ConvertHelper;
-import com.bytechef.commons.util.JsonHelper;
-import com.bytechef.commons.util.XmlHelper;
+import com.bytechef.commons.util.ConvertUtils;
+import com.bytechef.commons.util.JsonUtils;
+import com.bytechef.commons.util.MapUtils;
+import com.bytechef.commons.util.XmlUtils;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.PropertyAccessor;
@@ -30,6 +31,7 @@ import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.openapitools.jackson.nullable.JsonNullableModule;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.boot.jackson.JsonComponentModule;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -50,29 +52,14 @@ public class JacksonConfiguration {
     }
 
     @Bean
-    ConvertHelper convertHelper(ObjectMapper objectMapper) {
-        return new ConvertHelper(objectMapper);
-    }
-
-    @Bean
-    JsonHelper jsonHelper(ObjectMapper objectMapper) {
-        return new JsonHelper(objectMapper);
-    }
-
-    @Bean
     @Primary
     public ObjectMapper objectMapper() {
         return buildMapper(Jackson2ObjectMapperBuilder.json());
     }
 
     @Bean
-    XmlMapper xmlMapper() {
+    public XmlMapper xmlMapper() {
         return buildMapper(Jackson2ObjectMapperBuilder.xml());
-    }
-
-    @Bean
-    XmlHelper xmlHelper(XmlMapper xmlMapper) {
-        return new XmlHelper(xmlMapper);
     }
 
     private <T extends ObjectMapper> T buildMapper(Jackson2ObjectMapperBuilder objectMapperBuilder) {
@@ -84,5 +71,25 @@ public class JacksonConfiguration {
             .modules(new JavaTimeModule(), new Jdk8Module(), new JsonNullableModule(), jsonComponentModule)
             .visibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY)
             .build();
+    }
+
+    @Configuration
+    static class JsonUtilsConfiguration implements InitializingBean {
+
+        private final ObjectMapper objectMapper;
+        private final XmlMapper xmlMapper;
+
+        JsonUtilsConfiguration(ObjectMapper objectMapper, XmlMapper xmlMapper) {
+            this.objectMapper = objectMapper;
+            this.xmlMapper = xmlMapper;
+        }
+
+        @Override
+        public void afterPropertiesSet() {
+            ConvertUtils.setObjectMapper(objectMapper);
+            JsonUtils.setObjectMapper(objectMapper);
+            MapUtils.setObjectMapper(objectMapper);
+            XmlUtils.setXmlMapper(xmlMapper);
+        }
     }
 }

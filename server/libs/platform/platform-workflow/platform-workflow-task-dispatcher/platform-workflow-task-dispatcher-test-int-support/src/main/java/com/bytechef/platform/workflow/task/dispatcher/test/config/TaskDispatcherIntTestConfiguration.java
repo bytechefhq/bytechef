@@ -36,13 +36,9 @@ import com.bytechef.atlas.file.storage.TaskFileStorage;
 import com.bytechef.atlas.file.storage.TaskFileStorageImpl;
 import com.bytechef.config.ApplicationProperties;
 import com.bytechef.file.storage.base64.service.Base64FileStorageService;
+import com.bytechef.jackson.config.JacksonConfiguration;
 import com.bytechef.platform.workflow.task.dispatcher.test.workflow.TaskDispatcherJobTestExecutor;
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import java.util.Collections;
 import java.util.List;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
@@ -53,6 +49,7 @@ import org.springframework.cache.concurrent.ConcurrentMapCacheManager;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Import;
 import org.springframework.core.io.support.ResourcePatternResolver;
 
 /**
@@ -65,6 +62,7 @@ import org.springframework.core.io.support.ResourcePatternResolver;
     })
 @EnableConfigurationProperties(ApplicationProperties.class)
 @Configuration
+@Import(JacksonConfiguration.class)
 public class TaskDispatcherIntTestConfiguration {
 
     @Bean
@@ -87,16 +85,6 @@ public class TaskDispatcherIntTestConfiguration {
     @Bean
     JobService jobService(ObjectMapper objectMapper) {
         return new JobServiceImpl(new InMemoryJobRepository(taskExecutionRepository(), objectMapper));
-    }
-
-    @Bean
-    public ObjectMapper objectMapper() {
-        return new ObjectMapper()
-            .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
-            .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
-            .setSerializationInclusion(JsonInclude.Include.NON_NULL)
-            .registerModule(new JavaTimeModule())
-            .registerModule(new Jdk8Module());
     }
 
     @Bean

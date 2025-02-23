@@ -16,15 +16,23 @@
 
 package com.bytechef.commons.util;
 
+import com.bytechef.jackson.config.JacksonConfiguration;
 import java.util.List;
 import java.util.Map;
 import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.springframework.boot.jackson.JsonComponentModule;
 
 /**
  * @author Ivica Cardic
  */
 public class JsonUtilsTest {
+
+    @BeforeAll
+    public static void setUp() {
+        JsonUtils.setObjectMapper(new JacksonConfiguration(new JsonComponentModule()).objectMapper());
+    }
 
     @Test
     public void testRead() {

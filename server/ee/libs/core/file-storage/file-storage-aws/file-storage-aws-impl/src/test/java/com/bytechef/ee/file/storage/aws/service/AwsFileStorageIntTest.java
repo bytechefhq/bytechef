@@ -13,7 +13,7 @@ import static org.testcontainers.containers.localstack.LocalStackContainer.Servi
 
 import com.bytechef.config.ApplicationProperties;
 import com.bytechef.file.storage.domain.FileEntry;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.bytechef.jackson.config.JacksonConfiguration;
 import io.awspring.cloud.s3.S3Template;
 import java.io.IOException;
 import java.io.InputStream;
@@ -31,6 +31,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Import;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.testcontainers.containers.localstack.LocalStackContainer;
@@ -49,6 +50,7 @@ import software.amazon.awssdk.regions.providers.AwsRegionProvider;
  */
 @SpringBootTest
 @Testcontainers
+@Import(JacksonConfiguration.class)
 class AwsFileStorageIntTest {
 
     private static final String BUCKET_NAME = String.valueOf(UUID.randomUUID());
@@ -237,11 +239,6 @@ class AwsFileStorageIntTest {
             return new AwsFileStorageServiceImpl(s3Template, applicationProperties.getFileStorage()
                 .getAws()
                 .getBucket());
-        }
-
-        @Bean
-        ObjectMapper objectMapper() {
-            return new ObjectMapper();
         }
 
         @Bean

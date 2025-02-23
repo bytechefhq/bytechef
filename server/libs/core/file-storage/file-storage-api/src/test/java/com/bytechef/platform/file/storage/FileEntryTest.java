@@ -22,14 +22,17 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.evaluator.Evaluator;
 import com.bytechef.file.storage.domain.FileEntry;
+import com.bytechef.test.extension.ObjectMapperSetupExtension;
 import java.util.Collections;
 import java.util.Map;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 
 /**
  * @author Ivica Cardic
  */
+@ExtendWith(ObjectMapperSetupExtension.class)
 public class FileEntryTest {
 
     @Test

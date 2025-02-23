@@ -18,12 +18,9 @@ package com.bytechef.embedded.configuration.config;
 
 import com.bytechef.config.ApplicationProperties;
 import com.bytechef.encryption.EncryptionKey;
+import com.bytechef.jackson.config.JacksonConfiguration;
 import com.bytechef.liquibase.config.LiquibaseConfiguration;
 import com.bytechef.test.config.jdbc.AbstractIntTestJdbcConfiguration;
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.cache.annotation.EnableCaching;
@@ -44,21 +41,15 @@ import org.springframework.data.jdbc.repository.config.EnableJdbcRepositories;
 @EnableAutoConfiguration
 @EnableCaching
 @EnableConfigurationProperties(ApplicationProperties.class)
-@Import(LiquibaseConfiguration.class)
+@Import({
+    JacksonConfiguration.class, LiquibaseConfiguration.class
+})
 @Configuration
 public class IntegrationIntTestConfiguration {
 
     @Bean
     EncryptionKey encryptionKey() {
         return () -> "tTB1/UBIbYLuCXVi4PPfzA==";
-    }
-
-    @Bean
-    ObjectMapper objectMapper() {
-        return new ObjectMapper()
-            .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
-            .registerModule(new JavaTimeModule())
-            .registerModule(new Jdk8Module());
     }
 
     @EnableJdbcRepositories(

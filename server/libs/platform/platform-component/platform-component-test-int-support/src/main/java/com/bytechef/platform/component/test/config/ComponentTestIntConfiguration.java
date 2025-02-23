@@ -40,6 +40,7 @@ import com.bytechef.commons.util.MapUtils;
 import com.bytechef.config.ApplicationProperties;
 import com.bytechef.encryption.EncryptionKey;
 import com.bytechef.file.storage.base64.service.Base64FileStorageService;
+import com.bytechef.jackson.config.JacksonConfiguration;
 import com.bytechef.message.broker.MessageBroker;
 import com.bytechef.platform.component.test.ComponentJobTestExecutor;
 import com.bytechef.platform.configuration.accessor.JobPrincipalAccessorRegistry;
@@ -47,14 +48,7 @@ import com.bytechef.platform.connection.service.ConnectionService;
 import com.bytechef.platform.data.storage.DataStorage;
 import com.bytechef.platform.file.storage.FilesFileStorage;
 import com.bytechef.platform.file.storage.FilesFileStorageImpl;
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.dataformat.xml.XmlMapper;
-import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -63,11 +57,11 @@ import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceTransactionManagerAutoConfiguration;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
-import org.springframework.boot.jackson.JsonComponentModule;
 import org.springframework.cache.concurrent.ConcurrentMapCacheManager;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Import;
 import org.springframework.core.io.support.ResourcePatternResolver;
 
 /**
@@ -80,14 +74,8 @@ import org.springframework.core.io.support.ResourcePatternResolver;
     })
 @EnableConfigurationProperties(ApplicationProperties.class)
 @Configuration
+@Import(JacksonConfiguration.class)
 public class ComponentTestIntConfiguration {
-
-    private final JsonComponentModule jsonComponentModule;
-
-    @SuppressFBWarnings("EI")
-    public ComponentTestIntConfiguration(JsonComponentModule jsonComponentModule) {
-        this.jsonComponentModule = jsonComponentModule;
-    }
 
     @Bean
     ApplicationProperties applicationProperties() {
@@ -166,17 +154,6 @@ public class ComponentTestIntConfiguration {
     }
 
     @Bean
-    public ObjectMapper objectMapper() {
-        return new ObjectMapper()
-            .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
-            .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
-            .setSerializationInclusion(JsonInclude.Include.NON_NULL)
-            .registerModule(new JavaTimeModule())
-            .registerModule(new Jdk8Module())
-            .registerModule(jsonComponentModule);
-    }
-
-    @Bean
     TaskExecutionService taskExecutionService() {
         return new TaskExecutionServiceImpl(taskExecutionRepository());
     }
@@ -187,20 +164,12 @@ public class ComponentTestIntConfiguration {
     }
 
     @Bean
-    XmlMapper xmlMapper() {
-        return XmlMapper.xmlBuilder()
-            .serializationInclusion(JsonInclude.Include.NON_NULL)
-            .build();
-    }
-
-    @Bean
     TaskFileStorage workflowFileStorageFacade() {
         return new TaskFileStorageImpl(new Base64FileStorageService());
     }
 
     @Bean
     WorkflowService workflowService(List<WorkflowRepository> workflowRepositories) {
-        return new WorkflowServiceImpl(
-            new ConcurrentMapCacheManager(), Collections.emptyList(), workflowRepositories);
+        return new WorkflowServiceImpl(new ConcurrentMapCacheManager(), Collections.emptyList(), workflowRepositories);
     }
 }

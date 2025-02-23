@@ -16,7 +16,6 @@ dependencies {
     implementation(project(":server:libs:platform:platform-file-storage:platform-file-storage-impl"))
     implementation(project(":server:libs:platform:platform-workflow:platform-workflow-task-dispatcher:platform-workflow-task-dispatcher-api"))
 
-    testImplementation("com.fasterxml.jackson.datatype:jackson-datatype-jdk8")
-    testImplementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310")
+    testImplementation(project(":server:libs:config:jackson-config"))
     testImplementation(project(":server:libs:core:commons:commons-util"))
 }

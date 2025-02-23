@@ -16,6 +16,7 @@
 
 package com.bytechef.platform.component.config;
 
+import com.bytechef.jackson.config.JacksonConfiguration;
 import com.bytechef.liquibase.config.LiquibaseConfiguration;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.context.annotation.ComponentScan;
@@ -27,7 +28,9 @@ import org.springframework.context.annotation.Import;
         "com.bytechef.encryption", "com.bytechef.platform.component", "com.bytechef.platform.connection"
     })
 @EnableAutoConfiguration
-@Import(LiquibaseConfiguration.class)
+@Import({
+    JacksonConfiguration.class, LiquibaseConfiguration.class
+})
 @Configuration
 public class ComponentDefinitionIntTestConfiguration {
 

@@ -30,6 +30,7 @@ import com.bytechef.component.definition.TriggerDefinition;
 import com.bytechef.component.definition.UnifiedApiDefinition;
 import com.bytechef.encryption.Encryption;
 import com.bytechef.encryption.EncryptionKey;
+import com.bytechef.jackson.config.JacksonConfiguration;
 import com.bytechef.liquibase.config.LiquibaseConfiguration;
 import com.bytechef.test.config.jdbc.AbstractIntTestJdbcConfiguration;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -52,7 +53,9 @@ import org.springframework.data.jdbc.repository.config.EnableJdbcRepositories;
     "com.bytechef.encryption", "com.bytechef.platform.connection"
 })
 @EnableAutoConfiguration
-@Import(LiquibaseConfiguration.class)
+@Import({
+    JacksonConfiguration.class, LiquibaseConfiguration.class
+})
 @Configuration
 public class ConnectionIntTestConfiguration {
 
@@ -144,11 +147,6 @@ public class ConnectionIntTestConfiguration {
     @Bean
     EncryptionKey encryptionKey() {
         return () -> "tTB1/UBIbYLuCXVi4PPfzA==";
-    }
-
-    @Bean
-    ObjectMapper objectMapper() {
-        return new ObjectMapper();
     }
 
     @EnableJdbcRepositories(basePackages = {

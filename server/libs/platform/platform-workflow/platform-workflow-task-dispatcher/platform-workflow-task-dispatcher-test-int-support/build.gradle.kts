@@ -16,4 +16,5 @@ dependencies {
     implementation(project(":server:libs:core:message:message-broker:message-broker-sync"))
     implementation(project(":server:libs:platform:platform-file-storage:platform-file-storage-impl"))
     implementation(project(":server:libs:platform:platform-coordinator"))
+    implementation(project(":server:libs:test:test-int-support"))
 }

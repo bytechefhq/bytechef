@@ -32,7 +32,7 @@ import com.bytechef.automation.configuration.service.ProjectDeploymentWorkflowSe
 import com.bytechef.automation.configuration.service.ProjectService;
 import com.bytechef.automation.configuration.service.ProjectWorkflowService;
 import com.bytechef.commons.util.CollectionUtils;
-import com.bytechef.commons.util.JsonHelper;
+import com.bytechef.commons.util.JsonUtils;
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.platform.category.domain.Category;
 import com.bytechef.platform.category.service.CategoryService;
@@ -60,7 +60,6 @@ import org.springframework.transaction.annotation.Transactional;
 public class ProjectFacadeImpl implements ProjectFacade {
 
     private final CategoryService categoryService;
-    private final JsonHelper jsonHelper;
     private final ProjectService projectService;
     private final ProjectWorkflowService projectWorkflowService;
     private final ProjectDeploymentFacade projectDeploymentFacade;
@@ -74,7 +73,7 @@ public class ProjectFacadeImpl implements ProjectFacade {
 
     @SuppressFBWarnings("EI2")
     public ProjectFacadeImpl(
-        CategoryService categoryService, JsonHelper jsonHelper, ProjectWorkflowService projectWorkflowService,
+        CategoryService categoryService, ProjectWorkflowService projectWorkflowService,
         ProjectDeploymentService projectDeploymentService, ProjectService projectService,
         ProjectDeploymentFacade projectDeploymentFacade,
         ProjectDeploymentWorkflowService projectDeploymentWorkflowService,
@@ -83,7 +82,6 @@ public class ProjectFacadeImpl implements ProjectFacade {
         WorkflowNodeTestOutputService workflowNodeTestOutputService) {
 
         this.categoryService = categoryService;
-        this.jsonHelper = jsonHelper;
         this.projectWorkflowService = projectWorkflowService;
         this.projectDeploymentService = projectDeploymentService;
         this.projectService = projectService;
@@ -222,13 +220,13 @@ public class ProjectFacadeImpl implements ProjectFacade {
 
         Workflow workflow = workflowService.duplicateWorkflow(workflowId);
 
-        Map<String, Object> definitionMap = jsonHelper.read(workflow.getDefinition(), new TypeReference<>() {});
+        Map<String, Object> definitionMap = JsonUtils.read(workflow.getDefinition(), new TypeReference<>() {});
 
         definitionMap.put("label", MapUtils.getString(definitionMap, "label", "(2)") + " (2)");
 
         workflowService.update(
-            Validate.notNull(workflow.getId(), "id"),
-            jsonHelper.writeWithDefaultPrettyPrinter(definitionMap), workflow.getVersion());
+            Validate.notNull(workflow.getId(), "id"), JsonUtils.writeWithDefaultPrettyPrinter(definitionMap),
+            workflow.getVersion());
 
         projectWorkflowService.addWorkflow(id, project.getLastVersion(), workflow.getId());
 

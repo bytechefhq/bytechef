@@ -37,12 +37,17 @@ import com.bytechef.atlas.execution.service.CounterService;
 import com.bytechef.atlas.execution.service.TaskExecutionService;
 import com.bytechef.atlas.file.storage.TaskFileStorage;
 import com.bytechef.atlas.file.storage.TaskFileStorageImpl;
+import com.bytechef.commons.util.JsonUtils;
+import com.bytechef.commons.util.MapUtils;
 import com.bytechef.file.storage.base64.service.Base64FileStorageService;
+import com.bytechef.jackson.config.JacksonConfiguration;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.springframework.boot.jackson.JsonComponentModule;
 import org.springframework.context.ApplicationEventPublisher;
 
 /**
@@ -57,6 +62,13 @@ public class EachTaskDispatcherTest {
     private final TaskDispatcher<? super Task> taskDispatcher = mock(TaskDispatcher.class);
     private final TaskExecutionService taskExecutionService = mock(TaskExecutionService.class);
     private final TaskFileStorage taskFileStorage = new TaskFileStorageImpl(new Base64FileStorageService());
+
+    static {
+        ObjectMapper objectMapper = new JacksonConfiguration(new JsonComponentModule()).objectMapper();
+
+        JsonUtils.setObjectMapper(objectMapper);
+        MapUtils.setObjectMapper(objectMapper);
+    }
 
     @Test
     public void testDispatch1() {

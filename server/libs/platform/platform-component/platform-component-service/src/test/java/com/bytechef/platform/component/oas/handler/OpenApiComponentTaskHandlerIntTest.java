@@ -38,14 +38,12 @@ import com.bytechef.component.definition.TypeReference;
 import com.bytechef.file.storage.domain.FileEntry;
 import com.bytechef.platform.component.config.ComponentRegistryConfiguration;
 import com.bytechef.platform.component.config.ComponentRegistryConfigurationSharedMocks;
-import com.bytechef.platform.component.config.JacksonConfiguration;
 import com.bytechef.platform.component.constant.MetadataConstants;
 import com.bytechef.platform.component.definition.FileEntryImpl;
 import com.bytechef.platform.component.facade.ActionDefinitionFacade;
 import com.bytechef.platform.connection.domain.Connection;
 import com.bytechef.platform.connection.repository.ConnectionRepository;
 import com.bytechef.platform.constant.ModeType;
-import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
 import com.github.tomakehurst.wiremock.junit5.WireMockTest;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
@@ -62,16 +60,12 @@ import org.junit.jupiter.api.Test;
 import org.skyscreamer.jsonassert.JSONAssert;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.annotation.Import;
 import wiremock.com.fasterxml.jackson.databind.node.JsonNodeFactory;
 
 /**
  * @author Ivica Cardic
  */
 @SpringBootTest(classes = ComponentRegistryConfiguration.class)
-@Import({
-    JacksonConfiguration.class, PostgreSQLContainerConfiguration.class
-})
 @ComponentRegistryConfigurationSharedMocks
 @WireMockTest(httpPort = 9999)
 public class OpenApiComponentTaskHandlerIntTest {

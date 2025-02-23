@@ -16,12 +16,11 @@
 
 package com.bytechef.commons.util;
 
-import static com.bytechef.commons.util.constant.ObjectMapperConstants.OBJECT_MAPPER;
-
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.type.TypeFactory;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.lang.reflect.Type;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -30,18 +29,17 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * @deprecated Use ConvertHelper instead.
- *
  * @author Ivica Cardic
  */
-@Deprecated
 public class ConvertUtils {
 
     private static final Logger logger = LoggerFactory.getLogger(ConvertUtils.class);
 
+    private static ObjectMapper objectMapper;
+
     public static boolean canConvert(Object fromValue, Class<?> toValueType) {
         try {
-            OBJECT_MAPPER.convertValue(fromValue, toValueType);
+            objectMapper.convertValue(fromValue, toValueType);
         } catch (Exception e) {
             // ignore
             return false;
@@ -51,11 +49,11 @@ public class ConvertUtils {
     }
 
     public static <T> T convertValue(Object fromValue, Class<T> toValueType) {
-        return OBJECT_MAPPER.convertValue(fromValue, toValueType);
+        return objectMapper.convertValue(fromValue, toValueType);
     }
 
     public static <T> T convertValue(Object fromValue, Class<T> toValueType, boolean includeNulls) {
-        ObjectMapper currentObjectMapper = OBJECT_MAPPER;
+        ObjectMapper currentObjectMapper = objectMapper;
 
         if (includeNulls) {
             currentObjectMapper = currentObjectMapper.copy()
@@ -66,13 +64,13 @@ public class ConvertUtils {
     }
 
     public static <T> T convertValue(Object fromValue, Type type) {
-        TypeFactory typeFactory = OBJECT_MAPPER.getTypeFactory();
+        TypeFactory typeFactory = objectMapper.getTypeFactory();
 
-        return OBJECT_MAPPER.convertValue(fromValue, typeFactory.constructType(type));
+        return objectMapper.convertValue(fromValue, typeFactory.constructType(type));
     }
 
     public static <T> T convertValue(Object fromValue, TypeReference<T> toValueTypeRef) {
-        return OBJECT_MAPPER.convertValue(fromValue, toValueTypeRef);
+        return objectMapper.convertValue(fromValue, toValueTypeRef);
     }
 
     public static Object convertString(String str) {
@@ -113,5 +111,10 @@ public class ConvertUtils {
         }
 
         return str;
+    }
+
+    @SuppressFBWarnings("EI")
+    public static void setObjectMapper(ObjectMapper objectMapper) {
+        ConvertUtils.objectMapper = objectMapper;
     }
 }

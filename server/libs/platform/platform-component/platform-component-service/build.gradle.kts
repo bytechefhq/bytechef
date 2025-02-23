@@ -21,8 +21,6 @@ dependencies {
     implementation(project(":server:libs:platform:platform-workflow:platform-workflow-worker:platform-workflow-worker-api"))
 
     testImplementation("org.springframework.data:spring-data-jdbc")
-    testImplementation("com.fasterxml.jackson.datatype:jackson-datatype-jdk8")
-    testImplementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310")
     testImplementation(libs.org.wiremock.wiremock)
     testImplementation(project(":server:libs:atlas:atlas-file-storage:atlas-file-storage-impl"))
     testImplementation(project(":server:libs:core:commons:commons-data"))
