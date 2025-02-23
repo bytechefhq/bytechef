@@ -23,7 +23,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "TaskDispatcherDefinitionBasic", description = "A task dispatcher defines a strategy for dispatching tasks to be executed.")
 @JsonTypeName("TaskDispatcherDefinitionBasic")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-02-20T20:18:25.636056+01:00[Europe/Zagreb]", comments = "Generator version: 7.11.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-02-23T10:29:20.527744+01:00[Europe/Zagreb]", comments = "Generator version: 7.11.0")
 public class TaskDispatcherDefinitionBasicModel {
 
   private @Nullable String description;
@@ -37,6 +37,8 @@ public class TaskDispatcherDefinitionBasicModel {
   private @Nullable ResourcesModel resources;
 
   private @Nullable String title;
+
+  private @Nullable Boolean variablePropertiesDefined;
 
   private Integer version;
 
@@ -173,6 +175,26 @@ public class TaskDispatcherDefinitionBasicModel {
     this.title = title;
   }
 
+  public TaskDispatcherDefinitionBasicModel variablePropertiesDefined(Boolean variablePropertiesDefined) {
+    this.variablePropertiesDefined = variablePropertiesDefined;
+    return this;
+  }
+
+  /**
+   * Does task dispatcher define dynamic variable properties.
+   * @return variablePropertiesDefined
+   */
+  
+  @Schema(name = "variablePropertiesDefined", description = "Does task dispatcher define dynamic variable properties.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("variablePropertiesDefined")
+  public Boolean getVariablePropertiesDefined() {
+    return variablePropertiesDefined;
+  }
+
+  public void setVariablePropertiesDefined(Boolean variablePropertiesDefined) {
+    this.variablePropertiesDefined = variablePropertiesDefined;
+  }
+
   public TaskDispatcherDefinitionBasicModel version(Integer version) {
     this.version = version;
     return this;
@@ -208,12 +230,13 @@ public class TaskDispatcherDefinitionBasicModel {
         Objects.equals(this.outputDefined, taskDispatcherDefinitionBasic.outputDefined) &&
         Objects.equals(this.resources, taskDispatcherDefinitionBasic.resources) &&
         Objects.equals(this.title, taskDispatcherDefinitionBasic.title) &&
+        Objects.equals(this.variablePropertiesDefined, taskDispatcherDefinitionBasic.variablePropertiesDefined) &&
         Objects.equals(this.version, taskDispatcherDefinitionBasic.version);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(description, icon, name, outputDefined, resources, title, version);
+    return Objects.hash(description, icon, name, outputDefined, resources, title, variablePropertiesDefined, version);
   }
 
   @Override
@@ -226,6 +249,7 @@ public class TaskDispatcherDefinitionBasicModel {
     sb.append("    outputDefined: ").append(toIndentedString(outputDefined)).append("\n");
     sb.append("    resources: ").append(toIndentedString(resources)).append("\n");
     sb.append("    title: ").append(toIndentedString(title)).append("\n");
+    sb.append("    variablePropertiesDefined: ").append(toIndentedString(variablePropertiesDefined)).append("\n");
     sb.append("    version: ").append(toIndentedString(version)).append("\n");
     sb.append("}");
     return sb.toString();
