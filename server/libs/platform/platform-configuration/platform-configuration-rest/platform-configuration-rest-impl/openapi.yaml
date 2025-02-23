@@ -1882,6 +1882,9 @@ components:
         title:
           description: "The title"
           type: "string"
+        variablePropertiesDefined:
+          description: "Does task dispatcher define dynamic variable properties."
+          type: "boolean"
         version:
           description: "The version of a task dispatcher."
           type: "integer"
