@@ -43,7 +43,9 @@ public class ApprovalController {
         this.jobFacade = jobFacade;
     }
 
-    @RequestMapping(method = RequestMethod.POST, value = "/approvals/{id}")
+    @RequestMapping(method = {
+        RequestMethod.GET, RequestMethod.POST
+    }, value = "/approvals/{id}")
     public ResponseEntity<Void> approve(@PathVariable String id) {
         ApprovalId approvalId = ApprovalId.parse(id);
 
