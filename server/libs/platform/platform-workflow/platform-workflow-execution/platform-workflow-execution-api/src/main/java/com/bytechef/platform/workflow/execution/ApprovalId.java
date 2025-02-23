@@ -20,6 +20,7 @@ import com.bytechef.commons.util.EncodingUtils;
 import com.bytechef.tenant.TenantContext;
 import java.io.Serializable;
 import java.util.Objects;
+import java.util.UUID;
 
 /**
  * @author Ivica Cardic
@@ -29,15 +30,20 @@ public class ApprovalId implements Serializable {
     private final boolean approved;
     private final long jobId;
     private final String tenantId;
+    private final String uuid;
 
-    private ApprovalId(String tenantId, long jobId, boolean approved) {
+    private ApprovalId(String tenantId, long jobId, String uuid, boolean approved) {
         this.approved = approved;
         this.jobId = jobId;
         this.tenantId = tenantId;
+
+        this.uuid = uuid;
     }
 
     public static ApprovalId of(long jobId, boolean approved) {
-        return new ApprovalId(TenantContext.getCurrentTenantId(), jobId, approved);
+        UUID uuid = UUID.randomUUID();
+
+        return new ApprovalId(TenantContext.getCurrentTenantId(), jobId, uuid.toString(), approved);
     }
 
     public static ApprovalId parse(String id) {
@@ -45,7 +51,7 @@ public class ApprovalId implements Serializable {
 
         String[] items = id.split(":");
 
-        return new ApprovalId(items[0], Long.parseLong(items[1]), Boolean.parseBoolean(items[2]));
+        return new ApprovalId(items[0], Long.parseLong(items[1]), items[2], Boolean.parseBoolean(items[3]));
     }
 
     public long getJobId() {
@@ -54,6 +60,10 @@ public class ApprovalId implements Serializable {
 
     public String getTenantId() {
         return Objects.requireNonNull(tenantId);
+    }
+
+    public String getUuid() {
+        return uuid;
     }
 
     public boolean isApproved() {
@@ -66,6 +76,8 @@ public class ApprovalId implements Serializable {
             tenantId +
                 ":" +
                 jobId +
+                ":" +
+                uuid +
                 ":" +
                 approved);
     }

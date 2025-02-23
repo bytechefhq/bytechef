@@ -32,6 +32,7 @@ import com.bytechef.atlas.execution.service.TaskExecutionService;
 import com.bytechef.atlas.file.storage.TaskFileStorage;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.Instant;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -47,7 +48,9 @@ import org.springframework.transaction.annotation.Transactional;
  */
 public class JobFacadeImpl implements JobFacade {
 
-    private static final Logger logger = LoggerFactory.getLogger(JobFacadeImpl.class);
+    private static final Logger log = LoggerFactory.getLogger(JobFacadeImpl.class);
+
+    private static final String APPROVALS = "approvals";
 
     private final ApplicationEventPublisher eventPublisher;
     private final ContextService contextService;
@@ -79,7 +82,7 @@ public class JobFacadeImpl implements JobFacade {
 
         long jobId = Validate.notNull(job.getId(), "id");
 
-        logger.debug("Job id={}, label='{}' created", jobId, job.getLabel());
+        log.debug("Job id={}, label='{}' created", jobId, job.getLabel());
 
         contextService.push(
             jobId, Context.Classname.JOB,
@@ -100,7 +103,25 @@ public class JobFacadeImpl implements JobFacade {
     }
 
     @Override
-    public void resumeApproval(long jobId, boolean approved) {
+    public void resumeApproval(long jobId, String uuid, boolean approved) {
+        Map<String, Object> jobContext = new HashMap<>(
+            taskFileStorage.readContextValue(contextService.peek(jobId, Context.Classname.JOB)));
+
+        @SuppressWarnings("unchecked")
+        Map<String, Boolean> approvalMap = new HashMap<>(
+            (Map<String, Boolean>) jobContext.computeIfAbsent(APPROVALS, k -> new HashMap<>()));
+
+        if (approvalMap.containsKey(uuid)) {
+            throw new IllegalArgumentException("Approval already processed");
+        }
+
+        approvalMap.put(uuid, approved);
+
+        jobContext.put(APPROVALS, approvalMap);
+
+        contextService.push(
+            jobId, Context.Classname.JOB, taskFileStorage.storeContextValue(jobId, Context.Classname.JOB, jobContext));
+
         jobService.resumeToStatusStarted(jobId);
 
         List<TaskExecution> taskExecutions = taskExecutionService.getJobTaskExecutions(jobId);

@@ -27,7 +27,7 @@ public interface JobFacade {
 
     void deleteJob(long id);
 
-    void resumeApproval(long jobId, boolean approved);
+    void resumeApproval(long jobId, String uuid, boolean approved);
 
     void resumeJob(long id);
 

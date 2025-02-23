@@ -44,7 +44,7 @@ public class RemoteJobFacadeClient implements JobFacade {
     }
 
     @Override
-    public void resumeApproval(long jobId, boolean approved) {
+    public void resumeApproval(long jobId, String uuid, boolean approved) {
         throw new UnsupportedOperationException();
     }
 
