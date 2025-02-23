@@ -128,12 +128,11 @@ public class SchemaUtils {
     }
 
     public static OutputResponse toOutput(
-        String name, Object sampleOutput, OutputFactoryFunction outputFactoryFunction,
-        SchemaPropertyFactory propertyFactoryFunction) {
+        Object value, OutputFactoryFunction outputFactoryFunction, SchemaPropertyFactory propertyFactoryFunction) {
 
         return toOutput(
             new BaseOutputDefinition.OutputResponse((BaseProperty.BaseValueProperty<?>) getOutputSchema(
-                name, sampleOutput, propertyFactoryFunction), sampleOutput),
+                value, propertyFactoryFunction), value),
             outputFactoryFunction, propertyFactoryFunction);
     }
 

@@ -204,7 +204,7 @@ public class WorkflowNodeOutputFacadeImpl implements WorkflowNodeOutputFacade {
                         Object item = items.getFirst();
 
                         outputResponse = SchemaUtils.toOutput(
-                            "item", item,
+                            Map.of("item", item, "index", 0),
                             (property, sampleOutput) -> new OutputResponse(
                                 Property.toProperty(
                                     (com.bytechef.platform.workflow.task.dispatcher.definition.Property) property),
