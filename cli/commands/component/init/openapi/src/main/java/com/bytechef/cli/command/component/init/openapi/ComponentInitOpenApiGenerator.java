@@ -381,11 +381,14 @@ public class ComponentInitOpenApiGenerator {
         String simpleClassName = getComponentHandlerClassName(componentName);
 
         javacOpts.add(sourcePath.getParent() + "/Abstract" + simpleClassName + ".java");
-        javacOpts
-            .add(sourcePath.getParent() + "/utils/" + "Abstract" + getComponentClassName(componentName) + "Utils.java");
         javacOpts.add(sourcePath.getParent() + "/" + simpleClassName + ".java");
         javacOpts.add(
             sourcePath.getParent() + "/connection/" + getComponentClassName(componentName) + "Connection.java");
+
+        if (!dynamicOptionsMap.isEmpty()) {
+            javacOpts.add(
+                sourcePath.getParent() + "/utils/" + "Abstract" + getComponentClassName(componentName) + "Utils.java");
+        }
 
         javaCompiler.run(null, null, null, javacOpts.toArray(new String[0]));
 
