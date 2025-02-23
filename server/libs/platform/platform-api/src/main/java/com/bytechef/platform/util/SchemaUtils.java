@@ -21,6 +21,7 @@ import com.bytechef.commons.util.JsonUtils;
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.definition.BaseControlType;
 import com.bytechef.definition.BaseFileEntry;
+import com.bytechef.definition.BaseOutputDefinition;
 import com.bytechef.definition.BaseProperty;
 import com.bytechef.definition.BaseProperty.BaseArrayProperty;
 import com.bytechef.definition.BaseProperty.BaseBooleanProperty;
@@ -45,7 +46,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -56,49 +56,43 @@ public class SchemaUtils {
 
     private static final Logger logger = LoggerFactory.getLogger(SchemaUtils.class);
 
-    public static BaseProperty getOutputSchema(
-        Object value, SchemaPropertyFactory propertyFactoryFunction) {
-
-        return getOutputSchema(null, value, propertyFactoryFunction);
+    public static BaseProperty getOutputSchema(Object value, SchemaPropertyFactory schemaPropertyFactory) {
+        return getOutputSchema(null, value, schemaPropertyFactory);
     }
 
-    public static BaseProperty getOutputSchema(
-        String name, Object value, SchemaPropertyFactory propertyFactory) {
-
-        Validate.notNull(propertyFactory, "propertyFactory must not be null");
-
+    public static BaseProperty getOutputSchema(String name, Object value, SchemaPropertyFactory schemaPropertyFactory) {
         BaseProperty outputProperty;
 
         if (value == null) {
-            outputProperty = propertyFactory.create(name, null, BaseNullProperty.class);
+            outputProperty = schemaPropertyFactory.create(name, null, BaseNullProperty.class);
         } else {
             Class<?> valueClass = value.getClass();
 
             if (value instanceof List<?> || valueClass.isArray()) {
-                outputProperty = propertyFactory.create(name, value, BaseArrayProperty.class);
+                outputProperty = schemaPropertyFactory.create(name, value, BaseArrayProperty.class);
             } else if (value instanceof Boolean) {
-                outputProperty = propertyFactory.create(name, value, BaseBooleanProperty.class);
+                outputProperty = schemaPropertyFactory.create(name, value, BaseBooleanProperty.class);
             } else if (value instanceof Date || value instanceof LocalDate) {
-                outputProperty = propertyFactory.create(name, value, BaseDateProperty.class);
+                outputProperty = schemaPropertyFactory.create(name, value, BaseDateProperty.class);
             } else if (value instanceof LocalDateTime) {
-                outputProperty = propertyFactory.create(name, value, BaseDateTimeProperty.class);
+                outputProperty = schemaPropertyFactory.create(name, value, BaseDateTimeProperty.class);
             } else if (value instanceof BaseFileEntry) {
-                outputProperty = propertyFactory.create(name, value, BaseFileEntryProperty.class);
+                outputProperty = schemaPropertyFactory.create(name, value, BaseFileEntryProperty.class);
             } else if (value instanceof Integer) {
-                outputProperty = propertyFactory.create(name, value, BaseIntegerProperty.class);
+                outputProperty = schemaPropertyFactory.create(name, value, BaseIntegerProperty.class);
             } else if (value instanceof Number) {
-                outputProperty = propertyFactory.create(name, value, BaseNumberProperty.class);
+                outputProperty = schemaPropertyFactory.create(name, value, BaseNumberProperty.class);
             } else if (value instanceof Map<?, ?>) {
-                outputProperty = propertyFactory.create(name, value, BaseObjectProperty.class);
+                outputProperty = schemaPropertyFactory.create(name, value, BaseObjectProperty.class);
             } else if (value instanceof String) {
-                outputProperty = propertyFactory.create(name, value, BaseStringProperty.class);
+                outputProperty = schemaPropertyFactory.create(name, value, BaseStringProperty.class);
             } else if (value instanceof LocalTime) {
-                outputProperty = propertyFactory.create(name, value, BaseTimeProperty.class);
+                outputProperty = schemaPropertyFactory.create(name, value, BaseTimeProperty.class);
             } else {
                 if (ConvertUtils.canConvert(value, Map.class)) {
-                    outputProperty = propertyFactory.create(name, value, BaseObjectProperty.class);
+                    outputProperty = schemaPropertyFactory.create(name, value, BaseObjectProperty.class);
                 } else {
-                    outputProperty = propertyFactory.create(name, value, BaseProperty.class);
+                    outputProperty = schemaPropertyFactory.create(name, value, BaseProperty.class);
                 }
             }
         }
@@ -108,8 +102,7 @@ public class SchemaUtils {
 
     public static OutputResponse toOutput(
         com.bytechef.definition.BaseOutputDefinition.OutputResponse outputResponse,
-        OutputFactoryFunction outputFactoryFunction,
-        SchemaPropertyFactory propertyFactoryFunction) {
+        OutputFactoryFunction outputFactoryFunction, SchemaPropertyFactory propertyFactoryFunction) {
 
         Object sampleOutput = outputResponse.sampleOutput();
 
@@ -132,6 +125,16 @@ public class SchemaUtils {
         }
 
         return outputFactoryFunction.apply(outputSchema, sampleOutput);
+    }
+
+    public static OutputResponse toOutput(
+        String name, Object sampleOutput, OutputFactoryFunction outputFactoryFunction,
+        SchemaPropertyFactory propertyFactoryFunction) {
+
+        return toOutput(
+            new BaseOutputDefinition.OutputResponse((BaseProperty.BaseValueProperty<?>) SchemaUtils
+                .getOutputSchema(name, sampleOutput, propertyFactoryFunction), sampleOutput),
+            outputFactoryFunction, propertyFactoryFunction);
     }
 
     @SuppressFBWarnings("DLS")

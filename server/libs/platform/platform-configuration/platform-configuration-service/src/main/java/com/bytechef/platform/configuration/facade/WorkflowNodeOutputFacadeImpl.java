@@ -37,8 +37,9 @@ import com.bytechef.platform.configuration.service.WorkflowTestConfigurationServ
 import com.bytechef.platform.definition.WorkflowNodeType;
 import com.bytechef.platform.domain.BaseProperty;
 import com.bytechef.platform.domain.OutputResponse;
-import com.bytechef.platform.workflow.task.dispatcher.definition.TaskDispatcherDsl;
-import com.bytechef.platform.workflow.task.dispatcher.domain.ObjectProperty;
+import com.bytechef.platform.util.SchemaUtils;
+import com.bytechef.platform.workflow.task.dispatcher.definition.PropertyFactory;
+import com.bytechef.platform.workflow.task.dispatcher.domain.Property;
 import com.bytechef.platform.workflow.task.dispatcher.domain.TaskDispatcherDefinition;
 import com.bytechef.platform.workflow.task.dispatcher.service.TaskDispatcherDefinitionService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -195,7 +196,21 @@ public class WorkflowNodeOutputFacadeImpl implements WorkflowNodeOutputFacade {
 
             if (workflowNodeType.componentOperationName() == null) {
                 if (Objects.equals(workflowNodeType.componentName(), "loop")) {
-                    outputResponse = new OutputResponse(new ObjectProperty(TaskDispatcherDsl.object("item")));
+                    Map<String, ?> parameters = workflowTask.evaluateParameters(outputs);
+
+                    List<Object> items = MapUtils.getList(parameters, "items", Object.class, List.of());
+
+                    if (!items.isEmpty()) {
+                        Object item = items.getFirst();
+
+                        outputResponse = SchemaUtils.toOutput(
+                            "item", item,
+                            (property, sampleOutput) -> new OutputResponse(
+                                Property.toProperty(
+                                    (com.bytechef.platform.workflow.task.dispatcher.definition.Property) property),
+                                sampleOutput),
+                            PropertyFactory.PROPERTY_FACTORY);
+                    }
                 } else {
                     outputResponse = taskDispatcherDefinitionService.executeOutput(
                         workflowNodeType.componentName(), workflowNodeType.componentVersion(), inputParameters);
