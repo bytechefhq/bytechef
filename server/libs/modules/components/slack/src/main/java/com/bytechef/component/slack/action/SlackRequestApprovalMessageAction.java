@@ -67,16 +67,22 @@ public class SlackRequestApprovalMessageAction {
                 Http.Body.of(
                     CHANNEL, inputParameters.getRequiredString(CHANNEL),
                     TEXT,
-                    inputParameters.getRequiredString(TEXT)
-                        + "\n\n Approve: ${approvalLink}\n\n Disapprove: ${disapprovalLink}",
-                    "blocks", List.of(
-                        Map.of("type", "section", TEXT,
+                    "%s%n%n Approve: ${approvalLink}%n%n Disapprove: ${disapprovalLink}".formatted(
+                        inputParameters.getRequiredString(TEXT)),
+                    "blocks",
+                    List.of(
+                        Map.of(
+                            "type", "section", TEXT,
                             Map.of("type", "mrkdwn", TEXT, inputParameters.getRequiredString(TEXT))),
-                        Map.of("type", "actions", "block_id", "actions", "elements", List.of(
-                            Map.of("type", "button", "text", Map.of("type", "plain_text", "text", "Approve"), "style",
-                                "primary", "url", approval.approvalLink()),
-                            Map.of("type", "button", "text", Map.of("type", "plain_text", "text", "Disapprove"),
-                                "style", "danger", "url", approval.disapprovalLink()))))))
+                        Map.of(
+                            "type", "actions", "block_id", "actions", "elements",
+                            List.of(
+                                Map.of(
+                                    "type", "button", "text", Map.of("type", "plain_text", "text", "Approve"),
+                                    "style", "primary", "url", links.approvalLink()),
+                                Map.of(
+                                    "type", "button", "text", Map.of("type", "plain_text", "text", "Disapprove"),
+                                    "style", "danger", "url", links.disapprovalLink()))))))
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});
