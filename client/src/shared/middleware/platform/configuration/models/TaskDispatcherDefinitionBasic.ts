@@ -64,6 +64,12 @@ export interface TaskDispatcherDefinitionBasic {
      */
     title?: string;
     /**
+     * Does task dispatcher define dynamic variable properties.
+     * @type {boolean}
+     * @memberof TaskDispatcherDefinitionBasic
+     */
+    variablePropertiesDefined?: boolean;
+    /**
      * The version of a task dispatcher.
      * @type {number}
      * @memberof TaskDispatcherDefinitionBasic
@@ -97,6 +103,7 @@ export function TaskDispatcherDefinitionBasicFromJSONTyped(json: any, ignoreDisc
         'outputDefined': json['outputDefined'],
         'resources': json['resources'] == null ? undefined : ResourcesFromJSON(json['resources']),
         'title': json['title'] == null ? undefined : json['title'],
+        'variablePropertiesDefined': json['variablePropertiesDefined'] == null ? undefined : json['variablePropertiesDefined'],
         'version': json['version'],
     };
 }
@@ -118,6 +125,7 @@ export function TaskDispatcherDefinitionBasicToJSONTyped(value?: TaskDispatcherD
         'outputDefined': value['outputDefined'],
         'resources': ResourcesToJSON(value['resources']),
         'title': value['title'],
+        'variablePropertiesDefined': value['variablePropertiesDefined'],
         'version': value['version'],
     };
 }
