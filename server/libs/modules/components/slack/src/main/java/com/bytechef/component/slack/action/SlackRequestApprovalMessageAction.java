@@ -59,7 +59,7 @@ public class SlackRequestApprovalMessageAction {
     protected static Object perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) {
 
-        Approval.ApprovalLinks approval = actionContext.approval(Approval::generateLinks);
+        Approval.Links links = actionContext.approval(Approval::generateLinks);
 
         return actionContext
             .http(http -> http.post("/chat.postMessage"))
