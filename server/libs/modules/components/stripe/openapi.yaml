@@ -104,6 +104,7 @@ paths:
                   type: "string"
                   title: "Customer ID"
                   description: "ID of the customer who will be billed."
+                  x-dynamic-options: true
                 currency:
                   type: "string"
                   description: "Currency used for invoice."

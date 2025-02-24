@@ -22,27 +22,17 @@ import static com.bytechef.component.definition.ComponentDsl.authorization;
 import static com.bytechef.component.definition.ComponentDsl.string;
 
 import com.bytechef.component.OpenApiComponentHandler;
-import com.bytechef.component.definition.ActionDefinition;
 import com.bytechef.component.definition.Authorization.ApplyResponse;
 import com.bytechef.component.definition.Authorization.AuthorizationType;
 import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDsl.ModifiableComponentDefinition;
 import com.bytechef.component.definition.ComponentDsl.ModifiableConnectionDefinition;
-import com.bytechef.component.definition.ComponentDsl.ModifiableObjectProperty;
-import com.bytechef.component.definition.ComponentDsl.ModifiableProperty;
-import com.bytechef.component.definition.ComponentDsl.ModifiableStringProperty;
 import com.bytechef.component.definition.ComponentDsl.ModifiableTriggerDefinition;
-import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
-import com.bytechef.component.definition.Property.ValueProperty;
 import com.bytechef.component.stripe.trigger.StripeNewCustomerTrigger;
 import com.bytechef.component.stripe.trigger.StripeNewInvoiceTrigger;
-import com.bytechef.component.stripe.util.StripeUtils;
-import com.bytechef.definition.BaseProperty;
 import com.google.auto.service.AutoService;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
 
 /**
  * @author Monika Kušter
@@ -82,24 +72,4 @@ public class StripeComponentHandler extends AbstractStripeComponentHandler {
                                 "Content-Type", List.of("application/x-www-form-urlencoded"),
                                 AUTHORIZATION, List.of("Bearer " + connectionParameters.getRequiredString(TOKEN))))));
     }
-
-    @Override
-    public ModifiableProperty<?> modifyProperty(
-        ActionDefinition actionDefinition, ModifiableProperty<?> modifiableProperty) {
-
-        if (Objects.equals(modifiableProperty.getName(), "__item")) {
-            Optional<List<? extends ValueProperty<?>>> propertiesOptional =
-                ((ModifiableObjectProperty) modifiableProperty).getProperties();
-
-            for (BaseProperty baseProperty : propertiesOptional.get()) {
-                if (Objects.equals(baseProperty.getName(), "customer")) {
-                    ((ModifiableStringProperty) baseProperty)
-                        .options((ActionOptionsFunction<String>) StripeUtils::getCustomerOptions);
-                }
-            }
-        }
-
-        return modifiableProperty;
-    }
-
 }

@@ -25,7 +25,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TriggerContext;
@@ -43,7 +43,7 @@ import org.mockito.ArgumentCaptor;
 class StripeUtilsTest {
 
     private final ArgumentCaptor<Http.Body> bodyArgumentCaptor = ArgumentCaptor.forClass(Http.Body.class);
-    private final ActionContext mockedActionContext = mock(ActionContext.class);
+    private final Context mockedContext = mock(Context.class);
     private final Http.Executor mockedExecutor = mock(Http.Executor.class);
     private final Object mockedObject = mock(Object.class);
     private final Parameters mockedParameters = mock(Parameters.class);
@@ -53,7 +53,7 @@ class StripeUtilsTest {
 
     @BeforeEach()
     void beforeEach() {
-        when(mockedActionContext.http(any()))
+        when(mockedContext.http(any()))
             .thenReturn(mockedExecutor);
         when(mockedTriggerContext.http(any()))
             .thenReturn(mockedExecutor);
@@ -71,7 +71,7 @@ class StripeUtilsTest {
             .thenReturn(Map.of("data", List.of(Map.of("name", "some name", ID, "abc"))));
 
         assertEquals(List.of(option("some name", "abc")),
-            StripeUtils.getCustomerOptions(mockedParameters, mockedParameters, Map.of(), "", mockedActionContext));
+            StripeUtils.getCustomerOptions(mockedParameters, mockedParameters, Map.of(), "", mockedContext));
     }
 
     @Test

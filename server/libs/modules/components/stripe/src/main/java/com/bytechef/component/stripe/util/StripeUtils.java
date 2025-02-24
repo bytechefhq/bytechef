@@ -20,7 +20,7 @@ import static com.bytechef.component.definition.ComponentDsl.option;
 import static com.bytechef.component.definition.Context.Http.responseType;
 import static com.bytechef.component.stripe.constant.StripeConstants.ID;
 
-import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Context.Http.ResponseType;
 import com.bytechef.component.definition.Option;
@@ -36,13 +36,16 @@ import java.util.Map;
 /**
  * @author Monika Kušter
  */
-public class StripeUtils {
+public class StripeUtils extends AbstractStripeUtils {
+
+    private StripeUtils() {
+    }
 
     public static List<Option<String>> getCustomerOptions(
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
-        String searchText, ActionContext actionContext) {
+        String searchText, Context context) {
 
-        Map<String, Object> body = actionContext.http(
+        Map<String, Object> body = context.http(
             http -> http.get("/customers"))
             .configuration(responseType(ResponseType.JSON))
             .execute()
