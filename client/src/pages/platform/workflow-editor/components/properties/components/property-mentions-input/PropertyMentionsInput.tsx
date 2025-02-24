@@ -26,7 +26,7 @@ interface PropertyMentionsInputProps {
     handleInputTypeSwitchButtonClick?: () => void;
     label?: string;
     leadingIcon?: ReactNode;
-    path: string;
+    path?: string;
     placeholder?: string;
     required?: boolean;
     showInputTypeSwitchButton?: boolean;
