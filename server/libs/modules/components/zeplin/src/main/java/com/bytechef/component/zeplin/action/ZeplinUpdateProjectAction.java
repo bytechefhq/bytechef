@@ -18,7 +18,6 @@ package com.bytechef.component.zeplin.action;
 
 import static com.bytechef.component.OpenApiComponentHandler.PropertyType;
 import static com.bytechef.component.definition.ComponentDsl.action;
-import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.Context.Http.BodyContentType;
 
@@ -47,17 +46,18 @@ public class ZeplinUpdateProjectAction {
             .metadata(
                 Map.of(
                     "type", PropertyType.PATH)),
-            object("__item").properties(string("name").label("Name")
+            string("name").metadata(
+                Map.of(
+                    "type", PropertyType.BODY))
+                .label("Name")
                 .description("New name for the project.")
                 .required(true),
-                string("description").label("Description")
-                    .description("New description for the project.")
-                    .required(false))
-                .label("Project")
-                .required(true)
-                .metadata(
-                    Map.of(
-                        "type", PropertyType.BODY)));
+            string("description").metadata(
+                Map.of(
+                    "type", PropertyType.BODY))
+                .label("Description")
+                .description("New description for the project.")
+                .required(false));
 
     private ZeplinUpdateProjectAction() {
     }

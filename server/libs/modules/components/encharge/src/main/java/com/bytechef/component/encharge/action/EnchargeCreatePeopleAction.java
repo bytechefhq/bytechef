@@ -62,11 +62,11 @@ public class EnchargeCreatePeopleAction {
                 .description("The person's phone number")
                 .required(false)))
             .placeholder("Add to Items")
-            .label("People")
-            .required(true)
             .metadata(
                 Map.of(
-                    "type", PropertyType.BODY)))
+                    "type", PropertyType.BODY))
+            .label("People")
+            .required(true))
         .output(outputSchema(object()
             .properties(object("body")
                 .properties(array("users")

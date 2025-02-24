@@ -42,7 +42,7 @@ public class AsanaCreateProjectAction {
                 "path", "/projects", "bodyContentType", BodyContentType.JSON, "mimeType", "application/json"
 
             ))
-        .properties(object("__item").properties(object("data").properties(string("workspace").label("Workspace")
+        .properties(object("data").properties(string("workspace").label("Workspace")
             .description("The workspace to create the project in.")
             .required(true),
             string("name").label("Name")
@@ -54,12 +54,11 @@ public class AsanaCreateProjectAction {
             string("team").label("Team")
                 .description("The team that this project is shared with.")
                 .required(true))
-            .label("Data")
-            .required(false))
-            .label("Project")
             .metadata(
                 Map.of(
-                    "type", PropertyType.BODY)))
+                    "type", PropertyType.BODY))
+            .label("Data")
+            .required(false))
         .output(outputSchema(object()
             .properties(object("data")
                 .properties(string("gid").required(false), string("name").required(false),

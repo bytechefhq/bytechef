@@ -49,16 +49,18 @@ public class ClickupCreateTaskAction {
             .metadata(
                 Map.of(
                     "type", PropertyType.PATH)),
-            object("__item").properties(string("name").label("Name")
+            string("name").metadata(
+                Map.of(
+                    "type", PropertyType.BODY))
+                .label("Name")
                 .description("The name of the task.")
                 .required(true),
-                string("description").label("Description")
-                    .description("The description of task.")
-                    .required(false))
-                .label("Task")
-                .metadata(
-                    Map.of(
-                        "type", PropertyType.BODY)))
+            string("description").metadata(
+                Map.of(
+                    "type", PropertyType.BODY))
+                .label("Description")
+                .description("The description of task.")
+                .required(false))
         .output(outputSchema(object()
             .properties(object("body")
                 .properties(string("id").required(false), string("name").required(false),

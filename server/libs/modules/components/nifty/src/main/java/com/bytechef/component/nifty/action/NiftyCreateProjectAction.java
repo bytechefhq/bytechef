@@ -42,20 +42,24 @@ public class NiftyCreateProjectAction {
                 "path", "/projects", "bodyContentType", BodyContentType.JSON, "mimeType", "application/json"
 
             ))
-        .properties(object("__item").properties(string("name").label("Name")
+        .properties(string("name").metadata(
+            Map.of(
+                "type", PropertyType.BODY))
+            .label("Name")
             .description("Name of the project.")
             .required(true),
-            string("description").label("Description")
+            string("description").metadata(
+                Map.of(
+                    "type", PropertyType.BODY))
+                .label("Description")
                 .description("Description of the project's purpose, goals, or any other relevent information.")
                 .required(false),
-            string("template_id").label("Template ID")
+            string("template_id").metadata(
+                Map.of(
+                    "type", PropertyType.BODY))
+                .label("Template ID")
                 .description("ID of template that can be used to pre-configure the project.")
                 .required(false))
-            .label("Project")
-            .required(true)
-            .metadata(
-                Map.of(
-                    "type", PropertyType.BODY)))
         .output(outputSchema(object()
             .properties(object("body")
                 .properties(string("id").required(false), string("name").required(false),

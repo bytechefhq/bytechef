@@ -44,24 +44,32 @@ public class TodoistCreateTaskAction {
                 "path", "/tasks", "bodyContentType", BodyContentType.JSON, "mimeType", "application/json"
 
             ))
-        .properties(object("__item").properties(string("content").label("Content")
+        .properties(string("content").metadata(
+            Map.of(
+                "type", PropertyType.BODY))
+            .label("Content")
             .description("Task content. It may contain some markdown-formatted text and hyperlinks.")
             .required(true),
-            string("description").label("Description")
+            string("description").metadata(
+                Map.of(
+                    "type", PropertyType.BODY))
+                .label("Description")
                 .description(
                     "A description for the task. This value may contain some markdown-formatted text and hyperlinks.")
                 .required(false),
-            string("project_id").label("Project ID")
+            string("project_id").metadata(
+                Map.of(
+                    "type", PropertyType.BODY))
+                .label("Project ID")
                 .description("Task project ID. If not set, task is put to user's Inbox.")
                 .required(false),
-            integer("priority").label("Priority")
+            integer("priority").metadata(
+                Map.of(
+                    "type", PropertyType.BODY))
+                .label("Priority")
                 .description("Task priority from 1 (normal) to 4 (urgent).")
                 .options(option("1", 1), option("2", 2), option("3", 3), option("4", 4))
                 .required(false))
-            .label("Contact")
-            .metadata(
-                Map.of(
-                    "type", PropertyType.BODY)))
         .output(outputSchema(object()
             .properties(object("body")
                 .properties(string("id").required(false), string("project_id").required(false),

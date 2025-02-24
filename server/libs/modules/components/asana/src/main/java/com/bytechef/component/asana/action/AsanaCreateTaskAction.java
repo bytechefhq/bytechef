@@ -44,7 +44,7 @@ public class AsanaCreateTaskAction {
                 "path", "/tasks", "bodyContentType", BodyContentType.JSON, "mimeType", "application/json"
 
             ))
-        .properties(object("__item").properties(object("data").properties(string("workspace").label("Workspace")
+        .properties(object("data").properties(string("workspace").label("Workspace")
             .description("The workspace to create the task in.")
             .required(true),
             string("project").label("Project")
@@ -67,12 +67,11 @@ public class AsanaCreateTaskAction {
             string("assignee").label("Assignee")
                 .description("User to assign the task to.")
                 .required(false))
-            .label("Data")
-            .required(false))
-            .label("Task")
             .metadata(
                 Map.of(
-                    "type", PropertyType.BODY)))
+                    "type", PropertyType.BODY))
+            .label("Data")
+            .required(false))
         .output(
             outputSchema(
                 object()

@@ -50,13 +50,12 @@ public class ClickupCreateFolderAction {
             .metadata(
                 Map.of(
                     "type", PropertyType.PATH)),
-            object("__item").properties(string("name").label("Name")
+            string("name").metadata(
+                Map.of(
+                    "type", PropertyType.BODY))
+                .label("Name")
                 .description("The name of the folder.")
                 .required(true))
-                .label("Folder")
-                .metadata(
-                    Map.of(
-                        "type", PropertyType.BODY)))
         .output(outputSchema(object()
             .properties(object("body")
                 .properties(string("id").required(false), string("name").required(false),

@@ -19,7 +19,6 @@ package com.bytechef.component.salesflare.action;
 import static com.bytechef.component.OpenApiComponentHandler.PropertyType;
 import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.array;
-import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.Context.Http.BodyContentType;
 
@@ -41,30 +40,46 @@ public class SalesflareCreateAccountAction {
                 "path", "/accounts", "bodyContentType", BodyContentType.JSON, "mimeType", "application/json"
 
             ))
-        .properties(object("__item").properties(string("name").label("Name")
+        .properties(string("name").metadata(
+            Map.of(
+                "type", PropertyType.BODY))
+            .label("Name")
             .description("Account name")
             .required(true),
-            string("website").label("Website")
+            string("website").metadata(
+                Map.of(
+                    "type", PropertyType.BODY))
+                .label("Website")
                 .description("Account website")
                 .required(false),
-            string("description").label("Description")
+            string("description").metadata(
+                Map.of(
+                    "type", PropertyType.BODY))
+                .label("Description")
                 .description("Account description")
                 .required(false),
             string("email").maxLength(1000)
+                .metadata(
+                    Map.of(
+                        "type", PropertyType.BODY))
                 .label("Email")
                 .required(false),
-            string("phone_number").label("Phone Number")
+            string("phone_number").metadata(
+                Map.of(
+                    "type", PropertyType.BODY))
+                .label("Phone Number")
                 .required(false),
-            array("social_profiles").items(string().description("Social profile URL"))
+            array("social_profiles").items(string().metadata(
+                Map.of(
+                    "type", PropertyType.BODY))
+                .description("Social profile URL"))
                 .placeholder("Add to Social Profiles")
+                .metadata(
+                    Map.of(
+                        "type", PropertyType.BODY))
                 .label("Social Profiles")
                 .description("Social profile URL")
-                .required(false))
-            .label("Account")
-            .required(true)
-            .metadata(
-                Map.of(
-                    "type", PropertyType.BODY)));
+                .required(false));
 
     private SalesflareCreateAccountAction() {
     }

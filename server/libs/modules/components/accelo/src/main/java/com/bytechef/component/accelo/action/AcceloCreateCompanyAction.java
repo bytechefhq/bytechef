@@ -42,22 +42,30 @@ public class AcceloCreateCompanyAction {
                 "path", "/companies", "bodyContentType", BodyContentType.JSON, "mimeType", "application/json"
 
             ))
-        .properties(object("__item").properties(string("name").label("Name")
+        .properties(string("name").metadata(
+            Map.of(
+                "type", PropertyType.BODY))
+            .label("Name")
             .description("The name of the company.")
             .required(true),
-            string("website").label("Website")
+            string("website").metadata(
+                Map.of(
+                    "type", PropertyType.BODY))
+                .label("Website")
                 .description("The company's website.")
                 .required(false),
-            string("phone").label("Phone")
+            string("phone").metadata(
+                Map.of(
+                    "type", PropertyType.BODY))
+                .label("Phone")
                 .description("A contact phone number for the company.")
                 .required(false),
-            string("comments").label("Comments")
+            string("comments").metadata(
+                Map.of(
+                    "type", PropertyType.BODY))
+                .label("Comments")
                 .description("Any comments or notes made against the company.")
                 .required(false))
-            .label("Company")
-            .metadata(
-                Map.of(
-                    "type", PropertyType.BODY)))
         .output(
             outputSchema(object()
                 .properties(object("body")

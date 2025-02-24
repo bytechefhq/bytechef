@@ -50,19 +50,24 @@ public class ReckonCreatePaymentAction {
             .metadata(
                 Map.of(
                     "type", PropertyType.PATH)),
-            object("__item").properties(string("supplier").label("Supplier")
+            string("supplier").metadata(
+                Map.of(
+                    "type", PropertyType.BODY))
+                .label("Supplier")
                 .description("The supplier that is being paid.")
                 .required(true),
-                date("paymentDate").label("Payment Date")
-                    .description("The date of the payment.")
-                    .required(true),
-                number("totalAmount").label("Total Amount")
-                    .description("The total amount of the payment applied.")
-                    .required(true))
-                .label("Payment")
-                .metadata(
-                    Map.of(
-                        "type", PropertyType.BODY)))
+            date("paymentDate").metadata(
+                Map.of(
+                    "type", PropertyType.BODY))
+                .label("Payment Date")
+                .description("The date of the payment.")
+                .required(true),
+            number("totalAmount").metadata(
+                Map.of(
+                    "type", PropertyType.BODY))
+                .label("Total Amount")
+                .description("The total amount of the payment applied.")
+                .required(true))
         .output(outputSchema(object().properties(object("body").properties(string("id").required(false))
             .required(false))
             .metadata(

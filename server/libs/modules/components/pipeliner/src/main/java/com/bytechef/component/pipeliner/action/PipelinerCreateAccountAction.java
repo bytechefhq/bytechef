@@ -43,18 +43,19 @@ public class PipelinerCreateAccountAction {
                 "path", "/entities/Accounts", "bodyContentType", BodyContentType.JSON, "mimeType", "application/json"
 
             ))
-        .properties(object("__item").properties(string("owner_id").label("Owner ID")
+        .properties(string("owner_id").metadata(
+            Map.of(
+                "type", PropertyType.BODY))
+            .label("Owner ID")
             .description(
                 "Id of the user in Pipeliner Application that will become the owner of the newly created account.")
             .required(true),
-            string("name").label("Name")
+            string("name").metadata(
+                Map.of(
+                    "type", PropertyType.BODY))
+                .label("Name")
                 .description("Account name")
                 .required(true))
-            .label("Account")
-            .required(true)
-            .metadata(
-                Map.of(
-                    "type", PropertyType.BODY)))
         .output(outputSchema(object()
             .properties(bool("success").description("True when response succeeded, false on error.")
                 .required(false),

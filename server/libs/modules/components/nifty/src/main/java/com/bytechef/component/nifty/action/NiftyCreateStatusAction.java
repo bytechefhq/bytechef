@@ -43,17 +43,18 @@ public class NiftyCreateStatusAction {
                 "path", "/taskgroups", "bodyContentType", BodyContentType.JSON, "mimeType", "application/json"
 
             ))
-        .properties(object("__item").properties(string("name").label("Name")
+        .properties(string("name").metadata(
+            Map.of(
+                "type", PropertyType.BODY))
+            .label("Name")
             .description("Name of the status.")
             .required(true),
-            string("project_id").label("Project ID")
+            string("project_id").metadata(
+                Map.of(
+                    "type", PropertyType.BODY))
+                .label("Project ID")
                 .description("Project ID that the status belongs to.")
                 .required(true))
-            .label("Status")
-            .required(true)
-            .metadata(
-                Map.of(
-                    "type", PropertyType.BODY)))
         .output(outputSchema(object()
             .properties(object("body")
                 .properties(string("message").required(false),

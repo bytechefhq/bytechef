@@ -43,21 +43,25 @@ public class PipelinerCreateContactAction {
                 "path", "/entities/Contacts", "bodyContentType", BodyContentType.JSON, "mimeType", "application/json"
 
             ))
-        .properties(object("__item").properties(string("owner_id").label("Owner ID")
+        .properties(string("owner_id").metadata(
+            Map.of(
+                "type", PropertyType.BODY))
+            .label("Owner ID")
             .description(
                 "ID of the user in Pipeliner Application that will become the owner of the newly created Contact.")
             .required(true),
-            string("first_name").label("First Name")
+            string("first_name").metadata(
+                Map.of(
+                    "type", PropertyType.BODY))
+                .label("First Name")
                 .description("The firstname of the contact.")
                 .required(false),
-            string("last_name").label("Last Name")
+            string("last_name").metadata(
+                Map.of(
+                    "type", PropertyType.BODY))
+                .label("Last Name")
                 .description("The lastname of the contact.")
                 .required(true))
-            .label("Contact")
-            .required(true)
-            .metadata(
-                Map.of(
-                    "type", PropertyType.BODY)))
         .output(outputSchema(object()
             .properties(bool("success").description("True when response succeeded, false on error.")
                 .required(false),

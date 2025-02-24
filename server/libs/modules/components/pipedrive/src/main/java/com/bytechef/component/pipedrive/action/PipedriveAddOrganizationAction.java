@@ -43,16 +43,18 @@ public class PipedriveAddOrganizationAction {
                 "path", "/organizations", "bodyContentType", BodyContentType.JSON, "mimeType", "application/json"
 
             ))
-        .properties(object("__item").properties(string("name").label("Name")
+        .properties(string("name").metadata(
+            Map.of(
+                "type", PropertyType.BODY))
+            .label("Name")
             .description("The name of the organization.")
             .required(true),
-            integer("owner_id").label("Owner ID")
+            integer("owner_id").metadata(
+                Map.of(
+                    "type", PropertyType.BODY))
+                .label("Owner ID")
                 .description("ID of the user who will be marked as the owner of this organization.")
                 .required(false))
-            .label("Organization")
-            .metadata(
-                Map.of(
-                    "type", PropertyType.BODY)))
         .output(outputSchema(object()
             .properties(object("body")
                 .properties(object("data")

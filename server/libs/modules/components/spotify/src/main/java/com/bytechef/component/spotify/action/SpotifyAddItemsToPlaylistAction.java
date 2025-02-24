@@ -57,13 +57,12 @@ public class SpotifyAddItemsToPlaylistAction {
                 .metadata(
                     Map.of(
                         "type", PropertyType.QUERY)),
-            object("__item").properties(integer("position").label("Position")
+            integer("position").metadata(
+                Map.of(
+                    "type", PropertyType.BODY))
+                .label("Position")
                 .description("Position to insert the items, a zero-based index.")
                 .required(false))
-                .label("Item")
-                .metadata(
-                    Map.of(
-                        "type", PropertyType.BODY)))
         .output(outputSchema(object().properties(object("body").properties(string("snapshot_id").required(false))
             .required(false))
             .metadata(

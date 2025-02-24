@@ -68,11 +68,11 @@ public class SalesflareCreateContactsAction {
                 .description("Social profile URL")
                 .required(false)))
             .placeholder("Add to Items")
-            .label("Contacts")
-            .required(true)
             .metadata(
                 Map.of(
-                    "type", PropertyType.BODY)))
+                    "type", PropertyType.BODY))
+            .label("Contacts")
+            .required(true))
         .output(outputSchema(object().properties(array("body").items(object().properties(integer("id").required(false)))
             .required(false))
             .metadata(

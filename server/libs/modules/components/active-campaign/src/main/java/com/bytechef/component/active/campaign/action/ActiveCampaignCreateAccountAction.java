@@ -42,18 +42,17 @@ public class ActiveCampaignCreateAccountAction {
                 "path", "/accounts", "bodyContentType", BodyContentType.JSON, "mimeType", "application/json"
 
             ))
-        .properties(object("__item").properties(object("account").properties(string("name").label("Name")
+        .properties(object("account").properties(string("name").label("Name")
             .description("Account's name")
             .required(true),
             string("accountUrl").label("Website")
                 .description("Account's website")
                 .required(false))
-            .label("Account")
-            .required(false))
-            .label("Account")
             .metadata(
                 Map.of(
-                    "type", PropertyType.BODY)))
+                    "type", PropertyType.BODY))
+            .label("Account")
+            .required(false))
         .output(outputSchema(object()
             .properties(object("body")
                 .properties(

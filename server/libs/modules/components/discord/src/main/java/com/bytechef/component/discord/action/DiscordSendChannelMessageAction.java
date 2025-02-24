@@ -50,17 +50,19 @@ public class DiscordSendChannelMessageAction {
             .metadata(
                 Map.of(
                     "type", PropertyType.PATH)),
-            object("__item").properties(string("content").label("Message Text")
+            string("content").metadata(
+                Map.of(
+                    "type", PropertyType.BODY))
+                .label("Message Text")
                 .description("Message contents (up to 2000 characters)")
                 .required(true),
-                bool("tts").label("Text to Speech")
-                    .description("True if this is a TTS message")
-                    .defaultValue(false)
-                    .required(false))
-                .label("Message")
-                .metadata(
-                    Map.of(
-                        "type", PropertyType.BODY)))
+            bool("tts").metadata(
+                Map.of(
+                    "type", PropertyType.BODY))
+                .label("Text to Speech")
+                .description("True if this is a TTS message")
+                .defaultValue(false)
+                .required(false))
         .output(outputSchema(object()
             .properties(object("body")
                 .properties(string("id").required(false), string("content").required(false),

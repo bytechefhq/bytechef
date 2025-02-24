@@ -43,16 +43,28 @@ public class StripeCreateCustomerAction {
                 "application/x-www-form-urlencoded"
 
             ))
-        .properties(object("__item").properties(string("email").maxLength(512)
+        .properties(string("email").maxLength(512)
+            .metadata(
+                Map.of(
+                    "type", PropertyType.BODY))
             .label("Email")
             .description("Customer’s email address.")
             .required(false),
-            string("name").label("Name")
+            string("name").metadata(
+                Map.of(
+                    "type", PropertyType.BODY))
+                .label("Name")
                 .description("The customer's full name.")
                 .required(false),
-            string("description").label("Description")
+            string("description").metadata(
+                Map.of(
+                    "type", PropertyType.BODY))
+                .label("Description")
                 .required(false),
-            string("phone").label("Phone")
+            string("phone").metadata(
+                Map.of(
+                    "type", PropertyType.BODY))
+                .label("Phone")
                 .required(false),
             object("address").properties(string("city").label("City")
                 .required(false),
@@ -67,12 +79,11 @@ public class StripeCreateCustomerAction {
                 string("state").label("State")
                     .description("State, country, province, or region.")
                     .required(false))
+                .metadata(
+                    Map.of(
+                        "type", PropertyType.BODY))
                 .label("Address")
                 .required(false))
-            .label("Customer")
-            .metadata(
-                Map.of(
-                    "type", PropertyType.BODY)))
         .output(outputSchema(object()
             .properties(object("body")
                 .properties(string("id").required(false), string("description").required(false),
