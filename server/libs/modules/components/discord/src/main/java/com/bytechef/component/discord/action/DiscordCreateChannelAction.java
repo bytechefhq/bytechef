@@ -27,6 +27,8 @@ import static com.bytechef.component.definition.Context.Http.BodyContentType;
 import static com.bytechef.component.definition.Context.Http.ResponseType;
 
 import com.bytechef.component.definition.ComponentDsl;
+import com.bytechef.component.definition.OptionsDataSource;
+import com.bytechef.component.discord.util.DiscordUtils;
 import java.util.Map;
 
 /**
@@ -47,6 +49,7 @@ public class DiscordCreateChannelAction {
             ))
         .properties(string("guildId").label("Guild ID")
             .required(true)
+            .options((OptionsDataSource.ActionOptionsFunction<String>) DiscordUtils::getGuildIdOptions)
             .metadata(
                 Map.of(
                     "type", PropertyType.PATH)),
