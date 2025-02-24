@@ -22,16 +22,10 @@ import com.bytechef.component.OpenApiComponentHandler;
 import com.bytechef.component.definition.ActionDefinition;
 import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDsl.ModifiableComponentDefinition;
-import com.bytechef.component.definition.ComponentDsl.ModifiableObjectProperty;
 import com.bytechef.component.definition.ComponentDsl.ModifiableProperty;
 import com.bytechef.component.definition.ComponentDsl.ModifiableStringProperty;
-import com.bytechef.component.definition.Property.ValueProperty;
-import com.bytechef.component.todoist.util.TodoistUtils;
-import com.bytechef.definition.BaseProperty;
 import com.google.auto.service.AutoService;
-import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 
 /**
  * @author Monika Kušter
@@ -51,42 +45,29 @@ public class TodoistComponentHandler extends AbstractTodoistComponentHandler {
     public ModifiableProperty<?> modifyProperty(
         ActionDefinition actionDefinition, ModifiableProperty<?> modifiableProperty) {
 
-        if (Objects.equals(modifiableProperty.getName(), "taskId")) {
+        if (Objects.equals(modifiableProperty.getName(), "color")) {
             ((ModifiableStringProperty) modifiableProperty)
-                .options(TodoistUtils.getOptions("/tasks", "content"));
-        } else if (Objects.equals(modifiableProperty.getName(), "__item")) {
-            Optional<List<? extends ValueProperty<?>>> propertiesOptional =
-                ((ModifiableObjectProperty) modifiableProperty).getProperties();
-
-            for (BaseProperty baseProperty : propertiesOptional.get()) {
-                if (Objects.equals(baseProperty.getName(), "project_id")) {
-                    ((ModifiableStringProperty) baseProperty)
-                        .options(TodoistUtils.getOptions("/projects", "name"));
-                } else if (Objects.equals(baseProperty.getName(), "color")) {
-                    ((ModifiableStringProperty) baseProperty)
-                        .options(
-                            option("Berry red", "beryy_red"),
-                            option("Red", "red"),
-                            option("Orange", "orange"),
-                            option("Yellow", "yellow"),
-                            option("Olive green", "olive_green"),
-                            option("Lime green", "lime_green"),
-                            option("Green", "green"),
-                            option("Mint green", "mint_green"),
-                            option("Teal", "teal"),
-                            option("Sky blue", "sky_blue"),
-                            option("Light blue", "light_blue"),
-                            option("Blue", "blue"),
-                            option("Grape", "grape"),
-                            option("Violet", "violet"),
-                            option("Lavender", "lavender"),
-                            option("Magenta", "magenta"),
-                            option("Salmon", "salmon"),
-                            option("Charcoal", "charcoal"),
-                            option("Grey", "grey"),
-                            option("Taupe", "taupe"));
-                }
-            }
+                .options(
+                    option("Berry red", "beryy_red"),
+                    option("Red", "red"),
+                    option("Orange", "orange"),
+                    option("Yellow", "yellow"),
+                    option("Olive green", "olive_green"),
+                    option("Lime green", "lime_green"),
+                    option("Green", "green"),
+                    option("Mint green", "mint_green"),
+                    option("Teal", "teal"),
+                    option("Sky blue", "sky_blue"),
+                    option("Light blue", "light_blue"),
+                    option("Blue", "blue"),
+                    option("Grape", "grape"),
+                    option("Violet", "violet"),
+                    option("Lavender", "lavender"),
+                    option("Magenta", "magenta"),
+                    option("Salmon", "salmon"),
+                    option("Charcoal", "charcoal"),
+                    option("Grey", "grey"),
+                    option("Taupe", "taupe"));
         }
 
         return modifiableProperty;

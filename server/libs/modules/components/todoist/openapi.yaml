@@ -31,6 +31,7 @@ paths:
                   type: "string"
                   description: "Task project ID. If not set, task is put to user's Inbox."
                   title: "Project ID"
+                  x-dynamic-options: true
                 priority:
                   type: "integer"
                   description: "Task priority from 1 (normal) to 4 (urgent)."
@@ -73,6 +74,7 @@ paths:
           schema:
             title: "Task ID"
             type: "string"
+            x-dynamic-options: true
       responses:
         204:
           description: "Successful operation"
