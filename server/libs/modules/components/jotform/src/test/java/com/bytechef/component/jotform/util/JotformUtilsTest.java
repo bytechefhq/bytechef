@@ -22,7 +22,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Parameters;
@@ -36,14 +36,14 @@ import org.junit.jupiter.api.Test;
  */
 class JotformUtilsTest {
 
-    private final ActionContext mockedActionContext = mock(ActionContext.class);
+    private final Context mockedContext = mock(Context.class);
     private final Http.Executor mockedExecutor = mock(Http.Executor.class);
     private final Parameters mockedParameters = mock(Parameters.class);
     private final Http.Response mockedResponse = mock(Http.Response.class);
 
     @Test
     void testGetRootFolderOptions() {
-        when(mockedActionContext.http(any()))
+        when(mockedContext.http(any()))
             .thenReturn(mockedExecutor);
         when(mockedExecutor.configuration(any()))
             .thenReturn(mockedExecutor);
@@ -56,6 +56,6 @@ class JotformUtilsTest {
 
         assertEquals(
             expectedOptions,
-            JotformUtils.getFormOptions(mockedParameters, mockedParameters, Map.of(), "", mockedActionContext));
+            JotformUtils.getFormIdOptions(mockedParameters, mockedParameters, Map.of(), "", mockedContext));
     }
 }
