@@ -20,7 +20,6 @@ import static com.bytechef.component.definition.ComponentDsl.option;
 import static com.bytechef.component.shopify.constant.ShopifyConstants.ID;
 import static com.bytechef.component.shopify.constant.ShopifyConstants.PRODUCT_ID;
 
-import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Option;
@@ -33,14 +32,14 @@ import java.util.Map;
 /**
  * @author Monika Domiter
  */
-public class ShopifyUtils {
+public class ShopifyUtils extends AbstractShopifyUtils {
 
     private ShopifyUtils() {
     }
 
     public static List<Option<Long>> getOrderIdOptions(
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
-        String searchText, ActionContext context) {
+        String searchText, Context context) {
 
         Map<String, List<Map<String, Object>>> body = context
             .http(http -> http.get("/orders.json?status=any"))
@@ -59,7 +58,7 @@ public class ShopifyUtils {
 
     public static List<Option<Long>> getProductIdOptions(
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
-        String searchText, ActionContext context) {
+        String searchText, Context context) {
 
         Map<String, List<Map<String, Object>>> body = context
             .http(http -> http.get("/products.json"))
@@ -78,7 +77,7 @@ public class ShopifyUtils {
 
     public static List<Option<Long>> getVariantIdOptions(
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
-        String searchText, ActionContext context) {
+        String searchText, Context context) {
 
         Map<String, List<Map<String, Object>>> body = context.http(
             http -> http.get(
