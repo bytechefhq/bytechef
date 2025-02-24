@@ -16,7 +16,6 @@
 
 package com.bytechef.component.mailchimp.util;
 
-import static com.bytechef.component.definition.Authorization.ACCESS_TOKEN;
 import static com.bytechef.component.definition.Authorization.AUTHORIZATION;
 import static com.bytechef.component.definition.ComponentDsl.option;
 
@@ -32,7 +31,10 @@ import java.util.Map;
 /**
  * @author Ivica Cardic
  */
-public class MailchimpUtils {
+public class MailchimpUtils extends AbstractMailchimpUtils {
+
+    private MailchimpUtils() {
+    }
 
     public static String getMailChimpServer(String accessToken, Context context) {
         Map<?, ?> response = context.http(http -> http.get("https://login.mailchimp.com/oauth2/metadata")
@@ -49,14 +51,12 @@ public class MailchimpUtils {
         return (String) response.get("dc");
     }
 
-    @SuppressWarnings("unchecked")
-    public static List<Option<String>> getListIdOptions(Parameters connectionParameters, Context context) {
-        String accessToken = connectionParameters.getRequiredString(ACCESS_TOKEN);
-
-        String url = "https://%s.api.mailchimp.com/3.0/lists".formatted(getMailChimpServer(accessToken, context));
+    public static List<Option<String>> getListIdOptions(
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
+        String searchText, Context context) {
 
         Map<String, ?> response = context
-            .http(http -> http.get(url))
+            .http(http -> http.get("/lists"))
             .queryParameters(
                 Map.of(
                     "fields", List.of("lists.id,lists.name,total_items"),
@@ -65,12 +65,14 @@ public class MailchimpUtils {
             .execute()
             .getBody(new TypeReference<>() {});
 
-        context.log(log -> log.debug("Response for url='%s': %s".formatted(url, response)));
-
         List<Option<String>> options = new ArrayList<>();
 
-        for (Map<?, ?> list : (List<Map<?, ?>>) response.get("lists")) {
-            options.add(option((String) list.get("name"), (String) list.get("id")));
+        if (response.get("lists") instanceof List<?> lists) {
+            for (Object list : lists) {
+                if (list instanceof Map<?, ?> map) {
+                    options.add(option((String) map.get("name"), (String) map.get("id")));
+                }
+            }
         }
 
         return options;

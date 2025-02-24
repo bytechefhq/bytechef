@@ -19,19 +19,14 @@ package com.bytechef.component.mailchimp;
 import static com.bytechef.component.definition.Authorization.ACCESS_TOKEN;
 
 import com.bytechef.component.OpenApiComponentHandler;
-import com.bytechef.component.definition.ActionDefinition;
 import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDsl.ModifiableComponentDefinition;
 import com.bytechef.component.definition.ComponentDsl.ModifiableConnectionDefinition;
-import com.bytechef.component.definition.ComponentDsl.ModifiableProperty;
-import com.bytechef.component.definition.ComponentDsl.ModifiableStringProperty;
 import com.bytechef.component.definition.ComponentDsl.ModifiableTriggerDefinition;
-import com.bytechef.component.definition.OptionsDataSource;
 import com.bytechef.component.mailchimp.trigger.MailchimpSubscribeTrigger;
 import com.bytechef.component.mailchimp.util.MailchimpUtils;
 import com.google.auto.service.AutoService;
 import java.util.List;
-import java.util.Objects;
 
 /**
  * @author Ivica Cardic
@@ -53,26 +48,11 @@ public class MailchimpComponentHandler extends AbstractMailchimpComponentHandler
     }
 
     @Override
-    public ModifiableConnectionDefinition
-        modifyConnection(ModifiableConnectionDefinition modifiableConnectionDefinition) {
+    public ModifiableConnectionDefinition modifyConnection(
+        ModifiableConnectionDefinition modifiableConnectionDefinition) {
 
         return modifiableConnectionDefinition
             .baseUri((connectionParameters, context) -> "https://%s.api.mailchimp.com/3.0".formatted(
                 MailchimpUtils.getMailChimpServer(connectionParameters.getRequiredString(ACCESS_TOKEN), context)));
-    }
-
-    @Override
-    public ModifiableProperty<?> modifyProperty(
-        ActionDefinition actionDefinition, ModifiableProperty<?> modifiableProperty) {
-
-        if (Objects.equals(modifiableProperty.getName(), "listId")) {
-            ((ModifiableStringProperty) modifiableProperty)
-                .options(
-                    (OptionsDataSource.ActionOptionsFunction<String>) (
-                        inputParameters, connectionParameters, arrayIndex, searchText,
-                        context) -> MailchimpUtils.getListIdOptions(connectionParameters, context));
-        }
-
-        return modifiableProperty;
     }
 }
