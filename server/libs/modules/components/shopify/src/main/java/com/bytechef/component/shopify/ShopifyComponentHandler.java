@@ -20,31 +20,19 @@ import static com.bytechef.component.definition.Authorization.KEY;
 import static com.bytechef.component.definition.Authorization.VALUE;
 import static com.bytechef.component.definition.ComponentDsl.authorization;
 import static com.bytechef.component.definition.ComponentDsl.string;
-import static com.bytechef.component.shopify.constant.ShopifyConstants.PRODUCT_ID;
 import static com.bytechef.component.shopify.constant.ShopifyConstants.SHOP_NAME;
 
 import com.bytechef.component.OpenApiComponentHandler;
-import com.bytechef.component.definition.ActionDefinition;
 import com.bytechef.component.definition.Authorization.AuthorizationType;
 import com.bytechef.component.definition.ComponentCategory;
-import com.bytechef.component.definition.ComponentDsl.ModifiableArrayProperty;
 import com.bytechef.component.definition.ComponentDsl.ModifiableComponentDefinition;
 import com.bytechef.component.definition.ComponentDsl.ModifiableConnectionDefinition;
-import com.bytechef.component.definition.ComponentDsl.ModifiableIntegerProperty;
-import com.bytechef.component.definition.ComponentDsl.ModifiableObjectProperty;
-import com.bytechef.component.definition.ComponentDsl.ModifiableProperty;
 import com.bytechef.component.definition.ComponentDsl.ModifiableTriggerDefinition;
-import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
-import com.bytechef.component.definition.Property.ValueProperty;
 import com.bytechef.component.shopify.trigger.ShopifyNewCancelledOrderTrigger;
 import com.bytechef.component.shopify.trigger.ShopifyNewOrderTrigger;
 import com.bytechef.component.shopify.trigger.ShopifyNewPaidOrderTrigger;
-import com.bytechef.component.shopify.util.ShopifyUtils;
-import com.bytechef.definition.BaseProperty;
 import com.google.auto.service.AutoService;
 import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
 
 /**
  * @author Monika Domiter
@@ -90,50 +78,5 @@ public class ShopifyComponentHandler extends AbstractShopifyComponentHandler {
                             .required(true)))
             .baseUri((connectionParameters, context) -> "https://" + connectionParameters.getRequiredString(SHOP_NAME)
                 + ".myshopify.com/admin/api/2024-04");
-    }
-
-    @Override
-    public ModifiableProperty<?> modifyProperty(
-        ActionDefinition actionDefinition, ModifiableProperty<?> modifiableProperty) {
-
-        if (Objects.equals(modifiableProperty.getName(), "orderId")) {
-            ((ModifiableIntegerProperty) modifiableProperty)
-                .options((ActionOptionsFunction<Long>) ShopifyUtils::getOrderIdOptions);
-        } else if (Objects.equals(modifiableProperty.getName(), "__item")) {
-            Optional<List<? extends ValueProperty<?>>> propertiesOptional =
-                ((ModifiableObjectProperty) modifiableProperty).getProperties();
-
-            for (BaseProperty baseProperty : propertiesOptional.get()) {
-                if (Objects.equals(baseProperty.getName(), "order")) {
-                    Optional<List<? extends ValueProperty<?>>> propertiesOptional1 =
-                        ((ModifiableObjectProperty) baseProperty).getProperties();
-
-                    for (BaseProperty baseProperty1 : propertiesOptional1.get()) {
-                        if (Objects.equals(baseProperty1.getName(), "line_items")) {
-                            Optional<List<? extends ValueProperty<?>>> items =
-                                ((ModifiableArrayProperty) baseProperty1).getItems();
-
-                            for (BaseProperty baseProperty2 : items.get()) {
-                                Optional<List<? extends ValueProperty<?>>> propertiesOptional2 =
-                                    ((ModifiableObjectProperty) baseProperty2).getProperties();
-
-                                for (BaseProperty baseProperty3 : propertiesOptional2.get()) {
-                                    if (Objects.equals(baseProperty3.getName(), PRODUCT_ID)) {
-                                        ((ModifiableIntegerProperty) baseProperty3)
-                                            .options((ActionOptionsFunction<Long>) ShopifyUtils::getProductIdOptions);
-                                    } else if (Objects.equals(baseProperty3.getName(), "variant_id")) {
-                                        ((ModifiableIntegerProperty) baseProperty3)
-                                            .optionsLookupDependsOn("__item.order.line_items[index]." + PRODUCT_ID)
-                                            .options((ActionOptionsFunction<Long>) ShopifyUtils::getVariantIdOptions);
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-        return modifiableProperty;
     }
 }
