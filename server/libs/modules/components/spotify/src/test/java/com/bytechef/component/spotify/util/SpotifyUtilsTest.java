@@ -68,6 +68,6 @@ class SpotifyUtilsTest {
             .thenReturn(Map.of("items", List.of(Map.of(NAME, "name", ID, "uri"))));
 
         assertEquals(List.of(option("name", "uri")),
-            SpotifyUtils.getPlaylistOptions(parameters, parameters, Map.of(), "", mockedActionContext));
+            SpotifyUtils.getPlaylistIdOptions(parameters, parameters, Map.of(), "", mockedActionContext));
     }
 }
