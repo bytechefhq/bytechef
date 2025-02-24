@@ -29,6 +29,7 @@ paths:
                   format: "uuid"
                   description: "Id of the user in Pipeliner Application that will become the owner of the newly created account."
                   title: "Owner ID"
+                  x-dynamic-options: true
                 name:
                   type: "string"
                   description: "Account name"
@@ -78,6 +79,7 @@ paths:
                   format: "uuid"
                   description: "ID of the user in Pipeliner Application that will become the owner of the newly created Contact."
                   title: "Owner ID"
+                  x-dynamic-options: true
                 first_name:
                   type: "string"
                   description: "The firstname of the contact."
@@ -137,15 +139,18 @@ paths:
                   format: "uuid"
                   description: "Id of the activity type of task."
                   title: "Activity Type ID"
+                  x-dynamic-options: true
                 unit_id:
                   type: "string"
                   format: "uuid"
                   description: "Sales Unit ID"
                   title: "Unit ID"
+                  x-dynamic-options: true
                 owner_id:
                   type: "string"
                   format: "uuid"
                   title: "Owner ID"
+                  x-dynamic-options: true
               required:
                 - "subject"
                 - "activity_type_id"
