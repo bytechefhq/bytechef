@@ -21,6 +21,7 @@ import static com.bytechef.component.spotify.constant.SpotifyConstants.ID;
 import static com.bytechef.component.spotify.constant.SpotifyConstants.NAME;
 
 import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Parameters;
@@ -32,7 +33,7 @@ import java.util.Map;
 /**
  * @author Monika Kušter
  */
-public class SpotifyUtils {
+public class SpotifyUtils extends AbstractSpotifyUtils {
 
     private SpotifyUtils() {
     }
@@ -47,9 +48,9 @@ public class SpotifyUtils {
         return (String) body.get(ID);
     }
 
-    public static List<Option<String>> getPlaylistOptions(
+    public static List<Option<String>> getPlaylistIdOptions(
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
-        String searchText, ActionContext context) {
+        String searchText, Context context) {
 
         Map<String, Object> body = context
             .http(http -> http.get("/me/playlists"))

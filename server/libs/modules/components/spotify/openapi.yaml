@@ -54,6 +54,7 @@ paths:
           schema:
             title: "Playlist ID"
             type: "string"
+            x-dynamic-options: true
         - name: "uris"
           in: "query"
           required: true
