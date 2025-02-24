@@ -14,6 +14,7 @@ import saveWorkflowDefinition from './saveWorkflowDefinition';
 interface HandleConditionClickProps {
     clickedItem: ClickedDefinitionType;
     edge?: boolean;
+    projectId: number;
     queryClient: QueryClient;
     sourceNodeId: string;
     updateWorkflowMutation: UpdateWorkflowMutationType;
@@ -23,6 +24,7 @@ interface HandleConditionClickProps {
 export default async function handleConditionClick({
     clickedItem,
     edge,
+    projectId,
     queryClient,
     sourceNodeId,
     updateWorkflowMutation,
@@ -114,6 +116,7 @@ export default async function handleConditionClick({
                 workflow,
             }),
         placeholderId: sourceNodeId,
+        projectId,
         queryClient,
         updateWorkflowMutation,
     });

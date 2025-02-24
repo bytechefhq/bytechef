@@ -7,6 +7,7 @@ import {useQueryClient} from '@tanstack/react-query';
 import {ComponentIcon} from 'lucide-react';
 import {useCallback, useMemo} from 'react';
 import InlineSVG from 'react-inlinesvg';
+import {useParams} from 'react-router-dom';
 import {useShallow} from 'zustand/react/shallow';
 
 import {useWorkflowMutation} from '../providers/workflowMutationProvider';
@@ -56,6 +57,8 @@ const WorkflowNodesPopoverMenuOperationList = ({
 
     const operations = useMemo(() => (trigger ? triggers : actions), [trigger, triggers, actions]);
 
+    const {projectId} = useParams();
+
     const handleOperationClick = useCallback(
         async (clickedOperation: ClickedOperationType) => {
             if (!componentDefinition) {
@@ -99,6 +102,7 @@ const WorkflowNodesPopoverMenuOperationList = ({
                             queryClient,
                             workflow,
                         }),
+                    projectId: +projectId!,
                     queryClient,
                     updateWorkflowMutation,
                 });
@@ -151,6 +155,7 @@ const WorkflowNodesPopoverMenuOperationList = ({
                             queryClient,
                             workflow,
                         }),
+                    projectId: +projectId!,
                     queryClient,
                     updateWorkflowMutation,
                 });
@@ -208,6 +213,7 @@ const WorkflowNodesPopoverMenuOperationList = ({
                         operation: clickedOperation,
                         operationDefinition: clickedComponentActionDefinition,
                         placeholderId: sourceNodeId,
+                        projectId: +projectId!,
                         queryClient,
                         updateWorkflowMutation,
                         workflow,
@@ -218,6 +224,7 @@ const WorkflowNodesPopoverMenuOperationList = ({
                         operation: clickedOperation,
                         operationDefinition: clickedComponentActionDefinition,
                         placeholderId: sourceNodeId,
+                        projectId: +projectId!,
                         queryClient,
                         updateWorkflowMutation,
                         workflow,

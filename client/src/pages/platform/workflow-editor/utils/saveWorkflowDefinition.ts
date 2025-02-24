@@ -4,6 +4,7 @@ import {
     WorkflowTask,
     WorkflowTrigger,
 } from '@/shared/middleware/platform/configuration';
+import {ProjectWorkflowKeys} from '@/shared/queries/automation/projectWorkflows.queries';
 import {ComponentDefinitionKeys} from '@/shared/queries/platform/componentDefinitions.queries';
 import {NodeDataType, WorkflowDefinitionType} from '@/shared/types';
 import {QueryClient, UseMutationResult} from '@tanstack/react-query';
@@ -27,6 +28,7 @@ interface SaveWorkflowDefinitionProps {
     nodeIndex?: number;
     onSuccess?: () => void;
     placeholderId?: string;
+    projectId: number;
     queryClient: QueryClient;
     subtask?: boolean;
     updateWorkflowMutation: UseMutationResult<void, Error, UpdateWorkflowRequestType, unknown>;
@@ -40,6 +42,7 @@ export default async function saveWorkflowDefinition({
     nodeIndex,
     onSuccess,
     placeholderId,
+    projectId,
     queryClient,
     subtask,
     updateWorkflowMutation,
@@ -202,7 +205,13 @@ export default async function saveWorkflowDefinition({
             },
         },
         {
-            onSuccess,
+            onSuccess: () => {
+                if (onSuccess) {
+                    onSuccess();
+                }
+
+                queryClient.invalidateQueries({queryKey: ProjectWorkflowKeys.projectWorkflows(projectId)});
+            },
         }
     );
 }

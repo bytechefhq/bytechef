@@ -15,6 +15,7 @@ interface HandleConditionChildOperationClickProps {
     operation: ClickedOperationType;
     operationDefinition: ActionDefinition;
     placeholderId: string;
+    projectId: number;
     queryClient: QueryClient;
     updateWorkflowMutation: UpdateWorkflowMutationType;
     workflow: Workflow & WorkflowTaskDataType;
@@ -25,6 +26,7 @@ export default function handleConditionChildOperationClick({
     operation,
     operationDefinition,
     placeholderId,
+    projectId,
     queryClient,
     updateWorkflowMutation,
     workflow,
@@ -62,6 +64,7 @@ export default function handleConditionChildOperationClick({
                 workflow,
             }),
         placeholderId,
+        projectId,
         queryClient,
         updateWorkflowMutation,
     });

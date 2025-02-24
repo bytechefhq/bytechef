@@ -42,6 +42,7 @@ import {useQueryClient} from '@tanstack/react-query';
 import {useCallback, useEffect, useMemo, useState} from 'react';
 import isEqual from 'react-fast-compare';
 import InlineSVG from 'react-inlinesvg';
+import {useParams} from 'react-router-dom';
 import {twMerge} from 'tailwind-merge';
 import {useShallow} from 'zustand/react/shallow';
 
@@ -113,6 +114,8 @@ const WorkflowNodeDetailsPanel = ({
     );
 
     const queryClient = useQueryClient();
+
+    const {projectId} = useParams();
 
     const {data: currentComponentDefinition} = useGetComponentDefinitionQuery(
         {
@@ -421,6 +424,7 @@ const WorkflowNodeDetailsPanel = ({
                         type: `${componentName}/v${currentComponentDefinition.version}/${newOperationName}`,
                     });
                 },
+                projectId: +projectId!,
                 queryClient,
                 subtask: !!currentNode?.conditionData,
                 updateWorkflowMutation,
@@ -432,6 +436,7 @@ const WorkflowNodeDetailsPanel = ({
             currentNode,
             currentOperationProperties,
             nodes,
+            projectId,
             queryClient,
             setCurrentComponent,
             updateWorkflowMutation,

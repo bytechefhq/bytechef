@@ -15,6 +15,7 @@ import saveWorkflowDefinition from './saveWorkflowDefinition';
 interface HandleLoopClickProps {
     clickedItem: ClickedDefinitionType;
     edge?: boolean;
+    projectId: number;
     queryClient: QueryClient;
     sourceNodeId: string;
     updateWorkflowMutation: UpdateWorkflowMutationType;
@@ -24,6 +25,7 @@ interface HandleLoopClickProps {
 export default async function handleLoopClick({
     clickedItem,
     edge,
+    projectId,
     queryClient,
     sourceNodeId,
     updateWorkflowMutation,
@@ -106,6 +108,7 @@ export default async function handleLoopClick({
                 workflow,
             }),
         placeholderId: sourceNodeId,
+        projectId,
         queryClient,
         updateWorkflowMutation,
     });

@@ -4,6 +4,7 @@ import {ComponentDefinitionKeys} from '@/shared/queries/platform/componentDefini
 import {ClickedDefinitionType} from '@/shared/types';
 import {useQueryClient} from '@tanstack/react-query';
 import {PropsWithChildren, useCallback, useEffect, useMemo, useState} from 'react';
+import {useParams} from 'react-router-dom';
 import {twMerge} from 'tailwind-merge';
 
 import {useWorkflowMutation} from '../providers/workflowMutationProvider';
@@ -46,6 +47,8 @@ const WorkflowNodesPopoverMenu = ({
 
     const queryClient = useQueryClient();
 
+    const {projectId} = useParams();
+
     const memoizedComponentDefinitions = useMemo(() => componentDefinitions, [componentDefinitions]);
     const memoizedTaskDispatcherDefinitions = useMemo(() => taskDispatcherDefinitions, [taskDispatcherDefinitions]);
 
@@ -62,6 +65,7 @@ const WorkflowNodesPopoverMenu = ({
                     await handleConditionClick({
                         clickedItem,
                         edge,
+                        projectId: +projectId!,
                         queryClient,
                         sourceNodeId,
                         updateWorkflowMutation,
@@ -71,6 +75,7 @@ const WorkflowNodesPopoverMenu = ({
                     await handleLoopClick({
                         clickedItem,
                         edge,
+                        projectId: +projectId!,
                         queryClient,
                         sourceNodeId,
                         updateWorkflowMutation,

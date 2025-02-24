@@ -12,6 +12,7 @@ import {
 import {NodeDataType, UpdateWorkflowMutationType} from '@/shared/types';
 import {useQueryClient} from '@tanstack/react-query';
 import {ChangeEvent} from 'react';
+import {useParams} from 'react-router-dom';
 import {useDebouncedCallback} from 'use-debounce';
 import {useShallow} from 'zustand/react/shallow';
 
@@ -36,6 +37,8 @@ const DescriptionTab = ({
     const {currentComponent, currentNode, setCurrentComponent, setCurrentNode} = useWorkflowNodeDetailsPanelStore();
 
     const queryClient = useQueryClient();
+
+    const {projectId} = useParams();
 
     const updateNodeData = (value: string, field: 'label' | 'description'): NodeDataType | undefined => {
         if (!currentNode || !workflow.definition) {
@@ -171,6 +174,7 @@ const DescriptionTab = ({
                     label: event.target.value,
                 });
             },
+            projectId: +projectId!,
             queryClient,
             updateWorkflowMutation,
         });
@@ -208,6 +212,7 @@ const DescriptionTab = ({
                     description: event.target.value,
                 });
             },
+            projectId: +projectId!,
             queryClient,
             updateWorkflowMutation,
         });
