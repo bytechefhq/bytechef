@@ -26,6 +26,8 @@ import static com.bytechef.component.definition.Context.Http.BodyContentType;
 import static com.bytechef.component.definition.Context.Http.ResponseType;
 
 import com.bytechef.component.definition.ComponentDsl;
+import com.bytechef.component.definition.OptionsDataSource;
+import com.bytechef.component.nifty.util.NiftyUtils;
 import java.util.Map;
 
 /**
@@ -47,7 +49,9 @@ public class NiftyCreateTaskAction {
             Map.of(
                 "type", PropertyType.BODY))
             .label("Status")
-            .required(true),
+            .required(true)
+            .options((OptionsDataSource.ActionOptionsFunction<String>) NiftyUtils::getTaskGroupIdOptions)
+            .optionsLookupDependsOn("project"),
             string("name").metadata(
                 Map.of(
                     "type", PropertyType.BODY))

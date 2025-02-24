@@ -25,6 +25,8 @@ import static com.bytechef.component.definition.Context.Http.BodyContentType;
 import static com.bytechef.component.definition.Context.Http.ResponseType;
 
 import com.bytechef.component.definition.ComponentDsl;
+import com.bytechef.component.definition.OptionsDataSource;
+import com.bytechef.component.nifty.util.NiftyUtils;
 import java.util.Map;
 
 /**
@@ -59,7 +61,8 @@ public class NiftyCreateProjectAction {
                     "type", PropertyType.BODY))
                 .label("Template ID")
                 .description("ID of template that can be used to pre-configure the project.")
-                .required(false))
+                .required(false)
+                .options((OptionsDataSource.ActionOptionsFunction<String>) NiftyUtils::getTemplateIdOptions))
         .output(outputSchema(object()
             .properties(object("body")
                 .properties(string("id").required(false), string("name").required(false),

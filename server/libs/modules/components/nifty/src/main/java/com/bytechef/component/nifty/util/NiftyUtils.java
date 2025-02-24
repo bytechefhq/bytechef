@@ -21,7 +21,7 @@ import static com.bytechef.component.nifty.constant.NiftyConstants.ID;
 import static com.bytechef.component.nifty.constant.NiftyConstants.NAME;
 import static com.bytechef.component.nifty.constant.NiftyConstants.PROJECT;
 
-import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Parameters;
@@ -35,9 +35,9 @@ import java.util.Map;
  * @author Luka Ljubić
  * @author Monika Kušter
  */
-public class NiftyOptionUtils {
+public class NiftyUtils extends AbstractNiftyUtils {
 
-    private NiftyOptionUtils() {
+    private NiftyUtils() {
     }
 
     public static List<Option<String>> getAppIdOptions(
@@ -65,7 +65,7 @@ public class NiftyOptionUtils {
 
     public static List<Option<String>> getTaskGroupIdOptions(
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
-        String searchText, ActionContext context) {
+        String searchText, Context context) {
 
         Map<String, Object> body = context
             .http(http -> http.get(
@@ -79,7 +79,7 @@ public class NiftyOptionUtils {
 
     public static List<Option<String>> getProjectIdOptions(
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
-        String searchText, ActionContext context) {
+        String searchText, Context context) {
 
         Map<String, Object> body = context.http(http -> http.get("/projects"))
             .configuration(Http.responseType(Http.ResponseType.JSON))
@@ -89,9 +89,9 @@ public class NiftyOptionUtils {
         return getOptions(body, "projects");
     }
 
-    public static List<Option<String>> getProjectTemplateOptions(
+    public static List<Option<String>> getTemplateIdOptions(
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
-        String searchText, ActionContext context) {
+        String searchText, Context context) {
 
         Map<String, Object> body = context.http(http -> http.get("/templates"))
             .queryParameter("type", "project")
@@ -104,7 +104,7 @@ public class NiftyOptionUtils {
 
     public static List<Option<String>> getTaskIdOptions(
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
-        String searchText, ActionContext context) {
+        String searchText, Context context) {
 
         Map<String, Object> body = context.http(http -> http.get("/tasks"))
             .configuration(Http.responseType(Http.ResponseType.JSON))

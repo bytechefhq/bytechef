@@ -26,6 +26,8 @@ import static com.bytechef.component.definition.Context.Http.BodyContentType;
 import static com.bytechef.component.definition.Context.Http.ResponseType;
 
 import com.bytechef.component.definition.ComponentDsl;
+import com.bytechef.component.definition.OptionsDataSource;
+import com.bytechef.component.nifty.util.NiftyUtils;
 import java.util.Map;
 
 /**
@@ -54,7 +56,8 @@ public class NiftyCreateStatusAction {
                     "type", PropertyType.BODY))
                 .label("Project ID")
                 .description("Project ID that the status belongs to.")
-                .required(true))
+                .required(true)
+                .options((OptionsDataSource.ActionOptionsFunction<String>) NiftyUtils::getProjectIdOptions))
         .output(outputSchema(object()
             .properties(object("body")
                 .properties(string("message").required(false),

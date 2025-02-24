@@ -40,7 +40,7 @@ import org.mockito.ArgumentCaptor;
 /**
  * @author Luka Ljubić
  */
-class NiftyOptionUtilsTest {
+class NiftyUtilsTest {
 
     private final List<Option<String>> expectedOptions = List.of(option("abc", "123"));
     private final ActionContext mockedActionContext = mock(ActionContext.class);
@@ -74,7 +74,7 @@ class NiftyOptionUtilsTest {
 
         assertEquals(
             expectedOptions,
-            NiftyOptionUtils.getAppIdOptions(mockedParameters, mockedParameters, Map.of(), "", mockedTriggerContext));
+            NiftyUtils.getAppIdOptions(mockedParameters, mockedParameters, Map.of(), "", mockedTriggerContext));
 
         Object[] query = queryArgumentCaptor.getValue();
 
@@ -88,7 +88,7 @@ class NiftyOptionUtilsTest {
 
         assertEquals(
             expectedOptions,
-            NiftyOptionUtils.getTaskGroupIdOptions(mockedParameters, mockedParameters, Map.of(), "",
+            NiftyUtils.getTaskGroupIdOptions(mockedParameters, mockedParameters, Map.of(), "",
                 mockedActionContext));
     }
 
@@ -99,7 +99,7 @@ class NiftyOptionUtilsTest {
 
         assertEquals(
             expectedOptions,
-            NiftyOptionUtils.getProjectIdOptions(mockedParameters, mockedParameters, Map.of(), "",
+            NiftyUtils.getProjectIdOptions(mockedParameters, mockedParameters, Map.of(), "",
                 mockedActionContext));
     }
 
@@ -110,7 +110,7 @@ class NiftyOptionUtilsTest {
 
         assertEquals(
             expectedOptions,
-            NiftyOptionUtils.getProjectTemplateOptions(mockedParameters, mockedParameters, Map.of(), "",
+            NiftyUtils.getTemplateIdOptions(mockedParameters, mockedParameters, Map.of(), "",
                 mockedActionContext));
 
         assertEquals(List.of("type", "project"), stringArgumentCaptor.getAllValues());
@@ -123,7 +123,7 @@ class NiftyOptionUtilsTest {
 
         assertEquals(
             expectedOptions,
-            NiftyOptionUtils.getTaskIdOptions(mockedParameters, mockedParameters, Map.of(), "",
+            NiftyUtils.getTaskIdOptions(mockedParameters, mockedParameters, Map.of(), "",
                 mockedActionContext));
     }
 }

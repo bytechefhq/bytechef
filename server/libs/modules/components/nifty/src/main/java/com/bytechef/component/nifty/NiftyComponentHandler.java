@@ -16,23 +16,15 @@
 
 package com.bytechef.component.nifty;
 
-import static com.bytechef.component.nifty.constant.NiftyConstants.PROJECT;
 import static com.bytechef.component.nifty.constant.NiftyConstants.PROJECT_PROPERTY;
 
 import com.bytechef.component.OpenApiComponentHandler;
-import com.bytechef.component.definition.ActionDefinition;
 import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.ComponentDsl.ModifiableComponentDefinition;
-import com.bytechef.component.definition.ComponentDsl.ModifiableObjectProperty;
-import com.bytechef.component.definition.ComponentDsl.ModifiableProperty;
-import com.bytechef.component.definition.ComponentDsl.ModifiableStringProperty;
 import com.bytechef.component.definition.ComponentDsl.ModifiableTriggerDefinition;
-import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.Property;
 import com.bytechef.component.nifty.trigger.NiftyNewTaskTrigger;
-import com.bytechef.component.nifty.util.NiftyOptionUtils;
-import com.bytechef.definition.BaseProperty;
 import com.google.auto.service.AutoService;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -74,35 +66,4 @@ public class NiftyComponentHandler extends AbstractNiftyComponentHandler {
             .categories(ComponentCategory.PROJECT_MANAGEMENT, ComponentCategory.PRODUCTIVITY_AND_COLLABORATION);
     }
 
-    @Override
-    public ModifiableProperty<?> modifyProperty(
-        ActionDefinition actionDefinition, ModifiableProperty<?> modifiableProperty) {
-
-        if (Objects.equals(modifiableProperty.getName(), "project_id")) {
-            ((ModifiableStringProperty) modifiableProperty)
-                .options((ActionOptionsFunction<String>) NiftyOptionUtils::getProjectIdOptions);
-        } else if (Objects.equals(modifiableProperty.getName(), "taskId")) {
-            ((ModifiableStringProperty) modifiableProperty)
-                .options((ActionOptionsFunction<String>) NiftyOptionUtils::getTaskIdOptions);
-        } else if (Objects.equals(modifiableProperty.getName(), "__item")) {
-            Optional<List<? extends Property.ValueProperty<?>>> propertiesOptional =
-                ((ModifiableObjectProperty) modifiableProperty).getProperties();
-
-            for (BaseProperty baseProperty : propertiesOptional.get()) {
-                if (Objects.equals(baseProperty.getName(), "task_group_id")) {
-                    ((ModifiableStringProperty) baseProperty)
-                        .options((ActionOptionsFunction<String>) NiftyOptionUtils::getTaskGroupIdOptions)
-                        .optionsLookupDependsOn(PROJECT);
-                } else if (Objects.equals(baseProperty.getName(), "template_id")) {
-                    ((ModifiableStringProperty) baseProperty)
-                        .options((ActionOptionsFunction<String>) NiftyOptionUtils::getProjectTemplateOptions);
-                } else if (Objects.equals(baseProperty.getName(), "project_id")) {
-                    ((ModifiableStringProperty) baseProperty)
-                        .options((ActionOptionsFunction<String>) NiftyOptionUtils::getProjectIdOptions);
-                }
-            }
-        }
-
-        return modifiableProperty;
-    }
 }
