@@ -136,6 +136,7 @@ public class ComponentInitOpenApiGenerator {
     private final int version;
     private final Set<String> oAuth2Scopes = new HashSet<>();
     private final Map<String, String> dynamicOptionsMap = new HashMap<>();
+    private final List<String> dynamicProperties = new ArrayList<>();
 
     @SuppressFBWarnings("CT_CONSTRUCTOR_THROW")
     public ComponentInitOpenApiGenerator(
@@ -189,7 +190,7 @@ public class ComponentInitOpenApiGenerator {
             writeComponentHandlerDefinition(componentHandlerSourcePath, getPackageName(), version);
         }
 
-        if (!dynamicOptionsMap.isEmpty()) {
+        if (!dynamicOptionsMap.isEmpty() || !dynamicProperties.isEmpty()) {
             writeAbstractUtils(sourceMainJavaDirPath);
             writeUtils(sourceMainJavaDirPath);
         }
@@ -1125,23 +1126,34 @@ public class ComponentInitOpenApiGenerator {
         return codeBlocks;
     }
 
-    private CodeBlock getExtensionsCodeBlock(
-        String propertyName, String propertyDescription, Boolean required, Schema<?> schema, boolean outputSchema,
-        Map<String, Object> extensionMap) {
+    private CodeBlock addDynamicProperty(
+        String propertyName, String propertyDescription, Boolean required, Map<String, Object> extensionMap,
+        boolean bodySchema) {
 
         CodeBlock.Builder builder = CodeBlock.builder();
 
         propertyName = StringUtils.isEmpty(propertyName) ? "__item" : propertyName;
 
-        builder.add("$L($S)", extensionMap.get("x-property-type"), propertyName);
-
-        if (!StringUtils.isEmpty(propertyName) && !outputSchema &&
-            !Objects.equals(extensionMap.get("x-property-type"), "dynamicProperties")) {
+        if (extensionMap.get("x-dynamic-properties")
+            .equals(true)) {
+            builder.add("dynamicProperties($S)", propertyName);
 
             builder.add(
-                ".label($S)",
-                StringUtils.isEmpty(schema.getTitle()) ? buildPropertyLabel(propertyName.replace("__", ""))
-                    : schema.getTitle());
+                ".properties(($T.ActionPropertiesFunction)$T::get"
+                    + buildOptionsFunctionsName(propertyName) + "Properties)",
+                ClassName.get("com.bytechef.component.definition", "PropertiesDataSource"),
+                ClassName.get("com.bytechef.component." + componentName + ".util",
+                    getComponentClassName(componentName) + "Utils"));
+
+            dynamicProperties.add(buildOptionsFunctionsName(propertyName));
+
+            if (extensionMap.get("x-dynamic-properties-dependency") instanceof List<?> dependencies) {
+                List<String> allDependencies = dependencies.stream()
+                    .map(object -> "\"" + object + "\"")
+                    .toList();
+
+                builder.add(".propertiesLookupDependsOn($L)", String.join(",", allDependencies));
+            }
         }
 
         if (propertyDescription != null) {
@@ -1150,6 +1162,18 @@ public class ComponentInitOpenApiGenerator {
 
         if (required != null) {
             builder.add(".required($L)", required);
+        }
+
+        if (bodySchema) {
+            builder.add(
+                """
+                    .metadata(
+                       $T.of(
+                         "type", PropertyType.BODY
+                       )
+                    )
+                    """,
+                Map.class);
         }
 
         return builder.build();
@@ -1681,7 +1705,7 @@ public class ComponentInitOpenApiGenerator {
 
         Map<String, Object> extensionMap = schema.getExtensions();
 
-        if (extensionMap == null || !extensionMap.containsKey("x-property-type")) {
+        if (extensionMap == null || extensionMap.containsKey("x-dynamic-options")) {
             if (StringUtils.isEmpty(schema.get$ref())) {
                 String type = StringUtils.isEmpty(schema.getType()) ? "object" : schema.getType();
 
@@ -1905,10 +1929,8 @@ public class ComponentInitOpenApiGenerator {
 
             handleDynamicOptions(propertyName, schema, extensionMap, builder);
 
-        } else {
-            builder.add(
-                getExtensionsCodeBlock(
-                    propertyName, propertyDescription, required, schema, outputSchema, extensionMap));
+        } else if (extensionMap.containsKey("x-dynamic-properties")) {
+            builder.add(addDynamicProperty(propertyName, propertyDescription, required, extensionMap, bodySchema));
         }
 
         return builder.build();
@@ -2248,7 +2270,7 @@ public class ComponentInitOpenApiGenerator {
     private void writeAbstractUtils(Path sourceDirPath) throws IOException {
         TypeSpec.Builder builder = TypeSpec.classBuilder("Abstract" + getComponentClassName(componentName) + "Utils")
             .addJavadoc("""
-                Provides methods for retrieving dynamic options for various properties within the component.
+                Provides methods for retrieving dynamic options and properties for various properties within the component.
 
                 @generated
                 """)
@@ -2258,6 +2280,8 @@ public class ComponentInitOpenApiGenerator {
             ClassName returnType = getReturnTypeForOption(type);
             builder.addMethod(createOptionsMethod(propertyName, returnType));
         });
+
+        dynamicProperties.forEach(s -> builder.addMethod(createPropertiesMethod(s)));
 
         JavaFile javaFile = addStaticImport(
             JavaFile.builder(
@@ -2289,6 +2313,30 @@ public class ComponentInitOpenApiGenerator {
                 ParameterizedTypeName.get(
                     ClassName.get("com.bytechef.component.definition", "Option"),
                     returnType)))
+            .addStatement("\n return List.of()")
+            .build();
+    }
+
+    private MethodSpec createPropertiesMethod(String propertyName) {
+        return MethodSpec.methodBuilder("get" + propertyName + "Properties")
+            .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
+            .addParameter(ParameterSpec.builder(Parameters.class, "inputParameters")
+                .build())
+            .addParameter(ParameterSpec.builder(Parameters.class, "connectionParameters")
+                .build())
+            .addParameter(ParameterSpec.builder(
+                ParameterizedTypeName.get(ClassName.get(Map.class), ClassName.get(String.class),
+                    ClassName.get(String.class)),
+                "dependencyPaths")
+                .build())
+            .addParameter(ParameterSpec.builder(Context.class, "context")
+                .build())
+            .returns(ParameterizedTypeName.get(
+                ClassName.get("java.util", "List"),
+                ParameterizedTypeName.get(
+                    ClassName.get(
+                        "com.bytechef.component.definition", "ComponentDsl", "ModifiableValueProperty"),
+                    WildcardTypeName.subtypeOf(Object.class), WildcardTypeName.subtypeOf(Object.class))))
             .addStatement("\n return List.of()")
             .build();
     }
