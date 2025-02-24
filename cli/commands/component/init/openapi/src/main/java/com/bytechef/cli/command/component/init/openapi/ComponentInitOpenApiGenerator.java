@@ -274,7 +274,7 @@ public class ComponentInitOpenApiGenerator {
             }
         }
 
-        if (required != null) {
+        if (required != null && !StringUtils.isEmpty(propertyName)) {
             builder.add(".required($L)", required);
         }
 
@@ -1328,7 +1328,7 @@ public class ComponentInitOpenApiGenerator {
 
         Schema<?> schema = mediaType.getSchema();
 
-        builder.add(getSchemaCodeBlock(null, schema.getDescription(), null, null, schema, true, true, openAPI));
+        builder.add(getSchemaCodeBlock(null, schema.getDescription(), null, null, schema, true, true, openAPI, false));
 
         String responseType;
 
@@ -1373,7 +1373,7 @@ public class ComponentInitOpenApiGenerator {
                 builder.add(
                     getSchemaCodeBlock(
                         parameter.getName(), parameter.getDescription(), parameter.getRequired(), null,
-                        parameter.getSchema(), false, false, openAPI));
+                        parameter.getSchema(), false, false, openAPI, false));
                 builder.add(
                     CodeBlock.of(
                         """
@@ -1455,7 +1455,7 @@ public class ComponentInitOpenApiGenerator {
             if (schema.getAllOf() == null) {
                 codeBlock = getSchemaCodeBlock(
                     entry.getKey(), schema.getDescription(), required.contains(entry.getKey()), null, schema, false,
-                    outputSchema, openAPI);
+                    outputSchema, openAPI, false);
             } else {
                 codeBlock = getAllOfSchemaCodeBlock(
                     entry.getKey(), schema.getDescription(), schema.getAllOf(), outputSchema, openAPI);
@@ -1493,7 +1493,7 @@ public class ComponentInitOpenApiGenerator {
                 ? StringUtils.uncapitalize(curSchemaName)
                 : propertyName,
             schema.getDescription(), required, curSchemaName, schema, excludePropertyNameIfEmpty,
-            outputSchema, openAPI);
+            outputSchema, openAPI, false);
     }
 
     @SuppressWarnings({
@@ -1530,16 +1530,8 @@ public class ComponentInitOpenApiGenerator {
                 Schema schema = mediaType.getSchema();
 
                 builder.add(
-                    getSchemaCodeBlock(null, null, requestBody.getRequired(), null, schema, false, false, openAPI));
-                builder.add(
-                    """
-                        .metadata(
-                           $T.of(
-                             "type", PropertyType.BODY
-                           )
-                        )
-                        """,
-                    Map.class);
+                    getSchemaCodeBlock(
+                        null, null, requestBody.getRequired(), null, schema, false, false, openAPI, true));
             }
 
             requestBodyPropertiesEntry = new PropertiesEntry(builder.build(), bodyContentType, mimeType);
@@ -1683,7 +1675,7 @@ public class ComponentInitOpenApiGenerator {
 
     private CodeBlock getSchemaCodeBlock(
         String propertyName, String propertyDescription, Boolean required, String schemaName, Schema<?> schema,
-        boolean excludePropertyNameIfEmpty, boolean outputSchema, OpenAPI openAPI) {
+        boolean excludePropertyNameIfEmpty, boolean outputSchema, OpenAPI openAPI, boolean bodySchema) {
 
         CodeBlock.Builder builder = CodeBlock.builder();
 
@@ -1700,7 +1692,7 @@ public class ComponentInitOpenApiGenerator {
                                 "array().items($L)",
                                 getSchemaCodeBlock(
                                     null, schema.getDescription(), null, null, schema.getItems(), true, outputSchema,
-                                    openAPI));
+                                    openAPI, bodySchema));
                         } else {
                             propertyName = StringUtils.isEmpty(propertyName) ? "__items" : propertyName;
 
@@ -1709,15 +1701,41 @@ public class ComponentInitOpenApiGenerator {
                                 propertyName,
                                 getSchemaCodeBlock(
                                     null, schema.getDescription(), null, null, schema.getItems(), true, outputSchema,
-                                    openAPI));
+                                    openAPI, bodySchema));
                         }
 
                         if (!outputSchema) {
                             builder.add(
                                 ".placeholder($S)", "Add to " + buildPropertyLabel(propertyName.replace("__", "")));
                         }
+
+                        if (bodySchema) {
+                            builder.add(
+                                """
+                                    .metadata(
+                                       $T.of(
+                                         "type", PropertyType.BODY
+                                       )
+                                    )
+                                    """,
+                                Map.class);
+                        }
                     }
-                    case "boolean" -> builder.add("bool($S)", propertyName);
+                    case "boolean" -> {
+                        builder.add("bool($S)", propertyName);
+
+                        if (bodySchema) {
+                            builder.add(
+                                """
+                                    .metadata(
+                                       $T.of(
+                                         "type", PropertyType.BODY
+                                       )
+                                    )
+                                    """,
+                                Map.class);
+                        }
+                    }
                     case "integer" -> {
                         builder.add("integer($S)", propertyName);
 
@@ -1731,6 +1749,18 @@ public class ComponentInitOpenApiGenerator {
                             BigDecimal maximum = schema.getMaximum();
 
                             builder.add(".maxValue($L)", maximum.intValue());
+                        }
+
+                        if (bodySchema) {
+                            builder.add(
+                                """
+                                    .metadata(
+                                       $T.of(
+                                         "type", PropertyType.BODY
+                                       )
+                                    )
+                                    """,
+                                Map.class);
                         }
                     }
                     case "number" -> {
@@ -1747,23 +1777,79 @@ public class ComponentInitOpenApiGenerator {
 
                             builder.add(".maxValue($L)", maximum.doubleValue());
                         }
+
+                        if (bodySchema) {
+                            builder.add(
+                                """
+                                    .metadata(
+                                       $T.of(
+                                         "type", PropertyType.BODY
+                                       )
+                                    )
+                                    """,
+                                Map.class);
+                        }
                     }
                     case "object" -> {
                         if (StringUtils.isEmpty(propertyName) && excludePropertyNameIfEmpty) {
                             builder.add("object()");
+
+                            if (schema.getProperties() != null || schema.getAllOf() != null) {
+                                builder.add(
+                                    getPropertiesCodeBlock(propertyName, schemaName, schema, outputSchema, openAPI));
+                            }
+
+                            if (schema.getAdditionalProperties() != null) {
+                                builder.add(getAdditionalPropertiesCodeBlock(propertyName, schema, outputSchema));
+                            }
                         } else {
-                            propertyName = StringUtils.isEmpty(propertyName) ? "__item" : propertyName;
+                            if (StringUtils.isEmpty(propertyName)) {
 
-                            builder.add("object($S)", propertyName);
+                                if (schema.getProperties() != null || schema.getAllOf() != null) {
+                                    List<CodeBlock> codeBlocks = new ArrayList<>();
+
+                                    for (Map.Entry<String, Schema> entry : schema.getProperties()
+                                        .entrySet()) {
+                                        String propertyName1 = entry.getKey();
+                                        Boolean required1 = schema.getRequired() != null && schema.getRequired()
+                                            .contains(propertyName1);
+                                        Schema<?> propertySchema = entry.getValue();
+
+                                        codeBlocks.add(getSchemaCodeBlock(
+                                            propertyName1, propertySchema.getDescription(), required1,
+                                            schemaName, propertySchema, false, outputSchema, openAPI, bodySchema));
+                                    }
+
+                                    CodeBlock collect = codeBlocks.stream()
+                                        .collect(CodeBlock.joining(","));
+                                    builder.add(collect);
+                                }
+
+                            } else {
+                                builder.add("object($S)", propertyName);
+
+                                if (schema.getProperties() != null || schema.getAllOf() != null) {
+                                    builder.add(
+                                        getPropertiesCodeBlock(propertyName, schemaName, schema, outputSchema,
+                                            openAPI));
+                                }
+
+                                if (schema.getAdditionalProperties() != null) {
+                                    builder.add(getAdditionalPropertiesCodeBlock(propertyName, schema, outputSchema));
+                                }
+                            }
                         }
 
-                        if (schema.getProperties() != null || schema.getAllOf() != null) {
+                        if (bodySchema && !StringUtils.isEmpty(propertyName)) {
                             builder.add(
-                                getPropertiesCodeBlock(propertyName, schemaName, schema, outputSchema, openAPI));
-                        }
-
-                        if (schema.getAdditionalProperties() != null) {
-                            builder.add(getAdditionalPropertiesCodeBlock(propertyName, schema, outputSchema));
+                                """
+                                    .metadata(
+                                       $T.of(
+                                         "type", PropertyType.BODY
+                                       )
+                                    )
+                                    """,
+                                Map.class);
                         }
                     }
                     case "string" -> {
@@ -1792,6 +1878,18 @@ public class ComponentInitOpenApiGenerator {
                             Integer maxLength = schema.getMaxLength();
 
                             builder.add(".maxLength($L)", maxLength);
+                        }
+
+                        if (bodySchema) {
+                            builder.add(
+                                """
+                                    .metadata(
+                                       $T.of(
+                                         "type", PropertyType.BODY
+                                       )
+                                    )
+                                    """,
+                                Map.class);
                         }
                     }
                     default -> throw new IllegalArgumentException(

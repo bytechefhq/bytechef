@@ -115,35 +115,49 @@ public class OpenApiClientUtils {
             return null;
         }
 
-        for (Property property : properties) {
-            if (Objects.equals(MapUtils.get(property.getMetadata(), TYPE, PropertyType.class), PropertyType.BODY)) {
-                return switch (bodyContentType) {
-                    case BINARY -> Http.Body.of(
-                        MapUtils.get(inputParameters, property.getName(), FileEntry.class), mimeType);
-                    case FORM_DATA -> Http.Body.of(
-                        MapUtils.getMap(inputParameters, property.getName(), List.of(FileEntry.class), Map.of()),
-                        bodyContentType);
-                    case FORM_URL_ENCODED -> Http.Body.of(
-                        MapUtils.getMap(inputParameters, property.getName(), Map.of()), bodyContentType);
-                    case JSON, XML -> {
-                        if (property.getType() == Property.Type.ARRAY) {
-                            yield Http.Body.of(
-                                MapUtils.getList(inputParameters, property.getName(), Object.class, List.of()),
-                                bodyContentType);
-                        } else if (property.getType() == Property.Type.DYNAMIC_PROPERTIES) {
-                            yield Http.Body.of(
-                                MapUtils.getMap(inputParameters, property.getName(), Map.of()), bodyContentType);
-                        } else if (property.getType() == Property.Type.OBJECT) {
-                            yield Http.Body.of(
-                                MapUtils.getMap(inputParameters, property.getName(), Map.of()), bodyContentType);
-                        } else {
-                            yield Http.Body.of(
-                                MapUtils.getRequiredString(inputParameters, property.getName()), bodyContentType);
+        if (properties.size() == 1) {
+            for (Property property : properties) {
+                if (Objects.equals(MapUtils.get(property.getMetadata(), TYPE, PropertyType.class), PropertyType.BODY)) {
+                    return switch (bodyContentType) {
+                        case BINARY -> Http.Body.of(
+                            MapUtils.get(inputParameters, property.getName(), FileEntry.class), mimeType);
+                        case FORM_DATA -> Http.Body.of(
+                            MapUtils.getMap(inputParameters, property.getName(), List.of(FileEntry.class), Map.of()),
+                            bodyContentType);
+                        case FORM_URL_ENCODED -> Http.Body.of(
+                            MapUtils.getMap(inputParameters, property.getName(), Map.of()), bodyContentType);
+                        case JSON, XML -> {
+                            if (property.getType() == Property.Type.ARRAY) {
+                                yield Http.Body.of(
+                                    MapUtils.getList(inputParameters, property.getName(), Object.class, List.of()),
+                                    bodyContentType);
+                            } else if (property.getType() == Property.Type.DYNAMIC_PROPERTIES) {
+                                yield Http.Body.of(
+                                    MapUtils.getMap(inputParameters, property.getName(), Map.of()), bodyContentType);
+                            } else if (property.getType() == Property.Type.OBJECT) {
+                                yield Http.Body.of(
+                                    MapUtils.getMap(inputParameters, property.getName(), Map.of()), bodyContentType);
+                            } else {
+                                yield Http.Body.of(
+                                    MapUtils.getRequiredString(inputParameters, property.getName()), bodyContentType);
+                            }
                         }
-                    }
-                    case RAW -> Http.Body.of(MapUtils.getString(inputParameters, property.getName()), mimeType);
-                };
+                        case RAW -> Http.Body.of(MapUtils.getString(inputParameters, property.getName()), mimeType);
+                    };
+                }
             }
+        } else if (properties.size() > 1) {
+            Map<String, Object> body = new HashMap<>();
+            for (Property property : properties) {
+                if (Objects.equals(MapUtils.get(property.getMetadata(), TYPE, PropertyType.class), PropertyType.BODY)) {
+                    Object o = MapUtils.get(inputParameters, property.getName());
+
+                    if (o != null) {
+                        body.put(property.getName(), o);
+                    }
+                }
+            }
+            return Http.Body.of(body, bodyContentType);
         }
 
         return null;
