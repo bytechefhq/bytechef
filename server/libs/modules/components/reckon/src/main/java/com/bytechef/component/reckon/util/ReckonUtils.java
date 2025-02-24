@@ -40,7 +40,7 @@ import java.util.Map;
 /**
  * @author Monika Kušter
  */
-public class ReckonUtils {
+public class ReckonUtils extends AbstractReckonUtils {
 
     private ReckonUtils() {
     }

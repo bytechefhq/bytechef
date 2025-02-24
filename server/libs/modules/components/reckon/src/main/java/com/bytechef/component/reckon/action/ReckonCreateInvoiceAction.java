@@ -29,6 +29,8 @@ import static com.bytechef.component.definition.Context.Http.BodyContentType;
 import static com.bytechef.component.definition.Context.Http.ResponseType;
 
 import com.bytechef.component.definition.ComponentDsl;
+import com.bytechef.component.definition.OptionsDataSource;
+import com.bytechef.component.reckon.util.ReckonUtils;
 import java.util.Map;
 
 /**
@@ -49,6 +51,7 @@ public class ReckonCreateInvoiceAction {
         .properties(string("bookId").label("Book ID")
             .description("ID of the book where new invoice will be created.")
             .required(true)
+            .options((OptionsDataSource.ActionOptionsFunction<String>) ReckonUtils::getBookIdOptions)
             .metadata(
                 Map.of(
                     "type", PropertyType.PATH)),
@@ -57,7 +60,8 @@ public class ReckonCreateInvoiceAction {
                     "type", PropertyType.BODY))
                 .label("Customer")
                 .description("The customer that is being invoiced.")
-                .required(true),
+                .required(true)
+                .options((OptionsDataSource.ActionOptionsFunction<String>) ReckonUtils::getCustomerOptions),
             date("invoiceDate").metadata(
                 Map.of(
                     "type", PropertyType.BODY))
