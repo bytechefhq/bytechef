@@ -136,7 +136,10 @@ public class OpenApiClientUtils {
                                     MapUtils.getMap(inputParameters, property.getName(), Map.of()), bodyContentType);
                             } else if (property.getType() == Property.Type.OBJECT) {
                                 yield Http.Body.of(
-                                    MapUtils.getMap(inputParameters, property.getName(), Map.of()), bodyContentType);
+                                    Map.of(
+                                        property.getName(),
+                                        MapUtils.getMap(inputParameters, property.getName(), Map.of())),
+                                    bodyContentType);
                             } else {
                                 yield Http.Body.of(
                                     MapUtils.getRequiredString(inputParameters, property.getName()), bodyContentType);
