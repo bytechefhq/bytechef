@@ -27,6 +27,8 @@ import static com.bytechef.component.definition.Context.Http.BodyContentType;
 import static com.bytechef.component.definition.Context.Http.ResponseType;
 
 import com.bytechef.component.definition.ComponentDsl;
+import com.bytechef.component.definition.OptionsDataSource;
+import com.bytechef.component.hubspot.util.HubspotUtils;
 import java.util.Map;
 
 /**
@@ -51,11 +53,15 @@ public class HubspotCreateDealAction {
             date("closedate").label("Close Date")
                 .required(false),
             string("pipeline").label("Pipeline")
-                .required(false),
+                .required(false)
+                .options((OptionsDataSource.ActionOptionsFunction<String>) HubspotUtils::getPipelineOptions),
             string("dealstage").label("Deal Stage")
-                .required(false),
+                .required(false)
+                .options((OptionsDataSource.ActionOptionsFunction<String>) HubspotUtils::getDealstageOptions)
+                .optionsLookupDependsOn("properties.pipeline"),
             string("hubspot_owner_id").label("Deal Owner")
-                .required(false))
+                .required(false)
+                .options((OptionsDataSource.ActionOptionsFunction<String>) HubspotUtils::getHubspotOwnerIdOptions))
             .metadata(
                 Map.of(
                     "type", PropertyType.BODY))

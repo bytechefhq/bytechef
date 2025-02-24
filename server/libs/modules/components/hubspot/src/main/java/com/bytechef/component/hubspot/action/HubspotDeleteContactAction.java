@@ -21,6 +21,8 @@ import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.string;
 
 import com.bytechef.component.definition.ComponentDsl;
+import com.bytechef.component.definition.OptionsDataSource;
+import com.bytechef.component.hubspot.util.HubspotUtils;
 import java.util.Map;
 
 /**
@@ -40,6 +42,7 @@ public class HubspotDeleteContactAction {
             ))
         .properties(string("contactId").label("Contact ID")
             .required(true)
+            .options((OptionsDataSource.ActionOptionsFunction<String>) HubspotUtils::getContactIdOptions)
             .metadata(
                 Map.of(
                     "type", PropertyType.PATH)));

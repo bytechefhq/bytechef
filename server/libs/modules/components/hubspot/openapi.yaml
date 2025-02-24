@@ -82,6 +82,7 @@ paths:
           schema:
             title: "Contact ID"
             type: "string"
+            x-dynamic-options: true
       responses:
         204:
           description: "successful operation"
@@ -96,6 +97,7 @@ paths:
           schema:
             title: "Contact ID"
             type: "string"
+            x-dynamic-options: true
       responses:
         200:
           description: "successful operation"
@@ -138,6 +140,7 @@ paths:
             title: "Contact"
             description: "Contact to update."
             type: "string"
+            x-dynamic-options: true
       requestBody:
         content:
           application/json:
@@ -221,12 +224,17 @@ paths:
                     pipeline:
                       type: "string"
                       title: "Pipeline"
+                      x-dynamic-options: true
                     dealstage:
                       type: "string"
                       title: "Deal Stage"
+                      x-dynamic-options: true
+                      x-dynamic-options-dependency:
+                        - "properties.pipeline"
                     hubspot_owner_id:
                       type: "string"
                       title: "Deal Owner"
+                      x-dynamic-options: true
       responses:
         201:
           description: "successful operation"
@@ -271,6 +279,7 @@ paths:
             title: "Ticket ID"
             description: "The ID of the ticket to get."
             type: "string"
+            x-dynamic-options: true
       responses:
         200:
           description: "successful operation"
