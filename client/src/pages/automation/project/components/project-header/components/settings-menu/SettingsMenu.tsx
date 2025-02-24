@@ -59,11 +59,11 @@ const SettingsMenu = ({project, updateWorkflowMutation, workflow}: ProjectHeader
         <>
             <DropdownMenu onOpenChange={setOpenDropdownMenu} open={openDropdownMenu}>
                 <Tooltip>
-                    <TooltipTrigger asChild>
-                        <DropdownMenuTrigger
-                            asChild
-                            className="cursor-pointer [&[data-state=open]]:bg-surface-brand-secondary [&[data-state=open]]:text-content-brand-primary-pressed"
-                        >
+                    <DropdownMenuTrigger
+                        asChild
+                        className="cursor-pointer [&[data-state=open]]:bg-surface-brand-secondary [&[data-state=open]]:text-content-brand-primary-pressed"
+                    >
+                        <TooltipTrigger asChild>
                             <Button
                                 aria-label="Settings"
                                 className="hover:bg-surface-neutral-primary-hover active:bg-surface-brand-secondary active:text-content-brand-primary-pressed [&_svg]:size-5"
@@ -71,11 +71,11 @@ const SettingsMenu = ({project, updateWorkflowMutation, workflow}: ProjectHeader
                                 variant="ghost"
                             >
                                 <SettingsIcon />
-
-                                <TooltipContent>Project and workflow settings</TooltipContent>
                             </Button>
-                        </DropdownMenuTrigger>
-                    </TooltipTrigger>
+                        </TooltipTrigger>
+                    </DropdownMenuTrigger>
+
+                    <TooltipContent>Project and workflow settings</TooltipContent>
                 </Tooltip>
 
                 <DropdownMenuContent className="p-0">
