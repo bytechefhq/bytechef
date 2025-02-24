@@ -22,6 +22,9 @@ paths:
           schema:
             title: "Channel ID"
             type: "string"
+            x-dynamic-options: true
+            x-dynamic-options-dependency:
+              - "guildId"
       requestBody:
         content:
           application/json:
@@ -71,6 +74,7 @@ paths:
           schema:
             title: "Guild ID"
             type: "string"
+            x-dynamic-options: true
       requestBody:
         content:
           application/json:
