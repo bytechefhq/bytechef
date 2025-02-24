@@ -43,22 +43,29 @@ public class PipelinerCreateTaskAction {
                 "path", "/entities/Tasks", "bodyContentType", BodyContentType.JSON, "mimeType", "application/json"
 
             ))
-        .properties(object("__item").properties(string("subject").label("Subject")
+        .properties(string("subject").metadata(
+            Map.of(
+                "type", PropertyType.BODY))
+            .label("Subject")
             .description("Name of the entity and its default text representation.")
             .required(true),
-            string("activity_type_id").label("Activity Type ID")
+            string("activity_type_id").metadata(
+                Map.of(
+                    "type", PropertyType.BODY))
+                .label("Activity Type ID")
                 .description("Id of the activity type of task.")
                 .required(true),
-            string("unit_id").label("Unit ID")
+            string("unit_id").metadata(
+                Map.of(
+                    "type", PropertyType.BODY))
+                .label("Unit ID")
                 .description("Sales Unit ID")
                 .required(true),
-            string("owner_id").label("Owner ID")
-                .required(true))
-            .label("Task")
-            .required(true)
-            .metadata(
+            string("owner_id").metadata(
                 Map.of(
-                    "type", PropertyType.BODY)))
+                    "type", PropertyType.BODY))
+                .label("Owner ID")
+                .required(true))
         .output(outputSchema(object()
             .properties(bool("success").required(false),
                 object("data")

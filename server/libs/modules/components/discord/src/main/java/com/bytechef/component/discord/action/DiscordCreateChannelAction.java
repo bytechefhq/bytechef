@@ -50,18 +50,20 @@ public class DiscordCreateChannelAction {
             .metadata(
                 Map.of(
                     "type", PropertyType.PATH)),
-            object("__item").properties(string("name").minLength(1)
+            string("name").minLength(1)
                 .maxLength(100)
+                .metadata(
+                    Map.of(
+                        "type", PropertyType.BODY))
                 .label("Name")
                 .description("The name of the new channel")
                 .required(true),
-                integer("type").label("Type")
-                    .options(option("0", 0), option("2", 2), option("4", 4))
-                    .required(false))
-                .label("Channel")
-                .metadata(
-                    Map.of(
-                        "type", PropertyType.BODY)))
+            integer("type").metadata(
+                Map.of(
+                    "type", PropertyType.BODY))
+                .label("Type")
+                .options(option("0", 0), option("2", 2), option("4", 4))
+                .required(false))
         .output(outputSchema(object()
             .properties(object("body")
                 .properties(string("id").required(false), integer("type").required(false),

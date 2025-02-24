@@ -47,9 +47,8 @@ public class KeapCreateContactAction {
                 "path", "/contacts", "bodyContentType", BodyContentType.JSON, "mimeType", "application/json"
 
             ))
-        .properties(object("__item").properties(array("addresses").items(object().properties(
-            string("country_code").label("Country Code")
-                .required(false),
+        .properties(array("addresses").items(object().properties(string("country_code").label("Country Code")
+            .required(false),
             string("field").label("Field")
                 .options(option("BILLING", "BILLING"), option("SHIPPING", "SHIPPING"), option("OTHER", "OTHER"))
                 .required(true),
@@ -74,23 +73,41 @@ public class KeapCreateContactAction {
                     "Last four of a full zip code ex. '8244', '4320'. This field is supplemental to the zip_code field, otherwise will be ignored.")
                 .required(false)))
             .placeholder("Add to Addresses")
+            .metadata(
+                Map.of(
+                    "type", PropertyType.BODY))
             .label("Addresses")
             .required(false),
-            dateTime("anniversary").label("Anniversary")
+            dateTime("anniversary").metadata(
+                Map.of(
+                    "type", PropertyType.BODY))
+                .label("Anniversary")
                 .required(false),
-            dateTime("birthday").label("Birthday")
+            dateTime("birthday").metadata(
+                Map.of(
+                    "type", PropertyType.BODY))
+                .label("Birthday")
                 .required(false),
             object("company").properties(integer("id").label("Id")
                 .required(false))
+                .metadata(
+                    Map.of(
+                        "type", PropertyType.BODY))
                 .label("RequestCompanyReference")
                 .required(false),
-            string("contact_type").label("Contact Type")
+            string("contact_type").metadata(
+                Map.of(
+                    "type", PropertyType.BODY))
+                .label("Contact Type")
                 .required(false),
             array("custom_fields").items(object().properties(object("content").label("Content")
                 .required(false),
                 integer("id").label("Id")
                     .required(false)))
                 .placeholder("Add to Custom Fields")
+                .metadata(
+                    Map.of(
+                        "type", PropertyType.BODY))
                 .label("Custom Fields")
                 .required(false),
             array("email_addresses").items(object().properties(string("email").label("Email")
@@ -99,9 +116,15 @@ public class KeapCreateContactAction {
                     .options(option("EMAIL1", "EMAIL1"), option("EMAIL2", "EMAIL2"), option("EMAIL3", "EMAIL3"))
                     .required(true)))
                 .placeholder("Add to Email Addresses")
+                .metadata(
+                    Map.of(
+                        "type", PropertyType.BODY))
                 .label("Email Addresses")
                 .required(false),
-            string("family_name").label("Family Name")
+            string("family_name").metadata(
+                Map.of(
+                    "type", PropertyType.BODY))
+                .label("Family Name")
                 .required(false),
             array("fax_numbers").items(object().properties(string("field").label("Field")
                 .options(option("FAX1", "FAX1"), option("FAX2", "FAX2"))
@@ -111,23 +134,47 @@ public class KeapCreateContactAction {
                 string("type").label("Type")
                     .required(false)))
                 .placeholder("Add to Fax Numbers")
+                .metadata(
+                    Map.of(
+                        "type", PropertyType.BODY))
                 .label("Fax Numbers")
                 .required(false),
-            string("given_name").label("Given Name")
+            string("given_name").metadata(
+                Map.of(
+                    "type", PropertyType.BODY))
+                .label("Given Name")
                 .required(false),
-            string("job_title").label("Job Title")
+            string("job_title").metadata(
+                Map.of(
+                    "type", PropertyType.BODY))
+                .label("Job Title")
                 .required(false),
-            integer("lead_source_id").label("Lead Source Id")
+            integer("lead_source_id").metadata(
+                Map.of(
+                    "type", PropertyType.BODY))
+                .label("Lead Source Id")
                 .required(false),
-            string("middle_name").label("Middle Name")
+            string("middle_name").metadata(
+                Map.of(
+                    "type", PropertyType.BODY))
+                .label("Middle Name")
                 .required(false),
-            string("opt_in_reason").label("Opt In Reason")
+            string("opt_in_reason").metadata(
+                Map.of(
+                    "type", PropertyType.BODY))
+                .label("Opt In Reason")
                 .required(false),
             object("origin").properties(string("ip_address").label("Ip Address")
                 .required(true))
+                .metadata(
+                    Map.of(
+                        "type", PropertyType.BODY))
                 .label("CreateContactOrigin")
                 .required(false),
-            integer("owner_id").label("Owner Id")
+            integer("owner_id").metadata(
+                Map.of(
+                    "type", PropertyType.BODY))
+                .label("Owner Id")
                 .required(false),
             array("phone_numbers").items(object().properties(string("extension").label("Extension")
                 .required(false),
@@ -140,14 +187,26 @@ public class KeapCreateContactAction {
                 string("type").label("Type")
                     .required(false)))
                 .placeholder("Add to Phone Numbers")
+                .metadata(
+                    Map.of(
+                        "type", PropertyType.BODY))
                 .label("Phone Numbers")
                 .required(false),
-            string("preferred_locale").label("Preferred Locale")
+            string("preferred_locale").metadata(
+                Map.of(
+                    "type", PropertyType.BODY))
+                .label("Preferred Locale")
                 .required(false)
                 .exampleValue("en_US"),
-            string("preferred_name").label("Preferred Name")
+            string("preferred_name").metadata(
+                Map.of(
+                    "type", PropertyType.BODY))
+                .label("Preferred Name")
                 .required(false),
-            string("prefix").label("Prefix")
+            string("prefix").metadata(
+                Map.of(
+                    "type", PropertyType.BODY))
+                .label("Prefix")
                 .required(false),
             array("social_accounts").items(object().properties(string("name").label("Name")
                 .required(false),
@@ -157,27 +216,41 @@ public class KeapCreateContactAction {
                         option("Snapchat", "Snapchat"), option("YouTube", "YouTube"), option("Pinterest", "Pinterest"))
                     .required(false)))
                 .placeholder("Add to Social Accounts")
+                .metadata(
+                    Map.of(
+                        "type", PropertyType.BODY))
                 .label("Social Accounts")
                 .required(false),
-            string("source_type").label("Source Type")
+            string("source_type").metadata(
+                Map.of(
+                    "type", PropertyType.BODY))
+                .label("Source Type")
                 .options(option("APPOINTMENT", "APPOINTMENT"), option("FORMAPIHOSTED", "FORMAPIHOSTED"),
                     option("FORMAPIINTERNAL", "FORMAPIINTERNAL"), option("WEBFORM", "WEBFORM"),
                     option("INTERNALFORM", "INTERNALFORM"), option("LANDINGPAGE", "LANDINGPAGE"),
                     option("IMPORT", "IMPORT"), option("MANUAL", "MANUAL"), option("API", "API"),
                     option("OTHER", "OTHER"), option("UNKNOWN", "UNKNOWN"))
                 .required(false),
-            string("spouse_name").label("Spouse Name")
-                .required(false),
-            string("suffix").label("Suffix")
-                .required(false),
-            string("time_zone").label("Time Zone")
-                .required(false),
-            string("website").label("Website")
-                .required(false))
-            .label("CreateOrPatchContact")
-            .metadata(
+            string("spouse_name").metadata(
                 Map.of(
-                    "type", PropertyType.BODY)))
+                    "type", PropertyType.BODY))
+                .label("Spouse Name")
+                .required(false),
+            string("suffix").metadata(
+                Map.of(
+                    "type", PropertyType.BODY))
+                .label("Suffix")
+                .required(false),
+            string("time_zone").metadata(
+                Map.of(
+                    "type", PropertyType.BODY))
+                .label("Time Zone")
+                .required(false),
+            string("website").metadata(
+                Map.of(
+                    "type", PropertyType.BODY))
+                .label("Website")
+                .required(false))
         .output(outputSchema(object()
             .properties(string("ScoreValue").required(false), array("addresses")
                 .items(object().properties(string("country_code").required(false),

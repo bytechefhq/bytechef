@@ -46,38 +46,58 @@ public class PipedriveAddLeadAction {
                 "path", "/leads", "bodyContentType", BodyContentType.JSON, "mimeType", "application/json"
 
             ))
-        .properties(object("__item").properties(string("title").label("Title")
+        .properties(string("title").metadata(
+            Map.of(
+                "type", PropertyType.BODY))
+            .label("Title")
             .description("The name of the lead.")
             .required(true),
-            integer("owner_id").label("Owner ID")
+            integer("owner_id").metadata(
+                Map.of(
+                    "type", PropertyType.BODY))
+                .label("Owner ID")
                 .description("User which will be the owner of the created lead.")
                 .required(false),
-            array("label_ids").items(string().description("ID of the labels which will be associated with the lead."))
+            array("label_ids").items(string().metadata(
+                Map.of(
+                    "type", PropertyType.BODY))
+                .description("ID of the labels which will be associated with the lead."))
                 .placeholder("Add to Label Ids")
+                .metadata(
+                    Map.of(
+                        "type", PropertyType.BODY))
                 .label("Lead Labels IDs")
                 .description("ID of the labels which will be associated with the lead.")
                 .required(false),
-            integer("person_id").label("Person ID")
+            integer("person_id").metadata(
+                Map.of(
+                    "type", PropertyType.BODY))
+                .label("Person ID")
                 .description("Person which this lead will be linked to.")
                 .required(false),
-            integer("organization_id").label("Organization ID")
+            integer("organization_id").metadata(
+                Map.of(
+                    "type", PropertyType.BODY))
+                .label("Organization ID")
                 .description("Organization which this lead will be linked to.")
                 .required(false),
             object("value").properties(number("amount").label("Amount")
                 .required(true),
                 string("currency").label("Currency")
                     .required(true))
+                .metadata(
+                    Map.of(
+                        "type", PropertyType.BODY))
                 .label("Value")
                 .description("The potential value of the lead")
                 .required(false),
-            date("expected_close_date").label("Expected Close Date")
+            date("expected_close_date").metadata(
+                Map.of(
+                    "type", PropertyType.BODY))
+                .label("Expected Close Date")
                 .description(
                     "The date of when the deal which will be created from the lead is expected to be closed. In ISO 8601 format: YYYY-MM-DD.")
                 .required(false))
-            .label("Lead")
-            .metadata(
-                Map.of(
-                    "type", PropertyType.BODY)))
         .output(
             outputSchema(
                 object()

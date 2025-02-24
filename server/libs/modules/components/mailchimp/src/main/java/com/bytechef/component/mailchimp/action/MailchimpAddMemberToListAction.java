@@ -64,77 +64,115 @@ public class MailchimpAddMemberToListAction {
                 .metadata(
                     Map.of(
                         "type", PropertyType.QUERY)),
-            object("__item").properties(string("email_address").label("Email Address")
+            string("email_address").metadata(
+                Map.of(
+                    "type", PropertyType.BODY))
+                .label("Email Address")
                 .description("Email address for a subscriber.")
                 .required(true),
-                string("status").label("Status")
-                    .description("Subscriber's current status.")
-                    .options(option("Subscribed", "subscribed"), option("Unsubscribed", "unsubscribed"),
-                        option("Cleaned", "cleaned"), option("Pending", "pending"),
-                        option("Transactional", "transactional"))
-                    .required(true),
-                string("email_type").label("Email Type")
-                    .description("Type of email this member asked to get ('html' or 'text').")
-                    .options(option("Html", "html"), option("Text", "text"))
-                    .required(false),
-                object("merge_fields").additionalProperties(string())
-                    .placeholder("Add to Merge Fields")
-                    .label("Merge Fields")
-                    .description("A dictionary of merge fields where the keys are the merge tags.")
-                    .required(false),
-                object("interests").additionalProperties(string())
-                    .placeholder("Add to Interests")
-                    .label("Interests")
-                    .description("The key of this object's properties is the ID of the interest in question.")
-                    .required(false),
-                string("language").label("Language")
-                    .description("If set/detected, the subscriber's language.")
-                    .required(false),
-                bool("vip").label("Vip")
-                    .description("VIP status for subscriber.")
-                    .required(false),
-                object("location").properties(number("latitude").label("Latitude")
-                    .description("The location latitude.")
-                    .required(false),
-                    number("longitude").label("Longitude")
-                        .description("The location longitude.")
-                        .required(false))
-                    .label("Location")
-                    .description("Subscriber location information.")
-                    .required(false),
-                array("marketing_permissions")
-                    .items(object().properties(string("marketing_permission_id").label("Marketing Permission Id")
-                        .description("The id for the marketing permission on the list.")
-                        .required(false),
-                        bool("enabled").label("Enabled")
-                            .description("If the subscriber has opted-in to the marketing permission.")
-                            .required(false))
-                        .description("The marketing permissions for the subscriber."))
-                    .placeholder("Add to Marketing Permissions")
-                    .label("Marketing Permissions")
-                    .description("The marketing permissions for the subscriber.")
-                    .required(false),
-                string("ip_signup").label("Ip Signup")
-                    .description("IP address the subscriber signed up from.")
-                    .required(false),
-                string("timestamp_signup").label("Timestamp Signup")
-                    .description("The date and time the subscriber signed up for the list in ISO 8601 format.")
-                    .required(false),
-                string("ip_opt").label("Ip Opt")
-                    .description("The IP address the subscriber used to confirm their opt-in status.")
-                    .required(false),
-                string("timestamp_opt").label("Timestamp Opt")
-                    .description("The date and time the subscriber confirmed their opt-in status in ISO 8601 format.")
-                    .required(false),
-                array("tags").items(string().description("The tags that are associated with a member."))
-                    .placeholder("Add to Tags")
-                    .label("Tags")
-                    .description("The tags that are associated with a member.")
-                    .required(false))
-                .label("Item")
+            string("status").label("Status")
+                .description("Subscriber's current status.")
+                .options(option("Subscribed", "subscribed"), option("Unsubscribed", "unsubscribed"),
+                    option("Cleaned", "cleaned"), option("Pending", "pending"),
+                    option("Transactional", "transactional"))
+                .required(true),
+            string("email_type").metadata(
+                Map.of(
+                    "type", PropertyType.BODY))
+                .label("Email Type")
+                .description("Type of email this member asked to get ('html' or 'text').")
+                .options(option("Html", "html"), option("Text", "text"))
+                .required(false),
+            object("merge_fields").additionalProperties(string())
+                .placeholder("Add to Merge Fields")
                 .metadata(
                     Map.of(
-                        "type", PropertyType.BODY)))
+                        "type", PropertyType.BODY))
+                .label("Merge Fields")
+                .description("A dictionary of merge fields where the keys are the merge tags.")
+                .required(false),
+            object("interests").additionalProperties(string())
+                .placeholder("Add to Interests")
+                .metadata(
+                    Map.of(
+                        "type", PropertyType.BODY))
+                .label("Interests")
+                .description("The key of this object's properties is the ID of the interest in question.")
+                .required(false),
+            string("language").metadata(
+                Map.of(
+                    "type", PropertyType.BODY))
+                .label("Language")
+                .description("If set/detected, the subscriber's language.")
+                .required(false),
+            bool("vip").metadata(
+                Map.of(
+                    "type", PropertyType.BODY))
+                .label("Vip")
+                .description("VIP status for subscriber.")
+                .required(false),
+            object("location").properties(number("latitude").label("Latitude")
+                .description("The location latitude.")
+                .required(false),
+                number("longitude").label("Longitude")
+                    .description("The location longitude.")
+                    .required(false))
+                .metadata(
+                    Map.of(
+                        "type", PropertyType.BODY))
+                .label("Location")
+                .description("Subscriber location information.")
+                .required(false),
+            array("marketing_permissions")
+                .items(object().properties(string("marketing_permission_id").label("Marketing Permission Id")
+                    .description("The id for the marketing permission on the list.")
+                    .required(false),
+                    bool("enabled").label("Enabled")
+                        .description("If the subscriber has opted-in to the marketing permission.")
+                        .required(false))
+                    .description("The marketing permissions for the subscriber."))
+                .placeholder("Add to Marketing Permissions")
+                .metadata(
+                    Map.of(
+                        "type", PropertyType.BODY))
+                .label("Marketing Permissions")
+                .description("The marketing permissions for the subscriber.")
+                .required(false),
+            string("ip_signup").metadata(
+                Map.of(
+                    "type", PropertyType.BODY))
+                .label("Ip Signup")
+                .description("IP address the subscriber signed up from.")
+                .required(false),
+            string("timestamp_signup").metadata(
+                Map.of(
+                    "type", PropertyType.BODY))
+                .label("Timestamp Signup")
+                .description("The date and time the subscriber signed up for the list in ISO 8601 format.")
+                .required(false),
+            string("ip_opt").metadata(
+                Map.of(
+                    "type", PropertyType.BODY))
+                .label("Ip Opt")
+                .description("The IP address the subscriber used to confirm their opt-in status.")
+                .required(false),
+            string("timestamp_opt").metadata(
+                Map.of(
+                    "type", PropertyType.BODY))
+                .label("Timestamp Opt")
+                .description("The date and time the subscriber confirmed their opt-in status in ISO 8601 format.")
+                .required(false),
+            array("tags").items(string().metadata(
+                Map.of(
+                    "type", PropertyType.BODY))
+                .description("The tags that are associated with a member."))
+                .placeholder("Add to Tags")
+                .metadata(
+                    Map.of(
+                        "type", PropertyType.BODY))
+                .label("Tags")
+                .description("The tags that are associated with a member.")
+                .required(false))
         .output(
             outputSchema(object().properties(string("id")
                 .description("The MD5 hash of the lowercase version of the list member's email address.")

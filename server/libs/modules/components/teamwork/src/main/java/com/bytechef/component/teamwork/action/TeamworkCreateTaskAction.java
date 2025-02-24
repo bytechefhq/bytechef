@@ -51,19 +51,18 @@ public class TeamworkCreateTaskAction {
             .metadata(
                 Map.of(
                     "type", PropertyType.PATH)),
-            object("__item").properties(object("task").properties(string("name").label("Name")
+            object("task").properties(string("name").label("Name")
                 .description("Task name")
                 .required(false),
                 string("description").label("Description")
                     .required(false),
                 date("dueAt").label("Due Date")
                     .required(false))
-                .label("Task")
-                .required(false))
-                .label("Task")
                 .metadata(
                     Map.of(
-                        "type", PropertyType.BODY)))
+                        "type", PropertyType.BODY))
+                .label("Task")
+                .required(false))
         .output(outputSchema(object()
             .properties(object("body")
                 .properties(string("name").required(false), string("description").required(false),

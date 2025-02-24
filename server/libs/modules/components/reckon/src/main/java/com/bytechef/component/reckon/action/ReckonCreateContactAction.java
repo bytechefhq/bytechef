@@ -48,14 +48,13 @@ public class ReckonCreateContactAction {
             .metadata(
                 Map.of(
                     "type", PropertyType.PATH)),
-            object("__item").properties(string("name").maxLength(100)
+            string("name").maxLength(100)
+                .metadata(
+                    Map.of(
+                        "type", PropertyType.BODY))
                 .label("Name")
                 .description("The name of the contact.")
                 .required(true))
-                .label("Contact")
-                .metadata(
-                    Map.of(
-                        "type", PropertyType.BODY)))
         .output(outputSchema(object().properties(object("body").properties(string("id").required(false))
             .required(false))
             .metadata(

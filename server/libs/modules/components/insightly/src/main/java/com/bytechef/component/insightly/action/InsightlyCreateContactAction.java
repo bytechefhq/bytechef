@@ -43,31 +43,41 @@ public class InsightlyCreateContactAction {
                 "path", "/Contacts", "bodyContentType", BodyContentType.JSON, "mimeType", "application/json"
 
             ))
-        .properties(object("__item").properties(string("FIRST_NAME").maxLength(255)
+        .properties(string("FIRST_NAME").maxLength(255)
+            .metadata(
+                Map.of(
+                    "type", PropertyType.BODY))
             .label("First Name")
             .description("The first name of the contact.")
             .required(true),
             string("LAST_NAME").maxLength(255)
+                .metadata(
+                    Map.of(
+                        "type", PropertyType.BODY))
                 .label("Last Name")
                 .description("The last name of the contact.")
                 .required(false),
             string("EMAIL_ADDRESS").maxLength(255)
+                .metadata(
+                    Map.of(
+                        "type", PropertyType.BODY))
                 .label("Email Address")
                 .description("Email address of the contact.")
                 .required(false),
             string("PHONE").maxLength(255)
+                .metadata(
+                    Map.of(
+                        "type", PropertyType.BODY))
                 .label("Phone")
                 .description("Phone number of the contact.")
                 .required(false),
             string("TITLE").maxLength(255)
+                .metadata(
+                    Map.of(
+                        "type", PropertyType.BODY))
                 .label("Title")
                 .description("The contact's title in company.")
                 .required(false))
-            .label("Contact")
-            .required(true)
-            .metadata(
-                Map.of(
-                    "type", PropertyType.BODY)))
         .output(outputSchema(object()
             .properties(integer("CONTACT_ID").required(false), string("FIRST_NAME").required(false),
                 string("LAST_NAME").required(false), string("EMAIL_ADDRESS").required(false),

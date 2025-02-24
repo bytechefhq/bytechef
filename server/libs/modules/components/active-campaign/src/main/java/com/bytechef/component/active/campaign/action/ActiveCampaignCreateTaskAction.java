@@ -44,7 +44,7 @@ public class ActiveCampaignCreateTaskAction {
                 "path", "/dealTasks", "bodyContentType", BodyContentType.JSON, "mimeType", "application/json"
 
             ))
-        .properties(object("__item").properties(object("dealTask").properties(string("title").label("Title")
+        .properties(object("dealTask").properties(string("title").label("Title")
             .description("The title to be assigned to the task.")
             .required(false),
             integer("relid").label("Assigned To")
@@ -56,12 +56,11 @@ public class ActiveCampaignCreateTaskAction {
             integer("dealTasktype").label("Task Type ID")
                 .description("ID of the task type.")
                 .required(true))
-            .label("Deal Task")
-            .required(false))
-            .label("Task")
             .metadata(
                 Map.of(
-                    "type", PropertyType.BODY)))
+                    "type", PropertyType.BODY))
+            .label("Deal Task")
+            .required(false))
         .output(outputSchema(object()
             .properties(object("body")
                 .properties(object("dealTask")

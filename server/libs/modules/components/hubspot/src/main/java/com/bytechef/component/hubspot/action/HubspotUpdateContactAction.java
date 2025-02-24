@@ -48,7 +48,7 @@ public class HubspotUpdateContactAction {
             .metadata(
                 Map.of(
                     "type", PropertyType.PATH)),
-            object("__item").properties(object("properties").properties(string("firstname").label("First Name")
+            object("properties").properties(string("firstname").label("First Name")
                 .required(false),
                 string("lastname").label("Last Name")
                     .required(false),
@@ -62,12 +62,11 @@ public class HubspotUpdateContactAction {
                 string("website").label("Website")
                     .description("Website of the contact.")
                     .required(false))
-                .label("Properties")
-                .required(false))
-                .label("Contact")
                 .metadata(
                     Map.of(
-                        "type", PropertyType.BODY)))
+                        "type", PropertyType.BODY))
+                .label("Properties")
+                .required(false))
         .output(outputSchema(object()
             .properties(object("body")
                 .properties(string("id").required(false),

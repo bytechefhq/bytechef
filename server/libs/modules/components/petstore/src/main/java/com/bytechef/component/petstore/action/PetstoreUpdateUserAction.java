@@ -50,10 +50,7 @@ public class PetstoreUpdateUserAction {
                 Map.of(
                     "type", PropertyType.PATH)),
             object("user").properties(PetstoreUserProperties.PROPERTIES)
-                .label("User")
-                .metadata(
-                    Map.of(
-                        "type", PropertyType.BODY)))
+                .label("User"))
         .output(outputSchema(object().properties(PetstoreUserProperties.PROPERTIES)
             .metadata(
                 Map.of(

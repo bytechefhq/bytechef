@@ -20,7 +20,6 @@ import static com.bytechef.component.OpenApiComponentHandler.PropertyType;
 import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.array;
 import static com.bytechef.component.definition.ComponentDsl.integer;
-import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.Context.Http.BodyContentType;
 
@@ -47,21 +46,29 @@ public class SpotifyStartResumePlaybackAction {
             .metadata(
                 Map.of(
                     "type", PropertyType.QUERY)),
-            object("__item").properties(string("context_uri").label("Context Uri")
+            string("context_uri").metadata(
+                Map.of(
+                    "type", PropertyType.BODY))
+                .label("Context Uri")
                 .description("Spotify URI of the context to play (album, artist, playlist).")
                 .required(false),
-                array("uris").items(string().description("Spotify track URIs to play."))
-                    .placeholder("Add to Uris")
-                    .label("Tracks")
-                    .description("Spotify track URIs to play.")
-                    .required(false),
-                integer("position_ms").label("Position")
-                    .description("The position in milliseconds to start playback from.")
-                    .required(false))
-                .label("Item")
+            array("uris").items(string().metadata(
+                Map.of(
+                    "type", PropertyType.BODY))
+                .description("Spotify track URIs to play."))
+                .placeholder("Add to Uris")
                 .metadata(
                     Map.of(
-                        "type", PropertyType.BODY)));
+                        "type", PropertyType.BODY))
+                .label("Tracks")
+                .description("Spotify track URIs to play.")
+                .required(false),
+            integer("position_ms").metadata(
+                Map.of(
+                    "type", PropertyType.BODY))
+                .label("Position")
+                .description("The position in milliseconds to start playback from.")
+                .required(false));
 
     private SpotifyStartResumePlaybackAction() {
     }
