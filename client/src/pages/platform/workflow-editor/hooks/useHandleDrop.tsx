@@ -18,6 +18,7 @@ import {useQueryClient} from '@tanstack/react-query';
 import {Edge, Node} from '@xyflow/react';
 import {PlayIcon} from 'lucide-react';
 import InlineSVG from 'react-inlinesvg';
+import {useParams} from 'react-router-dom';
 
 import useWorkflowDataStore from '../stores/useWorkflowDataStore';
 import getFormattedName from '../utils/getFormattedName';
@@ -38,6 +39,8 @@ export default function useHandleDrop(): [
     const {updateWorkflowMutation} = useWorkflowMutation();
 
     const queryClient = useQueryClient();
+
+    const {projectId} = useParams();
 
     async function handleDropOnPlaceholderNode(targetNode: Node, droppedNode: ClickedDefinitionType) {
         const {edges, nodes} = useWorkflowDataStore.getState();
@@ -162,6 +165,7 @@ export default function useHandleDrop(): [
                 parameters,
             },
             nodeIndex: taskNodeIndex,
+            projectId: +projectId!,
             queryClient,
             updateWorkflowMutation,
         });
@@ -284,6 +288,7 @@ export default function useHandleDrop(): [
                 parameters,
             },
             nodeIndex: targetEdgeIndex,
+            projectId: +projectId!,
             queryClient,
             updateWorkflowMutation,
         });
@@ -344,6 +349,7 @@ export default function useHandleDrop(): [
                     properties: draggedComponentTriggerDefinition.properties || [],
                 }),
             },
+            projectId: +projectId!,
             queryClient,
             updateWorkflowMutation,
         });
