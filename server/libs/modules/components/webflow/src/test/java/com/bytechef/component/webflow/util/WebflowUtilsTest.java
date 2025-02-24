@@ -25,7 +25,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Parameters;
@@ -41,14 +41,14 @@ import org.junit.jupiter.api.Test;
 class WebflowUtilsTest {
 
     private final List<Option<String>> expectedOptions = List.of(option("abc", "123"));
-    private final ActionContext mockedActionContext = mock(ActionContext.class);
+    private final Context mockedContext = mock(Context.class);
     private final Http.Executor mockedExecutor = mock(Http.Executor.class);
     private final Parameters mockedParameters = mock(Parameters.class);
     private final Http.Response mockedResponse = mock(Http.Response.class);
 
     @BeforeEach
     void beforeEach() {
-        when(mockedActionContext.http(any()))
+        when(mockedContext.http(any()))
             .thenReturn(mockedExecutor);
         when(mockedExecutor.configuration(any()))
             .thenReturn(mockedExecutor);
@@ -57,43 +57,43 @@ class WebflowUtilsTest {
     }
 
     @Test
-    void testGetCollectionItemOptions() {
+    void testGetItemIdOptions() {
         when(mockedResponse.getBody(any(TypeReference.class)))
             .thenReturn(Map.of("items", List.of(Map.of(ID, "123", "fieldData", Map.of("name", "abc")))));
 
         assertEquals(
             expectedOptions,
-            WebflowUtils.getCollectionItemOptions(mockedParameters, mockedParameters, Map.of(), "",
-                mockedActionContext));
+            WebflowUtils.getItemIdOptions(mockedParameters, mockedParameters, Map.of(), "",
+                mockedContext));
     }
 
     @Test
-    void testGetCollectionOptions() {
+    void testGetCollectionIdOptions() {
         when(mockedResponse.getBody(any(TypeReference.class)))
             .thenReturn(Map.of("collections", List.of(Map.of(ID, "123", DISPLAY_NAME, "abc"))));
 
         assertEquals(
             expectedOptions,
-            WebflowUtils.getCollectionOptions(mockedParameters, mockedParameters, Map.of(), "", mockedActionContext));
+            WebflowUtils.getCollectionIdOptions(mockedParameters, mockedParameters, Map.of(), "", mockedContext));
     }
 
     @Test
-    void testGetOrderOptions() {
+    void testGetOrderIdOptions() {
         when(mockedResponse.getBody(any(TypeReference.class)))
             .thenReturn(Map.of("orders", List.of(Map.of(ORDER_ID, "123"))));
 
         assertEquals(
             List.of(option("123", "123")),
-            WebflowUtils.getOrderOptions(mockedParameters, mockedParameters, Map.of(), "", mockedActionContext));
+            WebflowUtils.getOrderIdOptions(mockedParameters, mockedParameters, Map.of(), "", mockedContext));
     }
 
     @Test
-    void testGetSiteOptions() {
+    void testGetSiteIdOptions() {
         when(mockedResponse.getBody(any(TypeReference.class)))
             .thenReturn(Map.of("sites", List.of(Map.of(ID, "123", DISPLAY_NAME, "abc"))));
 
         assertEquals(
             expectedOptions,
-            WebflowUtils.getSiteOptions(mockedParameters, mockedParameters, Map.of(), "", mockedActionContext));
+            WebflowUtils.getSiteIdOptions(mockedParameters, mockedParameters, Map.of(), "", mockedContext));
     }
 }
