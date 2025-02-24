@@ -27,6 +27,7 @@ paths:
           schema:
             type: "string"
             title: "Owner ID"
+            x-dynamic-otions: true
         - name: "account_id"
           description: "The ID for the account within your Apollo instance. This is the company that you are targeting as part of the deal being created."
           in: "query"
@@ -34,6 +35,7 @@ paths:
           schema:
             type: "string"
             title: "Account ID"
+            x-dynamic-options: true
         - name: "amount"
           description: "The monetary value of the deal being created. Do not enter commas or currency symbols for the value. "
           in: "query"
@@ -102,6 +104,7 @@ paths:
           schema:
             type: "string"
             title: "Opportunity Id"
+            x-dynamic-options: true
         - name: "owner_id"
           description: "The ID for the deal owner within your team's Apollo account."
           in: "query"
@@ -109,6 +112,7 @@ paths:
           schema:
             type: "string"
             title: "Owner ID"
+            x-dynamic-options: true
         - name: "name"
           description: "New name for the deal."
           in: "query"

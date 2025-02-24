@@ -25,7 +25,9 @@ import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.Context.Http.ResponseType;
 
+import com.bytechef.component.apollo.util.ApolloUtils;
 import com.bytechef.component.definition.ComponentDsl;
+import com.bytechef.component.definition.OptionsDataSource;
 import java.util.Map;
 
 /**
@@ -59,6 +61,7 @@ public class ApolloCreateDealAction {
                 .description(
                     "The ID for the account within your Apollo instance. This is the company that you are targeting as part of the deal being created.")
                 .required(false)
+                .options((OptionsDataSource.ActionOptionsFunction<String>) ApolloUtils::getAccountIdOptions)
                 .metadata(
                     Map.of(
                         "type", PropertyType.QUERY)),
