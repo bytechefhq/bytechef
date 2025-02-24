@@ -18,7 +18,7 @@ package com.bytechef.component.pipeliner.util;
 
 import static com.bytechef.component.definition.ComponentDsl.option;
 
-import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Parameters;
@@ -28,16 +28,16 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * @author Monika Domiter
+ * @author Monika Kušter
  */
-public class PipelinerUtils {
+public class PipelinerUtils extends AbstractPipelinerUtils {
 
     private PipelinerUtils() {
     }
 
     public static List<Option<String>> getActivityTypeIdOptions(
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
-        String searchText, ActionContext context) {
+        String searchText, Context context) {
 
         Map<String, ?> body = context
             .http(http -> http.get("/entities/TaskTypes"))
@@ -54,7 +54,7 @@ public class PipelinerUtils {
 
     public static List<Option<String>> getOwnerIdOptions(
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
-        String searchText, ActionContext context) {
+        String searchText, Context context) {
 
         Map<String, ?> body = context
             .http(http -> http.get("/entities/Clients"))
@@ -75,9 +75,9 @@ public class PipelinerUtils {
         return options;
     }
 
-    public static List<Option<String>> getSalesUnitsIdOptions(
+    public static List<Option<String>> getUnitIdOptions(
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
-        String searchText, ActionContext context) {
+        String searchText, Context context) {
 
         Map<String, ?> body = context
             .http(http -> http.get("/entities/SalesUnits"))
