@@ -31,6 +31,8 @@ import static com.bytechef.component.definition.Context.Http.BodyContentType;
 import static com.bytechef.component.definition.Context.Http.ResponseType;
 
 import com.bytechef.component.definition.ComponentDsl;
+import com.bytechef.component.definition.OptionsDataSource;
+import com.bytechef.component.mailchimp.util.MailchimpUtils;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
@@ -54,6 +56,7 @@ public class MailchimpAddMemberToListAction {
         .properties(string("listId").label("List ID")
             .description("The unique ID for the list.")
             .required(true)
+            .options((OptionsDataSource.ActionOptionsFunction<String>) MailchimpUtils::getListIdOptions)
             .metadata(
                 Map.of(
                     "type", PropertyType.PATH)),

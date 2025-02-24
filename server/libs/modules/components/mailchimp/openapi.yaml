@@ -20,6 +20,7 @@ paths:
         schema:
           type: "string"
           title: "List ID"
+          x-dynamic-options: true
       - name: "skip_merge_validation"
         description: "If skip_merge_validation is true, member data will be accepted\
           \ without merge field values, even if the merge field is usually required.\
