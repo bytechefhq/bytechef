@@ -23,7 +23,7 @@ import static com.bytechef.component.webflow.constant.WebflowConstants.ID;
 import static com.bytechef.component.webflow.constant.WebflowConstants.ORDER_ID;
 import static com.bytechef.component.webflow.constant.WebflowConstants.SITE_ID;
 
-import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Parameters;
@@ -35,14 +35,14 @@ import java.util.Map;
 /**
  * @author Monika Kušter
  */
-public class WebflowUtils {
+public class WebflowUtils extends AbstractWebflowUtils {
 
     private WebflowUtils() {
     }
 
-    public static List<Option<String>> getCollectionItemOptions(
+    public static List<Option<String>> getItemIdOptions(
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
-        String searchText, ActionContext context) {
+        String searchText, Context context) {
 
         Map<String, Object> body = context
             .http(http -> http.get("/collections/" + inputParameters.getRequiredString(COLLECTION_ID) + "/items"))
@@ -63,9 +63,9 @@ public class WebflowUtils {
         return options;
     }
 
-    public static List<Option<String>> getCollectionOptions(
+    public static List<Option<String>> getCollectionIdOptions(
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
-        String searchText, ActionContext context) {
+        String searchText, Context context) {
 
         Map<String, List<Map<String, Object>>> body = context
             .http(http -> http.get("/sites/" + inputParameters.getRequiredString(SITE_ID) + "/collections"))
@@ -82,9 +82,9 @@ public class WebflowUtils {
         return options;
     }
 
-    public static List<Option<String>> getOrderOptions(
+    public static List<Option<String>> getOrderIdOptions(
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
-        String searchText, ActionContext context) {
+        String searchText, Context context) {
 
         Map<String, List<Map<String, Object>>> body = context
             .http(http -> http.get("/sites/" + inputParameters.getRequiredString(SITE_ID) + "/orders"))
@@ -101,9 +101,9 @@ public class WebflowUtils {
         return options;
     }
 
-    public static List<Option<String>> getSiteOptions(
+    public static List<Option<String>> getSiteIdOptions(
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
-        String searchText, ActionContext context) {
+        String searchText, Context context) {
 
         Map<String, List<Map<String, Object>>> body = context
             .http(http -> http.get("/sites"))
