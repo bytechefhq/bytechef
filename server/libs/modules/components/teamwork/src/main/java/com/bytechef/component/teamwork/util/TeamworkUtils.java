@@ -18,7 +18,7 @@ package com.bytechef.component.teamwork.util;
 
 import static com.bytechef.component.definition.ComponentDsl.option;
 
-import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Parameters;
@@ -28,33 +28,32 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * @author Monika Domiter
+ * @author Monika Kušter
  */
-public class TeamworkUtils {
+public class TeamworkUtils extends AbstractTeamworkUtils {
 
     private TeamworkUtils() {
     }
 
-    public static List<Option<String>> getTaskListIdOptions(
+    public static List<Option<Long>> getTasklistIdOptions(
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
-        String searchText, ActionContext context) {
+        String searchText, Context context) {
 
         Map<String, ?> body = context.http(http -> http.get("/tasklists"))
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});
 
-        List<Option<String>> options = new ArrayList<>();
+        List<Option<Long>> options = new ArrayList<>();
 
         if (body.get("tasklists") instanceof List<?> list) {
             for (Object item : list) {
                 if (item instanceof Map<?, ?> map) {
-                    options.add(option((String) map.get("name"), String.valueOf(map.get("id"))));
+                    options.add(option((String) map.get("name"), ((Integer) map.get("id")).intValue()));
                 }
             }
         }
 
         return options;
     }
-
 }
