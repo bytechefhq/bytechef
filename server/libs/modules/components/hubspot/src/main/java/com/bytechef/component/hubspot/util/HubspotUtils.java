@@ -23,12 +23,12 @@ import static com.bytechef.component.hubspot.constant.HubspotConstants.ID;
 import static com.bytechef.component.hubspot.constant.HubspotConstants.LABEL;
 import static com.bytechef.component.hubspot.constant.HubspotConstants.RESULTS;
 
-import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TriggerContext;
-import com.bytechef.component.definition.TriggerDefinition.WebhookBody;
+import com.bytechef.component.definition.TriggerDefinition;
 import com.bytechef.component.definition.TypeReference;
 import java.util.ArrayList;
 import java.util.List;
@@ -37,20 +37,20 @@ import java.util.Map;
 /**
  * @author Monika Kušter
  */
-public class HubspotUtils {
+public class HubspotUtils extends AbstractHubspotUtils {
 
     private HubspotUtils() {
     }
 
-    public static Map<String, Object> extractFirstContentMap(WebhookBody body) {
+    public static Map<String, Object> extractFirstContentMap(TriggerDefinition.WebhookBody body) {
         List<Map<String, Object>> content = body.getContent(new TypeReference<>() {});
 
         return content.getFirst();
     }
 
-    public static List<Option<String>> getContactsOptions(
+    public static List<Option<String>> getContactIdOptions(
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
-        String searchText, ActionContext context) {
+        String searchText, Context context) {
 
         Map<String, Object> response = context
             .http(http -> http.get("/crm/v3/objects/contacts"))
@@ -75,9 +75,9 @@ public class HubspotUtils {
         return options;
     }
 
-    public static List<Option<String>> getDealStageOptions(
+    public static List<Option<String>> getDealstageOptions(
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
-        String searchText, ActionContext context) {
+        String searchText, Context context) {
 
         Map<String, ?> itemMap = inputParameters.getMap("__item");
 
@@ -96,9 +96,9 @@ public class HubspotUtils {
         return List.of();
     }
 
-    public static List<Option<String>> getOwnerOptions(
+    public static List<Option<String>> getHubspotOwnerIdOptions(
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
-        String searchText, ActionContext context) {
+        String searchText, Context context) {
 
         Map<String, Object> body =
             context.http(http -> http.get("/crm/v3/owners"))
@@ -110,9 +110,9 @@ public class HubspotUtils {
 
     }
 
-    public static List<Option<String>> getPipelineDealOptions(
+    public static List<Option<String>> getPipelineOptions(
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
-        String searchText, ActionContext context) {
+        String searchText, Context context) {
 
         Map<String, Object> body =
             context.http(http -> http.get("/crm/v3/pipelines/deals"))
@@ -125,7 +125,7 @@ public class HubspotUtils {
 
     public static List<Option<String>> getTicketIdOptions(
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
-        String searchText, ActionContext context) {
+        String searchText, Context context) {
 
         Map<String, Object> body =
             context.http(http -> http.get("/crm/v3/objects/tickets"))
@@ -153,24 +153,24 @@ public class HubspotUtils {
         triggerContext
             .http(http -> http.put("/webhooks/v3/%s/settings".formatted(appId)))
             .queryParameter(HAPIKEY, hapikey)
-            .body(Http.Body.of(
+            .body(Context.Http.Body.of(
                 "throttling", Map.of(
                     "period", "SECONDLY",
                     "maxConcurrentRequests", 10),
                 "targetUrl", webhookUrl))
             .configuration(
-                Http.responseType(Http.ResponseType.JSON)
+                Context.Http.responseType(Context.Http.ResponseType.JSON)
                     .disableAuthorization(true))
             .execute();
 
         Map<String, Object> body = triggerContext
             .http(http -> http.post("/webhooks/v3/%s/subscriptions".formatted(appId)))
             .queryParameter(HAPIKEY, hapikey)
-            .body(Http.Body.of(
+            .body(Context.Http.Body.of(
                 EVENT_TYPE, eventType,
                 "active", true))
             .configuration(
-                Http.responseType(Http.ResponseType.JSON)
+                Context.Http.responseType(Context.Http.ResponseType.JSON)
                     .disableAuthorization(true))
             .execute()
             .getBody(new TypeReference<>() {});
@@ -183,7 +183,7 @@ public class HubspotUtils {
             .http(http -> http.delete("/webhooks/v3/%s/subscriptions/%s".formatted(appId, subscriptionId)))
             .queryParameter(HAPIKEY, hapikey)
             .configuration(
-                Http.responseType(Http.ResponseType.JSON)
+                Context.Http.responseType(Context.Http.ResponseType.JSON)
                     .disableAuthorization(true))
             .execute();
     }
