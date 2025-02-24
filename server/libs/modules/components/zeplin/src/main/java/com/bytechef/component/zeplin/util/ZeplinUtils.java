@@ -31,7 +31,7 @@ import java.util.Map;
 /**
  * @author Monika Kušter
  */
-public class ZeplinUtils {
+public class ZeplinUtils extends AbstractZeplinUtils {
 
     private ZeplinUtils() {
     }
