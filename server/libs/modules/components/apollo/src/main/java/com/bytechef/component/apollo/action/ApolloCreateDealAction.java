@@ -54,6 +54,7 @@ public class ApolloCreateDealAction {
             string("owner_id").label("Owner ID")
                 .description("The ID for the deal owner within your team's Apollo account.")
                 .required(false)
+                .options((OptionsDataSource.ActionOptionsFunction<String>) ApolloUtils::getOwnerIdOptions)
                 .metadata(
                     Map.of(
                         "type", PropertyType.QUERY)),
