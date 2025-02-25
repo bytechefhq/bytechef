@@ -36,33 +36,41 @@ const TASK_DISPATCHER_NAMES = [
 ];
 
 const calculateNodeHeight = (node: Node, nodes: Node[], index: number) => {
+    const loopPlaceholderNode =
+        (node.data.taskDispatcherId as string)?.includes('loop') && node.id.includes('placeholder');
+    const loopGhostNode = (node.data.taskDispatcherId as string)?.includes('loop') && node.type?.includes('GhostNode');
+
+    const conditionPlaceholderNode = node.id.includes('condition') && node.id.includes('placeholder');
+
     let height = NODE_HEIGHT;
 
-    if (node.id.includes('condition')) {
-        if (node.id.includes('placeholder')) {
-            height = PLACEHOLDER_NODE_HEIGHT * 2;
+    if (conditionPlaceholderNode) {
+        height = PLACEHOLDER_NODE_HEIGHT * 2;
 
-            if (node.id.includes('placeholder-0')) {
-                const hasOtherConditionCaseNodes = filterConditionCaseNodes(nodes, node);
+        if (node.id.includes('placeholder-0')) {
+            const otherConditionCaseNodes = filterConditionCaseNodes(nodes, node);
 
-                if (hasOtherConditionCaseNodes.length) {
-                    height = 0;
-                } else {
-                    height = PLACEHOLDER_NODE_HEIGHT * 2;
-                }
-            } else {
-                height = PLACEHOLDER_NODE_HEIGHT;
+            if (otherConditionCaseNodes.length) {
+                height = 0;
             }
-
-            if (node.id.includes('bottom')) {
-                height = PLACEHOLDER_NODE_HEIGHT;
-            }
-        }
-    } else if (node.id.includes('loop')) {
-        if (node.id.includes('placeholder')) {
+        } else {
             height = PLACEHOLDER_NODE_HEIGHT;
         }
-    } else if (!node.data.conditionData) {
+
+        if (node.id.includes('bottom')) {
+            height = PLACEHOLDER_NODE_HEIGHT;
+        }
+    } else if (loopPlaceholderNode) {
+        const otherLoopPlaceholderNodes = getOtherLoopPlaceholderNodes(nodes, node);
+
+        height = PLACEHOLDER_NODE_HEIGHT * 2;
+
+        if (otherLoopPlaceholderNodes.length) {
+            height = 0;
+        }
+    } else if (loopGhostNode) {
+        height = 0;
+    } else if (!node.data.conditionData && !node.data.loopData) {
         height = NODE_HEIGHT * 1.2;
     }
 
@@ -126,20 +134,63 @@ const filterConditionCaseNodes = (nodes: Node[], node: Node) => {
     });
 };
 
+const getOtherLoopPlaceholderNodes = (nodes: Node[], node: Node) =>
+    nodes.filter((nodeItem) => {
+        if (nodeItem.id === node.id) {
+            return false;
+        }
+
+        if (!nodeItem.data.loopId) {
+            return false;
+        }
+
+        return nodeItem.data.loopId === node.data.loopId && nodeItem.id !== node.id;
+    });
+
 const getNodePosition = (node: Node, canvasWidth: number, nodes: Node[], dagreGraph: dagre.graphlib.Graph) => {
+    const conditionPlaceholderNode = node.id.includes('condition') && node.id.includes('placeholder');
+
+    const loopPlaceholderNode =
+        (node.data.taskDispatcherId as string)?.includes('loop') && node.id.includes('placeholder');
+
+    const loopChildTaskNode = node.data.loopData;
+
     const x = dagreGraph.node(node.id).x + (canvasWidth / 2 - dagreGraph.node(nodes[0].id).x - 72 / 2);
     let y = dagreGraph.node(node.id).y;
 
-    if (node.id.includes('condition')) {
-        if (node.id.includes('placeholder-0') && !node.id.includes('bottom')) {
+    if (conditionPlaceholderNode) {
+        if (node.id.includes('placeholder-0')) {
             const hasOtherConditionCaseNodes = filterConditionCaseNodes(nodes, node);
 
             if (hasOtherConditionCaseNodes.length) {
                 y += 35;
             }
-        } else if (node.id.includes('bottom-placeholder')) {
+        } else if (node.id.includes('bottom')) {
             y += 35;
         }
+    }
+
+    if (loopPlaceholderNode) {
+        const hasOtherLoopNodes = getOtherLoopPlaceholderNodes(nodes, node);
+
+        if (!node.id.includes('placeholder-0')) {
+            y -= 20;
+        }
+
+        if (!hasOtherLoopNodes.length) {
+            y -= 15;
+        }
+    }
+
+    if (loopChildTaskNode) {
+        y -= 40;
+    }
+
+    const previousNodeIndex = nodes.findIndex((nodeItem) => nodeItem.id === node.id) - 1;
+    const previousNode = nodes[previousNodeIndex];
+
+    if (previousNode?.type === 'taskDispatcherBottomGhostNode') {
+        y = dagreGraph.node(previousNode.id).y + 100;
     }
 
     return {x, y};
@@ -395,7 +446,7 @@ export default function useLayout({
             const belowPlaceholderNodeId = getNextLoopPlaceholderId(sourcePlaceholderNode.id);
 
             const belowPlaceholderNode = {
-                data: {label: '+', loopId},
+                data: {label: '+', loopId, taskDispatcherId: loopId},
                 id: belowPlaceholderNodeId,
                 position: {x: 0, y: 0},
                 type: 'placeholder',
