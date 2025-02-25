@@ -23,7 +23,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Provides methods for retrieving dynamic options for various properties within the component.
+ * Provides methods for retrieving dynamic options and properties for various properties within the component.
  *
  * @generated
  */
