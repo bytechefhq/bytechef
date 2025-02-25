@@ -2247,13 +2247,16 @@ components:
         - outputSchema
         - workflowNodeName
       properties:
-        actionDefinition:
-          $ref: '#/components/schemas/ActionDefinitionBasic'
         outputSchema:
           $ref: "#/components/schemas/Property"
         sampleOutput:
           description: "The sample value of an output."
           type: "object"
+        placeholder:
+          description: "The placeholder of an output."
+          type: "object"
+        actionDefinition:
+          $ref: '#/components/schemas/ActionDefinitionBasic'
         taskDispatcherDefinition:
           $ref: '#/components/schemas/TaskDispatcherDefinitionBasic'
         triggerDefinition:
