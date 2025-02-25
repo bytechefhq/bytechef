@@ -13,55 +13,6 @@
   "resources" : null,
   "version" : 1,
   "title" : "Baserow",
-  "connection" : {
-    "authorizations" : [ {
-      "detectOn" : null,
-      "description" : null,
-      "name" : "custom",
-      "properties" : [ {
-        "advancedOption" : null,
-        "description" : null,
-        "displayCondition" : null,
-        "expressionEnabled" : null,
-        "hidden" : null,
-        "metadata" : { },
-        "required" : true,
-        "name" : "token",
-        "type" : "STRING",
-        "defaultValue" : null,
-        "exampleValue" : null,
-        "label" : "Database Token",
-        "placeholder" : null,
-        "controlType" : "TEXT",
-        "languageId" : null,
-        "maxLength" : null,
-        "minLength" : null,
-        "options" : null,
-        "optionsDataSource" : null
-      } ],
-      "refreshOn" : null,
-      "title" : null,
-      "type" : "CUSTOM",
-      "acquire" : null,
-      "refreshUrl" : null,
-      "scopes" : null,
-      "tokenUrl" : null,
-      "apply" : { },
-      "clientId" : null,
-      "pkce" : null,
-      "refresh" : null,
-      "refreshToken" : null,
-      "authorizationUrl" : null,
-      "clientSecret" : null,
-      "authorizationCallback" : null,
-      "oauth2AuthorizationExtraQueryParameters" : null
-    } ],
-    "properties" : null,
-    "version" : 1,
-    "authorizationRequired" : null,
-    "baseUri" : { },
-    "test" : null
-  },
   "actions" : [ {
     "batch" : null,
     "deprecated" : null,
@@ -135,9 +86,9 @@
       }
     } ],
     "title" : "Create Row",
+    "workflowNodeDescription" : null,
     "perform" : { },
-    "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "processErrorResponse" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -186,9 +137,9 @@
       "optionsDataSource" : null
     } ],
     "title" : "Delete Row",
+    "workflowNodeDescription" : null,
     "perform" : { },
-    "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "processErrorResponse" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -266,9 +217,9 @@
       "controlType" : "SELECT"
     } ],
     "title" : "Get Row",
+    "workflowNodeDescription" : null,
     "perform" : { },
-    "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "processErrorResponse" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -366,9 +317,9 @@
       "controlType" : "SELECT"
     } ],
     "title" : "List Rows",
+    "workflowNodeDescription" : null,
     "perform" : { },
-    "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "processErrorResponse" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -461,11 +412,60 @@
       }
     } ],
     "title" : "Update Row",
+    "workflowNodeDescription" : null,
     "perform" : { },
-    "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "processErrorResponse" : null
   } ],
-  "triggers" : null,
   "dataStream" : null,
-  "unifiedApi" : null
+  "triggers" : null,
+  "unifiedApi" : null,
+  "connection" : {
+    "authorizations" : [ {
+      "detectOn" : null,
+      "description" : null,
+      "name" : "custom",
+      "properties" : [ {
+        "advancedOption" : null,
+        "description" : null,
+        "displayCondition" : null,
+        "expressionEnabled" : null,
+        "hidden" : null,
+        "metadata" : { },
+        "required" : true,
+        "name" : "token",
+        "type" : "STRING",
+        "defaultValue" : null,
+        "exampleValue" : null,
+        "label" : "Database Token",
+        "placeholder" : null,
+        "controlType" : "TEXT",
+        "languageId" : null,
+        "maxLength" : null,
+        "minLength" : null,
+        "options" : null,
+        "optionsDataSource" : null
+      } ],
+      "refreshOn" : null,
+      "title" : null,
+      "type" : "CUSTOM",
+      "acquire" : null,
+      "apply" : { },
+      "authorizationCallback" : null,
+      "authorizationUrl" : null,
+      "clientId" : null,
+      "clientSecret" : null,
+      "oauth2AuthorizationExtraQueryParameters" : null,
+      "pkce" : null,
+      "refresh" : null,
+      "refreshUrl" : null,
+      "scopes" : null,
+      "refreshToken" : null,
+      "tokenUrl" : null
+    } ],
+    "properties" : null,
+    "version" : 1,
+    "authorizationRequired" : null,
+    "baseUri" : { },
+    "test" : null
+  }
 }

@@ -13,75 +13,6 @@
   "resources" : null,
   "version" : 1,
   "title" : "ClickUp",
-  "connection" : {
-    "authorizations" : [ {
-      "detectOn" : null,
-      "description" : null,
-      "name" : "oauth2_authorization_code",
-      "properties" : [ {
-        "advancedOption" : null,
-        "description" : null,
-        "displayCondition" : null,
-        "expressionEnabled" : null,
-        "hidden" : null,
-        "metadata" : { },
-        "required" : true,
-        "name" : "clientId",
-        "type" : "STRING",
-        "defaultValue" : null,
-        "exampleValue" : null,
-        "label" : "Client Id",
-        "placeholder" : null,
-        "controlType" : "TEXT",
-        "languageId" : null,
-        "maxLength" : null,
-        "minLength" : null,
-        "options" : null,
-        "optionsDataSource" : null
-      }, {
-        "advancedOption" : null,
-        "description" : null,
-        "displayCondition" : null,
-        "expressionEnabled" : null,
-        "hidden" : null,
-        "metadata" : { },
-        "required" : true,
-        "name" : "clientSecret",
-        "type" : "STRING",
-        "defaultValue" : null,
-        "exampleValue" : null,
-        "label" : "Client Secret",
-        "placeholder" : null,
-        "controlType" : "TEXT",
-        "languageId" : null,
-        "maxLength" : null,
-        "minLength" : null,
-        "options" : null,
-        "optionsDataSource" : null
-      } ],
-      "refreshOn" : null,
-      "title" : "OAuth2 Authorization Code",
-      "type" : "OAUTH2_AUTHORIZATION_CODE",
-      "acquire" : null,
-      "authorizationCallback" : null,
-      "oauth2AuthorizationExtraQueryParameters" : null,
-      "apply" : null,
-      "clientId" : null,
-      "pkce" : null,
-      "refresh" : null,
-      "refreshUrl" : null,
-      "scopes" : null,
-      "tokenUrl" : { },
-      "authorizationUrl" : { },
-      "clientSecret" : null,
-      "refreshToken" : null
-    } ],
-    "properties" : null,
-    "version" : 1,
-    "authorizationRequired" : null,
-    "baseUri" : { },
-    "test" : null
-  },
   "actions" : [ {
     "batch" : null,
     "deprecated" : null,
@@ -231,8 +162,8 @@
                 "options" : null,
                 "optionsDataSource" : null
               } ],
-              "controlType" : "OBJECT_BUILDER",
-              "optionsDataSource" : null
+              "optionsDataSource" : null,
+              "controlType" : "OBJECT_BUILDER"
             }, {
               "advancedOption" : null,
               "description" : null,
@@ -291,14 +222,14 @@
                 "options" : null,
                 "optionsDataSource" : null
               } ],
-              "controlType" : "OBJECT_BUILDER",
-              "optionsDataSource" : null
+              "optionsDataSource" : null,
+              "controlType" : "OBJECT_BUILDER"
             } ],
-            "controlType" : "OBJECT_BUILDER",
-            "optionsDataSource" : null
+            "optionsDataSource" : null,
+            "controlType" : "OBJECT_BUILDER"
           } ],
-          "controlType" : "OBJECT_BUILDER",
-          "optionsDataSource" : null
+          "optionsDataSource" : null,
+          "controlType" : "OBJECT_BUILDER"
         },
         "sampleOutput" : null,
         "placeholder" : null
@@ -437,8 +368,8 @@
               "options" : null,
               "optionsDataSource" : null
             } ],
-            "controlType" : "OBJECT_BUILDER",
-            "optionsDataSource" : null
+            "optionsDataSource" : null,
+            "controlType" : "OBJECT_BUILDER"
           }, {
             "advancedOption" : null,
             "description" : null,
@@ -497,14 +428,14 @@
               "options" : null,
               "optionsDataSource" : null
             } ],
-            "controlType" : "OBJECT_BUILDER",
-            "optionsDataSource" : null
+            "optionsDataSource" : null,
+            "controlType" : "OBJECT_BUILDER"
           } ],
-          "controlType" : "OBJECT_BUILDER",
-          "optionsDataSource" : null
+          "optionsDataSource" : null,
+          "controlType" : "OBJECT_BUILDER"
         } ],
-        "controlType" : "OBJECT_BUILDER",
-        "optionsDataSource" : null
+        "optionsDataSource" : null,
+        "controlType" : "OBJECT_BUILDER"
       },
       "sampleOutput" : null
     },
@@ -517,18 +448,16 @@
       "metadata" : { },
       "required" : true,
       "name" : "workspaceId",
-      "type" : "NUMBER",
+      "type" : "STRING",
       "defaultValue" : null,
       "exampleValue" : null,
       "label" : "Workspace ID",
       "placeholder" : null,
-      "maxNumberPrecision" : null,
-      "maxValue" : null,
-      "minNumberPrecision" : null,
-      "minValue" : null,
-      "numberPrecision" : null,
-      "options" : null,
       "controlType" : "SELECT",
+      "languageId" : null,
+      "maxLength" : null,
+      "minLength" : null,
+      "options" : null,
       "optionsDataSource" : {
         "optionsLookupDependsOn" : null,
         "options" : { }
@@ -542,18 +471,16 @@
       "metadata" : { },
       "required" : true,
       "name" : "spaceId",
-      "type" : "NUMBER",
+      "type" : "STRING",
       "defaultValue" : null,
       "exampleValue" : null,
       "label" : "Space ID",
       "placeholder" : null,
-      "maxNumberPrecision" : null,
-      "maxValue" : null,
-      "minNumberPrecision" : null,
-      "minValue" : null,
-      "numberPrecision" : null,
-      "options" : null,
       "controlType" : "SELECT",
+      "languageId" : null,
+      "maxLength" : null,
+      "minLength" : null,
+      "options" : null,
       "optionsDataSource" : {
         "optionsLookupDependsOn" : [ "workspaceId" ],
         "options" : { }
@@ -569,69 +496,47 @@
       },
       "required" : true,
       "name" : "folderId",
-      "type" : "NUMBER",
+      "type" : "STRING",
       "defaultValue" : null,
       "exampleValue" : null,
       "label" : "Folder ID",
       "placeholder" : null,
-      "maxNumberPrecision" : null,
-      "maxValue" : null,
-      "minNumberPrecision" : null,
-      "minValue" : null,
-      "numberPrecision" : null,
-      "options" : null,
       "controlType" : "SELECT",
+      "languageId" : null,
+      "maxLength" : null,
+      "minLength" : null,
+      "options" : null,
       "optionsDataSource" : {
         "optionsLookupDependsOn" : [ "spaceId", "workspaceId" ],
         "options" : { }
       }
     }, {
       "advancedOption" : null,
-      "description" : null,
+      "description" : "The name of the list.",
       "displayCondition" : null,
       "expressionEnabled" : null,
       "hidden" : null,
       "metadata" : {
         "type" : "BODY"
       },
-      "required" : null,
-      "name" : "__item",
-      "type" : "OBJECT",
+      "required" : true,
+      "name" : "name",
+      "type" : "STRING",
       "defaultValue" : null,
       "exampleValue" : null,
-      "label" : "List",
+      "label" : "Name",
       "placeholder" : null,
-      "additionalProperties" : null,
-      "multipleValues" : null,
+      "controlType" : "TEXT",
+      "languageId" : null,
+      "maxLength" : null,
+      "minLength" : null,
       "options" : null,
-      "properties" : [ {
-        "advancedOption" : null,
-        "description" : "The name of the list.",
-        "displayCondition" : null,
-        "expressionEnabled" : null,
-        "hidden" : null,
-        "metadata" : { },
-        "required" : true,
-        "name" : "name",
-        "type" : "STRING",
-        "defaultValue" : null,
-        "exampleValue" : null,
-        "label" : "Name",
-        "placeholder" : null,
-        "controlType" : "TEXT",
-        "languageId" : null,
-        "maxLength" : null,
-        "minLength" : null,
-        "options" : null,
-        "optionsDataSource" : null
-      } ],
-      "controlType" : "OBJECT_BUILDER",
       "optionsDataSource" : null
     } ],
     "title" : "Create List",
-    "processErrorResponse" : null,
     "workflowNodeDescription" : null,
-    "perform" : null
+    "perform" : null,
+    "processErrorResponse" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -821,8 +726,8 @@
                 "options" : null,
                 "optionsDataSource" : null
               } ],
-              "controlType" : "OBJECT_BUILDER",
-              "optionsDataSource" : null
+              "optionsDataSource" : null,
+              "controlType" : "OBJECT_BUILDER"
             }, {
               "advancedOption" : null,
               "description" : null,
@@ -881,8 +786,8 @@
                 "options" : null,
                 "optionsDataSource" : null
               } ],
-              "controlType" : "OBJECT_BUILDER",
-              "optionsDataSource" : null
+              "optionsDataSource" : null,
+              "controlType" : "OBJECT_BUILDER"
             }, {
               "advancedOption" : null,
               "description" : null,
@@ -921,14 +826,14 @@
                 "options" : null,
                 "optionsDataSource" : null
               } ],
-              "controlType" : "OBJECT_BUILDER",
-              "optionsDataSource" : null
+              "optionsDataSource" : null,
+              "controlType" : "OBJECT_BUILDER"
             } ],
-            "controlType" : "OBJECT_BUILDER",
-            "optionsDataSource" : null
+            "optionsDataSource" : null,
+            "controlType" : "OBJECT_BUILDER"
           } ],
-          "controlType" : "OBJECT_BUILDER",
-          "optionsDataSource" : null
+          "optionsDataSource" : null,
+          "controlType" : "OBJECT_BUILDER"
         },
         "sampleOutput" : null,
         "placeholder" : null
@@ -1107,8 +1012,8 @@
               "options" : null,
               "optionsDataSource" : null
             } ],
-            "controlType" : "OBJECT_BUILDER",
-            "optionsDataSource" : null
+            "optionsDataSource" : null,
+            "controlType" : "OBJECT_BUILDER"
           }, {
             "advancedOption" : null,
             "description" : null,
@@ -1167,8 +1072,8 @@
               "options" : null,
               "optionsDataSource" : null
             } ],
-            "controlType" : "OBJECT_BUILDER",
-            "optionsDataSource" : null
+            "optionsDataSource" : null,
+            "controlType" : "OBJECT_BUILDER"
           }, {
             "advancedOption" : null,
             "description" : null,
@@ -1207,14 +1112,14 @@
               "options" : null,
               "optionsDataSource" : null
             } ],
-            "controlType" : "OBJECT_BUILDER",
-            "optionsDataSource" : null
+            "optionsDataSource" : null,
+            "controlType" : "OBJECT_BUILDER"
           } ],
-          "controlType" : "OBJECT_BUILDER",
-          "optionsDataSource" : null
+          "optionsDataSource" : null,
+          "controlType" : "OBJECT_BUILDER"
         } ],
-        "controlType" : "OBJECT_BUILDER",
-        "optionsDataSource" : null
+        "optionsDataSource" : null,
+        "controlType" : "OBJECT_BUILDER"
       },
       "sampleOutput" : null
     },
@@ -1227,18 +1132,16 @@
       "metadata" : { },
       "required" : true,
       "name" : "workspaceId",
-      "type" : "NUMBER",
+      "type" : "STRING",
       "defaultValue" : null,
       "exampleValue" : null,
       "label" : "Workspace ID",
       "placeholder" : null,
-      "maxNumberPrecision" : null,
-      "maxValue" : null,
-      "minNumberPrecision" : null,
-      "minValue" : null,
-      "numberPrecision" : null,
-      "options" : null,
       "controlType" : "SELECT",
+      "languageId" : null,
+      "maxLength" : null,
+      "minLength" : null,
+      "options" : null,
       "optionsDataSource" : {
         "optionsLookupDependsOn" : null,
         "options" : { }
@@ -1252,18 +1155,16 @@
       "metadata" : { },
       "required" : true,
       "name" : "spaceId",
-      "type" : "NUMBER",
+      "type" : "STRING",
       "defaultValue" : null,
       "exampleValue" : null,
       "label" : "Space ID",
       "placeholder" : null,
-      "maxNumberPrecision" : null,
-      "maxValue" : null,
-      "minNumberPrecision" : null,
-      "minValue" : null,
-      "numberPrecision" : null,
-      "options" : null,
       "controlType" : "SELECT",
+      "languageId" : null,
+      "maxLength" : null,
+      "minLength" : null,
+      "options" : null,
       "optionsDataSource" : {
         "optionsLookupDependsOn" : [ "workspaceId" ],
         "options" : { }
@@ -1277,18 +1178,16 @@
       "metadata" : { },
       "required" : false,
       "name" : "folderId",
-      "type" : "NUMBER",
+      "type" : "STRING",
       "defaultValue" : null,
       "exampleValue" : null,
       "label" : "Folder ID",
       "placeholder" : null,
-      "maxNumberPrecision" : null,
-      "maxValue" : null,
-      "minNumberPrecision" : null,
-      "minValue" : null,
-      "numberPrecision" : null,
-      "options" : null,
       "controlType" : "SELECT",
+      "languageId" : null,
+      "maxLength" : null,
+      "minLength" : null,
+      "options" : null,
       "optionsDataSource" : {
         "optionsLookupDependsOn" : [ "spaceId", "workspaceId" ],
         "options" : { }
@@ -1304,89 +1203,69 @@
       },
       "required" : true,
       "name" : "listId",
-      "type" : "NUMBER",
+      "type" : "STRING",
       "defaultValue" : null,
       "exampleValue" : null,
       "label" : "List ID",
       "placeholder" : null,
-      "maxNumberPrecision" : null,
-      "maxValue" : null,
-      "minNumberPrecision" : null,
-      "minValue" : null,
-      "numberPrecision" : null,
-      "options" : null,
       "controlType" : "SELECT",
+      "languageId" : null,
+      "maxLength" : null,
+      "minLength" : null,
+      "options" : null,
       "optionsDataSource" : {
         "optionsLookupDependsOn" : [ "folderId", "spaceId", "workspaceId" ],
         "options" : { }
       }
     }, {
       "advancedOption" : null,
-      "description" : null,
+      "description" : "The name of the task.",
       "displayCondition" : null,
       "expressionEnabled" : null,
       "hidden" : null,
       "metadata" : {
         "type" : "BODY"
       },
-      "required" : null,
-      "name" : "__item",
-      "type" : "OBJECT",
+      "required" : true,
+      "name" : "name",
+      "type" : "STRING",
       "defaultValue" : null,
       "exampleValue" : null,
-      "label" : "Task",
+      "label" : "Name",
       "placeholder" : null,
-      "additionalProperties" : null,
-      "multipleValues" : null,
+      "controlType" : "TEXT",
+      "languageId" : null,
+      "maxLength" : null,
+      "minLength" : null,
       "options" : null,
-      "properties" : [ {
-        "advancedOption" : null,
-        "description" : "The name of the task.",
-        "displayCondition" : null,
-        "expressionEnabled" : null,
-        "hidden" : null,
-        "metadata" : { },
-        "required" : true,
-        "name" : "name",
-        "type" : "STRING",
-        "defaultValue" : null,
-        "exampleValue" : null,
-        "label" : "Name",
-        "placeholder" : null,
-        "controlType" : "TEXT",
-        "languageId" : null,
-        "maxLength" : null,
-        "minLength" : null,
-        "options" : null,
-        "optionsDataSource" : null
-      }, {
-        "advancedOption" : null,
-        "description" : "The description of task.",
-        "displayCondition" : null,
-        "expressionEnabled" : null,
-        "hidden" : null,
-        "metadata" : { },
-        "required" : false,
-        "name" : "description",
-        "type" : "STRING",
-        "defaultValue" : null,
-        "exampleValue" : null,
-        "label" : "Description",
-        "placeholder" : null,
-        "controlType" : "TEXT",
-        "languageId" : null,
-        "maxLength" : null,
-        "minLength" : null,
-        "options" : null,
-        "optionsDataSource" : null
-      } ],
-      "controlType" : "OBJECT_BUILDER",
+      "optionsDataSource" : null
+    }, {
+      "advancedOption" : null,
+      "description" : "The description of task.",
+      "displayCondition" : null,
+      "expressionEnabled" : null,
+      "hidden" : null,
+      "metadata" : {
+        "type" : "BODY"
+      },
+      "required" : false,
+      "name" : "description",
+      "type" : "STRING",
+      "defaultValue" : null,
+      "exampleValue" : null,
+      "label" : "Description",
+      "placeholder" : null,
+      "controlType" : "TEXT",
+      "languageId" : null,
+      "maxLength" : null,
+      "minLength" : null,
+      "options" : null,
       "optionsDataSource" : null
     } ],
     "title" : "Create Task",
-    "processErrorResponse" : null,
     "workflowNodeDescription" : null,
-    "perform" : null
+    "perform" : null,
+    "processErrorResponse" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -1536,14 +1415,14 @@
                 "options" : null,
                 "optionsDataSource" : null
               } ],
-              "controlType" : "OBJECT_BUILDER",
-              "optionsDataSource" : null
+              "optionsDataSource" : null,
+              "controlType" : "OBJECT_BUILDER"
             } ],
-            "controlType" : "OBJECT_BUILDER",
-            "optionsDataSource" : null
+            "optionsDataSource" : null,
+            "controlType" : "OBJECT_BUILDER"
           } ],
-          "controlType" : "OBJECT_BUILDER",
-          "optionsDataSource" : null
+          "optionsDataSource" : null,
+          "controlType" : "OBJECT_BUILDER"
         },
         "sampleOutput" : null,
         "placeholder" : null
@@ -1682,14 +1561,14 @@
               "options" : null,
               "optionsDataSource" : null
             } ],
-            "controlType" : "OBJECT_BUILDER",
-            "optionsDataSource" : null
+            "optionsDataSource" : null,
+            "controlType" : "OBJECT_BUILDER"
           } ],
-          "controlType" : "OBJECT_BUILDER",
-          "optionsDataSource" : null
+          "optionsDataSource" : null,
+          "controlType" : "OBJECT_BUILDER"
         } ],
-        "controlType" : "OBJECT_BUILDER",
-        "optionsDataSource" : null
+        "optionsDataSource" : null,
+        "controlType" : "OBJECT_BUILDER"
       },
       "sampleOutput" : null
     },
@@ -1702,18 +1581,16 @@
       "metadata" : { },
       "required" : true,
       "name" : "workspaceId",
-      "type" : "NUMBER",
+      "type" : "STRING",
       "defaultValue" : null,
       "exampleValue" : null,
       "label" : "Workspace ID",
       "placeholder" : null,
-      "maxNumberPrecision" : null,
-      "maxValue" : null,
-      "minNumberPrecision" : null,
-      "minValue" : null,
-      "numberPrecision" : null,
-      "options" : null,
       "controlType" : "SELECT",
+      "languageId" : null,
+      "maxLength" : null,
+      "minLength" : null,
+      "options" : null,
       "optionsDataSource" : {
         "optionsLookupDependsOn" : null,
         "options" : { }
@@ -1729,71 +1606,48 @@
       },
       "required" : true,
       "name" : "spaceId",
-      "type" : "NUMBER",
+      "type" : "STRING",
       "defaultValue" : null,
       "exampleValue" : null,
       "label" : "Space ID",
       "placeholder" : null,
-      "maxNumberPrecision" : null,
-      "maxValue" : null,
-      "minNumberPrecision" : null,
-      "minValue" : null,
-      "numberPrecision" : null,
-      "options" : null,
       "controlType" : "SELECT",
+      "languageId" : null,
+      "maxLength" : null,
+      "minLength" : null,
+      "options" : null,
       "optionsDataSource" : {
         "optionsLookupDependsOn" : [ "workspaceId" ],
         "options" : { }
       }
     }, {
       "advancedOption" : null,
-      "description" : null,
+      "description" : "The name of the folder.",
       "displayCondition" : null,
       "expressionEnabled" : null,
       "hidden" : null,
       "metadata" : {
         "type" : "BODY"
       },
-      "required" : null,
-      "name" : "__item",
-      "type" : "OBJECT",
+      "required" : true,
+      "name" : "name",
+      "type" : "STRING",
       "defaultValue" : null,
       "exampleValue" : null,
-      "label" : "Folder",
+      "label" : "Name",
       "placeholder" : null,
-      "additionalProperties" : null,
-      "multipleValues" : null,
+      "controlType" : "TEXT",
+      "languageId" : null,
+      "maxLength" : null,
+      "minLength" : null,
       "options" : null,
-      "properties" : [ {
-        "advancedOption" : null,
-        "description" : "The name of the folder.",
-        "displayCondition" : null,
-        "expressionEnabled" : null,
-        "hidden" : null,
-        "metadata" : { },
-        "required" : true,
-        "name" : "name",
-        "type" : "STRING",
-        "defaultValue" : null,
-        "exampleValue" : null,
-        "label" : "Name",
-        "placeholder" : null,
-        "controlType" : "TEXT",
-        "languageId" : null,
-        "maxLength" : null,
-        "minLength" : null,
-        "options" : null,
-        "optionsDataSource" : null
-      } ],
-      "controlType" : "OBJECT_BUILDER",
       "optionsDataSource" : null
     } ],
     "title" : "Create Folder",
-    "processErrorResponse" : null,
     "workflowNodeDescription" : null,
-    "perform" : null
+    "perform" : null,
+    "processErrorResponse" : null
   } ],
-  "dataStream" : null,
   "unifiedApi" : null,
   "triggers" : [ {
     "batch" : null,
@@ -1919,8 +1773,8 @@
               "options" : null,
               "optionsDataSource" : null
             } ],
-            "controlType" : "OBJECT_BUILDER",
-            "optionsDataSource" : null
+            "optionsDataSource" : null,
+            "controlType" : "OBJECT_BUILDER"
           }, {
             "advancedOption" : null,
             "description" : null,
@@ -1979,11 +1833,11 @@
               "options" : null,
               "optionsDataSource" : null
             } ],
-            "controlType" : "OBJECT_BUILDER",
-            "optionsDataSource" : null
+            "optionsDataSource" : null,
+            "controlType" : "OBJECT_BUILDER"
           } ],
-          "controlType" : "OBJECT_BUILDER",
-          "optionsDataSource" : null
+          "optionsDataSource" : null,
+          "controlType" : "OBJECT_BUILDER"
         },
         "sampleOutput" : null,
         "placeholder" : null
@@ -2103,8 +1957,8 @@
             "options" : null,
             "optionsDataSource" : null
           } ],
-          "controlType" : "OBJECT_BUILDER",
-          "optionsDataSource" : null
+          "optionsDataSource" : null,
+          "controlType" : "OBJECT_BUILDER"
         }, {
           "advancedOption" : null,
           "description" : null,
@@ -2163,11 +2017,11 @@
             "options" : null,
             "optionsDataSource" : null
           } ],
-          "controlType" : "OBJECT_BUILDER",
-          "optionsDataSource" : null
+          "optionsDataSource" : null,
+          "controlType" : "OBJECT_BUILDER"
         } ],
-        "controlType" : "OBJECT_BUILDER",
-        "optionsDataSource" : null
+        "optionsDataSource" : null,
+        "controlType" : "OBJECT_BUILDER"
       },
       "sampleOutput" : null
     },
@@ -2199,18 +2053,18 @@
     "type" : "DYNAMIC_WEBHOOK",
     "webhookRawBody" : null,
     "workflowSyncExecution" : null,
-    "processErrorResponse" : null,
     "workflowNodeDescription" : null,
-    "dynamicWebhookRefresh" : null,
-    "webhookValidateOnEnable" : null,
-    "deduplicate" : null,
+    "processErrorResponse" : null,
     "poll" : null,
+    "deduplicate" : null,
     "webhookDisable" : { },
     "webhookEnable" : { },
+    "dynamicWebhookRefresh" : null,
     "listenerDisable" : null,
     "listenerEnable" : null,
     "webhookRequest" : { },
-    "webhookValidate" : null
+    "webhookValidate" : null,
+    "webhookValidateOnEnable" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -2375,8 +2229,8 @@
               "options" : null,
               "optionsDataSource" : null
             } ],
-            "controlType" : "OBJECT_BUILDER",
-            "optionsDataSource" : null
+            "optionsDataSource" : null,
+            "controlType" : "OBJECT_BUILDER"
           }, {
             "advancedOption" : null,
             "description" : null,
@@ -2435,8 +2289,8 @@
               "options" : null,
               "optionsDataSource" : null
             } ],
-            "controlType" : "OBJECT_BUILDER",
-            "optionsDataSource" : null
+            "optionsDataSource" : null,
+            "controlType" : "OBJECT_BUILDER"
           }, {
             "advancedOption" : null,
             "description" : null,
@@ -2495,11 +2349,11 @@
               "options" : null,
               "optionsDataSource" : null
             } ],
-            "controlType" : "OBJECT_BUILDER",
-            "optionsDataSource" : null
+            "optionsDataSource" : null,
+            "controlType" : "OBJECT_BUILDER"
           } ],
-          "controlType" : "OBJECT_BUILDER",
-          "optionsDataSource" : null
+          "optionsDataSource" : null,
+          "controlType" : "OBJECT_BUILDER"
         },
         "sampleOutput" : null,
         "placeholder" : null
@@ -2659,8 +2513,8 @@
             "options" : null,
             "optionsDataSource" : null
           } ],
-          "controlType" : "OBJECT_BUILDER",
-          "optionsDataSource" : null
+          "optionsDataSource" : null,
+          "controlType" : "OBJECT_BUILDER"
         }, {
           "advancedOption" : null,
           "description" : null,
@@ -2719,8 +2573,8 @@
             "options" : null,
             "optionsDataSource" : null
           } ],
-          "controlType" : "OBJECT_BUILDER",
-          "optionsDataSource" : null
+          "optionsDataSource" : null,
+          "controlType" : "OBJECT_BUILDER"
         }, {
           "advancedOption" : null,
           "description" : null,
@@ -2779,11 +2633,11 @@
             "options" : null,
             "optionsDataSource" : null
           } ],
-          "controlType" : "OBJECT_BUILDER",
-          "optionsDataSource" : null
+          "optionsDataSource" : null,
+          "controlType" : "OBJECT_BUILDER"
         } ],
-        "controlType" : "OBJECT_BUILDER",
-        "optionsDataSource" : null
+        "optionsDataSource" : null,
+        "controlType" : "OBJECT_BUILDER"
       },
       "sampleOutput" : null
     },
@@ -2815,17 +2669,87 @@
     "type" : "DYNAMIC_WEBHOOK",
     "webhookRawBody" : null,
     "workflowSyncExecution" : null,
-    "processErrorResponse" : null,
     "workflowNodeDescription" : null,
-    "dynamicWebhookRefresh" : null,
-    "webhookValidateOnEnable" : null,
-    "deduplicate" : null,
+    "processErrorResponse" : null,
     "poll" : null,
+    "deduplicate" : null,
     "webhookDisable" : { },
     "webhookEnable" : { },
+    "dynamicWebhookRefresh" : null,
     "listenerDisable" : null,
     "listenerEnable" : null,
     "webhookRequest" : { },
-    "webhookValidate" : null
-  } ]
+    "webhookValidate" : null,
+    "webhookValidateOnEnable" : null
+  } ],
+  "dataStream" : null,
+  "connection" : {
+    "authorizations" : [ {
+      "detectOn" : null,
+      "description" : null,
+      "name" : "oauth2_authorization_code",
+      "properties" : [ {
+        "advancedOption" : null,
+        "description" : null,
+        "displayCondition" : null,
+        "expressionEnabled" : null,
+        "hidden" : null,
+        "metadata" : { },
+        "required" : true,
+        "name" : "clientId",
+        "type" : "STRING",
+        "defaultValue" : null,
+        "exampleValue" : null,
+        "label" : "Client Id",
+        "placeholder" : null,
+        "controlType" : "TEXT",
+        "languageId" : null,
+        "maxLength" : null,
+        "minLength" : null,
+        "options" : null,
+        "optionsDataSource" : null
+      }, {
+        "advancedOption" : null,
+        "description" : null,
+        "displayCondition" : null,
+        "expressionEnabled" : null,
+        "hidden" : null,
+        "metadata" : { },
+        "required" : true,
+        "name" : "clientSecret",
+        "type" : "STRING",
+        "defaultValue" : null,
+        "exampleValue" : null,
+        "label" : "Client Secret",
+        "placeholder" : null,
+        "controlType" : "TEXT",
+        "languageId" : null,
+        "maxLength" : null,
+        "minLength" : null,
+        "options" : null,
+        "optionsDataSource" : null
+      } ],
+      "refreshOn" : null,
+      "title" : "OAuth2 Authorization Code",
+      "type" : "OAUTH2_AUTHORIZATION_CODE",
+      "acquire" : null,
+      "apply" : null,
+      "authorizationCallback" : null,
+      "authorizationUrl" : { },
+      "clientId" : null,
+      "clientSecret" : null,
+      "oauth2AuthorizationExtraQueryParameters" : null,
+      "pkce" : null,
+      "refresh" : null,
+      "refreshUrl" : null,
+      "scopes" : null,
+      "refreshToken" : null,
+      "tokenUrl" : { }
+    } ],
+    "properties" : null,
+    "version" : 1,
+    "authorizationRequired" : null,
+    "baseUri" : { },
+    "test" : null
+  }
 }

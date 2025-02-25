@@ -13,7 +13,6 @@
   "resources" : null,
   "version" : 1,
   "title" : "Math Helper",
-  "connection" : null,
   "actions" : [ {
     "batch" : null,
     "deprecated" : null,
@@ -44,8 +43,8 @@
           "minValue" : null,
           "numberPrecision" : null,
           "options" : null,
-          "optionsDataSource" : null,
-          "controlType" : "NUMBER"
+          "controlType" : "NUMBER",
+          "optionsDataSource" : null
         },
         "sampleOutput" : null,
         "placeholder" : null
@@ -70,8 +69,8 @@
         "minValue" : null,
         "numberPrecision" : null,
         "options" : null,
-        "optionsDataSource" : null,
-        "controlType" : "NUMBER"
+        "controlType" : "NUMBER",
+        "optionsDataSource" : null
       },
       "sampleOutput" : null
     },
@@ -95,8 +94,8 @@
       "minValue" : null,
       "numberPrecision" : null,
       "options" : null,
-      "optionsDataSource" : null,
-      "controlType" : "NUMBER"
+      "controlType" : "NUMBER",
+      "optionsDataSource" : null
     }, {
       "advancedOption" : null,
       "description" : null,
@@ -117,8 +116,8 @@
       "minValue" : null,
       "numberPrecision" : null,
       "options" : null,
-      "optionsDataSource" : null,
-      "controlType" : "NUMBER"
+      "controlType" : "NUMBER",
+      "optionsDataSource" : null
     } ],
     "title" : "Addition",
     "perform" : { },
@@ -154,8 +153,8 @@
           "minValue" : null,
           "numberPrecision" : null,
           "options" : null,
-          "optionsDataSource" : null,
-          "controlType" : "NUMBER"
+          "controlType" : "NUMBER",
+          "optionsDataSource" : null
         },
         "sampleOutput" : null,
         "placeholder" : null
@@ -180,8 +179,8 @@
         "minValue" : null,
         "numberPrecision" : null,
         "options" : null,
-        "optionsDataSource" : null,
-        "controlType" : "NUMBER"
+        "controlType" : "NUMBER",
+        "optionsDataSource" : null
       },
       "sampleOutput" : null
     },
@@ -205,8 +204,8 @@
       "minValue" : null,
       "numberPrecision" : null,
       "options" : null,
-      "optionsDataSource" : null,
-      "controlType" : "NUMBER"
+      "controlType" : "NUMBER",
+      "optionsDataSource" : null
     }, {
       "advancedOption" : null,
       "description" : "Number to divide by.",
@@ -227,8 +226,8 @@
       "minValue" : null,
       "numberPrecision" : null,
       "options" : null,
-      "optionsDataSource" : null,
-      "controlType" : "NUMBER"
+      "controlType" : "NUMBER",
+      "optionsDataSource" : null
     } ],
     "title" : "Division",
     "perform" : { },
@@ -264,8 +263,8 @@
           "minValue" : null,
           "numberPrecision" : null,
           "options" : null,
-          "optionsDataSource" : null,
-          "controlType" : "NUMBER"
+          "controlType" : "NUMBER",
+          "optionsDataSource" : null
         },
         "sampleOutput" : null,
         "placeholder" : null
@@ -290,8 +289,8 @@
         "minValue" : null,
         "numberPrecision" : null,
         "options" : null,
-        "optionsDataSource" : null,
-        "controlType" : "NUMBER"
+        "controlType" : "NUMBER",
+        "optionsDataSource" : null
       },
       "sampleOutput" : null
     },
@@ -315,8 +314,8 @@
       "minValue" : null,
       "numberPrecision" : null,
       "options" : null,
-      "optionsDataSource" : null,
-      "controlType" : "NUMBER"
+      "controlType" : "NUMBER",
+      "optionsDataSource" : null
     }, {
       "advancedOption" : null,
       "description" : "Number to divide by.",
@@ -337,8 +336,8 @@
       "minValue" : null,
       "numberPrecision" : null,
       "options" : null,
-      "optionsDataSource" : null,
-      "controlType" : "NUMBER"
+      "controlType" : "NUMBER",
+      "optionsDataSource" : null
     } ],
     "title" : "Modulo",
     "perform" : { },
@@ -374,8 +373,8 @@
           "minValue" : null,
           "numberPrecision" : null,
           "options" : null,
-          "optionsDataSource" : null,
-          "controlType" : "NUMBER"
+          "controlType" : "NUMBER",
+          "optionsDataSource" : null
         },
         "sampleOutput" : null,
         "placeholder" : null
@@ -400,8 +399,8 @@
         "minValue" : null,
         "numberPrecision" : null,
         "options" : null,
-        "optionsDataSource" : null,
-        "controlType" : "NUMBER"
+        "controlType" : "NUMBER",
+        "optionsDataSource" : null
       },
       "sampleOutput" : null
     },
@@ -425,8 +424,8 @@
       "minValue" : null,
       "numberPrecision" : null,
       "options" : null,
-      "optionsDataSource" : null,
-      "controlType" : "NUMBER"
+      "controlType" : "NUMBER",
+      "optionsDataSource" : null
     }, {
       "advancedOption" : null,
       "description" : null,
@@ -447,8 +446,8 @@
       "minValue" : null,
       "numberPrecision" : null,
       "options" : null,
-      "optionsDataSource" : null,
-      "controlType" : "NUMBER"
+      "controlType" : "NUMBER",
+      "optionsDataSource" : null
     } ],
     "title" : "Multiplication",
     "perform" : { },
@@ -484,8 +483,8 @@
           "minValue" : null,
           "numberPrecision" : null,
           "options" : null,
-          "optionsDataSource" : null,
-          "controlType" : "NUMBER"
+          "controlType" : "NUMBER",
+          "optionsDataSource" : null
         },
         "sampleOutput" : null,
         "placeholder" : null
@@ -510,8 +509,8 @@
         "minValue" : null,
         "numberPrecision" : null,
         "options" : null,
-        "optionsDataSource" : null,
-        "controlType" : "NUMBER"
+        "controlType" : "NUMBER",
+        "optionsDataSource" : null
       },
       "sampleOutput" : null
     },
@@ -535,8 +534,8 @@
       "minValue" : null,
       "numberPrecision" : null,
       "options" : null,
-      "optionsDataSource" : null,
-      "controlType" : "NUMBER"
+      "controlType" : "NUMBER",
+      "optionsDataSource" : null
     }, {
       "advancedOption" : null,
       "description" : "Number to subtract.",
@@ -557,8 +556,8 @@
       "minValue" : null,
       "numberPrecision" : null,
       "options" : null,
-      "optionsDataSource" : null,
-      "controlType" : "NUMBER"
+      "controlType" : "NUMBER",
+      "optionsDataSource" : null
     } ],
     "title" : "Subtraction",
     "perform" : { },
@@ -567,5 +566,6 @@
   } ],
   "dataStream" : null,
   "triggers" : null,
-  "unifiedApi" : null
+  "unifiedApi" : null,
+  "connection" : null
 }

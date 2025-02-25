@@ -13,7 +13,6 @@
   "resources" : null,
   "version" : 1,
   "title" : "XML File",
-  "connection" : null,
   "actions" : [ {
     "batch" : null,
     "deprecated" : null,
@@ -514,7 +513,8 @@
     "processErrorResponse" : null,
     "workflowNodeDescription" : null
   } ],
-  "dataStream" : null,
+  "connection" : null,
   "triggers" : null,
+  "dataStream" : null,
   "unifiedApi" : null
 }
