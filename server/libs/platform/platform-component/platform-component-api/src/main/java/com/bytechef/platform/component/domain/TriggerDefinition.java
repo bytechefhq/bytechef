@@ -150,8 +150,9 @@ public class TriggerDefinition extends TriggerDefinitionBasic {
             .map(
                 outputResponse -> SchemaUtils.toOutput(
                     outputResponse,
-                    (property, sampleOutput) -> new OutputResponse(
-                        Property.toProperty((com.bytechef.component.definition.Property) property), sampleOutput),
+                    (outputSchema, sampleOutput, placeholder) -> new OutputResponse(
+                        Property.toProperty((com.bytechef.component.definition.Property) outputSchema), sampleOutput,
+                        placeholder),
                     PropertyFactory.PROPERTY_FACTORY))
             .orElse(null);
     }

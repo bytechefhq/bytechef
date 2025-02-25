@@ -44,6 +44,10 @@ public class WorkflowNodeOutputModelJsonSerializer extends JsonSerializer<Workfl
             jsonGenerator.writeObjectField("outputSchema", value.getOutputSchema());
         }
 
+        if (value.getPlaceholder() != null) {
+            jsonGenerator.writeObjectField("placeholder", value.getPlaceholder());
+        }
+
         if (value.getTaskDispatcherDefinition() != null) {
             jsonGenerator.writeObjectField("taskDispatcherDefinition", value.getTaskDispatcherDefinition());
         }

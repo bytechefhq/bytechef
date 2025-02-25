@@ -19,9 +19,9 @@ package com.bytechef.platform.domain;
 /**
  * @author Ivica Cardic
  */
-public record OutputResponse(BaseProperty outputSchema, Object sampleOutput) {
+public record OutputResponse(BaseProperty outputSchema, Object sampleOutput, Object placeholder) {
 
-    public OutputResponse(BaseProperty outputSchema) {
-        this(outputSchema, null);
+    public OutputResponse(BaseProperty outputSchema, Object sampleOutput) {
+        this(outputSchema, sampleOutput, null);
     }
 }

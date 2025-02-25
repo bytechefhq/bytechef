@@ -26,8 +26,9 @@ import com.bytechef.platform.workflow.task.dispatcher.domain.TaskDispatcherDefin
  * @author Ivica Cardic
  */
 public record WorkflowNodeOutputDTO(
-    String workflowNodeName, BaseProperty outputSchema, Object sampleOutput, TriggerDefinition triggerDefinition,
-    ActionDefinition actionDefinition, TaskDispatcherDefinition taskDispatcherDefinition) {
+    String workflowNodeName, BaseProperty outputSchema, Object sampleOutput, Object placeholder,
+    TriggerDefinition triggerDefinition, ActionDefinition actionDefinition,
+    TaskDispatcherDefinition taskDispatcherDefinition) {
 
     public WorkflowNodeOutputDTO(
         String workflowNodeName, OutputResponse outputResponse, TriggerDefinition triggerDefinition,
@@ -35,7 +36,8 @@ public record WorkflowNodeOutputDTO(
 
         this(
             workflowNodeName, outputResponse == null ? null : outputResponse.outputSchema(),
-            outputResponse == null ? null : outputResponse.sampleOutput(), triggerDefinition, actionDefinition,
+            outputResponse == null ? null : outputResponse.sampleOutput(),
+            outputResponse == null ? null : outputResponse.placeholder(), triggerDefinition, actionDefinition,
             taskDispatcherDefinition);
     }
 }

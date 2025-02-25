@@ -89,7 +89,7 @@ public class AppEventTrigger {
 
         Object value = context.json(json -> json.read(appEvent.getSchema()));
 
-        return new OutputResponse(context.outputSchema(outputSchema -> outputSchema.getOutputSchema(value)), value);
+        return OutputResponse.of(context.outputSchema(outputSchema -> outputSchema.getOutputSchema(value)), value);
     }
 
     protected Object webhookRequest(

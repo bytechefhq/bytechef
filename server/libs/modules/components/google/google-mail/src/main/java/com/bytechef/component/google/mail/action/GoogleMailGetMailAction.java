@@ -77,6 +77,6 @@ public class GoogleMailGetMailAction {
     public static OutputResponse getOutput(
         Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) {
 
-        return new OutputResponse(getMessageOutputProperty(inputParameters.getRequiredString(FORMAT)));
+        return OutputResponse.of(getMessageOutputProperty(inputParameters.getRequiredString(FORMAT)));
     }
 }

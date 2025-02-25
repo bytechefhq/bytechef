@@ -27,6 +27,7 @@ import com.bytechef.component.definition.Property.ValueProperty;
 import com.bytechef.component.definition.unified.base.adapter.ProviderModelAdapter;
 import com.bytechef.component.definition.unified.base.mapper.ProviderModelMapper;
 import com.bytechef.definition.BaseOutputDefinition.OutputSchema;
+import com.bytechef.definition.BaseOutputDefinition.Placeholder;
 import com.bytechef.definition.BaseOutputDefinition.SampleOutput;
 import com.bytechef.definition.BaseOutputFunction;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -263,6 +264,10 @@ public final class ComponentDsl {
         return new OutputSchema<>(outputSchema);
     }
 
+    public static Placeholder placeholder(Object placeholder) {
+        return new Placeholder(placeholder);
+    }
+
     public static SampleOutput sampleOutput(Object sampleOutput) {
         return new SampleOutput(sampleOutput);
     }
@@ -379,7 +384,7 @@ public final class ComponentDsl {
         }
 
         public ModifiableActionDefinition output() {
-            this.outputDefinition = new OutputDefinition();
+            this.outputDefinition = OutputDefinition.of();
 
             return this;
         }
@@ -387,15 +392,19 @@ public final class ComponentDsl {
         public <P extends ModifiableValueProperty<?, ?>> ModifiableActionDefinition output(
             OutputSchema<P> outputSchema) {
 
-            this.outputDefinition = new OutputDefinition(outputSchema.outputSchema());
+            this.outputDefinition = OutputDefinition.of(outputSchema.outputSchema());
 
             return this;
         }
 
-        public <P extends ModifiableValueProperty<?, ?>> ModifiableActionDefinition output(
-            SampleOutput sampleOutput) {
+        public ModifiableActionDefinition output(SampleOutput sampleOutput) {
+            this.outputDefinition = OutputDefinition.of(sampleOutput.sampleOutput());
 
-            this.outputDefinition = new OutputDefinition(sampleOutput.sampleOutput());
+            return this;
+        }
+
+        public ModifiableActionDefinition output(Placeholder placeholder) {
+            this.outputDefinition = OutputDefinition.of(null, null, placeholder.placeholder());
 
             return this;
         }
@@ -403,19 +412,19 @@ public final class ComponentDsl {
         public <P extends ModifiableValueProperty<?, ?>> ModifiableActionDefinition output(
             OutputSchema<P> outputSchema, SampleOutput sampleOutput) {
 
-            this.outputDefinition = new OutputDefinition(outputSchema.outputSchema(), sampleOutput.sampleOutput());
+            this.outputDefinition = OutputDefinition.of(outputSchema.outputSchema(), sampleOutput.sampleOutput());
 
             return this;
         }
 
         public ModifiableActionDefinition output(BaseOutputFunction output) {
-            this.outputDefinition = new OutputDefinition(output);
+            this.outputDefinition = OutputDefinition.of(output);
 
             return this;
         }
 
         public ModifiableActionDefinition output(OutputFunction output) {
-            this.outputDefinition = new OutputDefinition(output);
+            this.outputDefinition = OutputDefinition.of(output);
 
             return this;
         }
@@ -3175,7 +3184,7 @@ public final class ComponentDsl {
         }
 
         public ModifiableTriggerDefinition output() {
-            this.outputDefinition = new OutputDefinition();
+            this.outputDefinition = OutputDefinition.of();
 
             return this;
         }
@@ -3183,15 +3192,21 @@ public final class ComponentDsl {
         public <P extends ModifiableValueProperty<?, ?>> ModifiableTriggerDefinition output(
             OutputSchema<P> outputSchema) {
 
-            this.outputDefinition = new OutputDefinition(outputSchema.outputSchema());
+            this.outputDefinition = OutputDefinition.of(outputSchema.outputSchema());
 
             return this;
         }
 
-        public <P extends ModifiableValueProperty<?, ?>> ModifiableTriggerDefinition output(
+        public ModifiableTriggerDefinition output(
             SampleOutput sampleOutput) {
 
-            this.outputDefinition = new OutputDefinition(sampleOutput.sampleOutput());
+            this.outputDefinition = OutputDefinition.of(sampleOutput.sampleOutput());
+
+            return this;
+        }
+
+        public ModifiableTriggerDefinition output(Placeholder placeholder) {
+            this.outputDefinition = OutputDefinition.of(null, null, placeholder.placeholder());
 
             return this;
         }
@@ -3199,13 +3214,13 @@ public final class ComponentDsl {
         public <P extends ModifiableValueProperty<?, ?>> ModifiableTriggerDefinition output(
             OutputSchema<P> outputSchema, SampleOutput sampleOutput) {
 
-            this.outputDefinition = new OutputDefinition(outputSchema.outputSchema(), sampleOutput.sampleOutput());
+            this.outputDefinition = OutputDefinition.of(outputSchema.outputSchema(), sampleOutput.sampleOutput());
 
             return this;
         }
 
         public ModifiableTriggerDefinition output(TriggerOutputFunction output) {
-            this.outputDefinition = new OutputDefinition(output);
+            this.outputDefinition = OutputDefinition.of(output);
 
             return this;
         }

@@ -45,7 +45,7 @@ public class ApprovalLinkCreateApprovalLinksAction {
     protected static OutputResponse output(
         Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
 
-        return new OutputResponse(
+        return OutputResponse.of(
             Map.of(
                 "approvalLink", "https://example.com/approvals/s244aeoqwed853/jobs/12/true",
                 "disapprovalLink", "https://example.com/approvals/s244aeoqwed853/jobs/12/false"));

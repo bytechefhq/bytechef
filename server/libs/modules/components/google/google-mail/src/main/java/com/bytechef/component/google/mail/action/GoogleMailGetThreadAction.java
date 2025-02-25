@@ -112,7 +112,7 @@ public class GoogleMailGetThreadAction {
     public static OutputResponse getOutput(
         Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) {
 
-        return new OutputResponse(
+        return OutputResponse.of(
             object()
                 .properties(
                     string(ID),

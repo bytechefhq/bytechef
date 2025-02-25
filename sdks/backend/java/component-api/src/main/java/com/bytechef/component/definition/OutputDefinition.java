@@ -33,38 +33,54 @@ public final class OutputDefinition implements BaseOutputDefinition {
     private BaseOutputFunction output;
     private OutputResponse outputResponse;
 
-    public OutputDefinition() {
+    private OutputDefinition() {
     }
 
-    public OutputDefinition(ValueProperty<?> outputSchema) {
-        Objects.requireNonNull(outputSchema, "'outputSchema' mut not be null");
-
-        this.outputResponse = new OutputResponse(outputSchema);
-    }
-
-    public OutputDefinition(Object sampleOutput) {
-        Objects.requireNonNull(sampleOutput, "'sampleOutput' mut not be null");
-
-        this.outputResponse = new OutputResponse(sampleOutput);
-    }
-
-    public OutputDefinition(ValueProperty<?> outputSchema, Object sampleOutput) {
-        Objects.requireNonNull(outputSchema, "'outputSchema' mut not be null");
-        Objects.requireNonNull(sampleOutput, "'sampleOutput' mut not be null");
-
-        this.outputResponse = new OutputResponse(outputSchema, sampleOutput);
-    }
-
-    public OutputDefinition(BaseOutputFunction output) {
-        Objects.requireNonNull(output, "'output' mut not be null");
-
+    private OutputDefinition(BaseOutputFunction output) {
         this.output = output;
     }
 
-    public OutputDefinition(OutputFunction output) {
+    private OutputDefinition(ValueProperty<?> outputSchema, Object sampleOutput, Object placeholder) {
+        this.outputResponse = new OutputResponse(outputSchema, sampleOutput, placeholder);
+    }
+
+    public static OutputDefinition of() {
+        return new OutputDefinition();
+    }
+
+    public static OutputDefinition of(ValueProperty<?> outputSchema) {
+        Objects.requireNonNull(outputSchema, "'outputSchema' mut not be null");
+
+        return of(outputSchema, null, null);
+    }
+
+    public static OutputDefinition of(Object sampleOutput) {
+        Objects.requireNonNull(sampleOutput, "'sampleOutput' mut not be null");
+
+        return of(null, sampleOutput, null);
+    }
+
+    public static OutputDefinition of(ValueProperty<?> outputSchema, Object sampleOutput) {
+        Objects.requireNonNull(outputSchema, "'outputSchema' mut not be null");
+        Objects.requireNonNull(sampleOutput, "'sampleOutput' mut not be null");
+
+        return of(outputSchema, sampleOutput, null);
+    }
+
+    public static OutputDefinition of(ValueProperty<?> outputSchema, Object sampleOutput, Object placeholder) {
+        return new OutputDefinition(outputSchema, sampleOutput, placeholder);
+    }
+
+    public static OutputDefinition of(BaseOutputFunction output) {
         Objects.requireNonNull(output, "'output' mut not be null");
 
-        this.output = output;
+        return new OutputDefinition(output);
+    }
+
+    public static OutputDefinition of(OutputFunction output) {
+        Objects.requireNonNull(output, "'output' mut not be null");
+
+        return new OutputDefinition(output);
     }
 
     @Override
