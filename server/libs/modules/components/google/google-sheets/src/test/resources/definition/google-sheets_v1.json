@@ -13,6 +13,75 @@
   "resources" : null,
   "version" : 1,
   "title" : "Google Sheets",
+  "connection" : {
+    "authorizations" : [ {
+      "detectOn" : null,
+      "description" : null,
+      "name" : "oauth2_authorization_code",
+      "properties" : [ {
+        "advancedOption" : null,
+        "description" : null,
+        "displayCondition" : null,
+        "expressionEnabled" : null,
+        "hidden" : null,
+        "metadata" : { },
+        "required" : true,
+        "name" : "clientId",
+        "type" : "STRING",
+        "defaultValue" : null,
+        "exampleValue" : null,
+        "label" : "Client Id",
+        "placeholder" : null,
+        "controlType" : "TEXT",
+        "languageId" : null,
+        "maxLength" : null,
+        "minLength" : null,
+        "options" : null,
+        "optionsDataSource" : null
+      }, {
+        "advancedOption" : null,
+        "description" : null,
+        "displayCondition" : null,
+        "expressionEnabled" : null,
+        "hidden" : null,
+        "metadata" : { },
+        "required" : true,
+        "name" : "clientSecret",
+        "type" : "STRING",
+        "defaultValue" : null,
+        "exampleValue" : null,
+        "label" : "Client Secret",
+        "placeholder" : null,
+        "controlType" : "TEXT",
+        "languageId" : null,
+        "maxLength" : null,
+        "minLength" : null,
+        "options" : null,
+        "optionsDataSource" : null
+      } ],
+      "refreshOn" : [ "^.*(4\\d\\d)(\\s(Unauthorized)?.*)?$" ],
+      "title" : "OAuth2 Authorization Code",
+      "type" : "OAUTH2_AUTHORIZATION_CODE",
+      "acquire" : null,
+      "oauth2AuthorizationExtraQueryParameters" : { },
+      "authorizationCallback" : null,
+      "apply" : null,
+      "clientId" : null,
+      "pkce" : null,
+      "refresh" : null,
+      "refreshUrl" : { },
+      "scopes" : { },
+      "tokenUrl" : { },
+      "authorizationUrl" : { },
+      "clientSecret" : null,
+      "refreshToken" : null
+    } ],
+    "properties" : null,
+    "version" : 1,
+    "authorizationRequired" : null,
+    "baseUri" : null,
+    "test" : null
+  },
   "actions" : [ {
     "batch" : null,
     "deprecated" : null,
@@ -92,9 +161,9 @@
       "controlType" : "SELECT"
     } ],
     "title" : "Clear Sheet",
+    "processErrorResponse" : null,
     "workflowNodeDescription" : null,
-    "perform" : { },
-    "processErrorResponse" : null
+    "perform" : { }
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -207,7 +276,8 @@
           "controlType" : "OBJECT_BUILDER",
           "optionsDataSource" : null
         },
-        "sampleOutput" : null
+        "sampleOutput" : null,
+        "placeholder" : null
       },
       "outputSchema" : {
         "advancedOption" : null,
@@ -381,9 +451,9 @@
       "optionsDataSource" : null
     } ],
     "title" : "Create Column",
+    "processErrorResponse" : null,
     "workflowNodeDescription" : null,
-    "perform" : { },
-    "processErrorResponse" : null
+    "perform" : { }
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -496,7 +566,8 @@
           "controlType" : "OBJECT_BUILDER",
           "optionsDataSource" : null
         },
-        "sampleOutput" : null
+        "sampleOutput" : null,
+        "placeholder" : null
       },
       "outputSchema" : {
         "advancedOption" : null,
@@ -688,9 +759,9 @@
       "optionsDataSource" : null
     } ],
     "title" : "Create Sheet",
+    "processErrorResponse" : null,
     "workflowNodeDescription" : null,
-    "perform" : { },
-    "processErrorResponse" : null
+    "perform" : { }
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -766,9 +837,9 @@
       "optionsDataSource" : null
     } ],
     "title" : "Delete Column",
+    "processErrorResponse" : null,
     "workflowNodeDescription" : null,
-    "perform" : { },
-    "processErrorResponse" : null
+    "perform" : { }
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -827,9 +898,9 @@
       }
     } ],
     "title" : "Create Spreadsheet",
+    "processErrorResponse" : null,
     "workflowNodeDescription" : null,
-    "perform" : { },
-    "processErrorResponse" : null
+    "perform" : { }
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -904,9 +975,9 @@
       "optionsDataSource" : null
     } ],
     "title" : "Delete Row",
+    "processErrorResponse" : null,
     "workflowNodeDescription" : null,
-    "perform" : { },
-    "processErrorResponse" : null
+    "perform" : { }
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -962,9 +1033,9 @@
       }
     } ],
     "title" : "Delete Sheet",
+    "processErrorResponse" : null,
     "workflowNodeDescription" : null,
-    "perform" : { },
-    "processErrorResponse" : null
+    "perform" : { }
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -1069,9 +1140,9 @@
       "optionsDataSource" : null
     } ],
     "title" : "Find Row by Number",
+    "processErrorResponse" : null,
     "workflowNodeDescription" : null,
-    "perform" : { },
-    "processErrorResponse" : null
+    "perform" : { }
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -1200,9 +1271,9 @@
       }
     } ],
     "title" : "Insert Multiple Rows",
+    "processErrorResponse" : null,
     "workflowNodeDescription" : null,
-    "perform" : { },
-    "processErrorResponse" : null
+    "perform" : { }
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -1331,9 +1402,9 @@
       }
     } ],
     "title" : "Insert Row",
+    "processErrorResponse" : null,
     "workflowNodeDescription" : null,
-    "perform" : { },
-    "processErrorResponse" : null
+    "perform" : { }
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -1424,7 +1495,8 @@
           "controlType" : "OBJECT_BUILDER",
           "optionsDataSource" : null
         },
-        "sampleOutput" : null
+        "sampleOutput" : null,
+        "placeholder" : null
       },
       "outputSchema" : {
         "advancedOption" : null,
@@ -1533,9 +1605,9 @@
       }
     } ],
     "title" : "List Sheets",
+    "processErrorResponse" : null,
     "workflowNodeDescription" : null,
-    "perform" : { },
-    "processErrorResponse" : null
+    "perform" : { }
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -1679,79 +1751,11 @@
       }
     } ],
     "title" : "Update Row",
+    "processErrorResponse" : null,
     "workflowNodeDescription" : null,
-    "perform" : { },
-    "processErrorResponse" : null
+    "perform" : { }
   } ],
-  "connection" : {
-    "authorizations" : [ {
-      "detectOn" : null,
-      "description" : null,
-      "name" : "oauth2_authorization_code",
-      "properties" : [ {
-        "advancedOption" : null,
-        "description" : null,
-        "displayCondition" : null,
-        "expressionEnabled" : null,
-        "hidden" : null,
-        "metadata" : { },
-        "required" : true,
-        "name" : "clientId",
-        "type" : "STRING",
-        "defaultValue" : null,
-        "exampleValue" : null,
-        "label" : "Client Id",
-        "placeholder" : null,
-        "controlType" : "TEXT",
-        "languageId" : null,
-        "maxLength" : null,
-        "minLength" : null,
-        "options" : null,
-        "optionsDataSource" : null
-      }, {
-        "advancedOption" : null,
-        "description" : null,
-        "displayCondition" : null,
-        "expressionEnabled" : null,
-        "hidden" : null,
-        "metadata" : { },
-        "required" : true,
-        "name" : "clientSecret",
-        "type" : "STRING",
-        "defaultValue" : null,
-        "exampleValue" : null,
-        "label" : "Client Secret",
-        "placeholder" : null,
-        "controlType" : "TEXT",
-        "languageId" : null,
-        "maxLength" : null,
-        "minLength" : null,
-        "options" : null,
-        "optionsDataSource" : null
-      } ],
-      "refreshOn" : [ "^.*(4\\d\\d)(\\s(Unauthorized)?.*)?$" ],
-      "title" : "OAuth2 Authorization Code",
-      "type" : "OAUTH2_AUTHORIZATION_CODE",
-      "acquire" : null,
-      "apply" : null,
-      "authorizationCallback" : null,
-      "authorizationUrl" : { },
-      "clientId" : null,
-      "clientSecret" : null,
-      "oauth2AuthorizationExtraQueryParameters" : { },
-      "pkce" : null,
-      "refresh" : null,
-      "refreshUrl" : { },
-      "scopes" : { },
-      "refreshToken" : null,
-      "tokenUrl" : { }
-    } ],
-    "properties" : null,
-    "version" : 1,
-    "authorizationRequired" : null,
-    "baseUri" : null,
-    "test" : null
-  },
+  "dataStream" : null,
   "triggers" : [ {
     "batch" : null,
     "deprecated" : null,
@@ -1839,19 +1843,18 @@
     "type" : "DYNAMIC_WEBHOOK",
     "webhookRawBody" : null,
     "workflowSyncExecution" : null,
-    "poll" : null,
+    "processErrorResponse" : null,
+    "workflowNodeDescription" : null,
+    "dynamicWebhookRefresh" : null,
+    "webhookValidateOnEnable" : null,
     "deduplicate" : null,
+    "poll" : null,
     "webhookDisable" : { },
     "webhookEnable" : { },
-    "dynamicWebhookRefresh" : null,
-    "workflowNodeDescription" : null,
-    "processErrorResponse" : null,
     "webhookRequest" : { },
     "listenerDisable" : null,
     "listenerEnable" : null,
-    "webhookValidate" : null,
-    "webhookValidateOnEnable" : null
+    "webhookValidate" : null
   } ],
-  "dataStream" : null,
   "unifiedApi" : null
 }

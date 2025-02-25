@@ -13,6 +13,7 @@
   "resources" : null,
   "version" : 1,
   "title" : "PDF Helper",
+  "connection" : null,
   "actions" : [ {
     "batch" : null,
     "deprecated" : null,
@@ -44,9 +45,9 @@
           "options" : null,
           "optionsDataSource" : null
         },
-        "sampleOutput" : null
+        "sampleOutput" : null,
+        "placeholder" : null
       },
-      "sampleOutput" : null,
       "outputSchema" : {
         "advancedOption" : null,
         "description" : null,
@@ -67,7 +68,8 @@
         "minLength" : null,
         "options" : null,
         "optionsDataSource" : null
-      }
+      },
+      "sampleOutput" : null
     },
     "properties" : [ {
       "advancedOption" : null,
@@ -173,6 +175,5 @@
   } ],
   "dataStream" : null,
   "triggers" : null,
-  "unifiedApi" : null,
-  "connection" : null
+  "unifiedApi" : null
 }

@@ -10,6 +10,136 @@
   "resources" : null,
   "version" : 1,
   "title" : "Petstore",
+  "connection" : {
+    "authorizations" : [ {
+      "detectOn" : null,
+      "description" : null,
+      "name" : "oauth2_implicit_code",
+      "properties" : [ {
+        "advancedOption" : null,
+        "description" : null,
+        "displayCondition" : null,
+        "expressionEnabled" : null,
+        "hidden" : null,
+        "metadata" : { },
+        "required" : true,
+        "name" : "clientId",
+        "type" : "STRING",
+        "defaultValue" : null,
+        "exampleValue" : null,
+        "label" : "Client Id",
+        "placeholder" : null,
+        "controlType" : "TEXT",
+        "languageId" : null,
+        "maxLength" : null,
+        "minLength" : null,
+        "options" : null,
+        "optionsDataSource" : null
+      }, {
+        "advancedOption" : null,
+        "description" : null,
+        "displayCondition" : null,
+        "expressionEnabled" : null,
+        "hidden" : null,
+        "metadata" : { },
+        "required" : true,
+        "name" : "clientSecret",
+        "type" : "STRING",
+        "defaultValue" : null,
+        "exampleValue" : null,
+        "label" : "Client Secret",
+        "placeholder" : null,
+        "controlType" : "TEXT",
+        "languageId" : null,
+        "maxLength" : null,
+        "minLength" : null,
+        "options" : null,
+        "optionsDataSource" : null
+      } ],
+      "refreshOn" : null,
+      "title" : "OAuth2 Implicit",
+      "type" : "OAUTH2_IMPLICIT_CODE",
+      "acquire" : null,
+      "apply" : null,
+      "clientId" : null,
+      "pkce" : null,
+      "refresh" : null,
+      "refreshUrl" : null,
+      "scopes" : { },
+      "tokenUrl" : null,
+      "authorizationUrl" : { },
+      "clientSecret" : null,
+      "refreshToken" : null,
+      "authorizationCallback" : null,
+      "oauth2AuthorizationExtraQueryParameters" : null
+    }, {
+      "detectOn" : null,
+      "description" : null,
+      "name" : "api_key",
+      "properties" : [ {
+        "advancedOption" : null,
+        "description" : null,
+        "displayCondition" : null,
+        "expressionEnabled" : null,
+        "hidden" : true,
+        "metadata" : { },
+        "required" : true,
+        "name" : "key",
+        "type" : "STRING",
+        "defaultValue" : "api_key",
+        "exampleValue" : null,
+        "label" : "Key",
+        "placeholder" : null,
+        "controlType" : "TEXT",
+        "languageId" : null,
+        "maxLength" : null,
+        "minLength" : null,
+        "options" : null,
+        "optionsDataSource" : null
+      }, {
+        "advancedOption" : null,
+        "description" : null,
+        "displayCondition" : null,
+        "expressionEnabled" : null,
+        "hidden" : null,
+        "metadata" : { },
+        "required" : true,
+        "name" : "value",
+        "type" : "STRING",
+        "defaultValue" : null,
+        "exampleValue" : null,
+        "label" : "Value",
+        "placeholder" : null,
+        "controlType" : "TEXT",
+        "languageId" : null,
+        "maxLength" : null,
+        "minLength" : null,
+        "options" : null,
+        "optionsDataSource" : null
+      } ],
+      "refreshOn" : null,
+      "title" : "API Key",
+      "type" : "API_KEY",
+      "acquire" : null,
+      "apply" : null,
+      "clientId" : null,
+      "pkce" : null,
+      "refresh" : null,
+      "refreshUrl" : null,
+      "scopes" : null,
+      "tokenUrl" : null,
+      "authorizationUrl" : null,
+      "clientSecret" : null,
+      "refreshToken" : null,
+      "authorizationCallback" : null,
+      "oauth2AuthorizationExtraQueryParameters" : null
+    } ],
+    "properties" : null,
+    "version" : 1,
+    "authorizationRequired" : null,
+    "baseUri" : { },
+    "test" : null
+  },
   "actions" : [ {
     "batch" : null,
     "deprecated" : null,
@@ -299,8 +429,10 @@
           "controlType" : "OBJECT_BUILDER",
           "optionsDataSource" : null
         },
-        "sampleOutput" : null
+        "sampleOutput" : null,
+        "placeholder" : null
       },
+      "sampleOutput" : null,
       "outputSchema" : {
         "advancedOption" : null,
         "description" : null,
@@ -574,8 +706,7 @@
         } ],
         "controlType" : "OBJECT_BUILDER",
         "optionsDataSource" : null
-      },
-      "sampleOutput" : null
+      }
     },
     "properties" : [ {
       "advancedOption" : null,
@@ -1144,8 +1275,10 @@
           "controlType" : "OBJECT_BUILDER",
           "optionsDataSource" : null
         },
-        "sampleOutput" : null
+        "sampleOutput" : null,
+        "placeholder" : null
       },
+      "sampleOutput" : null,
       "outputSchema" : {
         "advancedOption" : null,
         "description" : null,
@@ -1419,8 +1552,7 @@
         } ],
         "controlType" : "OBJECT_BUILDER",
         "optionsDataSource" : null
-      },
-      "sampleOutput" : null
+      }
     },
     "properties" : [ {
       "advancedOption" : null,
@@ -2008,8 +2140,10 @@
           "controlType" : "ARRAY_BUILDER",
           "optionsDataSource" : null
         },
-        "sampleOutput" : null
+        "sampleOutput" : null,
+        "placeholder" : null
       },
+      "sampleOutput" : null,
       "outputSchema" : {
         "advancedOption" : null,
         "description" : null,
@@ -2304,8 +2438,7 @@
         "options" : null,
         "controlType" : "ARRAY_BUILDER",
         "optionsDataSource" : null
-      },
-      "sampleOutput" : null
+      }
     },
     "properties" : [ {
       "advancedOption" : null,
@@ -2654,8 +2787,10 @@
           "controlType" : "ARRAY_BUILDER",
           "optionsDataSource" : null
         },
-        "sampleOutput" : null
+        "sampleOutput" : null,
+        "placeholder" : null
       },
+      "sampleOutput" : null,
       "outputSchema" : {
         "advancedOption" : null,
         "description" : null,
@@ -2950,8 +3085,7 @@
         "options" : null,
         "controlType" : "ARRAY_BUILDER",
         "optionsDataSource" : null
-      },
-      "sampleOutput" : null
+      }
     },
     "properties" : [ {
       "advancedOption" : null,
@@ -3347,8 +3481,10 @@
           "controlType" : "OBJECT_BUILDER",
           "optionsDataSource" : null
         },
-        "sampleOutput" : null
+        "sampleOutput" : null,
+        "placeholder" : null
       },
+      "sampleOutput" : null,
       "outputSchema" : {
         "advancedOption" : null,
         "description" : null,
@@ -3622,8 +3758,7 @@
         } ],
         "controlType" : "OBJECT_BUILDER",
         "optionsDataSource" : null
-      },
-      "sampleOutput" : null
+      }
     },
     "properties" : [ {
       "advancedOption" : null,
@@ -3829,8 +3964,10 @@
           "controlType" : "OBJECT_BUILDER",
           "optionsDataSource" : null
         },
-        "sampleOutput" : null
+        "sampleOutput" : null,
+        "placeholder" : null
       },
+      "sampleOutput" : null,
       "outputSchema" : {
         "advancedOption" : null,
         "description" : null,
@@ -3912,8 +4049,7 @@
         } ],
         "controlType" : "OBJECT_BUILDER",
         "optionsDataSource" : null
-      },
-      "sampleOutput" : null
+      }
     },
     "properties" : [ {
       "advancedOption" : null,
@@ -4116,8 +4252,10 @@
           "controlType" : "OBJECT_BUILDER",
           "optionsDataSource" : null
         },
-        "sampleOutput" : null
+        "sampleOutput" : null,
+        "placeholder" : null
       },
+      "sampleOutput" : null,
       "outputSchema" : {
         "advancedOption" : null,
         "description" : null,
@@ -4159,8 +4297,7 @@
         "properties" : null,
         "controlType" : "OBJECT_BUILDER",
         "optionsDataSource" : null
-      },
-      "sampleOutput" : null
+      }
     },
     "properties" : [ ],
     "title" : "Returns pet inventories by status",
@@ -4335,8 +4472,10 @@
           "controlType" : "OBJECT_BUILDER",
           "optionsDataSource" : null
         },
-        "sampleOutput" : null
+        "sampleOutput" : null,
+        "placeholder" : null
       },
+      "sampleOutput" : null,
       "outputSchema" : {
         "advancedOption" : null,
         "description" : null,
@@ -4489,8 +4628,7 @@
         } ],
         "controlType" : "OBJECT_BUILDER",
         "optionsDataSource" : null
-      },
-      "sampleOutput" : null
+      }
     },
     "properties" : [ {
       "advancedOption" : null,
@@ -4852,8 +4990,10 @@
           "controlType" : "OBJECT_BUILDER",
           "optionsDataSource" : null
         },
-        "sampleOutput" : null
+        "sampleOutput" : null,
+        "placeholder" : null
       },
+      "sampleOutput" : null,
       "outputSchema" : {
         "advancedOption" : null,
         "description" : null,
@@ -5006,8 +5146,7 @@
         } ],
         "controlType" : "OBJECT_BUILDER",
         "optionsDataSource" : null
-      },
-      "sampleOutput" : null
+      }
     },
     "properties" : [ {
       "advancedOption" : null,
@@ -5231,8 +5370,10 @@
           "controlType" : "OBJECT_BUILDER",
           "optionsDataSource" : null
         },
-        "sampleOutput" : null
+        "sampleOutput" : null,
+        "placeholder" : null
       },
+      "sampleOutput" : null,
       "outputSchema" : {
         "advancedOption" : null,
         "description" : null,
@@ -5413,8 +5554,7 @@
         } ],
         "controlType" : "OBJECT_BUILDER",
         "optionsDataSource" : null
-      },
-      "sampleOutput" : null
+      }
     },
     "properties" : [ {
       "advancedOption" : null,
@@ -5818,8 +5958,10 @@
           "controlType" : "ARRAY_BUILDER",
           "optionsDataSource" : null
         },
-        "sampleOutput" : null
+        "sampleOutput" : null,
+        "placeholder" : null
       },
+      "sampleOutput" : null,
       "outputSchema" : {
         "advancedOption" : null,
         "description" : null,
@@ -6021,8 +6163,7 @@
         "options" : null,
         "controlType" : "ARRAY_BUILDER",
         "optionsDataSource" : null
-      },
-      "sampleOutput" : null
+      }
     },
     "properties" : [ {
       "advancedOption" : null,
@@ -6462,8 +6603,10 @@
           "controlType" : "OBJECT_BUILDER",
           "optionsDataSource" : null
         },
-        "sampleOutput" : null
+        "sampleOutput" : null,
+        "placeholder" : null
       },
+      "sampleOutput" : null,
       "outputSchema" : {
         "advancedOption" : null,
         "description" : null,
@@ -6644,8 +6787,7 @@
         } ],
         "controlType" : "OBJECT_BUILDER",
         "optionsDataSource" : null
-      },
-      "sampleOutput" : null
+      }
     },
     "properties" : [ {
       "advancedOption" : null,
@@ -6870,8 +7012,10 @@
           "controlType" : "OBJECT_BUILDER",
           "optionsDataSource" : null
         },
-        "sampleOutput" : null
+        "sampleOutput" : null,
+        "placeholder" : null
       },
+      "sampleOutput" : null,
       "outputSchema" : {
         "advancedOption" : null,
         "description" : null,
@@ -7052,8 +7196,7 @@
         } ],
         "controlType" : "OBJECT_BUILDER",
         "optionsDataSource" : null
-      },
-      "sampleOutput" : null
+      }
     },
     "properties" : [ {
       "advancedOption" : null,
@@ -7264,136 +7407,6 @@
     "workflowNodeDescription" : null
   } ],
   "triggers" : [ ],
-  "unifiedApi" : null,
   "dataStream" : null,
-  "connection" : {
-    "authorizations" : [ {
-      "detectOn" : null,
-      "description" : null,
-      "name" : "oauth2_implicit_code",
-      "properties" : [ {
-        "advancedOption" : null,
-        "description" : null,
-        "displayCondition" : null,
-        "expressionEnabled" : null,
-        "hidden" : null,
-        "metadata" : { },
-        "required" : true,
-        "name" : "clientId",
-        "type" : "STRING",
-        "defaultValue" : null,
-        "exampleValue" : null,
-        "label" : "Client Id",
-        "placeholder" : null,
-        "controlType" : "TEXT",
-        "languageId" : null,
-        "maxLength" : null,
-        "minLength" : null,
-        "options" : null,
-        "optionsDataSource" : null
-      }, {
-        "advancedOption" : null,
-        "description" : null,
-        "displayCondition" : null,
-        "expressionEnabled" : null,
-        "hidden" : null,
-        "metadata" : { },
-        "required" : true,
-        "name" : "clientSecret",
-        "type" : "STRING",
-        "defaultValue" : null,
-        "exampleValue" : null,
-        "label" : "Client Secret",
-        "placeholder" : null,
-        "controlType" : "TEXT",
-        "languageId" : null,
-        "maxLength" : null,
-        "minLength" : null,
-        "options" : null,
-        "optionsDataSource" : null
-      } ],
-      "refreshOn" : null,
-      "title" : "OAuth2 Implicit",
-      "type" : "OAUTH2_IMPLICIT_CODE",
-      "acquire" : null,
-      "apply" : null,
-      "authorizationCallback" : null,
-      "authorizationUrl" : { },
-      "clientId" : null,
-      "clientSecret" : null,
-      "oauth2AuthorizationExtraQueryParameters" : null,
-      "pkce" : null,
-      "refresh" : null,
-      "refreshUrl" : null,
-      "scopes" : { },
-      "refreshToken" : null,
-      "tokenUrl" : null
-    }, {
-      "detectOn" : null,
-      "description" : null,
-      "name" : "api_key",
-      "properties" : [ {
-        "advancedOption" : null,
-        "description" : null,
-        "displayCondition" : null,
-        "expressionEnabled" : null,
-        "hidden" : true,
-        "metadata" : { },
-        "required" : true,
-        "name" : "key",
-        "type" : "STRING",
-        "defaultValue" : "api_key",
-        "exampleValue" : null,
-        "label" : "Key",
-        "placeholder" : null,
-        "controlType" : "TEXT",
-        "languageId" : null,
-        "maxLength" : null,
-        "minLength" : null,
-        "options" : null,
-        "optionsDataSource" : null
-      }, {
-        "advancedOption" : null,
-        "description" : null,
-        "displayCondition" : null,
-        "expressionEnabled" : null,
-        "hidden" : null,
-        "metadata" : { },
-        "required" : true,
-        "name" : "value",
-        "type" : "STRING",
-        "defaultValue" : null,
-        "exampleValue" : null,
-        "label" : "Value",
-        "placeholder" : null,
-        "controlType" : "TEXT",
-        "languageId" : null,
-        "maxLength" : null,
-        "minLength" : null,
-        "options" : null,
-        "optionsDataSource" : null
-      } ],
-      "refreshOn" : null,
-      "title" : "API Key",
-      "type" : "API_KEY",
-      "acquire" : null,
-      "apply" : null,
-      "authorizationCallback" : null,
-      "authorizationUrl" : null,
-      "clientId" : null,
-      "clientSecret" : null,
-      "oauth2AuthorizationExtraQueryParameters" : null,
-      "pkce" : null,
-      "refresh" : null,
-      "refreshUrl" : null,
-      "scopes" : null,
-      "refreshToken" : null,
-      "tokenUrl" : null
-    } ],
-    "properties" : null,
-    "version" : 1,
-    "authorizationRequired" : null,
-    "baseUri" : { },
-    "test" : null
-  }
+  "unifiedApi" : null
 }

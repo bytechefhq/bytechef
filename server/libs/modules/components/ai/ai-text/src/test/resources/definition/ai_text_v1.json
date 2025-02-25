@@ -1333,7 +1333,8 @@
           "options" : null,
           "optionsDataSource" : null
         },
-        "sampleOutput" : "Generated text."
+        "sampleOutput" : "Generated text.",
+        "placeholder" : null
       },
       "outputSchema" : {
         "advancedOption" : null,

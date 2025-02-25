@@ -13,6 +13,7 @@
   "resources" : null,
   "version" : 1,
   "title" : "Image Helper",
+  "connection" : null,
   "actions" : [ {
     "batch" : null,
     "deprecated" : null,
@@ -120,7 +121,8 @@
           } ],
           "controlType" : "FILE_ENTRY"
         },
-        "sampleOutput" : null
+        "sampleOutput" : null,
+        "placeholder" : null
       },
       "outputSchema" : {
         "advancedOption" : null,
@@ -362,8 +364,8 @@
     } ],
     "title" : "Compress Image",
     "processErrorResponse" : null,
-    "perform" : { },
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "perform" : { }
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -471,7 +473,8 @@
           } ],
           "controlType" : "FILE_ENTRY"
         },
-        "sampleOutput" : null
+        "sampleOutput" : null,
+        "placeholder" : null
       },
       "outputSchema" : {
         "advancedOption" : null,
@@ -767,8 +770,8 @@
     } ],
     "title" : "Crop Image",
     "processErrorResponse" : null,
-    "perform" : { },
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "perform" : { }
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -901,8 +904,8 @@
     } ],
     "title" : "Get Image Metadata",
     "processErrorResponse" : null,
-    "perform" : { },
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "perform" : { }
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -934,7 +937,8 @@
           "options" : null,
           "optionsDataSource" : null
         },
-        "sampleOutput" : null
+        "sampleOutput" : null,
+        "placeholder" : null
       },
       "outputSchema" : {
         "advancedOption" : null,
@@ -1058,8 +1062,8 @@
     } ],
     "title" : "Image to Base64",
     "processErrorResponse" : null,
-    "perform" : { },
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "perform" : { }
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -1167,7 +1171,8 @@
           } ],
           "controlType" : "FILE_ENTRY"
         },
-        "sampleOutput" : null
+        "sampleOutput" : null,
+        "placeholder" : null
       },
       "outputSchema" : {
         "advancedOption" : null,
@@ -1425,8 +1430,8 @@
     } ],
     "title" : "Resize Image",
     "processErrorResponse" : null,
-    "perform" : { },
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "perform" : { }
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -1534,7 +1539,8 @@
           } ],
           "controlType" : "FILE_ENTRY"
         },
-        "sampleOutput" : null
+        "sampleOutput" : null,
+        "placeholder" : null
       },
       "outputSchema" : {
         "advancedOption" : null,
@@ -1785,11 +1791,10 @@
     } ],
     "title" : "Rotate Image",
     "processErrorResponse" : null,
-    "perform" : { },
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "perform" : { }
   } ],
   "dataStream" : null,
   "triggers" : null,
-  "unifiedApi" : null,
-  "connection" : null
+  "unifiedApi" : null
 }

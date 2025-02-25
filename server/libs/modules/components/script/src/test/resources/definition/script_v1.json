@@ -241,13 +241,13 @@
     } ],
     "title" : "JavaScript",
     "perform" : { },
-    "processErrorResponse" : null,
     "outputDefinition" : {
       "output" : null,
       "outputResponse" : null,
       "outputSchema" : null,
       "sampleOutput" : null
     },
+    "processErrorResponse" : null,
     "workflowNodeDescription" : null
   }, {
     "batch" : null,
@@ -491,13 +491,13 @@
     } ],
     "title" : "Python",
     "perform" : { },
-    "processErrorResponse" : null,
     "outputDefinition" : {
       "output" : null,
       "outputResponse" : null,
       "outputSchema" : null,
       "sampleOutput" : null
     },
+    "processErrorResponse" : null,
     "workflowNodeDescription" : null
   }, {
     "batch" : null,
@@ -741,13 +741,13 @@
     } ],
     "title" : "Ruby",
     "perform" : { },
-    "processErrorResponse" : null,
     "outputDefinition" : {
       "output" : null,
       "outputResponse" : null,
       "outputSchema" : null,
       "sampleOutput" : null
     },
+    "processErrorResponse" : null,
     "workflowNodeDescription" : null
   } ],
   "categories" : [ {

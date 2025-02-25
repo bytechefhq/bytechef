@@ -220,8 +220,6 @@
     } ],
     "title" : "Generate Image",
     "perform" : { },
-    "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
     "outputDefinition" : {
       "output" : null,
       "outputResponse" : {
@@ -286,7 +284,8 @@
           "optionsDataSource" : null,
           "controlType" : "OBJECT_BUILDER"
         },
-        "sampleOutput" : null
+        "sampleOutput" : null,
+        "placeholder" : null
       },
       "outputSchema" : {
         "advancedOption" : null,
@@ -350,7 +349,9 @@
         "controlType" : "OBJECT_BUILDER"
       },
       "sampleOutput" : null
-    }
+    },
+    "processErrorResponse" : null,
+    "workflowNodeDescription" : null
   } ],
   "categories" : [ {
     "key" : "artificial-intelligence",
