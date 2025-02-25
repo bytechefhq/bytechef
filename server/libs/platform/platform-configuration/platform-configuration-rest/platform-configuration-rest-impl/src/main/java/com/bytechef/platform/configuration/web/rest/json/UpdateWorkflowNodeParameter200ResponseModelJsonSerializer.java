@@ -41,6 +41,9 @@ public class UpdateWorkflowNodeParameter200ResponseModelJsonSerializer
         jsonGenerator.writeObjectField("metadata", value.getMetadata());
         jsonGenerator.writeFieldName("parameters");
         jsonGenerator.writeRaw(":");
+
+        // Include null values in parameters
+
         jsonGenerator.writeRaw(JsonUtils.write(value.getParameters(), true));
         jsonGenerator.writeEndObject();
     }
