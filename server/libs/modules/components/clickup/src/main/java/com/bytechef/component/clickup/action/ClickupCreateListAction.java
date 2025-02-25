@@ -18,14 +18,15 @@ package com.bytechef.component.clickup.action;
 
 import static com.bytechef.component.OpenApiComponentHandler.PropertyType;
 import static com.bytechef.component.definition.ComponentDsl.action;
-import static com.bytechef.component.definition.ComponentDsl.number;
 import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.Context.Http.BodyContentType;
 import static com.bytechef.component.definition.Context.Http.ResponseType;
 
+import com.bytechef.component.clickup.util.ClickupUtils;
 import com.bytechef.component.definition.ComponentDsl;
+import com.bytechef.component.definition.OptionsDataSource;
 import java.util.Map;
 
 /**
@@ -44,9 +45,10 @@ public class ClickupCreateListAction {
                 "application/json"
 
             ))
-        .properties(number("folderId").label("Folder ID")
+        .properties(string("folderId").label("Folder ID")
             .description("ID of the folder where new list will be created.")
             .required(true)
+            .options((OptionsDataSource.ActionOptionsFunction<String>) ClickupUtils::getFolderIdOptions)
             .metadata(
                 Map.of(
                     "type", PropertyType.PATH)),
