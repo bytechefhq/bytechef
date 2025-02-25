@@ -26,14 +26,16 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "WorkflowNodeOutput", description = "The workflow node output")
 @JsonTypeName("WorkflowNodeOutput")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-02-23T10:29:20.527744+01:00[Europe/Zagreb]", comments = "Generator version: 7.11.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-02-23T22:40:14.580258+01:00[Europe/Zagreb]", comments = "Generator version: 7.11.0")
 public class WorkflowNodeOutputModel {
-
-  private @Nullable ActionDefinitionBasicModel actionDefinition;
 
   private PropertyModel outputSchema;
 
   private @Nullable Object sampleOutput;
+
+  private @Nullable Object placeholder;
+
+  private @Nullable ActionDefinitionBasicModel actionDefinition;
 
   private @Nullable TaskDispatcherDefinitionBasicModel taskDispatcherDefinition;
 
@@ -51,26 +53,6 @@ public class WorkflowNodeOutputModel {
   public WorkflowNodeOutputModel(PropertyModel outputSchema, String workflowNodeName) {
     this.outputSchema = outputSchema;
     this.workflowNodeName = workflowNodeName;
-  }
-
-  public WorkflowNodeOutputModel actionDefinition(ActionDefinitionBasicModel actionDefinition) {
-    this.actionDefinition = actionDefinition;
-    return this;
-  }
-
-  /**
-   * Get actionDefinition
-   * @return actionDefinition
-   */
-  @Valid 
-  @Schema(name = "actionDefinition", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  @JsonProperty("actionDefinition")
-  public ActionDefinitionBasicModel getActionDefinition() {
-    return actionDefinition;
-  }
-
-  public void setActionDefinition(ActionDefinitionBasicModel actionDefinition) {
-    this.actionDefinition = actionDefinition;
   }
 
   public WorkflowNodeOutputModel outputSchema(PropertyModel outputSchema) {
@@ -111,6 +93,46 @@ public class WorkflowNodeOutputModel {
 
   public void setSampleOutput(Object sampleOutput) {
     this.sampleOutput = sampleOutput;
+  }
+
+  public WorkflowNodeOutputModel placeholder(Object placeholder) {
+    this.placeholder = placeholder;
+    return this;
+  }
+
+  /**
+   * The placeholder of an output.
+   * @return placeholder
+   */
+  
+  @Schema(name = "placeholder", description = "The placeholder of an output.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("placeholder")
+  public Object getPlaceholder() {
+    return placeholder;
+  }
+
+  public void setPlaceholder(Object placeholder) {
+    this.placeholder = placeholder;
+  }
+
+  public WorkflowNodeOutputModel actionDefinition(ActionDefinitionBasicModel actionDefinition) {
+    this.actionDefinition = actionDefinition;
+    return this;
+  }
+
+  /**
+   * Get actionDefinition
+   * @return actionDefinition
+   */
+  @Valid 
+  @Schema(name = "actionDefinition", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("actionDefinition")
+  public ActionDefinitionBasicModel getActionDefinition() {
+    return actionDefinition;
+  }
+
+  public void setActionDefinition(ActionDefinitionBasicModel actionDefinition) {
+    this.actionDefinition = actionDefinition;
   }
 
   public WorkflowNodeOutputModel taskDispatcherDefinition(TaskDispatcherDefinitionBasicModel taskDispatcherDefinition) {
@@ -182,9 +204,10 @@ public class WorkflowNodeOutputModel {
       return false;
     }
     WorkflowNodeOutputModel workflowNodeOutput = (WorkflowNodeOutputModel) o;
-    return Objects.equals(this.actionDefinition, workflowNodeOutput.actionDefinition) &&
-        Objects.equals(this.outputSchema, workflowNodeOutput.outputSchema) &&
+    return Objects.equals(this.outputSchema, workflowNodeOutput.outputSchema) &&
         Objects.equals(this.sampleOutput, workflowNodeOutput.sampleOutput) &&
+        Objects.equals(this.placeholder, workflowNodeOutput.placeholder) &&
+        Objects.equals(this.actionDefinition, workflowNodeOutput.actionDefinition) &&
         Objects.equals(this.taskDispatcherDefinition, workflowNodeOutput.taskDispatcherDefinition) &&
         Objects.equals(this.triggerDefinition, workflowNodeOutput.triggerDefinition) &&
         Objects.equals(this.workflowNodeName, workflowNodeOutput.workflowNodeName);
@@ -192,16 +215,17 @@ public class WorkflowNodeOutputModel {
 
   @Override
   public int hashCode() {
-    return Objects.hash(actionDefinition, outputSchema, sampleOutput, taskDispatcherDefinition, triggerDefinition, workflowNodeName);
+    return Objects.hash(outputSchema, sampleOutput, placeholder, actionDefinition, taskDispatcherDefinition, triggerDefinition, workflowNodeName);
   }
 
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
     sb.append("class WorkflowNodeOutputModel {\n");
-    sb.append("    actionDefinition: ").append(toIndentedString(actionDefinition)).append("\n");
     sb.append("    outputSchema: ").append(toIndentedString(outputSchema)).append("\n");
     sb.append("    sampleOutput: ").append(toIndentedString(sampleOutput)).append("\n");
+    sb.append("    placeholder: ").append(toIndentedString(placeholder)).append("\n");
+    sb.append("    actionDefinition: ").append(toIndentedString(actionDefinition)).append("\n");
     sb.append("    taskDispatcherDefinition: ").append(toIndentedString(taskDispatcherDefinition)).append("\n");
     sb.append("    triggerDefinition: ").append(toIndentedString(triggerDefinition)).append("\n");
     sb.append("    workflowNodeName: ").append(toIndentedString(workflowNodeName)).append("\n");
