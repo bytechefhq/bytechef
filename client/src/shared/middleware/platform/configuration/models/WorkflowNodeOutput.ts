@@ -50,12 +50,6 @@ import {
 export interface WorkflowNodeOutput {
     /**
      * 
-     * @type {ActionDefinitionBasic}
-     * @memberof WorkflowNodeOutput
-     */
-    actionDefinition?: ActionDefinitionBasic;
-    /**
-     * 
      * @type {Property}
      * @memberof WorkflowNodeOutput
      */
@@ -66,6 +60,18 @@ export interface WorkflowNodeOutput {
      * @memberof WorkflowNodeOutput
      */
     sampleOutput?: object;
+    /**
+     * The placeholder of an output.
+     * @type {object}
+     * @memberof WorkflowNodeOutput
+     */
+    placeholder?: object;
+    /**
+     * 
+     * @type {ActionDefinitionBasic}
+     * @memberof WorkflowNodeOutput
+     */
+    actionDefinition?: ActionDefinitionBasic;
     /**
      * 
      * @type {TaskDispatcherDefinitionBasic}
@@ -105,9 +111,10 @@ export function WorkflowNodeOutputFromJSONTyped(json: any, ignoreDiscriminator: 
     }
     return {
         
-        'actionDefinition': json['actionDefinition'] == null ? undefined : ActionDefinitionBasicFromJSON(json['actionDefinition']),
         'outputSchema': PropertyFromJSON(json['outputSchema']),
         'sampleOutput': json['sampleOutput'] == null ? undefined : json['sampleOutput'],
+        'placeholder': json['placeholder'] == null ? undefined : json['placeholder'],
+        'actionDefinition': json['actionDefinition'] == null ? undefined : ActionDefinitionBasicFromJSON(json['actionDefinition']),
         'taskDispatcherDefinition': json['taskDispatcherDefinition'] == null ? undefined : TaskDispatcherDefinitionBasicFromJSON(json['taskDispatcherDefinition']),
         'triggerDefinition': json['triggerDefinition'] == null ? undefined : TriggerDefinitionBasicFromJSON(json['triggerDefinition']),
         'workflowNodeName': json['workflowNodeName'],
@@ -125,9 +132,10 @@ export function WorkflowNodeOutputToJSONTyped(value?: WorkflowNodeOutput | null,
 
     return {
         
-        'actionDefinition': ActionDefinitionBasicToJSON(value['actionDefinition']),
         'outputSchema': PropertyToJSON(value['outputSchema']),
         'sampleOutput': value['sampleOutput'],
+        'placeholder': value['placeholder'],
+        'actionDefinition': ActionDefinitionBasicToJSON(value['actionDefinition']),
         'taskDispatcherDefinition': TaskDispatcherDefinitionBasicToJSON(value['taskDispatcherDefinition']),
         'triggerDefinition': TriggerDefinitionBasicToJSON(value['triggerDefinition']),
         'workflowNodeName': value['workflowNodeName'],
