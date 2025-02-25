@@ -29,7 +29,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "NullProperty", description = "A null property type.")
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-02-23T10:29:20.527744+01:00[Europe/Zagreb]", comments = "Generator version: 7.11.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-02-23T22:40:14.580258+01:00[Europe/Zagreb]", comments = "Generator version: 7.11.0")
 public class NullPropertyModel extends ValuePropertyModel {
 
   public NullPropertyModel() {
