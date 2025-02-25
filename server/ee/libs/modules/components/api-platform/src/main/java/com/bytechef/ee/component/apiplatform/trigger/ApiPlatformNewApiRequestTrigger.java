@@ -142,7 +142,7 @@ public class ApiPlatformNewApiRequestTrigger {
             properties.add(body);
         }
 
-        return new OutputResponse(object().properties(properties));
+        return OutputResponse.of(object().properties(properties));
     }
 
     protected Map<String, ?> webhookResult(

@@ -165,7 +165,7 @@ public class TaskDispatcherDefinition {
             ", icon='" + icon + '\'' +
             ", name='" + name + '\'' +
             ", properties=" + properties +
-            ", outputDefinition=" + outputResponse +
+            ", outputResponse=" + outputResponse +
             ", resources=" + resources +
             ", taskProperties=" + taskProperties +
             ", title='" + title + '\'' +

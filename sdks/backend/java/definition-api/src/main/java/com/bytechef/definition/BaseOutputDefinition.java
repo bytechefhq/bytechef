@@ -17,6 +17,7 @@
 package com.bytechef.definition;
 
 import com.bytechef.definition.BaseProperty.BaseValueProperty;
+import java.util.Objects;
 import java.util.Optional;
 
 /**
@@ -30,24 +31,37 @@ public interface BaseOutputDefinition {
 
     default BaseValueProperty<?> getOutputSchema() {
         return getOutputResponse()
-            .map(OutputResponse::outputSchema)
+            .map(OutputResponse::getOutputSchema)
             .orElse(null);
     }
 
     default Object getSampleOutput() {
         return getOutputResponse()
-            .map(OutputResponse::sampleOutput)
+            .map(OutputResponse::getSampleOutput)
             .orElse(null);
     }
 
-    record OutputResponse(BaseValueProperty<?> outputSchema, Object sampleOutput) {
+    class OutputResponse {
+
+        private BaseValueProperty<?> outputSchema;
+        private Object sampleOutput;
+        private Object placeholder;
+
+        private OutputResponse() {
+        }
+
+        public OutputResponse(BaseValueProperty<?> outputSchema, Object sampleOutput, Object placeholder) {
+            this.outputSchema = outputSchema;
+            this.sampleOutput = sampleOutput;
+            this.placeholder = placeholder;
+        }
 
         public OutputResponse(BaseValueProperty<?> outputSchema) {
-            this(outputSchema, null);
+            this(outputSchema, null, null);
         }
 
         public OutputResponse(Object sampleOutput) {
-            this(null, sampleOutput);
+            this(null, sampleOutput, null);
         }
 
         public static OutputResponse of(BaseValueProperty<?> outputSchema) {
@@ -59,7 +73,53 @@ public interface BaseOutputDefinition {
         }
 
         public static OutputResponse of(BaseValueProperty<?> outputSchema, Object sampleOutput) {
-            return new OutputResponse(outputSchema, sampleOutput);
+            return new OutputResponse(outputSchema, sampleOutput, null);
+        }
+
+        public static OutputResponse of(BaseValueProperty<?> outputSchema, Object sampleOutput, Object placeholder) {
+            return new OutputResponse(outputSchema, sampleOutput, placeholder);
+        }
+
+        public BaseValueProperty<?> getOutputSchema() {
+            return outputSchema;
+        }
+
+        public Object getSampleOutput() {
+            return sampleOutput;
+        }
+
+        public Object getPlaceholder() {
+            return placeholder;
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (obj == this) {
+                return true;
+            }
+
+            if (obj == null || obj.getClass() != this.getClass()) {
+                return false;
+            }
+
+            var that = (OutputResponse) obj;
+
+            return Objects.equals(this.outputSchema, that.outputSchema) &&
+                Objects.equals(this.sampleOutput, that.sampleOutput) &&
+                Objects.equals(this.placeholder, that.placeholder);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(outputSchema, sampleOutput, placeholder);
+        }
+
+        @Override
+        public String toString() {
+            return "OutputResponse[" +
+                "outputSchema=" + outputSchema + ", " +
+                "sampleOutput=" + sampleOutput + ", " +
+                "placeholder=" + placeholder + ']';
         }
     }
 
@@ -68,6 +128,12 @@ public interface BaseOutputDefinition {
      * @param <P>
      */
     record OutputSchema<P extends BaseValueProperty<?>>(P outputSchema) {
+    }
+
+    /**
+     * @param placeholder
+     */
+    record Placeholder(Object placeholder) {
     }
 
     /**

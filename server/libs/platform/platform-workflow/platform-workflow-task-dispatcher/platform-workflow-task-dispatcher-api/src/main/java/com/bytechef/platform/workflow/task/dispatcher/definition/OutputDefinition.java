@@ -35,14 +35,14 @@ public final class OutputDefinition implements BaseOutputDefinition {
     public OutputDefinition(ValueProperty<?> outputSchema) {
         Objects.requireNonNull(outputSchema, "'outputSchema' mut not be null");
 
-        this.outputResponse = new OutputResponse(outputSchema);
+        this.outputResponse = OutputResponse.of(outputSchema);
     }
 
     public OutputDefinition(ValueProperty<?> outputSchema, Object sampleOutput) {
         Objects.requireNonNull(outputSchema, "'outputSchema' mut not be null");
         Objects.requireNonNull(sampleOutput, "'sampleOutput' mut not be null");
 
-        this.outputResponse = new OutputResponse(outputSchema, sampleOutput);
+        this.outputResponse = OutputResponse.of(outputSchema, sampleOutput);
     }
 
     public OutputDefinition(OutputFunction output) {

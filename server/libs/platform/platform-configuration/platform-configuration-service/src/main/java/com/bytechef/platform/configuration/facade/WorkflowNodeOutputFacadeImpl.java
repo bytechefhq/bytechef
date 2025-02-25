@@ -205,10 +205,10 @@ public class WorkflowNodeOutputFacadeImpl implements WorkflowNodeOutputFacade {
 
                         outputResponse = SchemaUtils.toOutput(
                             Map.of("item", item, "index", 0),
-                            (property, sampleOutput) -> new OutputResponse(
+                            (outputSchema, sampleOutput, placeholder) -> new OutputResponse(
                                 Property.toProperty(
-                                    (com.bytechef.platform.workflow.task.dispatcher.definition.Property) property),
-                                sampleOutput),
+                                    (com.bytechef.platform.workflow.task.dispatcher.definition.Property) outputSchema),
+                                sampleOutput, placeholder),
                             PropertyFactory.PROPERTY_FACTORY);
                     }
                 } else {
@@ -232,7 +232,8 @@ public class WorkflowNodeOutputFacadeImpl implements WorkflowNodeOutputFacade {
             List<?> list = arrayProperty.getItems();
 
             if (!list.isEmpty()) {
-                outputResponse = new OutputResponse((BaseProperty) list.getFirst(), outputResponse.sampleOutput());
+                outputResponse = new OutputResponse(
+                    (BaseProperty) list.getFirst(), outputResponse.sampleOutput(), outputResponse.placeholder());
             }
         }
 

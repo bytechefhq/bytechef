@@ -104,10 +104,10 @@ public class SchemaUtils {
         BaseOutputDefinition.OutputResponse outputResponse, OutputFactoryFunction outputFactoryFunction,
         SchemaPropertyFactory propertyFactoryFunction) {
 
-        Object sampleOutput = outputResponse.sampleOutput();
+        Object sampleOutput = outputResponse.getSampleOutput();
 
-        if (sampleOutput == null) {
-            sampleOutput = getSampleOutput(outputResponse.outputSchema());
+        if (sampleOutput == null && outputResponse.getOutputSchema() != null) {
+            sampleOutput = getSampleOutput(outputResponse.getOutputSchema());
         } else if (sampleOutput instanceof String string) {
             try {
                 sampleOutput = JsonUtils.readMap(string);
@@ -118,20 +118,20 @@ public class SchemaUtils {
             }
         }
 
-        BaseProperty.BaseValueProperty<?> outputSchema = outputResponse.outputSchema();
+        BaseProperty.BaseValueProperty<?> outputSchema = outputResponse.getOutputSchema();
 
-        if (outputSchema == null) {
+        if (outputSchema == null && sampleOutput != null) {
             outputSchema = (BaseProperty.BaseValueProperty<?>) getOutputSchema(sampleOutput, propertyFactoryFunction);
         }
 
-        return outputFactoryFunction.apply(outputSchema, sampleOutput);
+        return outputFactoryFunction.apply(outputSchema, sampleOutput, outputResponse.getPlaceholder());
     }
 
     public static OutputResponse toOutput(
         Object value, OutputFactoryFunction outputFactoryFunction, SchemaPropertyFactory propertyFactoryFunction) {
 
         return toOutput(
-            new BaseOutputDefinition.OutputResponse((BaseProperty.BaseValueProperty<?>) getOutputSchema(
+            BaseOutputDefinition.OutputResponse.of((BaseProperty.BaseValueProperty<?>) getOutputSchema(
                 value, propertyFactoryFunction), value),
             outputFactoryFunction, propertyFactoryFunction);
     }
@@ -190,7 +190,7 @@ public class SchemaUtils {
     @FunctionalInterface
     public interface OutputFactoryFunction {
 
-        OutputResponse apply(BaseProperty property, Object value);
+        OutputResponse apply(BaseProperty outputSchema, Object sampleOutput, Object placeholder);
     }
 
     @FunctionalInterface

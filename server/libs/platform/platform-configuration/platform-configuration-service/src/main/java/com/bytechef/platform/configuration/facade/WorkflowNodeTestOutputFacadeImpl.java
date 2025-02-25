@@ -138,12 +138,13 @@ public class WorkflowNodeTestOutputFacadeImpl implements WorkflowNodeTestOutputF
 
         OutputResponse outputResponse =
             SchemaUtils.toOutput(
-                new BaseOutputDefinition.OutputResponse(
+                BaseOutputDefinition.OutputResponse.of(
                     (BaseProperty.BaseValueProperty<?>) SchemaUtils.getOutputSchema(
                         object, PropertyFactory.PROPERTY_FACTORY),
                     object),
-                (property, sampleOutput) -> new OutputResponse(
-                    Property.toProperty((com.bytechef.component.definition.Property) property), sampleOutput),
+                (outputSchema, sampleOutput, placeholder) -> new OutputResponse(
+                    Property.toProperty((com.bytechef.component.definition.Property) outputSchema), sampleOutput,
+                    placeholder),
                 PropertyFactory.PROPERTY_FACTORY);
 
         if (outputResponse == null || outputResponse.outputSchema() instanceof NullProperty) {
@@ -169,12 +170,13 @@ public class WorkflowNodeTestOutputFacadeImpl implements WorkflowNodeTestOutputF
 
         OutputResponse outputResponse =
             SchemaUtils.toOutput(
-                new BaseOutputDefinition.OutputResponse(
+                BaseOutputDefinition.OutputResponse.of(
                     (BaseProperty.BaseValueProperty<?>) SchemaUtils.getOutputSchema(
                         triggerOutput.value(), PropertyFactory.PROPERTY_FACTORY),
                     triggerOutput.batch()),
-                (property, sampleOutput) -> new OutputResponse(
-                    Property.toProperty((com.bytechef.component.definition.Property) property), sampleOutput),
+                (outputSchema, sampleOutput, placeholder) -> new OutputResponse(
+                    Property.toProperty((com.bytechef.component.definition.Property) outputSchema), sampleOutput,
+                    placeholder),
                 PropertyFactory.PROPERTY_FACTORY);
 
         if (outputResponse == null) {

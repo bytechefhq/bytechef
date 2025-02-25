@@ -84,7 +84,7 @@ public class ApiPlatformResponseToApiRequestAction {
             return null;
         }
 
-        return new OutputResponse(response);
+        return OutputResponse.of(response);
     }
 
     protected Object perform(Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) {

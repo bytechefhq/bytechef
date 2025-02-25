@@ -61,6 +61,10 @@ public abstract class Property extends BaseProperty {
 
     @SuppressWarnings("unchecked")
     public static <P extends Property> P toProperty(com.bytechef.component.definition.Property property) {
+        if (property == null) {
+            return null;
+        }
+
         return switch (property.getType()) {
             case ARRAY -> (P) toArrayProperty((com.bytechef.component.definition.Property.ArrayProperty) property);
             case BOOLEAN -> (P) toBooleanProperty(
