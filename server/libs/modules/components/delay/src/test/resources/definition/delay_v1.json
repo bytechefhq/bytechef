@@ -13,7 +13,6 @@
   "resources" : null,
   "version" : 1,
   "title" : "Delay",
-  "connection" : null,
   "actions" : [ {
     "batch" : null,
     "deprecated" : null,
@@ -43,11 +42,12 @@
       "optionsDataSource" : null
     } ],
     "title" : "Sleep",
+    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
-    "perform" : { }
+    "workflowNodeDescription" : null
   } ],
-  "triggers" : null,
   "dataStream" : null,
-  "unifiedApi" : null
+  "triggers" : null,
+  "unifiedApi" : null,
+  "connection" : null
 }

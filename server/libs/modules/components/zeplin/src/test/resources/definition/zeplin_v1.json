@@ -13,6 +13,94 @@
   "resources" : null,
   "version" : 1,
   "title" : "Zeplin",
+  "actions" : [ {
+    "batch" : null,
+    "deprecated" : null,
+    "description" : "Updates an existing project.",
+    "help" : null,
+    "metadata" : {
+      "path" : "/projects/{project_id}",
+      "mimeType" : "application/json",
+      "method" : "PATCH",
+      "bodyContentType" : "JSON"
+    },
+    "name" : "updateProject",
+    "outputDefinition" : null,
+    "properties" : [ {
+      "advancedOption" : null,
+      "description" : "Project to update.",
+      "displayCondition" : null,
+      "expressionEnabled" : null,
+      "hidden" : null,
+      "metadata" : {
+        "type" : "PATH"
+      },
+      "required" : true,
+      "name" : "project_id",
+      "type" : "STRING",
+      "defaultValue" : null,
+      "exampleValue" : null,
+      "label" : "Project ID",
+      "placeholder" : null,
+      "controlType" : "SELECT",
+      "languageId" : null,
+      "maxLength" : null,
+      "minLength" : null,
+      "options" : null,
+      "optionsDataSource" : {
+        "optionsLookupDependsOn" : null,
+        "options" : { }
+      }
+    }, {
+      "advancedOption" : null,
+      "description" : "New name for the project.",
+      "displayCondition" : null,
+      "expressionEnabled" : null,
+      "hidden" : null,
+      "metadata" : {
+        "type" : "BODY"
+      },
+      "required" : true,
+      "name" : "name",
+      "type" : "STRING",
+      "defaultValue" : null,
+      "exampleValue" : null,
+      "label" : "Name",
+      "placeholder" : null,
+      "controlType" : "TEXT",
+      "languageId" : null,
+      "maxLength" : null,
+      "minLength" : null,
+      "options" : null,
+      "optionsDataSource" : null
+    }, {
+      "advancedOption" : null,
+      "description" : "New description for the project.",
+      "displayCondition" : null,
+      "expressionEnabled" : null,
+      "hidden" : null,
+      "metadata" : {
+        "type" : "BODY"
+      },
+      "required" : false,
+      "name" : "description",
+      "type" : "STRING",
+      "defaultValue" : null,
+      "exampleValue" : null,
+      "label" : "Description",
+      "placeholder" : null,
+      "controlType" : "TEXT",
+      "languageId" : null,
+      "maxLength" : null,
+      "minLength" : null,
+      "options" : null,
+      "optionsDataSource" : null
+    } ],
+    "title" : "Update Project",
+    "perform" : null,
+    "processErrorResponse" : null,
+    "workflowNodeDescription" : null
+  } ],
   "connection" : {
     "authorizations" : [ {
       "detectOn" : null,
@@ -63,17 +151,17 @@
       "title" : "OAuth2 Authorization Code",
       "type" : "OAUTH2_AUTHORIZATION_CODE",
       "acquire" : null,
-      "oauth2AuthorizationExtraQueryParameters" : null,
       "authorizationCallback" : null,
-      "authorizationUrl" : { },
-      "clientSecret" : null,
-      "refreshToken" : null,
       "apply" : null,
+      "authorizationUrl" : { },
       "clientId" : null,
+      "clientSecret" : null,
+      "oauth2AuthorizationExtraQueryParameters" : null,
       "pkce" : null,
       "refresh" : null,
       "refreshUrl" : { },
       "scopes" : null,
+      "refreshToken" : null,
       "tokenUrl" : { }
     } ],
     "properties" : null,
@@ -82,112 +170,6 @@
     "baseUri" : { },
     "test" : null
   },
-  "actions" : [ {
-    "batch" : null,
-    "deprecated" : null,
-    "description" : "Updates an existing project.",
-    "help" : null,
-    "metadata" : {
-      "path" : "/projects/{project_id}",
-      "mimeType" : "application/json",
-      "method" : "PATCH",
-      "bodyContentType" : "JSON"
-    },
-    "name" : "updateProject",
-    "outputDefinition" : null,
-    "properties" : [ {
-      "advancedOption" : null,
-      "description" : "Project to update.",
-      "displayCondition" : null,
-      "expressionEnabled" : null,
-      "hidden" : null,
-      "metadata" : {
-        "type" : "PATH"
-      },
-      "required" : true,
-      "name" : "project_id",
-      "type" : "STRING",
-      "defaultValue" : null,
-      "exampleValue" : null,
-      "label" : "Project ID",
-      "placeholder" : null,
-      "controlType" : "SELECT",
-      "languageId" : null,
-      "maxLength" : null,
-      "minLength" : null,
-      "options" : null,
-      "optionsDataSource" : {
-        "optionsLookupDependsOn" : null,
-        "options" : { }
-      }
-    }, {
-      "advancedOption" : null,
-      "description" : null,
-      "displayCondition" : null,
-      "expressionEnabled" : null,
-      "hidden" : null,
-      "metadata" : {
-        "type" : "BODY"
-      },
-      "required" : true,
-      "name" : "__item",
-      "type" : "OBJECT",
-      "defaultValue" : null,
-      "exampleValue" : null,
-      "label" : "Project",
-      "placeholder" : null,
-      "additionalProperties" : null,
-      "multipleValues" : null,
-      "options" : null,
-      "properties" : [ {
-        "advancedOption" : null,
-        "description" : "New name for the project.",
-        "displayCondition" : null,
-        "expressionEnabled" : null,
-        "hidden" : null,
-        "metadata" : { },
-        "required" : true,
-        "name" : "name",
-        "type" : "STRING",
-        "defaultValue" : null,
-        "exampleValue" : null,
-        "label" : "Name",
-        "placeholder" : null,
-        "controlType" : "TEXT",
-        "languageId" : null,
-        "maxLength" : null,
-        "minLength" : null,
-        "options" : null,
-        "optionsDataSource" : null
-      }, {
-        "advancedOption" : null,
-        "description" : "New description for the project.",
-        "displayCondition" : null,
-        "expressionEnabled" : null,
-        "hidden" : null,
-        "metadata" : { },
-        "required" : false,
-        "name" : "description",
-        "type" : "STRING",
-        "defaultValue" : null,
-        "exampleValue" : null,
-        "label" : "Description",
-        "placeholder" : null,
-        "controlType" : "TEXT",
-        "languageId" : null,
-        "maxLength" : null,
-        "minLength" : null,
-        "options" : null,
-        "optionsDataSource" : null
-      } ],
-      "optionsDataSource" : null,
-      "controlType" : "OBJECT_BUILDER"
-    } ],
-    "title" : "Update Project",
-    "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
-    "perform" : null
-  } ],
   "triggers" : [ {
     "batch" : null,
     "deprecated" : null,
@@ -457,8 +439,8 @@
                       "options" : null,
                       "optionsDataSource" : null
                     } ],
-                    "optionsDataSource" : null,
-                    "controlType" : "OBJECT_BUILDER"
+                    "controlType" : "OBJECT_BUILDER",
+                    "optionsDataSource" : null
                   }, {
                     "advancedOption" : null,
                     "description" : null,
@@ -480,21 +462,21 @@
                     "options" : null,
                     "optionsDataSource" : null
                   } ],
-                  "optionsDataSource" : null,
-                  "controlType" : "OBJECT_BUILDER"
+                  "controlType" : "OBJECT_BUILDER",
+                  "optionsDataSource" : null
                 } ],
                 "maxItems" : null,
                 "minItems" : null,
                 "multipleValues" : null,
                 "options" : null,
-                "optionsDataSource" : null,
-                "controlType" : "ARRAY_BUILDER"
+                "controlType" : "ARRAY_BUILDER",
+                "optionsDataSource" : null
               } ],
-              "optionsDataSource" : null,
-              "controlType" : "OBJECT_BUILDER"
+              "controlType" : "OBJECT_BUILDER",
+              "optionsDataSource" : null
             } ],
-            "optionsDataSource" : null,
-            "controlType" : "OBJECT_BUILDER"
+            "controlType" : "OBJECT_BUILDER",
+            "optionsDataSource" : null
           }, {
             "advancedOption" : null,
             "description" : null,
@@ -536,8 +518,8 @@
             "options" : null,
             "optionsDataSource" : null
           } ],
-          "optionsDataSource" : null,
-          "controlType" : "OBJECT_BUILDER"
+          "controlType" : "OBJECT_BUILDER",
+          "optionsDataSource" : null
         },
         "sampleOutput" : null,
         "placeholder" : null
@@ -802,8 +784,8 @@
                     "options" : null,
                     "optionsDataSource" : null
                   } ],
-                  "optionsDataSource" : null,
-                  "controlType" : "OBJECT_BUILDER"
+                  "controlType" : "OBJECT_BUILDER",
+                  "optionsDataSource" : null
                 }, {
                   "advancedOption" : null,
                   "description" : null,
@@ -825,21 +807,21 @@
                   "options" : null,
                   "optionsDataSource" : null
                 } ],
-                "optionsDataSource" : null,
-                "controlType" : "OBJECT_BUILDER"
+                "controlType" : "OBJECT_BUILDER",
+                "optionsDataSource" : null
               } ],
               "maxItems" : null,
               "minItems" : null,
               "multipleValues" : null,
               "options" : null,
-              "optionsDataSource" : null,
-              "controlType" : "ARRAY_BUILDER"
+              "controlType" : "ARRAY_BUILDER",
+              "optionsDataSource" : null
             } ],
-            "optionsDataSource" : null,
-            "controlType" : "OBJECT_BUILDER"
+            "controlType" : "OBJECT_BUILDER",
+            "optionsDataSource" : null
           } ],
-          "optionsDataSource" : null,
-          "controlType" : "OBJECT_BUILDER"
+          "controlType" : "OBJECT_BUILDER",
+          "optionsDataSource" : null
         }, {
           "advancedOption" : null,
           "description" : null,
@@ -881,8 +863,8 @@
           "options" : null,
           "optionsDataSource" : null
         } ],
-        "optionsDataSource" : null,
-        "controlType" : "OBJECT_BUILDER"
+        "controlType" : "OBJECT_BUILDER",
+        "optionsDataSource" : null
       },
       "sampleOutput" : null
     },
@@ -914,18 +896,18 @@
     "type" : "DYNAMIC_WEBHOOK",
     "webhookRawBody" : null,
     "workflowSyncExecution" : null,
-    "dynamicWebhookRefresh" : null,
-    "webhookValidateOnEnable" : { },
     "processErrorResponse" : null,
     "workflowNodeDescription" : null,
+    "deduplicate" : null,
     "webhookDisable" : { },
+    "poll" : null,
     "webhookEnable" : { },
+    "dynamicWebhookRefresh" : null,
     "listenerDisable" : null,
     "listenerEnable" : null,
     "webhookRequest" : { },
     "webhookValidate" : null,
-    "deduplicate" : null,
-    "poll" : null
+    "webhookValidateOnEnable" : { }
   } ],
   "dataStream" : null,
   "unifiedApi" : null
