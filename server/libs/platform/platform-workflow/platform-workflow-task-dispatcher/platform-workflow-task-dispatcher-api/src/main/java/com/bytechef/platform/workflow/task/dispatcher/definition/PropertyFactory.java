@@ -18,6 +18,7 @@ package com.bytechef.platform.workflow.task.dispatcher.definition;
 
 import com.bytechef.commons.util.ConvertUtils;
 import com.bytechef.definition.BaseProperty;
+import com.bytechef.platform.domain.OutputResponse;
 import com.bytechef.platform.util.SchemaUtils;
 import com.bytechef.platform.util.SchemaUtils.SchemaPropertyFactory;
 import com.bytechef.platform.workflow.task.dispatcher.definition.TaskDispatcherDsl.ModifiableArrayProperty;
@@ -32,6 +33,11 @@ import java.util.Map;
  * @author Ivica Cardic
  */
 public record PropertyFactory() implements SchemaPropertyFactory {
+
+    public static final SchemaUtils.OutputFactoryFunction OUTPUT_FACTORY_FUNCTION =
+        (outputSchema, sampleOutput, placeholder) -> new OutputResponse(
+            com.bytechef.platform.workflow.task.dispatcher.domain.Property.toProperty((Property) outputSchema),
+            sampleOutput, placeholder);
 
     public static final PropertyFactory PROPERTY_FACTORY = new PropertyFactory();
 

@@ -24,7 +24,6 @@ import com.bytechef.platform.util.WorkflowNodeDescriptionUtils;
 import com.bytechef.platform.workflow.task.dispatcher.TaskDispatcherDefinitionRegistry;
 import com.bytechef.platform.workflow.task.dispatcher.definition.OutputFunction;
 import com.bytechef.platform.workflow.task.dispatcher.definition.PropertyFactory;
-import com.bytechef.platform.workflow.task.dispatcher.domain.Property;
 import com.bytechef.platform.workflow.task.dispatcher.domain.TaskDispatcherDefinition;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
@@ -58,12 +57,7 @@ public class TaskDispatcherDefinitionServiceImpl implements TaskDispatcherDefini
                     BaseOutputDefinition.OutputResponse outputDefinition = outputFunction.apply(inputParameters);
 
                     return SchemaUtils.toOutput(
-                        outputDefinition,
-                        (outputSchema, sampleOutput, placeholder) -> new OutputResponse(
-                            Property.toProperty(
-                                (com.bytechef.platform.workflow.task.dispatcher.definition.Property) outputSchema),
-                            sampleOutput, placeholder),
-                        PropertyFactory.PROPERTY_FACTORY);
+                        outputDefinition, PropertyFactory.OUTPUT_FACTORY_FUNCTION, PropertyFactory.PROPERTY_FACTORY);
                 } catch (Exception e) {
                     throw new RuntimeException(e);
                 }
