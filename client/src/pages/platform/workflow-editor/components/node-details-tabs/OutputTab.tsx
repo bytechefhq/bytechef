@@ -39,8 +39,7 @@ const OutputTab = ({connectionMissing, currentNode, outputDefined = false, workf
         workflowNodeName: currentNode?.name as string,
     });
 
-    const {outputSchema, sampleOutput} = workflowNodeOutput || {};
-
+    const {outputSchema, placeholder, sampleOutput} = workflowNodeOutput || {};
     const queryClient = useQueryClient();
 
     const deleteWorkflowNodeTestOutputMutation = useDeleteWorkflowNodeTestOutputMutation({
@@ -253,7 +252,7 @@ const OutputTab = ({connectionMissing, currentNode, outputDefined = false, workf
                 onClose={() => setShowUploadDialog(false)}
                 onUpload={handleSampleDataDialogUpload}
                 open={showUploadDialog}
-                sampleOutput={sampleOutput}
+                placeholder={placeholder || sampleOutput}
             />
         </div>
     );

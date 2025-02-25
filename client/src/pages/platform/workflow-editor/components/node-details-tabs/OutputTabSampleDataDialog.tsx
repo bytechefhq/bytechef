@@ -19,12 +19,12 @@ const OutputTabSampleDataDialog = ({
     onClose,
     onUpload,
     open,
-    sampleOutput,
+    placeholder,
 }: {
     onClose: () => void;
     onUpload: (value: string) => void;
     open: boolean;
-    sampleOutput?: object;
+    placeholder?: object;
 }) => {
     const [value, setValue] = useState<object | undefined>();
 
@@ -49,27 +49,27 @@ const OutputTabSampleDataDialog = ({
     };
 
     const handleEditorOnMount = (editor: IStandaloneCodeEditor) => {
-        const placeholder = document.querySelector('#monaco-placeholder') as HTMLElement | null;
+        const monacoPlaceholder = document.querySelector('#monaco-placeholder') as HTMLElement | null;
 
-        if (!placeholder) {
+        if (!monacoPlaceholder) {
             return;
         }
 
-        placeholder.style.display = value ? 'none' : 'block';
+        monacoPlaceholder.style.display = value ? 'none' : 'block';
 
         editor.focus();
     };
 
     const handleOpenChange = (open: boolean) => {
         if (!open) {
-            setValue(sampleOutput);
+            setValue(placeholder);
             onClose();
         }
     };
 
     useEffect(() => {
-        setValue(sampleOutput !== undefined && Object.keys(sampleOutput).length ? sampleOutput : undefined);
-    }, [sampleOutput]);
+        setValue(placeholder !== undefined && Object.keys(placeholder).length ? placeholder : undefined);
+    }, [placeholder]);
 
     return (
         <Dialog onOpenChange={handleOpenChange} open={open}>
