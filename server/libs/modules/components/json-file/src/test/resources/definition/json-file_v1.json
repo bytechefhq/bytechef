@@ -13,6 +13,7 @@
   "resources" : null,
   "version" : 1,
   "title" : "JSON File",
+  "connection" : null,
   "actions" : [ {
     "batch" : null,
     "deprecated" : null,
@@ -344,7 +345,8 @@
           } ],
           "controlType" : "FILE_ENTRY"
         },
-        "sampleOutput" : null
+        "sampleOutput" : null,
+        "placeholder" : null
       },
       "outputSchema" : {
         "advancedOption" : null,
@@ -568,8 +570,7 @@
     "processErrorResponse" : null,
     "workflowNodeDescription" : null
   } ],
-  "dataStream" : null,
   "triggers" : null,
-  "unifiedApi" : null,
-  "connection" : null
+  "dataStream" : null,
+  "unifiedApi" : null
 }

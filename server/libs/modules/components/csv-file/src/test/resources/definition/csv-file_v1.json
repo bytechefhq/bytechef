@@ -13,6 +13,7 @@
   "resources" : null,
   "version" : 1,
   "title" : "CSV File",
+  "connection" : null,
   "actions" : [ {
     "batch" : null,
     "deprecated" : null,
@@ -274,9 +275,9 @@
       "controlType" : "SELECT"
     } ],
     "title" : "Read from File",
-    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "perform" : { }
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -384,7 +385,8 @@
           } ],
           "controlType" : "FILE_ENTRY"
         },
-        "sampleOutput" : null
+        "sampleOutput" : null,
+        "placeholder" : null
       },
       "outputSchema" : {
         "advancedOption" : null,
@@ -631,12 +633,10 @@
       "optionsDataSource" : null
     } ],
     "title" : "Write to CSV File",
-    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "perform" : { }
   } ],
-  "connection" : null,
-  "triggers" : null,
   "dataStream" : {
     "reader" : {
       "properties" : null,
@@ -648,5 +648,6 @@
       "dataStreamItemWriter" : { }
     }
   },
+  "triggers" : null,
   "unifiedApi" : null
 }

@@ -13,6 +13,7 @@
   "resources" : null,
   "version" : 1,
   "title" : "Var",
+  "connection" : null,
   "actions" : [ {
     "batch" : null,
     "deprecated" : null,
@@ -261,11 +262,10 @@
       "optionsDataSource" : null
     } ],
     "title" : "Set Value",
-    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "perform" : { }
   } ],
-  "connection" : null,
   "dataStream" : null,
   "triggers" : null,
   "unifiedApi" : null

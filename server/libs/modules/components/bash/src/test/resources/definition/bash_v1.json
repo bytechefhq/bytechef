@@ -10,6 +10,7 @@
   "resources" : null,
   "version" : 1,
   "title" : "Bash",
+  "connection" : null,
   "actions" : [ {
     "batch" : null,
     "deprecated" : null,
@@ -41,7 +42,8 @@
           "options" : null,
           "optionsDataSource" : null
         },
-        "sampleOutput" : "Sample result"
+        "sampleOutput" : "Sample result",
+        "placeholder" : null
       },
       "outputSchema" : {
         "advancedOption" : null,
@@ -88,12 +90,11 @@
       "optionsDataSource" : null
     } ],
     "title" : "Execute",
-    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "perform" : { }
   } ],
-  "dataStream" : null,
   "triggers" : null,
   "unifiedApi" : null,
-  "connection" : null
+  "dataStream" : null
 }

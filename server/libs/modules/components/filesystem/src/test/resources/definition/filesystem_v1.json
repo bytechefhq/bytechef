@@ -13,6 +13,7 @@
   "resources" : null,
   "version" : 1,
   "title" : "Filesystem",
+  "connection" : null,
   "actions" : [ {
     "batch" : null,
     "deprecated" : null,
@@ -120,7 +121,8 @@
           } ],
           "controlType" : "FILE_ENTRY"
         },
-        "sampleOutput" : null
+        "sampleOutput" : null,
+        "placeholder" : null
       },
       "outputSchema" : {
         "advancedOption" : null,
@@ -243,9 +245,9 @@
       "optionsDataSource" : null
     } ],
     "title" : "Read File",
-    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "perform" : { }
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -290,15 +292,16 @@
             "maxValue" : null,
             "minValue" : null,
             "options" : null,
-            "controlType" : "INTEGER",
-            "optionsDataSource" : null
+            "optionsDataSource" : null,
+            "controlType" : "INTEGER"
           } ],
-          "controlType" : "OBJECT_BUILDER",
-          "optionsDataSource" : null
+          "optionsDataSource" : null,
+          "controlType" : "OBJECT_BUILDER"
         },
         "sampleOutput" : {
           "bytes" : 1024
-        }
+        },
+        "placeholder" : null
       },
       "outputSchema" : {
         "advancedOption" : null,
@@ -334,11 +337,11 @@
           "maxValue" : null,
           "minValue" : null,
           "options" : null,
-          "controlType" : "INTEGER",
-          "optionsDataSource" : null
+          "optionsDataSource" : null,
+          "controlType" : "INTEGER"
         } ],
-        "controlType" : "OBJECT_BUILDER",
-        "optionsDataSource" : null
+        "optionsDataSource" : null,
+        "controlType" : "OBJECT_BUILDER"
       },
       "sampleOutput" : {
         "bytes" : 1024
@@ -462,9 +465,9 @@
       "optionsDataSource" : null
     } ],
     "title" : "Write to File",
-    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "perform" : { }
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -496,7 +499,8 @@
           "options" : null,
           "optionsDataSource" : null
         },
-        "sampleOutput" : "/sample_tmp_dir"
+        "sampleOutput" : "/sample_tmp_dir",
+        "placeholder" : null
       },
       "outputSchema" : {
         "advancedOption" : null,
@@ -523,9 +527,9 @@
     },
     "properties" : null,
     "title" : "Create Temp Directory",
-    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "perform" : { }
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -557,7 +561,8 @@
           "options" : null,
           "optionsDataSource" : null
         },
-        "sampleOutput" : "/sample_data"
+        "sampleOutput" : "/sample_data",
+        "placeholder" : null
       },
       "outputSchema" : {
         "advancedOption" : null,
@@ -604,9 +609,9 @@
       "optionsDataSource" : null
     } ],
     "title" : "Get Parent Folder",
-    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "perform" : { }
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -705,20 +710,21 @@
               "maxValue" : null,
               "minValue" : null,
               "options" : null,
-              "controlType" : "INTEGER",
-              "optionsDataSource" : null
+              "optionsDataSource" : null,
+              "controlType" : "INTEGER"
             } ],
-            "controlType" : "OBJECT_BUILDER",
-            "optionsDataSource" : null
+            "optionsDataSource" : null,
+            "controlType" : "OBJECT_BUILDER"
           } ],
           "maxItems" : null,
           "minItems" : null,
           "multipleValues" : null,
           "options" : null,
-          "controlType" : "ARRAY_BUILDER",
-          "optionsDataSource" : null
+          "optionsDataSource" : null,
+          "controlType" : "ARRAY_BUILDER"
         },
-        "sampleOutput" : null
+        "sampleOutput" : null,
+        "placeholder" : null
       },
       "outputSchema" : {
         "advancedOption" : null,
@@ -808,18 +814,18 @@
             "maxValue" : null,
             "minValue" : null,
             "options" : null,
-            "controlType" : "INTEGER",
-            "optionsDataSource" : null
+            "optionsDataSource" : null,
+            "controlType" : "INTEGER"
           } ],
-          "controlType" : "OBJECT_BUILDER",
-          "optionsDataSource" : null
+          "optionsDataSource" : null,
+          "controlType" : "OBJECT_BUILDER"
         } ],
         "maxItems" : null,
         "minItems" : null,
         "multipleValues" : null,
         "options" : null,
-        "controlType" : "ARRAY_BUILDER",
-        "optionsDataSource" : null
+        "optionsDataSource" : null,
+        "controlType" : "ARRAY_BUILDER"
       },
       "sampleOutput" : null
     },
@@ -869,9 +875,9 @@
       "controlType" : "SELECT"
     } ],
     "title" : "List",
-    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "perform" : { }
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -903,7 +909,8 @@
           "options" : null,
           "optionsDataSource" : null
         },
-        "sampleOutput" : "/sample_data"
+        "sampleOutput" : "/sample_data",
+        "placeholder" : null
       },
       "outputSchema" : {
         "advancedOption" : null,
@@ -950,9 +957,9 @@
       "optionsDataSource" : null
     } ],
     "title" : "Create",
-    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "perform" : { }
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -988,7 +995,8 @@
           } ],
           "controlType" : "SELECT"
         },
-        "sampleOutput" : true
+        "sampleOutput" : true,
+        "placeholder" : null
       },
       "outputSchema" : {
         "advancedOption" : null,
@@ -1039,12 +1047,11 @@
       "optionsDataSource" : null
     } ],
     "title" : "Remove",
-    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "perform" : { }
   } ],
   "dataStream" : null,
   "triggers" : null,
-  "unifiedApi" : null,
-  "connection" : null
+  "unifiedApi" : null
 }
