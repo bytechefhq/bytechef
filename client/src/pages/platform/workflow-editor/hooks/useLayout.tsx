@@ -282,10 +282,10 @@ export default function useLayout({
     // Prepare auxiliary nodes
     taskNodes.forEach((taskNode) => {
         if (taskNode.data.componentName === 'condition') {
-            caseTrueTaskNames = (taskNode.data as NodeDataType)?.parameters?.caseTrue.map(
+            caseTrueTaskNames = (taskNode.data as NodeDataType)?.parameters?.caseTrue?.map(
                 (task: WorkflowTask) => task.name
             );
-            caseFalseTaskNames = (taskNode.data as NodeDataType)?.parameters?.caseFalse.map(
+            caseFalseTaskNames = (taskNode.data as NodeDataType)?.parameters?.caseFalse?.map(
                 (task: WorkflowTask) => task.name
             );
 
@@ -297,22 +297,22 @@ export default function useLayout({
 
         const isConditionChildTask = Object.values(conditionChildTasks).some(
             (conditionCases) =>
-                conditionCases.caseTrue.includes(taskNode.id) || conditionCases.caseFalse.includes(taskNode.id)
+                conditionCases.caseTrue.includes(taskNode.id) || conditionCases.caseFalse?.includes(taskNode.id)
         );
 
         // Handle Condition child placeholder nodes
         if (isConditionChildTask) {
             const conditionId = Object.keys(conditionChildTasks).find(
                 (key) =>
-                    conditionChildTasks[key].caseTrue.includes(taskNode.id) ||
-                    conditionChildTasks[key].caseFalse.includes(taskNode.id)
+                    conditionChildTasks[key].caseTrue?.includes(taskNode.id) ||
+                    conditionChildTasks[key].caseFalse?.includes(taskNode.id)
             );
 
             if (!conditionId) {
                 return;
             }
 
-            const conditionCase = conditionChildTasks[conditionId].caseTrue.includes(taskNode.id)
+            const conditionCase = conditionChildTasks[conditionId].caseTrue?.includes(taskNode.id)
                 ? CONDITION_CASE_TRUE
                 : CONDITION_CASE_FALSE;
 
@@ -459,8 +459,8 @@ export default function useLayout({
             const conditionCases = conditionChildTasks[key];
 
             return (
-                conditionCases.caseTrue.includes((taskNode.data as NodeDataType)?.conditionId ?? '') ||
-                conditionCases.caseFalse.includes((taskNode.data as NodeDataType)?.conditionId ?? '')
+                conditionCases.caseTrue?.includes((taskNode.data as NodeDataType)?.conditionId ?? '') ||
+                conditionCases.caseFalse?.includes((taskNode.data as NodeDataType)?.conditionId ?? '')
             );
         });
 
