@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.platform.webhook.web.rest;
+package com.bytechef.platform.webhook.web;
 
 import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.service.WorkflowService;
@@ -78,13 +78,17 @@ import org.springframework.web.util.UriComponentsBuilder;
 public abstract class AbstractWebhookTriggerController {
 
     private final FilesFileStorage filesFileStorage;
-    private final JobPrincipalAccessorRegistry jobPrincipalAccessorRegistry;
-    private final String publicUrld;
-    private final TriggerDefinitionService triggerDefinitionService;
-    private final WorkflowExecutor workflowExecutor;
-    private final WorkflowService workflowService;
+    private JobPrincipalAccessorRegistry jobPrincipalAccessorRegistry;
+    private String publicUrld;
+    private TriggerDefinitionService triggerDefinitionService;
+    private WorkflowExecutor workflowExecutor;
+    private WorkflowService workflowService;
 
     private static final Logger logger = LoggerFactory.getLogger(AbstractWebhookTriggerController.class);
+
+    protected AbstractWebhookTriggerController(FilesFileStorage filesFileStorage) {
+        this.filesFileStorage = filesFileStorage;
+    }
 
     protected AbstractWebhookTriggerController(
         FilesFileStorage filesFileStorage, JobPrincipalAccessorRegistry jobPrincipalAccessorRegistry, String publicUrld,
@@ -139,7 +143,7 @@ public abstract class AbstractWebhookTriggerController {
         return responseEntity;
     }
 
-    protected WebhookRequest getWebhookRequest(
+    public WebhookRequest getWebhookRequest(
         HttpServletRequest httpServletRequest, WebhookTriggerFlags webhookTriggerFlags)
         throws IOException, ServletException {
 

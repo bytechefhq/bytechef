@@ -8,7 +8,7 @@ dependencies {
     implementation(project(":server:libs:config:app-config"))
     implementation(project(":server:libs:core:commons:commons-util"))
     implementation(project(":server:libs:core:tenant:tenant-api"))
-    implementation(project(":server:libs:platform:platform-webhook:platform-webhook-rest:platform-webhook-rest-api"))
+    implementation(project(":server:libs:platform:platform-webhook:platform-webhook-web:platform-webhook-web-api"))
 
     testImplementation("org.springframework.boot:spring-boot-starter-web")
     testImplementation(project(":server:libs:test:test-int-support"))

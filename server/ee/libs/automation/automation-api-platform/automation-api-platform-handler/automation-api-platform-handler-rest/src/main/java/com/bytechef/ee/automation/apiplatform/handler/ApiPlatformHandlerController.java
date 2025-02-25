@@ -28,7 +28,7 @@ import com.bytechef.platform.constant.Environment;
 import com.bytechef.platform.constant.ModeType;
 import com.bytechef.platform.file.storage.FilesFileStorage;
 import com.bytechef.platform.webhook.executor.WorkflowExecutor;
-import com.bytechef.platform.webhook.web.rest.AbstractWebhookTriggerController;
+import com.bytechef.platform.webhook.web.AbstractWebhookTriggerController;
 import com.bytechef.platform.workflow.execution.WorkflowExecutionId;
 import com.bytechef.tenant.TenantContext;
 import com.bytechef.tenant.util.TenantUtils;
