@@ -27,7 +27,7 @@ paths:
           schema:
             type: "string"
             title: "Owner ID"
-            x-dynamic-otions: true
+            x-dynamic-options: true
         - name: "account_id"
           description: "The ID for the account within your Apollo instance. This is the company that you are targeting as part of the deal being created."
           in: "query"
