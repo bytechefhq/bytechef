@@ -32,6 +32,7 @@ paths:
                     workspace:
                       type: "string"
                       description: "The workspace to create the project in."
+                      x-dynamic-options: true
                     name:
                       type: "string"
                       description: "Name of the project."
@@ -41,6 +42,9 @@ paths:
                     team:
                       type: "string"
                       description: "The team that this project is shared with."
+                      x-dynamic-options: true
+                      x-dynamic-options-dependecy:
+                        - "data.workspace"
       responses:
         201:
           description: "Successfully created new project"
@@ -97,9 +101,13 @@ paths:
                     workspace:
                       type: "string"
                       description: "The workspace to create the task in."
+                      x-dynamic-options: true
                     project:
                       type: "string"
                       description: "Asana project to create the task in."
+                      x-dynamic-options: true
+                      x-dynamic-options-dependecy:
+                        - "workspace"
                     name:
                       type: "string"
                       description: "Name of the task."
@@ -116,9 +124,13 @@ paths:
                       items:
                         type: "string"
                       description: "Tags to add to the task."
+                      x-dynamic-options: true
                     assignee:
                       type: "string"
                       description: "User to assign the task to."
+                      x-dynamic-options: true
+                      x-dynamic-options-dependecy:
+                        - "workspace"
       responses:
         201:
           description: "Successfully created new task"
