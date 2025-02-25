@@ -18,14 +18,15 @@ package com.bytechef.component.clickup.action;
 
 import static com.bytechef.component.OpenApiComponentHandler.PropertyType;
 import static com.bytechef.component.definition.ComponentDsl.action;
-import static com.bytechef.component.definition.ComponentDsl.number;
 import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.Context.Http.BodyContentType;
 import static com.bytechef.component.definition.Context.Http.ResponseType;
 
+import com.bytechef.component.clickup.util.ClickupUtils;
 import com.bytechef.component.definition.ComponentDsl;
+import com.bytechef.component.definition.OptionsDataSource;
 import java.util.Map;
 
 /**
@@ -43,9 +44,10 @@ public class ClickupCreateTaskAction {
                 "path", "/list/{listId}/task", "bodyContentType", BodyContentType.JSON, "mimeType", "application/json"
 
             ))
-        .properties(number("listId").label("List ID")
+        .properties(string("listId").label("List ID")
             .description("ID of the list where new task will be created.")
             .required(true)
+            .options((OptionsDataSource.ActionOptionsFunction<String>) ClickupUtils::getListIdOptions)
             .metadata(
                 Map.of(
                     "type", PropertyType.PATH)),
