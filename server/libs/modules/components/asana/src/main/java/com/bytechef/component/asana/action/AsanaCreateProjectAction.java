@@ -24,7 +24,9 @@ import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.Context.Http.BodyContentType;
 import static com.bytechef.component.definition.Context.Http.ResponseType;
 
+import com.bytechef.component.asana.util.AsanaUtils;
 import com.bytechef.component.definition.ComponentDsl;
+import com.bytechef.component.definition.OptionsDataSource;
 import java.util.Map;
 
 /**
@@ -44,7 +46,8 @@ public class AsanaCreateProjectAction {
             ))
         .properties(object("data").properties(string("workspace").label("Workspace")
             .description("The workspace to create the project in.")
-            .required(true),
+            .required(true)
+            .options((OptionsDataSource.ActionOptionsFunction<String>) AsanaUtils::getWorkspaceOptions),
             string("name").label("Name")
                 .description("Name of the project.")
                 .required(true),
@@ -53,7 +56,8 @@ public class AsanaCreateProjectAction {
                 .required(true),
             string("team").label("Team")
                 .description("The team that this project is shared with.")
-                .required(true))
+                .required(true)
+                .options((OptionsDataSource.ActionOptionsFunction<String>) AsanaUtils::getTeamOptions))
             .metadata(
                 Map.of(
                     "type", PropertyType.BODY))

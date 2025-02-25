@@ -26,7 +26,9 @@ import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.Context.Http.BodyContentType;
 import static com.bytechef.component.definition.Context.Http.ResponseType;
 
+import com.bytechef.component.asana.util.AsanaUtils;
 import com.bytechef.component.definition.ComponentDsl;
+import com.bytechef.component.definition.OptionsDataSource;
 import java.util.Map;
 
 /**
@@ -46,10 +48,12 @@ public class AsanaCreateTaskAction {
             ))
         .properties(object("data").properties(string("workspace").label("Workspace")
             .description("The workspace to create the task in.")
-            .required(true),
+            .required(true)
+            .options((OptionsDataSource.ActionOptionsFunction<String>) AsanaUtils::getWorkspaceOptions),
             string("project").label("Project")
                 .description("Asana project to create the task in.")
-                .required(true),
+                .required(true)
+                .options((OptionsDataSource.ActionOptionsFunction<String>) AsanaUtils::getProjectOptions),
             string("name").label("Name")
                 .description("Name of the task.")
                 .required(true),
@@ -63,10 +67,12 @@ public class AsanaCreateTaskAction {
                 .placeholder("Add to Tags")
                 .label("Tags")
                 .description("Tags to add to the task.")
-                .required(false),
+                .required(false)
+                .options((OptionsDataSource.ActionOptionsFunction<String>) AsanaUtils::getTagsOptions),
             string("assignee").label("Assignee")
                 .description("User to assign the task to.")
-                .required(false))
+                .required(false)
+                .options((OptionsDataSource.ActionOptionsFunction<String>) AsanaUtils::getAssigneeOptions))
             .metadata(
                 Map.of(
                     "type", PropertyType.BODY))
