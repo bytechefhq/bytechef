@@ -16,25 +16,17 @@
 
 package com.bytechef.component.airtable;
 
-import static com.bytechef.component.airtable.constant.AirtableConstants.BASE_ID;
-import static com.bytechef.component.airtable.constant.AirtableConstants.TABLE_ID;
-
 import com.bytechef.component.OpenApiComponentHandler;
 import com.bytechef.component.airtable.datastream.AirtableDataStream;
 import com.bytechef.component.airtable.trigger.AirtableNewRecordTrigger;
-import com.bytechef.component.airtable.util.AirtableUtils;
-import com.bytechef.component.definition.ActionDefinition;
 import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.ComponentDsl.ModifiableComponentDefinition;
-import com.bytechef.component.definition.ComponentDsl.ModifiableDynamicPropertiesProperty;
-import com.bytechef.component.definition.ComponentDsl.ModifiableProperty;
 import com.bytechef.component.definition.ComponentDsl.ModifiableTriggerDefinition;
 import com.bytechef.component.exception.ProviderException;
 import com.google.auto.service.AutoService;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 
 /**
  * @author Ivica Cardic
@@ -72,18 +64,5 @@ public class AirtableComponentHandler extends AbstractAirtableComponentHandler {
             .icon("path:assets/airtable.svg")
             .categories(ComponentCategory.PRODUCTIVITY_AND_COLLABORATION)
             .dataStream(AirtableDataStream.DATA_STREAM_DEFINITION);
-    }
-
-    @Override
-    public ModifiableProperty<?> modifyProperty(
-        ActionDefinition actionDefinition, ModifiableProperty<?> modifiableProperty) {
-
-        if (Objects.equals(modifiableProperty.getName(), "__item")) {
-            ((ModifiableDynamicPropertiesProperty) modifiableProperty)
-                .propertiesLookupDependsOn(BASE_ID, TABLE_ID)
-                .properties(AirtableUtils.getFieldsProperties());
-        }
-
-        return modifiableProperty;
     }
 }

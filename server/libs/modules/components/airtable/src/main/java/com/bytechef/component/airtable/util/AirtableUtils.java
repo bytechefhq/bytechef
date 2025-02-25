@@ -33,7 +33,6 @@ import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.definition.PropertiesDataSource.ActionPropertiesFunction;
 import com.bytechef.component.definition.Property.ControlType;
 import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.exception.ProviderException;
@@ -74,81 +73,82 @@ public class AirtableUtils extends AbstractAirtableUtils {
         return getOptions(body, "bases", "name");
     }
 
-    public static ActionPropertiesFunction getFieldsProperties() {
-        return (inputParameters, connection, dependencyPaths, context) -> {
-            List<ModifiableValueProperty<?, ?>> properties = new ArrayList<>();
+    public static List<ModifiableValueProperty<?, ?>> getFieldsProperties(
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
+        Context context) {
 
-            String url = "/meta/bases/%s/tables".formatted(
-                inputParameters.getRequiredString(BASE_ID));
+        List<ModifiableValueProperty<?, ?>> properties = new ArrayList<>();
 
-            Http.Response response = context.http(http -> http.get(url))
-                .configuration(Http.responseType(ResponseType.JSON))
-                .execute();
+        String url = "/meta/bases/%s/tables".formatted(
+            inputParameters.getRequiredString(BASE_ID));
 
-            Map<?, ?> body = response.getBody(Map.class);
+        Http.Response response = context.http(http -> http.get(url))
+            .configuration(Http.responseType(ResponseType.JSON))
+            .execute();
 
-            if (body.containsKey("error")) {
-                throw new ProviderException.BadRequestException(
-                    (String) ((Map<?, ?>) body.get("error")).get("message"));
+        Map<?, ?> body = response.getBody(Map.class);
+
+        if (body.containsKey("error")) {
+            throw new ProviderException.BadRequestException(
+                (String) ((Map<?, ?>) body.get("error")).get("message"));
+        }
+
+        Map<String, List<AirtableTable>> tablesMap = response.getBody(new TypeReference<>() {});
+
+        context.log(log -> log.debug("Response for url='%s': %s".formatted(url, tablesMap)));
+
+        List<AirtableTable> tables = tablesMap.get("tables");
+
+        AirtableTable table = tables
+            .stream()
+            .filter(curTable -> Objects.equals(
+                curTable.id(), inputParameters.getRequiredString(TABLE_ID)))
+            .findFirst()
+            .orElseThrow(() -> new ProviderException.BadRequestException("Requested table does not exist"));
+
+        for (AirtableField field : table.fields()) {
+            if (SKIP_FIELDS.contains(field.type())) {
+                continue;
             }
 
-            Map<String, List<AirtableTable>> tablesMap = response.getBody(new TypeReference<>() {});
+            String name = field.name();
 
-            context.log(log -> log.debug("Response for url='%s': %s".formatted(url, tablesMap)));
+            ModifiableValueProperty<?, ?> property = switch (field.type()) {
+                case "autoNumber", "percent", "count" -> integer(name);
+                case "barcode", "button", "createdBy", "createdTime", "currency", "externalSyncSource", "formula",
+                    "lastModifiedBy", "lastModifiedTime", "lookup", "multipleAttachments", "multipleLookupValues",
+                    "multipleRecordLinks", "rating", "richText", "rollup", "singleLineText", "date", "dateTime",
+                    "duration" -> string(name);
+                case "checkbox" -> bool(name);
+                case "email" -> string(name)
+                    .controlType(ControlType.EMAIL);
+                case "multilineText" -> string(name)
+                    .controlType(ControlType.TEXT_AREA);
+                case "multipleSelects" -> array(name)
+                    .items(string())
+                    .options(getOptions(field));
+                case "number" -> number(name);
+                case "phoneNumber" -> string(name)
+                    .controlType(ControlType.PHONE);
+                case "singleSelect" -> string(name).options(getOptions(field));
+                case "url" -> string(name).controlType(ControlType.URL);
+                default -> throw new IllegalArgumentException(
+                    "Unknown Airtable field type='%s'".formatted(field.type()));
+            };
 
-            List<AirtableTable> tables = tablesMap.get("tables");
+            properties.add(
+                property.description(
+                    List.of("date", "dateTime")
+                        .contains(field.type())
+                            ? "%s. Expected format for value: mmmm d,yyyy".formatted(field.description())
+                            : field.description()));
+        }
 
-            AirtableTable table = tables
-                .stream()
-                .filter(curTable -> Objects.equals(
-                    curTable.id(), inputParameters.getRequiredString(TABLE_ID)))
-                .findFirst()
-                .orElseThrow(() -> new ProviderException.BadRequestException("Requested table does not exist"));
-
-            for (AirtableField field : table.fields()) {
-                if (SKIP_FIELDS.contains(field.type())) {
-                    continue;
-                }
-
-                String name = field.name();
-
-                ModifiableValueProperty<?, ?> property = switch (field.type()) {
-                    case "autoNumber", "percent", "count" -> integer(name);
-                    case "barcode", "button", "createdBy", "createdTime", "currency", "externalSyncSource", "formula",
-                        "lastModifiedBy", "lastModifiedTime", "lookup", "multipleAttachments", "multipleLookupValues",
-                        "multipleRecordLinks", "rating", "richText", "rollup", "singleLineText", "date", "dateTime",
-                        "duration" -> string(name);
-                    case "checkbox" -> bool(name);
-                    case "email" -> string(name)
-                        .controlType(ControlType.EMAIL);
-                    case "multilineText" -> string(name)
-                        .controlType(ControlType.TEXT_AREA);
-                    case "multipleSelects" -> array(name)
-                        .items(string())
-                        .options(getOptions(field));
-                    case "number" -> number(name);
-                    case "phoneNumber" -> string(name)
-                        .controlType(ControlType.PHONE);
-                    case "singleSelect" -> string(name).options(getOptions(field));
-                    case "url" -> string(name).controlType(ControlType.URL);
-                    default -> throw new IllegalArgumentException(
-                        "Unknown Airtable field type='%s'".formatted(field.type()));
-                };
-
-                properties.add(
-                    property.description(
-                        List.of("date", "dateTime")
-                            .contains(field.type())
-                                ? "%s. Expected format for value: mmmm d,yyyy".formatted(field.description())
-                                : field.description()));
-            }
-
-            return List.of(
-                object("fields")
-                    .label("Fields")
-                    .properties(properties)
-                    .required(false));
-        };
+        return List.of(
+            object("fields")
+                .label("Fields")
+                .properties(properties)
+                .required(false));
     }
 
     public static List<Option<String>> getRecordIdOptions(

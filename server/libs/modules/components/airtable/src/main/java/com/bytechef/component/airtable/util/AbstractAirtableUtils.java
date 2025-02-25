@@ -16,6 +16,7 @@
 
 package com.bytechef.component.airtable.util;
 
+import com.bytechef.component.definition.ComponentDsl;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Parameters;
@@ -48,6 +49,13 @@ public abstract class AbstractAirtableUtils {
         Parameters inputParameters,
         Parameters connectionParameters, Map<String, String> dependencyPaths, String searchText,
         Context context) {
+
+        return List.of();
+    }
+
+    public static List<ComponentDsl.ModifiableValueProperty<?, ?>> getFieldsProperties(
+        Parameters inputParameters, Parameters connectionParameters,
+        Map<String, String> dependencyPaths, Context context) {
 
         return List.of();
     }

@@ -134,8 +134,8 @@ class AirtableUtilsTest {
         when(mockedResponse.getBody(any(TypeReference.class)))
             .thenReturn(tablesMap);
 
-        List<? extends ValueProperty<?>> result = AirtableUtils.getFieldsProperties()
-            .apply(parameters, parameters, Map.of(), mockedActionContext);
+        List<? extends ValueProperty<?>> result = AirtableUtils.getFieldsProperties(
+            parameters, parameters, Map.of(), mockedActionContext);
 
         List<ModifiableObjectProperty> expectedProperties = List.of(object("fields")
             .label("Fields")
