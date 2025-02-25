@@ -45,10 +45,11 @@ public class PineconeConstants {
 
         if (matcher.find())
             return PineconeVectorStore
-                .builder(
-                    openAiEmbeddingModel, connectionParameters.getRequiredString(API_KEY),
-                    matcher.group(2), matcher.group(3),
-                    matcher.group(1))
+                .builder(openAiEmbeddingModel)
+                .apiKey(connectionParameters.getRequiredString(API_KEY))
+                .projectId(matcher.group(2))
+                .environment(matcher.group(3))
+                .indexName(matcher.group(1))
                 .build();
         else
             throw new IllegalArgumentException("Invalid Host url");
