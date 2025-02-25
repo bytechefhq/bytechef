@@ -115,11 +115,7 @@ public class ActionDefinition extends ActionDefinitionBasic {
         return outputDefinition.getOutputResponse()
             .map(
                 outputResponse -> SchemaUtils.toOutput(
-                    outputResponse,
-                    (outputSchema, sampleOutput, placeholder) -> new OutputResponse(
-                        Property.toProperty((com.bytechef.component.definition.Property) outputSchema), sampleOutput,
-                        placeholder),
-                    PropertyFactory.PROPERTY_FACTORY))
+                    outputResponse, PropertyFactory.OUTPUT_FACTORY_FUNCTION, PropertyFactory.PROPERTY_FACTORY))
             .orElse(null);
     }
 }

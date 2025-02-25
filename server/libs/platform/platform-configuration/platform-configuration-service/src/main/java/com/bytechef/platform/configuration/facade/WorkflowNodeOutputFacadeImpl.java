@@ -39,7 +39,6 @@ import com.bytechef.platform.domain.BaseProperty;
 import com.bytechef.platform.domain.OutputResponse;
 import com.bytechef.platform.util.SchemaUtils;
 import com.bytechef.platform.workflow.task.dispatcher.definition.PropertyFactory;
-import com.bytechef.platform.workflow.task.dispatcher.domain.Property;
 import com.bytechef.platform.workflow.task.dispatcher.domain.TaskDispatcherDefinition;
 import com.bytechef.platform.workflow.task.dispatcher.service.TaskDispatcherDefinitionService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -204,11 +203,7 @@ public class WorkflowNodeOutputFacadeImpl implements WorkflowNodeOutputFacade {
                         Object item = items.getFirst();
 
                         outputResponse = SchemaUtils.toOutput(
-                            Map.of("item", item, "index", 0),
-                            (outputSchema, sampleOutput, placeholder) -> new OutputResponse(
-                                Property.toProperty(
-                                    (com.bytechef.platform.workflow.task.dispatcher.definition.Property) outputSchema),
-                                sampleOutput, placeholder),
+                            Map.of("item", item, "index", 0), PropertyFactory.OUTPUT_FACTORY_FUNCTION,
                             PropertyFactory.PROPERTY_FACTORY);
                     }
                 } else {

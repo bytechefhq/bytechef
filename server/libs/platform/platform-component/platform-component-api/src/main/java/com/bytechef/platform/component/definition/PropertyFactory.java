@@ -25,6 +25,8 @@ import com.bytechef.component.definition.ComponentDsl.ModifiableObjectProperty;
 import com.bytechef.component.definition.ComponentDsl.ModifiableValueProperty;
 import com.bytechef.definition.BaseProperty;
 import com.bytechef.definition.BaseProperty.BaseValueProperty;
+import com.bytechef.platform.component.domain.Property;
+import com.bytechef.platform.domain.OutputResponse;
 import com.bytechef.platform.util.SchemaUtils;
 import com.bytechef.platform.util.SchemaUtils.SchemaPropertyFactory;
 import java.util.ArrayList;
@@ -35,6 +37,10 @@ import java.util.Map;
  * @author Ivica Cardic
  */
 public record PropertyFactory() implements SchemaPropertyFactory {
+
+    public static final SchemaUtils.OutputFactoryFunction OUTPUT_FACTORY_FUNCTION =
+        (outputSchema, sampleOutput, placeholder) -> new OutputResponse(
+            Property.toProperty((com.bytechef.component.definition.Property) outputSchema), sampleOutput, placeholder);
 
     public static final PropertyFactory PROPERTY_FACTORY = new PropertyFactory();
 

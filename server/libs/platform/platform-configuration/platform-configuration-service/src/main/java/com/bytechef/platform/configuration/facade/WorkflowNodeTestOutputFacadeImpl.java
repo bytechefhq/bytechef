@@ -136,16 +136,12 @@ public class WorkflowNodeTestOutputFacadeImpl implements WorkflowNodeTestOutputF
             workflowNodeType.componentOperationName(), null, null, null, null, null, inputParameters,
             connectionIds, Map.of(), true);
 
-        OutputResponse outputResponse =
-            SchemaUtils.toOutput(
-                BaseOutputDefinition.OutputResponse.of(
-                    (BaseProperty.BaseValueProperty<?>) SchemaUtils.getOutputSchema(
-                        object, PropertyFactory.PROPERTY_FACTORY),
-                    object),
-                (outputSchema, sampleOutput, placeholder) -> new OutputResponse(
-                    Property.toProperty((com.bytechef.component.definition.Property) outputSchema), sampleOutput,
-                    placeholder),
-                PropertyFactory.PROPERTY_FACTORY);
+        BaseOutputDefinition.OutputResponse definitionOutputResponse = BaseOutputDefinition.OutputResponse.of(
+            (BaseProperty.BaseValueProperty<?>) SchemaUtils.getOutputSchema(object, PropertyFactory.PROPERTY_FACTORY),
+            object);
+
+        OutputResponse outputResponse = SchemaUtils.toOutput(
+            definitionOutputResponse, PropertyFactory.OUTPUT_FACTORY_FUNCTION, PropertyFactory.PROPERTY_FACTORY);
 
         if (outputResponse == null || outputResponse.outputSchema() instanceof NullProperty) {
             return null;
@@ -168,16 +164,13 @@ public class WorkflowNodeTestOutputFacadeImpl implements WorkflowNodeTestOutputF
             workflowNodeType.componentOperationName(), null, null, null, workflowTrigger.evaluateParameters(inputs),
             null, null, connectionId, true);
 
-        OutputResponse outputResponse =
-            SchemaUtils.toOutput(
-                BaseOutputDefinition.OutputResponse.of(
-                    (BaseProperty.BaseValueProperty<?>) SchemaUtils.getOutputSchema(
-                        triggerOutput.value(), PropertyFactory.PROPERTY_FACTORY),
-                    triggerOutput.batch()),
-                (outputSchema, sampleOutput, placeholder) -> new OutputResponse(
-                    Property.toProperty((com.bytechef.component.definition.Property) outputSchema), sampleOutput,
-                    placeholder),
-                PropertyFactory.PROPERTY_FACTORY);
+        BaseOutputDefinition.OutputResponse definitionOutputResponse = BaseOutputDefinition.OutputResponse.of(
+            (BaseProperty.BaseValueProperty<?>) SchemaUtils.getOutputSchema(
+                triggerOutput.value(), PropertyFactory.PROPERTY_FACTORY),
+            triggerOutput.batch());
+
+        OutputResponse outputResponse = SchemaUtils.toOutput(
+            definitionOutputResponse, PropertyFactory.OUTPUT_FACTORY_FUNCTION, PropertyFactory.PROPERTY_FACTORY);
 
         if (outputResponse == null) {
             return null;
