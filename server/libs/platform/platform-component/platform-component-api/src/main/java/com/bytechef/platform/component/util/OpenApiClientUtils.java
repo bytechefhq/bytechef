@@ -116,13 +116,14 @@ public class OpenApiClientUtils {
         }
 
         List<? extends Property> bodyProperties = properties.stream()
-            .filter(property -> Objects.equals(MapUtils.get(property.getMetadata(), TYPE, PropertyType.class),
-                PropertyType.BODY))
+            .filter(property -> Objects.equals(
+                MapUtils.get(property.getMetadata(), TYPE, PropertyType.class), PropertyType.BODY))
             .toList();
 
         if (bodyProperties.size() == 1) {
             Property bodyProperty = bodyProperties.getFirst();
-            final String name = bodyProperty.getName();
+
+            String name = bodyProperty.getName();
 
             return switch (bodyContentType) {
                 case BINARY -> Http.Body.of(
@@ -136,8 +137,7 @@ public class OpenApiClientUtils {
 
                     if (type == Property.Type.ARRAY) {
                         yield Http.Body.of(
-                            MapUtils.getList(inputParameters, name, Object.class, List.of()),
-                            bodyContentType);
+                            MapUtils.getList(inputParameters, name, Object.class, List.of()), bodyContentType);
                     } else if (type == Property.Type.DYNAMIC_PROPERTIES) {
                         yield Http.Body.of(MapUtils.getMap(inputParameters, name, Map.of()), bodyContentType);
                     } else {
