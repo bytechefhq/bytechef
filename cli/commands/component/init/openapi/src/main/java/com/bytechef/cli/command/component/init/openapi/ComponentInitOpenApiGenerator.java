@@ -1067,6 +1067,20 @@ public class ComponentInitOpenApiGenerator {
                 optionType = "Long";
             } else if (Objects.equals(type, "string")) {
                 optionType = "String";
+            } else if (Objects.equals(type, "array")) {
+                String itemsType = schema.getItems()
+                    .getType();
+
+                if (Objects.equals(itemsType, "integer")) {
+                    optionType = "Long";
+                } else if (Objects.equals(itemsType, "string")) {
+                    optionType = "String";
+                } else {
+                    throw new IllegalArgumentException("Parameter type %s is not supported yet.".formatted(itemsType));
+                }
+
+                type = itemsType;
+
             } else {
                 throw new IllegalArgumentException("Parameter type %s is not supported yet.".formatted(type));
             }
@@ -2262,11 +2276,12 @@ public class ComponentInitOpenApiGenerator {
 
     private void writeAbstractUtils(Path sourceDirPath) throws IOException {
         TypeSpec.Builder builder = TypeSpec.classBuilder("Abstract" + getComponentClassName(componentName) + "Utils")
-            .addJavadoc("""
-                Provides methods for retrieving dynamic options and properties for various properties within the component.
+            .addJavadoc(
+                """
+                    Provides methods for retrieving dynamic options and properties for various properties within the component.
 
-                @generated
-                """)
+                    @generated
+                    """)
             .addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT);
 
         dynamicOptionsMap.forEach((propertyName, type) -> {
