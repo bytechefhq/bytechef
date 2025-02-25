@@ -140,6 +140,7 @@ export type NodeDataType = {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     parameters?: {[key: string]: any};
     taskDispatcher?: boolean;
+    taskDispatcherId?: string;
     title?: string;
     trigger?: boolean;
     type?: string;

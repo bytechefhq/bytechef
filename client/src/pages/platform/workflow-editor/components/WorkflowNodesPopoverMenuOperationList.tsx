@@ -2,7 +2,6 @@ import {useAnalytics} from '@/shared/hooks/useAnalytics';
 import {ActionDefinitionApi, ComponentDefinition} from '@/shared/middleware/platform/configuration';
 import {ActionDefinitionKeys} from '@/shared/queries/platform/actionDefinitions.queries';
 import {ClickedOperationType, NodeDataType, PropertyAllType} from '@/shared/types';
-import {getRandomId} from '@/shared/util/random-utils';
 import {Component1Icon} from '@radix-ui/react-icons';
 import {useQueryClient} from '@tanstack/react-query';
 import {ComponentIcon} from 'lucide-react';
@@ -157,6 +156,37 @@ const WorkflowNodesPopoverMenuOperationList = ({
                 });
             };
 
+            const calculateNodeInsertIndex = (targetId: string) => {
+                const nextTaskIndex = workflow.tasks?.findIndex((task) => task.name === targetId) ?? 0;
+
+                const conditionTasks =
+                    workflow.tasks?.slice(0, nextTaskIndex).filter((task) => task?.type.includes('condition/')) || [];
+
+                const loopTasks =
+                    workflow.tasks?.slice(0, nextTaskIndex).filter((task) => task?.type.includes('loop/')) || [];
+
+                let tasksInConditions = 0;
+                let tasksInLoops = 0;
+
+                if (conditionTasks.length) {
+                    tasksInConditions = conditionTasks.reduce((count, conditionTask) => {
+                        const caseTrueTasks = conditionTask.parameters?.caseTrue?.length || 0;
+                        const caseFalseTasks = conditionTask.parameters?.caseFalse?.length || 0;
+
+                        return count + caseTrueTasks + caseFalseTasks;
+                    }, 0);
+                }
+
+                if (loopTasks.length) {
+                    tasksInLoops = loopTasks.reduce(
+                        (count, loopTask) => count + loopTask.parameters?.iteratee?.length || 0,
+                        0
+                    );
+                }
+
+                return nextTaskIndex - tasksInConditions - tasksInLoops;
+            };
+
             const handleEdgeCase = () => {
                 const clickedEdge = edges.find((edge) => edge.id === sourceNodeId);
 
@@ -166,21 +196,9 @@ const WorkflowNodesPopoverMenuOperationList = ({
 
                 captureComponentUsed(componentName, operationName, undefined);
 
-                const newWorkflowNode = {
-                    data: newWorkflowNodeData,
-                    id: getRandomId(),
-                    position: {x: 0, y: 0},
-                    type: 'workflow',
-                };
+                const insertIndex = calculateNodeInsertIndex(clickedEdge.target);
 
-                const previousWorkflowNodeIndex = nodes.findIndex((node) => node.id === clickedEdge.source);
-                const tempNodes = [...nodes];
-
-                tempNodes.splice(previousWorkflowNodeIndex + 1, 0, newWorkflowNode);
-
-                const previousWorkflowTaskIndex = workflow.tasks?.findIndex((task) => task.name === clickedEdge.source);
-
-                saveNodeToDefinition(newWorkflowNodeData, (previousWorkflowTaskIndex ?? 0) + 1);
+                saveNodeToDefinition(newWorkflowNodeData, insertIndex);
             };
 
             const handleNonEdgeCase = () => {
@@ -213,22 +231,19 @@ const WorkflowNodesPopoverMenuOperationList = ({
 
                     captureComponentUsed(componentName, operationName, undefined);
 
-                    let taskNodeIndex: number | undefined = undefined;
+                    let insertIndex: number | undefined = undefined;
 
                     if (sourceNodeId.includes('bottom-placeholder')) {
                         const sourceNodeIndex = nodes.findIndex((node) => node.id === sourceNodeId);
 
                         const nextNode = nodes[sourceNodeIndex + 1];
 
-                        taskNodeIndex = workflow.tasks?.findIndex((task) => task.name === nextNode.id);
-
-                        if (taskNodeIndex && taskNodeIndex > 1) {
-                            taskNodeIndex -= 1;
-                        }
+                        insertIndex = calculateNodeInsertIndex(nextNode?.id);
                     }
 
-                    saveNodeToDefinition(newWorkflowNodeData, taskNodeIndex);
+                    saveNodeToDefinition(newWorkflowNodeData, insertIndex);
                 }
+
                 setPopoverOpen(false);
             };
 

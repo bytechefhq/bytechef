@@ -16,7 +16,9 @@ import PlaceholderEdge from '../edges/PlaceholderEdge';
 import WorkflowEdge from '../edges/WorkflowEdge';
 import useHandleDrop from '../hooks/useHandleDrop';
 import useLayout from '../hooks/useLayout';
+import LoopLeftGhostNode from '../nodes/LoopLeftGhostNode';
 import PlaceholderNode from '../nodes/PlaceholderNode';
+import TaskDispatcherBottomGhostNode from '../nodes/TaskDispatcherBottomGhostNode';
 import WorkflowNode from '../nodes/WorkflowNode';
 
 export interface WorkflowEditorProps {
@@ -48,7 +50,9 @@ const WorkflowEditor = ({componentDefinitions, leftSidebarOpen, taskDispatcherDe
 
     const nodeTypes = useMemo(
         () => ({
+            loopLeftGhostNode: LoopLeftGhostNode,
             placeholder: PlaceholderNode,
+            taskDispatcherBottomGhostNode: TaskDispatcherBottomGhostNode,
             workflow: WorkflowNode,
         }),
         []
