@@ -26,6 +26,8 @@ import static com.bytechef.component.definition.Context.Http.BodyContentType;
 import static com.bytechef.component.definition.Context.Http.ResponseType;
 
 import com.bytechef.component.definition.ComponentDsl;
+import com.bytechef.component.definition.OptionsDataSource;
+import com.bytechef.component.nifty.util.NiftyUtils;
 import java.util.Map;
 
 /**
@@ -43,22 +45,31 @@ public class NiftyCreateTaskAction {
                 "path", "/tasks", "bodyContentType", BodyContentType.JSON, "mimeType", "application/json"
 
             ))
-        .properties(object("__item").properties(string("task_group_id").label("Status")
-            .required(true),
-            string("name").label("Name")
+        .properties(string("task_group_id").metadata(
+            Map.of(
+                "type", PropertyType.BODY))
+            .label("Status")
+            .required(true)
+            .options((OptionsDataSource.ActionOptionsFunction<String>) NiftyUtils::getTaskGroupIdOptions)
+            .optionsLookupDependsOn("project"),
+            string("name").metadata(
+                Map.of(
+                    "type", PropertyType.BODY))
+                .label("Name")
                 .description("Name of the task.")
                 .required(true),
-            string("description").label("Description")
+            string("description").metadata(
+                Map.of(
+                    "type", PropertyType.BODY))
+                .label("Description")
                 .description("Description of the task.")
                 .required(false),
-            dateTime("due_date").label("Due Date")
+            dateTime("due_date").metadata(
+                Map.of(
+                    "type", PropertyType.BODY))
+                .label("Due Date")
                 .description("Due date for the task.")
                 .required(false))
-            .label("Task")
-            .required(true)
-            .metadata(
-                Map.of(
-                    "type", PropertyType.BODY)))
         .output(outputSchema(object().properties(object("body")
             .properties(string("id").required(false), string("name").required(false), string("project").required(false),
                 string("description").required(false), dateTime("due_date").required(false))

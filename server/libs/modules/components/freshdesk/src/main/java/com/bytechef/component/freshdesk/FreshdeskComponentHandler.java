@@ -29,14 +29,9 @@ import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDsl.ModifiableComponentDefinition;
 import com.bytechef.component.definition.ComponentDsl.ModifiableConnectionDefinition;
 import com.bytechef.component.definition.ComponentDsl.ModifiableIntegerProperty;
-import com.bytechef.component.definition.ComponentDsl.ModifiableObjectProperty;
 import com.bytechef.component.definition.ComponentDsl.ModifiableProperty;
-import com.bytechef.component.definition.Property;
-import com.bytechef.definition.BaseProperty;
 import com.google.auto.service.AutoService;
-import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 
 /**
  * @author Monika Domiter
@@ -77,29 +72,22 @@ public class FreshdeskComponentHandler extends AbstractFreshdeskComponentHandler
     public ModifiableProperty<?> modifyProperty(
         ActionDefinition actionDefinition, ModifiableProperty<?> modifiableProperty) {
 
-        if (Objects.equals(actionDefinition.getName(), "createTicket")) {
-            Optional<List<? extends Property.ValueProperty<?>>> propertiesOptional =
-                ((ModifiableObjectProperty) modifiableProperty).getProperties();
-
-            for (BaseProperty baseProperty : propertiesOptional.get()) {
-                if (Objects.equals(baseProperty.getName(), "priority")) {
-                    ((ModifiableIntegerProperty) baseProperty)
-                        .options(
-                            option("Low", 1),
-                            option("Medium", 2),
-                            option("High", 3),
-                            option("Urgent", 4))
-                        .defaultValue(1);
-                } else if (Objects.equals(baseProperty.getName(), "status")) {
-                    ((ModifiableIntegerProperty) baseProperty)
-                        .options(
-                            option("Open", 2),
-                            option("Pending", 3),
-                            option("Resolved", 4),
-                            option("Closed", 5))
-                        .defaultValue(2);
-                }
-            }
+        if (Objects.equals(modifiableProperty.getName(), "priority")) {
+            ((ModifiableIntegerProperty) modifiableProperty)
+                .options(
+                    option("Low", 1),
+                    option("Medium", 2),
+                    option("High", 3),
+                    option("Urgent", 4))
+                .defaultValue(1);
+        } else if (Objects.equals(modifiableProperty.getName(), "status")) {
+            ((ModifiableIntegerProperty) modifiableProperty)
+                .options(
+                    option("Open", 2),
+                    option("Pending", 3),
+                    option("Resolved", 4),
+                    option("Closed", 5))
+                .defaultValue(2);
         }
 
         return modifiableProperty;

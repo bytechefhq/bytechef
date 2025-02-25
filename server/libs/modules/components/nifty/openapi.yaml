@@ -33,6 +33,7 @@ paths:
                   type: "string"
                   title: "Template ID"
                   description: "ID of template that can be used to pre-configure the project."
+                  x-dynamic-options: true
       responses:
         201:
           description: "Creation confirmation. Returns created Project"
@@ -68,6 +69,9 @@ paths:
                 task_group_id:
                   title: "Status"
                   type: "string"
+                  x-dynamic-options: true
+                  x-dynamic-options-dependency:
+                    - "project"
                 name:
                   type: "string"
                   format: "uuid"
@@ -118,6 +122,7 @@ paths:
           schema:
             type: "string"
             title: "Task ID"
+            x-dynamic-options: true
       responses:
         201:
           description: ""
@@ -157,6 +162,7 @@ paths:
                   type: "string"
                   description: "Project ID that the status belongs to."
                   title: "Project ID"
+                  x-dynamic-options: true
               required:
                 - "name"
                 - "project_id"
@@ -201,6 +207,7 @@ paths:
           schema:
             title: "Project ID"
             type: "string"
+            x-dynamic-options: true
         - name: "start_date"
           in: "query"
           description: "Start date for the report."

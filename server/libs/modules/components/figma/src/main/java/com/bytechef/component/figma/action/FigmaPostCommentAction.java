@@ -49,14 +49,12 @@ public class FigmaPostCommentAction {
             .metadata(
                 Map.of(
                     "type", PropertyType.PATH)),
-            object("__item").properties(string("message").label("Comment")
+            string("message").metadata(
+                Map.of(
+                    "type", PropertyType.BODY))
+                .label("Comment")
                 .description("Comment to post on the file.")
                 .required(true))
-                .label("Item")
-                .required(true)
-                .metadata(
-                    Map.of(
-                        "type", PropertyType.BODY)))
         .output(outputSchema(object()
             .properties(object("body")
                 .properties(string("id").required(false), string("file_key").required(false),

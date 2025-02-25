@@ -44,28 +44,39 @@ public class FreshdeskCreateTicketAction {
                 "path", "/tickets", "bodyContentType", BodyContentType.JSON, "mimeType", "application/json"
 
             ))
-        .properties(object("__item").properties(string("subject").label("Subject")
+        .properties(string("subject").metadata(
+            Map.of(
+                "type", PropertyType.BODY))
+            .label("Subject")
             .description("Subject of the ticket.")
             .required(true),
-            string("email").label("Email")
+            string("email").metadata(
+                Map.of(
+                    "type", PropertyType.BODY))
+                .label("Email")
                 .description(
                     "Email address of the requester. If no contact exists with this email address in Freshdesk, it will be added as a new contact.")
                 .required(true),
-            string("description").label("Description")
+            string("description").metadata(
+                Map.of(
+                    "type", PropertyType.BODY))
+                .label("Description")
                 .description("HTML content of the ticket.")
                 .required(true),
-            integer("priority").label("Priority")
+            integer("priority").metadata(
+                Map.of(
+                    "type", PropertyType.BODY))
+                .label("Priority")
                 .description("Priority of the ticket.")
                 .options(option("1", 1), option("2", 2), option("3", 3), option("4", 4))
                 .required(false),
-            integer("status").label("Status")
+            integer("status").metadata(
+                Map.of(
+                    "type", PropertyType.BODY))
+                .label("Status")
                 .description("Status of the ticket.")
                 .options(option("2", 2), option("3", 3), option("4", 4), option("5", 5))
                 .required(false))
-            .label("Ticket")
-            .metadata(
-                Map.of(
-                    "type", PropertyType.BODY)))
         .output(outputSchema(object()
             .properties(object("body")
                 .properties(string("subject").required(false), string("email").required(false),

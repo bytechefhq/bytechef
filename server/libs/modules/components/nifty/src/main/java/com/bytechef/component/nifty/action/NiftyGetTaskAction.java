@@ -24,6 +24,8 @@ import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.Context.Http.ResponseType;
 
 import com.bytechef.component.definition.ComponentDsl;
+import com.bytechef.component.definition.OptionsDataSource;
+import com.bytechef.component.nifty.util.NiftyUtils;
 import java.util.Map;
 
 /**
@@ -44,6 +46,7 @@ public class NiftyGetTaskAction {
         .properties(string("taskId").label("Task ID")
             .description("ID of the task to get details for.")
             .required(true)
+            .options((OptionsDataSource.ActionOptionsFunction<String>) NiftyUtils::getTaskIdOptions)
             .metadata(
                 Map.of(
                     "type", PropertyType.PATH)))

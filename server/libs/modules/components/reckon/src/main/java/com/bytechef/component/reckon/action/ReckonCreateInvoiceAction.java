@@ -29,6 +29,8 @@ import static com.bytechef.component.definition.Context.Http.BodyContentType;
 import static com.bytechef.component.definition.Context.Http.ResponseType;
 
 import com.bytechef.component.definition.ComponentDsl;
+import com.bytechef.component.definition.OptionsDataSource;
+import com.bytechef.component.reckon.util.ReckonUtils;
 import java.util.Map;
 
 /**
@@ -49,31 +51,41 @@ public class ReckonCreateInvoiceAction {
         .properties(string("bookId").label("Book ID")
             .description("ID of the book where new invoice will be created.")
             .required(true)
+            .options((OptionsDataSource.ActionOptionsFunction<String>) ReckonUtils::getBookIdOptions)
             .metadata(
                 Map.of(
                     "type", PropertyType.PATH)),
-            object("__item").properties(string("customer").label("Customer")
+            string("customer").metadata(
+                Map.of(
+                    "type", PropertyType.BODY))
+                .label("Customer")
                 .description("The customer that is being invoiced.")
+                .required(true)
+                .options((OptionsDataSource.ActionOptionsFunction<String>) ReckonUtils::getCustomerOptions),
+            date("invoiceDate").metadata(
+                Map.of(
+                    "type", PropertyType.BODY))
+                .label("Invoice Date")
+                .description("The date of the invoice.")
                 .required(true),
-                date("invoiceDate").label("Invoice Date")
-                    .description("The date of the invoice.")
-                    .required(true),
-                string("amountTaxStatus").label("Amount Tax Status")
-                    .description("The amount tax status of the amounts in the invoice.")
-                    .options(option("NonTaxed", "NonTaxed"), option("Inclusive", "Inclusive"),
-                        option("Exclusive", "Exclusive"))
-                    .required(true),
-                array("lineItems").items(object().properties(integer("lineNumber").label("Line Number")
-                    .required(false))
-                    .description("The individual items that make up the invoice."))
-                    .placeholder("Add to Line Items")
-                    .label("Line Items")
-                    .description("The individual items that make up the invoice.")
-                    .required(true))
-                .label("Invoice")
+            string("amountTaxStatus").metadata(
+                Map.of(
+                    "type", PropertyType.BODY))
+                .label("Amount Tax Status")
+                .description("The amount tax status of the amounts in the invoice.")
+                .options(option("NonTaxed", "NonTaxed"), option("Inclusive", "Inclusive"),
+                    option("Exclusive", "Exclusive"))
+                .required(true),
+            array("lineItems").items(object().properties(integer("lineNumber").label("Line Number")
+                .required(false))
+                .description("The individual items that make up the invoice."))
+                .placeholder("Add to Line Items")
                 .metadata(
                     Map.of(
-                        "type", PropertyType.BODY)))
+                        "type", PropertyType.BODY))
+                .label("Line Items")
+                .description("The individual items that make up the invoice.")
+                .required(true))
         .output(outputSchema(object().properties(object("body").properties(string("id").required(false))
             .required(false))
             .metadata(

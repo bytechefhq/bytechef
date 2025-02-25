@@ -49,10 +49,11 @@ public class ClickupNewTaskTrigger {
         .title("New Task")
         .description("Triggers when new task is created.")
         .type(TriggerType.DYNAMIC_WEBHOOK)
-        .properties(string(WORKSPACE_ID)
-            .label("Workspace ID")
-            .options((TriggerOptionsFunction<String>) ClickupUtils::getWorkspaceIdOptions)
-            .required(true))
+        .properties(
+            string(WORKSPACE_ID)
+                .label("Workspace ID")
+                .options((TriggerOptionsFunction<String>) ClickupUtils::getWorkspaceIdOptions)
+                .required(true))
         .output(
             outputSchema(
                 object()

@@ -16,95 +16,6 @@
   "resources" : null,
   "version" : 1,
   "title" : "Microsoft Outlook 365",
-  "connection" : {
-    "authorizations" : [ {
-      "detectOn" : null,
-      "description" : null,
-      "name" : "oauth2_authorization_code",
-      "properties" : [ {
-        "advancedOption" : null,
-        "description" : null,
-        "displayCondition" : null,
-        "expressionEnabled" : null,
-        "hidden" : null,
-        "metadata" : { },
-        "required" : true,
-        "name" : "clientId",
-        "type" : "STRING",
-        "defaultValue" : null,
-        "exampleValue" : null,
-        "label" : "Client Id",
-        "placeholder" : null,
-        "controlType" : "TEXT",
-        "languageId" : null,
-        "maxLength" : null,
-        "minLength" : null,
-        "options" : null,
-        "optionsDataSource" : null
-      }, {
-        "advancedOption" : null,
-        "description" : null,
-        "displayCondition" : null,
-        "expressionEnabled" : null,
-        "hidden" : null,
-        "metadata" : { },
-        "required" : true,
-        "name" : "clientSecret",
-        "type" : "STRING",
-        "defaultValue" : null,
-        "exampleValue" : null,
-        "label" : "Client Secret",
-        "placeholder" : null,
-        "controlType" : "TEXT",
-        "languageId" : null,
-        "maxLength" : null,
-        "minLength" : null,
-        "options" : null,
-        "optionsDataSource" : null
-      }, {
-        "advancedOption" : null,
-        "description" : null,
-        "displayCondition" : null,
-        "expressionEnabled" : null,
-        "hidden" : null,
-        "metadata" : { },
-        "required" : true,
-        "name" : "tenantId",
-        "type" : "STRING",
-        "defaultValue" : "common",
-        "exampleValue" : null,
-        "label" : "Tenant Id",
-        "placeholder" : null,
-        "controlType" : "TEXT",
-        "languageId" : null,
-        "maxLength" : null,
-        "minLength" : null,
-        "options" : null,
-        "optionsDataSource" : null
-      } ],
-      "refreshOn" : null,
-      "title" : "OAuth2 Authorization Code",
-      "type" : "OAUTH2_AUTHORIZATION_CODE",
-      "acquire" : null,
-      "authorizationUrl" : { },
-      "clientSecret" : null,
-      "refreshToken" : null,
-      "apply" : null,
-      "clientId" : null,
-      "pkce" : null,
-      "refresh" : null,
-      "refreshUrl" : { },
-      "scopes" : { },
-      "tokenUrl" : { },
-      "authorizationCallback" : null,
-      "oauth2AuthorizationExtraQueryParameters" : null
-    } ],
-    "properties" : null,
-    "version" : 1,
-    "authorizationRequired" : null,
-    "baseUri" : { },
-    "test" : null
-  },
   "actions" : [ {
     "batch" : null,
     "deprecated" : null,
@@ -207,8 +118,8 @@
             "label" : null,
             "placeholder" : null,
             "options" : null,
-            "optionsDataSource" : null,
-            "controlType" : "DATE_TIME"
+            "controlType" : "DATE_TIME",
+            "optionsDataSource" : null
           }, {
             "advancedOption" : null,
             "description" : null,
@@ -224,8 +135,8 @@
             "label" : null,
             "placeholder" : null,
             "options" : null,
-            "optionsDataSource" : null,
-            "controlType" : "DATE_TIME"
+            "controlType" : "DATE_TIME",
+            "optionsDataSource" : null
           }, {
             "advancedOption" : null,
             "description" : null,
@@ -265,8 +176,8 @@
             "minItems" : null,
             "multipleValues" : null,
             "options" : null,
-            "optionsDataSource" : null,
-            "controlType" : "ARRAY_BUILDER"
+            "controlType" : "ARRAY_BUILDER",
+            "optionsDataSource" : null
           }, {
             "advancedOption" : null,
             "description" : null,
@@ -336,8 +247,8 @@
             } ],
             "controlType" : "SELECT"
           } ],
-          "optionsDataSource" : null,
-          "controlType" : "OBJECT_BUILDER"
+          "controlType" : "OBJECT_BUILDER",
+          "optionsDataSource" : null
         },
         "sampleOutput" : null,
         "placeholder" : null
@@ -434,8 +345,8 @@
           "label" : null,
           "placeholder" : null,
           "options" : null,
-          "optionsDataSource" : null,
-          "controlType" : "DATE_TIME"
+          "controlType" : "DATE_TIME",
+          "optionsDataSource" : null
         }, {
           "advancedOption" : null,
           "description" : null,
@@ -451,8 +362,8 @@
           "label" : null,
           "placeholder" : null,
           "options" : null,
-          "optionsDataSource" : null,
-          "controlType" : "DATE_TIME"
+          "controlType" : "DATE_TIME",
+          "optionsDataSource" : null
         }, {
           "advancedOption" : null,
           "description" : null,
@@ -492,8 +403,8 @@
           "minItems" : null,
           "multipleValues" : null,
           "options" : null,
-          "optionsDataSource" : null,
-          "controlType" : "ARRAY_BUILDER"
+          "controlType" : "ARRAY_BUILDER",
+          "optionsDataSource" : null
         }, {
           "advancedOption" : null,
           "description" : null,
@@ -563,8 +474,8 @@
           } ],
           "controlType" : "SELECT"
         } ],
-        "optionsDataSource" : null,
-        "controlType" : "OBJECT_BUILDER"
+        "controlType" : "OBJECT_BUILDER",
+        "optionsDataSource" : null
       },
       "sampleOutput" : null
     },
@@ -650,8 +561,8 @@
       "label" : "Start Date",
       "placeholder" : null,
       "options" : null,
-      "optionsDataSource" : null,
-      "controlType" : "DATE"
+      "controlType" : "DATE",
+      "optionsDataSource" : null
     }, {
       "advancedOption" : null,
       "description" : "The end date of the event.",
@@ -667,8 +578,8 @@
       "label" : "End Date",
       "placeholder" : null,
       "options" : null,
-      "optionsDataSource" : null,
-      "controlType" : "DATE"
+      "controlType" : "DATE",
+      "optionsDataSource" : null
     }, {
       "advancedOption" : null,
       "description" : "The start time of the event.",
@@ -684,8 +595,8 @@
       "label" : "Start Date Time",
       "placeholder" : null,
       "options" : null,
-      "optionsDataSource" : null,
-      "controlType" : "DATE_TIME"
+      "controlType" : "DATE_TIME",
+      "optionsDataSource" : null
     }, {
       "advancedOption" : null,
       "description" : "The end time of the event.",
@@ -701,8 +612,8 @@
       "label" : "End Date Time",
       "placeholder" : null,
       "options" : null,
-      "optionsDataSource" : null,
-      "controlType" : "DATE_TIME"
+      "controlType" : "DATE_TIME",
+      "optionsDataSource" : null
     }, {
       "advancedOption" : null,
       "description" : "The attendees of the event.",
@@ -742,8 +653,8 @@
       "minItems" : null,
       "multipleValues" : null,
       "options" : null,
-      "optionsDataSource" : null,
-      "controlType" : "ARRAY_BUILDER"
+      "controlType" : "ARRAY_BUILDER",
+      "optionsDataSource" : null
     }, {
       "advancedOption" : null,
       "description" : "Is the event an online meeting?",
@@ -785,8 +696,8 @@
       "maxValue" : null,
       "minValue" : null,
       "options" : null,
-      "optionsDataSource" : null,
-      "controlType" : "INTEGER"
+      "controlType" : "INTEGER",
+      "optionsDataSource" : null
     } ],
     "title" : "Create Event",
     "perform" : { },
@@ -967,8 +878,8 @@
               "label" : null,
               "placeholder" : null,
               "options" : null,
-              "optionsDataSource" : null,
-              "controlType" : "DATE_TIME"
+              "controlType" : "DATE_TIME",
+              "optionsDataSource" : null
             }, {
               "advancedOption" : null,
               "description" : null,
@@ -984,8 +895,8 @@
               "label" : null,
               "placeholder" : null,
               "options" : null,
-              "optionsDataSource" : null,
-              "controlType" : "DATE_TIME"
+              "controlType" : "DATE_TIME",
+              "optionsDataSource" : null
             }, {
               "advancedOption" : null,
               "description" : null,
@@ -1025,8 +936,8 @@
               "minItems" : null,
               "multipleValues" : null,
               "options" : null,
-              "optionsDataSource" : null,
-              "controlType" : "ARRAY_BUILDER"
+              "controlType" : "ARRAY_BUILDER",
+              "optionsDataSource" : null
             }, {
               "advancedOption" : null,
               "description" : null,
@@ -1096,15 +1007,15 @@
               } ],
               "controlType" : "SELECT"
             } ],
-            "optionsDataSource" : null,
-            "controlType" : "OBJECT_BUILDER"
+            "controlType" : "OBJECT_BUILDER",
+            "optionsDataSource" : null
           } ],
           "maxItems" : null,
           "minItems" : null,
           "multipleValues" : null,
           "options" : null,
-          "optionsDataSource" : null,
-          "controlType" : "ARRAY_BUILDER"
+          "controlType" : "ARRAY_BUILDER",
+          "optionsDataSource" : null
         },
         "sampleOutput" : null,
         "placeholder" : null
@@ -1215,8 +1126,8 @@
             "label" : null,
             "placeholder" : null,
             "options" : null,
-            "optionsDataSource" : null,
-            "controlType" : "DATE_TIME"
+            "controlType" : "DATE_TIME",
+            "optionsDataSource" : null
           }, {
             "advancedOption" : null,
             "description" : null,
@@ -1232,8 +1143,8 @@
             "label" : null,
             "placeholder" : null,
             "options" : null,
-            "optionsDataSource" : null,
-            "controlType" : "DATE_TIME"
+            "controlType" : "DATE_TIME",
+            "optionsDataSource" : null
           }, {
             "advancedOption" : null,
             "description" : null,
@@ -1273,8 +1184,8 @@
             "minItems" : null,
             "multipleValues" : null,
             "options" : null,
-            "optionsDataSource" : null,
-            "controlType" : "ARRAY_BUILDER"
+            "controlType" : "ARRAY_BUILDER",
+            "optionsDataSource" : null
           }, {
             "advancedOption" : null,
             "description" : null,
@@ -1344,15 +1255,15 @@
             } ],
             "controlType" : "SELECT"
           } ],
-          "optionsDataSource" : null,
-          "controlType" : "OBJECT_BUILDER"
+          "controlType" : "OBJECT_BUILDER",
+          "optionsDataSource" : null
         } ],
         "maxItems" : null,
         "minItems" : null,
         "multipleValues" : null,
         "options" : null,
-        "optionsDataSource" : null,
-        "controlType" : "ARRAY_BUILDER"
+        "controlType" : "ARRAY_BUILDER",
+        "optionsDataSource" : null
       },
       "sampleOutput" : null
     },
@@ -1411,8 +1322,8 @@
         "label" : "From",
         "placeholder" : null,
         "options" : null,
-        "optionsDataSource" : null,
-        "controlType" : "DATE_TIME"
+        "controlType" : "DATE_TIME",
+        "optionsDataSource" : null
       }, {
         "advancedOption" : null,
         "description" : "End of the time range.",
@@ -1428,11 +1339,11 @@
         "label" : "To",
         "placeholder" : null,
         "options" : null,
-        "optionsDataSource" : null,
-        "controlType" : "DATE_TIME"
+        "controlType" : "DATE_TIME",
+        "optionsDataSource" : null
       } ],
-      "optionsDataSource" : null,
-      "controlType" : "OBJECT_BUILDER"
+      "controlType" : "OBJECT_BUILDER",
+      "optionsDataSource" : null
     } ],
     "title" : "Get Events",
     "perform" : { },
@@ -1494,8 +1405,8 @@
               "label" : null,
               "placeholder" : null,
               "options" : null,
-              "optionsDataSource" : null,
-              "controlType" : "DATE_TIME"
+              "controlType" : "DATE_TIME",
+              "optionsDataSource" : null
             }, {
               "advancedOption" : null,
               "description" : null,
@@ -1511,18 +1422,18 @@
               "label" : null,
               "placeholder" : null,
               "options" : null,
-              "optionsDataSource" : null,
-              "controlType" : "DATE_TIME"
+              "controlType" : "DATE_TIME",
+              "optionsDataSource" : null
             } ],
-            "optionsDataSource" : null,
-            "controlType" : "OBJECT_BUILDER"
+            "controlType" : "OBJECT_BUILDER",
+            "optionsDataSource" : null
           } ],
           "maxItems" : null,
           "minItems" : null,
           "multipleValues" : null,
           "options" : null,
-          "optionsDataSource" : null,
-          "controlType" : "ARRAY_BUILDER"
+          "controlType" : "ARRAY_BUILDER",
+          "optionsDataSource" : null
         },
         "sampleOutput" : null,
         "placeholder" : null
@@ -1573,8 +1484,8 @@
             "label" : null,
             "placeholder" : null,
             "options" : null,
-            "optionsDataSource" : null,
-            "controlType" : "DATE_TIME"
+            "controlType" : "DATE_TIME",
+            "optionsDataSource" : null
           }, {
             "advancedOption" : null,
             "description" : null,
@@ -1590,18 +1501,18 @@
             "label" : null,
             "placeholder" : null,
             "options" : null,
-            "optionsDataSource" : null,
-            "controlType" : "DATE_TIME"
+            "controlType" : "DATE_TIME",
+            "optionsDataSource" : null
           } ],
-          "optionsDataSource" : null,
-          "controlType" : "OBJECT_BUILDER"
+          "controlType" : "OBJECT_BUILDER",
+          "optionsDataSource" : null
         } ],
         "maxItems" : null,
         "minItems" : null,
         "multipleValues" : null,
         "options" : null,
-        "optionsDataSource" : null,
-        "controlType" : "ARRAY_BUILDER"
+        "controlType" : "ARRAY_BUILDER",
+        "optionsDataSource" : null
       },
       "sampleOutput" : null
     },
@@ -1660,8 +1571,8 @@
         "label" : "From",
         "placeholder" : null,
         "options" : null,
-        "optionsDataSource" : null,
-        "controlType" : "DATE_TIME"
+        "controlType" : "DATE_TIME",
+        "optionsDataSource" : null
       }, {
         "advancedOption" : null,
         "description" : "End of the time range.",
@@ -1677,11 +1588,11 @@
         "label" : "To",
         "placeholder" : null,
         "options" : null,
-        "optionsDataSource" : null,
-        "controlType" : "DATE_TIME"
+        "controlType" : "DATE_TIME",
+        "optionsDataSource" : null
       } ],
-      "optionsDataSource" : null,
-      "controlType" : "OBJECT_BUILDER"
+      "controlType" : "OBJECT_BUILDER",
+      "optionsDataSource" : null
     } ],
     "title" : "Get Free Time Slots",
     "perform" : { },
@@ -1832,8 +1743,8 @@
               "options" : null,
               "optionsDataSource" : null
             } ],
-            "optionsDataSource" : null,
-            "controlType" : "OBJECT_BUILDER"
+            "controlType" : "OBJECT_BUILDER",
+            "optionsDataSource" : null
           }, {
             "advancedOption" : null,
             "description" : null,
@@ -1909,14 +1820,14 @@
                 "options" : null,
                 "optionsDataSource" : null
               } ],
-              "optionsDataSource" : null,
-              "controlType" : "OBJECT_BUILDER"
+              "controlType" : "OBJECT_BUILDER",
+              "optionsDataSource" : null
             } ],
-            "optionsDataSource" : null,
-            "controlType" : "OBJECT_BUILDER"
+            "controlType" : "OBJECT_BUILDER",
+            "optionsDataSource" : null
           } ],
-          "optionsDataSource" : null,
-          "controlType" : "OBJECT_BUILDER"
+          "controlType" : "OBJECT_BUILDER",
+          "optionsDataSource" : null
         },
         "sampleOutput" : null,
         "placeholder" : null
@@ -2056,8 +1967,8 @@
             "options" : null,
             "optionsDataSource" : null
           } ],
-          "optionsDataSource" : null,
-          "controlType" : "OBJECT_BUILDER"
+          "controlType" : "OBJECT_BUILDER",
+          "optionsDataSource" : null
         }, {
           "advancedOption" : null,
           "description" : null,
@@ -2133,14 +2044,14 @@
               "options" : null,
               "optionsDataSource" : null
             } ],
-            "optionsDataSource" : null,
-            "controlType" : "OBJECT_BUILDER"
+            "controlType" : "OBJECT_BUILDER",
+            "optionsDataSource" : null
           } ],
-          "optionsDataSource" : null,
-          "controlType" : "OBJECT_BUILDER"
+          "controlType" : "OBJECT_BUILDER",
+          "optionsDataSource" : null
         } ],
-        "optionsDataSource" : null,
-        "controlType" : "OBJECT_BUILDER"
+        "controlType" : "OBJECT_BUILDER",
+        "optionsDataSource" : null
       },
       "sampleOutput" : null
     },
@@ -2387,8 +2298,8 @@
                 "options" : null,
                 "optionsDataSource" : null
               } ],
-              "optionsDataSource" : null,
-              "controlType" : "OBJECT_BUILDER"
+              "controlType" : "OBJECT_BUILDER",
+              "optionsDataSource" : null
             }, {
               "advancedOption" : null,
               "description" : null,
@@ -2464,21 +2375,21 @@
                   "options" : null,
                   "optionsDataSource" : null
                 } ],
-                "optionsDataSource" : null,
-                "controlType" : "OBJECT_BUILDER"
+                "controlType" : "OBJECT_BUILDER",
+                "optionsDataSource" : null
               } ],
-              "optionsDataSource" : null,
-              "controlType" : "OBJECT_BUILDER"
+              "controlType" : "OBJECT_BUILDER",
+              "optionsDataSource" : null
             } ],
-            "optionsDataSource" : null,
-            "controlType" : "OBJECT_BUILDER"
+            "controlType" : "OBJECT_BUILDER",
+            "optionsDataSource" : null
           } ],
           "maxItems" : null,
           "minItems" : null,
           "multipleValues" : null,
           "options" : null,
-          "optionsDataSource" : null,
-          "controlType" : "ARRAY_BUILDER"
+          "controlType" : "ARRAY_BUILDER",
+          "optionsDataSource" : null
         },
         "sampleOutput" : null,
         "placeholder" : null
@@ -2632,8 +2543,8 @@
               "options" : null,
               "optionsDataSource" : null
             } ],
-            "optionsDataSource" : null,
-            "controlType" : "OBJECT_BUILDER"
+            "controlType" : "OBJECT_BUILDER",
+            "optionsDataSource" : null
           }, {
             "advancedOption" : null,
             "description" : null,
@@ -2709,21 +2620,21 @@
                 "options" : null,
                 "optionsDataSource" : null
               } ],
-              "optionsDataSource" : null,
-              "controlType" : "OBJECT_BUILDER"
+              "controlType" : "OBJECT_BUILDER",
+              "optionsDataSource" : null
             } ],
-            "optionsDataSource" : null,
-            "controlType" : "OBJECT_BUILDER"
+            "controlType" : "OBJECT_BUILDER",
+            "optionsDataSource" : null
           } ],
-          "optionsDataSource" : null,
-          "controlType" : "OBJECT_BUILDER"
+          "controlType" : "OBJECT_BUILDER",
+          "optionsDataSource" : null
         } ],
         "maxItems" : null,
         "minItems" : null,
         "multipleValues" : null,
         "options" : null,
-        "optionsDataSource" : null,
-        "controlType" : "ARRAY_BUILDER"
+        "controlType" : "ARRAY_BUILDER",
+        "optionsDataSource" : null
       },
       "sampleOutput" : null
     },
@@ -2915,14 +2826,14 @@
             "options" : null,
             "optionsDataSource" : null
           } ],
-          "optionsDataSource" : null,
-          "controlType" : "OBJECT_BUILDER"
+          "controlType" : "OBJECT_BUILDER",
+          "optionsDataSource" : null
         } ],
-        "optionsDataSource" : null,
-        "controlType" : "OBJECT_BUILDER"
+        "controlType" : "OBJECT_BUILDER",
+        "optionsDataSource" : null
       } ],
-      "optionsDataSource" : null,
-      "controlType" : "OBJECT_BUILDER"
+      "controlType" : "OBJECT_BUILDER",
+      "optionsDataSource" : null
     }, {
       "advancedOption" : null,
       "description" : "The To: recipients for the message.",
@@ -3012,18 +2923,18 @@
             "options" : null,
             "optionsDataSource" : null
           } ],
-          "optionsDataSource" : null,
-          "controlType" : "OBJECT_BUILDER"
+          "controlType" : "OBJECT_BUILDER",
+          "optionsDataSource" : null
         } ],
-        "optionsDataSource" : null,
-        "controlType" : "OBJECT_BUILDER"
+        "controlType" : "OBJECT_BUILDER",
+        "optionsDataSource" : null
       } ],
       "maxItems" : null,
       "minItems" : null,
       "multipleValues" : null,
       "options" : null,
-      "optionsDataSource" : null,
-      "controlType" : "ARRAY_BUILDER"
+      "controlType" : "ARRAY_BUILDER",
+      "optionsDataSource" : null
     }, {
       "advancedOption" : null,
       "description" : "The subject of the message.",
@@ -3133,18 +3044,18 @@
             "options" : null,
             "optionsDataSource" : null
           } ],
-          "optionsDataSource" : null,
-          "controlType" : "OBJECT_BUILDER"
+          "controlType" : "OBJECT_BUILDER",
+          "optionsDataSource" : null
         } ],
-        "optionsDataSource" : null,
-        "controlType" : "OBJECT_BUILDER"
+        "controlType" : "OBJECT_BUILDER",
+        "optionsDataSource" : null
       } ],
       "maxItems" : null,
       "minItems" : null,
       "multipleValues" : null,
       "options" : null,
-      "optionsDataSource" : null,
-      "controlType" : "ARRAY_BUILDER"
+      "controlType" : "ARRAY_BUILDER",
+      "optionsDataSource" : null
     }, {
       "advancedOption" : null,
       "description" : "The Cc recipients for the message.",
@@ -3234,18 +3145,18 @@
             "options" : null,
             "optionsDataSource" : null
           } ],
-          "optionsDataSource" : null,
-          "controlType" : "OBJECT_BUILDER"
+          "controlType" : "OBJECT_BUILDER",
+          "optionsDataSource" : null
         } ],
-        "optionsDataSource" : null,
-        "controlType" : "OBJECT_BUILDER"
+        "controlType" : "OBJECT_BUILDER",
+        "optionsDataSource" : null
       } ],
       "maxItems" : null,
       "minItems" : null,
       "multipleValues" : null,
       "options" : null,
-      "optionsDataSource" : null,
-      "controlType" : "ARRAY_BUILDER"
+      "controlType" : "ARRAY_BUILDER",
+      "optionsDataSource" : null
     }, {
       "advancedOption" : null,
       "description" : "The email addresses to use when replying.",
@@ -3335,18 +3246,18 @@
             "options" : null,
             "optionsDataSource" : null
           } ],
-          "optionsDataSource" : null,
-          "controlType" : "OBJECT_BUILDER"
+          "controlType" : "OBJECT_BUILDER",
+          "optionsDataSource" : null
         } ],
-        "optionsDataSource" : null,
-        "controlType" : "OBJECT_BUILDER"
+        "controlType" : "OBJECT_BUILDER",
+        "optionsDataSource" : null
       } ],
       "maxItems" : null,
       "minItems" : null,
       "multipleValues" : null,
       "options" : null,
-      "optionsDataSource" : null,
-      "controlType" : "ARRAY_BUILDER"
+      "controlType" : "ARRAY_BUILDER",
+      "optionsDataSource" : null
     }, {
       "advancedOption" : null,
       "description" : "The body of the message. It can be in HTML or text format.",
@@ -3433,14 +3344,103 @@
         "options" : null,
         "optionsDataSource" : null
       } ],
-      "optionsDataSource" : null,
-      "controlType" : "OBJECT_BUILDER"
+      "controlType" : "OBJECT_BUILDER",
+      "optionsDataSource" : null
     } ],
     "title" : "Send Email",
     "perform" : { },
     "processErrorResponse" : null,
     "workflowNodeDescription" : null
   } ],
+  "connection" : {
+    "authorizations" : [ {
+      "detectOn" : null,
+      "description" : null,
+      "name" : "oauth2_authorization_code",
+      "properties" : [ {
+        "advancedOption" : null,
+        "description" : null,
+        "displayCondition" : null,
+        "expressionEnabled" : null,
+        "hidden" : null,
+        "metadata" : { },
+        "required" : true,
+        "name" : "clientId",
+        "type" : "STRING",
+        "defaultValue" : null,
+        "exampleValue" : null,
+        "label" : "Client Id",
+        "placeholder" : null,
+        "controlType" : "TEXT",
+        "languageId" : null,
+        "maxLength" : null,
+        "minLength" : null,
+        "options" : null,
+        "optionsDataSource" : null
+      }, {
+        "advancedOption" : null,
+        "description" : null,
+        "displayCondition" : null,
+        "expressionEnabled" : null,
+        "hidden" : null,
+        "metadata" : { },
+        "required" : true,
+        "name" : "clientSecret",
+        "type" : "STRING",
+        "defaultValue" : null,
+        "exampleValue" : null,
+        "label" : "Client Secret",
+        "placeholder" : null,
+        "controlType" : "TEXT",
+        "languageId" : null,
+        "maxLength" : null,
+        "minLength" : null,
+        "options" : null,
+        "optionsDataSource" : null
+      }, {
+        "advancedOption" : null,
+        "description" : null,
+        "displayCondition" : null,
+        "expressionEnabled" : null,
+        "hidden" : null,
+        "metadata" : { },
+        "required" : true,
+        "name" : "tenantId",
+        "type" : "STRING",
+        "defaultValue" : "common",
+        "exampleValue" : null,
+        "label" : "Tenant Id",
+        "placeholder" : null,
+        "controlType" : "TEXT",
+        "languageId" : null,
+        "maxLength" : null,
+        "minLength" : null,
+        "options" : null,
+        "optionsDataSource" : null
+      } ],
+      "refreshOn" : null,
+      "title" : "OAuth2 Authorization Code",
+      "type" : "OAUTH2_AUTHORIZATION_CODE",
+      "acquire" : null,
+      "apply" : null,
+      "authorizationCallback" : null,
+      "authorizationUrl" : { },
+      "clientId" : null,
+      "clientSecret" : null,
+      "oauth2AuthorizationExtraQueryParameters" : null,
+      "pkce" : null,
+      "refresh" : null,
+      "refreshUrl" : { },
+      "scopes" : { },
+      "refreshToken" : null,
+      "tokenUrl" : { }
+    } ],
+    "properties" : null,
+    "version" : 1,
+    "authorizationRequired" : null,
+    "baseUri" : { },
+    "test" : null
+  },
   "dataStream" : null,
   "triggers" : [ {
     "batch" : null,
@@ -3600,8 +3600,8 @@
                 "options" : null,
                 "optionsDataSource" : null
               } ],
-              "optionsDataSource" : null,
-              "controlType" : "OBJECT_BUILDER"
+              "controlType" : "OBJECT_BUILDER",
+              "optionsDataSource" : null
             }, {
               "advancedOption" : null,
               "description" : null,
@@ -3677,21 +3677,21 @@
                   "options" : null,
                   "optionsDataSource" : null
                 } ],
-                "optionsDataSource" : null,
-                "controlType" : "OBJECT_BUILDER"
+                "controlType" : "OBJECT_BUILDER",
+                "optionsDataSource" : null
               } ],
-              "optionsDataSource" : null,
-              "controlType" : "OBJECT_BUILDER"
+              "controlType" : "OBJECT_BUILDER",
+              "optionsDataSource" : null
             } ],
-            "optionsDataSource" : null,
-            "controlType" : "OBJECT_BUILDER"
+            "controlType" : "OBJECT_BUILDER",
+            "optionsDataSource" : null
           } ],
           "maxItems" : null,
           "minItems" : null,
           "multipleValues" : null,
           "options" : null,
-          "optionsDataSource" : null,
-          "controlType" : "ARRAY_BUILDER"
+          "controlType" : "ARRAY_BUILDER",
+          "optionsDataSource" : null
         },
         "sampleOutput" : null,
         "placeholder" : null
@@ -3845,8 +3845,8 @@
               "options" : null,
               "optionsDataSource" : null
             } ],
-            "optionsDataSource" : null,
-            "controlType" : "OBJECT_BUILDER"
+            "controlType" : "OBJECT_BUILDER",
+            "optionsDataSource" : null
           }, {
             "advancedOption" : null,
             "description" : null,
@@ -3922,21 +3922,21 @@
                 "options" : null,
                 "optionsDataSource" : null
               } ],
-              "optionsDataSource" : null,
-              "controlType" : "OBJECT_BUILDER"
+              "controlType" : "OBJECT_BUILDER",
+              "optionsDataSource" : null
             } ],
-            "optionsDataSource" : null,
-            "controlType" : "OBJECT_BUILDER"
+            "controlType" : "OBJECT_BUILDER",
+            "optionsDataSource" : null
           } ],
-          "optionsDataSource" : null,
-          "controlType" : "OBJECT_BUILDER"
+          "controlType" : "OBJECT_BUILDER",
+          "optionsDataSource" : null
         } ],
         "maxItems" : null,
         "minItems" : null,
         "multipleValues" : null,
         "options" : null,
-        "optionsDataSource" : null,
-        "controlType" : "ARRAY_BUILDER"
+        "controlType" : "ARRAY_BUILDER",
+        "optionsDataSource" : null
       },
       "sampleOutput" : null
     },
@@ -3945,17 +3945,17 @@
     "type" : "POLLING",
     "webhookRawBody" : null,
     "workflowSyncExecution" : null,
+    "poll" : { },
+    "deduplicate" : null,
     "webhookDisable" : null,
     "webhookEnable" : null,
+    "dynamicWebhookRefresh" : null,
     "webhookRequest" : null,
     "listenerDisable" : null,
     "listenerEnable" : null,
-    "webhookValidate" : null,
-    "deduplicate" : null,
-    "poll" : { },
     "processErrorResponse" : null,
     "workflowNodeDescription" : null,
-    "dynamicWebhookRefresh" : null,
+    "webhookValidate" : null,
     "webhookValidateOnEnable" : null
   } ],
   "unifiedApi" : null

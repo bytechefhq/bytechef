@@ -16,7 +16,6 @@
   "resources" : null,
   "version" : 1,
   "title" : "Approval Link",
-  "connection" : null,
   "actions" : [ {
     "batch" : null,
     "deprecated" : null,
@@ -32,11 +31,12 @@
     },
     "properties" : [ ],
     "title" : "Create Approval Links",
-    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "perform" : { }
   } ],
-  "triggers" : null,
   "dataStream" : null,
-  "unifiedApi" : null
+  "triggers" : null,
+  "unifiedApi" : null,
+  "connection" : null
 }

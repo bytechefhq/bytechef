@@ -17,17 +17,12 @@
 package com.bytechef.component.webflow;
 
 import static com.bytechef.component.definition.ComponentDsl.string;
-import static com.bytechef.component.webflow.constant.WebflowConstants.COLLECTION_ID;
-import static com.bytechef.component.webflow.constant.WebflowConstants.ORDER_ID;
 import static com.bytechef.component.webflow.constant.WebflowConstants.SITE_ID;
 
 import com.bytechef.component.OpenApiComponentHandler;
-import com.bytechef.component.definition.ActionDefinition;
 import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.ComponentDsl.ModifiableComponentDefinition;
-import com.bytechef.component.definition.ComponentDsl.ModifiableProperty;
-import com.bytechef.component.definition.ComponentDsl.ModifiableStringProperty;
 import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.Property;
 import com.bytechef.component.webflow.util.WebflowUtils;
@@ -55,7 +50,7 @@ public class WebflowComponentHandler extends AbstractWebflowComponentHandler {
                 properties.addFirst(
                     string(SITE_ID)
                         .label("Site ID")
-                        .options((ActionOptionsFunction<String>) WebflowUtils::getSiteOptions)
+                        .options((ActionOptionsFunction<String>) WebflowUtils::getSiteIdOptions)
                         .required(true));
 
                 modifiableActionDefinition.properties(properties);
@@ -71,29 +66,5 @@ public class WebflowComponentHandler extends AbstractWebflowComponentHandler {
             .customAction(true)
             .icon("path:assets/webflow.svg")
             .categories(ComponentCategory.DEVELOPER_TOOLS);
-    }
-
-    @Override
-    public ModifiableProperty<?> modifyProperty(
-        ActionDefinition actionDefinition, ModifiableProperty<?> modifiableProperty) {
-
-        if (Objects.equals(modifiableProperty.getName(), SITE_ID)) {
-            ((ModifiableStringProperty) modifiableProperty)
-                .options((ActionOptionsFunction<String>) WebflowUtils::getSiteOptions);
-        } else if (Objects.equals(modifiableProperty.getName(), ORDER_ID)) {
-            ((ModifiableStringProperty) modifiableProperty)
-                .options((ActionOptionsFunction<String>) WebflowUtils::getOrderOptions)
-                .optionsLookupDependsOn(SITE_ID);
-        } else if (Objects.equals(modifiableProperty.getName(), COLLECTION_ID)) {
-            ((ModifiableStringProperty) modifiableProperty)
-                .options((ActionOptionsFunction<String>) WebflowUtils::getCollectionOptions)
-                .optionsLookupDependsOn(SITE_ID);
-        } else if (Objects.equals(modifiableProperty.getName(), "itemId")) {
-            ((ModifiableStringProperty) modifiableProperty)
-                .options((ActionOptionsFunction<String>) WebflowUtils::getCollectionItemOptions)
-                .optionsLookupDependsOn(COLLECTION_ID, SITE_ID);
-        }
-
-        return modifiableProperty;
     }
 }

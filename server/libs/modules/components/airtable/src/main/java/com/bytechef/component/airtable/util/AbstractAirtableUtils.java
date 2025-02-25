@@ -16,6 +16,7 @@
 
 package com.bytechef.component.airtable.util;
 
+import com.bytechef.component.definition.ComponentDsl;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Parameters;
@@ -23,7 +24,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Provides methods for retrieving dynamic options for various properties within the component.
+ * Provides methods for retrieving dynamic options and properties for various properties within the component.
  *
  * @generated
  */
@@ -48,6 +49,13 @@ public abstract class AbstractAirtableUtils {
         Parameters inputParameters,
         Parameters connectionParameters, Map<String, String> dependencyPaths, String searchText,
         Context context) {
+
+        return List.of();
+    }
+
+    public static List<ComponentDsl.ModifiableValueProperty<?, ?>> getFieldsProperties(
+        Parameters inputParameters, Parameters connectionParameters,
+        Map<String, String> dependencyPaths, Context context) {
 
         return List.of();
     }

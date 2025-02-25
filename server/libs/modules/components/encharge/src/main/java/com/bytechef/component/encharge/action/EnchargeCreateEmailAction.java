@@ -43,23 +43,30 @@ public class EnchargeCreateEmailAction {
                 "path", "/emails", "bodyContentType", BodyContentType.JSON, "mimeType", "application/json"
 
             ))
-        .properties(object("__item").properties(string("name").label("Name")
+        .properties(string("name").metadata(
+            Map.of(
+                "type", PropertyType.BODY))
+            .label("Name")
             .description("Name of the email template")
             .required(true),
-            string("subject").label("Subject")
+            string("subject").metadata(
+                Map.of(
+                    "type", PropertyType.BODY))
+                .label("Subject")
                 .description("Subject of the email")
                 .required(true),
-            string("fromEmail").label("From Email")
+            string("fromEmail").metadata(
+                Map.of(
+                    "type", PropertyType.BODY))
+                .label("From Email")
                 .description("From address to send the email from")
                 .required(true),
-            string("replyEmail").label("Reply Email")
+            string("replyEmail").metadata(
+                Map.of(
+                    "type", PropertyType.BODY))
+                .label("Reply Email")
                 .description("Address that recipients will reply to by default.")
                 .required(false))
-            .label("Email Template")
-            .required(true)
-            .metadata(
-                Map.of(
-                    "type", PropertyType.BODY)))
         .output(outputSchema(object()
             .properties(object("body")
                 .properties(object("email")

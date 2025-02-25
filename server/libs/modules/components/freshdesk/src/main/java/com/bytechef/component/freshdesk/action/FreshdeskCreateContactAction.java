@@ -43,28 +43,42 @@ public class FreshdeskCreateContactAction {
                 "path", "/contacts", "bodyContentType", BodyContentType.JSON, "mimeType", "application/json"
 
             ))
-        .properties(object("__item").properties(string("name").label("Name")
+        .properties(string("name").metadata(
+            Map.of(
+                "type", PropertyType.BODY))
+            .label("Name")
             .description("Full name of the contact")
             .required(true),
-            string("email").label("Email")
+            string("email").metadata(
+                Map.of(
+                    "type", PropertyType.BODY))
+                .label("Email")
                 .description("Primary email address of the contact.")
                 .required(true),
-            string("phone").label("Work Phone")
+            string("phone").metadata(
+                Map.of(
+                    "type", PropertyType.BODY))
+                .label("Work Phone")
                 .description("Telephone number of the contact")
                 .required(false),
-            string("mobile").label("Mobile")
+            string("mobile").metadata(
+                Map.of(
+                    "type", PropertyType.BODY))
+                .label("Mobile")
                 .description("Mobile number of the contact")
                 .required(false),
-            string("description").label("Description")
+            string("description").metadata(
+                Map.of(
+                    "type", PropertyType.BODY))
+                .label("Description")
                 .description("A small description of the contact")
                 .required(false),
-            string("job_title").label("Job Title")
+            string("job_title").metadata(
+                Map.of(
+                    "type", PropertyType.BODY))
+                .label("Job Title")
                 .description("Job title of the contact")
                 .required(false))
-            .label("Contact")
-            .metadata(
-                Map.of(
-                    "type", PropertyType.BODY)))
         .output(outputSchema(object()
             .properties(object("body")
                 .properties(string("description").required(false), string("email").required(false),

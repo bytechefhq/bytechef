@@ -44,7 +44,6 @@ import io.swagger.parser.OpenAPIParser;
 import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.Operation;
-import io.swagger.v3.oas.models.PathItem;
 import io.swagger.v3.oas.models.info.Info;
 import io.swagger.v3.oas.models.media.Content;
 import io.swagger.v3.oas.models.media.MediaType;
@@ -136,6 +135,7 @@ public class ComponentInitOpenApiGenerator {
     private final int version;
     private final Set<String> oAuth2Scopes = new HashSet<>();
     private final Map<String, String> dynamicOptionsMap = new HashMap<>();
+    private final List<String> dynamicProperties = new ArrayList<>();
 
     @SuppressFBWarnings("CT_CONSTRUCTOR_THROW")
     public ComponentInitOpenApiGenerator(
@@ -189,10 +189,100 @@ public class ComponentInitOpenApiGenerator {
             writeComponentHandlerDefinition(componentHandlerSourcePath, getPackageName(), version);
         }
 
-        if (!dynamicOptionsMap.isEmpty()) {
+        if (!dynamicOptionsMap.isEmpty() || !dynamicProperties.isEmpty()) {
             writeAbstractUtils(sourceMainJavaDirPath);
             writeUtils(sourceMainJavaDirPath);
         }
+    }
+
+    private OpenAPI parseOpenAPIFile(String openApiPath) {
+        SwaggerParseResult result = new OpenAPIParser().readLocation(openApiPath, null, null);
+
+        OpenAPI openAPI = result.getOpenAPI();
+
+        if (result.getMessages() != null) {
+            List<String> messages = result.getMessages();
+
+            messages.forEach(logger::error);
+        }
+
+        return openAPI;
+    }
+
+    private CodeBlock addDynamicProperty(
+        String propertyName, String propertyDescription, Boolean required, Map<String, Object> extensionMap,
+        boolean bodySchema) {
+
+        CodeBlock.Builder builder = CodeBlock.builder();
+
+        propertyName = StringUtils.isEmpty(propertyName) ? "__item" : propertyName;
+
+        Object dynamicProperties = extensionMap.get("x-dynamic-properties");
+
+        if (dynamicProperties.equals(true)) {
+            builder.add("dynamicProperties($S)", propertyName);
+
+            builder.add(
+                ".properties(($T.ActionPropertiesFunction)$T::get" + buildOptionsFunctionsName(propertyName) +
+                    "Properties)",
+                ClassName.get("com.bytechef.component.definition", "PropertiesDataSource"),
+                ClassName.get(
+                    "com.bytechef.component." + componentName + ".util",
+                    getComponentClassName(componentName) + "Utils"));
+
+            this.dynamicProperties.add(buildOptionsFunctionsName(propertyName));
+
+            if (extensionMap.get("x-dynamic-properties-dependency") instanceof List<?> dependencies) {
+                List<String> allDependencies = dependencies.stream()
+                    .map(object -> "\"" + object + "\"")
+                    .toList();
+
+                builder.add(".propertiesLookupDependsOn($L)", String.join(",", allDependencies));
+            }
+        }
+
+        if (propertyDescription != null) {
+            builder.add(".description($S)", propertyDescription);
+        }
+
+        if (required != null) {
+            builder.add(".required($L)", required);
+        }
+
+        if (bodySchema) {
+            builder.add(
+                """
+                    .metadata(
+                       $T.of(
+                         "type", PropertyType.BODY
+                       )
+                    )
+                    """,
+                Map.class);
+        }
+
+        return builder.build();
+    }
+
+    private void addOperationItem(List<OperationItem> operationItems, Operation operation, String method, String path) {
+        if (operation != null) {
+            operationItems.add(new OperationItem(operation, method, path));
+        }
+    }
+
+    private Map<String, List<OperationItem>> getOperationItemsMap(io.swagger.v3.oas.models.Paths paths) {
+        Map<String, List<OperationItem>> operationItemsMap = new LinkedHashMap<>();
+        List<OperationItem> operationItems = extractOperationItems(paths);
+
+        for (OperationItem operationItem : operationItems) {
+            String tag = determineTag(operationItem);
+
+            operationItemsMap
+                .computeIfAbsent(tag, k -> new ArrayList<>())
+                .add(operationItem);
+        }
+
+        return operationItemsMap;
     }
 
     private JavaFile.Builder addStaticImport(JavaFile.Builder builder) {
@@ -235,6 +325,13 @@ public class ComponentInitOpenApiGenerator {
             .addStaticImport(OPEN_API_COMPONENT_HANDLER_CLASS, "PropertyType");
     }
 
+    private static String buildOptionsFunctionsName(String propertyName) {
+        return Arrays.stream(StringUtils.split(propertyName, '_'))
+            .flatMap(item -> Arrays.stream(StringUtils.splitByCharacterTypeCamelCase(item)))
+            .map(StringUtils::capitalize)
+            .collect(Collectors.joining(""));
+    }
+
     private static String buildPropertyLabel(String propertyName) {
         return Arrays.stream(StringUtils.split(propertyName, '_'))
             .flatMap(item -> Arrays.stream(StringUtils.splitByCharacterTypeCamelCase(item)))
@@ -274,7 +371,7 @@ public class ComponentInitOpenApiGenerator {
             }
         }
 
-        if (required != null) {
+        if (required != null && !StringUtils.isEmpty(propertyName)) {
             builder.add(".required($L)", required);
         }
 
@@ -301,31 +398,6 @@ public class ComponentInitOpenApiGenerator {
                     }
 
                     getObjectPropertiesCodeBlock(null, entry.getValue(), false, openAPI);
-                }
-            }
-        }
-    }
-
-    private void collectOAuthScopes(List<SecurityRequirement> securityRequirements) {
-        Components components = openAPI.getComponents();
-
-        if (components != null) {
-            Map<String, SecurityScheme> securitySchemeMap = components.getSecuritySchemes();
-            List<String> oauth2SecuritySchemeNames = new ArrayList<>();
-
-            for (Map.Entry<String, SecurityScheme> entry : securitySchemeMap.entrySet()) {
-                SecurityScheme securityScheme = entry.getValue();
-
-                if (securityScheme.getType() == SecurityScheme.Type.OAUTH2) {
-                    oauth2SecuritySchemeNames.add(entry.getKey());
-                }
-            }
-
-            for (SecurityRequirement securityRequirement : securityRequirements) {
-                for (Map.Entry<String, List<String>> entry : securityRequirement.entrySet()) {
-                    if (oauth2SecuritySchemeNames.contains(entry.getKey())) {
-                        oAuth2Scopes.addAll(entry.getValue());
-                    }
                 }
             }
         }
@@ -395,6 +467,113 @@ public class ComponentInitOpenApiGenerator {
         return tempDirPath;
     }
 
+    private void collectOAuthScopes(List<SecurityRequirement> securityRequirements) {
+        Components components = openAPI.getComponents();
+
+        if (components != null) {
+            Map<String, SecurityScheme> securitySchemeMap = components.getSecuritySchemes();
+            List<String> oauth2SecuritySchemeNames = new ArrayList<>();
+
+            for (Map.Entry<String, SecurityScheme> entry : securitySchemeMap.entrySet()) {
+                SecurityScheme securityScheme = entry.getValue();
+
+                if (securityScheme.getType() == SecurityScheme.Type.OAUTH2) {
+                    oauth2SecuritySchemeNames.add(entry.getKey());
+                }
+            }
+
+            for (SecurityRequirement securityRequirement : securityRequirements) {
+                for (Map.Entry<String, List<String>> entry : securityRequirement.entrySet()) {
+                    if (oauth2SecuritySchemeNames.contains(entry.getKey())) {
+                        oAuth2Scopes.addAll(entry.getValue());
+                    }
+                }
+            }
+        }
+    }
+
+    private static <T> Object convert(Object fromValue, TypeReference<T> toValueType) {
+        try {
+            return OBJECT_MAPPER.convertValue(fromValue, toValueType);
+        } catch (IllegalArgumentException e1) {
+            if (logger.isTraceEnabled()) {
+                logger.trace(e1.getMessage(), e1);
+            }
+        }
+
+        return null;
+    }
+
+    private OpenApiComponentHandler createComponentHandler(Path classPath, String className) throws Exception {
+        File classFile = classPath.toFile();
+
+        URI classURI = classFile.toURI();
+
+        URL[] classUrls = new URL[] {
+            classURI.toURL()
+        };
+
+        URLClassLoader classLoader = URLClassLoader.newInstance(
+            classUrls, OpenApiComponentHandler.class.getClassLoader());
+
+        @SuppressWarnings("unchecked")
+        Class<OpenApiComponentHandler> clazz = (Class<OpenApiComponentHandler>) Class.forName(
+            className, true, classLoader);
+
+        Constructor<OpenApiComponentHandler> declaredConstructor = clazz.getDeclaredConstructor();
+
+        return declaredConstructor.newInstance();
+    }
+
+    private MethodSpec createOptionsMethod(String propertyName, ClassName returnType) {
+        return MethodSpec.methodBuilder("get" + propertyName + "Options")
+            .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
+            .addParameter(ParameterSpec.builder(Parameters.class, "inputParameters")
+                .build())
+            .addParameter(ParameterSpec.builder(Parameters.class, "connectionParameters")
+                .build())
+            .addParameter(ParameterSpec.builder(
+                ParameterizedTypeName.get(ClassName.get(Map.class), ClassName.get(String.class),
+                    ClassName.get(String.class)),
+                "dependencyPaths")
+                .build())
+            .addParameter(ParameterSpec.builder(String.class, "searchText")
+                .build())
+            .addParameter(ParameterSpec.builder(Context.class, "context")
+                .build())
+            .returns(ParameterizedTypeName.get(
+                ClassName.get("java.util", "List"),
+                ParameterizedTypeName.get(
+                    ClassName.get("com.bytechef.component.definition", "Option"),
+                    returnType)))
+            .addStatement("\n return List.of()")
+            .build();
+    }
+
+    private MethodSpec createPropertiesMethod(String propertyName) {
+        return MethodSpec.methodBuilder("get" + propertyName + "Properties")
+            .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
+            .addParameter(ParameterSpec.builder(Parameters.class, "inputParameters")
+                .build())
+            .addParameter(ParameterSpec.builder(Parameters.class, "connectionParameters")
+                .build())
+            .addParameter(ParameterSpec.builder(
+                ParameterizedTypeName.get(ClassName.get(Map.class), ClassName.get(String.class),
+                    ClassName.get(String.class)),
+                "dependencyPaths")
+                .build())
+            .addParameter(ParameterSpec.builder(Context.class, "context")
+                .build())
+            .returns(ParameterizedTypeName.get(
+                ClassName.get("java.util", "List"),
+                ParameterizedTypeName.get(
+                    ClassName.get(
+                        "com.bytechef.component.definition", "ComponentDsl", "ModifiableValueProperty"),
+                    WildcardTypeName.subtypeOf(Object.class), WildcardTypeName.subtypeOf(Object.class))))
+            .addStatement("\n return List.of()")
+            .build();
+    }
+
     private String deleteWhitespace(final String str) {
         if (StringUtils.isEmpty(str)) {
             return str;
@@ -419,6 +598,28 @@ public class ComponentInitOpenApiGenerator {
         }
 
         return new String(chs, 0, count);
+    }
+
+    private String determineTag(OperationItem operationItem) {
+        List<String> tags = operationItem.operation()
+            .getTags();
+
+        return (tags != null && !tags.isEmpty()) ? tags.getFirst() : "unnamed";
+    }
+
+    private List<OperationItem> extractOperationItems(io.swagger.v3.oas.models.Paths paths) {
+        List<OperationItem> operationItems = new ArrayList<>();
+
+        paths.forEach((path, pathItem) -> {
+            addOperationItem(operationItems, pathItem.getDelete(), "DELETE", path);
+            addOperationItem(operationItems, pathItem.getHead(), "HEAD", path);
+            addOperationItem(operationItems, pathItem.getGet(), "GET", path);
+            addOperationItem(operationItems, pathItem.getPatch(), "PATCH", path);
+            addOperationItem(operationItems, pathItem.getPost(), "POST", path);
+            addOperationItem(operationItems, pathItem.getPut(), "PUT", path);
+        });
+
+        return operationItems;
     }
 
     private Map<String, List<OperationItem>> filterOperationItemsMap(Map<String, List<OperationItem>> operationsMap) {
@@ -447,18 +648,6 @@ public class ComponentInitOpenApiGenerator {
         return filteredOperationsMap;
     }
 
-    private static <T> Object convert(Object fromValue, TypeReference<T> toValueType) {
-        try {
-            return OBJECT_MAPPER.convertValue(fromValue, toValueType);
-        } catch (IllegalArgumentException e1) {
-            if (logger.isTraceEnabled()) {
-                logger.trace(e1.getMessage(), e1);
-            }
-        }
-
-        return null;
-    }
-
     private String getAbsolutePathname(String subPath) {
         return outputPathname + File.separator + componentName + File.separator + subPath;
     }
@@ -472,25 +661,7 @@ public class ComponentInitOpenApiGenerator {
 
         CodeBlock.Builder builder = CodeBlock.builder();
 
-        CodeBlock.Builder metadataBuilder = CodeBlock.builder();
-
-        metadataBuilder.add(
-            """
-                "method", $S,
-                "path", $S
-                """,
-            method,
-            operationItem.path);
-
-        if (propertiesEntry.bodyContentType != null) {
-            metadataBuilder.add(
-                """
-                    ,"bodyContentType", BodyContentType.$L
-                    ,"mimeType", $S
-                    """,
-                propertiesEntry.bodyContentType,
-                propertiesEntry.mimeType);
-        }
+        CodeBlock.Builder metadataBuilder = getMetadataBuilder(operationItem, method, propertiesEntry);
 
         builder.add(
             """
@@ -647,6 +818,29 @@ public class ComponentInitOpenApiGenerator {
         }
 
         return getPropertiesSchemaCodeBlock(allOfProperties, allOfRequired, outputSchema, openAPI);
+    }
+
+    @SuppressWarnings({
+        "rawtypes", "unchecked"
+    })
+    private Map<String, Schema> getAllOfSchemaProperties(String name, String description, List<Schema> allOfSchemas) {
+        Map<String, Schema> allOfProperties = new HashMap<>();
+
+        for (Schema allOfSchema : allOfSchemas) {
+            if (allOfSchema.getProperties() != null || allOfSchema.getAllOf() != null) {
+                if (allOfSchema.getProperties() != null) {
+                    allOfProperties.putAll(allOfSchema.getProperties());
+                }
+
+                if (allOfSchema.getAllOf() != null) {
+                    allOfProperties.putAll(getAllOfSchemaProperties(name, description, allOfSchema.getAllOf()));
+                }
+            } else {
+                allOfProperties.put(name, allOfSchema.description(description));
+            }
+        }
+
+        return allOfProperties;
     }
 
     private CodeBlock getAuthorizationApiKeyCodeBlock(SecurityScheme securityScheme) {
@@ -959,29 +1153,6 @@ public class ComponentInitOpenApiGenerator {
             .collect(CodeBlock.joining(","));
     }
 
-    @SuppressWarnings({
-        "rawtypes", "unchecked"
-    })
-    private Map<String, Schema> getAllOfSchemaProperties(String name, String description, List<Schema> allOfSchemas) {
-        Map<String, Schema> allOfProperties = new HashMap<>();
-
-        for (Schema allOfSchema : allOfSchemas) {
-            if (allOfSchema.getProperties() != null || allOfSchema.getAllOf() != null) {
-                if (allOfSchema.getProperties() != null) {
-                    allOfProperties.putAll(allOfSchema.getProperties());
-                }
-
-                if (allOfSchema.getAllOf() != null) {
-                    allOfProperties.putAll(getAllOfSchemaProperties(name, description, allOfSchema.getAllOf()));
-                }
-            } else {
-                allOfProperties.put(name, allOfSchema.description(description));
-            }
-        }
-
-        return allOfProperties;
-    }
-
     private static CodeBlock getBaseUriCodeBlock(List<Server> servers) {
         CodeBlock.Builder builder = CodeBlock.builder();
 
@@ -1022,6 +1193,14 @@ public class ComponentInitOpenApiGenerator {
         return builder.build();
     }
 
+    private String getComponentClassName(String componentName) {
+        String[] items = componentName.split("-");
+
+        return Arrays.stream(items)
+            .map(StringUtils::capitalize)
+            .collect(Collectors.joining());
+    }
+
     private CodeBlock getComponentCodeBlock(Path componentHandlerDirPath) throws IOException {
         CodeBlock.Builder builder = CodeBlock.builder();
 
@@ -1053,14 +1232,6 @@ public class ComponentInitOpenApiGenerator {
         builder.add(".triggers(getTriggers())");
 
         return builder.build();
-    }
-
-    private String getComponentClassName(String componentName) {
-        String[] items = componentName.split("-");
-
-        return Arrays.stream(items)
-            .map(StringUtils::capitalize)
-            .collect(Collectors.joining());
     }
 
     private String getComponentHandlerClassName(String componentName) {
@@ -1125,34 +1296,29 @@ public class ComponentInitOpenApiGenerator {
         return codeBlocks;
     }
 
-    private CodeBlock getExtensionsCodeBlock(
-        String propertyName, String propertyDescription, Boolean required, Schema<?> schema, boolean outputSchema,
-        Map<String, Object> extensionMap) {
+    private static CodeBlock.Builder getMetadataBuilder(
+        OperationItem operationItem, String method, PropertiesEntry propertiesEntry) {
 
-        CodeBlock.Builder builder = CodeBlock.builder();
+        CodeBlock.Builder metadataBuilder = CodeBlock.builder();
 
-        propertyName = StringUtils.isEmpty(propertyName) ? "__item" : propertyName;
+        metadataBuilder.add(
+            """
+                "method", $S,
+                "path", $S
+                """,
+            method,
+            operationItem.path);
 
-        builder.add("$L($S)", extensionMap.get("x-property-type"), propertyName);
-
-        if (!StringUtils.isEmpty(propertyName) && !outputSchema &&
-            !Objects.equals(extensionMap.get("x-property-type"), "dynamicProperties")) {
-
-            builder.add(
-                ".label($S)",
-                StringUtils.isEmpty(schema.getTitle()) ? buildPropertyLabel(propertyName.replace("__", ""))
-                    : schema.getTitle());
+        if (propertiesEntry.bodyContentType != null) {
+            metadataBuilder.add(
+                """
+                    ,"bodyContentType", BodyContentType.$L
+                    ,"mimeType", $S
+                    """,
+                propertiesEntry.bodyContentType,
+                propertiesEntry.mimeType);
         }
-
-        if (propertyDescription != null) {
-            builder.add(".description($S)", propertyDescription);
-        }
-
-        if (required != null) {
-            builder.add(".required($L)", required);
-        }
-
-        return builder.build();
+        return metadataBuilder;
     }
 
     private String getMimeType(Set<Map.Entry<String, MediaType>> entries) {
@@ -1219,68 +1385,6 @@ public class ComponentInitOpenApiGenerator {
             .collect(CodeBlock.joining(","));
     }
 
-    private Map<String, List<OperationItem>> getOperationItemsMap(io.swagger.v3.oas.models.Paths paths) {
-        Map<String, List<OperationItem>> operationItemsMap = new LinkedHashMap<>();
-
-        List<OperationItem> operationItems = new ArrayList<>();
-
-        for (Map.Entry<String, PathItem> pathEntry : paths.entrySet()) {
-            String path = pathEntry.getKey();
-            PathItem pathItem = pathEntry.getValue();
-
-            if (pathItem.getDelete() != null) {
-                operationItems.add(new OperationItem(pathItem.getDelete(), "DELETE", path));
-            }
-
-            if (pathItem.getHead() != null) {
-                operationItems.add(new OperationItem(pathItem.getHead(), "HEAD", path));
-            }
-
-            if (pathItem.getGet() != null) {
-                operationItems.add(new OperationItem(pathItem.getGet(), "GET", path));
-            }
-
-            if (pathItem.getPatch() != null) {
-                operationItems.add(new OperationItem(pathItem.getPatch(), "PATCH", path));
-            }
-
-            if (pathItem.getPost() != null) {
-                operationItems.add(new OperationItem(pathItem.getPost(), "POST", path));
-            }
-
-            if (pathItem.getPut() != null) {
-                operationItems.add(new OperationItem(pathItem.getPut(), "PUT", path));
-            }
-        }
-
-        for (OperationItem operationItem : operationItems) {
-            List<String> tags = operationItem.operation()
-                .getTags();
-
-            String tag = "unnamed";
-
-            if (tags != null && !tags.isEmpty()) {
-                tag = tags.getFirst();
-            }
-
-            operationItemsMap.compute(tag, (key, tagOperationItems) -> {
-                if (tagOperationItems == null) {
-                    tagOperationItems = new ArrayList<>();
-                }
-
-                if (tagOperationItems.stream()
-                    .noneMatch(curOperationItem -> Objects.equals(operationItem.getOperationId(),
-                        curOperationItem.getOperationId()))) {
-                    tagOperationItems.add(operationItem);
-                }
-
-                return tagOperationItems;
-            });
-        }
-
-        return operationItemsMap;
-    }
-
     private OutputEntry getOutputEntry(Operation operation) {
         ApiResponse apiResponse = null;
         ApiResponses apiResponses = operation.getResponses();
@@ -1313,9 +1417,12 @@ public class ComponentInitOpenApiGenerator {
             } else if (apiResponse.getContent() == null && apiResponse.getExtensions() != null) {
                 Map<String, Object> extensions = apiResponse.getExtensions();
 
-                if (extensions != null && extensions.get("x-dynamic-output")
-                    .equals(true)) {
-                    outputEntry = new OutputEntry(null, null, true);
+                if (extensions != null) {
+                    Object dynamicOutput = extensions.get("x-dynamic-output");
+
+                    if (dynamicOutput.equals(true)) {
+                        outputEntry = new OutputEntry(null, null, true);
+                    }
                 }
             }
         }
@@ -1328,7 +1435,7 @@ public class ComponentInitOpenApiGenerator {
 
         Schema<?> schema = mediaType.getSchema();
 
-        builder.add(getSchemaCodeBlock(null, schema.getDescription(), null, null, schema, true, true, openAPI));
+        builder.add(getSchemaCodeBlock(null, schema.getDescription(), null, null, schema, true, true, openAPI, false));
 
         String responseType;
 
@@ -1373,7 +1480,7 @@ public class ComponentInitOpenApiGenerator {
                 builder.add(
                     getSchemaCodeBlock(
                         parameter.getName(), parameter.getDescription(), parameter.getRequired(), null,
-                        parameter.getSchema(), false, false, openAPI));
+                        parameter.getSchema(), false, false, openAPI, false));
                 builder.add(
                     CodeBlock.of(
                         """
@@ -1455,7 +1562,7 @@ public class ComponentInitOpenApiGenerator {
             if (schema.getAllOf() == null) {
                 codeBlock = getSchemaCodeBlock(
                     entry.getKey(), schema.getDescription(), required.contains(entry.getKey()), null, schema, false,
-                    outputSchema, openAPI);
+                    outputSchema, openAPI, false);
             } else {
                 codeBlock = getAllOfSchemaCodeBlock(
                     entry.getKey(), schema.getDescription(), schema.getAllOf(), outputSchema, openAPI);
@@ -1473,6 +1580,7 @@ public class ComponentInitOpenApiGenerator {
             .collect(CodeBlock.joining(","));
     }
 
+    @SuppressWarnings("rawtypes")
     private CodeBlock getRefCodeBlock(
         String propertyName, Boolean required, Schema<?> schema, boolean excludePropertyNameIfEmpty,
         boolean outputSchema, OpenAPI openAPI) {
@@ -1493,7 +1601,7 @@ public class ComponentInitOpenApiGenerator {
                 ? StringUtils.uncapitalize(curSchemaName)
                 : propertyName,
             schema.getDescription(), required, curSchemaName, schema, excludePropertyNameIfEmpty,
-            outputSchema, openAPI);
+            outputSchema, openAPI, false);
     }
 
     @SuppressWarnings({
@@ -1530,16 +1638,8 @@ public class ComponentInitOpenApiGenerator {
                 Schema schema = mediaType.getSchema();
 
                 builder.add(
-                    getSchemaCodeBlock(null, null, requestBody.getRequired(), null, schema, false, false, openAPI));
-                builder.add(
-                    """
-                        .metadata(
-                           $T.of(
-                             "type", PropertyType.BODY
-                           )
-                        )
-                        """,
-                    Map.class);
+                    getSchemaCodeBlock(
+                        null, null, requestBody.getRequired(), null, schema, false, false, openAPI, true));
             }
 
             requestBodyPropertiesEntry = new PropertiesEntry(builder.build(), bodyContentType, mimeType);
@@ -1548,148 +1648,163 @@ public class ComponentInitOpenApiGenerator {
         return requestBodyPropertiesEntry;
     }
 
+    private ClassName getReturnTypeForOption(String type) {
+        return switch (type) {
+            case "integer" -> ClassName.get(Long.class);
+            case "string" -> ClassName.get(String.class);
+            default ->
+                throw new IllegalArgumentException("Type %s is not supported for dynamic options.".formatted(type));
+        };
+    }
+
     private static CodeBlock getSampleOutputCodeBlock(Object sampleOutput) {
         CodeBlock.Builder builder = CodeBlock.builder();
 
-        if (sampleOutput == null) {
-            return builder.build();
-        } else if (sampleOutput instanceof String string) {
-            Object convertedSampleOutput = null;
-            JsonNode jsonNode = null;
-
-            try {
-                jsonNode = OBJECT_MAPPER.readTree(string);
-            } catch (JsonProcessingException e) {
-                if (logger.isTraceEnabled()) {
-                    logger.trace(e.getMessage(), e);
-                }
+        switch (sampleOutput) {
+            case null -> {
+                return builder.build();
             }
+            case String string -> {
+                Object convertedSampleOutput = null;
+                JsonNode jsonNode = null;
 
-            if (jsonNode != null) {
-                convertedSampleOutput = convert(jsonNode, new TypeReference<Map<String, Object>>() {});
+                try {
+                    jsonNode = OBJECT_MAPPER.readTree(string);
+                } catch (JsonProcessingException e) {
+                    if (logger.isTraceEnabled()) {
+                        logger.trace(e.getMessage(), e);
+                    }
+                }
+
+                if (jsonNode != null) {
+                    convertedSampleOutput = convert(jsonNode, new TypeReference<Map<String, Object>>() {});
+
+                    if (convertedSampleOutput == null) {
+                        convertedSampleOutput = convert(jsonNode, new TypeReference<List<Map<String, Object>>>() {});
+                    }
+                }
 
                 if (convertedSampleOutput == null) {
-                    convertedSampleOutput = convert(jsonNode, new TypeReference<List<Map<String, Object>>>() {});
+                    convertedSampleOutput = convert(sampleOutput, new TypeReference<Boolean>() {});
+                }
+
+                if (convertedSampleOutput == null) {
+                    convertedSampleOutput = convert(sampleOutput, new TypeReference<Double>() {});
+                }
+
+                if (convertedSampleOutput == null) {
+                    convertedSampleOutput = convert(sampleOutput, new TypeReference<Float>() {});
+                }
+
+                if (convertedSampleOutput == null) {
+                    convertedSampleOutput = convert(sampleOutput, new TypeReference<Long>() {});
+                }
+
+                if (convertedSampleOutput == null) {
+                    convertedSampleOutput = convert(sampleOutput, new TypeReference<Integer>() {});
+                }
+
+                if (convertedSampleOutput == null) {
+                    convertedSampleOutput = convert(sampleOutput, new TypeReference<Short>() {});
+                }
+
+                if (convertedSampleOutput == null) {
+                    convertedSampleOutput = convert(sampleOutput, new TypeReference<LocalDateTime>() {});
+                }
+
+                if (convertedSampleOutput == null) {
+                    convertedSampleOutput = convert(sampleOutput, new TypeReference<LocalDate>() {});
+                }
+
+                if (convertedSampleOutput == null) {
+                    convertedSampleOutput = convert(sampleOutput, new TypeReference<Map<String, Object>>() {});
+                }
+
+                if (convertedSampleOutput == null) {
+                    convertedSampleOutput = convert(sampleOutput, new TypeReference<List<?>>() {});
+                }
+
+                if (convertedSampleOutput != null) {
+                    sampleOutput = convertedSampleOutput;
                 }
             }
+            case ObjectNode objectNode -> {
+                sampleOutput = convert(objectNode, new TypeReference<Map<String, Object>>() {});
 
-            if (convertedSampleOutput == null) {
-                convertedSampleOutput = convert(sampleOutput, new TypeReference<Boolean>() {});
+                if (sampleOutput == null) {
+                    sampleOutput = convert(objectNode, new TypeReference<List<Map<String, Object>>>() {});
+                }
             }
-
-            if (convertedSampleOutput == null) {
-                convertedSampleOutput = convert(sampleOutput, new TypeReference<Double>() {});
-            }
-
-            if (convertedSampleOutput == null) {
-                convertedSampleOutput = convert(sampleOutput, new TypeReference<Float>() {});
-            }
-
-            if (convertedSampleOutput == null) {
-                convertedSampleOutput = convert(sampleOutput, new TypeReference<Long>() {});
-            }
-
-            if (convertedSampleOutput == null) {
-                convertedSampleOutput = convert(sampleOutput, new TypeReference<Integer>() {});
-            }
-
-            if (convertedSampleOutput == null) {
-                convertedSampleOutput = convert(sampleOutput, new TypeReference<Short>() {});
-            }
-
-            if (convertedSampleOutput == null) {
-                convertedSampleOutput = convert(sampleOutput, new TypeReference<LocalDateTime>() {});
-            }
-
-            if (convertedSampleOutput == null) {
-                convertedSampleOutput = convert(sampleOutput, new TypeReference<LocalDate>() {});
-            }
-
-            if (convertedSampleOutput == null) {
-                convertedSampleOutput = convert(sampleOutput, new TypeReference<Map<String, Object>>() {});
-            }
-
-            if (convertedSampleOutput == null) {
-                convertedSampleOutput = convert(sampleOutput, new TypeReference<List<?>>() {});
-            }
-
-            if (convertedSampleOutput != null) {
-                sampleOutput = convertedSampleOutput;
-            }
-        } else if (sampleOutput instanceof ObjectNode objectNode) {
-            sampleOutput = convert(objectNode, new TypeReference<Map<String, Object>>() {});
-
-            if (sampleOutput == null) {
-                sampleOutput = convert(objectNode, new TypeReference<List<Map<String, Object>>>() {});
+            default -> {
             }
         }
 
-        if (sampleOutput instanceof LocalDateTime localDateTime) {
-            builder.add(
+        switch (sampleOutput) {
+            case LocalDateTime localDateTime -> builder.add(
                 "$T.of($L,$L,$L,$L,$L,$L)", ClassName.get(LocalDateTime.class),
                 localDateTime.getYear(), localDateTime.getMonthValue(), localDateTime.getDayOfMonth(),
                 localDateTime.getHour(), localDateTime.getMinute(), localDateTime.getSecond());
-        } else if (sampleOutput instanceof LocalDate localDate) {
-            builder.add(
+            case LocalDate localDate -> builder.add(
                 "$T.of($L,$L,$L)", ClassName.get(LocalDate.class), localDate.getYear(), localDate.getMonthValue(),
                 localDate.getDayOfMonth());
-        } else if (sampleOutput instanceof Collection<?> collection) {
-            List<?> list = new ArrayList<>(collection);
+            case Collection<?> collection -> {
+                List<?> list = new ArrayList<>(collection);
 
-            builder.add("$T.of(", ClassName.get(List.class));
+                builder.add("$T.of(", ClassName.get(List.class));
 
-            for (int i = 0; i < list.size(); i++) {
-                builder.add("$L", getSampleOutputCodeBlock(list.get(i)));
+                for (int i = 0; i < list.size(); i++) {
+                    builder.add("$L", getSampleOutputCodeBlock(list.get(i)));
 
-                if (i < list.size() - 1) {
-                    builder.add(",");
+                    if (i < list.size() - 1) {
+                        builder.add(",");
+                    }
                 }
+
+                builder.add(")");
             }
+            case Map<?, ?> map -> {
+                builder.add("$T.<String, Object>ofEntries(", ClassName.get(Map.class));
 
-            builder.add(")");
-        } else if (sampleOutput instanceof Map<?, ?> map) {
-            builder.add("$T.<String, Object>ofEntries(", ClassName.get(Map.class));
+                List<Map.Entry<String, CodeBlock>> entries = map.entrySet()
+                    .stream()
+                    .map(entry -> Map.entry((String) entry.getKey(), getSampleOutputCodeBlock(entry.getValue())))
+                    .toList();
 
-            List<Map.Entry<String, CodeBlock>> entries = map.entrySet()
-                .stream()
-                .map(entry -> Map.entry((String) entry.getKey(), getSampleOutputCodeBlock(entry.getValue())))
-                .toList();
+                for (int i = 0; i < entries.size(); i++) {
+                    Map.Entry<String, CodeBlock> entry = entries.get(i);
 
-            for (int i = 0; i < entries.size(); i++) {
-                Map.Entry<String, CodeBlock> entry = entries.get(i);
+                    CodeBlock valueCodeBlock = entry.getValue();
 
-                CodeBlock valueCodeBlock = entry.getValue();
+                    if (valueCodeBlock.isEmpty()) {
+                        builder.add("Map.entry($S,$S)", entry.getKey(), "");
+                    } else {
+                        builder.add("Map.entry($S,$L)", entry.getKey(), entry.getValue());
+                    }
 
-                if (valueCodeBlock.isEmpty()) {
-                    builder.add("Map.entry($S,$S)", entry.getKey(), "");
-                } else {
-                    builder.add("Map.entry($S,$L)", entry.getKey(), entry.getValue());
+                    if (i < entries.size() - 1) {
+                        builder.add(",");
+                    }
                 }
 
-                if (i < entries.size() - 1) {
-                    builder.add(",");
-                }
+                builder.add(")");
             }
-
-            builder.add(")");
-        } else if (sampleOutput instanceof String string) {
-            builder.add("$S", string);
-        } else {
-            builder.add("$L", sampleOutput);
+            case String string -> builder.add("$S", string);
+            case null, default -> builder.add("$L", sampleOutput);
         }
 
         return builder.build();
     }
 
+    @SuppressWarnings("rawtypes")
     private CodeBlock getSchemaCodeBlock(
         String propertyName, String propertyDescription, Boolean required, String schemaName, Schema<?> schema,
-        boolean excludePropertyNameIfEmpty, boolean outputSchema, OpenAPI openAPI) {
+        boolean excludePropertyNameIfEmpty, boolean outputSchema, OpenAPI openAPI, boolean bodySchema) {
 
         CodeBlock.Builder builder = CodeBlock.builder();
 
         Map<String, Object> extensionMap = schema.getExtensions();
 
-        if (extensionMap == null || !extensionMap.containsKey("x-property-type")) {
+        if (extensionMap == null || extensionMap.containsKey("x-dynamic-options")) {
             if (StringUtils.isEmpty(schema.get$ref())) {
                 String type = StringUtils.isEmpty(schema.getType()) ? "object" : schema.getType();
 
@@ -1700,7 +1815,7 @@ public class ComponentInitOpenApiGenerator {
                                 "array().items($L)",
                                 getSchemaCodeBlock(
                                     null, schema.getDescription(), null, null, schema.getItems(), true, outputSchema,
-                                    openAPI));
+                                    openAPI, bodySchema));
                         } else {
                             propertyName = StringUtils.isEmpty(propertyName) ? "__items" : propertyName;
 
@@ -1709,15 +1824,41 @@ public class ComponentInitOpenApiGenerator {
                                 propertyName,
                                 getSchemaCodeBlock(
                                     null, schema.getDescription(), null, null, schema.getItems(), true, outputSchema,
-                                    openAPI));
+                                    openAPI, bodySchema));
                         }
 
                         if (!outputSchema) {
                             builder.add(
                                 ".placeholder($S)", "Add to " + buildPropertyLabel(propertyName.replace("__", "")));
                         }
+
+                        if (bodySchema) {
+                            builder.add(
+                                """
+                                    .metadata(
+                                       $T.of(
+                                         "type", PropertyType.BODY
+                                       )
+                                    )
+                                    """,
+                                Map.class);
+                        }
                     }
-                    case "boolean" -> builder.add("bool($S)", propertyName);
+                    case "boolean" -> {
+                        builder.add("bool($S)", propertyName);
+
+                        if (bodySchema) {
+                            builder.add(
+                                """
+                                    .metadata(
+                                       $T.of(
+                                         "type", PropertyType.BODY
+                                       )
+                                    )
+                                    """,
+                                Map.class);
+                        }
+                    }
                     case "integer" -> {
                         builder.add("integer($S)", propertyName);
 
@@ -1731,6 +1872,18 @@ public class ComponentInitOpenApiGenerator {
                             BigDecimal maximum = schema.getMaximum();
 
                             builder.add(".maxValue($L)", maximum.intValue());
+                        }
+
+                        if (bodySchema) {
+                            builder.add(
+                                """
+                                    .metadata(
+                                       $T.of(
+                                         "type", PropertyType.BODY
+                                       )
+                                    )
+                                    """,
+                                Map.class);
                         }
                     }
                     case "number" -> {
@@ -1747,23 +1900,79 @@ public class ComponentInitOpenApiGenerator {
 
                             builder.add(".maxValue($L)", maximum.doubleValue());
                         }
+
+                        if (bodySchema) {
+                            builder.add(
+                                """
+                                    .metadata(
+                                       $T.of(
+                                         "type", PropertyType.BODY
+                                       )
+                                    )
+                                    """,
+                                Map.class);
+                        }
                     }
                     case "object" -> {
                         if (StringUtils.isEmpty(propertyName) && excludePropertyNameIfEmpty) {
                             builder.add("object()");
+
+                            if (schema.getProperties() != null || schema.getAllOf() != null) {
+                                builder.add(
+                                    getPropertiesCodeBlock(propertyName, schemaName, schema, outputSchema, openAPI));
+                            }
+
+                            if (schema.getAdditionalProperties() != null) {
+                                builder.add(getAdditionalPropertiesCodeBlock(propertyName, schema, outputSchema));
+                            }
                         } else {
-                            propertyName = StringUtils.isEmpty(propertyName) ? "__item" : propertyName;
+                            if (StringUtils.isEmpty(propertyName)) {
 
-                            builder.add("object($S)", propertyName);
+                                if (schema.getProperties() != null || schema.getAllOf() != null) {
+                                    List<CodeBlock> codeBlocks = new ArrayList<>();
+
+                                    for (Map.Entry<String, Schema> entry : schema.getProperties()
+                                        .entrySet()) {
+                                        String propertyName1 = entry.getKey();
+                                        Boolean required1 = schema.getRequired() != null && schema.getRequired()
+                                            .contains(propertyName1);
+                                        Schema<?> propertySchema = entry.getValue();
+
+                                        codeBlocks.add(getSchemaCodeBlock(
+                                            propertyName1, propertySchema.getDescription(), required1,
+                                            schemaName, propertySchema, false, outputSchema, openAPI, bodySchema));
+                                    }
+
+                                    CodeBlock collect = codeBlocks.stream()
+                                        .collect(CodeBlock.joining(","));
+                                    builder.add(collect);
+                                }
+
+                            } else {
+                                builder.add("object($S)", propertyName);
+
+                                if (schema.getProperties() != null || schema.getAllOf() != null) {
+                                    builder.add(
+                                        getPropertiesCodeBlock(propertyName, schemaName, schema, outputSchema,
+                                            openAPI));
+                                }
+
+                                if (schema.getAdditionalProperties() != null) {
+                                    builder.add(getAdditionalPropertiesCodeBlock(propertyName, schema, outputSchema));
+                                }
+                            }
                         }
 
-                        if (schema.getProperties() != null || schema.getAllOf() != null) {
+                        if (bodySchema && !StringUtils.isEmpty(propertyName)) {
                             builder.add(
-                                getPropertiesCodeBlock(propertyName, schemaName, schema, outputSchema, openAPI));
-                        }
-
-                        if (schema.getAdditionalProperties() != null) {
-                            builder.add(getAdditionalPropertiesCodeBlock(propertyName, schema, outputSchema));
+                                """
+                                    .metadata(
+                                       $T.of(
+                                         "type", PropertyType.BODY
+                                       )
+                                    )
+                                    """,
+                                Map.class);
                         }
                     }
                     case "string" -> {
@@ -1793,6 +2002,18 @@ public class ComponentInitOpenApiGenerator {
 
                             builder.add(".maxLength($L)", maxLength);
                         }
+
+                        if (bodySchema) {
+                            builder.add(
+                                """
+                                    .metadata(
+                                       $T.of(
+                                         "type", PropertyType.BODY
+                                       )
+                                    )
+                                    """,
+                                Map.class);
+                        }
                     }
                     default -> throw new IllegalArgumentException(
                         "Parameter type %s is not supported.".formatted(schema.getType()));
@@ -1807,10 +2028,8 @@ public class ComponentInitOpenApiGenerator {
 
             handleDynamicOptions(propertyName, schema, extensionMap, builder);
 
-        } else {
-            builder.add(
-                getExtensionsCodeBlock(
-                    propertyName, propertyDescription, required, schema, outputSchema, extensionMap));
+        } else if (extensionMap.containsKey("x-dynamic-properties")) {
+            builder.add(addDynamicProperty(propertyName, propertyDescription, required, extensionMap, bodySchema));
         }
 
         return builder.build();
@@ -1827,6 +2046,20 @@ public class ComponentInitOpenApiGenerator {
                 optionType = "Long";
             } else if (Objects.equals(type, "string")) {
                 optionType = "String";
+            } else if (Objects.equals(type, "array")) {
+                String itemsType = schema.getItems()
+                    .getType();
+
+                if (Objects.equals(itemsType, "integer")) {
+                    optionType = "Long";
+                } else if (Objects.equals(itemsType, "string")) {
+                    optionType = "String";
+                } else {
+                    throw new IllegalArgumentException("Parameter type %s is not supported yet.".formatted(itemsType));
+                }
+
+                type = itemsType;
+
             } else {
                 throw new IllegalArgumentException("Parameter type %s is not supported yet.".formatted(type));
             }
@@ -1848,48 +2081,6 @@ public class ComponentInitOpenApiGenerator {
                 builder.add(".optionsLookupDependsOn($L)", String.join(",", allDependencies));
             }
         }
-    }
-
-    private static String buildOptionsFunctionsName(String propertyName) {
-        return Arrays.stream(StringUtils.split(propertyName, '_'))
-            .flatMap(item -> Arrays.stream(StringUtils.splitByCharacterTypeCamelCase(item)))
-            .map(StringUtils::capitalize)
-            .collect(Collectors.joining(""));
-    }
-
-    private OpenAPI parseOpenAPIFile(String openApiPath) {
-        SwaggerParseResult result = new OpenAPIParser().readLocation(openApiPath, null, null);
-
-        OpenAPI openAPI = result.getOpenAPI();
-
-        if (result.getMessages() != null) {
-            List<String> messages = result.getMessages();
-
-            messages.forEach(logger::error);
-        }
-
-        return openAPI;
-    }
-
-    private OpenApiComponentHandler createComponentHandler(Path classPath, String className) throws Exception {
-        File classFile = classPath.toFile();
-
-        URI classURI = classFile.toURI();
-
-        URL[] classUrls = new URL[] {
-            classURI.toURL()
-        };
-
-        URLClassLoader classLoader = URLClassLoader.newInstance(
-            classUrls, OpenApiComponentHandler.class.getClassLoader());
-
-        @SuppressWarnings("unchecked")
-        Class<OpenApiComponentHandler> clazz = (Class<OpenApiComponentHandler>) Class.forName(
-            className, true, classLoader);
-
-        Constructor<OpenApiComponentHandler> declaredConstructor = clazz.getDeclaredConstructor();
-
-        return declaredConstructor.newInstance();
     }
 
     private Path writeAbstractComponentHandlerSource(Path sourceDirPath) throws IOException {
@@ -1919,6 +2110,32 @@ public class ComponentInitOpenApiGenerator {
                         .build();
 
         return javaFile.writeToPath(sourceDirPath);
+    }
+
+    private void writeAbstractUtils(Path sourceDirPath) throws IOException {
+        TypeSpec.Builder builder = TypeSpec.classBuilder("Abstract" + getComponentClassName(componentName) + "Utils")
+            .addJavadoc(
+                """
+                    Provides methods for retrieving dynamic options and properties for various properties within the component.
+
+                    @generated
+                    """)
+            .addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT);
+
+        dynamicOptionsMap.forEach((propertyName, type) -> {
+            ClassName returnType = getReturnTypeForOption(type);
+            builder.addMethod(createOptionsMethod(propertyName, returnType));
+        });
+
+        dynamicProperties.forEach(s -> builder.addMethod(createPropertiesMethod(s)));
+
+        JavaFile javaFile = addStaticImport(
+            JavaFile.builder(
+                getPackageName() + ".util",
+                builder.build()))
+                    .build();
+
+        javaFile.writeToPath(sourceDirPath);
     }
 
     private void writeAbstractComponentHandlerTest(Path testDirPath) throws IOException {
@@ -2010,6 +2227,27 @@ public class ComponentInitOpenApiGenerator {
         javaFile.writeTo(componentHandlerDirPath);
     }
 
+    private void writeComponentHandlerDefinition(
+        Path componentHandlerSourcePath, String packageName, int version) throws Exception {
+
+        String resourcesPathname = getAbsolutePathname("src" + File.separator + "test" + File.separator + "resources");
+
+        Path definitionDirPath = Files.createDirectories(Paths.get(resourcesPathname + File.separator + "definition"));
+
+        Path defintionFilePath = definitionDirPath.resolve(componentName + "_v" + version + ".json");
+
+        File definitionFile = defintionFilePath.toFile();
+
+        if (!definitionFile.exists()) {
+            Path classPath = compileComponentHandlerSource(componentHandlerSourcePath);
+
+            OpenApiComponentHandler openApiComponentHandler = createComponentHandler(
+                classPath, packageName + "." + getComponentHandlerClassName(componentName));
+
+            OBJECT_MAPPER.writeValue(definitionFile, openApiComponentHandler.getDefinition());
+        }
+    }
+
     private void writeComponentHandlerSource(Path sourceDirPath) throws IOException {
         String packageName = getPackageName();
 
@@ -2061,27 +2299,6 @@ public class ComponentInitOpenApiGenerator {
                 .build();
 
             javaFile.writeToPath(testDirPath);
-        }
-    }
-
-    private void writeComponentHandlerDefinition(
-        Path componentHandlerSourcePath, String packageName, int version) throws Exception {
-
-        String resourcesPathname = getAbsolutePathname("src" + File.separator + "test" + File.separator + "resources");
-
-        Path definitionDirPath = Files.createDirectories(Paths.get(resourcesPathname + File.separator + "definition"));
-
-        Path defintionFilePath = definitionDirPath.resolve(componentName + "_v" + version + ".json");
-
-        File definitionFile = defintionFilePath.toFile();
-
-        if (!definitionFile.exists()) {
-            Path classPath = compileComponentHandlerSource(componentHandlerSourcePath);
-
-            OpenApiComponentHandler openApiComponentHandler = createComponentHandler(
-                classPath, packageName + "." + getComponentHandlerClassName(componentName));
-
-            OBJECT_MAPPER.writeValue(definitionFile, openApiComponentHandler.getDefinition());
         }
     }
 
@@ -2145,63 +2362,6 @@ public class ComponentInitOpenApiGenerator {
                 }
             }
         }
-    }
-
-    private void writeAbstractUtils(Path sourceDirPath) throws IOException {
-        TypeSpec.Builder builder = TypeSpec.classBuilder("Abstract" + getComponentClassName(componentName) + "Utils")
-            .addJavadoc("""
-                Provides methods for retrieving dynamic options for various properties within the component.
-
-                @generated
-                """)
-            .addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT);
-
-        dynamicOptionsMap.forEach((propertyName, type) -> {
-            ClassName returnType = getReturnTypeForOption(type);
-            builder.addMethod(createOptionsMethod(propertyName, returnType));
-        });
-
-        JavaFile javaFile = addStaticImport(
-            JavaFile.builder(
-                getPackageName() + ".util",
-                builder.build()))
-                    .build();
-
-        javaFile.writeToPath(sourceDirPath);
-    }
-
-    private MethodSpec createOptionsMethod(String propertyName, ClassName returnType) {
-        return MethodSpec.methodBuilder("get" + propertyName + "Options")
-            .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
-            .addParameter(ParameterSpec.builder(Parameters.class, "inputParameters")
-                .build())
-            .addParameter(ParameterSpec.builder(Parameters.class, "connectionParameters")
-                .build())
-            .addParameter(ParameterSpec.builder(
-                ParameterizedTypeName.get(ClassName.get(Map.class), ClassName.get(String.class),
-                    ClassName.get(String.class)),
-                "dependencyPaths")
-                .build())
-            .addParameter(ParameterSpec.builder(String.class, "searchText")
-                .build())
-            .addParameter(ParameterSpec.builder(Context.class, "context")
-                .build())
-            .returns(ParameterizedTypeName.get(
-                ClassName.get("java.util", "List"),
-                ParameterizedTypeName.get(
-                    ClassName.get("com.bytechef.component.definition", "Option"),
-                    returnType)))
-            .addStatement("\n return List.of()")
-            .build();
-    }
-
-    private ClassName getReturnTypeForOption(String type) {
-        return switch (type) {
-            case "integer" -> ClassName.get(Long.class);
-            case "string" -> ClassName.get(String.class);
-            default ->
-                throw new IllegalArgumentException("Type %s is not supported for dynamic options.".formatted(type));
-        };
     }
 
     private void writeUtils(Path sourceDirPath) throws IOException {

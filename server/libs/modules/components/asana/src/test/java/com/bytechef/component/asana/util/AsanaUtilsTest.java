@@ -82,17 +82,17 @@ class AsanaUtilsTest {
     }
 
     @Test
-    void testGetProjectIdOptions() {
+    void testGetProjectOptions() {
         assertEquals(
             expectedOptions,
-            AsanaUtils.getProjectIdOptions(mockedParameters, mockedParameters, Map.of(), "", mockedContext));
+            AsanaUtils.getProjectOptions(mockedParameters, mockedParameters, Map.of(), "", mockedContext));
     }
 
     @Test
-    void testGetTagOptions() {
+    void testGetTagsOptions() {
         assertEquals(
             expectedOptions,
-            AsanaUtils.getTagOptions(mockedParameters, mockedParameters, Map.of(), "", mockedContext));
+            AsanaUtils.getTagsOptions(mockedParameters, mockedParameters, Map.of(), "", mockedContext));
     }
 
     @Test
@@ -103,9 +103,9 @@ class AsanaUtilsTest {
     }
 
     @Test
-    void testGetWorkspaceIdOptions() {
+    void testGetWorkspaceOptions() {
         assertEquals(
             expectedOptions,
-            AsanaUtils.getWorkspaceIdOptions(mockedParameters, mockedParameters, Map.of(), "", mockedContext));
+            AsanaUtils.getWorkspaceOptions(mockedParameters, mockedParameters, Map.of(), "", mockedContext));
     }
 }

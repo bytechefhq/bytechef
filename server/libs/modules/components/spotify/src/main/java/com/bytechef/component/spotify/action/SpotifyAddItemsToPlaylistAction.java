@@ -27,6 +27,8 @@ import static com.bytechef.component.definition.Context.Http.BodyContentType;
 import static com.bytechef.component.definition.Context.Http.ResponseType;
 
 import com.bytechef.component.definition.ComponentDsl;
+import com.bytechef.component.definition.OptionsDataSource;
+import com.bytechef.component.spotify.util.SpotifyUtils;
 import java.util.Map;
 
 /**
@@ -47,6 +49,7 @@ public class SpotifyAddItemsToPlaylistAction {
             ))
         .properties(string("playlist_id").label("Playlist ID")
             .required(true)
+            .options((OptionsDataSource.ActionOptionsFunction<String>) SpotifyUtils::getPlaylistIdOptions)
             .metadata(
                 Map.of(
                     "type", PropertyType.PATH)),
@@ -57,13 +60,12 @@ public class SpotifyAddItemsToPlaylistAction {
                 .metadata(
                     Map.of(
                         "type", PropertyType.QUERY)),
-            object("__item").properties(integer("position").label("Position")
+            integer("position").metadata(
+                Map.of(
+                    "type", PropertyType.BODY))
+                .label("Position")
                 .description("Position to insert the items, a zero-based index.")
                 .required(false))
-                .label("Item")
-                .metadata(
-                    Map.of(
-                        "type", PropertyType.BODY)))
         .output(outputSchema(object().properties(object("body").properties(string("snapshot_id").required(false))
             .required(false))
             .metadata(

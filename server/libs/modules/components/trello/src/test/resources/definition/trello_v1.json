@@ -13,75 +13,6 @@
   "resources" : null,
   "version" : 1,
   "title" : "Trello",
-  "connection" : {
-    "authorizations" : [ {
-      "detectOn" : null,
-      "description" : null,
-      "name" : "custom",
-      "properties" : [ {
-        "advancedOption" : null,
-        "description" : null,
-        "displayCondition" : null,
-        "expressionEnabled" : null,
-        "hidden" : null,
-        "metadata" : { },
-        "required" : true,
-        "name" : "key",
-        "type" : "STRING",
-        "defaultValue" : null,
-        "exampleValue" : null,
-        "label" : "Key",
-        "placeholder" : null,
-        "controlType" : "TEXT",
-        "languageId" : null,
-        "maxLength" : null,
-        "minLength" : null,
-        "options" : null,
-        "optionsDataSource" : null
-      }, {
-        "advancedOption" : null,
-        "description" : null,
-        "displayCondition" : null,
-        "expressionEnabled" : null,
-        "hidden" : null,
-        "metadata" : { },
-        "required" : true,
-        "name" : "token",
-        "type" : "STRING",
-        "defaultValue" : null,
-        "exampleValue" : null,
-        "label" : "Token",
-        "placeholder" : null,
-        "controlType" : "TEXT",
-        "languageId" : null,
-        "maxLength" : null,
-        "minLength" : null,
-        "options" : null,
-        "optionsDataSource" : null
-      } ],
-      "refreshOn" : null,
-      "title" : null,
-      "type" : "CUSTOM",
-      "acquire" : null,
-      "authorizationUrl" : null,
-      "clientSecret" : null,
-      "refreshToken" : null,
-      "apply" : { },
-      "clientId" : null,
-      "pkce" : null,
-      "refresh" : null,
-      "refreshUrl" : null,
-      "scopes" : null,
-      "tokenUrl" : null,
-      "authorizationCallback" : null,
-      "oauth2AuthorizationExtraQueryParameters" : null
-    } ],
-    "properties" : null,
-    "version" : 1,
-    "authorizationRequired" : null,
-    "baseUri" : { },
-    "test" : null
-  },
   "actions" : [ {
     "batch" : null,
     "deprecated" : null,
@@ -263,8 +194,8 @@
             "options" : null,
             "optionsDataSource" : null
           } ],
-          "optionsDataSource" : null,
-          "controlType" : "OBJECT_BUILDER"
+          "controlType" : "OBJECT_BUILDER",
+          "optionsDataSource" : null
         },
         "sampleOutput" : null,
         "placeholder" : null
@@ -387,8 +318,8 @@
           "options" : null,
           "optionsDataSource" : null
         } ],
-        "optionsDataSource" : null,
-        "controlType" : "OBJECT_BUILDER"
+        "controlType" : "OBJECT_BUILDER",
+        "optionsDataSource" : null
       },
       "sampleOutput" : null
     },
@@ -611,8 +542,8 @@
             "options" : null,
             "optionsDataSource" : null
           } ],
-          "optionsDataSource" : null,
-          "controlType" : "OBJECT_BUILDER"
+          "controlType" : "OBJECT_BUILDER",
+          "optionsDataSource" : null
         },
         "sampleOutput" : null,
         "placeholder" : null
@@ -735,8 +666,8 @@
           "options" : null,
           "optionsDataSource" : null
         } ],
-        "optionsDataSource" : null,
-        "controlType" : "OBJECT_BUILDER"
+        "controlType" : "OBJECT_BUILDER",
+        "optionsDataSource" : null
       },
       "sampleOutput" : null
     },
@@ -920,8 +851,8 @@
             "options" : null,
             "optionsDataSource" : null
           } ],
-          "optionsDataSource" : null,
-          "controlType" : "OBJECT_BUILDER"
+          "controlType" : "OBJECT_BUILDER",
+          "optionsDataSource" : null
         },
         "sampleOutput" : null,
         "placeholder" : null
@@ -1044,8 +975,8 @@
           "options" : null,
           "optionsDataSource" : null
         } ],
-        "optionsDataSource" : null,
-        "controlType" : "OBJECT_BUILDER"
+        "controlType" : "OBJECT_BUILDER",
+        "optionsDataSource" : null
       },
       "sampleOutput" : null
     },
@@ -1100,18 +1031,87 @@
     "type" : "DYNAMIC_WEBHOOK",
     "webhookRawBody" : null,
     "workflowSyncExecution" : null,
+    "poll" : null,
+    "deduplicate" : null,
     "webhookDisable" : { },
     "webhookEnable" : { },
+    "dynamicWebhookRefresh" : null,
+    "processErrorResponse" : null,
+    "workflowNodeDescription" : null,
     "webhookRequest" : { },
     "listenerDisable" : null,
     "listenerEnable" : null,
     "webhookValidate" : null,
-    "deduplicate" : null,
-    "poll" : null,
-    "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
-    "dynamicWebhookRefresh" : null,
     "webhookValidateOnEnable" : null
   } ],
-  "unifiedApi" : null
+  "unifiedApi" : null,
+  "connection" : {
+    "authorizations" : [ {
+      "detectOn" : null,
+      "description" : null,
+      "name" : "custom",
+      "properties" : [ {
+        "advancedOption" : null,
+        "description" : null,
+        "displayCondition" : null,
+        "expressionEnabled" : null,
+        "hidden" : null,
+        "metadata" : { },
+        "required" : true,
+        "name" : "key",
+        "type" : "STRING",
+        "defaultValue" : null,
+        "exampleValue" : null,
+        "label" : "Key",
+        "placeholder" : null,
+        "controlType" : "TEXT",
+        "languageId" : null,
+        "maxLength" : null,
+        "minLength" : null,
+        "options" : null,
+        "optionsDataSource" : null
+      }, {
+        "advancedOption" : null,
+        "description" : null,
+        "displayCondition" : null,
+        "expressionEnabled" : null,
+        "hidden" : null,
+        "metadata" : { },
+        "required" : true,
+        "name" : "token",
+        "type" : "STRING",
+        "defaultValue" : null,
+        "exampleValue" : null,
+        "label" : "Token",
+        "placeholder" : null,
+        "controlType" : "TEXT",
+        "languageId" : null,
+        "maxLength" : null,
+        "minLength" : null,
+        "options" : null,
+        "optionsDataSource" : null
+      } ],
+      "refreshOn" : null,
+      "title" : null,
+      "type" : "CUSTOM",
+      "acquire" : null,
+      "apply" : { },
+      "authorizationCallback" : null,
+      "authorizationUrl" : null,
+      "clientId" : null,
+      "clientSecret" : null,
+      "oauth2AuthorizationExtraQueryParameters" : null,
+      "pkce" : null,
+      "refresh" : null,
+      "refreshUrl" : null,
+      "scopes" : null,
+      "refreshToken" : null,
+      "tokenUrl" : null
+    } ],
+    "properties" : null,
+    "version" : 1,
+    "authorizationRequired" : null,
+    "baseUri" : { },
+    "test" : null
+  }
 }

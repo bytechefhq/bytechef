@@ -24,6 +24,8 @@ import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.Context.Http.ResponseType;
 
 import com.bytechef.component.definition.ComponentDsl;
+import com.bytechef.component.definition.OptionsDataSource;
+import com.bytechef.component.webflow.util.WebflowUtils;
 import java.util.Map;
 
 /**
@@ -43,11 +45,14 @@ public class WebflowFulfillOrderAction {
             ))
         .properties(string("siteId").label("Site ID")
             .required(true)
+            .options((OptionsDataSource.ActionOptionsFunction<String>) WebflowUtils::getSiteIdOptions)
             .metadata(
                 Map.of(
                     "type", PropertyType.PATH)),
             string("orderId").label("Order ID")
                 .required(true)
+                .options((OptionsDataSource.ActionOptionsFunction<String>) WebflowUtils::getOrderIdOptions)
+                .optionsLookupDependsOn("siteId")
                 .metadata(
                     Map.of(
                         "type", PropertyType.PATH)))

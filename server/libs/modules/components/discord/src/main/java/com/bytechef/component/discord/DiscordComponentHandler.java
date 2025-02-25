@@ -22,10 +22,7 @@ import static com.bytechef.component.definition.Authorization.TOKEN;
 import static com.bytechef.component.definition.ComponentDsl.authorization;
 import static com.bytechef.component.definition.ComponentDsl.option;
 import static com.bytechef.component.definition.ComponentDsl.string;
-import static com.bytechef.component.discord.constant.DiscordConstants.CHANNEL_ID;
-import static com.bytechef.component.discord.constant.DiscordConstants.GUILD_ID;
 import static com.bytechef.component.discord.constant.DiscordConstants.GUILD_ID_PROPERTY;
-import static com.bytechef.component.discord.constant.DiscordConstants.RECIPIENT_ID;
 
 import com.bytechef.component.OpenApiComponentHandler;
 import com.bytechef.component.definition.ActionDefinition;
@@ -35,14 +32,9 @@ import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition
 import com.bytechef.component.definition.ComponentDsl.ModifiableComponentDefinition;
 import com.bytechef.component.definition.ComponentDsl.ModifiableConnectionDefinition;
 import com.bytechef.component.definition.ComponentDsl.ModifiableIntegerProperty;
-import com.bytechef.component.definition.ComponentDsl.ModifiableObjectProperty;
 import com.bytechef.component.definition.ComponentDsl.ModifiableProperty;
-import com.bytechef.component.definition.ComponentDsl.ModifiableStringProperty;
-import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.Property;
 import com.bytechef.component.discord.action.DiscordSendDirectMessageAction;
-import com.bytechef.component.discord.util.DiscordUtils;
-import com.bytechef.definition.BaseProperty;
 import com.google.auto.service.AutoService;
 import java.util.ArrayList;
 import java.util.List;
@@ -109,30 +101,12 @@ public class DiscordComponentHandler extends AbstractDiscordComponentHandler {
     public ModifiableProperty<?> modifyProperty(
         ActionDefinition actionDefinition, ModifiableProperty<?> modifiableProperty) {
 
-        if (Objects.equals(modifiableProperty.getName(), GUILD_ID)) {
-            ((ModifiableStringProperty) modifiableProperty)
-                .options((ActionOptionsFunction<String>) DiscordUtils::getGuildIdOptions);
-        } else if (Objects.equals(modifiableProperty.getName(), CHANNEL_ID)) {
-            ((ModifiableStringProperty) modifiableProperty)
-                .optionsLookupDependsOn(GUILD_ID)
-                .options((ActionOptionsFunction<String>) DiscordUtils::getChannelIdOptions);
-        } else if (Objects.equals(modifiableProperty.getName(), "__item")) {
-            Optional<List<? extends Property.ValueProperty<?>>> propertiesOptional =
-                ((ModifiableObjectProperty) modifiableProperty).getProperties();
-
-            for (BaseProperty baseProperty : propertiesOptional.get()) {
-                if (Objects.equals(baseProperty.getName(), "type")) {
-                    ((ModifiableIntegerProperty) baseProperty)
-                        .options(
-                            option("GUILD_TEXT", 0, "a text channel within a server"),
-                            option("GUILD_VOICE", 2, "a voice channel within a server"),
-                            option("GUILD_CATEGORY", 4, "an organizational category that contains up to 50 channels"));
-                } else if (Objects.equals(baseProperty.getName(), RECIPIENT_ID)) {
-                    ((ModifiableStringProperty) baseProperty)
-                        .optionsLookupDependsOn(GUILD_ID)
-                        .options((ActionOptionsFunction<String>) DiscordUtils::getGuildMemberIdOptions);
-                }
-            }
+        if (Objects.equals(modifiableProperty.getName(), "type")) {
+            ((ModifiableIntegerProperty) modifiableProperty)
+                .options(
+                    option("GUILD_TEXT", 0, "a text channel within a server"),
+                    option("GUILD_VOICE", 2, "a voice channel within a server"),
+                    option("GUILD_CATEGORY", 4, "an organizational category that contains up to 50 channels"));
         }
 
         return modifiableProperty;

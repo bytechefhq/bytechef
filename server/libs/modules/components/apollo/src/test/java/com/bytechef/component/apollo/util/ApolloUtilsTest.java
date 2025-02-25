@@ -22,13 +22,14 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
 import java.util.List;
 import java.util.Map;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -36,29 +37,52 @@ import org.junit.jupiter.api.Test;
  */
 class ApolloUtilsTest {
 
+    private final List<Option<String>> expectedOptions = List.of(option("ime", "123"));
     private final Http.Executor mockedExecutor = mock(Http.Executor.class);
     private final Parameters mockedParameters = mock(Parameters.class);
     private final Http.Response mockedResponse = mock(Http.Response.class);
-    private final ActionContext mockedActionContext = mock(ActionContext.class);
+    private final Context mockedContext = mock(Context.class);
 
-    @Test
-    void testGetOptions() throws Exception {
-        when(mockedActionContext.http(any()))
+    @BeforeEach
+    void beforeEach() {
+        when(mockedContext.http(any()))
             .thenReturn(mockedExecutor);
         when(mockedExecutor.configuration(any()))
             .thenReturn(mockedExecutor);
         when(mockedExecutor.execute())
             .thenReturn(mockedResponse);
+    }
+
+    @Test
+    void testGetAccountIdOptions() {
+        when(mockedResponse.getBody(any(TypeReference.class)))
+            .thenReturn(Map.of("organizations", List.of(Map.of("id", "123", "name", "ime"))));
+
+        List<Option<String>> result = ApolloUtils.getAccountIdOptions(
+            mockedParameters, mockedParameters, null, "", mockedContext);
+
+        assertEquals(expectedOptions, result);
+    }
+
+    @Test
+    void testGetOOwnerIdOptions() {
         when(mockedResponse.getBody(any(TypeReference.class)))
             .thenReturn(Map.of("users", List.of(Map.of("id", "123", "name", "ime"))));
 
-        List<Option<String>> expectedOptions = List.of(option("ime", "123"));
-
-        List<? extends Option<String>> result = ApolloUtils.getOptions("path", "users")
-            .apply(mockedParameters, mockedParameters, null, "", mockedActionContext);
+        List<Option<String>> result = ApolloUtils.getOwnerIdOptions(
+            mockedParameters, mockedParameters, null, "", mockedContext);
 
         assertEquals(expectedOptions, result);
-
     }
 
+    @Test
+    void testGetOpportunityIdOptions() {
+        when(mockedResponse.getBody(any(TypeReference.class)))
+            .thenReturn(Map.of("opportunities", List.of(Map.of("id", "123", "name", "ime"))));
+
+        List<Option<String>> result = ApolloUtils.getOpportunityIdOptions(
+            mockedParameters, mockedParameters, null, "", mockedContext);
+
+        assertEquals(expectedOptions, result);
+    }
 }

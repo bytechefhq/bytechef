@@ -16,7 +16,6 @@
 
 package com.bytechef.component.petstore.action;
 
-import static com.bytechef.component.OpenApiComponentHandler.PropertyType;
 import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
@@ -43,10 +42,7 @@ public class PetstorePlaceOrderAction {
 
             ))
         .properties(object("order").properties(PetstoreOrderProperties.PROPERTIES)
-            .label("Order")
-            .metadata(
-                Map.of(
-                    "type", PropertyType.BODY)))
+            .label("Order"))
         .output(outputSchema(object().properties(PetstoreOrderProperties.PROPERTIES)
             .metadata(
                 Map.of(

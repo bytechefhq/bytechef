@@ -18,7 +18,7 @@ package com.bytechef.component.jotform.util;
 
 import static com.bytechef.component.definition.ComponentDsl.option;
 
-import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Parameters;
@@ -30,17 +30,16 @@ import java.util.Map;
 /**
  * @author Monika Kušter
  */
-public class JotformUtils {
+public class JotformUtils extends AbstractJotformUtils {
 
     private JotformUtils() {
     }
 
-    public static List<Option<String>> getFormOptions(
+    public static List<Option<String>> getFormIdOptions(
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
-        String searchText, ActionContext context) {
+        String searchText, Context context) {
 
-        Map<String, Object> body = context.http(
-            http -> http.get("/user/forms"))
+        Map<String, Object> body = context.http(http -> http.get("/user/forms"))
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});

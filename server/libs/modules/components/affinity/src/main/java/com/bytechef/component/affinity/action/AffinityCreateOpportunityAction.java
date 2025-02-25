@@ -42,13 +42,12 @@ public class AffinityCreateOpportunityAction {
                 "path", "/opportunities", "bodyContentType", BodyContentType.JSON, "mimeType", "application/json"
 
             ))
-        .properties(object("__item").properties(string("name").label("Name")
+        .properties(string("name").metadata(
+            Map.of(
+                "type", PropertyType.BODY))
+            .label("Name")
             .description("The name of the opportunity.")
             .required(true))
-            .label("Opportunity")
-            .metadata(
-                Map.of(
-                    "type", PropertyType.BODY)))
         .output(outputSchema(object()
             .properties(object("body").properties(string("id").required(false), string("name").required(false))
                 .required(false))

@@ -22,13 +22,12 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
@@ -38,23 +37,13 @@ import org.junit.jupiter.api.Test;
  */
 class TeamworkUtilsTest {
 
-    private final ActionContext mockedContext = mock(ActionContext.class);
+    private final Context mockedContext = mock(Context.class);
     private final Http.Executor mockedExecutor = mock(Http.Executor.class);
     private final Parameters mockedParameters = mock(Parameters.class);
     private final Http.Response mockedResponse = mock(Http.Response.class);
 
     @Test
-    void testGetTaskListIdOptions() {
-        Map<String, Object> map = new LinkedHashMap<>();
-        List<Map<String, String>> taskLists = new ArrayList<>();
-        Map<String, String> taskListMap = new LinkedHashMap<>();
-
-        taskListMap.put("name", "name");
-        taskListMap.put("id", "id");
-
-        taskLists.add(taskListMap);
-
-        map.put("tasklists", taskLists);
+    void testGetTasklistIdOptions() {
 
         when(mockedContext.http(any()))
             .thenReturn(mockedExecutor);
@@ -63,14 +52,14 @@ class TeamworkUtilsTest {
         when(mockedExecutor.execute())
             .thenReturn(mockedResponse);
         when(mockedResponse.getBody(any(TypeReference.class)))
-            .thenReturn(map);
+            .thenReturn(Map.of("tasklists", List.of(Map.of("name", "name", "id", 123))));
 
-        List<Option<String>> expectedOptions = new ArrayList<>();
+        List<Option<Long>> expectedOptions = new ArrayList<>();
 
-        expectedOptions.add(option("name", "id"));
+        expectedOptions.add(option("name", 123));
 
         assertEquals(
             expectedOptions,
-            TeamworkUtils.getTaskListIdOptions(mockedParameters, mockedParameters, Map.of(), "", mockedContext));
+            TeamworkUtils.getTasklistIdOptions(mockedParameters, mockedParameters, Map.of(), "", mockedContext));
     }
 }

@@ -43,19 +43,24 @@ public class FreshdeskCreateCompanyAction {
                 "path", "/companies", "bodyContentType", BodyContentType.JSON, "mimeType", "application/json"
 
             ))
-        .properties(object("__item").properties(string("name").label("Name")
+        .properties(string("name").metadata(
+            Map.of(
+                "type", PropertyType.BODY))
+            .label("Name")
             .description("Name of the company")
             .required(true),
-            string("description").label("Description")
+            string("description").metadata(
+                Map.of(
+                    "type", PropertyType.BODY))
+                .label("Description")
                 .description("Description of the company")
                 .required(false),
-            string("note").label("Note")
+            string("note").metadata(
+                Map.of(
+                    "type", PropertyType.BODY))
+                .label("Note")
                 .description("Any specific note about the company")
                 .required(false))
-            .label("Company")
-            .metadata(
-                Map.of(
-                    "type", PropertyType.BODY)))
         .output(outputSchema(object()
             .properties(object("body")
                 .properties(number("id").required(false), string("name").required(false),

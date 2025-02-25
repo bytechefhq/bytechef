@@ -19,7 +19,8 @@ paths:
           required: true
           schema:
             title: "Folder ID"
-            type: "number"
+            type: "string"
+            x-dynamic-options: true
       requestBody:
         content:
           application/json:
@@ -73,7 +74,8 @@ paths:
           required: true
           schema:
             title: "List ID"
-            type: "number"
+            type: "string"
+            x-dynamic-options: true
       requestBody:
         content:
           application/json:
@@ -139,7 +141,8 @@ paths:
           required: true
           schema:
             title: "Space ID"
-            type: "number"
+            type: "string"
+            x-dynamic-options: true
       requestBody:
         content:
           application/json:

@@ -18,7 +18,6 @@ package com.bytechef.component.encharge.action;
 
 import static com.bytechef.component.OpenApiComponentHandler.PropertyType;
 import static com.bytechef.component.definition.ComponentDsl.action;
-import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.Context.Http.BodyContentType;
 
@@ -40,17 +39,18 @@ public class EnchargeAddTagAction {
                 "path", "/tags", "bodyContentType", BodyContentType.JSON, "mimeType", "application/json"
 
             ))
-        .properties(object("__item").properties(string("tag").label("Tag")
+        .properties(string("tag").metadata(
+            Map.of(
+                "type", PropertyType.BODY))
+            .label("Tag")
             .description("Tag(s) to add. To add multiple tags, use a comma-separated list, e.g. tag1,tag2")
             .required(true),
-            string("email").label("Email")
-                .description("Email of the person.")
-                .required(true))
-            .label("Tag")
-            .required(true)
-            .metadata(
+            string("email").metadata(
                 Map.of(
-                    "type", PropertyType.BODY)));
+                    "type", PropertyType.BODY))
+                .label("Email")
+                .description("Email of the person.")
+                .required(true));
 
     private EnchargeAddTagAction() {
     }

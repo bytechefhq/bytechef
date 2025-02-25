@@ -21,6 +21,7 @@ import static com.bytechef.component.discord.constant.DiscordConstants.GUILD_ID;
 import static com.bytechef.component.discord.constant.DiscordConstants.RECIPIENT_ID;
 
 import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Parameters;
@@ -30,16 +31,16 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * @author Monika Domiter
+ * @author Monika Kušter
  */
-public class DiscordUtils {
+public class DiscordUtils extends AbstractDiscordUtils {
 
     private DiscordUtils() {
     }
 
     public static List<Option<String>> getChannelIdOptions(
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
-        String searchText, ActionContext context) {
+        String searchText, Context context) {
 
         List<Map<String, Object>> body = context.http(http -> http
             .get("/guilds/" + inputParameters.getRequiredString(GUILD_ID) + "/channels"))
@@ -60,7 +61,7 @@ public class DiscordUtils {
 
     public static List<Option<String>> getGuildIdOptions(
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
-        String searchText, ActionContext context) {
+        String searchText, Context context) {
 
         List<Map<String, Object>> body = context.http(http -> http.get("/users/@me/guilds"))
             .configuration(Http.responseType(Http.ResponseType.JSON))

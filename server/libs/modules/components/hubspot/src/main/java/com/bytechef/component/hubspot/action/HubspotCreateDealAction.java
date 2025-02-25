@@ -27,6 +27,8 @@ import static com.bytechef.component.definition.Context.Http.BodyContentType;
 import static com.bytechef.component.definition.Context.Http.ResponseType;
 
 import com.bytechef.component.definition.ComponentDsl;
+import com.bytechef.component.definition.OptionsDataSource;
+import com.bytechef.component.hubspot.util.HubspotUtils;
 import java.util.Map;
 
 /**
@@ -44,24 +46,27 @@ public class HubspotCreateDealAction {
                 "path", "/crm/v3/objects/deals", "bodyContentType", BodyContentType.JSON, "mimeType", "application/json"
 
             ))
-        .properties(object("__item").properties(object("properties").properties(string("dealname").label("Deal Name")
+        .properties(object("properties").properties(string("dealname").label("Deal Name")
             .required(false),
             number("amount").label("Amount")
                 .required(false),
             date("closedate").label("Close Date")
                 .required(false),
             string("pipeline").label("Pipeline")
-                .required(false),
+                .required(false)
+                .options((OptionsDataSource.ActionOptionsFunction<String>) HubspotUtils::getPipelineOptions),
             string("dealstage").label("Deal Stage")
-                .required(false),
+                .required(false)
+                .options((OptionsDataSource.ActionOptionsFunction<String>) HubspotUtils::getDealstageOptions)
+                .optionsLookupDependsOn("properties.pipeline"),
             string("hubspot_owner_id").label("Deal Owner")
-                .required(false))
-            .label("Properties")
-            .required(false))
-            .label("Deal")
+                .required(false)
+                .options((OptionsDataSource.ActionOptionsFunction<String>) HubspotUtils::getHubspotOwnerIdOptions))
             .metadata(
                 Map.of(
-                    "type", PropertyType.BODY)))
+                    "type", PropertyType.BODY))
+            .label("Properties")
+            .required(false))
         .output(outputSchema(object()
             .properties(object("body")
                 .properties(string("id").required(false),

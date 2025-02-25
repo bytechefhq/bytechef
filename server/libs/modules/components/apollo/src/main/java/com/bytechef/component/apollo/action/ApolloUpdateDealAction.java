@@ -25,7 +25,9 @@ import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.Context.Http.ResponseType;
 
+import com.bytechef.component.apollo.util.ApolloUtils;
 import com.bytechef.component.definition.ComponentDsl;
+import com.bytechef.component.definition.OptionsDataSource;
 import java.util.Map;
 
 /**
@@ -46,12 +48,14 @@ public class ApolloUpdateDealAction {
         .properties(string("opportunity_id").label("Opportunity Id")
             .description("The ID for the deal you want to update.")
             .required(true)
+            .options((OptionsDataSource.ActionOptionsFunction<String>) ApolloUtils::getOpportunityIdOptions)
             .metadata(
                 Map.of(
                     "type", PropertyType.PATH)),
             string("owner_id").label("Owner ID")
                 .description("The ID for the deal owner within your team's Apollo account.")
                 .required(false)
+                .options((OptionsDataSource.ActionOptionsFunction<String>) ApolloUtils::getOwnerIdOptions)
                 .metadata(
                     Map.of(
                         "type", PropertyType.QUERY)),

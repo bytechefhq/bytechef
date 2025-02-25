@@ -25,6 +25,8 @@ import static com.bytechef.component.definition.Context.Http.BodyContentType;
 import static com.bytechef.component.definition.Context.Http.ResponseType;
 
 import com.bytechef.component.definition.ComponentDsl;
+import com.bytechef.component.definition.OptionsDataSource;
+import com.bytechef.component.stripe.util.StripeUtils;
 import java.util.Map;
 
 /**
@@ -43,19 +45,25 @@ public class StripeCreateInvoiceAction {
                 "application/x-www-form-urlencoded"
 
             ))
-        .properties(object("__item").properties(string("customer").label("Customer ID")
+        .properties(string("customer").metadata(
+            Map.of(
+                "type", PropertyType.BODY))
+            .label("Customer ID")
             .description("ID of the customer who will be billed.")
-            .required(true),
-            string("currency").label("Currency")
+            .required(true)
+            .options((OptionsDataSource.ActionOptionsFunction<String>) StripeUtils::getCustomerOptions),
+            string("currency").metadata(
+                Map.of(
+                    "type", PropertyType.BODY))
+                .label("Currency")
                 .description("Currency used for invoice.")
                 .required(true),
-            string("description").label("Description")
+            string("description").metadata(
+                Map.of(
+                    "type", PropertyType.BODY))
+                .label("Description")
                 .description("Description for the invoice.")
                 .required(false))
-            .label("Invoice")
-            .metadata(
-                Map.of(
-                    "type", PropertyType.BODY)))
         .output(outputSchema(object()
             .properties(object("body")
                 .properties(string("id").required(false), string("customer").required(false),

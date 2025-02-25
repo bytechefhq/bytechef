@@ -42,7 +42,7 @@ public class ActiveCampaignCreateContactAction {
                 "path", "/contacts", "bodyContentType", BodyContentType.JSON, "mimeType", "application/json"
 
             ))
-        .properties(object("__item").properties(object("contact").properties(string("email").label("Email")
+        .properties(object("contact").properties(string("email").label("Email")
             .description("Email address of the new contact.")
             .required(true)
             .exampleValue("test@example.com"),
@@ -55,12 +55,11 @@ public class ActiveCampaignCreateContactAction {
             string("phone").label("Phone")
                 .description("Phone number of the contact.")
                 .required(false))
-            .label("Contact")
-            .required(false))
-            .label("Contact")
             .metadata(
                 Map.of(
-                    "type", PropertyType.BODY)))
+                    "type", PropertyType.BODY))
+            .label("Contact")
+            .required(false))
         .output(outputSchema(object()
             .properties(object("body")
                 .properties(object("contact")

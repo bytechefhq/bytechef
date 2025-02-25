@@ -26,7 +26,7 @@ import com.bytechef.component.definition.ComponentDsl;
 import com.bytechef.component.definition.ComponentDsl.ModifiableTriggerDefinition;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Context.Http.Body;
-import com.bytechef.component.definition.OptionsDataSource;
+import com.bytechef.component.definition.OptionsDataSource.TriggerOptionsFunction;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TriggerContext;
 import com.bytechef.component.definition.TriggerDefinition.HttpHeaders;
@@ -54,10 +54,7 @@ public class MailchimpSubscribeTrigger {
         .type(TriggerType.DYNAMIC_WEBHOOK)
         .properties(
             string(LIST_ID)
-                .options(
-                    (OptionsDataSource.TriggerOptionsFunction<String>) (
-                        inputParameters, connectionParameters, arrayIndex, searchText,
-                        context) -> MailchimpUtils.getListIdOptions(connectionParameters, context))
+                .options((TriggerOptionsFunction<String>) MailchimpUtils::getListIdOptions)
                 .label("List Id")
                 .description("The list id of intended audience to which you would like to add the contact.")
                 .required(true))

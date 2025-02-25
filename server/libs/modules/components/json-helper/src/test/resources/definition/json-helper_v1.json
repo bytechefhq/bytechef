@@ -13,7 +13,6 @@
   "resources" : null,
   "version" : 1,
   "title" : "JSON Helper",
-  "connection" : null,
   "actions" : [ {
     "batch" : null,
     "deprecated" : null,
@@ -49,9 +48,9 @@
       "optionsDataSource" : null
     } ],
     "title" : "Convert from JSON String",
+    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
-    "perform" : { }
+    "workflowNodeDescription" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -136,11 +135,12 @@
       "optionsDataSource" : null
     } ],
     "title" : "Convert to JSON String",
+    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
-    "perform" : { }
+    "workflowNodeDescription" : null
   } ],
-  "triggers" : null,
+  "connection" : null,
   "dataStream" : null,
+  "triggers" : null,
   "unifiedApi" : null
 }
