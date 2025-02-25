@@ -100,7 +100,9 @@ public class OpenAiCreateTranscriptionAction {
             Language language = inputParameters.get(LANGUAGE, Language.class);
 
             return new OpenAiAudioTranscriptionModel(
-                new OpenAiAudioApi(connectionParameters.getString(TOKEN)),
+                OpenAiAudioApi.builder()
+                    .apiKey(connectionParameters.getString(TOKEN))
+                    .build(),
                 OpenAiAudioTranscriptionOptions.builder()
                     .model(inputParameters.getRequiredString(MODEL))
                     .prompt(inputParameters.getString(PROMPT))

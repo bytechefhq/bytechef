@@ -118,7 +118,10 @@ public class OpenAiCreateSpeechAction {
             .build();
 
         SpeechModel speechModel = new OpenAiAudioSpeechModel(
-            new OpenAiAudioApi(connectionParameters.getString(TOKEN)), speechOptions);
+            OpenAiAudioApi.builder()
+                .apiKey(connectionParameters.getRequiredString(TOKEN))
+                .build(),
+            speechOptions);
 
         SpeechResponse response = speechModel.call(new SpeechPrompt(input));
 

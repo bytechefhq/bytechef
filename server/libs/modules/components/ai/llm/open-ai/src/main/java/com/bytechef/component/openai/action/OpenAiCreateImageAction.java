@@ -116,7 +116,9 @@ public class OpenAiCreateImageAction {
         Quality quality = inputParameters.get(QUALITY, Quality.class, STANDARD);
 
         return new OpenAiImageModel(
-            new OpenAiImageApi(connectionParameters.getString(TOKEN)),
+            OpenAiImageApi.builder()
+                .apiKey(connectionParameters.getString(TOKEN))
+                .build(),
             OpenAiImageOptions.builder()
                 .height(size.getDimensions()[1])
                 .model(inputParameters.getRequiredString(MODEL))
