@@ -971,7 +971,7 @@ const Property = ({
                             placeholder={
                                 isNumericalInput && minValue && maxValue
                                     ? `From ${minValue} to ${maxValue}`
-                                    : placeholder || 'Type something...'
+                                    : placeholder || `Type a ${isNumericalInput ? 'number' : 'something'} ...`
                             }
                             ref={inputRef}
                             required={required}
