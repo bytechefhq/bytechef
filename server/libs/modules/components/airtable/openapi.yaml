@@ -38,11 +38,12 @@ paths:
           application/json:
             schema:
               type: "object"
-              x-property-type: "dynamicProperties"
               properties:
                 fields:
-                  type: "object"
-                  additionalProperties: true
+                  x-dynamic-properties: true
+                  x-dynamic-properties-dependency:
+                    - "baseId"
+                    - "tableId"
       responses:
         "200":
           description: "Successful operation"

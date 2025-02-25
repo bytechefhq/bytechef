@@ -36,6 +36,7 @@ import static com.bytechef.component.definition.Context.Http.ResponseType;
 import com.bytechef.component.airtable.util.AirtableUtils;
 import com.bytechef.component.definition.ComponentDsl;
 import com.bytechef.component.definition.OptionsDataSource;
+import com.bytechef.component.definition.PropertiesDataSource;
 import java.util.Map;
 
 /**
@@ -68,7 +69,13 @@ public class AirtableCreateRecordAction {
                 .metadata(
                     Map.of(
                         "type", PropertyType.PATH)),
-            dynamicProperties("__item"))
+            dynamicProperties("fields")
+                .properties((PropertiesDataSource.ActionPropertiesFunction) AirtableUtils::getFieldsProperties)
+                .propertiesLookupDependsOn("baseId", "tableId")
+                .required(false)
+                .metadata(
+                    Map.of(
+                        "type", PropertyType.BODY)))
         .output(outputSchema(object()
             .properties(dateTime("createdTime").required(false), object("fields").additionalProperties(
                 array(), bool(), date(), dateTime(), integer(), nullable(), number(), object(), string(), time())
