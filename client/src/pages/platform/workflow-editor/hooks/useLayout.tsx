@@ -127,7 +127,7 @@ const filterConditionCaseNodes = (nodes: Node[], node: Node) => {
 };
 
 const getNodePosition = (node: Node, canvasWidth: number, nodes: Node[], dagreGraph: dagre.graphlib.Graph) => {
-    let x = dagreGraph.node(node.id).x + (canvasWidth / 2 - dagreGraph.node(nodes[0].id).x - 72 / 2);
+    const x = dagreGraph.node(node.id).x + (canvasWidth / 2 - dagreGraph.node(nodes[0].id).x - 72 / 2);
     let y = dagreGraph.node(node.id).y;
 
     if (node.id.includes('condition')) {
@@ -140,15 +140,6 @@ const getNodePosition = (node: Node, canvasWidth: number, nodes: Node[], dagreGr
         } else if (node.id.includes('bottom-placeholder')) {
             y += 35;
         }
-    }
-
-    if (node.data.loopId || node.data.loopData) {
-        x += 150;
-        y += 35;
-    }
-
-    if (node.id.includes('loop-bottom-placeholder')) {
-        y += 35;
     }
 
     return {x, y};
@@ -605,24 +596,37 @@ export default function useLayout({
             }
         }
 
-        if (loopRelatedTaskNode) {
+        if (loopRelatedTaskNode && !taskNode.id.includes('ghost')) {
             // Create initial edges for the Loop node
             if (loopNode) {
-                const loopPlaceholderEdge = {
+                const loopPlaceholderEdge: Edge = {
                     id: `${taskNode.id}=>${taskNode.id}-loop-placeholder-0`,
                     source: taskNode.id,
+                    sourceHandle: `${taskNode.id}-right-source-handle`,
+                    style: EDGE_STYLES,
                     target: `${taskNode.id}-loop-placeholder-0`,
-                    type: 'condition',
+                    type: 'smoothstep',
                 };
 
-                const decorativeEdge = {
-                    id: `${taskNode.id}=>${taskNode.id}-loop-bottom-placeholder`,
+                const loopToDecorativeGhostEdge: Edge = {
+                    id: `${taskNode.id}=>${taskNode.id}-loop-left-ghost`,
                     source: taskNode.id,
-                    target: `${taskNode.id}-loop-bottom-placeholder`,
-                    type: 'loopDecorative',
+                    sourceHandle: `${taskNode.id}-left-source-handle`,
+                    style: EDGE_STYLES,
+                    target: `${taskNode.id}-loop-left-ghost`,
+                    type: 'smoothstep',
                 };
 
-                taskEdges.push(decorativeEdge, loopPlaceholderEdge);
+                const decorativeGhostToBottomGhostEdge: Edge = {
+                    id: `${taskNode.id}-loop-left-ghost=>${taskNode.id}-loop-bottom-ghost`,
+                    source: `${taskNode.id}-loop-left-ghost`,
+                    style: EDGE_STYLES,
+                    target: `${taskNode.id}-loop-bottom-ghost`,
+                    targetHandle: `${taskNode.id}-loop-bottom-ghost-bottom-ghost-left`,
+                    type: 'smoothstep',
+                };
+
+                taskEdges.push(loopToDecorativeGhostEdge, decorativeGhostToBottomGhostEdge, loopPlaceholderEdge);
 
                 return;
             }
@@ -684,15 +688,28 @@ export default function useLayout({
                         return;
                     }
                 }
+
+                if (taskNode.id.includes('left-ghost') && nextNode.id.includes('placeholder')) {
+                    return;
+                }
             }
 
-            taskEdges.push({
+            let edgeToNextNode: Edge = {
                 id: `${taskNode.id}=>${nextNode.id}`,
                 source: taskNode.id,
                 style: EDGE_STYLES,
                 target: nextNode.id,
                 type: taskNode.id.includes('placeholder') ? 'smoothstep' : 'workflow',
-            });
+            };
+
+            if (nextNode.type === 'taskDispatcherBottomGhostNode') {
+                edgeToNextNode = {
+                    ...edgeToNextNode,
+                    targetHandle: `${nextNode.id}-bottom-ghost-right`,
+                };
+            }
+
+            taskEdges.push(edgeToNextNode);
         } else {
             triggerAndTaskNodes.push(finalPlaceholderNode);
 
