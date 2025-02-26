@@ -13,55 +13,6 @@
   "resources" : null,
   "version" : 1,
   "title" : "Discord",
-  "connection" : {
-    "authorizations" : [ {
-      "detectOn" : null,
-      "description" : null,
-      "name" : "bearer_token",
-      "properties" : [ {
-        "advancedOption" : null,
-        "description" : null,
-        "displayCondition" : null,
-        "expressionEnabled" : null,
-        "hidden" : null,
-        "metadata" : { },
-        "required" : true,
-        "name" : "token",
-        "type" : "STRING",
-        "defaultValue" : null,
-        "exampleValue" : null,
-        "label" : "Bot token",
-        "placeholder" : null,
-        "controlType" : "TEXT",
-        "languageId" : null,
-        "maxLength" : null,
-        "minLength" : null,
-        "options" : null,
-        "optionsDataSource" : null
-      } ],
-      "refreshOn" : null,
-      "title" : "Bearer Token",
-      "type" : "BEARER_TOKEN",
-      "acquire" : null,
-      "apply" : { },
-      "clientId" : null,
-      "pkce" : null,
-      "refresh" : null,
-      "refreshUrl" : null,
-      "scopes" : null,
-      "tokenUrl" : null,
-      "authorizationUrl" : null,
-      "clientSecret" : null,
-      "refreshToken" : null,
-      "oauth2AuthorizationExtraQueryParameters" : null,
-      "authorizationCallback" : null
-    } ],
-    "properties" : null,
-    "version" : 1,
-    "authorizationRequired" : null,
-    "baseUri" : { },
-    "test" : null
-  },
   "actions" : [ {
     "batch" : null,
     "deprecated" : null,
@@ -346,70 +297,52 @@
       }
     }, {
       "advancedOption" : null,
-      "description" : null,
+      "description" : "Message contents (up to 2000 characters)",
       "displayCondition" : null,
       "expressionEnabled" : null,
       "hidden" : null,
       "metadata" : {
         "type" : "BODY"
       },
-      "required" : null,
-      "name" : "__item",
-      "type" : "OBJECT",
+      "required" : true,
+      "name" : "content",
+      "type" : "STRING",
       "defaultValue" : null,
       "exampleValue" : null,
-      "label" : "Message",
+      "label" : "Message Text",
       "placeholder" : null,
-      "additionalProperties" : null,
-      "multipleValues" : null,
+      "controlType" : "TEXT",
+      "languageId" : null,
+      "maxLength" : null,
+      "minLength" : null,
       "options" : null,
-      "properties" : [ {
-        "advancedOption" : null,
-        "description" : "Message contents (up to 2000 characters)",
-        "displayCondition" : null,
-        "expressionEnabled" : null,
-        "hidden" : null,
-        "metadata" : { },
-        "required" : true,
-        "name" : "content",
-        "type" : "STRING",
-        "defaultValue" : null,
-        "exampleValue" : null,
-        "label" : "Message Text",
-        "placeholder" : null,
-        "controlType" : "TEXT",
-        "languageId" : null,
-        "maxLength" : null,
-        "minLength" : null,
-        "options" : null,
-        "optionsDataSource" : null
-      }, {
-        "advancedOption" : null,
-        "description" : "True if this is a TTS message",
-        "displayCondition" : null,
-        "expressionEnabled" : null,
-        "hidden" : null,
-        "metadata" : { },
-        "required" : false,
-        "name" : "tts",
-        "type" : "BOOLEAN",
-        "defaultValue" : false,
-        "exampleValue" : null,
-        "label" : "Text to Speech",
-        "placeholder" : null,
-        "options" : [ {
-          "description" : null,
-          "label" : "True",
-          "value" : true
-        }, {
-          "description" : null,
-          "label" : "False",
-          "value" : false
-        } ],
-        "controlType" : "SELECT"
-      } ],
-      "controlType" : "OBJECT_BUILDER",
       "optionsDataSource" : null
+    }, {
+      "advancedOption" : null,
+      "description" : "True if this is a TTS message",
+      "displayCondition" : null,
+      "expressionEnabled" : null,
+      "hidden" : null,
+      "metadata" : {
+        "type" : "BODY"
+      },
+      "required" : false,
+      "name" : "tts",
+      "type" : "BOOLEAN",
+      "defaultValue" : false,
+      "exampleValue" : null,
+      "label" : "Text to Speech",
+      "placeholder" : null,
+      "options" : [ {
+        "description" : null,
+        "label" : "True",
+        "value" : true
+      }, {
+        "description" : null,
+        "label" : "False",
+        "value" : false
+      } ],
+      "controlType" : "SELECT"
     } ],
     "title" : "Send Channel Message",
     "perform" : null,
@@ -666,6 +599,28 @@
       }
     }, {
       "advancedOption" : null,
+      "description" : "The name of the new channel",
+      "displayCondition" : null,
+      "expressionEnabled" : null,
+      "hidden" : null,
+      "metadata" : {
+        "type" : "BODY"
+      },
+      "required" : true,
+      "name" : "name",
+      "type" : "STRING",
+      "defaultValue" : null,
+      "exampleValue" : null,
+      "label" : "Name",
+      "placeholder" : null,
+      "controlType" : "TEXT",
+      "languageId" : null,
+      "maxLength" : 100,
+      "minLength" : 1,
+      "options" : null,
+      "optionsDataSource" : null
+    }, {
+      "advancedOption" : null,
       "description" : null,
       "displayCondition" : null,
       "expressionEnabled" : null,
@@ -673,69 +628,29 @@
       "metadata" : {
         "type" : "BODY"
       },
-      "required" : null,
-      "name" : "__item",
-      "type" : "OBJECT",
+      "required" : false,
+      "name" : "type",
+      "type" : "INTEGER",
       "defaultValue" : null,
       "exampleValue" : null,
-      "label" : "Channel",
+      "label" : "Type",
       "placeholder" : null,
-      "additionalProperties" : null,
-      "multipleValues" : null,
-      "options" : null,
-      "properties" : [ {
-        "advancedOption" : null,
-        "description" : "The name of the new channel",
-        "displayCondition" : null,
-        "expressionEnabled" : null,
-        "hidden" : null,
-        "metadata" : { },
-        "required" : true,
-        "name" : "name",
-        "type" : "STRING",
-        "defaultValue" : null,
-        "exampleValue" : null,
-        "label" : "Name",
-        "placeholder" : null,
-        "controlType" : "TEXT",
-        "languageId" : null,
-        "maxLength" : 100,
-        "minLength" : 1,
-        "options" : null,
-        "optionsDataSource" : null
+      "maxValue" : null,
+      "minValue" : null,
+      "options" : [ {
+        "description" : "a text channel within a server",
+        "label" : "GUILD_TEXT",
+        "value" : 0
       }, {
-        "advancedOption" : null,
-        "description" : null,
-        "displayCondition" : null,
-        "expressionEnabled" : null,
-        "hidden" : null,
-        "metadata" : { },
-        "required" : false,
-        "name" : "type",
-        "type" : "INTEGER",
-        "defaultValue" : null,
-        "exampleValue" : null,
-        "label" : "Type",
-        "placeholder" : null,
-        "maxValue" : null,
-        "minValue" : null,
-        "options" : [ {
-          "description" : "a text channel within a server",
-          "label" : "GUILD_TEXT",
-          "value" : 0
-        }, {
-          "description" : "a voice channel within a server",
-          "label" : "GUILD_VOICE",
-          "value" : 2
-        }, {
-          "description" : "an organizational category that contains up to 50 channels",
-          "label" : "GUILD_CATEGORY",
-          "value" : 4
-        } ],
-        "controlType" : "SELECT",
-        "optionsDataSource" : null
+        "description" : "a voice channel within a server",
+        "label" : "GUILD_VOICE",
+        "value" : 2
+      }, {
+        "description" : "an organizational category that contains up to 50 channels",
+        "label" : "GUILD_CATEGORY",
+        "value" : 4
       } ],
-      "controlType" : "OBJECT_BUILDER",
+      "controlType" : "SELECT",
       "optionsDataSource" : null
     } ],
     "title" : "Create Channel",
@@ -975,7 +890,56 @@
     "processErrorResponse" : null,
     "workflowNodeDescription" : null
   } ],
+  "connection" : {
+    "authorizations" : [ {
+      "detectOn" : null,
+      "description" : null,
+      "name" : "bearer_token",
+      "properties" : [ {
+        "advancedOption" : null,
+        "description" : null,
+        "displayCondition" : null,
+        "expressionEnabled" : null,
+        "hidden" : null,
+        "metadata" : { },
+        "required" : true,
+        "name" : "token",
+        "type" : "STRING",
+        "defaultValue" : null,
+        "exampleValue" : null,
+        "label" : "Bot token",
+        "placeholder" : null,
+        "controlType" : "TEXT",
+        "languageId" : null,
+        "maxLength" : null,
+        "minLength" : null,
+        "options" : null,
+        "optionsDataSource" : null
+      } ],
+      "refreshOn" : null,
+      "title" : "Bearer Token",
+      "type" : "BEARER_TOKEN",
+      "acquire" : null,
+      "apply" : { },
+      "authorizationCallback" : null,
+      "authorizationUrl" : null,
+      "clientId" : null,
+      "clientSecret" : null,
+      "oauth2AuthorizationExtraQueryParameters" : null,
+      "pkce" : null,
+      "refresh" : null,
+      "refreshUrl" : null,
+      "scopes" : null,
+      "refreshToken" : null,
+      "tokenUrl" : null
+    } ],
+    "properties" : null,
+    "version" : 1,
+    "authorizationRequired" : null,
+    "baseUri" : { },
+    "test" : null
+  },
   "dataStream" : null,
-  "unifiedApi" : null,
-  "triggers" : [ ]
+  "triggers" : [ ],
+  "unifiedApi" : null
 }

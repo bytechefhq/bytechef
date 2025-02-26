@@ -45,10 +45,10 @@ public class PetstoreCreateUsersWithListInputAction {
             ))
         .properties(array("__items").items(object().properties(PetstoreUserProperties.PROPERTIES))
             .placeholder("Add to Items")
-            .label("Items")
             .metadata(
                 Map.of(
-                    "type", PropertyType.BODY)))
+                    "type", PropertyType.BODY))
+            .label("Items"))
         .output(outputSchema(array().items(object().properties(PetstoreUserProperties.PROPERTIES))
             .metadata(
                 Map.of(

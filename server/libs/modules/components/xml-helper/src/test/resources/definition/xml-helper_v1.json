@@ -13,7 +13,6 @@
   "resources" : null,
   "version" : 1,
   "title" : "XML Helper",
-  "connection" : null,
   "actions" : [ {
     "batch" : null,
     "deprecated" : null,
@@ -228,6 +227,7 @@
     "processErrorResponse" : null,
     "workflowNodeDescription" : null
   } ],
+  "connection" : null,
   "triggers" : null,
   "dataStream" : null,
   "unifiedApi" : null

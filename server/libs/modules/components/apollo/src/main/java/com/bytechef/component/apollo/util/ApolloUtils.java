@@ -18,9 +18,10 @@ package com.bytechef.component.apollo.util;
 
 import static com.bytechef.component.definition.ComponentDsl.option;
 
+import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Option;
-import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
+import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
 import java.util.ArrayList;
 import java.util.List;
@@ -29,29 +30,48 @@ import java.util.Map;
 /**
  * @author Monika Kušter
  */
-public class ApolloUtils {
+public class ApolloUtils extends AbstractApolloUtils {
 
     private ApolloUtils() {
     }
 
-    public static ActionOptionsFunction<String> getOptions(String path, String resources) {
-        return (inputParameters, connectionParameters, arrayIndex, searchText, actionContext) -> {
-            Map<String, ?> body = actionContext.http(http -> http.get(path))
-                .configuration(Http.responseType(Http.ResponseType.JSON))
-                .execute()
-                .getBody(new TypeReference<>() {});
+    public static List<Option<String>> getAccountIdOptions(
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
+        String searchText, Context context) {
 
-            List<Option<String>> options = new ArrayList<>();
+        return getOptions("/mixed_companies/search", "organizations", context);
+    }
 
-            if (body.get(resources) instanceof List<?> users) {
-                for (Object user : users) {
-                    if (user instanceof Map<?, ?> map) {
-                        options.add(option((String) map.get("name"), (String) map.get("id")));
-                    }
+    public static List<Option<String>> getOwnerIdOptions(
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
+        String searchText, Context context) {
+
+        return getOptions("/users/search", "users", context);
+    }
+
+    public static List<Option<String>> getOpportunityIdOptions(
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
+        String searchText, Context context) {
+
+        return getOptions("/opportunities/search", "opportunities", context);
+    }
+
+    private static List<Option<String>> getOptions(String path, String resources, Context context) {
+        Map<String, ?> body = context.http(http -> http.get(path))
+            .configuration(Http.responseType(Http.ResponseType.JSON))
+            .execute()
+            .getBody(new TypeReference<>() {});
+
+        List<Option<String>> options = new ArrayList<>();
+
+        if (body.get(resources) instanceof List<?> users) {
+            for (Object user : users) {
+                if (user instanceof Map<?, ?> map) {
+                    options.add(option((String) map.get("name"), (String) map.get("id")));
                 }
             }
+        }
 
-            return options;
-        };
+        return options;
     }
 }

@@ -27,7 +27,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Parameters;
@@ -46,7 +46,7 @@ import org.mockito.ArgumentCaptor;
 class HubspotUtilsTest {
 
     private final ArgumentCaptor<Http.Body> bodyArgumentCaptor = ArgumentCaptor.forClass(Http.Body.class);
-    private final ActionContext mockedActionContext = mock(ActionContext.class);
+    private final Context mockedContext = mock(Context.class);
     private final TriggerContext mockedTriggerContext = mock(TriggerContext.class);
     private final Http.Executor mockedExecutor = mock(Http.Executor.class);
     private final Parameters mockedParameters =
@@ -68,7 +68,7 @@ class HubspotUtilsTest {
     }
 
     @Test
-    void testGetContactsOptions() {
+    void testGetContactIdOptions() {
         Map<String, Object> propertiesMap = Map.of("firstname", "first", "lastname", "last");
 
         mockHttpResponse();
@@ -79,11 +79,11 @@ class HubspotUtilsTest {
 
         assertEquals(
             expectedOptions,
-            HubspotUtils.getContactsOptions(mockedParameters, mockedParameters, Map.of(), "", mockedActionContext));
+            HubspotUtils.getContactIdOptions(mockedParameters, mockedParameters, Map.of(), "", mockedContext));
     }
 
     @Test
-    void testGetDealStageOptions() {
+    void testGetDealstageOptions() {
         mockHttpResponse();
         when(mockedResponse.getBody(any(TypeReference.class)))
             .thenReturn(Map.of(RESULTS, List.of(Map.of(ID, "123", LABEL, "label"))));
@@ -92,11 +92,11 @@ class HubspotUtilsTest {
 
         assertEquals(
             expectedOptions,
-            HubspotUtils.getDealStageOptions(mockedParameters, mockedParameters, Map.of(), "", mockedActionContext));
+            HubspotUtils.getDealstageOptions(mockedParameters, mockedParameters, Map.of(), "", mockedContext));
     }
 
     @Test
-    void testGetOwnerOptions() {
+    void testGetHubspotOwnerIdOptions() {
         mockHttpResponse();
         when(mockedResponse.getBody(any(TypeReference.class)))
             .thenReturn(Map.of(RESULTS, List.of(Map.of(ID, "123", "email", "label"))));
@@ -105,11 +105,12 @@ class HubspotUtilsTest {
 
         assertEquals(
             expectedOptions,
-            HubspotUtils.getOwnerOptions(mockedParameters, mockedParameters, Map.of(), "", mockedActionContext));
+            HubspotUtils.getHubspotOwnerIdOptions(mockedParameters, mockedParameters, Map.of(), "",
+                mockedContext));
     }
 
     @Test
-    void testGetPipelineDealOptions() {
+    void testGetPipelineOptions() {
         mockHttpResponse();
         when(mockedResponse.getBody(any(TypeReference.class)))
             .thenReturn(Map.of(RESULTS, List.of(Map.of(ID, "123", LABEL, "label"))));
@@ -118,7 +119,7 @@ class HubspotUtilsTest {
 
         assertEquals(
             expectedOptions,
-            HubspotUtils.getPipelineDealOptions(mockedParameters, mockedParameters, Map.of(), "", mockedActionContext));
+            HubspotUtils.getPipelineOptions(mockedParameters, mockedParameters, Map.of(), "", mockedContext));
     }
 
     @Test
@@ -134,11 +135,11 @@ class HubspotUtilsTest {
 
         assertEquals(
             expectedOptions,
-            HubspotUtils.getTicketIdOptions(mockedParameters, mockedParameters, Map.of(), "", mockedActionContext));
+            HubspotUtils.getTicketIdOptions(mockedParameters, mockedParameters, Map.of(), "", mockedContext));
     }
 
     private void mockHttpResponse() {
-        when(mockedActionContext.http(any()))
+        when(mockedContext.http(any()))
             .thenReturn(mockedExecutor);
         when(mockedExecutor.configuration(any()))
             .thenReturn(mockedExecutor);

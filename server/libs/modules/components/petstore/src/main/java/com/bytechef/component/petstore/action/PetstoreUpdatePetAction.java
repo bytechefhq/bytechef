@@ -16,7 +16,6 @@
 
 package com.bytechef.component.petstore.action;
 
-import static com.bytechef.component.OpenApiComponentHandler.PropertyType;
 import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
@@ -44,10 +43,7 @@ public class PetstoreUpdatePetAction {
             ))
         .properties(object("pet").properties(PetstorePetProperties.PROPERTIES)
             .label("Pet")
-            .required(true)
-            .metadata(
-                Map.of(
-                    "type", PropertyType.BODY)))
+            .required(true))
         .output(outputSchema(object().properties(PetstorePetProperties.PROPERTIES)
             .metadata(
                 Map.of(

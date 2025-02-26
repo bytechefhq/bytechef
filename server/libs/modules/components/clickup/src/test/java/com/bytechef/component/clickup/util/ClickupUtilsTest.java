@@ -70,7 +70,7 @@ class ClickupUtilsTest {
     }
 
     @Test
-    void testGetAllListIdOptions() {
+    void testGetListIdOptions() {
         when(mockedParameters.getString(FOLDER_ID))
             .thenReturn("folder");
         when(mockedParameters.getRequiredString(SPACE_ID))
@@ -80,7 +80,7 @@ class ClickupUtilsTest {
             .thenReturn(Map.of("lists", List.of(Map.of(NAME, "some name", ID, "abc"))));
 
         assertEquals(List.of(option("some name", "abc"), option("some name", "abc")),
-            ClickupUtils.getAllListIdOptions(mockedParameters, mockedParameters, Map.of(), "", mockedActionContext));
+            ClickupUtils.getListIdOptions(mockedParameters, mockedParameters, Map.of(), "", mockedActionContext));
     }
 
     @Test

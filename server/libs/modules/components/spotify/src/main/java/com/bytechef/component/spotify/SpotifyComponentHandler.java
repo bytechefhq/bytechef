@@ -17,17 +17,11 @@
 package com.bytechef.component.spotify;
 
 import com.bytechef.component.OpenApiComponentHandler;
-import com.bytechef.component.definition.ActionDefinition;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.ComponentDsl.ModifiableComponentDefinition;
-import com.bytechef.component.definition.ComponentDsl.ModifiableProperty;
-import com.bytechef.component.definition.ComponentDsl.ModifiableStringProperty;
-import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.spotify.action.SpotifyCreatePlaylistAction;
-import com.bytechef.component.spotify.util.SpotifyUtils;
 import com.google.auto.service.AutoService;
 import java.util.List;
-import java.util.Objects;
 
 /**
  * @author Monika Kušter
@@ -45,17 +39,5 @@ public class SpotifyComponentHandler extends AbstractSpotifyComponentHandler {
         return modifiableComponentDefinition
             .customAction(true)
             .icon("path:assets/spotify.svg");
-    }
-
-    @Override
-    public ModifiableProperty<?> modifyProperty(
-        ActionDefinition actionDefinition, ModifiableProperty<?> modifiableProperty) {
-
-        if (Objects.equals(modifiableProperty.getName(), "playlist_id")) {
-            ((ModifiableStringProperty) modifiableProperty)
-                .options((ActionOptionsFunction<String>) SpotifyUtils::getPlaylistOptions);
-        }
-
-        return modifiableProperty;
     }
 }

@@ -51,11 +51,11 @@ public class SalesflareCreateTasksAction {
             date("reminder_date").label("Reminder Data")
                 .required(false)))
             .placeholder("Add to Items")
-            .label("Tasks")
-            .required(true)
             .metadata(
                 Map.of(
-                    "type", PropertyType.BODY)))
+                    "type", PropertyType.BODY))
+            .label("Tasks")
+            .required(true))
         .output(outputSchema(object().properties(array("body").items(object().properties(integer("id").required(false)))
             .required(false))
             .metadata(

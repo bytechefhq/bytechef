@@ -19,12 +19,16 @@ paths:
           schema:
             type: "string"
             title: "Site ID"
+            x-dynamic-options: true
         - name: "orderId"
           in: "path"
           required: true
           schema:
             type: "string"
             title: "Order ID"
+            x-dynamic-options: true
+            x-dynamic-options-dependency:
+              - "siteId"
       responses:
         200:
           description: "Successful operation"
@@ -53,6 +57,9 @@ paths:
           schema:
             type: "string"
             title: "Collection ID"
+            x-dynamic-options: true
+            x-dynamic-options-dependency:
+              - "siteId"
         - name: "itemId"
           in: "path"
           description: ""
@@ -60,6 +67,10 @@ paths:
           schema:
             type: "string"
             title: "Item  ID"
+            x-dynamic-options: true
+            x-dynamic-options-dependency:
+              - "collectionId"
+              - "siteId"
       responses:
         200:
           description: "Successful operation"

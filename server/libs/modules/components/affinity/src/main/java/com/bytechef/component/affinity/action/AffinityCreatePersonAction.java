@@ -43,21 +43,29 @@ public class AffinityCreatePersonAction {
                 "path", "/persons", "bodyContentType", BodyContentType.JSON, "mimeType", "application/json"
 
             ))
-        .properties(object("__item").properties(string("first_name").label("First Name")
+        .properties(string("first_name").metadata(
+            Map.of(
+                "type", PropertyType.BODY))
+            .label("First Name")
             .description("The first name of the person.")
             .required(true),
-            string("last_name").label("Last Name")
+            string("last_name").metadata(
+                Map.of(
+                    "type", PropertyType.BODY))
+                .label("Last Name")
                 .description("The last name of the person.")
                 .required(true),
-            array("emails").items(string().description("The email addresses of the person."))
+            array("emails").items(string().metadata(
+                Map.of(
+                    "type", PropertyType.BODY))
+                .description("The email addresses of the person."))
                 .placeholder("Add to Emails")
+                .metadata(
+                    Map.of(
+                        "type", PropertyType.BODY))
                 .label("Emails")
                 .description("The email addresses of the person.")
                 .required(false))
-            .label("Person")
-            .metadata(
-                Map.of(
-                    "type", PropertyType.BODY)))
         .output(outputSchema(object()
             .properties(object("body")
                 .properties(string("id").required(false), string("first_name").required(false),

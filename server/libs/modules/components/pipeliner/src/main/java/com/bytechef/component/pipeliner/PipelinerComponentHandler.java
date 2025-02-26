@@ -25,19 +25,11 @@ import static com.bytechef.component.pipeliner.constant.PipelinerConstants.SERVE
 import static com.bytechef.component.pipeliner.constant.PipelinerConstants.SPACE_ID;
 
 import com.bytechef.component.OpenApiComponentHandler;
-import com.bytechef.component.definition.ActionDefinition;
 import com.bytechef.component.definition.Authorization.AuthorizationType;
 import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDsl.ModifiableComponentDefinition;
 import com.bytechef.component.definition.ComponentDsl.ModifiableConnectionDefinition;
-import com.bytechef.component.definition.ComponentDsl.ModifiableObjectProperty;
-import com.bytechef.component.definition.ComponentDsl.ModifiableProperty;
-import com.bytechef.component.definition.ComponentDsl.ModifiableStringProperty;
-import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
-import com.bytechef.component.pipeliner.util.PipelinerUtils;
-import com.bytechef.definition.BaseProperty;
 import com.google.auto.service.AutoService;
-import java.util.Objects;
 
 /**
  * @author Monika Domiter
@@ -88,28 +80,5 @@ public class PipelinerComponentHandler extends AbstractPipelinerComponentHandler
                 connectionParameters.getRequiredString(SPACE_ID));
 
         return modifiableConnectionDefinition;
-    }
-
-    @Override
-    public ModifiableProperty<?> modifyProperty(
-        ActionDefinition actionDefinition, ModifiableProperty<?> modifiableProperty) {
-
-        if (Objects.equals(modifiableProperty.getName(), "__item")) {
-            for (BaseProperty baseProperty : ((ModifiableObjectProperty) modifiableProperty).getProperties()
-                .get()) {
-                if (Objects.equals(baseProperty.getName(), "owner_id")) {
-                    ((ModifiableStringProperty) baseProperty)
-                        .options((ActionOptionsFunction<String>) PipelinerUtils::getOwnerIdOptions);
-                } else if (Objects.equals(baseProperty.getName(), "activity_type_id")) {
-                    ((ModifiableStringProperty) baseProperty)
-                        .options((ActionOptionsFunction<String>) PipelinerUtils::getActivityTypeIdOptions);
-                } else if (Objects.equals(baseProperty.getName(), "unit_id")) {
-                    ((ModifiableStringProperty) baseProperty)
-                        .options((ActionOptionsFunction<String>) PipelinerUtils::getSalesUnitsIdOptions);
-                }
-            }
-        }
-
-        return modifiableProperty;
     }
 }

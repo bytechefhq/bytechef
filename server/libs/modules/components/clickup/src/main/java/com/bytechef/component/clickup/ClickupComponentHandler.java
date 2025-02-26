@@ -26,15 +26,13 @@ import static com.bytechef.component.clickup.constant.ClickupConstants.WORKSPACE
 import com.bytechef.component.OpenApiComponentHandler;
 import com.bytechef.component.clickup.trigger.ClickupNewListTrigger;
 import com.bytechef.component.clickup.trigger.ClickupNewTaskTrigger;
-import com.bytechef.component.clickup.util.ClickupUtils;
 import com.bytechef.component.definition.ActionDefinition;
 import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.ComponentDsl.ModifiableComponentDefinition;
-import com.bytechef.component.definition.ComponentDsl.ModifiableNumberProperty;
 import com.bytechef.component.definition.ComponentDsl.ModifiableProperty;
+import com.bytechef.component.definition.ComponentDsl.ModifiableStringProperty;
 import com.bytechef.component.definition.ComponentDsl.ModifiableTriggerDefinition;
-import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.Property;
 import com.google.auto.service.AutoService;
 import java.util.ArrayList;
@@ -89,16 +87,13 @@ public class ClickupComponentHandler extends AbstractClickupComponentHandler {
         ActionDefinition actionDefinition, ModifiableProperty<?> modifiableProperty) {
 
         if (Objects.equals(modifiableProperty.getName(), "listId")) {
-            ((ModifiableNumberProperty) modifiableProperty)
-                .options((ActionOptionsFunction<String>) ClickupUtils::getAllListIdOptions)
+            ((ModifiableStringProperty) modifiableProperty)
                 .optionsLookupDependsOn(FOLDER_ID, SPACE_ID, WORKSPACE_ID);
         } else if (Objects.equals(modifiableProperty.getName(), FOLDER_ID)) {
-            ((ModifiableNumberProperty) modifiableProperty)
-                .options((ActionOptionsFunction<String>) ClickupUtils::getFolderIdOptions)
+            ((ModifiableStringProperty) modifiableProperty)
                 .optionsLookupDependsOn(SPACE_ID, WORKSPACE_ID);
-        } else if (Objects.equals(modifiableProperty.getName(), "spaceId")) {
-            ((ModifiableNumberProperty) modifiableProperty)
-                .options((ActionOptionsFunction<String>) ClickupUtils::getSpaceIdOptions)
+        } else if (Objects.equals(modifiableProperty.getName(), SPACE_ID)) {
+            ((ModifiableStringProperty) modifiableProperty)
                 .optionsLookupDependsOn(WORKSPACE_ID);
         }
 

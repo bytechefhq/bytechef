@@ -13,95 +13,6 @@
   "resources" : null,
   "version" : 1,
   "title" : "Pinecone",
-  "connection" : {
-    "authorizations" : [ {
-      "detectOn" : null,
-      "description" : null,
-      "name" : "custom",
-      "properties" : [ {
-        "advancedOption" : null,
-        "description" : "The API key for the OpenAI API which is used to generate embeddings.",
-        "displayCondition" : null,
-        "expressionEnabled" : null,
-        "hidden" : null,
-        "metadata" : { },
-        "required" : true,
-        "name" : "embeddingApiKey",
-        "type" : "STRING",
-        "defaultValue" : null,
-        "exampleValue" : null,
-        "label" : "Open AI API Key",
-        "placeholder" : null,
-        "controlType" : "TEXT",
-        "languageId" : null,
-        "maxLength" : null,
-        "minLength" : null,
-        "options" : null,
-        "optionsDataSource" : null
-      }, {
-        "advancedOption" : null,
-        "description" : "The API key for the Pinecone API.",
-        "displayCondition" : null,
-        "expressionEnabled" : null,
-        "hidden" : null,
-        "metadata" : { },
-        "required" : true,
-        "name" : "apiKey",
-        "type" : "STRING",
-        "defaultValue" : null,
-        "exampleValue" : null,
-        "label" : "Pinecone API Key",
-        "placeholder" : null,
-        "controlType" : "TEXT",
-        "languageId" : null,
-        "maxLength" : null,
-        "minLength" : null,
-        "options" : null,
-        "optionsDataSource" : null
-      }, {
-        "advancedOption" : null,
-        "description" : "Url of the host.",
-        "displayCondition" : null,
-        "expressionEnabled" : null,
-        "hidden" : null,
-        "metadata" : { },
-        "required" : true,
-        "name" : "host",
-        "type" : "STRING",
-        "defaultValue" : null,
-        "exampleValue" : "https://indexname-pr0j1d7.svc.aped-1234-a12b.pinecone.io",
-        "label" : "Host",
-        "placeholder" : null,
-        "controlType" : "TEXT",
-        "languageId" : null,
-        "maxLength" : null,
-        "minLength" : null,
-        "options" : null,
-        "optionsDataSource" : null
-      } ],
-      "refreshOn" : null,
-      "title" : null,
-      "type" : "CUSTOM",
-      "acquire" : null,
-      "authorizationUrl" : null,
-      "clientSecret" : null,
-      "refreshToken" : null,
-      "apply" : null,
-      "clientId" : null,
-      "pkce" : null,
-      "refresh" : null,
-      "refreshUrl" : null,
-      "scopes" : null,
-      "tokenUrl" : null,
-      "oauth2AuthorizationExtraQueryParameters" : null,
-      "authorizationCallback" : null
-    } ],
-    "properties" : null,
-    "version" : 1,
-    "authorizationRequired" : null,
-    "baseUri" : null,
-    "test" : null
-  },
   "actions" : [ {
     "batch" : null,
     "deprecated" : null,
@@ -137,8 +48,8 @@
       "optionsDataSource" : null
     } ],
     "title" : "Data Query",
-    "perform" : { },
     "processErrorResponse" : null,
+    "perform" : { },
     "workflowNodeDescription" : null
   }, {
     "batch" : null,
@@ -227,8 +138,8 @@
       "minItems" : null,
       "multipleValues" : null,
       "options" : null,
-      "optionsDataSource" : null,
-      "controlType" : "ARRAY_BUILDER"
+      "controlType" : "ARRAY_BUILDER",
+      "optionsDataSource" : null
     }, {
       "advancedOption" : null,
       "description" : null,
@@ -383,8 +294,8 @@
         "maxValue" : null,
         "minValue" : null,
         "options" : null,
-        "optionsDataSource" : null,
-        "controlType" : "INTEGER"
+        "controlType" : "INTEGER",
+        "optionsDataSource" : null
       }, {
         "advancedOption" : null,
         "description" : "The minimum size of each text chunk in characters.",
@@ -402,8 +313,8 @@
         "maxValue" : null,
         "minValue" : null,
         "options" : null,
-        "optionsDataSource" : null,
-        "controlType" : "INTEGER"
+        "controlType" : "INTEGER",
+        "optionsDataSource" : null
       }, {
         "advancedOption" : null,
         "description" : "The minimum length of a chunk to be included.",
@@ -421,8 +332,8 @@
         "maxValue" : null,
         "minValue" : null,
         "options" : null,
-        "optionsDataSource" : null,
-        "controlType" : "INTEGER"
+        "controlType" : "INTEGER",
+        "optionsDataSource" : null
       }, {
         "advancedOption" : null,
         "description" : "The maximum number of chunks to generate from a text.",
@@ -440,8 +351,8 @@
         "maxValue" : null,
         "minValue" : null,
         "options" : null,
-        "optionsDataSource" : null,
-        "controlType" : "INTEGER"
+        "controlType" : "INTEGER",
+        "optionsDataSource" : null
       }, {
         "advancedOption" : null,
         "description" : "Whether to keep separators (like newlines) in the chunks.",
@@ -467,8 +378,8 @@
         } ],
         "controlType" : "SELECT"
       } ],
-      "optionsDataSource" : null,
-      "controlType" : "OBJECT_BUILDER"
+      "controlType" : "OBJECT_BUILDER",
+      "optionsDataSource" : null
     }, {
       "advancedOption" : null,
       "description" : "Whether to use the keyword metadata enricher.",
@@ -527,11 +438,11 @@
         "maxValue" : null,
         "minValue" : null,
         "options" : null,
-        "optionsDataSource" : null,
-        "controlType" : "INTEGER"
+        "controlType" : "INTEGER",
+        "optionsDataSource" : null
       } ],
-      "optionsDataSource" : null,
-      "controlType" : "OBJECT_BUILDER"
+      "controlType" : "OBJECT_BUILDER",
+      "optionsDataSource" : null
     }, {
       "advancedOption" : null,
       "description" : "Whether to use the summary enricher.",
@@ -624,18 +535,107 @@
           "label" : "Next",
           "value" : "NEXT"
         } ],
-        "optionsDataSource" : null,
-        "controlType" : "MULTI_SELECT"
+        "controlType" : "MULTI_SELECT",
+        "optionsDataSource" : null
       } ],
-      "optionsDataSource" : null,
-      "controlType" : "OBJECT_BUILDER"
+      "controlType" : "OBJECT_BUILDER",
+      "optionsDataSource" : null
     } ],
     "title" : "Load Data",
-    "perform" : { },
     "processErrorResponse" : null,
+    "perform" : { },
     "workflowNodeDescription" : null
   } ],
   "dataStream" : null,
   "triggers" : null,
-  "unifiedApi" : null
+  "unifiedApi" : null,
+  "connection" : {
+    "authorizations" : [ {
+      "detectOn" : null,
+      "description" : null,
+      "name" : "custom",
+      "properties" : [ {
+        "advancedOption" : null,
+        "description" : "The API key for the OpenAI API which is used to generate embeddings.",
+        "displayCondition" : null,
+        "expressionEnabled" : null,
+        "hidden" : null,
+        "metadata" : { },
+        "required" : true,
+        "name" : "embeddingApiKey",
+        "type" : "STRING",
+        "defaultValue" : null,
+        "exampleValue" : null,
+        "label" : "Open AI API Key",
+        "placeholder" : null,
+        "controlType" : "TEXT",
+        "languageId" : null,
+        "maxLength" : null,
+        "minLength" : null,
+        "options" : null,
+        "optionsDataSource" : null
+      }, {
+        "advancedOption" : null,
+        "description" : "The API key for the Pinecone API.",
+        "displayCondition" : null,
+        "expressionEnabled" : null,
+        "hidden" : null,
+        "metadata" : { },
+        "required" : true,
+        "name" : "apiKey",
+        "type" : "STRING",
+        "defaultValue" : null,
+        "exampleValue" : null,
+        "label" : "Pinecone API Key",
+        "placeholder" : null,
+        "controlType" : "TEXT",
+        "languageId" : null,
+        "maxLength" : null,
+        "minLength" : null,
+        "options" : null,
+        "optionsDataSource" : null
+      }, {
+        "advancedOption" : null,
+        "description" : "Url of the host.",
+        "displayCondition" : null,
+        "expressionEnabled" : null,
+        "hidden" : null,
+        "metadata" : { },
+        "required" : true,
+        "name" : "host",
+        "type" : "STRING",
+        "defaultValue" : null,
+        "exampleValue" : "https://indexname-pr0j1d7.svc.aped-1234-a12b.pinecone.io",
+        "label" : "Host",
+        "placeholder" : null,
+        "controlType" : "TEXT",
+        "languageId" : null,
+        "maxLength" : null,
+        "minLength" : null,
+        "options" : null,
+        "optionsDataSource" : null
+      } ],
+      "refreshOn" : null,
+      "title" : null,
+      "type" : "CUSTOM",
+      "acquire" : null,
+      "apply" : null,
+      "authorizationCallback" : null,
+      "authorizationUrl" : null,
+      "clientId" : null,
+      "clientSecret" : null,
+      "oauth2AuthorizationExtraQueryParameters" : null,
+      "pkce" : null,
+      "refresh" : null,
+      "refreshUrl" : null,
+      "scopes" : null,
+      "refreshToken" : null,
+      "tokenUrl" : null
+    } ],
+    "properties" : null,
+    "version" : 1,
+    "authorizationRequired" : null,
+    "baseUri" : null,
+    "test" : null
+  }
 }

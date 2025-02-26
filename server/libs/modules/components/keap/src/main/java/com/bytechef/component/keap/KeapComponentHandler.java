@@ -47,17 +47,13 @@ public class KeapComponentHandler extends AbstractKeapComponentHandler {
     public ModifiableProperty<?> modifyProperty(
         ActionDefinition actionDefinition, ModifiableProperty<?> modifiableProperty) {
 
-        if (Objects.equals(actionDefinition.getName(), "createContact")) {
+        if (Objects.equals(actionDefinition.getName(), "createContact") &&
+            Objects.equals(modifiableProperty.getName(), "company")) {
             for (BaseProperty baseProperty : ((ModifiableObjectProperty) modifiableProperty).getProperties()
                 .get()) {
-                if (Objects.equals(baseProperty.getName(), "company")) {
-                    for (BaseProperty baseProperty1 : ((ModifiableObjectProperty) baseProperty).getProperties()
-                        .get()) {
-                        if (Objects.equals(baseProperty1.getName(), "id")) {
-                            ((ModifiableIntegerProperty) baseProperty1).options(
-                                (ActionOptionsFunction<Long>) KeapUtils::getCompanyIdOptions);
-                        }
-                    }
+                if (Objects.equals(baseProperty.getName(), "id")) {
+                    ((ModifiableIntegerProperty) baseProperty).options(
+                        (ActionOptionsFunction<Long>) KeapUtils::getCompanyIdOptions);
                 }
             }
         }

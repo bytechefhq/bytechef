@@ -43,18 +43,23 @@ public class TodoistCreateProjectAction {
                 "path", "/projects", "bodyContentType", BodyContentType.JSON, "mimeType", "application/json"
 
             ))
-        .properties(object("__item").properties(string("name").label("Name")
+        .properties(string("name").metadata(
+            Map.of(
+                "type", PropertyType.BODY))
+            .label("Name")
             .description("Name of the project.")
             .required(true),
-            string("color").label("Color")
+            string("color").metadata(
+                Map.of(
+                    "type", PropertyType.BODY))
+                .label("Color")
                 .required(false),
-            bool("is_favorite").label("Is Project a Favorite?")
+            bool("is_favorite").metadata(
+                Map.of(
+                    "type", PropertyType.BODY))
+                .label("Is Project a Favorite?")
                 .description("Whether the project is a favorite.")
                 .required(false))
-            .label("Project")
-            .metadata(
-                Map.of(
-                    "type", PropertyType.BODY)))
         .output(outputSchema(object()
             .properties(object("body").properties(string("id").required(false), string("name").required(false),
                 string("color").required(false), string("is_favorite").required(false), string("url").required(false))

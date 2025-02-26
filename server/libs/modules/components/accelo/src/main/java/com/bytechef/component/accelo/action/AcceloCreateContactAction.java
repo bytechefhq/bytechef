@@ -44,26 +44,37 @@ public class AcceloCreateContactAction {
                 "path", "/contacts", "bodyContentType", BodyContentType.JSON, "mimeType", "application/json"
 
             ))
-        .properties(object("__item").properties(string("firstname").label("First Name")
+        .properties(string("firstname").metadata(
+            Map.of(
+                "type", PropertyType.BODY))
+            .label("First Name")
             .description("The first name of the contact.")
             .required(false),
-            string("surname").label("Last Name")
+            string("surname").metadata(
+                Map.of(
+                    "type", PropertyType.BODY))
+                .label("Last Name")
                 .description("The last name of the contact.")
                 .required(false),
-            string("company_id").label("Company ID")
+            string("company_id").metadata(
+                Map.of(
+                    "type", PropertyType.BODY))
+                .label("Company ID")
                 .description("ID of the company  to which the newly affiliated contact will be linked.")
                 .required(true)
                 .options((OptionsDataSource.ActionOptionsFunction<String>) AcceloUtils::getCompanyIdOptions),
-            string("phone").label("Phone")
+            string("phone").metadata(
+                Map.of(
+                    "type", PropertyType.BODY))
+                .label("Phone")
                 .description("The contact's phone number in their role in the associated company.")
                 .required(false),
-            string("email").label("Email")
+            string("email").metadata(
+                Map.of(
+                    "type", PropertyType.BODY))
+                .label("Email")
                 .description("The contact's position in the associated company.")
                 .required(false))
-            .label("Contact")
-            .metadata(
-                Map.of(
-                    "type", PropertyType.BODY)))
         .output(outputSchema(object()
             .properties(object("body")
                 .properties(

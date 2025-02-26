@@ -10,7 +10,6 @@
   "resources" : null,
   "version" : 1,
   "title" : "Bash",
-  "connection" : null,
   "actions" : [ {
     "batch" : null,
     "deprecated" : null,
@@ -45,6 +44,7 @@
         "sampleOutput" : "Sample result",
         "placeholder" : null
       },
+      "sampleOutput" : "Sample result",
       "outputSchema" : {
         "advancedOption" : null,
         "description" : null,
@@ -65,8 +65,7 @@
         "minLength" : null,
         "options" : null,
         "optionsDataSource" : null
-      },
-      "sampleOutput" : "Sample result"
+      }
     },
     "properties" : [ {
       "advancedOption" : null,
@@ -94,7 +93,8 @@
     "workflowNodeDescription" : null,
     "perform" : { }
   } ],
+  "dataStream" : null,
   "triggers" : null,
   "unifiedApi" : null,
-  "dataStream" : null
+  "connection" : null
 }

@@ -70,6 +70,7 @@ paths:
           schema:
             type: "integer"
             title: "Task List ID"
+            x-dynamic-options: true
       requestBody:
         content:
           application/json:

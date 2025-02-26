@@ -20,6 +20,7 @@ paths:
           schema:
             title: "Book ID"
             type: "string"
+            x-dynamic-options: true
       requestBody:
         content:
           application/json:
@@ -59,6 +60,7 @@ paths:
           schema:
             title: "Book ID"
             type: "string"
+            x-dynamic-options: true
       requestBody:
         content:
           application/json:
@@ -74,6 +76,7 @@ paths:
                 customer:
                   type: "string"
                   description: "The customer that is being invoiced."
+                  x-dynamic-options: true
                 invoiceDate:
                   type: "string"
                   title: "Invoice Date"
@@ -123,6 +126,7 @@ paths:
           schema:
             title: "Book ID"
             type: "string"
+            x-dynamic-options: true
       requestBody:
         content:
           application/json:
@@ -137,6 +141,7 @@ paths:
                 supplier:
                   type: "string"
                   description: "The supplier that is being paid."
+                  x-dynamic-options: true
                 paymentDate:
                   type: "string"
                   format: "date"

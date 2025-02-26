@@ -23,27 +23,17 @@ import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.hubspot.constant.HubspotConstants.HAPIKEY;
 
 import com.bytechef.component.OpenApiComponentHandler;
-import com.bytechef.component.definition.ActionDefinition;
 import com.bytechef.component.definition.Authorization;
 import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDsl.ModifiableComponentDefinition;
 import com.bytechef.component.definition.ComponentDsl.ModifiableConnectionDefinition;
-import com.bytechef.component.definition.ComponentDsl.ModifiableObjectProperty;
-import com.bytechef.component.definition.ComponentDsl.ModifiableProperty;
-import com.bytechef.component.definition.ComponentDsl.ModifiableStringProperty;
 import com.bytechef.component.definition.ComponentDsl.ModifiableTriggerDefinition;
-import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
-import com.bytechef.component.definition.Property.ValueProperty;
 import com.bytechef.component.hubspot.trigger.HubspotNewContactTrigger;
 import com.bytechef.component.hubspot.trigger.HubspotNewDealTrigger;
 import com.bytechef.component.hubspot.trigger.HubspotNewTicketTrigger;
 import com.bytechef.component.hubspot.unified.HubspotUnifiedApi;
-import com.bytechef.component.hubspot.util.HubspotUtils;
-import com.bytechef.definition.BaseProperty;
 import com.google.auto.service.AutoService;
 import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
 
 /**
  * @author Ivica Cardic
@@ -93,45 +83,5 @@ public class HubspotComponentHandler extends AbstractHubspotComponentHandler {
                     "crm.objects.owners.read", "tickets"))
                 .tokenUrl((connectionParameters, context) -> "https://api.hubapi.com/oauth/v1/token")
                 .refreshUrl((connectionParameters, context) -> "https://api.hubapi.com/oauth/v1/token"));
-    }
-
-    @Override
-    public ModifiableProperty<?> modifyProperty(
-        ActionDefinition actionDefinition, ModifiableProperty<?> modifiableProperty) {
-
-        if (Objects.equals(modifiableProperty.getName(), "contactId")) {
-            ((ModifiableStringProperty) modifiableProperty)
-                .options((ActionOptionsFunction<String>) HubspotUtils::getContactsOptions);
-        } else if (Objects.equals(modifiableProperty.getName(), "ticketId")) {
-            ((ModifiableStringProperty) modifiableProperty)
-                .options((ActionOptionsFunction<String>) HubspotUtils::getTicketIdOptions);
-        } else if (Objects.equals(modifiableProperty.getName(), "__item")) {
-            Optional<List<? extends ValueProperty<?>>> propertiesOptional =
-                ((ModifiableObjectProperty) modifiableProperty).getProperties();
-
-            for (BaseProperty baseProperty : propertiesOptional.get()) {
-
-                if (Objects.equals(baseProperty.getName(), "properties")) {
-                    Optional<List<? extends ValueProperty<?>>> propertiesOptional1 =
-                        ((ModifiableObjectProperty) baseProperty).getProperties();
-
-                    for (BaseProperty baseProperty1 : propertiesOptional1.get()) {
-                        if (Objects.equals(baseProperty1.getName(), "pipeline")) {
-                            ((ModifiableStringProperty) baseProperty1)
-                                .options((ActionOptionsFunction<String>) HubspotUtils::getPipelineDealOptions);
-                        } else if (Objects.equals(baseProperty1.getName(), "dealstage")) {
-                            ((ModifiableStringProperty) baseProperty1)
-                                .options((ActionOptionsFunction<String>) HubspotUtils::getDealStageOptions)
-                                .optionsLookupDependsOn("__item.properties.pipeline");
-                        } else if (Objects.equals(baseProperty1.getName(), "hubspot_owner_id")) {
-                            ((ModifiableStringProperty) baseProperty1)
-                                .options((ActionOptionsFunction<String>) HubspotUtils::getOwnerOptions);
-                        }
-                    }
-                }
-            }
-        }
-
-        return modifiableProperty;
     }
 }

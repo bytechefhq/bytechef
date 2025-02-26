@@ -42,7 +42,7 @@ public class TeamworkCreateCompanyAction {
                 "path", "/companies.json", "bodyContentType", BodyContentType.JSON, "mimeType", "application/json"
 
             ))
-        .properties(object("__item").properties(object("company").properties(string("name").label("Name")
+        .properties(object("company").properties(string("name").label("Name")
             .description("The name of the company.")
             .required(false),
             string("emailOne").label("Email")
@@ -53,12 +53,11 @@ public class TeamworkCreateCompanyAction {
             string("website").label("Website")
                 .description("The company's website.")
                 .required(false))
-            .label("Company")
-            .required(false))
-            .label("Company")
             .metadata(
                 Map.of(
-                    "type", PropertyType.BODY)))
+                    "type", PropertyType.BODY))
+            .label("Company")
+            .required(false))
         .output(outputSchema(object()
             .properties(object("body")
                 .properties(string("name").required(false), string("emailOne").required(false),

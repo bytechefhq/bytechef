@@ -49,10 +49,14 @@ paths:
                             type: "integer"
                             description: "The ID of the product that the line item belongs to."
                             title: "Product ID"
+                            x-dynamic-options: true
                           variant_id:
                             type: "integer"
                             description: "The ID of the product variant."
                             title: "Variant ID"
+                            x-dynamic-options: true
+                            x-dynamic-options-dependency:
+                              - "order.line_items[index].product_id"
                           quantity:
                             type: "integer"
                             description: "The number of items that were purchased."
@@ -86,6 +90,7 @@ paths:
           schema:
             type: "integer"
             title: "Order ID"
+            x-dynamic-options: true
       responses:
         200:
           description: "Successful operation"
@@ -101,6 +106,7 @@ paths:
           schema:
             title: "Order ID"
             type: "integer"
+            x-dynamic-options: true
       responses:
         200:
           description: "Successful operation"
@@ -120,6 +126,7 @@ paths:
           schema:
             type: "integer"
             title: "Order ID"
+            x-dynamic-options: true
       requestBody:
         content:
           application/json:
@@ -163,6 +170,7 @@ paths:
           schema:
             type: "integer"
             title: "Order ID"
+            x-dynamic-options: true
       responses:
         200:
           description: "Successful operation"

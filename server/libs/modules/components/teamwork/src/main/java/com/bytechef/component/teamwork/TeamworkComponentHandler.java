@@ -22,17 +22,11 @@ import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.teamwork.constant.TeamworkConstants.SITE_NAME;
 
 import com.bytechef.component.OpenApiComponentHandler;
-import com.bytechef.component.definition.ActionDefinition;
 import com.bytechef.component.definition.Authorization.AuthorizationType;
 import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDsl.ModifiableComponentDefinition;
 import com.bytechef.component.definition.ComponentDsl.ModifiableConnectionDefinition;
-import com.bytechef.component.definition.ComponentDsl.ModifiableIntegerProperty;
-import com.bytechef.component.definition.ComponentDsl.ModifiableProperty;
-import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
-import com.bytechef.component.teamwork.util.TeamworkUtils;
 import com.google.auto.service.AutoService;
-import java.util.Objects;
 
 /**
  * @author Monika Domiter
@@ -66,19 +60,5 @@ public class TeamworkComponentHandler extends AbstractTeamworkComponentHandler {
                             .required(true)))
             .baseUri((connectionParameters, context) -> "https://" + connectionParameters.getRequiredString(SITE_NAME)
                 + ".teamwork.com/projects/api/v3");
-    }
-
-    @Override
-    public ModifiableProperty<?> modifyProperty(
-        ActionDefinition actionDefinition, ModifiableProperty<?> modifiableProperty) {
-
-        if (Objects.equals(actionDefinition.getName(), "createTask") &&
-            Objects.equals(modifiableProperty.getName(), "tasklistId")) {
-
-            ((ModifiableIntegerProperty) modifiableProperty)
-                .options((ActionOptionsFunction<String>) TeamworkUtils::getTaskListIdOptions);
-        }
-
-        return modifiableProperty;
     }
 }

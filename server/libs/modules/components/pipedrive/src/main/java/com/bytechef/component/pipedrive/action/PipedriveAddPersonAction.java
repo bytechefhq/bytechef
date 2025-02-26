@@ -46,13 +46,22 @@ public class PipedriveAddPersonAction {
                 "path", "/persons", "bodyContentType", BodyContentType.JSON, "mimeType", "application/json"
 
             ))
-        .properties(object("__item").properties(string("name").label("Name")
+        .properties(string("name").metadata(
+            Map.of(
+                "type", PropertyType.BODY))
+            .label("Name")
             .description("Person full name")
             .required(true),
-            integer("owner_id").label("Owner ID")
+            integer("owner_id").metadata(
+                Map.of(
+                    "type", PropertyType.BODY))
+                .label("Owner ID")
                 .description("ID of the user who will be marked as the owner of this person.")
                 .required(false),
-            integer("org_id").label("Organization ID")
+            integer("org_id").metadata(
+                Map.of(
+                    "type", PropertyType.BODY))
+                .label("Organization ID")
                 .description("ID of the organization this person will belong to.")
                 .required(false),
             array("email").items(object().properties(string("value").label("Email Address")
@@ -66,6 +75,9 @@ public class PipedriveAddPersonAction {
                     .required(false))
                 .description("An email addresses related to the person."))
                 .placeholder("Add to Email")
+                .metadata(
+                    Map.of(
+                        "type", PropertyType.BODY))
                 .label("Email")
                 .description("An email addresses related to the person.")
                 .required(false),
@@ -82,13 +94,12 @@ public class PipedriveAddPersonAction {
                     .required(false))
                 .description("A phone numbers related to the person."))
                 .placeholder("Add to Phone")
+                .metadata(
+                    Map.of(
+                        "type", PropertyType.BODY))
                 .label("Phone")
                 .description("A phone numbers related to the person.")
                 .required(false))
-            .label("Person")
-            .metadata(
-                Map.of(
-                    "type", PropertyType.BODY)))
         .output(outputSchema(object()
             .properties(object("body")
                 .properties(object("data")

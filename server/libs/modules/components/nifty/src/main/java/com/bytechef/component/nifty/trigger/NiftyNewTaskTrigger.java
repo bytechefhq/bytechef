@@ -37,7 +37,7 @@ import com.bytechef.component.definition.TriggerDefinition.WebhookEnableOutput;
 import com.bytechef.component.definition.TriggerDefinition.WebhookMethod;
 import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.exception.ProviderException;
-import com.bytechef.component.nifty.util.NiftyOptionUtils;
+import com.bytechef.component.nifty.util.NiftyUtils;
 import java.util.List;
 import java.util.Map;
 
@@ -53,7 +53,7 @@ public class NiftyNewTaskTrigger {
             string(APP_ID)
                 .label("Application")
                 .description("Application to be used for the trigger.")
-                .options((TriggerOptionsFunction<String>) NiftyOptionUtils::getAppIdOptions)
+                .options((TriggerOptionsFunction<String>) NiftyUtils::getAppIdOptions)
                 .required(true))
         .type(TriggerType.DYNAMIC_WEBHOOK)
         .output(

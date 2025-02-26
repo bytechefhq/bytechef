@@ -46,61 +46,59 @@ public class KeapCreateCompanyAction {
                 "path", "/companies", "bodyContentType", BodyContentType.JSON, "mimeType", "application/json"
 
             ))
-        .properties(object("__item")
-            .properties(object("address")
-                .properties(object("address").properties(string("country_code").label("Country Code")
+        .properties(object("address")
+            .properties(object("address").properties(string("country_code").label("Country Code")
+                .required(false),
+                string("line1").label("Line 1")
                     .required(false),
-                    string("line1").label("Line 1")
-                        .required(false),
-                    string("line2").label("Line 2")
-                        .required(false),
-                    string("locality").label("Locality")
-                        .required(false),
-                    string("region").label("Region")
-                        .required(false),
-                    string("zip_code").label("Zip Code")
-                        .required(false),
-                    string("zip_four").label("Zip Four")
-                        .required(false))
-                    .label("CompanyAddress")
+                string("line2").label("Line 2")
                     .required(false),
-                    string("company_name").label("Company Name")
-                        .required(false),
-                    array("custom_fields").items(object().properties(object("content").label("Content")
-                        .required(false),
-                        integer("id").label("Id")
-                            .required(false)))
-                        .placeholder("Add to Custom Fields")
-                        .label("Custom Fields")
-                        .required(false),
-                    string("email_address").label("Email Address")
-                        .required(false),
-                    object("fax_number").properties(string("number").label("Number")
-                        .required(false),
-                        string("type").label("Type")
-                            .required(false))
-                        .label("CompanyFaxNumber")
-                        .required(false),
-                    string("notes").label("Notes")
-                        .required(false),
-                    string("opt_in_reason").label("Opt In Reason")
-                        .required(false),
-                    object("phone_number").properties(string("extension").label("Extension")
-                        .required(false),
-                        string("number").label("Number")
-                            .required(false),
-                        string("type").label("Type")
-                            .required(false))
-                        .label("CompanyPhoneNumber")
-                        .required(false),
-                    string("website").label("Website")
-                        .required(false))
+                string("locality").label("Locality")
+                    .required(false),
+                string("region").label("Region")
+                    .required(false),
+                string("zip_code").label("Zip Code")
+                    .required(false),
+                string("zip_four").label("Zip Four")
+                    .required(false))
                 .label("CompanyAddress")
-                .required(false))
-            .label("Item")
+                .required(false),
+                string("company_name").label("Company Name")
+                    .required(false),
+                array("custom_fields").items(object().properties(object("content").label("Content")
+                    .required(false),
+                    integer("id").label("Id")
+                        .required(false)))
+                    .placeholder("Add to Custom Fields")
+                    .label("Custom Fields")
+                    .required(false),
+                string("email_address").label("Email Address")
+                    .required(false),
+                object("fax_number").properties(string("number").label("Number")
+                    .required(false),
+                    string("type").label("Type")
+                        .required(false))
+                    .label("CompanyFaxNumber")
+                    .required(false),
+                string("notes").label("Notes")
+                    .required(false),
+                string("opt_in_reason").label("Opt In Reason")
+                    .required(false),
+                object("phone_number").properties(string("extension").label("Extension")
+                    .required(false),
+                    string("number").label("Number")
+                        .required(false),
+                    string("type").label("Type")
+                        .required(false))
+                    .label("CompanyPhoneNumber")
+                    .required(false),
+                string("website").label("Website")
+                    .required(false))
             .metadata(
                 Map.of(
-                    "type", PropertyType.BODY)))
+                    "type", PropertyType.BODY))
+            .label("CompanyAddress")
+            .required(false))
         .output(
             outputSchema(
                 object()

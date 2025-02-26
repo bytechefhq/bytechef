@@ -42,16 +42,18 @@ public class AffinityCreateOrganizationAction {
                 "path", "/organizations", "bodyContentType", BodyContentType.JSON, "mimeType", "application/json"
 
             ))
-        .properties(object("__item").properties(string("name").label("Name")
+        .properties(string("name").metadata(
+            Map.of(
+                "type", PropertyType.BODY))
+            .label("Name")
             .description("The name of the organization.")
             .required(true),
-            string("domain").label("Domain")
+            string("domain").metadata(
+                Map.of(
+                    "type", PropertyType.BODY))
+                .label("Domain")
                 .description("The domain name of the organization.")
                 .required(false))
-            .label("Organization")
-            .metadata(
-                Map.of(
-                    "type", PropertyType.BODY)))
         .output(outputSchema(object()
             .properties(object("body")
                 .properties(string("id").required(false), string("name").required(false),

@@ -26,7 +26,9 @@ import static com.bytechef.component.definition.Context.Http.BodyContentType;
 import static com.bytechef.component.definition.Context.Http.ResponseType;
 
 import com.bytechef.component.definition.ComponentDsl;
+import com.bytechef.component.definition.OptionsDataSource;
 import com.bytechef.component.shopify.property.ShopifyOrderProperties;
+import com.bytechef.component.shopify.util.ShopifyUtils;
 import java.util.Map;
 
 /**
@@ -48,10 +50,11 @@ public class ShopifyUpdateOrderAction {
         .properties(integer("orderId").label("Order ID")
             .description("ID of the order to update.")
             .required(true)
+            .options((OptionsDataSource.ActionOptionsFunction<Long>) ShopifyUtils::getOrderIdOptions)
             .metadata(
                 Map.of(
                     "type", PropertyType.PATH)),
-            object("__item").properties(object("order").properties(string("note").label("Note")
+            object("order").properties(string("note").label("Note")
                 .description("An optional note that a shop owner can attach to the order.")
                 .required(false),
                 string("email").label("Email")
@@ -63,12 +66,11 @@ public class ShopifyUpdateOrderAction {
                 string("tags").label("Tags")
                     .description("Tags attached to the order, formatted as a string of comma-separated values.")
                     .required(false))
-                .label("Order")
-                .required(false))
-                .label("Order")
                 .metadata(
                     Map.of(
-                        "type", PropertyType.BODY)))
+                        "type", PropertyType.BODY))
+                .label("Order")
+                .required(false))
         .output(outputSchema(object().properties(ShopifyOrderProperties.PROPERTIES)
             .metadata(
                 Map.of(

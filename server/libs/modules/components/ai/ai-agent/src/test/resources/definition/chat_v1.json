@@ -50,8 +50,8 @@
     "title" : "Chat",
     "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
-    "outputDefinition" : null
+    "outputDefinition" : null,
+    "workflowNodeDescription" : null
   } ],
   "categories" : [ {
     "key" : "artificial-intelligence",
