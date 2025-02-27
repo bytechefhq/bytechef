@@ -1583,7 +1583,7 @@ public class ComponentInitOpenApiGenerator {
     @SuppressWarnings("rawtypes")
     private CodeBlock getRefCodeBlock(
         String propertyName, Boolean required, Schema<?> schema, boolean excludePropertyNameIfEmpty,
-        boolean outputSchema, OpenAPI openAPI) {
+        boolean outputSchema, OpenAPI openAPI, boolean bodySchema) {
 
         String ref = schema.get$ref();
         Components components = openAPI.getComponents();
@@ -1597,11 +1597,8 @@ public class ComponentInitOpenApiGenerator {
         schema = schemaMap.get(curSchemaName);
 
         return getSchemaCodeBlock(
-            StringUtils.isEmpty(propertyName) && !excludePropertyNameIfEmpty
-                ? StringUtils.uncapitalize(curSchemaName)
-                : propertyName,
-            schema.getDescription(), required, curSchemaName, schema, excludePropertyNameIfEmpty,
-            outputSchema, openAPI, false);
+            propertyName, schema.getDescription(), required, curSchemaName, schema, excludePropertyNameIfEmpty,
+            outputSchema, openAPI, bodySchema);
     }
 
     @SuppressWarnings({
@@ -1804,7 +1801,8 @@ public class ComponentInitOpenApiGenerator {
 
         Map<String, Object> extensionMap = schema.getExtensions();
 
-        if (extensionMap == null || extensionMap.containsKey("x-dynamic-options")) {
+        if (extensionMap == null || extensionMap.containsKey("x-dynamic-options")
+            || !extensionMap.containsKey("x-dynamic-properties")) {
             if (StringUtils.isEmpty(schema.get$ref())) {
                 String type = StringUtils.isEmpty(schema.getType()) ? "object" : schema.getType();
 
@@ -2023,7 +2021,8 @@ public class ComponentInitOpenApiGenerator {
                     propertyName, propertyDescription, required, schema, outputSchema, type, builder);
             } else {
                 builder.add(
-                    getRefCodeBlock(propertyName, required, schema, excludePropertyNameIfEmpty, outputSchema, openAPI));
+                    getRefCodeBlock(
+                        propertyName, required, schema, excludePropertyNameIfEmpty, outputSchema, openAPI, bodySchema));
             }
 
             handleDynamicOptions(propertyName, schema, extensionMap, builder);
