@@ -339,6 +339,17 @@ public class ComponentInitOpenApiGenerator {
             .collect(Collectors.joining(" "));
     }
 
+    public static String buildPropertyNameFromTitle(String title) {
+        String[] split = StringUtils.split(title, ' ');
+
+        String collect = Arrays.stream(split)
+            .skip(1)
+            .map(StringUtils::capitalize)
+            .collect(Collectors.joining(""));
+
+        return split[0].toLowerCase() + collect;
+    }
+
     private void checkAdditionalProperties(
         String propertyName, String propertyDescription, Boolean required, Schema<?> schema, boolean outputSchema,
         String type, CodeBlock.Builder builder) {
@@ -1815,7 +1826,9 @@ public class ComponentInitOpenApiGenerator {
                                     null, schema.getDescription(), null, null, schema.getItems(), true, outputSchema,
                                     openAPI, bodySchema));
                         } else {
-                            propertyName = StringUtils.isEmpty(propertyName) ? "__items" : propertyName;
+                            propertyName = StringUtils.isEmpty(propertyName)
+                                ? schema.getTitle() == null ? "__items" : buildPropertyNameFromTitle(schema.getTitle())
+                                : propertyName;
 
                             builder.add(
                                 "array($S).items($L)",
