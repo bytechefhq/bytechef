@@ -1,6 +1,7 @@
 import useWorkflowTestChatStore from '@/pages/platform/workflow-editor/stores/useWorkflowTestChatStore';
 import {CONDITION_CASE_FALSE, CONDITION_CASE_TRUE, SPACE} from '@/shared/constants';
 import {Workflow, WorkflowTask} from '@/shared/middleware/platform/configuration';
+import {ProjectWorkflowKeys} from '@/shared/queries/automation/projectWorkflows.queries';
 import {WorkflowNodeOutputKeys} from '@/shared/queries/platform/workflowNodeOutputs.queries';
 import {ConditionTaskDispatcherType, NodeDataType, WorkflowDefinitionType, WorkflowTaskType} from '@/shared/types';
 import {QueryClient, UseMutationResult} from '@tanstack/react-query';
@@ -13,6 +14,7 @@ import getParentLoopTask from './getParentLoopTask';
 interface HandleDeleteTaskProps {
     currentNode?: NodeDataType;
     data: NodeDataType;
+    projectId: number;
     queryClient: QueryClient;
     updateWorkflowMutation: UseMutationResult<void, unknown, {id: string; workflow: Workflow}>;
     workflow: Workflow & WorkflowTaskDataType;
@@ -21,6 +23,7 @@ interface HandleDeleteTaskProps {
 export default function handleDeleteTask({
     currentNode,
     data,
+    projectId,
     queryClient,
     updateWorkflowMutation,
     workflow,
@@ -139,6 +142,14 @@ export default function handleDeleteTask({
                         id: workflow.id!,
                         lastWorkflowNodeName: currentNode?.name,
                     }),
+                });
+
+                queryClient.invalidateQueries({
+                    queryKey: ProjectWorkflowKeys.projectWorkflows(+projectId!),
+                });
+
+                queryClient.invalidateQueries({
+                    queryKey: ProjectWorkflowKeys.workflows,
                 });
 
                 if (currentNode?.name === data.name) {
