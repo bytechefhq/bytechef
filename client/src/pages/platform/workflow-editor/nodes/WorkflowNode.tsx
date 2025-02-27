@@ -9,6 +9,7 @@ import {useQueryClient} from '@tanstack/react-query';
 import {Handle, Position} from '@xyflow/react';
 import {PencilIcon, TrashIcon} from 'lucide-react';
 import {memo, useState} from 'react';
+import {useParams} from 'react-router-dom';
 import sanitize from 'sanitize-html';
 import {twMerge} from 'tailwind-merge';
 
@@ -41,11 +42,14 @@ const WorkflowNode = ({data, id}: {data: NodeDataType; id: string}) => {
 
     const {updateWorkflowMutation} = useWorkflowMutation();
 
+    const {projectId} = useParams();
+
     const handleDeleteNodeClick = (data: NodeDataType) => {
         if (data) {
             handleDeleteTask({
                 currentNode,
                 data,
+                projectId: +projectId!,
                 queryClient,
                 updateWorkflowMutation,
                 workflow,
