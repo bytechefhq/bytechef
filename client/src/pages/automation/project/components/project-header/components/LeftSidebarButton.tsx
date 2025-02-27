@@ -2,7 +2,7 @@ import {Button} from '@/components/ui/button';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {PanelLeftIcon} from 'lucide-react';
 
-const LeftLeftSidebarButton = ({onLeftSidebarOpenClick}: {onLeftSidebarOpenClick: () => void}) => {
+const LeftSidebarButton = ({onLeftSidebarOpenClick}: {onLeftSidebarOpenClick: () => void}) => {
     return (
         <Tooltip>
             <TooltipTrigger asChild>
@@ -21,4 +21,4 @@ const LeftLeftSidebarButton = ({onLeftSidebarOpenClick}: {onLeftSidebarOpenClick
     );
 };
 
-export default LeftLeftSidebarButton;
+export default LeftSidebarButton;
