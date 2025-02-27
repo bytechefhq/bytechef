@@ -1,6 +1,4 @@
-import {Button} from '@/components/ui/button';
-import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
-import LeftLeftSidebarButton from '@/pages/automation/project/components/project-header/components/LeftSidebarButton';
+import LeftSidebarButton from '@/pages/automation/project/components/project-header/components/LeftSidebarButton';
 import LoaderNotification from '@/pages/automation/project/components/project-header/components/LoaderNotification';
 import OutputPanelButton from '@/pages/automation/project/components/project-header/components/OutputButton';
 import ProjectBreadcrumb from '@/pages/automation/project/components/project-header/components/ProjectBreadcrumb';
@@ -12,10 +10,7 @@ import {useProjectHeader} from '@/pages/automation/project/components/project-he
 import useProjectsLeftSidebarStore from '@/pages/automation/project/stores/useProjectsLeftSidebarStore';
 import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWorkflowDataStore';
 import useWorkflowEditorStore from '@/pages/platform/workflow-editor/stores/useWorkflowEditorStore';
-import WorkflowDialog from '@/shared/components/workflow/WorkflowDialog';
-import {useGetWorkflowQuery} from '@/shared/queries/automation/workflows.queries';
 import {UpdateWorkflowMutationType} from '@/shared/types';
-import {PlusIcon} from '@radix-ui/react-icons';
 import {onlineManager, useIsFetching} from '@tanstack/react-query';
 import {RefObject} from 'react';
 import {ImperativePanelHandle} from 'react-resizable-panels';
@@ -35,13 +30,12 @@ const ProjectHeader = ({
     runDisabled: boolean;
     updateWorkflowMutation: UpdateWorkflowMutationType;
 }) => {
-    const {leftSidebarOpen, setLeftSidebarOpen} = useProjectsLeftSidebarStore();
+    const {projectLeftSidebarOpen, setProjectLeftSidebarOpen} = useProjectsLeftSidebarStore();
     const {workflowIsRunning} = useWorkflowEditorStore();
     const {workflow} = useWorkflowDataStore();
 
     const isFetching = useIsFetching();
     const {
-        createProjectWorkflowMutation,
         handleProjectWorkflowValueChange,
         handlePublishProjectSubmit,
         handleRunClick,
@@ -63,15 +57,13 @@ const ProjectHeader = ({
     }
 
     return (
-        <header className="flex items-center justify-between bg-background px-3 py-2.5">
+        <header className="flex items-center justify-between bg-surface-main px-3 py-2.5">
             <div className="flex items-center">
-                {!leftSidebarOpen && (
-                    <LeftLeftSidebarButton onLeftSidebarOpenClick={() => setLeftSidebarOpen(!leftSidebarOpen)} />
-                )}
+                <LeftSidebarButton onLeftSidebarOpenClick={() => setProjectLeftSidebarOpen(!projectLeftSidebarOpen)} />
 
-                {projectWorkflows && workflow.label && (
+                {projectWorkflows && (
                     <ProjectBreadcrumb
-                        currentWorkflowLabel={workflow.label}
+                        currentWorkflow={workflow}
                         onProjectWorkflowValueChange={handleProjectWorkflowValueChange}
                         project={project}
                         projectWorkflowId={projectWorkflowId}
@@ -81,30 +73,6 @@ const ProjectHeader = ({
             </div>
 
             <div className="flex items-center space-x-2">
-                {!!projectId && (
-                    <WorkflowDialog
-                        createWorkflowMutation={createProjectWorkflowMutation}
-                        parentId={projectId}
-                        triggerNode={
-                            <Button
-                                className="hover:bg-surface-neutral-primary-hover [&_svg]:size-5"
-                                size="icon"
-                                variant="ghost"
-                            >
-                                <Tooltip>
-                                    <TooltipTrigger asChild>
-                                        <PlusIcon />
-                                    </TooltipTrigger>
-
-                                    <TooltipContent>New workflow</TooltipContent>
-                                </Tooltip>
-                            </Button>
-                        }
-                        updateWorkflowMutation={updateWorkflowMutation}
-                        useGetWorkflowQuery={useGetWorkflowQuery}
-                    />
-                )}
-
                 <OutputPanelButton onShowOutputClick={handleShowOutputClick} />
 
                 <LoaderNotification isFetching={isFetching} isOnline={isOnline} />
