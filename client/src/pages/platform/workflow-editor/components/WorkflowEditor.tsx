@@ -23,11 +23,15 @@ import WorkflowNode from '../nodes/WorkflowNode';
 
 export interface WorkflowEditorProps {
     componentDefinitions: ComponentDefinitionBasic[];
-    leftSidebarOpen: boolean;
+    projectLeftSidebarOpen?: boolean;
     taskDispatcherDefinitions: TaskDispatcherDefinitionBasic[];
 }
 
-const WorkflowEditor = ({componentDefinitions, leftSidebarOpen, taskDispatcherDefinitions}: WorkflowEditorProps) => {
+const WorkflowEditor = ({
+    componentDefinitions,
+    projectLeftSidebarOpen,
+    taskDispatcherDefinitions,
+}: WorkflowEditorProps) => {
     const {workflow} = useWorkflowDataStore();
 
     const {edges, nodes, onEdgesChange, onNodesChange} = useWorkflowDataStore(
@@ -187,7 +191,7 @@ const WorkflowEditor = ({componentDefinitions, leftSidebarOpen, taskDispatcherDe
         canvasWidth -= 400;
     }
 
-    if (leftSidebarOpen) {
+    if (projectLeftSidebarOpen) {
         canvasWidth -= 384;
     }
 

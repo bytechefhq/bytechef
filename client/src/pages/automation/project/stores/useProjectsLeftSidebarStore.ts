@@ -2,18 +2,18 @@ import {create} from 'zustand';
 import {devtools, persist} from 'zustand/middleware';
 
 interface LeftSidebarStateI {
-    leftSidebarOpen: boolean;
-    setLeftSidebarOpen: (rightSidebarStatus: boolean) => void;
+    projectLeftSidebarOpen: boolean;
+    setProjectLeftSidebarOpen: (projectLeftSidebarStatus: boolean) => void;
 }
 
 const useProjectsLeftSidebarStore = create<LeftSidebarStateI>()(
     devtools(
         persist(
             (set) => ({
-                leftSidebarOpen: false,
-                setLeftSidebarOpen: (leftSidebarOpen) =>
+                projectLeftSidebarOpen: false,
+                setProjectLeftSidebarOpen: (projectLeftSidebarOpen) =>
                     set(() => ({
-                        leftSidebarOpen,
+                        projectLeftSidebarOpen,
                     })),
             }),
             {
