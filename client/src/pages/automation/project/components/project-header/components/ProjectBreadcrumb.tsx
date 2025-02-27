@@ -4,14 +4,14 @@ import WorkflowSelect from '@/pages/automation/project/components/project-header
 import {Project, Workflow} from '@/shared/middleware/automation/configuration';
 
 export interface ProjectBreadcrumbProps {
-    currentWorkflowLabel: string;
+    currentWorkflow: Workflow;
     onProjectWorkflowValueChange: (projectWorkflowId: number) => void;
     project: Project;
     projectWorkflowId: number;
     projectWorkflows: Workflow[];
 }
 const ProjectBreadcrumb = ({
-    currentWorkflowLabel,
+    currentWorkflow,
     onProjectWorkflowValueChange,
     project,
     projectWorkflowId,
@@ -30,7 +30,7 @@ const ProjectBreadcrumb = ({
 
                 <BreadcrumbItem>
                     <WorkflowSelect
-                        currentWorkflowLabel={currentWorkflowLabel}
+                        currentWorkflowLabel={currentWorkflow.label}
                         onValueChange={onProjectWorkflowValueChange}
                         projectId={project.id!}
                         projectWorkflowId={projectWorkflowId}

@@ -7,6 +7,7 @@ import {
     SelectTrigger,
     SelectValue,
 } from '@/components/ui/select';
+import {Skeleton} from '@/components/ui/skeleton';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {Workflow} from '@/shared/middleware/automation/configuration';
 
@@ -16,7 +17,7 @@ const WorkflowSelect = ({
     projectWorkflowId,
     projectWorkflows,
 }: {
-    currentWorkflowLabel: string;
+    currentWorkflowLabel?: string;
     onValueChange: (projectWorkflowId: number) => void;
     projectId: number;
     projectWorkflowId: number;
@@ -33,13 +34,17 @@ const WorkflowSelect = ({
                 <TooltipTrigger asChild>
                     <SelectTrigger
                         aria-label="Workflow select"
-                        className="[&>span]:line-clamp-0 w-60 gap-2 border shadow-none hover:bg-surface-neutral-primary-hover [&>span]:truncate [&>svg]:min-w-4"
+                        className="[&>span]:line-clamp-0 w-64 gap-2 border shadow-none hover:bg-surface-neutral-primary-hover [&>span]:truncate [&>svg]:min-w-4"
                     >
-                        <SelectValue className="font-semibold" placeholder="Select a workflow" />
+                        <SelectValue className="font-semibold" placeholder="Select a workflow">
+                            {!currentWorkflowLabel ? <Skeleton className="h-3 w-44" /> : currentWorkflowLabel}
+                        </SelectValue>
                     </SelectTrigger>
                 </TooltipTrigger>
 
-                <TooltipContent>{currentWorkflowLabel}</TooltipContent>
+                {currentWorkflowLabel && currentWorkflowLabel.length > 30 && (
+                    <TooltipContent>{currentWorkflowLabel}</TooltipContent>
+                )}
             </Tooltip>
 
             {projectWorkflows && (
@@ -51,7 +56,7 @@ const WorkflowSelect = ({
                             <SelectItem
                                 className="w-60 [&>span]:truncate"
                                 key={workflow.projectWorkflowId!}
-                                title={workflow.label!}
+                                title={workflow.label!.length > 32 ? workflow.label! : undefined}
                                 value={workflow.projectWorkflowId!.toString()}
                             >
                                 {workflow.label!}

@@ -2,19 +2,27 @@ import {Skeleton} from '@/components/ui/skeleton';
 
 const ProjectSkeleton = () => {
     return (
-        <header className="flex bg-background px-3 py-2.5">
-            <div className="flex flex-1">
-                <Skeleton className="h-9 w-1/5" />
+        <header className="flex items-center justify-between bg-surface-main px-3 py-2.5">
+            <div className="flex items-center gap-5">
+                <Skeleton className="size-6" />
+
+                <Skeleton className="h-6 w-80" />
+
+                <Skeleton className="h-6 w-72" />
             </div>
 
-            <div className="flex items-center space-x-2">
-                <Skeleton className="h-9 w-32" />
+            <div className="flex items-center gap-4">
+                <Skeleton className="size-6" />
 
-                <Skeleton className="h-9 w-24" />
+                <Skeleton className="size-4 rounded-full" />
 
-                <Skeleton className="h-9 w-16" />
+                <Skeleton className="size-6" />
 
-                <Skeleton className="h-9 w-16" />
+                <div className="flex gap-2">
+                    <Skeleton className="h-9 w-28" />
+
+                    <Skeleton className="h-9 w-20" />
+                </div>
             </div>
         </header>
     );

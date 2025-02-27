@@ -9,7 +9,7 @@ const ProjectTitle = ({project}: {project: Project}) => {
                 <div className="flex max-w-96 items-center space-x-2">
                     <h1 className="truncate">{project?.name}</h1>
 
-                    <TooltipContent>{project.name}</TooltipContent>
+                    {project.name.length > 43 && <TooltipContent>{project.name}</TooltipContent>}
 
                     {project && (
                         <Badge
