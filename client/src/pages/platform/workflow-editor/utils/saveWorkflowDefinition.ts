@@ -211,6 +211,8 @@ export default async function saveWorkflowDefinition({
                 }
 
                 queryClient.invalidateQueries({queryKey: ProjectWorkflowKeys.projectWorkflows(projectId)});
+
+                queryClient.invalidateQueries({queryKey: ProjectWorkflowKeys.workflows});
             },
         }
     );
