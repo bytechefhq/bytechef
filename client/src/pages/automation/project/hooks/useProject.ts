@@ -106,6 +106,10 @@ export const useProject = () => {
                 queryKey: ProjectWorkflowKeys.projectWorkflows(+projectId!),
             });
 
+            queryClient.invalidateQueries({
+                queryKey: ProjectWorkflowKeys.workflows,
+            });
+
             setShowEditWorkflowDialog(false);
         },
         useUpdateWorkflowMutation: useUpdateWorkflowMutation,
