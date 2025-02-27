@@ -27,7 +27,7 @@ import useWorkflowNodeDetailsPanelStore from './stores/useWorkflowNodeDetailsPan
 
 const WorkflowEditorLayout = () => {
     const {copilotPanelOpen} = useCopilotStore();
-    const {leftSidebarOpen} = useProjectsLeftSidebarStore();
+    const {projectLeftSidebarOpen} = useProjectsLeftSidebarStore();
     const {rightSidebarOpen} = useRightSidebarStore();
     const {workflow} = useWorkflowDataStore();
     const {
@@ -71,7 +71,7 @@ const WorkflowEditorLayout = () => {
                     {componentDefinitions && taskDispatcherDefinitions && (
                         <WorkflowEditor
                             componentDefinitions={componentDefinitions}
-                            leftSidebarOpen={leftSidebarOpen}
+                            projectLeftSidebarOpen={projectLeftSidebarOpen}
                             taskDispatcherDefinitions={taskDispatcherDefinitions}
                         />
                     )}
