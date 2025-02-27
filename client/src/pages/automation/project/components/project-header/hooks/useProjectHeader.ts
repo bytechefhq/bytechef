@@ -9,9 +9,8 @@ import {useAnalytics} from '@/shared/hooks/useAnalytics';
 import {Project} from '@/shared/middleware/automation/configuration';
 import {WorkflowTestApi} from '@/shared/middleware/platform/workflow/test';
 import {usePublishProjectMutation} from '@/shared/mutations/automation/projects.mutations';
-import {useCreateProjectWorkflowMutation} from '@/shared/mutations/automation/workflows.mutations';
 import {ProjectVersionKeys} from '@/shared/queries/automation/projectVersions.queries';
-import {ProjectWorkflowKeys, useGetProjectWorkflowsQuery} from '@/shared/queries/automation/projectWorkflows.queries';
+import {useGetProjectWorkflowsQuery} from '@/shared/queries/automation/projectWorkflows.queries';
 import {ProjectKeys, useGetProjectQuery} from '@/shared/queries/automation/projects.queries';
 import {useQueryClient} from '@tanstack/react-query';
 import {RefObject, useCallback, useEffect} from 'react';
@@ -38,9 +37,10 @@ export const useProjectHeader = ({
     const {resetMessages, setWorkflowTestChatPanelOpen, workflowTestChatPanelOpen} = useWorkflowTestChatStore();
     const {currentWorkspaceId} = useWorkspaceStore();
 
-    const {captureProjectPublished, captureProjectWorkflowCreated, captureProjectWorkflowTested} = useAnalytics();
+    const {captureProjectPublished, captureProjectWorkflowTested} = useAnalytics();
     const navigate = useNavigate();
     const [searchParams] = useSearchParams();
+
     const {toast} = useToast();
 
     const {data: project} = useGetProjectQuery(projectId, useLoaderData() as Project);
@@ -48,24 +48,6 @@ export const useProjectHeader = ({
     const {data: projectWorkflows} = useGetProjectWorkflowsQuery(projectId, !!projectId);
 
     const queryClient = useQueryClient();
-
-    const createProjectWorkflowMutation = useCreateProjectWorkflowMutation({
-        onSuccess: (projectWorkflowId) => {
-            captureProjectWorkflowCreated();
-
-            queryClient.invalidateQueries({
-                queryKey: ProjectWorkflowKeys.projectWorkflows(projectId),
-            });
-
-            setShowBottomPanelOpen(false);
-
-            if (bottomResizablePanelRef.current) {
-                bottomResizablePanelRef.current.resize(0);
-            }
-
-            navigate(`/automation/projects/${projectId}/project-workflows/${projectWorkflowId}`);
-        },
-    });
 
     const publishProjectMutation = usePublishProjectMutation({
         onSuccess: () => {
@@ -180,7 +162,6 @@ export const useProjectHeader = ({
     }, [handleStopClick, workflowNodeDetailsPanelOpen, workflowTestChatPanelOpen]);
 
     return {
-        createProjectWorkflowMutation,
         handleProjectWorkflowValueChange,
         handlePublishProjectSubmit,
         handleRunClick,
