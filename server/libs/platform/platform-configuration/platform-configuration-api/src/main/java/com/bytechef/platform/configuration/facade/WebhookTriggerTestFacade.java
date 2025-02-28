@@ -14,27 +14,18 @@
  * limitations under the License.
  */
 
-package com.bytechef.platform.configuration.accessor;
+package com.bytechef.platform.configuration.facade;
 
 import com.bytechef.platform.constant.ModeType;
-import java.util.Map;
 
 /**
  * @author Ivica Cardic
  */
-public interface JobPrincipalAccessor {
+public interface WebhookTriggerTestFacade {
 
-    boolean isConnectionUsed(long connectionId);
+    void disableTrigger(String workflowId, ModeType type);
 
-    boolean isWorkflowEnabled(long principalId, String workflowReferenceCode);
+    String enableTrigger(String workflowId, ModeType type);
 
-    Map<String, ?> getInputMap(long principalId, String workflowReferenceCode);
-
-    ModeType getType();
-
-    String getWorkflowId(long principalId, String workflowReferenceCode);
-
-    String getLatestWorkflowId(String workflowReferenceCode);
-
-    String getWorkflowReferenceCode(String workflowId);
+    void stopByWorkflowReferenceCode(String workflowReferenceCode, ModeType type);
 }

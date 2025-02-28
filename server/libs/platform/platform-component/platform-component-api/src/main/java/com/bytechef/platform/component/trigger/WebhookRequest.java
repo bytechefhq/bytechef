@@ -91,5 +91,15 @@ public record WebhookRequest(
         public String getRawContent() {
             return rawContent;
         }
+
+        @Override
+        public String toString() {
+            return "WebhookBodyImpl{" +
+                "content=" + content +
+                ", contentType=" + contentType +
+                ", mimeType='" + mimeType + '\'' +
+                ", rawContent='" + rawContent + '\'' +
+                '}';
+        }
     }
 }

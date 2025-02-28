@@ -78,16 +78,22 @@ import org.springframework.web.util.UriComponentsBuilder;
 public abstract class AbstractWebhookTriggerController {
 
     private final FilesFileStorage filesFileStorage;
-    private JobPrincipalAccessorRegistry jobPrincipalAccessorRegistry;
+    private final JobPrincipalAccessorRegistry jobPrincipalAccessorRegistry;
     private String publicUrld;
-    private TriggerDefinitionService triggerDefinitionService;
+    private final TriggerDefinitionService triggerDefinitionService;
     private WorkflowExecutor workflowExecutor;
-    private WorkflowService workflowService;
+    private final WorkflowService workflowService;
 
     private static final Logger logger = LoggerFactory.getLogger(AbstractWebhookTriggerController.class);
 
-    protected AbstractWebhookTriggerController(FilesFileStorage filesFileStorage) {
+    protected AbstractWebhookTriggerController(
+        FilesFileStorage filesFileStorage, JobPrincipalAccessorRegistry jobPrincipalAccessorRegistry,
+        TriggerDefinitionService triggerDefinitionService,  WorkflowService workflowService) {
+
         this.filesFileStorage = filesFileStorage;
+        this.jobPrincipalAccessorRegistry = jobPrincipalAccessorRegistry;
+        this.triggerDefinitionService = triggerDefinitionService;
+        this.workflowService = workflowService;
     }
 
     protected AbstractWebhookTriggerController(
@@ -328,8 +334,16 @@ public abstract class AbstractWebhookTriggerController {
         JobPrincipalAccessor jobPrincipalAccessor =
             jobPrincipalAccessorRegistry.getJobPrincipalAccessor(workflowExecutionId.getType());
 
-        return jobPrincipalAccessor.getWorkflowId(
-            workflowExecutionId.getPrincipalId(), workflowExecutionId.getWorkflowReferenceCode());
+        String workflowId;
+
+        if (workflowExecutionId.getPrincipalId() == -1) {
+            workflowId = jobPrincipalAccessor.getLatestWorkflowId(workflowExecutionId.getWorkflowReferenceCode());
+        } else {
+            workflowId = jobPrincipalAccessor.getWorkflowId(
+                workflowExecutionId.getPrincipalId(), workflowExecutionId.getWorkflowReferenceCode());
+        }
+
+        return workflowId;
     }
 
     @SuppressWarnings("unchecked")

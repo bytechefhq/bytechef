@@ -17,6 +17,7 @@
 package com.bytechef.embedded.configuration.instance.accessor;
 
 import com.bytechef.embedded.configuration.domain.IntegrationInstanceConfigurationWorkflow;
+import com.bytechef.embedded.configuration.domain.IntegrationWorkflow;
 import com.bytechef.embedded.configuration.service.IntegrationInstanceConfigurationService;
 import com.bytechef.embedded.configuration.service.IntegrationInstanceConfigurationWorkflowService;
 import com.bytechef.embedded.configuration.service.IntegrationWorkflowService;
@@ -82,7 +83,20 @@ public class IntegrationJobPrincipalAccessor implements JobPrincipalAccessor {
 
     @Override
     public String getWorkflowId(long principalId, String workflowReferenceCode) {
-        return integrationWorkflowService.getIntegrationInstanceIntegrationWorkflowWorkflowId(principalId,
-            workflowReferenceCode);
+        return integrationWorkflowService.getWorkflowId(
+            principalId, workflowReferenceCode);
+    }
+
+    @Override
+    public String getLatestWorkflowId(String workflowReferenceCode) {
+        return integrationWorkflowService.getLatestWorkflowId(workflowReferenceCode);
+    }
+
+    @Override
+    public String getWorkflowReferenceCode(String workflowId) {
+        IntegrationWorkflow workflowIntegrationWorkflow = integrationWorkflowService.getWorkflowIntegrationWorkflow(
+            workflowId);
+
+        return workflowIntegrationWorkflow.getWorkflowReferenceCode();
     }
 }

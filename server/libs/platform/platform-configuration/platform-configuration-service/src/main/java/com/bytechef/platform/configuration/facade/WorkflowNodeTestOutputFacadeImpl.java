@@ -37,6 +37,9 @@ import com.bytechef.platform.definition.WorkflowNodeType;
 import com.bytechef.platform.domain.OutputResponse;
 import com.bytechef.platform.util.SchemaUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import org.apache.commons.lang3.Validate;
@@ -164,10 +167,19 @@ public class WorkflowNodeTestOutputFacadeImpl implements WorkflowNodeTestOutputF
             workflowNodeType.componentOperationName(), null, null, null, workflowTrigger.evaluateParameters(inputs),
             null, null, connectionId, true);
 
+        Object value = triggerOutput.value();
+
+        if (!triggerOutput.batch() && triggerOutput.value() instanceof Collection<?> triggerOutputValues) {
+            List<Object> outputsList = new ArrayList<>(triggerOutputValues);
+
+            if (!outputsList.isEmpty()) {
+                value = outputsList.getFirst();
+            }
+        }
+
         BaseOutputDefinition.OutputResponse definitionOutputResponse = BaseOutputDefinition.OutputResponse.of(
-            (BaseProperty.BaseValueProperty<?>) SchemaUtils.getOutputSchema(
-                triggerOutput.value(), PropertyFactory.PROPERTY_FACTORY),
-            triggerOutput.batch());
+            (BaseProperty.BaseValueProperty<?>) SchemaUtils.getOutputSchema(value, PropertyFactory.PROPERTY_FACTORY),
+            value);
 
         OutputResponse outputResponse = SchemaUtils.toOutput(
             definitionOutputResponse, PropertyFactory.OUTPUT_FACTORY_FUNCTION, PropertyFactory.PROPERTY_FACTORY);
