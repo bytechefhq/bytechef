@@ -22,6 +22,7 @@ import com.bytechef.platform.configuration.service.WorkflowNodeTestOutputService
 import com.bytechef.platform.configuration.web.rest.model.CheckWorkflowNodeTestOutputExists200ResponseModel;
 import com.bytechef.platform.configuration.web.rest.model.WorkflowNodeTestOutputModel;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.time.OffsetDateTime;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -51,13 +52,12 @@ public class WorkflowNodeTestOutputApiController implements WorkflowNodeTestOutp
 
     @Override
     public ResponseEntity<CheckWorkflowNodeTestOutputExists200ResponseModel> checkWorkflowNodeTestOutputExists(
-        String id, String workflowNodeName) {
+        String id, String workflowNodeName, OffsetDateTime createdDate) {
 
         return ResponseEntity.ok(
-            new CheckWorkflowNodeTestOutputExists200ResponseModel()
-                .exists(
-                    workflowNodeTestOutputService.fetchWorkflowTestNodeOutput(id, workflowNodeName)
-                        .isPresent()));
+            new CheckWorkflowNodeTestOutputExists200ResponseModel().exists(
+                workflowNodeTestOutputService.checkWorkflowNodeTestOutputExists(
+                    id, workflowNodeName, createdDate.toInstant())));
     }
 
     @Override

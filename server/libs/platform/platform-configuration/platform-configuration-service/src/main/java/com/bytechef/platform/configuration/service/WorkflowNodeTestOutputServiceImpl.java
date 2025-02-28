@@ -25,9 +25,11 @@ import com.bytechef.platform.configuration.domain.WorkflowTrigger;
 import com.bytechef.platform.configuration.repository.WorkflowNodeTestOutputRepository;
 import com.bytechef.platform.definition.WorkflowNodeType;
 import com.bytechef.platform.domain.OutputResponse;
+import java.time.Instant;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import javax.annotation.Nullable;
 import org.apache.commons.lang3.Validate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -54,8 +56,22 @@ public class WorkflowNodeTestOutputServiceImpl implements WorkflowNodeTestOutput
     }
 
     @Override
+    public boolean checkWorkflowNodeTestOutputExists(
+        String workflowId, String workflowNodeName, @Nullable Instant createdDate) {
+
+        if (createdDate == null) {
+            return workflowNodeTestOutputRepository.existsByWorkflowIdAndWorkflowNodeName(workflowId, workflowNodeName);
+        } else {
+            return workflowNodeTestOutputRepository.existsByWorkflowIdAndWorkflowNodeNameAndLastModifiedDateAfter(
+                workflowId, workflowNodeName, createdDate);
+        }
+    }
+
+    @Override
     @Transactional(readOnly = true)
-    public Optional<WorkflowNodeTestOutput> fetchWorkflowTestNodeOutput(String workflowId, String workflowNodeName) {
+    public Optional<WorkflowNodeTestOutput> fetchWorkflowTestNodeOutput(
+        String workflowId, String workflowNodeName) {
+
         return workflowNodeTestOutputRepository.findByWorkflowIdAndWorkflowNodeName(workflowId, workflowNodeName);
     }
 
