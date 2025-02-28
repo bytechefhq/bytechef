@@ -442,17 +442,16 @@ public class OpenApiComponentTaskHandlerIntTest {
         OpenApiComponentTaskHandler openApiComponentTaskHandler = createOpenApiComponentHandler("addPet");
 
         TaskExecution taskExecution = getTaskExecution(
-            Map.of(
-                "pet", new LinkedHashMap<String, Object>() {
-                    {
-                        put("id", 10);
-                        put("name", "doggie");
-                        put("category", Map.of("id", 1));
-                        put("photoUrls", List.of("string"));
-                        put("status", "available");
-                        put("tags", List.of(Map.of("name", "tag1")));
-                    }
-                }));
+            new LinkedHashMap<>() {
+                {
+                    put("id", 10);
+                    put("name", "doggie");
+                    put("category", Map.of("id", 1));
+                    put("photoUrls", List.of("string"));
+                    put("status", "available");
+                    put("tags", List.of(Map.of("name", "tag1")));
+                }
+            });
 
         Response response = (Response) openApiComponentTaskHandler.handle(taskExecution);
 
@@ -546,17 +545,16 @@ public class OpenApiComponentTaskHandlerIntTest {
         openApiComponentTaskHandler = createOpenApiComponentHandler("placeOrder");
 
         taskExecution = getTaskExecution(
-            Map.of(
-                "order", new LinkedHashMap<String, Object>() {
-                    {
-                        put("id", 10);
-                        put("petId", 198772);
-                        put("quantity", 7);
-                        put("shipDate", LocalDateTime.of(2023, 1, 23, 7, 45));
-                        put("status", "approved");
-                        put("complete", true);
-                    }
-                }));
+            new LinkedHashMap<>() {
+                {
+                    put("id", 10);
+                    put("petId", 198772);
+                    put("quantity", 7);
+                    put("shipDate", LocalDateTime.of(2023, 1, 23, 7, 45));
+                    put("status", "approved");
+                    put("complete", true);
+                }
+            });
 
         response = (Response) openApiComponentTaskHandler.handle(taskExecution);
 
@@ -589,19 +587,18 @@ public class OpenApiComponentTaskHandlerIntTest {
         openApiComponentTaskHandler = createOpenApiComponentHandler("createUser");
 
         taskExecution = getTaskExecution(
-            Map.of(
-                "user", new LinkedHashMap<String, Object>() {
-                    {
-                        put("id", 10);
-                        put("username", "user1");
-                        put("firstName", "John");
-                        put("lastName", "James");
-                        put("email", "john@email.com");
-                        put("password", "12345");
-                        put("phone", "12345");
-                        put("userStatus", 1);
-                    }
-                }));
+            new LinkedHashMap<>() {
+                {
+                    put("id", 10);
+                    put("username", "user1");
+                    put("firstName", "John");
+                    put("lastName", "James");
+                    put("email", "john@email.com");
+                    put("password", "12345");
+                    put("phone", "12345");
+                    put("userStatus", 1);
+                }
+            });
 
         response = (Response) openApiComponentTaskHandler.handle(taskExecution);
 
@@ -690,17 +687,16 @@ public class OpenApiComponentTaskHandlerIntTest {
             "updatePet");
 
         TaskExecution taskExecution = getTaskExecution(
-            Map.of(
-                "pet", new LinkedHashMap<String, Object>() {
-                    {
-                        put("id", 10);
-                        put("name", "doggie");
-                        put("category", Map.of("id", 1));
-                        put("photoUrls", List.of("string"));
-                        put("status", "available");
-                        put("tags", List.of(Map.of("name", "tag1")));
-                    }
-                }));
+            new LinkedHashMap<>() {
+                {
+                    put("id", 10);
+                    put("name", "doggie");
+                    put("category", Map.of("id", 1));
+                    put("photoUrls", List.of("string"));
+                    put("status", "available");
+                    put("tags", List.of(Map.of("name", "tag1")));
+                }
+            });
 
         Response response = (Response) openApiComponentTaskHandler.handle(taskExecution);
 
@@ -733,20 +729,18 @@ public class OpenApiComponentTaskHandlerIntTest {
         openApiComponentTaskHandler = createOpenApiComponentHandler("updateUser");
 
         taskExecution = getTaskExecution(
-            Map.of(
-                "username", "user1",
-                "user", new LinkedHashMap<String, Object>() {
-                    {
-                        put("id", 10);
-                        put("username", "user1");
-                        put("firstName", "John");
-                        put("lastName", "James");
-                        put("email", "john@email.com");
-                        put("password", "12345");
-                        put("phone", "12345");
-                        put("userStatus", 1);
-                    }
-                }));
+            new LinkedHashMap<>() {
+                {
+                    put("id", 10);
+                    put("username", "user1");
+                    put("firstName", "John");
+                    put("lastName", "James");
+                    put("email", "john@email.com");
+                    put("password", "12345");
+                    put("phone", "12345");
+                    put("userStatus", 1);
+                }
+            });
 
         response = (Response) openApiComponentTaskHandler.handle(taskExecution);
 
