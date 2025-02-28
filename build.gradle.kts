@@ -2,6 +2,7 @@ plugins {
     alias(libs.plugins.com.github.ben.manes.versions)
     id("com.bytechef.java-common-conventions")
     id("jacoco-report-aggregation")
+    id("jvm-test-suite")
     alias(libs.plugins.nl.littlerobots.version.catalog.update)
 }
 
@@ -35,7 +36,7 @@ reporting {
     reports {
         @Suppress("UnstableApiUsage")
         val jacocoRootReport by registering(JacocoCoverageReport::class) {
-            testType.set(TestSuiteType.UNIT_TEST)
+            testSuiteName = "test"
 
             dependencies {
                 project.subprojects
