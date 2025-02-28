@@ -28,6 +28,9 @@ import com.bytechef.platform.component.domain.Property;
 import com.bytechef.platform.component.facade.ActionDefinitionFacade;
 import com.bytechef.platform.component.facade.TriggerDefinitionFacade;
 import com.bytechef.platform.component.trigger.TriggerOutput;
+import com.bytechef.platform.component.trigger.WebhookRequest;
+import com.bytechef.platform.configuration.accessor.JobPrincipalAccessor;
+import com.bytechef.platform.configuration.accessor.JobPrincipalAccessorRegistry;
 import com.bytechef.platform.configuration.domain.WorkflowNodeTestOutput;
 import com.bytechef.platform.configuration.domain.WorkflowTestConfigurationConnection;
 import com.bytechef.platform.configuration.domain.WorkflowTrigger;
@@ -36,6 +39,7 @@ import com.bytechef.platform.configuration.service.WorkflowTestConfigurationServ
 import com.bytechef.platform.definition.WorkflowNodeType;
 import com.bytechef.platform.domain.OutputResponse;
 import com.bytechef.platform.util.SchemaUtils;
+import com.bytechef.platform.workflow.execution.WorkflowExecutionId;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -52,22 +56,27 @@ import org.springframework.stereotype.Service;
 public class WorkflowNodeTestOutputFacadeImpl implements WorkflowNodeTestOutputFacade {
 
     private final ActionDefinitionFacade actionDefinitionFacade;
+    private final JobPrincipalAccessorRegistry jobPrincipalAccessorRegistry;
     private final TriggerDefinitionFacade triggerDefinitionFacade;
     private final WorkflowNodeOutputFacade workflowNodeOutputFacade;
     private final WorkflowNodeTestOutputService workflowNodeTestOutputService;
+    private final WebhookTriggerTestFacade webhookTriggerTestFacade;
     private final WorkflowService workflowService;
     private final WorkflowTestConfigurationService workflowTestConfigurationService;
 
     @SuppressFBWarnings("EI")
     public WorkflowNodeTestOutputFacadeImpl(
-        ActionDefinitionFacade actionDefinitionFacade, TriggerDefinitionFacade triggerDefinitionFacade,
-        WorkflowNodeTestOutputService workflowNodeTestOutputService, WorkflowNodeOutputFacade workflowNodeOutputFacade,
+        ActionDefinitionFacade actionDefinitionFacade, JobPrincipalAccessorRegistry jobPrincipalAccessorRegistry,
+        TriggerDefinitionFacade triggerDefinitionFacade, WorkflowNodeTestOutputService workflowNodeTestOutputService,
+        WorkflowNodeOutputFacade workflowNodeOutputFacade, WebhookTriggerTestFacade webhookTriggerTestFacade,
         WorkflowService workflowService, WorkflowTestConfigurationService workflowTestConfigurationService) {
 
         this.actionDefinitionFacade = actionDefinitionFacade;
+        this.jobPrincipalAccessorRegistry = jobPrincipalAccessorRegistry;
         this.triggerDefinitionFacade = triggerDefinitionFacade;
         this.workflowNodeOutputFacade = workflowNodeOutputFacade;
         this.workflowNodeTestOutputService = workflowNodeTestOutputService;
+        this.webhookTriggerTestFacade = webhookTriggerTestFacade;
         this.workflowService = workflowService;
         this.workflowTestConfigurationService = workflowTestConfigurationService;
     }
@@ -117,6 +126,33 @@ public class WorkflowNodeTestOutputFacadeImpl implements WorkflowNodeTestOutputF
 
         return workflowNodeTestOutputService.save(
             workflowId, workflowNodeName, workflowNodeType, new OutputResponse(outputSchema, sampleOutput));
+    }
+
+    @Override
+    public void saveWorkflowNodeTestOutput(WorkflowExecutionId workflowExecutionId, WebhookRequest webhookRequest) {
+        JobPrincipalAccessor jobPrincipalAccessor = jobPrincipalAccessorRegistry.getJobPrincipalAccessor(
+            workflowExecutionId.getType());
+
+        String workflowId = jobPrincipalAccessor.getLatestWorkflowId(
+            workflowExecutionId.getWorkflowReferenceCode());
+
+        try {
+            Workflow workflow = workflowService.getWorkflow(workflowId);
+
+            WorkflowTrigger workflowTrigger = WorkflowTrigger.of(workflow)
+                .getFirst();
+
+            WorkflowNodeType triggerWorkflowNodeType = WorkflowNodeType.ofType(workflowTrigger.getType());
+
+            TriggerOutput triggerOutput = triggerDefinitionFacade.executeTrigger(
+                triggerWorkflowNodeType.componentName(), triggerWorkflowNodeType.componentVersion(),
+                triggerWorkflowNodeType.componentOperationName(), workflowExecutionId.getType(), null,
+                workflowExecutionId.getWorkflowReferenceCode(), Map.of(), Map.of(), webhookRequest, null, true);
+
+            saveWorkflowNodeTestOutput(workflowId, workflowTrigger.getName(), triggerOutput.value());
+        } finally {
+            webhookTriggerTestFacade.disableTrigger(workflowId, workflowExecutionId.getType());
+        }
     }
 
     @SuppressWarnings("unchecked")

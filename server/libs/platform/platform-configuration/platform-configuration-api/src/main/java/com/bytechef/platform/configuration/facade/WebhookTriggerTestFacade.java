@@ -16,6 +16,7 @@
 
 package com.bytechef.platform.configuration.facade;
 
+import com.bytechef.component.definition.TriggerDefinition.WebhookValidateResponse;
 import com.bytechef.platform.component.trigger.WebhookRequest;
 import com.bytechef.platform.constant.ModeType;
 import com.bytechef.platform.workflow.execution.WorkflowExecutionId;
@@ -29,7 +30,7 @@ public interface WebhookTriggerTestFacade {
 
     String enableTrigger(String workflowId, ModeType type);
 
-    void saveTestOutput(WorkflowExecutionId workflowExecutionId, WebhookRequest webhookRequest);
+    boolean isWorkflowEnabled(WorkflowExecutionId workflowExecutionId);
 
-    void stopByWorkflowReferenceCode(String workflowReferenceCode, ModeType type);
+    WebhookValidateResponse validateOnEnable(WorkflowExecutionId workflowExecutionId, WebhookRequest webhookRequest);
 }

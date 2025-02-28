@@ -18,16 +18,23 @@ package com.bytechef.platform.configuration.web.rest;
 
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
+import com.bytechef.component.definition.TriggerDefinition;
 import com.bytechef.platform.component.domain.WebhookTriggerFlags;
 import com.bytechef.platform.component.service.TriggerDefinitionService;
 import com.bytechef.platform.component.trigger.WebhookRequest;
 import com.bytechef.platform.configuration.accessor.JobPrincipalAccessorRegistry;
 import com.bytechef.platform.configuration.facade.WebhookTriggerTestFacade;
+import com.bytechef.platform.configuration.facade.WorkflowNodeTestOutputFacade;
 import com.bytechef.platform.configuration.web.file.storage.TempFilesFileStorage;
+import com.bytechef.platform.webhook.executor.WorkflowExecutor;
 import com.bytechef.platform.webhook.rest.AbstractWebhookTriggerController;
 import com.bytechef.platform.workflow.execution.WorkflowExecutionId;
+import com.bytechef.tenant.util.TenantUtils;
 import jakarta.servlet.http.HttpServletRequest;
+import java.util.Objects;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.MultiValueMapAdapter;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -40,14 +47,19 @@ import org.springframework.web.bind.annotation.RestController;
 @ConditionalOnCoordinator
 public class WebhookTriggerTestController extends AbstractWebhookTriggerController {
 
+    private final WorkflowExecutor workflowExecutor;
+    private final WorkflowNodeTestOutputFacade workflowNodeTestOutputFacade;
     private final WebhookTriggerTestFacade webhookTriggerTestFacade;
 
     public WebhookTriggerTestController(
         TriggerDefinitionService triggerDefinitionService, JobPrincipalAccessorRegistry jobPrincipalAccessorRegistry,
-        WebhookTriggerTestFacade webhookTriggerTestFacade, WorkflowService workflowService) {
+        WorkflowNodeTestOutputFacade workflowNodeTestOutputFacade, WorkflowService workflowService,
+        WorkflowExecutor workflowExecutor, WebhookTriggerTestFacade webhookTriggerTestFacade) {
 
         super(new TempFilesFileStorage(), jobPrincipalAccessorRegistry, triggerDefinitionService, workflowService);
 
+        this.workflowNodeTestOutputFacade = workflowNodeTestOutputFacade;
+        this.workflowExecutor = workflowExecutor;
         this.webhookTriggerTestFacade = webhookTriggerTestFacade;
     }
 
@@ -56,23 +68,53 @@ public class WebhookTriggerTestController extends AbstractWebhookTriggerControll
             RequestMethod.HEAD, RequestMethod.GET, RequestMethod.POST
         },
         value = "/webhooks/{id}/test")
-    public ResponseEntity<?> executeWorkflow(@PathVariable String id, HttpServletRequest httpServletRequest)
-        throws Exception {
-
+    public ResponseEntity<?> executeWorkflow(@PathVariable String id, HttpServletRequest httpServletRequest) {
         WorkflowExecutionId workflowExecutionId = WorkflowExecutionId.parse(id);
 
-        WebhookTriggerFlags webhookTriggerFlags = getWebhookTriggerFlags(workflowExecutionId);
+        return TenantUtils.callWithTenantId(workflowExecutionId.getTenantId(), () -> {
+            ResponseEntity<?> responseEntity;
+            WebhookTriggerFlags webhookTriggerFlags = getWebhookTriggerFlags(workflowExecutionId);
 
-        try {
-            WebhookRequest webhookRequest = getWebhookRequest(httpServletRequest, webhookTriggerFlags);
+            if (Objects.equals(httpServletRequest.getMethod(), RequestMethod.HEAD.name()) ||
+                isWorkflowDisabled(workflowExecutionId)) {
 
-            webhookTriggerTestFacade.saveTestOutput(workflowExecutionId, webhookRequest);
+                WebhookRequest webhookRequest = getWebhookRequest(httpServletRequest, webhookTriggerFlags);
 
-            return ResponseEntity.noContent()
-                .build();
-        } finally {
-            webhookTriggerTestFacade.stopByWorkflowReferenceCode(
-                workflowExecutionId.getWorkflowReferenceCode(), workflowExecutionId.getType());
-        }
+                if (webhookTriggerFlags.workflowSyncOnEnableValidation()) {
+                    responseEntity = doValidateOnEnable(workflowExecutionId, webhookRequest);
+                } else {
+                    responseEntity = ResponseEntity.ok()
+                        .build();
+                }
+            } else {
+                WebhookRequest webhookRequest = getWebhookRequest(httpServletRequest, webhookTriggerFlags);
+
+                workflowNodeTestOutputFacade.saveWorkflowNodeTestOutput(workflowExecutionId, webhookRequest);
+
+                responseEntity = ResponseEntity.ok()
+                    .build();
+            }
+
+            return responseEntity;
+        });
+    }
+
+    @Override
+    protected boolean isWorkflowDisabled(WorkflowExecutionId workflowExecutionId) {
+        return !webhookTriggerTestFacade.isWorkflowEnabled(workflowExecutionId);
+    }
+
+    private ResponseEntity<?> doValidateOnEnable(
+        WorkflowExecutionId workflowExecutionId, WebhookRequest webhookRequest) {
+
+        TriggerDefinition.WebhookValidateResponse response = workflowExecutor.validateOnEnable(
+            workflowExecutionId, webhookRequest);
+
+        return ResponseEntity.status(response.status())
+            .headers(
+                response.headers() == null
+                    ? null
+                    : HttpHeaders.readOnlyHttpHeaders(new MultiValueMapAdapter<>(response.headers())))
+            .body(response.body());
     }
 }
