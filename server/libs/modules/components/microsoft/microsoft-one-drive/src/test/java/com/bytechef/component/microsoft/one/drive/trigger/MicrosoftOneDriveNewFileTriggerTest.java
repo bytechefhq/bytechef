@@ -23,6 +23,7 @@ import static com.bytechef.component.microsoft.one.drive.trigger.MicrosoftOneDri
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
@@ -33,6 +34,7 @@ import com.bytechef.component.definition.TriggerContext;
 import com.bytechef.component.definition.TriggerDefinition.PollOutput;
 import com.bytechef.component.definition.TypeReference;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
@@ -57,12 +59,13 @@ class MicrosoftOneDriveNewFileTriggerTest {
         LocalDateTime startDate = LocalDateTime.of(2024, 1, 1, 0, 0, 0);
         LocalDateTime endDate = LocalDateTime.of(2024, 1, 2, 0, 0, 0);
 
-        try (MockedStatic<LocalDateTime> localDateTimeMockedStatic =
-            mockStatic(LocalDateTime.class, Mockito.CALLS_REAL_METHODS)) {
-            localDateTimeMockedStatic.when(LocalDateTime::now)
+        try (MockedStatic<LocalDateTime> localDateTimeMockedStatic = mockStatic(
+            LocalDateTime.class, Mockito.CALLS_REAL_METHODS)) {
+
+            localDateTimeMockedStatic.when(() -> LocalDateTime.now(any(ZoneId.class)))
                 .thenReturn(endDate);
 
-            when(parameters.getLocalDateTime(LAST_TIME_CHECKED, LocalDateTime.now()))
+            when(parameters.getLocalDateTime(eq(LAST_TIME_CHECKED), any()))
                 .thenReturn(startDate);
             when(mockedTriggerContext.http(any()))
                 .thenReturn(mockedExecutor);

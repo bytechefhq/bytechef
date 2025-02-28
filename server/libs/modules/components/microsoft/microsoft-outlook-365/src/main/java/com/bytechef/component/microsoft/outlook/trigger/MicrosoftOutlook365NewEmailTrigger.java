@@ -32,7 +32,7 @@ import com.bytechef.component.definition.TriggerDefinition.PollOutput;
 import com.bytechef.component.definition.TriggerDefinition.TriggerType;
 import com.bytechef.component.definition.TypeReference;
 import java.time.LocalDateTime;
-import java.time.ZoneOffset;
+import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -59,8 +59,11 @@ public class MicrosoftOutlook365NewEmailTrigger {
         Parameters inputParameters, Parameters connectionParameters, Parameters closureParameters,
         TriggerContext context) {
 
-        LocalDateTime startDate = closureParameters.getLocalDateTime(LAST_TIME_CHECKED, LocalDateTime.now());
-        LocalDateTime endDate = LocalDateTime.now();
+        ZoneId zoneId = ZoneId.of("GMT");
+
+        LocalDateTime now = LocalDateTime.now(zoneId);
+
+        LocalDateTime startDate = closureParameters.getLocalDateTime(LAST_TIME_CHECKED, now.minusHours(3));
 
         List<Map<?, ?>> maps = new ArrayList<>();
 
@@ -72,9 +75,9 @@ public class MicrosoftOutlook365NewEmailTrigger {
             .getBody(new TypeReference<>() {});
 
         if (body.get(VALUE) instanceof List<?> list) {
-            for (Object o : list) {
-                if (o instanceof Map<?, ?> map) {
-                    addValidEmail(map, startDate, endDate, maps);
+            for (Object item : list) {
+                if (item instanceof Map<?, ?> map) {
+                    addValidEmail(map, startDate, now, maps, zoneId);
                 }
             }
         }
@@ -82,18 +85,18 @@ public class MicrosoftOutlook365NewEmailTrigger {
         List<Map<?, ?>> otherItems = getItemsFromNextPage((String) body.get(ODATA_NEXT_LINK), context);
 
         for (Map<?, ?> map : otherItems) {
-            addValidEmail(map, startDate, endDate, maps);
+            addValidEmail(map, startDate, now, maps, zoneId);
         }
 
-        return new PollOutput(maps, Map.of(LAST_TIME_CHECKED, endDate), false);
+        return new PollOutput(maps, Map.of(LAST_TIME_CHECKED, now), false);
     }
 
     private static void addValidEmail(
-        Map<?, ?> map, LocalDateTime startDate, LocalDateTime endDate, List<Map<?, ?>> maps) {
+        Map<?, ?> map, LocalDateTime startDate, LocalDateTime endDate, List<Map<?, ?>> maps, ZoneId zoneId) {
 
-        LocalDateTime createdDateTime =
-            LocalDateTime.ofInstant(ZonedDateTime.parse((String) map.get("receivedDateTime"))
-                .toInstant(), ZoneOffset.systemDefault());
+        ZonedDateTime receivedDateTime = ZonedDateTime.parse((String) map.get("receivedDateTime"));
+
+        LocalDateTime createdDateTime = LocalDateTime.ofInstant(receivedDateTime.toInstant(), zoneId);
 
         if (createdDateTime.isAfter(startDate) && createdDateTime.isBefore(endDate)) {
             maps.add(map);

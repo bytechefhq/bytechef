@@ -32,6 +32,7 @@ import com.bytechef.component.definition.TypeReference;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
@@ -100,8 +101,11 @@ public class ReckonUtils extends AbstractReckonUtils {
     public static PollOutput getPollOutput(
         Parameters inputParameters, Parameters closureParameters, TriggerContext context, String path) {
 
-        LocalDateTime startDate = closureParameters.getLocalDateTime(LAST_TIME_CHECKED, LocalDateTime.now());
-        LocalDateTime endDate = LocalDateTime.now();
+        ZoneId zoneId = ZoneId.of("GMT");
+
+        LocalDateTime now = LocalDateTime.now(zoneId);
+
+        LocalDateTime startDate = closureParameters.getLocalDateTime(LAST_TIME_CHECKED, now.minusHours(3));
 
         // TODO check filter queryParameter and add orderBy if needed
 
@@ -116,6 +120,6 @@ public class ReckonUtils extends AbstractReckonUtils {
 
         Map<String, List<?>> body = response.getBody(new TypeReference<>() {});
 
-        return new PollOutput(body.get("list"), Map.of(LAST_TIME_CHECKED, endDate), false);
+        return new PollOutput(body.get("list"), Map.of(LAST_TIME_CHECKED, now), false);
     }
 }

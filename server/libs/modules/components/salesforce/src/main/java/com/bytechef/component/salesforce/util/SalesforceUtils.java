@@ -79,7 +79,7 @@ public class SalesforceUtils {
 
         String object = inputParameters.getRequiredString(OBJECT);
 
-        Map<String, Object> body = getSObjectDesribe(actionContext, object);
+        Map<String, Object> body = getSObjectDescribe(actionContext, object);
 
         if (body.get(FIELDS) instanceof List<?> fields) {
             for (Object field : fields) {
@@ -193,9 +193,11 @@ public class SalesforceUtils {
     public static PollOutput getPollOutput(
         Parameters inputParameters, Parameters closureParameters, TriggerContext triggerContext, String dateFieldName) {
 
-        ZoneId zoneId = ZoneId.of("UTC");
-        LocalDateTime startDate = closureParameters.getLocalDateTime(LAST_TIME_CHECKED, LocalDateTime.now(zoneId));
-        LocalDateTime endDate = LocalDateTime.now(zoneId);
+        ZoneId zoneId = ZoneId.of("GMT");
+
+        LocalDateTime now = LocalDateTime.now(zoneId);
+
+        LocalDateTime startDate = closureParameters.getLocalDateTime(LAST_TIME_CHECKED, now.minusHours(3));
 
         String formattedStartDate = startDate.format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss'Z'")
             .withZone(zoneId));
@@ -203,10 +205,10 @@ public class SalesforceUtils {
             "SELECT FIELDS(ALL) FROM %s WHERE %s > %s ORDER BY %s ASC LIMIT 200 OFFSET 0",
             inputParameters.getRequiredString(OBJECT), dateFieldName, formattedStartDate, dateFieldName);
 
-        Map<String, ?> resposeBody = executeSOQLQuery(triggerContext, query);
+        Map<String, ?> responseBody = executeSOQLQuery(triggerContext, query);
 
-        if (resposeBody.get("records") instanceof List<?> records) {
-            return new PollOutput(records, Map.of(LAST_TIME_CHECKED, endDate), false);
+        if (responseBody.get("records") instanceof List<?> records) {
+            return new PollOutput(records, Map.of(LAST_TIME_CHECKED, now), false);
         }
 
         throw new ProviderException("Failed to fetch records from Salesforce.");
@@ -257,7 +259,7 @@ public class SalesforceUtils {
         return options;
     }
 
-    private static Map<String, Object> getSObjectDesribe(ActionContext actionContext, String object) {
+    private static Map<String, Object> getSObjectDescribe(ActionContext actionContext, String object) {
         return actionContext
             .http(http -> http.get("/sobjects/" + object + "/describe"))
             .configuration(Http.responseType(Http.ResponseType.JSON))
