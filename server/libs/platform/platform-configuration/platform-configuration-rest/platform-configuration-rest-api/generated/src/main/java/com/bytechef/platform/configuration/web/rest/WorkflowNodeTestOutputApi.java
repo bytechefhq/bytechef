@@ -6,6 +6,8 @@
 package com.bytechef.platform.configuration.web.rest;
 
 import com.bytechef.platform.configuration.web.rest.model.CheckWorkflowNodeTestOutputExists200ResponseModel;
+import org.springframework.format.annotation.DateTimeFormat;
+import java.time.OffsetDateTime;
 import com.bytechef.platform.configuration.web.rest.model.WorkflowNodeTestOutputModel;
 import io.swagger.v3.oas.annotations.ExternalDocumentation;
 import io.swagger.v3.oas.annotations.Operation;
@@ -33,7 +35,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-02-27T19:58:17.697198+01:00[Europe/Zagreb]", comments = "Generator version: 7.11.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-02-28T09:51:58.948829+01:00[Europe/Zagreb]", comments = "Generator version: 7.11.0")
 @Validated
 @Tag(name = "workflow-node-test-output", description = "The Platform Workflow Node Test Output Internal API")
 public interface WorkflowNodeTestOutputApi {
@@ -48,6 +50,7 @@ public interface WorkflowNodeTestOutputApi {
      *
      * @param id The id of a workflow. (required)
      * @param workflowNodeName The name of a workflow node for which to create test output objects. (required)
+     * @param createdDate Check if a test output exists after a specific date. (optional)
      * @return Successful operation. (status code 200)
      */
     @Operation(
@@ -69,7 +72,8 @@ public interface WorkflowNodeTestOutputApi {
     
     default ResponseEntity<CheckWorkflowNodeTestOutputExists200ResponseModel> checkWorkflowNodeTestOutputExists(
         @Parameter(name = "id", description = "The id of a workflow.", required = true, in = ParameterIn.PATH) @PathVariable("id") String id,
-        @Parameter(name = "workflowNodeName", description = "The name of a workflow node for which to create test output objects.", required = true, in = ParameterIn.PATH) @PathVariable("workflowNodeName") String workflowNodeName
+        @Parameter(name = "workflowNodeName", description = "The name of a workflow node for which to create test output objects.", required = true, in = ParameterIn.PATH) @PathVariable("workflowNodeName") String workflowNodeName,
+        @Parameter(name = "createdDate", description = "Check if a test output exists after a specific date.", in = ParameterIn.QUERY) @Valid @RequestParam(value = "createdDate", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) OffsetDateTime createdDate
     ) {
         getRequest().ifPresent(request -> {
             for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {

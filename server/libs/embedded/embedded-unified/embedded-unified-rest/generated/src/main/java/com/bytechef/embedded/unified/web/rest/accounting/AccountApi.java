@@ -36,7 +36,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-02-27T19:58:17.147479+01:00[Europe/Zagreb]", comments = "Generator version: 7.11.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-02-28T09:51:58.226077+01:00[Europe/Zagreb]", comments = "Generator version: 7.11.0")
 @Validated
 @Tag(name = "account", description = "The `Account` Common Object represents a \"company\" in CRMs.")
 public interface AccountApi {
