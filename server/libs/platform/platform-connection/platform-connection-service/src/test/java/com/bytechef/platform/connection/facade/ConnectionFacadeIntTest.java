@@ -300,6 +300,16 @@ public class ConnectionFacadeIntTest {
                 public String getWorkflowId(long principalId, String workflowReferenceCode) {
                     return "";
                 }
+
+                @Override
+                public String getLatestWorkflowId(String workflowReferenceCode) {
+                    return "";
+                }
+
+                @Override
+                public String getWorkflowReferenceCode(String workflowId) {
+                    return "";
+                }
             };
         }
     }

@@ -61,4 +61,6 @@ public interface ProjectWorkflowRepository extends ListCrudRepository<ProjectWor
     Optional<ProjectWorkflow> findByProjectDeploymentIdAndWorkflowReferenceCode(
         @Param("projectDeploymentId") long projectDeploymentId,
         @Param("workflowReferenceCode") String workflowReferenceCode);
+
+    Optional<ProjectWorkflow> findLatestProjectWorkflowByWorkflowReferenceCode(String workflowReferenceCode);
 }

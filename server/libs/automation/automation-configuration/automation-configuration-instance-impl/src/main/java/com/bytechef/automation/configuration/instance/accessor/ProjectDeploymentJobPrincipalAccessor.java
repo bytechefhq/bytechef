@@ -17,6 +17,7 @@
 package com.bytechef.automation.configuration.instance.accessor;
 
 import com.bytechef.automation.configuration.domain.ProjectDeploymentWorkflow;
+import com.bytechef.automation.configuration.domain.ProjectWorkflow;
 import com.bytechef.automation.configuration.service.ProjectDeploymentService;
 import com.bytechef.automation.configuration.service.ProjectDeploymentWorkflowService;
 import com.bytechef.automation.configuration.service.ProjectWorkflowService;
@@ -82,6 +83,18 @@ public class ProjectDeploymentJobPrincipalAccessor implements JobPrincipalAccess
 
     @Override
     public String getWorkflowId(long principalId, String workflowReferenceCode) {
-        return projectWorkflowService.getProjectDeploymentProjectWorkflowWorkflowId(principalId, workflowReferenceCode);
+        return projectWorkflowService.getWorkflowId(principalId, workflowReferenceCode);
+    }
+
+    @Override
+    public String getLatestWorkflowId(String workflowReferenceCode) {
+        return projectWorkflowService.getLatestWorkflowId(workflowReferenceCode);
+    }
+
+    @Override
+    public String getWorkflowReferenceCode(String workflowId) {
+        ProjectWorkflow workflowProjectWorkflow = projectWorkflowService.getWorkflowProjectWorkflow(workflowId);
+
+        return workflowProjectWorkflow.getWorkflowReferenceCode();
     }
 }
