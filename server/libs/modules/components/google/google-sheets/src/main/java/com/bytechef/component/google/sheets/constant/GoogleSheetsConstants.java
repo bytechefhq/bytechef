@@ -16,13 +16,16 @@
 
 package com.bytechef.component.google.sheets.constant;
 
+import static com.bytechef.component.definition.ComponentDsl.array;
 import static com.bytechef.component.definition.ComponentDsl.bool;
 import static com.bytechef.component.definition.ComponentDsl.integer;
+import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.option;
 import static com.bytechef.component.definition.ComponentDsl.string;
 
 import com.bytechef.component.definition.ComponentDsl.ModifiableBooleanProperty;
 import com.bytechef.component.definition.ComponentDsl.ModifiableIntegerProperty;
+import com.bytechef.component.definition.ComponentDsl.ModifiableObjectProperty;
 import com.bytechef.component.definition.ComponentDsl.ModifiableStringProperty;
 import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.google.sheets.util.GoogleSheetsUtils;
@@ -76,6 +79,16 @@ public class GoogleSheetsConstants {
         .options((ActionOptionsFunction<String>) GoogleSheetsUtils::getSheetNameOptions)
         .optionsLookupDependsOn(SPREADSHEET_ID)
         .required(true);
+
+    public static final ModifiableObjectProperty SHEET_RECORD_OUTPUT_PROPERTY = object()
+        .properties(
+            string(SPREADSHEET_ID)
+                .description("ID of the spreadsheet."),
+            string(SHEET_NAME)
+                .description("Name of the sheet."),
+            array(HEADERS)
+                .description("List of headers on the sheet.")
+                .items(string()));
 
     public static final ModifiableStringProperty VALUE_INPUT_PROPERTY = string(VALUE_INPUT_OPTION)
         .label("Value Input Option")

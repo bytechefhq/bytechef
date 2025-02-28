@@ -115,10 +115,14 @@ public class GoogleMailGetThreadAction {
         return OutputResponse.of(
             object()
                 .properties(
-                    string(ID),
-                    string(SNIPPET),
-                    string(HISTORY_ID),
+                    string(ID)
+                        .description("The unique ID of the thread."),
+                    string(SNIPPET)
+                        .description("A short part of the message text."),
+                    string(HISTORY_ID)
+                        .description("The ID of the last history record that modified this thread."),
                     array(MESSAGES)
+                        .description("List of messages in the thread.")
                         .items(getMessageOutputProperty(inputParameters.getRequiredString(FORMAT)))));
     }
 }

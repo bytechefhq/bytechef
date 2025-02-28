@@ -38,9 +38,14 @@ public final class GoogleDriveConstants {
 
     public static final ModifiableObjectProperty GOOGLE_FILE_OUTPUT_PROPERTY = object()
         .properties(
-            string(ID),
-            string(MIME_TYPE),
-            string(NAME));
+            string(ID)
+                .description("The ID of the file."),
+            string("kind")
+                .description("Identifies what kind of resource this is."),
+            string(MIME_TYPE)
+                .description("The MIME type of the file."),
+            string(NAME)
+                .description("The name of the file."));
 
     public static final Map<String, String> GOOGLE_FILE_SAMPLE_OUTPUT = Map.of(
         ID, "1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr",

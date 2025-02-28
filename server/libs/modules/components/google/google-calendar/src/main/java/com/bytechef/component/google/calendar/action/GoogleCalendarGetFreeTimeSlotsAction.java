@@ -67,11 +67,14 @@ public class GoogleCalendarGetFreeTimeSlotsAction {
         .output(
             outputSchema(
                 array()
+                    .description("Free time slots.")
                     .items(
                         object()
                             .properties(
-                                dateTime("startTime"),
-                                dateTime("endTime")))))
+                                dateTime("startTime")
+                                    .description("Start time of the free time slot."),
+                                dateTime("endTime")
+                                    .description("End time of the free time slot.")))))
         .perform(GoogleCalendarGetFreeTimeSlotsAction::perform);
 
     private GoogleCalendarGetFreeTimeSlotsAction() {

@@ -96,57 +96,103 @@ public class GoogleMailUtils {
 
     protected static final ModifiableObjectProperty SIMPLE_MESSAGE_OUTPUT_PROPERTY = object()
         .properties(
-            string(ID),
-            string(THREAD_ID),
-            number(HISTORY_ID),
-            string(SUBJECT),
-            string(FROM),
-            array(TO).items(string()),
-            array(CC).items(string()),
-            array(BCC).items(string()),
-            string("bodyPlain"),
-            string("bodyHtml"),
-            array(ATTACHMENTS).items(fileEntry()));
+            string(ID)
+                .description("The ID of the message."),
+            string(THREAD_ID)
+                .description("The ID of the thread the message belongs to."),
+            string(HISTORY_ID)
+                .description("The ID of the last history record that modified this message."),
+            string(SUBJECT)
+                .description("The subject of the message."),
+            string(FROM)
+                .description("The sender of the message."),
+            array(TO)
+                .description("List of recipients of the message.")
+                .items(string()),
+            array(CC)
+                .description("List of CC recipients of the message.")
+                .items(string()),
+            array(BCC)
+                .description("List of BCC recipients of the message.")
+                .items(string()),
+            string("bodyPlain")
+                .description("The plain text body of the message."),
+            string("bodyHtml")
+                .description("The HTML body of the message."),
+            array(ATTACHMENTS)
+                .description("List of attachments of the message.")
+                .items(fileEntry()));
 
     protected static final ModifiableObjectProperty RAW_MESSAGE_OUTPUT_PROPERTY = object()
         .properties(
-            string(HISTORY_ID),
-            string(ID),
-            number(INTERNAL_DATE),
+            string(HISTORY_ID)
+                .description("The ID of the last history record that modified this message."),
+            string(ID)
+                .description("The ID of the message."),
+            number(INTERNAL_DATE)
+                .description(
+                    "The internal message creation timestamp (epoch ms), which determines ordering in the inbox."),
             array(LABEL_IDS)
+                .description("List of IDs of labels applied to this message.")
                 .items(string()),
-            string(RAW),
-            integer(SIZE_ESTIMATE),
-            string(SNIPPET),
-            string(THREAD_ID));
+            string(RAW)
+                .description("The entire email message in an RFC 2822 formatted and base64url encoded string."),
+            integer(SIZE_ESTIMATE)
+                .description("Estimated size in bytes of the message."),
+            string(SNIPPET)
+                .description("A short part of the message text."),
+            string(THREAD_ID)
+                .description("The ID of the thread the message belongs to."));
 
     protected static final ModifiableObjectProperty MINIMAL_MESSAGE_OUTPUT_PROPERTY = object()
         .properties(
-            string(HISTORY_ID),
-            string(ID),
-            number(INTERNAL_DATE),
-            array(LABEL_IDS).items(string()),
-            integer(SIZE_ESTIMATE),
-            string(SNIPPET),
-            string(THREAD_ID));
+            string(HISTORY_ID)
+                .description("The ID of the last history record that modified this message."),
+            string(ID)
+                .description("The ID of the message."),
+            number(INTERNAL_DATE)
+                .description(
+                    "The internal message creation timestamp (epoch ms), which determines ordering in the inbox."),
+            array(LABEL_IDS)
+                .description("List of IDs of labels applied to this message.")
+                .items(string()),
+            integer(SIZE_ESTIMATE)
+                .description("Estimated size in bytes of the message."),
+            string(SNIPPET)
+                .description("A short part of the message text."),
+            string(THREAD_ID)
+                .description("The ID of the thread the message belongs to."));
 
     protected static final ModifiableObjectProperty METADATA_MESSAGE_OUTPUT_PROPERTY = object()
         .properties(
-            string(HISTORY_ID),
-            string(ID),
-            number(INTERNAL_DATE),
-            array(LABEL_IDS).items(string()),
+            string(HISTORY_ID)
+                .description("A short part of the message text."),
+            string(ID)
+                .description("The ID of the message."),
+            number(INTERNAL_DATE)
+                .description(
+                    "The internal message creation timestamp (epoch ms), which determines ordering in the inbox."),
+            array(LABEL_IDS)
+                .description("List of IDs of labels applied to this message.")
+                .items(string()),
             object(PAYLOAD)
+                .description("The parsed email structure in the message parts.")
                 .properties(
                     array(HEADERS)
+                        .description("List of headers on the message part.")
                         .items(
                             object()
                                 .properties(
-                                    string(NAME),
-                                    string(VALUE)))),
-            integer(SIZE_ESTIMATE),
-            string(SNIPPET),
-            string(THREAD_ID));
+                                    string(NAME)
+                                        .description("The name of the header before the : separator."),
+                                    string(VALUE)
+                                        .description("The value of the header after the : separator."))),
+                    integer(SIZE_ESTIMATE)
+                        .description("Estimated size in bytes of the message."),
+                    string(SNIPPET)
+                        .description("A short part of the message text."),
+                    string(THREAD_ID)
+                        .description("The ID of the thread the message belongs to.")));
 
     private GoogleMailUtils() {
     }

@@ -92,10 +92,13 @@ public class GoogleMailSendEmailAction {
             outputSchema(
                 object()
                     .properties(
-                        string(ID),
+                        string(ID)
+                            .description("The ID of the message."),
+                        string(THREAD_ID)
+                            .description("The ID of the thread the message belongs to."),
                         array(LABEL_IDS)
-                            .items(string()),
-                        string(THREAD_ID))))
+                            .description("List of IDs of labels applied to this message.")
+                            .items(string()))))
         .perform(GoogleMailSendEmailAction::perform);
 
     private GoogleMailSendEmailAction() {

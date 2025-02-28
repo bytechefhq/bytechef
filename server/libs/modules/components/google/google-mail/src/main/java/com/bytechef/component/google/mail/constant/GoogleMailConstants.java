@@ -94,33 +94,56 @@ public class GoogleMailConstants {
 
     public static final ModifiableObjectProperty FULL_MESSAGE_OUTPUT_PROPERTY = object()
         .properties(
-            string(ID),
-            string(THREAD_ID),
+            string(ID)
+                .description("The ID of the message."),
+            string(THREAD_ID)
+                .description("The ID of the thread the message belongs to."),
             array(LABEL_IDS)
+                .description("List of IDs of labels applied to this message.")
                 .items(string()),
-            string(SNIPPET),
-            string(HISTORY_ID),
-            number(INTERNAL_DATE),
+            string(SNIPPET)
+                .description("A short part of the message text."),
+            string(HISTORY_ID)
+                .description("The ID of the last history record that modified this message."),
+            number(INTERNAL_DATE)
+                .description(
+                    "The internal message creation timestamp (epoch ms), which determines ordering in the inbox."),
             object(PAYLOAD)
+                .description("The parsed email structure in the message parts.")
                 .properties(
-                    string("partId"),
-                    string("mimeType"),
-                    string("filename"),
+                    string("partId")
+                        .description("The ID of the message part."),
+                    string("mimeType")
+                        .description("The MIME type of the message part."),
+                    string("filename")
+                        .description("The filename of the attachment."),
                     array(HEADERS)
+                        .description("List of headers on the message part.")
                         .items(
                             object()
                                 .properties(
-                                    string(NAME),
-                                    string(VALUE))),
+                                    string(NAME)
+                                        .description("The name of the header before the : separator."),
+                                    string(VALUE)
+                                        .description("The value of the header after the : separator."))),
                     object(BODY)
+                        .description("The message part body for this part.")
                         .properties(
-                            string("attachmentId"),
-                            integer("size"),
-                            string("data")),
+                            string("attachmentId")
+                                .description(
+                                    "ID of an external attachment that can be retrieved in a separate " +
+                                        "messages.attachments.get request."),
+                            integer("size")
+                                .description("Number of bytes for the message part data (encoding notwithstanding)."),
+                            string("data")
+                                .description("The body data of a MIME message part as a base64url encoded string.")),
                     array("parts")
+                        .description("The child MIME message parts of this part.")
                         .items()),
-            integer(SIZE_ESTIMATE),
-            string(RAW));
+            integer(SIZE_ESTIMATE)
+                .description("Estimated size in bytes of the message."),
+            string(RAW)
+                .description("The entire email message in an RFC 2822 formatted and base64url encoded string."));
 
     public static final ModifiableArrayProperty METADATA_HEADERS_PROPERTY = array(METADATA_HEADERS)
         .label("Metadata headers")

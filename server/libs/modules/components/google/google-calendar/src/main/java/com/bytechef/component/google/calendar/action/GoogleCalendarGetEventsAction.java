@@ -97,6 +97,7 @@ public class GoogleCalendarGetEventsAction {
         .output(
             outputSchema(
                 array()
+                    .description("List of events.")
                     .items(EVENT_OUTPUT_PROPERTY)))
         .perform(GoogleCalendarGetEventsAction::perform);
 

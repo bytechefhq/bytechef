@@ -49,6 +49,7 @@ public class GoogleDriveNewFolderTrigger {
         .output(
             outputSchema(
                 array()
+                    .description("List of folders that were uploaded to Google Drive.")
                     .items(GOOGLE_FILE_OUTPUT_PROPERTY)))
         .poll(GoogleDriveNewFolderTrigger::poll);
 

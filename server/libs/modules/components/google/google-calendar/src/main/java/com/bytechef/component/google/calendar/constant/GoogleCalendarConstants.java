@@ -82,48 +82,86 @@ public class GoogleCalendarConstants {
 
     public static final ModifiableObjectProperty EVENT_OUTPUT_PROPERTY = object()
         .properties(
-            string("iCalUID"),
-            string(ID),
-            string(SUMMARY),
-            dateTime("startTime"),
-            dateTime("endTime"),
-            string("etag"),
-            string(EVENT_TYPE),
-            string("htmlLink"),
-            string(STATUS),
-            string(LOCATION),
-            string("hangoutLink"),
+            string("iCalUID")
+                .description(
+                    "Event unique identifier as defined in RFC5545. It is used to uniquely identify events accross " +
+                        "calendaring systems."),
+            string(ID)
+                .description("Identifier of the event."),
+            string(SUMMARY)
+                .description("Title of the event."),
+            dateTime("startTime")
+                .description("Start time of the event."),
+            dateTime("endTime")
+                .description("End time of the event."),
+            string("etag")
+                .description("ETag of the resource."),
+            string(EVENT_TYPE)
+                .description("Specific type of the event."),
+            string("htmlLink")
+                .description("An absolute link to this event in the Google Calendar Web UI."),
+            string(STATUS)
+                .description("Status of the event."),
+            string(LOCATION)
+                .description("Geographic location of the event as free-form text."),
+            string("hangoutLink")
+                .description("An absolute link to the Google Hangout associated with this event."),
             array(ATTENDEES)
+                .description("The attendees of the event.")
                 .items(
                     object()
                         .properties(
-                            integer("additionalGuests"),
-                            string("comment"),
-                            string(DISPLAY_NAME),
-                            string(EMAIL),
-                            string(ID),
-                            bool("optional"),
-                            bool(ORGANIZER),
-                            bool("resource"),
-                            string("responseStatus"),
-                            bool(SELF))),
+                            integer("additionalGuests")
+                                .description("Number of additional guests."),
+                            string("comment")
+                                .description("The attendee's response comment."),
+                            string(DISPLAY_NAME)
+                                .description("The attendee's name."),
+                            string(EMAIL)
+                                .description("The attendee's email address."),
+                            string(ID)
+                                .description("The attendee's Profile ID."),
+                            bool("optional")
+                                .description("Whether this is an optional attendee."),
+                            bool(ORGANIZER)
+                                .description("Whether the attendee is the organizer of the event."),
+                            bool("resource")
+                                .description("Whether the attendee is a resource. "),
+                            string("responseStatus")
+                                .description("The attendee's response status."),
+                            bool(SELF)
+                                .description(
+                                    "Whether this entry represents the calendar on which this copy of the event appears."))),
             array(ATTACHMENTS)
+                .description("File attachments for the event.")
                 .items(
                     object()
-                        .properties(string("fileId"),
-                            string("fileUrl"),
-                            string(ICON_LINK),
-                            string("mimeType"),
-                            string(TITLE))),
+                        .properties(
+                            string("fileId")
+                                .description("ID of the attached file. "),
+                            string("fileUrl")
+                                .description("URL link to the attachment."),
+                            string(ICON_LINK)
+                                .description("URL link to the attachment's icon."),
+                            string("mimeType")
+                                .description("Internet media type (MIME type) of the attachment."),
+                            string(TITLE)
+                                .description("Attachment title."))),
             object(REMINDERS)
+                .description("Information about the event's reminders for the authenticated user.")
                 .properties(
                     array("overrides")
                         .items(
                             object()
                                 .properties(
-                                    string(METHOD),
-                                    integer(MINUTES))),
-                    bool(USE_DEFAULT)));
+                                    string(METHOD)
+                                        .description("The method used by this reminder."),
+                                    integer(MINUTES)
+                                        .description(
+                                            "Number of minutes before the start of the event when the reminder " +
+                                                "should trigger."))),
+                    bool(USE_DEFAULT)
+                        .description("Whether the default reminders of the calendar apply to the event.")));
 
     public static final ModifiableStringProperty SEND_UPDATES_PROPERTY =
         string(SEND_UPDATES)

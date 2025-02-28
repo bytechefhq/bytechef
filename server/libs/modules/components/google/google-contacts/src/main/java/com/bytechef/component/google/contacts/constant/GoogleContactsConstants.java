@@ -43,28 +43,39 @@ public class GoogleContactsConstants {
         object()
             .properties(
                 array("names")
+                    .description("The person's names.")
                     .items(
                         object()
                             .properties(
-                                string(FAMILY_NAME),
-                                string(GIVEN_NAME),
-                                string(MIDDLE_NAME))),
+                                string(FAMILY_NAME)
+                                    .description("The family name."),
+                                string(GIVEN_NAME)
+                                    .description("The given name."),
+                                string(MIDDLE_NAME)
+                                    .description("The middle name(s)."))),
                 array("organizations")
+                    .description("The person's past or current organizations.")
                     .items(
                         object()
                             .properties(
-                                string(NAME),
-                                string(TITLE))),
+                                string(NAME)
+                                    .description("The name of the organization."),
+                                string(TITLE)
+                                    .description("The person's job title at the organization."))),
                 array("emailAddresses")
+                    .description("The person's email addresses.")
                     .items(
                         object()
                             .properties(
-                                string("value"))),
+                                string("value")
+                                    .description("The email address."))),
                 array("phoneNumbers")
+                    .description("The person's phone numbers.")
                     .items(
                         object()
                             .properties(
-                                string("value"))));
+                                string("value")
+                                    .description("The phone number."))));
 
     private GoogleContactsConstants() {
     }

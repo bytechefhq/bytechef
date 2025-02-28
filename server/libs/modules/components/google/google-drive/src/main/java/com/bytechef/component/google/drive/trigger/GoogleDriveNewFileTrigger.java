@@ -49,6 +49,7 @@ public class GoogleDriveNewFileTrigger {
         .output(
             outputSchema(
                 array()
+                    .description("List of files that were uploaded to Google Drive.")
                     .items(GOOGLE_FILE_OUTPUT_PROPERTY)))
         .poll(GoogleDriveNewFileTrigger::poll);
 

@@ -48,7 +48,10 @@ public class GoogleContactsCreateGroupAction {
             outputSchema(
                 object()
                     .properties(
-                        string(NAME))))
+                        string(NAME)
+                            .description(
+                                "The contact group name set by the group owner or a system provided name for " +
+                                    "system groups."))))
         .perform(GoogleContactsCreateGroupAction::perform);
 
     private GoogleContactsCreateGroupAction() {
