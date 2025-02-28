@@ -1440,6 +1440,8 @@ public class ApplicationProperties {
         private String password;
         private int port = 25;
         private Smtp smtp = new Smtp();
+        private Ssl ssl = new Ssl();
+        private Transport transport = new Transport();
         private String username;
 
         public String getBaseUrl() {
@@ -1488,6 +1490,22 @@ public class ApplicationProperties {
 
         public void setSmtp(Smtp smtp) {
             this.smtp = smtp;
+        }
+
+        public Ssl getSsl() {
+            return ssl;
+        }
+
+        public void setSsl(Ssl ssl) {
+            this.ssl = ssl;
+        }
+
+        public Transport getTransport() {
+            return transport;
+        }
+
+        public void setTransport(Transport transport) {
+            this.transport = transport;
         }
 
         public String getUsername() {
@@ -1539,6 +1557,28 @@ public class ApplicationProperties {
                 public void setRequired(boolean required) {
                     this.required = required;
                 }
+            }
+        }
+
+        public static class Ssl {
+
+            private boolean enabled;
+
+            public boolean isEnabled() {
+                return enabled;
+            }
+        }
+
+        public static class Transport {
+
+            private String protocol;
+
+            public String getProtocol() {
+                return protocol;
+            }
+
+            public void setProtocol(String protocol) {
+                this.protocol = protocol;
             }
         }
     }
