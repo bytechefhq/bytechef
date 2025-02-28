@@ -55,7 +55,7 @@ public class ProjectTriggerDispatcherPreSendProcessor extends AbstractDispatcher
             triggerExecution.getInstanceId(), workflowExecutionId.getWorkflowReferenceCode());
 
         Map<String, Long> connectionIdMap = getConnectionIdMap(
-            workflowExecutionId.getPrincipalId(), workflowId, triggerExecution.getName());
+            workflowExecutionId.getJobPrincipalId(), workflowId, triggerExecution.getName());
 
         if (!connectionIdMap.isEmpty()) {
             triggerExecution.putMetadata(MetadataConstants.CONNECTION_IDS, connectionIdMap);

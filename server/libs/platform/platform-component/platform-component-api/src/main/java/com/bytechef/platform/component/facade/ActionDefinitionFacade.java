@@ -22,6 +22,8 @@ import com.bytechef.platform.component.domain.Option;
 import com.bytechef.platform.component.domain.Property;
 import com.bytechef.platform.constant.ModeType;
 import com.bytechef.platform.domain.OutputResponse;
+
+import javax.annotation.Nullable;
 import java.util.List;
 import java.util.Map;
 
@@ -31,9 +33,8 @@ import java.util.Map;
 public interface ActionDefinitionFacade extends OperationDefinitionFacade {
 
     List<Property> executeDynamicProperties(
-        String componentName, int componentVersion, String actionName, String propertyName,
-        String workflowId, Map<String, ?> inputParameters, List<String> lookupDependsOnPaths,
-        Long connectionId);
+        String componentName, int componentVersion, String actionName, String propertyName, String workflowId,
+        Map<String, ?> inputParameters, List<String> lookupDependsOnPaths, @Nullable Long connectionId);
 
     List<Option> executeOptions(
         String componentName, int componentVersion, String actionName, String propertyName,
@@ -44,14 +45,13 @@ public interface ActionDefinitionFacade extends OperationDefinitionFacade {
         Map<String, Long> connectionIds);
 
     Object executePerform(
-        String componentName, int componentVersion, String actionName, ModeType type,
-        Long principalId, Long principalWorkflowId, Long jobId, String workflowId, Map<String, ?> inputParameters,
+        String componentName, int componentVersion, String actionName, ModeType type, Long jobPrincipalId,
+        Long jobPrincipalWorkflowId, Long jobId, String workflowId, Map<String, ?> inputParameters,
         Map<String, Long> connectionIds, Map<String, ?> extensions, boolean editorEnvironment);
 
     Object executePerformForPolyglot(
-        String componentName, int componentVersion, String actionName,
-        Map<String, ?> inputParameters, ComponentConnection componentConnection,
-        ActionContext actionContext);
+        String componentName, int componentVersion, String actionName, Map<String, ?> inputParameters,
+        ComponentConnection componentConnection, ActionContext actionContext);
 
     String executeWorkflowNodeDescription(
         String componentName, int componentVersion, String actionName, Map<String, ?> inputParameters);

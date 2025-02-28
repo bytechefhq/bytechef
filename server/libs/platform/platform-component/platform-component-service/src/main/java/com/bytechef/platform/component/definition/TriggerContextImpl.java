@@ -33,14 +33,14 @@ class TriggerContextImpl extends ContextImpl implements TriggerContext, TriggerC
 
     private final Data data;
     private final boolean editorEnvironment;
-    private final Long principalId;
+    private final Long jobPrincipalId;
     private final String triggerName;
     private final ModeType type;
     private final String workflowReferenceCode;
 
     @SuppressFBWarnings("EI")
     public TriggerContextImpl(
-        String componentName, int componentVersion, String triggerName, ModeType type, Long principalId,
+        String componentName, int componentVersion, String triggerName, ModeType type, Long jobPrincipalId,
         String workflowReferenceCode, ComponentConnection connection, DataStorage dataStorage,
         FilesFileStorage filesFileStorage, HttpClientExecutor httpClientExecutor, boolean editorEnvironment) {
 
@@ -49,7 +49,7 @@ class TriggerContextImpl extends ContextImpl implements TriggerContext, TriggerC
         this.data = new DataImpl(
             componentName, componentVersion, triggerName, type, workflowReferenceCode, dataStorage);
         this.editorEnvironment = editorEnvironment;
-        this.principalId = principalId;
+        this.jobPrincipalId = jobPrincipalId;
         this.triggerName = triggerName;
         this.type = type;
         this.workflowReferenceCode = workflowReferenceCode;
@@ -65,8 +65,8 @@ class TriggerContextImpl extends ContextImpl implements TriggerContext, TriggerC
     }
 
     @Override
-    public Long getPrincipalId() {
-        return principalId;
+    public Long getJobPrincipalId() {
+        return jobPrincipalId;
     }
 
     @Override

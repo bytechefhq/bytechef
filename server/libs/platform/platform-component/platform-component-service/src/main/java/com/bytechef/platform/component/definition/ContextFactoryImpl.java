@@ -60,11 +60,11 @@ class ContextFactoryImpl implements ContextFactory {
     @Override
     public ActionContext createActionContext(
         String componentName, int componentVersion, String actionName, ModeType type,
-        Long principalId, Long principalWorkflowId, String workflowId, Long jobId, ComponentConnection connection,
+        Long jobPrincipalId, Long jobPrincipalWorkflowId, String workflowId, Long jobId, ComponentConnection connection,
         boolean editorEnvironment) {
 
         return new ActionContextImpl(
-            componentName, componentVersion, actionName, type, principalId, principalWorkflowId, workflowId, jobId,
+            componentName, componentVersion, actionName, type, jobPrincipalId, jobPrincipalWorkflowId, workflowId, jobId,
             connection, publicUrl, getDataStorage(workflowId, editorEnvironment), eventPublisher,
             getFilesFileStorage(editorEnvironment), getHttpClientExecutor(editorEnvironment), editorEnvironment);
     }
@@ -78,10 +78,10 @@ class ContextFactoryImpl implements ContextFactory {
     @Override
     public TriggerContext createTriggerContext(
         String componentName, int componentVersion, String triggerName, ModeType type,
-        Long principalId, String workflowReferenceCode, ComponentConnection connection, boolean editorEnvironment) {
+        Long jobPrincipalId, String workflowReferenceCode, ComponentConnection connection, boolean editorEnvironment) {
 
         return new TriggerContextImpl(
-            componentName, componentVersion, triggerName, type, principalId, workflowReferenceCode, connection,
+            componentName, componentVersion, triggerName, type, jobPrincipalId, workflowReferenceCode, connection,
             getDataStorage(workflowReferenceCode, editorEnvironment), getFilesFileStorage(editorEnvironment),
             getHttpClientExecutor(editorEnvironment), editorEnvironment);
     }

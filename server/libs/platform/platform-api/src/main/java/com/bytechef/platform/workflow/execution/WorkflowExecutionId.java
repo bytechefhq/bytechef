@@ -29,7 +29,7 @@ import org.springframework.lang.Nullable;
  */
 public class WorkflowExecutionId implements Serializable {
 
-    private long principalId;
+    private long jobPrincipalId;
 
     @Nullable
     private ModeType type;
@@ -48,9 +48,9 @@ public class WorkflowExecutionId implements Serializable {
     }
 
     private WorkflowExecutionId(
-        String tenantId, ModeType type, long principalId, String workflowReferenceCode, String triggerName) {
+        String tenantId, ModeType type, long jobPrincipalId, String workflowReferenceCode, String triggerName) {
 
-        this.principalId = principalId;
+        this.jobPrincipalId = jobPrincipalId;
         this.tenantId = tenantId;
         this.triggerName = triggerName;
         this.type = type;
@@ -76,8 +76,8 @@ public class WorkflowExecutionId implements Serializable {
             items[0], ModeType.values()[Integer.parseInt(items[1])], Long.parseLong(items[2]), items[3], items[4]);
     }
 
-    public long getPrincipalId() {
-        return principalId;
+    public long getJobPrincipalId() {
+        return jobPrincipalId;
     }
 
     public ModeType getType() {
@@ -106,7 +106,7 @@ public class WorkflowExecutionId implements Serializable {
                 type1.ordinal()
                 +
                 ":" +
-                principalId +
+                jobPrincipalId +
                 ":" +
                 workflowReferenceCode +
                 ":" +

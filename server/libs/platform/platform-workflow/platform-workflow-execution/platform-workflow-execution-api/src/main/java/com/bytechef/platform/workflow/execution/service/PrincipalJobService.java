@@ -42,6 +42,6 @@ public interface PrincipalJobService {
     List<Long> getJobIds(long principalId, ModeType type);
 
     Page<Long> getJobIds(
-        Status status, Instant startDate, Instant endDate, List<Long> principalIds,
-        ModeType type, List<String> workflowIds, int pageNumber);
+        Status status, Instant startDate, Instant endDate, List<Long> principalIds, ModeType type,
+        List<String> workflowIds, int pageNumber);
 }

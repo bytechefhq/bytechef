@@ -93,7 +93,7 @@ public class RemoteActionDefinitionFacadeController {
         return ResponseEntity.ok(
             actionDefinitionFacade.executePerform(
                 performRequest.componentName, performRequest.componentVersion, performRequest.actionName,
-                performRequest.type, performRequest.principalId, performRequest.principalWorkflowId,
+                performRequest.type, performRequest.jobPrincipalId, performRequest.jobPrincipalWorkflowId,
                 performRequest.jobId, performRequest.workflowId, performRequest.inputParameters,
                 performRequest.connectionIds, performRequest.extensions, false));
     }
@@ -138,8 +138,8 @@ public class RemoteActionDefinitionFacadeController {
 
     @SuppressFBWarnings("EI")
     public record PerformRequest(
-        String componentName, int componentVersion, String actionName, ModeType type, Long principalId,
-        Long principalWorkflowId, long jobId, String workflowId, Map<String, ?> inputParameters,
+        String componentName, int componentVersion, String actionName, ModeType type, Long jobPrincipalId,
+        Long jobPrincipalWorkflowId, long jobId, String workflowId, Map<String, ?> inputParameters,
         Map<String, Long> connectionIds, Map<String, Long> extensions) {
     }
 }

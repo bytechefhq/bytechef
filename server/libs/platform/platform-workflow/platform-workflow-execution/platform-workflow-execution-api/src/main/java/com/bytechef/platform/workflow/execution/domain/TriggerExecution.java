@@ -240,7 +240,7 @@ public class TriggerExecution implements Cloneable, Errorable, Prioritizable, Re
 
     @JsonIgnore
     public long getInstanceId() {
-        return workflowExecutionId.getPrincipalId();
+        return workflowExecutionId.getJobPrincipalId();
     }
 
     /**

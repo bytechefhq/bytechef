@@ -88,7 +88,7 @@ public class WorkflowExecutorImpl implements WorkflowExecutor {
                 Job job = jobSyncExecutor.execute(
                     createJobParameters(workflowExecutionId, workflowId, inputMap, triggerOutputValue),
                     jobParameters -> principalJobFacade.createSyncJob(
-                        jobParameters, workflowExecutionId.getPrincipalId(), workflowExecutionId.getType()));
+                        jobParameters, workflowExecutionId.getJobPrincipalId(), workflowExecutionId.getType()));
 
                 outputsList.add(taskFileStorage.readJobOutputs(job.getOutputs()));
             }
@@ -98,7 +98,7 @@ public class WorkflowExecutorImpl implements WorkflowExecutor {
             Job job = jobSyncExecutor.execute(
                 createJobParameters(workflowExecutionId, workflowId, inputMap, triggerOutput.value()),
                 jobParameters -> principalJobFacade.createSyncJob(
-                    jobParameters, workflowExecutionId.getPrincipalId(), workflowExecutionId.getType()));
+                    jobParameters, workflowExecutionId.getJobPrincipalId(), workflowExecutionId.getType()));
 
             outputs = job.getOutputs() == null ? null : taskFileStorage.readJobOutputs(job.getOutputs());
         }
@@ -142,7 +142,7 @@ public class WorkflowExecutorImpl implements WorkflowExecutor {
             jobPrincipalAccessorRegistry.getJobPrincipalAccessor(workflowExecutionId.getType());
 
         return jobPrincipalAccessor.getInputMap(
-            workflowExecutionId.getPrincipalId(), workflowExecutionId.getWorkflowReferenceCode());
+            workflowExecutionId.getJobPrincipalId(), workflowExecutionId.getWorkflowReferenceCode());
     }
 
     private String getWorkflowId(WorkflowExecutionId workflowExecutionId) {
@@ -150,6 +150,6 @@ public class WorkflowExecutorImpl implements WorkflowExecutor {
             jobPrincipalAccessorRegistry.getJobPrincipalAccessor(workflowExecutionId.getType());
 
         return jobPrincipalAccessor.getWorkflowId(
-            workflowExecutionId.getPrincipalId(), workflowExecutionId.getWorkflowReferenceCode());
+            workflowExecutionId.getJobPrincipalId(), workflowExecutionId.getWorkflowReferenceCode());
     }
 }

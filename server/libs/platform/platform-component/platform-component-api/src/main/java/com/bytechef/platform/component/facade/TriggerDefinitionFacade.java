@@ -24,6 +24,8 @@ import com.bytechef.platform.component.trigger.TriggerOutput;
 import com.bytechef.platform.component.trigger.WebhookRequest;
 import com.bytechef.platform.constant.ModeType;
 import com.bytechef.platform.domain.OutputResponse;
+
+import javax.annotation.Nullable;
 import java.util.List;
 import java.util.Map;
 
@@ -51,28 +53,29 @@ public interface TriggerDefinitionFacade extends OperationDefinitionFacade {
      */
     TriggerDefinition.WebhookEnableOutput executeDynamicWebhookRefresh(
         String componentName, int componentVersion, String triggerName, Map<String, ?> outputParameters,
-        Long connectionId);
+        @Nullable Long connectionId);
 
     void executeListenerDisable(
         String componentName, int componentVersion, String triggerName, Map<String, ?> inputParameters,
-        String workflowExecutionId, Long connectionId);
+        String workflowExecutionId, @Nullable Long connectionId);
 
     void executeListenerEnable(
         String componentName, int componentVersion, String triggerName, Map<String, ?> inputParameters,
-        String workflowExecutionId, Long connectionId);
+        String workflowExecutionId, @Nullable Long connectionId);
 
     List<Option> executeOptions(
         String componentName, int componentVersion, String triggerName, String propertyName,
-        Map<String, ?> inputParameters, List<String> lookupDependsOnPaths, String searchText, Long connectionId);
+        Map<String, ?> inputParameters, List<String> lookupDependsOnPaths, String searchText,
+        @Nullable Long connectionId);
 
     OutputResponse executeOutput(
         String componentName, int componentVersion, String triggerName, Map<String, ?> inputParameters,
-        Long connectionId);
+        @Nullable Long connectionId);
 
     TriggerOutput executeTrigger(
-        String componentName, int componentVersion, String triggerName,
-        ModeType type, Long principalId, String workflowReferenceCode, Map<String, ?> inputParameters,
-        Object triggerState, WebhookRequest webhookRequest, Long connectionId, boolean editorEnvironment);
+        String componentName, int componentVersion, String triggerName, ModeType type, Long jobPrincipalId,
+        String workflowReferenceCode, Map<String, ?> inputParameters, Object triggerState,
+        WebhookRequest webhookRequest, @Nullable Long connectionId, boolean editorEnvironment);
 
     void executeWebhookDisable(
         String componentName, int componentVersion, String triggerName, Map<String, ?> inputParameters,
@@ -80,15 +83,15 @@ public interface TriggerDefinitionFacade extends OperationDefinitionFacade {
 
     TriggerDefinition.WebhookEnableOutput executeWebhookEnable(
         String componentName, int componentVersion, String triggerName, Map<String, ?> inputParameters,
-        String workflowExecutionId, Long connectionId, String webhookUrl);
+        String workflowExecutionId, @Nullable Long connectionId, String webhookUrl);
 
     WebhookValidateResponse executeWebhookValidate(
         String componentName, int componentVersion, String triggerName, Map<String, ?> inputParameters,
-        WebhookRequest webhookRequest, Long connectionId);
+        WebhookRequest webhookRequest, @Nullable Long connectionId);
 
     WebhookValidateResponse executeWebhookValidateOnEnable(
         String componentName, int componentVersion, String triggerName, Map<String, ?> inputParameters,
-        WebhookRequest webhookRequest, Long connectionId);
+        WebhookRequest webhookRequest, @Nullable Long connectionId);
 
     String executeWorkflowNodeDescription(
         String componentName, int componentVersion, String triggerName, Map<String, ?> inputParameters);

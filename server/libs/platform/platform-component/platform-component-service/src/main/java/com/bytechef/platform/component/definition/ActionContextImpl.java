@@ -41,8 +41,8 @@ class ActionContextImpl extends ContextImpl implements ActionContext, ActionCont
     private Approval approval;
     private final Data data;
     private final Event event;
-    private final Long principalId;
-    private final Long principalWorkflowId;
+    private final Long jobPrincipalId;
+    private final Long jobPrincipalWorkflowId;
     private final Long jobId;
     private final boolean editorEnvironment;
     private final ModeType type;
@@ -50,8 +50,8 @@ class ActionContextImpl extends ContextImpl implements ActionContext, ActionCont
 
     @SuppressFBWarnings("EI")
     public ActionContextImpl(
-        String componentName, int componentVersion, String actionName, ModeType type, Long principalId,
-        Long principalWorkflowId, String workflowId, Long jobId, ComponentConnection connection,
+        String componentName, int componentVersion, String actionName, ModeType type, Long jobPrincipalId,
+        Long jobPrincipalWorkflowId, String workflowId, Long jobId, ComponentConnection connection,
         String publicUrl, DataStorage dataStorage, ApplicationEventPublisher eventPublisher,
         FilesFileStorage filesFileStorage, HttpClientExecutor httpClientExecutor, boolean editorEnvironment) {
 
@@ -64,11 +64,11 @@ class ActionContextImpl extends ContextImpl implements ActionContext, ActionCont
         }
 
         this.data = new DataImpl(
-            componentName, componentVersion, actionName, type, principalId, principalWorkflowId, jobId, dataStorage);
+            componentName, componentVersion, actionName, type, jobPrincipalId, jobPrincipalWorkflowId, jobId, dataStorage);
         this.editorEnvironment = editorEnvironment;
         this.event = jobId == null ? progress -> {} : new EventImpl(eventPublisher, jobId);
-        this.principalId = principalId;
-        this.principalWorkflowId = principalWorkflowId;
+        this.jobPrincipalId = jobPrincipalId;
+        this.jobPrincipalWorkflowId = jobPrincipalWorkflowId;
         this.jobId = jobId;
         this.type = type;
         this.workflowId = workflowId;
@@ -108,13 +108,13 @@ class ActionContextImpl extends ContextImpl implements ActionContext, ActionCont
     }
 
     @Override
-    public Long getPrincipalId() {
-        return principalId;
+    public Long getJobPrincipalId() {
+        return jobPrincipalId;
     }
 
     @Override
-    public Long getPrincipalWorkflowId() {
-        return principalWorkflowId;
+    public Long getJobPrincipalWorkflowId() {
+        return jobPrincipalWorkflowId;
     }
 
     @Override

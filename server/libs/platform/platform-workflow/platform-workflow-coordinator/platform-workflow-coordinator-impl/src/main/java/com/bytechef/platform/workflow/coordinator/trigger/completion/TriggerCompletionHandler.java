@@ -94,7 +94,7 @@ public class TriggerCompletionHandler {
                 createJob(
                     workflowId,
                     MapUtils.concat(inputMap, Map.of(triggerExecution.getName(), Map.of())),
-                    workflowExecutionId.getPrincipalId(), workflowExecutionId.getType()));
+                    workflowExecutionId.getJobPrincipalId(), workflowExecutionId.getType()));
         } else {
             Object output = triggerFileStorage.readTriggerExecutionOutput(triggerExecution.getOutput());
 
@@ -104,14 +104,14 @@ public class TriggerCompletionHandler {
                         createJob(
                             workflowId,
                             MapUtils.concat(inputMap, Map.of(triggerExecution.getName(), triggerOutputValue)),
-                            workflowExecutionId.getPrincipalId(), workflowExecutionId.getType()));
+                            workflowExecutionId.getJobPrincipalId(), workflowExecutionId.getType()));
                 }
             } else {
                 triggerExecution.addJobId(
                     createJob(
                         workflowId,
                         MapUtils.concat(inputMap, Map.of(triggerExecution.getName(), output)),
-                        workflowExecutionId.getPrincipalId(), workflowExecutionId.getType()));
+                        workflowExecutionId.getJobPrincipalId(), workflowExecutionId.getType()));
             }
         }
 
@@ -124,8 +124,8 @@ public class TriggerCompletionHandler {
         }
     }
 
-    private long createJob(String workflowId, Map<String, ?> inpputMap, long principalId, ModeType type) {
-        return principalJobFacade.createJob(new JobParametersDTO(workflowId, inpputMap), principalId, type);
+    private long createJob(String workflowId, Map<String, ?> inpputMap, long jobPrincipalId, ModeType type) {
+        return principalJobFacade.createJob(new JobParametersDTO(workflowId, inpputMap), jobPrincipalId, type);
     }
 
     private Map<String, ?> getInputMap(WorkflowExecutionId workflowExecutionId) {
@@ -133,7 +133,7 @@ public class TriggerCompletionHandler {
             jobPrincipalAccessorRegistry.getJobPrincipalAccessor(workflowExecutionId.getType());
 
         return jobPrincipalAccessor.getInputMap(
-            workflowExecutionId.getPrincipalId(), workflowExecutionId.getWorkflowReferenceCode());
+            workflowExecutionId.getJobPrincipalId(), workflowExecutionId.getWorkflowReferenceCode());
     }
 
     private String getWorkflowId(WorkflowExecutionId workflowExecutionId) {
@@ -141,6 +141,6 @@ public class TriggerCompletionHandler {
             jobPrincipalAccessorRegistry.getJobPrincipalAccessor(workflowExecutionId.getType());
 
         return jobPrincipalAccessor.getWorkflowId(
-            workflowExecutionId.getPrincipalId(), workflowExecutionId.getWorkflowReferenceCode());
+            workflowExecutionId.getJobPrincipalId(), workflowExecutionId.getWorkflowReferenceCode());
     }
 }

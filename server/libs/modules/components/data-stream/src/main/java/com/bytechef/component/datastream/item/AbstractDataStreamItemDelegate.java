@@ -84,10 +84,10 @@ public abstract class AbstractDataStreamItemDelegate {
 
         JobParameter<?> jobParameter = jobParameters.getParameter(PRINCIPAL_ID);
 
-        Long principalId = null;
+        Long jobPrincipalId = null;
 
         if (jobParameter != null) {
-            principalId = (Long) jobParameter.getValue();
+            jobPrincipalId = (Long) jobParameter.getValue();
         }
 
         jobParameter = jobParameters.getParameter(PRINCIPAL_WORKFLOW_ID);
@@ -123,7 +123,7 @@ public abstract class AbstractDataStreamItemDelegate {
 
         context = new DataStreamContextImpl(
             contextFactory.createActionContext(
-                componentName, componentVersion, STREAM, type, principalId, principalWorkflowId,
+                componentName, componentVersion, STREAM, type, jobPrincipalId, principalWorkflowId,
                 null, jobId, null, editorEnvironment));
 
         doBeforeStep(stepExecution);

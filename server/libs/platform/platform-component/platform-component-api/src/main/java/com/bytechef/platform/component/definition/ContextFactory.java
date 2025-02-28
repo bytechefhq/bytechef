@@ -28,13 +28,13 @@ import com.bytechef.platform.constant.ModeType;
 public interface ContextFactory {
 
     ActionContext createActionContext(
-        String componentName, int componentVersion, String actionName, ModeType type, Long principalId,
-        Long principalWorkflowId, String workflowId, Long jobId, ComponentConnection connection,
+        String componentName, int componentVersion, String actionName, ModeType type, Long jobPrincipalId,
+        Long jobPrincipalWorkflowId, String workflowId, Long jobId, ComponentConnection connection,
         boolean editorEnvironment);
 
     Context createContext(String componentName, ComponentConnection connection);
 
     TriggerContext createTriggerContext(
-        String componentName, int componentVersion, String triggerName, ModeType type, Long principalId,
+        String componentName, int componentVersion, String triggerName, ModeType type, Long jobPrincipalId,
         String workflowReferenceCode, ComponentConnection connection, boolean editorEnvironment);
 }

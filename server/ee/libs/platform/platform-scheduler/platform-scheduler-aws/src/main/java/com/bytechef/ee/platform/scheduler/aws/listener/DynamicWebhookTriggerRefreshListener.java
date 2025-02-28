@@ -80,7 +80,7 @@ public class DynamicWebhookTriggerRefreshListener {
             jobPrincipalAccessorRegistry.getJobPrincipalAccessor(workflowExecutionId.getType());
 
         String workflowId = jobPrincipalAccessor.getWorkflowId(
-            workflowExecutionId.getPrincipalId(), workflowExecutionId.getWorkflowReferenceCode());
+            workflowExecutionId.getJobPrincipalId(), workflowExecutionId.getWorkflowReferenceCode());
 
         Workflow workflow = workflowService.getWorkflow(workflowId);
 
