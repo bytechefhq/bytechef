@@ -34,6 +34,7 @@ import com.bytechef.component.test.definition.MockParametersFactory;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Map;
@@ -57,15 +58,16 @@ class AirtableNewRecordTriggerTest {
         LocalDateTime startDate = LocalDateTime.of(2024, 1, 1, 0, 0, 0);
         LocalDateTime endDate = LocalDateTime.of(2024, 1, 2, 0, 0, 0);
 
-        Parameters parameters =
-            MockParametersFactory.create(Map.of(LAST_TIME_CHECKED, startDate, TRIGGER_FIELD, "field"));
+        Parameters parameters = MockParametersFactory.create(
+            Map.of(LAST_TIME_CHECKED, startDate, TRIGGER_FIELD, "field"));
 
-        try (MockedStatic<LocalDateTime> localDateTimeMockedStatic =
-            mockStatic(LocalDateTime.class, Mockito.CALLS_REAL_METHODS)) {
-            localDateTimeMockedStatic.when(LocalDateTime::now)
+        try (MockedStatic<LocalDateTime> localDateTimeMockedStatic = mockStatic(
+            LocalDateTime.class, Mockito.CALLS_REAL_METHODS)) {
+
+            localDateTimeMockedStatic.when(() -> LocalDateTime.now(any(ZoneId.class)))
                 .thenReturn(endDate);
 
-            when(parameters.getLocalDateTime(LAST_TIME_CHECKED, LocalDateTime.now()))
+            when(parameters.getLocalDateTime(LAST_TIME_CHECKED, LocalDateTime.now(ZoneId.of("GMT"))))
                 .thenReturn(startDate);
             when(mockedTriggerContext.http(any()))
                 .thenReturn(mockedExecutor);

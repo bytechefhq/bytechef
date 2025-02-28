@@ -33,6 +33,7 @@ import com.bytechef.component.definition.TypeReference;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Map;
@@ -72,8 +73,11 @@ public class AirtableNewRecordTrigger {
         Parameters inputParameters, Parameters connectionParameters, Parameters closureParameters,
         TriggerContext triggerContext) {
 
-        LocalDateTime startDate = closureParameters.getLocalDateTime(LAST_TIME_CHECKED, LocalDateTime.now());
-        LocalDateTime endDate = LocalDateTime.now();
+        ZoneId zoneId = ZoneId.of("GMT");
+
+        LocalDateTime now = LocalDateTime.now(zoneId);
+
+        LocalDateTime startDate = closureParameters.getLocalDateTime(LAST_TIME_CHECKED, now.minusHours(3));
 
         String filterByFormula = URLEncoder.encode(
             String.format(
@@ -91,6 +95,6 @@ public class AirtableNewRecordTrigger {
 
         Map<String, List<?>> body = response.getBody(new TypeReference<>() {});
 
-        return new PollOutput(body.get("records"), Map.of(LAST_TIME_CHECKED, endDate), false);
+        return new PollOutput(body.get("records"), Map.of(LAST_TIME_CHECKED, now), false);
     }
 }
