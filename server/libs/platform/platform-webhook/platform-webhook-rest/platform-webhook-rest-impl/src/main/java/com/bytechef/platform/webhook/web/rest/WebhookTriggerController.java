@@ -75,30 +75,29 @@ public class WebhookTriggerController extends AbstractWebhookTriggerController {
 
         WorkflowExecutionId workflowExecutionId = WorkflowExecutionId.parse(id);
 
-        return TenantUtils.callWithTenantId(
-            workflowExecutionId.getTenantId(), () -> {
-                ResponseEntity<?> responseEntity;
+        return TenantUtils.callWithTenantId(workflowExecutionId.getTenantId(), () -> {
+            ResponseEntity<?> responseEntity;
 
-                if (Objects.equals(httpServletRequest.getMethod(), RequestMethod.HEAD.name()) ||
-                    isWorkflowDisabled(workflowExecutionId)) {
+            if (Objects.equals(httpServletRequest.getMethod(), RequestMethod.HEAD.name()) ||
+                isWorkflowDisabled(workflowExecutionId)) {
 
-                    WebhookTriggerFlags webhookTriggerFlags = getWebhookTriggerFlags(workflowExecutionId);
+                WebhookTriggerFlags webhookTriggerFlags = getWebhookTriggerFlags(workflowExecutionId);
 
-                    WebhookRequest webhookRequest = getWebhookRequest(httpServletRequest, webhookTriggerFlags);
+                WebhookRequest webhookRequest = getWebhookRequest(httpServletRequest, webhookTriggerFlags);
 
-                    if (webhookTriggerFlags.workflowSyncOnEnableValidation()) {
-                        responseEntity = doValidateOnEnable(workflowExecutionId, webhookRequest);
-                    } else {
-                        responseEntity = ResponseEntity.ok()
-                            .build();
-                    }
+                if (webhookTriggerFlags.workflowSyncOnEnableValidation()) {
+                    responseEntity = doValidateOnEnable(workflowExecutionId, webhookRequest);
                 } else {
-                    responseEntity = doProcessTrigger(
-                        workflowExecutionId, null, httpServletRequest, httpServletResponse);
+                    responseEntity = ResponseEntity.ok()
+                        .build();
                 }
+            } else {
+                responseEntity = doProcessTrigger(
+                    workflowExecutionId, null, httpServletRequest, httpServletResponse);
+            }
 
-                return responseEntity;
-            });
+            return responseEntity;
+        });
     }
 
     private ResponseEntity<?> doValidateOnEnable(

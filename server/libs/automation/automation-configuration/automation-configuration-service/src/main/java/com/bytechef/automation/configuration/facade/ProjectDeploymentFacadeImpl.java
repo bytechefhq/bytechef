@@ -95,8 +95,8 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
     @SuppressFBWarnings("EI")
     public ProjectDeploymentFacadeImpl(
         ConnectionService connectionService, PrincipalJobFacade principalJobFacade,
-        PrincipalJobService principalJobService,
-        JobFacade jobFacade, JobService jobService, ProjectDeploymentService projectDeploymentService,
+        PrincipalJobService principalJobService, JobFacade jobFacade, JobService jobService,
+        ProjectDeploymentService projectDeploymentService,
         ProjectDeploymentWorkflowService projectDeploymentWorkflowService, ProjectService projectService,
         ProjectWorkflowService projectWorkflowService, TagService tagService,
         TriggerDefinitionService triggerDefinitionService, TriggerExecutionService triggerExecutionService,
@@ -533,8 +533,7 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
     }
 
     private Long getConnectionId(long projectDeploymentId, String workflowId, WorkflowTrigger workflowTrigger) {
-        return componentConnectionFacade
-            .getComponentConnections(workflowTrigger)
+        return componentConnectionFacade.getComponentConnections(workflowTrigger)
             .stream()
             .findFirst()
             .map(workflowConnection -> getConnectionId(

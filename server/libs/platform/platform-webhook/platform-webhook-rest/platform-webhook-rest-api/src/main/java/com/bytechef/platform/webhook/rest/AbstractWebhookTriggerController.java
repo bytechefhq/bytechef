@@ -88,7 +88,7 @@ public abstract class AbstractWebhookTriggerController {
 
     protected AbstractWebhookTriggerController(
         FilesFileStorage filesFileStorage, JobPrincipalAccessorRegistry jobPrincipalAccessorRegistry,
-        TriggerDefinitionService triggerDefinitionService,  WorkflowService workflowService) {
+        TriggerDefinitionService triggerDefinitionService, WorkflowService workflowService) {
 
         this.filesFileStorage = filesFileStorage;
         this.jobPrincipalAccessorRegistry = jobPrincipalAccessorRegistry;
