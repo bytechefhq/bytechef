@@ -42,7 +42,7 @@ dependencies {
     implementation(project(":server:libs:platform:platform-configuration:platform-configuration-rest:platform-configuration-rest-api"))
     implementation(project(":server:libs:platform:platform-file-storage:platform-file-storage-impl"))
     implementation(project(":server:libs:platform:platform-oauth2:platform-oauth2-api"))
-    implementation(project(":server:libs:platform:platform-webhook:platform-webhook-web:platform-webhook-web-api"))
+    implementation(project(":server:libs:platform:platform-webhook:platform-webhook-rest:platform-webhook-rest-api"))
     implementation(project(":server:libs:platform:platform-workflow:platform-workflow-test:platform-workflow-test-api"))
 
     testImplementation("org.springframework:spring-webflux")

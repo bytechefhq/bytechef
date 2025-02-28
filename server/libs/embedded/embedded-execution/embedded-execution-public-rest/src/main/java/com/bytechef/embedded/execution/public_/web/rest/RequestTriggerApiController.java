@@ -37,7 +37,7 @@ import com.bytechef.platform.definition.WorkflowNodeType;
 import com.bytechef.platform.file.storage.FilesFileStorage;
 import com.bytechef.platform.security.util.SecurityUtils;
 import com.bytechef.platform.webhook.executor.WorkflowExecutor;
-import com.bytechef.platform.webhook.web.AbstractWebhookTriggerController;
+import com.bytechef.platform.webhook.rest.AbstractWebhookTriggerController;
 import com.bytechef.platform.workflow.execution.WorkflowExecutionId;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import jakarta.servlet.ServletException;

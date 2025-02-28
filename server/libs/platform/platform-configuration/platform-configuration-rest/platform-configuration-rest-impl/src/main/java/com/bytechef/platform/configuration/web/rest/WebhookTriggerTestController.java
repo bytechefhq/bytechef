@@ -25,7 +25,7 @@ import com.bytechef.platform.configuration.accessor.JobPrincipalAccessorRegistry
 import com.bytechef.platform.configuration.facade.WebhookTriggerTestFacade;
 import com.bytechef.platform.configuration.facade.WorkflowNodeTestOutputFacade;
 import com.bytechef.platform.configuration.web.file.storage.TempFilesFileStorage;
-import com.bytechef.platform.webhook.web.AbstractWebhookTriggerController;
+import com.bytechef.platform.webhook.rest.AbstractWebhookTriggerController;
 import com.bytechef.platform.workflow.execution.WorkflowExecutionId;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.ResponseEntity;
