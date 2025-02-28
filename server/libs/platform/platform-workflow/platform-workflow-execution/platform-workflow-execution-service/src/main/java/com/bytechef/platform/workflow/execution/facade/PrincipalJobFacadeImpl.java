@@ -52,20 +52,20 @@ public class PrincipalJobFacadeImpl implements PrincipalJobFacade {
 
     @Override
     // TODO @Transactional
-    public long createJob(JobParametersDTO jobParametersDTO, long principalId, ModeType type) {
+    public long createJob(JobParametersDTO jobParametersDTO, long jobPrincipalId, ModeType type) {
         long jobId = jobFacade.createJob(jobParametersDTO);
 
-        principalJobService.create(jobId, principalId, type);
+        principalJobService.create(jobId, jobPrincipalId, type);
 
         return jobId;
     }
 
     @Override
     @Transactional
-    public Job createSyncJob(JobParametersDTO jobParametersDTO, long principalId, ModeType type) {
+    public Job createSyncJob(JobParametersDTO jobParametersDTO, long jobPrincipalId, ModeType type) {
         Job job = jobService.create(jobParametersDTO, workflowService.getWorkflow(jobParametersDTO.getWorkflowId()));
 
-        principalJobService.create(Validate.notNull(job.getId(), "id"), principalId, type);
+        principalJobService.create(Validate.notNull(job.getId(), "id"), jobPrincipalId, type);
 
         return job;
     }

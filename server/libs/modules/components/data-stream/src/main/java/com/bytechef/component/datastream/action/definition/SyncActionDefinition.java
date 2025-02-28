@@ -76,14 +76,14 @@ public class SyncActionDefinition extends AbstractActionDefinitionWrapper {
                     put(DESTINATION, new JobParameter<>(extensions.getMap(DESTINATION), Map.class));
                     put(INPUT_PARAMETERS, new JobParameter<>(inputParameters, Map.class));
 
-                    if (actionContextAware.getPrincipalId() != null) {
-                        put(PRINCIPAL_ID, new JobParameter<>(actionContextAware.getPrincipalId(), Long.class));
+                    if (actionContextAware.getJobPrincipalId() != null) {
+                        put(PRINCIPAL_ID, new JobParameter<>(actionContextAware.getJobPrincipalId(), Long.class));
                     }
 
-                    if (actionContextAware.getPrincipalWorkflowId() != null) {
+                    if (actionContextAware.getJobPrincipalWorkflowId() != null) {
                         put(
                             PRINCIPAL_WORKFLOW_ID,
-                            new JobParameter<>(actionContextAware.getPrincipalWorkflowId(), Long.class));
+                            new JobParameter<>(actionContextAware.getJobPrincipalWorkflowId(), Long.class));
                     }
 
                     put(JOB_ID, new JobParameter<>(actionContextAware.getJobId(), Long.class));

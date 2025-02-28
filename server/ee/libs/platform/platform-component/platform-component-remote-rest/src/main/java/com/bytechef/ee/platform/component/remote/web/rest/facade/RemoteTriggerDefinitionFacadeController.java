@@ -171,7 +171,7 @@ public class RemoteTriggerDefinitionFacadeController {
         return ResponseEntity.ok(
             triggerDefinitionFacade.executeTrigger(
                 triggerRequest.componentName, triggerRequest.componentVersion, triggerRequest.triggerName,
-                triggerRequest.type, triggerRequest.principalId, triggerRequest.workflowReferenceCode,
+                triggerRequest.type, triggerRequest.jobPrincipalId, triggerRequest.workflowReferenceCode,
                 triggerRequest.inputParameters, triggerRequest.state, triggerRequest.webhookRequest,
                 triggerRequest.connectionId, false));
     }
@@ -289,14 +289,13 @@ public class RemoteTriggerDefinitionFacadeController {
     @SuppressFBWarnings("EI")
     public record TriggerRequest(
         String componentName, int componentVersion, String triggerName,
-        ModeType type, Long principalId, String workflowReferenceCode,
-        Map<String, ?> inputParameters, Object state, WebhookRequest webhookRequest,
-        Long connectionId) {
+        ModeType type, Long jobPrincipalId, String workflowReferenceCode, Map<String, ?> inputParameters,
+        Object state, WebhookRequest webhookRequest, Long connectionId) {
     }
 
     @SuppressFBWarnings("EI")
     public record WebhookValidateRequest(
-        String componentName, int componentVersion, String triggerName,
-        Map<String, ?> inputParameters, WebhookRequest webhookRequest, Long connectionId) {
+        String componentName, int componentVersion, String triggerName, Map<String, ?> inputParameters,
+        WebhookRequest webhookRequest, Long connectionId) {
     }
 }

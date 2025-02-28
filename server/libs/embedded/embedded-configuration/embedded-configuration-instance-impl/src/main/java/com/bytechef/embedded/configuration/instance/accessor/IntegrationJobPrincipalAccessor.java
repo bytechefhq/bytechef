@@ -54,12 +54,12 @@ public class IntegrationJobPrincipalAccessor implements JobPrincipalAccessor {
     }
 
     @Override
-    public boolean isWorkflowEnabled(long principalId, String workflowReferenceCode) {
+    public boolean isWorkflowEnabled(long jobPrincipalId, String workflowReferenceCode) {
         boolean workflowEnabled = false;
 
-        if (integrationInstanceConfigurationService.isIntegrationInstanceConfigurationEnabled(principalId) &&
+        if (integrationInstanceConfigurationService.isIntegrationInstanceConfigurationEnabled(jobPrincipalId) &&
             integrationInstanceConfigurationWorkflowService.isIntegrationInstanceWorkflowEnabled(
-                principalId, getWorkflowId(principalId, workflowReferenceCode))) {
+                jobPrincipalId, getWorkflowId(jobPrincipalId, workflowReferenceCode))) {
 
             workflowEnabled = true;
         }
@@ -68,10 +68,10 @@ public class IntegrationJobPrincipalAccessor implements JobPrincipalAccessor {
     }
 
     @Override
-    public Map<String, ?> getInputMap(long principalId, String workflowReferenceCode) {
+    public Map<String, ?> getInputMap(long jobPrincipalId, String workflowReferenceCode) {
         IntegrationInstanceConfigurationWorkflow integrationInstanceConfigurationWorkflow =
             integrationInstanceConfigurationWorkflowService.getIntegrationInstanceConfigurationWorkflow(
-                principalId, getWorkflowId(principalId, workflowReferenceCode));
+                jobPrincipalId, getWorkflowId(jobPrincipalId, workflowReferenceCode));
 
         return integrationInstanceConfigurationWorkflow.getInputs();
     }
@@ -82,9 +82,9 @@ public class IntegrationJobPrincipalAccessor implements JobPrincipalAccessor {
     }
 
     @Override
-    public String getWorkflowId(long principalId, String workflowReferenceCode) {
+    public String getWorkflowId(long jobPrincipalId, String workflowReferenceCode) {
         return integrationWorkflowService.getWorkflowId(
-            principalId, workflowReferenceCode);
+            jobPrincipalId, workflowReferenceCode);
     }
 
     @Override

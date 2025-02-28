@@ -34,26 +34,26 @@ public class RemotePrincipalJobFacadeClient implements PrincipalJobFacade {
     }
 
     @Override
-    public long createJob(JobParametersDTO jobParametersDTO, long principalId, ModeType type) {
+    public long createJob(JobParametersDTO jobParametersDTO, long jobPrincipalId, ModeType type) {
         return loadBalancedRestClient.post(
             uriBuilder -> uriBuilder
                 .host(EXECUTION_APP)
                 .path(PRINCIPAL_JOB_FACADE + "/create-job")
                 .build(),
-            new CreateJobRequest(jobParametersDTO, principalId, type), Long.class);
+            new CreateJobRequest(jobParametersDTO, jobPrincipalId, type), Long.class);
     }
 
     @Override
-    public Job createSyncJob(JobParametersDTO jobParametersDTO, long principalId, ModeType type) {
+    public Job createSyncJob(JobParametersDTO jobParametersDTO, long jobPrincipalId, ModeType type) {
         return loadBalancedRestClient.post(
             uriBuilder -> uriBuilder
                 .host(EXECUTION_APP)
                 .path(PRINCIPAL_JOB_FACADE + "/create-sync-job")
                 .build(),
-            new CreateJobRequest(jobParametersDTO, principalId, type), Job.class);
+            new CreateJobRequest(jobParametersDTO, jobPrincipalId, type), Job.class);
     }
 
     @SuppressFBWarnings("EI")
-    public record CreateJobRequest(JobParametersDTO jobParameters, long principalId, ModeType type) {
+    public record CreateJobRequest(JobParametersDTO jobParameters, long jobPrincipalId, ModeType type) {
     }
 }

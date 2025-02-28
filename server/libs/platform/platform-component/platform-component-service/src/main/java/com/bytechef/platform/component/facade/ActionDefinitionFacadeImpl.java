@@ -133,15 +133,15 @@ public class ActionDefinitionFacadeImpl implements ActionDefinitionFacade {
 
     @Override
     public Object executePerform(
-        String componentName, int componentVersion, String actionName, ModeType type, Long principalId,
-        Long principalWorkflowId, Long jobId, String workflowId, Map<String, ?> inputParameters,
+        String componentName, int componentVersion, String actionName, ModeType type, Long jobPrincipalId,
+        Long jobPrincipalWorkflowId, Long jobId, String workflowId, Map<String, ?> inputParameters,
         Map<String, Long> connectionIds, Map<String, ?> extensions, boolean editorEnvironment) {
 
         ExecuteFunctionData executeFunctionData = getExecuteFunctionData(
             componentName, componentVersion, actionName, connectionIds);
 
         ActionContext actionContext = contextFactory.createActionContext(
-            componentName, componentVersion, actionName, type, principalId, principalWorkflowId, workflowId, jobId,
+            componentName, componentVersion, actionName, type, jobPrincipalId, jobPrincipalWorkflowId, workflowId, jobId,
             executeFunctionData.componentConnection, editorEnvironment);
 
         if (executeFunctionData.singleConnectionPerform) {
@@ -152,7 +152,7 @@ public class ActionDefinitionFacadeImpl implements ActionDefinitionFacade {
                     componentName, componentVersion, actionName, inputParameters, componentConnection1,
                     actionContext1),
                 componentConnection1 -> contextFactory.createActionContext(
-                    componentName, componentVersion, actionName, type, principalId, principalWorkflowId, workflowId,
+                    componentName, componentVersion, actionName, type, jobPrincipalId, jobPrincipalWorkflowId, workflowId,
                     jobId,
                     componentConnection1, editorEnvironment));
         } else {
@@ -176,7 +176,7 @@ public class ActionDefinitionFacadeImpl implements ActionDefinitionFacade {
                 componentName, componentVersion, actionName, inputParameters, componentConnection1, actionContext1),
             componentConnection1 -> contextFactory.createActionContext(
                 componentName, componentVersion, actionName, actionContextAware.getType(),
-                actionContextAware.getPrincipalId(), actionContextAware.getPrincipalWorkflowId(),
+                actionContextAware.getJobPrincipalId(), actionContextAware.getJobPrincipalWorkflowId(),
                 actionContextAware.getWorkflowId(), actionContextAware.getJobId(), componentConnection1,
                 actionContextAware.isEditorEnvironment()));
     }

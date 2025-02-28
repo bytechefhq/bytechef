@@ -97,7 +97,7 @@ public class WorkflowSyncExecutor {
         TriggerOutput triggerOutput = triggerDefinitionFacade.executeTrigger(
             workflowNodeType.componentName(), workflowNodeType.componentVersion(),
             workflowNodeType.componentOperationName(), workflowExecutionId.getType(),
-            workflowExecutionId.getPrincipalId(), workflowExecutionId.getWorkflowReferenceCode(),
+            workflowExecutionId.getJobPrincipalId(), workflowExecutionId.getWorkflowReferenceCode(),
             triggerExecution.getParameters(), triggerExecution.getState(),
             MapUtils.get(triggerExecution.getMetadata(), WebhookRequest.WEBHOOK_REQUEST, WebhookRequest.class),
             OptionalUtils.orElse(CollectionUtils.findFirst(connectIdMap.values()), null), false);
@@ -161,7 +161,7 @@ public class WorkflowSyncExecutor {
             jobPrincipalAccessorRegistry.getJobPrincipalAccessor(workflowExecutionId.getType());
 
         return jobPrincipalAccessor.getInputMap(
-            workflowExecutionId.getPrincipalId(), workflowExecutionId.getWorkflowReferenceCode());
+            workflowExecutionId.getJobPrincipalId(), workflowExecutionId.getWorkflowReferenceCode());
     }
 
     private Result getProcessData(WorkflowExecutionId workflowExecutionId, WebhookRequest webhookRequest) {
@@ -188,7 +188,7 @@ public class WorkflowSyncExecutor {
             jobPrincipalAccessorRegistry.getJobPrincipalAccessor(workflowExecutionId.getType());
 
         return jobPrincipalAccessor.getWorkflowId(
-            workflowExecutionId.getPrincipalId(), workflowExecutionId.getWorkflowReferenceCode());
+            workflowExecutionId.getJobPrincipalId(), workflowExecutionId.getWorkflowReferenceCode());
     }
 
     private WorkflowTrigger getWorkflowTrigger(WorkflowExecutionId workflowExecutionId, String workflowId) {

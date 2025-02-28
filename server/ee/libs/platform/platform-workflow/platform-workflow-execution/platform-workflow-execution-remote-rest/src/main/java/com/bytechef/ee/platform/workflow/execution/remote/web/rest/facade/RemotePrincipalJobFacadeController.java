@@ -43,7 +43,7 @@ public class RemotePrincipalJobFacadeController {
     public ResponseEntity<Long> createJob(@Valid @RequestBody CreateJobRequest createJobRequest) {
         return ResponseEntity.ok(
             principalJobFacade.createJob(
-                createJobRequest.jobParameters, createJobRequest.principalId, createJobRequest.type));
+                createJobRequest.jobParameters, createJobRequest.jobPrincipalId, createJobRequest.type));
     }
 
     @RequestMapping(
@@ -52,11 +52,11 @@ public class RemotePrincipalJobFacadeController {
     public ResponseEntity<Job> create(@Valid @RequestBody CreateJobRequest createJobRequest) {
         return ResponseEntity.ok(
             principalJobFacade.createSyncJob(
-                createJobRequest.jobParameters, createJobRequest.principalId,
+                createJobRequest.jobParameters, createJobRequest.jobPrincipalId,
                 createJobRequest.type));
     }
 
     @SuppressFBWarnings("EI")
-    public record CreateJobRequest(JobParametersDTO jobParameters, long principalId, ModeType type) {
+    public record CreateJobRequest(JobParametersDTO jobParameters, long jobPrincipalId, ModeType type) {
     }
 }

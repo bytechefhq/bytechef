@@ -24,7 +24,7 @@ import com.bytechef.platform.constant.ModeType;
  */
 public interface TriggerContextAware extends TriggerContext {
 
-    Long getPrincipalId();
+    Long getJobPrincipalId();
 
     String getTriggerName();
 

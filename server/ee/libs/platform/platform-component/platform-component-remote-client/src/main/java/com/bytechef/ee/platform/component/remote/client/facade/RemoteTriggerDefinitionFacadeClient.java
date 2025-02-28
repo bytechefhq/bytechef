@@ -118,9 +118,9 @@ public class RemoteTriggerDefinitionFacadeClient extends AbstractWorkerClient im
 
     @Override
     public TriggerOutput executeTrigger(
-        String componentName, int componentVersion, String triggerName, ModeType type,
-        Long principalId, String workflowReferenceCode, Map<String, ?> inputParameters,
-        Object triggerState, WebhookRequest webhookRequest, Long connectionId, boolean editorEnvironment) {
+        String componentName, int componentVersion, String triggerName, ModeType type, Long jobPrincipalId,
+        String workflowReferenceCode, Map<String, ?> inputParameters, Object triggerState,
+        WebhookRequest webhookRequest, Long connectionId, boolean editorEnvironment) {
 
         return defaultRestClient.post(
             uriBuilder -> toUri(

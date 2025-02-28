@@ -54,12 +54,12 @@ public class ProjectDeploymentJobPrincipalAccessor implements JobPrincipalAccess
     }
 
     @Override
-    public boolean isWorkflowEnabled(long principalId, String workflowReferenceCode) {
+    public boolean isWorkflowEnabled(long jobPrincipalId, String workflowReferenceCode) {
         boolean workflowEnabled = false;
 
-        if (projectDeploymentService.isProjectDeploymentEnabled(principalId) &&
+        if (projectDeploymentService.isProjectDeploymentEnabled(jobPrincipalId) &&
             projectDeploymentWorkflowService.isProjectDeploymentWorkflowEnabled(
-                principalId, getWorkflowId(principalId, workflowReferenceCode))) {
+                jobPrincipalId, getWorkflowId(jobPrincipalId, workflowReferenceCode))) {
 
             workflowEnabled = true;
         }
@@ -68,10 +68,10 @@ public class ProjectDeploymentJobPrincipalAccessor implements JobPrincipalAccess
     }
 
     @Override
-    public Map<String, ?> getInputMap(long principalId, String workflowReferenceCode) {
+    public Map<String, ?> getInputMap(long jobPrincipalId, String workflowReferenceCode) {
         ProjectDeploymentWorkflow projectDeploymentWorkflow =
             projectDeploymentWorkflowService.getProjectDeploymentWorkflow(
-                principalId, getWorkflowId(principalId, workflowReferenceCode));
+                jobPrincipalId, getWorkflowId(jobPrincipalId, workflowReferenceCode));
 
         return projectDeploymentWorkflow.getInputs();
     }
@@ -82,8 +82,8 @@ public class ProjectDeploymentJobPrincipalAccessor implements JobPrincipalAccess
     }
 
     @Override
-    public String getWorkflowId(long principalId, String workflowReferenceCode) {
-        return projectWorkflowService.getWorkflowId(principalId, workflowReferenceCode);
+    public String getWorkflowId(long jobPrincipalId, String workflowReferenceCode) {
+        return projectWorkflowService.getWorkflowId(jobPrincipalId, workflowReferenceCode);
     }
 
     @Override

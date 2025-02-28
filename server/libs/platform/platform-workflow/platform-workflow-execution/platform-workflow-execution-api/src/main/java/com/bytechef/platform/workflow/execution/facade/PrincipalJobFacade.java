@@ -25,7 +25,7 @@ import com.bytechef.platform.constant.ModeType;
  */
 public interface PrincipalJobFacade {
 
-    long createJob(JobParametersDTO jobParametersDTO, long principalId, ModeType type);
+    long createJob(JobParametersDTO jobParametersDTO, long jobPrincipalId, ModeType type);
 
-    Job createSyncJob(JobParametersDTO jobParametersDTO, long principalId, ModeType type);
+    Job createSyncJob(JobParametersDTO jobParametersDTO, long jobPrincipalId, ModeType type);
 }
