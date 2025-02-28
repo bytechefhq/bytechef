@@ -36,7 +36,7 @@ import com.bytechef.platform.constant.ModeType;
 import com.bytechef.platform.definition.WorkflowNodeType;
 import com.bytechef.platform.file.storage.FilesFileStorage;
 import com.bytechef.platform.security.util.SecurityUtils;
-import com.bytechef.platform.webhook.executor.WorkflowExecutor;
+import com.bytechef.platform.webhook.executor.WebhookWorkflowExecutor;
 import com.bytechef.platform.webhook.rest.AbstractWebhookTriggerController;
 import com.bytechef.platform.workflow.execution.WorkflowExecutionId;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -72,13 +72,13 @@ public class RequestTriggerApiController extends AbstractWebhookTriggerControlle
         ApplicationProperties applicationProperties, ConnectedUserService connectedUserService,
         FilesFileStorage filesFileStorage, HttpServletRequest httpServletRequest,
         HttpServletResponse httpServletResponse, JobPrincipalAccessorRegistry jobPrincipalAccessorRegistry,
-        TriggerDefinitionService triggerDefinitionService, WorkflowExecutor workflowExecutor,
+        TriggerDefinitionService triggerDefinitionService, WebhookWorkflowExecutor webhookWorkflowExecutor,
         WorkflowService workflowService, IntegrationInstanceService integrationInstanceService,
         IntegrationWorkflowService integrationWorkflowService, WorkflowService workflowService1) {
 
         super(
             filesFileStorage, jobPrincipalAccessorRegistry, applicationProperties.getPublicUrl(),
-            triggerDefinitionService, workflowExecutor, workflowService);
+            triggerDefinitionService, webhookWorkflowExecutor, workflowService);
 
         this.connectedUserService = connectedUserService;
         this.httpServletRequest = httpServletRequest;

@@ -24,7 +24,7 @@ import org.springframework.lang.Nullable;
 /**
  * @author Ivica Cardic
  */
-public interface WorkflowExecutor {
+public interface WebhookWorkflowExecutor {
 
     void execute(WorkflowExecutionId workflowExecutionId, WebhookRequest webhookRequest);
 

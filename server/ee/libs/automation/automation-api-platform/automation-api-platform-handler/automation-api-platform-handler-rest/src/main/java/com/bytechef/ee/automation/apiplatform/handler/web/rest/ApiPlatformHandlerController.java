@@ -27,7 +27,7 @@ import com.bytechef.platform.configuration.accessor.JobPrincipalAccessorRegistry
 import com.bytechef.platform.constant.Environment;
 import com.bytechef.platform.constant.ModeType;
 import com.bytechef.platform.file.storage.FilesFileStorage;
-import com.bytechef.platform.webhook.executor.WorkflowExecutor;
+import com.bytechef.platform.webhook.executor.WebhookWorkflowExecutor;
 import com.bytechef.platform.webhook.rest.AbstractWebhookTriggerController;
 import com.bytechef.platform.workflow.execution.WorkflowExecutionId;
 import com.bytechef.tenant.TenantContext;
@@ -78,11 +78,11 @@ public class ApiPlatformHandlerController extends AbstractWebhookTriggerControll
         JobPrincipalAccessorRegistry jobPrincipalAccessorRegistry, ProjectDeploymentService projectDeploymentService,
         ProjectDeploymentWorkflowService projectDeploymentWorkflowService,
         TriggerDefinitionService triggerDefinitionService, WorkflowService workflowService,
-        WorkflowExecutor workflowExecutor) {
+        WebhookWorkflowExecutor webhookWorkflowExecutor) {
 
         super(
             filesFileStorage, jobPrincipalAccessorRegistry, applicationProperties.getPublicUrl(),
-            triggerDefinitionService, workflowExecutor, workflowService);
+            triggerDefinitionService, webhookWorkflowExecutor, workflowService);
 
         this.apiCollectionService = apiCollectionService;
         this.apiCollectionEndpointService = apiCollectionEndpointService;

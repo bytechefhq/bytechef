@@ -33,6 +33,7 @@ import com.bytechef.platform.workflow.coordinator.event.TriggerExecutionErrorEve
 import com.bytechef.platform.workflow.coordinator.event.TriggerListenerEvent;
 import com.bytechef.platform.workflow.coordinator.event.TriggerPollEvent;
 import com.bytechef.platform.workflow.coordinator.event.TriggerWebhookEvent;
+import com.bytechef.platform.workflow.coordinator.event.TriggerWebhookEvent.WebhookParameters;
 import com.bytechef.platform.workflow.coordinator.event.listener.ApplicationEventListener;
 import com.bytechef.platform.workflow.coordinator.event.listener.ErrorEventListener;
 import com.bytechef.platform.workflow.coordinator.trigger.completion.TriggerCompletionHandler;
@@ -192,7 +193,7 @@ public class TriggerCoordinator {
             logger.trace("onTriggerWebhookEvent: triggerWebhookEvent={}", triggerWebhookEvent);
         }
 
-        TriggerWebhookEvent.WebhookParameters webhookParameters = triggerWebhookEvent.getWebhookParameters();
+        WebhookParameters webhookParameters = triggerWebhookEvent.getWebhookParameters();
 
         TriggerExecution triggerExecution = TriggerExecution.builder()
             .metadata(Map.of(WebhookRequest.WEBHOOK_REQUEST, webhookParameters.webhookRequest()))
