@@ -518,6 +518,72 @@ paths:
                 type: "array"
                 items:
                   $ref: "#/components/schemas/ComponentDefinitionBasic"
+  /webhooks/{workflowId}/test/start:
+    post:
+      description: "Test a webhook trigger."
+      summary: "Test a webhook trigger"
+      tags:
+        - "webhook-trigger-test"
+      operationId: "startWebhookTriggerTest"
+      parameters:
+        - name: "modeType"
+          description: "The application mode."
+          in: "query"
+          required: true
+          schema:
+            type: "integer"
+            enum:
+              - 0
+              - 1
+            x-enum-varnames:
+              - "AUTOMATION"
+              - "EMBEDDED"
+        - name: "workflowId"
+          description: "The id of a workflow."
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+      responses:
+        "200":
+          description: "Returns the webhook URL."
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  webhookUrl:
+                    description: "The webhook URL."
+                    type: "string"
+  /webhooks/{workflowId}/test/stop:
+    post:
+      description: "Test a webhook trigger."
+      summary: "Test a webhook trigger"
+      tags:
+        - "webhook-trigger-test"
+      operationId: "stopWebhookTriggerTest"
+      parameters:
+        - name: "modeType"
+          description: "The application mode."
+          in: "query"
+          required: true
+          schema:
+            type: "integer"
+            enum:
+              - 0
+              - 1
+            x-enum-varnames:
+              - "AUTOMATION"
+              - "EMBEDDED"
+        - name: "workflowId"
+          description: "The id of a workflow."
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+      responses:
+        "204":
+          description: "Successful operation."
   /workflow-test-configurations/{workflowId}:
     get:
       description: "Get a workflow test configuration."
@@ -1048,6 +1114,38 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/WorkflowNodeTestOutput"
+  /workflows/{id}/test-outputs/{workflowNodeName}/exists:
+    get:
+      description: "Check if a workflow node test output exists."
+      summary: "Check if a workflow node test output exists"
+      tags:
+        - "workflow-node-test-output"
+      operationId: "checkWorkflowNodeTestOutputExists"
+      parameters:
+        - name: "id"
+          description: "The id of a workflow."
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+        - name: "workflowNodeName"
+          description: "The name of a workflow node for which to create test output objects."
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+      responses:
+        "200":
+          description: "Successful operation."
+          content:
+            application/json:
+              schema:
+                type: "object"
+                required:
+                  - "exists"
+                properties:
+                  exists:
+                    type: "boolean"
   /workflows/{id}/test-outputs/{workflowNodeName}/sample-output:
     put:
       description: "Upload a sample output to create a new or update existing workflow node test output."
