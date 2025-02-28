@@ -28,6 +28,7 @@ import {
 export interface CheckWorkflowNodeTestOutputExistsRequest {
     id: string;
     workflowNodeName: string;
+    createdDate?: Date;
 }
 
 export interface DeleteWorkflowNodeTestOutputRequest {
@@ -71,6 +72,10 @@ export class WorkflowNodeTestOutputApi extends runtime.BaseAPI {
         }
 
         const queryParameters: any = {};
+
+        if (requestParameters['createdDate'] != null) {
+            queryParameters['createdDate'] = (requestParameters['createdDate'] as any).toISOString();
+        }
 
         const headerParameters: runtime.HTTPHeaders = {};
 
