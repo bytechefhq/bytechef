@@ -27,7 +27,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "ConnectionDefinition", description = "Definition of a connection to an outside service.")
 @JsonTypeName("ConnectionDefinition")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-02-23T22:40:14.580258+01:00[Europe/Zagreb]", comments = "Generator version: 7.11.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-02-27T19:58:17.697198+01:00[Europe/Zagreb]", comments = "Generator version: 7.11.0")
 public class ConnectionDefinitionModel {
 
   private Boolean authorizationRequired = true;

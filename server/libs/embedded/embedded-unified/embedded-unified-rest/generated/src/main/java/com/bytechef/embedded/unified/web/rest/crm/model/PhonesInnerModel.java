@@ -22,7 +22,7 @@ import jakarta.annotation.Generated;
  */
 
 @JsonTypeName("phones_inner")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-02-23T22:40:14.247046+01:00[Europe/Zagreb]", comments = "Generator version: 7.11.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-02-27T19:58:17.361773+01:00[Europe/Zagreb]", comments = "Generator version: 7.11.0")
 public class PhonesInnerModel {
 
   private JsonNullable<String> phoneNumber = JsonNullable.<String>undefined();

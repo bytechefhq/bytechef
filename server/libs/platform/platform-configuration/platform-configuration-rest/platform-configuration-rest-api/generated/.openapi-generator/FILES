@@ -7,6 +7,7 @@ src/main/java/com/bytechef/platform/configuration/web/rest/ConnectionDefinitionA
 src/main/java/com/bytechef/platform/configuration/web/rest/Oauth2Api.java
 src/main/java/com/bytechef/platform/configuration/web/rest/TaskDispatcherDefinitionApi.java
 src/main/java/com/bytechef/platform/configuration/web/rest/TriggerDefinitionApi.java
+src/main/java/com/bytechef/platform/configuration/web/rest/WebhookTriggerTestApi.java
 src/main/java/com/bytechef/platform/configuration/web/rest/WorkflowNodeDescriptionApi.java
 src/main/java/com/bytechef/platform/configuration/web/rest/WorkflowNodeDynamicPropertiesApi.java
 src/main/java/com/bytechef/platform/configuration/web/rest/WorkflowNodeOptionApi.java
@@ -21,6 +22,7 @@ src/main/java/com/bytechef/platform/configuration/web/rest/model/ArrayPropertyMo
 src/main/java/com/bytechef/platform/configuration/web/rest/model/AuthorizationModel.java
 src/main/java/com/bytechef/platform/configuration/web/rest/model/AuthorizationTypeModel.java
 src/main/java/com/bytechef/platform/configuration/web/rest/model/BooleanPropertyModel.java
+src/main/java/com/bytechef/platform/configuration/web/rest/model/CheckWorkflowNodeTestOutputExists200ResponseModel.java
 src/main/java/com/bytechef/platform/configuration/web/rest/model/ComponentCategoryModel.java
 src/main/java/com/bytechef/platform/configuration/web/rest/model/ComponentConnectionModel.java
 src/main/java/com/bytechef/platform/configuration/web/rest/model/ComponentDefinitionBasicModel.java
@@ -55,6 +57,7 @@ src/main/java/com/bytechef/platform/configuration/web/rest/model/ResourcesModel.
 src/main/java/com/bytechef/platform/configuration/web/rest/model/SaveWorkflowTestConfigurationConnectionRequestModel.java
 src/main/java/com/bytechef/platform/configuration/web/rest/model/SaveWorkflowTestConfigurationInputsRequestModel.java
 src/main/java/com/bytechef/platform/configuration/web/rest/model/ScriptTestExecutionModel.java
+src/main/java/com/bytechef/platform/configuration/web/rest/model/StartWebhookTriggerTest200ResponseModel.java
 src/main/java/com/bytechef/platform/configuration/web/rest/model/StringPropertyModel.java
 src/main/java/com/bytechef/platform/configuration/web/rest/model/TaskDispatcherDefinitionBasicModel.java
 src/main/java/com/bytechef/platform/configuration/web/rest/model/TaskDispatcherDefinitionModel.java

@@ -29,7 +29,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "ApiConnector", description = "An API connector.")
 @JsonTypeName("ApiConnector")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-02-23T10:28:21.621928+01:00[Europe/Zagreb]", comments = "Generator version: 7.11.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-02-27T07:20:12.748361+01:00[Europe/Zagreb]", comments = "Generator version: 7.11.0")
 public class ApiConnectorModel {
 
   private String connectorVersion;

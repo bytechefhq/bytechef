@@ -33,7 +33,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-02-23T10:28:21.317288+01:00[Europe/Zagreb]", comments = "Generator version: 7.11.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-02-27T07:20:12.461075+01:00[Europe/Zagreb]", comments = "Generator version: 7.11.0")
 @Validated
 @Tag(name = "workflow-test", description = "The Platform Workflow Test Internal API")
 public interface WorkflowTestApi {

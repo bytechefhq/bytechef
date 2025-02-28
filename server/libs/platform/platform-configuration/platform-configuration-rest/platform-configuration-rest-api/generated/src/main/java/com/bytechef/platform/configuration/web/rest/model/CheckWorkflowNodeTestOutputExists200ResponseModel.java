@@ -17,33 +17,44 @@ import java.util.*;
 import jakarta.annotation.Generated;
 
 /**
- * SaveWorkflowTestConfigurationConnectionRequestModel
+ * CheckWorkflowNodeTestOutputExists200ResponseModel
  */
 
-@JsonTypeName("saveWorkflowTestConfigurationConnection_request")
+@JsonTypeName("checkWorkflowNodeTestOutputExists_200_response")
 @Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-02-27T19:58:17.697198+01:00[Europe/Zagreb]", comments = "Generator version: 7.11.0")
-public class SaveWorkflowTestConfigurationConnectionRequestModel {
+public class CheckWorkflowNodeTestOutputExists200ResponseModel {
 
-  private @Nullable Long connectionId;
+  private Boolean exists;
 
-  public SaveWorkflowTestConfigurationConnectionRequestModel connectionId(Long connectionId) {
-    this.connectionId = connectionId;
+  public CheckWorkflowNodeTestOutputExists200ResponseModel() {
+    super();
+  }
+
+  /**
+   * Constructor with only required parameters
+   */
+  public CheckWorkflowNodeTestOutputExists200ResponseModel(Boolean exists) {
+    this.exists = exists;
+  }
+
+  public CheckWorkflowNodeTestOutputExists200ResponseModel exists(Boolean exists) {
+    this.exists = exists;
     return this;
   }
 
   /**
-   * Get connectionId
-   * @return connectionId
+   * Get exists
+   * @return exists
    */
-  
-  @Schema(name = "connectionId", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  @JsonProperty("connectionId")
-  public Long getConnectionId() {
-    return connectionId;
+  @NotNull 
+  @Schema(name = "exists", requiredMode = Schema.RequiredMode.REQUIRED)
+  @JsonProperty("exists")
+  public Boolean getExists() {
+    return exists;
   }
 
-  public void setConnectionId(Long connectionId) {
-    this.connectionId = connectionId;
+  public void setExists(Boolean exists) {
+    this.exists = exists;
   }
 
   @Override
@@ -54,20 +65,20 @@ public class SaveWorkflowTestConfigurationConnectionRequestModel {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    SaveWorkflowTestConfigurationConnectionRequestModel saveWorkflowTestConfigurationConnectionRequest = (SaveWorkflowTestConfigurationConnectionRequestModel) o;
-    return Objects.equals(this.connectionId, saveWorkflowTestConfigurationConnectionRequest.connectionId);
+    CheckWorkflowNodeTestOutputExists200ResponseModel checkWorkflowNodeTestOutputExists200Response = (CheckWorkflowNodeTestOutputExists200ResponseModel) o;
+    return Objects.equals(this.exists, checkWorkflowNodeTestOutputExists200Response.exists);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(connectionId);
+    return Objects.hash(exists);
   }
 
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    sb.append("class SaveWorkflowTestConfigurationConnectionRequestModel {\n");
-    sb.append("    connectionId: ").append(toIndentedString(connectionId)).append("\n");
+    sb.append("class CheckWorkflowNodeTestOutputExists200ResponseModel {\n");
+    sb.append("    exists: ").append(toIndentedString(exists)).append("\n");
     sb.append("}");
     return sb.toString();
   }

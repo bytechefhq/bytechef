@@ -34,7 +34,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "StringProperty", description = "A string property.")
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-02-23T22:40:14.580258+01:00[Europe/Zagreb]", comments = "Generator version: 7.11.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-02-27T19:58:17.697198+01:00[Europe/Zagreb]", comments = "Generator version: 7.11.0")
 public class StringPropertyModel extends ValuePropertyModel {
 
   private @Nullable String languageId;
