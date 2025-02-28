@@ -41,6 +41,9 @@ public class GoogleFormsNewResponseTrigger {
 
     protected static final String LAST_TIME_CHECKED = "lastTimeChecked";
 
+    private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern(
+        "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+
     public static final ModifiableTriggerDefinition TRIGGER_DEFINITION = trigger("newResponse")
         .title("New Response")
         .description("Triggers when response is submitted to Google Form.")
@@ -61,15 +64,16 @@ public class GoogleFormsNewResponseTrigger {
         Parameters inputParameters, Parameters connectionParameters, Parameters closureParameters,
         TriggerContext triggerContext) {
 
-        ZoneId gmtZoneId = ZoneId.of("GMT");
-        LocalDateTime startDate = closureParameters.getLocalDateTime(LAST_TIME_CHECKED, LocalDateTime.now(gmtZoneId));
-        String startDateString = startDate.format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
-            .withZone(gmtZoneId));
-        LocalDateTime endDate = LocalDateTime.now(gmtZoneId);
+        ZoneId zoneId = ZoneId.of("GMT");
 
-        List<Map<String, Object>> customResponses =
-            getCustomResponses(triggerContext, inputParameters.getRequiredString(FORM_ID), startDateString);
+        LocalDateTime now = LocalDateTime.now(zoneId);
 
-        return new PollOutput(customResponses, Map.of(LAST_TIME_CHECKED, endDate), false);
+        LocalDateTime startDate = closureParameters.getLocalDateTime(LAST_TIME_CHECKED, now.minusHours(3));
+
+        List<Map<String, Object>> customResponses = getCustomResponses(
+            triggerContext, inputParameters.getRequiredString(FORM_ID),
+            startDate.format(DATE_TIME_FORMATTER.withZone(zoneId)));
+
+        return new PollOutput(customResponses, Map.of(LAST_TIME_CHECKED, now), false);
     }
 }

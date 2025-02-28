@@ -44,26 +44,29 @@ public class GoogleDriveUtils {
     public static PollOutput getPollOutput(
         Parameters inputParameters, Parameters connectionParameters, Parameters closureParameters, boolean newFile) {
 
-        ZoneId gmt = ZoneId.of("GMT");
-        LocalDateTime startDate = closureParameters.getLocalDateTime(LAST_TIME_CHECKED, LocalDateTime.now(gmt));
-        String startDateString = startDate.format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss"));
-        LocalDateTime endDate = LocalDateTime.now(gmt);
-        Drive drive = GoogleServices.getDrive(connectionParameters);
+        ZoneId zoneId = ZoneId.of("GMT");
+
+        LocalDateTime now = LocalDateTime.now(zoneId);
+
+        LocalDateTime startDate = closureParameters.getLocalDateTime(LAST_TIME_CHECKED, now.minusHours(3));
 
         try {
-            String mimeType = newFile ? "mimeType != '" + APPLICATION_VND_GOOGLE_APPS_FOLDER + "'"
+            String mimeType = newFile
+                ? "mimeType != '" + APPLICATION_VND_GOOGLE_APPS_FOLDER + "'"
                 : "mimeType = '" + APPLICATION_VND_GOOGLE_APPS_FOLDER + "'";
 
-            FileList fileList = drive
-                .files()
+            Drive drive = GoogleServices.getDrive(connectionParameters);
+
+            FileList fileList = drive.files()
                 .list()
                 .setQ(mimeType + " and '" + inputParameters.getRequiredString(FOLDER_ID) + "' in parents and " +
-                    "trashed = false and createdTime > '" + startDateString + "'")
+                    "trashed = false and createdTime > '" +
+                    startDate.format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss")) + "'")
                 .setFields("files(id, name, mimeType, webViewLink, kind)")
                 .setOrderBy("createdTime asc")
                 .execute();
 
-            return new PollOutput(fileList.getFiles(), Map.of(LAST_TIME_CHECKED, endDate), false);
+            return new PollOutput(fileList.getFiles(), Map.of(LAST_TIME_CHECKED, now), false);
 
         } catch (IOException e) {
             throw new RuntimeException(e);

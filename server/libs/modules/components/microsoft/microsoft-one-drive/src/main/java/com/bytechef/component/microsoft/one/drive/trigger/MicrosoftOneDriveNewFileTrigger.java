@@ -37,7 +37,7 @@ import com.bytechef.component.definition.TriggerDefinition.TriggerType;
 import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.microsoft.one.drive.util.MicrosoftOneDriveUtils;
 import java.time.LocalDateTime;
-import java.time.ZoneOffset;
+import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -77,8 +77,11 @@ public class MicrosoftOneDriveNewFileTrigger {
         Parameters inputParameters, Parameters connectionParameters, Parameters closureParameters,
         TriggerContext context) {
 
-        LocalDateTime startDate = closureParameters.getLocalDateTime(LAST_TIME_CHECKED, LocalDateTime.now());
-        LocalDateTime endDate = LocalDateTime.now();
+        ZoneId zoneId = ZoneId.of("GMT");
+
+        LocalDateTime now = LocalDateTime.now(zoneId);
+
+        LocalDateTime startDate = closureParameters.getLocalDateTime(LAST_TIME_CHECKED, now.minusHours(3));
 
         Map<String, Object> body = context
             .http(http -> http.get("/items/" + getFolderId(inputParameters.getString(PARENT_ID)) + "/children"))
@@ -91,17 +94,17 @@ public class MicrosoftOneDriveNewFileTrigger {
         if (body.get(VALUE) instanceof List<?> list) {
             for (Object o : list) {
                 if (o instanceof Map<?, ?> map && map.containsKey("file")) {
-                    LocalDateTime createdDateTime =
-                        LocalDateTime.ofInstant(ZonedDateTime.parse((String) map.get("createdDateTime"))
-                            .toInstant(), ZoneOffset.systemDefault());
+                    ZonedDateTime zonedCreatedDateTime = ZonedDateTime.parse((String) map.get("createdDateTime"));
 
-                    if (createdDateTime.isAfter(startDate) && createdDateTime.isBefore(endDate)) {
+                    LocalDateTime createdDateTime = LocalDateTime.ofInstant(zonedCreatedDateTime.toInstant(), zoneId);
+
+                    if (createdDateTime.isAfter(startDate) && createdDateTime.isBefore(now)) {
                         maps.add(map);
                     }
                 }
             }
         }
 
-        return new PollOutput(maps, Map.of(LAST_TIME_CHECKED, endDate), false);
+        return new PollOutput(maps, Map.of(LAST_TIME_CHECKED, now), false);
     }
 }

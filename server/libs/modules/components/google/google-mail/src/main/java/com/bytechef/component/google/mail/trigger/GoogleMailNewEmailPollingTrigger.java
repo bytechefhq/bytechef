@@ -66,22 +66,24 @@ public class GoogleMailNewEmailPollingTrigger {
         Parameters inputParameters, Parameters connectionParameters, Parameters closureParameters,
         TriggerContext context) {
 
-        LocalDateTime startDate = closureParameters.getLocalDateTime(LAST_TIME_CHECKED, LocalDateTime.now());
-        LocalDateTime endDate = LocalDateTime.now();
+        ZoneId zoneId = ZoneId.of("GMT");
+
+        LocalDateTime now = LocalDateTime.now(zoneId);
+
+        LocalDateTime startDate = closureParameters.getLocalDateTime(LAST_TIME_CHECKED, now.minusHours(3));
 
         Gmail gmail = GoogleServices.getMail(connectionParameters);
 
         try {
-            ZonedDateTime zonedDateTime = startDate.atZone(ZoneId.systemDefault());
+            ZonedDateTime zonedDateTime = startDate.atZone(zoneId);
 
-            ListMessagesResponse listMessagesResponse = gmail
-                .users()
+            ListMessagesResponse listMessagesResponse = gmail.users()
                 .messages()
                 .list(ME)
                 .setQ("is:unread after:" + zonedDateTime.toEpochSecond())
                 .execute();
 
-            return new PollOutput(listMessagesResponse.getMessages(), Map.of(LAST_TIME_CHECKED, endDate), false);
+            return new PollOutput(listMessagesResponse.getMessages(), Map.of(LAST_TIME_CHECKED, now), false);
 
         } catch (IOException e) {
             throw new RuntimeException(e);

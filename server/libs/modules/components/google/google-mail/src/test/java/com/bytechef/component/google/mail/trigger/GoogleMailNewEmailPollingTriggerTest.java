@@ -86,10 +86,12 @@ class GoogleMailNewEmailPollingTriggerTest {
             assertEquals(messages, pollOutput.records());
             assertFalse(pollOutput.pollImmediately());
 
-            ZonedDateTime zonedDateTime = startDate.atZone(ZoneId.systemDefault());
+            ZoneId zoneId = ZoneId.of("GMT");
 
-            assertEquals(List.of(ME, "is:unread after:" + zonedDateTime.toEpochSecond()),
-                stringArgumentCaptor.getAllValues());
+            ZonedDateTime zonedDateTime = startDate.atZone(zoneId);
+
+            assertEquals(
+                List.of(ME, "is:unread after:" + zonedDateTime.toEpochSecond()), stringArgumentCaptor.getAllValues());
             assertEquals(parameters, parametersArgumentCaptor.getValue());
         }
     }
