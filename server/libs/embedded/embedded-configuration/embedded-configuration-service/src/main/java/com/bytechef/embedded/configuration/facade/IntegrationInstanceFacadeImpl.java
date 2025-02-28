@@ -255,7 +255,7 @@ public class IntegrationInstanceFacadeImpl implements IntegrationInstanceFacade 
 
             triggerLifecycleFacade.executeTriggerDisable(
                 workflow.getId(), workflowExecutionId, WorkflowNodeType.ofType(workflowTrigger.getType()),
-                workflowTrigger.getParameters(),
+                workflowTrigger.evaluateParameters(integrationInstanceConfigurationWorkflow.getInputs()),
                 getConnectionId(
                     integrationInstanceConfiguration.getIntegrationId(), integrationInstanceConfiguration.getId(),
                     integrationInstanceWorkflow.getIntegrationInstanceId(), workflow.getId(), workflowTrigger));
@@ -285,7 +285,7 @@ public class IntegrationInstanceFacadeImpl implements IntegrationInstanceFacade 
 
             triggerLifecycleFacade.executeTriggerEnable(
                 workflow.getId(), workflowExecutionId, WorkflowNodeType.ofType(workflowTrigger.getType()),
-                workflowTrigger.getParameters(),
+                workflowTrigger.evaluateParameters(integrationInstanceConfigurationWorkflow.getInputs()),
                 getConnectionId(integrationInstanceConfiguration.getIntegrationId(),
                     integrationInstanceConfiguration.getId(), integrationInstanceWorkflow.getIntegrationInstanceId(),
                     workflow.getId(), workflowTrigger),
