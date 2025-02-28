@@ -18,86 +18,98 @@ package com.bytechef.platform.configuration.facade;
 
 import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.service.WorkflowService;
+import com.bytechef.component.definition.TriggerDefinition.WebhookEnableOutput;
 import com.bytechef.config.ApplicationProperties;
 import com.bytechef.platform.component.domain.TriggerDefinition;
 import com.bytechef.platform.component.facade.TriggerDefinitionFacade;
 import com.bytechef.platform.component.service.TriggerDefinitionService;
-import com.bytechef.platform.component.trigger.WebhookRequest;
 import com.bytechef.platform.configuration.accessor.JobPrincipalAccessor;
 import com.bytechef.platform.configuration.accessor.JobPrincipalAccessorRegistry;
 import com.bytechef.platform.configuration.domain.WorkflowTrigger;
+import com.bytechef.platform.configuration.service.WorkflowNodeTestOutputService;
 import com.bytechef.platform.configuration.service.WorkflowTestConfigurationService;
 import com.bytechef.platform.constant.ModeType;
 import com.bytechef.platform.definition.WorkflowNodeType;
 import com.bytechef.platform.workflow.execution.WorkflowExecutionId;
 import java.util.Map;
+import java.util.concurrent.Callable;
+
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.cache.Cache;
+import org.springframework.cache.CacheManager;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * @author Ivica Cardic
  */
 @Service
+@Transactional
 public class WebhookTriggerTestFacadeImpl implements WebhookTriggerTestFacade {
 
     private static final Logger log = LoggerFactory.getLogger(WebhookTriggerTestFacadeImpl.class);
 
+    private final CacheManager cacheManager;
     private final JobPrincipalAccessorRegistry jobPrincipalAccessorRegistry;
-    private final String publicUrl;
+    private final String webhookUrl;
     private final TriggerDefinitionFacade triggerDefinitionFacade;
     private final TriggerDefinitionService triggerDefinitionService;
+    private final WorkflowNodeTestOutputService workflowNodeTestOutputService;
     private final WorkflowService workflowService;
     private final WorkflowTestConfigurationService workflowTestConfigurationService;
-    private final WorkflowNodeTestOutputFacade workflowNodeTestOutputFacade;
 
+    @SuppressFBWarnings("EI")
     public WebhookTriggerTestFacadeImpl(
-        ApplicationProperties applicationProperties,
+        CacheManager cacheManager, ApplicationProperties applicationProperties,
         JobPrincipalAccessorRegistry jobPrincipalAccessorRegistry, TriggerDefinitionFacade triggerDefinitionFacade,
-        TriggerDefinitionService triggerDefinitionService, WorkflowService workflowService,
-        WorkflowTestConfigurationService workflowTestConfigurationService,
-        WorkflowNodeTestOutputFacade workflowNodeTestOutputFacade) {
+        TriggerDefinitionService triggerDefinitionService, WorkflowNodeTestOutputService workflowNodeTestOutputService,
+        WorkflowService workflowService, WorkflowTestConfigurationService workflowTestConfigurationService) {
 
+        this.cacheManager = cacheManager;
         this.jobPrincipalAccessorRegistry = jobPrincipalAccessorRegistry;
-        this.publicUrl = applicationProperties.getPublicUrl();
+        this.webhookUrl = applicationProperties.getWebhookUrl();
         this.triggerDefinitionFacade = triggerDefinitionFacade;
         this.triggerDefinitionService = triggerDefinitionService;
+        this.workflowNodeTestOutputService = workflowNodeTestOutputService;
         this.workflowService = workflowService;
         this.workflowTestConfigurationService = workflowTestConfigurationService;
-        this.workflowNodeTestOutputFacade = workflowNodeTestOutputFacade;
     }
 
     @Override
     public void disableTrigger(String workflowId, ModeType type) {
-        executeTrigger(false, workflowId, type);
+        executeTrigger(workflowId, type, false);
     }
 
     @Override
     public String enableTrigger(String workflowId, ModeType type) {
         try {
-            executeTrigger(false, workflowId, type);
+            WorkflowTrigger workflowTrigger = WorkflowTrigger.of(workflowService.getWorkflow(workflowId))
+                .getFirst();
+
+            workflowNodeTestOutputService.deleteWorkflowNodeTestOutput(workflowId, workflowTrigger.getName());
+
+            executeTrigger(workflowId, type, false);
         } catch (Exception e) {
-            if (log.isDebugEnabled()) {
-                log.debug("Failed to disable trigger for workflowId={}, type={}", workflowId, type, e);
+            if (log.isTraceEnabled()) {
+                log.trace("Failed to disable trigger for workflowId={}, type={}", workflowId, type, e);
             }
         }
 
-        return executeTrigger(true, workflowId, type);
+        return executeTrigger(workflowId, type, true);
     }
 
     @Override
-    public void saveTestOutput(WorkflowExecutionId workflowExecutionId, WebhookRequest webhookRequest) {
+    public boolean isWorkflowEnabled(WorkflowExecutionId workflowExecutionId) {
+        Cache cache = getWebhookTriggerTestsCache();
 
+        Boolean enabled = cache.get(workflowExecutionId.toString(), Boolean.class);
+
+        return enabled != null && enabled;
     }
 
-    @Override
-    public void stopByWorkflowReferenceCode(String workflowReferenceCode, ModeType type) {
-        JobPrincipalAccessor jobPrincipalAccessor = jobPrincipalAccessorRegistry.getJobPrincipalAccessor(type);
-
-        executeTrigger(false, jobPrincipalAccessor.getLatestWorkflowId(workflowReferenceCode), type);
-    }
-
-    private String executeTrigger(boolean enable, String workflowId, ModeType type) {
+    private String executeTrigger(String workflowId, ModeType type, boolean enable) {
         JobPrincipalAccessor jobPrincipalAccessor = jobPrincipalAccessorRegistry.getJobPrincipalAccessor(type);
 
         String workflowReferenceCode = jobPrincipalAccessor.getWorkflowReferenceCode(workflowId);
@@ -116,10 +128,22 @@ public class WebhookTriggerTestFacadeImpl implements WebhookTriggerTestFacade {
         WorkflowExecutionId workflowExecutionId = WorkflowExecutionId.of(
             type, -1, workflowReferenceCode, workflowTrigger.getName());
 
+        Cache cache = getWebhookTriggerTestsCache();
+
         if (enable) {
             executeTriggerEnable(workflowExecutionId, triggerWorkflowNodeType, triggerParameters, connectionId);
+
+            cache.putIfAbsent(workflowExecutionId.toString(), true);
         } else {
-            executeTriggerDisable(workflowExecutionId, triggerWorkflowNodeType, triggerParameters, connectionId);
+            try {
+                executeTriggerDisable(workflowExecutionId, triggerWorkflowNodeType, triggerParameters, connectionId);
+            } catch (Exception e) {
+                if (log.isTraceEnabled()) {
+                    log.trace("Failed to disable trigger for workflowId={}, type={}", workflowId, type, e);
+                }
+            }
+
+            cache.evictIfPresent(workflowExecutionId.toString());
         }
 
         return getWebhookUrl(workflowExecutionId);
@@ -135,15 +159,17 @@ public class WebhookTriggerTestFacadeImpl implements WebhookTriggerTestFacade {
 
         switch (triggerDefinition.getType()) {
             case HYBRID, DYNAMIC_WEBHOOK -> {
+                Cache cache = getWebhookEnableOutputCache();
+
                 triggerDefinitionFacade.executeWebhookDisable(
                     triggerWorkflowNodeType.componentName(), triggerWorkflowNodeType.componentVersion(),
                     triggerWorkflowNodeType.componentOperationName(), triggerParameters, workflowExecutionId.toString(),
-                    Map.of(), connectionId);
+                    cache.get(workflowExecutionId.toString(), (Callable<Map<String, ?>>) Map::of), connectionId);
             }
             case LISTENER -> triggerDefinitionFacade.executeListenerDisable(
                 triggerWorkflowNodeType.componentName(), triggerWorkflowNodeType.componentVersion(),
-                triggerWorkflowNodeType.componentOperationName(), triggerParameters,
-                workflowExecutionId.toString(), connectionId);
+                triggerWorkflowNodeType.componentOperationName(), triggerParameters, workflowExecutionId.toString(),
+                connectionId);
             default -> {
             }
         }
@@ -164,10 +190,18 @@ public class WebhookTriggerTestFacadeImpl implements WebhookTriggerTestFacade {
             triggerWorkflowNodeType.componentOperationName());
 
         switch (triggerDefinition.getType()) {
-            case DYNAMIC_WEBHOOK, HYBRID, STATIC_WEBHOOK -> triggerDefinitionFacade.executeWebhookEnable(
-                triggerWorkflowNodeType.componentName(), triggerWorkflowNodeType.componentVersion(),
-                triggerWorkflowNodeType.componentOperationName(), triggerParameters,
-                workflowExecutionId.toString(), connectionId, getWebhookUrl(workflowExecutionId));
+            case DYNAMIC_WEBHOOK, HYBRID, STATIC_WEBHOOK -> {
+                WebhookEnableOutput webhookEnableOutput = triggerDefinitionFacade.executeWebhookEnable(
+                    triggerWorkflowNodeType.componentName(), triggerWorkflowNodeType.componentVersion(),
+                    triggerWorkflowNodeType.componentOperationName(), triggerParameters,
+                    workflowExecutionId.toString(), connectionId, getWebhookUrl(workflowExecutionId));
+
+                if (webhookEnableOutput != null) {
+                    Cache cache = getWebhookEnableOutputCache();
+
+                    cache.put(workflowExecutionId.toString(), webhookEnableOutput.parameters());
+                }
+            }
             case LISTENER -> triggerDefinitionFacade.executeListenerEnable(
                 triggerWorkflowNodeType.componentName(), triggerWorkflowNodeType.componentVersion(),
                 triggerWorkflowNodeType.componentOperationName(), triggerParameters, workflowExecutionId.toString(),
@@ -183,7 +217,16 @@ public class WebhookTriggerTestFacadeImpl implements WebhookTriggerTestFacade {
         }
     }
 
+    private Cache getWebhookEnableOutputCache() {
+        return cacheManager.getCache(WebhookTriggerTestFacade.class + ".webhookEnableOutputs");
+    }
+
+    private Cache getWebhookTriggerTestsCache() {
+        return cacheManager.getCache(WebhookTriggerTestFacade.class + "webhooks");
+    }
+
     private String getWebhookUrl(WorkflowExecutionId workflowExecutionId) {
-        return "%s/webhooks/%s/test".formatted(publicUrl, workflowExecutionId.toString());
+        return "%s/test".formatted(webhookUrl)
+            .replace("{id}", workflowExecutionId.toString());
     }
 }

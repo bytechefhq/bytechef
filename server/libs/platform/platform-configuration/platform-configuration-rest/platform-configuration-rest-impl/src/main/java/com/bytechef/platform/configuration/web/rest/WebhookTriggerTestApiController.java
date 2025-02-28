@@ -44,12 +44,9 @@ public class WebhookTriggerTestApiController implements WebhookTriggerTestApi {
 
         String webhookUrl = webhookTriggerTestFacade.enableTrigger(workflowId, ModeType.values()[modeType]);
 
-        System.out.println(webhookUrl);
-
         return ResponseEntity.ok(
             new StartWebhookTriggerTest200ResponseModel()
-                .webhookUrl(webhookUrl)
-        );
+                .webhookUrl(webhookUrl));
     }
 
     @Override

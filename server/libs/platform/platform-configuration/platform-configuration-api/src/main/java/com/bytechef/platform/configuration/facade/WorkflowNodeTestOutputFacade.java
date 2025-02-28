@@ -16,7 +16,9 @@
 
 package com.bytechef.platform.configuration.facade;
 
+import com.bytechef.platform.component.trigger.WebhookRequest;
 import com.bytechef.platform.configuration.domain.WorkflowNodeTestOutput;
+import com.bytechef.platform.workflow.execution.WorkflowExecutionId;
 
 /**
  * @author Ivica Cardic
@@ -26,4 +28,6 @@ public interface WorkflowNodeTestOutputFacade {
     WorkflowNodeTestOutput saveWorkflowNodeTestOutput(String workflowId, String workflowNodeName);
 
     WorkflowNodeTestOutput saveWorkflowNodeTestOutput(String workflowId, String workflowNodeName, Object sampleOutput);
+
+    void saveWorkflowNodeTestOutput(WorkflowExecutionId workflowExecutionId, WebhookRequest webhookRequest);
 }

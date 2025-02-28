@@ -19,6 +19,7 @@ package com.bytechef.platform.configuration.web.rest;
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
 import com.bytechef.platform.configuration.facade.WorkflowNodeTestOutputFacade;
 import com.bytechef.platform.configuration.service.WorkflowNodeTestOutputService;
+import com.bytechef.platform.configuration.web.rest.model.CheckWorkflowNodeTestOutputExists200ResponseModel;
 import com.bytechef.platform.configuration.web.rest.model.WorkflowNodeTestOutputModel;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.core.convert.ConversionService;
@@ -46,6 +47,17 @@ public class WorkflowNodeTestOutputApiController implements WorkflowNodeTestOutp
         this.conversionService = conversionService;
         this.workflowNodeTestOutputFacade = workflowNodeTestOutputFacade;
         this.workflowNodeTestOutputService = workflowNodeTestOutputService;
+    }
+
+    @Override
+    public ResponseEntity<CheckWorkflowNodeTestOutputExists200ResponseModel> checkWorkflowNodeTestOutputExists(
+        String id, String workflowNodeName) {
+
+        return ResponseEntity.ok(
+            new CheckWorkflowNodeTestOutputExists200ResponseModel()
+                .exists(
+                    workflowNodeTestOutputService.fetchWorkflowTestNodeOutput(id, workflowNodeName)
+                        .isPresent()));
     }
 
     @Override
