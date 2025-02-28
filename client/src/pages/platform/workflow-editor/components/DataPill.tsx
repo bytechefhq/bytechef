@@ -175,6 +175,10 @@ const DataPill = ({
                                     workflowNodeName={workflowNodeName}
                                 />
 
+                                {sampleValue === null && (
+                                    <span className="flex-1 truncate text-xs text-muted-foreground">null</span>
+                                )}
+
                                 {(sampleValue || sampleValue === 0 || sampleValue === false) &&
                                     typeof sampleValue !== 'object' && (
                                         <div className="flex-1 text-xs text-muted-foreground">
