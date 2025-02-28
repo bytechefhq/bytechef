@@ -19,6 +19,7 @@ package com.bytechef.embedded.configuration.service;
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.embedded.configuration.domain.IntegrationWorkflow;
 import com.bytechef.embedded.configuration.repository.IntegrationWorkflowRepository;
+import com.bytechef.platform.constant.Environment;
 import java.util.List;
 import java.util.UUID;
 import org.apache.commons.lang3.Validate;
@@ -73,16 +74,6 @@ public class IntegrationWorkflowServiceImpl implements IntegrationWorkflowServic
     }
 
     @Override
-    public String getIntegrationInstanceIntegrationWorkflowWorkflowId(
-        long integrationInstanceId, String workflowReferenceCode) {
-
-        return OptionalUtils.get(
-            integrationWorkflowRepository
-                .findByIntegrationInstanceIdWorkflowReferenceCode(integrationInstanceId, workflowReferenceCode)
-                .map(IntegrationWorkflow::getWorkflowId));
-    }
-
-    @Override
     public List<Long> getIntegrationWorkflowIds(long integrationId, int integrationVersion) {
         return integrationWorkflowRepository
             .findAllByIntegrationIdAndIntegrationVersion(integrationId, integrationVersion)
@@ -108,10 +99,26 @@ public class IntegrationWorkflowServiceImpl implements IntegrationWorkflowServic
     }
 
     @Override
-    public String getLatestIntegrationWorkflowId(String workflowReferenceCode) {
+    public String getLatestWorkflowId(String workflowReferenceCode) {
         return OptionalUtils.get(
             integrationWorkflowRepository
                 .findLatestIntegrationWorkflowByWorkflowReferenceCode(workflowReferenceCode)
+                .map(IntegrationWorkflow::getWorkflowId));
+    }
+
+    @Override
+    public String getLatestWorkflowId(String workflowReferenceCode, Environment environment) {
+        return OptionalUtils.get(
+            integrationWorkflowRepository
+                .findLatestByWorkflowReferenceCodeAndEnvironment(workflowReferenceCode, environment.ordinal())
+                .map(IntegrationWorkflow::getWorkflowId));
+    }
+
+    @Override
+    public String getWorkflowId(long integrationInstanceId, String workflowReferenceCode) {
+        return OptionalUtils.get(
+            integrationWorkflowRepository
+                .findByIntegrationInstanceIdAndWorkflowReferenceCode(integrationInstanceId, workflowReferenceCode)
                 .map(IntegrationWorkflow::getWorkflowId));
     }
 
