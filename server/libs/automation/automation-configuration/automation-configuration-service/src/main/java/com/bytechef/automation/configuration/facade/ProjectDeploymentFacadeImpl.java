@@ -452,7 +452,7 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
 
             triggerLifecycleFacade.executeTriggerDisable(
                 workflow.getId(), workflowExecutionId, WorkflowNodeType.ofType(workflowTrigger.getType()),
-                workflowTrigger.getParameters(),
+                workflowTrigger.evaluateParameters(projectDeploymentWorkflow.getInputs()),
                 getConnectionId(projectDeploymentWorkflow.getProjectDeploymentId(), workflow.getId(), workflowTrigger));
         }
     }
@@ -521,7 +521,8 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
                 projectWorkflow.getWorkflowReferenceCode(), workflowTrigger.getName());
 
             triggerLifecycleFacade.executeTriggerEnable(
-                workflow.getId(), workflowExecutionId, workflowNodeType, workflowTrigger.getParameters(),
+                workflow.getId(), workflowExecutionId, workflowNodeType,
+                workflowTrigger.evaluateParameters(projectDeploymentWorkflow.getInputs()),
                 getConnectionId(projectDeploymentWorkflow.getProjectDeploymentId(), workflow.getId(), workflowTrigger),
                 getWebhookUrl(workflowExecutionId));
         }
