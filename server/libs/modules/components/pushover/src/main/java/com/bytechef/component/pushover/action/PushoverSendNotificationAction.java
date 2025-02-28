@@ -23,7 +23,7 @@ import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.Context.Http.responseType;
-import static com.bytechef.component.pushover.constant.PushoverConstants.ATTACHMENT;
+import static com.bytechef.component.pushover.constant.PushoverConstants.ATTACHMENT_BASE_64;
 import static com.bytechef.component.pushover.constant.PushoverConstants.EXPIRE;
 import static com.bytechef.component.pushover.constant.PushoverConstants.MESSAGE;
 import static com.bytechef.component.pushover.constant.PushoverConstants.PRIORITY;
@@ -36,10 +36,12 @@ import static com.bytechef.component.pushover.constant.PushoverConstants.URL;
 import static com.bytechef.component.pushover.constant.PushoverConstants.URL_TITLE;
 import static com.bytechef.component.pushover.constant.PushoverConstants.USER;
 
+import com.bytechef.commons.util.EncodingUtils;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context.Http.Body;
 import com.bytechef.component.definition.Context.Http.ResponseType;
+import com.bytechef.component.definition.FileEntry;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.pushover.util.PushoverUtils;
@@ -87,7 +89,7 @@ public class PushoverSendNotificationAction {
                 .description("When the user taps on the notification in Pushover to expand it," +
                     " the URL will be shown as the supplied url_title")
                 .required(false),
-            fileEntry(ATTACHMENT)
+            fileEntry(ATTACHMENT_BASE_64)
                 .label("Attachment")
                 .description("The attachment to send.")
                 .required(false))
@@ -104,21 +106,30 @@ public class PushoverSendNotificationAction {
     protected static Object perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) {
 
-        byte[] attachment = actionContext.file(file -> file.readAllBytes(inputParameters.getFileEntry(ATTACHMENT)));
+        FileEntry fileEntry = inputParameters.getFileEntry(ATTACHMENT_BASE_64);
+        String attachmentBase64 = null;
+
+        if (fileEntry != null) {
+            byte[] fileContent =
+                actionContext.file(file -> file.readAllBytes(fileEntry));
+
+            attachmentBase64 = EncodingUtils.base64EncodeToString(fileContent);
+        }
 
         return actionContext
             .http(http -> http.post("/messages.json"))
-            .body(Body.of(
-                TOKEN, connectionParameters.getRequiredString(TOKEN),
-                USER, connectionParameters.getRequiredString(USER),
-                MESSAGE, inputParameters.getRequiredString(MESSAGE),
-                TITLE, inputParameters.getString(TITLE),
-                PRIORITY, inputParameters.getString(PRIORITY),
-                RETRY, inputParameters.getInteger(RETRY),
-                EXPIRE, inputParameters.getInteger(EXPIRE),
-                URL, inputParameters.getString(URL),
-                URL_TITLE, inputParameters.getString(URL_TITLE),
-                ATTACHMENT, attachment))
+            .body(
+                Body.of(
+                    TOKEN, connectionParameters.getRequiredString(TOKEN),
+                    USER, connectionParameters.getRequiredString(USER),
+                    MESSAGE, inputParameters.getRequiredString(MESSAGE),
+                    TITLE, inputParameters.getString(TITLE),
+                    PRIORITY, inputParameters.getString(PRIORITY),
+                    RETRY, inputParameters.getInteger(RETRY),
+                    EXPIRE, inputParameters.getInteger(EXPIRE),
+                    URL, inputParameters.getString(URL),
+                    URL_TITLE, inputParameters.getString(URL_TITLE),
+                    ATTACHMENT_BASE_64, attachmentBase64))
             .configuration(responseType(ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});
