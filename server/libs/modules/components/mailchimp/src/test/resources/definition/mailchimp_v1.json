@@ -1312,6 +1312,27 @@
           "optionsDataSource" : null
         },
         "sampleOutput" : {
+          "email_type" : "string",
+          "marketing_permissions" : [ {
+            "text" : "string",
+            "enabled" : true,
+            "marketing_permission_id" : "string"
+          } ],
+          "tags" : [ {
+            "name" : "string",
+            "id" : 0
+          } ],
+          "ip_signup" : "string",
+          "location" : {
+            "region" : "string",
+            "longitude" : 0,
+            "gmtoff" : 0,
+            "country_code" : "string",
+            "timezone" : "string",
+            "dstoff" : 0,
+            "latitude" : 0
+          },
+          "ip_opt" : "string",
           "timestamp_opt" : "2019-08-24T14:15:22",
           "unsubscribe_reason" : "string",
           "status" : "subscribed",
@@ -1325,9 +1346,9 @@
           "contact_id" : "string",
           "stats" : {
             "ecommerce_data" : {
+              "total_revenue" : 0,
               "currency_code" : "USD",
-              "number_of_orders" : 0,
-              "total_revenue" : 0
+              "number_of_orders" : 0
             },
             "avg_open_rate" : 0,
             "avg_click_rate" : 0
@@ -1348,11 +1369,11 @@
           "member_rating" : 0,
           "web_id" : 0,
           "_links" : [ {
+            "targetSchema" : "string",
+            "method" : "GET",
             "rel" : "string",
             "href" : "string",
-            "schema" : "string",
-            "targetSchema" : "string",
-            "method" : "GET"
+            "schema" : "string"
           } ],
           "id" : "string",
           "timestamp_signup" : "2019-08-24T14:15:22",
@@ -1360,28 +1381,7 @@
             "property2" : true,
             "property1" : true
           },
-          "language" : "string",
-          "email_type" : "string",
-          "marketing_permissions" : [ {
-            "enabled" : true,
-            "marketing_permission_id" : "string",
-            "text" : "string"
-          } ],
-          "tags" : [ {
-            "name" : "string",
-            "id" : 0
-          } ],
-          "ip_signup" : "string",
-          "location" : {
-            "longitude" : 0,
-            "gmtoff" : 0,
-            "country_code" : "string",
-            "timezone" : "string",
-            "dstoff" : 0,
-            "latitude" : 0,
-            "region" : "string"
-          },
-          "ip_opt" : "string"
+          "language" : "string"
         },
         "placeholder" : null
       },
@@ -2669,6 +2669,27 @@
         "optionsDataSource" : null
       },
       "sampleOutput" : {
+        "email_type" : "string",
+        "marketing_permissions" : [ {
+          "text" : "string",
+          "enabled" : true,
+          "marketing_permission_id" : "string"
+        } ],
+        "tags" : [ {
+          "name" : "string",
+          "id" : 0
+        } ],
+        "ip_signup" : "string",
+        "location" : {
+          "region" : "string",
+          "longitude" : 0,
+          "gmtoff" : 0,
+          "country_code" : "string",
+          "timezone" : "string",
+          "dstoff" : 0,
+          "latitude" : 0
+        },
+        "ip_opt" : "string",
         "timestamp_opt" : "2019-08-24T14:15:22",
         "unsubscribe_reason" : "string",
         "status" : "subscribed",
@@ -2682,9 +2703,9 @@
         "contact_id" : "string",
         "stats" : {
           "ecommerce_data" : {
+            "total_revenue" : 0,
             "currency_code" : "USD",
-            "number_of_orders" : 0,
-            "total_revenue" : 0
+            "number_of_orders" : 0
           },
           "avg_open_rate" : 0,
           "avg_click_rate" : 0
@@ -2705,11 +2726,11 @@
         "member_rating" : 0,
         "web_id" : 0,
         "_links" : [ {
+          "targetSchema" : "string",
+          "method" : "GET",
           "rel" : "string",
           "href" : "string",
-          "schema" : "string",
-          "targetSchema" : "string",
-          "method" : "GET"
+          "schema" : "string"
         } ],
         "id" : "string",
         "timestamp_signup" : "2019-08-24T14:15:22",
@@ -2717,28 +2738,7 @@
           "property2" : true,
           "property1" : true
         },
-        "language" : "string",
-        "email_type" : "string",
-        "marketing_permissions" : [ {
-          "enabled" : true,
-          "marketing_permission_id" : "string",
-          "text" : "string"
-        } ],
-        "tags" : [ {
-          "name" : "string",
-          "id" : 0
-        } ],
-        "ip_signup" : "string",
-        "location" : {
-          "longitude" : 0,
-          "gmtoff" : 0,
-          "country_code" : "string",
-          "timezone" : "string",
-          "dstoff" : 0,
-          "latitude" : 0,
-          "region" : "string"
-        },
-        "ip_opt" : "string"
+        "language" : "string"
       }
     },
     "properties" : [ {
@@ -2820,7 +2820,9 @@
       "displayCondition" : null,
       "expressionEnabled" : null,
       "hidden" : null,
-      "metadata" : { },
+      "metadata" : {
+        "type" : "BODY"
+      },
       "required" : true,
       "name" : "status",
       "type" : "STRING",
@@ -3305,10 +3307,78 @@
     } ],
     "title" : "Add Member to List",
     "perform" : null,
-    "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "processErrorResponse" : null
   } ],
-  "unifiedApi" : null,
+  "connection" : {
+    "authorizations" : [ {
+      "detectOn" : null,
+      "description" : null,
+      "name" : "oauth2_authorization_code",
+      "properties" : [ {
+        "advancedOption" : null,
+        "description" : null,
+        "displayCondition" : null,
+        "expressionEnabled" : null,
+        "hidden" : null,
+        "metadata" : { },
+        "required" : true,
+        "name" : "clientId",
+        "type" : "STRING",
+        "defaultValue" : null,
+        "exampleValue" : null,
+        "label" : "Client Id",
+        "placeholder" : null,
+        "controlType" : "TEXT",
+        "languageId" : null,
+        "maxLength" : null,
+        "minLength" : null,
+        "options" : null,
+        "optionsDataSource" : null
+      }, {
+        "advancedOption" : null,
+        "description" : null,
+        "displayCondition" : null,
+        "expressionEnabled" : null,
+        "hidden" : null,
+        "metadata" : { },
+        "required" : true,
+        "name" : "clientSecret",
+        "type" : "STRING",
+        "defaultValue" : null,
+        "exampleValue" : null,
+        "label" : "Client Secret",
+        "placeholder" : null,
+        "controlType" : "TEXT",
+        "languageId" : null,
+        "maxLength" : null,
+        "minLength" : null,
+        "options" : null,
+        "optionsDataSource" : null
+      } ],
+      "refreshOn" : null,
+      "title" : "OAuth2 Authorization Code",
+      "type" : "OAUTH2_AUTHORIZATION_CODE",
+      "acquire" : null,
+      "apply" : null,
+      "authorizationCallback" : null,
+      "authorizationUrl" : { },
+      "clientId" : null,
+      "clientSecret" : null,
+      "oauth2AuthorizationExtraQueryParameters" : null,
+      "pkce" : null,
+      "refresh" : null,
+      "refreshUrl" : null,
+      "scopes" : null,
+      "refreshToken" : null,
+      "tokenUrl" : { }
+    } ],
+    "properties" : null,
+    "version" : 1,
+    "authorizationRequired" : null,
+    "baseUri" : { },
+    "test" : null
+  },
   "triggers" : [ {
     "batch" : null,
     "deprecated" : null,
@@ -3947,8 +4017,8 @@
     "type" : "DYNAMIC_WEBHOOK",
     "webhookRawBody" : null,
     "workflowSyncExecution" : null,
-    "processErrorResponse" : null,
     "workflowNodeDescription" : null,
+    "processErrorResponse" : null,
     "poll" : null,
     "deduplicate" : null,
     "webhookDisable" : { },
@@ -3961,73 +4031,5 @@
     "webhookValidateOnEnable" : null
   } ],
   "dataStream" : null,
-  "connection" : {
-    "authorizations" : [ {
-      "detectOn" : null,
-      "description" : null,
-      "name" : "oauth2_authorization_code",
-      "properties" : [ {
-        "advancedOption" : null,
-        "description" : null,
-        "displayCondition" : null,
-        "expressionEnabled" : null,
-        "hidden" : null,
-        "metadata" : { },
-        "required" : true,
-        "name" : "clientId",
-        "type" : "STRING",
-        "defaultValue" : null,
-        "exampleValue" : null,
-        "label" : "Client Id",
-        "placeholder" : null,
-        "controlType" : "TEXT",
-        "languageId" : null,
-        "maxLength" : null,
-        "minLength" : null,
-        "options" : null,
-        "optionsDataSource" : null
-      }, {
-        "advancedOption" : null,
-        "description" : null,
-        "displayCondition" : null,
-        "expressionEnabled" : null,
-        "hidden" : null,
-        "metadata" : { },
-        "required" : true,
-        "name" : "clientSecret",
-        "type" : "STRING",
-        "defaultValue" : null,
-        "exampleValue" : null,
-        "label" : "Client Secret",
-        "placeholder" : null,
-        "controlType" : "TEXT",
-        "languageId" : null,
-        "maxLength" : null,
-        "minLength" : null,
-        "options" : null,
-        "optionsDataSource" : null
-      } ],
-      "refreshOn" : null,
-      "title" : "OAuth2 Authorization Code",
-      "type" : "OAUTH2_AUTHORIZATION_CODE",
-      "acquire" : null,
-      "apply" : null,
-      "authorizationCallback" : null,
-      "authorizationUrl" : { },
-      "clientId" : null,
-      "clientSecret" : null,
-      "oauth2AuthorizationExtraQueryParameters" : null,
-      "pkce" : null,
-      "refresh" : null,
-      "refreshUrl" : null,
-      "scopes" : null,
-      "refreshToken" : null,
-      "tokenUrl" : { }
-    } ],
-    "properties" : null,
-    "version" : 1,
-    "authorizationRequired" : null,
-    "baseUri" : { },
-    "test" : null
-  }
+  "unifiedApi" : null
 }

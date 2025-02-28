@@ -447,9 +447,9 @@
       "optionsDataSource" : null
     } ],
     "title" : "Create Email Template",
+    "workflowNodeDescription" : null,
     "perform" : null,
-    "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "processErrorResponse" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -928,12 +928,12 @@
         "type" : "BODY"
       },
       "required" : true,
-      "name" : "__items",
+      "name" : "people",
       "type" : "ARRAY",
       "defaultValue" : null,
       "exampleValue" : null,
       "label" : "People",
-      "placeholder" : "Add to Items",
+      "placeholder" : "Add to People",
       "items" : [ {
         "advancedOption" : null,
         "description" : null,
@@ -1083,9 +1083,9 @@
       "optionsDataSource" : null
     } ],
     "title" : "Create People",
+    "workflowNodeDescription" : null,
     "perform" : null,
-    "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "processErrorResponse" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -1148,13 +1148,10 @@
       }
     } ],
     "title" : "Add Tag",
+    "workflowNodeDescription" : null,
     "perform" : null,
-    "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "processErrorResponse" : null
   } ],
-  "unifiedApi" : null,
-  "triggers" : [ ],
-  "dataStream" : null,
   "connection" : {
     "authorizations" : [ {
       "detectOn" : null,
@@ -1221,7 +1218,10 @@
     "properties" : null,
     "version" : 1,
     "authorizationRequired" : null,
-    "test" : null,
-    "baseUri" : { }
-  }
+    "baseUri" : { },
+    "test" : null
+  },
+  "triggers" : [ ],
+  "dataStream" : null,
+  "unifiedApi" : null
 }
