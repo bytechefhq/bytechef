@@ -76,8 +76,9 @@ public class PushoverSendNotificationAction {
                 .required(true),
             integer(EXPIRE)
                 .label("Expire")
-                .description("If the notification has not be acknowledged in expire seconds, " +
-                    "it will be marked as expired and will stop being sent to the user.")
+                .description(
+                    "If the notification has not be acknowledged in expire seconds, it will be marked as expired and " +
+                        "will stop being sent to the user.")
                 .displayCondition("%s == '%s'".formatted(PRIORITY, "2"))
                 .required(true),
             string(URL)
@@ -86,8 +87,9 @@ public class PushoverSendNotificationAction {
                 .required(false),
             string(URL_TITLE)
                 .label("Url Title")
-                .description("When the user taps on the notification in Pushover to expand it," +
-                    " the URL will be shown as the supplied url_title")
+                .description(
+                    "When the user taps on the notification in Pushover to expand it, the URL will be shown as the " +
+                        "supplied url_title")
                 .required(false),
             fileEntry(ATTACHMENT_BASE_64)
                 .label("Attachment")
