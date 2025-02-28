@@ -49,8 +49,9 @@ class DateHelperGetCurrentDateActionTest {
 
         LocalDateTime localDateTime = LocalDateTime.of(2023, 1, 1, 1, 1, 1);
 
-        try (MockedStatic<LocalDateTime> localDateTimeMockedStatic =
-            mockStatic(LocalDateTime.class, Mockito.CALLS_REAL_METHODS)) {
+        try (MockedStatic<LocalDateTime> localDateTimeMockedStatic = mockStatic(
+            LocalDateTime.class, Mockito.CALLS_REAL_METHODS)) {
+
             localDateTimeMockedStatic.when(LocalDateTime::now)
                 .thenReturn(localDateTime);
 
@@ -71,8 +72,9 @@ class DateHelperGetCurrentDateActionTest {
 
         LocalDateTime localDateTime = LocalDateTime.now(ZoneId.of("America/New_York"));
 
-        try (MockedStatic<LocalDateTime> localDateTimeMockedStatic =
-            mockStatic(LocalDateTime.class, Mockito.CALLS_REAL_METHODS)) {
+        try (MockedStatic<LocalDateTime> localDateTimeMockedStatic = mockStatic(
+            LocalDateTime.class, Mockito.CALLS_REAL_METHODS)) {
+
             localDateTimeMockedStatic.when(() -> LocalDateTime.now(ZoneId.of("America/New_York")))
                 .thenReturn(localDateTime);
 
