@@ -58,7 +58,12 @@ Add a new pet to the store
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| pet | Pet | OBJECT <details> <summary> Properties </summary> {INTEGER\(id), STRING\(name), {INTEGER\(id), STRING\(name)}\(category), [STRING]\(photoUrls), [{INTEGER\(id), STRING\(name)}]\(tags), STRING\(status)} </details> |  | true |
+| id | Id | INTEGER |  | false |
+| name | Name | STRING |  | true |
+| category | Category | OBJECT <details> <summary> Properties </summary> {INTEGER\(id), STRING\(name)} </details> |  | false |
+| photoUrls | Photo Urls | ARRAY <details> <summary> Items </summary> [STRING] </details> |  | true |
+| tags | Tags | ARRAY <details> <summary> Items </summary> [{INTEGER\(id), STRING\(name)}] </details> |  | false |
+| status | Status | STRING <details> <summary> Options </summary> available, pending, sold </details> | pet status in the store | false |
 
 
 #### Output
@@ -88,20 +93,18 @@ Type: OBJECT
   "label" : "Add a new pet to the store",
   "name" : "addPet",
   "parameters" : {
-    "pet" : {
+    "id" : 1,
+    "name" : "",
+    "category" : {
       "id" : 1,
-      "name" : "",
-      "category" : {
-        "id" : 1,
-        "name" : ""
-      },
-      "photoUrls" : [ "" ],
-      "tags" : [ {
-        "id" : 1,
-        "name" : ""
-      } ],
-      "status" : ""
-    }
+      "name" : ""
+    },
+    "photoUrls" : [ "" ],
+    "tags" : [ {
+      "id" : 1,
+      "name" : ""
+    } ],
+    "status" : ""
   },
   "type" : "petstore/v1/addPet"
 }
@@ -117,7 +120,12 @@ Update an existing pet by Id
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| pet | Pet | OBJECT <details> <summary> Properties </summary> {INTEGER\(id), STRING\(name), {INTEGER\(id), STRING\(name)}\(category), [STRING]\(photoUrls), [{INTEGER\(id), STRING\(name)}]\(tags), STRING\(status)} </details> |  | true |
+| id | Id | INTEGER |  | false |
+| name | Name | STRING |  | true |
+| category | Category | OBJECT <details> <summary> Properties </summary> {INTEGER\(id), STRING\(name)} </details> |  | false |
+| photoUrls | Photo Urls | ARRAY <details> <summary> Items </summary> [STRING] </details> |  | true |
+| tags | Tags | ARRAY <details> <summary> Items </summary> [{INTEGER\(id), STRING\(name)}] </details> |  | false |
+| status | Status | STRING <details> <summary> Options </summary> available, pending, sold </details> | pet status in the store | false |
 
 
 #### Output
@@ -147,20 +155,18 @@ Type: OBJECT
   "label" : "Update an existing pet",
   "name" : "updatePet",
   "parameters" : {
-    "pet" : {
+    "id" : 1,
+    "name" : "",
+    "category" : {
       "id" : 1,
-      "name" : "",
-      "category" : {
-        "id" : 1,
-        "name" : ""
-      },
-      "photoUrls" : [ "" ],
-      "tags" : [ {
-        "id" : 1,
-        "name" : ""
-      } ],
-      "status" : ""
-    }
+      "name" : ""
+    },
+    "photoUrls" : [ "" ],
+    "tags" : [ {
+      "id" : 1,
+      "name" : ""
+    } ],
+    "status" : ""
   },
   "type" : "petstore/v1/updatePet"
 }
@@ -438,7 +444,12 @@ Place a new order in the store
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| order | Order | OBJECT <details> <summary> Properties </summary> {INTEGER\(id), INTEGER\(petId), INTEGER\(quantity), DATE_TIME\(shipDate), STRING\(status), BOOLEAN\(complete)} </details> |  | null |
+| id | Id | INTEGER |  | false |
+| petId | Pet Id | INTEGER |  | false |
+| quantity | Quantity | INTEGER |  | false |
+| shipDate | Ship Date | DATE_TIME |  | false |
+| status | Status | STRING <details> <summary> Options </summary> placed, approved, delivered </details> | Order Status | false |
+| complete | Complete | BOOLEAN <details> <summary> Options </summary> true, false </details> |  | false |
 
 
 #### Output
@@ -468,14 +479,12 @@ Type: OBJECT
   "label" : "Place an order for a pet",
   "name" : "placeOrder",
   "parameters" : {
-    "order" : {
-      "id" : 1,
-      "petId" : 1,
-      "quantity" : 1,
-      "shipDate" : "2021-01-01T00:00:00",
-      "status" : "",
-      "complete" : false
-    }
+    "id" : 1,
+    "petId" : 1,
+    "quantity" : 1,
+    "shipDate" : "2021-01-01T00:00:00",
+    "status" : "",
+    "complete" : false
   },
   "type" : "petstore/v1/placeOrder"
 }
@@ -562,7 +571,14 @@ This can only be done by the logged in user.
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| user | User | OBJECT <details> <summary> Properties </summary> {INTEGER\(id), STRING\(username), STRING\(firstName), STRING\(lastName), STRING\(email), STRING\(password), STRING\(phone), INTEGER\(userStatus)} </details> |  | null |
+| id | Id | INTEGER |  | false |
+| username | Username | STRING |  | false |
+| firstName | First Name | STRING |  | false |
+| lastName | Last Name | STRING |  | false |
+| email | Email | STRING |  | false |
+| password | Password | STRING |  | false |
+| phone | Phone | STRING |  | false |
+| userStatus | User Status | INTEGER | User Status | false |
 
 
 #### Output
@@ -594,16 +610,14 @@ Type: OBJECT
   "label" : "Create user",
   "name" : "createUser",
   "parameters" : {
-    "user" : {
-      "id" : 1,
-      "username" : "",
-      "firstName" : "",
-      "lastName" : "",
-      "email" : "",
-      "password" : "",
-      "phone" : "",
-      "userStatus" : 1
-    }
+    "id" : 1,
+    "username" : "",
+    "firstName" : "",
+    "lastName" : "",
+    "email" : "",
+    "password" : "",
+    "phone" : "",
+    "userStatus" : 1
   },
   "type" : "petstore/v1/createUser"
 }
@@ -743,7 +757,14 @@ This can only be done by the logged in user.
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | username | Username | STRING | name that need to be deleted | true |
-| user | User | OBJECT <details> <summary> Properties </summary> {INTEGER\(id), STRING\(username), STRING\(firstName), STRING\(lastName), STRING\(email), STRING\(password), STRING\(phone), INTEGER\(userStatus)} </details> |  | null |
+| id | Id | INTEGER |  | false |
+| username | Username | STRING |  | false |
+| firstName | First Name | STRING |  | false |
+| lastName | Last Name | STRING |  | false |
+| email | Email | STRING |  | false |
+| password | Password | STRING |  | false |
+| phone | Phone | STRING |  | false |
+| userStatus | User Status | INTEGER | User Status | false |
 
 
 #### Output
@@ -776,16 +797,13 @@ Type: OBJECT
   "name" : "updateUser",
   "parameters" : {
     "username" : "",
-    "user" : {
-      "id" : 1,
-      "username" : "",
-      "firstName" : "",
-      "lastName" : "",
-      "email" : "",
-      "password" : "",
-      "phone" : "",
-      "userStatus" : 1
-    }
+    "id" : 1,
+    "firstName" : "",
+    "lastName" : "",
+    "email" : "",
+    "password" : "",
+    "phone" : "",
+    "userStatus" : 1
   },
   "type" : "petstore/v1/updateUser"
 }

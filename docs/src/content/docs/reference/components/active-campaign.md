@@ -50,7 +50,7 @@ Creates a new account.
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| __item | Account | OBJECT <details> <summary> Properties </summary> {{STRING\(name), STRING\(accountUrl)}\(account)} </details> |  | null |
+| account | Account | OBJECT <details> <summary> Properties </summary> {STRING\(name), STRING\(accountUrl)} </details> |  | false |
 
 
 #### Output
@@ -75,11 +75,9 @@ Type: OBJECT
   "label" : "Create Account",
   "name" : "createAccount",
   "parameters" : {
-    "__item" : {
-      "account" : {
-        "name" : "",
-        "accountUrl" : ""
-      }
+    "account" : {
+      "name" : "",
+      "accountUrl" : ""
     }
   },
   "type" : "active-campaign/v1/createAccount"
@@ -96,7 +94,7 @@ Creates a new contact.
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| __item | Contact | OBJECT <details> <summary> Properties </summary> {{STRING\(email), STRING\(firstName), STRING\(lastName), STRING\(phone)}\(contact)} </details> |  | null |
+| contact | Contact | OBJECT <details> <summary> Properties </summary> {STRING\(email), STRING\(firstName), STRING\(lastName), STRING\(phone)} </details> |  | false |
 
 
 #### Output
@@ -121,13 +119,11 @@ Type: OBJECT
   "label" : "Create Contact",
   "name" : "createContact",
   "parameters" : {
-    "__item" : {
-      "contact" : {
-        "email" : "",
-        "firstName" : "",
-        "lastName" : "",
-        "phone" : ""
-      }
+    "contact" : {
+      "email" : "",
+      "firstName" : "",
+      "lastName" : "",
+      "phone" : ""
     }
   },
   "type" : "active-campaign/v1/createContact"
@@ -144,7 +140,7 @@ Creates a new task.
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| __item | Task | OBJECT <details> <summary> Properties </summary> {{STRING\(title), INTEGER\(relid), DATE\(duedate), INTEGER\(dealTasktype)}\(dealTask)} </details> |  | null |
+| dealTask | Deal Task | OBJECT <details> <summary> Properties </summary> {STRING\(title), INTEGER\(relid), DATE\(duedate), INTEGER\(dealTasktype)} </details> |  | false |
 
 
 #### Output
@@ -169,13 +165,11 @@ Type: OBJECT
   "label" : "Create Task",
   "name" : "createTask",
   "parameters" : {
-    "__item" : {
-      "dealTask" : {
-        "title" : "",
-        "relid" : 1,
-        "duedate" : "2021-01-01",
-        "dealTasktype" : 1
-      }
+    "dealTask" : {
+      "title" : "",
+      "relid" : 1,
+      "duedate" : "2021-01-01",
+      "dealTasktype" : 1
     }
   },
   "type" : "active-campaign/v1/createTask"

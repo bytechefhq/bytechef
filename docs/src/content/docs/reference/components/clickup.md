@@ -49,10 +49,10 @@ Creates a new List in specified Folder.
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| workspaceId | Workspace ID | NUMBER |  | true |
-| spaceId | Space ID | NUMBER <details> <summary> Depends On </summary> workspaceId </details> |  | true |
-| folderId | Folder ID | NUMBER <details> <summary> Depends On </summary> spaceId, workspaceId </details> | ID of the folder where new list will be created. | true |
-| __item | List | OBJECT <details> <summary> Properties </summary> {STRING\(name)} </details> |  | null |
+| workspaceId | Workspace ID | STRING |  | true |
+| spaceId | Space ID | STRING <details> <summary> Depends On </summary> workspaceId </details> |  | true |
+| folderId | Folder ID | STRING <details> <summary> Depends On </summary> spaceId, workspaceId </details> | ID of the folder where new list will be created. | true |
+| name | Name | STRING | The name of the list. | true |
 
 
 #### Output
@@ -77,12 +77,10 @@ Type: OBJECT
   "label" : "Create List",
   "name" : "createList",
   "parameters" : {
-    "workspaceId" : 0.0,
-    "spaceId" : 0.0,
-    "folderId" : 0.0,
-    "__item" : {
-      "name" : ""
-    }
+    "workspaceId" : "",
+    "spaceId" : "",
+    "folderId" : "",
+    "name" : ""
   },
   "type" : "clickup/v1/createList"
 }
@@ -98,11 +96,12 @@ Create a new task in a ClickUp workspace and list.
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| workspaceId | Workspace ID | NUMBER |  | true |
-| spaceId | Space ID | NUMBER <details> <summary> Depends On </summary> workspaceId </details> |  | true |
-| folderId | Folder ID | NUMBER <details> <summary> Depends On </summary> spaceId, workspaceId </details> |  | false |
-| listId | List ID | NUMBER <details> <summary> Depends On </summary> folderId, spaceId, workspaceId </details> | ID of the list where new task will be created. | true |
-| __item | Task | OBJECT <details> <summary> Properties </summary> {STRING\(name), STRING\(description)} </details> |  | null |
+| workspaceId | Workspace ID | STRING |  | true |
+| spaceId | Space ID | STRING <details> <summary> Depends On </summary> workspaceId </details> |  | true |
+| folderId | Folder ID | STRING <details> <summary> Depends On </summary> spaceId, workspaceId </details> |  | false |
+| listId | List ID | STRING <details> <summary> Depends On </summary> folderId, spaceId, workspaceId </details> | ID of the list where new task will be created. | true |
+| name | Name | STRING | The name of the task. | true |
+| description | Description | STRING | The description of task. | false |
 
 
 #### Output
@@ -127,14 +126,12 @@ Type: OBJECT
   "label" : "Create Task",
   "name" : "createTask",
   "parameters" : {
-    "workspaceId" : 0.0,
-    "spaceId" : 0.0,
-    "folderId" : 0.0,
-    "listId" : 0.0,
-    "__item" : {
-      "name" : "",
-      "description" : ""
-    }
+    "workspaceId" : "",
+    "spaceId" : "",
+    "folderId" : "",
+    "listId" : "",
+    "name" : "",
+    "description" : ""
   },
   "type" : "clickup/v1/createTask"
 }
@@ -150,9 +147,9 @@ Creates a new folder in a ClickUp workspace.
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| workspaceId | Workspace ID | NUMBER |  | true |
-| spaceId | Space ID | NUMBER <details> <summary> Depends On </summary> workspaceId </details> | ID of the space where new folder will be created. | true |
-| __item | Folder | OBJECT <details> <summary> Properties </summary> {STRING\(name)} </details> |  | null |
+| workspaceId | Workspace ID | STRING |  | true |
+| spaceId | Space ID | STRING <details> <summary> Depends On </summary> workspaceId </details> | ID of the space where new folder will be created. | true |
+| name | Name | STRING | The name of the folder. | true |
 
 
 #### Output
@@ -177,11 +174,9 @@ Type: OBJECT
   "label" : "Create Folder",
   "name" : "createFolder",
   "parameters" : {
-    "workspaceId" : 0.0,
-    "spaceId" : 0.0,
-    "__item" : {
-      "name" : ""
-    }
+    "workspaceId" : "",
+    "spaceId" : "",
+    "name" : ""
   },
   "type" : "clickup/v1/createFolder"
 }

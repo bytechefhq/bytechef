@@ -49,7 +49,7 @@ Creates a new project in a workspace or team.
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| __item | Project | OBJECT <details> <summary> Properties </summary> {{STRING\(workspace), STRING\(name), STRING\(notes), STRING\(team)}\(data)} </details> |  | null |
+| data | Data | OBJECT <details> <summary> Properties </summary> {STRING\(workspace), STRING\(name), STRING\(notes), STRING\(team)} </details> |  | false |
 
 
 #### Output
@@ -74,13 +74,11 @@ Type: OBJECT
   "label" : "Create Project",
   "name" : "createProject",
   "parameters" : {
-    "__item" : {
-      "data" : {
-        "workspace" : "",
-        "name" : "",
-        "notes" : "",
-        "team" : ""
-      }
+    "data" : {
+      "workspace" : "",
+      "name" : "",
+      "notes" : "",
+      "team" : ""
     }
   },
   "type" : "asana/v1/createProject"
@@ -97,7 +95,7 @@ Creates a new task
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| __item | Task | OBJECT <details> <summary> Properties </summary> {{STRING\(workspace), STRING\(project), STRING\(name), STRING\(notes), DATE\(due_on), [STRING]\(tags), STRING\(assignee)}\(data)} </details> |  | null |
+| data | Data | OBJECT <details> <summary> Properties </summary> {STRING\(workspace), STRING\(project), STRING\(name), STRING\(notes), DATE\(due_on), [STRING]\(tags), STRING\(assignee)} </details> |  | false |
 
 
 #### Output
@@ -122,16 +120,14 @@ Type: OBJECT
   "label" : "Create Task",
   "name" : "createTask",
   "parameters" : {
-    "__item" : {
-      "data" : {
-        "workspace" : "",
-        "project" : "",
-        "name" : "",
-        "notes" : "",
-        "due_on" : "2021-01-01",
-        "tags" : [ "" ],
-        "assignee" : ""
-      }
+    "data" : {
+      "workspace" : "",
+      "project" : "",
+      "name" : "",
+      "notes" : "",
+      "due_on" : "2021-01-01",
+      "tags" : [ "" ],
+      "assignee" : ""
     }
   },
   "type" : "asana/v1/createTask"

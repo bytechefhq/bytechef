@@ -91,7 +91,7 @@ Posts a new comment on the file.
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | fileKey | File Key | STRING | File to add comments in. Figma file key copy from Figma file URL. | true |
-| __item | Item | OBJECT <details> <summary> Properties </summary> {STRING\(message)} </details> |  | true |
+| message | Comment | STRING | Comment to post on the file. | true |
 
 
 #### Output
@@ -117,9 +117,7 @@ Type: OBJECT
   "name" : "postComment",
   "parameters" : {
     "fileKey" : "",
-    "__item" : {
-      "message" : ""
-    }
+    "message" : ""
   },
   "type" : "figma/v1/postComment"
 }

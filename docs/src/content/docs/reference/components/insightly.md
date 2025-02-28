@@ -49,7 +49,11 @@ Creates new contact.
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| __item | Contact | OBJECT <details> <summary> Properties </summary> {STRING\(FIRST_NAME), STRING\(LAST_NAME), STRING\(EMAIL_ADDRESS), STRING\(PHONE), STRING\(TITLE)} </details> |  | true |
+| FIRST_NAME | First Name | STRING | The first name of the contact. | true |
+| LAST_NAME | Last Name | STRING | The last name of the contact. | false |
+| EMAIL_ADDRESS | Email Address | STRING | Email address of the contact. | false |
+| PHONE | Phone | STRING | Phone number of the contact. | false |
+| TITLE | Title | STRING | The contact's title in company. | false |
 
 
 #### Output
@@ -79,13 +83,11 @@ Type: OBJECT
   "label" : "Create Contact",
   "name" : "createContact",
   "parameters" : {
-    "__item" : {
-      "FIRST_NAME" : "",
-      "LAST_NAME" : "",
-      "EMAIL_ADDRESS" : "",
-      "PHONE" : "",
-      "TITLE" : ""
-    }
+    "FIRST_NAME" : "",
+    "LAST_NAME" : "",
+    "EMAIL_ADDRESS" : "",
+    "PHONE" : "",
+    "TITLE" : ""
   },
   "type" : "insightly/v1/createContact"
 }
@@ -101,7 +103,9 @@ Creates new organization.
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| __item | Organization | OBJECT <details> <summary> Properties </summary> {STRING\(ORGANISATION_NAME), STRING\(PHONE), STRING\(WEBSITE)} </details> |  | true |
+| ORGANISATION_NAME | Organization Name | STRING | The name of the organization. | true |
+| PHONE | Phone | STRING | A contact phone number for the organization. | false |
+| WEBSITE | Website | STRING | The organization's website. | false |
 
 
 #### Output
@@ -129,11 +133,9 @@ Type: OBJECT
   "label" : "Create Organization",
   "name" : "createOrganization",
   "parameters" : {
-    "__item" : {
-      "ORGANISATION_NAME" : "",
-      "PHONE" : "",
-      "WEBSITE" : ""
-    }
+    "ORGANISATION_NAME" : "",
+    "PHONE" : "",
+    "WEBSITE" : ""
   },
   "type" : "insightly/v1/createOrganization"
 }
@@ -149,7 +151,8 @@ Creates new task.
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| __item | Task | OBJECT <details> <summary> Properties </summary> {STRING\(TITLE), STRING\(STATUS)} </details> |  | true |
+| TITLE | Title | STRING |  | true |
+| STATUS | Status | STRING <details> <summary> Options </summary> Not Started, In Progress, Completed, Deferred, Waiting </details> | Task status | false |
 
 
 #### Output
@@ -176,10 +179,8 @@ Type: OBJECT
   "label" : "Create Task",
   "name" : "createTask",
   "parameters" : {
-    "__item" : {
-      "TITLE" : "",
-      "STATUS" : ""
-    }
+    "TITLE" : "",
+    "STATUS" : ""
   },
   "type" : "insightly/v1/createTask"
 }

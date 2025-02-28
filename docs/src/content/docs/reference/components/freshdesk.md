@@ -49,7 +49,9 @@ Creates a new company
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| __item | Company | OBJECT <details> <summary> Properties </summary> {STRING\(name), STRING\(description), STRING\(note)} </details> |  | null |
+| name | Name | STRING | Name of the company | true |
+| description | Description | STRING | Description of the company | false |
+| note | Note | STRING | Any specific note about the company | false |
 
 
 #### Output
@@ -74,11 +76,9 @@ Type: OBJECT
   "label" : "Create Company",
   "name" : "createCompany",
   "parameters" : {
-    "__item" : {
-      "name" : "",
-      "description" : "",
-      "note" : ""
-    }
+    "name" : "",
+    "description" : "",
+    "note" : ""
   },
   "type" : "freshdesk/v1/createCompany"
 }
@@ -94,7 +94,12 @@ Creates a new contact
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| __item | Contact | OBJECT <details> <summary> Properties </summary> {STRING\(name), STRING\(email), STRING\(phone), STRING\(mobile), STRING\(description), STRING\(job_title)} </details> |  | null |
+| name | Name | STRING | Full name of the contact | true |
+| email | Email | STRING | Primary email address of the contact. | true |
+| phone | Work Phone | STRING | Telephone number of the contact | false |
+| mobile | Mobile | STRING | Mobile number of the contact | false |
+| description | Description | STRING | A small description of the contact | false |
+| job_title | Job Title | STRING | Job title of the contact | false |
 
 
 #### Output
@@ -119,14 +124,12 @@ Type: OBJECT
   "label" : "Create Contact",
   "name" : "createContact",
   "parameters" : {
-    "__item" : {
-      "name" : "",
-      "email" : "",
-      "phone" : "",
-      "mobile" : "",
-      "description" : "",
-      "job_title" : ""
-    }
+    "name" : "",
+    "email" : "",
+    "phone" : "",
+    "mobile" : "",
+    "description" : "",
+    "job_title" : ""
   },
   "type" : "freshdesk/v1/createContact"
 }
@@ -142,7 +145,11 @@ Creates a new ticket
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| __item | Ticket | OBJECT <details> <summary> Properties </summary> {STRING\(subject), STRING\(email), STRING\(description), INTEGER\(priority), INTEGER\(status)} </details> |  | null |
+| subject | Subject | STRING | Subject of the ticket. | true |
+| email | Email | STRING | Email address of the requester. If no contact exists with this email address in Freshdesk, it will be added as a new contact. | true |
+| description | Description | STRING | HTML content of the ticket. | true |
+| priority | Priority | INTEGER <details> <summary> Options </summary> 1, 2, 3, 4 </details> | Priority of the ticket. | false |
+| status | Status | INTEGER <details> <summary> Options </summary> 2, 3, 4, 5 </details> | Status of the ticket. | false |
 
 
 #### Output
@@ -167,13 +174,11 @@ Type: OBJECT
   "label" : "Create Ticket",
   "name" : "createTicket",
   "parameters" : {
-    "__item" : {
-      "subject" : "",
-      "email" : "",
-      "description" : "",
-      "priority" : 1,
-      "status" : 1
-    }
+    "subject" : "",
+    "email" : "",
+    "description" : "",
+    "priority" : 1,
+    "status" : 1
   },
   "type" : "freshdesk/v1/createTicket"
 }

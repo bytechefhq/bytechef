@@ -51,7 +51,20 @@ Adds a new member to the list.
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | listId | List ID | STRING | The unique ID for the list. | true |
 | skip_merge_validation | Skip Merge Validation | BOOLEAN <details> <summary> Options </summary> true, false </details> | If skip_merge_validation is true, member data will be accepted without merge field values, even if the merge field is usually required. This defaults to false. | false |
-| __item | Item | OBJECT <details> <summary> Properties </summary> {STRING\(email_address), STRING\(status), STRING\(email_type), {}\(merge_fields), {}\(interests), STRING\(language), BOOLEAN\(vip), {NUMBER\(latitude), NUMBER\(longitude)}\(location), [{STRING\(marketing_permission_id), BOOLEAN\(enabled)}]\(marketing_permissions), STRING\(ip_signup), STRING\(timestamp_signup), STRING\(ip_opt), STRING\(timestamp_opt), [STRING]\(tags)} </details> |  | null |
+| email_address | Email Address | STRING | Email address for a subscriber. | true |
+| status | Status | STRING <details> <summary> Options </summary> subscribed, unsubscribed, cleaned, pending, transactional </details> | Subscriber's current status. | true |
+| email_type | Email Type | STRING <details> <summary> Options </summary> html, text </details> | Type of email this member asked to get ('html' or 'text'). | false |
+| merge_fields | Merge Fields | OBJECT <details> <summary> Properties </summary> {} </details> | A dictionary of merge fields where the keys are the merge tags. | false |
+| interests | Interests | OBJECT <details> <summary> Properties </summary> {} </details> | The key of this object's properties is the ID of the interest in question. | false |
+| language | Language | STRING | If set/detected, the subscriber's language. | false |
+| vip | Vip | BOOLEAN <details> <summary> Options </summary> true, false </details> | VIP status for subscriber. | false |
+| location | Location | OBJECT <details> <summary> Properties </summary> {NUMBER\(latitude), NUMBER\(longitude)} </details> | Subscriber location information. | false |
+| marketing_permissions | Marketing Permissions | ARRAY <details> <summary> Items </summary> [{STRING\(marketing_permission_id), BOOLEAN\(enabled)}] </details> | The marketing permissions for the subscriber. | false |
+| ip_signup | Ip Signup | STRING | IP address the subscriber signed up from. | false |
+| timestamp_signup | Timestamp Signup | STRING | The date and time the subscriber signed up for the list in ISO 8601 format. | false |
+| ip_opt | Ip Opt | STRING | The IP address the subscriber used to confirm their opt-in status. | false |
+| timestamp_opt | Timestamp Opt | STRING | The date and time the subscriber confirmed their opt-in status in ISO 8601 format. | false |
+| tags | Tags | ARRAY <details> <summary> Items </summary> [STRING] </details> | The tags that are associated with a member. | false |
 
 
 #### Output
@@ -59,7 +72,7 @@ Adds a new member to the list.
 
 ___Sample Output:___
 
-```{timestamp_opt=2019-08-24T14:15:22, unsubscribe_reason=string, status=subscribed, email_address=string, last_note={note=string, created_at=2019-08-24T14:15:22, note_id=0, created_by=string}, contact_id=string, stats={ecommerce_data={currency_code=USD, number_of_orders=0, total_revenue=0}, avg_open_rate=0, avg_click_rate=0}, merge_fields={property2=, property1=}, full_name=string, list_id=string, tags_count=0, unique_email_id=string, email_client=string, consents_to_one_to_one_messaging=true, source=string, last_changed=2019-08-24T14:15:22, vip=true, member_rating=0, web_id=0, _links=[{rel=string, href=string, schema=string, targetSchema=string, method=GET}], id=string, timestamp_signup=2019-08-24T14:15:22, interests={property2=true, property1=true}, language=string, email_type=string, marketing_permissions=[{enabled=true, marketing_permission_id=string, text=string}], tags=[{name=string, id=0}], ip_signup=string, location={longitude=0, gmtoff=0, country_code=string, timezone=string, dstoff=0, latitude=0, region=string}, ip_opt=string}```
+```{email_type=string, marketing_permissions=[{text=string, enabled=true, marketing_permission_id=string}], tags=[{name=string, id=0}], ip_signup=string, location={region=string, longitude=0, gmtoff=0, country_code=string, timezone=string, dstoff=0, latitude=0}, ip_opt=string, timestamp_opt=2019-08-24T14:15:22, unsubscribe_reason=string, status=subscribed, email_address=string, last_note={note=string, created_at=2019-08-24T14:15:22, note_id=0, created_by=string}, contact_id=string, stats={ecommerce_data={total_revenue=0, currency_code=USD, number_of_orders=0}, avg_open_rate=0, avg_click_rate=0}, merge_fields={property2=, property1=}, full_name=string, list_id=string, tags_count=0, unique_email_id=string, email_client=string, consents_to_one_to_one_messaging=true, source=string, last_changed=2019-08-24T14:15:22, vip=true, member_rating=0, web_id=0, _links=[{targetSchema=string, method=GET, rel=string, href=string, schema=string}], id=string, timestamp_signup=2019-08-24T14:15:22, interests={property2=true, property1=true}, language=string}```
 
 
 
@@ -112,28 +125,26 @@ Type: OBJECT
   "parameters" : {
     "listId" : "",
     "skip_merge_validation" : false,
-    "__item" : {
-      "email_address" : "",
-      "status" : "",
-      "email_type" : "",
-      "merge_fields" : { },
-      "interests" : { },
-      "language" : "",
-      "vip" : false,
-      "location" : {
-        "latitude" : 0.0,
-        "longitude" : 0.0
-      },
-      "marketing_permissions" : [ {
-        "marketing_permission_id" : "",
-        "enabled" : false
-      } ],
-      "ip_signup" : "",
-      "timestamp_signup" : "",
-      "ip_opt" : "",
-      "timestamp_opt" : "",
-      "tags" : [ "" ]
-    }
+    "email_address" : "",
+    "status" : "",
+    "email_type" : "",
+    "merge_fields" : { },
+    "interests" : { },
+    "language" : "",
+    "vip" : false,
+    "location" : {
+      "latitude" : 0.0,
+      "longitude" : 0.0
+    },
+    "marketing_permissions" : [ {
+      "marketing_permission_id" : "",
+      "enabled" : false
+    } ],
+    "ip_signup" : "",
+    "timestamp_signup" : "",
+    "ip_opt" : "",
+    "timestamp_opt" : "",
+    "tags" : [ "" ]
   },
   "type" : "mailchimp/v1/addMemberToList"
 }

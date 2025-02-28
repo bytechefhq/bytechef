@@ -50,7 +50,8 @@ Post a new message to a specific #channel you choose.
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | guildId | Guild ID | STRING |  | true |
 | channelId | Channel ID | STRING <details> <summary> Depends On </summary> guildId </details> | ID of the channel where to send the message. | true |
-| __item | Message | OBJECT <details> <summary> Properties </summary> {STRING\(content), BOOLEAN\(tts)} </details> |  | null |
+| content | Message Text | STRING | Message contents (up to 2000 characters) | true |
+| tts | Text to Speech | BOOLEAN <details> <summary> Options </summary> true, false </details> | True if this is a TTS message | false |
 
 
 #### Output
@@ -77,10 +78,8 @@ Type: OBJECT
   "parameters" : {
     "guildId" : "",
     "channelId" : "",
-    "__item" : {
-      "content" : "",
-      "tts" : false
-    }
+    "content" : "",
+    "tts" : false
   },
   "type" : "discord/v1/sendChannelMessage"
 }
@@ -97,7 +96,8 @@ Create a new channel
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | guildId | Guild ID | STRING |  | true |
-| __item | Channel | OBJECT <details> <summary> Properties </summary> {STRING\(name), INTEGER\(type)} </details> |  | null |
+| name | Name | STRING | The name of the new channel | true |
+| type | Type | INTEGER <details> <summary> Options </summary> 0, 2, 4 </details> |  | false |
 
 
 #### Output
@@ -123,10 +123,8 @@ Type: OBJECT
   "name" : "createChannel",
   "parameters" : {
     "guildId" : "",
-    "__item" : {
-      "name" : "",
-      "type" : 1
-    }
+    "name" : "",
+    "type" : 1
   },
   "type" : "discord/v1/createChannel"
 }

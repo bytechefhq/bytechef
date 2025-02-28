@@ -49,7 +49,7 @@ Creates a new company.
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| __item | Company | OBJECT <details> <summary> Properties </summary> {{STRING\(name), STRING\(emailOne), STRING\(phone), STRING\(website)}\(company)} </details> |  | null |
+| company | Company | OBJECT <details> <summary> Properties </summary> {STRING\(name), STRING\(emailOne), STRING\(phone), STRING\(website)} </details> |  | false |
 
 
 #### Output
@@ -74,13 +74,11 @@ Type: OBJECT
   "label" : "Create Company",
   "name" : "createCompany",
   "parameters" : {
-    "__item" : {
-      "company" : {
-        "name" : "",
-        "emailOne" : "",
-        "phone" : "",
-        "website" : ""
-      }
+    "company" : {
+      "name" : "",
+      "emailOne" : "",
+      "phone" : "",
+      "website" : ""
     }
   },
   "type" : "teamwork/v1/createCompany"
@@ -98,7 +96,7 @@ Create a new task
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | tasklistId | Task List ID | INTEGER | Task list where new task is added | true |
-| __item | Task | OBJECT <details> <summary> Properties </summary> {{STRING\(name), STRING\(description), DATE\(dueAt)}\(task)} </details> |  | null |
+| task | Task | OBJECT <details> <summary> Properties </summary> {STRING\(name), STRING\(description), DATE\(dueAt)} </details> |  | false |
 
 
 #### Output
@@ -124,12 +122,10 @@ Type: OBJECT
   "name" : "createTask",
   "parameters" : {
     "tasklistId" : 1,
-    "__item" : {
-      "task" : {
-        "name" : "",
-        "description" : "",
-        "dueAt" : "2021-01-01"
-      }
+    "task" : {
+      "name" : "",
+      "description" : "",
+      "dueAt" : "2021-01-01"
     }
   },
   "type" : "teamwork/v1/createTask"

@@ -50,7 +50,7 @@ Adds a record into an Airtable table.
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | baseId | Base ID | STRING | ID of the base where table is located. | true |
 | tableId | Table ID | STRING <details> <summary> Depends On </summary> baseId </details> | The table where the record will be created. | true |
-| __item | | DYNAMIC_PROPERTIES <details> <summary> Depends On </summary> baseId, tableId </details> |  | null |
+| fields | | DYNAMIC_PROPERTIES <details> <summary> Depends On </summary> baseId, tableId </details> |  | false |
 
 
 #### Output
@@ -78,7 +78,7 @@ Type: OBJECT
   "parameters" : {
     "baseId" : "",
     "tableId" : "",
-    "__item" : { }
+    "fields" : { }
   },
   "type" : "airtable/v1/createRecord"
 }

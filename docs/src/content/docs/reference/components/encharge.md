@@ -49,7 +49,10 @@ Create email template
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| __item | Email Template | OBJECT <details> <summary> Properties </summary> {STRING\(name), STRING\(subject), STRING\(fromEmail), STRING\(replyEmail)} </details> |  | true |
+| name | Name | STRING | Name of the email template | true |
+| subject | Subject | STRING | Subject of the email | true |
+| fromEmail | From Email | STRING | From address to send the email from | true |
+| replyEmail | Reply Email | STRING | Address that recipients will reply to by default. | false |
 
 
 #### Output
@@ -74,12 +77,10 @@ Type: OBJECT
   "label" : "Create Email Template",
   "name" : "createEmail",
   "parameters" : {
-    "__item" : {
-      "name" : "",
-      "subject" : "",
-      "fromEmail" : "",
-      "replyEmail" : ""
-    }
+    "name" : "",
+    "subject" : "",
+    "fromEmail" : "",
+    "replyEmail" : ""
   },
   "type" : "encharge/v1/createEmail"
 }
@@ -95,7 +96,7 @@ Creates new People
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| __items | People | ARRAY <details> <summary> Items </summary> [{STRING\(email), STRING\(firstName), STRING\(lastName), STRING\(website), STRING\(title), STRING\(phone)}] </details> |  | true |
+| people | People | ARRAY <details> <summary> Items </summary> [{STRING\(email), STRING\(firstName), STRING\(lastName), STRING\(website), STRING\(title), STRING\(phone)}] </details> |  | true |
 
 
 #### Output
@@ -120,7 +121,7 @@ Type: OBJECT
   "label" : "Create People",
   "name" : "createPeople",
   "parameters" : {
-    "__items" : [ {
+    "people" : [ {
       "email" : "",
       "firstName" : "",
       "lastName" : "",
@@ -143,7 +144,8 @@ Add tag(s) to an existing user.
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| __item | Tag | OBJECT <details> <summary> Properties </summary> {STRING\(tag), STRING\(email)} </details> |  | true |
+| tag | Tag | STRING | Tag(s) to add. To add multiple tags, use a comma-separated list, e.g. tag1,tag2 | true |
+| email | Email | STRING | Email of the person. | true |
 
 
 #### JSON Example
@@ -152,10 +154,8 @@ Add tag(s) to an existing user.
   "label" : "Add Tag",
   "name" : "addTag",
   "parameters" : {
-    "__item" : {
-      "tag" : "",
-      "email" : ""
-    }
+    "tag" : "",
+    "email" : ""
   },
   "type" : "encharge/v1/addTag"
 }
