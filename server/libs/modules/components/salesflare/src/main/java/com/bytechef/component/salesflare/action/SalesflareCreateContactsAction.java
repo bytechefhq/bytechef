@@ -44,7 +44,7 @@ public class SalesflareCreateContactsAction {
                 "path", "/contacts", "bodyContentType", BodyContentType.JSON, "mimeType", "application/json"
 
             ))
-        .properties(array("__items").items(object().properties(string("email").maxLength(1000)
+        .properties(array("contacts").items(object().properties(string("email").maxLength(1000)
             .label("Email")
             .description("Email address of the contact.")
             .required(true),
@@ -67,7 +67,7 @@ public class SalesflareCreateContactsAction {
                 .label("Social Profiles")
                 .description("Social profile URL")
                 .required(false)))
-            .placeholder("Add to Items")
+            .placeholder("Add to Contacts")
             .metadata(
                 Map.of(
                     "type", PropertyType.BODY))

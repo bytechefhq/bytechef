@@ -16,14 +16,21 @@
 
 package com.bytechef.component.petstore.action;
 
+import static com.bytechef.component.OpenApiComponentHandler.PropertyType;
 import static com.bytechef.component.definition.ComponentDsl.action;
+import static com.bytechef.component.definition.ComponentDsl.array;
+import static com.bytechef.component.definition.ComponentDsl.integer;
 import static com.bytechef.component.definition.ComponentDsl.object;
+import static com.bytechef.component.definition.ComponentDsl.option;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
+import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.Context.Http.BodyContentType;
 import static com.bytechef.component.definition.Context.Http.ResponseType;
 
 import com.bytechef.component.definition.ComponentDsl;
+import com.bytechef.component.petstore.property.PetstoreCategoryProperties;
 import com.bytechef.component.petstore.property.PetstorePetProperties;
+import com.bytechef.component.petstore.property.PetstoreTagProperties;
 import java.util.Map;
 
 /**
@@ -41,9 +48,47 @@ public class PetstoreAddPetAction {
                 "path", "/pet", "bodyContentType", BodyContentType.JSON, "mimeType", "application/json"
 
             ))
-        .properties(object("pet").properties(PetstorePetProperties.PROPERTIES)
-            .label("Pet")
-            .required(true))
+        .properties(integer("id").metadata(
+            Map.of(
+                "type", PropertyType.BODY))
+            .label("Id")
+            .required(false)
+            .exampleValue(10),
+            string("name").metadata(
+                Map.of(
+                    "type", PropertyType.BODY))
+                .label("Name")
+                .required(true)
+                .exampleValue("doggie"),
+            object("category").properties(PetstoreCategoryProperties.PROPERTIES)
+                .metadata(
+                    Map.of(
+                        "type", PropertyType.BODY))
+                .label("Category")
+                .required(false),
+            array("photoUrls").items(string().metadata(
+                Map.of(
+                    "type", PropertyType.BODY)))
+                .placeholder("Add to Photo Urls")
+                .metadata(
+                    Map.of(
+                        "type", PropertyType.BODY))
+                .label("Photo Urls")
+                .required(true),
+            array("tags").items(object().properties(PetstoreTagProperties.PROPERTIES))
+                .placeholder("Add to Tags")
+                .metadata(
+                    Map.of(
+                        "type", PropertyType.BODY))
+                .label("Tags")
+                .required(false),
+            string("status").metadata(
+                Map.of(
+                    "type", PropertyType.BODY))
+                .label("Status")
+                .description("pet status in the store")
+                .options(option("Available", "available"), option("Pending", "pending"), option("Sold", "sold"))
+                .required(false))
         .output(outputSchema(object().properties(PetstorePetProperties.PROPERTIES)
             .metadata(
                 Map.of(

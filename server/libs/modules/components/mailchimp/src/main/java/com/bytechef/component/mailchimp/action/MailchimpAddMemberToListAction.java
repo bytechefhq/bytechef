@@ -73,7 +73,10 @@ public class MailchimpAddMemberToListAction {
                 .label("Email Address")
                 .description("Email address for a subscriber.")
                 .required(true),
-            string("status").label("Status")
+            string("status").metadata(
+                Map.of(
+                    "type", PropertyType.BODY))
+                .label("Status")
                 .description("Subscriber's current status.")
                 .options(option("Subscribed", "subscribed"), option("Unsubscribed", "unsubscribed"),
                     option("Cleaned", "cleaned"), option("Pending", "pending"),

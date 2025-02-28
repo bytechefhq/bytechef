@@ -45,12 +45,12 @@ public class SalesflareCreateTasksAction {
                 "path", "/tasks", "bodyContentType", BodyContentType.JSON, "mimeType", "application/json"
 
             ))
-        .properties(array("__items").items(object().properties(string("description").label("Description")
+        .properties(array("tasks").items(object().properties(string("description").label("Description")
             .description("Description of new task.")
             .required(true),
             date("reminder_date").label("Reminder Data")
                 .required(false)))
-            .placeholder("Add to Items")
+            .placeholder("Add to Tasks")
             .metadata(
                 Map.of(
                     "type", PropertyType.BODY))
