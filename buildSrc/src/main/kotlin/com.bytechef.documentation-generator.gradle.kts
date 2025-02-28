@@ -67,8 +67,10 @@ open class FindJsonFilesTask : DefaultTask() {
 
         fun getOutputString(): String {
             val typeDetails = getTypeDetails()
+            val name2 = if (name == null) "" else name
+            val description2 = if (description == null) "" else description
 
-            return formatWithoutLabel(name, typeDetails)
+            return "| $name2 | $typeDetails | $description2 |"
         }
 
         override fun toString(): String {
@@ -102,11 +104,6 @@ open class FindJsonFilesTask : DefaultTask() {
             } else {
                 type.toString()
             }
-        }
-
-        private fun formatWithoutLabel(name: String?, typeDetails: String): String {
-            return if (name == null) "|  | $typeDetails |"
-            else "| $name | $typeDetails |"
         }
 
         private fun formatWithoutDescription(name: String?, label: String?, typeDetails: String): String {
@@ -210,16 +207,16 @@ open class FindJsonFilesTask : DefaultTask() {
                 """
 #### Properties
 
-|     Name     |     Type     |
-|:------------:|:------------:|
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
 ${properties?.joinToString("\n") { it.getOutputString() }}
 """
             } else if (!items.isNullOrEmpty()) {
                 """
 #### Properties
 
-|     Name     |     Type     |
-|:------------:|:------------:|
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
 ${items?.joinToString("\n") { it.getOutputString() }}
 """
             } else ""
@@ -447,7 +444,7 @@ ${properties?.joinToString("\n")}
         var type: String? = null
 
         override fun toString(): String {
-            val label = if(title == null) name else title;
+            val label = if (title == null) name else title;
             return """
 ### $label
 
