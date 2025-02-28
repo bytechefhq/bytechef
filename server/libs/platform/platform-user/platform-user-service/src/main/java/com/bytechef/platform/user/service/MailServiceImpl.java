@@ -24,12 +24,15 @@ import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import java.nio.charset.StandardCharsets;
 import java.util.Locale;
+import java.util.Properties;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.MessageSource;
+import org.springframework.core.env.Environment;
 import org.springframework.mail.MailException;
 import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
@@ -59,17 +62,39 @@ public class MailServiceImpl implements MailService {
     @SuppressFBWarnings("EI")
     public MailServiceImpl(
         JavaMailSender javaMailSender, ApplicationProperties applicationProperties, MessageSource messageSource,
-        SpringTemplateEngine templateEngine) {
+        SpringTemplateEngine templateEngine, Environment environment) {
 
         this.javaMailSender = javaMailSender;
         this.mail = applicationProperties.getMail();
         this.messageSource = messageSource;
         this.templateEngine = templateEngine;
 
+        log.info("Listing properties in spring active profiles...");
+        log.info("spring.mail.host: {}", mail.getHost());
+        log.info(
+            "spring.mail.protocol: {}",
+            environment.getProperty("spring.mail.protocol"));
+        log.info(
+            "spring.mail.properties.mail.smtp.auth: {}",
+            environment.getProperty("spring.mail.properties.mail.smtp.auth"));
+        log.info(
+            "spring.mail.properties.mail.smtp.starttls.enable: {}",
+            environment.getProperty("spring.mail.properties.mail.smtp.starttls.enable"));
+        log.info(
+            "spring.mail.properties.mail.smtp.starttls.required: {}",
+            environment.getProperty("spring.mail.properties.mail.smtp.starttls.required"));
+
+        Properties javaMailProperties = ((JavaMailSenderImpl) this.javaMailSender).getJavaMailProperties();
+
+        log.info("Listing properties in javaMailProperties...");
+
+        for (String key : javaMailProperties.stringPropertyNames()) {
+            log.info("{}: {}", key, javaMailProperties.getProperty(key));
+        }
+
         if (StringUtils.isBlank(mail.getHost()) && log.isWarnEnabled()) {
             log.warn("Mail server is not configured, not sending mail");
         }
-
     }
 
     @Override
