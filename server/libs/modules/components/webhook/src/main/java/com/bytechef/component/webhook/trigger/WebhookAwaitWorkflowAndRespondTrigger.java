@@ -20,6 +20,7 @@ import static com.bytechef.component.definition.ComponentDsl.integer;
 import static com.bytechef.component.definition.ComponentDsl.placeholder;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.ComponentDsl.trigger;
+import static com.bytechef.component.webhook.constant.WebhookConstants.BODY;
 import static com.bytechef.component.webhook.constant.WebhookConstants.CSRF_TOKEN;
 import static com.bytechef.component.webhook.constant.WebhookConstants.HEADERS;
 import static com.bytechef.component.webhook.constant.WebhookConstants.METHOD;
@@ -54,7 +55,7 @@ public class WebhookAwaitWorkflowAndRespondTrigger {
                 .description(
                     "The incoming request will time out after the specified number of milliseconds. The max wait " +
                         "time before a timeout is 5 minutes."))
-        .output(placeholder(Map.of(METHOD, "POST", HEADERS, Map.of(), PARAMETERS, Map.of())))
+        .output(placeholder(Map.of(METHOD, "POST", HEADERS, Map.of(), PARAMETERS, Map.of(), BODY, Map.of())))
         .webhookRequest(WebhookUtils::getWebhookResult)
         .webhookValidate(WebhookUtils::getWebhookValidate);
 }
