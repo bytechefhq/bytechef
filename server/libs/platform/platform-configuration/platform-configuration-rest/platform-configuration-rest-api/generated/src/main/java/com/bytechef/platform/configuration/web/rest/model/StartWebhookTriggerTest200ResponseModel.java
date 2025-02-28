@@ -17,33 +17,33 @@ import java.util.*;
 import jakarta.annotation.Generated;
 
 /**
- * SaveWorkflowTestConfigurationConnectionRequestModel
+ * StartWebhookTriggerTest200ResponseModel
  */
 
-@JsonTypeName("saveWorkflowTestConfigurationConnection_request")
+@JsonTypeName("startWebhookTriggerTest_200_response")
 @Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-02-27T19:58:17.697198+01:00[Europe/Zagreb]", comments = "Generator version: 7.11.0")
-public class SaveWorkflowTestConfigurationConnectionRequestModel {
+public class StartWebhookTriggerTest200ResponseModel {
 
-  private @Nullable Long connectionId;
+  private @Nullable String webhookUrl;
 
-  public SaveWorkflowTestConfigurationConnectionRequestModel connectionId(Long connectionId) {
-    this.connectionId = connectionId;
+  public StartWebhookTriggerTest200ResponseModel webhookUrl(String webhookUrl) {
+    this.webhookUrl = webhookUrl;
     return this;
   }
 
   /**
-   * Get connectionId
-   * @return connectionId
+   * The webhook URL.
+   * @return webhookUrl
    */
   
-  @Schema(name = "connectionId", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  @JsonProperty("connectionId")
-  public Long getConnectionId() {
-    return connectionId;
+  @Schema(name = "webhookUrl", description = "The webhook URL.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("webhookUrl")
+  public String getWebhookUrl() {
+    return webhookUrl;
   }
 
-  public void setConnectionId(Long connectionId) {
-    this.connectionId = connectionId;
+  public void setWebhookUrl(String webhookUrl) {
+    this.webhookUrl = webhookUrl;
   }
 
   @Override
@@ -54,20 +54,20 @@ public class SaveWorkflowTestConfigurationConnectionRequestModel {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    SaveWorkflowTestConfigurationConnectionRequestModel saveWorkflowTestConfigurationConnectionRequest = (SaveWorkflowTestConfigurationConnectionRequestModel) o;
-    return Objects.equals(this.connectionId, saveWorkflowTestConfigurationConnectionRequest.connectionId);
+    StartWebhookTriggerTest200ResponseModel startWebhookTriggerTest200Response = (StartWebhookTriggerTest200ResponseModel) o;
+    return Objects.equals(this.webhookUrl, startWebhookTriggerTest200Response.webhookUrl);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(connectionId);
+    return Objects.hash(webhookUrl);
   }
 
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    sb.append("class SaveWorkflowTestConfigurationConnectionRequestModel {\n");
-    sb.append("    connectionId: ").append(toIndentedString(connectionId)).append("\n");
+    sb.append("class StartWebhookTriggerTest200ResponseModel {\n");
+    sb.append("    webhookUrl: ").append(toIndentedString(webhookUrl)).append("\n");
     sb.append("}");
     return sb.toString();
   }
