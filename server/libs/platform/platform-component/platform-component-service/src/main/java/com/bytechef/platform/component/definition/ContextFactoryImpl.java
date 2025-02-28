@@ -64,8 +64,8 @@ class ContextFactoryImpl implements ContextFactory {
         boolean editorEnvironment) {
 
         return new ActionContextImpl(
-            componentName, componentVersion, actionName, type, jobPrincipalId, jobPrincipalWorkflowId, workflowId, jobId,
-            connection, publicUrl, getDataStorage(workflowId, editorEnvironment), eventPublisher,
+            componentName, componentVersion, actionName, type, jobPrincipalId, jobPrincipalWorkflowId, workflowId,
+            jobId, connection, publicUrl, getDataStorage(workflowId, editorEnvironment), eventPublisher,
             getFilesFileStorage(editorEnvironment), getHttpClientExecutor(editorEnvironment), editorEnvironment);
     }
 

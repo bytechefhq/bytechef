@@ -24,10 +24,9 @@ import com.bytechef.platform.component.trigger.TriggerOutput;
 import com.bytechef.platform.component.trigger.WebhookRequest;
 import com.bytechef.platform.constant.ModeType;
 import com.bytechef.platform.domain.OutputResponse;
-
-import javax.annotation.Nullable;
 import java.util.List;
 import java.util.Map;
+import javax.annotation.Nullable;
 
 /**
  * @author Ivica Cardic
@@ -36,7 +35,7 @@ public interface TriggerDefinitionFacade extends OperationDefinitionFacade {
 
     List<Property> executeDynamicProperties(
         String componentName, int componentVersion, String triggerName, String propertyName,
-        Map<String, ?> inputParameters, List<String> lookupDependsOnPaths, Long connectionId);
+        Map<String, ?> inputParameters, List<String> lookupDependsOnPaths, @Nullable Long connectionId);
 
     /**
      * Renews webhook subscription definition at provider side.
@@ -73,13 +72,13 @@ public interface TriggerDefinitionFacade extends OperationDefinitionFacade {
         @Nullable Long connectionId);
 
     TriggerOutput executeTrigger(
-        String componentName, int componentVersion, String triggerName, ModeType type, Long jobPrincipalId,
-        String workflowReferenceCode, Map<String, ?> inputParameters, Object triggerState,
-        WebhookRequest webhookRequest, @Nullable Long connectionId, boolean editorEnvironment);
+        String componentName, int componentVersion, String triggerName, @Nullable ModeType type,
+        @Nullable Long jobPrincipalId, @Nullable String workflowReferenceCode, Map<String, ?> inputParameters,
+        Object triggerState, WebhookRequest webhookRequest, @Nullable Long connectionId, boolean editorEnvironment);
 
     void executeWebhookDisable(
         String componentName, int componentVersion, String triggerName, Map<String, ?> inputParameters,
-        String workflowExecutionId, Map<String, ?> outputParameters, Long connectionId);
+        String workflowExecutionId, Map<String, ?> outputParameters, @Nullable Long connectionId);
 
     TriggerDefinition.WebhookEnableOutput executeWebhookEnable(
         String componentName, int componentVersion, String triggerName, Map<String, ?> inputParameters,

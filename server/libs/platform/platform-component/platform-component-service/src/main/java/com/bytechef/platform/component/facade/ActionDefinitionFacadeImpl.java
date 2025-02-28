@@ -141,7 +141,8 @@ public class ActionDefinitionFacadeImpl implements ActionDefinitionFacade {
             componentName, componentVersion, actionName, connectionIds);
 
         ActionContext actionContext = contextFactory.createActionContext(
-            componentName, componentVersion, actionName, type, jobPrincipalId, jobPrincipalWorkflowId, workflowId, jobId,
+            componentName, componentVersion, actionName, type, jobPrincipalId, jobPrincipalWorkflowId, workflowId,
+            jobId,
             executeFunctionData.componentConnection, editorEnvironment);
 
         if (executeFunctionData.singleConnectionPerform) {
@@ -152,7 +153,8 @@ public class ActionDefinitionFacadeImpl implements ActionDefinitionFacade {
                     componentName, componentVersion, actionName, inputParameters, componentConnection1,
                     actionContext1),
                 componentConnection1 -> contextFactory.createActionContext(
-                    componentName, componentVersion, actionName, type, jobPrincipalId, jobPrincipalWorkflowId, workflowId,
+                    componentName, componentVersion, actionName, type, jobPrincipalId, jobPrincipalWorkflowId,
+                    workflowId,
                     jobId,
                     componentConnection1, editorEnvironment));
         } else {
@@ -194,8 +196,7 @@ public class ActionDefinitionFacadeImpl implements ActionDefinitionFacade {
 
     @Override
     public String executeWorkflowNodeDescription(
-        String componentName, int componentVersion, String actionName,
-        Map<String, ?> inputParameters) {
+        String componentName, int componentVersion, String actionName, Map<String, ?> inputParameters) {
 
         return actionDefinitionService.executeWorkflowNodeDescription(
             componentName, componentVersion, actionName, inputParameters,
