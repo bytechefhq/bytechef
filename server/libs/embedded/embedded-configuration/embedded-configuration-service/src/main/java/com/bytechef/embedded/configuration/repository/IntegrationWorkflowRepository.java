@@ -43,12 +43,13 @@ public interface IntegrationWorkflowRepository extends ListCrudRepository<Integr
         SELECT integration_workflow.* FROM integration_workflow
         JOIN integration_instance_configuration ON integration_instance_configuration.integration_id = integration_workflow.integration_id
         AND integration_instance_configuration.integration_version = integration_workflow.integration_version
-        WHERE integration_workflow.workflow_id = :workflowId
-        AND integration_instance_configuration.id = :integrationInstanceConfigurationId
+        JOIN integration_instance ON integration_instance.integration_instance_configuration_id = integration_instance_configuration.id
+        WHERE integration_workflow.workflow_reference_code = :workflowReferenceCode
+        AND integration_instance.id = :integrationInstanceId
         """)
-    Optional<IntegrationWorkflow> findByIntegrationInstanceConfigurationIdWorkflowId(
-        @Param("integrationInstanceConfigurationId") long integrationInstanceConfigurationId,
-        @Param("workflowId") String workflowId);
+    Optional<IntegrationWorkflow> findByIntegrationInstanceIdAndWorkflowReferenceCode(
+        @Param("integrationInstanceId") long integrationInstanceId,
+        @Param("workflowReferenceCode") String workflowReferenceCode);
 
     @Query("""
         SELECT integration_workflow.* FROM integration_workflow
@@ -56,11 +57,12 @@ public interface IntegrationWorkflowRepository extends ListCrudRepository<Integr
         AND integration_instance_configuration.integration_version = integration_workflow.integration_version
         JOIN integration_instance ON integration_instance.integration_instance_configuration_id = integration_instance_configuration.id
         WHERE integration_workflow.workflow_reference_code = :workflowReferenceCode
-        AND integration_instance.id = :integrationInstanceId
+        AND integration_instance_configuration.environment = :environment
+        ORDER BY integration_workflow.integration_version DESC
+        LIMIT 1
         """)
-    Optional<IntegrationWorkflow> findByIntegrationInstanceIdWorkflowReferenceCode(
-        @Param("integrationInstanceId") long integrationInstanceId,
-        @Param("workflowReferenceCode") String workflowReferenceCode);
+    Optional<IntegrationWorkflow> findLatestByWorkflowReferenceCodeAndEnvironment(
+        @Param("workflowReferenceCode") String workflowReferenceCode, @Param("environment") int environment);
 
     Optional<IntegrationWorkflow> findLatestIntegrationWorkflowByWorkflowReferenceCode(String workflowReferenceCode);
 }

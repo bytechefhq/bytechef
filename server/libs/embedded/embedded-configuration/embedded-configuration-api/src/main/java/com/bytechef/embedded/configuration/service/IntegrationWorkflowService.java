@@ -17,6 +17,7 @@
 package com.bytechef.embedded.configuration.service;
 
 import com.bytechef.embedded.configuration.domain.IntegrationWorkflow;
+import com.bytechef.platform.constant.Environment;
 import java.util.List;
 
 /**
@@ -35,9 +36,6 @@ public interface IntegrationWorkflowService {
 
     IntegrationWorkflow getIntegrationWorkflow(long id);
 
-    String getIntegrationInstanceIntegrationWorkflowWorkflowId(
-        long integrationInstanceId, String workflowReferenceCode);
-
     List<Long> getIntegrationWorkflowIds(long integrationId, int integrationVersion);
 
     List<IntegrationWorkflow> getIntegrationWorkflows();
@@ -46,12 +44,15 @@ public interface IntegrationWorkflowService {
 
     List<IntegrationWorkflow> getIntegrationWorkflows(long integrationId, int integrationVersion);
 
-    String getLatestIntegrationWorkflowId(String workflowReferenceCode);
+    String getLatestWorkflowId(String workflowReferenceCode);
+
+    String getLatestWorkflowId(String workflowReferenceCode, Environment environment);
+
+    String getWorkflowId(long integrationInstanceId, String workflowReferenceCode);
 
     List<String> getWorkflowIds(long integrationId, int integrationVersion);
 
     IntegrationWorkflow getWorkflowIntegrationWorkflow(String workflowId);
 
     IntegrationWorkflow update(IntegrationWorkflow integrationWorkflow);
-
 }

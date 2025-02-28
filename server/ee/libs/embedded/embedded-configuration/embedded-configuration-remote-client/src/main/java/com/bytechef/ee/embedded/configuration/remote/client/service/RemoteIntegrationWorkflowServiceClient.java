@@ -9,6 +9,7 @@ package com.bytechef.ee.embedded.configuration.remote.client.service;
 
 import com.bytechef.embedded.configuration.domain.IntegrationWorkflow;
 import com.bytechef.embedded.configuration.service.IntegrationWorkflowService;
+import com.bytechef.platform.constant.Environment;
 import java.util.List;
 import org.springframework.stereotype.Component;
 
@@ -43,7 +44,7 @@ public class RemoteIntegrationWorkflowServiceClient implements IntegrationWorkfl
     }
 
     @Override
-    public String getIntegrationInstanceIntegrationWorkflowWorkflowId(
+    public String getWorkflowId(
         long integrationInstanceId, String workflowReferenceCode) {
 
         throw new UnsupportedOperationException();
@@ -70,7 +71,12 @@ public class RemoteIntegrationWorkflowServiceClient implements IntegrationWorkfl
     }
 
     @Override
-    public String getLatestIntegrationWorkflowId(String workflowReferenceCode) {
+    public String getLatestWorkflowId(String workflowReferenceCode) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public String getLatestWorkflowId(String workflowReferenceCode, Environment environment) {
         throw new UnsupportedOperationException();
     }
 
