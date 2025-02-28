@@ -20,7 +20,7 @@ import com.fasterxml.jackson.annotation.JsonValue;
  * Gets or Sets lifecycle_stage
  */
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-02-27T19:58:17.361773+01:00[Europe/Zagreb]", comments = "Generator version: 7.11.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-02-28T09:51:58.381998+01:00[Europe/Zagreb]", comments = "Generator version: 7.11.0")
 public enum LifecycleStageModel {
   
   SUBSCRIBER("SUBSCRIBER"),
