@@ -120,6 +120,7 @@ spring:
     username: ${bytechef.datasource.username}
     password: ${bytechef.datasource.password}
     hikari:
+      connection-test-query: SELECT 1
       poolName: Hikari
   h2:
     console:
