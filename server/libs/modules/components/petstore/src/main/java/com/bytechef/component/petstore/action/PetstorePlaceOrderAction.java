@@ -16,9 +16,15 @@
 
 package com.bytechef.component.petstore.action;
 
+import static com.bytechef.component.OpenApiComponentHandler.PropertyType;
 import static com.bytechef.component.definition.ComponentDsl.action;
+import static com.bytechef.component.definition.ComponentDsl.bool;
+import static com.bytechef.component.definition.ComponentDsl.dateTime;
+import static com.bytechef.component.definition.ComponentDsl.integer;
 import static com.bytechef.component.definition.ComponentDsl.object;
+import static com.bytechef.component.definition.ComponentDsl.option;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
+import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.Context.Http.BodyContentType;
 import static com.bytechef.component.definition.Context.Http.ResponseType;
 
@@ -41,8 +47,42 @@ public class PetstorePlaceOrderAction {
                 "path", "/store/order", "bodyContentType", BodyContentType.JSON, "mimeType", "application/json"
 
             ))
-        .properties(object("order").properties(PetstoreOrderProperties.PROPERTIES)
-            .label("Order"))
+        .properties(integer("id").metadata(
+            Map.of(
+                "type", PropertyType.BODY))
+            .label("Id")
+            .required(false)
+            .exampleValue(10),
+            integer("petId").metadata(
+                Map.of(
+                    "type", PropertyType.BODY))
+                .label("Pet Id")
+                .required(false)
+                .exampleValue(198772),
+            integer("quantity").metadata(
+                Map.of(
+                    "type", PropertyType.BODY))
+                .label("Quantity")
+                .required(false)
+                .exampleValue(7),
+            dateTime("shipDate").metadata(
+                Map.of(
+                    "type", PropertyType.BODY))
+                .label("Ship Date")
+                .required(false),
+            string("status").metadata(
+                Map.of(
+                    "type", PropertyType.BODY))
+                .label("Status")
+                .description("Order Status")
+                .options(option("Placed", "placed"), option("Approved", "approved"), option("Delivered", "delivered"))
+                .required(false)
+                .exampleValue("approved"),
+            bool("complete").metadata(
+                Map.of(
+                    "type", PropertyType.BODY))
+                .label("Complete")
+                .required(false))
         .output(outputSchema(object().properties(PetstoreOrderProperties.PROPERTIES)
             .metadata(
                 Map.of(

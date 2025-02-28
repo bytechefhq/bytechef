@@ -16,9 +16,12 @@
 
 package com.bytechef.component.petstore.action;
 
+import static com.bytechef.component.OpenApiComponentHandler.PropertyType;
 import static com.bytechef.component.definition.ComponentDsl.action;
+import static com.bytechef.component.definition.ComponentDsl.integer;
 import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
+import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.Context.Http.BodyContentType;
 import static com.bytechef.component.definition.Context.Http.ResponseType;
 
@@ -41,8 +44,55 @@ public class PetstoreCreateUserAction {
                 "path", "/user", "bodyContentType", BodyContentType.JSON, "mimeType", "application/json"
 
             ))
-        .properties(object("user").properties(PetstoreUserProperties.PROPERTIES)
-            .label("User"))
+        .properties(integer("id").metadata(
+            Map.of(
+                "type", PropertyType.BODY))
+            .label("Id")
+            .required(false)
+            .exampleValue(10),
+            string("username").metadata(
+                Map.of(
+                    "type", PropertyType.BODY))
+                .label("Username")
+                .required(false)
+                .exampleValue("theUser"),
+            string("firstName").metadata(
+                Map.of(
+                    "type", PropertyType.BODY))
+                .label("First Name")
+                .required(false)
+                .exampleValue("John"),
+            string("lastName").metadata(
+                Map.of(
+                    "type", PropertyType.BODY))
+                .label("Last Name")
+                .required(false)
+                .exampleValue("James"),
+            string("email").metadata(
+                Map.of(
+                    "type", PropertyType.BODY))
+                .label("Email")
+                .required(false)
+                .exampleValue("john@email.com"),
+            string("password").metadata(
+                Map.of(
+                    "type", PropertyType.BODY))
+                .label("Password")
+                .required(false)
+                .exampleValue("12345"),
+            string("phone").metadata(
+                Map.of(
+                    "type", PropertyType.BODY))
+                .label("Phone")
+                .required(false)
+                .exampleValue("12345"),
+            integer("userStatus").metadata(
+                Map.of(
+                    "type", PropertyType.BODY))
+                .label("User Status")
+                .description("User Status")
+                .required(false)
+                .exampleValue(1))
         .output(outputSchema(object().properties(PetstoreUserProperties.PROPERTIES)
             .metadata(
                 Map.of(

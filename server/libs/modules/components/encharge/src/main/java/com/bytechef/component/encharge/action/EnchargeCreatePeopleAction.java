@@ -43,7 +43,7 @@ public class EnchargeCreatePeopleAction {
                 "path", "/people", "bodyContentType", BodyContentType.JSON, "mimeType", "application/json"
 
             ))
-        .properties(array("__items").items(object().properties(string("email").label("Email")
+        .properties(array("people").items(object().properties(string("email").label("Email")
             .description("The person's email address.")
             .required(true),
             string("firstName").label("First Name")
@@ -61,7 +61,7 @@ public class EnchargeCreatePeopleAction {
             string("phone").label("Phone")
                 .description("The person's phone number")
                 .required(false)))
-            .placeholder("Add to Items")
+            .placeholder("Add to People")
             .metadata(
                 Map.of(
                     "type", PropertyType.BODY))
