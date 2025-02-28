@@ -24,7 +24,6 @@ import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import java.nio.charset.StandardCharsets;
 import java.util.Locale;
-import java.util.Properties;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,7 +31,6 @@ import org.springframework.context.MessageSource;
 import org.springframework.core.env.Environment;
 import org.springframework.mail.MailException;
 import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
@@ -50,6 +48,13 @@ import org.thymeleaf.spring6.SpringTemplateEngine;
 public class MailServiceImpl implements MailService {
 
     private final Logger log = LoggerFactory.getLogger(MailServiceImpl.class);
+
+    private static final String[] PROPERTY_NAMES = {
+        "spring.mail.host", "spring.mail.port", "spring.mail.protocol", "spring.mail.ssl.enabled",
+        "spring.mail.properties.mail.debug", "spring.mail.properties.mail.smtp.auth",
+        "spring.mail.properties.mail.smtp.starttls.enable", "spring.mail.properties.mail.transport.protocol",
+        "spring.mail.properties.mail.smtp.starttls.required"
+    };
 
     private static final String USER = "user";
     private static final String BASE_URL = "baseUrl";
@@ -69,31 +74,14 @@ public class MailServiceImpl implements MailService {
         this.messageSource = messageSource;
         this.templateEngine = templateEngine;
 
-        log.info("Listing properties in spring active profiles...");
-        log.info("spring.mail.host: {}", mail.getHost());
-        log.info(
-            "spring.mail.protocol: {}",
-            environment.getProperty("spring.mail.protocol"));
-        log.info(
-            "spring.mail.properties.mail.smtp.auth: {}",
-            environment.getProperty("spring.mail.properties.mail.smtp.auth"));
-        log.info(
-            "spring.mail.properties.mail.smtp.starttls.enable: {}",
-            environment.getProperty("spring.mail.properties.mail.smtp.starttls.enable"));
-        log.info(
-            "spring.mail.properties.mail.smtp.starttls.required: {}",
-            environment.getProperty("spring.mail.properties.mail.smtp.starttls.required"));
-
-        Properties javaMailProperties = ((JavaMailSenderImpl) this.javaMailSender).getJavaMailProperties();
-
-        log.info("Listing properties in javaMailProperties...");
-
-        for (String key : javaMailProperties.stringPropertyNames()) {
-            log.info("{}: {}", key, javaMailProperties.getProperty(key));
-        }
-
         if (StringUtils.isBlank(mail.getHost()) && log.isWarnEnabled()) {
-            log.warn("Mail server is not configured, not sending mail");
+            log.warn("Mail server is not configured, not sending mails");
+        } else {
+            log.info("Listing mail server properties:");
+
+            for (String propertyName : PROPERTY_NAMES) {
+                log.info("{}: {}", propertyName, environment.getProperty(propertyName));
+            }
         }
     }
 
