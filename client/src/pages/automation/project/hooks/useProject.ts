@@ -1,5 +1,6 @@
 import {Type} from '@/pages/automation/projects/Projects';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
+import useDataPillPanelStore from '@/pages/platform/workflow-editor/stores/useDataPillPanelStore';
 import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWorkflowDataStore';
 import useWorkflowEditorStore from '@/pages/platform/workflow-editor/stores/useWorkflowEditorStore';
 import useWorkflowNodeDetailsPanelStore from '@/pages/platform/workflow-editor/stores/useWorkflowNodeDetailsPanelStore';
@@ -27,6 +28,7 @@ export const useProject = () => {
     const {setWorkflow, workflow} = useWorkflowDataStore();
 
     const {setCopilotPanelOpen} = useCopilotStore();
+    const {setDataPillPanelOpen} = useDataPillPanelStore();
     const {setShowBottomPanelOpen, setShowEditWorkflowDialog} = useWorkflowEditorStore();
     const {setWorkflowNodeDetailsPanelOpen} = useWorkflowNodeDetailsPanelStore();
     const {setWorkflowTestChatPanelOpen} = useWorkflowTestChatStore();
@@ -142,6 +144,7 @@ export const useProject = () => {
     }, []);
 
     useEffect(() => {
+        setDataPillPanelOpen(false);
         setWorkflowNodeDetailsPanelOpen(false);
         setWorkflowTestChatPanelOpen(false);
 
