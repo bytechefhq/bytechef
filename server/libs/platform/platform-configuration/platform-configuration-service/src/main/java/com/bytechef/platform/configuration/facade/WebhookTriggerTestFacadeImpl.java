@@ -86,10 +86,6 @@ public class WebhookTriggerTestFacadeImpl implements WebhookTriggerTestFacade {
     @Override
     public String enableTrigger(String workflowId, ModeType type) {
         try {
-            WorkflowTrigger workflowTrigger = getWorkflowTrigger(workflowId);
-
-            workflowNodeTestOutputService.deleteWorkflowNodeTestOutput(workflowId, workflowTrigger.getName());
-
             executeTrigger(workflowId, type, false);
         } catch (Exception e) {
             if (log.isTraceEnabled()) {

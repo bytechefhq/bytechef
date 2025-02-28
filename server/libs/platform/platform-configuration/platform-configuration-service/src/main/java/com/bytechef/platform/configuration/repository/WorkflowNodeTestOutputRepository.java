@@ -17,6 +17,7 @@
 package com.bytechef.platform.configuration.repository;
 
 import com.bytechef.platform.configuration.domain.WorkflowNodeTestOutput;
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.data.jdbc.repository.query.Modifying;
@@ -31,6 +32,11 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface WorkflowNodeTestOutputRepository
     extends ListCrudRepository<WorkflowNodeTestOutput, Long> {
+
+    boolean existsByWorkflowIdAndWorkflowNodeName(String workflowId, String workflowNodeName);
+
+    boolean existsByWorkflowIdAndWorkflowNodeNameAndLastModifiedDateAfter(
+        String workflowId, String workflowNodeName, Instant lastModifiedDate);
 
     List<WorkflowNodeTestOutput> findByWorkflowId(String workflowId);
 
