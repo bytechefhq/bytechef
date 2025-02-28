@@ -549,6 +549,7 @@ const WorkflowNodeDetailsPanel = ({
             updatedNode = {
                 ...updatedNode,
                 operationName: currentOperationName,
+                triggerType: currentTriggerDefinition?.type,
                 type: `${currentComponent?.componentName}/v${currentComponentDefinition?.version}/${currentOperationName}`,
             };
         }
@@ -574,6 +575,7 @@ const WorkflowNodeDetailsPanel = ({
         currentComponentDefinition?.version,
         currentWorkflowNodeConnections,
         workflowTestConfigurationConnections,
+        currentTriggerDefinition,
     ]);
 
     // Set currentOperationName depending on the currentComponentAction.operationName
@@ -819,7 +821,11 @@ const WorkflowNodeDetailsPanel = ({
                                             }
                                             currentNode={currentNode}
                                             key={`${currentNode?.workflowNodeName}_output`}
-                                            outputDefined={currentActionDefinition?.outputDefined ?? false}
+                                            outputDefined={
+                                                (currentActionDefinition?.outputDefined ||
+                                                    currentTriggerDefinition?.outputDefined) ??
+                                                false
+                                            }
                                             workflowId={workflow.id!}
                                         />
                                     )}

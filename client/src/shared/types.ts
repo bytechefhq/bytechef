@@ -21,6 +21,7 @@ import {
     TaskProperty,
     TimeProperty,
     TriggerDefinition,
+    TriggerType,
     ValueProperty,
 } from '@/shared/middleware/platform/configuration';
 import {UseMutationResult} from '@tanstack/react-query';
@@ -144,6 +145,7 @@ export type NodeDataType = {
     title?: string;
     trigger?: boolean;
     type?: string;
+    triggerType?: TriggerType;
     version?: number;
     workflowNodeName: string;
 };
