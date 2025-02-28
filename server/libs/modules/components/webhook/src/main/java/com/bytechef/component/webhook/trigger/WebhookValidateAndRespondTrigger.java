@@ -19,6 +19,7 @@ package com.bytechef.component.webhook.trigger;
 import static com.bytechef.component.definition.ComponentDsl.placeholder;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.ComponentDsl.trigger;
+import static com.bytechef.component.webhook.constant.WebhookConstants.BODY;
 import static com.bytechef.component.webhook.constant.WebhookConstants.CSRF_TOKEN;
 import static com.bytechef.component.webhook.constant.WebhookConstants.HEADERS;
 import static com.bytechef.component.webhook.constant.WebhookConstants.METHOD;
@@ -47,7 +48,7 @@ public class WebhookValidateAndRespondTrigger {
                     "To trigger the workflow successfully, the security token must match the X-Csrf-Token HTTP " +
                         "header value passed by the client.")
                 .required(true))
-        .output(placeholder(Map.of(METHOD, "POST", HEADERS, Map.of(), PARAMETERS, Map.of())))
+        .output(placeholder(Map.of(METHOD, "POST", HEADERS, Map.of(), PARAMETERS, Map.of(), BODY, Map.of())))
         .webhookRequest(WebhookUtils::getWebhookResult)
         .webhookValidate(WebhookUtils::getWebhookValidate);
 }
