@@ -15,12 +15,20 @@
 
 import * as runtime from '../runtime';
 import type {
+  CheckWorkflowNodeTestOutputExists200Response,
   WorkflowNodeTestOutput,
 } from '../models/index';
 import {
+    CheckWorkflowNodeTestOutputExists200ResponseFromJSON,
+    CheckWorkflowNodeTestOutputExists200ResponseToJSON,
     WorkflowNodeTestOutputFromJSON,
     WorkflowNodeTestOutputToJSON,
 } from '../models/index';
+
+export interface CheckWorkflowNodeTestOutputExistsRequest {
+    id: string;
+    workflowNodeName: string;
+}
 
 export interface DeleteWorkflowNodeTestOutputRequest {
     id: string;
@@ -42,6 +50,48 @@ export interface UploadWorkflowNodeSampleOutputRequest {
  * 
  */
 export class WorkflowNodeTestOutputApi extends runtime.BaseAPI {
+
+    /**
+     * Check if a workflow node test output exists.
+     * Check if a workflow node test output exists
+     */
+    async checkWorkflowNodeTestOutputExistsRaw(requestParameters: CheckWorkflowNodeTestOutputExistsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<CheckWorkflowNodeTestOutputExists200Response>> {
+        if (requestParameters['id'] == null) {
+            throw new runtime.RequiredError(
+                'id',
+                'Required parameter "id" was null or undefined when calling checkWorkflowNodeTestOutputExists().'
+            );
+        }
+
+        if (requestParameters['workflowNodeName'] == null) {
+            throw new runtime.RequiredError(
+                'workflowNodeName',
+                'Required parameter "workflowNodeName" was null or undefined when calling checkWorkflowNodeTestOutputExists().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        const response = await this.request({
+            path: `/workflows/{id}/test-outputs/{workflowNodeName}/exists`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id']))).replace(`{${"workflowNodeName"}}`, encodeURIComponent(String(requestParameters['workflowNodeName']))),
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => CheckWorkflowNodeTestOutputExists200ResponseFromJSON(jsonValue));
+    }
+
+    /**
+     * Check if a workflow node test output exists.
+     * Check if a workflow node test output exists
+     */
+    async checkWorkflowNodeTestOutputExists(requestParameters: CheckWorkflowNodeTestOutputExistsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<CheckWorkflowNodeTestOutputExists200Response> {
+        const response = await this.checkWorkflowNodeTestOutputExistsRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
 
     /**
      * Delete existing workflow node test output.
