@@ -32,9 +32,9 @@ public interface ProjectWorkflowService {
 
     void delete(long projectId, int projectVersion, String workflowId);
 
-    ProjectWorkflow getProjectDeploymentProjectWorkflow(long id);
+    String getLatestWorkflowId(String workflowReferenceCode);
 
-    String getProjectDeploymentProjectWorkflowWorkflowId(long projectDeploymentId, String workflowReferenceCode);
+    ProjectWorkflow getProjectDeploymentProjectWorkflow(long id);
 
     List<Long> getProjectWorkflowIds(long projectId, int projectVersion);
 
@@ -43,6 +43,8 @@ public interface ProjectWorkflowService {
     List<ProjectWorkflow> getProjectWorkflows(long projectId);
 
     List<ProjectWorkflow> getProjectWorkflows(long projectId, int projectVersion);
+
+    String getWorkflowId(long projectDeploymentId, String workflowReferenceCode);
 
     List<String> getWorkflowIds(long projectId);
 
