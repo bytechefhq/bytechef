@@ -33,8 +33,9 @@ public class PushoverComponentHandler implements ComponentHandler {
 
     private static final ComponentDefinition COMPONENT_DEFINITION = component("pushover")
         .title("Pushover")
-        .description("Pushover is a notification service that sends real-time alerts to mobile and desktop devices, " +
-            "integrating with apps, scripts, and services.")
+        .description(
+            "Pushover is a notification service that sends real-time alerts to mobile and desktop devices, " +
+                "integrating with apps, scripts, and services.")
         .icon("path:assets/pushover.svg")
         .categories(ComponentCategory.COMMUNICATION)
         .connection(PushoverConnection.CONNECTION_DEFINITION)

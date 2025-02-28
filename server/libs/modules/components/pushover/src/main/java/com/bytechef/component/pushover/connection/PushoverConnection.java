@@ -34,10 +34,11 @@ public class PushoverConnection {
         .baseUri((connectionParameters, context) -> "https://api.pushover.net/1")
         .authorizations(
             authorization(AuthorizationType.CUSTOM)
-                .properties(string(TOKEN)
-                    .label("Applications API Token")
-                    .description("Applications API Token can be found in your applications dashboard.")
-                    .required(true),
+                .properties(
+                    string(TOKEN)
+                        .label("Applications API Token")
+                        .description("Applications API Token can be found in your applications dashboard.")
+                        .required(true),
                     string(USER)
                         .label("User Key")
                         .description("User Key can be found in main dashboard.")
