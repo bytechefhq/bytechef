@@ -4,6 +4,7 @@ apis/ConnectionDefinitionApi.ts
 apis/Oauth2Api.ts
 apis/TaskDispatcherDefinitionApi.ts
 apis/TriggerDefinitionApi.ts
+apis/WebhookTriggerTestApi.ts
 apis/WorkflowNodeDescriptionApi.ts
 apis/WorkflowNodeDynamicPropertiesApi.ts
 apis/WorkflowNodeOptionApi.ts
@@ -20,6 +21,7 @@ models/ArrayProperty.ts
 models/Authorization.ts
 models/AuthorizationType.ts
 models/BooleanProperty.ts
+models/CheckWorkflowNodeTestOutputExists200Response.ts
 models/ComponentCategory.ts
 models/ComponentConnection.ts
 models/ComponentDefinition.ts
@@ -54,6 +56,7 @@ models/Resources.ts
 models/SaveWorkflowTestConfigurationConnectionRequest.ts
 models/SaveWorkflowTestConfigurationInputsRequest.ts
 models/ScriptTestExecution.ts
+models/StartWebhookTriggerTest200Response.ts
 models/StringProperty.ts
 models/TaskDispatcherDefinition.ts
 models/TaskDispatcherDefinitionBasic.ts
