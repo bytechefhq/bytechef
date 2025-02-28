@@ -64,7 +64,8 @@ class ActionContextImpl extends ContextImpl implements ActionContext, ActionCont
         }
 
         this.data = new DataImpl(
-            componentName, componentVersion, actionName, type, jobPrincipalId, jobPrincipalWorkflowId, jobId, dataStorage);
+            componentName, componentVersion, actionName, type, jobPrincipalId, jobPrincipalWorkflowId, jobId,
+            dataStorage);
         this.editorEnvironment = editorEnvironment;
         this.event = jobId == null ? progress -> {} : new EventImpl(eventPublisher, jobId);
         this.jobPrincipalId = jobPrincipalId;

@@ -21,6 +21,7 @@ import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.TriggerContext;
 import com.bytechef.platform.component.domain.ComponentConnection;
 import com.bytechef.platform.constant.ModeType;
+import javax.annotation.Nullable;
 
 /**
  * @author Ivica Cardic
@@ -28,13 +29,14 @@ import com.bytechef.platform.constant.ModeType;
 public interface ContextFactory {
 
     ActionContext createActionContext(
-        String componentName, int componentVersion, String actionName, ModeType type, Long jobPrincipalId,
-        Long jobPrincipalWorkflowId, String workflowId, Long jobId, ComponentConnection connection,
-        boolean editorEnvironment);
+        String componentName, int componentVersion, String actionName, @Nullable ModeType type,
+        @Nullable Long jobPrincipalId, @Nullable Long jobPrincipalWorkflowId, @Nullable String workflowId,
+        @Nullable Long jobId, @Nullable ComponentConnection connection, boolean editorEnvironment);
 
     Context createContext(String componentName, ComponentConnection connection);
 
     TriggerContext createTriggerContext(
-        String componentName, int componentVersion, String triggerName, ModeType type, Long jobPrincipalId,
-        String workflowReferenceCode, ComponentConnection connection, boolean editorEnvironment);
+        String componentName, int componentVersion, String triggerName, @Nullable ModeType type,
+        @Nullable Long jobPrincipalId, @Nullable String workflowReferenceCode, @Nullable ComponentConnection connection,
+        boolean editorEnvironment);
 }

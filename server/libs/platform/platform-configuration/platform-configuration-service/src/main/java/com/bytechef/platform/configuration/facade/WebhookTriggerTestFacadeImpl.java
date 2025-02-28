@@ -22,6 +22,7 @@ import com.bytechef.config.ApplicationProperties;
 import com.bytechef.platform.component.domain.TriggerDefinition;
 import com.bytechef.platform.component.facade.TriggerDefinitionFacade;
 import com.bytechef.platform.component.service.TriggerDefinitionService;
+import com.bytechef.platform.component.trigger.WebhookRequest;
 import com.bytechef.platform.configuration.accessor.JobPrincipalAccessor;
 import com.bytechef.platform.configuration.accessor.JobPrincipalAccessorRegistry;
 import com.bytechef.platform.configuration.domain.WorkflowTrigger;
@@ -48,12 +49,14 @@ public class WebhookTriggerTestFacadeImpl implements WebhookTriggerTestFacade {
     private final TriggerDefinitionService triggerDefinitionService;
     private final WorkflowService workflowService;
     private final WorkflowTestConfigurationService workflowTestConfigurationService;
+    private final WorkflowNodeTestOutputFacade workflowNodeTestOutputFacade;
 
     public WebhookTriggerTestFacadeImpl(
         ApplicationProperties applicationProperties,
         JobPrincipalAccessorRegistry jobPrincipalAccessorRegistry, TriggerDefinitionFacade triggerDefinitionFacade,
         TriggerDefinitionService triggerDefinitionService, WorkflowService workflowService,
-        WorkflowTestConfigurationService workflowTestConfigurationService) {
+        WorkflowTestConfigurationService workflowTestConfigurationService,
+        WorkflowNodeTestOutputFacade workflowNodeTestOutputFacade) {
 
         this.jobPrincipalAccessorRegistry = jobPrincipalAccessorRegistry;
         this.publicUrl = applicationProperties.getPublicUrl();
@@ -61,6 +64,7 @@ public class WebhookTriggerTestFacadeImpl implements WebhookTriggerTestFacade {
         this.triggerDefinitionService = triggerDefinitionService;
         this.workflowService = workflowService;
         this.workflowTestConfigurationService = workflowTestConfigurationService;
+        this.workflowNodeTestOutputFacade = workflowNodeTestOutputFacade;
     }
 
     @Override
@@ -79,6 +83,11 @@ public class WebhookTriggerTestFacadeImpl implements WebhookTriggerTestFacade {
         }
 
         return executeTrigger(true, workflowId, type);
+    }
+
+    @Override
+    public void saveTestOutput(WorkflowExecutionId workflowExecutionId, WebhookRequest webhookRequest) {
+
     }
 
     @Override

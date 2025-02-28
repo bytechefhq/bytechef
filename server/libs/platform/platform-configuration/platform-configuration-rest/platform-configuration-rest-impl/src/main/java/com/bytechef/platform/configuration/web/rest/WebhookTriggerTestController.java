@@ -23,7 +23,6 @@ import com.bytechef.platform.component.service.TriggerDefinitionService;
 import com.bytechef.platform.component.trigger.WebhookRequest;
 import com.bytechef.platform.configuration.accessor.JobPrincipalAccessorRegistry;
 import com.bytechef.platform.configuration.facade.WebhookTriggerTestFacade;
-import com.bytechef.platform.configuration.facade.WorkflowNodeTestOutputFacade;
 import com.bytechef.platform.configuration.web.file.storage.TempFilesFileStorage;
 import com.bytechef.platform.webhook.rest.AbstractWebhookTriggerController;
 import com.bytechef.platform.workflow.execution.WorkflowExecutionId;
@@ -42,16 +41,14 @@ import org.springframework.web.bind.annotation.RestController;
 public class WebhookTriggerTestController extends AbstractWebhookTriggerController {
 
     private final WebhookTriggerTestFacade webhookTriggerTestFacade;
-    private final WorkflowNodeTestOutputFacade workflowNodeTestOutputFacade;
 
     public WebhookTriggerTestController(
         TriggerDefinitionService triggerDefinitionService, JobPrincipalAccessorRegistry jobPrincipalAccessorRegistry,
-        WebhookTriggerTestFacade webhookTriggerTestFacade, WorkflowService workflowService, WorkflowNodeTestOutputFacade workflowNodeTestOutputFacade) {
+        WebhookTriggerTestFacade webhookTriggerTestFacade, WorkflowService workflowService) {
 
         super(new TempFilesFileStorage(), jobPrincipalAccessorRegistry, triggerDefinitionService, workflowService);
 
         this.webhookTriggerTestFacade = webhookTriggerTestFacade;
-        this.workflowNodeTestOutputFacade = workflowNodeTestOutputFacade;
     }
 
     @RequestMapping(
@@ -69,7 +66,7 @@ public class WebhookTriggerTestController extends AbstractWebhookTriggerControll
         try {
             WebhookRequest webhookRequest = getWebhookRequest(httpServletRequest, webhookTriggerFlags);
 
-            //workflowNodeTestOutputFacade.saveWorkflowNodeTestOutput()
+            webhookTriggerTestFacade.saveTestOutput(workflowExecutionId, webhookRequest);
 
             return ResponseEntity.noContent()
                 .build();
