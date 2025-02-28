@@ -16,6 +16,8 @@
 
 package com.bytechef.component.google.mail.trigger;
 
+import static com.bytechef.component.google.mail.constant.GoogleMailConstants.FORMAT;
+import static com.bytechef.component.google.mail.constant.GoogleMailConstants.FULL;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.HISTORY_ID;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.ME;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.TOPIC_NAME;
@@ -92,7 +94,7 @@ class GoogleMailNewEmailTriggerTest {
         mockedGoogleServices.when(() -> GoogleServices.getMail(parametersArgumentCaptor.capture()))
             .thenReturn(mockedGmail);
 
-        parameters = MockParametersFactory.create(Map.of(TOPIC_NAME, "topic"));
+        parameters = MockParametersFactory.create(Map.of(TOPIC_NAME, "topic", FORMAT, FULL));
     }
 
     @AfterEach
@@ -168,6 +170,8 @@ class GoogleMailNewEmailTriggerTest {
             .thenReturn(mockedMessages);
         when(mockedMessages.get(stringArgumentCaptor.capture(), stringArgumentCaptor.capture()))
             .thenReturn(mockedGet);
+        when(mockedGet.setFormat(stringArgumentCaptor.capture()))
+            .thenReturn(mockedGet);
         when(mockedGet.execute())
             .thenReturn(message);
 
@@ -177,7 +181,7 @@ class GoogleMailNewEmailTriggerTest {
 
         assertEquals(List.of(message), messages);
 
-        assertEquals(List.of(ME, ME, "2"), stringArgumentCaptor.getAllValues());
+        assertEquals(List.of(ME, ME, "2", FULL), stringArgumentCaptor.getAllValues());
         assertEquals(new BigInteger("123"), bigIntegerArgumentCaptor.getValue());
     }
 }

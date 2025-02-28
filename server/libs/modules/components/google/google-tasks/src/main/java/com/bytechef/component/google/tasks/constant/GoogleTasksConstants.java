@@ -36,10 +36,14 @@ public class GoogleTasksConstants {
     public static final ModifiableObjectProperty TASK_OUTPUT_PROPERTY =
         object()
             .properties(
-                string("id"),
-                string(TITLE),
-                string(NOTES),
-                string(STATUS));
+                string("id")
+                    .description("Task identifier."),
+                string(TITLE)
+                    .description("Title of the task."),
+                string(NOTES)
+                    .description("Notes describing the task."),
+                string(STATUS)
+                    .description("Status of the task."));
 
     private GoogleTasksConstants() {
     }

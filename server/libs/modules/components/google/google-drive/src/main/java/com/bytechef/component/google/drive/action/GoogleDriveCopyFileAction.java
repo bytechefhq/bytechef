@@ -17,13 +17,10 @@
 package com.bytechef.component.google.drive.action;
 
 import static com.bytechef.component.definition.ComponentDsl.action;
-import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.google.drive.constant.GoogleDriveConstants.APPLICATION_VND_GOOGLE_APPS_FOLDER;
-import static com.bytechef.component.google.drive.constant.GoogleDriveConstants.ID;
-import static com.bytechef.component.google.drive.constant.GoogleDriveConstants.MIME_TYPE;
-import static com.bytechef.component.google.drive.constant.GoogleDriveConstants.NAME;
+import static com.bytechef.component.google.drive.constant.GoogleDriveConstants.GOOGLE_FILE_OUTPUT_PROPERTY;
 import static com.bytechef.google.commons.constant.GoogleCommonsContants.FILE_ID;
 import static com.bytechef.google.commons.constant.GoogleCommonsContants.FILE_NAME;
 import static com.bytechef.google.commons.constant.GoogleCommonsContants.FOLDER_ID;
@@ -58,14 +55,7 @@ public class GoogleDriveCopyFileAction {
                 .description("The ID of the folder where the copied file will be stored.")
                 .options(GoogleUtils.getFileOptionsByMimeType(APPLICATION_VND_GOOGLE_APPS_FOLDER, true))
                 .required(true))
-        .output(
-            outputSchema(
-                object()
-                    .properties(
-                        string(ID),
-                        string("kind"),
-                        string(MIME_TYPE),
-                        string(NAME))))
+        .output(outputSchema(GOOGLE_FILE_OUTPUT_PROPERTY))
         .perform(GoogleDriveCopyFileAction::perform);
 
     private GoogleDriveCopyFileAction() {

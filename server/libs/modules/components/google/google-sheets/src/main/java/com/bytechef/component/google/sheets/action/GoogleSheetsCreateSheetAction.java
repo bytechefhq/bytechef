@@ -18,11 +18,11 @@ package com.bytechef.component.google.sheets.action;
 
 import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.array;
-import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.HEADERS;
 import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.SHEET_NAME;
+import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.SHEET_RECORD_OUTPUT_PROPERTY;
 import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.SPREADSHEET_ID;
 import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.SPREADSHEET_ID_PROPERTY;
 import static com.bytechef.component.google.sheets.util.GoogleSheetsUtils.SheetRecord;
@@ -61,14 +61,7 @@ public class GoogleSheetsCreateSheetAction {
                 .description("The headers of the new sheet.")
                 .items(string())
                 .required(false))
-        .output(
-            outputSchema(
-                object()
-                    .properties(
-                        string(SPREADSHEET_ID),
-                        string(SHEET_NAME),
-                        array(HEADERS)
-                            .items(string()))))
+        .output(outputSchema(SHEET_RECORD_OUTPUT_PROPERTY))
         .perform(GoogleSheetsCreateSheetAction::perform);
 
     private GoogleSheetsCreateSheetAction() {

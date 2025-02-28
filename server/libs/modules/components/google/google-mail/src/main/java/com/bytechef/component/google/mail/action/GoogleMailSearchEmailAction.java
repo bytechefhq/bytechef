@@ -114,10 +114,13 @@ public class GoogleMailSearchEmailAction {
                             .items(
                                 object()
                                     .properties(
-                                        string(ID),
-                                        string(THREAD_ID))),
+                                        string(ID)
+                                            .description("ID of the message."),
+                                        string(THREAD_ID)
+                                            .description("The ID of the thread the message belongs to."))),
                         string(NEXT_PAGE_TOKEN),
-                        number(RESULT_SIZE_ESTIMATE))))
+                        number(RESULT_SIZE_ESTIMATE)
+                            .description("Estimated number of messages."))))
         .perform(GoogleMailSearchEmailAction::perform);
 
     private GoogleMailSearchEmailAction() {

@@ -53,10 +53,13 @@ public class GoogleMailNewEmailPollingTrigger {
         .output(
             outputSchema(
                 array()
-                    .items(object()
-                        .properties(
-                            string(ID),
-                            string(THREAD_ID)))))
+                    .items(
+                        object()
+                            .properties(
+                                string(ID)
+                                    .description("ID of the message."),
+                                string(THREAD_ID)
+                                    .description("The ID of the thread the message belongs to.")))))
         .poll(GoogleMailNewEmailPollingTrigger::poll);
 
     private GoogleMailNewEmailPollingTrigger() {

@@ -18,12 +18,9 @@ package com.bytechef.component.google.sheets.action;
 
 import static com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import static com.bytechef.component.definition.ComponentDsl.action;
-import static com.bytechef.component.definition.ComponentDsl.integer;
-import static com.bytechef.component.definition.ComponentDsl.object;
+import static com.bytechef.component.definition.ComponentDsl.array;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
-import static com.bytechef.component.definition.ComponentDsl.string;
-import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.SHEET_ID;
-import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.SHEET_NAME;
+import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.SHEET_RECORD_OUTPUT_PROPERTY;
 import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.SPREADSHEET_ID;
 import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.SPREADSHEET_ID_PROPERTY;
 import static com.bytechef.component.google.sheets.util.GoogleSheetsUtils.SheetRecord;
@@ -49,11 +46,9 @@ public class GoogleSheetsListSheetsAction {
         .properties(SPREADSHEET_ID_PROPERTY)
         .output(
             outputSchema(
-                object()
-                    .properties(
-                        string(SPREADSHEET_ID),
-                        integer(SHEET_ID),
-                        string(SHEET_NAME))))
+                array()
+                    .description("List of sheets in the spreadsheet.")
+                    .items(SHEET_RECORD_OUTPUT_PROPERTY)))
         .perform(GoogleSheetsListSheetsAction::perform);
 
     private GoogleSheetsListSheetsAction() {
