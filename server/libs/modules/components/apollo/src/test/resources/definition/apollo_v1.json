@@ -1413,12 +1413,15 @@
       "exampleValue" : null,
       "label" : "Owner ID",
       "placeholder" : null,
-      "controlType" : "TEXT",
+      "controlType" : "SELECT",
       "languageId" : null,
       "maxLength" : null,
       "minLength" : null,
       "options" : null,
-      "optionsDataSource" : null
+      "optionsDataSource" : {
+        "optionsLookupDependsOn" : null,
+        "options" : { }
+      }
     }, {
       "advancedOption" : null,
       "description" : "The ID for the account within your Apollo instance. This is the company that you are targeting as part of the deal being created.",
@@ -3047,9 +3050,6 @@
     "perform" : null,
     "processErrorResponse" : null
   } ],
-  "triggers" : [ ],
-  "dataStream" : null,
-  "unifiedApi" : null,
   "connection" : {
     "authorizations" : [ {
       "detectOn" : null,
@@ -3179,5 +3179,8 @@
     "authorizationRequired" : null,
     "baseUri" : { },
     "test" : null
-  }
+  },
+  "triggers" : [ ],
+  "unifiedApi" : null,
+  "dataStream" : null
 }
