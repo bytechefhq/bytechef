@@ -1803,7 +1803,9 @@ public class ComponentInitOpenApiGenerator {
         return builder.build();
     }
 
-    @SuppressWarnings("rawtypes")
+    @SuppressWarnings({
+        "checkstyle:methodlength", "rawtypes"
+    })
     private CodeBlock getSchemaCodeBlock(
         String propertyName, String propertyDescription, Boolean required, String schemaName, Schema<?> schema,
         boolean excludePropertyNameIfEmpty, boolean outputSchema, OpenAPI openAPI, boolean bodySchema) {
@@ -1812,8 +1814,9 @@ public class ComponentInitOpenApiGenerator {
 
         Map<String, Object> extensionMap = schema.getExtensions();
 
-        if (extensionMap == null || extensionMap.containsKey("x-dynamic-options")
-            || !extensionMap.containsKey("x-dynamic-properties")) {
+        if (extensionMap == null || extensionMap.containsKey("x-dynamic-options") ||
+            !extensionMap.containsKey("x-dynamic-properties")) {
+
             if (StringUtils.isEmpty(schema.get$ref())) {
                 String type = StringUtils.isEmpty(schema.getType()) ? "object" : schema.getType();
 
