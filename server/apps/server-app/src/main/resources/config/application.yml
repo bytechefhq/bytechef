@@ -133,11 +133,17 @@ spring:
     password: ${bytechef.mail.password}
     properties:
       mail:
+        debug: ${bytechef.mail.debug:false}
         smtp:
           auth: ${bytechef.mail.smtp.auth:false}
           starttls:
             enable: ${bytechef.mail.smtp.starttls.enable:false}
             required: ${bytechef.mail.smtp.starttls.required:false}
+        transport:
+          protocol: ${bytechef.mail.transport.protocol}
+    protocol: ${bytechef.mail.transport.protocol}
+    ssl:
+      enabled: ${bytechef.mail.ssl.enabled}
   liquibase:
     contexts: mono, #spring.profiles.active#
   output:
