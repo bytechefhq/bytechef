@@ -38,7 +38,7 @@ import com.bytechef.platform.configuration.accessor.JobPrincipalAccessorRegistry
 import com.bytechef.platform.configuration.domain.WorkflowTrigger;
 import com.bytechef.platform.definition.WorkflowNodeType;
 import com.bytechef.platform.file.storage.FilesFileStorage;
-import com.bytechef.platform.webhook.executor.WorkflowExecutor;
+import com.bytechef.platform.webhook.executor.WebhookWorkflowExecutor;
 import com.bytechef.platform.webhook.executor.constant.WebhookConstants;
 import com.bytechef.platform.workflow.execution.WorkflowExecutionId;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -81,7 +81,7 @@ public abstract class AbstractWebhookTriggerController {
     private final JobPrincipalAccessorRegistry jobPrincipalAccessorRegistry;
     private String publicUrld;
     private final TriggerDefinitionService triggerDefinitionService;
-    private WorkflowExecutor workflowExecutor;
+    private WebhookWorkflowExecutor webhookWorkflowExecutor;
     private final WorkflowService workflowService;
 
     private static final Logger logger = LoggerFactory.getLogger(AbstractWebhookTriggerController.class);
@@ -98,14 +98,14 @@ public abstract class AbstractWebhookTriggerController {
 
     protected AbstractWebhookTriggerController(
         FilesFileStorage filesFileStorage, JobPrincipalAccessorRegistry jobPrincipalAccessorRegistry, String publicUrld,
-        TriggerDefinitionService triggerDefinitionService, WorkflowExecutor workflowExecutor,
+        TriggerDefinitionService triggerDefinitionService, WebhookWorkflowExecutor webhookWorkflowExecutor,
         WorkflowService workflowService) {
 
         this.filesFileStorage = filesFileStorage;
         this.jobPrincipalAccessorRegistry = jobPrincipalAccessorRegistry;
         this.publicUrld = publicUrld;
         this.triggerDefinitionService = triggerDefinitionService;
-        this.workflowExecutor = workflowExecutor;
+        this.webhookWorkflowExecutor = webhookWorkflowExecutor;
         this.workflowService = workflowService;
     }
 
@@ -128,7 +128,7 @@ public abstract class AbstractWebhookTriggerController {
         }
 
         if (webhookTriggerFlags.workflowSyncExecution()) {
-            Object outputs = workflowExecutor.executeSync(workflowExecutionId, webhookRequest);
+            Object outputs = webhookWorkflowExecutor.executeSync(workflowExecutionId, webhookRequest);
 
             if (outputs instanceof Map<?, ?> responseMap &&
                 responseMap.containsKey(WebhookConstants.WEBHOOK_RESPONSE)) {
@@ -140,7 +140,7 @@ public abstract class AbstractWebhookTriggerController {
         } else if (webhookTriggerFlags.workflowSyncValidation()) {
             responseEntity = validateAndExecuteAsync(workflowExecutionId, webhookRequest);
         } else {
-            workflowExecutor.execute(workflowExecutionId, webhookRequest);
+            webhookWorkflowExecutor.execute(workflowExecutionId, webhookRequest);
 
             responseEntity = ResponseEntity.ok()
                 .build();
@@ -446,7 +446,7 @@ public abstract class AbstractWebhookTriggerController {
     private ResponseEntity<Object> validateAndExecuteAsync(
         WorkflowExecutionId workflowExecutionId, WebhookRequest webhookRequest) {
 
-        TriggerDefinition.WebhookValidateResponse response = workflowExecutor.validateAndExecuteAsync(
+        TriggerDefinition.WebhookValidateResponse response = webhookWorkflowExecutor.validateAndExecuteAsync(
             workflowExecutionId, webhookRequest);
 
         return ResponseEntity.status(response.status())

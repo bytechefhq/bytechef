@@ -28,6 +28,7 @@ import com.bytechef.platform.configuration.accessor.JobPrincipalAccessor;
 import com.bytechef.platform.configuration.accessor.JobPrincipalAccessorRegistry;
 import com.bytechef.platform.coordinator.job.JobSyncExecutor;
 import com.bytechef.platform.workflow.coordinator.event.TriggerWebhookEvent;
+import com.bytechef.platform.workflow.coordinator.event.TriggerWebhookEvent.WebhookParameters;
 import com.bytechef.platform.workflow.execution.WorkflowExecutionId;
 import com.bytechef.platform.workflow.execution.facade.PrincipalJobFacade;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -41,33 +42,33 @@ import org.springframework.lang.Nullable;
 /**
  * @author Ivica Cardic
  */
-public class WorkflowExecutorImpl implements WorkflowExecutor {
+public class WebhookWorkflowExecutorImpl implements WebhookWorkflowExecutor {
 
     private final ApplicationEventPublisher eventPublisher;
     private final JobPrincipalAccessorRegistry jobPrincipalAccessorRegistry;
     private final PrincipalJobFacade principalJobFacade;
     private final JobSyncExecutor jobSyncExecutor;
-    private final WorkflowSyncExecutor workflowSyncExecutor;
+    private final WebhookWorkflowSyncExecutor webhookWorkflowSyncExecutor;
     private final TaskFileStorage taskFileStorage;
 
     @SuppressFBWarnings("EI")
-    public WorkflowExecutorImpl(
+    public WebhookWorkflowExecutorImpl(
         ApplicationEventPublisher eventPublisher, JobPrincipalAccessorRegistry jobPrincipalAccessorRegistry,
         PrincipalJobFacade principalJobFacade, JobSyncExecutor jobSyncExecutor,
-        WorkflowSyncExecutor workflowSyncExecutor, TaskFileStorage taskFileStorage) {
+        WebhookWorkflowSyncExecutor webhookWorkflowSyncExecutor, TaskFileStorage taskFileStorage) {
 
         this.jobPrincipalAccessorRegistry = jobPrincipalAccessorRegistry;
         this.principalJobFacade = principalJobFacade;
         this.jobSyncExecutor = jobSyncExecutor;
         this.eventPublisher = eventPublisher;
-        this.workflowSyncExecutor = workflowSyncExecutor;
+        this.webhookWorkflowSyncExecutor = webhookWorkflowSyncExecutor;
         this.taskFileStorage = taskFileStorage;
     }
 
     @Override
     public void execute(WorkflowExecutionId workflowExecutionId, WebhookRequest webhookRequest) {
         eventPublisher.publishEvent(
-            new TriggerWebhookEvent(new TriggerWebhookEvent.WebhookParameters(workflowExecutionId, webhookRequest)));
+            new TriggerWebhookEvent(new WebhookParameters(workflowExecutionId, webhookRequest)));
     }
 
     @Override
@@ -75,7 +76,7 @@ public class WorkflowExecutorImpl implements WorkflowExecutor {
     public Object executeSync(WorkflowExecutionId workflowExecutionId, WebhookRequest webhookRequest) {
         Object outputs;
 
-        TriggerOutput triggerOutput = workflowSyncExecutor.execute(workflowExecutionId, webhookRequest);
+        TriggerOutput triggerOutput = webhookWorkflowSyncExecutor.execute(workflowExecutionId, webhookRequest);
 
         Map<String, ?> inputMap = getInputMap(workflowExecutionId);
         String workflowId = getWorkflowId(workflowExecutionId);
@@ -109,7 +110,7 @@ public class WorkflowExecutorImpl implements WorkflowExecutor {
     public WebhookValidateResponse validateAndExecuteAsync(
         WorkflowExecutionId workflowExecutionId, WebhookRequest webhookRequest) {
 
-        WebhookValidateResponse response = workflowSyncExecutor.validate(workflowExecutionId, webhookRequest);
+        WebhookValidateResponse response = webhookWorkflowSyncExecutor.validate(workflowExecutionId, webhookRequest);
 
         if (response.status() == HttpStatus.OK.getValue()) {
             execute(workflowExecutionId, webhookRequest);
@@ -122,7 +123,7 @@ public class WorkflowExecutorImpl implements WorkflowExecutor {
     public WebhookValidateResponse validateOnEnable(
         WorkflowExecutionId workflowExecutionId, WebhookRequest webhookRequest) {
 
-        return workflowSyncExecutor.validateOnEnable(workflowExecutionId, webhookRequest);
+        return webhookWorkflowSyncExecutor.validateOnEnable(workflowExecutionId, webhookRequest);
     }
 
     @SuppressWarnings("unchecked")

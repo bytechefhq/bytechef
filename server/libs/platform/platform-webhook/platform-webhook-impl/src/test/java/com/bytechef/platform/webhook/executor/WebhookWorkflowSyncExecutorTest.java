@@ -23,7 +23,7 @@ import org.junit.jupiter.api.Test;
  * @author Ivica Cardic
  */
 @Disabled
-public class WorkflowSyncExecutorTest {
+public class WebhookWorkflowSyncExecutorTest {
 
     @Test
     public void testExecute() {

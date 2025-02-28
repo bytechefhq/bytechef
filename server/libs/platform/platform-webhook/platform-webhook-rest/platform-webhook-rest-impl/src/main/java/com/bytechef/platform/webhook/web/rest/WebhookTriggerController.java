@@ -25,7 +25,7 @@ import com.bytechef.platform.component.service.TriggerDefinitionService;
 import com.bytechef.platform.component.trigger.WebhookRequest;
 import com.bytechef.platform.configuration.accessor.JobPrincipalAccessorRegistry;
 import com.bytechef.platform.file.storage.FilesFileStorage;
-import com.bytechef.platform.webhook.executor.WorkflowExecutor;
+import com.bytechef.platform.webhook.executor.WebhookWorkflowExecutor;
 import com.bytechef.platform.webhook.rest.AbstractWebhookTriggerController;
 import com.bytechef.platform.workflow.execution.WorkflowExecutionId;
 import com.bytechef.tenant.util.TenantUtils;
@@ -50,19 +50,19 @@ import org.springframework.web.bind.annotation.RestController;
 @ConditionalOnCoordinator
 public class WebhookTriggerController extends AbstractWebhookTriggerController {
 
-    private final WorkflowExecutor workflowExecutor;
+    private final WebhookWorkflowExecutor webhookWorkflowExecutor;
 
     @SuppressFBWarnings("EI")
     public WebhookTriggerController(
         ApplicationProperties applicationProperties, FilesFileStorage filesFileStorage,
         JobPrincipalAccessorRegistry jobPrincipalAccessorRegistry, TriggerDefinitionService triggerDefinitionService,
-        WorkflowExecutor workflowExecutor, WorkflowService workflowService) {
+        WebhookWorkflowExecutor webhookWorkflowExecutor, WorkflowService workflowService) {
 
         super(
             filesFileStorage, jobPrincipalAccessorRegistry, applicationProperties.getPublicUrl(),
-            triggerDefinitionService, workflowExecutor, workflowService);
+            triggerDefinitionService, webhookWorkflowExecutor, workflowService);
 
-        this.workflowExecutor = workflowExecutor;
+        this.webhookWorkflowExecutor = webhookWorkflowExecutor;
     }
 
     @RequestMapping(
@@ -103,7 +103,7 @@ public class WebhookTriggerController extends AbstractWebhookTriggerController {
     private ResponseEntity<?> doValidateOnEnable(
         WorkflowExecutionId workflowExecutionId, WebhookRequest webhookRequest) {
 
-        WebhookValidateResponse response = workflowExecutor.validateOnEnable(
+        WebhookValidateResponse response = webhookWorkflowExecutor.validateOnEnable(
             workflowExecutionId, webhookRequest);
 
         return ResponseEntity.status(response.status())

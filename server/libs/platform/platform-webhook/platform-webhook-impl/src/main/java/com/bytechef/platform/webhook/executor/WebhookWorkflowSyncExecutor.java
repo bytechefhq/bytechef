@@ -47,7 +47,7 @@ import org.springframework.stereotype.Component;
  * @author Ivica Cardic
  */
 @Component
-public class WorkflowSyncExecutor {
+public class WebhookWorkflowSyncExecutor {
 
     private final JobPrincipalAccessorRegistry jobPrincipalAccessorRegistry;
     private final TriggerDefinitionFacade triggerDefinitionFacade;
@@ -58,7 +58,7 @@ public class WorkflowSyncExecutor {
     private final WorkflowService workflowService;
 
     @SuppressFBWarnings("EI")
-    public WorkflowSyncExecutor(
+    public WebhookWorkflowSyncExecutor(
         JobPrincipalAccessorRegistry jobPrincipalAccessorRegistry,
         TriggerDefinitionFacade triggerDefinitionFacade, TriggerExecutionService triggerExecutionService,
         List<TriggerDispatcherPreSendProcessor> triggerDispatcherPreSendProcessors,
