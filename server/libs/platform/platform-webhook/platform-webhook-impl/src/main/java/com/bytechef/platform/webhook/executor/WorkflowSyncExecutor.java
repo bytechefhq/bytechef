@@ -137,6 +137,7 @@ public class WorkflowSyncExecutor {
 
         Result result = getProcessData(workflowExecutionId, webhookRequest);
 
+        Map<String, Long> connectIdMap = result.connectIdMap();
         TriggerExecution triggerExecution = result.triggerExecution();
         WorkflowNodeType workflowNodeType = result.workflowNodeType();
 
@@ -144,8 +145,7 @@ public class WorkflowSyncExecutor {
             workflowNodeType.componentName(), workflowNodeType.componentVersion(),
             workflowNodeType.componentOperationName(), triggerExecution.getParameters(),
             MapUtils.getRequired(triggerExecution.getMetadata(), WebhookRequest.WEBHOOK_REQUEST, WebhookRequest.class),
-            OptionalUtils.orElse(CollectionUtils.findFirst(result.connectIdMap()
-                .values()), null));
+            OptionalUtils.orElse(CollectionUtils.findFirst(connectIdMap.values()), null));
     }
 
     private WorkflowNodeType getComponentOperation(WorkflowExecutionId workflowExecutionId, String workflowId) {

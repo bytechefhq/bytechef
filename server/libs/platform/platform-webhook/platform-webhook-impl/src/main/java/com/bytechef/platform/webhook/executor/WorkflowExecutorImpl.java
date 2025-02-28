@@ -54,8 +54,7 @@ public class WorkflowExecutorImpl implements WorkflowExecutor {
     public WorkflowExecutorImpl(
         ApplicationEventPublisher eventPublisher, JobPrincipalAccessorRegistry jobPrincipalAccessorRegistry,
         PrincipalJobFacade principalJobFacade, JobSyncExecutor jobSyncExecutor,
-        WorkflowSyncExecutor workflowSyncExecutor,
-        TaskFileStorage taskFileStorage) {
+        WorkflowSyncExecutor workflowSyncExecutor, TaskFileStorage taskFileStorage) {
 
         this.jobPrincipalAccessorRegistry = jobPrincipalAccessorRegistry;
         this.principalJobFacade = principalJobFacade;

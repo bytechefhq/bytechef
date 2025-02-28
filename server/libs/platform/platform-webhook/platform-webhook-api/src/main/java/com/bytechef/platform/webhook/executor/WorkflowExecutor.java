@@ -34,6 +34,5 @@ public interface WorkflowExecutor {
     WebhookValidateResponse validateAndExecuteAsync(
         WorkflowExecutionId workflowExecutionId, WebhookRequest webhookRequest);
 
-    WebhookValidateResponse validateOnEnable(
-        WorkflowExecutionId workflowExecutionId, WebhookRequest webhookRequest);
+    WebhookValidateResponse validateOnEnable(WorkflowExecutionId workflowExecutionId, WebhookRequest webhookRequest);
 }
