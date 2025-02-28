@@ -1134,6 +1134,13 @@ paths:
           required: true
           schema:
             type: "string"
+        - name: "createdDate"
+          description: "Check if a test output exists after a specific date."
+          in: "query"
+          required: false
+          schema:
+            type: "string"
+            format: "date-time"
       responses:
         "200":
           description: "Successful operation."
