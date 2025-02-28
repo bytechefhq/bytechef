@@ -51,7 +51,8 @@ Creates new account.
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| __item | Account | OBJECT <details> <summary> Properties </summary> {STRING\(owner_id), STRING\(name)} </details> |  | true |
+| owner_id | Owner ID | STRING | Id of the user in Pipeliner Application that will become the owner of the newly created account. | true |
+| name | Name | STRING | Account name | true |
 
 
 #### Output
@@ -77,10 +78,8 @@ Type: OBJECT
   "label" : "Create Account",
   "name" : "createAccount",
   "parameters" : {
-    "__item" : {
-      "owner_id" : "",
-      "name" : ""
-    }
+    "owner_id" : "",
+    "name" : ""
   },
   "type" : "pipeliner/v1/createAccount"
 }
@@ -96,7 +95,9 @@ Creates new Contact
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| __item | Contact | OBJECT <details> <summary> Properties </summary> {STRING\(owner_id), STRING\(first_name), STRING\(last_name)} </details> |  | true |
+| owner_id | Owner ID | STRING | ID of the user in Pipeliner Application that will become the owner of the newly created Contact. | true |
+| first_name | First Name | STRING | The firstname of the contact. | false |
+| last_name | Last Name | STRING | The lastname of the contact. | true |
 
 
 #### Output
@@ -122,11 +123,9 @@ Type: OBJECT
   "label" : "Create Contact",
   "name" : "createContact",
   "parameters" : {
-    "__item" : {
-      "owner_id" : "",
-      "first_name" : "",
-      "last_name" : ""
-    }
+    "owner_id" : "",
+    "first_name" : "",
+    "last_name" : ""
   },
   "type" : "pipeliner/v1/createContact"
 }
@@ -142,7 +141,10 @@ Creates new Task
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| __item | Task | OBJECT <details> <summary> Properties </summary> {STRING\(subject), STRING\(activity_type_id), STRING\(unit_id), STRING\(owner_id)} </details> |  | true |
+| subject | Subject | STRING | Name of the entity and its default text representation. | true |
+| activity_type_id | Activity Type ID | STRING | Id of the activity type of task. | true |
+| unit_id | Unit ID | STRING | Sales Unit ID | true |
+| owner_id | Owner ID | STRING |  | true |
 
 
 #### Output
@@ -168,12 +170,10 @@ Type: OBJECT
   "label" : "Create Task",
   "name" : "createTask",
   "parameters" : {
-    "__item" : {
-      "subject" : "",
-      "activity_type_id" : "",
-      "unit_id" : "",
-      "owner_id" : ""
-    }
+    "subject" : "",
+    "activity_type_id" : "",
+    "unit_id" : "",
+    "owner_id" : ""
   },
   "type" : "pipeliner/v1/createTask"
 }

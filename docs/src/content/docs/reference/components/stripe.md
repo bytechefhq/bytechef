@@ -48,7 +48,11 @@ Creates a new customer.
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| __item | Customer | OBJECT <details> <summary> Properties </summary> {STRING\(email), STRING\(name), STRING\(description), STRING\(phone), {STRING\(city), STRING\(country), STRING\(line1), STRING\(line2), STRING\(postal_code), STRING\(state)}\(address)} </details> |  | null |
+| email | Email | STRING | Customer’s email address. | false |
+| name | Name | STRING | The customer's full name. | false |
+| description | Description | STRING |  | false |
+| phone | Phone | STRING |  | false |
+| address | Address | OBJECT <details> <summary> Properties </summary> {STRING\(city), STRING\(country), STRING\(line1), STRING\(line2), STRING\(postal_code), STRING\(state)} </details> |  | false |
 
 
 #### Output
@@ -73,19 +77,17 @@ Type: OBJECT
   "label" : "Create Customer",
   "name" : "createCustomer",
   "parameters" : {
-    "__item" : {
-      "email" : "",
-      "name" : "",
-      "description" : "",
-      "phone" : "",
-      "address" : {
-        "city" : "",
-        "country" : "",
-        "line1" : "",
-        "line2" : "",
-        "postal_code" : "",
-        "state" : ""
-      }
+    "email" : "",
+    "name" : "",
+    "description" : "",
+    "phone" : "",
+    "address" : {
+      "city" : "",
+      "country" : "",
+      "line1" : "",
+      "line2" : "",
+      "postal_code" : "",
+      "state" : ""
     }
   },
   "type" : "stripe/v1/createCustomer"
@@ -102,7 +104,9 @@ Creates a new invoice.
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| __item | Invoice | OBJECT <details> <summary> Properties </summary> {STRING\(customer), STRING\(currency), STRING\(description)} </details> |  | null |
+| customer | Customer ID | STRING | ID of the customer who will be billed. | true |
+| currency | Currency | STRING | Currency used for invoice. | true |
+| description | Description | STRING | Description for the invoice. | false |
 
 
 #### Output
@@ -127,11 +131,9 @@ Type: OBJECT
   "label" : "Create Invoice",
   "name" : "createInvoice",
   "parameters" : {
-    "__item" : {
-      "customer" : "",
-      "currency" : "",
-      "description" : ""
-    }
+    "customer" : "",
+    "currency" : "",
+    "description" : ""
   },
   "type" : "stripe/v1/createInvoice"
 }

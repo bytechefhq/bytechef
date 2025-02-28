@@ -74,11 +74,6 @@ Type: STATIC_WEBHOOK
 #### Output
 
 
-___Sample Output:___
-
-```{method=POST, headers={}, parameters={}}```
-
-
 null
 
 #### JSON Example
@@ -106,11 +101,6 @@ Type: STATIC_WEBHOOK
 
 
 #### Output
-
-
-___Sample Output:___
-
-```{method=POST, headers={}, parameters={}}```
 
 
 null
@@ -144,11 +134,6 @@ Type: STATIC_WEBHOOK
 
 
 #### Output
-
-
-___Sample Output:___
-
-```{method=POST, headers={}, parameters={}}```
 
 
 null

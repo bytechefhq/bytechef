@@ -50,7 +50,7 @@ Create a contact with the given properties.
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| __item | Contact | OBJECT <details> <summary> Properties </summary> {{STRING\(firstname), STRING\(lastname), STRING\(email), STRING\(phone), STRING\(company), STRING\(website)}\(properties)} </details> |  | null |
+| properties | Properties | OBJECT <details> <summary> Properties </summary> {STRING\(firstname), STRING\(lastname), STRING\(email), STRING\(phone), STRING\(company), STRING\(website)} </details> |  | false |
 
 
 #### Output
@@ -75,15 +75,13 @@ Type: OBJECT
   "label" : "Create Contact",
   "name" : "createContact",
   "parameters" : {
-    "__item" : {
-      "properties" : {
-        "firstname" : "",
-        "lastname" : "",
-        "email" : "",
-        "phone" : "",
-        "company" : "",
-        "website" : ""
-      }
+    "properties" : {
+      "firstname" : "",
+      "lastname" : "",
+      "email" : "",
+      "phone" : "",
+      "company" : "",
+      "website" : ""
     }
   },
   "type" : "hubspot/v1/createContact"
@@ -167,7 +165,7 @@ Update Contact properties.
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | contactId | Contact | STRING |  | true |
-| __item | Contact | OBJECT <details> <summary> Properties </summary> {{STRING\(firstname), STRING\(lastname), STRING\(email), STRING\(phone), STRING\(company), STRING\(website)}\(properties)} </details> |  | null |
+| properties | Properties | OBJECT <details> <summary> Properties </summary> {STRING\(firstname), STRING\(lastname), STRING\(email), STRING\(phone), STRING\(company), STRING\(website)} </details> |  | false |
 
 
 #### Output
@@ -193,15 +191,13 @@ Type: OBJECT
   "name" : "updateContact",
   "parameters" : {
     "contactId" : "",
-    "__item" : {
-      "properties" : {
-        "firstname" : "",
-        "lastname" : "",
-        "email" : "",
-        "phone" : "",
-        "company" : "",
-        "website" : ""
-      }
+    "properties" : {
+      "firstname" : "",
+      "lastname" : "",
+      "email" : "",
+      "phone" : "",
+      "company" : "",
+      "website" : ""
     }
   },
   "type" : "hubspot/v1/updateContact"
@@ -218,7 +214,7 @@ Creates a new deal.
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| __item | Deal | OBJECT <details> <summary> Properties </summary> {{STRING\(dealname), NUMBER\(amount), DATE\(closedate), STRING\(pipeline), STRING\(dealstage), STRING\(hubspot_owner_id)}\(properties)} </details> |  | null |
+| properties | Properties | OBJECT <details> <summary> Properties </summary> {STRING\(dealname), NUMBER\(amount), DATE\(closedate), STRING\(pipeline), STRING\(dealstage), STRING\(hubspot_owner_id)} </details> |  | false |
 
 
 #### Output
@@ -243,15 +239,13 @@ Type: OBJECT
   "label" : "Create Deal",
   "name" : "createDeal",
   "parameters" : {
-    "__item" : {
-      "properties" : {
-        "dealname" : "",
-        "amount" : 0.0,
-        "closedate" : "2021-01-01",
-        "pipeline" : "",
-        "dealstage" : "",
-        "hubspot_owner_id" : ""
-      }
+    "properties" : {
+      "dealname" : "",
+      "amount" : 0.0,
+      "closedate" : "2021-01-01",
+      "pipeline" : "",
+      "dealstage" : "",
+      "hubspot_owner_id" : ""
     }
   },
   "type" : "hubspot/v1/createDeal"

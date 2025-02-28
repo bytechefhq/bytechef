@@ -50,7 +50,8 @@ Updates an existing project.
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | project_id | Project ID | STRING | Project to update. | true |
-| __item | Project | OBJECT <details> <summary> Properties </summary> {STRING\(name), STRING\(description)} </details> |  | true |
+| name | Name | STRING | New name for the project. | true |
+| description | Description | STRING | New description for the project. | false |
 
 
 #### JSON Example
@@ -60,10 +61,8 @@ Updates an existing project.
   "name" : "updateProject",
   "parameters" : {
     "project_id" : "",
-    "__item" : {
-      "name" : "",
-      "description" : ""
-    }
+    "name" : "",
+    "description" : ""
   },
   "type" : "zeplin/v1/updateProject"
 }

@@ -48,7 +48,12 @@ Creates new account.
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| __item | Account | OBJECT <details> <summary> Properties </summary> {STRING\(name), STRING\(website), STRING\(description), STRING\(email), STRING\(phone_number), [STRING]\(social_profiles)} </details> |  | true |
+| name | Name | STRING | Account name | true |
+| website | Website | STRING | Account website | false |
+| description | Description | STRING | Account description | false |
+| email | Email | STRING |  | false |
+| phone_number | Phone Number | STRING |  | false |
+| social_profiles | Social Profiles | ARRAY <details> <summary> Items </summary> [STRING] </details> | Social profile URL | false |
 
 
 #### JSON Example
@@ -57,14 +62,12 @@ Creates new account.
   "label" : "Create Account",
   "name" : "createAccount",
   "parameters" : {
-    "__item" : {
-      "name" : "",
-      "website" : "",
-      "description" : "",
-      "email" : "",
-      "phone_number" : "",
-      "social_profiles" : [ "" ]
-    }
+    "name" : "",
+    "website" : "",
+    "description" : "",
+    "email" : "",
+    "phone_number" : "",
+    "social_profiles" : [ "" ]
   },
   "type" : "salesflare/v1/createAccount"
 }
@@ -80,7 +83,7 @@ Creates new contacts.
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| __items | Contacts | ARRAY <details> <summary> Items </summary> [{STRING\(email), STRING\(firstname), STRING\(lastname), STRING\(phone_number), STRING\(mobile_phone_number), STRING\(home_phone_number), STRING\(fax_number), [STRING]\(social_profiles)}] </details> |  | true |
+| contacts | Contacts | ARRAY <details> <summary> Items </summary> [{STRING\(email), STRING\(firstname), STRING\(lastname), STRING\(phone_number), STRING\(mobile_phone_number), STRING\(home_phone_number), STRING\(fax_number), [STRING]\(social_profiles)}] </details> |  | true |
 
 
 #### Output
@@ -105,7 +108,7 @@ Type: OBJECT
   "label" : "Create Contacts",
   "name" : "createContacts",
   "parameters" : {
-    "__items" : [ {
+    "contacts" : [ {
       "email" : "",
       "firstname" : "",
       "lastname" : "",
@@ -130,7 +133,7 @@ Creates new tasks.
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| __items | Tasks | ARRAY <details> <summary> Items </summary> [{STRING\(description), DATE\(reminder_date)}] </details> |  | true |
+| tasks | Tasks | ARRAY <details> <summary> Items </summary> [{STRING\(description), DATE\(reminder_date)}] </details> |  | true |
 
 
 #### Output
@@ -155,7 +158,7 @@ Type: OBJECT
   "label" : "Create Tasks",
   "name" : "createTasks",
   "parameters" : {
-    "__items" : [ {
+    "tasks" : [ {
       "description" : "",
       "reminder_date" : "2021-01-01"
     } ]

@@ -48,7 +48,9 @@ Start or resume current playback on an active device.
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | deviceId | Device ID | STRING |  | false |
-| __item | Item | OBJECT <details> <summary> Properties </summary> {STRING\(context_uri), [STRING]\(uris), INTEGER\(position_ms)} </details> |  | null |
+| context_uri | Context Uri | STRING | Spotify URI of the context to play (album, artist, playlist). | false |
+| uris | Tracks | ARRAY <details> <summary> Items </summary> [STRING] </details> | Spotify track URIs to play. | false |
+| position_ms | Position | INTEGER | The position in milliseconds to start playback from. | false |
 
 
 #### JSON Example
@@ -58,11 +60,9 @@ Start or resume current playback on an active device.
   "name" : "startResumePlayback",
   "parameters" : {
     "deviceId" : "",
-    "__item" : {
-      "context_uri" : "",
-      "uris" : [ "" ],
-      "position_ms" : 1
-    }
+    "context_uri" : "",
+    "uris" : [ "" ],
+    "position_ms" : 1
   },
   "type" : "spotify/v1/startResumePlayback"
 }
@@ -80,7 +80,7 @@ Adds one or more items to your playlist.
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | playlist_id | Playlist ID | STRING |  | true |
 | uris | Tracks | ARRAY <details> <summary> Items </summary> [STRING] </details> |  | true |
-| __item | Item | OBJECT <details> <summary> Properties </summary> {INTEGER\(position)} </details> |  | null |
+| position | Position | INTEGER | Position to insert the items, a zero-based index. | false |
 
 
 #### Output
@@ -107,9 +107,7 @@ Type: OBJECT
   "parameters" : {
     "playlist_id" : "",
     "uris" : [ "" ],
-    "__item" : {
-      "position" : 1
-    }
+    "position" : 1
   },
   "type" : "spotify/v1/addItemsToPlaylist"
 }

@@ -50,7 +50,7 @@ Adds an order into a Shopify store.
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| __item | Order | OBJECT <details> <summary> Properties </summary> {{[{STRING\(fulfillment_status), STRING\(grams), NUMBER\(price), INTEGER\(product_id), INTEGER\(variant_id), INTEGER\(quantity), STRING\(title)}]\(line_items), STRING\(total_tax), STRING\(currency)}\(order)} </details> |  | null |
+| order | Order | OBJECT <details> <summary> Properties </summary> {[{STRING\(fulfillment_status), STRING\(grams), NUMBER\(price), INTEGER\(product_id), INTEGER\(variant_id), INTEGER\(quantity), STRING\(title)}]\(line_items), STRING\(total_tax), STRING\(currency)} </details> |  | false |
 
 
 #### Output
@@ -82,20 +82,18 @@ Type: OBJECT
   "label" : "Create Order",
   "name" : "createOrder",
   "parameters" : {
-    "__item" : {
-      "order" : {
-        "line_items" : [ {
-          "fulfillment_status" : "",
-          "grams" : "",
-          "price" : 0.0,
-          "product_id" : 1,
-          "variant_id" : 1,
-          "quantity" : 1,
-          "title" : ""
-        } ],
-        "total_tax" : "",
-        "currency" : ""
-      }
+    "order" : {
+      "line_items" : [ {
+        "fulfillment_status" : "",
+        "grams" : "",
+        "price" : 0.0,
+        "product_id" : 1,
+        "variant_id" : 1,
+        "quantity" : 1,
+        "title" : ""
+      } ],
+      "total_tax" : "",
+      "currency" : ""
     }
   },
   "type" : "shopify/v1/createOrder"
@@ -186,7 +184,7 @@ Update an existing order.
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | orderId | Order ID | INTEGER | ID of the order to update. | true |
-| __item | Order | OBJECT <details> <summary> Properties </summary> {{STRING\(note), STRING\(email), STRING\(phone), STRING\(tags)}\(order)} </details> |  | null |
+| order | Order | OBJECT <details> <summary> Properties </summary> {STRING\(note), STRING\(email), STRING\(phone), STRING\(tags)} </details> |  | false |
 
 
 #### Output
@@ -219,13 +217,11 @@ Type: OBJECT
   "name" : "updateOrder",
   "parameters" : {
     "orderId" : 1,
-    "__item" : {
-      "order" : {
-        "note" : "",
-        "email" : "",
-        "phone" : "",
-        "tags" : ""
-      }
+    "order" : {
+      "note" : "",
+      "email" : "",
+      "phone" : "",
+      "tags" : ""
     }
   },
   "type" : "shopify/v1/updateOrder"

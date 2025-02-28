@@ -49,7 +49,10 @@ Creates a new task.
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| __item | Contact | OBJECT <details> <summary> Properties </summary> {STRING\(content), STRING\(description), STRING\(project_id), INTEGER\(priority)} </details> |  | null |
+| content | Content | STRING | Task content. It may contain some markdown-formatted text and hyperlinks. | true |
+| description | Description | STRING | A description for the task. This value may contain some markdown-formatted text and hyperlinks. | false |
+| project_id | Project ID | STRING | Task project ID. If not set, task is put to user's Inbox. | false |
+| priority | Priority | INTEGER <details> <summary> Options </summary> 1, 2, 3, 4 </details> | Task priority from 1 (normal) to 4 (urgent). | false |
 
 
 #### Output
@@ -74,12 +77,10 @@ Type: OBJECT
   "label" : "Create Task",
   "name" : "createTask",
   "parameters" : {
-    "__item" : {
-      "content" : "",
-      "description" : "",
-      "project_id" : "",
-      "priority" : 1
-    }
+    "content" : "",
+    "description" : "",
+    "project_id" : "",
+    "priority" : 1
   },
   "type" : "todoist/v1/createTask"
 }
@@ -120,7 +121,9 @@ Creates a new project.
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| __item | Project | OBJECT <details> <summary> Properties </summary> {STRING\(name), STRING\(color), BOOLEAN\(is_favorite)} </details> |  | null |
+| name | Name | STRING | Name of the project. | true |
+| color | Color | STRING <details> <summary> Options </summary> beryy_red, red, orange, yellow, olive_green, lime_green, green, mint_green, teal, sky_blue, light_blue, blue, grape, violet, lavender, magenta, salmon, charcoal, grey, taupe </details> |  | false |
+| is_favorite | Is Project a Favorite? | BOOLEAN <details> <summary> Options </summary> true, false </details> | Whether the project is a favorite. | false |
 
 
 #### Output
@@ -145,11 +148,9 @@ Type: OBJECT
   "label" : "Create Project",
   "name" : "createProject",
   "parameters" : {
-    "__item" : {
-      "name" : "",
-      "color" : "",
-      "is_favorite" : false
-    }
+    "name" : "",
+    "color" : "",
+    "is_favorite" : false
   },
   "type" : "todoist/v1/createProject"
 }

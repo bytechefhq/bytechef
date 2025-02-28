@@ -98,7 +98,18 @@ Adds a new deal.
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| __item | Deal | OBJECT <details> <summary> Properties </summary> {STRING\(title), STRING\(value), STRING\(currency), INTEGER\(user_id), INTEGER\(person_id), INTEGER\(org_id), INTEGER\(pipeline_id), INTEGER\(stage_id), STRING\(status), DATE\(expected_close_date), NUMBER\(probability), STRING\(lost_reason)} </details> |  | null |
+| title | Title | STRING | The title of the deal | true |
+| value | Value | STRING | The value of the deal. | false |
+| currency | Currency | STRING | The currency of the deal. If omitted, currency will be set to the default currency of the authorized user. | false |
+| user_id | User ID | INTEGER | ID of the user which will be the owner of the created deal. If not provided, the user making the request will be used. | false |
+| person_id | Person ID | INTEGER | ID of the person which this deal will be linked to. This property is required unless `org_id` is specified. | false |
+| org_id | Organization ID | INTEGER | ID of the organization which this deal will be linked to. This property is required unless `person_id` is specified. | false |
+| pipeline_id | Pipeline ID | INTEGER | Id of the pipeline this deal will be added to. By default, the deal will be added to the first stage of the specified pipeline. Please note that `pipeline_id` and `stage_id` should not be used together as `pipeline_id` will be ignored. | false |
+| stage_id | Stage ID | INTEGER | Stage this deal will be added to. Please note that a pipeline will be assigned automatically based on the `stage_id`. If omitted, the deal will be placed in the first stage of the default pipeline. | false |
+| status | Status | STRING <details> <summary> Options </summary> open, won, lost, deleted </details> |  | false |
+| expected_close_date | Expected Close Date | DATE | The expected close date of the deal. | false |
+| probability | Probability | NUMBER | The success probability percentage of the deal. Used/shown only when `deal_probability` for the pipeline of the deal is enabled. | false |
+| lost_reason | Lost Reason | STRING | The optional message about why the deal was lost. | false |
 
 
 #### Output
@@ -123,20 +134,18 @@ Type: OBJECT
   "label" : "Add Deal",
   "name" : "addDeal",
   "parameters" : {
-    "__item" : {
-      "title" : "",
-      "value" : "",
-      "currency" : "",
-      "user_id" : 1,
-      "person_id" : 1,
-      "org_id" : 1,
-      "pipeline_id" : 1,
-      "stage_id" : 1,
-      "status" : "",
-      "expected_close_date" : "2021-01-01",
-      "probability" : 0.0,
-      "lost_reason" : ""
-    }
+    "title" : "",
+    "value" : "",
+    "currency" : "",
+    "user_id" : 1,
+    "person_id" : 1,
+    "org_id" : 1,
+    "pipeline_id" : 1,
+    "stage_id" : 1,
+    "status" : "",
+    "expected_close_date" : "2021-01-01",
+    "probability" : 0.0,
+    "lost_reason" : ""
   },
   "type" : "pipedrive/v1/addDeal"
 }
@@ -338,7 +347,13 @@ Creates a lead. A lead always has to be linked to a person or an organization or
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| __item | Lead | OBJECT <details> <summary> Properties </summary> {STRING\(title), INTEGER\(owner_id), [STRING]\(label_ids), INTEGER\(person_id), INTEGER\(organization_id), {NUMBER\(amount), STRING\(currency)}\(value), DATE\(expected_close_date)} </details> |  | null |
+| title | Title | STRING | The name of the lead. | true |
+| owner_id | Owner ID | INTEGER | User which will be the owner of the created lead. | false |
+| label_ids | Lead Labels IDs | ARRAY <details> <summary> Items </summary> [STRING] </details> | ID of the labels which will be associated with the lead. | false |
+| person_id | Person ID | INTEGER | Person which this lead will be linked to. | false |
+| organization_id | Organization ID | INTEGER | Organization which this lead will be linked to. | false |
+| value | Value | OBJECT <details> <summary> Properties </summary> {NUMBER\(amount), STRING\(currency)} </details> | The potential value of the lead | false |
+| expected_close_date | Expected Close Date | DATE | The date of when the deal which will be created from the lead is expected to be closed. In ISO 8601 format: YYYY-MM-DD. | false |
 
 
 #### Output
@@ -363,18 +378,16 @@ Type: OBJECT
   "label" : "Add Lead",
   "name" : "addLead",
   "parameters" : {
-    "__item" : {
-      "title" : "",
-      "owner_id" : 1,
-      "label_ids" : [ "" ],
-      "person_id" : 1,
-      "organization_id" : 1,
-      "value" : {
-        "amount" : 0.0,
-        "currency" : ""
-      },
-      "expected_close_date" : "2021-01-01"
-    }
+    "title" : "",
+    "owner_id" : 1,
+    "label_ids" : [ "" ],
+    "person_id" : 1,
+    "organization_id" : 1,
+    "value" : {
+      "amount" : 0.0,
+      "currency" : ""
+    },
+    "expected_close_date" : "2021-01-01"
   },
   "type" : "pipedrive/v1/addLead"
 }
@@ -570,7 +583,8 @@ Adds a new organization.
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| __item | Organization | OBJECT <details> <summary> Properties </summary> {STRING\(name), INTEGER\(owner_id)} </details> |  | null |
+| name | Name | STRING | The name of the organization. | true |
+| owner_id | Owner ID | INTEGER | ID of the user who will be marked as the owner of this organization. | false |
 
 
 #### Output
@@ -595,10 +609,8 @@ Type: OBJECT
   "label" : "Add Organization",
   "name" : "addOrganization",
   "parameters" : {
-    "__item" : {
-      "name" : "",
-      "owner_id" : 1
-    }
+    "name" : "",
+    "owner_id" : 1
   },
   "type" : "pipedrive/v1/addOrganization"
 }
@@ -788,7 +800,11 @@ Adds a new person.
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| __item | Person | OBJECT <details> <summary> Properties </summary> {STRING\(name), INTEGER\(owner_id), INTEGER\(org_id), [{STRING\(value), BOOLEAN\(primary), STRING\(label)}]\(email), [{STRING\(value), BOOLEAN\(primary), STRING\(label)}]\(phone)} </details> |  | null |
+| name | Name | STRING | Person full name | true |
+| owner_id | Owner ID | INTEGER | ID of the user who will be marked as the owner of this person. | false |
+| org_id | Organization ID | INTEGER | ID of the organization this person will belong to. | false |
+| email | Email | ARRAY <details> <summary> Items </summary> [{STRING\(value), BOOLEAN\(primary), STRING\(label)}] </details> | An email addresses related to the person. | false |
+| phone | Phone | ARRAY <details> <summary> Items </summary> [{STRING\(value), BOOLEAN\(primary), STRING\(label)}] </details> | A phone numbers related to the person. | false |
 
 
 #### Output
@@ -813,21 +829,19 @@ Type: OBJECT
   "label" : "Add Person",
   "name" : "addPerson",
   "parameters" : {
-    "__item" : {
-      "name" : "",
-      "owner_id" : 1,
-      "org_id" : 1,
-      "email" : [ {
-        "value" : "",
-        "primary" : false,
-        "label" : ""
-      } ],
-      "phone" : [ {
-        "value" : "",
-        "primary" : false,
-        "label" : ""
-      } ]
-    }
+    "name" : "",
+    "owner_id" : 1,
+    "org_id" : 1,
+    "email" : [ {
+      "value" : "",
+      "primary" : false,
+      "label" : ""
+    } ],
+    "phone" : [ {
+      "value" : "",
+      "primary" : false,
+      "label" : ""
+    } ]
   },
   "type" : "pipedrive/v1/addPerson"
 }

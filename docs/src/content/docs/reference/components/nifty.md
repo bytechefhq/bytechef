@@ -49,7 +49,9 @@ Creates new project.
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| __item | Project | OBJECT <details> <summary> Properties </summary> {STRING\(name), STRING\(description), STRING\(template_id)} </details> |  | true |
+| name | Name | STRING | Name of the project. | true |
+| description | Description | STRING | Description of the project's purpose, goals, or any other relevent information. | false |
+| template_id | Template ID | STRING | ID of template that can be used to pre-configure the project. | false |
 
 
 #### Output
@@ -74,11 +76,9 @@ Type: OBJECT
   "label" : "Create Project",
   "name" : "createProject",
   "parameters" : {
-    "__item" : {
-      "name" : "",
-      "description" : "",
-      "template_id" : ""
-    }
+    "name" : "",
+    "description" : "",
+    "template_id" : ""
   },
   "type" : "nifty/v1/createProject"
 }
@@ -95,7 +95,10 @@ Creates new task
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | project | Project ID | STRING | ID of the project within which the task will be created. | true |
-| __item | Task | OBJECT <details> <summary> Properties </summary> {STRING\(task_group_id), STRING\(name), STRING\(description), DATE_TIME\(due_date)} </details> |  | true |
+| task_group_id | Status | STRING <details> <summary> Depends On </summary> project </details> |  | true |
+| name | Name | STRING | Name of the task. | true |
+| description | Description | STRING | Description of the task. | false |
+| due_date | Due Date | DATE_TIME | Due date for the task. | false |
 
 
 #### Output
@@ -121,12 +124,10 @@ Type: OBJECT
   "name" : "createTask",
   "parameters" : {
     "project" : "",
-    "__item" : {
-      "task_group_id" : "",
-      "name" : "",
-      "description" : "",
-      "due_date" : "2021-01-01T00:00:00"
-    }
+    "task_group_id" : "",
+    "name" : "",
+    "description" : "",
+    "due_date" : "2021-01-01T00:00:00"
   },
   "type" : "nifty/v1/createTask"
 }
@@ -183,7 +184,8 @@ Creates new status
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| __item | Status | OBJECT <details> <summary> Properties </summary> {STRING\(name), STRING\(project_id)} </details> |  | true |
+| name | Name | STRING | Name of the status. | true |
+| project_id | Project ID | STRING | Project ID that the status belongs to. | true |
 
 
 #### Output
@@ -208,10 +210,8 @@ Type: OBJECT
   "label" : "Create Status",
   "name" : "createStatus",
   "parameters" : {
-    "__item" : {
-      "name" : "",
-      "project_id" : ""
-    }
+    "name" : "",
+    "project_id" : ""
   },
   "type" : "nifty/v1/createStatus"
 }

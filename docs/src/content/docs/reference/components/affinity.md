@@ -48,7 +48,7 @@ Creates a new opportunity.
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| __item | Opportunity | OBJECT <details> <summary> Properties </summary> {STRING\(name)} </details> |  | null |
+| name | Name | STRING | The name of the opportunity. | true |
 
 
 #### Output
@@ -73,9 +73,7 @@ Type: OBJECT
   "label" : "Create Opportunity",
   "name" : "createOpportunity",
   "parameters" : {
-    "__item" : {
-      "name" : ""
-    }
+    "name" : ""
   },
   "type" : "affinity/v1/createOpportunity"
 }
@@ -91,7 +89,8 @@ Creates a new organization.
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| __item | Organization | OBJECT <details> <summary> Properties </summary> {STRING\(name), STRING\(domain)} </details> |  | null |
+| name | Name | STRING | The name of the organization. | true |
+| domain | Domain | STRING | The domain name of the organization. | false |
 
 
 #### Output
@@ -116,10 +115,8 @@ Type: OBJECT
   "label" : "Create Organization",
   "name" : "createOrganization",
   "parameters" : {
-    "__item" : {
-      "name" : "",
-      "domain" : ""
-    }
+    "name" : "",
+    "domain" : ""
   },
   "type" : "affinity/v1/createOrganization"
 }
@@ -135,7 +132,9 @@ Creates a new person.
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| __item | Person | OBJECT <details> <summary> Properties </summary> {STRING\(first_name), STRING\(last_name), [STRING]\(emails)} </details> |  | null |
+| first_name | First Name | STRING | The first name of the person. | true |
+| last_name | Last Name | STRING | The last name of the person. | true |
+| emails | Emails | ARRAY <details> <summary> Items </summary> [STRING] </details> | The email addresses of the person. | false |
 
 
 #### Output
@@ -160,11 +159,9 @@ Type: OBJECT
   "label" : "Create Person",
   "name" : "createPerson",
   "parameters" : {
-    "__item" : {
-      "first_name" : "",
-      "last_name" : "",
-      "emails" : [ "" ]
-    }
+    "first_name" : "",
+    "last_name" : "",
+    "emails" : [ "" ]
   },
   "type" : "affinity/v1/createPerson"
 }

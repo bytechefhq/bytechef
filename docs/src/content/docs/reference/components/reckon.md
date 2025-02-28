@@ -50,7 +50,7 @@ Creates a new contact.
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | bookId | Book ID | STRING | ID of the book where new contact will be created. | true |
-| __item | Contact | OBJECT <details> <summary> Properties </summary> {STRING\(name)} </details> |  | null |
+| name | Name | STRING | The name of the contact. | true |
 
 
 #### Output
@@ -76,9 +76,7 @@ Type: OBJECT
   "name" : "createContact",
   "parameters" : {
     "bookId" : "",
-    "__item" : {
-      "name" : ""
-    }
+    "name" : ""
   },
   "type" : "reckon/v1/createContact"
 }
@@ -95,7 +93,10 @@ Creates a new invoice.
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | bookId | Book ID | STRING | ID of the book where new invoice will be created. | true |
-| __item | Invoice | OBJECT <details> <summary> Properties </summary> {STRING\(customer), DATE\(invoiceDate), STRING\(amountTaxStatus), [{INTEGER\(lineNumber)}]\(lineItems)} </details> |  | null |
+| customer | Customer | STRING | The customer that is being invoiced. | true |
+| invoiceDate | Invoice Date | DATE | The date of the invoice. | true |
+| amountTaxStatus | Amount Tax Status | STRING <details> <summary> Options </summary> NonTaxed, Inclusive, Exclusive </details> | The amount tax status of the amounts in the invoice. | true |
+| lineItems | Line Items | ARRAY <details> <summary> Items </summary> [{INTEGER\(lineNumber)}] </details> | The individual items that make up the invoice. | true |
 
 
 #### Output
@@ -121,14 +122,12 @@ Type: OBJECT
   "name" : "createInvoice",
   "parameters" : {
     "bookId" : "",
-    "__item" : {
-      "customer" : "",
-      "invoiceDate" : "2021-01-01",
-      "amountTaxStatus" : "",
-      "lineItems" : [ {
-        "lineNumber" : 1
-      } ]
-    }
+    "customer" : "",
+    "invoiceDate" : "2021-01-01",
+    "amountTaxStatus" : "",
+    "lineItems" : [ {
+      "lineNumber" : 1
+    } ]
   },
   "type" : "reckon/v1/createInvoice"
 }
@@ -145,7 +144,9 @@ Creates a new payment.
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | bookId | Book ID | STRING | ID of the book where new payment will be created. | true |
-| __item | Payment | OBJECT <details> <summary> Properties </summary> {STRING\(supplier), DATE\(paymentDate), NUMBER\(totalAmount)} </details> |  | null |
+| supplier | Supplier | STRING | The supplier that is being paid. | true |
+| paymentDate | Payment Date | DATE | The date of the payment. | true |
+| totalAmount | Total Amount | NUMBER | The total amount of the payment applied. | true |
 
 
 #### Output
@@ -171,11 +172,9 @@ Type: OBJECT
   "name" : "createPayment",
   "parameters" : {
     "bookId" : "",
-    "__item" : {
-      "supplier" : "",
-      "paymentDate" : "2021-01-01",
-      "totalAmount" : 0.0
-    }
+    "supplier" : "",
+    "paymentDate" : "2021-01-01",
+    "totalAmount" : 0.0
   },
   "type" : "reckon/v1/createPayment"
 }

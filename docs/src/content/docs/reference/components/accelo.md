@@ -50,7 +50,10 @@ Creates a new company.
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| __item | Company | OBJECT <details> <summary> Properties </summary> {STRING\(name), STRING\(website), STRING\(phone), STRING\(comments)} </details> |  | null |
+| name | Name | STRING | The name of the company. | true |
+| website | Website | STRING | The company's website. | false |
+| phone | Phone | STRING | A contact phone number for the company. | false |
+| comments | Comments | STRING | Any comments or notes made against the company. | false |
 
 
 #### Output
@@ -75,12 +78,10 @@ Type: OBJECT
   "label" : "Create Company",
   "name" : "createCompany",
   "parameters" : {
-    "__item" : {
-      "name" : "",
-      "website" : "",
-      "phone" : "",
-      "comments" : ""
-    }
+    "name" : "",
+    "website" : "",
+    "phone" : "",
+    "comments" : ""
   },
   "type" : "accelo/v1/createCompany"
 }
@@ -96,7 +97,11 @@ Creates a new contact.
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| __item | Contact | OBJECT <details> <summary> Properties </summary> {STRING\(firstname), STRING\(surname), STRING\(company_id), STRING\(phone), STRING\(email)} </details> |  | null |
+| firstname | First Name | STRING | The first name of the contact. | false |
+| surname | Last Name | STRING | The last name of the contact. | false |
+| company_id | Company ID | STRING | ID of the company  to which the newly affiliated contact will be linked. | true |
+| phone | Phone | STRING | The contact's phone number in their role in the associated company. | false |
+| email | Email | STRING | The contact's position in the associated company. | false |
 
 
 #### Output
@@ -121,13 +126,11 @@ Type: OBJECT
   "label" : "Create Contact",
   "name" : "createContact",
   "parameters" : {
-    "__item" : {
-      "firstname" : "",
-      "surname" : "",
-      "company_id" : "",
-      "phone" : "",
-      "email" : ""
-    }
+    "firstname" : "",
+    "surname" : "",
+    "company_id" : "",
+    "phone" : "",
+    "email" : ""
   },
   "type" : "accelo/v1/createContact"
 }
