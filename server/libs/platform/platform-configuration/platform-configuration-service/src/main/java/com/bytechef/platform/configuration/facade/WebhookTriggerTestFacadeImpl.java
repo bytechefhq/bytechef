@@ -19,10 +19,12 @@ package com.bytechef.platform.configuration.facade;
 import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.component.definition.TriggerDefinition.WebhookEnableOutput;
+import com.bytechef.component.definition.TriggerDefinition.WebhookValidateResponse;
 import com.bytechef.config.ApplicationProperties;
 import com.bytechef.platform.component.domain.TriggerDefinition;
 import com.bytechef.platform.component.facade.TriggerDefinitionFacade;
 import com.bytechef.platform.component.service.TriggerDefinitionService;
+import com.bytechef.platform.component.trigger.WebhookRequest;
 import com.bytechef.platform.configuration.accessor.JobPrincipalAccessor;
 import com.bytechef.platform.configuration.accessor.JobPrincipalAccessorRegistry;
 import com.bytechef.platform.configuration.domain.WorkflowTrigger;
@@ -31,10 +33,9 @@ import com.bytechef.platform.configuration.service.WorkflowTestConfigurationServ
 import com.bytechef.platform.constant.ModeType;
 import com.bytechef.platform.definition.WorkflowNodeType;
 import com.bytechef.platform.workflow.execution.WorkflowExecutionId;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Map;
 import java.util.concurrent.Callable;
-
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.cache.Cache;
@@ -85,8 +86,7 @@ public class WebhookTriggerTestFacadeImpl implements WebhookTriggerTestFacade {
     @Override
     public String enableTrigger(String workflowId, ModeType type) {
         try {
-            WorkflowTrigger workflowTrigger = WorkflowTrigger.of(workflowService.getWorkflow(workflowId))
-                .getFirst();
+            WorkflowTrigger workflowTrigger = getWorkflowTrigger(workflowId);
 
             workflowNodeTestOutputService.deleteWorkflowNodeTestOutput(workflowId, workflowTrigger.getName());
 
@@ -109,24 +109,40 @@ public class WebhookTriggerTestFacadeImpl implements WebhookTriggerTestFacade {
         return enabled != null && enabled;
     }
 
-    private String executeTrigger(String workflowId, ModeType type, boolean enable) {
-        JobPrincipalAccessor jobPrincipalAccessor = jobPrincipalAccessorRegistry.getJobPrincipalAccessor(type);
+    @Override
+    public WebhookValidateResponse validateOnEnable(
+        WorkflowExecutionId workflowExecutionId, WebhookRequest webhookRequest) {
 
-        String workflowReferenceCode = jobPrincipalAccessor.getWorkflowReferenceCode(workflowId);
+        String workflowId = getLatestWorkflowId(
+            workflowExecutionId.getWorkflowReferenceCode(), workflowExecutionId.getType());
 
-        Workflow workflow = workflowService.getWorkflow(workflowId);
+        WorkflowTrigger workflowTrigger = getWorkflowTrigger(workflowId);
 
-        WorkflowTrigger workflowTrigger = WorkflowTrigger.of(workflow)
-            .getFirst();
-
+        WorkflowNodeType workflowNodeType = WorkflowNodeType.ofType(workflowTrigger.getType());
+        Map<String, ?> triggerParameters = workflowTrigger.evaluateParameters(
+            workflowTestConfigurationService.getWorkflowTestConfigurationInputs(workflowId));
         Long connectionId = workflowTestConfigurationService
             .fetchWorkflowTestConfigurationConnectionId(workflowId, workflowTrigger.getName())
             .orElse(null);
-        Map<String, ?> triggerParameters = workflowTrigger.evaluateParameters(
-            workflowTestConfigurationService.getWorkflowTestConfigurationInputs(workflowId));
-        WorkflowNodeType triggerWorkflowNodeType = WorkflowNodeType.ofType(workflowTrigger.getType());
+
+        return triggerDefinitionFacade.executeWebhookValidateOnEnable(
+            workflowNodeType.componentName(), workflowNodeType.componentVersion(),
+            workflowNodeType.componentOperationName(), triggerParameters, webhookRequest, connectionId);
+    }
+
+    private String executeTrigger(String workflowId, ModeType type, boolean enable) {
+        String workflowReferenceCode = getWorkflowReferenceCode(workflowId, type);
+
+        WorkflowTrigger workflowTrigger = getWorkflowTrigger(workflowId);
+
         WorkflowExecutionId workflowExecutionId = WorkflowExecutionId.of(
             type, -1, workflowReferenceCode, workflowTrigger.getName());
+        WorkflowNodeType triggerWorkflowNodeType = WorkflowNodeType.ofType(workflowTrigger.getType());
+        Map<String, ?> triggerParameters = workflowTrigger.evaluateParameters(
+            workflowTestConfigurationService.getWorkflowTestConfigurationInputs(workflowId));
+        Long connectionId = workflowTestConfigurationService
+            .fetchWorkflowTestConfigurationConnectionId(workflowId, workflowTrigger.getName())
+            .orElse(null);
 
         Cache cache = getWebhookTriggerTestsCache();
 
@@ -217,6 +233,12 @@ public class WebhookTriggerTestFacadeImpl implements WebhookTriggerTestFacade {
         }
     }
 
+    private String getLatestWorkflowId(String workflowReferenceCode, ModeType type) {
+        JobPrincipalAccessor jobPrincipalAccessor = jobPrincipalAccessorRegistry.getJobPrincipalAccessor(type);
+
+        return jobPrincipalAccessor.getLatestWorkflowId(workflowReferenceCode);
+    }
+
     private Cache getWebhookEnableOutputCache() {
         return cacheManager.getCache(WebhookTriggerTestFacade.class + ".webhookEnableOutputs");
     }
@@ -228,5 +250,18 @@ public class WebhookTriggerTestFacadeImpl implements WebhookTriggerTestFacade {
     private String getWebhookUrl(WorkflowExecutionId workflowExecutionId) {
         return "%s/test".formatted(webhookUrl)
             .replace("{id}", workflowExecutionId.toString());
+    }
+
+    private String getWorkflowReferenceCode(String workflowId, ModeType type) {
+        JobPrincipalAccessor jobPrincipalAccessor = jobPrincipalAccessorRegistry.getJobPrincipalAccessor(type);
+
+        return jobPrincipalAccessor.getWorkflowReferenceCode(workflowId);
+    }
+
+    private WorkflowTrigger getWorkflowTrigger(String workflowId) {
+        Workflow workflow = workflowService.getWorkflow(workflowId);
+
+        return WorkflowTrigger.of(workflow)
+            .getFirst();
     }
 }
