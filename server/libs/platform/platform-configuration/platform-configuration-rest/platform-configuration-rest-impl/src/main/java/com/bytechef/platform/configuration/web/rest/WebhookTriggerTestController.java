@@ -18,7 +18,7 @@ package com.bytechef.platform.configuration.web.rest;
 
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
-import com.bytechef.component.definition.TriggerDefinition;
+import com.bytechef.component.definition.TriggerDefinition.WebhookValidateResponse;
 import com.bytechef.platform.component.domain.WebhookTriggerFlags;
 import com.bytechef.platform.component.service.TriggerDefinitionService;
 import com.bytechef.platform.component.trigger.WebhookRequest;
@@ -26,7 +26,6 @@ import com.bytechef.platform.configuration.accessor.JobPrincipalAccessorRegistry
 import com.bytechef.platform.configuration.facade.WebhookTriggerTestFacade;
 import com.bytechef.platform.configuration.facade.WorkflowNodeTestOutputFacade;
 import com.bytechef.platform.configuration.web.file.storage.TempFilesFileStorage;
-import com.bytechef.platform.webhook.executor.WorkflowExecutor;
 import com.bytechef.platform.webhook.rest.AbstractWebhookTriggerController;
 import com.bytechef.platform.workflow.execution.WorkflowExecutionId;
 import com.bytechef.tenant.util.TenantUtils;
@@ -47,20 +46,18 @@ import org.springframework.web.bind.annotation.RestController;
 @ConditionalOnCoordinator
 public class WebhookTriggerTestController extends AbstractWebhookTriggerController {
 
-    private final WorkflowExecutor workflowExecutor;
-    private final WorkflowNodeTestOutputFacade workflowNodeTestOutputFacade;
     private final WebhookTriggerTestFacade webhookTriggerTestFacade;
+    private final WorkflowNodeTestOutputFacade workflowNodeTestOutputFacade;
 
     public WebhookTriggerTestController(
         TriggerDefinitionService triggerDefinitionService, JobPrincipalAccessorRegistry jobPrincipalAccessorRegistry,
-        WorkflowNodeTestOutputFacade workflowNodeTestOutputFacade, WorkflowService workflowService,
-        WorkflowExecutor workflowExecutor, WebhookTriggerTestFacade webhookTriggerTestFacade) {
+        WebhookTriggerTestFacade webhookTriggerTestFacade, WorkflowNodeTestOutputFacade workflowNodeTestOutputFacade,
+        WorkflowService workflowService) {
 
         super(new TempFilesFileStorage(), jobPrincipalAccessorRegistry, triggerDefinitionService, workflowService);
 
-        this.workflowNodeTestOutputFacade = workflowNodeTestOutputFacade;
-        this.workflowExecutor = workflowExecutor;
         this.webhookTriggerTestFacade = webhookTriggerTestFacade;
+        this.workflowNodeTestOutputFacade = workflowNodeTestOutputFacade;
     }
 
     @RequestMapping(
@@ -107,7 +104,7 @@ public class WebhookTriggerTestController extends AbstractWebhookTriggerControll
     private ResponseEntity<?> doValidateOnEnable(
         WorkflowExecutionId workflowExecutionId, WebhookRequest webhookRequest) {
 
-        TriggerDefinition.WebhookValidateResponse response = workflowExecutor.validateOnEnable(
+        WebhookValidateResponse response = webhookTriggerTestFacade.validateOnEnable(
             workflowExecutionId, webhookRequest);
 
         return ResponseEntity.status(response.status())
