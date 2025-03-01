@@ -208,7 +208,6 @@ dependencies {
     implementation(project(":server:libs:modules:components:pipedrive"))
     implementation(project(":server:libs:modules:components:pipeliner"))
     implementation(project(":server:libs:modules:components:postgresql"))
-    implementation(project(":server:libs:modules:components:pushover"))
     implementation(project(":server:libs:modules:components:quickbooks"))
     implementation(project(":server:libs:modules:components:rabbitmq"))
     implementation(project(":server:libs:modules:components:random-helper"))
