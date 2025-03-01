@@ -136,13 +136,18 @@ spring:
       mail:
         debug: ${bytechef.mail.debug:false}
         smtp:
-          auth: ${bytechef.mail.smtp.auth:false}
+          auth: ${bytechef.mail.auth:false}
           starttls:
-            enable: ${bytechef.mail.smtp.starttls.enable:false}
-            required: ${bytechef.mail.smtp.starttls.required:false}
+            enable: ${bytechef.mail.starttls.enable:false}
+            required: ${bytechef.mail.starttls.required:false}
+        smtps:
+          auth: true
+          starttls:
+            enable: ${bytechef.mail.starttls.enable:false}
+            required: ${bytechef.mail.starttls.required:false}
         transport:
-          protocol: ${bytechef.mail.transport.protocol:smtp}
-    protocol: ${bytechef.mail.transport.protocol:smtp}
+          protocol: ${bytechef.mail.protocol:smtp}
+    protocol: ${bytechef.mail.protocol:smtp}
     ssl:
       enabled: ${bytechef.mail.ssl.enabled:false}
   liquibase:
