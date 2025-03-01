@@ -74,7 +74,7 @@ public class DateHelperAddTimeAction {
                 .label("Second")
                 .description("Seconds to add.")
                 .required(false))
-        .output(outputSchema(string()))
+        .output(outputSchema(string().description("Date with added time.")))
         .perform(DateHelperAddTimeAction::perform);
 
     private DateHelperAddTimeAction() {

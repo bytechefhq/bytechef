@@ -27,6 +27,7 @@ import static com.bytechef.component.freshsales.constant.FreshsalesConstants.COU
 import static com.bytechef.component.freshsales.constant.FreshsalesConstants.EMAIL;
 import static com.bytechef.component.freshsales.constant.FreshsalesConstants.FACEBOOK;
 import static com.bytechef.component.freshsales.constant.FreshsalesConstants.FIRST_NAME;
+import static com.bytechef.component.freshsales.constant.FreshsalesConstants.ID;
 import static com.bytechef.component.freshsales.constant.FreshsalesConstants.JOB_TITLE;
 import static com.bytechef.component.freshsales.constant.FreshsalesConstants.LAST_NAME;
 import static com.bytechef.component.freshsales.constant.FreshsalesConstants.LINKEDIN;
@@ -119,22 +120,40 @@ public class FreshsalesCreateContactAction {
             outputSchema(
                 object()
                     .properties(
-                        number("id"),
-                        string(FIRST_NAME),
-                        string(LAST_NAME),
-                        string(JOB_TITLE),
-                        string(CITY),
-                        string(STATE),
-                        string(ZIPCODE),
-                        string(COUNTRY),
-                        string(EMAIL),
-                        string(WORK_NUMBER),
-                        string(MOBILE_NUMBER),
-                        string(ADDRESS),
-                        string(MEDIUM),
-                        string(FACEBOOK),
-                        string(TWITTER),
-                        string(LINKEDIN))))
+                        object("contact")
+                            .properties(
+                                number(ID)
+                                    .description("ID of the contact."),
+                                string(FIRST_NAME)
+                                    .description("First name of the contact."),
+                                string(LAST_NAME)
+                                    .description("Last name of the contact."),
+                                string(JOB_TITLE)
+                                    .description("Designation of the contact in the account he belongs to."),
+                                string(CITY)
+                                    .description("City that the contact belongs to."),
+                                string(STATE)
+                                    .description("State that the contact belongs to."),
+                                string(ZIPCODE)
+                                    .description("Zipcode of the region that the contact belongs to."),
+                                string(COUNTRY)
+                                    .description("Country that the contact belongs to."),
+                                string(EMAIL)
+                                    .description("Primary email address of the contact."),
+                                string(WORK_NUMBER)
+                                    .description("Work phone number of the contact."),
+                                string(MOBILE_NUMBER)
+                                    .description("Mobile phone number of the contact."),
+                                string(ADDRESS)
+                                    .description("Address of the contact."),
+                                string(MEDIUM)
+                                    .description("The medium that led your contact to your website/ web app."),
+                                string(FACEBOOK)
+                                    .description("Facebook username of the contact."),
+                                string(TWITTER)
+                                    .description("Twitter username of the contact."),
+                                string(LINKEDIN)
+                                    .description("LinkedIn account of the contact.")))))
         .perform(FreshsalesCreateContactAction::perform);
 
     private FreshsalesCreateContactAction() {

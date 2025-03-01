@@ -52,7 +52,7 @@ class FilesystemLsActionTest {
         Assertions.assertEquals(
             Set.of("C.txt", "B.txt", "A.txt"),
             files.stream()
-                .map(FilesystemLsAction.FileInfo::getFilename)
+                .map(FilesystemLsAction.FileInfo::filename)
                 .collect(Collectors.toSet()));
     }
 
@@ -72,7 +72,7 @@ class FilesystemLsActionTest {
         Assertions.assertEquals(
             Set.of("sub1/C.txt", "B.txt", "A.txt"),
             files.stream()
-                .map(FilesystemLsAction.FileInfo::getRelativePath)
+                .map(FilesystemLsAction.FileInfo::relativePath)
                 .collect(Collectors.toSet()));
     }
 
@@ -92,7 +92,7 @@ class FilesystemLsActionTest {
         Assertions.assertEquals(
             Set.of("B.txt", "A.txt"),
             files.stream()
-                .map(FilesystemLsAction.FileInfo::getFilename)
+                .map(FilesystemLsAction.FileInfo::filename)
                 .collect(Collectors.toSet()));
     }
 

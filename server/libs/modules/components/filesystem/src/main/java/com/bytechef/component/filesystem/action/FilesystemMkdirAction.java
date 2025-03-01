@@ -20,7 +20,6 @@ import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.sampleOutput;
 import static com.bytechef.component.definition.ComponentDsl.string;
-import static com.bytechef.component.filesystem.constant.FilesystemConstants.MKDIR;
 import static com.bytechef.component.filesystem.constant.FilesystemConstants.PATH;
 
 import com.bytechef.component.definition.ActionContext;
@@ -35,7 +34,7 @@ import java.nio.file.Paths;
  */
 public class FilesystemMkdirAction {
 
-    public static final ModifiableActionDefinition ACTION_DEFINITION = action(MKDIR)
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action("mkdir")
         .title("Create")
         .description("Creates a directory.")
         .properties(
@@ -43,7 +42,9 @@ public class FilesystemMkdirAction {
                 .label("Path")
                 .description("The path of a directory.")
                 .required(true))
-        .output(outputSchema(string()), sampleOutput("/sample_data"))
+        .output(
+            outputSchema(string().description("The full path of the created directory.")),
+            sampleOutput("/sample_data"))
         .perform(FilesystemMkdirAction::perform);
 
     private FilesystemMkdirAction() {

@@ -23,7 +23,6 @@ import static com.bytechef.component.definition.ComponentDsl.integer;
 import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
-import static com.bytechef.component.filesystem.constant.FilesystemConstants.LS;
 import static com.bytechef.component.filesystem.constant.FilesystemConstants.PATH;
 import static com.bytechef.component.filesystem.constant.FilesystemConstants.RECURSIVE;
 
@@ -46,7 +45,7 @@ import org.apache.commons.lang3.Validate;
  */
 public class FilesystemLsAction {
 
-    public static final ModifiableActionDefinition ACTION_DEFINITION = action(LS)
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action("ls")
         .title("List")
         .description("Lists the content of a directory for the given path.")
         .properties(
@@ -64,9 +63,12 @@ public class FilesystemLsAction {
                     .items(
                         object()
                             .properties(
-                                string("fileName"),
-                                string("relativePath"),
-                                integer("size")))))
+                                string("filename")
+                                    .description("Name of the file."),
+                                string("relativePath")
+                                    .description("Relative path of the file."),
+                                integer("size")
+                                    .description("Size of the file.")))))
         .perform(FilesystemLsAction::perform);
 
     private FilesystemLsAction() {
@@ -104,31 +106,12 @@ public class FilesystemLsAction {
             String.valueOf(path.getFileName()), String.valueOf(root.relativize(path)), file.length());
     }
 
-    public static class FileInfo {
-        private final String fileName;
-        private final String relativePath;
-        private final long size;
+    public record FileInfo(String filename, String relativePath, long size) {
 
         @SuppressFBWarnings("CT_CONSTRUCTOR_THROW")
-        public FileInfo(String fileName, String relativePath, long size) {
-            Validate.notNull(fileName, "fileName is required");
+        public FileInfo {
+            Validate.notNull(filename, "fileName is required");
             Validate.notNull(relativePath, "relativePath is required");
-
-            this.fileName = fileName;
-            this.relativePath = relativePath;
-            this.size = size;
-        }
-
-        public String getFilename() {
-            return fileName;
-        }
-
-        public String getRelativePath() {
-            return relativePath;
-        }
-
-        public long getSize() {
-            return size;
         }
     }
 }

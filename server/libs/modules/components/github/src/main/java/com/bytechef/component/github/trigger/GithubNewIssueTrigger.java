@@ -18,15 +18,14 @@ package com.bytechef.component.github.trigger;
 
 import static com.bytechef.component.definition.ComponentDsl.ModifiableTriggerDefinition;
 import static com.bytechef.component.definition.ComponentDsl.integer;
-import static com.bytechef.component.definition.ComponentDsl.number;
 import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.ComponentDsl.trigger;
-import static com.bytechef.component.github.constant.GithubConstants.BODY;
 import static com.bytechef.component.github.constant.GithubConstants.ID;
+import static com.bytechef.component.github.constant.GithubConstants.ISSUE_OUTPUT_PROPERTIES;
 import static com.bytechef.component.github.constant.GithubConstants.REPOSITORY;
-import static com.bytechef.component.github.constant.GithubConstants.TITLE;
+import static com.bytechef.component.github.constant.GithubConstants.REPOSITORY_OUTPUT_PROPERTY;
 import static com.bytechef.component.github.util.GithubUtils.getContent;
 import static com.bytechef.component.github.util.GithubUtils.subscribeWebhook;
 
@@ -61,33 +60,18 @@ public class GithubNewIssueTrigger {
                 object()
                     .properties(
                         object("issue")
-                            .properties(
-                                string("url"),
-                                string("repository_url"),
-                                number(ID),
-                                integer("number"),
-                                string(TITLE),
-                                string("state"),
-                                string(BODY)),
+                            .properties(ISSUE_OUTPUT_PROPERTIES),
                         object("sender")
+                            .description("Information about the author of the issue.")
                             .properties(
-                                string("login"),
-                                integer(ID)),
-                        string("action"),
-                        string("starred_at"),
-                        object("repository")
-                            .properties(
-                                integer(ID),
-                                string("name"),
-                                string("full_name"),
-                                object("owner")
-                                    .properties(
-                                        string("login"),
-                                        integer(ID)),
-                                string("visibility"),
-                                integer("forks"),
-                                integer("open_issues"),
-                                string("default_branch")))))
+                                string("login")
+                                    .description("The username of the individual who created the issue."),
+                                integer(ID)
+                                    .description("ID of the sender.")),
+                        string("action")
+                            .description(
+                                "The action performed on the issue, such as 'opened', 'closed', or 'reopened'."),
+                        REPOSITORY_OUTPUT_PROPERTY)))
         .webhookEnable(GithubNewIssueTrigger::webhookEnable)
         .webhookDisable(GithubNewIssueTrigger::webhookDisable)
         .webhookRequest(GithubNewIssueTrigger::webhookRequest);

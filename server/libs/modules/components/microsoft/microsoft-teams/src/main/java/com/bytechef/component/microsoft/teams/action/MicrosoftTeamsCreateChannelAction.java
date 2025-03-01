@@ -59,9 +59,12 @@ public class MicrosoftTeamsCreateChannelAction {
             outputSchema(
                 object()
                     .properties(
-                        string(ID),
-                        string(DISPLAY_NAME),
-                        string(DESCRIPTION))))
+                        string(ID)
+                            .description("ID of the channel."),
+                        string(DISPLAY_NAME)
+                            .description("Name of the channel that will appear to the user in Microsoft Teams."),
+                        string(DESCRIPTION)
+                            .description("Description of the channel."))))
         .perform(MicrosoftTeamsCreateChannelAction::perform);
 
     private MicrosoftTeamsCreateChannelAction() {

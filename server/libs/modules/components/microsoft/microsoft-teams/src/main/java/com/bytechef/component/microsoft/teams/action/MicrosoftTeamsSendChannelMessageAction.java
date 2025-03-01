@@ -63,15 +63,22 @@ public class MicrosoftTeamsSendChannelMessageAction {
             outputSchema(
                 object()
                     .properties(
-                        string(ID),
+                        string(ID)
+                            .description("ID of the message."),
                         object(BODY)
+                            .description("Plaintext/HTML representation of the content of the chat message.")
                             .properties(
-                                string(CONTENT_TYPE),
-                                string(CONTENT)),
+                                string(CONTENT_TYPE)
+                                    .description("Type of the content."),
+                                string(CONTENT)
+                                    .description("The content of the message.")),
                         object("channelIdentity")
+                            .description("Represents identity of the channel.")
                             .properties(
-                                string(TEAM_ID),
-                                string(CHANNEL_ID)))))
+                                string(TEAM_ID)
+                                    .description("ID of the team in which the message was posted."),
+                                string(CHANNEL_ID)
+                                    .description("ID of the channel in which the message was posted.")))))
         .perform(MicrosoftTeamsSendChannelMessageAction::perform);
 
     private MicrosoftTeamsSendChannelMessageAction() {

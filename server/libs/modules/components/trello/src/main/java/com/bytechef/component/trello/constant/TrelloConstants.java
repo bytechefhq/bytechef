@@ -34,11 +34,16 @@ public class TrelloConstants {
 
     public static final ModifiableObjectProperty CARD_OUTPUT_PROPERTY = object()
         .properties(
-            string(ID),
-            string(DESC),
-            string(ID_BOARD),
-            string(ID_LIST),
-            string(NAME));
+            string(ID)
+                .description("ID of the card."),
+            string(DESC)
+                .description("Description of the card."),
+            string(ID_BOARD)
+                .description("ID of the board the card belongs to."),
+            string(ID_LIST)
+                .description("ID of the list the card belongs to."),
+            string(NAME)
+                .description("Name of the card."));
 
     private TrelloConstants() {
     }

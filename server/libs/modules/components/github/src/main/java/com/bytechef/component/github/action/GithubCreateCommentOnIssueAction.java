@@ -52,8 +52,8 @@ public class GithubCreateCommentOnIssueAction {
             string(ISSUE)
                 .options((ActionOptionsFunction<String>) GithubUtils::getIssueOptions)
                 .optionsLookupDependsOn(REPOSITORY)
-                .label("Issue")
-                .description("The issue to comment on.")
+                .label("Issue Number")
+                .description("The number of the issue to comment on.")
                 .required(true),
             string(BODY)
                 .label("Comment")

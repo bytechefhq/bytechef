@@ -17,16 +17,11 @@
 package com.bytechef.component.intercom.action;
 
 import static com.bytechef.component.definition.ComponentDsl.action;
-import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.Context.Http;
-import static com.bytechef.component.intercom.constant.IntercomConstants.EMAIL;
+import static com.bytechef.component.intercom.constant.IntercomConstants.CONTACT_OUTPUT_PROPERTY;
 import static com.bytechef.component.intercom.constant.IntercomConstants.ID;
-import static com.bytechef.component.intercom.constant.IntercomConstants.NAME;
-import static com.bytechef.component.intercom.constant.IntercomConstants.PHONE;
-import static com.bytechef.component.intercom.constant.IntercomConstants.ROLE;
-import static com.bytechef.component.intercom.constant.IntercomConstants.TYPE;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
@@ -49,16 +44,7 @@ public class IntercomGetContactAction {
                 .label("Contact ID")
                 .required(true)
                 .options((ActionOptionsFunction<String>) IntercomUtils::getContactIdOptions))
-        .output(
-            outputSchema(
-                object()
-                    .properties(
-                        string(TYPE),
-                        string(ID),
-                        string(ROLE),
-                        string(EMAIL),
-                        string(PHONE),
-                        string(NAME))))
+        .output(outputSchema(CONTACT_OUTPUT_PROPERTY))
         .perform(IntercomGetContactAction::perform);
 
     public static Object

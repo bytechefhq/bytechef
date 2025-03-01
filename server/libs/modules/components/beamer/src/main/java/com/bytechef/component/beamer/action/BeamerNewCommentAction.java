@@ -77,15 +77,24 @@ public class BeamerNewCommentAction {
             outputSchema(
                 object()
                     .properties(
-                        string(ID),
-                        string("date"),
-                        string(TEXT),
-                        string("postTitle"),
-                        string(USER_ID),
-                        string(USER_EMAIL),
-                        string(USER_FIRST_NAME),
-                        string(USER_LAST_NAME),
-                        string("url"))))
+                        string(ID)
+                            .description("ID of the new comment."),
+                        string("date")
+                            .description("Publication date of the new comment."),
+                        string(TEXT)
+                            .description("Content of the new comment."),
+                        string("postTitle")
+                            .description("Title of the post this comment was created on."),
+                        string(USER_ID)
+                            .description("ID of the user that created the new comment."),
+                        string(USER_EMAIL)
+                            .description("Email of the user that created the new comment."),
+                        string(USER_FIRST_NAME)
+                            .description("First name of the user that created the new comment."),
+                        string(USER_LAST_NAME)
+                            .description("Last name of the user that created the new comment."),
+                        string("url")
+                            .description("URL of the new comment in your dashboard."))))
         .perform(BeamerNewCommentAction::perform);
 
     private BeamerNewCommentAction() {

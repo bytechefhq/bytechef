@@ -84,17 +84,28 @@ public final class XeroConstants {
 
     public static final ModifiableObjectProperty CONTACT_OUTPUT_PROPERTY = object()
         .properties(
-            string(CONTACT_ID),
-            string(COMPANY_NUMBER),
-            string(ACCOUNT_NUMBER),
-            string(CONTACT_STATUS),
-            string(NAME),
-            string(FIRST_NAME),
-            string(LAST_NAME),
-            string(EMAIL_ADDRESS),
-            string(BANK_ACCOUNT_DETAILS),
-            string(TAX_NUMBER),
+            string(CONTACT_ID)
+                .description("ID of the contact."),
+            string(COMPANY_NUMBER)
+                .description("Company registration number."),
+            string(ACCOUNT_NUMBER)
+                .description("A user defined account number."),
+            string(CONTACT_STATUS)
+                .description("Status of the contact."),
+            string(NAME)
+                .description("Full name of contact/organisation."),
+            string(FIRST_NAME)
+                .description("First name of contact person."),
+            string(LAST_NAME)
+                .description("Last name of contact person."),
+            string(EMAIL_ADDRESS)
+                .description("Email address of contact person."),
+            string(BANK_ACCOUNT_DETAILS)
+                .description("Bank account number of contact."),
+            string(TAX_NUMBER)
+                .description("Tax number of contact."),
             array(ADDRESSES)
+                .description("List of addresses associated with the contact.")
                 .items(
                     object()
                         .properties(
@@ -114,25 +125,38 @@ public final class XeroConstants {
 
     public static final ModifiableObjectProperty INVOICE_OUTPUT_PROPERTY = object()
         .properties(
-            string(TYPE),
-            string(REFERENCE),
+            string(TYPE)
+                .description("Type of the invoice."),
             object(CONTACT)
+                .description("Contact associated with the invoice.")
                 .properties(
-                    string(CONTACT_ID),
-                    string(NAME),
-                    string(EMAIL_ADDRESS)),
-            string("DateString"),
-            string("DueDateString"),
-            string(STATUS),
-            string(LINE_AMOUNT_TYPES),
+                    string(CONTACT_ID)
+                        .description("ID of the contact."),
+                    string(NAME)
+                        .description("Full name of contact/organization."),
+                    string(EMAIL_ADDRESS)
+                        .description("Email address of contact person")),
+            string("DateString")
+                .description("Date of the invoice – YYYY-MM-DDThh-mm-ss"),
+            string("DueDateString")
+                .description("Due date of the invoice – YYYY-MM-DDThh-mm-ss"),
+            string(STATUS)
+                .description("Status of the invoice."),
+            string(LINE_AMOUNT_TYPES)
+                .description("Line Amount Type"),
             array(LINE_ITEMS)
+                .description("Line items on the invoice.")
                 .items(
                     object()
                         .properties(
-                            string(DESCRIPTION),
-                            integer(QUANTITY),
-                            number(UNIT_AMOUNT))),
-            string(CURRENCY_CODE));
+                            string(DESCRIPTION)
+                                .description("The sales description of the item."),
+                            integer(QUANTITY)
+                                .description("Line item quantity."),
+                            number(UNIT_AMOUNT)
+                                .description("Line item unit amount."))),
+            string(CURRENCY_CODE)
+                .description("The currency that invoice has been raised in."));
 
     public static final ModifiableStringProperty LINE_AMOUNT_TYPE_PROPERTY = string(LINE_AMOUNT_TYPES)
         .label("Line Amount Type")

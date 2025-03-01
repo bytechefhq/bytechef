@@ -22,7 +22,6 @@ import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.sampleOutput;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.filesystem.constant.FilesystemConstants.PATH;
-import static com.bytechef.component.filesystem.constant.FilesystemConstants.RM;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
@@ -40,7 +39,7 @@ import java.nio.file.attribute.BasicFileAttributes;
  */
 public class FilesystemRmAction {
 
-    public static final ModifiableActionDefinition ACTION_DEFINITION = action(RM)
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action("rm")
         .title("Remove")
         .description("Permanently removes the content of a directory.")
         .properties(
@@ -48,7 +47,9 @@ public class FilesystemRmAction {
                 .label("Path")
                 .description("The path of a directory.")
                 .required(true))
-        .output(outputSchema(bool()), sampleOutput(true))
+        .output(
+            outputSchema(bool().description("Indicates whether the directory was removed or not.")),
+            sampleOutput(true))
         .perform(FilesystemRmAction::perform);
 
     private FilesystemRmAction() {

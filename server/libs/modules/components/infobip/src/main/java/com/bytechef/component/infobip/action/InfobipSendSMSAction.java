@@ -72,23 +72,44 @@ public class InfobipSendSMSAction {
             outputSchema(
                 object()
                     .properties(
-                        string(BULK_ID),
+                        string(BULK_ID)
+                            .description(
+                                "ID assigned to the request if messaging multiple recipients or sending multiple " +
+                                    "messages via a single API request."),
                         array(MESSAGES)
+                            .description(
+                                "An array of message objects of a single message or multiple messages sent under " +
+                                    "one bulk ID.")
                             .items(
                                 object()
                                     .properties(
-                                        string(MESSAGE_ID),
+                                        string(MESSAGE_ID)
+                                            .description("ID of the message."),
                                         object(STATUS)
+                                            .description("Status of the message.")
                                             .properties(
-                                                integer(GROUP_ID),
-                                                string(GROUP_NAME),
-                                                integer(ID),
-                                                string(NAME),
-                                                string(DESCRIPTION),
-                                                string("action")),
-                                        string("destination"),
+                                                integer(GROUP_ID)
+                                                    .description("Status group ID."),
+                                                string(GROUP_NAME)
+                                                    .description(
+                                                        "Status group name that describes which category the status " +
+                                                            "code belongs to"),
+                                                integer(ID)
+                                                    .description("Status code ID."),
+                                                string(NAME)
+                                                    .description("Status code name."),
+                                                string(DESCRIPTION)
+                                                    .description("Human-readable description of the status."),
+                                                string("action")
+                                                    .description("Action to take to recover from the error.")),
+                                        string("destination")
+                                            .description("The destination address of the message."),
                                         object("details")
-                                            .properties(integer(MESSAGE_COUNT)))))))
+                                            .description("Other details of the message.")
+                                            .properties(
+                                                integer(MESSAGE_COUNT)
+                                                    .description(
+                                                        "Number of SMS message parts required to deliver the message.")))))))
         .perform(InfobipSendSMSAction::perform);
 
     private InfobipSendSMSAction() {

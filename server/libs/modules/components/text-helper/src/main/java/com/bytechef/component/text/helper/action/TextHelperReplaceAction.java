@@ -53,7 +53,7 @@ public class TextHelperReplaceAction {
                 .label("Replace Only First Match")
                 .defaultValue(false)
                 .required(true))
-        .output(outputSchema(string()))
+        .output(outputSchema(string().description("The text with replaced values.")))
         .perform(TextHelperReplaceAction::perform);
 
     private TextHelperReplaceAction() {

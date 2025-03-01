@@ -20,7 +20,6 @@ import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.sampleOutput;
 import static com.bytechef.component.definition.ComponentDsl.string;
-import static com.bytechef.component.filesystem.constant.FilesystemConstants.CREATE_TEMP_DIR;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
@@ -35,11 +34,13 @@ import java.nio.file.Path;
  */
 public class FilesystemCreateTempDirAction {
 
-    public static final ModifiableActionDefinition ACTION_DEFINITION = action(CREATE_TEMP_DIR)
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action("createTempDir")
         .title("Create Temp Directory")
         .description(
             "Creates a file in the temporary directory on the filesystem. Returns the created directory's full path.")
-        .output(outputSchema(string()), sampleOutput("/sample_tmp_dir"))
+        .output(
+            outputSchema(string().description("The full path of the created directory.")),
+            sampleOutput("/sample_tmp_dir"))
         .perform(FilesystemCreateTempDirAction::perform);
 
     private FilesystemCreateTempDirAction() {

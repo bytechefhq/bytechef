@@ -53,8 +53,8 @@ public class GithubAddLabelsToIssueAction {
             string(ISSUE)
                 .options((ActionOptionsFunction<String>) GithubUtils::getIssueOptions)
                 .optionsLookupDependsOn(REPOSITORY)
-                .label("Issue")
-                .description("The issue to add labels to.")
+                .label("Issue Number")
+                .description("The number of the issue to add labels to.")
                 .required(true),
             array(LABELS)
                 .label("Labels")
@@ -65,12 +65,18 @@ public class GithubAddLabelsToIssueAction {
                 .required(true))
         .output(outputSchema(
             array()
+                .description("The list of labels added to the issue.")
                 .items(
                     object()
                         .properties(
-                            string(ID),
-                            string("name"),
-                            string("description")))))
+                            string(ID)
+                                .description("ID of the label"),
+                            string("name")
+                                .description("Name of the label."),
+                            string("description")
+                                .description("Description of the label."),
+                            string("color")
+                                .description("The hexadecimal color code for the label, without the leading #.")))))
         .perform(GithubAddLabelsToIssueAction::perform);
 
     private GithubAddLabelsToIssueAction() {

@@ -71,17 +71,27 @@ public class InfobipSendWhatsappTextMessageAction {
             outputSchema(
                 object()
                     .properties(
-                        string(TO),
-                        integer(MESSAGE_COUNT),
-                        string(MESSAGE_ID),
+                        string(TO)
+                            .description("The destination address of the message."),
+                        integer(MESSAGE_COUNT)
+                            .description("Number of messages required to deliver."),
+                        string(MESSAGE_ID)
+                            .description("ID of the message sent."),
                         object(STATUS)
+                            .description("Status of the message.")
                             .properties(
-                                integer(GROUP_ID),
-                                string(GROUP_NAME),
-                                integer(ID),
-                                string(NAME),
-                                string(DESCRIPTION),
-                                string("action")))))
+                                integer(GROUP_ID)
+                                    .description("Status group ID."),
+                                string(GROUP_NAME)
+                                    .description("Status group name."),
+                                integer(ID)
+                                    .description("Status ID."),
+                                string(NAME)
+                                    .description("Status name."),
+                                string(DESCRIPTION)
+                                    .description("Human-readable description of the status."),
+                                string("action")
+                                    .description("Action that should be taken to eliminate error.")))))
         .perform(InfobipSendWhatsappTextMessageAction::perform);
 
     private InfobipSendWhatsappTextMessageAction() {

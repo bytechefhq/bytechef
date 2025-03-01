@@ -68,7 +68,7 @@ public class ImageHelperCropImageAction {
                 .description("Height of the crop area")
                 .required(true),
             RESULT_FILE_NAME_PROPERTY)
-        .output(outputSchema(fileEntry()))
+        .output(outputSchema(fileEntry().description("Cropped image.")))
         .perform(ImageHelperCropImageAction::perform);
 
     private ImageHelperCropImageAction() {

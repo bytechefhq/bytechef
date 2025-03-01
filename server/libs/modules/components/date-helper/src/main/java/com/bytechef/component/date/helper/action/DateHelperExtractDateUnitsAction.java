@@ -66,7 +66,7 @@ public class DateHelperExtractDateUnitsAction {
                     option("Day of Week", DAY_OF_WEEK),
                     option("Month name", MONTH_NAME))
                 .required(true))
-        .output(outputSchema(string()))
+        .output(outputSchema(string().description("Extracted date unit.")))
         .perform(DateHelperExtractDateUnitsAction::perform);
 
     private DateHelperExtractDateUnitsAction() {

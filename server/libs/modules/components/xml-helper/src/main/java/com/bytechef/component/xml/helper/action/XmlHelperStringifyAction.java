@@ -59,7 +59,7 @@ public class XmlHelperStringifyAction {
                 .description("The array to convert to XML string.")
                 .displayCondition("type == '%s'".formatted(ValueType.ARRAY.name()))
                 .required(true))
-        .output(outputSchema(string()))
+        .output(outputSchema(string().description("The XML string.")))
         .perform(XmlHelperStringifyAction::perform);
 
     protected static String perform(

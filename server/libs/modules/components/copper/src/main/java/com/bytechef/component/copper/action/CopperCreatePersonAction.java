@@ -205,46 +205,73 @@ public class CopperCreatePersonAction {
         .output(outputSchema(
             object()
                 .properties(
-                    string(ID),
-                    string(NAME),
+                    string(ID)
+                        .description("ID of the new person."),
+                    string(NAME)
+                        .description("First and last name of the new person."),
                     object(ADDRESS)
+                        .description("Address of the new person.")
                         .properties(
-                            string(STREET),
-                            string(CITY),
-                            string(STATE),
-                            string(POSTAL_CODE),
-                            string(COUNTRY)),
-                    string(ASSIGNEE_ID),
-                    string(COMPANY_ID),
-                    string(CONTACT_TYPE_ID),
-                    string(DETAILS),
+                            string(STREET)
+                                .description("Street of the new person."),
+                            string(CITY)
+                                .description("City of the new person."),
+                            string(STATE)
+                                .description("State of the new person."),
+                            string(POSTAL_CODE)
+                                .description("Postal code of the new person."),
+                            string(COUNTRY)
+                                .description("Country of the new person.")),
+                    string(ASSIGNEE_ID)
+                        .description("ID of the user that is owner of the new person."),
+                    string(COMPANY_ID)
+                        .description("ID of the primary company with which the new person is associated."),
+                    string("company_name")
+                        .description("The name of the primary company with which the new person is associated."),
+                    string(CONTACT_TYPE_ID)
+                        .description("ID of the contact type of the new person."),
+                    string(DETAILS)
+                        .description("Description of the new person."),
                     array(EMAILS)
+                        .description("Email addresses belonging to the new person.")
                         .items(
                             object()
                                 .properties(
-                                    string(EMAIL),
-                                    string(CATEGORY))),
+                                    string(EMAIL)
+                                        .description("Email address."),
+                                    string(CATEGORY)
+                                        .description("Category of the email address."))),
                     array(PHONE_NUMBERS)
+                        .description("Phone numbers belonging to the new person.")
                         .items(
                             object()
                                 .properties(
-                                    string(NUMBER),
-                                    string(CATEGORY))),
+                                    string(NUMBER)
+                                        .description("Phone number for the new person."),
+                                    string(CATEGORY)
+                                        .description("Category of the phone number."))),
                     array(SOCIALS)
+                        .description("Social profiles belonging to the person.")
                         .items(
                             object()
                                 .properties(
-                                    string(URL),
-                                    string(CATEGORY))),
+                                    string(URL)
+                                        .description("URL of the social profile."),
+                                    string(CATEGORY)
+                                        .description("Category of the social profile."))),
                     array(TAGS)
+                        .description("Tags associated with the person.")
                         .items(string()),
                     string(TITLE),
                     array(WEBSITES)
+                        .description("Websites belonging to the person.")
                         .items(
                             object()
                                 .properties(
-                                    string(URL),
-                                    string(CATEGORY))))))
+                                    string(URL)
+                                        .description("URL of the website."),
+                                    string(CATEGORY)
+                                        .description("Category of the website."))))))
         .perform(CopperCreatePersonAction::perform);
 
     protected static final ContextFunction<Http, Http.Executor> POST_PEOPLE_CONTEXT_FUNCTION =

@@ -46,7 +46,7 @@ public class ObjectHelperContainsAction {
                 .label("Key")
                 .description("Key to check for existence.")
                 .required(true))
-        .output(outputSchema(bool()))
+        .output(outputSchema(bool().description("Indicator of whether the key exists in the object.")))
         .perform(ObjectHelperContainsAction::perform);
 
     private ObjectHelperContainsAction() {

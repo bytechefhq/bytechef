@@ -57,7 +57,7 @@ public class ImageHelperRotateImageAction {
                     option("270°", 270))
                 .required(true),
             RESULT_FILE_NAME_PROPERTY)
-        .output(outputSchema(fileEntry()))
+        .output(outputSchema(fileEntry().description("Rotated image.")))
         .perform(ImageHelperRotateImageAction::perform);
 
     private ImageHelperRotateImageAction() {

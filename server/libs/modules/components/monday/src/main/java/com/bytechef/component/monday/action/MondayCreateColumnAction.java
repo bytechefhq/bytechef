@@ -70,8 +70,10 @@ public class MondayCreateColumnAction {
                     .properties(
                         object("create_column")
                             .properties(
-                                string(ID),
-                                string(TITLE)))))
+                                string(ID)
+                                    .description("ID of the column."),
+                                string(TITLE)
+                                    .description("Title of the column.")))))
         .perform(MondayCreateColumnAction::perform);
 
     private MondayCreateColumnAction() {

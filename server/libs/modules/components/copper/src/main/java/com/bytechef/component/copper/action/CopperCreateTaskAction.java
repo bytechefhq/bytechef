@@ -17,7 +17,6 @@
 package com.bytechef.component.copper.action;
 
 import static com.bytechef.component.copper.constant.CopperConstants.ASSIGNEE_ID;
-import static com.bytechef.component.copper.constant.CopperConstants.CUSTOM_FIELDS;
 import static com.bytechef.component.copper.constant.CopperConstants.DETAILS;
 import static com.bytechef.component.copper.constant.CopperConstants.DUE_DATE;
 import static com.bytechef.component.copper.constant.CopperConstants.ID;
@@ -104,24 +103,33 @@ public class CopperCreateTaskAction {
             outputSchema(
                 object()
                     .properties(
-                        string(ID),
-                        string(NAME),
+                        string(ID)
+                            .description("ID of the new task."),
+                        string(NAME)
+                            .description("Name of the new task."),
                         object("related_resource")
+                            .description("Primary related resource for the new task.")
                             .properties(
-                                string(ID),
+                                string(ID)
+                                    .description(""),
                                 string(TYPE)),
-                        string(ASSIGNEE_ID),
-                        string(DUE_DATE),
-                        string(REMINDER_DATE),
-                        string("completed_date"),
-                        string(PRIORITY),
-                        string(STATUS),
-                        string(DETAILS),
+                        string(ASSIGNEE_ID)
+                            .description("ID of the user that is owner of the new task."),
+                        string(DUE_DATE)
+                            .description("The due date of the new task."),
+                        string(REMINDER_DATE)
+                            .description("The reminder date of the new task."),
+                        string("completed_date")
+                            .description("The date the task was completed."),
+                        string(PRIORITY)
+                            .description("The priority of the new task."),
+                        string(STATUS)
+                            .description("The status of the new task."),
+                        string(DETAILS)
+                            .description("Description of the new task."),
                         array(TAGS)
-                            .items(string()),
-                        array(CUSTOM_FIELDS),
-                        string("date_created"),
-                        string("date_modified"))))
+                            .description("Tags associated with the new task.")
+                            .items(string()))))
         .perform(CopperCreateTaskAction::perform);
 
     protected static final ContextFunction<Http, Http.Executor> POST_CREATE_TASK_FUNCTION =

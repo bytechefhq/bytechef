@@ -52,8 +52,8 @@ public class GithubAddAssigneesToIssueAction {
             string(ISSUE)
                 .options((ActionOptionsFunction<String>) GithubUtils::getIssueOptions)
                 .optionsLookupDependsOn(REPOSITORY)
-                .label("Issue")
-                .description("The issue to add assignee to.")
+                .label("Issue Number")
+                .description("The number of the issue to add assignee to.")
                 .required(true),
             array(ASSIGNEES)
                 .label("Assignees")

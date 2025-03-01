@@ -63,7 +63,7 @@ public class SalesforceCreateRecordAction {
         .output(
             outputSchema(
                 object()
-                    .properties(string(ID))))
+                    .properties(string(ID).description("ID of the created record."))))
         .perform(SalesforceCreateRecordAction::perform);
 
     private SalesforceCreateRecordAction() {

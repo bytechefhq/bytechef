@@ -21,6 +21,7 @@ import static com.bytechef.component.capsule.crm.constant.CapsuleCRMConstants.CO
 import static com.bytechef.component.capsule.crm.constant.CapsuleCRMConstants.DESCRIPTION;
 import static com.bytechef.component.capsule.crm.constant.CapsuleCRMConstants.DETAIL;
 import static com.bytechef.component.capsule.crm.constant.CapsuleCRMConstants.DUE_ON;
+import static com.bytechef.component.capsule.crm.constant.CapsuleCRMConstants.ID;
 import static com.bytechef.component.capsule.crm.constant.CapsuleCRMConstants.NAME;
 import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.date;
@@ -75,14 +76,23 @@ public class CapsuleCRMCreateTaskAction {
         .output(outputSchema(
             object()
                 .properties(
-                    integer("id"),
-                    string(DESCRIPTION),
-                    date(DUE_ON),
-                    string(DETAIL),
+                    integer(ID)
+                        .description("The ID of the new task."),
+                    string(DESCRIPTION)
+                        .description("The description of the task."),
+                    date(DUE_ON)
+                        .description("The due date of the task."),
+                    string(DETAIL)
+                        .description("Details of the new task."),
                     object(CATEGORY)
+                        .description("The category of the new task.")
                         .properties(
-                            string(NAME),
-                            string(COLOUR)))))
+                            string(ID)
+                                .description("ID of the category."),
+                            string(NAME)
+                                .description("Name of the category."),
+                            string(COLOUR)
+                                .description("The hex colour code of the category.")))))
         .perform(CapsuleCRMCreateTaskAction::perform);
 
     protected static final ContextFunction<Http, Http.Executor> POST_TASKS_CONTEXT_FUNCTION =

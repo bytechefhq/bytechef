@@ -46,7 +46,7 @@ public class PdfHelperExtractTextAction {
                 .label("PDF File")
                 .description("The PDF file from which to extract text.")
                 .required(true))
-        .output(outputSchema(string()))
+        .output(outputSchema(string().description("Extracted text from the PDF file.")))
         .perform(PdfHelperExtractTextAction::perform);
 
     private PdfHelperExtractTextAction() {

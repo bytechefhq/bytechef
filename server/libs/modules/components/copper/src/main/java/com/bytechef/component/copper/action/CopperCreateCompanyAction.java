@@ -177,39 +177,61 @@ public class CopperCreateCompanyAction {
         .output(outputSchema(
             object()
                 .properties(
-                    string(ID),
-                    string(NAME),
+                    string(ID)
+                        .description("ID of the new company."),
+                    string(NAME)
+                        .description("Name of the new company."),
                     object(ADDRESS)
+                        .description("Address of the new company.")
                         .properties(
-                            string(STREET),
-                            string(CITY),
-                            string(STATE),
-                            string(POSTAL_CODE),
-                            string(COUNTRY)),
-                    string(ASSIGNEE_ID),
-                    string(CONTACT_TYPE_ID),
-                    string(DETAILS),
-                    string(EMAIL_DOMAIN),
+                            string(STREET)
+                                .description("Street of the new company."),
+                            string(CITY)
+                                .description("City of the new company."),
+                            string(STATE)
+                                .description("State of the new company."),
+                            string(POSTAL_CODE)
+                                .description("Postal code of the new company."),
+                            string(COUNTRY)
+                                .description("Country of the new company.")),
+                    string(ASSIGNEE_ID)
+                        .description("ID of the user that is owner of the new company."),
+                    string(CONTACT_TYPE_ID)
+                        .description("ID of the contact type of the new company."),
+                    string(DETAILS)
+                        .description("Description of the new company."),
+                    string(EMAIL_DOMAIN)
+                        .description("Domain to which email addresses of the new company belong."),
                     array(PHONE_NUMBERS)
+                        .description("Phone numbers belonging to the new company.")
                         .items(
                             object()
                                 .properties(
-                                    string(NUMBER),
-                                    string(CATEGORY))),
+                                    string(NUMBER)
+                                        .description("Phone number for the new company."),
+                                    string(CATEGORY)
+                                        .description("Category of the phone number."))),
                     array(SOCIALS)
+                        .description("Social profiles belonging to the company.")
                         .items(
                             object()
                                 .properties(
-                                    string(URL),
-                                    string(CATEGORY))),
+                                    string(URL)
+                                        .description("URL of the social profile."),
+                                    string(CATEGORY)
+                                        .description("Category of the social profile."))),
                     array(TAGS)
+                        .description("Tags associated with the company.")
                         .items(string()),
                     array(WEBSITES)
+                        .description("Websites belonging to the company.")
                         .items(
                             object()
                                 .properties(
-                                    string(URL),
-                                    string(CATEGORY))))))
+                                    string(URL)
+                                        .description("URL of the website."),
+                                    string(CATEGORY)
+                                        .description("Category of the website."))))))
         .perform(CopperCreateCompanyAction::perform);
 
     protected static final ContextFunction<Http, Http.Executor> POST_COMPANIES_CONTEXT_FUNCTION =

@@ -42,7 +42,7 @@ public class TextHelperFindAction {
                 .label("Expression")
                 .description("Text to search for.")
                 .required(true))
-        .output(outputSchema(bool()))
+        .output(outputSchema(bool().description("True if the text contains the expression, false otherwise.")))
         .perform(TextHelperFindAction::perform);
 
     private TextHelperFindAction() {

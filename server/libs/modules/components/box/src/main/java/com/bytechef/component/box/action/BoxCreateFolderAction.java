@@ -16,7 +16,7 @@
 
 package com.bytechef.component.box.action;
 
-import static com.bytechef.component.box.constant.BoxConstants.FILE_OUTPUT_PROPERTY;
+import static com.bytechef.component.box.constant.BoxConstants.FOLDER_OUTPUT_PROPERTY;
 import static com.bytechef.component.box.constant.BoxConstants.ID;
 import static com.bytechef.component.box.constant.BoxConstants.NAME;
 import static com.bytechef.component.box.constant.BoxConstants.PARENT;
@@ -51,13 +51,12 @@ public class BoxCreateFolderAction {
             string(ID)
                 .label("Parent Folder ID")
                 .description(
-                    "ID of the folder where the new folder will be created; if no folder is selected, the folder will "
-                        +
-                        "be created in the root folder.")
+                    "ID of the folder where the new folder will be created; if no folder is selected, the folder " +
+                        "will be created in the root folder.")
                 .options((ActionOptionsFunction<String>) BoxUtils::getRootFolderOptions)
                 .defaultValue("0")
                 .required(true))
-        .output(outputSchema(FILE_OUTPUT_PROPERTY))
+        .output(outputSchema(FOLDER_OUTPUT_PROPERTY))
         .perform(BoxCreateFolderAction::perform);
 
     private BoxCreateFolderAction() {

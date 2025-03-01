@@ -72,7 +72,7 @@ public class AcumbamailCreateSubscriberListAction {
                 .label("Phone")
                 .description("Phone number of the company")
                 .required(false))
-        .output(outputSchema(integer()))
+        .output(outputSchema(integer().description("ID of the created list.")))
         .perform(AcumbamailCreateSubscriberListAction::perform);
 
     private AcumbamailCreateSubscriberListAction() {

@@ -67,23 +67,43 @@ public class BeamerCreatePostAction {
         .output(outputSchema(
             object()
                 .properties(
-                    string(ID),
-                    string("date"),
-                    string("dueDate"),
-                    string("published"),
-                    string(CATEGORY),
-                    string("feedbackEnabled"),
-                    string("reactionsEnabled"),
+                    string(ID)
+                        .description("The ID of the new post."),
+                    string("date")
+                        .description("Publication date of the new post."),
+                    string("dueDate")
+                        .description("Expiration date of the new post."),
+                    string("published")
+                        .description("Whether the new post is published or a draft."),
+                    string(CATEGORY)
+                        .description("Category of the new post."),
+                    string("feedbackEnabled")
+                        .description("Whether this user feedback is enabled for this post."),
+                    string("reactionsEnabled")
+                        .description("Whether reactions are enabled for this post."),
                     array("translations")
                         .items(
                             object()
                                 .properties(
-                                    string(TITLE),
-                                    string(CONTENT),
-                                    string(CATEGORY),
-                                    string("contentHtml"),
-                                    string("language"),
-                                    string("postUrl"))))))
+                                    string(TITLE)
+                                        .description("Title of post."),
+                                    string(CONTENT)
+                                        .description("Content of the post (plain text)."),
+                                    string("contentHtml")
+                                        .description("Content of the post (original HTML format)."),
+                                    string("language")
+                                        .description("Language of th post (in ISO-639 two-letter code format)."),
+                                    string(CATEGORY)
+                                        .description("Custom category of the post."),
+                                    string("linkUrl")
+                                        .description(
+                                            "The URL where users will be redirected when they click on the header of " +
+                                                "the post or the link shown at the bottom of it."),
+                                    string("linkText")
+                                        .description("The text shown in the link of this post."),
+                                    array("images")
+                                        .description("URLs of the images embedded in this post.")
+                                        .items(string()))))))
         .perform(BeamerCreatePostAction::perform);
 
     private BeamerCreatePostAction() {

@@ -25,7 +25,6 @@ import static com.bytechef.component.definition.ComponentDsl.sampleOutput;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.filesystem.constant.FilesystemConstants.FILENAME;
 import static com.bytechef.component.filesystem.constant.FilesystemConstants.FILE_ENTRY;
-import static com.bytechef.component.filesystem.constant.FilesystemConstants.WRITE_FILE;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
@@ -42,20 +41,21 @@ import java.util.Map;
  */
 public class FilesystemWriteFileAction {
 
-    public static final ModifiableActionDefinition ACTION_DEFINITION = action(WRITE_FILE)
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action("writeFile")
         .title("Write to File")
         .properties(
             fileEntry(FILE_ENTRY)
                 .label("File")
-                .description(
-                    "File entry object to be written.")
+                .description("File entry object to be written.")
                 .required(true),
             string(FILENAME)
                 .label("File path")
                 .description("The path to which the file should be written.")
                 .placeholder("/data/your_file.pdf")
                 .required(true))
-        .output(outputSchema(object().properties(integer("bytes"))), sampleOutput(Map.of("bytes", 1024)))
+        .output(
+            outputSchema(object().properties(integer("bytes").description("Number of bytes written."))),
+            sampleOutput(Map.of("bytes", 1024)))
         .perform(FilesystemWriteFileAction::perform);
 
     private FilesystemWriteFileAction() {

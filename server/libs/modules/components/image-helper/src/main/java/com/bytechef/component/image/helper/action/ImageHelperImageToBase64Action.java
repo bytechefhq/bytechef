@@ -36,7 +36,7 @@ public class ImageHelperImageToBase64Action {
         .title("Image to Base64")
         .description("Converts image to Base64 string.")
         .properties(IMAGE_PROPERTY)
-        .output(outputSchema(string()))
+        .output(outputSchema(string().description("Base64 encoded image.")))
         .perform(ImageHelperImageToBase64Action::perform);
 
     private ImageHelperImageToBase64Action() {

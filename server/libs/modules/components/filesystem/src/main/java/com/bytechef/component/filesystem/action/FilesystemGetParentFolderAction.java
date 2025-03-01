@@ -21,7 +21,6 @@ import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.sampleOutput;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.filesystem.constant.FilesystemConstants.FILENAME;
-import static com.bytechef.component.filesystem.constant.FilesystemConstants.GET_PARENT_FOLDER;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
@@ -34,16 +33,18 @@ import java.nio.file.NoSuchFileException;
  */
 public class FilesystemGetParentFolderAction {
 
-    public static final ModifiableActionDefinition ACTION_DEFINITION = action(GET_PARENT_FOLDER)
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action("getFilePath")
         .title("Get Parent Folder")
-        .description(
-            "Gets the path of the parent folder of the file. If the file doesn't exist, it throws an error.")
-        .properties(string(FILENAME)
-            .label("File path")
-            .description("The path to full filename.")
-            .placeholder("/data/your_file.pdf")
-            .required(true))
-        .output(outputSchema(string()), sampleOutput("/sample_data"))
+        .description("Gets the path of the parent folder of the file. If the file doesn't exist, it throws an error.")
+        .properties(
+            string(FILENAME)
+                .label("File path")
+                .description("The path to full filename.")
+                .placeholder("/data/your_file.pdf")
+                .required(true))
+        .output(
+            outputSchema(string().description("The path of the parent folder of the file.")),
+            sampleOutput("/sample_data"))
         .perform(FilesystemGetParentFolderAction::perform);
 
     private FilesystemGetParentFolderAction() {

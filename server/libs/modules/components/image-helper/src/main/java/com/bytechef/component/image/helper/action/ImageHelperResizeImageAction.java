@@ -57,7 +57,7 @@ public class ImageHelperResizeImageAction {
                 .description("Height in pixels")
                 .required(true),
             RESULT_FILE_NAME_PROPERTY)
-        .output(outputSchema(fileEntry()))
+        .output(outputSchema(fileEntry().description("Resized image.")))
         .perform(ImageHelperResizeImageAction::perform);
 
     private ImageHelperResizeImageAction() {

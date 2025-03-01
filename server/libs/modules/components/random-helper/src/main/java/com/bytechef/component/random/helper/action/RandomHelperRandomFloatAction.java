@@ -47,7 +47,7 @@ public class RandomHelperRandomFloatAction {
                 .description("The maximum possible generated value.")
                 .required(true)
                 .defaultValue(100))
-        .output(outputSchema(number()))
+        .output(outputSchema(number().description("Generated random float value.")))
         .perform(RandomHelperRandomFloatAction::perform);
 
     /**

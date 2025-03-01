@@ -44,7 +44,7 @@ public class AcumbamailAddSubscriberAction {
                 .description("List identifier.")
                 .options((ActionOptionsFunction<String>) AcumbamailUtils::getListsIdOptions)
                 .required(true))
-        .output(outputSchema(integer()))
+        .output(outputSchema(integer().description("ID of the created subscriber.")))
         .perform(AcumbamailAddSubscriberAction::perform);
 
     private AcumbamailAddSubscriberAction() {
