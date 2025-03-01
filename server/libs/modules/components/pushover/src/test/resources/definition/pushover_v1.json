@@ -314,7 +314,7 @@
       "hidden" : null,
       "metadata" : { },
       "required" : false,
-      "name" : "attachment_base64",
+      "name" : "attachment",
       "type" : "FILE_ENTRY",
       "defaultValue" : null,
       "exampleValue" : null,
@@ -477,7 +477,7 @@
     "baseUri" : { },
     "test" : null
   },
-  "triggers" : null,
   "dataStream" : null,
+  "triggers" : null,
   "unifiedApi" : null
 }
