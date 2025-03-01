@@ -268,7 +268,11 @@ $outputSchema
 
         private fun getOutputString(): String {
             return if (outputResponse != null) "$outputResponse"
-            else return ""
+            else return """
+#### Output
+
+The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
+"""
         }
 
         override fun toString(): String {
@@ -288,7 +292,11 @@ $outputSchema
 
         private fun getOutputDefinitionString(): String {
             if (outputDefinition == null) {
-                return ""
+                return """
+#### Output
+
+This action does not produce any output.
+"""
             }
 
             return "$outputDefinition"
@@ -363,7 +371,11 @@ ${properties?.joinToString("\n")}
 
         private fun getOutputResponseString(): String {
             if (outputDefinition == null) {
-                return ""
+                return """
+#### Output
+
+This trigger does not produce any output.
+"""
             }
 
             return "$outputDefinition"
