@@ -56,7 +56,7 @@ Sends a notification.
 | expire | Expire | INTEGER | If the notification has not be acknowledged in expire seconds, it will be marked as expired and will stop being sent to the user. | true |
 | url | URL | STRING | Clickable URL link in the message to send. | false |
 | url_title | Url Title | STRING | When the user taps on the notification in Pushover to expand it, the URL will be shown as the supplied url_title | false |
-| attachment_base64 | Attachment | FILE_ENTRY | The attachment to send. | false |
+| attachment | Attachment | FILE_ENTRY | The attachment to send. | false |
 
 
 #### Output
@@ -89,7 +89,7 @@ Type: OBJECT
     "expire" : 1,
     "url" : "",
     "url_title" : "",
-    "attachment_base64" : {
+    "attachment" : {
       "extension" : "",
       "mimeType" : "",
       "name" : "",

@@ -21,7 +21,7 @@ package com.bytechef.component.pushover.constant;
  */
 public class PushoverConstants {
 
-    public static final String ATTACHMENT_BASE_64 = "attachment_base64";
+    public static final String ATTACHMENT = "attachment";
     public static final String EXPIRE = "expire";
     public static final String MESSAGE = "message";
     public static final String PRIORITY = "priority";
