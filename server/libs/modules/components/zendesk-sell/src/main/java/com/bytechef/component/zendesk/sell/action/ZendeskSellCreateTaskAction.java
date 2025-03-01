@@ -53,9 +53,12 @@ public class ZendeskSellCreateTaskAction {
                     .properties(
                         object(DATA)
                             .properties(
-                                integer("id"),
-                                string(CONTENT),
-                                date(DUE_DATE)),
+                                integer("id")
+                                    .description("The ID of the task."),
+                                string(CONTENT)
+                                    .description("Name of the task."),
+                                date(DUE_DATE)
+                                    .description("Due date of the task.")),
                         object("meta")
                             .properties(
                                 string("type")))))

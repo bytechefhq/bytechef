@@ -25,6 +25,7 @@ import static com.bytechef.component.definition.ComponentDsl.trigger;
 import static com.bytechef.component.github.constant.GithubConstants.BODY;
 import static com.bytechef.component.github.constant.GithubConstants.ID;
 import static com.bytechef.component.github.constant.GithubConstants.REPOSITORY;
+import static com.bytechef.component.github.constant.GithubConstants.REPOSITORY_OUTPUT_PROPERTY;
 import static com.bytechef.component.github.constant.GithubConstants.TITLE;
 import static com.bytechef.component.github.util.GithubUtils.getContent;
 import static com.bytechef.component.github.util.GithubUtils.subscribeWebhook;
@@ -59,32 +60,31 @@ public class GithubNewPullRequestTrigger {
             outputSchema(
                 object()
                     .properties(
-                        integer("number"),
+                        integer("number")
+                            .description("Number uniquely identifying the pull request within its repository."),
                         object("pull_request")
                             .properties(
-                                integer(ID),
-                                string("state"),
-                                string(TITLE),
-                                string(BODY),
-                                integer("commits")),
+                                integer(ID)
+                                    .description("ID of the pull request."),
+                                string("state")
+                                    .description("The current state of the pull request, such as open or closed."),
+                                string(TITLE)
+                                    .description("The title of the pull request, summarizing its purpose or changes."),
+                                string(BODY)
+                                    .description("The main content of the pull request."),
+                                integer("commits")
+                                    .description("The total number of commits included in the pull request.")),
                         object("sender")
+                            .description("Information about the author of the pull request.")
                             .properties(
-                                string("login"),
-                                integer(ID)),
-                        string("action"),
-                        object("repository")
-                            .properties(
-                                integer(ID),
-                                string("name"),
-                                string("full_name"),
-                                object("owner")
-                                    .properties(
-                                        string("login"),
-                                        integer(ID)),
-                                string("visibility"),
-                                integer("forks"),
-                                integer("open_issues"),
-                                string("default_branch")))))
+                                string("login")
+                                    .description("The username of the person who created the pull request."),
+                                integer(ID)
+                                    .description("ID of the sender.")),
+                        string("action")
+                            .description(
+                                "The action performed on the pull request, such as opened, closed, or synchronized."),
+                        REPOSITORY_OUTPUT_PROPERTY)))
         .webhookEnable(GithubNewPullRequestTrigger::webhookEnable)
         .webhookDisable(GithubNewPullRequestTrigger::webhookDisable)
         .webhookRequest(GithubNewPullRequestTrigger::webhookRequest);

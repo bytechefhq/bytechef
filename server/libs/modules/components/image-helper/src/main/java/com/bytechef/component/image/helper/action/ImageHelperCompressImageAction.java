@@ -60,7 +60,7 @@ public class ImageHelperCompressImageAction {
                 .maxValue(1)
                 .required(true),
             RESULT_FILE_NAME_PROPERTY)
-        .output(outputSchema(fileEntry()))
+        .output(outputSchema(fileEntry().description("Compressed image.")))
         .perform(ImageHelperCompressImageAction::perform);
 
     private ImageHelperCompressImageAction() {

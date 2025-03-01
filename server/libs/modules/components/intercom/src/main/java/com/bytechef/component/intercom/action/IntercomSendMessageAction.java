@@ -25,10 +25,12 @@ import static com.bytechef.component.definition.Context.Http.ResponseType;
 import static com.bytechef.component.definition.Context.Http.responseType;
 import static com.bytechef.component.intercom.constant.IntercomConstants.BODY;
 import static com.bytechef.component.intercom.constant.IntercomConstants.FROM;
+import static com.bytechef.component.intercom.constant.IntercomConstants.ID;
 import static com.bytechef.component.intercom.constant.IntercomConstants.MESSAGE_TYPE;
 import static com.bytechef.component.intercom.constant.IntercomConstants.SUBJECT;
 import static com.bytechef.component.intercom.constant.IntercomConstants.TEMPLATE;
 import static com.bytechef.component.intercom.constant.IntercomConstants.TO;
+import static com.bytechef.component.intercom.constant.IntercomConstants.TYPE;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
@@ -78,7 +80,22 @@ public class IntercomSendMessageAction {
                 .description("ID of the contact to send the message to.")
                 .required(true)
                 .options((ActionOptionsFunction<String>) IntercomUtils::getContactIdOptions))
-        .output(outputSchema(object()))
+        .output(
+            outputSchema(
+                object()
+                    .properties(
+                        string(TYPE)
+                            .description("The type of the message."),
+                        string(ID)
+                            .description("ID of the message."),
+                        string(SUBJECT)
+                            .description("The subject of the message."),
+                        string(BODY)
+                            .description("The message body, which may contain HTML."),
+                        string(MESSAGE_TYPE)
+                            .description("The type of message that was sent."),
+                        string("conversation_id")
+                            .description("The associated conversation_id."))))
         .perform(IntercomSendMessageAction::perform);
 
     protected static final ContextFunction<Http, Http.Executor> POST_MESSAGES_CONTEXT_FUNCTION =

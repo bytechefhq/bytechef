@@ -78,8 +78,10 @@ public class MondayCreateItemAction {
                     .properties(
                         object("create_item")
                             .properties(
-                                string(ID),
-                                string(NAME)))))
+                                string(ID)
+                                    .description("ID of the item."),
+                                string(NAME)
+                                    .description("Name of the item.")))))
         .perform(MondayCreateItemAction::perform);
 
     private MondayCreateItemAction() {

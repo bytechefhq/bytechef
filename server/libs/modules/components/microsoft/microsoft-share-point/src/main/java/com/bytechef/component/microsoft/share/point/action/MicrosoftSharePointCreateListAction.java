@@ -52,9 +52,12 @@ public class MicrosoftSharePointCreateListAction {
             outputSchema(
                 object()
                     .properties(
-                        string(ID),
-                        string(DESCRIPTION),
-                        string(DISPLAY_NAME))))
+                        string(ID)
+                            .description("ID of the list."),
+                        string(DESCRIPTION)
+                            .description("Description of the list."),
+                        string(DISPLAY_NAME)
+                            .description("The displayable title of the list."))))
         .perform(MicrosoftSharePointCreateListAction::perform);
 
     private MicrosoftSharePointCreateListAction() {

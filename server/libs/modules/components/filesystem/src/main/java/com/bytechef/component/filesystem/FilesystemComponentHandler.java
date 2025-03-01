@@ -17,7 +17,6 @@
 package com.bytechef.component.filesystem;
 
 import static com.bytechef.component.definition.ComponentDsl.component;
-import static com.bytechef.component.filesystem.constant.FilesystemConstants.FILESYSTEM;
 
 import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.definition.ComponentCategory;
@@ -37,19 +36,19 @@ import com.google.auto.service.AutoService;
 @AutoService(ComponentHandler.class)
 public class FilesystemComponentHandler implements ComponentHandler {
 
-    private static final ComponentDefinition COMPONENT_DEFINITION = component(FILESYSTEM)
+    private static final ComponentDefinition COMPONENT_DEFINITION = component("filesystem")
         .title("Filesystem")
         .description("Allows multiple operations over files on the filesystem.")
         .icon("path:assets/filesystem.svg")
         .categories(ComponentCategory.HELPERS)
         .actions(
-            FilesystemReadFileAction.ACTION_DEFINITION,
-            FilesystemWriteFileAction.ACTION_DEFINITION,
             FilesystemCreateTempDirAction.ACTION_DEFINITION,
+            FilesystemMkdirAction.ACTION_DEFINITION,
             FilesystemGetParentFolderAction.ACTION_DEFINITION,
             FilesystemLsAction.ACTION_DEFINITION,
-            FilesystemMkdirAction.ACTION_DEFINITION,
-            FilesystemRmAction.ACTION_DEFINITION);
+            FilesystemReadFileAction.ACTION_DEFINITION,
+            FilesystemRmAction.ACTION_DEFINITION,
+            FilesystemWriteFileAction.ACTION_DEFINITION);
 
     @Override
     public ComponentDefinition getDefinition() {

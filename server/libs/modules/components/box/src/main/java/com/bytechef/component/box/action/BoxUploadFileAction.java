@@ -65,6 +65,7 @@ public class BoxUploadFileAction {
                 object()
                     .properties(
                         array("entries")
+                            .description("A list of files that were uploaded.")
                             .items(FILE_OUTPUT_PROPERTY))))
         .perform(BoxUploadFileAction::perform);
 

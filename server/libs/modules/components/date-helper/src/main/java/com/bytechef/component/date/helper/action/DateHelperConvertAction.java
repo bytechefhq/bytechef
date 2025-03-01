@@ -60,7 +60,7 @@ public class DateHelperConvertAction {
                     option("ISO8601 Date", ISO8601_DATE_FORMAT, "Get date in yyyy-MM-dd"))
                 .required(true)
                 .defaultValue(ISO8601_DATE_TIME_FORMAT))
-        .output(outputSchema(string()))
+        .output(outputSchema(string().description("ISO8601 Date")))
         .perform(DateHelperConvertAction::perform);
 
     private DateHelperConvertAction() {

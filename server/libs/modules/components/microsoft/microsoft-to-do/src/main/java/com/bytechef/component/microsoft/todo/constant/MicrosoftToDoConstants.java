@@ -39,16 +39,25 @@ public class MicrosoftToDoConstants {
     public static final ModifiableObjectProperty OUTPUT_TASK_PROPERTY = object()
         .properties(
             string("@odata.etag"),
-            string(IMPORTANCE),
-            bool(IS_REMINDER_ON),
-            string("status"),
-            string(TITLE),
-            string("categories"),
-            string(ID),
+            string(IMPORTANCE)
+                .description("Importance of the task."),
+            bool(IS_REMINDER_ON)
+                .description("Indicates whether an alert is set to reminder the user of the task."),
+            string("status")
+                .description("State or progress of the task."),
+            string(TITLE)
+                .description("Title of the task."),
+            string("categories")
+                .description("The categories associated with the task."),
+            string(ID)
+                .description("ID of the task."),
             object("body")
+                .description("Body of the task containing information about the task.")
                 .properties(
-                    string("content"),
-                    string("contentType")),
+                    string("content")
+                        .description("Content of the task."),
+                    string("contentType")
+                        .description("The type of the content.")),
             object("linkedResources")
                 .properties(
                     string(ID),

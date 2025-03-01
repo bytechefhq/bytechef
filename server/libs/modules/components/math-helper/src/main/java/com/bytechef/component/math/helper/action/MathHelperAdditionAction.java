@@ -41,7 +41,7 @@ public class MathHelperAdditionAction {
             number(SECOND_NUMBER)
                 .label("Second Number")
                 .required(true))
-        .output(outputSchema(number()))
+        .output(outputSchema(number().description("Result of addition.")))
         .perform(MathHelperAdditionAction::perform);
 
     private MathHelperAdditionAction() {

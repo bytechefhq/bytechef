@@ -82,11 +82,17 @@ public class ZendeskSellCreateContactAction {
                     .properties(
                         object(DATA)
                             .properties(
-                                string("id"),
-                                bool(IS_ORGANIZATION),
-                                string(TITLE),
-                                string(WEBSITE),
-                                string(EMAIL)),
+                                string("id")
+                                    .description("The ID of the contact."),
+                                bool(IS_ORGANIZATION)
+                                    .description(
+                                        "Indicator of whether or not this contact refers to an organization or an individual."),
+                                string(TITLE)
+                                    .description("The contact’s description."),
+                                string(WEBSITE)
+                                    .description("The contact’s website address."),
+                                string(EMAIL)
+                                    .description("The contact’s email address.")),
                         object("meta")
                             .properties(
                                 integer("version"),

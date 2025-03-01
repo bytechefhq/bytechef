@@ -49,7 +49,7 @@ public class DateHelperGetCurrentDateAction {
                 .options((ActionOptionsFunction<String>) DateHelperUtils::getZoneOptions)
                 .required(true),
             DATE_FORMAT_PROPERTY)
-        .output(outputSchema(string()))
+        .output(outputSchema(string().description("Current date in the specified time zone and format.")))
         .perform(DateHelperGetCurrentDateAction::perform);
 
     private DateHelperGetCurrentDateAction() {

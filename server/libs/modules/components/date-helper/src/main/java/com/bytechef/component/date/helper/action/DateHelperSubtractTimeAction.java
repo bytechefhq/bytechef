@@ -73,7 +73,7 @@ public class DateHelperSubtractTimeAction {
                 .label("Second")
                 .description("Seconds to subtract.")
                 .required(false))
-        .output(outputSchema(dateTime()))
+        .output(outputSchema(dateTime().description("Date with subtracted time.")))
         .perform(DateHelperSubtractTimeAction::perform);
 
     private DateHelperSubtractTimeAction() {

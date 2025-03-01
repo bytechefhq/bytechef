@@ -37,7 +37,12 @@ public class BeamerGetFeedAction {
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("getFeed")
         .title("Get Feed")
         .description("Get the URL for your feed.")
-        .output(outputSchema(object().properties(string("url"))))
+        .output(
+            outputSchema(
+                object()
+                    .properties(
+                        string("url")
+                            .description("URL for your standalone feed."))))
         .perform(BeamerGetFeedAction::perform);
 
     private BeamerGetFeedAction() {

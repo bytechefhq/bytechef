@@ -23,6 +23,7 @@ import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.freshsales.constant.FreshsalesConstants.EMAIL;
 import static com.bytechef.component.freshsales.constant.FreshsalesConstants.FIRST_NAME;
+import static com.bytechef.component.freshsales.constant.FreshsalesConstants.ID;
 import static com.bytechef.component.freshsales.constant.FreshsalesConstants.LAST_NAME;
 
 import com.bytechef.component.definition.ActionContext;
@@ -58,10 +59,16 @@ public class FreshsalesCreateLeadAction {
             outputSchema(
                 object()
                     .properties(
-                        number("id"),
-                        string(EMAIL),
-                        string(FIRST_NAME),
-                        string(LAST_NAME))))
+                        object("lead")
+                            .properties(
+                                number(ID)
+                                    .description("ID of the lead."),
+                                string(EMAIL)
+                                    .description("Primary email address of the lead."),
+                                string(FIRST_NAME)
+                                    .description("First name of the lead."),
+                                string(LAST_NAME)
+                                    .description("Last name of the lead.")))))
         .perform(FreshsalesCreateLeadAction::perform);
 
     private FreshsalesCreateLeadAction() {

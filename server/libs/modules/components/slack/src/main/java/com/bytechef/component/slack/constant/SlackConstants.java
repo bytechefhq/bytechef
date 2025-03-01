@@ -38,16 +38,25 @@ public class SlackConstants {
 
     public static final ModifiableObjectProperty CHAT_POST_MESSAGE_RESPONSE_PROPERTY = object()
         .properties(
-            bool("ok"),
-            string(CHANNEL),
-            string("ts"),
+            bool("ok")
+                .description("Indicates if the message was successfully sent."),
+            string(CHANNEL)
+                .description("ID of the channel the message was sent to."),
+            string("ts")
+                .description("Timestamp of the message."),
             object("message")
+                .description("The sent message.")
                 .properties(
-                    string("user"),
-                    string("type"),
-                    string("ts"),
-                    string("text"),
-                    string("team"),
+                    string("user")
+                        .description("ID of the user who sent the message."),
+                    string("type")
+                        .description("Type of the message."),
+                    string("ts")
+                        .description("Timestamp of the message."),
+                    string("text")
+                        .description("The text of the message."),
+                    string("team")
+                        .description("ID of the team the message was sent to."),
                     string("subtype")),
             string("warning"),
             object("responseMetadata")

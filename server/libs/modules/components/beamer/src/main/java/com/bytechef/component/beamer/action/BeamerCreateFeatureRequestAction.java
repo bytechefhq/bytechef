@@ -66,32 +66,63 @@ public class BeamerCreateFeatureRequestAction {
             outputSchema(
                 object()
                     .properties(
-                        string(ID),
-                        string("date"),
-                        string("visible"),
-                        string(CATEGORY),
-                        string("status"),
+                        string(ID)
+                            .description("The ID of the new feature request."),
+                        string("date")
+                            .description("Publish date of the new feature request."),
+                        string("visible")
+                            .description("Whether this feature required is visible or not."),
+                        string(CATEGORY)
+                            .description("The category of the new feature request."),
+                        string("status")
+                            .description("The status of the new feature request."),
                         array("translations")
                             .items(
                                 object()
                                     .properties(
-                                        string(TITLE),
-                                        string(CONTENT),
-                                        string("contentHtml"),
-                                        string("language"),
-                                        string("permalink"),
-                                        array("images").items(string()))),
-                        integer("votesCount"),
-                        string("commentsCount"),
-                        string("notes"),
-                        string("filters"),
-                        string("internalUserEmail"),
-                        string("internalUserFirstname"),
-                        string("internalUserLastname"),
-                        string(USER_ID),
-                        string(USER_EMAIL),
-                        string(USER_FIRST_NAME),
-                        string(USER_LAST_NAME))))
+                                        string(TITLE)
+                                            .description("Title of the feature request."),
+                                        string(CONTENT)
+                                            .description("Content of the feature request (plain text)."),
+                                        string("contentHtml")
+                                            .description("Content of the feature request (original HTML format)."),
+                                        string("language")
+                                            .description(
+                                                "Language of this feature request (in ISO-639 two-letter code format)."),
+                                        string("permalink")
+                                            .description("Permalink of this feature request."),
+                                        array("images")
+                                            .description("URLs of the images embedded in this post.")
+                                            .items(string()))),
+                        integer("votesCount")
+                            .description("The number of votes for the new feature request."),
+                        string("commentsCount")
+                            .description("The number of comments for the new feature request."),
+                        string("notes")
+                            .description("The notes for the new feature request."),
+                        string("filters")
+                            .description("Segment filters for the new feature request."),
+                        string("internalUserEmail")
+                            .description(
+                                "Email of the user in your account who created this feature request (if created by a team member)."),
+                        string("internalUserFirstname")
+                            .description(
+                                "First name of the user in your account who created this feature request (if created by a team member)."),
+                        string("internalUserLastname")
+                            .description(
+                                "Last name of the user in your account who created this feature request (if created by a team member)."),
+                        string(USER_ID)
+                            .description(
+                                "ID of the end user who created this feature request (if created by an end user)."),
+                        string(USER_EMAIL)
+                            .description(
+                                "Email of the end user who created this feature request (if created by an end user)."),
+                        string(USER_FIRST_NAME)
+                            .description(
+                                "First name of the end user who created this feature request (if created by an end user)."),
+                        string(USER_LAST_NAME)
+                            .description(
+                                "Last name of the end user who created this feature request (if created by an end user)."))))
         .perform(BeamerCreateFeatureRequestAction::perform);
 
     private BeamerCreateFeatureRequestAction() {

@@ -66,8 +66,10 @@ public class MicrosoftOutlook365GetFreeTimeSlotsAction {
                     .items(
                         object()
                             .properties(
-                                dateTime("startTime"),
-                                dateTime("endTime")))))
+                                dateTime("startTime")
+                                    .description("Start time of the free time slot."),
+                                dateTime("endTime")
+                                    .description("End time of the free time slot.")))))
         .perform(MicrosoftOutlook365GetFreeTimeSlotsAction::perform);
 
     private MicrosoftOutlook365GetFreeTimeSlotsAction() {

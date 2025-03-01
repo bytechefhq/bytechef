@@ -18,6 +18,7 @@ package com.bytechef.component.text.helper.action;
 
 import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.option;
+import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.text.helper.constant.TextHelperConstants.CONTENT;
 import static com.bytechef.component.text.helper.constant.TextHelperConstants.ENCODING_SCHEMA;
@@ -25,7 +26,7 @@ import static com.bytechef.component.text.helper.constant.TextHelperConstants.EN
 import static com.bytechef.component.text.helper.constant.TextHelperConstants.ENCODING_SCHEMA_BASE64URL;
 
 import com.bytechef.component.definition.ActionContext;
-import com.bytechef.component.definition.ComponentDsl;
+import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.Property.ControlType;
 import java.nio.charset.StandardCharsets;
@@ -37,7 +38,7 @@ import java.util.Objects;
  */
 public class TextHelperBase64DecodeAction {
 
-    public static final ComponentDsl.ModifiableActionDefinition ACTION_DEFINITION = action("base64Decode")
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action("base64Decode")
         .title("Base64 Decode")
         .description("Decodes base64 encoded text into human readable plain text.")
         .properties(
@@ -53,10 +54,10 @@ public class TextHelperBase64DecodeAction {
                 .description("The Base64 encoded content that needs to be decoded.")
                 .controlType(ControlType.TEXT_AREA)
                 .required(true))
-        .output()
+        .output(outputSchema(string().description("Decoded content.")))
         .perform(TextHelperBase64DecodeAction::perform);
 
-    protected static Object perform(
+    protected static String perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
 
         String base64Content = inputParameters.getRequiredString(CONTENT);

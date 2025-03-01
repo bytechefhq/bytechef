@@ -44,7 +44,7 @@ public class ObjectHelperEqualsAction {
                 .label("Target")
                 .description("The target object to compare against.")
                 .required(true))
-        .output(outputSchema(bool()))
+        .output(outputSchema(bool().description("Indicates whether the two objects are equal.")))
         .perform(ObjectHelperEqualsAction::perform);
 
     private ObjectHelperEqualsAction() {

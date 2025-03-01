@@ -46,7 +46,7 @@ public class TextHelperMarkdownToHTMLAction {
                 .description("Markdown content to convert to HTML.")
                 .controlType(ControlType.TEXT_AREA)
                 .required(true))
-        .output(outputSchema(string()))
+        .output(outputSchema(string().description("HTML content.")))
         .perform(TextHelperMarkdownToHTMLAction::perform);
 
     private TextHelperMarkdownToHTMLAction() {

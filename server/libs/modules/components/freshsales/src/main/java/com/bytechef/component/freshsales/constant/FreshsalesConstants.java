@@ -30,6 +30,7 @@ public class FreshsalesConstants {
     public static final String EMAIL = "email";
     public static final String FACEBOOK = "facebook";
     public static final String FIRST_NAME = "first_name";
+    public static final String ID = "id";
     public static final String JOB_TITLE = "job_title";
     public static final String LAST_NAME = "last_name";
     public static final String LINKEDIN = "linkedin";

@@ -43,7 +43,7 @@ public class MathHelperSubtractionAction {
                 .label("Second Number")
                 .description("Number to subtract.")
                 .required(true))
-        .output(outputSchema(number()))
+        .output(outputSchema(number().description("Result of subtraction.")))
         .perform(MathHelperSubtractionAction::perform);
 
     private MathHelperSubtractionAction() {

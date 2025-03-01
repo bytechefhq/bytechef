@@ -21,7 +21,6 @@ import static com.bytechef.component.definition.ComponentDsl.fileEntry;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.filesystem.constant.FilesystemConstants.FILENAME;
-import static com.bytechef.component.filesystem.constant.FilesystemConstants.READ_FILE;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
@@ -36,14 +35,15 @@ import java.io.InputStream;
  */
 public class FilesystemReadFileAction {
 
-    public static final ModifiableActionDefinition ACTION_DEFINITION = action(READ_FILE)
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action("readFile")
         .title("Read File")
         .description("Reads all data from a specified file path and outputs it in file entry format.")
-        .properties(string(FILENAME)
-            .label("File path")
-            .description("The path of the file to read.")
-            .placeholder("/data/your_file.pdf")
-            .required(true))
+        .properties(
+            string(FILENAME)
+                .label("File path")
+                .description("The path of the file to read.")
+                .placeholder("/data/your_file.pdf")
+                .required(true))
         .output(outputSchema(fileEntry()))
         .perform(FilesystemReadFileAction::perform);
 

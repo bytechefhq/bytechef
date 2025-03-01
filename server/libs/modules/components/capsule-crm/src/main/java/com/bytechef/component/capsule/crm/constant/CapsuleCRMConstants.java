@@ -32,6 +32,7 @@ public class CapsuleCRMConstants {
     public static final String DUE_ON = "dueOn";
     public static final String EMAIL_ADDRESSES = "emailAddresses";
     public static final String FIRST_NAME = "firstName";
+    public static final String ID = "id";
     public static final String LAST_NAME = "lastName";
     public static final String NAME = "name";
     public static final String NUMBER = "number";

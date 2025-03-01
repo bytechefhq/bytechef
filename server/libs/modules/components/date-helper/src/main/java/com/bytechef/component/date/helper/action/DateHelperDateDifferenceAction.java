@@ -65,7 +65,7 @@ public class DateHelperDateDifferenceAction {
                     option("Minute", MINUTE),
                     option("Second", SECOND))
                 .required(true))
-        .output(outputSchema(number()))
+        .output(outputSchema(number().description("Difference between two dates.")))
         .perform(DateHelperDateDifferenceAction::perform);
 
     private DateHelperDateDifferenceAction() {

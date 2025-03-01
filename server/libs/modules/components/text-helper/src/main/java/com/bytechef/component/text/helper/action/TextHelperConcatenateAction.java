@@ -46,7 +46,7 @@ public class TextHelperConcatenateAction {
                 .label("Separator")
                 .description("The text that separates the texts you want to concatenate.")
                 .required(false))
-        .output(outputSchema(string()))
+        .output(outputSchema(string().description("The concatenated text.")))
         .perform(TextHelperConcatenateAction::perform);
 
     private TextHelperConcatenateAction() {

@@ -63,8 +63,10 @@ public class MondayCreateGroupAction {
                     .properties(
                         object("create_group")
                             .properties(
-                                string(ID),
-                                string(NAME)))))
+                                string(ID)
+                                    .description("ID of the group."),
+                                string(NAME)
+                                    .description("Name of the group.")))))
         .perform(MondayCreateGroupAction::perform);
 
     private MondayCreateGroupAction() {

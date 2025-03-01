@@ -55,12 +55,17 @@ public class MicrosoftTeamsSendChatMessageAction {
             outputSchema(
                 object()
                     .properties(
-                        string(ID),
-                        string("chatId"),
+                        string(ID)
+                            .description("ID of the message."),
+                        string("chatId")
+                            .description("ID of the chat."),
                         object(BODY)
+                            .description("Plaintext/HTML representation of the content of the chat message.")
                             .properties(
-                                string(CONTENT_TYPE),
-                                string(CONTENT)))))
+                                string(CONTENT_TYPE)
+                                    .description("Type of the content."),
+                                string(CONTENT)
+                                    .description("The content of the message.")))))
         .perform(MicrosoftTeamsSendChatMessageAction::perform);
 
     private MicrosoftTeamsSendChatMessageAction() {

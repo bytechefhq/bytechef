@@ -96,32 +96,51 @@ public class MicrosoftOutlook365Constants {
 
     public static final ModifiableObjectProperty CUSTOM_EVENT_OUTPUT_PROPERTY = object()
         .properties(
-            string(I_CAL_UID),
-            string(ID),
-            string(SUBJECT),
-            dateTime("startTime"),
-            dateTime("endTime"),
+            string(I_CAL_UID)
+                .description("ID for an event across calendars,"),
+            string(ID)
+                .description("ID of the event."),
+            string(SUBJECT)
+                .description("The text of the event's subject line."),
+            dateTime("startTime")
+                .description("Start time of the event."),
+            dateTime("endTime")
+                .description("End time of the event."),
             array(ATTENDEES)
-                .items(string()),
-            bool(IS_ONLINE_MEETING),
-            string("onlineMeetingUrl"),
-            bool(REMINDER_MINUTES_BEFORE_START));
+                .description("The attendees for the event.")
+                .items(string().description("The email address of the person or entity.")),
+            bool(IS_ONLINE_MEETING)
+                .description("Indicates whether the event is an online meeting."),
+            string("onlineMeetingUrl")
+                .description("URL for an online meeting."),
+            bool(REMINDER_MINUTES_BEFORE_START)
+                .description("The number of minutes before the event start time that the reminder alert occurs."));
 
     public static final ModifiableObjectProperty MESSAGE_OUTPUT_PROPERTY = object()
         .properties(
-            string(ID),
-            string(SUBJECT),
-            string("bodyPreview"),
+            string(ID)
+                .description("ID of the message."),
+            string(SUBJECT)
+                .description("Subject of the message."),
+            string("bodyPreview")
+                .description("The first 255 characters of the message body."),
             object(BODY)
+                .description("The body of the message. It can be in HTML or text format.")
                 .properties(
-                    string(CONTENT_TYPE),
-                    string(CONTENT)),
+                    string(CONTENT_TYPE)
+                        .description("The content type of the message body."),
+                    string(CONTENT)
+                        .description("The content of the message body.")),
             object(FROM)
+                .description("The owner of the mailbox from which the message is sent.")
                 .properties(
                     object(EMAIL_ADDRESS)
+                        .description("The recipient's email address.")
                         .properties(
-                            string(NAME),
-                            string(ADDRESS))));
+                            string(NAME)
+                                .description("The display name of the sender."),
+                            string(ADDRESS)
+                                .description("The email address of the sender."))));
 
     public static final ModifiableObjectProperty RECIPIENT_PROPERTY = object()
         .label("Recipient")

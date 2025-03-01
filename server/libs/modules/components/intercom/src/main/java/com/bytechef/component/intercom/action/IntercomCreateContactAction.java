@@ -18,15 +18,14 @@ package com.bytechef.component.intercom.action;
 
 import static com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import static com.bytechef.component.definition.ComponentDsl.action;
-import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.option;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.Context.Http.ResponseType;
 import static com.bytechef.component.definition.Context.Http.responseType;
 import static com.bytechef.component.intercom.constant.IntercomConstants.AVATAR;
+import static com.bytechef.component.intercom.constant.IntercomConstants.CONTACT_OUTPUT_PROPERTY;
 import static com.bytechef.component.intercom.constant.IntercomConstants.EMAIL;
-import static com.bytechef.component.intercom.constant.IntercomConstants.ID;
 import static com.bytechef.component.intercom.constant.IntercomConstants.LEAD;
 import static com.bytechef.component.intercom.constant.IntercomConstants.NAME;
 import static com.bytechef.component.intercom.constant.IntercomConstants.PHONE;
@@ -76,16 +75,7 @@ public class IntercomCreateContactAction {
                 .description("Image of the contact")
                 .maxLength(500)
                 .required(false))
-        .output(
-            outputSchema(
-                object()
-                    .properties(
-                        string("type"),
-                        string(ID),
-                        string(ROLE),
-                        string(EMAIL),
-                        string(PHONE),
-                        string(NAME))))
+        .output(outputSchema(CONTACT_OUTPUT_PROPERTY))
         .perform(IntercomCreateContactAction::perform);
 
     protected static final ContextFunction<Http, Http.Executor> POST_CONTACTS_CONTEXT_FUNCTION =

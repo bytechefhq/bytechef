@@ -16,6 +16,11 @@
 
 package com.bytechef.component.intercom.constant;
 
+import static com.bytechef.component.definition.ComponentDsl.object;
+import static com.bytechef.component.definition.ComponentDsl.string;
+
+import com.bytechef.component.definition.ComponentDsl;
+
 /**
  * @author Luka Ljubić
  */
@@ -36,6 +41,21 @@ public class IntercomConstants {
     public static final String TO = "to";
     public static final String TYPE = "type";
     public static final String USER = "user";
+
+    public static final ComponentDsl.ModifiableObjectProperty CONTACT_OUTPUT_PROPERTY = object()
+        .properties(
+            string(TYPE)
+                .description("The type of the contact."),
+            string(ID)
+                .description("ID of the contact."),
+            string(ROLE)
+                .description("Role of the contact."),
+            string(EMAIL)
+                .description("Email of the contact."),
+            string(PHONE)
+                .description("The contacts phone."),
+            string(NAME)
+                .description("The contacts name."));
 
     private IntercomConstants() {
     }

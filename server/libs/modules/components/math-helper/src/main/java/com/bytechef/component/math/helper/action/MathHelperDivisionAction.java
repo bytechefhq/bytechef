@@ -43,7 +43,7 @@ public class MathHelperDivisionAction {
                 .label("Second Number")
                 .description("Number to divide by.")
                 .required(true))
-        .output(outputSchema(number()))
+        .output(outputSchema(number().description("Result of division.")))
         .perform(MathHelperDivisionAction::perform);
 
     private MathHelperDivisionAction() {

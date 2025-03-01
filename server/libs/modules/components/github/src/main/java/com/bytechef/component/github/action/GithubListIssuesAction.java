@@ -66,7 +66,11 @@ public class GithubListIssuesAction {
                     option("All", "all", "All issues."))
                 .defaultValue("open")
                 .required(true))
-        .output(outputSchema(array().items(ISSUE_OUTPUT_PROPERTY)))
+        .output(
+            outputSchema(
+                array()
+                    .description("List of issues assigned to the authenticated user.")
+                    .items(ISSUE_OUTPUT_PROPERTY)))
         .perform(GithubListIssuesAction::perform);
 
     private GithubListIssuesAction() {

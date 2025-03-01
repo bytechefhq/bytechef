@@ -78,16 +78,24 @@ public class CopperCreateActivityAction {
         .output(outputSchema(
             object()
                 .properties(
-                    string(ID),
+                    string(ID)
+                        .description("The ID of the new activity."),
                     object(TYPE)
+                        .description("The type of the new activity.")
                         .properties(
-                            string(CATEGORY),
-                            string(ID)),
-                    string(DETAILS),
+                            string(CATEGORY)
+                                .description("The category of the activity type."),
+                            string(ID)
+                                .description("The ID of the activity type.")),
+                    string(DETAILS)
+                        .description("Text body of the new activity."),
                     object(PARENT)
+                        .description("The resource to which this new activity belongs.")
                         .properties(
-                            string(TYPE),
-                            string(ID)))))
+                            string(TYPE)
+                                .description("Parent type associated with new activity."),
+                            string(ID)
+                                .description("ID of the parent this activity is associated with.")))))
         .perform(CopperCreateActivityAction::perform);
 
     protected static final ContextFunction<Http, Http.Executor> POST_ACTIVITIES_CONTEXT_FUNCTION =

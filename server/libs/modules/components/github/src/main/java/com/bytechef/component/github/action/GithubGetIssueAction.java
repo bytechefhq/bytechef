@@ -48,8 +48,8 @@ public class GithubGetIssueAction {
                 .options((ActionOptionsFunction<String>) GithubUtils::getRepositoryOptions)
                 .required(true),
             string(ISSUE)
-                .label("Issue")
-                .description("The issue you want to get details from.")
+                .label("Issue Number")
+                .description("The number of the issue you want to get details from.")
                 .options((ActionOptionsFunction<String>) GithubUtils::getIssueOptions)
                 .optionsLookupDependsOn(REPOSITORY)
                 .required(true))

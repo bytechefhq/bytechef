@@ -42,8 +42,11 @@ public class TextHelperSplitAction {
                 .label("Delimiter")
                 .description("Delimiter used for splitting the text.")
                 .required(true))
-        .output(outputSchema(
-            array().items(string())))
+        .output(
+            outputSchema(
+                array()
+                    .description("List of elements.")
+                    .items(string())))
         .perform(TextHelperSplitAction::perform);
 
     private TextHelperSplitAction() {

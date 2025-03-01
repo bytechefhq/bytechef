@@ -72,14 +72,22 @@ public class BeamerNewVoteAction {
             outputSchema(
                 object()
                     .properties(
-                        string(ID),
-                        string("date"),
-                        string("featureRequestTitle"),
-                        string(USER_ID),
-                        string(USER_EMAIL),
-                        string(USER_FIRST_NAME),
-                        string(USER_LAST_NAME),
-                        string("url"))))
+                        string(ID)
+                            .description("The ID of the new vote."),
+                        string("date")
+                            .description("Creation date of the new vote."),
+                        string("featureRequestTitle")
+                            .description("Title of the feature request this vote is created on."),
+                        string(USER_ID)
+                            .description("ID of the user that created the new vote."),
+                        string(USER_EMAIL)
+                            .description("Email of the user that created the new vote."),
+                        string(USER_FIRST_NAME)
+                            .description("First name of the user that created the new vote."),
+                        string(USER_LAST_NAME)
+                            .description("Last name of the user that created the new vote."),
+                        string("url")
+                            .description("URL of the new vote in your dashboard."))))
         .perform(BeamerNewVoteAction::perform);
 
     private BeamerNewVoteAction() {

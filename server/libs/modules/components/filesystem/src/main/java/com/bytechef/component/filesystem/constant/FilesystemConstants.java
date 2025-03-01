@@ -21,14 +21,9 @@ package com.bytechef.component.filesystem.constant;
  */
 public class FilesystemConstants {
 
-    public static final String FILESYSTEM = "filesystem";
-    public static final String READ_FILE = "readFile";
-    public static final String WRITE_FILE = "writeFile";
-    public static final String CREATE_TEMP_DIR = "createTempDir";
-    public static final String GET_PARENT_FOLDER = "getFilePath";
-    public static final String LS = "ls";
-    public static final String MKDIR = "mkdir";
-    public static final String RM = "rm";
+    private FilesystemConstants() {
+    }
+
     public static final String FILE_ENTRY = "fileEntry";
     public static final String FILENAME = "filename";
     public static final String PATH = "path";

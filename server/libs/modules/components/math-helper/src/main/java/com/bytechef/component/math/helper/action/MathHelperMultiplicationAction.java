@@ -41,7 +41,7 @@ public class MathHelperMultiplicationAction {
             number(SECOND_NUMBER)
                 .label("Second Number")
                 .required(true))
-        .output(outputSchema(number()))
+        .output(outputSchema(number().description("Result of multiplication.")))
         .perform(MathHelperMultiplicationAction::perform);
 
     private MathHelperMultiplicationAction() {

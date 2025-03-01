@@ -64,8 +64,10 @@ public class MondayCreateBoardAction {
                     .properties(
                         object("create_board")
                             .properties(
-                                string(ID),
-                                string(BOARD_NAME)))))
+                                string(ID)
+                                    .description("ID of the board"),
+                                string(BOARD_NAME)
+                                    .description("Name of the board.")))))
         .perform(MondayCreateBoardAction::perform);
 
     private MondayCreateBoardAction() {

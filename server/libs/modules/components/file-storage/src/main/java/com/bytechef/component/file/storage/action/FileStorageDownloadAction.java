@@ -59,7 +59,7 @@ public class FileStorageDownloadAction {
                 .label("Filename")
                 .description("Filename to set for data. By default, \"file.txt\" will be used.")
                 .defaultValue("file.txt"))
-        .output(outputSchema(fileEntry()))
+        .output(outputSchema(fileEntry().description("Downloaded file.")))
         .perform(FileStorageDownloadAction::perform);
 
     /**

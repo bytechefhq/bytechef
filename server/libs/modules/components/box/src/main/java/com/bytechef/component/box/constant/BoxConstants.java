@@ -40,12 +40,41 @@ public class BoxConstants {
 
     public static final ModifiableObjectProperty FILE_OUTPUT_PROPERTY = object()
         .properties(
-            string(TYPE),
-            string(ID),
-            string(NAME),
+            string(TYPE)
+                .description("This is always set to file."),
+            string(ID)
+                .description("ID of the uploaded file."),
+            string(NAME)
+                .description("Name of the uploaded file."),
             object(PARENT)
+                .description(
+                    "Folder that uploaded file is located within. This value may be null " +
+                        "for some folders such as the root folder or the trash folder.")
                 .properties(
-                    string(TYPE),
-                    string(ID),
-                    string(NAME)));
+                    string(TYPE)
+                        .description("This is always set to folder."),
+                    string(ID)
+                        .description("ID of the parent folder."),
+                    string(NAME)
+                        .description("Name of the parent folder.")));
+
+    public static final ModifiableObjectProperty FOLDER_OUTPUT_PROPERTY = object()
+        .properties(
+            string(TYPE)
+                .description("This is always set to folder."),
+            string(ID)
+                .description("ID of the new folder."),
+            string(NAME)
+                .description("Name of the new folder."),
+            object(PARENT)
+                .description(
+                    "Folder that new folder is located within. This value may be null for some folders such as " +
+                        "the root folder or the trash folder.")
+                .properties(
+                    string(TYPE)
+                        .description("This is always set to folder."),
+                    string(ID)
+                        .description("ID of the parent folder."),
+                    string(NAME)
+                        .description("Name of the parent folder.")));
 }
