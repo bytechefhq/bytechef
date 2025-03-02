@@ -3,6 +3,7 @@ package com.bytechef.platform.configuration.web.rest.model;
 import java.net.URI;
 import java.util.Objects;
 import com.bytechef.platform.configuration.web.rest.model.ActionDefinitionBasicModel;
+import com.bytechef.platform.configuration.web.rest.model.ClusterElementTypeModel;
 import com.bytechef.platform.configuration.web.rest.model.ComponentCategoryModel;
 import com.bytechef.platform.configuration.web.rest.model.ConnectionDefinitionBasicModel;
 import com.bytechef.platform.configuration.web.rest.model.ResourcesModel;
@@ -32,20 +33,25 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "ComponentDefinition", description = "A component contains a set of reusable code(actions) that accomplish specific tasks, triggers and connections if there is a need for a connection to an outside service.")
 @JsonTypeName("ComponentDefinition")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-02-28T09:51:58.948829+01:00[Europe/Zagreb]", comments = "Generator version: 7.11.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-03-10T21:49:31.015728+01:00[Europe/Zagreb]", comments = "Generator version: 7.12.0")
 public class ComponentDefinitionModel {
 
   @Valid
   private List<@Valid ActionDefinitionBasicModel> actions = new ArrayList<>();
 
+  private Boolean clusterElement;
+
   @Valid
-  private List<@Valid ComponentCategoryModel> categories = new ArrayList<>();
+  private List<@Valid ClusterElementTypeModel> clusterElementTypes = new ArrayList<>();
+
+  private Boolean clusterRoot;
+
+  @Valid
+  private List<@Valid ComponentCategoryModel> componentCategories = new ArrayList<>();
 
   private @Nullable ConnectionDefinitionBasicModel connection;
 
   private Boolean connectionRequired;
-
-  private @Nullable Boolean dataStreamSupported;
 
   private @Nullable String description;
 
@@ -74,7 +80,9 @@ public class ComponentDefinitionModel {
   /**
    * Constructor with only required parameters
    */
-  public ComponentDefinitionModel(Boolean connectionRequired, String name, Integer version) {
+  public ComponentDefinitionModel(Boolean clusterElement, Boolean clusterRoot, Boolean connectionRequired, String name, Integer version) {
+    this.clusterElement = clusterElement;
+    this.clusterRoot = clusterRoot;
     this.connectionRequired = connectionRequired;
     this.name = name;
     this.version = version;
@@ -108,32 +116,100 @@ public class ComponentDefinitionModel {
     this.actions = actions;
   }
 
-  public ComponentDefinitionModel categories(List<@Valid ComponentCategoryModel> categories) {
-    this.categories = categories;
+  public ComponentDefinitionModel clusterElement(Boolean clusterElement) {
+    this.clusterElement = clusterElement;
     return this;
   }
 
-  public ComponentDefinitionModel addCategoriesItem(ComponentCategoryModel categoriesItem) {
-    if (this.categories == null) {
-      this.categories = new ArrayList<>();
+  /**
+   * Is the component cluster element.
+   * @return clusterElement
+   */
+  @NotNull 
+  @Schema(name = "clusterElement", description = "Is the component cluster element.", requiredMode = Schema.RequiredMode.REQUIRED)
+  @JsonProperty("clusterElement")
+  public Boolean getClusterElement() {
+    return clusterElement;
+  }
+
+  public void setClusterElement(Boolean clusterElement) {
+    this.clusterElement = clusterElement;
+  }
+
+  public ComponentDefinitionModel clusterElementTypes(List<@Valid ClusterElementTypeModel> clusterElementTypes) {
+    this.clusterElementTypes = clusterElementTypes;
+    return this;
+  }
+
+  public ComponentDefinitionModel addClusterElementTypesItem(ClusterElementTypeModel clusterElementTypesItem) {
+    if (this.clusterElementTypes == null) {
+      this.clusterElementTypes = new ArrayList<>();
     }
-    this.categories.add(categoriesItem);
+    this.clusterElementTypes.add(clusterElementTypesItem);
+    return this;
+  }
+
+  /**
+   * The list of cluster element types.
+   * @return clusterElementTypes
+   */
+  @Valid 
+  @Schema(name = "clusterElementTypes", description = "The list of cluster element types.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("clusterElementTypes")
+  public List<@Valid ClusterElementTypeModel> getClusterElementTypes() {
+    return clusterElementTypes;
+  }
+
+  public void setClusterElementTypes(List<@Valid ClusterElementTypeModel> clusterElementTypes) {
+    this.clusterElementTypes = clusterElementTypes;
+  }
+
+  public ComponentDefinitionModel clusterRoot(Boolean clusterRoot) {
+    this.clusterRoot = clusterRoot;
+    return this;
+  }
+
+  /**
+   * Is the component cluster root.
+   * @return clusterRoot
+   */
+  @NotNull 
+  @Schema(name = "clusterRoot", description = "Is the component cluster root.", requiredMode = Schema.RequiredMode.REQUIRED)
+  @JsonProperty("clusterRoot")
+  public Boolean getClusterRoot() {
+    return clusterRoot;
+  }
+
+  public void setClusterRoot(Boolean clusterRoot) {
+    this.clusterRoot = clusterRoot;
+  }
+
+  public ComponentDefinitionModel componentCategories(List<@Valid ComponentCategoryModel> componentCategories) {
+    this.componentCategories = componentCategories;
+    return this;
+  }
+
+  public ComponentDefinitionModel addComponentCategoriesItem(ComponentCategoryModel componentCategoriesItem) {
+    if (this.componentCategories == null) {
+      this.componentCategories = new ArrayList<>();
+    }
+    this.componentCategories.add(componentCategoriesItem);
     return this;
   }
 
   /**
    * The list of categories the component belongs to.
-   * @return categories
+   * @return componentCategories
    */
   @Valid 
-  @Schema(name = "categories", description = "The list of categories the component belongs to.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  @JsonProperty("categories")
-  public List<@Valid ComponentCategoryModel> getCategories() {
-    return categories;
+  @Schema(name = "componentCategories", description = "The list of categories the component belongs to.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("componentCategories")
+  public List<@Valid ComponentCategoryModel> getComponentCategories() {
+    return componentCategories;
   }
 
-  public void setCategories(List<@Valid ComponentCategoryModel> categories) {
-    this.categories = categories;
+  public void setComponentCategories(List<@Valid ComponentCategoryModel> componentCategories) {
+    this.componentCategories = componentCategories;
   }
 
   public ComponentDefinitionModel connection(ConnectionDefinitionBasicModel connection) {
@@ -174,26 +250,6 @@ public class ComponentDefinitionModel {
 
   public void setConnectionRequired(Boolean connectionRequired) {
     this.connectionRequired = connectionRequired;
-  }
-
-  public ComponentDefinitionModel dataStreamSupported(Boolean dataStreamSupported) {
-    this.dataStreamSupported = dataStreamSupported;
-    return this;
-  }
-
-  /**
-   * If the component supports data stream.
-   * @return dataStreamSupported
-   */
-  
-  @Schema(name = "dataStreamSupported", description = "If the component supports data stream.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  @JsonProperty("dataStreamSupported")
-  public Boolean getDataStreamSupported() {
-    return dataStreamSupported;
-  }
-
-  public void setDataStreamSupported(Boolean dataStreamSupported) {
-    this.dataStreamSupported = dataStreamSupported;
   }
 
   public ComponentDefinitionModel description(String description) {
@@ -402,10 +458,12 @@ public class ComponentDefinitionModel {
     }
     ComponentDefinitionModel componentDefinition = (ComponentDefinitionModel) o;
     return Objects.equals(this.actions, componentDefinition.actions) &&
-        Objects.equals(this.categories, componentDefinition.categories) &&
+        Objects.equals(this.clusterElement, componentDefinition.clusterElement) &&
+        Objects.equals(this.clusterElementTypes, componentDefinition.clusterElementTypes) &&
+        Objects.equals(this.clusterRoot, componentDefinition.clusterRoot) &&
+        Objects.equals(this.componentCategories, componentDefinition.componentCategories) &&
         Objects.equals(this.connection, componentDefinition.connection) &&
         Objects.equals(this.connectionRequired, componentDefinition.connectionRequired) &&
-        Objects.equals(this.dataStreamSupported, componentDefinition.dataStreamSupported) &&
         Objects.equals(this.description, componentDefinition.description) &&
         Objects.equals(this.icon, componentDefinition.icon) &&
         Objects.equals(this.name, componentDefinition.name) &&
@@ -419,7 +477,7 @@ public class ComponentDefinitionModel {
 
   @Override
   public int hashCode() {
-    return Objects.hash(actions, categories, connection, connectionRequired, dataStreamSupported, description, icon, name, resources, tags, title, triggers, unifiedApiCategory, version);
+    return Objects.hash(actions, clusterElement, clusterElementTypes, clusterRoot, componentCategories, connection, connectionRequired, description, icon, name, resources, tags, title, triggers, unifiedApiCategory, version);
   }
 
   @Override
@@ -427,10 +485,12 @@ public class ComponentDefinitionModel {
     StringBuilder sb = new StringBuilder();
     sb.append("class ComponentDefinitionModel {\n");
     sb.append("    actions: ").append(toIndentedString(actions)).append("\n");
-    sb.append("    categories: ").append(toIndentedString(categories)).append("\n");
+    sb.append("    clusterElement: ").append(toIndentedString(clusterElement)).append("\n");
+    sb.append("    clusterElementTypes: ").append(toIndentedString(clusterElementTypes)).append("\n");
+    sb.append("    clusterRoot: ").append(toIndentedString(clusterRoot)).append("\n");
+    sb.append("    componentCategories: ").append(toIndentedString(componentCategories)).append("\n");
     sb.append("    connection: ").append(toIndentedString(connection)).append("\n");
     sb.append("    connectionRequired: ").append(toIndentedString(connectionRequired)).append("\n");
-    sb.append("    dataStreamSupported: ").append(toIndentedString(dataStreamSupported)).append("\n");
     sb.append("    description: ").append(toIndentedString(description)).append("\n");
     sb.append("    icon: ").append(toIndentedString(icon)).append("\n");
     sb.append("    name: ").append(toIndentedString(name)).append("\n");

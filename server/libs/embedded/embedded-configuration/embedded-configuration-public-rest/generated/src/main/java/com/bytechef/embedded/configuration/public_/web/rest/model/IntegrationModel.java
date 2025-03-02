@@ -26,7 +26,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "Integration", description = "A group of workflows that make one logical integration.")
 @JsonTypeName("Integration")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-02-27T07:20:09.730779+01:00[Europe/Zagreb]", comments = "Generator version: 7.11.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-03-10T21:49:27.700570+01:00[Europe/Zagreb]", comments = "Generator version: 7.12.0")
 public class IntegrationModel {
 
   private @Nullable Long id;
@@ -41,7 +41,7 @@ public class IntegrationModel {
 
   private @Nullable Integer integrationVersion;
 
-  private Boolean allowMultipleInstances = false;
+  private Boolean multipleInstances = false;
 
   @Valid
   private List<@Valid WorkflowModel> workflows = new ArrayList<>();
@@ -53,10 +53,10 @@ public class IntegrationModel {
   /**
    * Constructor with only required parameters
    */
-  public IntegrationModel(String componentName, String icon, Boolean allowMultipleInstances) {
+  public IntegrationModel(String componentName, String icon, Boolean multipleInstances) {
     this.componentName = componentName;
     this.icon = icon;
-    this.allowMultipleInstances = allowMultipleInstances;
+    this.multipleInstances = multipleInstances;
   }
 
   public IntegrationModel id(Long id) {
@@ -179,24 +179,24 @@ public class IntegrationModel {
     this.integrationVersion = integrationVersion;
   }
 
-  public IntegrationModel allowMultipleInstances(Boolean allowMultipleInstances) {
-    this.allowMultipleInstances = allowMultipleInstances;
+  public IntegrationModel multipleInstances(Boolean multipleInstances) {
+    this.multipleInstances = multipleInstances;
     return this;
   }
 
   /**
    * If multiple instances of an integration are allowed or not.
-   * @return allowMultipleInstances
+   * @return multipleInstances
    */
   
-  @Schema(name = "allowMultipleInstances", accessMode = Schema.AccessMode.READ_ONLY, description = "If multiple instances of an integration are allowed or not.", requiredMode = Schema.RequiredMode.REQUIRED)
-  @JsonProperty("allowMultipleInstances")
-  public Boolean getAllowMultipleInstances() {
-    return allowMultipleInstances;
+  @Schema(name = "multipleInstances", accessMode = Schema.AccessMode.READ_ONLY, description = "If multiple instances of an integration are allowed or not.", requiredMode = Schema.RequiredMode.REQUIRED)
+  @JsonProperty("multipleInstances")
+  public Boolean getMultipleInstances() {
+    return multipleInstances;
   }
 
-  public void setAllowMultipleInstances(Boolean allowMultipleInstances) {
-    this.allowMultipleInstances = allowMultipleInstances;
+  public void setMultipleInstances(Boolean multipleInstances) {
+    this.multipleInstances = multipleInstances;
   }
 
   public IntegrationModel workflows(List<@Valid WorkflowModel> workflows) {
@@ -242,13 +242,13 @@ public class IntegrationModel {
         Objects.equals(this.description, integration.description) &&
         Objects.equals(this.icon, integration.icon) &&
         Objects.equals(this.integrationVersion, integration.integrationVersion) &&
-        Objects.equals(this.allowMultipleInstances, integration.allowMultipleInstances) &&
+        Objects.equals(this.multipleInstances, integration.multipleInstances) &&
         Objects.equals(this.workflows, integration.workflows);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(id, componentName, title, description, icon, integrationVersion, allowMultipleInstances, workflows);
+    return Objects.hash(id, componentName, title, description, icon, integrationVersion, multipleInstances, workflows);
   }
 
   @Override
@@ -261,7 +261,7 @@ public class IntegrationModel {
     sb.append("    description: ").append(toIndentedString(description)).append("\n");
     sb.append("    icon: ").append(toIndentedString(icon)).append("\n");
     sb.append("    integrationVersion: ").append(toIndentedString(integrationVersion)).append("\n");
-    sb.append("    allowMultipleInstances: ").append(toIndentedString(allowMultipleInstances)).append("\n");
+    sb.append("    multipleInstances: ").append(toIndentedString(multipleInstances)).append("\n");
     sb.append("    workflows: ").append(toIndentedString(workflows)).append("\n");
     sb.append("}");
     return sb.toString();

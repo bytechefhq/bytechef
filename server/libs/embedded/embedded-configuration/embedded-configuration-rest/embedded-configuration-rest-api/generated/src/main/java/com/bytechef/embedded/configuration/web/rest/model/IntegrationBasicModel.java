@@ -26,10 +26,8 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "IntegrationBasic", description = "A group of workflows that make one logical integration.")
 @JsonTypeName("IntegrationBasic")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-02-27T07:20:10.905643+01:00[Europe/Zagreb]", comments = "Generator version: 7.11.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-03-10T21:49:30.205405+01:00[Europe/Zagreb]", comments = "Generator version: 7.12.0")
 public class IntegrationBasicModel {
-
-  private Boolean allowMultipleInstances = false;
 
   private String componentName;
 
@@ -56,6 +54,8 @@ public class IntegrationBasicModel {
 
   private @Nullable Integer lastVersion;
 
+  private Boolean multipleInstances = false;
+
   private @Nullable String name;
 
   public IntegrationBasicModel() {
@@ -65,29 +65,9 @@ public class IntegrationBasicModel {
   /**
    * Constructor with only required parameters
    */
-  public IntegrationBasicModel(Boolean allowMultipleInstances, String componentName) {
-    this.allowMultipleInstances = allowMultipleInstances;
+  public IntegrationBasicModel(String componentName, Boolean multipleInstances) {
     this.componentName = componentName;
-  }
-
-  public IntegrationBasicModel allowMultipleInstances(Boolean allowMultipleInstances) {
-    this.allowMultipleInstances = allowMultipleInstances;
-    return this;
-  }
-
-  /**
-   * If multiple instances of an integration are allowed or not.
-   * @return allowMultipleInstances
-   */
-  @NotNull 
-  @Schema(name = "allowMultipleInstances", description = "If multiple instances of an integration are allowed or not.", requiredMode = Schema.RequiredMode.REQUIRED)
-  @JsonProperty("allowMultipleInstances")
-  public Boolean getAllowMultipleInstances() {
-    return allowMultipleInstances;
-  }
-
-  public void setAllowMultipleInstances(Boolean allowMultipleInstances) {
-    this.allowMultipleInstances = allowMultipleInstances;
+    this.multipleInstances = multipleInstances;
   }
 
   public IntegrationBasicModel componentName(String componentName) {
@@ -310,6 +290,26 @@ public class IntegrationBasicModel {
     this.lastVersion = lastVersion;
   }
 
+  public IntegrationBasicModel multipleInstances(Boolean multipleInstances) {
+    this.multipleInstances = multipleInstances;
+    return this;
+  }
+
+  /**
+   * If multiple instances of an integration are allowed or not.
+   * @return multipleInstances
+   */
+  @NotNull 
+  @Schema(name = "multipleInstances", description = "If multiple instances of an integration are allowed or not.", requiredMode = Schema.RequiredMode.REQUIRED)
+  @JsonProperty("multipleInstances")
+  public Boolean getMultipleInstances() {
+    return multipleInstances;
+  }
+
+  public void setMultipleInstances(Boolean multipleInstances) {
+    this.multipleInstances = multipleInstances;
+  }
+
   public IntegrationBasicModel name(String name) {
     this.name = name;
     return this;
@@ -339,8 +339,7 @@ public class IntegrationBasicModel {
       return false;
     }
     IntegrationBasicModel integrationBasic = (IntegrationBasicModel) o;
-    return Objects.equals(this.allowMultipleInstances, integrationBasic.allowMultipleInstances) &&
-        Objects.equals(this.componentName, integrationBasic.componentName) &&
+    return Objects.equals(this.componentName, integrationBasic.componentName) &&
         Objects.equals(this.createdBy, integrationBasic.createdBy) &&
         Objects.equals(this.createdDate, integrationBasic.createdDate) &&
         Objects.equals(this.description, integrationBasic.description) &&
@@ -351,19 +350,19 @@ public class IntegrationBasicModel {
         Objects.equals(this.lastPublishedDate, integrationBasic.lastPublishedDate) &&
         Objects.equals(this.lastStatus, integrationBasic.lastStatus) &&
         Objects.equals(this.lastVersion, integrationBasic.lastVersion) &&
+        Objects.equals(this.multipleInstances, integrationBasic.multipleInstances) &&
         Objects.equals(this.name, integrationBasic.name);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(allowMultipleInstances, componentName, createdBy, createdDate, description, icon, id, lastModifiedBy, lastModifiedDate, lastPublishedDate, lastStatus, lastVersion, name);
+    return Objects.hash(componentName, createdBy, createdDate, description, icon, id, lastModifiedBy, lastModifiedDate, lastPublishedDate, lastStatus, lastVersion, multipleInstances, name);
   }
 
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
     sb.append("class IntegrationBasicModel {\n");
-    sb.append("    allowMultipleInstances: ").append(toIndentedString(allowMultipleInstances)).append("\n");
     sb.append("    componentName: ").append(toIndentedString(componentName)).append("\n");
     sb.append("    createdBy: ").append(toIndentedString(createdBy)).append("\n");
     sb.append("    createdDate: ").append(toIndentedString(createdDate)).append("\n");
@@ -375,6 +374,7 @@ public class IntegrationBasicModel {
     sb.append("    lastPublishedDate: ").append(toIndentedString(lastPublishedDate)).append("\n");
     sb.append("    lastStatus: ").append(toIndentedString(lastStatus)).append("\n");
     sb.append("    lastVersion: ").append(toIndentedString(lastVersion)).append("\n");
+    sb.append("    multipleInstances: ").append(toIndentedString(multipleInstances)).append("\n");
     sb.append("    name: ").append(toIndentedString(name)).append("\n");
     sb.append("}");
     return sb.toString();
