@@ -3,7 +3,6 @@ package com.bytechef.platform.configuration.web.rest.model;
 import java.net.URI;
 import java.util.Objects;
 import com.bytechef.platform.configuration.web.rest.model.ComponentConnectionModel;
-import com.bytechef.platform.configuration.web.rest.model.DataStreamComponentModel;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonTypeName;
@@ -29,15 +28,13 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "WorkflowTask", description = "Represents a definition of a workflow task.")
 @JsonTypeName("WorkflowTask")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-02-28T09:51:58.948829+01:00[Europe/Zagreb]", comments = "Generator version: 7.11.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-03-10T21:49:31.015728+01:00[Europe/Zagreb]", comments = "Generator version: 7.12.0")
 public class WorkflowTaskModel {
 
   @Valid
   private List<@Valid ComponentConnectionModel> connections = new ArrayList<>();
 
   private @Nullable String description;
-
-  private @Nullable DataStreamComponentModel destination;
 
   @Valid
   private List<@Valid WorkflowTaskModel> finalize = new ArrayList<>();
@@ -59,8 +56,6 @@ public class WorkflowTaskModel {
 
   @Valid
   private List<@Valid WorkflowTaskModel> pre = new ArrayList<>();
-
-  private @Nullable DataStreamComponentModel source;
 
   private @Nullable String timeout;
 
@@ -124,26 +119,6 @@ public class WorkflowTaskModel {
 
   public void setDescription(String description) {
     this.description = description;
-  }
-
-  public WorkflowTaskModel destination(DataStreamComponentModel destination) {
-    this.destination = destination;
-    return this;
-  }
-
-  /**
-   * Get destination
-   * @return destination
-   */
-  @Valid 
-  @Schema(name = "destination", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  @JsonProperty("destination")
-  public DataStreamComponentModel getDestination() {
-    return destination;
-  }
-
-  public void setDestination(DataStreamComponentModel destination) {
-    this.destination = destination;
   }
 
   public WorkflowTaskModel finalize(List<@Valid WorkflowTaskModel> finalize) {
@@ -346,26 +321,6 @@ public class WorkflowTaskModel {
     this.pre = pre;
   }
 
-  public WorkflowTaskModel source(DataStreamComponentModel source) {
-    this.source = source;
-    return this;
-  }
-
-  /**
-   * Get source
-   * @return source
-   */
-  @Valid 
-  @Schema(name = "source", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  @JsonProperty("source")
-  public DataStreamComponentModel getSource() {
-    return source;
-  }
-
-  public void setSource(DataStreamComponentModel source) {
-    this.source = source;
-  }
-
   public WorkflowTaskModel timeout(String timeout) {
     this.timeout = timeout;
     return this;
@@ -417,7 +372,6 @@ public class WorkflowTaskModel {
     WorkflowTaskModel workflowTask = (WorkflowTaskModel) o;
     return Objects.equals(this.connections, workflowTask.connections) &&
         Objects.equals(this.description, workflowTask.description) &&
-        Objects.equals(this.destination, workflowTask.destination) &&
         Objects.equals(this.finalize, workflowTask.finalize) &&
         Objects.equals(this.label, workflowTask.label) &&
         Objects.equals(this.metadata, workflowTask.metadata) &&
@@ -426,14 +380,13 @@ public class WorkflowTaskModel {
         Objects.equals(this.parameters, workflowTask.parameters) &&
         Objects.equals(this.post, workflowTask.post) &&
         Objects.equals(this.pre, workflowTask.pre) &&
-        Objects.equals(this.source, workflowTask.source) &&
         Objects.equals(this.timeout, workflowTask.timeout) &&
         Objects.equals(this.type, workflowTask.type);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(connections, description, destination, finalize, label, metadata, name, node, parameters, post, pre, source, timeout, type);
+    return Objects.hash(connections, description, finalize, label, metadata, name, node, parameters, post, pre, timeout, type);
   }
 
   @Override
@@ -442,7 +395,6 @@ public class WorkflowTaskModel {
     sb.append("class WorkflowTaskModel {\n");
     sb.append("    connections: ").append(toIndentedString(connections)).append("\n");
     sb.append("    description: ").append(toIndentedString(description)).append("\n");
-    sb.append("    destination: ").append(toIndentedString(destination)).append("\n");
     sb.append("    finalize: ").append(toIndentedString(finalize)).append("\n");
     sb.append("    label: ").append(toIndentedString(label)).append("\n");
     sb.append("    metadata: ").append(toIndentedString(metadata)).append("\n");
@@ -451,7 +403,6 @@ public class WorkflowTaskModel {
     sb.append("    parameters: ").append(toIndentedString(parameters)).append("\n");
     sb.append("    post: ").append(toIndentedString(post)).append("\n");
     sb.append("    pre: ").append(toIndentedString(pre)).append("\n");
-    sb.append("    source: ").append(toIndentedString(source)).append("\n");
     sb.append("    timeout: ").append(toIndentedString(timeout)).append("\n");
     sb.append("    type: ").append(toIndentedString(type)).append("\n");
     sb.append("}");

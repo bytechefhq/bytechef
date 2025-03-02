@@ -22,10 +22,10 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "ComponentCategory", description = "A category of component.")
 @JsonTypeName("ComponentCategory")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-02-28T09:51:58.948829+01:00[Europe/Zagreb]", comments = "Generator version: 7.11.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-03-10T21:49:31.015728+01:00[Europe/Zagreb]", comments = "Generator version: 7.12.0")
 public class ComponentCategoryModel {
 
-  private String key;
+  private String name;
 
   private @Nullable String label;
 
@@ -36,28 +36,28 @@ public class ComponentCategoryModel {
   /**
    * Constructor with only required parameters
    */
-  public ComponentCategoryModel(String key) {
-    this.key = key;
+  public ComponentCategoryModel(String name) {
+    this.name = name;
   }
 
-  public ComponentCategoryModel key(String key) {
-    this.key = key;
+  public ComponentCategoryModel name(String name) {
+    this.name = name;
     return this;
   }
 
   /**
-   * The key of a category.
-   * @return key
+   * The name of a category.
+   * @return name
    */
   @NotNull 
-  @Schema(name = "key", description = "The key of a category.", requiredMode = Schema.RequiredMode.REQUIRED)
-  @JsonProperty("key")
-  public String getKey() {
-    return key;
+  @Schema(name = "name", description = "The name of a category.", requiredMode = Schema.RequiredMode.REQUIRED)
+  @JsonProperty("name")
+  public String getName() {
+    return name;
   }
 
-  public void setKey(String key) {
-    this.key = key;
+  public void setName(String name) {
+    this.name = name;
   }
 
   public ComponentCategoryModel label(String label) {
@@ -89,20 +89,20 @@ public class ComponentCategoryModel {
       return false;
     }
     ComponentCategoryModel componentCategory = (ComponentCategoryModel) o;
-    return Objects.equals(this.key, componentCategory.key) &&
+    return Objects.equals(this.name, componentCategory.name) &&
         Objects.equals(this.label, componentCategory.label);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(key, label);
+    return Objects.hash(name, label);
   }
 
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
     sb.append("class ComponentCategoryModel {\n");
-    sb.append("    key: ").append(toIndentedString(key)).append("\n");
+    sb.append("    name: ").append(toIndentedString(name)).append("\n");
     sb.append("    label: ").append(toIndentedString(label)).append("\n");
     sb.append("}");
     return sb.toString();

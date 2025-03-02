@@ -2,6 +2,7 @@ README.md
 pom.xml
 src/main/java/com/bytechef/platform/configuration/web/rest/ActionDefinitionApi.java
 src/main/java/com/bytechef/platform/configuration/web/rest/ApiUtil.java
+src/main/java/com/bytechef/platform/configuration/web/rest/ClusterElementDefinitionApi.java
 src/main/java/com/bytechef/platform/configuration/web/rest/ComponentDefinitionApi.java
 src/main/java/com/bytechef/platform/configuration/web/rest/ConnectionDefinitionApi.java
 src/main/java/com/bytechef/platform/configuration/web/rest/Oauth2Api.java
@@ -23,6 +24,9 @@ src/main/java/com/bytechef/platform/configuration/web/rest/model/AuthorizationMo
 src/main/java/com/bytechef/platform/configuration/web/rest/model/AuthorizationTypeModel.java
 src/main/java/com/bytechef/platform/configuration/web/rest/model/BooleanPropertyModel.java
 src/main/java/com/bytechef/platform/configuration/web/rest/model/CheckWorkflowNodeTestOutputExists200ResponseModel.java
+src/main/java/com/bytechef/platform/configuration/web/rest/model/ClusterElementDefinitionBasicModel.java
+src/main/java/com/bytechef/platform/configuration/web/rest/model/ClusterElementDefinitionModel.java
+src/main/java/com/bytechef/platform/configuration/web/rest/model/ClusterElementTypeModel.java
 src/main/java/com/bytechef/platform/configuration/web/rest/model/ComponentCategoryModel.java
 src/main/java/com/bytechef/platform/configuration/web/rest/model/ComponentConnectionModel.java
 src/main/java/com/bytechef/platform/configuration/web/rest/model/ComponentDefinitionBasicModel.java
@@ -30,7 +34,6 @@ src/main/java/com/bytechef/platform/configuration/web/rest/model/ComponentDefini
 src/main/java/com/bytechef/platform/configuration/web/rest/model/ConnectionDefinitionBasicModel.java
 src/main/java/com/bytechef/platform/configuration/web/rest/model/ConnectionDefinitionModel.java
 src/main/java/com/bytechef/platform/configuration/web/rest/model/ControlTypeModel.java
-src/main/java/com/bytechef/platform/configuration/web/rest/model/DataStreamComponentModel.java
 src/main/java/com/bytechef/platform/configuration/web/rest/model/DatePropertyModel.java
 src/main/java/com/bytechef/platform/configuration/web/rest/model/DateTimePropertyModel.java
 src/main/java/com/bytechef/platform/configuration/web/rest/model/DeleteWorkflowNodeParameter200ResponseModel.java
