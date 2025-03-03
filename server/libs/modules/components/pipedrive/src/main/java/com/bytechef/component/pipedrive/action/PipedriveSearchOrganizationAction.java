@@ -70,16 +70,14 @@ public class PipedriveSearchOrganizationAction {
                     Map.of(
                         "type", PropertyType.QUERY)))
         .output(outputSchema(object()
-            .properties(object("body")
-                .properties(object("data")
-                    .properties(array("items")
-                        .items(object().properties(integer("id").required(false), integer("company_id").required(false),
-                            object("owner_id")
-                                .properties(integer("id").required(false), string("name").required(false),
-                                    string("email").required(false))
-                                .required(false),
-                            string("name").required(false)))
-                        .required(false))
+            .properties(object("data")
+                .properties(array("items")
+                    .items(object().properties(integer("id").required(false), integer("company_id").required(false),
+                        object("owner_id")
+                            .properties(integer("id").required(false), string("name").required(false),
+                                string("email").required(false))
+                            .required(false),
+                        string("name").required(false)))
                     .required(false))
                 .required(false))
             .metadata(

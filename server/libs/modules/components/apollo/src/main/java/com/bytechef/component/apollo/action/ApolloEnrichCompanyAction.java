@@ -51,16 +51,14 @@ public class ApolloEnrichCompanyAction {
                 Map.of(
                     "type", PropertyType.QUERY)))
         .output(outputSchema(object()
-            .properties(object("body")
-                .properties(object("organization")
-                    .properties(string("id").required(false), string("name").required(false),
-                        string("website_url").required(false), string("blog_url").required(false),
-                        string("linkedin_url").required(false), string("twitter_url").required(false),
-                        string("facebook_url").required(false), string("phone").required(false),
-                        string("logo_url").required(false), string("primary_domain").required(false),
-                        string("industry").required(false), array("keywords").items(string())
-                            .required(false))
-                    .required(false))
+            .properties(object("organization")
+                .properties(string("id").required(false), string("name").required(false),
+                    string("website_url").required(false), string("blog_url").required(false),
+                    string("linkedin_url").required(false), string("twitter_url").required(false),
+                    string("facebook_url").required(false), string("phone").required(false),
+                    string("logo_url").required(false), string("primary_domain").required(false),
+                    string("industry").required(false), array("keywords").items(string())
+                        .required(false))
                 .required(false))
             .metadata(
                 Map.of(

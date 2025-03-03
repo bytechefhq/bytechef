@@ -48,24 +48,17 @@ public class PipedriveGetLeadDetailsAction {
             .metadata(
                 Map.of(
                     "type", PropertyType.PATH)))
-        .output(
-            outputSchema(
-                object()
-                    .properties(
-                        object("body")
-                            .properties(object("data")
-                                .properties(string("id").required(false), string("title").required(false),
-                                    integer("owner_id").required(false),
-                                    object("value")
-                                        .properties(integer("amount").required(false),
-                                            string("currency").required(false))
-                                        .required(false),
-                                    date("expected_close_date").required(false), integer("person_id").required(false))
-                                .required(false))
-                            .required(false))
-                    .metadata(
-                        Map.of(
-                            "responseType", ResponseType.JSON))));
+        .output(outputSchema(object()
+            .properties(object("data")
+                .properties(string("id").required(false), string("title").required(false),
+                    integer("owner_id").required(false),
+                    object("value").properties(integer("amount").required(false), string("currency").required(false))
+                        .required(false),
+                    date("expected_close_date").required(false), integer("person_id").required(false))
+                .required(false))
+            .metadata(
+                Map.of(
+                    "responseType", ResponseType.JSON))));
 
     private PipedriveGetLeadDetailsAction() {
     }

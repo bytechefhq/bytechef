@@ -76,17 +76,15 @@ public class AcceloCreateContactAction {
                 .description("The contact's position in the associated company.")
                 .required(false))
         .output(outputSchema(object()
-            .properties(object("body")
-                .properties(
-                    object("response")
-                        .properties(string("id").required(false), string("firstname").required(false),
-                            string("lastname").required(false), string("email").required(false))
-                        .required(false),
-                    object("meta")
-                        .properties(string("more_info").required(false), string("status").required(false),
-                            string("message").required(false))
-                        .required(false))
-                .required(false))
+            .properties(
+                object("response")
+                    .properties(string("id").required(false), string("firstname").required(false),
+                        string("lastname").required(false), string("email").required(false))
+                    .required(false),
+                object("meta")
+                    .properties(string("more_info").required(false), string("status").required(false),
+                        string("message").required(false))
+                    .required(false))
             .metadata(
                 Map.of(
                     "responseType", ResponseType.JSON))));

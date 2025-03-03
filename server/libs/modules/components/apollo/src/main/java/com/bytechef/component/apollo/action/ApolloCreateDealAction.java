@@ -81,17 +81,15 @@ public class ApolloCreateDealAction {
                     Map.of(
                         "type", PropertyType.QUERY)))
         .output(outputSchema(object()
-            .properties(object("body")
-                .properties(object("opportunity")
-                    .properties(string("id").required(false), string("team_id").required(false),
-                        string("owner_id").required(false), number("amount").required(false),
-                        date("closed_date").required(false), string("account_id").required(false),
-                        string("description").required(false), string("name").required(false),
-                        object("currency")
-                            .properties(string("name").required(false), string("iso_code").required(false),
-                                string("symbol").required(false))
-                            .required(false))
-                    .required(false))
+            .properties(object("opportunity")
+                .properties(string("id").required(false), string("team_id").required(false),
+                    string("owner_id").required(false), number("amount").required(false),
+                    date("closed_date").required(false), string("account_id").required(false),
+                    string("description").required(false), string("name").required(false),
+                    object("currency")
+                        .properties(string("name").required(false), string("iso_code").required(false),
+                            string("symbol").required(false))
+                        .required(false))
                 .required(false))
             .metadata(
                 Map.of(

@@ -72,8 +72,7 @@ public class ReckonCreatePaymentAction {
                 .label("Total Amount")
                 .description("The total amount of the payment applied.")
                 .required(true))
-        .output(outputSchema(object().properties(object("body").properties(string("id").required(false))
-            .required(false))
+        .output(outputSchema(object().properties(string("id").required(false))
             .metadata(
                 Map.of(
                     "responseType", ResponseType.JSON))));

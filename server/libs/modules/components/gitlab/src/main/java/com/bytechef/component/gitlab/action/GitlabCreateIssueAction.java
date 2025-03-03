@@ -65,11 +65,9 @@ public class GitlabCreateIssueAction {
                     Map.of(
                         "type", PropertyType.QUERY)))
         .output(outputSchema(object()
-            .properties(object("body")
-                .properties(integer("id").required(false), integer("iid").required(false),
-                    integer("project_id").required(false), string("title").required(false),
-                    string("description").required(false), string("web_url").required(false))
-                .required(false))
+            .properties(integer("id").required(false), integer("iid").required(false),
+                integer("project_id").required(false), string("title").required(false),
+                string("description").required(false), string("web_url").required(false))
             .metadata(
                 Map.of(
                     "responseType", ResponseType.JSON))));

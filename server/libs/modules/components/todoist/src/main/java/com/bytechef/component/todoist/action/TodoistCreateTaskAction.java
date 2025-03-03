@@ -74,11 +74,9 @@ public class TodoistCreateTaskAction {
                 .options(option("1", 1), option("2", 2), option("3", 3), option("4", 4))
                 .required(false))
         .output(outputSchema(object()
-            .properties(object("body")
-                .properties(string("id").required(false), string("project_id").required(false),
-                    string("content").required(false), string("description").required(false),
-                    integer("priority").required(false))
-                .required(false))
+            .properties(string("id").required(false), string("project_id").required(false),
+                string("content").required(false), string("description").required(false),
+                integer("priority").required(false))
             .metadata(
                 Map.of(
                     "responseType", ResponseType.JSON))));

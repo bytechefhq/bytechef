@@ -70,10 +70,9 @@ public class NiftyCreateTaskAction {
                 .label("Due Date")
                 .description("Due date for the task.")
                 .required(false))
-        .output(outputSchema(object().properties(object("body")
+        .output(outputSchema(object()
             .properties(string("id").required(false), string("name").required(false), string("project").required(false),
                 string("description").required(false), dateTime("due_date").required(false))
-            .required(false))
             .metadata(
                 Map.of(
                     "responseType", ResponseType.JSON))));

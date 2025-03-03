@@ -61,11 +61,9 @@ public class ActiveCampaignCreateContactAction {
             .label("Contact")
             .required(false))
         .output(outputSchema(object()
-            .properties(object("body")
-                .properties(object("contact")
-                    .properties(string("email").required(false), string("firstName").required(false),
-                        string("lastName").required(false), string("phone").required(false))
-                    .required(false))
+            .properties(object("contact")
+                .properties(string("email").required(false), string("firstName").required(false),
+                    string("lastName").required(false), string("phone").required(false))
                 .required(false))
             .metadata(
                 Map.of(

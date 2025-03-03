@@ -86,16 +86,14 @@ public class ApolloEnrichPersonAction {
                     Map.of(
                         "type", PropertyType.QUERY)))
         .output(outputSchema(object()
-            .properties(object("body")
-                .properties(object("person")
-                    .properties(string("id").required(false), string("first_name").required(false),
-                        string("last_name").required(false), string("name").required(false),
-                        string("linkedin_url").required(false), string("title").required(false),
-                        string("email_status").required(false), string("photo_url").required(false),
-                        string("twitter_url").required(false), string("github_url").required(false),
-                        string("facebook_url").required(false), string("headline").required(false),
-                        string("email").required(false), string("organization_id").required(false))
-                    .required(false))
+            .properties(object("person")
+                .properties(string("id").required(false), string("first_name").required(false),
+                    string("last_name").required(false), string("name").required(false),
+                    string("linkedin_url").required(false), string("title").required(false),
+                    string("email_status").required(false), string("photo_url").required(false),
+                    string("twitter_url").required(false), string("github_url").required(false),
+                    string("facebook_url").required(false), string("headline").required(false),
+                    string("email").required(false), string("organization_id").required(false))
                 .required(false))
             .metadata(
                 Map.of(

@@ -59,11 +59,9 @@ public class ClickupCreateFolderAction {
                 .description("The name of the folder.")
                 .required(true))
         .output(outputSchema(object()
-            .properties(object("body")
-                .properties(string("id").required(false), string("name").required(false),
-                    object("space").properties(string("id").required(false), string("name").required(false))
-                        .required(false))
-                .required(false))
+            .properties(string("id").required(false), string("name").required(false),
+                object("space").properties(string("id").required(false), string("name").required(false))
+                    .required(false))
             .metadata(
                 Map.of(
                     "responseType", ResponseType.JSON))));

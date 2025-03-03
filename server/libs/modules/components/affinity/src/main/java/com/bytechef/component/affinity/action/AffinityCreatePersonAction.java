@@ -67,11 +67,9 @@ public class AffinityCreatePersonAction {
                 .description("The email addresses of the person.")
                 .required(false))
         .output(outputSchema(object()
-            .properties(object("body")
-                .properties(string("id").required(false), string("first_name").required(false),
-                    string("last_name").required(false), array("emails").items(string())
-                        .required(false))
-                .required(false))
+            .properties(string("id").required(false), string("first_name").required(false),
+                string("last_name").required(false), array("emails").items(string())
+                    .required(false))
             .metadata(
                 Map.of(
                     "responseType", ResponseType.JSON))));

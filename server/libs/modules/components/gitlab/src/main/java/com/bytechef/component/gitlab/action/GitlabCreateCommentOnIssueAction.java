@@ -65,9 +65,7 @@ public class GitlabCreateCommentOnIssueAction {
                 .metadata(
                     Map.of(
                         "type", PropertyType.QUERY)))
-        .output(outputSchema(object()
-            .properties(object("body").properties(integer("id").required(false), string("body").required(false))
-                .required(false))
+        .output(outputSchema(object().properties(integer("id").required(false), string("body").required(false))
             .metadata(
                 Map.of(
                     "responseType", ResponseType.JSON))));

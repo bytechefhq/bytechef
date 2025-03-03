@@ -55,10 +55,7 @@ public class AffinityCreateOrganizationAction {
                 .description("The domain name of the organization.")
                 .required(false))
         .output(outputSchema(object()
-            .properties(object("body")
-                .properties(string("id").required(false), string("name").required(false),
-                    string("domain").required(false))
-                .required(false))
+            .properties(string("id").required(false), string("name").required(false), string("domain").required(false))
             .metadata(
                 Map.of(
                     "responseType", ResponseType.JSON))));

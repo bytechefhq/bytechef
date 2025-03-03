@@ -62,10 +62,8 @@ public class FreshdeskCreateCompanyAction {
                 .description("Any specific note about the company")
                 .required(false))
         .output(outputSchema(object()
-            .properties(object("body")
-                .properties(number("id").required(false), string("name").required(false),
-                    string("description").required(false), string("note").required(false))
-                .required(false))
+            .properties(number("id").required(false), string("name").required(false),
+                string("description").required(false), string("note").required(false))
             .metadata(
                 Map.of(
                     "responseType", ResponseType.JSON))));

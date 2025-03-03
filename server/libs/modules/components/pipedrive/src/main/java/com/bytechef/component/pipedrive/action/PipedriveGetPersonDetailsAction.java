@@ -52,27 +52,25 @@ public class PipedriveGetPersonDetailsAction {
                 Map.of(
                     "type", PropertyType.PATH)))
         .output(outputSchema(object()
-            .properties(object("body")
-                .properties(object("data")
-                    .properties(integer("id").required(false), integer("company_id").required(false),
-                        object("owner_id")
-                            .properties(integer("id").required(false), string("name").required(false),
-                                string("email").required(false))
-                            .required(false),
-                        object("org_id")
-                            .properties(string("name").required(false), integer("owner_id").required(false),
-                                string("cc_email").required(false))
-                            .required(false),
-                        string("name").required(false),
-                        array("phone")
-                            .items(object().properties(string("value").required(false), bool("primary").required(false),
-                                string("label").required(false)))
-                            .required(false),
-                        array("email")
-                            .items(object().properties(string("value").required(false), bool("primary").required(false),
-                                string("label").required(false)))
-                            .required(false))
-                    .required(false))
+            .properties(object("data")
+                .properties(integer("id").required(false), integer("company_id").required(false),
+                    object("owner_id")
+                        .properties(integer("id").required(false), string("name").required(false),
+                            string("email").required(false))
+                        .required(false),
+                    object("org_id")
+                        .properties(string("name").required(false), integer("owner_id").required(false),
+                            string("cc_email").required(false))
+                        .required(false),
+                    string("name").required(false),
+                    array("phone")
+                        .items(object().properties(string("value").required(false), bool("primary").required(false),
+                            string("label").required(false)))
+                        .required(false),
+                    array("email")
+                        .items(object().properties(string("value").required(false), bool("primary").required(false),
+                            string("label").required(false)))
+                        .required(false))
                 .required(false))
             .metadata(
                 Map.of(

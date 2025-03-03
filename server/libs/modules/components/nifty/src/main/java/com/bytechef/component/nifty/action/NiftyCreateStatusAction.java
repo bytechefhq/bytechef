@@ -59,14 +59,12 @@ public class NiftyCreateStatusAction {
                 .required(true)
                 .options((OptionsDataSource.ActionOptionsFunction<String>) NiftyUtils::getProjectIdOptions))
         .output(outputSchema(object()
-            .properties(object("body")
-                .properties(string("message").required(false),
-                    object("task_group")
-                        .properties(string("id").required(false), string("name").required(false),
-                            string("color").required(false), string("created_by").required(false),
-                            string("project").required(false), integer("order").required(false))
-                        .required(false))
-                .required(false))
+            .properties(string("message").required(false),
+                object("task_group")
+                    .properties(string("id").required(false), string("name").required(false),
+                        string("color").required(false), string("created_by").required(false),
+                        string("project").required(false), integer("order").required(false))
+                    .required(false))
             .metadata(
                 Map.of(
                     "responseType", ResponseType.JSON))));

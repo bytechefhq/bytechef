@@ -50,14 +50,12 @@ public class HubspotGetContactAction {
                 Map.of(
                     "type", PropertyType.PATH)))
         .output(outputSchema(object()
-            .properties(object("body")
-                .properties(string("id").required(false),
-                    object("properties")
-                        .properties(string("firstname").required(false), string("lastname").required(false),
-                            string("email").required(false), string("phone").required(false),
-                            string("company").required(false), string("website").required(false))
-                        .required(false))
-                .required(false))
+            .properties(string("id").required(false),
+                object("properties")
+                    .properties(string("firstname").required(false), string("lastname").required(false),
+                        string("email").required(false), string("phone").required(false),
+                        string("company").required(false), string("website").required(false))
+                    .required(false))
             .metadata(
                 Map.of(
                     "responseType", ResponseType.JSON))));

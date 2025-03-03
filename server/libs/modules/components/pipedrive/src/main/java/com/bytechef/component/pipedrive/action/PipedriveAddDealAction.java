@@ -129,22 +129,19 @@ public class PipedriveAddDealAction {
                 .description("The optional message about why the deal was lost.")
                 .required(false))
         .output(outputSchema(object()
-            .properties(object("body")
-                .properties(object("data")
-                    .properties(
-                        integer("id").required(false),
-                        object("user_id")
-                            .properties(integer("id").required(false), string("name").required(false),
-                                string("email").required(false))
-                            .required(false),
-                        object("person_id").properties(string("name").required(false))
-                            .required(false),
-                        object("org_id").properties(string("name").required(false), string("owner_id").required(false))
-                            .required(false),
-                        integer("stage_id").required(false), string("title").required(false),
-                        integer("value").required(false), string("currency").required(false),
-                        string("status").required(false))
-                    .required(false))
+            .properties(object("data")
+                .properties(integer("id").required(false),
+                    object("user_id")
+                        .properties(integer("id").required(false), string("name").required(false),
+                            string("email").required(false))
+                        .required(false),
+                    object("person_id").properties(string("name").required(false))
+                        .required(false),
+                    object("org_id").properties(string("name").required(false), string("owner_id").required(false))
+                        .required(false),
+                    integer("stage_id").required(false), string("title").required(false),
+                    integer("value").required(false), string("currency").required(false),
+                    string("status").required(false))
                 .required(false))
             .metadata(
                 Map.of(
