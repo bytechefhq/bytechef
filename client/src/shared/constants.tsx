@@ -56,3 +56,22 @@ export const PATH_SPACE_REPLACEMENT = '_SPACE_';
 export const PATH_DIGIT_PREFIX = '_DIGIT_';
 export const PATH_DASH_REPLACEMENT = '_DASH_';
 export const PATH_HASH_REPLACEMENT = '_HASH_';
+
+export const SORT_OPTIONS = [
+    {
+        label: 'Last edited',
+        value: 'last-edited',
+    },
+    {
+        label: 'Date created',
+        value: 'date-created',
+    },
+    {
+        label: 'A-Z',
+        value: 'alphabetical',
+    },
+    {
+        label: 'Z-A',
+        value: 'reverse-alphabetical',
+    },
+];
