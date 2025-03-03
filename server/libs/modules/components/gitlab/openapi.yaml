@@ -42,9 +42,6 @@ paths:
               schema:
                 type: "object"
                 properties:
-                  body:
-                    type: "object"
-                    properties:
                       id:
                         type: "integer"
                       iid:
@@ -96,9 +93,6 @@ paths:
               schema:
                 type: "object"
                 properties:
-                  body:
-                    type: "object"
-                    properties:
                       id:
                         type: "integer"
                       body:

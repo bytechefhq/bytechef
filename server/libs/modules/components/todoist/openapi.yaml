@@ -48,19 +48,16 @@ paths:
               schema:
                 type: "object"
                 properties:
-                  body:
-                    type: "object"
-                    properties:
-                      id:
-                        type: "string"
-                      project_id:
-                        type: "string"
-                      content:
-                        type: "string"
-                      description:
-                        type: "string"
-                      priority:
-                        type: "integer"
+                  id:
+                    type: "string"
+                  project_id:
+                    type: "string"
+                  content:
+                    type: "string"
+                  description:
+                    type: "string"
+                  priority:
+                    type: "integer"
   /tasks/{taskId}/close:
     post:
       summary: "Mark Task as Completed"
@@ -109,19 +106,16 @@ paths:
               schema:
                 type: "object"
                 properties:
-                  body:
-                    type: "object"
-                    properties:
-                      id:
-                        type: "string"
-                      name:
-                        type: "string"
-                      color:
-                        type: "string"
-                      is_favorite:
-                        type: "string"
-                      url:
-                        type: "string"
+                  id:
+                    type: "string"
+                  name:
+                    type: "string"
+                  color:
+                    type: "string"
+                  is_favorite:
+                    type: "string"
+                  url:
+                    type: "string"
 components:
   securitySchemes:
     oauth2:

@@ -51,15 +51,12 @@ paths:
               schema:
                 type: "object"
                 properties:
-                  body:
-                    type: "object"
-                    properties:
-                      id:
-                        type: "string"
-                      content:
-                        type: "string"
-                      tts:
-                        type: "boolean"
+                  id:
+                    type: "string"
+                  content:
+                    type: "string"
+                  tts:
+                    type: "boolean"
   /guilds/{guildId}/channels:
     post:
       tags:
@@ -103,15 +100,12 @@ paths:
               schema:
                 type: "object"
                 properties:
-                  body:
-                    type: "object"
-                    properties:
-                      id:
-                        type: "string"
-                      type:
-                        type: "integer"
-                      name:
-                        type: "string"
+                  id:
+                    type: "string"
+                  type:
+                    type: "integer"
+                  name:
+                    type: "string"
 components:
   securitySchemes:
     bearerAuth:

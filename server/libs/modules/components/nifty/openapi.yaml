@@ -42,17 +42,14 @@ paths:
               schema:
                 type: "object"
                 properties:
-                  body:
-                    type: "object"
-                    properties:
-                      id:
-                        type: "string"
-                      name:
-                        type: "string"
-                      description:
-                        type: "string"
-                      template_id:
-                        type: "string"
+                  id:
+                    type: "string"
+                  name:
+                    type: "string"
+                  description:
+                    type: "string"
+                  template_id:
+                    type: "string"
   /tasks:
     post:
       summary: "Create Task"
@@ -95,20 +92,17 @@ paths:
               schema:
                 type: "object"
                 properties:
-                  body:
-                    type: "object"
-                    properties:
-                      id:
-                        type: "string"
-                      name:
-                        type: "string"
-                      project:
-                        type: "string"
-                      description:
-                        type: "string"
-                      due_date:
-                        type: "string"
-                        format: "date-time"
+                  id:
+                    type: "string"
+                  name:
+                    type: "string"
+                  project:
+                    type: "string"
+                  description:
+                    type: "string"
+                  due_date:
+                    type: "string"
+                    format: "date-time"
   /tasks/{taskId}:
     get:
       summary: "Get Task"
@@ -131,17 +125,14 @@ paths:
               schema:
                 type: "object"
                 properties:
-                  body:
-                    type: "object"
-                    properties:
-                      id:
-                        type: "string"
-                      name:
-                        type: "string"
-                      project:
-                        type: "string"
-                      description:
-                        type: "string"
+                  id:
+                    type: "string"
+                  name:
+                    type: "string"
+                  project:
+                    type: "string"
+                  description:
+                    type: "string"
   /taskgroups:
     post:
       summary: "Create Status"
@@ -174,26 +165,23 @@ paths:
               schema:
                 type: "object"
                 properties:
-                  body:
+                  message:
+                    type: "string"
+                  task_group:
                     type: "object"
                     properties:
-                      message:
+                      id:
                         type: "string"
-                      task_group:
-                        type: "object"
-                        properties:
-                          id:
-                            type: "string"
-                          name:
-                            type: "string"
-                          color:
-                            type: "string"
-                          created_by:
-                            type: "string"
-                          project:
-                            type: "string"
-                          order:
-                            type: "integer"
+                      name:
+                        type: "string"
+                      color:
+                        type: "string"
+                      created_by:
+                        type: "string"
+                      project:
+                        type: "string"
+                      order:
+                        type: "integer"
   /time:
     get:
       summary: "Get Tracked Time Report"
@@ -230,32 +218,29 @@ paths:
               schema:
                 type: "object"
                 properties:
-                  body:
-                    type: "object"
-                    properties:
-                      items:
-                        type: "array"
-                        items:
-                          type: "object"
-                          properties:
-                            id:
-                              type: "string"
-                            project:
-                              type: "string"
-                            start:
-                              type: "string"
-                            manual:
-                              type: "boolean"
-                            user:
-                              type: "string"
-                            task:
-                              type: "string"
-                            end:
-                              type: "string"
-                            active:
-                              type: "boolean"
-                            duration:
-                              type: "string"
+                  items:
+                    type: "array"
+                    items:
+                      type: "object"
+                      properties:
+                        id:
+                          type: "string"
+                        project:
+                          type: "string"
+                        start:
+                          type: "string"
+                        manual:
+                          type: "boolean"
+                        user:
+                          type: "string"
+                        task:
+                          type: "string"
+                        end:
+                          type: "string"
+                        active:
+                          type: "boolean"
+                        duration:
+                          type: "string"
 
 components:
   securitySchemes:

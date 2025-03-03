@@ -41,16 +41,13 @@ paths:
               schema:
                 type: "object"
                 properties:
-                  body:
+                  account:
                     type: "object"
                     properties:
-                      account:
-                        type: "object"
-                        properties:
-                          name:
-                            type: "string"
-                          accountUrl:
-                            type: "string"
+                      name:
+                        type: "string"
+                      accountUrl:
+                        type: "string"
   /contacts:
     post:
       tags:
@@ -76,14 +73,14 @@ paths:
                       description: "Email address of the new contact."
                       example: "test@example.com"
                     firstName:
-                        type: "string"
-                        description: "First name of the new contact."
+                      type: "string"
+                      description: "First name of the new contact."
                     lastName:
-                        type: "string"
-                        description: "Last name of the new contact."
+                      type: "string"
+                      description: "Last name of the new contact."
                     phone:
-                        type: "string"
-                        description: "Phone number of the contact."
+                      type: "string"
+                      description: "Phone number of the contact."
       responses:
         201:
           description: "Successful operation. Returns created Contact"
@@ -92,21 +89,18 @@ paths:
               schema:
                 type: "object"
                 properties:
-                  body:
+                  contact:
                     type: "object"
                     properties:
-                      contact:
-                        type: "object"
-                        properties:
-                          email:
-                            type: "string"
-                            format: "email"
-                          firstName:
-                            type: "string"
-                          lastName:
-                            type: "string"
-                          phone:
-                            type: "string"
+                      email:
+                        type: "string"
+                        format: "email"
+                      firstName:
+                        type: "string"
+                      lastName:
+                        type: "string"
+                      phone:
+                        type: "string"
   /dealTasks:
     post:
       tags:
@@ -155,25 +149,22 @@ paths:
               schema:
                 type: "object"
                 properties:
-                  body:
+                  dealTask:
                     type: "object"
                     properties:
-                      dealTask:
-                        type: "object"
-                        properties:
-                          id:
-                            type: "string"
-                          title:
-                            type: "string"
-                          relid:
-                            type: "integer"
-                            format: "int32"
-                          duedate:
-                            type: "string"
-                            format: "date"
-                          dealTasktype:
-                            type: "integer"
-                            format: "int32"
+                      id:
+                        type: "string"
+                      title:
+                        type: "string"
+                      relid:
+                        type: "integer"
+                        format: "int32"
+                      duedate:
+                        type: "string"
+                        format: "date"
+                      dealTasktype:
+                        type: "integer"
+                        format: "int32"
 components:
   securitySchemes:
     ApiKeyAuth:

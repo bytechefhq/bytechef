@@ -44,17 +44,14 @@ paths:
               schema:
                 type: "object"
                 properties:
-                  body:
-                    type: "object"
-                    properties:
-                      name:
-                        type: "string"
-                      emailOne:
-                        type: "string"
-                      phone:
-                        type: "string"
-                      website:
-                        type: "string"
+                  name:
+                    type: "string"
+                  emailOne:
+                    type: "string"
+                  phone:
+                    type: "string"
+                  website:
+                    type: "string"
   /tasklists/{tasklistId}/tasks.json:
     post:
       tags:
@@ -97,15 +94,12 @@ paths:
               schema:
                 type: "object"
                 properties:
-                  body:
-                    type: "object"
-                    properties:
-                      name:
-                        type: "string"
-                      description:
-                        type: "string"
-                      dueAt:
-                        type: "string"
+                  name:
+                    type: "string"
+                  description:
+                    type: "string"
+                  dueAt:
+                    type: "string"
 components:
   securitySchemes:
     basicAuth:

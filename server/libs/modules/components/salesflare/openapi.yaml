@@ -106,15 +106,12 @@ paths:
           content:
             application/json:
               schema:
-                type: "object"
-                properties:
-                  body:
-                    type: "array"
-                    items:
-                      type: "object"
-                      properties:
-                        id:
-                          type: "integer"
+                type: "array"
+                items:
+                  type: "object"
+                  properties:
+                    id:
+                      type: "integer"
   /tasks:
     post:
       tags:
@@ -149,15 +146,12 @@ paths:
           content:
             application/json:
               schema:
-                type: "object"
-                properties:
-                  body:
-                    type: "array"
-                    items:
-                      type: "object"
-                      properties:
-                        id:
-                          type: "integer"
+                type: "array"
+                items:
+                  type: "object"
+                  properties:
+                    id:
+                      type: "integer"
 components:
   securitySchemes:
     bearerAuth:

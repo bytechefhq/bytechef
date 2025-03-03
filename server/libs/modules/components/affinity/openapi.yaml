@@ -33,9 +33,6 @@ paths:
               schema:
                 type: "object"
                 properties:
-                  body:
-                    type: "object"
-                    properties:
                       id:
                         type: "string"
                       name:
@@ -70,15 +67,12 @@ paths:
               schema:
                 type: "object"
                 properties:
-                  body:
-                    type: "object"
-                    properties:
-                      id:
-                        type: "string"
-                      name:
-                        type: "string"
-                      domain:
-                        type: "string"
+                  id:
+                    type: "string"
+                  name:
+                    type: "string"
+                  domain:
+                    type: "string"
   /persons:
     post:
       summary: "Create Person"
@@ -116,19 +110,16 @@ paths:
               schema:
                 type: "object"
                 properties:
-                  body:
-                    type: "object"
-                    properties:
-                      id:
-                        type: "string"
-                      first_name:
-                        type: "string"
-                      last_name:
-                        type: "string"
-                      emails:
-                        type: "array"
-                        items:
-                          type: "string"
+                  id:
+                    type: "string"
+                  first_name:
+                    type: "string"
+                  last_name:
+                    type: "string"
+                  emails:
+                    type: "array"
+                    items:
+                      type: "string"
 components:
   securitySchemes:
     bearerAuth:
