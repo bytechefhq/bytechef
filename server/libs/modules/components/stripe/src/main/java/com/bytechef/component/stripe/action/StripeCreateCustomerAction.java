@@ -85,15 +85,13 @@ public class StripeCreateCustomerAction {
                 .label("Address")
                 .required(false))
         .output(outputSchema(object()
-            .properties(object("body")
-                .properties(string("id").required(false), string("description").required(false),
-                    string("email").required(false), string("name").required(false), string("phone").required(false),
-                    object("address")
-                        .properties(string("city").required(false), string("country").required(false),
-                            string("line1").required(false), string("line2").required(false),
-                            string("postal_code").required(false), string("state").required(false))
-                        .required(false))
-                .required(false))
+            .properties(string("id").required(false), string("description").required(false),
+                string("email").required(false), string("name").required(false), string("phone").required(false),
+                object("address")
+                    .properties(string("city").required(false), string("country").required(false),
+                        string("line1").required(false), string("line2").required(false),
+                        string("postal_code").required(false), string("state").required(false))
+                    .required(false))
             .metadata(
                 Map.of(
                     "responseType", ResponseType.JSON))));

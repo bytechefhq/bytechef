@@ -50,14 +50,12 @@ public class HubspotGetTicketAction {
                 Map.of(
                     "type", PropertyType.PATH)))
         .output(outputSchema(object()
-            .properties(object("body")
-                .properties(string("id").required(false),
-                    object("properties")
-                        .properties(string("content").required(false), string("hs_object_id").required(false),
-                            string("hs_pipeline").required(false), string("hs_pipeline_stage").required(false),
-                            string("hs_ticket_priority").required(false), string("subject").required(false))
-                        .required(false))
-                .required(false))
+            .properties(string("id").required(false),
+                object("properties")
+                    .properties(string("content").required(false), string("hs_object_id").required(false),
+                        string("hs_pipeline").required(false), string("hs_pipeline_stage").required(false),
+                        string("hs_ticket_priority").required(false), string("subject").required(false))
+                    .required(false))
             .metadata(
                 Map.of(
                     "responseType", ResponseType.JSON))));

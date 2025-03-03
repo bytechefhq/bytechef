@@ -68,12 +68,10 @@ public class EnchargeCreateEmailAction {
                 .description("Address that recipients will reply to by default.")
                 .required(false))
         .output(outputSchema(object()
-            .properties(object("body")
-                .properties(object("email")
-                    .properties(integer("id").required(false), string("name").required(false),
-                        string("subject").required(false), string("fromEmail").required(false),
-                        string("replyEmail").required(false))
-                    .required(false))
+            .properties(object("email")
+                .properties(integer("id").required(false), string("name").required(false),
+                    string("subject").required(false), string("fromEmail").required(false),
+                    string("replyEmail").required(false))
                 .required(false))
             .metadata(
                 Map.of(

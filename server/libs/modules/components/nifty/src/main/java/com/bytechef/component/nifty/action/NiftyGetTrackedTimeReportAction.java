@@ -66,13 +66,11 @@ public class NiftyGetTrackedTimeReportAction {
                     Map.of(
                         "type", PropertyType.QUERY)))
         .output(outputSchema(object()
-            .properties(object("body")
-                .properties(array("items")
-                    .items(object().properties(string("id").required(false), string("project").required(false),
-                        string("start").required(false), bool("manual").required(false), string("user").required(false),
-                        string("task").required(false), string("end").required(false), bool("active").required(false),
-                        string("duration").required(false)))
-                    .required(false))
+            .properties(array("items")
+                .items(object().properties(string("id").required(false), string("project").required(false),
+                    string("start").required(false), bool("manual").required(false), string("user").required(false),
+                    string("task").required(false), string("end").required(false), bool("active").required(false),
+                    string("duration").required(false)))
                 .required(false))
             .metadata(
                 Map.of(

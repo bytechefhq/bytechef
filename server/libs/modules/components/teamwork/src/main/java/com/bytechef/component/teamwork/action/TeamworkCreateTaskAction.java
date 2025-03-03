@@ -67,10 +67,8 @@ public class TeamworkCreateTaskAction {
                 .label("Task")
                 .required(false))
         .output(outputSchema(object()
-            .properties(object("body")
-                .properties(string("name").required(false), string("description").required(false),
-                    string("dueAt").required(false))
-                .required(false))
+            .properties(string("name").required(false), string("description").required(false),
+                string("dueAt").required(false))
             .metadata(
                 Map.of(
                     "responseType", ResponseType.JSON))));

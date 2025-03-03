@@ -48,15 +48,13 @@ public class FigmaGetCommentsAction {
             .metadata(
                 Map.of(
                     "type", PropertyType.PATH)))
-        .output(outputSchema(object()
-            .properties(array("body")
-                .items(object().properties(string("id").required(false), string("file_key").required(false),
-                    string("parent_id").required(false),
-                    object("user")
-                        .properties(string("id").required(false), string("handle").required(false),
-                            string("img_url").required(false), string("email").required(false))
-                        .required(false)))
-                .required(false))
+        .output(outputSchema(array()
+            .items(object().properties(string("id").required(false), string("file_key").required(false),
+                string("parent_id").required(false),
+                object("user")
+                    .properties(string("id").required(false), string("handle").required(false),
+                        string("img_url").required(false), string("email").required(false))
+                    .required(false)))
             .metadata(
                 Map.of(
                     "responseType", ResponseType.JSON))));

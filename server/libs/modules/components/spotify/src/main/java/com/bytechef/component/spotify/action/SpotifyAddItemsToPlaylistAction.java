@@ -66,8 +66,7 @@ public class SpotifyAddItemsToPlaylistAction {
                 .label("Position")
                 .description("Position to insert the items, a zero-based index.")
                 .required(false))
-        .output(outputSchema(object().properties(object("body").properties(string("snapshot_id").required(false))
-            .required(false))
+        .output(outputSchema(object().properties(string("snapshot_id").required(false))
             .metadata(
                 Map.of(
                     "responseType", ResponseType.JSON))));

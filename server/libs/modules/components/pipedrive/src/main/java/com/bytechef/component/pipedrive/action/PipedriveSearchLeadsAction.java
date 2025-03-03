@@ -90,8 +90,8 @@ public class PipedriveSearchLeadsAction {
         .output(
             outputSchema(
                 object()
-                    .properties(object("body")
-                        .properties(object("data")
+                    .properties(
+                        object("data")
                             .properties(array("items")
                                 .items(object().properties(string("id").required(false),
                                     string("title").required(false), integer("owner_id").required(false),
@@ -102,7 +102,6 @@ public class PipedriveSearchLeadsAction {
                                     date("expected_close_date").required(false), integer("person_id").required(false)))
                                 .required(false))
                             .required(false))
-                        .required(false))
                     .metadata(
                         Map.of(
                             "responseType", ResponseType.JSON))));

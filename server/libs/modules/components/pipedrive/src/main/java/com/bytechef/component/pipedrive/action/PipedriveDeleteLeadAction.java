@@ -47,10 +47,8 @@ public class PipedriveDeleteLeadAction {
             .metadata(
                 Map.of(
                     "type", PropertyType.PATH)))
-        .output(outputSchema(object()
-            .properties(object("body").properties(object("data").properties(string("id").required(false))
-                .required(false))
-                .required(false))
+        .output(outputSchema(object().properties(object("data").properties(string("id").required(false))
+            .required(false))
             .metadata(
                 Map.of(
                     "responseType", ResponseType.JSON))));

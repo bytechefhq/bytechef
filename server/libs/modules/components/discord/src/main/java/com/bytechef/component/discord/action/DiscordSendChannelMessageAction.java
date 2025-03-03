@@ -68,10 +68,7 @@ public class DiscordSendChannelMessageAction {
                 .defaultValue(false)
                 .required(false))
         .output(outputSchema(object()
-            .properties(object("body")
-                .properties(string("id").required(false), string("content").required(false),
-                    bool("tts").required(false))
-                .required(false))
+            .properties(string("id").required(false), string("content").required(false), bool("tts").required(false))
             .metadata(
                 Map.of(
                     "responseType", ResponseType.JSON))));

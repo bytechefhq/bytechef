@@ -52,12 +52,10 @@ public class JotformGetFormSubmissionsAction {
                 Map.of(
                     "type", PropertyType.PATH)))
         .output(outputSchema(object()
-            .properties(object("body")
-                .properties(array("content")
-                    .items(object().properties(string("id").required(false), string("form_id").required(false),
-                        string("status").required(false), string("new").required(false), string("flag").required(false),
-                        string("notes").required(false)))
-                    .required(false))
+            .properties(array("content")
+                .items(object().properties(string("id").required(false), string("form_id").required(false),
+                    string("status").required(false), string("new").required(false), string("flag").required(false),
+                    string("notes").required(false)))
                 .required(false))
             .metadata(
                 Map.of(

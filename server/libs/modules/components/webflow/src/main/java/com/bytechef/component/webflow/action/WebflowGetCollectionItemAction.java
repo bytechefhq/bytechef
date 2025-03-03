@@ -60,11 +60,9 @@ public class WebflowGetCollectionItemAction {
                     Map.of(
                         "type", PropertyType.PATH)))
         .output(outputSchema(object()
-            .properties(object("body")
-                .properties(string("id").required(false),
-                    object("fieldData").properties(string("name").required(false), string("slug").required(false))
-                        .required(false))
-                .required(false))
+            .properties(string("id").required(false),
+                object("fieldData").properties(string("name").required(false), string("slug").required(false))
+                    .required(false))
             .metadata(
                 Map.of(
                     "responseType", ResponseType.JSON))));

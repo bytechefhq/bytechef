@@ -51,10 +51,8 @@ public class NiftyGetTaskAction {
                 Map.of(
                     "type", PropertyType.PATH)))
         .output(outputSchema(object()
-            .properties(object("body")
-                .properties(string("id").required(false), string("name").required(false),
-                    string("project").required(false), string("description").required(false))
-                .required(false))
+            .properties(string("id").required(false), string("name").required(false), string("project").required(false),
+                string("description").required(false))
             .metadata(
                 Map.of(
                     "responseType", ResponseType.JSON))));

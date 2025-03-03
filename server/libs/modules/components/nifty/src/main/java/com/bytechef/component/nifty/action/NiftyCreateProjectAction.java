@@ -64,10 +64,8 @@ public class NiftyCreateProjectAction {
                 .required(false)
                 .options((OptionsDataSource.ActionOptionsFunction<String>) NiftyUtils::getTemplateIdOptions))
         .output(outputSchema(object()
-            .properties(object("body")
-                .properties(string("id").required(false), string("name").required(false),
-                    string("description").required(false), string("template_id").required(false))
-                .required(false))
+            .properties(string("id").required(false), string("name").required(false),
+                string("description").required(false), string("template_id").required(false))
             .metadata(
                 Map.of(
                     "responseType", ResponseType.JSON))));

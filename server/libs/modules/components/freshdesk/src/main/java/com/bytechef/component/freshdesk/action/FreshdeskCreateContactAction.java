@@ -80,10 +80,8 @@ public class FreshdeskCreateContactAction {
                 .description("Job title of the contact")
                 .required(false))
         .output(outputSchema(object()
-            .properties(object("body")
-                .properties(string("description").required(false), string("email").required(false),
-                    number("id").required(false), string("job_title").required(false))
-                .required(false))
+            .properties(string("description").required(false), string("email").required(false),
+                number("id").required(false), string("job_title").required(false))
             .metadata(
                 Map.of(
                     "responseType", ResponseType.JSON))));

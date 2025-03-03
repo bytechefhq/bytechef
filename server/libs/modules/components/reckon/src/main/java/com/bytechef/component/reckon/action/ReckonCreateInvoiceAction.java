@@ -86,8 +86,7 @@ public class ReckonCreateInvoiceAction {
                 .label("Line Items")
                 .description("The individual items that make up the invoice.")
                 .required(true))
-        .output(outputSchema(object().properties(object("body").properties(string("id").required(false))
-            .required(false))
+        .output(outputSchema(object().properties(string("id").required(false))
             .metadata(
                 Map.of(
                     "responseType", ResponseType.JSON))));

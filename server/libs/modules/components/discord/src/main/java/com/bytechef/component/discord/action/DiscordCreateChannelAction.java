@@ -68,10 +68,7 @@ public class DiscordCreateChannelAction {
                 .options(option("0", 0), option("2", 2), option("4", 4))
                 .required(false))
         .output(outputSchema(object()
-            .properties(object("body")
-                .properties(string("id").required(false), integer("type").required(false),
-                    string("name").required(false))
-                .required(false))
+            .properties(string("id").required(false), integer("type").required(false), string("name").required(false))
             .metadata(
                 Map.of(
                     "responseType", ResponseType.JSON))));

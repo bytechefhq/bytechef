@@ -68,12 +68,10 @@ public class EnchargeCreatePeopleAction {
             .label("People")
             .required(true))
         .output(outputSchema(object()
-            .properties(object("body")
-                .properties(array("users")
-                    .items(object().properties(string("email").required(false), string("firstName").required(false),
-                        string("lastName").required(false), string("website").required(false),
-                        string("title").required(false), string("id").required(false), string("phone").required(false)))
-                    .required(false))
+            .properties(array("users")
+                .items(object().properties(string("email").required(false), string("firstName").required(false),
+                    string("lastName").required(false), string("website").required(false),
+                    string("title").required(false), string("id").required(false), string("phone").required(false)))
                 .required(false))
             .metadata(
                 Map.of(

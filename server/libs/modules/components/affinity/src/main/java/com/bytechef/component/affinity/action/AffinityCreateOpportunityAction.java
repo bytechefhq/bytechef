@@ -48,9 +48,7 @@ public class AffinityCreateOpportunityAction {
             .label("Name")
             .description("The name of the opportunity.")
             .required(true))
-        .output(outputSchema(object()
-            .properties(object("body").properties(string("id").required(false), string("name").required(false))
-                .required(false))
+        .output(outputSchema(object().properties(string("id").required(false), string("name").required(false))
             .metadata(
                 Map.of(
                     "responseType", ResponseType.JSON))));

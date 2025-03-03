@@ -61,9 +61,8 @@ public class TodoistCreateProjectAction {
                 .description("Whether the project is a favorite.")
                 .required(false))
         .output(outputSchema(object()
-            .properties(object("body").properties(string("id").required(false), string("name").required(false),
-                string("color").required(false), string("is_favorite").required(false), string("url").required(false))
-                .required(false))
+            .properties(string("id").required(false), string("name").required(false), string("color").required(false),
+                string("is_favorite").required(false), string("url").required(false))
             .metadata(
                 Map.of(
                     "responseType", ResponseType.JSON))));
