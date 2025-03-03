@@ -53,6 +53,10 @@ Create a document on Google Docs.
 | body | Content | STRING | Document content. | true |
 
 
+#### Output
+
+The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
+
 #### JSON Example
 ```json
 {
@@ -83,6 +87,10 @@ Creates a new document based on an existing one and can replace any placeholder 
 | images | Images | OBJECT <details> <summary> Properties </summary> {} </details> | Key: Image ID (get it manually from the Read File Action), Value: Image URL. | false |
 
 
+#### Output
+
+The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
+
 #### JSON Example
 ```json
 {
@@ -111,6 +119,10 @@ Retrieve a specified document from your Google Drive.
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | documentId | Document Id | STRING | The ID of the document to read. | true |
 
+
+#### Output
+
+The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
 
 #### JSON Example
 ```json

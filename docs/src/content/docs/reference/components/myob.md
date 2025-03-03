@@ -59,6 +59,10 @@ Creates a new customer.
 | Addresses | Addresses | ARRAY <details> <summary> Items </summary> [{STRING\(Street), STRING\(City), STRING\(State), STRING\(PostCode), STRING\(Country), STRING\(Phone1), STRING\(Email), STRING\(Website)}] </details> | List of addresses for the customer contact. | false |
 
 
+#### Output
+
+This action does not produce any output.
+
 #### JSON Example
 ```json
 {
@@ -102,6 +106,10 @@ Creates a new customer payment.
 | Customer | Customer UID | STRING <details> <summary> Depends On </summary> companyFile </details> |  | true |
 
 
+#### Output
+
+This action does not produce any output.
+
 #### JSON Example
 ```json
 {
@@ -135,6 +143,10 @@ Creates a new supplier.
 | IsActive | Is Active? | BOOLEAN <details> <summary> Options </summary> true, false </details> | Is supplier contact active? | false |
 | Addresses | Addresses | ARRAY <details> <summary> Items </summary> [{STRING\(Street), STRING\(City), STRING\(State), STRING\(PostCode), STRING\(Country), STRING\(Phone1), STRING\(Email), STRING\(Website)}] </details> | List of addresses for the customer contact. | false |
 
+
+#### Output
+
+This action does not produce any output.
 
 #### JSON Example
 ```json
@@ -178,6 +190,10 @@ Creates a new supplier payment.
 | Account | Account | STRING |  | true |
 | Supplier | Supplier UID | STRING <details> <summary> Depends On </summary> companyFile </details> |  | true |
 
+
+#### Output
+
+This action does not produce any output.
 
 #### JSON Example
 ```json

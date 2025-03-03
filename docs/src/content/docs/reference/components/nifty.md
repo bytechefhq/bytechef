@@ -65,7 +65,10 @@ Type: OBJECT
 
 |     Name     |     Type     |
 |:------------:|:------------:|
-| body | OBJECT <details> <summary> Properties </summary> {STRING\(id), STRING\(name), STRING\(description), STRING\(template_id)} </details> |
+| id | STRING |
+| name | STRING |
+| description | STRING |
+| template_id | STRING |
 
 
 
@@ -112,7 +115,11 @@ Type: OBJECT
 
 |     Name     |     Type     |
 |:------------:|:------------:|
-| body | OBJECT <details> <summary> Properties </summary> {STRING\(id), STRING\(name), STRING\(project), STRING\(description), DATE_TIME\(due_date)} </details> |
+| id | STRING |
+| name | STRING |
+| project | STRING |
+| description | STRING |
+| due_date | DATE_TIME |
 
 
 
@@ -157,7 +164,10 @@ Type: OBJECT
 
 |     Name     |     Type     |
 |:------------:|:------------:|
-| body | OBJECT <details> <summary> Properties </summary> {STRING\(id), STRING\(name), STRING\(project), STRING\(description)} </details> |
+| id | STRING |
+| name | STRING |
+| project | STRING |
+| description | STRING |
 
 
 
@@ -199,7 +209,8 @@ Type: OBJECT
 
 |     Name     |     Type     |
 |:------------:|:------------:|
-| body | OBJECT <details> <summary> Properties </summary> {STRING\(message), {STRING\(id), STRING\(name), STRING\(color), STRING\(created_by), STRING\(project), INTEGER\(order)}\(task_group)} </details> |
+| message | STRING |
+| task_group | OBJECT <details> <summary> Properties </summary> {STRING\(id), STRING\(name), STRING\(color), STRING\(created_by), STRING\(project), INTEGER\(order)} </details> |
 
 
 
@@ -243,7 +254,7 @@ Type: OBJECT
 
 |     Name     |     Type     |
 |:------------:|:------------:|
-| body | OBJECT <details> <summary> Properties </summary> {[{STRING\(id), STRING\(project), STRING\(start), BOOLEAN\(manual), STRING\(user), STRING\(task), STRING\(end), BOOLEAN\(active), STRING\(duration)}]\(items)} </details> |
+| items | ARRAY <details> <summary> Items </summary> [{STRING\(id), STRING\(project), STRING\(start), BOOLEAN\(manual), STRING\(user), STRING\(task), STRING\(end), BOOLEAN\(active), STRING\(duration)}] </details> |
 
 
 

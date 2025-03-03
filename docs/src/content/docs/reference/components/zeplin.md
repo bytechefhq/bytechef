@@ -54,6 +54,10 @@ Updates an existing project.
 | description | Description | STRING | New description for the project. | false |
 
 
+#### Output
+
+This action does not produce any output.
+
 #### JSON Example
 ```json
 {

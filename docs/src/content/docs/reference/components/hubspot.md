@@ -64,7 +64,8 @@ Type: OBJECT
 
 |     Name     |     Type     |
 |:------------:|:------------:|
-| body | OBJECT <details> <summary> Properties </summary> {STRING\(id), {STRING\(firstname), STRING\(lastname), STRING\(email), STRING\(phone), STRING\(company), STRING\(website)}\(properties)} </details> |
+| id | STRING |
+| properties | OBJECT <details> <summary> Properties </summary> {STRING\(firstname), STRING\(lastname), STRING\(email), STRING\(phone), STRING\(company), STRING\(website)} </details> |
 
 
 
@@ -100,6 +101,10 @@ Move Contact to the recycling bin.
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | contactId | Contact ID | STRING |  | true |
 
+
+#### Output
+
+This action does not produce any output.
 
 #### JSON Example
 ```json
@@ -137,7 +142,8 @@ Type: OBJECT
 
 |     Name     |     Type     |
 |:------------:|:------------:|
-| body | OBJECT <details> <summary> Properties </summary> {STRING\(id), {STRING\(firstname), STRING\(lastname), STRING\(email), STRING\(phone), STRING\(company), STRING\(website)}\(properties)} </details> |
+| id | STRING |
+| properties | OBJECT <details> <summary> Properties </summary> {STRING\(firstname), STRING\(lastname), STRING\(email), STRING\(phone), STRING\(company), STRING\(website)} </details> |
 
 
 
@@ -179,7 +185,8 @@ Type: OBJECT
 
 |     Name     |     Type     |
 |:------------:|:------------:|
-| body | OBJECT <details> <summary> Properties </summary> {STRING\(id), {STRING\(firstname), STRING\(lastname), STRING\(email), STRING\(phone), STRING\(company), STRING\(website)}\(properties)} </details> |
+| id | STRING |
+| properties | OBJECT <details> <summary> Properties </summary> {STRING\(firstname), STRING\(lastname), STRING\(email), STRING\(phone), STRING\(company), STRING\(website)} </details> |
 
 
 
@@ -228,7 +235,8 @@ Type: OBJECT
 
 |     Name     |     Type     |
 |:------------:|:------------:|
-| body | OBJECT <details> <summary> Properties </summary> {STRING\(id), {STRING\(dealname), NUMBER\(amount), DATE\(closedate), STRING\(pipeline), STRING\(dealstage), STRING\(hubspot_owner_id)}\(properties)} </details> |
+| id | STRING |
+| properties | OBJECT <details> <summary> Properties </summary> {STRING\(dealname), NUMBER\(amount), DATE\(closedate), STRING\(pipeline), STRING\(dealstage), STRING\(hubspot_owner_id)} </details> |
 
 
 
@@ -276,7 +284,8 @@ Type: OBJECT
 
 |     Name     |     Type     |
 |:------------:|:------------:|
-| body | OBJECT <details> <summary> Properties </summary> {STRING\(id), {STRING\(content), STRING\(hs_object_id), STRING\(hs_pipeline), STRING\(hs_pipeline_stage), STRING\(hs_ticket_priority), STRING\(subject)}\(properties)} </details> |
+| id | STRING |
+| properties | OBJECT <details> <summary> Properties </summary> {STRING\(content), STRING\(hs_object_id), STRING\(hs_pipeline), STRING\(hs_pipeline_stage), STRING\(hs_ticket_priority), STRING\(subject)} </details> |
 
 
 

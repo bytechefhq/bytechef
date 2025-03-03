@@ -64,7 +64,7 @@ Type: OBJECT
 
 |     Name     |     Type     |
 |:------------:|:------------:|
-| body | OBJECT <details> <summary> Properties </summary> {{STRING\(name), STRING\(accountUrl)}\(account)} </details> |
+| account | OBJECT <details> <summary> Properties </summary> {STRING\(name), STRING\(accountUrl)} </details> |
 
 
 
@@ -108,7 +108,7 @@ Type: OBJECT
 
 |     Name     |     Type     |
 |:------------:|:------------:|
-| body | OBJECT <details> <summary> Properties </summary> {{STRING\(email), STRING\(firstName), STRING\(lastName), STRING\(phone)}\(contact)} </details> |
+| contact | OBJECT <details> <summary> Properties </summary> {STRING\(email), STRING\(firstName), STRING\(lastName), STRING\(phone)} </details> |
 
 
 
@@ -154,7 +154,7 @@ Type: OBJECT
 
 |     Name     |     Type     |
 |:------------:|:------------:|
-| body | OBJECT <details> <summary> Properties </summary> {{STRING\(id), STRING\(title), INTEGER\(relid), DATE\(duedate), INTEGER\(dealTasktype)}\(dealTask)} </details> |
+| dealTask | OBJECT <details> <summary> Properties </summary> {STRING\(id), STRING\(title), INTEGER\(relid), DATE\(duedate), INTEGER\(dealTasktype)} </details> |
 
 
 

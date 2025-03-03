@@ -53,6 +53,10 @@ Creates a new row.
 | fields | | DYNAMIC_PROPERTIES <details> <summary> Depends On </summary> tableId </details> |  | true |
 
 
+#### Output
+
+The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
+
 #### JSON Example
 ```json
 {
@@ -81,6 +85,10 @@ Deletes the specified row.
 | rowId | Row ID | INTEGER | ID of the row to be deleted. | true |
 
 
+#### Output
+
+This action does not produce any output.
+
 #### JSON Example
 ```json
 {
@@ -108,6 +116,10 @@ Fetches a single table row.
 | rowId | Row ID | INTEGER | ID of the row to get. | true |
 | user_field_names | User Field Names | BOOLEAN <details> <summary> Options </summary> true, false </details> | The field names returned by this endpoint will be the actual names of the fields. | false |
 
+
+#### Output
+
+The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
 
 #### JSON Example
 ```json
@@ -139,6 +151,10 @@ Lists table rows.
 | user_field_names | User Field Names | BOOLEAN <details> <summary> Options </summary> true, false </details> | The field names returned by this endpoint will be the actual names of the fields. | false |
 
 
+#### Output
+
+The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
+
 #### JSON Example
 ```json
 {
@@ -169,6 +185,10 @@ Updates the specified row.
 | user_field_names | User Field Names | BOOLEAN <details> <summary> Options </summary> true, false </details> | The field names returned by this endpoint will be the actual names of the fields. | false |
 | fields | | DYNAMIC_PROPERTIES <details> <summary> Depends On </summary> tableId </details> |  | true |
 
+
+#### Output
+
+The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
 
 #### JSON Example
 ```json

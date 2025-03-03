@@ -113,6 +113,10 @@ Deletes an order. Orders that interact with an online gateway can't be deleted.
 | orderId | Order ID | INTEGER | ID of the order to delete. | true |
 
 
+#### Output
+
+This action does not produce any output.
+
 #### JSON Example
 ```json
 {

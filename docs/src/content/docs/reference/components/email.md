@@ -59,6 +59,10 @@ Send an email to any address.
 | attachments | Attachments | ARRAY <details> <summary> Items </summary> [FILE_ENTRY] </details> | A list of attachments to send with the email. | null |
 
 
+#### Output
+
+This action does not produce any output.
+
 #### JSON Example
 ```json
 {

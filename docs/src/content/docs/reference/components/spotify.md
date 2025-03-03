@@ -53,6 +53,10 @@ Start or resume current playback on an active device.
 | position_ms | Position | INTEGER | The position in milliseconds to start playback from. | false |
 
 
+#### Output
+
+This action does not produce any output.
+
 #### JSON Example
 ```json
 {
@@ -94,7 +98,7 @@ Type: OBJECT
 
 |     Name     |     Type     |
 |:------------:|:------------:|
-| body | OBJECT <details> <summary> Properties </summary> {STRING\(snapshot_id)} </details> |
+| snapshot_id | STRING |
 
 
 

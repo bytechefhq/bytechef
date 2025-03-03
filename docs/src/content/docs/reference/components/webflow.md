@@ -64,7 +64,8 @@ Type: OBJECT
 
 |     Name     |     Type     |
 |:------------:|:------------:|
-| body | OBJECT <details> <summary> Properties </summary> {STRING\(orderId), STRING\(status)} </details> |
+| orderId | STRING |
+| status | STRING |
 
 
 
@@ -108,7 +109,8 @@ Type: OBJECT
 
 |     Name     |     Type     |
 |:------------:|:------------:|
-| body | OBJECT <details> <summary> Properties </summary> {STRING\(id), {STRING\(name), STRING\(slug)}\(fieldData)} </details> |
+| id | STRING |
+| fieldData | OBJECT <details> <summary> Properties </summary> {STRING\(name), STRING\(slug)} </details> |
 
 
 

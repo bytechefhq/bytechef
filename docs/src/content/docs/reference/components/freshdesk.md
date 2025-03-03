@@ -65,7 +65,10 @@ Type: OBJECT
 
 |     Name     |     Type     |
 |:------------:|:------------:|
-| body | OBJECT <details> <summary> Properties </summary> {NUMBER\(id), STRING\(name), STRING\(description), STRING\(note)} </details> |
+| id | NUMBER |
+| name | STRING |
+| description | STRING |
+| note | STRING |
 
 
 
@@ -113,7 +116,10 @@ Type: OBJECT
 
 |     Name     |     Type     |
 |:------------:|:------------:|
-| body | OBJECT <details> <summary> Properties </summary> {STRING\(description), STRING\(email), NUMBER\(id), STRING\(job_title)} </details> |
+| description | STRING |
+| email | STRING |
+| id | NUMBER |
+| job_title | STRING |
 
 
 
@@ -163,7 +169,11 @@ Type: OBJECT
 
 |     Name     |     Type     |
 |:------------:|:------------:|
-| body | OBJECT <details> <summary> Properties </summary> {STRING\(subject), STRING\(email), STRING\(description), INTEGER\(priority), INTEGER\(status)} </details> |
+| subject | STRING |
+| email | STRING |
+| description | STRING |
+| priority | INTEGER |
+| status | INTEGER |
 
 
 

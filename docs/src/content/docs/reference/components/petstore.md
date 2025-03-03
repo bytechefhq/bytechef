@@ -268,6 +268,10 @@ delete a pet
 | petId | Pet Id | INTEGER | Pet id to delete | true |
 
 
+#### Output
+
+This action does not produce any output.
+
 #### JSON Example
 ```json
 {
@@ -341,6 +345,10 @@ Name: updatePetWithForm
 | name | Name | STRING | Name of pet that needs to be updated | false |
 | status | Status | STRING | Status of pet that needs to be updated | false |
 
+
+#### Output
+
+This action does not produce any output.
 
 #### JSON Example
 ```json
@@ -502,6 +510,10 @@ For valid response try integer IDs with value < 1000. Anything above 1000 or non
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | orderId | Order Id | INTEGER | ID of the order that needs to be deleted | true |
 
+
+#### Output
+
+This action does not produce any output.
 
 #### JSON Example
 ```json
@@ -685,6 +697,10 @@ This can only be done by the logged in user.
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | username | Username | STRING | The name that needs to be deleted | true |
 
+
+#### Output
+
+This action does not produce any output.
 
 #### JSON Example
 ```json

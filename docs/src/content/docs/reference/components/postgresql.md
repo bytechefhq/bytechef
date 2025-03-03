@@ -51,6 +51,10 @@ Execute an SQL query.
 | parameters | Parameters | OBJECT <details> <summary> Properties </summary> {} </details> | The list of properties which should be used as query parameters. | null |
 
 
+#### Output
+
+The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
+
 #### JSON Example
 ```json
 {
@@ -79,6 +83,10 @@ Insert rows in database.
 | columns | Fields | ARRAY <details> <summary> Items </summary> [STRING] </details> | The list of the table field names where corresponding values would be inserted. | null |
 | rows | Values | ARRAY <details> <summary> Items </summary> [{}] </details> | List of field values for corresponding field names | null |
 
+
+#### Output
+
+The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
 
 #### JSON Example
 ```json
@@ -112,6 +120,10 @@ Update rows in database.
 | rows | Values | ARRAY <details> <summary> Items </summary> [{}] </details> | List of field values for corresponding field names. | null |
 
 
+#### Output
+
+The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
+
 #### JSON Example
 ```json
 {
@@ -144,6 +156,10 @@ Delete rows from database.
 | rows | Criteria Values | ARRAY <details> <summary> Items </summary> [{}] </details> | List of values that are used to test delete key. | null |
 
 
+#### Output
+
+The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
+
 #### JSON Example
 ```json
 {
@@ -173,6 +189,10 @@ Execute an SQL DML or DML statement.
 | columns | Fields to select | ARRAY <details> <summary> Items </summary> [{}] </details> | List of fields to select from. | null |
 | parameters | Parameters | OBJECT <details> <summary> Properties </summary> {} </details> | The list of values which should be used to replace corresponding criteria parameters. | null |
 
+
+#### Output
+
+The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
 
 #### JSON Example
 ```json

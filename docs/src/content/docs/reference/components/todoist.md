@@ -66,7 +66,11 @@ Type: OBJECT
 
 |     Name     |     Type     |
 |:------------:|:------------:|
-| body | OBJECT <details> <summary> Properties </summary> {STRING\(id), STRING\(project_id), STRING\(content), STRING\(description), INTEGER\(priority)} </details> |
+| id | STRING |
+| project_id | STRING |
+| content | STRING |
+| description | STRING |
+| priority | INTEGER |
 
 
 
@@ -98,6 +102,10 @@ Mark a tas as being completed.
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | taskId | Task ID | STRING | ID of the task to be closed. | true |
 
+
+#### Output
+
+This action does not produce any output.
 
 #### JSON Example
 ```json
@@ -137,7 +145,11 @@ Type: OBJECT
 
 |     Name     |     Type     |
 |:------------:|:------------:|
-| body | OBJECT <details> <summary> Properties </summary> {STRING\(id), STRING\(name), STRING\(color), STRING\(is_favorite), STRING\(url)} </details> |
+| id | STRING |
+| name | STRING |
+| color | STRING |
+| is_favorite | STRING |
+| url | STRING |
 
 
 

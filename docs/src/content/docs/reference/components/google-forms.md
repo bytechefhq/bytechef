@@ -52,6 +52,10 @@ Get all responses of a form.
 | formId | Form ID | STRING | ID of the form whose responses to retrieve. | true |
 
 
+#### Output
+
+The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
+
 #### JSON Example
 ```json
 {
@@ -76,6 +80,10 @@ Get the information about a form.
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | formId | Form ID | STRING | ID of the form to retrieve. | true |
 
+
+#### Output
+
+The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
 
 #### JSON Example
 ```json
@@ -102,6 +110,10 @@ Get the response of a form.
 | formId | Form ID | STRING | ID of the form whose response to retrieve. | true |
 | responseId | Response ID | STRING <details> <summary> Depends On </summary> formId </details> | ID of the response to retrieve. | true |
 
+
+#### Output
+
+The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
 
 #### JSON Example
 ```json
@@ -135,6 +147,10 @@ Type: POLLING
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | formId | Form | STRING | Form to watch for new responses. | true |
 
+
+#### Output
+
+The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
 
 #### JSON Example
 ```json

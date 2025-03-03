@@ -87,6 +87,10 @@ Removes a subscriber from a list.
 | email | Email | STRING <details> <summary> Depends On </summary> list_id </details> | Subscriber email address. | true |
 
 
+#### Output
+
+This action does not produce any output.
+
 #### JSON Example
 ```json
 {
@@ -159,6 +163,10 @@ Deletes a list of subscribers.
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | list_id | List Id | INTEGER | List identifier. | true |
 
+
+#### Output
+
+This action does not produce any output.
 
 #### JSON Example
 ```json

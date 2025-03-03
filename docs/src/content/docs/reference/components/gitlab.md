@@ -65,7 +65,12 @@ Type: OBJECT
 
 |     Name     |     Type     |
 |:------------:|:------------:|
-| body | OBJECT <details> <summary> Properties </summary> {INTEGER\(id), INTEGER\(iid), INTEGER\(project_id), STRING\(title), STRING\(description), STRING\(web_url)} </details> |
+| id | INTEGER |
+| iid | INTEGER |
+| project_id | INTEGER |
+| title | STRING |
+| description | STRING |
+| web_url | STRING |
 
 
 
@@ -110,7 +115,8 @@ Type: OBJECT
 
 |     Name     |     Type     |
 |:------------:|:------------:|
-| body | OBJECT <details> <summary> Properties </summary> {INTEGER\(id), STRING\(body)} </details> |
+| id | INTEGER |
+| body | STRING |
 
 
 

@@ -40,6 +40,10 @@ Assign value to a variable that can be used in the following steps.
 | value | Value | TIME | Value of any type to set. | true |
 
 
+#### Output
+
+The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
+
 #### JSON Example
 ```json
 {

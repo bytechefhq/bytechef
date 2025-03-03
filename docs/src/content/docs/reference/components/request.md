@@ -29,6 +29,10 @@ The request trigger always replies immediately with an HTTP 200 status code in r
 Type: STATIC_WEBHOOK
 
 
+#### Output
+
+The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
+
 #### JSON Example
 ```json
 {
@@ -52,6 +56,10 @@ Type: STATIC_WEBHOOK
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | timeout | Timeout (ms) | INTEGER | The incoming request will time out after the specified number of milliseconds. The max wait time before a timeout is 5 minutes. | null |
 
+
+#### Output
+
+The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
 
 #### JSON Example
 ```json

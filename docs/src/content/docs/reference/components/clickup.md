@@ -66,7 +66,10 @@ Type: OBJECT
 
 |     Name     |     Type     |
 |:------------:|:------------:|
-| body | OBJECT <details> <summary> Properties </summary> {STRING\(id), STRING\(name), {STRING\(id), STRING\(name)}\(folder), {STRING\(id), STRING\(name)}\(space)} </details> |
+| id | STRING |
+| name | STRING |
+| folder | OBJECT <details> <summary> Properties </summary> {STRING\(id), STRING\(name)} </details> |
+| space | OBJECT <details> <summary> Properties </summary> {STRING\(id), STRING\(name)} </details> |
 
 
 
@@ -115,7 +118,13 @@ Type: OBJECT
 
 |     Name     |     Type     |
 |:------------:|:------------:|
-| body | OBJECT <details> <summary> Properties </summary> {STRING\(id), STRING\(name), STRING\(description), STRING\(url), {STRING\(id), STRING\(name)}\(list), {STRING\(id), STRING\(name)}\(folder), {STRING\(id)}\(space)} </details> |
+| id | STRING |
+| name | STRING |
+| description | STRING |
+| url | STRING |
+| list | OBJECT <details> <summary> Properties </summary> {STRING\(id), STRING\(name)} </details> |
+| folder | OBJECT <details> <summary> Properties </summary> {STRING\(id), STRING\(name)} </details> |
+| space | OBJECT <details> <summary> Properties </summary> {STRING\(id)} </details> |
 
 
 
@@ -163,7 +172,9 @@ Type: OBJECT
 
 |     Name     |     Type     |
 |:------------:|:------------:|
-| body | OBJECT <details> <summary> Properties </summary> {STRING\(id), STRING\(name), {STRING\(id), STRING\(name)}\(space)} </details> |
+| id | STRING |
+| name | STRING |
+| space | OBJECT <details> <summary> Properties </summary> {STRING\(id), STRING\(name)} </details> |
 
 
 

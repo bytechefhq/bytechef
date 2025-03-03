@@ -204,6 +204,10 @@ Delete a selected file from Google Drive.
 | fileId | File ID | STRING | The id of a file to delete. | true |
 
 
+#### Output
+
+This action does not produce any output.
+
 #### JSON Example
 ```json
 {

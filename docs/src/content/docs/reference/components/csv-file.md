@@ -38,6 +38,10 @@ Reads data from a csv file.
 | readAsString | Read as String | BOOLEAN <details> <summary> Options </summary> true, false </details> | In some cases and file formats, it is necessary to read data specifically as string, otherwise some special characters are interpreted the wrong way. | null |
 
 
+#### Output
+
+The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
+
 #### JSON Example
 ```json
 {

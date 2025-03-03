@@ -392,6 +392,10 @@ Stars a repository for the authenticated user.
 | repository | Repository | STRING | The name of the repository including owner without the .git extension. The name is not case sensitive. | true |
 
 
+#### Output
+
+This action does not produce any output.
+
 #### JSON Example
 ```json
 {

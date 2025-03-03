@@ -63,7 +63,10 @@ Type: OBJECT
 
 |     Name     |     Type     |
 |:------------:|:------------:|
-| body | OBJECT <details> <summary> Properties </summary> {STRING\(name), STRING\(emailOne), STRING\(phone), STRING\(website)} </details> |
+| name | STRING |
+| emailOne | STRING |
+| phone | STRING |
+| website | STRING |
 
 
 
@@ -110,7 +113,9 @@ Type: OBJECT
 
 |     Name     |     Type     |
 |:------------:|:------------:|
-| body | OBJECT <details> <summary> Properties </summary> {STRING\(name), STRING\(description), STRING\(dueAt)} </details> |
+| name | STRING |
+| description | STRING |
+| dueAt | STRING |
 
 
 

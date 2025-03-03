@@ -54,6 +54,10 @@ Clear a sheet of all values while preserving formats.
 | isTheFirstRowHeader | Is the First Row Headers? | BOOLEAN <details> <summary> Options </summary> true, false </details> | If the first row is header. | true |
 
 
+#### Output
+
+This action does not produce any output.
+
 #### JSON Example
 ```json
 {
@@ -177,6 +181,10 @@ Delete column on an existing sheet.
 | label | Column Label | STRING | The label of the column to be deleted. | true |
 
 
+#### Output
+
+This action does not produce any output.
+
 #### JSON Example
 ```json
 {
@@ -204,6 +212,10 @@ Create a new spreadsheet in a specified folder.
 | title | Title | STRING | Title of the new spreadsheet to be created. | true |
 | folderId | Folder ID | STRING | ID of the folder where the new spreadsheet will be stored. If no folder is selected, the folder will be created in the root folder. | false |
 
+
+#### Output
+
+The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
 
 #### JSON Example
 ```json
@@ -233,6 +245,10 @@ Delete row on an existing sheet.
 | rowNumber | Row Number | INTEGER | The row number to delete. | true |
 
 
+#### Output
+
+This action does not produce any output.
+
 #### JSON Example
 ```json
 {
@@ -260,6 +276,10 @@ Delete a specified sheet from a spreadsheet.
 | spreadsheetId | Spreadsheet ID | STRING | The ID of the spreadsheet to apply the updates to. | true |
 | sheetId | Sheet ID | INTEGER <details> <summary> Depends On </summary> spreadsheetId </details> | The ID of the sheet. | true |
 
+
+#### Output
+
+This action does not produce any output.
 
 #### JSON Example
 ```json
@@ -289,6 +309,10 @@ Get a row in a Google Sheet by row number.
 | isTheFirstRowHeader | Is the First Row Headers? | BOOLEAN <details> <summary> Options </summary> true, false </details> | If the first row is header. | true |
 | rowNumber | Row Number | INTEGER | The row number to get from the sheet. | true |
 
+
+#### Output
+
+The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
 
 #### JSON Example
 ```json
@@ -322,6 +346,10 @@ Append rows to the end of the spreadsheet.
 | rows | | DYNAMIC_PROPERTIES <details> <summary> Depends On </summary> spreadsheetId, sheetName, isTheFirstRowHeader </details> |  | true |
 
 
+#### Output
+
+The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
+
 #### JSON Example
 ```json
 {
@@ -354,6 +382,10 @@ Append a row of values to an existing sheet.
 | isTheFirstRowHeader | Is the First Row Headers? | BOOLEAN <details> <summary> Options </summary> true, false </details> | If the first row is header. | true |
 | row | | DYNAMIC_PROPERTIES <details> <summary> Depends On </summary> spreadsheetId, sheetName, isTheFirstRowHeader </details> |  | true |
 
+
+#### Output
+
+The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
 
 #### JSON Example
 ```json
@@ -432,6 +464,10 @@ Overwrite values in an existing row.
 | row | | DYNAMIC_PROPERTIES <details> <summary> Depends On </summary> spreadsheetId, sheetName, isTheFirstRowHeader, updateWholeRow </details> |  | true |
 
 
+#### Output
+
+The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
+
 #### JSON Example
 ```json
 {
@@ -470,6 +506,10 @@ Type: DYNAMIC_WEBHOOK
 | isTheFirstRowHeader | Is the First Row Headers? | BOOLEAN <details> <summary> Options </summary> true, false </details> | If the first row is header. | true |
 | sheetName | Sheet | STRING <details> <summary> Depends On </summary> spreadsheetId </details> | The name of the sheet | true |
 
+
+#### Output
+
+The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
 
 #### JSON Example
 ```json

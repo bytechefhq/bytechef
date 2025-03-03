@@ -62,6 +62,10 @@ Ask anything you want.
 | user | User | STRING | A unique identifier representing your end-user, which can help admins to monitor and detect abuse. | false |
 
 
+#### Output
+
+The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
+
 #### JSON Example
 ```json
 {

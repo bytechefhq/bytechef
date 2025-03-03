@@ -64,7 +64,7 @@ Type: OBJECT
 
 |     Name     |     Type     |
 |:------------:|:------------:|
-| body | OBJECT <details> <summary> Properties </summary> {STRING\(id)} </details> |
+| id | STRING |
 
 
 
@@ -110,7 +110,7 @@ Type: OBJECT
 
 |     Name     |     Type     |
 |:------------:|:------------:|
-| body | OBJECT <details> <summary> Properties </summary> {STRING\(id)} </details> |
+| id | STRING |
 
 
 
@@ -160,7 +160,7 @@ Type: OBJECT
 
 |     Name     |     Type     |
 |:------------:|:------------:|
-| body | OBJECT <details> <summary> Properties </summary> {STRING\(id)} </details> |
+| id | STRING |
 
 
 

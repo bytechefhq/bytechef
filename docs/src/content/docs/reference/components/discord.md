@@ -65,7 +65,9 @@ Type: OBJECT
 
 |     Name     |     Type     |
 |:------------:|:------------:|
-| body | OBJECT <details> <summary> Properties </summary> {STRING\(id), STRING\(content), BOOLEAN\(tts)} </details> |
+| id | STRING |
+| content | STRING |
+| tts | BOOLEAN <details> <summary> Options </summary> true, false </details> |
 
 
 
@@ -111,7 +113,9 @@ Type: OBJECT
 
 |     Name     |     Type     |
 |:------------:|:------------:|
-| body | OBJECT <details> <summary> Properties </summary> {STRING\(id), INTEGER\(type), STRING\(name)} </details> |
+| id | STRING |
+| type | INTEGER |
+| name | STRING |
 
 
 

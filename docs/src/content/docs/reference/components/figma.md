@@ -56,14 +56,14 @@ Gets a list of comments left on the file.
 
 
 
-Type: OBJECT
+Type: ARRAY
 
 
 #### Properties
 
 |     Name     |     Type     |
 |:------------:|:------------:|
-| body | ARRAY <details> <summary> Items </summary> [{STRING\(id), STRING\(file_key), STRING\(parent_id), {STRING\(id), STRING\(handle), STRING\(img_url), STRING\(email)}\(user)}] </details> |
+|  | OBJECT <details> <summary> Properties </summary> {STRING\(id), STRING\(file_key), STRING\(parent_id), {STRING\(id), STRING\(handle), STRING\(img_url), STRING\(email)}\(user)} </details> |
 
 
 
@@ -105,7 +105,10 @@ Type: OBJECT
 
 |     Name     |     Type     |
 |:------------:|:------------:|
-| body | OBJECT <details> <summary> Properties </summary> {STRING\(id), STRING\(file_key), STRING\(parent_id), STRING\(message)} </details> |
+| id | STRING |
+| file_key | STRING |
+| parent_id | STRING |
+| message | STRING |
 
 
 

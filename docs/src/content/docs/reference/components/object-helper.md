@@ -43,6 +43,10 @@ Add value to the object by key if it exists. Otherwise, update the value
 | value | Value | TIME | Value to be added or updated. | true |
 
 
+#### Output
+
+The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
+
 #### JSON Example
 ```json
 {
@@ -73,6 +77,10 @@ Add values from list to object or array. If the source is object, the items in t
 | source | Source | OBJECT <details> <summary> Properties </summary> {} </details> | Source object to be added or updated | true |
 | value | Key-Value Pairs | OBJECT <details> <summary> Properties </summary> {} </details> | Key-Value pairs to be added or updated. | true |
 
+
+#### Output
+
+The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
 
 #### JSON Example
 ```json
@@ -139,6 +147,10 @@ Deletes a key-value pair in the given object by the specified key. Returns the m
 | key | Key | STRING | The key of the key-value pair to delete. | true |
 
 
+#### Output
+
+The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
+
 #### JSON Example
 ```json
 {
@@ -202,6 +214,10 @@ Merge two objects into one. If there is any property with the same name, the sou
 | source | Source | OBJECT <details> <summary> Properties </summary> {} </details> | The source object to merge. | true |
 | target | Target | OBJECT <details> <summary> Properties </summary> {} </details> | The target object to merge into. | true |
 
+
+#### Output
+
+The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
 
 #### JSON Example
 ```json

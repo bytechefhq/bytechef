@@ -119,6 +119,10 @@ Deletes an event from the specified calendar.
 | event | Event ID | STRING <details> <summary> Depends On </summary> calendar </details> | Id of the event to delete. | true |
 
 
+#### Output
+
+This action does not produce any output.
+
 #### JSON Example
 ```json
 {
@@ -283,6 +287,10 @@ Creates a new reply to email.
 | comment | Comment | STRING | Content of the reply to the email. | true |
 
 
+#### Output
+
+This action does not produce any output.
+
 #### JSON Example
 ```json
 {
@@ -361,6 +369,10 @@ Send the message.
 | replyTo | Reply To | ARRAY <details> <summary> Items </summary> [{{STRING\(address), STRING\(name)}\(emailAddress)}] </details> | The email addresses to use when replying. | false |
 | body | Body | OBJECT <details> <summary> Properties </summary> {STRING\(contentType), STRING\(content), STRING\(content)} </details> | The body of the message. It can be in HTML or text format. | true |
 
+
+#### Output
+
+This action does not produce any output.
 
 #### JSON Example
 ```json

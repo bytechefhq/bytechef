@@ -62,7 +62,8 @@ Type: OBJECT
 
 |     Name     |     Type     |
 |:------------:|:------------:|
-| body | OBJECT <details> <summary> Properties </summary> {STRING\(id), STRING\(name)} </details> |
+| id | STRING |
+| name | STRING |
 
 
 
@@ -104,7 +105,9 @@ Type: OBJECT
 
 |     Name     |     Type     |
 |:------------:|:------------:|
-| body | OBJECT <details> <summary> Properties </summary> {STRING\(id), STRING\(name), STRING\(domain)} </details> |
+| id | STRING |
+| name | STRING |
+| domain | STRING |
 
 
 
@@ -148,7 +151,10 @@ Type: OBJECT
 
 |     Name     |     Type     |
 |:------------:|:------------:|
-| body | OBJECT <details> <summary> Properties </summary> {STRING\(id), STRING\(first_name), STRING\(last_name), [STRING]\(emails)} </details> |
+| id | STRING |
+| first_name | STRING |
+| last_name | STRING |
+| emails | ARRAY <details> <summary> Items </summary> [STRING] </details> |
 
 
 
