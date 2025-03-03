@@ -67,7 +67,9 @@ export const useProjectsLeftSidebar = ({
     };
 
     const getFilteredWorkflows = (workflows: Workflow[] | undefined, sortBy: string, searchValue: string) => {
-        if (!workflows) return [];
+        if (!workflows) {
+            return [];
+        }
 
         const sortFunctions = {
             alphabetical: (a: Workflow, b: Workflow) => (a.label || '').localeCompare(b.label || ''),
@@ -84,7 +86,9 @@ export const useProjectsLeftSidebar = ({
     };
 
     const calculateTimeDifference = (date?: string) => {
-        if (!date) return 'Unknown';
+        if (!date) {
+            return 'Unknown';
+        }
 
         const currentTimestamp = new Date();
         const workflowLastModifiedDate = new Date(date || '');
@@ -99,9 +103,17 @@ export const useProjectsLeftSidebar = ({
             return `Edited on ${workflowLastModifiedDate.toLocaleDateString()}`;
         }
 
-        if (days > 0) return `${days} day${days !== 1 ? 's' : ''} ago`;
-        if (hours > 0) return `${hours} hour${hours !== 1 ? 's' : ''} ago`;
-        if (minutes > 0) return `${minutes} minute${minutes !== 1 ? 's' : ''} ago`;
+        if (days > 0) {
+            return `${days} day${days !== 1 ? 's' : ''} ago`;
+        }
+
+        if (hours > 0) {
+            return `${hours} hour${hours !== 1 ? 's' : ''} ago`;
+        }
+
+        if (minutes > 0) {
+            return `${minutes} minute${minutes !== 1 ? 's' : ''} ago`;
+        }
 
         return `just now`;
     };
