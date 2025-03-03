@@ -3,15 +3,17 @@ import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {ComponentDefinitionBasic} from '@/shared/middleware/platform/configuration';
 import InlineSVG from 'react-inlinesvg';
 
+interface WorkflowComponentsIconsProps {
+    workflowComponentDefinitions: Record<string, ComponentDefinitionBasic | undefined>;
+    name: string;
+    workflowTaskDispatcherDefinitions: Record<string, ComponentDefinitionBasic | undefined>;
+}
+
 const WorkflowComponentsIcons = ({
     name,
     workflowComponentDefinitions,
     workflowTaskDispatcherDefinitions,
-}: {
-    workflowComponentDefinitions: Record<string, ComponentDefinitionBasic | undefined>;
-    name: string;
-    workflowTaskDispatcherDefinitions: Record<string, ComponentDefinitionBasic | undefined>;
-}) => {
+}: WorkflowComponentsIconsProps) => {
     const componentDefinition = workflowComponentDefinitions[name];
     const taskDispatcherDefinition = workflowTaskDispatcherDefinitions[name];
 

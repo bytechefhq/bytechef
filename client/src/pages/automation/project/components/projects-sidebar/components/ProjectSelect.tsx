@@ -11,17 +11,14 @@ import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {Project} from '@/shared/middleware/automation/configuration';
 import {useCallback} from 'react';
 
-const ProjectSelect = ({
-    projectId,
-    projects,
-    selectedProjectId,
-    setSelectedProjectId,
-}: {
+interface ProjectSelectProps {
     projectId: number;
     setSelectedProjectId: (projectId: number) => void;
     selectedProjectId: number;
     projects: Project[];
-}) => {
+}
+
+const ProjectSelect = ({projectId, projects, selectedProjectId, setSelectedProjectId}: ProjectSelectProps) => {
     const getProjectName = useCallback(
         (projectId: number) => {
             const project = projects.find((project) => project.id === projectId);
