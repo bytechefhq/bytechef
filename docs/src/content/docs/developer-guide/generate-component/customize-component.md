@@ -36,8 +36,34 @@ If some actions require properties not specified in the OpenAPI schema, override
 
 Refer to examples like [`DiscordComponentHandler`](https://github.com/bytechefhq/bytechef/blob/master/server/libs/modules/components/discord/src/main/java/com/bytechef/component/discord/DiscordComponentHandler.java#L66) or [`ClickupComponentHandler`](https://github.com/bytechefhq/bytechef/blob/master/server/libs/modules/components/clickup/src/main/java/com/bytechef/component/clickup/ClickupComponentHandler.java#L60).
 
-### Dynamic options
+### Dynamic Options
 
-For parameters that require dynamic options, override the `modifyProperty(ActionDefinition actionDefinition, ModifiableProperty<?> modifiableProperty)` method in `NewComponentComponentHandler`.
+1. Define Dynamic Options in OpenAPI Schema:
+    - Add `x-dynamic-options: true` to the parameter in your OpenAPI schema to indicate that it requires dynamic options.
+    - If the dynamic options depend on another parameter, include `x-dynamic-options-dependency` with the relevant parameter name.
+2. Regenerate the Component:
+    - Run the following command to regenerate the component with updated dynamic options:
+      ```bash
+      ./bytechef.sh component init --open-api-path ../../server/libs/modules/components/newcomponent/openapi.yaml --output-path ../../server/libs/modules/components --name newcomponent
+      ```
+3. For each parameter with dynamic `options`, the options() and `optionsLookupDependsOn()` methods are automatically generated in the `ModifiableActionDefinition` class.
+4. The `AbstractNewComponentUtils` class is generated, providing methods to retrieve dynamic options for various properties within the component.
+5. Override the appropriate method in the `NewComponentUtils` class to load the correct options based on your specific requirements.
 
-Check examples such as [`ShopifyComponentHandler`](https://github.com/bytechefhq/bytechef/blob/master/server/libs/modules/components/shopify/src/main/java/com/bytechef/component/shopify/ShopifyComponentHandler.java#L96) for implementation details.
+For implementation details, refer to examples from existing components such as [`Shopify`](https://github.com/bytechefhq/bytechef/blob/master/server/libs/modules/components/shopify), [`Airtable`](https://github.com/bytechefhq/bytechef/blob/master/server/libs/modules/components/airtable), and [`Hubspot`](https://github.com/bytechefhq/bytechef/blob/master/server/libs/modules/components/hubspot).
+
+### Dynamic Properties
+
+1. Define Dynamic Properties in OpenAPI Schema:
+    - Add `x-dynamic-properties: true` to the parameter in your OpenAPI schema to mark it as dynamic.
+    - If the dynamic property depends on another parameter, include` x-dynamic-properties-dependency` with the relevant parameter name.
+2. Regenerate the Component:
+    - Run the following command to regenerate the component with updated dynamic options:
+      ```bash
+      ./bytechef.sh component init --open-api-path ../../server/libs/modules/components/newcomponent/openapi.yaml --output-path ../../server/libs/modules/components --name newcomponent
+      ```
+3. For each dynamic property, the `properties()` and `propertiesLookupDependsOn()` methods are generated in the `ModifiableActionDefinition` class.
+4. The `AbstractNewComponentUtils` class is generated, offering methods to retrieve dynamic properties for various parameters within the component.
+5. Override the necessary method in the `NewComponentUtils` class to load the correct properties based on your specific needs.
+
+For implementation details, refer to examples from existing components such as [`Airtable`](https://github.com/bytechefhq/bytechef/blob/master/server/libs/modules/components/airtable).
