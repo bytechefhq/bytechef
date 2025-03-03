@@ -2,38 +2,17 @@ import {Button} from '@/components/ui/button';
 import {DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger} from '@/components/ui/dropdown-menu';
 import {Input} from '@/components/ui/input';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
+import {SORT_OPTIONS} from '@/shared/constants';
 import {CheckIcon, ListFilterIcon, SearchIcon} from 'lucide-react';
 
-const WorkflowsListFilter = ({
-    searchValue,
-    setSearchValue,
-    setSortBy,
-    sortBy,
-}: {
+interface WorkflowsListFilterProps {
     setSearchValue: (value: string) => void;
     searchValue: string;
     sortBy: string;
     setSortBy: (value: string) => void;
-}) => {
-    const sortOptions = [
-        {
-            label: 'Last edited',
-            value: 'last-edited',
-        },
-        {
-            label: 'Date created',
-            value: 'date-created',
-        },
-        {
-            label: 'A-Z',
-            value: 'alphabetical',
-        },
-        {
-            label: 'Z-A',
-            value: 'reverse-alphabetical',
-        },
-    ];
+}
 
+const WorkflowsListFilter = ({searchValue, setSearchValue, setSortBy, sortBy}: WorkflowsListFilterProps) => {
     return (
         <div className="flex w-80 items-center gap-2">
             <div className="relative w-full rounded-md bg-background">
@@ -65,7 +44,7 @@ const WorkflowsListFilter = ({
                 </Tooltip>
 
                 <DropdownMenuContent align="end">
-                    {sortOptions.map((option) => (
+                    {SORT_OPTIONS.map((option) => (
                         <DropdownMenuItem
                             className="flex cursor-pointer items-center justify-between rounded-none hover:bg-surface-neutral-primary-hover"
                             key={option.value}
