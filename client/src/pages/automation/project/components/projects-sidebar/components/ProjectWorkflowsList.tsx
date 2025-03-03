@@ -5,6 +5,16 @@ import WorkflowsListItem from '@/pages/automation/project/components/projects-si
 import {Project, Workflow} from '@/shared/middleware/automation/configuration';
 import {useMemo} from 'react';
 
+interface ProjectWorkflowsListProps {
+    calculateTimeDifference: (date: string) => string;
+    project: Project;
+    filteredWorkflowsList: Workflow[];
+    currentWorkflowId: string;
+    findProjectIdByWorkflow: (workflow: Workflow) => number;
+    onProjectClick: (projectId: number, projectWorkflowId: number) => void;
+    setSelectedProjectId: (projectId: number) => void;
+}
+
 const ProjectWorkflowsList = ({
     calculateTimeDifference,
     currentWorkflowId,
@@ -13,15 +23,7 @@ const ProjectWorkflowsList = ({
     onProjectClick,
     project,
     setSelectedProjectId,
-}: {
-    calculateTimeDifference: (date: string) => string;
-    project: Project;
-    filteredWorkflowsList: Workflow[];
-    currentWorkflowId: string;
-    findProjectIdByWorkflow: (workflow: Workflow) => number;
-    onProjectClick: (projectId: number, projectWorkflowId: number) => void;
-    setSelectedProjectId: (projectId: number) => void;
-}) => {
+}: ProjectWorkflowsListProps) => {
     const projectWorkflows = useMemo(
         () =>
             filteredWorkflowsList.filter(
