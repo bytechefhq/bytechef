@@ -66,6 +66,10 @@ Ask anything you want.
 | seed | Seed | INTEGER | Keeping the same seed would output the same response. | null |
 
 
+#### Output
+
+The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
+
 #### JSON Example
 ```json
 {

@@ -35,6 +35,10 @@ Transform an object or array of objects into an array of key-value pairs.
 | valueKey | Value Key | STRING | Property key of each newly created object in the array. Its property value will be a property value from the input. | true |
 
 
+#### Output
+
+The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
+
 #### JSON Example
 ```json
 {
@@ -68,6 +72,10 @@ Creates a new object with the chosen input properties. You can also rename the p
 | includeNulls | Include Nulls | BOOLEAN <details> <summary> Options </summary> true, false </details> | Should fields that have null values be included in the new object? | null |
 | includeEmptyStrings | Include Empty strings | BOOLEAN <details> <summary> Options </summary> true, false </details> | Should fields with empty string values be included in the new object? | null |
 
+
+#### Output
+
+The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
 
 #### JSON Example
 ```json
@@ -105,6 +113,10 @@ Creates a new object out of all objects that have the same key as the specified 
 | fieldValue | Field Value | STRING | The value of each property in the newly created objects value. | true |
 
 
+#### Output
+
+The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
+
 #### JSON Example
 ```json
 {
@@ -132,6 +144,10 @@ The action renames keys of an input object defined by mappings.
 | input | Input | OBJECT <details> <summary> Properties </summary> {} </details> | The input object that contains property keys and values. | true |
 | mappings | Mappings | ARRAY <details> <summary> Items </summary> [{STRING\(from), STRING\(to)}] </details> | An array of objects that contains properties 'From Path' and 'To'. | true |
 
+
+#### Output
+
+The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
 
 #### JSON Example
 ```json
@@ -174,6 +190,10 @@ Goes through all object parameters and replaces all specified input parameter va
 | mappings | Mappings | ARRAY <details> <summary> Items </summary> [{TIME\(from), TIME\(to)}] </details> | An array of objects that contains properties 'from' and 'to'. | null |
 
 
+#### Output
+
+The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
+
 #### JSON Example
 ```json
 {
@@ -206,6 +226,10 @@ Replaces all values specified by the keys in the input object with the values sp
 | output | Output | OBJECT <details> <summary> Properties </summary> {} </details> | An object containing one or more properties. | true |
 | mappings | Mappings | ARRAY <details> <summary> Items </summary> [{STRING\(from), STRING\(to)}] </details> | Object that contains properties 'from' and 'to'. | true |
 
+
+#### Output
+
+The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
 
 #### JSON Example
 ```json
@@ -264,6 +288,10 @@ Replaces a given value with the specified value defined in mappings. In case the
 | mappings | Mappings | ARRAY <details> <summary> Items </summary> [{STRING\(from), STRING\(to)}] </details> | An array of objects that contains properties 'from' and 'to'. | null |
 | mappings | Mappings | ARRAY <details> <summary> Items </summary> [{TIME\(from), TIME\(to)}] </details> | An array of objects that contains properties 'from' and 'to'. | null |
 
+
+#### Output
+
+The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
 
 #### JSON Example
 ```json

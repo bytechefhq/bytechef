@@ -31,6 +31,10 @@ null
 | text | | STRING |  | null |
 
 
+#### Output
+
+This action does not produce any output.
+
 #### JSON Example
 ```json
 {
@@ -55,6 +59,10 @@ null
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | text | | STRING |  | null |
 
+
+#### Output
+
+This action does not produce any output.
 
 #### JSON Example
 ```json
@@ -81,6 +89,10 @@ null
 | text | | STRING |  | null |
 
 
+#### Output
+
+This action does not produce any output.
+
 #### JSON Example
 ```json
 {
@@ -105,6 +117,10 @@ null
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | text | | STRING |  | null |
 
+
+#### Output
+
+This action does not produce any output.
 
 #### JSON Example
 ```json

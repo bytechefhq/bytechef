@@ -32,6 +32,10 @@ Decodes base64 encoded text into human readable plain text.
 | content | Base64 Content | STRING | The Base64 encoded content that needs to be decoded. | true |
 
 
+#### Output
+
+The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
+
 #### JSON Example
 ```json
 {
@@ -98,6 +102,10 @@ Extract content from the HTML content.
 | attribute | Attribute | STRING | The name of the attribute to return the value of | true |
 | returnArray | Return Array | BOOLEAN <details> <summary> Options </summary> true, false </details> | If selected, then extracted individual items are returned as an array. If you don't set this, all values are returned as a single string. | null |
 
+
+#### Output
+
+The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
 
 #### JSON Example
 ```json

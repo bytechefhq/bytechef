@@ -31,6 +31,10 @@ Delay action execution.
 | millis | Millis | INTEGER | Time in milliseconds. | true |
 
 
+#### Output
+
+This action does not produce any output.
+
 #### JSON Example
 ```json
 {

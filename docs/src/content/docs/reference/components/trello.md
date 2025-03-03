@@ -53,6 +53,10 @@ Creates a new board.
 | desc | Description | STRING | A new description for the board. | false |
 
 
+#### Output
+
+This action does not produce any output.
+
 #### JSON Example
 ```json
 {

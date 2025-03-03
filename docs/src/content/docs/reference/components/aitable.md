@@ -53,6 +53,10 @@ Creates a new record in datasheet.
 | fields | | DYNAMIC_PROPERTIES <details> <summary> Depends On </summary> datasheetId </details> |  | null |
 
 
+#### Output
+
+The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
+
 #### JSON Example
 ```json
 {
@@ -83,6 +87,10 @@ Find records in datasheet
 | recordIds | Record IDs | ARRAY <details> <summary> Items </summary> [STRING] </details> | The IDs of the records to find. | false |
 | maxRecords | Max Records | INTEGER | How many records are returned in total | false |
 
+
+#### Output
+
+The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
 
 #### JSON Example
 ```json
@@ -115,6 +123,10 @@ Update record in datasheet
 | recordId | Record ID | STRING <details> <summary> Depends On </summary> datasheetId </details> | ID of the record to update. | true |
 | fields | | DYNAMIC_PROPERTIES <details> <summary> Depends On </summary> datasheetId </details> |  | null |
 
+
+#### Output
+
+The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
 
 #### JSON Example
 ```json

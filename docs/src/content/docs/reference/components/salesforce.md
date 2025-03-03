@@ -99,6 +99,10 @@ Deletes an existing record of a specified Salesforce object.
 | id | Record ID | STRING <details> <summary> Depends On </summary> object </details> | ID of the object to delete. | true |
 
 
+#### Output
+
+This action does not produce any output.
+
 #### JSON Example
 ```json
 {
@@ -124,6 +128,10 @@ Executes a raw SOQL query to  extract data from Salesforce.
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | q | Query | STRING | SOQL query to execute. | true |
 
+
+#### Output
+
+The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
 
 #### JSON Example
 ```json
@@ -152,6 +160,10 @@ Updates an existing record for a specified Salesforce object.
 | fields | | DYNAMIC_PROPERTIES <details> <summary> Depends On </summary> object </details> |  | true |
 | customFields | Custom Fields | OBJECT <details> <summary> Properties </summary> {} </details> |  | false |
 
+
+#### Output
+
+This action does not produce any output.
 
 #### JSON Example
 ```json
@@ -188,6 +200,10 @@ Type: POLLING
 | object | Salesforce Object | STRING |  | true |
 
 
+#### Output
+
+The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
+
 #### JSON Example
 ```json
 {
@@ -214,6 +230,10 @@ Type: POLLING
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | object | Salesforce Object | STRING |  | true |
 
+
+#### Output
+
+The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
 
 #### JSON Example
 ```json

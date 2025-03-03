@@ -56,6 +56,10 @@ Append a row of values to an existing worksheet.
 | row | | DYNAMIC_PROPERTIES <details> <summary> Depends On </summary> isTheFirstRowHeader, worksheetName, workbookId </details> |  | true |
 
 
+#### Output
+
+The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
+
 #### JSON Example
 ```json
 {
@@ -86,6 +90,10 @@ Clear a worksheet of all values.
 | isTheFirstRowHeader | Is the First Row Header? | BOOLEAN <details> <summary> Options </summary> true, false </details> | If the first row is header. | true |
 
 
+#### Output
+
+This action does not produce any output.
+
 #### JSON Example
 ```json
 {
@@ -114,6 +122,10 @@ Delete row on an existing sheet.
 | worksheetName | Worksheet | STRING <details> <summary> Depends On </summary> workbookId </details> |  | true |
 | rowNumber | Row Number | INTEGER | The row number to delete. | true |
 
+
+#### Output
+
+This action does not produce any output.
 
 #### JSON Example
 ```json
@@ -144,6 +156,10 @@ Get row values from the worksheet by the row number.
 | isTheFirstRowHeader | Is the First Row Header? | BOOLEAN <details> <summary> Options </summary> true, false </details> | If the first row is header. | true |
 | rowNumber | Row Number | INTEGER | The row number to get the values from. | true |
 
+
+#### Output
+
+The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
 
 #### JSON Example
 ```json
@@ -176,6 +192,10 @@ Update a row in a worksheet.
 | isTheFirstRowHeader | Is the First Row Header? | BOOLEAN <details> <summary> Options </summary> true, false </details> | If the first row is header. | true |
 | row | | DYNAMIC_PROPERTIES <details> <summary> Depends On </summary> isTheFirstRowHeader, worksheetName, workbookId </details> |  | true |
 
+
+#### Output
+
+The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
 
 #### JSON Example
 ```json

@@ -41,6 +41,10 @@ Send a new RabbitMQ message.
 | message | null | OBJECT <details> <summary> Properties </summary> {} </details> | The name of the queue to read from | true |
 
 
+#### Output
+
+This action does not produce any output.
+
 #### JSON Example
 ```json
 {
@@ -73,6 +77,10 @@ Type: LISTENER
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | queue | null | STRING | The name of the queue to read from | true |
 
+
+#### Output
+
+The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
 
 #### JSON Example
 ```json

@@ -97,6 +97,10 @@ Delete an email from your Gmail account permanently via Id
 | id | Message ID | STRING | The ID of the message to delete. | true |
 
 
+#### Output
+
+This action does not produce any output.
+
 #### JSON Example
 ```json
 {
@@ -123,6 +127,10 @@ Get an email from your Gmail account via Id
 | format | Format | STRING <details> <summary> Options </summary> simple, minimal, full, raw, metadata </details> | The format to return the message in. | false |
 | metadataHeaders | Metadata headers | ARRAY <details> <summary> Items </summary> [STRING] </details> | When given and format is METADATA, only include headers specified. | false |
 
+
+#### Output
+
+The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
 
 #### JSON Example
 ```json
@@ -152,6 +160,10 @@ Gets the specified thread.
 | format | Format | STRING <details> <summary> Options </summary> simple, minimal, full, raw, metadata </details> | The format to return the message in. | false |
 | metadataHeaders | Metadata headers | ARRAY <details> <summary> Items </summary> [STRING] </details> | When given and format is METADATA, only include headers specified. | false |
 
+
+#### Output
+
+The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
 
 #### JSON Example
 ```json

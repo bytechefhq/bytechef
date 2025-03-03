@@ -67,7 +67,8 @@ Type: OBJECT
 
 |     Name     |     Type     |
 |:------------:|:------------:|
-| body | OBJECT <details> <summary> Properties </summary> {{STRING\(id), STRING\(name)}\(response), {STRING\(more_info), STRING\(status), STRING\(message)}\(meta)} </details> |
+| response | OBJECT <details> <summary> Properties </summary> {STRING\(id), STRING\(name)} </details> |
+| meta | OBJECT <details> <summary> Properties </summary> {STRING\(more_info), STRING\(status), STRING\(message)} </details> |
 
 
 
@@ -115,7 +116,8 @@ Type: OBJECT
 
 |     Name     |     Type     |
 |:------------:|:------------:|
-| body | OBJECT <details> <summary> Properties </summary> {{STRING\(id), STRING\(firstname), STRING\(lastname), STRING\(email)}\(response), {STRING\(more_info), STRING\(status), STRING\(message)}\(meta)} </details> |
+| response | OBJECT <details> <summary> Properties </summary> {STRING\(id), STRING\(firstname), STRING\(lastname), STRING\(email)} </details> |
+| meta | OBJECT <details> <summary> Properties </summary> {STRING\(more_info), STRING\(status), STRING\(message)} </details> |
 
 
 

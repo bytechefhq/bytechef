@@ -64,7 +64,7 @@ Type: OBJECT
 
 |     Name     |     Type     |
 |:------------:|:------------:|
-| body | OBJECT <details> <summary> Properties </summary> {[{STRING\(id), STRING\(form_id), STRING\(status), STRING\(new), STRING\(flag), STRING\(notes)}]\(content)} </details> |
+| content | ARRAY <details> <summary> Items </summary> [{STRING\(id), STRING\(form_id), STRING\(status), STRING\(new), STRING\(flag), STRING\(notes)}] </details> |
 
 
 

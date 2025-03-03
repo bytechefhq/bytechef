@@ -56,6 +56,10 @@ Creates new account.
 | social_profiles | Social Profiles | ARRAY <details> <summary> Items </summary> [STRING] </details> | Social profile URL | false |
 
 
+#### Output
+
+This action does not produce any output.
+
 #### JSON Example
 ```json
 {
@@ -90,14 +94,14 @@ Creates new contacts.
 
 
 
-Type: OBJECT
+Type: ARRAY
 
 
 #### Properties
 
 |     Name     |     Type     |
 |:------------:|:------------:|
-| body | ARRAY <details> <summary> Items </summary> [{INTEGER\(id)}] </details> |
+|  | OBJECT <details> <summary> Properties </summary> {INTEGER\(id)} </details> |
 
 
 
@@ -140,14 +144,14 @@ Creates new tasks.
 
 
 
-Type: OBJECT
+Type: ARRAY
 
 
 #### Properties
 
 |     Name     |     Type     |
 |:------------:|:------------:|
-| body | ARRAY <details> <summary> Items </summary> [{INTEGER\(id)}] </details> |
+|  | OBJECT <details> <summary> Properties </summary> {INTEGER\(id)} </details> |
 
 
 

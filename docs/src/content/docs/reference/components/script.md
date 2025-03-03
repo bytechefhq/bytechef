@@ -32,6 +32,10 @@ Executes custom JavaScript code.
 | script | JavaScript Code | STRING | Add your JavaScript custom logic here. | true |
 
 
+#### Output
+
+The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
+
 #### JSON Example
 ```json
 {
@@ -59,6 +63,10 @@ Executes custom Python code.
 | script | Python Code | STRING | Add your Python custom logic here. | true |
 
 
+#### Output
+
+The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
+
 #### JSON Example
 ```json
 {
@@ -85,6 +93,10 @@ Executes custom Ruby code.
 | input | Input | OBJECT <details> <summary> Properties </summary> {} </details> | Initialize parameter values used in the custom code. | null |
 | script | Ruby Code | STRING | Add your Ruby custom logic here. | true |
 
+
+#### Output
+
+The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
 
 #### JSON Example
 ```json
