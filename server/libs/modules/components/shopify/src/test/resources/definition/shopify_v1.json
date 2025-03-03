@@ -373,7 +373,6 @@
         "sampleOutput" : null,
         "placeholder" : null
       },
-      "sampleOutput" : null,
       "outputSchema" : {
         "advancedOption" : null,
         "description" : null,
@@ -715,7 +714,8 @@
         } ],
         "controlType" : "OBJECT_BUILDER",
         "optionsDataSource" : null
-      }
+      },
+      "sampleOutput" : null
     },
     "properties" : [ {
       "advancedOption" : null,
@@ -1384,7 +1384,6 @@
         "sampleOutput" : null,
         "placeholder" : null
       },
-      "sampleOutput" : null,
       "outputSchema" : {
         "advancedOption" : null,
         "description" : null,
@@ -1726,7 +1725,8 @@
         } ],
         "controlType" : "OBJECT_BUILDER",
         "optionsDataSource" : null
-      }
+      },
+      "sampleOutput" : null
     },
     "properties" : [ {
       "advancedOption" : null,
@@ -2117,7 +2117,6 @@
         "sampleOutput" : null,
         "placeholder" : null
       },
-      "sampleOutput" : null,
       "outputSchema" : {
         "advancedOption" : null,
         "description" : null,
@@ -2459,7 +2458,8 @@
         } ],
         "controlType" : "OBJECT_BUILDER",
         "optionsDataSource" : null
-      }
+      },
+      "sampleOutput" : null
     },
     "properties" : [ {
       "advancedOption" : null,
@@ -2950,7 +2950,6 @@
         "sampleOutput" : null,
         "placeholder" : null
       },
-      "sampleOutput" : null,
       "outputSchema" : {
         "advancedOption" : null,
         "description" : null,
@@ -3292,7 +3291,8 @@
         } ],
         "controlType" : "OBJECT_BUILDER",
         "optionsDataSource" : null
-      }
+      },
+      "sampleOutput" : null
     },
     "properties" : [ {
       "advancedOption" : null,
@@ -3324,96 +3324,6 @@
     "perform" : null,
     "processErrorResponse" : null
   } ],
-  "connection" : {
-    "authorizations" : [ {
-      "detectOn" : null,
-      "description" : null,
-      "name" : "api_key",
-      "properties" : [ {
-        "advancedOption" : null,
-        "description" : null,
-        "displayCondition" : null,
-        "expressionEnabled" : null,
-        "hidden" : null,
-        "metadata" : { },
-        "required" : true,
-        "name" : "shopName",
-        "type" : "STRING",
-        "defaultValue" : null,
-        "exampleValue" : null,
-        "label" : "Shop name",
-        "placeholder" : null,
-        "controlType" : "TEXT",
-        "languageId" : null,
-        "maxLength" : null,
-        "minLength" : null,
-        "options" : null,
-        "optionsDataSource" : null
-      }, {
-        "advancedOption" : null,
-        "description" : null,
-        "displayCondition" : null,
-        "expressionEnabled" : null,
-        "hidden" : true,
-        "metadata" : { },
-        "required" : true,
-        "name" : "key",
-        "type" : "STRING",
-        "defaultValue" : "X-Shopify-Access-Token",
-        "exampleValue" : null,
-        "label" : "Access token",
-        "placeholder" : null,
-        "controlType" : "TEXT",
-        "languageId" : null,
-        "maxLength" : null,
-        "minLength" : null,
-        "options" : null,
-        "optionsDataSource" : null
-      }, {
-        "advancedOption" : null,
-        "description" : null,
-        "displayCondition" : null,
-        "expressionEnabled" : null,
-        "hidden" : null,
-        "metadata" : { },
-        "required" : true,
-        "name" : "value",
-        "type" : "STRING",
-        "defaultValue" : null,
-        "exampleValue" : null,
-        "label" : "Access Token",
-        "placeholder" : null,
-        "controlType" : "TEXT",
-        "languageId" : null,
-        "maxLength" : null,
-        "minLength" : null,
-        "options" : null,
-        "optionsDataSource" : null
-      } ],
-      "refreshOn" : null,
-      "title" : "API Key",
-      "type" : "API_KEY",
-      "acquire" : null,
-      "apply" : null,
-      "authorizationCallback" : null,
-      "authorizationUrl" : null,
-      "clientId" : null,
-      "clientSecret" : null,
-      "oauth2AuthorizationExtraQueryParameters" : null,
-      "pkce" : null,
-      "refresh" : null,
-      "refreshUrl" : null,
-      "scopes" : null,
-      "refreshToken" : null,
-      "tokenUrl" : null
-    } ],
-    "properties" : null,
-    "version" : 1,
-    "authorizationRequired" : null,
-    "baseUri" : { },
-    "test" : null
-  },
-  "unifiedApi" : null,
   "triggers" : [ {
     "batch" : null,
     "deprecated" : null,
@@ -3766,7 +3676,6 @@
         "sampleOutput" : null,
         "placeholder" : null
       },
-      "sampleOutput" : null,
       "outputSchema" : {
         "advancedOption" : null,
         "description" : null,
@@ -4106,7 +4015,8 @@
         } ],
         "controlType" : "OBJECT_BUILDER",
         "optionsDataSource" : null
-      }
+      },
+      "sampleOutput" : null
     },
     "properties" : null,
     "title" : "New Cancelled Order",
@@ -4115,13 +4025,13 @@
     "workflowSyncExecution" : null,
     "workflowNodeDescription" : null,
     "processErrorResponse" : null,
+    "poll" : null,
     "deduplicate" : null,
     "webhookDisable" : { },
     "webhookEnable" : { },
     "dynamicWebhookRefresh" : null,
     "listenerDisable" : null,
     "listenerEnable" : null,
-    "poll" : null,
     "webhookRequest" : { },
     "webhookValidate" : null,
     "webhookValidateOnEnable" : null
@@ -4477,7 +4387,6 @@
         "sampleOutput" : null,
         "placeholder" : null
       },
-      "sampleOutput" : null,
       "outputSchema" : {
         "advancedOption" : null,
         "description" : null,
@@ -4817,7 +4726,8 @@
         } ],
         "controlType" : "OBJECT_BUILDER",
         "optionsDataSource" : null
-      }
+      },
+      "sampleOutput" : null
     },
     "properties" : null,
     "title" : "New Order",
@@ -4826,13 +4736,13 @@
     "workflowSyncExecution" : null,
     "workflowNodeDescription" : null,
     "processErrorResponse" : null,
+    "poll" : null,
     "deduplicate" : null,
     "webhookDisable" : { },
     "webhookEnable" : { },
     "dynamicWebhookRefresh" : null,
     "listenerDisable" : null,
     "listenerEnable" : null,
-    "poll" : null,
     "webhookRequest" : { },
     "webhookValidate" : null,
     "webhookValidateOnEnable" : null
@@ -5188,7 +5098,6 @@
         "sampleOutput" : null,
         "placeholder" : null
       },
-      "sampleOutput" : null,
       "outputSchema" : {
         "advancedOption" : null,
         "description" : null,
@@ -5528,7 +5437,8 @@
         } ],
         "controlType" : "OBJECT_BUILDER",
         "optionsDataSource" : null
-      }
+      },
+      "sampleOutput" : null
     },
     "properties" : null,
     "title" : "New Paid Order",
@@ -5537,16 +5447,106 @@
     "workflowSyncExecution" : null,
     "workflowNodeDescription" : null,
     "processErrorResponse" : null,
+    "poll" : null,
     "deduplicate" : null,
     "webhookDisable" : { },
     "webhookEnable" : { },
     "dynamicWebhookRefresh" : null,
     "listenerDisable" : null,
     "listenerEnable" : null,
-    "poll" : null,
     "webhookRequest" : { },
     "webhookValidate" : null,
     "webhookValidateOnEnable" : null
   } ],
-  "dataStream" : null
+  "dataStream" : null,
+  "unifiedApi" : null,
+  "connection" : {
+    "authorizations" : [ {
+      "detectOn" : null,
+      "description" : null,
+      "name" : "api_key",
+      "properties" : [ {
+        "advancedOption" : null,
+        "description" : null,
+        "displayCondition" : null,
+        "expressionEnabled" : null,
+        "hidden" : null,
+        "metadata" : { },
+        "required" : true,
+        "name" : "shopName",
+        "type" : "STRING",
+        "defaultValue" : null,
+        "exampleValue" : null,
+        "label" : "Shop name",
+        "placeholder" : null,
+        "controlType" : "TEXT",
+        "languageId" : null,
+        "maxLength" : null,
+        "minLength" : null,
+        "options" : null,
+        "optionsDataSource" : null
+      }, {
+        "advancedOption" : null,
+        "description" : null,
+        "displayCondition" : null,
+        "expressionEnabled" : null,
+        "hidden" : true,
+        "metadata" : { },
+        "required" : true,
+        "name" : "key",
+        "type" : "STRING",
+        "defaultValue" : "X-Shopify-Access-Token",
+        "exampleValue" : null,
+        "label" : "Access token",
+        "placeholder" : null,
+        "controlType" : "TEXT",
+        "languageId" : null,
+        "maxLength" : null,
+        "minLength" : null,
+        "options" : null,
+        "optionsDataSource" : null
+      }, {
+        "advancedOption" : null,
+        "description" : null,
+        "displayCondition" : null,
+        "expressionEnabled" : null,
+        "hidden" : null,
+        "metadata" : { },
+        "required" : true,
+        "name" : "value",
+        "type" : "STRING",
+        "defaultValue" : null,
+        "exampleValue" : null,
+        "label" : "Access Token",
+        "placeholder" : null,
+        "controlType" : "TEXT",
+        "languageId" : null,
+        "maxLength" : null,
+        "minLength" : null,
+        "options" : null,
+        "optionsDataSource" : null
+      } ],
+      "refreshOn" : null,
+      "title" : "API Key",
+      "type" : "API_KEY",
+      "acquire" : null,
+      "apply" : null,
+      "authorizationCallback" : null,
+      "authorizationUrl" : null,
+      "clientId" : null,
+      "clientSecret" : null,
+      "oauth2AuthorizationExtraQueryParameters" : null,
+      "pkce" : null,
+      "refresh" : null,
+      "refreshUrl" : null,
+      "scopes" : null,
+      "refreshToken" : null,
+      "tokenUrl" : null
+    } ],
+    "properties" : null,
+    "version" : 1,
+    "authorizationRequired" : null,
+    "baseUri" : { },
+    "test" : null
+  }
 }

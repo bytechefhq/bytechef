@@ -135,8 +135,8 @@
       "optionsDataSource" : null
     } ],
     "title" : "Play/Resume Playback",
-    "perform" : null,
     "workflowNodeDescription" : null,
+    "perform" : null,
     "processErrorResponse" : null
   }, {
     "batch" : null,
@@ -180,37 +180,17 @@
             "hidden" : null,
             "metadata" : { },
             "required" : false,
-            "name" : "body",
-            "type" : "OBJECT",
+            "name" : "snapshot_id",
+            "type" : "STRING",
             "defaultValue" : null,
             "exampleValue" : null,
             "label" : null,
             "placeholder" : null,
-            "additionalProperties" : null,
-            "multipleValues" : null,
+            "controlType" : "TEXT",
+            "languageId" : null,
+            "maxLength" : null,
+            "minLength" : null,
             "options" : null,
-            "properties" : [ {
-              "advancedOption" : null,
-              "description" : null,
-              "displayCondition" : null,
-              "expressionEnabled" : null,
-              "hidden" : null,
-              "metadata" : { },
-              "required" : false,
-              "name" : "snapshot_id",
-              "type" : "STRING",
-              "defaultValue" : null,
-              "exampleValue" : null,
-              "label" : null,
-              "placeholder" : null,
-              "controlType" : "TEXT",
-              "languageId" : null,
-              "maxLength" : null,
-              "minLength" : null,
-              "options" : null,
-              "optionsDataSource" : null
-            } ],
-            "controlType" : "OBJECT_BUILDER",
             "optionsDataSource" : null
           } ],
           "controlType" : "OBJECT_BUILDER",
@@ -247,37 +227,17 @@
           "hidden" : null,
           "metadata" : { },
           "required" : false,
-          "name" : "body",
-          "type" : "OBJECT",
+          "name" : "snapshot_id",
+          "type" : "STRING",
           "defaultValue" : null,
           "exampleValue" : null,
           "label" : null,
           "placeholder" : null,
-          "additionalProperties" : null,
-          "multipleValues" : null,
+          "controlType" : "TEXT",
+          "languageId" : null,
+          "maxLength" : null,
+          "minLength" : null,
           "options" : null,
-          "properties" : [ {
-            "advancedOption" : null,
-            "description" : null,
-            "displayCondition" : null,
-            "expressionEnabled" : null,
-            "hidden" : null,
-            "metadata" : { },
-            "required" : false,
-            "name" : "snapshot_id",
-            "type" : "STRING",
-            "defaultValue" : null,
-            "exampleValue" : null,
-            "label" : null,
-            "placeholder" : null,
-            "controlType" : "TEXT",
-            "languageId" : null,
-            "maxLength" : null,
-            "minLength" : null,
-            "options" : null,
-            "optionsDataSource" : null
-          } ],
-          "controlType" : "OBJECT_BUILDER",
           "optionsDataSource" : null
         } ],
         "controlType" : "OBJECT_BUILDER",
@@ -375,8 +335,8 @@
       "optionsDataSource" : null
     } ],
     "title" : "Add Items to a Playlist",
-    "perform" : null,
     "workflowNodeDescription" : null,
+    "perform" : null,
     "processErrorResponse" : null
   }, {
     "batch" : null,
@@ -1141,13 +1101,10 @@
       "controlType" : "SELECT"
     } ],
     "title" : "Create Playlist",
-    "perform" : { },
     "workflowNodeDescription" : null,
+    "perform" : { },
     "processErrorResponse" : null
   } ],
-  "triggers" : [ ],
-  "unifiedApi" : null,
-  "dataStream" : null,
   "connection" : {
     "authorizations" : [ {
       "detectOn" : null,
@@ -1216,5 +1173,8 @@
     "authorizationRequired" : null,
     "baseUri" : { },
     "test" : null
-  }
+  },
+  "triggers" : [ ],
+  "dataStream" : null,
+  "unifiedApi" : null
 }
