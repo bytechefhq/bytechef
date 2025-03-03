@@ -6,6 +6,15 @@ import {ComponentDefinitionBasic} from '@/shared/middleware/platform/configurati
 import {useMemo} from 'react';
 import {twMerge} from 'tailwind-merge';
 
+interface WorkflowsListItemProps {
+    calculateTimeDifference: (date: string) => string;
+    workflow: Workflow;
+    currentWorkflowId: string;
+    onProjectClick: (projectId: number, projectWorkflowId: number) => void;
+    findProjectIdByWorkflow: (workflow: Workflow) => number;
+    setSelectedProjectId: (projectId: number) => void;
+}
+
 const WorkflowsListItem = ({
     calculateTimeDifference,
     currentWorkflowId,
@@ -13,14 +22,7 @@ const WorkflowsListItem = ({
     onProjectClick,
     setSelectedProjectId,
     workflow,
-}: {
-    calculateTimeDifference: (date: string) => string;
-    workflow: Workflow;
-    currentWorkflowId: string;
-    onProjectClick: (projectId: number, projectWorkflowId: number) => void;
-    findProjectIdByWorkflow: (workflow: Workflow) => number;
-    setSelectedProjectId: (projectId: number) => void;
-}) => {
+}: WorkflowsListItemProps) => {
     const {componentDefinitions, taskDispatcherDefinitions} = useWorkflowDataStore();
 
     const {filteredComponentNames, workflowComponentDefinitions, workflowTaskDispatcherDefinitions} = useMemo(() => {
@@ -50,6 +52,14 @@ const WorkflowsListItem = ({
     const projectId = findProjectIdByWorkflow(workflow);
     const projectWorkflowId = workflow.projectWorkflowId || 0;
 
+    const memoizedFilteredComponentNamesList = useMemo(
+        () => ({
+            icons: filteredComponentNames.slice(0, 7),
+            remainingComponents: filteredComponentNames.slice(7),
+        }),
+        [filteredComponentNames]
+    );
+
     const timeAgo = useMemo(
         () => calculateTimeDifference(workflow?.lastModifiedDate?.toString() || ''),
         [calculateTimeDifference, workflow?.lastModifiedDate]
@@ -57,6 +67,7 @@ const WorkflowsListItem = ({
 
     const handleSelectWorkflowClick = () => {
         onProjectClick(projectId, projectWorkflowId);
+
         setSelectedProjectId(projectId);
     };
 
@@ -71,16 +82,14 @@ const WorkflowsListItem = ({
         >
             <div className="flex flex-col gap-3 overflow-hidden">
                 <div className="flex">
-                    {filteredComponentNames?.slice(0, 7).map((name) => {
-                        return (
-                            <WorkflowComponentsIcons
-                                key={name}
-                                name={name}
-                                workflowComponentDefinitions={workflowComponentDefinitions}
-                                workflowTaskDispatcherDefinitions={workflowTaskDispatcherDefinitions}
-                            />
-                        );
-                    })}
+                    {memoizedFilteredComponentNamesList.icons.map((name) => (
+                        <WorkflowComponentsIcons
+                            key={name}
+                            name={name}
+                            workflowComponentDefinitions={workflowComponentDefinitions}
+                            workflowTaskDispatcherDefinitions={workflowTaskDispatcherDefinitions}
+                        />
+                    ))}
 
                     {filteredComponentNames?.length > 7 && (
                         <Tooltip>
@@ -93,7 +102,7 @@ const WorkflowsListItem = ({
                             </TooltipTrigger>
 
                             <TooltipContent className="mt-1 max-w-28 text-pretty" side="bottom">
-                                {filteredComponentNames.slice(7).map((name, index) => (
+                                {memoizedFilteredComponentNamesList.remainingComponents.map((name, index) => (
                                     <span className="block" key={index}>
                                         {name}
                                     </span>
