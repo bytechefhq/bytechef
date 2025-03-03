@@ -16,19 +16,21 @@ import {PlusIcon} from 'lucide-react';
 import {RefObject, useEffect, useMemo, useState} from 'react';
 import {ImperativePanelHandle} from 'react-resizable-panels';
 
+interface ProjectsLeftSidebarProps {
+    bottomResizablePanelRef: RefObject<ImperativePanelHandle>;
+    onProjectClick: (projectId: number, projectWorkflowId: number) => void;
+    projectId: number;
+    updateWorkflowMutation: UpdateWorkflowMutationType;
+    currentWorkflowId: string;
+}
+
 const ProjectsLeftSidebar = ({
     bottomResizablePanelRef,
     currentWorkflowId,
     onProjectClick,
     projectId,
     updateWorkflowMutation,
-}: {
-    bottomResizablePanelRef: RefObject<ImperativePanelHandle>;
-    onProjectClick: (projectId: number, projectWorkflowId: number) => void;
-    projectId: number;
-    updateWorkflowMutation: UpdateWorkflowMutationType;
-    currentWorkflowId: string;
-}) => {
+}: ProjectsLeftSidebarProps) => {
     const [selectedProjectId, setSelectedProjectId] = useState(projectId || 0);
     const [sortBy, setSortBy] = useState('last-edited');
     const [searchValue, setSearchValue] = useState('');
@@ -43,10 +45,6 @@ const ProjectsLeftSidebar = ({
     );
     const workflows = eachProjectWorkflows || allProjectsWorkflows;
 
-    useEffect(() => {
-        setIsLoading(projectWorkflowsLoading || allProjectsWorkflowsLoading);
-    }, [projectWorkflowsLoading, allProjectsWorkflowsLoading]);
-
     const {calculateTimeDifference, createProjectWorkflowMutation, getFilteredWorkflows, getWorkflowsProjectId} =
         useProjectsLeftSidebar({
             bottomResizablePanelRef,
@@ -59,18 +57,22 @@ const ProjectsLeftSidebar = ({
         id: currentWorkspaceId!,
     });
 
-    useEffect(() => {
-        if (selectedProjectId === 0) {
-            refetchProjects();
-        }
-    }, [selectedProjectId, refetchProjects]);
-
     const findProjectIdByWorkflow = getWorkflowsProjectId(projects || []);
 
     const filteredWorkflowsList = useMemo(
         () => getFilteredWorkflows(workflows, sortBy, searchValue),
         [workflows, sortBy, searchValue, getFilteredWorkflows]
     );
+
+    useEffect(() => {
+        setIsLoading(projectWorkflowsLoading || allProjectsWorkflowsLoading);
+    }, [projectWorkflowsLoading, allProjectsWorkflowsLoading]);
+
+    useEffect(() => {
+        if (selectedProjectId === 0) {
+            refetchProjects();
+        }
+    }, [selectedProjectId, refetchProjects]);
 
     return (
         <aside className="flex h-full flex-col items-center gap-2 bg-surface-main pt-0.5">
@@ -115,34 +117,36 @@ const ProjectsLeftSidebar = ({
             </div>
 
             <ScrollArea className="h-screen w-full overflow-y-auto px-4">
-                {isLoading ? (
-                    <WorkflowsListSkeleton />
-                ) : (
+                {isLoading && <WorkflowsListSkeleton />}
+
+                {!isLoading && (
                     <ul className="flex flex-col items-center gap-2">
-                        {selectedProjectId === 0
-                            ? (projects || []).map((project) => (
-                                  <ProjectWorkflowsList
-                                      calculateTimeDifference={calculateTimeDifference}
-                                      currentWorkflowId={currentWorkflowId}
-                                      filteredWorkflowsList={filteredWorkflowsList}
-                                      findProjectIdByWorkflow={findProjectIdByWorkflow}
-                                      key={project.id}
-                                      onProjectClick={onProjectClick}
-                                      project={project}
-                                      setSelectedProjectId={setSelectedProjectId}
-                                  />
-                              ))
-                            : filteredWorkflowsList.map((workflow) => (
-                                  <WorkflowsListItem
-                                      calculateTimeDifference={calculateTimeDifference}
-                                      currentWorkflowId={currentWorkflowId}
-                                      findProjectIdByWorkflow={findProjectIdByWorkflow}
-                                      key={workflow.id}
-                                      onProjectClick={onProjectClick}
-                                      setSelectedProjectId={setSelectedProjectId}
-                                      workflow={workflow}
-                                  />
-                              ))}
+                        {selectedProjectId === 0 &&
+                            (projects || []).map((project) => (
+                                <ProjectWorkflowsList
+                                    calculateTimeDifference={calculateTimeDifference}
+                                    currentWorkflowId={currentWorkflowId}
+                                    filteredWorkflowsList={filteredWorkflowsList}
+                                    findProjectIdByWorkflow={findProjectIdByWorkflow}
+                                    key={project.id}
+                                    onProjectClick={onProjectClick}
+                                    project={project}
+                                    setSelectedProjectId={setSelectedProjectId}
+                                />
+                            ))}
+
+                        {selectedProjectId !== 0 &&
+                            filteredWorkflowsList.map((workflow) => (
+                                <WorkflowsListItem
+                                    calculateTimeDifference={calculateTimeDifference}
+                                    currentWorkflowId={currentWorkflowId}
+                                    findProjectIdByWorkflow={findProjectIdByWorkflow}
+                                    key={workflow.id}
+                                    onProjectClick={onProjectClick}
+                                    setSelectedProjectId={setSelectedProjectId}
+                                    workflow={workflow}
+                                />
+                            ))}
                     </ul>
                 )}
             </ScrollArea>
