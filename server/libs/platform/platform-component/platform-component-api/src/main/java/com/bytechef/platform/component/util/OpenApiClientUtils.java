@@ -52,7 +52,7 @@ public class OpenApiClientUtils {
 
     private static final String TYPE = "type";
 
-    public static Response execute(
+    public static Object execute(
         Map<String, ?> inputParameters, List<? extends Property> properties,
         @Nullable OutputDefinition outputDefinition, Map<String, Object> metadata,
         @Nullable ProcessErrorResponseFunction processErrorResponseFunction, ActionContext context) {
@@ -89,7 +89,7 @@ public class OpenApiClientUtils {
             }
         }
 
-        return response;
+        return response.getBody();
     }
 
     private static String createUrl(
