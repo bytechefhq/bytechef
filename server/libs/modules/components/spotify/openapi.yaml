@@ -83,11 +83,8 @@ paths:
               schema:
                 type: "object"
                 properties:
-                  body:
-                    type: "object"
-                    properties:
-                      snapshot_id:
-                        type: "string"
+                  snapshot_id:
+                    type: "string"
 components:
   securitySchemes:
     oauth2:
@@ -98,6 +95,6 @@ components:
           tokenUrl: "https://accounts.spotify.com/api/token"
           refreshUrl: "https://accounts.spotify.com/api/token"
           scopes:
-            "playlist-modify-private" : " "
+            "playlist-modify-private": " "
             "playlist-modify-public": " "
             "user-modify-playback-state": " "

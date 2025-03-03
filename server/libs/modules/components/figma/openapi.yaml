@@ -26,30 +26,27 @@ paths:
           content:
             application/json:
               schema:
-                type: "object"
-                properties:
-                  body:
-                    type: "array"
-                    items:
+                type: "array"
+                items:
+                  type: "object"
+                  properties:
+                    id:
+                      type: "string"
+                    file_key:
+                      type: "string"
+                    parent_id:
+                      type: "string"
+                    user:
                       type: "object"
                       properties:
                         id:
                           type: "string"
-                        file_key:
+                        handle:
                           type: "string"
-                        parent_id:
+                        img_url:
                           type: "string"
-                        user:
-                          type: "object"
-                          properties:
-                            id:
-                              type: "string"
-                            handle:
-                              type: "string"
-                            img_url:
-                              type: "string"
-                            email:
-                              type: "string"
+                        email:
+                          type: "string"
     post:
       summary: "Post Comment"
       description: "Posts a new comment on the file."
@@ -84,17 +81,14 @@ paths:
               schema:
                 type: "object"
                 properties:
-                  body:
-                    type: "object"
-                    properties:
-                      id:
-                        type: "string"
-                      file_key:
-                        type: "string"
-                      parent_id:
-                        type: "string"
-                      message:
-                        type: "string"
+                  id:
+                    type: "string"
+                  file_key:
+                    type: "string"
+                  parent_id:
+                    type: "string"
+                  message:
+                    type: "string"
 components:
   securitySchemes:
     oauth2:

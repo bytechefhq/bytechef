@@ -37,13 +37,10 @@ paths:
               schema:
                 type: "object"
                 properties:
-                  body:
-                    type: "object"
-                    properties:
-                      orderId:
-                        type: "string"
-                      status:
-                        type: "string"
+                  orderId:
+                    type: "string"
+                  status:
+                    type: "string"
   /collections/{collectionId}/items/{itemId}:
     get:
       summary: "Get Collection Item"
@@ -79,18 +76,15 @@ paths:
               schema:
                 type: "object"
                 properties:
-                  body:
+                  id:
+                    type: "string"
+                  fieldData:
                     type: "object"
                     properties:
-                      id:
+                      name:
                         type: "string"
-                      fieldData:
-                        type: "object"
-                        properties:
-                          name:
-                            type: "string"
-                          slug:
-                            type: "string"
+                      slug:
+                        type: "string"
 components:
   securitySchemes:
     oauth2:

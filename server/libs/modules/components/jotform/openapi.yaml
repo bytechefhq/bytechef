@@ -29,26 +29,23 @@ paths:
               schema:
                 type: "object"
                 properties:
-                  body:
-                    type: "object"
-                    properties:
-                      content:
-                        type: "array"
-                        items:
-                          type: "object"
-                          properties:
-                            id:
-                              type: "string"
-                            form_id:
-                              type: "string"
-                            status:
-                              type: "string"
-                            new:
-                              type: "string"
-                            flag:
-                              type: "string"
-                            notes:
-                              type: "string"
+                  content:
+                    type: "array"
+                    items:
+                      type: "object"
+                      properties:
+                        id:
+                          type: "string"
+                        form_id:
+                          type: "string"
+                        status:
+                          type: "string"
+                        new:
+                          type: "string"
+                        flag:
+                          type: "string"
+                        notes:
+                          type: "string"
 components:
   securitySchemes:
     ApiKeyAuth:

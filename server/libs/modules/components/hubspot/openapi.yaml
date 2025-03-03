@@ -50,26 +50,23 @@ paths:
               schema:
                 type: "object"
                 properties:
-                  body:
+                  id:
+                    type: "string"
+                  properties:
                     type: "object"
                     properties:
-                      id:
+                      firstname:
                         type: "string"
-                      properties:
-                        type: "object"
-                        properties:
-                          firstname:
-                            type: "string"
-                          lastname:
-                            type: "string"
-                          email:
-                            type: "string"
-                          phone:
-                            type: "string"
-                          company:
-                            type: "string"
-                          website:
-                            type: "string"
+                      lastname:
+                        type: "string"
+                      email:
+                        type: "string"
+                      phone:
+                        type: "string"
+                      company:
+                        type: "string"
+                      website:
+                        type: "string"
   /crm/v3/objects/contacts/{contactId}:
     delete:
       summary: "Delete Contact"
@@ -106,26 +103,23 @@ paths:
               schema:
                 type: "object"
                 properties:
-                  body:
+                  id:
+                    type: "string"
+                  properties:
                     type: "object"
                     properties:
-                      id:
+                      firstname:
                         type: "string"
-                      properties:
-                        type: "object"
-                        properties:
-                          firstname:
-                            type: "string"
-                          lastname:
-                            type: "string"
-                          email:
-                            type: "string"
-                          phone:
-                            type: "string"
-                          company:
-                            type: "string"
-                          website:
-                            type: "string"
+                      lastname:
+                        type: "string"
+                      email:
+                        type: "string"
+                      phone:
+                        type: "string"
+                      company:
+                        type: "string"
+                      website:
+                        type: "string"
     patch:
       summary: "Update Contact"
       description: "Update Contact properties."
@@ -177,26 +171,23 @@ paths:
               schema:
                 type: "object"
                 properties:
-                  body:
+                  id:
+                    type: "string"
+                  properties:
                     type: "object"
                     properties:
-                      id:
+                      firstname:
                         type: "string"
-                      properties:
-                        type: "object"
-                        properties:
-                          firstname:
-                            type: "string"
-                          lastname:
-                            type: "string"
-                          email:
-                            type: "string"
-                          phone:
-                            type: "string"
-                          company:
-                            type: "string"
-                          website:
-                            type: "string"
+                      lastname:
+                        type: "string"
+                      email:
+                        type: "string"
+                      phone:
+                        type: "string"
+                      company:
+                        type: "string"
+                      website:
+                        type: "string"
   /crm/v3/objects/deals:
     post:
       summary: "Create Deal"
@@ -243,29 +234,26 @@ paths:
               schema:
                 type: "object"
                 properties:
-                  body:
+                  id:
+                    type: "string"
+                  properties:
                     type: "object"
                     properties:
-                      id:
+                      dealname:
                         type: "string"
-                      properties:
-                        type: "object"
-                        properties:
-                          dealname:
-                            type: "string"
-                            title: "Deal name"
-                          amount:
-                            type: "number"
-                          closedate:
-                            type: "string"
-                            format: "date"
-                          pipeline:
-                            type: "string"
-                            title: "Pipeline"
-                          dealstage:
-                            type: "string"
-                          hubspot_owner_id:
-                            type: "string"
+                        title: "Deal name"
+                      amount:
+                        type: "number"
+                      closedate:
+                        type: "string"
+                        format: "date"
+                      pipeline:
+                        type: "string"
+                        title: "Pipeline"
+                      dealstage:
+                        type: "string"
+                      hubspot_owner_id:
+                        type: "string"
   /crm/v3/objects/tickets/{ticketId}:
     get:
       summary: "Get Ticket"
@@ -288,26 +276,23 @@ paths:
               schema:
                 type: "object"
                 properties:
-                  body:
+                  id:
+                    type: "string"
+                  properties:
                     type: "object"
                     properties:
-                      id:
+                      content:
                         type: "string"
-                      properties:
-                        type: "object"
-                        properties:
-                          content:
-                            type: "string"
-                          hs_object_id:
-                            type: "string"
-                          hs_pipeline:
-                            type: "string"
-                          hs_pipeline_stage:
-                            type: "string"
-                          hs_ticket_priority:
-                            type: "string"
-                          subject:
-                            type: "string"
+                      hs_object_id:
+                        type: "string"
+                      hs_pipeline:
+                        type: "string"
+                      hs_pipeline_stage:
+                        type: "string"
+                      hs_ticket_priority:
+                        type: "string"
+                      subject:
+                        type: "string"
 components:
   securitySchemes:
     oauth2:

@@ -40,17 +40,14 @@ paths:
               schema:
                 type: "object"
                 properties:
-                  body:
-                    type: "object"
-                    properties:
-                      id:
-                        type: "number"
-                      name:
-                        type: "string"
-                      description:
-                        type: "string"
-                      note:
-                        type: "string"
+                  id:
+                    type: "number"
+                  name:
+                    type: "string"
+                  description:
+                    type: "string"
+                  note:
+                    type: "string"
   /contacts:
     post:
       tags:
@@ -96,17 +93,14 @@ paths:
               schema:
                 type: "object"
                 properties:
-                  body:
-                    type: "object"
-                    properties:
-                      description:
-                        type: "string"
-                      email:
-                        type: "string"
-                      id:
-                        type: "number"
-                      job_title:
-                        type: "string"
+                  description:
+                    type: "string"
+                  email:
+                    type: "string"
+                  id:
+                    type: "number"
+                  job_title:
+                    type: "string"
 
   /tickets:
     post:
@@ -162,21 +156,18 @@ paths:
               schema:
                 type: "object"
                 properties:
-                  body:
-                    type: "object"
-                    properties:
-                      subject:
-                        type: "string"
-                      email:
-                        type: "string"
-                        format: "email"
-                      description:
-                        type: "string"
-                      priority:
-                        type: "integer"
-                        description: "Priority of the ticket."
-                      status:
-                        type: "integer"
+                  subject:
+                    type: "string"
+                  email:
+                    type: "string"
+                    format: "email"
+                  description:
+                    type: "string"
+                  priority:
+                    type: "integer"
+                    description: "Priority of the ticket."
+                  status:
+                    type: "integer"
 components:
   securitySchemes:
     basicAuth:

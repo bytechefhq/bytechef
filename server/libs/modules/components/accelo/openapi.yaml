@@ -45,25 +45,22 @@ paths:
               schema:
                 type: "object"
                 properties:
-                  body:
+                  response:
                     type: "object"
                     properties:
-                      response:
-                        type: "object"
-                        properties:
-                          id:
-                            type: "string"
-                          name:
-                            type: "string"
-                      meta:
-                        type: "object"
-                        properties:
-                          more_info:
-                            type: "string"
-                          status:
-                            type: "string"
-                          message:
-                            type: "string"
+                      id:
+                        type: "string"
+                      name:
+                        type: "string"
+                  meta:
+                    type: "object"
+                    properties:
+                      more_info:
+                        type: "string"
+                      status:
+                        type: "string"
+                      message:
+                        type: "string"
   /contacts:
     post:
       summary: "Create Contact"
@@ -107,9 +104,6 @@ paths:
               schema:
                 type: "object"
                 properties:
-                  body:
-                    type: "object"
-                    properties:
                       response:
                         type: "object"
                         properties:

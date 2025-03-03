@@ -41,27 +41,24 @@ paths:
               schema:
                 type: "object"
                 properties:
-                  body:
+                  id:
+                    type: "string"
+                  name:
+                    type: "string"
+                  folder:
                     type: "object"
                     properties:
                       id:
                         type: "string"
                       name:
                         type: "string"
-                      folder:
-                        type: "object"
-                        properties:
-                          id:
-                            type: "string"
-                          name:
-                            type: "string"
-                      space:
-                        type: "object"
-                        properties:
-                          id:
-                            type: "string"
-                          name:
-                            type: "string"
+                  space:
+                    type: "object"
+                    properties:
+                      id:
+                        type: "string"
+                      name:
+                        type: "string"
   /list/{listId}/task:
     post:
       summary: "Create Task"
@@ -99,36 +96,33 @@ paths:
               schema:
                 type: "object"
                 properties:
-                  body:
+                  id:
+                    type: "string"
+                  name:
+                    type: "string"
+                  description:
+                    type: "string"
+                  url:
+                    type: "string"
+                  list:
                     type: "object"
                     properties:
                       id:
                         type: "string"
                       name:
                         type: "string"
-                      description:
+                  folder:
+                    type: "object"
+                    properties:
+                      id:
                         type: "string"
-                      url:
+                      name:
                         type: "string"
-                      list:
-                        type: "object"
-                        properties:
-                          id:
-                            type: "string"
-                          name:
-                            type: "string"
-                      folder:
-                        type: "object"
-                        properties:
-                          id:
-                            type: "string"
-                          name:
-                            type: "string"
-                      space:
-                        type: "object"
-                        properties:
-                          id:
-                            type: "string"
+                  space:
+                    type: "object"
+                    properties:
+                      id:
+                        type: "string"
   /space/{spaceId}/folder:
     post:
       summary: "Create Folder"
@@ -163,20 +157,17 @@ paths:
               schema:
                 type: "object"
                 properties:
-                  body:
+                  id:
+                    type: "string"
+                  name:
+                    type: "string"
+                  space:
                     type: "object"
                     properties:
                       id:
                         type: "string"
                       name:
                         type: "string"
-                      space:
-                        type: "object"
-                        properties:
-                          id:
-                            type: "string"
-                          name:
-                            type: "string"
 components:
   securitySchemes:
     oauth2:

@@ -57,34 +57,32 @@ paths:
               schema:
                 type: "object"
                 properties:
-                  body:
+
+                  id:
+                    type: "string"
+                  description:
+                    type: "string"
+                  email:
+                    type: "string"
+                  name:
+                    type: "string"
+                  phone:
+                    type: "string"
+                  address:
                     type: "object"
                     properties:
-                      id:
+                      city:
                         type: "string"
-                      description:
+                      country:
                         type: "string"
-                      email:
+                      line1:
                         type: "string"
-                      name:
+                      line2:
                         type: "string"
-                      phone:
+                      postal_code:
                         type: "string"
-                      address:
-                        type: "object"
-                        properties:
-                          city:
-                            type: "string"
-                          country:
-                            type: "string"
-                          line1:
-                            type: "string"
-                          line2:
-                            type: "string"
-                          postal_code:
-                            type: "string"
-                          state:
-                            type: "string"
+                      state:
+                        type: "string"
   /invoices:
     post:
       summary: "Create Invoice"
@@ -119,17 +117,14 @@ paths:
               schema:
                 type: "object"
                 properties:
-                  body:
-                    type: "object"
-                    properties:
-                      id:
-                        type: "string"
-                      customer:
-                        type: "string"
-                      currency:
-                        type: "string"
-                      description:
-                        type: "string"
+                  id:
+                    type: "string"
+                  customer:
+                    type: "string"
+                  currency:
+                    type: "string"
+                  description:
+                    type: "string"
 components:
   securitySchemes:
     bearerAuth:

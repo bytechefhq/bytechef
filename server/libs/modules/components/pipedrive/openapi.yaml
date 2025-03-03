@@ -58,47 +58,44 @@ paths:
               schema:
                 type: "object"
                 properties:
-                  body:
-                    type: "object"
-                    properties:
-                      data:
-                        type: "array"
-                        items:
+                  data:
+                    type: "array"
+                    items:
+                      type: "object"
+                      properties:
+                        id:
+                          type: "integer"
+                        user_id:
                           type: "object"
                           properties:
                             id:
                               type: "integer"
-                            user_id:
-                              type: "object"
-                              properties:
-                                id:
-                                  type: "integer"
-                                name:
-                                  type: "string"
-                                email:
-                                  type: "string"
-                            person_id:
-                              type: "object"
-                              properties:
-                                name:
-                                  type: "string"
-                            org_id:
-                              type: "object"
-                              properties:
-                                name:
-                                  type: "string"
-                                owner_id:
-                                  type: "string"
-                            stage_id:
-                              type: "integer"
-                            title:
+                            name:
                               type: "string"
-                            value:
-                              type: "integer"
-                            currency:
+                            email:
                               type: "string"
-                            status:
+                        person_id:
+                          type: "object"
+                          properties:
+                            name:
                               type: "string"
+                        org_id:
+                          type: "object"
+                          properties:
+                            name:
+                              type: "string"
+                            owner_id:
+                              type: "string"
+                        stage_id:
+                          type: "integer"
+                        title:
+                          type: "string"
+                        value:
+                          type: "integer"
+                        currency:
+                          type: "string"
+                        status:
+                          type: "string"
     post:
       summary: "Add Deal"
       description: "Adds a new deal."
@@ -176,45 +173,42 @@ paths:
               schema:
                 type: "object"
                 properties:
-                  body:
+                  data:
                     type: "object"
                     properties:
-                      data:
+                      id:
+                        type: "integer"
+                      user_id:
                         type: "object"
                         properties:
                           id:
                             type: "integer"
-                          user_id:
-                            type: "object"
-                            properties:
-                              id:
-                                type: "integer"
-                              name:
-                                type: "string"
-                              email:
-                                type: "string"
-                          person_id:
-                            type: "object"
-                            properties:
-                              name:
-                                type: "string"
-                          org_id:
-                            type: "object"
-                            properties:
-                              name:
-                                type: "string"
-                              owner_id:
-                                type: "string"
-                          stage_id:
-                            type: "integer"
-                          title:
+                          name:
                             type: "string"
-                          value:
-                            type: "integer"
-                          currency:
+                          email:
                             type: "string"
-                          status:
+                      person_id:
+                        type: "object"
+                        properties:
+                          name:
                             type: "string"
+                      org_id:
+                        type: "object"
+                        properties:
+                          name:
+                            type: "string"
+                          owner_id:
+                            type: "string"
+                      stage_id:
+                        type: "integer"
+                      title:
+                        type: "string"
+                      value:
+                        type: "integer"
+                      currency:
+                        type: "string"
+                      status:
+                        type: "string"
   /deals/search:
     get:
       summary: "Search Deals"
@@ -279,52 +273,49 @@ paths:
               schema:
                 type: "object"
                 properties:
-                  body:
+                  data:
                     type: "object"
                     properties:
-                      data:
-                        type: "object"
-                        properties:
-                          items:
-                            type: "array"
-                            items:
+                      items:
+                        type: "array"
+                        items:
+                          type: "object"
+                          properties:
+                            id:
+                              type: "string"
+                            type:
+                              type: "string"
+                            user_id:
                               type: "object"
                               properties:
                                 id:
-                                  type: "string"
-                                type:
-                                  type: "string"
-                                user_id:
-                                  type: "object"
-                                  properties:
-                                    id:
-                                      type: "integer"
-                                    name:
-                                      type: "string"
-                                    email:
-                                      type: "string"
-                                person_id:
-                                  type: "object"
-                                  properties:
-                                    name:
-                                      type: "string"
-                                org_id:
-                                  type: "object"
-                                  properties:
-                                    name:
-                                      type: "string"
-                                    owner_id:
-                                      type: "string"
-                                stage_id:
                                   type: "integer"
-                                title:
+                                name:
                                   type: "string"
-                                value:
-                                  type: "integer"
-                                currency:
+                                email:
                                   type: "string"
-                                status:
+                            person_id:
+                              type: "object"
+                              properties:
+                                name:
                                   type: "string"
+                            org_id:
+                              type: "object"
+                              properties:
+                                name:
+                                  type: "string"
+                                owner_id:
+                                  type: "string"
+                            stage_id:
+                              type: "integer"
+                            title:
+                              type: "string"
+                            value:
+                              type: "integer"
+                            currency:
+                              type: "string"
+                            status:
+                              type: "string"
   /deals/{id}:
     delete:
       summary: "Delete Deal"
@@ -348,14 +339,11 @@ paths:
               schema:
                 type: "object"
                 properties:
-                  body:
+                  data:
                     type: "object"
                     properties:
-                      data:
-                        type: "object"
-                        properties:
-                          id:
-                            type: "integer"
+                      id:
+                        type: "integer"
     get:
       summary: "Get Details of Deal"
       description: "Returns the details of a specific deal."
@@ -377,45 +365,42 @@ paths:
               schema:
                 type: "object"
                 properties:
-                  body:
+                  data:
                     type: "object"
                     properties:
-                      data:
+                      id:
+                        type: "integer"
+                      user_id:
                         type: "object"
                         properties:
                           id:
                             type: "integer"
-                          user_id:
-                            type: "object"
-                            properties:
-                              id:
-                                type: "integer"
-                              name:
-                                type: "string"
-                              email:
-                                type: "string"
-                          person_id:
-                            type: "object"
-                            properties:
-                              name:
-                                type: "string"
-                          org_id:
-                            type: "object"
-                            properties:
-                              name:
-                                type: "string"
-                              owner_id:
-                                type: "string"
-                          stage_id:
-                            type: "integer"
-                          title:
+                          name:
                             type: "string"
-                          value:
-                            type: "integer"
-                          currency:
+                          email:
                             type: "string"
-                          status:
+                      person_id:
+                        type: "object"
+                        properties:
+                          name:
                             type: "string"
+                      org_id:
+                        type: "object"
+                        properties:
+                          name:
+                            type: "string"
+                          owner_id:
+                            type: "string"
+                      stage_id:
+                        type: "integer"
+                      title:
+                        type: "string"
+                      value:
+                        type: "integer"
+                      currency:
+                        type: "string"
+                      status:
+                        type: "string"
   /leads:
     get:
       tags:
@@ -485,32 +470,29 @@ paths:
               schema:
                 type: "object"
                 properties:
-                  body:
-                    type: "object"
-                    properties:
-                      data:
-                        type: "array"
-                        items:
+                  data:
+                    type: "array"
+                    items:
+                      type: "object"
+                      properties:
+                        id:
+                          type: "string"
+                        title:
+                          type: "string"
+                        owner_id:
+                          type: "integer"
+                        value:
                           type: "object"
                           properties:
-                            id:
-                              type: "string"
-                            title:
-                              type: "string"
-                            owner_id:
+                            amount:
                               type: "integer"
-                            value:
-                              type: "object"
-                              properties:
-                                amount:
-                                  type: "integer"
-                                currency:
-                                  type: "string"
-                            expected_close_date:
+                            currency:
                               type: "string"
-                              format: "date"
-                            person_id:
-                              type: "integer"
+                        expected_close_date:
+                          type: "string"
+                          format: "date"
+                        person_id:
+                          type: "integer"
     post:
       tags:
         - "Leads"
@@ -571,30 +553,27 @@ paths:
               schema:
                 type: "object"
                 properties:
-                  body:
+                  data:
                     type: "object"
                     properties:
-                      data:
+                      id:
+                        type: "string"
+                      title:
+                        type: "string"
+                      owner_id:
+                        type: "integer"
+                      value:
                         type: "object"
                         properties:
-                          id:
-                            type: "string"
-                          title:
-                            type: "string"
-                          owner_id:
+                          amount:
                             type: "integer"
-                          value:
-                            type: "object"
-                            properties:
-                              amount:
-                                type: "integer"
-                              currency:
-                                type: "string"
-                          expected_close_date:
+                          currency:
                             type: "string"
-                            format: "date"
-                          person_id:
-                            type: "integer"
+                      expected_close_date:
+                        type: "string"
+                        format: "date"
+                      person_id:
+                        type: "integer"
   /leads/{id}:
     get:
       tags:
@@ -618,30 +597,27 @@ paths:
               schema:
                 type: "object"
                 properties:
-                  body:
+                  data:
                     type: "object"
                     properties:
-                      data:
+                      id:
+                        type: "string"
+                      title:
+                        type: "string"
+                      owner_id:
+                        type: "integer"
+                      value:
                         type: "object"
                         properties:
-                          id:
-                            type: "string"
-                          title:
-                            type: "string"
-                          owner_id:
+                          amount:
                             type: "integer"
-                          value:
-                            type: "object"
-                            properties:
-                              amount:
-                                type: "integer"
-                              currency:
-                                type: "string"
-                          expected_close_date:
+                          currency:
                             type: "string"
-                            format: "date"
-                          person_id:
-                            type: "integer"
+                      expected_close_date:
+                        type: "string"
+                        format: "date"
+                      person_id:
+                        type: "integer"
     delete:
       tags:
         - "Leads"
@@ -665,14 +641,11 @@ paths:
               schema:
                 type: "object"
                 properties:
-                  body:
+                  data:
                     type: "object"
                     properties:
-                      data:
-                        type: "object"
-                        properties:
-                          id:
-                            type: "string"
+                      id:
+                        type: "string"
   /leads/search:
     get:
       summary: "Search Leads"
@@ -730,35 +703,32 @@ paths:
               schema:
                 type: "object"
                 properties:
-                  body:
+                  data:
                     type: "object"
                     properties:
-                      data:
-                        type: "object"
-                        properties:
-                          items:
-                            type: "array"
-                            items:
+                      items:
+                        type: "array"
+                        items:
+                          type: "object"
+                          properties:
+                            id:
+                              type: "string"
+                            title:
+                              type: "string"
+                            owner_id:
+                              type: "integer"
+                            value:
                               type: "object"
                               properties:
-                                id:
-                                  type: "string"
-                                title:
-                                  type: "string"
-                                owner_id:
+                                amount:
                                   type: "integer"
-                                value:
-                                  type: "object"
-                                  properties:
-                                    amount:
-                                      type: "integer"
-                                    currency:
-                                      type: "string"
-                                expected_close_date:
+                                currency:
                                   type: "string"
-                                  format: "date"
-                                person_id:
-                                  type: "integer"
+                            expected_close_date:
+                              type: "string"
+                              format: "date"
+                            person_id:
+                              type: "integer"
   /organizations:
     get:
       summary: "Get All Organizations"
@@ -798,29 +768,26 @@ paths:
               schema:
                 type: "object"
                 properties:
-                  body:
-                    type: "object"
-                    properties:
-                      data:
-                        type: "array"
-                        items:
+                  data:
+                    type: "array"
+                    items:
+                      type: "object"
+                      properties:
+                        id:
+                          type: "integer"
+                        company_id:
+                          type: "integer"
+                        owner_id:
                           type: "object"
                           properties:
                             id:
                               type: "integer"
-                            company_id:
-                              type: "integer"
-                            owner_id:
-                              type: "object"
-                              properties:
-                                id:
-                                  type: "integer"
-                                name:
-                                  type: "string"
-                                email:
-                                  type: "string"
                             name:
                               type: "string"
+                            email:
+                              type: "string"
+                        name:
+                          type: "string"
     post:
       summary: "Add Organization"
       description: "Adds a new organization."
@@ -851,27 +818,24 @@ paths:
               schema:
                 type: "object"
                 properties:
-                  body:
+                  data:
                     type: "object"
                     properties:
-                      data:
+                      id:
+                        type: "integer"
+                      company_id:
+                        type: "integer"
+                      owner_id:
                         type: "object"
                         properties:
                           id:
                             type: "integer"
-                          company_id:
-                            type: "integer"
-                          owner_id:
-                            type: "object"
-                            properties:
-                              id:
-                                type: "integer"
-                              name:
-                                type: "string"
-                              email:
-                                type: "string"
                           name:
                             type: "string"
+                          email:
+                            type: "string"
+                      name:
+                        type: "string"
   /organizations/search:
     get:
       summary: "Search Organizations"
@@ -913,32 +877,29 @@ paths:
               schema:
                 type: "object"
                 properties:
-                  body:
+                  data:
                     type: "object"
                     properties:
-                      data:
-                        type: "object"
-                        properties:
-                          items:
-                            type: "array"
-                            items:
+                      items:
+                        type: "array"
+                        items:
+                          type: "object"
+                          properties:
+                            id:
+                              type: "integer"
+                            company_id:
+                              type: "integer"
+                            owner_id:
                               type: "object"
                               properties:
                                 id:
                                   type: "integer"
-                                company_id:
-                                  type: "integer"
-                                owner_id:
-                                  type: "object"
-                                  properties:
-                                    id:
-                                      type: "integer"
-                                    name:
-                                      type: "string"
-                                    email:
-                                      type: "string"
                                 name:
                                   type: "string"
+                                email:
+                                  type: "string"
+                            name:
+                              type: "string"
   /organizations/{id}:
     delete:
       summary: "Delete Organization"
@@ -962,14 +923,11 @@ paths:
               schema:
                 type: "object"
                 properties:
-                  body:
+                  data:
                     type: "object"
                     properties:
-                      data:
-                        type: "object"
-                        properties:
-                          id:
-                            type: "integer"
+                      id:
+                        type: "integer"
     get:
       summary: "Get Details of Organization"
       description: "Returns the details of an organization."
@@ -992,27 +950,24 @@ paths:
               schema:
                 type: "object"
                 properties:
-                  body:
+                  data:
                     type: "object"
                     properties:
-                      data:
+                      id:
+                        type: "integer"
+                      company_id:
+                        type: "integer"
+                      owner_id:
                         type: "object"
                         properties:
                           id:
                             type: "integer"
-                          company_id:
-                            type: "integer"
-                          owner_id:
-                            type: "object"
-                            properties:
-                              id:
-                                type: "integer"
-                              name:
-                                type: "string"
-                              email:
-                                type: "string"
                           name:
                             type: "string"
+                          email:
+                            type: "string"
+                      name:
+                        type: "string"
   /persons:
     get:
       summary: "Get Persons"
@@ -1020,7 +975,6 @@ paths:
       operationId: "getPersons"
       tags:
         - "Persons"
-      parameters:
       parameters:
         - in: "query"
           name: "user_id"
@@ -1054,60 +1008,57 @@ paths:
               schema:
                 type: "object"
                 properties:
-                  body:
-                    type: "object"
-                    properties:
-                      data:
-                        type: "array"
-                        items:
+                  data:
+                    type: "array"
+                    items:
+                      type: "object"
+                      properties:
+                        id:
+                          type: "integer"
+                        company_id:
+                          type: "integer"
+                        owner_id:
                           type: "object"
                           properties:
                             id:
                               type: "integer"
-                            company_id:
-                              type: "integer"
-                            owner_id:
-                              type: "object"
-                              properties:
-                                id:
-                                  type: "integer"
-                                name:
-                                  type: "string"
-                                email:
-                                  type: "string"
-                            org_id:
-                              type: "object"
-                              properties:
-                                name:
-                                  type: "string"
-                                owner_id:
-                                  type: "integer"
-                                cc_email:
-                                  type: "string"
                             name:
                               type: "string"
-                            phone:
-                              type: "array"
-                              items:
-                                type: "object"
-                                properties:
-                                  value:
-                                    type: "string"
-                                  primary:
-                                    type: "boolean"
-                                  label:
-                                    type: "string"
                             email:
-                              type: "array"
-                              items:
-                                type: "object"
-                                properties:
-                                  value:
-                                    type: "string"
-                                  primary:
-                                    type: "boolean"
-                                  label:
-                                    type: "string"
+                              type: "string"
+                        org_id:
+                          type: "object"
+                          properties:
+                            name:
+                              type: "string"
+                            owner_id:
+                              type: "integer"
+                            cc_email:
+                              type: "string"
+                        name:
+                          type: "string"
+                        phone:
+                          type: "array"
+                          items:
+                            type: "object"
+                            properties:
+                              value:
+                                type: "string"
+                              primary:
+                                type: "boolean"
+                              label:
+                                type: "string"
+                        email:
+                          type: "array"
+                          items:
+                            type: "object"
+                            properties:
+                              value:
+                                type: "string"
+                              primary:
+                                type: "boolean"
+                              label:
+                                type: "string"
     post:
       summary: "Add Person"
       description: "Adds a new person."
@@ -1188,58 +1139,55 @@ paths:
               schema:
                 type: "object"
                 properties:
-                  body:
+                  data:
                     type: "object"
                     properties:
-                      data:
+                      id:
+                        type: "integer"
+                      company_id:
+                        type: "integer"
+                      owner_id:
                         type: "object"
                         properties:
                           id:
                             type: "integer"
-                          company_id:
-                            type: "integer"
-                          owner_id:
-                            type: "object"
-                            properties:
-                              id:
-                                type: "integer"
-                              name:
-                                type: "string"
-                              email:
-                                type: "string"
-                          org_id:
-                            type: "object"
-                            properties:
-                              name:
-                                type: "string"
-                              owner_id:
-                                type: "integer"
-                              cc_email:
-                                type: "string"
                           name:
                             type: "string"
-                          phone:
-                            type: "array"
-                            items:
-                              type: "object"
-                              properties:
-                                value:
-                                  type: "string"
-                                primary:
-                                  type: "boolean"
-                                label:
-                                  type: "string"
                           email:
-                            type: "array"
-                            items:
-                              type: "object"
-                              properties:
-                                value:
-                                  type: "string"
-                                primary:
-                                  type: "boolean"
-                                label:
-                                  type: "string"
+                            type: "string"
+                      org_id:
+                        type: "object"
+                        properties:
+                          name:
+                            type: "string"
+                          owner_id:
+                            type: "integer"
+                          cc_email:
+                            type: "string"
+                      name:
+                        type: "string"
+                      phone:
+                        type: "array"
+                        items:
+                          type: "object"
+                          properties:
+                            value:
+                              type: "string"
+                            primary:
+                              type: "boolean"
+                            label:
+                              type: "string"
+                      email:
+                        type: "array"
+                        items:
+                          type: "object"
+                          properties:
+                            value:
+                              type: "string"
+                            primary:
+                              type: "boolean"
+                            label:
+                              type: "string"
   /persons/search:
     get:
       summary: "Search Persons"
@@ -1285,63 +1233,60 @@ paths:
               schema:
                 type: "object"
                 properties:
-                  body:
+                  data:
                     type: "object"
                     properties:
-                      data:
-                        type: "object"
-                        properties:
-                          items:
-                            type: "array"
-                            items:
+                      items:
+                        type: "array"
+                        items:
+                          type: "object"
+                          properties:
+                            id:
+                              type: "integer"
+                            company_id:
+                              type: "integer"
+                            owner_id:
                               type: "object"
                               properties:
                                 id:
                                   type: "integer"
-                                company_id:
-                                  type: "integer"
-                                owner_id:
-                                  type: "object"
-                                  properties:
-                                    id:
-                                      type: "integer"
-                                    name:
-                                      type: "string"
-                                    email:
-                                      type: "string"
-                                org_id:
-                                  type: "object"
-                                  properties:
-                                    name:
-                                      type: "string"
-                                    owner_id:
-                                      type: "integer"
-                                    cc_email:
-                                      type: "string"
                                 name:
                                   type: "string"
-                                phone:
-                                  type: "array"
-                                  items:
-                                    type: "object"
-                                    properties:
-                                      value:
-                                        type: "string"
-                                      primary:
-                                        type: "boolean"
-                                      label:
-                                        type: "string"
                                 email:
-                                  type: "array"
-                                  items:
-                                    type: "object"
-                                    properties:
-                                      value:
-                                        type: "string"
-                                      primary:
-                                        type: "boolean"
-                                      label:
-                                        type: "string"
+                                  type: "string"
+                            org_id:
+                              type: "object"
+                              properties:
+                                name:
+                                  type: "string"
+                                owner_id:
+                                  type: "integer"
+                                cc_email:
+                                  type: "string"
+                            name:
+                              type: "string"
+                            phone:
+                              type: "array"
+                              items:
+                                type: "object"
+                                properties:
+                                  value:
+                                    type: "string"
+                                  primary:
+                                    type: "boolean"
+                                  label:
+                                    type: "string"
+                            email:
+                              type: "array"
+                              items:
+                                type: "object"
+                                properties:
+                                  value:
+                                    type: "string"
+                                  primary:
+                                    type: "boolean"
+                                  label:
+                                    type: "string"
   /persons/{id}:
     delete:
       summary: "Delete Person"
@@ -1365,14 +1310,11 @@ paths:
               schema:
                 type: "object"
                 properties:
-                  body:
+                  data:
                     type: "object"
                     properties:
-                      data:
-                        type: "object"
-                        properties:
-                          id:
-                            type: "integer"
+                      id:
+                        type: "integer"
     get:
       summary: "Get Details of Person"
       description: "Returns the details of a person. This also returns some additional fields which are not present when asking for all persons."
@@ -1395,58 +1337,55 @@ paths:
               schema:
                 type: "object"
                 properties:
-                  body:
+                  data:
                     type: "object"
                     properties:
-                      data:
+                      id:
+                        type: "integer"
+                      company_id:
+                        type: "integer"
+                      owner_id:
                         type: "object"
                         properties:
                           id:
                             type: "integer"
-                          company_id:
-                            type: "integer"
-                          owner_id:
-                            type: "object"
-                            properties:
-                              id:
-                                type: "integer"
-                              name:
-                                type: "string"
-                              email:
-                                type: "string"
-                          org_id:
-                            type: "object"
-                            properties:
-                              name:
-                                type: "string"
-                              owner_id:
-                                type: "integer"
-                              cc_email:
-                                type: "string"
                           name:
                             type: "string"
-                          phone:
-                            type: "array"
-                            items:
-                              type: "object"
-                              properties:
-                                value:
-                                  type: "string"
-                                primary:
-                                  type: "boolean"
-                                label:
-                                  type: "string"
                           email:
-                            type: "array"
-                            items:
-                              type: "object"
-                              properties:
-                                value:
-                                  type: "string"
-                                primary:
-                                  type: "boolean"
-                                label:
-                                  type: "string"
+                            type: "string"
+                      org_id:
+                        type: "object"
+                        properties:
+                          name:
+                            type: "string"
+                          owner_id:
+                            type: "integer"
+                          cc_email:
+                            type: "string"
+                      name:
+                        type: "string"
+                      phone:
+                        type: "array"
+                        items:
+                          type: "object"
+                          properties:
+                            value:
+                              type: "string"
+                            primary:
+                              type: "boolean"
+                            label:
+                              type: "string"
+                      email:
+                        type: "array"
+                        items:
+                          type: "object"
+                          properties:
+                            value:
+                              type: "string"
+                            primary:
+                              type: "boolean"
+                            label:
+                              type: "string"
 components:
   securitySchemes:
     oauth2:

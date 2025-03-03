@@ -47,22 +47,19 @@ paths:
               schema:
                 type: "object"
                 properties:
-                  body:
+                  email:
                     type: "object"
                     properties:
-                      email:
-                        type: "object"
-                        properties:
-                          id:
-                            type: "integer"
-                          name:
-                            type: "string"
-                          subject:
-                            type: "string"
-                          fromEmail:
-                            type: "string"
-                          replyEmail:
-                            type: "string"
+                      id:
+                        type: "integer"
+                      name:
+                        type: "string"
+                      subject:
+                        type: "string"
+                      fromEmail:
+                        type: "string"
+                      replyEmail:
+                        type: "string"
   /people:
     post:
       tags:
@@ -109,28 +106,25 @@ paths:
               schema:
                 type: "object"
                 properties:
-                  body:
-                    type: "object"
-                    properties:
-                      users:
-                        type: "array"
-                        items:
-                          type: "object"
-                          properties:
-                            email:
-                              type: "string"
-                            firstName:
-                              type: "string"
-                            lastName:
-                              type: "string"
-                            website:
-                              type: "string"
-                            title:
-                              type: "string"
-                            id:
-                              type: "string"
-                            phone:
-                              type: "string"
+                  users:
+                    type: "array"
+                    items:
+                      type: "object"
+                      properties:
+                        email:
+                          type: "string"
+                        firstName:
+                          type: "string"
+                        lastName:
+                          type: "string"
+                        website:
+                          type: "string"
+                        title:
+                          type: "string"
+                        id:
+                          type: "string"
+                        phone:
+                          type: "string"
   /tags:
     post:
       tags:
