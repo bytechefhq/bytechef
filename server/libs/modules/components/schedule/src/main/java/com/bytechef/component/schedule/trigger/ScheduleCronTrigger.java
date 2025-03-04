@@ -52,14 +52,24 @@ public class ScheduleCronTrigger {
             string(TIMEZONE)
                 .label("Timezone")
                 .description("The timezone at which the cron expression will be scheduled.")
-                .options(ScheduleUtils.getTimeZoneOptions()))
+                .options(ScheduleUtils.getTimeZoneOptions())
+                .required(true))
         .output(
             outputSchema(
                 object()
                     .properties(
-                        string(DATETIME),
-                        string(EXPRESSION),
-                        string(TIMEZONE))))
+                        string(DATETIME)
+                            .description(
+                                "The exact date and time when the trigger was activated, formatted according to the " +
+                                    "specified timezone."),
+                        string(EXPRESSION)
+                            .description(
+                                "The cron schedule expression that defines the timing pattern for triggering " +
+                                    "the workflow."),
+                        string(TIMEZONE)
+                            .description(
+                                "The timezone used for scheduling the cron expression, ensuring the trigger fires " +
+                                    "at the correct local time."))))
         .listenerDisable(this::listenerDisable)
         .listenerEnable(this::listenerEnable);
 
@@ -81,7 +91,7 @@ public class ScheduleCronTrigger {
         ListenerEmitter listenerEmitter, TriggerContext triggerContext) {
 
         String expression = inputParameters.getRequiredString(EXPRESSION);
-        String timezone = inputParameters.getString(TIMEZONE);
+        String timezone = inputParameters.getRequiredString(TIMEZONE);
 
         triggerScheduler.scheduleScheduleTrigger(
             "0 " + expression,

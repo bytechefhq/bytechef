@@ -49,13 +49,25 @@ public class HubspotGetTicketAction {
             .metadata(
                 Map.of(
                     "type", PropertyType.PATH)))
-        .output(outputSchema(object()
-            .properties(string("id").required(false),
-                object("properties")
-                    .properties(string("content").required(false), string("hs_object_id").required(false),
-                        string("hs_pipeline").required(false), string("hs_pipeline_stage").required(false),
-                        string("hs_ticket_priority").required(false), string("subject").required(false))
+        .output(outputSchema(object().properties(string("id").description("ID of the ticket")
+            .required(false),
+            object("properties").properties(
+                string("content").description("The main content or body of the ticket, detailing the issue or request.")
+                    .required(false),
+                string("hs_object_id").description("ID for the HubSpot object associated with the ticket.")
+                    .required(false),
+                string("hs_pipeline")
+                    .description("The pipeline to which the ticket belongs, indicating its workflow stage.")
+                    .required(false),
+                string("hs_pipeline_stage")
+                    .description("The current stage of the ticket within its pipeline, reflecting its progress.")
+                    .required(false),
+                string("hs_ticket_priority")
+                    .description("The priority level assigned to the ticket, such as high, medium, or low.")
+                    .required(false),
+                string("subject").description("The subject or title of the ticket, summarizing the issue or request.")
                     .required(false))
+                .required(false))
             .metadata(
                 Map.of(
                     "responseType", ResponseType.JSON))));
