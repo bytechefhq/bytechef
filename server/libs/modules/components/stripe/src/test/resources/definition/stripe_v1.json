@@ -792,8 +792,8 @@
     } ],
     "title" : "Create Customer",
     "perform" : null,
-    "workflowNodeDescription" : null,
-    "processErrorResponse" : null
+    "processErrorResponse" : null,
+    "workflowNodeDescription" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -1092,11 +1092,9 @@
     } ],
     "title" : "Create Invoice",
     "perform" : null,
-    "workflowNodeDescription" : null,
-    "processErrorResponse" : null
+    "processErrorResponse" : null,
+    "workflowNodeDescription" : null
   } ],
-  "dataStream" : null,
-  "unifiedApi" : null,
   "triggers" : [ {
     "batch" : null,
     "deprecated" : null,
@@ -1678,8 +1676,8 @@
     "type" : "DYNAMIC_WEBHOOK",
     "webhookRawBody" : null,
     "workflowSyncExecution" : null,
-    "workflowNodeDescription" : null,
     "processErrorResponse" : null,
+    "workflowNodeDescription" : null,
     "poll" : null,
     "deduplicate" : null,
     "webhookDisable" : { },
@@ -1991,8 +1989,8 @@
     "type" : "DYNAMIC_WEBHOOK",
     "webhookRawBody" : null,
     "workflowSyncExecution" : null,
-    "workflowNodeDescription" : null,
     "processErrorResponse" : null,
+    "workflowNodeDescription" : null,
     "poll" : null,
     "deduplicate" : null,
     "webhookDisable" : { },
@@ -2004,6 +2002,8 @@
     "webhookValidate" : null,
     "webhookValidateOnEnable" : null
   } ],
+  "dataStream" : null,
+  "unifiedApi" : null,
   "connection" : {
     "authorizations" : [ {
       "detectOn" : null,

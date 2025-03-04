@@ -25,7 +25,7 @@
       "outputResponse" : {
         "outputSchema" : {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "Generated random integer value.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -48,7 +48,7 @@
       },
       "outputSchema" : {
         "advancedOption" : null,
-        "description" : null,
+        "description" : "Generated random integer value.",
         "displayCondition" : null,
         "expressionEnabled" : null,
         "hidden" : null,
@@ -123,7 +123,7 @@
       "outputResponse" : {
         "outputSchema" : {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "Generated random float value.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -149,7 +149,7 @@
       },
       "outputSchema" : {
         "advancedOption" : null,
-        "description" : null,
+        "description" : "Generated random float value.",
         "displayCondition" : null,
         "expressionEnabled" : null,
         "hidden" : null,
@@ -216,8 +216,8 @@
     "perform" : { },
     "workflowNodeDescription" : null
   } ],
-  "connection" : null,
   "dataStream" : null,
   "triggers" : null,
-  "unifiedApi" : null
+  "unifiedApi" : null,
+  "connection" : null
 }

@@ -25,7 +25,7 @@
       "outputResponse" : {
         "outputSchema" : {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "Compressed image.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -125,7 +125,7 @@
       },
       "outputSchema" : {
         "advancedOption" : null,
-        "description" : null,
+        "description" : "Compressed image.",
         "displayCondition" : null,
         "expressionEnabled" : null,
         "hidden" : null,
@@ -377,7 +377,7 @@
       "outputResponse" : {
         "outputSchema" : {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "Cropped image.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -477,7 +477,7 @@
       },
       "outputSchema" : {
         "advancedOption" : null,
-        "description" : null,
+        "description" : "Cropped image.",
         "displayCondition" : null,
         "expressionEnabled" : null,
         "hidden" : null,
@@ -917,7 +917,7 @@
       "outputResponse" : {
         "outputSchema" : {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "Base64 encoded image.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -941,7 +941,7 @@
       },
       "outputSchema" : {
         "advancedOption" : null,
-        "description" : null,
+        "description" : "Base64 encoded image.",
         "displayCondition" : null,
         "expressionEnabled" : null,
         "hidden" : null,
@@ -1075,7 +1075,7 @@
       "outputResponse" : {
         "outputSchema" : {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "Resized image.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -1175,7 +1175,7 @@
       },
       "outputSchema" : {
         "advancedOption" : null,
-        "description" : null,
+        "description" : "Resized image.",
         "displayCondition" : null,
         "expressionEnabled" : null,
         "hidden" : null,
@@ -1443,7 +1443,7 @@
       "outputResponse" : {
         "outputSchema" : {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "Rotated image.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -1543,7 +1543,7 @@
       },
       "outputSchema" : {
         "advancedOption" : null,
-        "description" : null,
+        "description" : "Rotated image.",
         "displayCondition" : null,
         "expressionEnabled" : null,
         "hidden" : null,
@@ -1793,8 +1793,8 @@
     "perform" : { },
     "workflowNodeDescription" : null
   } ],
-  "connection" : null,
   "dataStream" : null,
   "triggers" : null,
-  "unifiedApi" : null
+  "unifiedApi" : null,
+  "connection" : null
 }

@@ -635,7 +635,7 @@
     "properties" : null,
     "version" : 1,
     "authorizationRequired" : null,
-    "test" : null,
-    "baseUri" : null
+    "baseUri" : null,
+    "test" : null
   }
 }

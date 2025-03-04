@@ -42,7 +42,7 @@
           "options" : null,
           "properties" : [ {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "The URL linking directly to the issue on GitHub.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -62,7 +62,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "The URL of the repository where the issue is located.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -82,7 +82,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "ID of the issue.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -104,7 +104,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "A unique number identifying the issue within its repository.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -123,7 +123,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "The title or headline of the issue.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -143,7 +143,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "The current state of the issue, such as open or closed.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -163,7 +163,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "A list of users assigned to the issue.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -194,7 +194,7 @@
               "options" : null,
               "properties" : [ {
                 "advancedOption" : null,
-                "description" : null,
+                "description" : "The username of the assignee.",
                 "displayCondition" : null,
                 "expressionEnabled" : null,
                 "hidden" : null,
@@ -214,7 +214,7 @@
                 "optionsDataSource" : null
               }, {
                 "advancedOption" : null,
-                "description" : null,
+                "description" : "ID of the assignee.",
                 "displayCondition" : null,
                 "expressionEnabled" : null,
                 "hidden" : null,
@@ -234,7 +234,7 @@
                 "optionsDataSource" : null
               }, {
                 "advancedOption" : null,
-                "description" : null,
+                "description" : "The URL to the assignee's profile page.",
                 "displayCondition" : null,
                 "expressionEnabled" : null,
                 "hidden" : null,
@@ -254,7 +254,7 @@
                 "optionsDataSource" : null
               }, {
                 "advancedOption" : null,
-                "description" : null,
+                "description" : "The type of user, e.g., User or Organization.",
                 "displayCondition" : null,
                 "expressionEnabled" : null,
                 "hidden" : null,
@@ -284,7 +284,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "A collection of labels associated with the issue.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -315,7 +315,7 @@
               "options" : null,
               "properties" : [ {
                 "advancedOption" : null,
-                "description" : null,
+                "description" : "ID of the label.",
                 "displayCondition" : null,
                 "expressionEnabled" : null,
                 "hidden" : null,
@@ -335,7 +335,7 @@
                 "optionsDataSource" : null
               }, {
                 "advancedOption" : null,
-                "description" : null,
+                "description" : "Name of the label",
                 "displayCondition" : null,
                 "expressionEnabled" : null,
                 "hidden" : null,
@@ -355,7 +355,7 @@
                 "optionsDataSource" : null
               }, {
                 "advancedOption" : null,
-                "description" : null,
+                "description" : "A brief description of the label's purpose.",
                 "displayCondition" : null,
                 "expressionEnabled" : null,
                 "hidden" : null,
@@ -385,7 +385,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "The main content of the issue.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -410,6 +410,7 @@
         "sampleOutput" : null,
         "placeholder" : null
       },
+      "sampleOutput" : null,
       "outputSchema" : {
         "advancedOption" : null,
         "description" : null,
@@ -429,7 +430,7 @@
         "options" : null,
         "properties" : [ {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "The URL linking directly to the issue on GitHub.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -449,7 +450,7 @@
           "optionsDataSource" : null
         }, {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "The URL of the repository where the issue is located.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -469,7 +470,7 @@
           "optionsDataSource" : null
         }, {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "ID of the issue.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -491,7 +492,7 @@
           "optionsDataSource" : null
         }, {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "A unique number identifying the issue within its repository.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -510,7 +511,7 @@
           "optionsDataSource" : null
         }, {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "The title or headline of the issue.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -530,7 +531,7 @@
           "optionsDataSource" : null
         }, {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "The current state of the issue, such as open or closed.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -550,7 +551,7 @@
           "optionsDataSource" : null
         }, {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "A list of users assigned to the issue.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -581,7 +582,7 @@
             "options" : null,
             "properties" : [ {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "The username of the assignee.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -601,7 +602,7 @@
               "optionsDataSource" : null
             }, {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "ID of the assignee.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -621,7 +622,7 @@
               "optionsDataSource" : null
             }, {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "The URL to the assignee's profile page.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -641,7 +642,7 @@
               "optionsDataSource" : null
             }, {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "The type of user, e.g., User or Organization.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -671,7 +672,7 @@
           "optionsDataSource" : null
         }, {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "A collection of labels associated with the issue.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -702,7 +703,7 @@
             "options" : null,
             "properties" : [ {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "ID of the label.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -722,7 +723,7 @@
               "optionsDataSource" : null
             }, {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "Name of the label",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -742,7 +743,7 @@
               "optionsDataSource" : null
             }, {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "A brief description of the label's purpose.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -772,7 +773,7 @@
           "optionsDataSource" : null
         }, {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "The main content of the issue.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -793,8 +794,7 @@
         } ],
         "controlType" : "OBJECT_BUILDER",
         "optionsDataSource" : null
-      },
-      "sampleOutput" : null
+      }
     },
     "properties" : [ {
       "advancedOption" : null,
@@ -821,7 +821,7 @@
       }
     }, {
       "advancedOption" : null,
-      "description" : "The issue to add assignee to.",
+      "description" : "The number of the issue to add assignee to.",
       "displayCondition" : null,
       "expressionEnabled" : null,
       "hidden" : null,
@@ -831,7 +831,7 @@
       "type" : "STRING",
       "defaultValue" : null,
       "exampleValue" : null,
-      "label" : "Issue",
+      "label" : "Issue Number",
       "placeholder" : null,
       "controlType" : "SELECT",
       "languageId" : null,
@@ -903,7 +903,7 @@
       "outputResponse" : {
         "outputSchema" : {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "The list of labels added to the issue.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -934,7 +934,7 @@
             "options" : null,
             "properties" : [ {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "ID of the label",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -954,7 +954,7 @@
               "optionsDataSource" : null
             }, {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "Name of the label.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -974,13 +974,33 @@
               "optionsDataSource" : null
             }, {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "Description of the label.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
               "metadata" : { },
               "required" : null,
               "name" : "description",
+              "type" : "STRING",
+              "defaultValue" : null,
+              "exampleValue" : null,
+              "label" : null,
+              "placeholder" : null,
+              "controlType" : "TEXT",
+              "languageId" : null,
+              "maxLength" : null,
+              "minLength" : null,
+              "options" : null,
+              "optionsDataSource" : null
+            }, {
+              "advancedOption" : null,
+              "description" : "The hexadecimal color code for the label, without the leading #.",
+              "displayCondition" : null,
+              "expressionEnabled" : null,
+              "hidden" : null,
+              "metadata" : { },
+              "required" : null,
+              "name" : "color",
               "type" : "STRING",
               "defaultValue" : null,
               "exampleValue" : null,
@@ -1006,9 +1026,10 @@
         "sampleOutput" : null,
         "placeholder" : null
       },
+      "sampleOutput" : null,
       "outputSchema" : {
         "advancedOption" : null,
-        "description" : null,
+        "description" : "The list of labels added to the issue.",
         "displayCondition" : null,
         "expressionEnabled" : null,
         "hidden" : null,
@@ -1039,7 +1060,7 @@
           "options" : null,
           "properties" : [ {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "ID of the label",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -1059,7 +1080,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "Name of the label.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -1079,13 +1100,33 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "Description of the label.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
             "metadata" : { },
             "required" : null,
             "name" : "description",
+            "type" : "STRING",
+            "defaultValue" : null,
+            "exampleValue" : null,
+            "label" : null,
+            "placeholder" : null,
+            "controlType" : "TEXT",
+            "languageId" : null,
+            "maxLength" : null,
+            "minLength" : null,
+            "options" : null,
+            "optionsDataSource" : null
+          }, {
+            "advancedOption" : null,
+            "description" : "The hexadecimal color code for the label, without the leading #.",
+            "displayCondition" : null,
+            "expressionEnabled" : null,
+            "hidden" : null,
+            "metadata" : { },
+            "required" : null,
+            "name" : "color",
             "type" : "STRING",
             "defaultValue" : null,
             "exampleValue" : null,
@@ -1107,8 +1148,7 @@
         "options" : null,
         "controlType" : "ARRAY_BUILDER",
         "optionsDataSource" : null
-      },
-      "sampleOutput" : null
+      }
     },
     "properties" : [ {
       "advancedOption" : null,
@@ -1135,7 +1175,7 @@
       }
     }, {
       "advancedOption" : null,
-      "description" : "The issue to add labels to.",
+      "description" : "The number of the issue to add labels to.",
       "displayCondition" : null,
       "expressionEnabled" : null,
       "hidden" : null,
@@ -1145,7 +1185,7 @@
       "type" : "STRING",
       "defaultValue" : null,
       "exampleValue" : null,
-      "label" : "Issue",
+      "label" : "Issue Number",
       "placeholder" : null,
       "controlType" : "SELECT",
       "languageId" : null,
@@ -1234,7 +1274,7 @@
           "options" : null,
           "properties" : [ {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "The URL linking directly to the issue on GitHub.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -1254,7 +1294,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "The URL of the repository where the issue is located.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -1274,7 +1314,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "ID of the issue.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -1296,7 +1336,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "A unique number identifying the issue within its repository.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -1315,7 +1355,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "The title or headline of the issue.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -1335,7 +1375,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "The current state of the issue, such as open or closed.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -1355,7 +1395,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "A list of users assigned to the issue.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -1386,7 +1426,7 @@
               "options" : null,
               "properties" : [ {
                 "advancedOption" : null,
-                "description" : null,
+                "description" : "The username of the assignee.",
                 "displayCondition" : null,
                 "expressionEnabled" : null,
                 "hidden" : null,
@@ -1406,7 +1446,7 @@
                 "optionsDataSource" : null
               }, {
                 "advancedOption" : null,
-                "description" : null,
+                "description" : "ID of the assignee.",
                 "displayCondition" : null,
                 "expressionEnabled" : null,
                 "hidden" : null,
@@ -1426,7 +1466,7 @@
                 "optionsDataSource" : null
               }, {
                 "advancedOption" : null,
-                "description" : null,
+                "description" : "The URL to the assignee's profile page.",
                 "displayCondition" : null,
                 "expressionEnabled" : null,
                 "hidden" : null,
@@ -1446,7 +1486,7 @@
                 "optionsDataSource" : null
               }, {
                 "advancedOption" : null,
-                "description" : null,
+                "description" : "The type of user, e.g., User or Organization.",
                 "displayCondition" : null,
                 "expressionEnabled" : null,
                 "hidden" : null,
@@ -1476,7 +1516,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "A collection of labels associated with the issue.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -1507,7 +1547,7 @@
               "options" : null,
               "properties" : [ {
                 "advancedOption" : null,
-                "description" : null,
+                "description" : "ID of the label.",
                 "displayCondition" : null,
                 "expressionEnabled" : null,
                 "hidden" : null,
@@ -1527,7 +1567,7 @@
                 "optionsDataSource" : null
               }, {
                 "advancedOption" : null,
-                "description" : null,
+                "description" : "Name of the label",
                 "displayCondition" : null,
                 "expressionEnabled" : null,
                 "hidden" : null,
@@ -1547,7 +1587,7 @@
                 "optionsDataSource" : null
               }, {
                 "advancedOption" : null,
-                "description" : null,
+                "description" : "A brief description of the label's purpose.",
                 "displayCondition" : null,
                 "expressionEnabled" : null,
                 "hidden" : null,
@@ -1577,7 +1617,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "The main content of the issue.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -1602,6 +1642,7 @@
         "sampleOutput" : null,
         "placeholder" : null
       },
+      "sampleOutput" : null,
       "outputSchema" : {
         "advancedOption" : null,
         "description" : null,
@@ -1621,7 +1662,7 @@
         "options" : null,
         "properties" : [ {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "The URL linking directly to the issue on GitHub.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -1641,7 +1682,7 @@
           "optionsDataSource" : null
         }, {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "The URL of the repository where the issue is located.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -1661,7 +1702,7 @@
           "optionsDataSource" : null
         }, {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "ID of the issue.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -1683,7 +1724,7 @@
           "optionsDataSource" : null
         }, {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "A unique number identifying the issue within its repository.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -1702,7 +1743,7 @@
           "optionsDataSource" : null
         }, {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "The title or headline of the issue.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -1722,7 +1763,7 @@
           "optionsDataSource" : null
         }, {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "The current state of the issue, such as open or closed.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -1742,7 +1783,7 @@
           "optionsDataSource" : null
         }, {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "A list of users assigned to the issue.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -1773,7 +1814,7 @@
             "options" : null,
             "properties" : [ {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "The username of the assignee.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -1793,7 +1834,7 @@
               "optionsDataSource" : null
             }, {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "ID of the assignee.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -1813,7 +1854,7 @@
               "optionsDataSource" : null
             }, {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "The URL to the assignee's profile page.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -1833,7 +1874,7 @@
               "optionsDataSource" : null
             }, {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "The type of user, e.g., User or Organization.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -1863,7 +1904,7 @@
           "optionsDataSource" : null
         }, {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "A collection of labels associated with the issue.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -1894,7 +1935,7 @@
             "options" : null,
             "properties" : [ {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "ID of the label.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -1914,7 +1955,7 @@
               "optionsDataSource" : null
             }, {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "Name of the label",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -1934,7 +1975,7 @@
               "optionsDataSource" : null
             }, {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "A brief description of the label's purpose.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -1964,7 +2005,7 @@
           "optionsDataSource" : null
         }, {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "The main content of the issue.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -1985,8 +2026,7 @@
         } ],
         "controlType" : "OBJECT_BUILDER",
         "optionsDataSource" : null
-      },
-      "sampleOutput" : null
+      }
     },
     "properties" : [ {
       "advancedOption" : null,
@@ -2013,7 +2053,7 @@
       }
     }, {
       "advancedOption" : null,
-      "description" : "The issue to comment on.",
+      "description" : "The number of the issue to comment on.",
       "displayCondition" : null,
       "expressionEnabled" : null,
       "hidden" : null,
@@ -2023,7 +2063,7 @@
       "type" : "STRING",
       "defaultValue" : null,
       "exampleValue" : null,
-      "label" : "Issue",
+      "label" : "Issue Number",
       "placeholder" : null,
       "controlType" : "SELECT",
       "languageId" : null,
@@ -2088,7 +2128,7 @@
           "options" : null,
           "properties" : [ {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "The URL linking directly to the issue on GitHub.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -2108,7 +2148,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "The URL of the repository where the issue is located.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -2128,7 +2168,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "ID of the issue.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -2150,7 +2190,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "A unique number identifying the issue within its repository.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -2169,7 +2209,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "The title or headline of the issue.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -2189,7 +2229,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "The current state of the issue, such as open or closed.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -2209,7 +2249,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "A list of users assigned to the issue.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -2240,7 +2280,7 @@
               "options" : null,
               "properties" : [ {
                 "advancedOption" : null,
-                "description" : null,
+                "description" : "The username of the assignee.",
                 "displayCondition" : null,
                 "expressionEnabled" : null,
                 "hidden" : null,
@@ -2260,7 +2300,7 @@
                 "optionsDataSource" : null
               }, {
                 "advancedOption" : null,
-                "description" : null,
+                "description" : "ID of the assignee.",
                 "displayCondition" : null,
                 "expressionEnabled" : null,
                 "hidden" : null,
@@ -2280,7 +2320,7 @@
                 "optionsDataSource" : null
               }, {
                 "advancedOption" : null,
-                "description" : null,
+                "description" : "The URL to the assignee's profile page.",
                 "displayCondition" : null,
                 "expressionEnabled" : null,
                 "hidden" : null,
@@ -2300,7 +2340,7 @@
                 "optionsDataSource" : null
               }, {
                 "advancedOption" : null,
-                "description" : null,
+                "description" : "The type of user, e.g., User or Organization.",
                 "displayCondition" : null,
                 "expressionEnabled" : null,
                 "hidden" : null,
@@ -2330,7 +2370,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "A collection of labels associated with the issue.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -2361,7 +2401,7 @@
               "options" : null,
               "properties" : [ {
                 "advancedOption" : null,
-                "description" : null,
+                "description" : "ID of the label.",
                 "displayCondition" : null,
                 "expressionEnabled" : null,
                 "hidden" : null,
@@ -2381,7 +2421,7 @@
                 "optionsDataSource" : null
               }, {
                 "advancedOption" : null,
-                "description" : null,
+                "description" : "Name of the label",
                 "displayCondition" : null,
                 "expressionEnabled" : null,
                 "hidden" : null,
@@ -2401,7 +2441,7 @@
                 "optionsDataSource" : null
               }, {
                 "advancedOption" : null,
-                "description" : null,
+                "description" : "A brief description of the label's purpose.",
                 "displayCondition" : null,
                 "expressionEnabled" : null,
                 "hidden" : null,
@@ -2431,7 +2471,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "The main content of the issue.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -2456,6 +2496,7 @@
         "sampleOutput" : null,
         "placeholder" : null
       },
+      "sampleOutput" : null,
       "outputSchema" : {
         "advancedOption" : null,
         "description" : null,
@@ -2475,7 +2516,7 @@
         "options" : null,
         "properties" : [ {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "The URL linking directly to the issue on GitHub.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -2495,7 +2536,7 @@
           "optionsDataSource" : null
         }, {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "The URL of the repository where the issue is located.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -2515,7 +2556,7 @@
           "optionsDataSource" : null
         }, {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "ID of the issue.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -2537,7 +2578,7 @@
           "optionsDataSource" : null
         }, {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "A unique number identifying the issue within its repository.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -2556,7 +2597,7 @@
           "optionsDataSource" : null
         }, {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "The title or headline of the issue.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -2576,7 +2617,7 @@
           "optionsDataSource" : null
         }, {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "The current state of the issue, such as open or closed.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -2596,7 +2637,7 @@
           "optionsDataSource" : null
         }, {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "A list of users assigned to the issue.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -2627,7 +2668,7 @@
             "options" : null,
             "properties" : [ {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "The username of the assignee.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -2647,7 +2688,7 @@
               "optionsDataSource" : null
             }, {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "ID of the assignee.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -2667,7 +2708,7 @@
               "optionsDataSource" : null
             }, {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "The URL to the assignee's profile page.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -2687,7 +2728,7 @@
               "optionsDataSource" : null
             }, {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "The type of user, e.g., User or Organization.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -2717,7 +2758,7 @@
           "optionsDataSource" : null
         }, {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "A collection of labels associated with the issue.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -2748,7 +2789,7 @@
             "options" : null,
             "properties" : [ {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "ID of the label.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -2768,7 +2809,7 @@
               "optionsDataSource" : null
             }, {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "Name of the label",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -2788,7 +2829,7 @@
               "optionsDataSource" : null
             }, {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "A brief description of the label's purpose.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -2818,7 +2859,7 @@
           "optionsDataSource" : null
         }, {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "The main content of the issue.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -2839,8 +2880,7 @@
         } ],
         "controlType" : "OBJECT_BUILDER",
         "optionsDataSource" : null
-      },
-      "sampleOutput" : null
+      }
     },
     "properties" : [ {
       "advancedOption" : null,
@@ -2939,7 +2979,7 @@
           "options" : null,
           "properties" : [ {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "The URL linking directly to the issue on GitHub.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -2959,7 +2999,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "The URL of the repository where the issue is located.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -2979,7 +3019,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "ID of the issue.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -3001,7 +3041,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "A unique number identifying the issue within its repository.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -3020,7 +3060,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "The title or headline of the issue.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -3040,7 +3080,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "The current state of the issue, such as open or closed.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -3060,7 +3100,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "A list of users assigned to the issue.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -3091,7 +3131,7 @@
               "options" : null,
               "properties" : [ {
                 "advancedOption" : null,
-                "description" : null,
+                "description" : "The username of the assignee.",
                 "displayCondition" : null,
                 "expressionEnabled" : null,
                 "hidden" : null,
@@ -3111,7 +3151,7 @@
                 "optionsDataSource" : null
               }, {
                 "advancedOption" : null,
-                "description" : null,
+                "description" : "ID of the assignee.",
                 "displayCondition" : null,
                 "expressionEnabled" : null,
                 "hidden" : null,
@@ -3131,7 +3171,7 @@
                 "optionsDataSource" : null
               }, {
                 "advancedOption" : null,
-                "description" : null,
+                "description" : "The URL to the assignee's profile page.",
                 "displayCondition" : null,
                 "expressionEnabled" : null,
                 "hidden" : null,
@@ -3151,7 +3191,7 @@
                 "optionsDataSource" : null
               }, {
                 "advancedOption" : null,
-                "description" : null,
+                "description" : "The type of user, e.g., User or Organization.",
                 "displayCondition" : null,
                 "expressionEnabled" : null,
                 "hidden" : null,
@@ -3181,7 +3221,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "A collection of labels associated with the issue.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -3212,7 +3252,7 @@
               "options" : null,
               "properties" : [ {
                 "advancedOption" : null,
-                "description" : null,
+                "description" : "ID of the label.",
                 "displayCondition" : null,
                 "expressionEnabled" : null,
                 "hidden" : null,
@@ -3232,7 +3272,7 @@
                 "optionsDataSource" : null
               }, {
                 "advancedOption" : null,
-                "description" : null,
+                "description" : "Name of the label",
                 "displayCondition" : null,
                 "expressionEnabled" : null,
                 "hidden" : null,
@@ -3252,7 +3292,7 @@
                 "optionsDataSource" : null
               }, {
                 "advancedOption" : null,
-                "description" : null,
+                "description" : "A brief description of the label's purpose.",
                 "displayCondition" : null,
                 "expressionEnabled" : null,
                 "hidden" : null,
@@ -3282,7 +3322,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "The main content of the issue.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -3307,6 +3347,7 @@
         "sampleOutput" : null,
         "placeholder" : null
       },
+      "sampleOutput" : null,
       "outputSchema" : {
         "advancedOption" : null,
         "description" : null,
@@ -3326,7 +3367,7 @@
         "options" : null,
         "properties" : [ {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "The URL linking directly to the issue on GitHub.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -3346,7 +3387,7 @@
           "optionsDataSource" : null
         }, {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "The URL of the repository where the issue is located.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -3366,7 +3407,7 @@
           "optionsDataSource" : null
         }, {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "ID of the issue.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -3388,7 +3429,7 @@
           "optionsDataSource" : null
         }, {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "A unique number identifying the issue within its repository.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -3407,7 +3448,7 @@
           "optionsDataSource" : null
         }, {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "The title or headline of the issue.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -3427,7 +3468,7 @@
           "optionsDataSource" : null
         }, {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "The current state of the issue, such as open or closed.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -3447,7 +3488,7 @@
           "optionsDataSource" : null
         }, {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "A list of users assigned to the issue.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -3478,7 +3519,7 @@
             "options" : null,
             "properties" : [ {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "The username of the assignee.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -3498,7 +3539,7 @@
               "optionsDataSource" : null
             }, {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "ID of the assignee.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -3518,7 +3559,7 @@
               "optionsDataSource" : null
             }, {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "The URL to the assignee's profile page.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -3538,7 +3579,7 @@
               "optionsDataSource" : null
             }, {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "The type of user, e.g., User or Organization.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -3568,7 +3609,7 @@
           "optionsDataSource" : null
         }, {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "A collection of labels associated with the issue.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -3599,7 +3640,7 @@
             "options" : null,
             "properties" : [ {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "ID of the label.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -3619,7 +3660,7 @@
               "optionsDataSource" : null
             }, {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "Name of the label",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -3639,7 +3680,7 @@
               "optionsDataSource" : null
             }, {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "A brief description of the label's purpose.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -3669,7 +3710,7 @@
           "optionsDataSource" : null
         }, {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "The main content of the issue.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -3690,8 +3731,7 @@
         } ],
         "controlType" : "OBJECT_BUILDER",
         "optionsDataSource" : null
-      },
-      "sampleOutput" : null
+      }
     },
     "properties" : [ {
       "advancedOption" : null,
@@ -3718,7 +3758,7 @@
       }
     }, {
       "advancedOption" : null,
-      "description" : "The issue you want to get details from.",
+      "description" : "The number of the issue you want to get details from.",
       "displayCondition" : null,
       "expressionEnabled" : null,
       "hidden" : null,
@@ -3728,7 +3768,7 @@
       "type" : "STRING",
       "defaultValue" : null,
       "exampleValue" : null,
-      "label" : "Issue",
+      "label" : "Issue Number",
       "placeholder" : null,
       "controlType" : "SELECT",
       "languageId" : null,
@@ -3756,7 +3796,7 @@
       "outputResponse" : {
         "outputSchema" : {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "List of issues assigned to the authenticated user.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -3787,7 +3827,7 @@
             "options" : null,
             "properties" : [ {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "The URL linking directly to the issue on GitHub.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -3807,7 +3847,7 @@
               "optionsDataSource" : null
             }, {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "The URL of the repository where the issue is located.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -3827,7 +3867,7 @@
               "optionsDataSource" : null
             }, {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "ID of the issue.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -3849,7 +3889,7 @@
               "optionsDataSource" : null
             }, {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "A unique number identifying the issue within its repository.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -3868,7 +3908,7 @@
               "optionsDataSource" : null
             }, {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "The title or headline of the issue.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -3888,7 +3928,7 @@
               "optionsDataSource" : null
             }, {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "The current state of the issue, such as open or closed.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -3908,7 +3948,7 @@
               "optionsDataSource" : null
             }, {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "A list of users assigned to the issue.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -3939,7 +3979,7 @@
                 "options" : null,
                 "properties" : [ {
                   "advancedOption" : null,
-                  "description" : null,
+                  "description" : "The username of the assignee.",
                   "displayCondition" : null,
                   "expressionEnabled" : null,
                   "hidden" : null,
@@ -3959,7 +3999,7 @@
                   "optionsDataSource" : null
                 }, {
                   "advancedOption" : null,
-                  "description" : null,
+                  "description" : "ID of the assignee.",
                   "displayCondition" : null,
                   "expressionEnabled" : null,
                   "hidden" : null,
@@ -3979,7 +4019,7 @@
                   "optionsDataSource" : null
                 }, {
                   "advancedOption" : null,
-                  "description" : null,
+                  "description" : "The URL to the assignee's profile page.",
                   "displayCondition" : null,
                   "expressionEnabled" : null,
                   "hidden" : null,
@@ -3999,7 +4039,7 @@
                   "optionsDataSource" : null
                 }, {
                   "advancedOption" : null,
-                  "description" : null,
+                  "description" : "The type of user, e.g., User or Organization.",
                   "displayCondition" : null,
                   "expressionEnabled" : null,
                   "hidden" : null,
@@ -4029,7 +4069,7 @@
               "optionsDataSource" : null
             }, {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "A collection of labels associated with the issue.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -4060,7 +4100,7 @@
                 "options" : null,
                 "properties" : [ {
                   "advancedOption" : null,
-                  "description" : null,
+                  "description" : "ID of the label.",
                   "displayCondition" : null,
                   "expressionEnabled" : null,
                   "hidden" : null,
@@ -4080,7 +4120,7 @@
                   "optionsDataSource" : null
                 }, {
                   "advancedOption" : null,
-                  "description" : null,
+                  "description" : "Name of the label",
                   "displayCondition" : null,
                   "expressionEnabled" : null,
                   "hidden" : null,
@@ -4100,7 +4140,7 @@
                   "optionsDataSource" : null
                 }, {
                   "advancedOption" : null,
-                  "description" : null,
+                  "description" : "A brief description of the label's purpose.",
                   "displayCondition" : null,
                   "expressionEnabled" : null,
                   "hidden" : null,
@@ -4130,7 +4170,7 @@
               "optionsDataSource" : null
             }, {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "The main content of the issue.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -4162,9 +4202,10 @@
         "sampleOutput" : null,
         "placeholder" : null
       },
+      "sampleOutput" : null,
       "outputSchema" : {
         "advancedOption" : null,
-        "description" : null,
+        "description" : "List of issues assigned to the authenticated user.",
         "displayCondition" : null,
         "expressionEnabled" : null,
         "hidden" : null,
@@ -4195,7 +4236,7 @@
           "options" : null,
           "properties" : [ {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "The URL linking directly to the issue on GitHub.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -4215,7 +4256,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "The URL of the repository where the issue is located.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -4235,7 +4276,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "ID of the issue.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -4257,7 +4298,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "A unique number identifying the issue within its repository.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -4276,7 +4317,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "The title or headline of the issue.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -4296,7 +4337,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "The current state of the issue, such as open or closed.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -4316,7 +4357,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "A list of users assigned to the issue.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -4347,7 +4388,7 @@
               "options" : null,
               "properties" : [ {
                 "advancedOption" : null,
-                "description" : null,
+                "description" : "The username of the assignee.",
                 "displayCondition" : null,
                 "expressionEnabled" : null,
                 "hidden" : null,
@@ -4367,7 +4408,7 @@
                 "optionsDataSource" : null
               }, {
                 "advancedOption" : null,
-                "description" : null,
+                "description" : "ID of the assignee.",
                 "displayCondition" : null,
                 "expressionEnabled" : null,
                 "hidden" : null,
@@ -4387,7 +4428,7 @@
                 "optionsDataSource" : null
               }, {
                 "advancedOption" : null,
-                "description" : null,
+                "description" : "The URL to the assignee's profile page.",
                 "displayCondition" : null,
                 "expressionEnabled" : null,
                 "hidden" : null,
@@ -4407,7 +4448,7 @@
                 "optionsDataSource" : null
               }, {
                 "advancedOption" : null,
-                "description" : null,
+                "description" : "The type of user, e.g., User or Organization.",
                 "displayCondition" : null,
                 "expressionEnabled" : null,
                 "hidden" : null,
@@ -4437,7 +4478,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "A collection of labels associated with the issue.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -4468,7 +4509,7 @@
               "options" : null,
               "properties" : [ {
                 "advancedOption" : null,
-                "description" : null,
+                "description" : "ID of the label.",
                 "displayCondition" : null,
                 "expressionEnabled" : null,
                 "hidden" : null,
@@ -4488,7 +4529,7 @@
                 "optionsDataSource" : null
               }, {
                 "advancedOption" : null,
-                "description" : null,
+                "description" : "Name of the label",
                 "displayCondition" : null,
                 "expressionEnabled" : null,
                 "hidden" : null,
@@ -4508,7 +4549,7 @@
                 "optionsDataSource" : null
               }, {
                 "advancedOption" : null,
-                "description" : null,
+                "description" : "A brief description of the label's purpose.",
                 "displayCondition" : null,
                 "expressionEnabled" : null,
                 "hidden" : null,
@@ -4538,7 +4579,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "The main content of the issue.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -4566,8 +4607,7 @@
         "options" : null,
         "controlType" : "ARRAY_BUILDER",
         "optionsDataSource" : null
-      },
-      "sampleOutput" : null
+      }
     },
     "properties" : [ {
       "advancedOption" : null,
@@ -4662,7 +4702,7 @@
       "outputResponse" : {
         "outputSchema" : {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "List of issues in the repository.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -4693,7 +4733,7 @@
             "options" : null,
             "properties" : [ {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "The URL linking directly to the issue on GitHub.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -4713,7 +4753,7 @@
               "optionsDataSource" : null
             }, {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "The URL of the repository where the issue is located.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -4733,7 +4773,7 @@
               "optionsDataSource" : null
             }, {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "ID of the issue.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -4755,7 +4795,7 @@
               "optionsDataSource" : null
             }, {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "A unique number identifying the issue within its repository.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -4774,7 +4814,7 @@
               "optionsDataSource" : null
             }, {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "The title or headline of the issue.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -4794,7 +4834,7 @@
               "optionsDataSource" : null
             }, {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "The current state of the issue, such as open or closed.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -4814,7 +4854,7 @@
               "optionsDataSource" : null
             }, {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "A list of users assigned to the issue.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -4845,7 +4885,7 @@
                 "options" : null,
                 "properties" : [ {
                   "advancedOption" : null,
-                  "description" : null,
+                  "description" : "The username of the assignee.",
                   "displayCondition" : null,
                   "expressionEnabled" : null,
                   "hidden" : null,
@@ -4865,7 +4905,7 @@
                   "optionsDataSource" : null
                 }, {
                   "advancedOption" : null,
-                  "description" : null,
+                  "description" : "ID of the assignee.",
                   "displayCondition" : null,
                   "expressionEnabled" : null,
                   "hidden" : null,
@@ -4885,7 +4925,7 @@
                   "optionsDataSource" : null
                 }, {
                   "advancedOption" : null,
-                  "description" : null,
+                  "description" : "The URL to the assignee's profile page.",
                   "displayCondition" : null,
                   "expressionEnabled" : null,
                   "hidden" : null,
@@ -4905,7 +4945,7 @@
                   "optionsDataSource" : null
                 }, {
                   "advancedOption" : null,
-                  "description" : null,
+                  "description" : "The type of user, e.g., User or Organization.",
                   "displayCondition" : null,
                   "expressionEnabled" : null,
                   "hidden" : null,
@@ -4935,7 +4975,7 @@
               "optionsDataSource" : null
             }, {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "A collection of labels associated with the issue.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -4966,7 +5006,7 @@
                 "options" : null,
                 "properties" : [ {
                   "advancedOption" : null,
-                  "description" : null,
+                  "description" : "ID of the label.",
                   "displayCondition" : null,
                   "expressionEnabled" : null,
                   "hidden" : null,
@@ -4986,7 +5026,7 @@
                   "optionsDataSource" : null
                 }, {
                   "advancedOption" : null,
-                  "description" : null,
+                  "description" : "Name of the label",
                   "displayCondition" : null,
                   "expressionEnabled" : null,
                   "hidden" : null,
@@ -5006,7 +5046,7 @@
                   "optionsDataSource" : null
                 }, {
                   "advancedOption" : null,
-                  "description" : null,
+                  "description" : "A brief description of the label's purpose.",
                   "displayCondition" : null,
                   "expressionEnabled" : null,
                   "hidden" : null,
@@ -5036,7 +5076,7 @@
               "optionsDataSource" : null
             }, {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "The main content of the issue.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -5068,9 +5108,10 @@
         "sampleOutput" : null,
         "placeholder" : null
       },
+      "sampleOutput" : null,
       "outputSchema" : {
         "advancedOption" : null,
-        "description" : null,
+        "description" : "List of issues in the repository.",
         "displayCondition" : null,
         "expressionEnabled" : null,
         "hidden" : null,
@@ -5101,7 +5142,7 @@
           "options" : null,
           "properties" : [ {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "The URL linking directly to the issue on GitHub.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -5121,7 +5162,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "The URL of the repository where the issue is located.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -5141,7 +5182,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "ID of the issue.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -5163,7 +5204,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "A unique number identifying the issue within its repository.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -5182,7 +5223,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "The title or headline of the issue.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -5202,7 +5243,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "The current state of the issue, such as open or closed.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -5222,7 +5263,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "A list of users assigned to the issue.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -5253,7 +5294,7 @@
               "options" : null,
               "properties" : [ {
                 "advancedOption" : null,
-                "description" : null,
+                "description" : "The username of the assignee.",
                 "displayCondition" : null,
                 "expressionEnabled" : null,
                 "hidden" : null,
@@ -5273,7 +5314,7 @@
                 "optionsDataSource" : null
               }, {
                 "advancedOption" : null,
-                "description" : null,
+                "description" : "ID of the assignee.",
                 "displayCondition" : null,
                 "expressionEnabled" : null,
                 "hidden" : null,
@@ -5293,7 +5334,7 @@
                 "optionsDataSource" : null
               }, {
                 "advancedOption" : null,
-                "description" : null,
+                "description" : "The URL to the assignee's profile page.",
                 "displayCondition" : null,
                 "expressionEnabled" : null,
                 "hidden" : null,
@@ -5313,7 +5354,7 @@
                 "optionsDataSource" : null
               }, {
                 "advancedOption" : null,
-                "description" : null,
+                "description" : "The type of user, e.g., User or Organization.",
                 "displayCondition" : null,
                 "expressionEnabled" : null,
                 "hidden" : null,
@@ -5343,7 +5384,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "A collection of labels associated with the issue.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -5374,7 +5415,7 @@
               "options" : null,
               "properties" : [ {
                 "advancedOption" : null,
-                "description" : null,
+                "description" : "ID of the label.",
                 "displayCondition" : null,
                 "expressionEnabled" : null,
                 "hidden" : null,
@@ -5394,7 +5435,7 @@
                 "optionsDataSource" : null
               }, {
                 "advancedOption" : null,
-                "description" : null,
+                "description" : "Name of the label",
                 "displayCondition" : null,
                 "expressionEnabled" : null,
                 "hidden" : null,
@@ -5414,7 +5455,7 @@
                 "optionsDataSource" : null
               }, {
                 "advancedOption" : null,
-                "description" : null,
+                "description" : "A brief description of the label's purpose.",
                 "displayCondition" : null,
                 "expressionEnabled" : null,
                 "hidden" : null,
@@ -5444,7 +5485,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "The main content of the issue.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -5472,8 +5513,7 @@
         "options" : null,
         "controlType" : "ARRAY_BUILDER",
         "optionsDataSource" : null
-      },
-      "sampleOutput" : null
+      }
     },
     "properties" : [ {
       "advancedOption" : null,
@@ -5603,7 +5643,7 @@
             "options" : null,
             "properties" : [ {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "The URL linking directly to the issue on GitHub.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -5623,7 +5663,7 @@
               "optionsDataSource" : null
             }, {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "The URL of the repository where the issue is located.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -5643,7 +5683,7 @@
               "optionsDataSource" : null
             }, {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "ID of the issue.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -5665,7 +5705,7 @@
               "optionsDataSource" : null
             }, {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "A unique number identifying the issue within its repository.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -5684,7 +5724,7 @@
               "optionsDataSource" : null
             }, {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "The title or headline of the issue.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -5704,7 +5744,7 @@
               "optionsDataSource" : null
             }, {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "The current state of the issue, such as open or closed.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -5724,7 +5764,229 @@
               "optionsDataSource" : null
             }, {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "A list of users assigned to the issue.",
+              "displayCondition" : null,
+              "expressionEnabled" : null,
+              "hidden" : null,
+              "metadata" : { },
+              "required" : null,
+              "name" : "assignees",
+              "type" : "ARRAY",
+              "defaultValue" : null,
+              "exampleValue" : null,
+              "label" : null,
+              "placeholder" : null,
+              "items" : [ {
+                "advancedOption" : null,
+                "description" : null,
+                "displayCondition" : null,
+                "expressionEnabled" : null,
+                "hidden" : null,
+                "metadata" : { },
+                "required" : null,
+                "name" : null,
+                "type" : "OBJECT",
+                "defaultValue" : null,
+                "exampleValue" : null,
+                "label" : null,
+                "placeholder" : null,
+                "additionalProperties" : null,
+                "multipleValues" : null,
+                "options" : null,
+                "properties" : [ {
+                  "advancedOption" : null,
+                  "description" : "The username of the assignee.",
+                  "displayCondition" : null,
+                  "expressionEnabled" : null,
+                  "hidden" : null,
+                  "metadata" : { },
+                  "required" : null,
+                  "name" : "login",
+                  "type" : "STRING",
+                  "defaultValue" : null,
+                  "exampleValue" : null,
+                  "label" : null,
+                  "placeholder" : null,
+                  "controlType" : "TEXT",
+                  "languageId" : null,
+                  "maxLength" : null,
+                  "minLength" : null,
+                  "options" : null,
+                  "optionsDataSource" : null
+                }, {
+                  "advancedOption" : null,
+                  "description" : "ID of the assignee.",
+                  "displayCondition" : null,
+                  "expressionEnabled" : null,
+                  "hidden" : null,
+                  "metadata" : { },
+                  "required" : null,
+                  "name" : "id",
+                  "type" : "STRING",
+                  "defaultValue" : null,
+                  "exampleValue" : null,
+                  "label" : null,
+                  "placeholder" : null,
+                  "controlType" : "TEXT",
+                  "languageId" : null,
+                  "maxLength" : null,
+                  "minLength" : null,
+                  "options" : null,
+                  "optionsDataSource" : null
+                }, {
+                  "advancedOption" : null,
+                  "description" : "The URL to the assignee's profile page.",
+                  "displayCondition" : null,
+                  "expressionEnabled" : null,
+                  "hidden" : null,
+                  "metadata" : { },
+                  "required" : null,
+                  "name" : "html_url",
+                  "type" : "STRING",
+                  "defaultValue" : null,
+                  "exampleValue" : null,
+                  "label" : null,
+                  "placeholder" : null,
+                  "controlType" : "TEXT",
+                  "languageId" : null,
+                  "maxLength" : null,
+                  "minLength" : null,
+                  "options" : null,
+                  "optionsDataSource" : null
+                }, {
+                  "advancedOption" : null,
+                  "description" : "The type of user, e.g., User or Organization.",
+                  "displayCondition" : null,
+                  "expressionEnabled" : null,
+                  "hidden" : null,
+                  "metadata" : { },
+                  "required" : null,
+                  "name" : "type",
+                  "type" : "STRING",
+                  "defaultValue" : null,
+                  "exampleValue" : null,
+                  "label" : null,
+                  "placeholder" : null,
+                  "controlType" : "TEXT",
+                  "languageId" : null,
+                  "maxLength" : null,
+                  "minLength" : null,
+                  "options" : null,
+                  "optionsDataSource" : null
+                } ],
+                "controlType" : "OBJECT_BUILDER",
+                "optionsDataSource" : null
+              } ],
+              "maxItems" : null,
+              "minItems" : null,
+              "multipleValues" : null,
+              "options" : null,
+              "controlType" : "ARRAY_BUILDER",
+              "optionsDataSource" : null
+            }, {
+              "advancedOption" : null,
+              "description" : "A collection of labels associated with the issue.",
+              "displayCondition" : null,
+              "expressionEnabled" : null,
+              "hidden" : null,
+              "metadata" : { },
+              "required" : null,
+              "name" : "labels",
+              "type" : "ARRAY",
+              "defaultValue" : null,
+              "exampleValue" : null,
+              "label" : null,
+              "placeholder" : null,
+              "items" : [ {
+                "advancedOption" : null,
+                "description" : null,
+                "displayCondition" : null,
+                "expressionEnabled" : null,
+                "hidden" : null,
+                "metadata" : { },
+                "required" : null,
+                "name" : null,
+                "type" : "OBJECT",
+                "defaultValue" : null,
+                "exampleValue" : null,
+                "label" : null,
+                "placeholder" : null,
+                "additionalProperties" : null,
+                "multipleValues" : null,
+                "options" : null,
+                "properties" : [ {
+                  "advancedOption" : null,
+                  "description" : "ID of the label.",
+                  "displayCondition" : null,
+                  "expressionEnabled" : null,
+                  "hidden" : null,
+                  "metadata" : { },
+                  "required" : null,
+                  "name" : "id",
+                  "type" : "STRING",
+                  "defaultValue" : null,
+                  "exampleValue" : null,
+                  "label" : null,
+                  "placeholder" : null,
+                  "controlType" : "TEXT",
+                  "languageId" : null,
+                  "maxLength" : null,
+                  "minLength" : null,
+                  "options" : null,
+                  "optionsDataSource" : null
+                }, {
+                  "advancedOption" : null,
+                  "description" : "Name of the label",
+                  "displayCondition" : null,
+                  "expressionEnabled" : null,
+                  "hidden" : null,
+                  "metadata" : { },
+                  "required" : null,
+                  "name" : "name",
+                  "type" : "STRING",
+                  "defaultValue" : null,
+                  "exampleValue" : null,
+                  "label" : null,
+                  "placeholder" : null,
+                  "controlType" : "TEXT",
+                  "languageId" : null,
+                  "maxLength" : null,
+                  "minLength" : null,
+                  "options" : null,
+                  "optionsDataSource" : null
+                }, {
+                  "advancedOption" : null,
+                  "description" : "A brief description of the label's purpose.",
+                  "displayCondition" : null,
+                  "expressionEnabled" : null,
+                  "hidden" : null,
+                  "metadata" : { },
+                  "required" : null,
+                  "name" : "description",
+                  "type" : "STRING",
+                  "defaultValue" : null,
+                  "exampleValue" : null,
+                  "label" : null,
+                  "placeholder" : null,
+                  "controlType" : "TEXT",
+                  "languageId" : null,
+                  "maxLength" : null,
+                  "minLength" : null,
+                  "options" : null,
+                  "optionsDataSource" : null
+                } ],
+                "controlType" : "OBJECT_BUILDER",
+                "optionsDataSource" : null
+              } ],
+              "maxItems" : null,
+              "minItems" : null,
+              "multipleValues" : null,
+              "options" : null,
+              "controlType" : "ARRAY_BUILDER",
+              "optionsDataSource" : null
+            }, {
+              "advancedOption" : null,
+              "description" : "The main content of the issue.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -5747,7 +6009,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "Information about the author of the issue.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -5764,7 +6026,7 @@
             "options" : null,
             "properties" : [ {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "The username of the individual who created the issue.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -5784,7 +6046,7 @@
               "optionsDataSource" : null
             }, {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "ID of the sender.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -5806,33 +6068,13 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "The action performed on the issue, such as 'opened', 'closed', or 'reopened'.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
             "metadata" : { },
             "required" : null,
             "name" : "action",
-            "type" : "STRING",
-            "defaultValue" : null,
-            "exampleValue" : null,
-            "label" : null,
-            "placeholder" : null,
-            "controlType" : "TEXT",
-            "languageId" : null,
-            "maxLength" : null,
-            "minLength" : null,
-            "options" : null,
-            "optionsDataSource" : null
-          }, {
-            "advancedOption" : null,
-            "description" : null,
-            "displayCondition" : null,
-            "expressionEnabled" : null,
-            "hidden" : null,
-            "metadata" : { },
-            "required" : null,
-            "name" : "starred_at",
             "type" : "STRING",
             "defaultValue" : null,
             "exampleValue" : null,
@@ -5863,7 +6105,7 @@
             "options" : null,
             "properties" : [ {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "ID of the repository.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -5882,7 +6124,7 @@
               "optionsDataSource" : null
             }, {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "Name of the repository.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -5902,7 +6144,7 @@
               "optionsDataSource" : null
             }, {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "The full name of the repository, including the owner's username.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -5939,7 +6181,7 @@
               "options" : null,
               "properties" : [ {
                 "advancedOption" : null,
-                "description" : null,
+                "description" : "The username of the repository owner.",
                 "displayCondition" : null,
                 "expressionEnabled" : null,
                 "hidden" : null,
@@ -5959,7 +6201,7 @@
                 "optionsDataSource" : null
               }, {
                 "advancedOption" : null,
-                "description" : null,
+                "description" : "ID of the owner.",
                 "displayCondition" : null,
                 "expressionEnabled" : null,
                 "hidden" : null,
@@ -5981,7 +6223,7 @@
               "optionsDataSource" : null
             }, {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "The visibility status of the repository, such as public or private.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -6001,7 +6243,7 @@
               "optionsDataSource" : null
             }, {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "The total number of times the repository has been forked by other users.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -6020,7 +6262,7 @@
               "optionsDataSource" : null
             }, {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "The current number of open issues in the repository.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -6039,7 +6281,7 @@
               "optionsDataSource" : null
             }, {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "The name of the default branch in the repository, typically 'main' or 'master'.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -6067,6 +6309,7 @@
         "sampleOutput" : null,
         "placeholder" : null
       },
+      "sampleOutput" : null,
       "outputSchema" : {
         "advancedOption" : null,
         "description" : null,
@@ -6103,7 +6346,7 @@
           "options" : null,
           "properties" : [ {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "The URL linking directly to the issue on GitHub.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -6123,7 +6366,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "The URL of the repository where the issue is located.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -6143,7 +6386,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "ID of the issue.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -6165,7 +6408,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "A unique number identifying the issue within its repository.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -6184,7 +6427,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "The title or headline of the issue.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -6204,7 +6447,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "The current state of the issue, such as open or closed.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -6224,7 +6467,229 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "A list of users assigned to the issue.",
+            "displayCondition" : null,
+            "expressionEnabled" : null,
+            "hidden" : null,
+            "metadata" : { },
+            "required" : null,
+            "name" : "assignees",
+            "type" : "ARRAY",
+            "defaultValue" : null,
+            "exampleValue" : null,
+            "label" : null,
+            "placeholder" : null,
+            "items" : [ {
+              "advancedOption" : null,
+              "description" : null,
+              "displayCondition" : null,
+              "expressionEnabled" : null,
+              "hidden" : null,
+              "metadata" : { },
+              "required" : null,
+              "name" : null,
+              "type" : "OBJECT",
+              "defaultValue" : null,
+              "exampleValue" : null,
+              "label" : null,
+              "placeholder" : null,
+              "additionalProperties" : null,
+              "multipleValues" : null,
+              "options" : null,
+              "properties" : [ {
+                "advancedOption" : null,
+                "description" : "The username of the assignee.",
+                "displayCondition" : null,
+                "expressionEnabled" : null,
+                "hidden" : null,
+                "metadata" : { },
+                "required" : null,
+                "name" : "login",
+                "type" : "STRING",
+                "defaultValue" : null,
+                "exampleValue" : null,
+                "label" : null,
+                "placeholder" : null,
+                "controlType" : "TEXT",
+                "languageId" : null,
+                "maxLength" : null,
+                "minLength" : null,
+                "options" : null,
+                "optionsDataSource" : null
+              }, {
+                "advancedOption" : null,
+                "description" : "ID of the assignee.",
+                "displayCondition" : null,
+                "expressionEnabled" : null,
+                "hidden" : null,
+                "metadata" : { },
+                "required" : null,
+                "name" : "id",
+                "type" : "STRING",
+                "defaultValue" : null,
+                "exampleValue" : null,
+                "label" : null,
+                "placeholder" : null,
+                "controlType" : "TEXT",
+                "languageId" : null,
+                "maxLength" : null,
+                "minLength" : null,
+                "options" : null,
+                "optionsDataSource" : null
+              }, {
+                "advancedOption" : null,
+                "description" : "The URL to the assignee's profile page.",
+                "displayCondition" : null,
+                "expressionEnabled" : null,
+                "hidden" : null,
+                "metadata" : { },
+                "required" : null,
+                "name" : "html_url",
+                "type" : "STRING",
+                "defaultValue" : null,
+                "exampleValue" : null,
+                "label" : null,
+                "placeholder" : null,
+                "controlType" : "TEXT",
+                "languageId" : null,
+                "maxLength" : null,
+                "minLength" : null,
+                "options" : null,
+                "optionsDataSource" : null
+              }, {
+                "advancedOption" : null,
+                "description" : "The type of user, e.g., User or Organization.",
+                "displayCondition" : null,
+                "expressionEnabled" : null,
+                "hidden" : null,
+                "metadata" : { },
+                "required" : null,
+                "name" : "type",
+                "type" : "STRING",
+                "defaultValue" : null,
+                "exampleValue" : null,
+                "label" : null,
+                "placeholder" : null,
+                "controlType" : "TEXT",
+                "languageId" : null,
+                "maxLength" : null,
+                "minLength" : null,
+                "options" : null,
+                "optionsDataSource" : null
+              } ],
+              "controlType" : "OBJECT_BUILDER",
+              "optionsDataSource" : null
+            } ],
+            "maxItems" : null,
+            "minItems" : null,
+            "multipleValues" : null,
+            "options" : null,
+            "controlType" : "ARRAY_BUILDER",
+            "optionsDataSource" : null
+          }, {
+            "advancedOption" : null,
+            "description" : "A collection of labels associated with the issue.",
+            "displayCondition" : null,
+            "expressionEnabled" : null,
+            "hidden" : null,
+            "metadata" : { },
+            "required" : null,
+            "name" : "labels",
+            "type" : "ARRAY",
+            "defaultValue" : null,
+            "exampleValue" : null,
+            "label" : null,
+            "placeholder" : null,
+            "items" : [ {
+              "advancedOption" : null,
+              "description" : null,
+              "displayCondition" : null,
+              "expressionEnabled" : null,
+              "hidden" : null,
+              "metadata" : { },
+              "required" : null,
+              "name" : null,
+              "type" : "OBJECT",
+              "defaultValue" : null,
+              "exampleValue" : null,
+              "label" : null,
+              "placeholder" : null,
+              "additionalProperties" : null,
+              "multipleValues" : null,
+              "options" : null,
+              "properties" : [ {
+                "advancedOption" : null,
+                "description" : "ID of the label.",
+                "displayCondition" : null,
+                "expressionEnabled" : null,
+                "hidden" : null,
+                "metadata" : { },
+                "required" : null,
+                "name" : "id",
+                "type" : "STRING",
+                "defaultValue" : null,
+                "exampleValue" : null,
+                "label" : null,
+                "placeholder" : null,
+                "controlType" : "TEXT",
+                "languageId" : null,
+                "maxLength" : null,
+                "minLength" : null,
+                "options" : null,
+                "optionsDataSource" : null
+              }, {
+                "advancedOption" : null,
+                "description" : "Name of the label",
+                "displayCondition" : null,
+                "expressionEnabled" : null,
+                "hidden" : null,
+                "metadata" : { },
+                "required" : null,
+                "name" : "name",
+                "type" : "STRING",
+                "defaultValue" : null,
+                "exampleValue" : null,
+                "label" : null,
+                "placeholder" : null,
+                "controlType" : "TEXT",
+                "languageId" : null,
+                "maxLength" : null,
+                "minLength" : null,
+                "options" : null,
+                "optionsDataSource" : null
+              }, {
+                "advancedOption" : null,
+                "description" : "A brief description of the label's purpose.",
+                "displayCondition" : null,
+                "expressionEnabled" : null,
+                "hidden" : null,
+                "metadata" : { },
+                "required" : null,
+                "name" : "description",
+                "type" : "STRING",
+                "defaultValue" : null,
+                "exampleValue" : null,
+                "label" : null,
+                "placeholder" : null,
+                "controlType" : "TEXT",
+                "languageId" : null,
+                "maxLength" : null,
+                "minLength" : null,
+                "options" : null,
+                "optionsDataSource" : null
+              } ],
+              "controlType" : "OBJECT_BUILDER",
+              "optionsDataSource" : null
+            } ],
+            "maxItems" : null,
+            "minItems" : null,
+            "multipleValues" : null,
+            "options" : null,
+            "controlType" : "ARRAY_BUILDER",
+            "optionsDataSource" : null
+          }, {
+            "advancedOption" : null,
+            "description" : "The main content of the issue.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -6247,7 +6712,7 @@
           "optionsDataSource" : null
         }, {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "Information about the author of the issue.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -6264,7 +6729,7 @@
           "options" : null,
           "properties" : [ {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "The username of the individual who created the issue.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -6284,7 +6749,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "ID of the sender.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -6306,33 +6771,13 @@
           "optionsDataSource" : null
         }, {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "The action performed on the issue, such as 'opened', 'closed', or 'reopened'.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
           "metadata" : { },
           "required" : null,
           "name" : "action",
-          "type" : "STRING",
-          "defaultValue" : null,
-          "exampleValue" : null,
-          "label" : null,
-          "placeholder" : null,
-          "controlType" : "TEXT",
-          "languageId" : null,
-          "maxLength" : null,
-          "minLength" : null,
-          "options" : null,
-          "optionsDataSource" : null
-        }, {
-          "advancedOption" : null,
-          "description" : null,
-          "displayCondition" : null,
-          "expressionEnabled" : null,
-          "hidden" : null,
-          "metadata" : { },
-          "required" : null,
-          "name" : "starred_at",
           "type" : "STRING",
           "defaultValue" : null,
           "exampleValue" : null,
@@ -6363,7 +6808,7 @@
           "options" : null,
           "properties" : [ {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "ID of the repository.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -6382,7 +6827,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "Name of the repository.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -6402,7 +6847,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "The full name of the repository, including the owner's username.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -6439,7 +6884,7 @@
             "options" : null,
             "properties" : [ {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "The username of the repository owner.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -6459,7 +6904,7 @@
               "optionsDataSource" : null
             }, {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "ID of the owner.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -6481,7 +6926,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "The visibility status of the repository, such as public or private.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -6501,7 +6946,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "The total number of times the repository has been forked by other users.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -6520,7 +6965,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "The current number of open issues in the repository.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -6539,7 +6984,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "The name of the default branch in the repository, typically 'main' or 'master'.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -6563,8 +7008,7 @@
         } ],
         "controlType" : "OBJECT_BUILDER",
         "optionsDataSource" : null
-      },
-      "sampleOutput" : null
+      }
     },
     "properties" : [ {
       "advancedOption" : null,
@@ -6634,7 +7078,7 @@
           "options" : null,
           "properties" : [ {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "Number uniquely identifying the pull request within its repository.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -6670,7 +7114,7 @@
             "options" : null,
             "properties" : [ {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "ID of the pull request.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -6689,7 +7133,7 @@
               "optionsDataSource" : null
             }, {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "The current state of the pull request, such as open or closed.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -6709,7 +7153,7 @@
               "optionsDataSource" : null
             }, {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "The title of the pull request, summarizing its purpose or changes.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -6729,7 +7173,7 @@
               "optionsDataSource" : null
             }, {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "The main content of the pull request.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -6749,7 +7193,7 @@
               "optionsDataSource" : null
             }, {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "The total number of commits included in the pull request.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -6771,7 +7215,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "Information about the author of the pull request.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -6788,7 +7232,7 @@
             "options" : null,
             "properties" : [ {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "The username of the person who created the pull request.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -6808,7 +7252,7 @@
               "optionsDataSource" : null
             }, {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "ID of the sender.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -6830,7 +7274,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "The action performed on the pull request, such as opened, closed, or synchronized.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -6867,7 +7311,7 @@
             "options" : null,
             "properties" : [ {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "ID of the repository.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -6886,7 +7330,7 @@
               "optionsDataSource" : null
             }, {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "Name of the repository.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -6906,7 +7350,7 @@
               "optionsDataSource" : null
             }, {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "The full name of the repository, including the owner's username.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -6943,7 +7387,7 @@
               "options" : null,
               "properties" : [ {
                 "advancedOption" : null,
-                "description" : null,
+                "description" : "The username of the repository owner.",
                 "displayCondition" : null,
                 "expressionEnabled" : null,
                 "hidden" : null,
@@ -6963,7 +7407,7 @@
                 "optionsDataSource" : null
               }, {
                 "advancedOption" : null,
-                "description" : null,
+                "description" : "ID of the owner.",
                 "displayCondition" : null,
                 "expressionEnabled" : null,
                 "hidden" : null,
@@ -6985,7 +7429,7 @@
               "optionsDataSource" : null
             }, {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "The visibility status of the repository, such as public or private.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -7005,7 +7449,7 @@
               "optionsDataSource" : null
             }, {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "The total number of times the repository has been forked by other users.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -7024,7 +7468,7 @@
               "optionsDataSource" : null
             }, {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "The current number of open issues in the repository.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -7043,7 +7487,7 @@
               "optionsDataSource" : null
             }, {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "The name of the default branch in the repository, typically 'main' or 'master'.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -7071,6 +7515,7 @@
         "sampleOutput" : null,
         "placeholder" : null
       },
+      "sampleOutput" : null,
       "outputSchema" : {
         "advancedOption" : null,
         "description" : null,
@@ -7090,7 +7535,7 @@
         "options" : null,
         "properties" : [ {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "Number uniquely identifying the pull request within its repository.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -7126,7 +7571,7 @@
           "options" : null,
           "properties" : [ {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "ID of the pull request.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -7145,7 +7590,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "The current state of the pull request, such as open or closed.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -7165,7 +7610,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "The title of the pull request, summarizing its purpose or changes.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -7185,7 +7630,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "The main content of the pull request.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -7205,7 +7650,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "The total number of commits included in the pull request.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -7227,7 +7672,7 @@
           "optionsDataSource" : null
         }, {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "Information about the author of the pull request.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -7244,7 +7689,7 @@
           "options" : null,
           "properties" : [ {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "The username of the person who created the pull request.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -7264,7 +7709,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "ID of the sender.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -7286,7 +7731,7 @@
           "optionsDataSource" : null
         }, {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "The action performed on the pull request, such as opened, closed, or synchronized.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -7323,7 +7768,7 @@
           "options" : null,
           "properties" : [ {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "ID of the repository.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -7342,7 +7787,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "Name of the repository.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -7362,7 +7807,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "The full name of the repository, including the owner's username.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -7399,7 +7844,7 @@
             "options" : null,
             "properties" : [ {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "The username of the repository owner.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -7419,7 +7864,7 @@
               "optionsDataSource" : null
             }, {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "ID of the owner.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -7441,7 +7886,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "The visibility status of the repository, such as public or private.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -7461,7 +7906,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "The total number of times the repository has been forked by other users.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -7480,7 +7925,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "The current number of open issues in the repository.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -7499,7 +7944,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "The name of the default branch in the repository, typically 'main' or 'master'.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -7523,8 +7968,7 @@
         } ],
         "controlType" : "OBJECT_BUILDER",
         "optionsDataSource" : null
-      },
-      "sampleOutput" : null
+      }
     },
     "properties" : [ {
       "advancedOption" : null,

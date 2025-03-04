@@ -22,8 +22,52 @@
     "name" : "base64Decode",
     "outputDefinition" : {
       "output" : null,
-      "outputResponse" : null,
-      "outputSchema" : null,
+      "outputResponse" : {
+        "outputSchema" : {
+          "advancedOption" : null,
+          "description" : "Decoded content.",
+          "displayCondition" : null,
+          "expressionEnabled" : null,
+          "hidden" : null,
+          "metadata" : { },
+          "required" : null,
+          "name" : null,
+          "type" : "STRING",
+          "defaultValue" : null,
+          "exampleValue" : null,
+          "label" : null,
+          "placeholder" : null,
+          "controlType" : "TEXT",
+          "languageId" : null,
+          "maxLength" : null,
+          "minLength" : null,
+          "options" : null,
+          "optionsDataSource" : null
+        },
+        "sampleOutput" : null,
+        "placeholder" : null
+      },
+      "outputSchema" : {
+        "advancedOption" : null,
+        "description" : "Decoded content.",
+        "displayCondition" : null,
+        "expressionEnabled" : null,
+        "hidden" : null,
+        "metadata" : { },
+        "required" : null,
+        "name" : null,
+        "type" : "STRING",
+        "defaultValue" : null,
+        "exampleValue" : null,
+        "label" : null,
+        "placeholder" : null,
+        "controlType" : "TEXT",
+        "languageId" : null,
+        "maxLength" : null,
+        "minLength" : null,
+        "options" : null,
+        "optionsDataSource" : null
+      },
       "sampleOutput" : null
     },
     "properties" : [ {
@@ -91,7 +135,7 @@
       "outputResponse" : {
         "outputSchema" : {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "The concatenated text.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -115,7 +159,7 @@
       },
       "outputSchema" : {
         "advancedOption" : null,
-        "description" : null,
+        "description" : "The concatenated text.",
         "displayCondition" : null,
         "expressionEnabled" : null,
         "hidden" : null,
@@ -348,7 +392,7 @@
       "outputResponse" : {
         "outputSchema" : {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "True if the text contains the expression, false otherwise.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -376,7 +420,7 @@
       },
       "outputSchema" : {
         "advancedOption" : null,
-        "description" : null,
+        "description" : "True if the text contains the expression, false otherwise.",
         "displayCondition" : null,
         "expressionEnabled" : null,
         "hidden" : null,
@@ -458,7 +502,7 @@
       "outputResponse" : {
         "outputSchema" : {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "Markdown content.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -482,7 +526,7 @@
       },
       "outputSchema" : {
         "advancedOption" : null,
-        "description" : null,
+        "description" : "Markdown content.",
         "displayCondition" : null,
         "expressionEnabled" : null,
         "hidden" : null,
@@ -540,7 +584,7 @@
       "outputResponse" : {
         "outputSchema" : {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "HTML content.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -564,7 +608,7 @@
       },
       "outputSchema" : {
         "advancedOption" : null,
-        "description" : null,
+        "description" : "HTML content.",
         "displayCondition" : null,
         "expressionEnabled" : null,
         "hidden" : null,
@@ -622,7 +666,7 @@
       "outputResponse" : {
         "outputSchema" : {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "The text with replaced values.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -646,7 +690,7 @@
       },
       "outputSchema" : {
         "advancedOption" : null,
-        "description" : null,
+        "description" : "The text with replaced values.",
         "displayCondition" : null,
         "expressionEnabled" : null,
         "hidden" : null,
@@ -768,7 +812,7 @@
       "outputResponse" : {
         "outputSchema" : {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "List of elements.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -813,7 +857,7 @@
       },
       "outputSchema" : {
         "advancedOption" : null,
-        "description" : null,
+        "description" : "List of elements.",
         "displayCondition" : null,
         "expressionEnabled" : null,
         "hidden" : null,

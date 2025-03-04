@@ -25,7 +25,7 @@
       "outputResponse" : {
         "outputSchema" : {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "ID of the created subscriber.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -48,7 +48,7 @@
       },
       "outputSchema" : {
         "advancedOption" : null,
-        "description" : null,
+        "description" : "ID of the created subscriber.",
         "displayCondition" : null,
         "expressionEnabled" : null,
         "hidden" : null,
@@ -165,7 +165,7 @@
       "outputResponse" : {
         "outputSchema" : {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "ID of the created list.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -188,7 +188,7 @@
       },
       "outputSchema" : {
         "advancedOption" : null,
-        "description" : null,
+        "description" : "ID of the created list.",
         "displayCondition" : null,
         "expressionEnabled" : null,
         "hidden" : null,

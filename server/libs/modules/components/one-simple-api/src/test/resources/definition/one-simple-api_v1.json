@@ -1618,8 +1618,8 @@
       "optionsDataSource" : null
     } ],
     "title" : "Currency Converter",
-    "processErrorResponse" : null,
     "perform" : { },
+    "processErrorResponse" : null,
     "workflowNodeDescription" : null
   }, {
     "batch" : null,
@@ -1900,8 +1900,8 @@
       "optionsDataSource" : null
     } ],
     "title" : "URL Shortener",
-    "processErrorResponse" : null,
     "perform" : { },
+    "processErrorResponse" : null,
     "workflowNodeDescription" : null
   }, {
     "batch" : null,
@@ -2542,10 +2542,13 @@
       "optionsDataSource" : null
     } ],
     "title" : "Web Page Information",
-    "processErrorResponse" : null,
     "perform" : { },
+    "processErrorResponse" : null,
     "workflowNodeDescription" : null
   } ],
+  "dataStream" : null,
+  "triggers" : null,
+  "unifiedApi" : null,
   "connection" : {
     "authorizations" : [ {
       "detectOn" : null,
@@ -2576,16 +2579,16 @@
       "title" : null,
       "type" : "CUSTOM",
       "acquire" : null,
+      "refresh" : null,
+      "scopes" : null,
       "apply" : { },
+      "pkce" : null,
       "authorizationCallback" : null,
       "authorizationUrl" : null,
       "clientId" : null,
       "clientSecret" : null,
       "oauth2AuthorizationExtraQueryParameters" : null,
-      "pkce" : null,
-      "refresh" : null,
       "refreshUrl" : null,
-      "scopes" : null,
       "refreshToken" : null,
       "tokenUrl" : null
     } ],
@@ -2594,8 +2597,5 @@
     "authorizationRequired" : null,
     "baseUri" : { },
     "test" : null
-  },
-  "dataStream" : null,
-  "triggers" : null,
-  "unifiedApi" : null
+  }
 }

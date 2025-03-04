@@ -53,6 +53,8 @@
     "type" : "STATIC_WEBHOOK",
     "webhookRawBody" : null,
     "workflowSyncExecution" : null,
+    "deduplicate" : null,
+    "webhookDisable" : null,
     "webhookEnable" : null,
     "dynamicWebhookRefresh" : null,
     "webhookRequest" : { },
@@ -62,9 +64,7 @@
     "processErrorResponse" : null,
     "webhookValidate" : null,
     "webhookValidateOnEnable" : null,
-    "workflowNodeDescription" : null,
-    "deduplicate" : null,
-    "webhookDisable" : null
+    "workflowNodeDescription" : null
   } ],
   "unifiedApi" : null,
   "version" : 1,

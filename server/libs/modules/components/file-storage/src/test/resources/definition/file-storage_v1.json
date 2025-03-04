@@ -28,7 +28,7 @@
       "outputResponse" : {
         "outputSchema" : {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "File content.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -50,10 +50,9 @@
         "sampleOutput" : "Sample content",
         "placeholder" : null
       },
-      "sampleOutput" : "Sample content",
       "outputSchema" : {
         "advancedOption" : null,
-        "description" : null,
+        "description" : "File content.",
         "displayCondition" : null,
         "expressionEnabled" : null,
         "hidden" : null,
@@ -71,7 +70,8 @@
         "minLength" : null,
         "options" : null,
         "optionsDataSource" : null
-      }
+      },
+      "sampleOutput" : "Sample content"
     },
     "properties" : [ {
       "advancedOption" : null,
@@ -186,7 +186,7 @@
       "outputResponse" : {
         "outputSchema" : {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "File entry with the written data.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -284,10 +284,9 @@
         "sampleOutput" : null,
         "placeholder" : null
       },
-      "sampleOutput" : null,
       "outputSchema" : {
         "advancedOption" : null,
-        "description" : null,
+        "description" : "File entry with the written data.",
         "displayCondition" : null,
         "expressionEnabled" : null,
         "hidden" : null,
@@ -381,7 +380,8 @@
           "optionsDataSource" : null
         } ],
         "controlType" : "FILE_ENTRY"
-      }
+      },
+      "sampleOutput" : null
     },
     "properties" : [ {
       "advancedOption" : null,
@@ -440,7 +440,7 @@
       "outputResponse" : {
         "outputSchema" : {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "Downloaded file.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -538,10 +538,9 @@
         "sampleOutput" : null,
         "placeholder" : null
       },
-      "sampleOutput" : null,
       "outputSchema" : {
         "advancedOption" : null,
-        "description" : null,
+        "description" : "Downloaded file.",
         "displayCondition" : null,
         "expressionEnabled" : null,
         "hidden" : null,
@@ -635,7 +634,8 @@
           "optionsDataSource" : null
         } ],
         "controlType" : "FILE_ENTRY"
-      }
+      },
+      "sampleOutput" : null
     },
     "properties" : [ {
       "advancedOption" : null,
@@ -683,8 +683,8 @@
     "processErrorResponse" : null,
     "workflowNodeDescription" : null
   } ],
-  "connection" : null,
   "dataStream" : null,
   "triggers" : null,
-  "unifiedApi" : null
+  "unifiedApi" : null,
+  "connection" : null
 }

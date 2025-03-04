@@ -312,8 +312,8 @@
     } ],
     "title" : "Create Company",
     "perform" : null,
-    "workflowNodeDescription" : null,
-    "processErrorResponse" : null
+    "processErrorResponse" : null,
+    "workflowNodeDescription" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -679,8 +679,8 @@
     } ],
     "title" : "Create Contact",
     "perform" : null,
-    "workflowNodeDescription" : null,
-    "processErrorResponse" : null
+    "processErrorResponse" : null,
+    "workflowNodeDescription" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -1086,9 +1086,12 @@
     } ],
     "title" : "Create Ticket",
     "perform" : null,
-    "workflowNodeDescription" : null,
-    "processErrorResponse" : null
+    "processErrorResponse" : null,
+    "workflowNodeDescription" : null
   } ],
+  "dataStream" : null,
+  "unifiedApi" : null,
+  "triggers" : [ ],
   "connection" : {
     "authorizations" : [ {
       "detectOn" : null,
@@ -1157,8 +1160,5 @@
     "authorizationRequired" : null,
     "baseUri" : { },
     "test" : null
-  },
-  "dataStream" : null,
-  "unifiedApi" : null,
-  "triggers" : [ ]
+  }
 }

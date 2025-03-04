@@ -42,7 +42,7 @@
           "options" : null,
           "properties" : [ {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "The ID of the file.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -62,7 +62,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "Identifies what kind of resource this is.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -82,7 +82,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "The MIME type of the file.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -102,7 +102,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "The name of the file.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -146,7 +146,7 @@
         "options" : null,
         "properties" : [ {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "The ID of the file.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -166,7 +166,7 @@
           "optionsDataSource" : null
         }, {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "Identifies what kind of resource this is.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -186,7 +186,7 @@
           "optionsDataSource" : null
         }, {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "The MIME type of the file.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -206,7 +206,7 @@
           "optionsDataSource" : null
         }, {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "The name of the file.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -330,7 +330,7 @@
           "options" : null,
           "properties" : [ {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "The ID of the file.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -350,7 +350,27 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "Identifies what kind of resource this is.",
+            "displayCondition" : null,
+            "expressionEnabled" : null,
+            "hidden" : null,
+            "metadata" : { },
+            "required" : null,
+            "name" : "kind",
+            "type" : "STRING",
+            "defaultValue" : null,
+            "exampleValue" : null,
+            "label" : null,
+            "placeholder" : null,
+            "controlType" : "TEXT",
+            "languageId" : null,
+            "maxLength" : null,
+            "minLength" : null,
+            "options" : null,
+            "optionsDataSource" : null
+          }, {
+            "advancedOption" : null,
+            "description" : "The MIME type of the file.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -370,7 +390,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "The name of the file.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -393,9 +413,9 @@
           "optionsDataSource" : null
         },
         "sampleOutput" : {
+          "name" : "new-file.txt",
           "id" : "1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr",
-          "mimeType" : "plain/text",
-          "name" : "new-file.txt"
+          "mimeType" : "plain/text"
         },
         "placeholder" : null
       },
@@ -418,7 +438,7 @@
         "options" : null,
         "properties" : [ {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "The ID of the file.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -438,7 +458,27 @@
           "optionsDataSource" : null
         }, {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "Identifies what kind of resource this is.",
+          "displayCondition" : null,
+          "expressionEnabled" : null,
+          "hidden" : null,
+          "metadata" : { },
+          "required" : null,
+          "name" : "kind",
+          "type" : "STRING",
+          "defaultValue" : null,
+          "exampleValue" : null,
+          "label" : null,
+          "placeholder" : null,
+          "controlType" : "TEXT",
+          "languageId" : null,
+          "maxLength" : null,
+          "minLength" : null,
+          "options" : null,
+          "optionsDataSource" : null
+        }, {
+          "advancedOption" : null,
+          "description" : "The MIME type of the file.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -458,7 +498,7 @@
           "optionsDataSource" : null
         }, {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "The name of the file.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -481,9 +521,9 @@
         "optionsDataSource" : null
       },
       "sampleOutput" : {
+        "name" : "new-file.txt",
         "id" : "1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr",
-        "mimeType" : "plain/text",
-        "name" : "new-file.txt"
+        "mimeType" : "plain/text"
       }
     },
     "properties" : [ {
@@ -563,7 +603,7 @@
           "options" : null,
           "properties" : [ {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "The ID of the file.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -583,7 +623,27 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "Identifies what kind of resource this is.",
+            "displayCondition" : null,
+            "expressionEnabled" : null,
+            "hidden" : null,
+            "metadata" : { },
+            "required" : null,
+            "name" : "kind",
+            "type" : "STRING",
+            "defaultValue" : null,
+            "exampleValue" : null,
+            "label" : null,
+            "placeholder" : null,
+            "controlType" : "TEXT",
+            "languageId" : null,
+            "maxLength" : null,
+            "minLength" : null,
+            "options" : null,
+            "optionsDataSource" : null
+          }, {
+            "advancedOption" : null,
+            "description" : "The MIME type of the file.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -603,7 +663,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "The name of the file.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -626,9 +686,9 @@
           "optionsDataSource" : null
         },
         "sampleOutput" : {
+          "name" : "new-file.txt",
           "id" : "1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr",
-          "mimeType" : "plain/text",
-          "name" : "new-file.txt"
+          "mimeType" : "plain/text"
         },
         "placeholder" : null
       },
@@ -651,7 +711,7 @@
         "options" : null,
         "properties" : [ {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "The ID of the file.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -671,7 +731,27 @@
           "optionsDataSource" : null
         }, {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "Identifies what kind of resource this is.",
+          "displayCondition" : null,
+          "expressionEnabled" : null,
+          "hidden" : null,
+          "metadata" : { },
+          "required" : null,
+          "name" : "kind",
+          "type" : "STRING",
+          "defaultValue" : null,
+          "exampleValue" : null,
+          "label" : null,
+          "placeholder" : null,
+          "controlType" : "TEXT",
+          "languageId" : null,
+          "maxLength" : null,
+          "minLength" : null,
+          "options" : null,
+          "optionsDataSource" : null
+        }, {
+          "advancedOption" : null,
+          "description" : "The MIME type of the file.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -691,7 +771,7 @@
           "optionsDataSource" : null
         }, {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "The name of the file.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -714,9 +794,9 @@
         "optionsDataSource" : null
       },
       "sampleOutput" : {
+        "name" : "new-file.txt",
         "id" : "1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr",
-        "mimeType" : "plain/text",
-        "name" : "new-file.txt"
+        "mimeType" : "plain/text"
       }
     },
     "properties" : [ {
@@ -1121,7 +1201,7 @@
           "options" : null,
           "properties" : [ {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "The ID of the file.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -1141,7 +1221,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "Identifies what kind of resource this is.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -1161,7 +1241,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "The MIME type of the file.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -1181,7 +1261,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "The name of the file.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -1225,7 +1305,7 @@
         "options" : null,
         "properties" : [ {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "The ID of the file.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -1245,7 +1325,7 @@
           "optionsDataSource" : null
         }, {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "Identifies what kind of resource this is.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -1265,7 +1345,7 @@
           "optionsDataSource" : null
         }, {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "The MIME type of the file.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -1285,7 +1365,7 @@
           "optionsDataSource" : null
         }, {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "The name of the file.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -1366,7 +1446,7 @@
           "options" : null,
           "properties" : [ {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "The ID of the file.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -1386,7 +1466,27 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "Identifies what kind of resource this is.",
+            "displayCondition" : null,
+            "expressionEnabled" : null,
+            "hidden" : null,
+            "metadata" : { },
+            "required" : null,
+            "name" : "kind",
+            "type" : "STRING",
+            "defaultValue" : null,
+            "exampleValue" : null,
+            "label" : null,
+            "placeholder" : null,
+            "controlType" : "TEXT",
+            "languageId" : null,
+            "maxLength" : null,
+            "minLength" : null,
+            "options" : null,
+            "optionsDataSource" : null
+          }, {
+            "advancedOption" : null,
+            "description" : "The MIME type of the file.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -1406,7 +1506,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "The name of the file.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -1429,9 +1529,9 @@
           "optionsDataSource" : null
         },
         "sampleOutput" : {
+          "name" : "new-file.txt",
           "id" : "1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr",
-          "mimeType" : "plain/text",
-          "name" : "new-file.txt"
+          "mimeType" : "plain/text"
         },
         "placeholder" : null
       },
@@ -1454,7 +1554,7 @@
         "options" : null,
         "properties" : [ {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "The ID of the file.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -1474,7 +1574,27 @@
           "optionsDataSource" : null
         }, {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "Identifies what kind of resource this is.",
+          "displayCondition" : null,
+          "expressionEnabled" : null,
+          "hidden" : null,
+          "metadata" : { },
+          "required" : null,
+          "name" : "kind",
+          "type" : "STRING",
+          "defaultValue" : null,
+          "exampleValue" : null,
+          "label" : null,
+          "placeholder" : null,
+          "controlType" : "TEXT",
+          "languageId" : null,
+          "maxLength" : null,
+          "minLength" : null,
+          "options" : null,
+          "optionsDataSource" : null
+        }, {
+          "advancedOption" : null,
+          "description" : "The MIME type of the file.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -1494,7 +1614,7 @@
           "optionsDataSource" : null
         }, {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "The name of the file.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -1517,9 +1637,9 @@
         "optionsDataSource" : null
       },
       "sampleOutput" : {
+        "name" : "new-file.txt",
         "id" : "1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr",
-        "mimeType" : "plain/text",
-        "name" : "new-file.txt"
+        "mimeType" : "plain/text"
       }
     },
     "properties" : [ {
@@ -1716,7 +1836,6 @@
     "baseUri" : null,
     "test" : null
   },
-  "dataStream" : null,
   "triggers" : [ {
     "batch" : null,
     "deprecated" : null,
@@ -1728,7 +1847,7 @@
       "outputResponse" : {
         "outputSchema" : {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "List of files that were uploaded to Google Drive.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -1759,7 +1878,7 @@
             "options" : null,
             "properties" : [ {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "The ID of the file.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -1779,7 +1898,27 @@
               "optionsDataSource" : null
             }, {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "Identifies what kind of resource this is.",
+              "displayCondition" : null,
+              "expressionEnabled" : null,
+              "hidden" : null,
+              "metadata" : { },
+              "required" : null,
+              "name" : "kind",
+              "type" : "STRING",
+              "defaultValue" : null,
+              "exampleValue" : null,
+              "label" : null,
+              "placeholder" : null,
+              "controlType" : "TEXT",
+              "languageId" : null,
+              "maxLength" : null,
+              "minLength" : null,
+              "options" : null,
+              "optionsDataSource" : null
+            }, {
+              "advancedOption" : null,
+              "description" : "The MIME type of the file.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -1799,7 +1938,7 @@
               "optionsDataSource" : null
             }, {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "The name of the file.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -1833,7 +1972,7 @@
       },
       "outputSchema" : {
         "advancedOption" : null,
-        "description" : null,
+        "description" : "List of files that were uploaded to Google Drive.",
         "displayCondition" : null,
         "expressionEnabled" : null,
         "hidden" : null,
@@ -1864,7 +2003,7 @@
           "options" : null,
           "properties" : [ {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "The ID of the file.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -1884,7 +2023,27 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "Identifies what kind of resource this is.",
+            "displayCondition" : null,
+            "expressionEnabled" : null,
+            "hidden" : null,
+            "metadata" : { },
+            "required" : null,
+            "name" : "kind",
+            "type" : "STRING",
+            "defaultValue" : null,
+            "exampleValue" : null,
+            "label" : null,
+            "placeholder" : null,
+            "controlType" : "TEXT",
+            "languageId" : null,
+            "maxLength" : null,
+            "minLength" : null,
+            "options" : null,
+            "optionsDataSource" : null
+          }, {
+            "advancedOption" : null,
+            "description" : "The MIME type of the file.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -1904,7 +2063,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "The name of the file.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -1986,7 +2145,7 @@
       "outputResponse" : {
         "outputSchema" : {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "List of folders that were uploaded to Google Drive.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -2017,7 +2176,7 @@
             "options" : null,
             "properties" : [ {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "The ID of the file.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -2037,7 +2196,27 @@
               "optionsDataSource" : null
             }, {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "Identifies what kind of resource this is.",
+              "displayCondition" : null,
+              "expressionEnabled" : null,
+              "hidden" : null,
+              "metadata" : { },
+              "required" : null,
+              "name" : "kind",
+              "type" : "STRING",
+              "defaultValue" : null,
+              "exampleValue" : null,
+              "label" : null,
+              "placeholder" : null,
+              "controlType" : "TEXT",
+              "languageId" : null,
+              "maxLength" : null,
+              "minLength" : null,
+              "options" : null,
+              "optionsDataSource" : null
+            }, {
+              "advancedOption" : null,
+              "description" : "The MIME type of the file.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -2057,7 +2236,7 @@
               "optionsDataSource" : null
             }, {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "The name of the file.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -2091,7 +2270,7 @@
       },
       "outputSchema" : {
         "advancedOption" : null,
-        "description" : null,
+        "description" : "List of folders that were uploaded to Google Drive.",
         "displayCondition" : null,
         "expressionEnabled" : null,
         "hidden" : null,
@@ -2122,7 +2301,7 @@
           "options" : null,
           "properties" : [ {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "The ID of the file.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -2142,7 +2321,27 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "Identifies what kind of resource this is.",
+            "displayCondition" : null,
+            "expressionEnabled" : null,
+            "hidden" : null,
+            "metadata" : { },
+            "required" : null,
+            "name" : "kind",
+            "type" : "STRING",
+            "defaultValue" : null,
+            "exampleValue" : null,
+            "label" : null,
+            "placeholder" : null,
+            "controlType" : "TEXT",
+            "languageId" : null,
+            "maxLength" : null,
+            "minLength" : null,
+            "options" : null,
+            "optionsDataSource" : null
+          }, {
+            "advancedOption" : null,
+            "description" : "The MIME type of the file.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -2162,7 +2361,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "The name of the file.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -2234,5 +2433,6 @@
     "webhookValidate" : null,
     "webhookValidateOnEnable" : null
   } ],
+  "dataStream" : null,
   "unifiedApi" : null
 }

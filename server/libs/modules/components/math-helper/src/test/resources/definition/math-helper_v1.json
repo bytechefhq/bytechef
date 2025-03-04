@@ -25,7 +25,7 @@
       "outputResponse" : {
         "outputSchema" : {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "Result of addition.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -51,7 +51,7 @@
       },
       "outputSchema" : {
         "advancedOption" : null,
-        "description" : null,
+        "description" : "Result of addition.",
         "displayCondition" : null,
         "expressionEnabled" : null,
         "hidden" : null,
@@ -135,7 +135,7 @@
       "outputResponse" : {
         "outputSchema" : {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "Result of division.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -161,7 +161,7 @@
       },
       "outputSchema" : {
         "advancedOption" : null,
-        "description" : null,
+        "description" : "Result of division.",
         "displayCondition" : null,
         "expressionEnabled" : null,
         "hidden" : null,
@@ -245,7 +245,7 @@
       "outputResponse" : {
         "outputSchema" : {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "Result of modulo.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -271,7 +271,7 @@
       },
       "outputSchema" : {
         "advancedOption" : null,
-        "description" : null,
+        "description" : "Result of modulo.",
         "displayCondition" : null,
         "expressionEnabled" : null,
         "hidden" : null,
@@ -355,7 +355,7 @@
       "outputResponse" : {
         "outputSchema" : {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "Result of multiplication.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -381,7 +381,7 @@
       },
       "outputSchema" : {
         "advancedOption" : null,
-        "description" : null,
+        "description" : "Result of multiplication.",
         "displayCondition" : null,
         "expressionEnabled" : null,
         "hidden" : null,
@@ -465,7 +465,7 @@
       "outputResponse" : {
         "outputSchema" : {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "Result of subtraction.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -491,7 +491,7 @@
       },
       "outputSchema" : {
         "advancedOption" : null,
-        "description" : null,
+        "description" : "Result of subtraction.",
         "displayCondition" : null,
         "expressionEnabled" : null,
         "hidden" : null,

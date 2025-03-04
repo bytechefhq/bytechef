@@ -785,8 +785,8 @@
     "processErrorResponse" : null
   } ],
   "triggers" : [ ],
-  "dataStream" : null,
   "unifiedApi" : null,
+  "dataStream" : null,
   "connection" : {
     "authorizations" : [ {
       "detectOn" : null,

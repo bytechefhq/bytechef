@@ -107,7 +107,7 @@
       "outputResponse" : {
         "outputSchema" : {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "The XML string.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -131,7 +131,7 @@
       },
       "outputSchema" : {
         "advancedOption" : null,
-        "description" : null,
+        "description" : "The XML string.",
         "displayCondition" : null,
         "expressionEnabled" : null,
         "hidden" : null,
@@ -227,8 +227,8 @@
     "processErrorResponse" : null,
     "workflowNodeDescription" : null
   } ],
-  "connection" : null,
-  "triggers" : null,
   "dataStream" : null,
-  "unifiedApi" : null
+  "triggers" : null,
+  "unifiedApi" : null,
+  "connection" : null
 }

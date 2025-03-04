@@ -306,8 +306,8 @@
     } ],
     "title" : "Send Channel Message",
     "perform" : null,
-    "workflowNodeDescription" : null,
-    "processErrorResponse" : null
+    "processErrorResponse" : null,
+    "workflowNodeDescription" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -575,8 +575,8 @@
     } ],
     "title" : "Create Channel",
     "perform" : null,
-    "workflowNodeDescription" : null,
-    "processErrorResponse" : null
+    "processErrorResponse" : null,
+    "workflowNodeDescription" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -807,12 +807,9 @@
     } ],
     "title" : "Send Direct Message",
     "perform" : { },
-    "workflowNodeDescription" : null,
-    "processErrorResponse" : null
+    "processErrorResponse" : null,
+    "workflowNodeDescription" : null
   } ],
-  "dataStream" : null,
-  "unifiedApi" : null,
-  "triggers" : [ ],
   "connection" : {
     "authorizations" : [ {
       "detectOn" : null,
@@ -861,5 +858,8 @@
     "authorizationRequired" : null,
     "baseUri" : { },
     "test" : null
-  }
+  },
+  "dataStream" : null,
+  "unifiedApi" : null,
+  "triggers" : [ ]
 }

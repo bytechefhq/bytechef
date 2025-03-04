@@ -42,7 +42,7 @@
           "options" : null,
           "properties" : [ {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "Type of the invoice.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -62,27 +62,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
-            "displayCondition" : null,
-            "expressionEnabled" : null,
-            "hidden" : null,
-            "metadata" : { },
-            "required" : null,
-            "name" : "Reference",
-            "type" : "STRING",
-            "defaultValue" : null,
-            "exampleValue" : null,
-            "label" : null,
-            "placeholder" : null,
-            "controlType" : "TEXT",
-            "languageId" : null,
-            "maxLength" : null,
-            "minLength" : null,
-            "options" : null,
-            "optionsDataSource" : null
-          }, {
-            "advancedOption" : null,
-            "description" : null,
+            "description" : "Contact associated with the invoice.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -99,7 +79,7 @@
             "options" : null,
             "properties" : [ {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "ID of the contact.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -119,7 +99,7 @@
               "optionsDataSource" : null
             }, {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "Full name of contact/organization.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -139,7 +119,7 @@
               "optionsDataSource" : null
             }, {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "Email address of contact person",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -162,7 +142,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "Date of the invoice – YYYY-MM-DDThh-mm-ss",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -182,7 +162,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "Due date of the invoice – YYYY-MM-DDThh-mm-ss",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -202,7 +182,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "Status of the invoice.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -222,7 +202,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "Line Amount Type",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -242,7 +222,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "Line items on the invoice.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -273,7 +253,7 @@
               "options" : null,
               "properties" : [ {
                 "advancedOption" : null,
-                "description" : null,
+                "description" : "The sales description of the item.",
                 "displayCondition" : null,
                 "expressionEnabled" : null,
                 "hidden" : null,
@@ -293,7 +273,7 @@
                 "optionsDataSource" : null
               }, {
                 "advancedOption" : null,
-                "description" : null,
+                "description" : "Line item quantity.",
                 "displayCondition" : null,
                 "expressionEnabled" : null,
                 "hidden" : null,
@@ -312,7 +292,7 @@
                 "optionsDataSource" : null
               }, {
                 "advancedOption" : null,
-                "description" : null,
+                "description" : "Line item unit amount.",
                 "displayCondition" : null,
                 "expressionEnabled" : null,
                 "hidden" : null,
@@ -344,7 +324,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "The currency that invoice has been raised in.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -388,7 +368,7 @@
         "options" : null,
         "properties" : [ {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "Type of the invoice.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -408,27 +388,7 @@
           "optionsDataSource" : null
         }, {
           "advancedOption" : null,
-          "description" : null,
-          "displayCondition" : null,
-          "expressionEnabled" : null,
-          "hidden" : null,
-          "metadata" : { },
-          "required" : null,
-          "name" : "Reference",
-          "type" : "STRING",
-          "defaultValue" : null,
-          "exampleValue" : null,
-          "label" : null,
-          "placeholder" : null,
-          "controlType" : "TEXT",
-          "languageId" : null,
-          "maxLength" : null,
-          "minLength" : null,
-          "options" : null,
-          "optionsDataSource" : null
-        }, {
-          "advancedOption" : null,
-          "description" : null,
+          "description" : "Contact associated with the invoice.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -445,7 +405,7 @@
           "options" : null,
           "properties" : [ {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "ID of the contact.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -465,7 +425,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "Full name of contact/organization.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -485,7 +445,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "Email address of contact person",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -508,7 +468,7 @@
           "optionsDataSource" : null
         }, {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "Date of the invoice – YYYY-MM-DDThh-mm-ss",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -528,7 +488,7 @@
           "optionsDataSource" : null
         }, {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "Due date of the invoice – YYYY-MM-DDThh-mm-ss",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -548,7 +508,7 @@
           "optionsDataSource" : null
         }, {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "Status of the invoice.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -568,7 +528,7 @@
           "optionsDataSource" : null
         }, {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "Line Amount Type",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -588,7 +548,7 @@
           "optionsDataSource" : null
         }, {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "Line items on the invoice.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -619,7 +579,7 @@
             "options" : null,
             "properties" : [ {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "The sales description of the item.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -639,7 +599,7 @@
               "optionsDataSource" : null
             }, {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "Line item quantity.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -658,7 +618,7 @@
               "optionsDataSource" : null
             }, {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "Line item unit amount.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -690,7 +650,7 @@
           "optionsDataSource" : null
         }, {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "The currency that invoice has been raised in.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -977,8 +937,8 @@
     } ],
     "title" : "Create Bill",
     "perform" : { },
-    "workflowNodeDescription" : null,
-    "processErrorResponse" : null
+    "processErrorResponse" : null,
+    "workflowNodeDescription" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -1008,7 +968,7 @@
           "options" : null,
           "properties" : [ {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "ID of the contact.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -1028,7 +988,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "Company registration number.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -1048,7 +1008,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "A user defined account number.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -1068,7 +1028,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "Status of the contact.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -1088,7 +1048,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "Full name of contact/organisation.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -1108,7 +1068,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "First name of contact person.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -1128,7 +1088,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "Last name of contact person.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -1148,7 +1108,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "Email address of contact person.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -1168,7 +1128,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "Bank account number of contact.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -1188,7 +1148,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "Tax number of contact.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -1208,7 +1168,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "List of addresses associated with the contact.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -1494,7 +1454,7 @@
         "options" : null,
         "properties" : [ {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "ID of the contact.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -1514,7 +1474,7 @@
           "optionsDataSource" : null
         }, {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "Company registration number.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -1534,7 +1494,7 @@
           "optionsDataSource" : null
         }, {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "A user defined account number.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -1554,7 +1514,7 @@
           "optionsDataSource" : null
         }, {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "Status of the contact.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -1574,7 +1534,7 @@
           "optionsDataSource" : null
         }, {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "Full name of contact/organisation.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -1594,7 +1554,7 @@
           "optionsDataSource" : null
         }, {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "First name of contact person.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -1614,7 +1574,7 @@
           "optionsDataSource" : null
         }, {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "Last name of contact person.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -1634,7 +1594,7 @@
           "optionsDataSource" : null
         }, {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "Email address of contact person.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -1654,7 +1614,7 @@
           "optionsDataSource" : null
         }, {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "Bank account number of contact.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -1674,7 +1634,7 @@
           "optionsDataSource" : null
         }, {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "Tax number of contact.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -1694,7 +1654,7 @@
           "optionsDataSource" : null
         }, {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "List of addresses associated with the contact.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -2441,8 +2401,8 @@
     } ],
     "title" : "Create Contact",
     "perform" : { },
-    "workflowNodeDescription" : null,
-    "processErrorResponse" : null
+    "processErrorResponse" : null,
+    "workflowNodeDescription" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -2472,7 +2432,7 @@
           "options" : null,
           "properties" : [ {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "Type of the invoice.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -2492,27 +2452,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
-            "displayCondition" : null,
-            "expressionEnabled" : null,
-            "hidden" : null,
-            "metadata" : { },
-            "required" : null,
-            "name" : "Reference",
-            "type" : "STRING",
-            "defaultValue" : null,
-            "exampleValue" : null,
-            "label" : null,
-            "placeholder" : null,
-            "controlType" : "TEXT",
-            "languageId" : null,
-            "maxLength" : null,
-            "minLength" : null,
-            "options" : null,
-            "optionsDataSource" : null
-          }, {
-            "advancedOption" : null,
-            "description" : null,
+            "description" : "Contact associated with the invoice.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -2529,7 +2469,7 @@
             "options" : null,
             "properties" : [ {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "ID of the contact.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -2549,7 +2489,7 @@
               "optionsDataSource" : null
             }, {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "Full name of contact/organization.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -2569,7 +2509,7 @@
               "optionsDataSource" : null
             }, {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "Email address of contact person",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -2592,7 +2532,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "Date of the invoice – YYYY-MM-DDThh-mm-ss",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -2612,7 +2552,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "Due date of the invoice – YYYY-MM-DDThh-mm-ss",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -2632,7 +2572,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "Status of the invoice.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -2652,7 +2592,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "Line Amount Type",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -2672,7 +2612,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "Line items on the invoice.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -2703,7 +2643,7 @@
               "options" : null,
               "properties" : [ {
                 "advancedOption" : null,
-                "description" : null,
+                "description" : "The sales description of the item.",
                 "displayCondition" : null,
                 "expressionEnabled" : null,
                 "hidden" : null,
@@ -2723,7 +2663,7 @@
                 "optionsDataSource" : null
               }, {
                 "advancedOption" : null,
-                "description" : null,
+                "description" : "Line item quantity.",
                 "displayCondition" : null,
                 "expressionEnabled" : null,
                 "hidden" : null,
@@ -2742,7 +2682,7 @@
                 "optionsDataSource" : null
               }, {
                 "advancedOption" : null,
-                "description" : null,
+                "description" : "Line item unit amount.",
                 "displayCondition" : null,
                 "expressionEnabled" : null,
                 "hidden" : null,
@@ -2774,7 +2714,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "The currency that invoice has been raised in.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -2818,7 +2758,7 @@
         "options" : null,
         "properties" : [ {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "Type of the invoice.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -2838,27 +2778,7 @@
           "optionsDataSource" : null
         }, {
           "advancedOption" : null,
-          "description" : null,
-          "displayCondition" : null,
-          "expressionEnabled" : null,
-          "hidden" : null,
-          "metadata" : { },
-          "required" : null,
-          "name" : "Reference",
-          "type" : "STRING",
-          "defaultValue" : null,
-          "exampleValue" : null,
-          "label" : null,
-          "placeholder" : null,
-          "controlType" : "TEXT",
-          "languageId" : null,
-          "maxLength" : null,
-          "minLength" : null,
-          "options" : null,
-          "optionsDataSource" : null
-        }, {
-          "advancedOption" : null,
-          "description" : null,
+          "description" : "Contact associated with the invoice.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -2875,7 +2795,7 @@
           "options" : null,
           "properties" : [ {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "ID of the contact.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -2895,7 +2815,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "Full name of contact/organization.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -2915,7 +2835,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "Email address of contact person",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -2938,7 +2858,7 @@
           "optionsDataSource" : null
         }, {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "Date of the invoice – YYYY-MM-DDThh-mm-ss",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -2958,7 +2878,7 @@
           "optionsDataSource" : null
         }, {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "Due date of the invoice – YYYY-MM-DDThh-mm-ss",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -2978,7 +2898,7 @@
           "optionsDataSource" : null
         }, {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "Status of the invoice.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -2998,7 +2918,7 @@
           "optionsDataSource" : null
         }, {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "Line Amount Type",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -3018,7 +2938,7 @@
           "optionsDataSource" : null
         }, {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "Line items on the invoice.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -3049,7 +2969,7 @@
             "options" : null,
             "properties" : [ {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "The sales description of the item.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -3069,7 +2989,7 @@
               "optionsDataSource" : null
             }, {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "Line item quantity.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -3088,7 +3008,7 @@
               "optionsDataSource" : null
             }, {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "Line item unit amount.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -3120,7 +3040,7 @@
           "optionsDataSource" : null
         }, {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "The currency that invoice has been raised in.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -3403,8 +3323,8 @@
     } ],
     "title" : "Create Invoice",
     "perform" : { },
-    "workflowNodeDescription" : null,
-    "processErrorResponse" : null
+    "processErrorResponse" : null,
+    "workflowNodeDescription" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -4746,78 +4666,10 @@
     } ],
     "title" : "Create Quote",
     "perform" : { },
-    "workflowNodeDescription" : null,
-    "processErrorResponse" : null
+    "processErrorResponse" : null,
+    "workflowNodeDescription" : null
   } ],
-  "connection" : {
-    "authorizations" : [ {
-      "detectOn" : null,
-      "description" : null,
-      "name" : "oauth2_authorization_code",
-      "properties" : [ {
-        "advancedOption" : null,
-        "description" : null,
-        "displayCondition" : null,
-        "expressionEnabled" : null,
-        "hidden" : null,
-        "metadata" : { },
-        "required" : true,
-        "name" : "clientId",
-        "type" : "STRING",
-        "defaultValue" : null,
-        "exampleValue" : null,
-        "label" : "Client Id",
-        "placeholder" : null,
-        "controlType" : "TEXT",
-        "languageId" : null,
-        "maxLength" : null,
-        "minLength" : null,
-        "options" : null,
-        "optionsDataSource" : null
-      }, {
-        "advancedOption" : null,
-        "description" : null,
-        "displayCondition" : null,
-        "expressionEnabled" : null,
-        "hidden" : null,
-        "metadata" : { },
-        "required" : true,
-        "name" : "clientSecret",
-        "type" : "STRING",
-        "defaultValue" : null,
-        "exampleValue" : null,
-        "label" : "Client Secret",
-        "placeholder" : null,
-        "controlType" : "TEXT",
-        "languageId" : null,
-        "maxLength" : null,
-        "minLength" : null,
-        "options" : null,
-        "optionsDataSource" : null
-      } ],
-      "refreshOn" : null,
-      "title" : "OAuth2 Authorization Code",
-      "type" : "OAUTH2_AUTHORIZATION_CODE",
-      "acquire" : null,
-      "apply" : { },
-      "authorizationCallback" : null,
-      "authorizationUrl" : { },
-      "clientId" : null,
-      "clientSecret" : null,
-      "oauth2AuthorizationExtraQueryParameters" : null,
-      "pkce" : null,
-      "refresh" : null,
-      "refreshUrl" : { },
-      "scopes" : { },
-      "refreshToken" : null,
-      "tokenUrl" : { }
-    } ],
-    "properties" : null,
-    "version" : 1,
-    "authorizationRequired" : null,
-    "baseUri" : { },
-    "test" : null
-  },
+  "dataStream" : null,
   "triggers" : [ {
     "batch" : null,
     "deprecated" : null,
@@ -4846,7 +4698,7 @@
           "options" : null,
           "properties" : [ {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "Type of the invoice.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -4866,27 +4718,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
-            "displayCondition" : null,
-            "expressionEnabled" : null,
-            "hidden" : null,
-            "metadata" : { },
-            "required" : null,
-            "name" : "Reference",
-            "type" : "STRING",
-            "defaultValue" : null,
-            "exampleValue" : null,
-            "label" : null,
-            "placeholder" : null,
-            "controlType" : "TEXT",
-            "languageId" : null,
-            "maxLength" : null,
-            "minLength" : null,
-            "options" : null,
-            "optionsDataSource" : null
-          }, {
-            "advancedOption" : null,
-            "description" : null,
+            "description" : "Contact associated with the invoice.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -4903,7 +4735,7 @@
             "options" : null,
             "properties" : [ {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "ID of the contact.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -4923,7 +4755,7 @@
               "optionsDataSource" : null
             }, {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "Full name of contact/organization.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -4943,7 +4775,7 @@
               "optionsDataSource" : null
             }, {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "Email address of contact person",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -4966,7 +4798,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "Date of the invoice – YYYY-MM-DDThh-mm-ss",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -4986,7 +4818,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "Due date of the invoice – YYYY-MM-DDThh-mm-ss",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -5006,7 +4838,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "Status of the invoice.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -5026,7 +4858,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "Line Amount Type",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -5046,7 +4878,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "Line items on the invoice.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -5077,7 +4909,7 @@
               "options" : null,
               "properties" : [ {
                 "advancedOption" : null,
-                "description" : null,
+                "description" : "The sales description of the item.",
                 "displayCondition" : null,
                 "expressionEnabled" : null,
                 "hidden" : null,
@@ -5097,7 +4929,7 @@
                 "optionsDataSource" : null
               }, {
                 "advancedOption" : null,
-                "description" : null,
+                "description" : "Line item quantity.",
                 "displayCondition" : null,
                 "expressionEnabled" : null,
                 "hidden" : null,
@@ -5116,7 +4948,7 @@
                 "optionsDataSource" : null
               }, {
                 "advancedOption" : null,
-                "description" : null,
+                "description" : "Line item unit amount.",
                 "displayCondition" : null,
                 "expressionEnabled" : null,
                 "hidden" : null,
@@ -5148,7 +4980,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "The currency that invoice has been raised in.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -5192,7 +5024,7 @@
         "options" : null,
         "properties" : [ {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "Type of the invoice.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -5212,27 +5044,7 @@
           "optionsDataSource" : null
         }, {
           "advancedOption" : null,
-          "description" : null,
-          "displayCondition" : null,
-          "expressionEnabled" : null,
-          "hidden" : null,
-          "metadata" : { },
-          "required" : null,
-          "name" : "Reference",
-          "type" : "STRING",
-          "defaultValue" : null,
-          "exampleValue" : null,
-          "label" : null,
-          "placeholder" : null,
-          "controlType" : "TEXT",
-          "languageId" : null,
-          "maxLength" : null,
-          "minLength" : null,
-          "options" : null,
-          "optionsDataSource" : null
-        }, {
-          "advancedOption" : null,
-          "description" : null,
+          "description" : "Contact associated with the invoice.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -5249,7 +5061,7 @@
           "options" : null,
           "properties" : [ {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "ID of the contact.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -5269,7 +5081,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "Full name of contact/organization.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -5289,7 +5101,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "Email address of contact person",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -5312,7 +5124,7 @@
           "optionsDataSource" : null
         }, {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "Date of the invoice – YYYY-MM-DDThh-mm-ss",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -5332,7 +5144,7 @@
           "optionsDataSource" : null
         }, {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "Due date of the invoice – YYYY-MM-DDThh-mm-ss",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -5352,7 +5164,7 @@
           "optionsDataSource" : null
         }, {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "Status of the invoice.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -5372,7 +5184,7 @@
           "optionsDataSource" : null
         }, {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "Line Amount Type",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -5392,7 +5204,7 @@
           "optionsDataSource" : null
         }, {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "Line items on the invoice.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -5423,7 +5235,7 @@
             "options" : null,
             "properties" : [ {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "The sales description of the item.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -5443,7 +5255,7 @@
               "optionsDataSource" : null
             }, {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "Line item quantity.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -5462,7 +5274,7 @@
               "optionsDataSource" : null
             }, {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "Line item unit amount.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -5494,7 +5306,7 @@
           "optionsDataSource" : null
         }, {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "The currency that invoice has been raised in.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -5548,9 +5360,9 @@
     "webhookDisable" : null,
     "webhookEnable" : null,
     "dynamicWebhookRefresh" : null,
-    "webhookRequest" : { },
-    "workflowNodeDescription" : null,
     "processErrorResponse" : null,
+    "workflowNodeDescription" : null,
+    "webhookRequest" : { },
     "listenerDisable" : null,
     "listenerEnable" : null,
     "webhookValidate" : { },
@@ -5583,7 +5395,7 @@
           "options" : null,
           "properties" : [ {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "ID of the contact.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -5603,7 +5415,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "Company registration number.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -5623,7 +5435,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "A user defined account number.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -5643,7 +5455,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "Status of the contact.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -5663,7 +5475,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "Full name of contact/organisation.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -5683,7 +5495,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "First name of contact person.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -5703,7 +5515,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "Last name of contact person.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -5723,7 +5535,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "Email address of contact person.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -5743,7 +5555,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "Bank account number of contact.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -5763,7 +5575,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "Tax number of contact.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -5783,7 +5595,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "List of addresses associated with the contact.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -6069,7 +5881,7 @@
         "options" : null,
         "properties" : [ {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "ID of the contact.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -6089,7 +5901,7 @@
           "optionsDataSource" : null
         }, {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "Company registration number.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -6109,7 +5921,7 @@
           "optionsDataSource" : null
         }, {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "A user defined account number.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -6129,7 +5941,7 @@
           "optionsDataSource" : null
         }, {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "Status of the contact.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -6149,7 +5961,7 @@
           "optionsDataSource" : null
         }, {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "Full name of contact/organisation.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -6169,7 +5981,7 @@
           "optionsDataSource" : null
         }, {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "First name of contact person.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -6189,7 +6001,7 @@
           "optionsDataSource" : null
         }, {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "Last name of contact person.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -6209,7 +6021,7 @@
           "optionsDataSource" : null
         }, {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "Email address of contact person.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -6229,7 +6041,7 @@
           "optionsDataSource" : null
         }, {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "Bank account number of contact.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -6249,7 +6061,7 @@
           "optionsDataSource" : null
         }, {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "Tax number of contact.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -6269,7 +6081,7 @@
           "optionsDataSource" : null
         }, {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "List of addresses associated with the contact.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -6565,9 +6377,9 @@
     "webhookDisable" : null,
     "webhookEnable" : null,
     "dynamicWebhookRefresh" : null,
-    "webhookRequest" : { },
-    "workflowNodeDescription" : null,
     "processErrorResponse" : null,
+    "workflowNodeDescription" : null,
+    "webhookRequest" : { },
     "listenerDisable" : null,
     "listenerEnable" : null,
     "webhookValidate" : { },
@@ -6600,7 +6412,7 @@
           "options" : null,
           "properties" : [ {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "Type of the invoice.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -6620,27 +6432,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
-            "displayCondition" : null,
-            "expressionEnabled" : null,
-            "hidden" : null,
-            "metadata" : { },
-            "required" : null,
-            "name" : "Reference",
-            "type" : "STRING",
-            "defaultValue" : null,
-            "exampleValue" : null,
-            "label" : null,
-            "placeholder" : null,
-            "controlType" : "TEXT",
-            "languageId" : null,
-            "maxLength" : null,
-            "minLength" : null,
-            "options" : null,
-            "optionsDataSource" : null
-          }, {
-            "advancedOption" : null,
-            "description" : null,
+            "description" : "Contact associated with the invoice.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -6657,7 +6449,7 @@
             "options" : null,
             "properties" : [ {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "ID of the contact.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -6677,7 +6469,7 @@
               "optionsDataSource" : null
             }, {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "Full name of contact/organization.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -6697,7 +6489,7 @@
               "optionsDataSource" : null
             }, {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "Email address of contact person",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -6720,7 +6512,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "Date of the invoice – YYYY-MM-DDThh-mm-ss",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -6740,7 +6532,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "Due date of the invoice – YYYY-MM-DDThh-mm-ss",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -6760,7 +6552,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "Status of the invoice.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -6780,7 +6572,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "Line Amount Type",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -6800,7 +6592,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "Line items on the invoice.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -6831,7 +6623,7 @@
               "options" : null,
               "properties" : [ {
                 "advancedOption" : null,
-                "description" : null,
+                "description" : "The sales description of the item.",
                 "displayCondition" : null,
                 "expressionEnabled" : null,
                 "hidden" : null,
@@ -6851,7 +6643,7 @@
                 "optionsDataSource" : null
               }, {
                 "advancedOption" : null,
-                "description" : null,
+                "description" : "Line item quantity.",
                 "displayCondition" : null,
                 "expressionEnabled" : null,
                 "hidden" : null,
@@ -6870,7 +6662,7 @@
                 "optionsDataSource" : null
               }, {
                 "advancedOption" : null,
-                "description" : null,
+                "description" : "Line item unit amount.",
                 "displayCondition" : null,
                 "expressionEnabled" : null,
                 "hidden" : null,
@@ -6902,7 +6694,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "The currency that invoice has been raised in.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -6946,7 +6738,7 @@
         "options" : null,
         "properties" : [ {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "Type of the invoice.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -6966,27 +6758,7 @@
           "optionsDataSource" : null
         }, {
           "advancedOption" : null,
-          "description" : null,
-          "displayCondition" : null,
-          "expressionEnabled" : null,
-          "hidden" : null,
-          "metadata" : { },
-          "required" : null,
-          "name" : "Reference",
-          "type" : "STRING",
-          "defaultValue" : null,
-          "exampleValue" : null,
-          "label" : null,
-          "placeholder" : null,
-          "controlType" : "TEXT",
-          "languageId" : null,
-          "maxLength" : null,
-          "minLength" : null,
-          "options" : null,
-          "optionsDataSource" : null
-        }, {
-          "advancedOption" : null,
-          "description" : null,
+          "description" : "Contact associated with the invoice.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -7003,7 +6775,7 @@
           "options" : null,
           "properties" : [ {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "ID of the contact.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -7023,7 +6795,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "Full name of contact/organization.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -7043,7 +6815,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "Email address of contact person",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -7066,7 +6838,7 @@
           "optionsDataSource" : null
         }, {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "Date of the invoice – YYYY-MM-DDThh-mm-ss",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -7086,7 +6858,7 @@
           "optionsDataSource" : null
         }, {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "Due date of the invoice – YYYY-MM-DDThh-mm-ss",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -7106,7 +6878,7 @@
           "optionsDataSource" : null
         }, {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "Status of the invoice.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -7126,7 +6898,7 @@
           "optionsDataSource" : null
         }, {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "Line Amount Type",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -7146,7 +6918,7 @@
           "optionsDataSource" : null
         }, {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "Line items on the invoice.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -7177,7 +6949,7 @@
             "options" : null,
             "properties" : [ {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "The sales description of the item.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -7197,7 +6969,7 @@
               "optionsDataSource" : null
             }, {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "Line item quantity.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -7216,7 +6988,7 @@
               "optionsDataSource" : null
             }, {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "Line item unit amount.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -7248,7 +7020,7 @@
           "optionsDataSource" : null
         }, {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "The currency that invoice has been raised in.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -7302,15 +7074,14 @@
     "webhookDisable" : null,
     "webhookEnable" : null,
     "dynamicWebhookRefresh" : null,
-    "webhookRequest" : { },
-    "workflowNodeDescription" : null,
     "processErrorResponse" : null,
+    "workflowNodeDescription" : null,
+    "webhookRequest" : { },
     "listenerDisable" : null,
     "listenerEnable" : null,
     "webhookValidate" : { },
     "webhookValidateOnEnable" : null
   } ],
-  "dataStream" : null,
   "unifiedApi" : {
     "category" : "ACCOUNTING",
     "providerAdapters" : [ {
@@ -7323,5 +7094,74 @@
     }, {
       "modelType" : "CONTACT"
     } ]
+  },
+  "connection" : {
+    "authorizations" : [ {
+      "detectOn" : null,
+      "description" : null,
+      "name" : "oauth2_authorization_code",
+      "properties" : [ {
+        "advancedOption" : null,
+        "description" : null,
+        "displayCondition" : null,
+        "expressionEnabled" : null,
+        "hidden" : null,
+        "metadata" : { },
+        "required" : true,
+        "name" : "clientId",
+        "type" : "STRING",
+        "defaultValue" : null,
+        "exampleValue" : null,
+        "label" : "Client Id",
+        "placeholder" : null,
+        "controlType" : "TEXT",
+        "languageId" : null,
+        "maxLength" : null,
+        "minLength" : null,
+        "options" : null,
+        "optionsDataSource" : null
+      }, {
+        "advancedOption" : null,
+        "description" : null,
+        "displayCondition" : null,
+        "expressionEnabled" : null,
+        "hidden" : null,
+        "metadata" : { },
+        "required" : true,
+        "name" : "clientSecret",
+        "type" : "STRING",
+        "defaultValue" : null,
+        "exampleValue" : null,
+        "label" : "Client Secret",
+        "placeholder" : null,
+        "controlType" : "TEXT",
+        "languageId" : null,
+        "maxLength" : null,
+        "minLength" : null,
+        "options" : null,
+        "optionsDataSource" : null
+      } ],
+      "refreshOn" : null,
+      "title" : "OAuth2 Authorization Code",
+      "type" : "OAUTH2_AUTHORIZATION_CODE",
+      "acquire" : null,
+      "apply" : { },
+      "authorizationCallback" : null,
+      "authorizationUrl" : { },
+      "clientId" : null,
+      "clientSecret" : null,
+      "oauth2AuthorizationExtraQueryParameters" : null,
+      "pkce" : null,
+      "refresh" : null,
+      "refreshUrl" : { },
+      "scopes" : { },
+      "refreshToken" : null,
+      "tokenUrl" : { }
+    } ],
+    "properties" : null,
+    "version" : 1,
+    "authorizationRequired" : null,
+    "baseUri" : { },
+    "test" : null
   }
 }

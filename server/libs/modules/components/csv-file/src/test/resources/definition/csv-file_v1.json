@@ -289,7 +289,7 @@
       "outputResponse" : {
         "outputSchema" : {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "File entry representing new csv file.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -389,7 +389,7 @@
       },
       "outputSchema" : {
         "advancedOption" : null,
-        "description" : null,
+        "description" : "File entry representing new csv file.",
         "displayCondition" : null,
         "expressionEnabled" : null,
         "hidden" : null,
@@ -636,6 +636,7 @@
     "processErrorResponse" : null,
     "workflowNodeDescription" : null
   } ],
+  "connection" : null,
   "dataStream" : {
     "reader" : {
       "properties" : null,
@@ -648,6 +649,5 @@
     }
   },
   "triggers" : null,
-  "unifiedApi" : null,
-  "connection" : null
+  "unifiedApi" : null
 }

@@ -165,11 +165,10 @@
       "optionsDataSource" : null
     } ],
     "title" : "Response to Chat Request",
-    "processErrorResponse" : null,
     "perform" : { },
+    "processErrorResponse" : null,
     "workflowNodeDescription" : null
   } ],
-  "connection" : null,
   "dataStream" : null,
   "triggers" : [ {
     "batch" : null,
@@ -573,6 +572,7 @@
     "type" : "STATIC_WEBHOOK",
     "webhookRawBody" : null,
     "workflowSyncExecution" : true,
+    "poll" : null,
     "deduplicate" : null,
     "webhookDisable" : null,
     "webhookEnable" : null,
@@ -580,11 +580,11 @@
     "webhookRequest" : { },
     "listenerDisable" : null,
     "listenerEnable" : null,
-    "poll" : null,
     "processErrorResponse" : null,
     "webhookValidate" : null,
     "webhookValidateOnEnable" : null,
     "workflowNodeDescription" : null
   } ],
-  "unifiedApi" : null
+  "unifiedApi" : null,
+  "connection" : null
 }

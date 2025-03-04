@@ -710,8 +710,8 @@
       "optionsDataSource" : null
     } ],
     "title" : "Update Deal",
-    "workflowNodeDescription" : null,
     "perform" : null,
+    "workflowNodeDescription" : null,
     "processErrorResponse" : null
   }, {
     "batch" : null,
@@ -1410,8 +1410,8 @@
       "optionsDataSource" : null
     } ],
     "title" : "Create Deal",
-    "workflowNodeDescription" : null,
     "perform" : null,
+    "workflowNodeDescription" : null,
     "processErrorResponse" : null
   }, {
     "batch" : null,
@@ -2233,8 +2233,8 @@
       "optionsDataSource" : null
     } ],
     "title" : "Enrich Person",
-    "workflowNodeDescription" : null,
     "perform" : null,
+    "workflowNodeDescription" : null,
     "processErrorResponse" : null
   }, {
     "batch" : null,
@@ -2886,10 +2886,13 @@
       "optionsDataSource" : null
     } ],
     "title" : "Enrich Company",
-    "workflowNodeDescription" : null,
     "perform" : null,
+    "workflowNodeDescription" : null,
     "processErrorResponse" : null
   } ],
+  "triggers" : [ ],
+  "dataStream" : null,
+  "unifiedApi" : null,
   "connection" : {
     "authorizations" : [ {
       "detectOn" : null,
@@ -3019,8 +3022,5 @@
     "authorizationRequired" : null,
     "baseUri" : { },
     "test" : null
-  },
-  "triggers" : [ ],
-  "unifiedApi" : null,
-  "dataStream" : null
+  }
 }

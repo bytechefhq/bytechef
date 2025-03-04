@@ -253,7 +253,7 @@
           "options" : null,
           "properties" : [ {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "ID of the list.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -273,7 +273,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "Description of the list.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -293,7 +293,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "The displayable title of the list.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -337,7 +337,7 @@
         "options" : null,
         "properties" : [ {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "ID of the list.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -357,7 +357,7 @@
           "optionsDataSource" : null
         }, {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "Description of the list.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -377,7 +377,7 @@
           "optionsDataSource" : null
         }, {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "The displayable title of the list.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,

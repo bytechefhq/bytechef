@@ -42,7 +42,7 @@
           "options" : null,
           "properties" : [ {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "The exact date and time when the trigger was activated, formatted according to the specified timezone.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -62,7 +62,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "The hour of the day (0-23) at which the workflow was set to trigger.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -81,7 +81,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "The minute of the hour (0-59) at which the workflow was set to trigger.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -100,7 +100,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "The specific days of the week (represented as integers) on which the workflow was set to trigger.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -140,7 +140,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "The timezone used for scheduling the cron expression, ensuring the trigger fires at the correct local time.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -184,7 +184,7 @@
         "options" : null,
         "properties" : [ {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "The exact date and time when the trigger was activated, formatted according to the specified timezone.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -204,7 +204,7 @@
           "optionsDataSource" : null
         }, {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "The hour of the day (0-23) at which the workflow was set to trigger.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -223,7 +223,7 @@
           "optionsDataSource" : null
         }, {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "The minute of the hour (0-59) at which the workflow was set to trigger.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -242,7 +242,7 @@
           "optionsDataSource" : null
         }, {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "The specific days of the week (represented as integers) on which the workflow was set to trigger.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -282,7 +282,7 @@
           "optionsDataSource" : null
         }, {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "The timezone used for scheduling the cron expression, ensuring the trigger fires at the correct local time.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -351,7 +351,7 @@
       "expressionEnabled" : null,
       "hidden" : null,
       "metadata" : { },
-      "required" : null,
+      "required" : true,
       "name" : "dayOfWeek",
       "type" : "ARRAY",
       "defaultValue" : null,
@@ -419,7 +419,7 @@
       "expressionEnabled" : null,
       "hidden" : null,
       "metadata" : { },
-      "required" : null,
+      "required" : true,
       "name" : "timezone",
       "type" : "STRING",
       "defaultValue" : null,
@@ -585,7 +585,7 @@
           "options" : null,
           "properties" : [ {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "The exact date and time when the trigger was activated, formatted according to the specified timezone.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -605,7 +605,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "The hour of the day (0-23) at which the workflow was set to trigger.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -624,7 +624,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "The minute of the hour (0-59) at which the workflow was set to trigger.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -643,7 +643,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "The day of the week (represented as integers) on which the workflow was set to trigger.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -662,7 +662,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "The timezone used for scheduling the cron expression, ensuring the trigger fires at the correct local time.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -706,7 +706,7 @@
         "options" : null,
         "properties" : [ {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "The exact date and time when the trigger was activated, formatted according to the specified timezone.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -726,7 +726,7 @@
           "optionsDataSource" : null
         }, {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "The hour of the day (0-23) at which the workflow was set to trigger.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -745,7 +745,7 @@
           "optionsDataSource" : null
         }, {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "The minute of the hour (0-59) at which the workflow was set to trigger.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -764,7 +764,7 @@
           "optionsDataSource" : null
         }, {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "The day of the week (represented as integers) on which the workflow was set to trigger.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -783,7 +783,7 @@
           "optionsDataSource" : null
         }, {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "The timezone used for scheduling the cron expression, ensuring the trigger fires at the correct local time.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -899,7 +899,7 @@
       "expressionEnabled" : null,
       "hidden" : null,
       "metadata" : { },
-      "required" : null,
+      "required" : true,
       "name" : "timezone",
       "type" : "STRING",
       "defaultValue" : null,
@@ -1065,7 +1065,7 @@
           "options" : null,
           "properties" : [ {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "The exact date and time when the trigger was activated, formatted according to the specified timezone.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -1085,7 +1085,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "The hour of the day (0-23) at which the workflow was set to trigger.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -1104,7 +1104,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "The minute of the hour (0-59) at which the workflow was set to trigger.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -1123,7 +1123,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "The specific day of the month (1-31) on which the workflow was set to trigger.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -1142,7 +1142,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "The timezone used for scheduling the cron expression, ensuring the trigger fires at the correct local time.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -1186,7 +1186,7 @@
         "options" : null,
         "properties" : [ {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "The exact date and time when the trigger was activated, formatted according to the specified timezone.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -1206,7 +1206,7 @@
           "optionsDataSource" : null
         }, {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "The hour of the day (0-23) at which the workflow was set to trigger.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -1225,7 +1225,7 @@
           "optionsDataSource" : null
         }, {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "The minute of the hour (0-59) at which the workflow was set to trigger.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -1244,7 +1244,7 @@
           "optionsDataSource" : null
         }, {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "The specific day of the month (1-31) on which the workflow was set to trigger.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -1263,7 +1263,7 @@
           "optionsDataSource" : null
         }, {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "The timezone used for scheduling the cron expression, ensuring the trigger fires at the correct local time.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -1351,7 +1351,7 @@
       "expressionEnabled" : null,
       "hidden" : null,
       "metadata" : { },
-      "required" : null,
+      "required" : true,
       "name" : "timezone",
       "type" : "STRING",
       "defaultValue" : null,
@@ -1517,7 +1517,7 @@
           "options" : null,
           "properties" : [ {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "The exact date and time when the trigger was activated, formatted according to the specified timezone.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -1537,7 +1537,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "The interval value that determines how frequently the workflow is triggered, based on the selected time unit.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -1556,7 +1556,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "The unit of time (e.g., minute, hour, day, month) used in conjunction with the interval to schedule the trigger.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -1599,7 +1599,7 @@
         "options" : null,
         "properties" : [ {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "The exact date and time when the trigger was activated, formatted according to the specified timezone.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -1619,7 +1619,7 @@
           "optionsDataSource" : null
         }, {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "The interval value that determines how frequently the workflow is triggered, based on the selected time unit.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -1638,7 +1638,7 @@
           "optionsDataSource" : null
         }, {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "The unit of time (e.g., minute, hour, day, month) used in conjunction with the interval to schedule the trigger.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -1663,7 +1663,7 @@
     },
     "properties" : [ {
       "advancedOption" : null,
-      "description" : "The hour at which a workflow will be triggered.",
+      "description" : "Specifies the frequency at which the workflow is triggered, based on the selected time unit. For example, an interval of 5 with a time unit of 'Minute' triggers the workflow every 5 minutes.",
       "displayCondition" : null,
       "expressionEnabled" : null,
       "hidden" : null,
@@ -1682,7 +1682,7 @@
       "optionsDataSource" : null
     }, {
       "advancedOption" : null,
-      "description" : "Days at which a workflow will be triggered.",
+      "description" : "Specifies the unit of time used in conjunction with the interval to determine the frequency of workflow triggers.",
       "displayCondition" : null,
       "expressionEnabled" : null,
       "hidden" : null,
@@ -1692,7 +1692,7 @@
       "type" : "INTEGER",
       "defaultValue" : null,
       "exampleValue" : null,
-      "label" : "Day of Week",
+      "label" : "Time Unit",
       "placeholder" : null,
       "maxValue" : null,
       "minValue" : null,
@@ -1760,7 +1760,7 @@
           "options" : null,
           "properties" : [ {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "The exact date and time when the trigger was activated, formatted according to the specified timezone.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -1780,7 +1780,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "The cron schedule expression that defines the timing pattern for triggering the workflow.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -1800,7 +1800,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "The timezone used for scheduling the cron expression, ensuring the trigger fires at the correct local time.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -1844,7 +1844,7 @@
         "options" : null,
         "properties" : [ {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "The exact date and time when the trigger was activated, formatted according to the specified timezone.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -1864,7 +1864,7 @@
           "optionsDataSource" : null
         }, {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "The cron schedule expression that defines the timing pattern for triggering the workflow.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -1884,7 +1884,7 @@
           "optionsDataSource" : null
         }, {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "The timezone used for scheduling the cron expression, ensuring the trigger fires at the correct local time.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -1935,7 +1935,7 @@
       "expressionEnabled" : null,
       "hidden" : null,
       "metadata" : { },
-      "required" : null,
+      "required" : true,
       "name" : "timezone",
       "type" : "STRING",
       "defaultValue" : null,

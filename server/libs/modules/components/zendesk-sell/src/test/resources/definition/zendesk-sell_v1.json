@@ -59,7 +59,7 @@
             "options" : null,
             "properties" : [ {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "The ID of the contact.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -79,7 +79,7 @@
               "optionsDataSource" : null
             }, {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "Indicator of whether or not this contact refers to an organization or an individual.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -103,7 +103,7 @@
               "controlType" : "SELECT"
             }, {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "The contact’s description.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -123,7 +123,7 @@
               "optionsDataSource" : null
             }, {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "The contact’s website address.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -143,7 +143,7 @@
               "optionsDataSource" : null
             }, {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "The contact’s email address.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -230,6 +230,7 @@
         "sampleOutput" : null,
         "placeholder" : null
       },
+      "sampleOutput" : null,
       "outputSchema" : {
         "advancedOption" : null,
         "description" : null,
@@ -266,7 +267,7 @@
           "options" : null,
           "properties" : [ {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "The ID of the contact.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -286,7 +287,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "Indicator of whether or not this contact refers to an organization or an individual.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -310,7 +311,7 @@
             "controlType" : "SELECT"
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "The contact’s description.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -330,7 +331,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "The contact’s website address.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -350,7 +351,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "The contact’s email address.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -433,8 +434,7 @@
         } ],
         "controlType" : "OBJECT_BUILDER",
         "optionsDataSource" : null
-      },
-      "sampleOutput" : null
+      }
     },
     "properties" : [ {
       "advancedOption" : null,
@@ -582,8 +582,8 @@
       "optionsDataSource" : null
     } ],
     "title" : "Create Contact",
-    "perform" : { },
     "processErrorResponse" : null,
+    "perform" : { },
     "workflowNodeDescription" : null
   }, {
     "batch" : null,
@@ -631,7 +631,7 @@
             "options" : null,
             "properties" : [ {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "The ID of the task.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -650,7 +650,7 @@
               "optionsDataSource" : null
             }, {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "Name of the task.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -670,7 +670,7 @@
               "optionsDataSource" : null
             }, {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "Due date of the task.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -735,6 +735,7 @@
         "sampleOutput" : null,
         "placeholder" : null
       },
+      "sampleOutput" : null,
       "outputSchema" : {
         "advancedOption" : null,
         "description" : null,
@@ -771,7 +772,7 @@
           "options" : null,
           "properties" : [ {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "The ID of the task.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -790,7 +791,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "Name of the task.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -810,7 +811,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "Due date of the task.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -871,8 +872,7 @@
         } ],
         "controlType" : "OBJECT_BUILDER",
         "optionsDataSource" : null
-      },
-      "sampleOutput" : null
+      }
     },
     "properties" : [ {
       "advancedOption" : null,
@@ -913,10 +913,25 @@
       "optionsDataSource" : null
     } ],
     "title" : "Create Task",
-    "perform" : { },
     "processErrorResponse" : null,
+    "perform" : { },
     "workflowNodeDescription" : null
   } ],
+  "dataStream" : null,
+  "triggers" : null,
+  "unifiedApi" : {
+    "category" : "TICKETING",
+    "providerAdapters" : [ {
+      "modelType" : "ACCOUNT"
+    }, {
+      "modelType" : "CONTACT"
+    } ],
+    "providerMappers" : [ {
+      "modelType" : "ACCOUNT"
+    }, {
+      "modelType" : "CONTACT"
+    } ]
+  },
   "connection" : {
     "authorizations" : [ {
       "detectOn" : null,
@@ -965,20 +980,5 @@
     "authorizationRequired" : null,
     "baseUri" : { },
     "test" : null
-  },
-  "triggers" : null,
-  "dataStream" : null,
-  "unifiedApi" : {
-    "category" : "TICKETING",
-    "providerAdapters" : [ {
-      "modelType" : "ACCOUNT"
-    }, {
-      "modelType" : "CONTACT"
-    } ],
-    "providerMappers" : [ {
-      "modelType" : "ACCOUNT"
-    }, {
-      "modelType" : "CONTACT"
-    } ]
   }
 }
