@@ -64,9 +64,9 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |
-|:------------:|:------------:|
-| result | OBJECT <details> <summary> Properties </summary> {STRING\(firstname), STRING\(lastname), STRING\(email), STRING\(phone), STRING\(assigned_user_id), STRING\(id)} </details> |
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| result | OBJECT <details> <summary> Properties </summary> {STRING\(firstname), STRING\(lastname), STRING\(email), STRING\(phone), STRING\(assigned_user_id), STRING\(id)} </details> |  |
 
 
 
@@ -108,9 +108,9 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |
-|:------------:|:------------:|
-| results | OBJECT <details> <summary> Properties </summary> {STRING\(productname), STRING\(product_type), STRING\(assigned_user_id), STRING\(id)} </details> |
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| results | OBJECT <details> <summary> Properties </summary> {STRING\(productname), STRING\(product_type), STRING\(assigned_user_id), STRING\(id)} </details> |  |
 
 
 
@@ -144,9 +144,9 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |
-|:------------:|:------------:|
-| result | OBJECT <details> <summary> Properties </summary> {STRING\(id), STRING\(user_name), STRING\(user_type), STRING\(email), STRING\(phone_home), STRING\(phone_work), STRING\(phone_mobile), STRING\(userlable), STRING\(address_street), STRING\(address_city), STRING\(address_state), STRING\(address_country), STRING\(roleid), STRING\(language), STRING\(is_admin), STRING\(is_owner), STRING\(status)} </details> |
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| result | OBJECT <details> <summary> Properties </summary> {STRING\(id), STRING\(user_name), STRING\(user_type), STRING\(email), STRING\(phone_home), STRING\(phone_work), STRING\(phone_mobile), STRING\(userlable), STRING\(address_street), STRING\(address_city), STRING\(address_state), STRING\(address_country), STRING\(roleid), STRING\(language), STRING\(is_admin), STRING\(is_owner), STRING\(status)} </details> |  |
 
 
 

@@ -71,9 +71,9 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |
-|:------------:|:------------:|
-| id | STRING |
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| id | STRING |  |
 
 
 

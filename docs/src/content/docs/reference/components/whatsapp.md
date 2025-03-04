@@ -62,11 +62,11 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |
-|:------------:|:------------:|
-| messaging_product | STRING |
-| contacts | OBJECT <details> <summary> Properties </summary> {STRING\(input), STRING\(wa_id)} </details> |
-| messages | OBJECT <details> <summary> Properties </summary> {STRING\(id)} </details> |
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| messaging_product | STRING |  |
+| contacts | OBJECT <details> <summary> Properties </summary> {STRING\(input), STRING\(wa_id)} </details> |  |
+| messages | OBJECT <details> <summary> Properties </summary> {STRING\(id)} </details> |  |
 
 
 
@@ -113,10 +113,10 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |
-|:------------:|:------------:|
-| object | STRING |
-| entry | OBJECT <details> <summary> Properties </summary> {STRING\(id), {{STRING\(messaging_product), {STRING\(display_phone_number), STRING\(phone_number_id)}\(metadata)}\(value), {{STRING\(name)}\(profile), STRING\(wa_id)}\(contacts), {STRING\(from), STRING\(id), STRING\(timestamp), {STRING\(body)}\(text)}\(messages)}\(changes)} </details> |
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| object | STRING |  |
+| entry | OBJECT <details> <summary> Properties </summary> {STRING\(id), {{STRING\(messaging_product), {STRING\(display_phone_number), STRING\(phone_number_id)}\(metadata)}\(value), {{STRING\(name)}\(profile), STRING\(wa_id)}\(contacts), {STRING\(from), STRING\(id), STRING\(timestamp), {STRING\(body)}\(text)}\(messages)}\(changes)} </details> |  |
 
 
 

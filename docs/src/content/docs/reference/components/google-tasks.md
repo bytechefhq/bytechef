@@ -64,12 +64,12 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |
-|:------------:|:------------:|
-| id | STRING |
-| title | STRING |
-| notes | STRING |
-| status | STRING |
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| id | STRING | Task identifier. |
+| title | STRING | Title of the task. |
+| notes | STRING | Notes describing the task. |
+| status | STRING | Status of the task. |
 
 
 
@@ -112,9 +112,9 @@ Type: ARRAY
 
 #### Properties
 
-|     Name     |     Type     |
-|:------------:|:------------:|
-|  | OBJECT <details> <summary> Properties </summary> {STRING\(id), STRING\(title), STRING\(notes), STRING\(status)} </details> |
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+|  | OBJECT <details> <summary> Properties </summary> {STRING\(id), STRING\(title), STRING\(notes), STRING\(status)} </details> |  |
 
 
 
@@ -158,12 +158,12 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |
-|:------------:|:------------:|
-| id | STRING |
-| title | STRING |
-| notes | STRING |
-| status | STRING |
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| id | STRING | Task identifier. |
+| title | STRING | Title of the task. |
+| notes | STRING | Notes describing the task. |
+| status | STRING | Status of the task. |
 
 
 

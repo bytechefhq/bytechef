@@ -67,12 +67,12 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |
-|:------------:|:------------:|
-| names | ARRAY <details> <summary> Items </summary> [{STRING\(familyName), STRING\(givenName), STRING\(middleName)}] </details> |
-| organizations | ARRAY <details> <summary> Items </summary> [{STRING\(name), STRING\(title)}] </details> |
-| emailAddresses | ARRAY <details> <summary> Items </summary> [{STRING\(value)}] </details> |
-| phoneNumbers | ARRAY <details> <summary> Items </summary> [{STRING\(value)}] </details> |
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| names | ARRAY <details> <summary> Items </summary> [{STRING\(familyName), STRING\(givenName), STRING\(middleName)}] </details> | The person's names. |
+| organizations | ARRAY <details> <summary> Items </summary> [{STRING\(name), STRING\(title)}] </details> | The person's past or current organizations. |
+| emailAddresses | ARRAY <details> <summary> Items </summary> [{STRING\(value)}] </details> | The person's email addresses. |
+| phoneNumbers | ARRAY <details> <summary> Items </summary> [{STRING\(value)}] </details> | The person's phone numbers. |
 
 
 
@@ -117,9 +117,9 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |
-|:------------:|:------------:|
-| name | STRING |
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| name | STRING | The contact group name set by the group owner or a system provided name for system groups. |
 
 
 
@@ -165,12 +165,12 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |
-|:------------:|:------------:|
-| names | ARRAY <details> <summary> Items </summary> [{STRING\(familyName), STRING\(givenName), STRING\(middleName)}] </details> |
-| organizations | ARRAY <details> <summary> Items </summary> [{STRING\(name), STRING\(title)}] </details> |
-| emailAddresses | ARRAY <details> <summary> Items </summary> [{STRING\(value)}] </details> |
-| phoneNumbers | ARRAY <details> <summary> Items </summary> [{STRING\(value)}] </details> |
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| names | ARRAY <details> <summary> Items </summary> [{STRING\(familyName), STRING\(givenName), STRING\(middleName)}] </details> | The person's names. |
+| organizations | ARRAY <details> <summary> Items </summary> [{STRING\(name), STRING\(title)}] </details> | The person's past or current organizations. |
+| emailAddresses | ARRAY <details> <summary> Items </summary> [{STRING\(value)}] </details> | The person's email addresses. |
+| phoneNumbers | ARRAY <details> <summary> Items </summary> [{STRING\(value)}] </details> | The person's phone numbers. |
 
 
 
@@ -218,9 +218,9 @@ Type: ARRAY
 
 #### Properties
 
-|     Name     |     Type     |
-|:------------:|:------------:|
-|  | OBJECT <details> <summary> Properties </summary> {[{STRING\(familyName), STRING\(givenName), STRING\(middleName)}]\(names), [{STRING\(name), STRING\(title)}]\(organizations), [{STRING\(value)}]\(emailAddresses), [{STRING\(value)}]\(phoneNumbers)} </details> |
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+|  | OBJECT <details> <summary> Properties </summary> {[{STRING\(familyName), STRING\(givenName), STRING\(middleName)}]\(names), [{STRING\(name), STRING\(title)}]\(organizations), [{STRING\(value)}]\(emailAddresses), [{STRING\(value)}]\(phoneNumbers)} </details> |  |
 
 
 

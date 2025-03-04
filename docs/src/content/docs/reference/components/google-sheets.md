@@ -96,11 +96,11 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |
-|:------------:|:------------:|
-| spreadsheetId | STRING |
-| sheetName | STRING |
-| headers | ARRAY <details> <summary> Items </summary> [STRING] </details> |
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| spreadsheetId | STRING | ID of the spreadsheet. |
+| sheetName | STRING | Name of the sheet. |
+| headers | ARRAY <details> <summary> Items </summary> [STRING] </details> | List of headers on the sheet. |
 
 
 
@@ -143,11 +143,11 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |
-|:------------:|:------------:|
-| spreadsheetId | STRING |
-| sheetName | STRING |
-| headers | ARRAY <details> <summary> Items </summary> [STRING] </details> |
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| spreadsheetId | STRING | ID of the spreadsheet. |
+| sheetName | STRING | Name of the sheet. |
+| headers | ARRAY <details> <summary> Items </summary> [STRING] </details> | List of headers on the sheet. |
 
 
 
@@ -420,16 +420,14 @@ Get all sheets from the spreadsheet.
 
 
 
-Type: OBJECT
+Type: ARRAY
 
 
 #### Properties
 
-|     Name     |     Type     |
-|:------------:|:------------:|
-| spreadsheetId | STRING |
-| sheetId | INTEGER |
-| sheetName | STRING |
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+|  | OBJECT <details> <summary> Properties </summary> {STRING\(spreadsheetId), STRING\(sheetName), [STRING]\(headers)} </details> |  |
 
 
 

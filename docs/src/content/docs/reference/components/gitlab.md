@@ -63,14 +63,14 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |
-|:------------:|:------------:|
-| id | INTEGER |
-| iid | INTEGER |
-| project_id | INTEGER |
-| title | STRING |
-| description | STRING |
-| web_url | STRING |
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| id | INTEGER |  |
+| iid | INTEGER |  |
+| project_id | INTEGER |  |
+| title | STRING |  |
+| description | STRING |  |
+| web_url | STRING |  |
 
 
 
@@ -113,10 +113,10 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |
-|:------------:|:------------:|
-| id | INTEGER |
-| body | STRING |
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| id | INTEGER |  |
+| body | STRING |  |
 
 
 
@@ -164,13 +164,13 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |
-|:------------:|:------------:|
-| description | STRING |
-| id | INTEGER |
-| iid | INTEGER |
-| projectId | INTEGER |
-| title | STRING |
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| description | STRING |  |
+| id | INTEGER |  |
+| iid | INTEGER |  |
+| projectId | INTEGER |  |
+| title | STRING |  |
 
 
 

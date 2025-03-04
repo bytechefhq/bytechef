@@ -41,55 +41,6 @@ Version: 1
 ## Actions
 
 
-### Create Contact
-Name: createContact
-
-Create a contact with the given properties.
-
-#### Properties
-
-|      Name       |      Label     |     Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| properties | Properties | OBJECT <details> <summary> Properties </summary> {STRING\(firstname), STRING\(lastname), STRING\(email), STRING\(phone), STRING\(company), STRING\(website)} </details> |  | false |
-
-
-#### Output
-
-
-
-Type: OBJECT
-
-
-#### Properties
-
-|     Name     |     Type     |
-|:------------:|:------------:|
-| id | STRING |
-| properties | OBJECT <details> <summary> Properties </summary> {STRING\(firstname), STRING\(lastname), STRING\(email), STRING\(phone), STRING\(company), STRING\(website)} </details> |
-
-
-
-
-#### JSON Example
-```json
-{
-  "label" : "Create Contact",
-  "name" : "createContact",
-  "parameters" : {
-    "properties" : {
-      "firstname" : "",
-      "lastname" : "",
-      "email" : "",
-      "phone" : "",
-      "company" : "",
-      "website" : ""
-    }
-  },
-  "type" : "hubspot/v1/createContact"
-}
-```
-
-
 ### Delete Contact
 Name: deleteContact
 
@@ -140,10 +91,10 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |
-|:------------:|:------------:|
-| id | STRING |
-| properties | OBJECT <details> <summary> Properties </summary> {STRING\(firstname), STRING\(lastname), STRING\(email), STRING\(phone), STRING\(company), STRING\(website)} </details> |
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| id | STRING | ID of the newly created contact. |
+| properties | OBJECT <details> <summary> Properties </summary> {STRING\(firstname), STRING\(lastname), STRING\(email), STRING\(phone), STRING\(company), STRING\(website)} </details> |  |
 
 
 
@@ -183,10 +134,10 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |
-|:------------:|:------------:|
-| id | STRING |
-| properties | OBJECT <details> <summary> Properties </summary> {STRING\(firstname), STRING\(lastname), STRING\(email), STRING\(phone), STRING\(company), STRING\(website)} </details> |
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| id | STRING | ID of the newly created contact. |
+| properties | OBJECT <details> <summary> Properties </summary> {STRING\(firstname), STRING\(lastname), STRING\(email), STRING\(phone), STRING\(company), STRING\(website)} </details> |  |
 
 
 
@@ -212,6 +163,55 @@ Type: OBJECT
 ```
 
 
+### Create Contact
+Name: createContact
+
+Create a contact with the given properties.
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| properties | Properties | OBJECT <details> <summary> Properties </summary> {STRING\(firstname), STRING\(lastname), STRING\(email), STRING\(phone), STRING\(company), STRING\(website)} </details> |  | false |
+
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| id | STRING | ID of the newly created contact. |
+| properties | OBJECT <details> <summary> Properties </summary> {STRING\(firstname), STRING\(lastname), STRING\(email), STRING\(phone), STRING\(company), STRING\(website)} </details> |  |
+
+
+
+
+#### JSON Example
+```json
+{
+  "label" : "Create Contact",
+  "name" : "createContact",
+  "parameters" : {
+    "properties" : {
+      "firstname" : "",
+      "lastname" : "",
+      "email" : "",
+      "phone" : "",
+      "company" : "",
+      "website" : ""
+    }
+  },
+  "type" : "hubspot/v1/createContact"
+}
+```
+
+
 ### Create Deal
 Name: createDeal
 
@@ -233,10 +233,10 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |
-|:------------:|:------------:|
-| id | STRING |
-| properties | OBJECT <details> <summary> Properties </summary> {STRING\(dealname), NUMBER\(amount), DATE\(closedate), STRING\(pipeline), STRING\(dealstage), STRING\(hubspot_owner_id)} </details> |
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| id | STRING | ID of the deal. |
+| properties | OBJECT <details> <summary> Properties </summary> {STRING\(dealname), NUMBER\(amount), DATE\(closedate), STRING\(pipeline), STRING\(dealstage), STRING\(hubspot_owner_id)} </details> |  |
 
 
 
@@ -282,10 +282,10 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |
-|:------------:|:------------:|
-| id | STRING |
-| properties | OBJECT <details> <summary> Properties </summary> {STRING\(content), STRING\(hs_object_id), STRING\(hs_pipeline), STRING\(hs_pipeline_stage), STRING\(hs_ticket_priority), STRING\(subject)} </details> |
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| id | STRING | ID of the ticket |
+| properties | OBJECT <details> <summary> Properties </summary> {STRING\(content), STRING\(hs_object_id), STRING\(hs_pipeline), STRING\(hs_pipeline_stage), STRING\(hs_ticket_priority), STRING\(subject)} </details> |  |
 
 
 
@@ -331,12 +331,12 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |
-|:------------:|:------------:|
-| eventId | STRING |
-| subscriptionId | STRING |
-| subscriptionType | STRING |
-| objectId | STRING |
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| eventId | STRING | ID of the event that triggered the workflow. |
+| subscriptionId | STRING | ID of the subscription associated with this webhook event. |
+| subscriptionType | STRING | Type of the subscription, indicating the nature of event. |
+| objectId | STRING | ID for the newly created contact. |
 
 
 
@@ -377,12 +377,12 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |
-|:------------:|:------------:|
-| eventId | STRING |
-| subscriptionId | STRING |
-| subscriptionType | STRING |
-| objectId | STRING |
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| eventId | STRING | ID of the event that triggered the workflow. |
+| subscriptionId | STRING | ID of the subscription associated with this webhook event. |
+| subscriptionType | STRING | Type of the subscription, indicating the nature of event. |
+| objectId | STRING | ID for the newly created deal. |
 
 
 
@@ -423,12 +423,12 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |
-|:------------:|:------------:|
-| eventId | STRING |
-| subscriptionId | STRING |
-| subscriptionType | STRING |
-| objectId | STRING |
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| eventId | STRING | ID of the event that triggered the workflow. |
+| subscriptionId | STRING | ID of the subscription associated with this webhook event. |
+| subscriptionType | STRING | Type of the subscription, indicating the nature of event. |
+| objectId | STRING | ID for the newly created ticket. |
 
 
 

@@ -61,19 +61,19 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |
-|:------------:|:------------:|
-| address | OBJECT <details> <summary> Properties </summary> {STRING\(country_code), STRING\(line1), STRING\(line2), STRING\(locality), STRING\(region), STRING\(zip_code), STRING\(zip_four)} </details> |
-| company_name | STRING |
-| custom_fields | ARRAY <details> <summary> Items </summary> [{{}\(content), INTEGER\(id)}] </details> |
-| email_address | STRING |
-| email_opted_in | BOOLEAN <details> <summary> Options </summary> true, false </details> |
-| email_status | STRING <details> <summary> Options </summary> UnengagedMarketable, SingleOptIn, DoubleOptin, Confirmed, UnengagedNonMarketable, NonMarketable, Lockdown, Bounce, HardBounce, Manual, Admin, System, ListUnsubscribe, Feedback, Spam, Invalid, Deactivated </details> |
-| fax_number | OBJECT <details> <summary> Properties </summary> {STRING\(number), STRING\(type)} </details> |
-| id | INTEGER |
-| notes | STRING |
-| phone_number | OBJECT <details> <summary> Properties </summary> {STRING\(extension), STRING\(number), STRING\(type)} </details> |
-| website | STRING |
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| address | OBJECT <details> <summary> Properties </summary> {STRING\(country_code), STRING\(line1), STRING\(line2), STRING\(locality), STRING\(region), STRING\(zip_code), STRING\(zip_four)} </details> |  |
+| company_name | STRING |  |
+| custom_fields | ARRAY <details> <summary> Items </summary> [{{}\(content), INTEGER\(id)}] </details> |  |
+| email_address | STRING |  |
+| email_opted_in | BOOLEAN <details> <summary> Options </summary> true, false </details> |  |
+| email_status | STRING <details> <summary> Options </summary> UnengagedMarketable, SingleOptIn, DoubleOptin, Confirmed, UnengagedNonMarketable, NonMarketable, Lockdown, Bounce, HardBounce, Manual, Admin, System, ListUnsubscribe, Feedback, Spam, Invalid, Deactivated </details> |  |
+| fax_number | OBJECT <details> <summary> Properties </summary> {STRING\(number), STRING\(type)} </details> |  |
+| id | INTEGER |  |
+| notes | STRING |  |
+| phone_number | OBJECT <details> <summary> Properties </summary> {STRING\(extension), STRING\(number), STRING\(type)} </details> |  |
+| website | STRING |  |
 
 
 
@@ -154,23 +154,23 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |
-|:------------:|:------------:|
-| completed | BOOLEAN <details> <summary> Options </summary> true, false </details> |
-| completion_date | DATE_TIME |
-| contact | OBJECT <details> <summary> Properties </summary> {STRING\(email), STRING\(first_name), INTEGER\(id), STRING\(last_name)} </details> |
-| creation_date | DATE_TIME |
-| description | STRING |
-| due_date | DATE_TIME |
-| funnel_id | INTEGER |
-| jgraph_id | INTEGER |
-| modification_date | DATE_TIME |
-| priority | INTEGER |
-| remind_time | INTEGER |
-| title | STRING |
-| type | STRING |
-| url | STRING |
-| user_id | INTEGER |
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| completed | BOOLEAN <details> <summary> Options </summary> true, false </details> |  |
+| completion_date | DATE_TIME |  |
+| contact | OBJECT <details> <summary> Properties </summary> {STRING\(email), STRING\(first_name), INTEGER\(id), STRING\(last_name)} </details> |  |
+| creation_date | DATE_TIME |  |
+| description | STRING |  |
+| due_date | DATE_TIME |  |
+| funnel_id | INTEGER |  |
+| jgraph_id | INTEGER |  |
+| modification_date | DATE_TIME |  |
+| priority | INTEGER |  |
+| remind_time | INTEGER | Value in minutes before start_date to show pop-up reminder. Acceptable values are in [`5`,`10`,`15`,`30`,`60`,`120`,`240`,`480`,`1440`,`2880`] |
+| title | STRING |  |
+| type | STRING |  |
+| url | STRING |  |
+| user_id | INTEGER |  |
 
 
 
@@ -253,43 +253,43 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |
-|:------------:|:------------:|
-| ScoreValue | STRING |
-| addresses | ARRAY <details> <summary> Items </summary> [{STRING\(country_code), STRING\(field), STRING\(line1), STRING\(line2), STRING\(locality), STRING\(postal_code), STRING\(region), STRING\(zip_code), STRING\(zip_four)}] </details> |
-| anniversary | DATE_TIME |
-| birthday | DATE_TIME |
-| company | OBJECT <details> <summary> Properties </summary> {STRING\(company_name), INTEGER\(id)} </details> |
-| company_name | STRING |
-| contact_type | STRING |
-| custom_fields | ARRAY <details> <summary> Items </summary> [{{}\(content), INTEGER\(id)}] </details> |
-| date_created | DATE_TIME |
-| email_addresses | ARRAY <details> <summary> Items </summary> [{STRING\(email), STRING\(field)}] </details> |
-| email_opted_in | BOOLEAN <details> <summary> Options </summary> true, false </details> |
-| email_status | STRING <details> <summary> Options </summary> UnengagedMarketable, SingleOptIn, DoubleOptin, Confirmed, UnengagedNonMarketable, NonMarketable, Lockdown, Bounce, HardBounce, Manual, Admin, System, ListUnsubscribe, Feedback, Spam, Invalid, Deactivated </details> |
-| family_name | STRING |
-| fax_numbers | ARRAY <details> <summary> Items </summary> [{STRING\(field), STRING\(number), STRING\(type)}] </details> |
-| given_name | STRING |
-| id | INTEGER |
-| job_title | STRING |
-| last_updated | DATE_TIME |
-| lead_source_id | INTEGER |
-| middle_name | STRING |
-| opt_in_reason | STRING |
-| origin | OBJECT <details> <summary> Properties </summary> {DATE_TIME\(date), STRING\(ip_address)} </details> |
-| owner_id | INTEGER |
-| phone_numbers | ARRAY <details> <summary> Items </summary> [{STRING\(extension), STRING\(field), STRING\(number), STRING\(type)}] </details> |
-| preferred_locale | STRING |
-| preferred_name | STRING |
-| prefix | STRING |
-| relationships | ARRAY <details> <summary> Items </summary> [{INTEGER\(id), INTEGER\(linked_contact_id), INTEGER\(relationship_type_id)}] </details> |
-| social_accounts | ARRAY <details> <summary> Items </summary> [{STRING\(name), STRING\(type)}] </details> |
-| source_type | STRING <details> <summary> Options </summary> APPOINTMENT, FORMAPIHOSTED, FORMAPIINTERNAL, WEBFORM, INTERNALFORM, LANDINGPAGE, IMPORT, MANUAL, API, OTHER, UNKNOWN </details> |
-| spouse_name | STRING |
-| suffix | STRING |
-| tag_ids | ARRAY <details> <summary> Items </summary> [INTEGER] </details> |
-| time_zone | STRING |
-| website | STRING |
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| ScoreValue | STRING |  |
+| addresses | ARRAY <details> <summary> Items </summary> [{STRING\(country_code), STRING\(field), STRING\(line1), STRING\(line2), STRING\(locality), STRING\(postal_code), STRING\(region), STRING\(zip_code), STRING\(zip_four)}] </details> |  |
+| anniversary | DATE_TIME |  |
+| birthday | DATE_TIME |  |
+| company | OBJECT <details> <summary> Properties </summary> {STRING\(company_name), INTEGER\(id)} </details> |  |
+| company_name | STRING |  |
+| contact_type | STRING |  |
+| custom_fields | ARRAY <details> <summary> Items </summary> [{{}\(content), INTEGER\(id)}] </details> |  |
+| date_created | DATE_TIME |  |
+| email_addresses | ARRAY <details> <summary> Items </summary> [{STRING\(email), STRING\(field)}] </details> |  |
+| email_opted_in | BOOLEAN <details> <summary> Options </summary> true, false </details> |  |
+| email_status | STRING <details> <summary> Options </summary> UnengagedMarketable, SingleOptIn, DoubleOptin, Confirmed, UnengagedNonMarketable, NonMarketable, Lockdown, Bounce, HardBounce, Manual, Admin, System, ListUnsubscribe, Feedback, Spam, Invalid, Deactivated </details> |  |
+| family_name | STRING |  |
+| fax_numbers | ARRAY <details> <summary> Items </summary> [{STRING\(field), STRING\(number), STRING\(type)}] </details> |  |
+| given_name | STRING |  |
+| id | INTEGER |  |
+| job_title | STRING |  |
+| last_updated | DATE_TIME |  |
+| lead_source_id | INTEGER |  |
+| middle_name | STRING |  |
+| opt_in_reason | STRING |  |
+| origin | OBJECT <details> <summary> Properties </summary> {DATE_TIME\(date), STRING\(ip_address)} </details> |  |
+| owner_id | INTEGER |  |
+| phone_numbers | ARRAY <details> <summary> Items </summary> [{STRING\(extension), STRING\(field), STRING\(number), STRING\(type)}] </details> |  |
+| preferred_locale | STRING |  |
+| preferred_name | STRING |  |
+| prefix | STRING |  |
+| relationships | ARRAY <details> <summary> Items </summary> [{INTEGER\(id), INTEGER\(linked_contact_id), INTEGER\(relationship_type_id)}] </details> |  |
+| social_accounts | ARRAY <details> <summary> Items </summary> [{STRING\(name), STRING\(type)}] </details> |  |
+| source_type | STRING <details> <summary> Options </summary> APPOINTMENT, FORMAPIHOSTED, FORMAPIINTERNAL, WEBFORM, INTERNALFORM, LANDINGPAGE, IMPORT, MANUAL, API, OTHER, UNKNOWN </details> |  |
+| spouse_name | STRING |  |
+| suffix | STRING |  |
+| tag_ids | ARRAY <details> <summary> Items </summary> [INTEGER] </details> |  |
+| time_zone | STRING |  |
+| website | STRING |  |
 
 
 

@@ -99,9 +99,9 @@ Type: ARRAY
 
 #### Properties
 
-|     Name     |     Type     |
-|:------------:|:------------:|
-|  | OBJECT <details> <summary> Properties </summary> {INTEGER\(id)} </details> |
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+|  | OBJECT <details> <summary> Properties </summary> {INTEGER\(id)} </details> |  |
 
 
 
@@ -149,9 +149,9 @@ Type: ARRAY
 
 #### Properties
 
-|     Name     |     Type     |
-|:------------:|:------------:|
-|  | OBJECT <details> <summary> Properties </summary> {INTEGER\(id)} </details> |
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+|  | OBJECT <details> <summary> Properties </summary> {INTEGER\(id)} </details> |  |
 
 
 

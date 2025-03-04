@@ -66,10 +66,10 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |
-|:------------:|:------------:|
-| data | OBJECT <details> <summary> Properties </summary> {STRING\(id), BOOLEAN\(is_organization), STRING\(title), STRING\(website), STRING\(email)} </details> |
-| meta | OBJECT <details> <summary> Properties </summary> {INTEGER\(version), STRING\(type)} </details> |
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| data | OBJECT <details> <summary> Properties </summary> {STRING\(id), BOOLEAN\(is_organization), STRING\(title), STRING\(website), STRING\(email)} </details> |  |
+| meta | OBJECT <details> <summary> Properties </summary> {INTEGER\(version), STRING\(type)} </details> |  |
 
 
 
@@ -115,10 +115,10 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |
-|:------------:|:------------:|
-| data | OBJECT <details> <summary> Properties </summary> {INTEGER\(id), STRING\(content), DATE\(due_date)} </details> |
-| meta | OBJECT <details> <summary> Properties </summary> {STRING\(type)} </details> |
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| data | OBJECT <details> <summary> Properties </summary> {INTEGER\(id), STRING\(content), DATE\(due_date)} </details> |  |
+| meta | OBJECT <details> <summary> Properties </summary> {STRING\(type)} </details> |  |
 
 
 

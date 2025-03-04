@@ -64,12 +64,12 @@ Type: FILE_ENTRY
 
 #### Properties
 
-|     Name     |     Type     |
-|:------------:|:------------:|
-| extension | STRING |
-| mimeType | STRING |
-| name | STRING |
-| url | STRING |
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| extension | STRING |  |
+| mimeType | STRING |  |
+| name | STRING |  |
+| url | STRING |  |
 
 
 
@@ -149,9 +149,9 @@ Type: ARRAY
 
 #### Properties
 
-|     Name     |     Type     |
-|:------------:|:------------:|
-|  | OBJECT <details> <summary> Properties </summary> {STRING\(key), STRING\(suffix), STRING\(uri)} </details> |
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+|  | OBJECT <details> <summary> Properties </summary> {STRING\(key), STRING\(suffix), STRING\(uri)} </details> |  |
 
 
 

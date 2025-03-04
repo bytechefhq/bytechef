@@ -63,12 +63,12 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |
-|:------------:|:------------:|
-| id | STRING |
-| name | STRING |
-| description | STRING |
-| template_id | STRING |
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| id | STRING |  |
+| name | STRING |  |
+| description | STRING |  |
+| template_id | STRING |  |
 
 
 
@@ -113,13 +113,13 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |
-|:------------:|:------------:|
-| id | STRING |
-| name | STRING |
-| project | STRING |
-| description | STRING |
-| due_date | DATE_TIME |
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| id | STRING |  |
+| name | STRING |  |
+| project | STRING |  |
+| description | STRING |  |
+| due_date | DATE_TIME |  |
 
 
 
@@ -162,12 +162,12 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |
-|:------------:|:------------:|
-| id | STRING |
-| name | STRING |
-| project | STRING |
-| description | STRING |
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| id | STRING |  |
+| name | STRING |  |
+| project | STRING |  |
+| description | STRING |  |
 
 
 
@@ -207,10 +207,10 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |
-|:------------:|:------------:|
-| message | STRING |
-| task_group | OBJECT <details> <summary> Properties </summary> {STRING\(id), STRING\(name), STRING\(color), STRING\(created_by), STRING\(project), INTEGER\(order)} </details> |
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| message | STRING |  |
+| task_group | OBJECT <details> <summary> Properties </summary> {STRING\(id), STRING\(name), STRING\(color), STRING\(created_by), STRING\(project), INTEGER\(order)} </details> |  |
 
 
 
@@ -252,9 +252,9 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |
-|:------------:|:------------:|
-| items | ARRAY <details> <summary> Items </summary> [{STRING\(id), STRING\(project), STRING\(start), BOOLEAN\(manual), STRING\(user), STRING\(task), STRING\(end), BOOLEAN\(active), STRING\(duration)}] </details> |
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| items | ARRAY <details> <summary> Items </summary> [{STRING\(id), STRING\(project), STRING\(start), BOOLEAN\(manual), STRING\(user), STRING\(task), STRING\(end), BOOLEAN\(active), STRING\(duration)}] </details> |  |
 
 
 
@@ -302,12 +302,12 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |
-|:------------:|:------------:|
-| id | STRING |
-| project | STRING |
-| order | STRING |
-| milestone | STRING |
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| id | STRING |  |
+| project | STRING |  |
+| order | STRING |  |
+| milestone | STRING |  |
 
 
 

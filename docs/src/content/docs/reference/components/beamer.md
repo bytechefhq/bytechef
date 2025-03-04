@@ -62,25 +62,25 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |
-|:------------:|:------------:|
-| id | STRING |
-| date | STRING |
-| visible | STRING |
-| category | STRING |
-| status | STRING |
-| translations | ARRAY <details> <summary> Items </summary> [{STRING\(title), STRING\(content), STRING\(contentHtml), STRING\(language), STRING\(permalink), [STRING]\(images)}] </details> |
-| votesCount | INTEGER |
-| commentsCount | STRING |
-| notes | STRING |
-| filters | STRING |
-| internalUserEmail | STRING |
-| internalUserFirstname | STRING |
-| internalUserLastname | STRING |
-| userId | STRING |
-| userEmail | STRING |
-| userFirstname | STRING |
-| userLastname | STRING |
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| id | STRING | The ID of the new feature request. |
+| date | STRING | Publish date of the new feature request. |
+| visible | STRING | Whether this feature required is visible or not. |
+| category | STRING | The category of the new feature request. |
+| status | STRING | The status of the new feature request. |
+| translations | ARRAY <details> <summary> Items </summary> [{STRING\(title), STRING\(content), STRING\(contentHtml), STRING\(language), STRING\(permalink), [STRING]\(images)}] </details> |  |
+| votesCount | INTEGER | The number of votes for the new feature request. |
+| commentsCount | STRING | The number of comments for the new feature request. |
+| notes | STRING | The notes for the new feature request. |
+| filters | STRING | Segment filters for the new feature request. |
+| internalUserEmail | STRING | Email of the user in your account who created this feature request (if created by a team member). |
+| internalUserFirstname | STRING | First name of the user in your account who created this feature request (if created by a team member). |
+| internalUserLastname | STRING | Last name of the user in your account who created this feature request (if created by a team member). |
+| userId | STRING | ID of the end user who created this feature request (if created by an end user). |
+| userEmail | STRING | Email of the end user who created this feature request (if created by an end user). |
+| userFirstname | STRING | First name of the end user who created this feature request (if created by an end user). |
+| userLastname | STRING | Last name of the end user who created this feature request (if created by an end user). |
 
 
 
@@ -124,16 +124,16 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |
-|:------------:|:------------:|
-| id | STRING |
-| date | STRING |
-| dueDate | STRING |
-| published | STRING |
-| category | STRING |
-| feedbackEnabled | STRING |
-| reactionsEnabled | STRING |
-| translations | ARRAY <details> <summary> Items </summary> [{STRING\(title), STRING\(content), STRING\(category), STRING\(contentHtml), STRING\(language), STRING\(postUrl)}] </details> |
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| id | STRING | The ID of the new post. |
+| date | STRING | Publication date of the new post. |
+| dueDate | STRING | Expiration date of the new post. |
+| published | STRING | Whether the new post is published or a draft. |
+| category | STRING | Category of the new post. |
+| feedbackEnabled | STRING | Whether this user feedback is enabled for this post. |
+| reactionsEnabled | STRING | Whether reactions are enabled for this post. |
+| translations | ARRAY <details> <summary> Items </summary> [{STRING\(title), STRING\(content), STRING\(contentHtml), STRING\(language), STRING\(category), STRING\(linkUrl), STRING\(linkText), [STRING]\(images)}] </details> |  |
 
 
 
@@ -169,9 +169,9 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |
-|:------------:|:------------:|
-| url | STRING |
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| url | STRING | URL for your standalone feed. |
 
 
 
@@ -212,17 +212,17 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |
-|:------------:|:------------:|
-| id | STRING |
-| date | STRING |
-| text | STRING |
-| postTitle | STRING |
-| userId | STRING |
-| userEmail | STRING |
-| userFirstname | STRING |
-| userLastname | STRING |
-| url | STRING |
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| id | STRING | ID of the new comment. |
+| date | STRING | Publication date of the new comment. |
+| text | STRING | Content of the new comment. |
+| postTitle | STRING | Title of the post this comment was created on. |
+| userId | STRING | ID of the user that created the new comment. |
+| userEmail | STRING | Email of the user that created the new comment. |
+| userFirstname | STRING | First name of the user that created the new comment. |
+| userLastname | STRING | Last name of the user that created the new comment. |
+| url | STRING | URL of the new comment in your dashboard. |
 
 
 
@@ -270,16 +270,16 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |
-|:------------:|:------------:|
-| id | STRING |
-| date | STRING |
-| featureRequestTitle | STRING |
-| userId | STRING |
-| userEmail | STRING |
-| userFirstname | STRING |
-| userLastname | STRING |
-| url | STRING |
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| id | STRING | The ID of the new vote. |
+| date | STRING | Creation date of the new vote. |
+| featureRequestTitle | STRING | Title of the feature request this vote is created on. |
+| userId | STRING | ID of the user that created the new vote. |
+| userEmail | STRING | Email of the user that created the new vote. |
+| userFirstname | STRING | First name of the user that created the new vote. |
+| userLastname | STRING | Last name of the user that created the new vote. |
+| url | STRING | URL of the new vote in your dashboard. |
 
 
 

@@ -63,11 +63,11 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |
-|:------------:|:------------:|
-| id | STRING |
-| content | STRING |
-| tts | BOOLEAN <details> <summary> Options </summary> true, false </details> |
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| id | STRING |  |
+| content | STRING |  |
+| tts | BOOLEAN <details> <summary> Options </summary> true, false </details> |  |
 
 
 
@@ -111,11 +111,11 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |
-|:------------:|:------------:|
-| id | STRING |
-| type | INTEGER |
-| name | STRING |
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| id | STRING |  |
+| type | INTEGER |  |
+| name | STRING |  |
 
 
 
@@ -159,9 +159,9 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |
-|:------------:|:------------:|
-| body | OBJECT <details> <summary> Properties </summary> {STRING\(id)} </details> |
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| body | OBJECT <details> <summary> Properties </summary> {STRING\(id)} </details> |  |
 
 
 

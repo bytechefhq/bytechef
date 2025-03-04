@@ -50,7 +50,7 @@ Adds an assignees to the specified issue.
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | repository | Repository | STRING |  | true |
-| issue | Issue | STRING <details> <summary> Depends On </summary> repository </details> | The issue to add assignee to. | true |
+| issue | Issue Number | STRING <details> <summary> Depends On </summary> repository </details> | The number of the issue to add assignee to. | true |
 | assignees | Assignees | ARRAY <details> <summary> Items </summary> [STRING] </details> | The list of assignees to add to the issue. | true |
 
 
@@ -63,17 +63,17 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |
-|:------------:|:------------:|
-| url | STRING |
-| repository_url | STRING |
-| id | NUMBER |
-| number | INTEGER |
-| title | STRING |
-| state | STRING |
-| assignees | ARRAY <details> <summary> Items </summary> [{STRING\(login), STRING\(id), STRING\(html_url), STRING\(type)}] </details> |
-| labels | ARRAY <details> <summary> Items </summary> [{STRING\(id), STRING\(name), STRING\(description)}] </details> |
-| body | STRING |
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| url | STRING | The URL linking directly to the issue on GitHub. |
+| repository_url | STRING | The URL of the repository where the issue is located. |
+| id | NUMBER | ID of the issue. |
+| number | INTEGER | A unique number identifying the issue within its repository. |
+| title | STRING | The title or headline of the issue. |
+| state | STRING | The current state of the issue, such as open or closed. |
+| assignees | ARRAY <details> <summary> Items </summary> [{STRING\(login), STRING\(id), STRING\(html_url), STRING\(type)}] </details> | A list of users assigned to the issue. |
+| labels | ARRAY <details> <summary> Items </summary> [{STRING\(id), STRING\(name), STRING\(description)}] </details> | A collection of labels associated with the issue. |
+| body | STRING | The main content of the issue. |
 
 
 
@@ -103,7 +103,7 @@ Adds labels to the specified issue.
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | repository | Repository | STRING |  | true |
-| issue | Issue | STRING <details> <summary> Depends On </summary> repository </details> | The issue to add labels to. | true |
+| issue | Issue Number | STRING <details> <summary> Depends On </summary> repository </details> | The number of the issue to add labels to. | true |
 | labels | Labels | ARRAY <details> <summary> Items </summary> [STRING] </details> | The list of labels to add to the issue. | true |
 
 
@@ -116,9 +116,9 @@ Type: ARRAY
 
 #### Properties
 
-|     Name     |     Type     |
-|:------------:|:------------:|
-|  | OBJECT <details> <summary> Properties </summary> {STRING\(id), STRING\(name), STRING\(description)} </details> |
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+|  | OBJECT <details> <summary> Properties </summary> {STRING\(id), STRING\(name), STRING\(description), STRING\(color)} </details> |  |
 
 
 
@@ -148,7 +148,7 @@ Adds a comment to the specified issue.
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | repository | Repository | STRING |  | true |
-| issue | Issue | STRING <details> <summary> Depends On </summary> repository </details> | The issue to comment on. | true |
+| issue | Issue Number | STRING <details> <summary> Depends On </summary> repository </details> | The number of the issue to comment on. | true |
 | body | Comment | STRING | The comment to add to the issue. | true |
 
 
@@ -161,17 +161,17 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |
-|:------------:|:------------:|
-| url | STRING |
-| repository_url | STRING |
-| id | NUMBER |
-| number | INTEGER |
-| title | STRING |
-| state | STRING |
-| assignees | ARRAY <details> <summary> Items </summary> [{STRING\(login), STRING\(id), STRING\(html_url), STRING\(type)}] </details> |
-| labels | ARRAY <details> <summary> Items </summary> [{STRING\(id), STRING\(name), STRING\(description)}] </details> |
-| body | STRING |
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| url | STRING | The URL linking directly to the issue on GitHub. |
+| repository_url | STRING | The URL of the repository where the issue is located. |
+| id | NUMBER | ID of the issue. |
+| number | INTEGER | A unique number identifying the issue within its repository. |
+| title | STRING | The title or headline of the issue. |
+| state | STRING | The current state of the issue, such as open or closed. |
+| assignees | ARRAY <details> <summary> Items </summary> [{STRING\(login), STRING\(id), STRING\(html_url), STRING\(type)}] </details> | A list of users assigned to the issue. |
+| labels | ARRAY <details> <summary> Items </summary> [{STRING\(id), STRING\(name), STRING\(description)}] </details> | A collection of labels associated with the issue. |
+| body | STRING | The main content of the issue. |
 
 
 
@@ -214,17 +214,17 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |
-|:------------:|:------------:|
-| url | STRING |
-| repository_url | STRING |
-| id | NUMBER |
-| number | INTEGER |
-| title | STRING |
-| state | STRING |
-| assignees | ARRAY <details> <summary> Items </summary> [{STRING\(login), STRING\(id), STRING\(html_url), STRING\(type)}] </details> |
-| labels | ARRAY <details> <summary> Items </summary> [{STRING\(id), STRING\(name), STRING\(description)}] </details> |
-| body | STRING |
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| url | STRING | The URL linking directly to the issue on GitHub. |
+| repository_url | STRING | The URL of the repository where the issue is located. |
+| id | NUMBER | ID of the issue. |
+| number | INTEGER | A unique number identifying the issue within its repository. |
+| title | STRING | The title or headline of the issue. |
+| state | STRING | The current state of the issue, such as open or closed. |
+| assignees | ARRAY <details> <summary> Items </summary> [{STRING\(login), STRING\(id), STRING\(html_url), STRING\(type)}] </details> | A list of users assigned to the issue. |
+| labels | ARRAY <details> <summary> Items </summary> [{STRING\(id), STRING\(name), STRING\(description)}] </details> | A collection of labels associated with the issue. |
+| body | STRING | The main content of the issue. |
 
 
 
@@ -254,7 +254,7 @@ Get information from a specific issue
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | repository | Repository | STRING |  | true |
-| issue | Issue | STRING <details> <summary> Depends On </summary> repository </details> | The issue you want to get details from. | true |
+| issue | Issue Number | STRING <details> <summary> Depends On </summary> repository </details> | The number of the issue you want to get details from. | true |
 
 
 #### Output
@@ -266,17 +266,17 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |
-|:------------:|:------------:|
-| url | STRING |
-| repository_url | STRING |
-| id | NUMBER |
-| number | INTEGER |
-| title | STRING |
-| state | STRING |
-| assignees | ARRAY <details> <summary> Items </summary> [{STRING\(login), STRING\(id), STRING\(html_url), STRING\(type)}] </details> |
-| labels | ARRAY <details> <summary> Items </summary> [{STRING\(id), STRING\(name), STRING\(description)}] </details> |
-| body | STRING |
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| url | STRING | The URL linking directly to the issue on GitHub. |
+| repository_url | STRING | The URL of the repository where the issue is located. |
+| id | NUMBER | ID of the issue. |
+| number | INTEGER | A unique number identifying the issue within its repository. |
+| title | STRING | The title or headline of the issue. |
+| state | STRING | The current state of the issue, such as open or closed. |
+| assignees | ARRAY <details> <summary> Items </summary> [{STRING\(login), STRING\(id), STRING\(html_url), STRING\(type)}] </details> | A list of users assigned to the issue. |
+| labels | ARRAY <details> <summary> Items </summary> [{STRING\(id), STRING\(name), STRING\(description)}] </details> | A collection of labels associated with the issue. |
+| body | STRING | The main content of the issue. |
 
 
 
@@ -317,9 +317,9 @@ Type: ARRAY
 
 #### Properties
 
-|     Name     |     Type     |
-|:------------:|:------------:|
-|  | OBJECT <details> <summary> Properties </summary> {STRING\(url), STRING\(repository_url), NUMBER\(id), INTEGER\(number), STRING\(title), STRING\(state), [{STRING\(login), STRING\(id), STRING\(html_url), STRING\(type)}]\(assignees), [{STRING\(id), STRING\(name), STRING\(description)}]\(labels), STRING\(body)} </details> |
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+|  | OBJECT <details> <summary> Properties </summary> {STRING\(url), STRING\(repository_url), NUMBER\(id), INTEGER\(number), STRING\(title), STRING\(state), [{STRING\(login), STRING\(id), STRING\(html_url), STRING\(type)}]\(assignees), [{STRING\(id), STRING\(name), STRING\(description)}]\(labels), STRING\(body)} </details> |  |
 
 
 
@@ -359,9 +359,9 @@ Type: ARRAY
 
 #### Properties
 
-|     Name     |     Type     |
-|:------------:|:------------:|
-|  | OBJECT <details> <summary> Properties </summary> {STRING\(url), STRING\(repository_url), NUMBER\(id), INTEGER\(number), STRING\(title), STRING\(state), [{STRING\(login), STRING\(id), STRING\(html_url), STRING\(type)}]\(assignees), [{STRING\(id), STRING\(name), STRING\(description)}]\(labels), STRING\(body)} </details> |
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+|  | OBJECT <details> <summary> Properties </summary> {STRING\(url), STRING\(repository_url), NUMBER\(id), INTEGER\(number), STRING\(title), STRING\(state), [{STRING\(login), STRING\(id), STRING\(html_url), STRING\(type)}]\(assignees), [{STRING\(id), STRING\(name), STRING\(description)}]\(labels), STRING\(body)} </details> |  |
 
 
 
@@ -438,13 +438,12 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |
-|:------------:|:------------:|
-| issue | OBJECT <details> <summary> Properties </summary> {STRING\(url), STRING\(repository_url), NUMBER\(id), INTEGER\(number), STRING\(title), STRING\(state), STRING\(body)} </details> |
-| sender | OBJECT <details> <summary> Properties </summary> {STRING\(login), INTEGER\(id)} </details> |
-| action | STRING |
-| starred_at | STRING |
-| repository | OBJECT <details> <summary> Properties </summary> {INTEGER\(id), STRING\(name), STRING\(full_name), {STRING\(login), INTEGER\(id)}\(owner), STRING\(visibility), INTEGER\(forks), INTEGER\(open_issues), STRING\(default_branch)} </details> |
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| issue | OBJECT <details> <summary> Properties </summary> {STRING\(url), STRING\(repository_url), NUMBER\(id), INTEGER\(number), STRING\(title), STRING\(state), [{STRING\(login), STRING\(id), STRING\(html_url), STRING\(type)}]\(assignees), [{STRING\(id), STRING\(name), STRING\(description)}]\(labels), STRING\(body)} </details> |  |
+| sender | OBJECT <details> <summary> Properties </summary> {STRING\(login), INTEGER\(id)} </details> | Information about the author of the issue. |
+| action | STRING | The action performed on the issue, such as 'opened', 'closed', or 'reopened'. |
+| repository | OBJECT <details> <summary> Properties </summary> {INTEGER\(id), STRING\(name), STRING\(full_name), {STRING\(login), INTEGER\(id)}\(owner), STRING\(visibility), INTEGER\(forks), INTEGER\(open_issues), STRING\(default_branch)} </details> |  |
 
 
 
@@ -485,13 +484,13 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |
-|:------------:|:------------:|
-| number | INTEGER |
-| pull_request | OBJECT <details> <summary> Properties </summary> {INTEGER\(id), STRING\(state), STRING\(title), STRING\(body), INTEGER\(commits)} </details> |
-| sender | OBJECT <details> <summary> Properties </summary> {STRING\(login), INTEGER\(id)} </details> |
-| action | STRING |
-| repository | OBJECT <details> <summary> Properties </summary> {INTEGER\(id), STRING\(name), STRING\(full_name), {STRING\(login), INTEGER\(id)}\(owner), STRING\(visibility), INTEGER\(forks), INTEGER\(open_issues), STRING\(default_branch)} </details> |
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| number | INTEGER | Number uniquely identifying the pull request within its repository. |
+| pull_request | OBJECT <details> <summary> Properties </summary> {INTEGER\(id), STRING\(state), STRING\(title), STRING\(body), INTEGER\(commits)} </details> |  |
+| sender | OBJECT <details> <summary> Properties </summary> {STRING\(login), INTEGER\(id)} </details> | Information about the author of the pull request. |
+| action | STRING | The action performed on the pull request, such as opened, closed, or synchronized. |
+| repository | OBJECT <details> <summary> Properties </summary> {INTEGER\(id), STRING\(name), STRING\(full_name), {STRING\(login), INTEGER\(id)}\(owner), STRING\(visibility), INTEGER\(forks), INTEGER\(open_issues), STRING\(default_branch)} </details> |  |
 
 
 

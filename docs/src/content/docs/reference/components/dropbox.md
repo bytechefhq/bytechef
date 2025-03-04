@@ -63,9 +63,9 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |
-|:------------:|:------------:|
-| metadata | OBJECT <details> <summary> Properties </summary> {STRING\(.tag), STRING\(name), STRING\(path_lower), STRING\(path_display), STRING\(id)} </details> |
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| metadata | OBJECT <details> <summary> Properties </summary> {STRING\(.tag), STRING\(name), STRING\(path_lower), STRING\(path_display), STRING\(id)} </details> |  |
 
 
 
@@ -106,9 +106,9 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |
-|:------------:|:------------:|
-| metadata | OBJECT <details> <summary> Properties </summary> {STRING\(name), STRING\(path_lower), STRING\(path_display), STRING\(id)} </details> |
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| metadata | OBJECT <details> <summary> Properties </summary> {STRING\(name), STRING\(path_lower), STRING\(path_display), STRING\(id)} </details> |  |
 
 
 
@@ -152,12 +152,12 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |
-|:------------:|:------------:|
-| url | STRING |
-| resultPath | STRING |
-| fileId | STRING |
-| paperRevision | INTEGER |
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| url | STRING |  |
+| resultPath | STRING |  |
+| fileId | STRING |  |
+| paperRevision | INTEGER |  |
 
 
 
@@ -202,9 +202,9 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |
-|:------------:|:------------:|
-| metadata | OBJECT <details> <summary> Properties </summary> {STRING\(.tag), STRING\(name), STRING\(path_lower), STRING\(path_display), STRING\(id)} </details> |
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| metadata | OBJECT <details> <summary> Properties </summary> {STRING\(.tag), STRING\(name), STRING\(path_lower), STRING\(path_display), STRING\(id)} </details> |  |
 
 
 
@@ -245,10 +245,10 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |
-|:------------:|:------------:|
-| metadata | OBJECT <details> <summary> Properties </summary> {STRING\(name), STRING\(path_lower), STRING\(path_display), STRING\(id)} </details> |
-| link | STRING |
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| metadata | OBJECT <details> <summary> Properties </summary> {STRING\(name), STRING\(path_lower), STRING\(path_display), STRING\(id)} </details> |  |
+| link | STRING |  |
 
 
 
@@ -288,9 +288,9 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |
-|:------------:|:------------:|
-| entries | ARRAY <details> <summary> Items </summary> [{{STRING\(.tag), STRING\(name), STRING\(path_lower), STRING\(path_Display), STRING\(id)}\(f)}] </details> |
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| entries | ARRAY <details> <summary> Items </summary> [{{STRING\(.tag), STRING\(name), STRING\(path_lower), STRING\(path_Display), STRING\(id)}\(f)}] </details> |  |
 
 
 
@@ -331,9 +331,9 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |
-|:------------:|:------------:|
-| metadata | OBJECT <details> <summary> Properties </summary> {STRING\(.tag), STRING\(name), STRING\(path_lower), STRING\(path_display), STRING\(id)} </details> |
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| metadata | OBJECT <details> <summary> Properties </summary> {STRING\(.tag), STRING\(name), STRING\(path_lower), STRING\(path_display), STRING\(id)} </details> |  |
 
 
 
@@ -374,9 +374,9 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |
-|:------------:|:------------:|
-| matches | ARRAY <details> <summary> Items </summary> [{{STRING\(.tag)}\(match_type), {STRING\(.tag), STRING\(id), STRING\(name), STRING\(path_display), STRING\(path_lower)}\(metadata)}] </details> |
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| matches | ARRAY <details> <summary> Items </summary> [{{STRING\(.tag)}\(match_type), {STRING\(.tag), STRING\(id), STRING\(name), STRING\(path_display), STRING\(path_lower)}\(metadata)}] </details> |  |
 
 
 
@@ -420,21 +420,21 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |
-|:------------:|:------------:|
-| id | STRING |
-| clientModified | DATE |
-| serverModified | DATE |
-| rev | STRING |
-| size | INTEGER |
-| symlinkInfo | OBJECT <details> <summary> Properties </summary> {STRING\(target)} </details> |
-| sharingInfo | OBJECT <details> <summary> Properties </summary> {STRING\(parentSharedFolderId), STRING\(modifiedBy)} </details> |
-| isDownloadable | BOOLEAN <details> <summary> Options </summary> true, false </details> |
-| exportInfo | OBJECT <details> <summary> Properties </summary> {STRING\(exportAs), [STRING]\(exportOptions)} </details> |
-| propertyGroups | ARRAY <details> <summary> Items </summary> [{STRING\(templateId), [{STRING\(name), STRING\(value)}]\(fields)}] </details> |
-| hasExplicitSharedMembers | BOOLEAN <details> <summary> Options </summary> true, false </details> |
-| contentHash | STRING |
-| fileLockInfo | OBJECT <details> <summary> Properties </summary> {BOOLEAN\(isLockholder), STRING\(lockholderName), STRING\(lockholderAccountId), DATE\(created)} </details> |
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| id | STRING |  |
+| clientModified | DATE |  |
+| serverModified | DATE |  |
+| rev | STRING |  |
+| size | INTEGER |  |
+| symlinkInfo | OBJECT <details> <summary> Properties </summary> {STRING\(target)} </details> |  |
+| sharingInfo | OBJECT <details> <summary> Properties </summary> {STRING\(parentSharedFolderId), STRING\(modifiedBy)} </details> |  |
+| isDownloadable | BOOLEAN <details> <summary> Options </summary> true, false </details> |  |
+| exportInfo | OBJECT <details> <summary> Properties </summary> {STRING\(exportAs), [STRING]\(exportOptions)} </details> |  |
+| propertyGroups | ARRAY <details> <summary> Items </summary> [{STRING\(templateId), [{STRING\(name), STRING\(value)}]\(fields)}] </details> |  |
+| hasExplicitSharedMembers | BOOLEAN <details> <summary> Options </summary> true, false </details> |  |
+| contentHash | STRING |  |
+| fileLockInfo | OBJECT <details> <summary> Properties </summary> {BOOLEAN\(isLockholder), STRING\(lockholderName), STRING\(lockholderAccountId), DATE\(created)} </details> |  |
 
 
 

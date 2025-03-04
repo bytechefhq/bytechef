@@ -130,10 +130,10 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |
-|:------------:|:------------:|
-| url | STRING |
-| b64Json | STRING |
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| url | STRING |  |
+| b64Json | STRING |  |
 
 
 
@@ -186,12 +186,12 @@ Type: FILE_ENTRY
 
 #### Properties
 
-|     Name     |     Type     |
-|:------------:|:------------:|
-| extension | STRING |
-| mimeType | STRING |
-| name | STRING |
-| url | STRING |
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| extension | STRING |  |
+| mimeType | STRING |  |
+| name | STRING |  |
+| url | STRING |  |
 
 
 

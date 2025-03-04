@@ -62,9 +62,9 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |
-|:------------:|:------------:|
-| account | OBJECT <details> <summary> Properties </summary> {STRING\(name), STRING\(accountUrl)} </details> |
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| account | OBJECT <details> <summary> Properties </summary> {STRING\(name), STRING\(accountUrl)} </details> |  |
 
 
 
@@ -106,9 +106,9 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |
-|:------------:|:------------:|
-| contact | OBJECT <details> <summary> Properties </summary> {STRING\(email), STRING\(firstName), STRING\(lastName), STRING\(phone)} </details> |
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| contact | OBJECT <details> <summary> Properties </summary> {STRING\(email), STRING\(firstName), STRING\(lastName), STRING\(phone)} </details> |  |
 
 
 
@@ -152,9 +152,9 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |
-|:------------:|:------------:|
-| dealTask | OBJECT <details> <summary> Properties </summary> {STRING\(id), STRING\(title), INTEGER\(relid), DATE\(duedate), INTEGER\(dealTasktype)} </details> |
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| dealTask | OBJECT <details> <summary> Properties </summary> {STRING\(id), STRING\(title), INTEGER\(relid), DATE\(duedate), INTEGER\(dealTasktype)} </details> |  |
 
 
 

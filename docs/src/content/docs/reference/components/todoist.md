@@ -64,13 +64,13 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |
-|:------------:|:------------:|
-| id | STRING |
-| project_id | STRING |
-| content | STRING |
-| description | STRING |
-| priority | INTEGER |
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| id | STRING |  |
+| project_id | STRING |  |
+| content | STRING |  |
+| description | STRING |  |
+| priority | INTEGER |  |
 
 
 
@@ -143,13 +143,13 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |
-|:------------:|:------------:|
-| id | STRING |
-| name | STRING |
-| color | STRING |
-| is_favorite | STRING |
-| url | STRING |
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| id | STRING |  |
+| name | STRING |  |
+| color | STRING |  |
+| is_favorite | STRING |  |
+| url | STRING |  |
 
 
 

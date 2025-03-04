@@ -64,11 +64,11 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |
-|:------------:|:------------:|
-| id | STRING |
-| displayName | STRING |
-| description | STRING |
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| id | STRING | ID of the channel. |
+| displayName | STRING | Name of the channel that will appear to the user in Microsoft Teams. |
+| description | STRING | Description of the channel. |
 
 
 
@@ -112,11 +112,11 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |
-|:------------:|:------------:|
-| id | STRING |
-| body | OBJECT <details> <summary> Properties </summary> {STRING\(contentType), STRING\(content)} </details> |
-| channelIdentity | OBJECT <details> <summary> Properties </summary> {STRING\(teamId), STRING\(channelId)} </details> |
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| id | STRING | ID of the message. |
+| body | OBJECT <details> <summary> Properties </summary> {STRING\(contentType), STRING\(content)} </details> | Plaintext/HTML representation of the content of the chat message. |
+| channelIdentity | OBJECT <details> <summary> Properties </summary> {STRING\(teamId), STRING\(channelId)} </details> | Represents identity of the channel. |
 
 
 
@@ -160,11 +160,11 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |
-|:------------:|:------------:|
-| id | STRING |
-| chatId | STRING |
-| body | OBJECT <details> <summary> Properties </summary> {STRING\(contentType), STRING\(content)} </details> |
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| id | STRING | ID of the message. |
+| chatId | STRING | ID of the chat. |
+| body | OBJECT <details> <summary> Properties </summary> {STRING\(contentType), STRING\(content)} </details> | Plaintext/HTML representation of the content of the chat message. |
 
 
 

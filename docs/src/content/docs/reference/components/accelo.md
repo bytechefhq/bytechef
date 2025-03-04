@@ -65,10 +65,10 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |
-|:------------:|:------------:|
-| response | OBJECT <details> <summary> Properties </summary> {STRING\(id), STRING\(name)} </details> |
-| meta | OBJECT <details> <summary> Properties </summary> {STRING\(more_info), STRING\(status), STRING\(message)} </details> |
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| response | OBJECT <details> <summary> Properties </summary> {STRING\(id), STRING\(name)} </details> |  |
+| meta | OBJECT <details> <summary> Properties </summary> {STRING\(more_info), STRING\(status), STRING\(message)} </details> |  |
 
 
 
@@ -114,10 +114,10 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |
-|:------------:|:------------:|
-| response | OBJECT <details> <summary> Properties </summary> {STRING\(id), STRING\(firstname), STRING\(lastname), STRING\(email)} </details> |
-| meta | OBJECT <details> <summary> Properties </summary> {STRING\(more_info), STRING\(status), STRING\(message)} </details> |
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| response | OBJECT <details> <summary> Properties </summary> {STRING\(id), STRING\(firstname), STRING\(lastname), STRING\(email)} </details> |  |
+| meta | OBJECT <details> <summary> Properties </summary> {STRING\(more_info), STRING\(status), STRING\(message)} </details> |  |
 
 
 
@@ -163,10 +163,10 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |
-|:------------:|:------------:|
-| response | OBJECT <details> <summary> Properties </summary> {STRING\(id), STRING\(title)} </details> |
-| meta | OBJECT <details> <summary> Properties </summary> {STRING\(more_info), STRING\(status), STRING\(message)} </details> |
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| response | OBJECT <details> <summary> Properties </summary> {STRING\(id), STRING\(title)} </details> |  |
+| meta | OBJECT <details> <summary> Properties </summary> {STRING\(more_info), STRING\(status), STRING\(message)} </details> |  |
 
 
 

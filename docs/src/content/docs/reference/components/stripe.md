@@ -64,14 +64,14 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |
-|:------------:|:------------:|
-| id | STRING |
-| description | STRING |
-| email | STRING |
-| name | STRING |
-| phone | STRING |
-| address | OBJECT <details> <summary> Properties </summary> {STRING\(city), STRING\(country), STRING\(line1), STRING\(line2), STRING\(postal_code), STRING\(state)} </details> |
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| id | STRING |  |
+| description | STRING |  |
+| email | STRING |  |
+| name | STRING |  |
+| phone | STRING |  |
+| address | OBJECT <details> <summary> Properties </summary> {STRING\(city), STRING\(country), STRING\(line1), STRING\(line2), STRING\(postal_code), STRING\(state)} </details> |  |
 
 
 
@@ -123,12 +123,12 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |
-|:------------:|:------------:|
-| id | STRING |
-| customer | STRING |
-| currency | STRING |
-| description | STRING |
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| id | STRING |  |
+| customer | STRING |  |
+| currency | STRING |  |
+| description | STRING |  |
 
 
 
@@ -170,15 +170,15 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |
-|:------------:|:------------:|
-| id | STRING |
-| object | STRING |
-| description | STRING |
-| email | STRING |
-| name | STRING |
-| phone | STRING |
-| address | OBJECT <details> <summary> Properties </summary> {STRING\(city), STRING\(country), STRING\(line1), STRING\(line2), STRING\(postal_code), STRING\(state)} </details> |
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| id | STRING |  |
+| object | STRING |  |
+| description | STRING |  |
+| email | STRING |  |
+| name | STRING |  |
+| phone | STRING |  |
+| address | OBJECT <details> <summary> Properties </summary> {STRING\(city), STRING\(country), STRING\(line1), STRING\(line2), STRING\(postal_code), STRING\(state)} </details> |  |
 
 
 
@@ -210,14 +210,14 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |
-|:------------:|:------------:|
-| id | STRING |
-| object | STRING |
-| currency | STRING |
-| customer | STRING |
-| customer_name | STRING |
-| description | STRING |
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| id | STRING |  |
+| object | STRING |  |
+| currency | STRING |  |
+| customer | STRING |  |
+| customer_name | STRING |  |
+| description | STRING |  |
 
 
 
