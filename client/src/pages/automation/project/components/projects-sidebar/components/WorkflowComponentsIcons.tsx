@@ -21,7 +21,7 @@ const WorkflowComponentsIcons = ({
         <div className="mr-2 flex items-center justify-center rounded-full border bg-background p-1" key={name}>
             <Tooltip>
                 <TooltipTrigger asChild>
-                    {componentDefinition ? (
+                    {componentDefinition?.icon || taskDispatcherDefinition?.icon ? (
                         <InlineSVG
                             className="size-5 flex-none"
                             src={componentDefinition?.icon || taskDispatcherDefinition?.icon || ''}
