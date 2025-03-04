@@ -429,9 +429,9 @@
       "optionsDataSource" : null
     } ],
     "title" : "Create Contact",
-    "processErrorResponse" : null,
+    "perform" : null,
     "workflowNodeDescription" : null,
-    "perform" : null
+    "processErrorResponse" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -724,9 +724,9 @@
       "optionsDataSource" : null
     } ],
     "title" : "Create Organization",
-    "processErrorResponse" : null,
+    "perform" : null,
     "workflowNodeDescription" : null,
-    "perform" : null
+    "processErrorResponse" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -977,13 +977,13 @@
       "optionsDataSource" : null
     } ],
     "title" : "Create Task",
-    "processErrorResponse" : null,
+    "perform" : null,
     "workflowNodeDescription" : null,
-    "perform" : null
+    "processErrorResponse" : null
   } ],
+  "triggers" : [ ],
   "dataStream" : null,
   "unifiedApi" : null,
-  "triggers" : [ ],
   "connection" : {
     "authorizations" : [ {
       "detectOn" : null,

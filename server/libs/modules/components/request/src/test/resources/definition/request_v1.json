@@ -14,6 +14,7 @@
   "version" : 1,
   "title" : "Request",
   "actions" : null,
+  "connection" : null,
   "dataStream" : null,
   "triggers" : [ {
     "batch" : null,
@@ -93,6 +94,5 @@
     "webhookValidateOnEnable" : null,
     "workflowNodeDescription" : null
   } ],
-  "unifiedApi" : null,
-  "connection" : null
+  "unifiedApi" : null
 }

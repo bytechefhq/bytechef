@@ -42,7 +42,7 @@
           "options" : null,
           "properties" : [ {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "Task identifier.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -62,7 +62,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "Title of the task.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -82,7 +82,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "Notes describing the task.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -102,7 +102,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "Status of the task.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -146,7 +146,7 @@
         "options" : null,
         "properties" : [ {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "Task identifier.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -166,7 +166,7 @@
           "optionsDataSource" : null
         }, {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "Title of the task.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -186,7 +186,7 @@
           "optionsDataSource" : null
         }, {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "Notes describing the task.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -206,7 +206,7 @@
           "optionsDataSource" : null
         }, {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "Status of the task.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -369,7 +369,7 @@
             "options" : null,
             "properties" : [ {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "Task identifier.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -389,7 +389,7 @@
               "optionsDataSource" : null
             }, {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "Title of the task.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -409,7 +409,7 @@
               "optionsDataSource" : null
             }, {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "Notes describing the task.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -429,7 +429,7 @@
               "optionsDataSource" : null
             }, {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "Status of the task.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -494,7 +494,7 @@
           "options" : null,
           "properties" : [ {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "Task identifier.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -514,7 +514,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "Title of the task.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -534,7 +534,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "Notes describing the task.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -554,7 +554,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "Status of the task.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -666,7 +666,7 @@
           "options" : null,
           "properties" : [ {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "Task identifier.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -686,7 +686,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "Title of the task.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -706,7 +706,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "Notes describing the task.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -726,7 +726,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "Status of the task.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -770,7 +770,7 @@
         "options" : null,
         "properties" : [ {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "Task identifier.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -790,7 +790,7 @@
           "optionsDataSource" : null
         }, {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "Title of the task.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -810,7 +810,7 @@
           "optionsDataSource" : null
         }, {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "Notes describing the task.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -830,7 +830,7 @@
           "optionsDataSource" : null
         }, {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "Status of the task.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -974,9 +974,6 @@
     "workflowNodeDescription" : null,
     "perform" : { }
   } ],
-  "dataStream" : null,
-  "triggers" : null,
-  "unifiedApi" : null,
   "connection" : {
     "authorizations" : [ {
       "detectOn" : null,
@@ -1028,12 +1025,12 @@
       "type" : "OAUTH2_AUTHORIZATION_CODE",
       "acquire" : null,
       "apply" : null,
-      "pkce" : null,
       "authorizationCallback" : null,
       "authorizationUrl" : { },
       "clientId" : null,
       "clientSecret" : null,
       "oauth2AuthorizationExtraQueryParameters" : { },
+      "pkce" : null,
       "refresh" : null,
       "refreshUrl" : { },
       "scopes" : { },
@@ -1045,5 +1042,8 @@
     "authorizationRequired" : null,
     "baseUri" : null,
     "test" : null
-  }
+  },
+  "dataStream" : null,
+  "triggers" : null,
+  "unifiedApi" : null
 }

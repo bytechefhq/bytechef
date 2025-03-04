@@ -346,9 +346,9 @@
       "optionsDataSource" : null
     } ],
     "title" : "Create Company",
+    "processErrorResponse" : null,
     "workflowNodeDescription" : null,
-    "perform" : null,
-    "processErrorResponse" : null
+    "perform" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -640,13 +640,13 @@
       "optionsDataSource" : null
     } ],
     "title" : "Create Task",
+    "processErrorResponse" : null,
     "workflowNodeDescription" : null,
-    "perform" : null,
-    "processErrorResponse" : null
+    "perform" : null
   } ],
+  "dataStream" : null,
   "unifiedApi" : null,
   "triggers" : [ ],
-  "dataStream" : null,
   "connection" : {
     "authorizations" : [ {
       "detectOn" : null,

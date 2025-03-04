@@ -42,7 +42,7 @@
           "options" : null,
           "properties" : [ {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "The ID of the new activity.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -62,7 +62,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "The type of the new activity.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -79,7 +79,7 @@
             "options" : null,
             "properties" : [ {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "The category of the activity type.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -99,7 +99,7 @@
               "optionsDataSource" : null
             }, {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "The ID of the activity type.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -122,7 +122,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "Text body of the new activity.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -142,7 +142,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "The resource to which this new activity belongs.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -159,7 +159,7 @@
             "options" : null,
             "properties" : [ {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "Parent type associated with new activity.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -179,7 +179,7 @@
               "optionsDataSource" : null
             }, {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "ID of the parent this activity is associated with.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -207,7 +207,6 @@
         "sampleOutput" : null,
         "placeholder" : null
       },
-      "sampleOutput" : null,
       "outputSchema" : {
         "advancedOption" : null,
         "description" : null,
@@ -227,7 +226,7 @@
         "options" : null,
         "properties" : [ {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "The ID of the new activity.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -247,7 +246,7 @@
           "optionsDataSource" : null
         }, {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "The type of the new activity.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -264,7 +263,7 @@
           "options" : null,
           "properties" : [ {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "The category of the activity type.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -284,7 +283,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "The ID of the activity type.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -307,7 +306,7 @@
           "optionsDataSource" : null
         }, {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "Text body of the new activity.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -327,7 +326,7 @@
           "optionsDataSource" : null
         }, {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "The resource to which this new activity belongs.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -344,7 +343,7 @@
           "options" : null,
           "properties" : [ {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "Parent type associated with new activity.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -364,7 +363,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "ID of the parent this activity is associated with.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -388,7 +387,8 @@
         } ],
         "controlType" : "OBJECT_BUILDER",
         "optionsDataSource" : null
-      }
+      },
+      "sampleOutput" : null
     },
     "properties" : [ {
       "advancedOption" : null,
@@ -526,7 +526,7 @@
           "options" : null,
           "properties" : [ {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "ID of the new company.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -546,7 +546,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "Name of the new company.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -566,7 +566,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "Address of the new company.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -583,7 +583,7 @@
             "options" : null,
             "properties" : [ {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "Street of the new company.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -603,7 +603,7 @@
               "optionsDataSource" : null
             }, {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "City of the new company.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -623,7 +623,7 @@
               "optionsDataSource" : null
             }, {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "State of the new company.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -643,7 +643,7 @@
               "optionsDataSource" : null
             }, {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "Postal code of the new company.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -663,7 +663,7 @@
               "optionsDataSource" : null
             }, {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "Country of the new company.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -686,7 +686,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "ID of the user that is owner of the new company.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -706,7 +706,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "ID of the contact type of the new company.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -726,7 +726,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "Description of the new company.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -746,7 +746,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "Domain to which email addresses of the new company belong.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -766,7 +766,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "Phone numbers belonging to the new company.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -797,7 +797,7 @@
               "options" : null,
               "properties" : [ {
                 "advancedOption" : null,
-                "description" : null,
+                "description" : "Phone number for the new company.",
                 "displayCondition" : null,
                 "expressionEnabled" : null,
                 "hidden" : null,
@@ -817,7 +817,7 @@
                 "optionsDataSource" : null
               }, {
                 "advancedOption" : null,
-                "description" : null,
+                "description" : "Category of the phone number.",
                 "displayCondition" : null,
                 "expressionEnabled" : null,
                 "hidden" : null,
@@ -847,7 +847,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "Social profiles belonging to the company.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -878,7 +878,7 @@
               "options" : null,
               "properties" : [ {
                 "advancedOption" : null,
-                "description" : null,
+                "description" : "URL of the social profile.",
                 "displayCondition" : null,
                 "expressionEnabled" : null,
                 "hidden" : null,
@@ -898,7 +898,7 @@
                 "optionsDataSource" : null
               }, {
                 "advancedOption" : null,
-                "description" : null,
+                "description" : "Category of the social profile.",
                 "displayCondition" : null,
                 "expressionEnabled" : null,
                 "hidden" : null,
@@ -928,7 +928,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "Tags associated with the company.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -969,7 +969,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "Websites belonging to the company.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -1000,7 +1000,7 @@
               "options" : null,
               "properties" : [ {
                 "advancedOption" : null,
-                "description" : null,
+                "description" : "URL of the website.",
                 "displayCondition" : null,
                 "expressionEnabled" : null,
                 "hidden" : null,
@@ -1020,7 +1020,7 @@
                 "optionsDataSource" : null
               }, {
                 "advancedOption" : null,
-                "description" : null,
+                "description" : "Category of the website.",
                 "displayCondition" : null,
                 "expressionEnabled" : null,
                 "hidden" : null,
@@ -1055,7 +1055,6 @@
         "sampleOutput" : null,
         "placeholder" : null
       },
-      "sampleOutput" : null,
       "outputSchema" : {
         "advancedOption" : null,
         "description" : null,
@@ -1075,7 +1074,7 @@
         "options" : null,
         "properties" : [ {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "ID of the new company.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -1095,7 +1094,7 @@
           "optionsDataSource" : null
         }, {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "Name of the new company.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -1115,7 +1114,7 @@
           "optionsDataSource" : null
         }, {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "Address of the new company.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -1132,7 +1131,7 @@
           "options" : null,
           "properties" : [ {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "Street of the new company.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -1152,7 +1151,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "City of the new company.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -1172,7 +1171,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "State of the new company.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -1192,7 +1191,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "Postal code of the new company.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -1212,7 +1211,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "Country of the new company.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -1235,7 +1234,7 @@
           "optionsDataSource" : null
         }, {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "ID of the user that is owner of the new company.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -1255,7 +1254,7 @@
           "optionsDataSource" : null
         }, {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "ID of the contact type of the new company.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -1275,7 +1274,7 @@
           "optionsDataSource" : null
         }, {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "Description of the new company.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -1295,7 +1294,7 @@
           "optionsDataSource" : null
         }, {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "Domain to which email addresses of the new company belong.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -1315,7 +1314,7 @@
           "optionsDataSource" : null
         }, {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "Phone numbers belonging to the new company.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -1346,7 +1345,7 @@
             "options" : null,
             "properties" : [ {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "Phone number for the new company.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -1366,7 +1365,7 @@
               "optionsDataSource" : null
             }, {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "Category of the phone number.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -1396,7 +1395,7 @@
           "optionsDataSource" : null
         }, {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "Social profiles belonging to the company.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -1427,7 +1426,7 @@
             "options" : null,
             "properties" : [ {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "URL of the social profile.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -1447,7 +1446,7 @@
               "optionsDataSource" : null
             }, {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "Category of the social profile.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -1477,7 +1476,7 @@
           "optionsDataSource" : null
         }, {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "Tags associated with the company.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -1518,7 +1517,7 @@
           "optionsDataSource" : null
         }, {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "Websites belonging to the company.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -1549,7 +1548,7 @@
             "options" : null,
             "properties" : [ {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "URL of the website.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -1569,7 +1568,7 @@
               "optionsDataSource" : null
             }, {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "Category of the website.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -1600,7 +1599,8 @@
         } ],
         "controlType" : "OBJECT_BUILDER",
         "optionsDataSource" : null
-      }
+      },
+      "sampleOutput" : null
     },
     "properties" : [ {
       "advancedOption" : null,
@@ -2209,7 +2209,7 @@
           "options" : null,
           "properties" : [ {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "ID of the new person.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -2229,7 +2229,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "First and last name of the new person.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -2249,7 +2249,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "Address of the new person.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -2266,7 +2266,7 @@
             "options" : null,
             "properties" : [ {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "Street of the new person.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -2286,7 +2286,7 @@
               "optionsDataSource" : null
             }, {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "City of the new person.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -2306,7 +2306,7 @@
               "optionsDataSource" : null
             }, {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "State of the new person.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -2326,7 +2326,7 @@
               "optionsDataSource" : null
             }, {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "Postal code of the new person.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -2346,7 +2346,7 @@
               "optionsDataSource" : null
             }, {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "Country of the new person.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -2369,7 +2369,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "ID of the user that is owner of the new person.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -2389,7 +2389,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "ID of the primary company with which the new person is associated.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -2409,7 +2409,27 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "The name of the primary company with which the new person is associated.",
+            "displayCondition" : null,
+            "expressionEnabled" : null,
+            "hidden" : null,
+            "metadata" : { },
+            "required" : null,
+            "name" : "company_name",
+            "type" : "STRING",
+            "defaultValue" : null,
+            "exampleValue" : null,
+            "label" : null,
+            "placeholder" : null,
+            "controlType" : "TEXT",
+            "languageId" : null,
+            "maxLength" : null,
+            "minLength" : null,
+            "options" : null,
+            "optionsDataSource" : null
+          }, {
+            "advancedOption" : null,
+            "description" : "ID of the contact type of the new person.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -2429,7 +2449,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "Description of the new person.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -2449,7 +2469,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "Email addresses belonging to the new person.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -2480,7 +2500,7 @@
               "options" : null,
               "properties" : [ {
                 "advancedOption" : null,
-                "description" : null,
+                "description" : "Email address.",
                 "displayCondition" : null,
                 "expressionEnabled" : null,
                 "hidden" : null,
@@ -2500,7 +2520,7 @@
                 "optionsDataSource" : null
               }, {
                 "advancedOption" : null,
-                "description" : null,
+                "description" : "Category of the email address.",
                 "displayCondition" : null,
                 "expressionEnabled" : null,
                 "hidden" : null,
@@ -2530,7 +2550,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "Phone numbers belonging to the new person.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -2561,7 +2581,7 @@
               "options" : null,
               "properties" : [ {
                 "advancedOption" : null,
-                "description" : null,
+                "description" : "Phone number for the new person.",
                 "displayCondition" : null,
                 "expressionEnabled" : null,
                 "hidden" : null,
@@ -2581,7 +2601,7 @@
                 "optionsDataSource" : null
               }, {
                 "advancedOption" : null,
-                "description" : null,
+                "description" : "Category of the phone number.",
                 "displayCondition" : null,
                 "expressionEnabled" : null,
                 "hidden" : null,
@@ -2611,7 +2631,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "Social profiles belonging to the person.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -2642,7 +2662,7 @@
               "options" : null,
               "properties" : [ {
                 "advancedOption" : null,
-                "description" : null,
+                "description" : "URL of the social profile.",
                 "displayCondition" : null,
                 "expressionEnabled" : null,
                 "hidden" : null,
@@ -2662,7 +2682,7 @@
                 "optionsDataSource" : null
               }, {
                 "advancedOption" : null,
-                "description" : null,
+                "description" : "Category of the social profile.",
                 "displayCondition" : null,
                 "expressionEnabled" : null,
                 "hidden" : null,
@@ -2692,7 +2712,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "Tags associated with the person.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -2753,7 +2773,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "Websites belonging to the person.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -2784,7 +2804,7 @@
               "options" : null,
               "properties" : [ {
                 "advancedOption" : null,
-                "description" : null,
+                "description" : "URL of the website.",
                 "displayCondition" : null,
                 "expressionEnabled" : null,
                 "hidden" : null,
@@ -2804,7 +2824,7 @@
                 "optionsDataSource" : null
               }, {
                 "advancedOption" : null,
-                "description" : null,
+                "description" : "Category of the website.",
                 "displayCondition" : null,
                 "expressionEnabled" : null,
                 "hidden" : null,
@@ -2839,7 +2859,6 @@
         "sampleOutput" : null,
         "placeholder" : null
       },
-      "sampleOutput" : null,
       "outputSchema" : {
         "advancedOption" : null,
         "description" : null,
@@ -2859,7 +2878,7 @@
         "options" : null,
         "properties" : [ {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "ID of the new person.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -2879,7 +2898,7 @@
           "optionsDataSource" : null
         }, {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "First and last name of the new person.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -2899,7 +2918,7 @@
           "optionsDataSource" : null
         }, {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "Address of the new person.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -2916,7 +2935,7 @@
           "options" : null,
           "properties" : [ {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "Street of the new person.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -2936,7 +2955,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "City of the new person.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -2956,7 +2975,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "State of the new person.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -2976,7 +2995,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "Postal code of the new person.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -2996,7 +3015,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "Country of the new person.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -3019,7 +3038,7 @@
           "optionsDataSource" : null
         }, {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "ID of the user that is owner of the new person.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -3039,7 +3058,7 @@
           "optionsDataSource" : null
         }, {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "ID of the primary company with which the new person is associated.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -3059,7 +3078,27 @@
           "optionsDataSource" : null
         }, {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "The name of the primary company with which the new person is associated.",
+          "displayCondition" : null,
+          "expressionEnabled" : null,
+          "hidden" : null,
+          "metadata" : { },
+          "required" : null,
+          "name" : "company_name",
+          "type" : "STRING",
+          "defaultValue" : null,
+          "exampleValue" : null,
+          "label" : null,
+          "placeholder" : null,
+          "controlType" : "TEXT",
+          "languageId" : null,
+          "maxLength" : null,
+          "minLength" : null,
+          "options" : null,
+          "optionsDataSource" : null
+        }, {
+          "advancedOption" : null,
+          "description" : "ID of the contact type of the new person.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -3079,7 +3118,7 @@
           "optionsDataSource" : null
         }, {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "Description of the new person.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -3099,7 +3138,7 @@
           "optionsDataSource" : null
         }, {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "Email addresses belonging to the new person.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -3130,7 +3169,7 @@
             "options" : null,
             "properties" : [ {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "Email address.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -3150,7 +3189,7 @@
               "optionsDataSource" : null
             }, {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "Category of the email address.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -3180,7 +3219,7 @@
           "optionsDataSource" : null
         }, {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "Phone numbers belonging to the new person.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -3211,7 +3250,7 @@
             "options" : null,
             "properties" : [ {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "Phone number for the new person.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -3231,7 +3270,7 @@
               "optionsDataSource" : null
             }, {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "Category of the phone number.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -3261,7 +3300,7 @@
           "optionsDataSource" : null
         }, {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "Social profiles belonging to the person.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -3292,7 +3331,7 @@
             "options" : null,
             "properties" : [ {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "URL of the social profile.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -3312,7 +3351,7 @@
               "optionsDataSource" : null
             }, {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "Category of the social profile.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -3342,7 +3381,7 @@
           "optionsDataSource" : null
         }, {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "Tags associated with the person.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -3403,7 +3442,7 @@
           "optionsDataSource" : null
         }, {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "Websites belonging to the person.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -3434,7 +3473,7 @@
             "options" : null,
             "properties" : [ {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "URL of the website.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -3454,7 +3493,7 @@
               "optionsDataSource" : null
             }, {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "Category of the website.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -3485,7 +3524,8 @@
         } ],
         "controlType" : "OBJECT_BUILDER",
         "optionsDataSource" : null
-      }
+      },
+      "sampleOutput" : null
     },
     "properties" : [ {
       "advancedOption" : null,
@@ -4210,7 +4250,7 @@
           "options" : null,
           "properties" : [ {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "ID of the new task.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -4230,7 +4270,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "Name of the new task.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -4250,7 +4290,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "Primary related resource for the new task.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -4267,7 +4307,7 @@
             "options" : null,
             "properties" : [ {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -4310,7 +4350,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "ID of the user that is owner of the new task.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -4330,7 +4370,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "The due date of the new task.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -4350,7 +4390,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "The reminder date of the new task.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -4370,7 +4410,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "The date the task was completed.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -4390,7 +4430,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "The priority of the new task.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -4410,7 +4450,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "The status of the new task.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -4430,7 +4470,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "Description of the new task.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -4450,7 +4490,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "Tags associated with the new task.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -4489,67 +4529,6 @@
             "options" : null,
             "controlType" : "ARRAY_BUILDER",
             "optionsDataSource" : null
-          }, {
-            "advancedOption" : null,
-            "description" : null,
-            "displayCondition" : null,
-            "expressionEnabled" : null,
-            "hidden" : null,
-            "metadata" : { },
-            "required" : null,
-            "name" : "custom_fields",
-            "type" : "ARRAY",
-            "defaultValue" : null,
-            "exampleValue" : null,
-            "label" : null,
-            "placeholder" : null,
-            "items" : null,
-            "maxItems" : null,
-            "minItems" : null,
-            "multipleValues" : null,
-            "options" : null,
-            "controlType" : "ARRAY_BUILDER",
-            "optionsDataSource" : null
-          }, {
-            "advancedOption" : null,
-            "description" : null,
-            "displayCondition" : null,
-            "expressionEnabled" : null,
-            "hidden" : null,
-            "metadata" : { },
-            "required" : null,
-            "name" : "date_created",
-            "type" : "STRING",
-            "defaultValue" : null,
-            "exampleValue" : null,
-            "label" : null,
-            "placeholder" : null,
-            "controlType" : "TEXT",
-            "languageId" : null,
-            "maxLength" : null,
-            "minLength" : null,
-            "options" : null,
-            "optionsDataSource" : null
-          }, {
-            "advancedOption" : null,
-            "description" : null,
-            "displayCondition" : null,
-            "expressionEnabled" : null,
-            "hidden" : null,
-            "metadata" : { },
-            "required" : null,
-            "name" : "date_modified",
-            "type" : "STRING",
-            "defaultValue" : null,
-            "exampleValue" : null,
-            "label" : null,
-            "placeholder" : null,
-            "controlType" : "TEXT",
-            "languageId" : null,
-            "maxLength" : null,
-            "minLength" : null,
-            "options" : null,
-            "optionsDataSource" : null
           } ],
           "controlType" : "OBJECT_BUILDER",
           "optionsDataSource" : null
@@ -4557,7 +4536,6 @@
         "sampleOutput" : null,
         "placeholder" : null
       },
-      "sampleOutput" : null,
       "outputSchema" : {
         "advancedOption" : null,
         "description" : null,
@@ -4577,7 +4555,7 @@
         "options" : null,
         "properties" : [ {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "ID of the new task.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -4597,7 +4575,7 @@
           "optionsDataSource" : null
         }, {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "Name of the new task.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -4617,7 +4595,7 @@
           "optionsDataSource" : null
         }, {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "Primary related resource for the new task.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -4634,7 +4612,7 @@
           "options" : null,
           "properties" : [ {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -4677,7 +4655,7 @@
           "optionsDataSource" : null
         }, {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "ID of the user that is owner of the new task.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -4697,7 +4675,7 @@
           "optionsDataSource" : null
         }, {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "The due date of the new task.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -4717,7 +4695,7 @@
           "optionsDataSource" : null
         }, {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "The reminder date of the new task.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -4737,7 +4715,7 @@
           "optionsDataSource" : null
         }, {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "The date the task was completed.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -4757,7 +4735,7 @@
           "optionsDataSource" : null
         }, {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "The priority of the new task.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -4777,7 +4755,7 @@
           "optionsDataSource" : null
         }, {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "The status of the new task.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -4797,7 +4775,7 @@
           "optionsDataSource" : null
         }, {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "Description of the new task.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -4817,7 +4795,7 @@
           "optionsDataSource" : null
         }, {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "Tags associated with the new task.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -4856,71 +4834,11 @@
           "options" : null,
           "controlType" : "ARRAY_BUILDER",
           "optionsDataSource" : null
-        }, {
-          "advancedOption" : null,
-          "description" : null,
-          "displayCondition" : null,
-          "expressionEnabled" : null,
-          "hidden" : null,
-          "metadata" : { },
-          "required" : null,
-          "name" : "custom_fields",
-          "type" : "ARRAY",
-          "defaultValue" : null,
-          "exampleValue" : null,
-          "label" : null,
-          "placeholder" : null,
-          "items" : null,
-          "maxItems" : null,
-          "minItems" : null,
-          "multipleValues" : null,
-          "options" : null,
-          "controlType" : "ARRAY_BUILDER",
-          "optionsDataSource" : null
-        }, {
-          "advancedOption" : null,
-          "description" : null,
-          "displayCondition" : null,
-          "expressionEnabled" : null,
-          "hidden" : null,
-          "metadata" : { },
-          "required" : null,
-          "name" : "date_created",
-          "type" : "STRING",
-          "defaultValue" : null,
-          "exampleValue" : null,
-          "label" : null,
-          "placeholder" : null,
-          "controlType" : "TEXT",
-          "languageId" : null,
-          "maxLength" : null,
-          "minLength" : null,
-          "options" : null,
-          "optionsDataSource" : null
-        }, {
-          "advancedOption" : null,
-          "description" : null,
-          "displayCondition" : null,
-          "expressionEnabled" : null,
-          "hidden" : null,
-          "metadata" : { },
-          "required" : null,
-          "name" : "date_modified",
-          "type" : "STRING",
-          "defaultValue" : null,
-          "exampleValue" : null,
-          "label" : null,
-          "placeholder" : null,
-          "controlType" : "TEXT",
-          "languageId" : null,
-          "maxLength" : null,
-          "minLength" : null,
-          "options" : null,
-          "optionsDataSource" : null
         } ],
         "controlType" : "OBJECT_BUILDER",
         "optionsDataSource" : null
-      }
+      },
+      "sampleOutput" : null
     },
     "properties" : [ {
       "advancedOption" : null,

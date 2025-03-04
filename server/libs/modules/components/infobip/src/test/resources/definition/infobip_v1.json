@@ -42,7 +42,7 @@
           "options" : null,
           "properties" : [ {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "ID assigned to the request if messaging multiple recipients or sending multiple messages via a single API request.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -62,7 +62,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "An array of message objects of a single message or multiple messages sent under one bulk ID.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -93,7 +93,7 @@
               "options" : null,
               "properties" : [ {
                 "advancedOption" : null,
-                "description" : null,
+                "description" : "ID of the message.",
                 "displayCondition" : null,
                 "expressionEnabled" : null,
                 "hidden" : null,
@@ -113,7 +113,7 @@
                 "optionsDataSource" : null
               }, {
                 "advancedOption" : null,
-                "description" : null,
+                "description" : "Status of the message.",
                 "displayCondition" : null,
                 "expressionEnabled" : null,
                 "hidden" : null,
@@ -130,7 +130,7 @@
                 "options" : null,
                 "properties" : [ {
                   "advancedOption" : null,
-                  "description" : null,
+                  "description" : "Status group ID.",
                   "displayCondition" : null,
                   "expressionEnabled" : null,
                   "hidden" : null,
@@ -149,7 +149,7 @@
                   "optionsDataSource" : null
                 }, {
                   "advancedOption" : null,
-                  "description" : null,
+                  "description" : "Status group name that describes which category the status code belongs to",
                   "displayCondition" : null,
                   "expressionEnabled" : null,
                   "hidden" : null,
@@ -169,7 +169,7 @@
                   "optionsDataSource" : null
                 }, {
                   "advancedOption" : null,
-                  "description" : null,
+                  "description" : "Status code ID.",
                   "displayCondition" : null,
                   "expressionEnabled" : null,
                   "hidden" : null,
@@ -188,7 +188,7 @@
                   "optionsDataSource" : null
                 }, {
                   "advancedOption" : null,
-                  "description" : null,
+                  "description" : "Status code name.",
                   "displayCondition" : null,
                   "expressionEnabled" : null,
                   "hidden" : null,
@@ -208,7 +208,7 @@
                   "optionsDataSource" : null
                 }, {
                   "advancedOption" : null,
-                  "description" : null,
+                  "description" : "Human-readable description of the status.",
                   "displayCondition" : null,
                   "expressionEnabled" : null,
                   "hidden" : null,
@@ -228,7 +228,7 @@
                   "optionsDataSource" : null
                 }, {
                   "advancedOption" : null,
-                  "description" : null,
+                  "description" : "Action to take to recover from the error.",
                   "displayCondition" : null,
                   "expressionEnabled" : null,
                   "hidden" : null,
@@ -251,7 +251,7 @@
                 "optionsDataSource" : null
               }, {
                 "advancedOption" : null,
-                "description" : null,
+                "description" : "The destination address of the message.",
                 "displayCondition" : null,
                 "expressionEnabled" : null,
                 "hidden" : null,
@@ -271,7 +271,7 @@
                 "optionsDataSource" : null
               }, {
                 "advancedOption" : null,
-                "description" : null,
+                "description" : "Other details of the message.",
                 "displayCondition" : null,
                 "expressionEnabled" : null,
                 "hidden" : null,
@@ -288,7 +288,7 @@
                 "options" : null,
                 "properties" : [ {
                   "advancedOption" : null,
-                  "description" : null,
+                  "description" : "Number of SMS message parts required to deliver the message.",
                   "displayCondition" : null,
                   "expressionEnabled" : null,
                   "hidden" : null,
@@ -325,7 +325,6 @@
         "sampleOutput" : null,
         "placeholder" : null
       },
-      "sampleOutput" : null,
       "outputSchema" : {
         "advancedOption" : null,
         "description" : null,
@@ -345,7 +344,7 @@
         "options" : null,
         "properties" : [ {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "ID assigned to the request if messaging multiple recipients or sending multiple messages via a single API request.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -365,7 +364,7 @@
           "optionsDataSource" : null
         }, {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "An array of message objects of a single message or multiple messages sent under one bulk ID.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -396,7 +395,7 @@
             "options" : null,
             "properties" : [ {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "ID of the message.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -416,7 +415,7 @@
               "optionsDataSource" : null
             }, {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "Status of the message.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -433,7 +432,7 @@
               "options" : null,
               "properties" : [ {
                 "advancedOption" : null,
-                "description" : null,
+                "description" : "Status group ID.",
                 "displayCondition" : null,
                 "expressionEnabled" : null,
                 "hidden" : null,
@@ -452,7 +451,7 @@
                 "optionsDataSource" : null
               }, {
                 "advancedOption" : null,
-                "description" : null,
+                "description" : "Status group name that describes which category the status code belongs to",
                 "displayCondition" : null,
                 "expressionEnabled" : null,
                 "hidden" : null,
@@ -472,7 +471,7 @@
                 "optionsDataSource" : null
               }, {
                 "advancedOption" : null,
-                "description" : null,
+                "description" : "Status code ID.",
                 "displayCondition" : null,
                 "expressionEnabled" : null,
                 "hidden" : null,
@@ -491,7 +490,7 @@
                 "optionsDataSource" : null
               }, {
                 "advancedOption" : null,
-                "description" : null,
+                "description" : "Status code name.",
                 "displayCondition" : null,
                 "expressionEnabled" : null,
                 "hidden" : null,
@@ -511,7 +510,7 @@
                 "optionsDataSource" : null
               }, {
                 "advancedOption" : null,
-                "description" : null,
+                "description" : "Human-readable description of the status.",
                 "displayCondition" : null,
                 "expressionEnabled" : null,
                 "hidden" : null,
@@ -531,7 +530,7 @@
                 "optionsDataSource" : null
               }, {
                 "advancedOption" : null,
-                "description" : null,
+                "description" : "Action to take to recover from the error.",
                 "displayCondition" : null,
                 "expressionEnabled" : null,
                 "hidden" : null,
@@ -554,7 +553,7 @@
               "optionsDataSource" : null
             }, {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "The destination address of the message.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -574,7 +573,7 @@
               "optionsDataSource" : null
             }, {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "Other details of the message.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -591,7 +590,7 @@
               "options" : null,
               "properties" : [ {
                 "advancedOption" : null,
-                "description" : null,
+                "description" : "Number of SMS message parts required to deliver the message.",
                 "displayCondition" : null,
                 "expressionEnabled" : null,
                 "hidden" : null,
@@ -624,7 +623,8 @@
         } ],
         "controlType" : "OBJECT_BUILDER",
         "optionsDataSource" : null
-      }
+      },
+      "sampleOutput" : null
     },
     "properties" : [ {
       "advancedOption" : null,
@@ -741,7 +741,7 @@
           "options" : null,
           "properties" : [ {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "The destination address of the message.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -761,7 +761,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "Number of messages required to deliver.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -780,7 +780,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "ID of the message sent.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -800,7 +800,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "Status of the message.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -817,7 +817,7 @@
             "options" : null,
             "properties" : [ {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "Status group ID.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -836,7 +836,7 @@
               "optionsDataSource" : null
             }, {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "Status group name.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -856,7 +856,7 @@
               "optionsDataSource" : null
             }, {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "Status ID.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -875,7 +875,7 @@
               "optionsDataSource" : null
             }, {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "Status name.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -895,7 +895,7 @@
               "optionsDataSource" : null
             }, {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "Human-readable description of the status.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -915,7 +915,7 @@
               "optionsDataSource" : null
             }, {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "Action that should be taken to eliminate error.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -943,7 +943,6 @@
         "sampleOutput" : null,
         "placeholder" : null
       },
-      "sampleOutput" : null,
       "outputSchema" : {
         "advancedOption" : null,
         "description" : null,
@@ -963,7 +962,7 @@
         "options" : null,
         "properties" : [ {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "The destination address of the message.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -983,7 +982,7 @@
           "optionsDataSource" : null
         }, {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "Number of messages required to deliver.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -1002,7 +1001,7 @@
           "optionsDataSource" : null
         }, {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "ID of the message sent.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -1022,7 +1021,7 @@
           "optionsDataSource" : null
         }, {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "Status of the message.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -1039,7 +1038,7 @@
           "options" : null,
           "properties" : [ {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "Status group ID.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -1058,7 +1057,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "Status group name.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -1078,7 +1077,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "Status ID.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -1097,7 +1096,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "Status name.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -1117,7 +1116,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "Human-readable description of the status.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -1137,7 +1136,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "Action that should be taken to eliminate error.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -1161,7 +1160,8 @@
         } ],
         "controlType" : "OBJECT_BUILDER",
         "optionsDataSource" : null
-      }
+      },
+      "sampleOutput" : null
     },
     "properties" : [ {
       "advancedOption" : null,
@@ -1229,9 +1229,6 @@
     "processErrorResponse" : null,
     "workflowNodeDescription" : null
   } ],
-  "dataStream" : null,
-  "triggers" : null,
-  "unifiedApi" : null,
   "connection" : {
     "authorizations" : [ {
       "detectOn" : null,
@@ -1300,5 +1297,8 @@
     "authorizationRequired" : null,
     "baseUri" : { },
     "test" : null
-  }
+  },
+  "dataStream" : null,
+  "triggers" : null,
+  "unifiedApi" : null
 }

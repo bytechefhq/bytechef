@@ -42,7 +42,7 @@
           "options" : null,
           "properties" : [ {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "ID of the channel.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -62,7 +62,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "Name of the channel that will appear to the user in Microsoft Teams.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -82,7 +82,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "Description of the channel.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -126,7 +126,7 @@
         "options" : null,
         "properties" : [ {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "ID of the channel.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -146,7 +146,7 @@
           "optionsDataSource" : null
         }, {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "Name of the channel that will appear to the user in Microsoft Teams.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -166,7 +166,7 @@
           "optionsDataSource" : null
         }, {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "Description of the channel.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -255,8 +255,8 @@
       "optionsDataSource" : null
     } ],
     "title" : "Create Channel",
-    "processErrorResponse" : null,
     "perform" : { },
+    "processErrorResponse" : null,
     "workflowNodeDescription" : null
   }, {
     "batch" : null,
@@ -287,7 +287,7 @@
           "options" : null,
           "properties" : [ {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "ID of the message.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -307,7 +307,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "Plaintext/HTML representation of the content of the chat message.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -324,7 +324,7 @@
             "options" : null,
             "properties" : [ {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "Type of the content.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -344,7 +344,7 @@
               "optionsDataSource" : null
             }, {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "The content of the message.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -367,7 +367,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "Represents identity of the channel.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -384,7 +384,7 @@
             "options" : null,
             "properties" : [ {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "ID of the team in which the message was posted.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -404,7 +404,7 @@
               "optionsDataSource" : null
             }, {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "ID of the channel in which the message was posted.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -451,7 +451,7 @@
         "options" : null,
         "properties" : [ {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "ID of the message.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -471,7 +471,7 @@
           "optionsDataSource" : null
         }, {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "Plaintext/HTML representation of the content of the chat message.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -488,7 +488,7 @@
           "options" : null,
           "properties" : [ {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "Type of the content.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -508,7 +508,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "The content of the message.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -531,7 +531,7 @@
           "optionsDataSource" : null
         }, {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "Represents identity of the channel.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -548,7 +548,7 @@
           "options" : null,
           "properties" : [ {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "ID of the team in which the message was posted.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -568,7 +568,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "ID of the channel in which the message was posted.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -691,8 +691,8 @@
       "optionsDataSource" : null
     } ],
     "title" : "Send Channel Message",
-    "processErrorResponse" : null,
     "perform" : { },
+    "processErrorResponse" : null,
     "workflowNodeDescription" : null
   }, {
     "batch" : null,
@@ -723,7 +723,7 @@
           "options" : null,
           "properties" : [ {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "ID of the message.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -743,7 +743,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "ID of the chat.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -763,7 +763,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "Plaintext/HTML representation of the content of the chat message.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -780,7 +780,7 @@
             "options" : null,
             "properties" : [ {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "Type of the content.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -800,7 +800,7 @@
               "optionsDataSource" : null
             }, {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "The content of the message.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -847,7 +847,7 @@
         "options" : null,
         "properties" : [ {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "ID of the message.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -867,7 +867,7 @@
           "optionsDataSource" : null
         }, {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "ID of the chat.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -887,7 +887,7 @@
           "optionsDataSource" : null
         }, {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "Plaintext/HTML representation of the content of the chat message.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -904,7 +904,7 @@
           "options" : null,
           "properties" : [ {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "Type of the content.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -924,7 +924,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "The content of the message.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -1024,10 +1024,13 @@
       "optionsDataSource" : null
     } ],
     "title" : "Send Chat Message",
-    "processErrorResponse" : null,
     "perform" : { },
+    "processErrorResponse" : null,
     "workflowNodeDescription" : null
   } ],
+  "dataStream" : null,
+  "triggers" : null,
+  "unifiedApi" : null,
   "connection" : {
     "authorizations" : [ {
       "detectOn" : null,
@@ -1116,8 +1119,5 @@
     "authorizationRequired" : null,
     "baseUri" : { },
     "test" : null
-  },
-  "dataStream" : null,
-  "triggers" : null,
-  "unifiedApi" : null
+  }
 }

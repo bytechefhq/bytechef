@@ -353,8 +353,8 @@
     } ],
     "title" : "Send Message",
     "perform" : { },
-    "workflowNodeDescription" : null,
-    "processErrorResponse" : null
+    "processErrorResponse" : null,
+    "workflowNodeDescription" : null
   } ],
   "connection" : {
     "authorizations" : [ {
@@ -425,6 +425,7 @@
     "baseUri" : { },
     "test" : null
   },
+  "dataStream" : null,
   "triggers" : [ {
     "batch" : null,
     "deprecated" : null,
@@ -1270,8 +1271,8 @@
     "deduplicate" : null,
     "webhookDisable" : { },
     "webhookEnable" : { },
-    "workflowNodeDescription" : null,
     "processErrorResponse" : null,
+    "workflowNodeDescription" : null,
     "dynamicWebhookRefresh" : null,
     "webhookRequest" : { },
     "listenerDisable" : null,
@@ -1279,6 +1280,5 @@
     "webhookValidate" : null,
     "webhookValidateOnEnable" : null
   } ],
-  "dataStream" : null,
   "unifiedApi" : null
 }

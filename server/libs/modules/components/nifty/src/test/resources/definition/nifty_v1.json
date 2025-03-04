@@ -1973,6 +1973,8 @@
     "perform" : null,
     "processErrorResponse" : null
   } ],
+  "dataStream" : null,
+  "unifiedApi" : null,
   "triggers" : [ {
     "batch" : null,
     "deprecated" : null,
@@ -2219,6 +2221,7 @@
     "workflowSyncExecution" : null,
     "workflowNodeDescription" : null,
     "processErrorResponse" : null,
+    "poll" : null,
     "deduplicate" : null,
     "webhookDisable" : { },
     "webhookEnable" : { },
@@ -2227,11 +2230,8 @@
     "listenerEnable" : null,
     "webhookRequest" : { },
     "webhookValidate" : null,
-    "webhookValidateOnEnable" : null,
-    "poll" : null
+    "webhookValidateOnEnable" : null
   } ],
-  "dataStream" : null,
-  "unifiedApi" : null,
   "connection" : {
     "authorizations" : [ {
       "detectOn" : null,

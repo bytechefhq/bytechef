@@ -237,14 +237,14 @@
     } ],
     "title" : "Classify Text",
     "perform" : { },
-    "workflowNodeDescription" : null,
     "processErrorResponse" : null,
     "outputDefinition" : {
       "output" : null,
       "outputResponse" : null,
       "outputSchema" : null,
       "sampleOutput" : null
-    }
+    },
+    "workflowNodeDescription" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -402,14 +402,14 @@
     } ],
     "title" : "Sentiment Analysis",
     "perform" : { },
-    "workflowNodeDescription" : null,
     "processErrorResponse" : null,
     "outputDefinition" : {
       "output" : null,
       "outputResponse" : null,
       "outputSchema" : null,
       "sampleOutput" : null
-    }
+    },
+    "workflowNodeDescription" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -696,14 +696,14 @@
     } ],
     "title" : "Score",
     "perform" : { },
-    "workflowNodeDescription" : null,
     "processErrorResponse" : null,
     "outputDefinition" : {
       "output" : null,
       "outputResponse" : null,
       "outputSchema" : null,
       "sampleOutput" : null
-    }
+    },
+    "workflowNodeDescription" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -921,14 +921,14 @@
     } ],
     "title" : "Summarize Text",
     "perform" : { },
-    "workflowNodeDescription" : null,
     "processErrorResponse" : null,
     "outputDefinition" : {
       "output" : null,
       "outputResponse" : null,
       "outputSchema" : null,
       "sampleOutput" : null
-    }
+    },
+    "workflowNodeDescription" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -1144,14 +1144,14 @@
     } ],
     "title" : "Similarity Search",
     "perform" : { },
-    "workflowNodeDescription" : null,
     "processErrorResponse" : null,
     "outputDefinition" : {
       "output" : null,
       "outputResponse" : null,
       "outputSchema" : null,
       "sampleOutput" : null
-    }
+    },
+    "workflowNodeDescription" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -1309,7 +1309,6 @@
     } ],
     "title" : "Text Generation",
     "perform" : { },
-    "workflowNodeDescription" : null,
     "processErrorResponse" : null,
     "outputDefinition" : {
       "output" : null,
@@ -1360,7 +1359,8 @@
         "optionsDataSource" : null
       },
       "sampleOutput" : "Generated text."
-    }
+    },
+    "workflowNodeDescription" : null
   } ],
   "categories" : [ {
     "key" : "artificial-intelligence",

@@ -320,9 +320,9 @@
       "optionsDataSource" : null
     } ],
     "title" : "Add Value to the Object by Key",
-    "processErrorResponse" : null,
     "perform" : { },
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "processErrorResponse" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -989,9 +989,9 @@
       "optionsDataSource" : null
     } ],
     "title" : "Add Key-Value Pairs to Object or Array",
-    "processErrorResponse" : null,
     "perform" : { },
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "processErrorResponse" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -1004,7 +1004,7 @@
       "outputResponse" : {
         "outputSchema" : {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "Indicator of whether the key exists in the object.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -1032,7 +1032,7 @@
       },
       "outputSchema" : {
         "advancedOption" : null,
-        "description" : null,
+        "description" : "Indicator of whether the key exists in the object.",
         "displayCondition" : null,
         "expressionEnabled" : null,
         "hidden" : null,
@@ -1099,9 +1099,9 @@
       "optionsDataSource" : null
     } ],
     "title" : "Contains",
-    "processErrorResponse" : null,
     "perform" : { },
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "processErrorResponse" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -1157,9 +1157,9 @@
       "optionsDataSource" : null
     } ],
     "title" : "Delete Key-Value Pair",
-    "processErrorResponse" : null,
     "perform" : { },
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "processErrorResponse" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -1172,7 +1172,7 @@
       "outputResponse" : {
         "outputSchema" : {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "Indicates whether the two objects are equal.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -1200,7 +1200,7 @@
       },
       "outputSchema" : {
         "advancedOption" : null,
-        "description" : null,
+        "description" : "Indicates whether the two objects are equal.",
         "displayCondition" : null,
         "expressionEnabled" : null,
         "hidden" : null,
@@ -1267,9 +1267,9 @@
       "optionsDataSource" : null
     } ],
     "title" : "Equals",
-    "processErrorResponse" : null,
     "perform" : { },
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "processErrorResponse" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -1325,9 +1325,9 @@
       "optionsDataSource" : null
     } ],
     "title" : "Merge Two Objects",
-    "processErrorResponse" : null,
     "perform" : { },
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "processErrorResponse" : null
   } ],
   "connection" : null,
   "dataStream" : null,

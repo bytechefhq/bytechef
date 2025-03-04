@@ -383,8 +383,8 @@
     } ],
     "title" : "Create Issue",
     "perform" : null,
-    "workflowNodeDescription" : null,
-    "processErrorResponse" : null
+    "processErrorResponse" : null,
+    "workflowNodeDescription" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -601,8 +601,8 @@
     } ],
     "title" : "Create Comment on Issue",
     "perform" : null,
-    "workflowNodeDescription" : null,
-    "processErrorResponse" : null
+    "processErrorResponse" : null,
+    "workflowNodeDescription" : null
   } ],
   "triggers" : [ {
     "batch" : null,
@@ -882,8 +882,8 @@
     "type" : "DYNAMIC_WEBHOOK",
     "webhookRawBody" : null,
     "workflowSyncExecution" : null,
-    "workflowNodeDescription" : null,
     "processErrorResponse" : null,
+    "workflowNodeDescription" : null,
     "poll" : null,
     "deduplicate" : null,
     "webhookDisable" : { },
@@ -895,8 +895,8 @@
     "webhookValidate" : null,
     "webhookValidateOnEnable" : null
   } ],
-  "unifiedApi" : null,
   "dataStream" : null,
+  "unifiedApi" : null,
   "connection" : {
     "authorizations" : [ {
       "detectOn" : null,

@@ -589,8 +589,8 @@
       "optionsDataSource" : null
     } ],
     "title" : "Create Project",
-    "perform" : null,
     "workflowNodeDescription" : null,
+    "perform" : null,
     "processErrorResponse" : null
   }, {
     "batch" : null,
@@ -1448,8 +1448,8 @@
       "optionsDataSource" : null
     } ],
     "title" : "Create Task",
-    "perform" : null,
     "workflowNodeDescription" : null,
+    "perform" : null,
     "processErrorResponse" : null
   } ],
   "connection" : {

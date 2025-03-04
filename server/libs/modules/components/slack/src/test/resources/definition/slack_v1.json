@@ -45,7 +45,7 @@
           "options" : null,
           "properties" : [ {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "Indicates if the message was successfully sent.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -69,7 +69,7 @@
             "controlType" : "SELECT"
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "ID of the channel the message was sent to.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -89,7 +89,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "Timestamp of the message.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -109,7 +109,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "The sent message.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -126,7 +126,7 @@
             "options" : null,
             "properties" : [ {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "ID of the user who sent the message.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -146,7 +146,7 @@
               "optionsDataSource" : null
             }, {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "Type of the message.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -166,7 +166,7 @@
               "optionsDataSource" : null
             }, {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "Timestamp of the message.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -186,7 +186,7 @@
               "optionsDataSource" : null
             }, {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "The text of the message.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -206,7 +206,7 @@
               "optionsDataSource" : null
             }, {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "ID of the team the message was sent to.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -354,7 +354,7 @@
         "options" : null,
         "properties" : [ {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "Indicates if the message was successfully sent.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -378,7 +378,7 @@
           "controlType" : "SELECT"
         }, {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "ID of the channel the message was sent to.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -398,7 +398,7 @@
           "optionsDataSource" : null
         }, {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "Timestamp of the message.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -418,7 +418,7 @@
           "optionsDataSource" : null
         }, {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "The sent message.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -435,7 +435,7 @@
           "options" : null,
           "properties" : [ {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "ID of the user who sent the message.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -455,7 +455,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "Type of the message.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -475,7 +475,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "Timestamp of the message.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -495,7 +495,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "The text of the message.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -515,7 +515,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "ID of the team the message was sent to.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -720,7 +720,7 @@
           "options" : null,
           "properties" : [ {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "Indicates if the message was successfully sent.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -744,7 +744,7 @@
             "controlType" : "SELECT"
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "ID of the channel the message was sent to.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -764,7 +764,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "Timestamp of the message.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -784,7 +784,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "The sent message.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -801,7 +801,7 @@
             "options" : null,
             "properties" : [ {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "ID of the user who sent the message.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -821,7 +821,7 @@
               "optionsDataSource" : null
             }, {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "Type of the message.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -841,7 +841,7 @@
               "optionsDataSource" : null
             }, {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "Timestamp of the message.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -861,7 +861,7 @@
               "optionsDataSource" : null
             }, {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "The text of the message.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -881,7 +881,7 @@
               "optionsDataSource" : null
             }, {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "ID of the team the message was sent to.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -1029,7 +1029,7 @@
         "options" : null,
         "properties" : [ {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "Indicates if the message was successfully sent.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -1053,7 +1053,7 @@
           "controlType" : "SELECT"
         }, {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "ID of the channel the message was sent to.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -1073,7 +1073,7 @@
           "optionsDataSource" : null
         }, {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "Timestamp of the message.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -1093,7 +1093,7 @@
           "optionsDataSource" : null
         }, {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "The sent message.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -1110,7 +1110,7 @@
           "options" : null,
           "properties" : [ {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "ID of the user who sent the message.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -1130,7 +1130,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "Type of the message.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -1150,7 +1150,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "Timestamp of the message.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -1170,7 +1170,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "The text of the message.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -1190,7 +1190,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "ID of the team the message was sent to.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -1395,7 +1395,7 @@
           "options" : null,
           "properties" : [ {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "Indicates if the message was successfully sent.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -1419,7 +1419,7 @@
             "controlType" : "SELECT"
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "ID of the channel the message was sent to.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -1439,7 +1439,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "Timestamp of the message.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -1459,7 +1459,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "The sent message.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -1476,7 +1476,7 @@
             "options" : null,
             "properties" : [ {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "ID of the user who sent the message.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -1496,7 +1496,7 @@
               "optionsDataSource" : null
             }, {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "Type of the message.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -1516,7 +1516,7 @@
               "optionsDataSource" : null
             }, {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "Timestamp of the message.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -1536,7 +1536,7 @@
               "optionsDataSource" : null
             }, {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "The text of the message.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -1556,7 +1556,7 @@
               "optionsDataSource" : null
             }, {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "ID of the team the message was sent to.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -1704,7 +1704,7 @@
         "options" : null,
         "properties" : [ {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "Indicates if the message was successfully sent.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -1728,7 +1728,7 @@
           "controlType" : "SELECT"
         }, {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "ID of the channel the message was sent to.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -1748,7 +1748,7 @@
           "optionsDataSource" : null
         }, {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "Timestamp of the message.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -1768,7 +1768,7 @@
           "optionsDataSource" : null
         }, {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "The sent message.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -1785,7 +1785,7 @@
           "options" : null,
           "properties" : [ {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "ID of the user who sent the message.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -1805,7 +1805,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "Type of the message.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -1825,7 +1825,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "Timestamp of the message.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -1845,7 +1845,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "The text of the message.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -1865,7 +1865,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "ID of the team the message was sent to.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,

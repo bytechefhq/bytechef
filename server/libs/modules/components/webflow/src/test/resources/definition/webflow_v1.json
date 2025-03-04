@@ -209,8 +209,8 @@
       }
     } ],
     "title" : "Fulfill Order",
-    "workflowNodeDescription" : null,
     "perform" : null,
+    "workflowNodeDescription" : null,
     "processErrorResponse" : null
   }, {
     "batch" : null,
@@ -511,8 +511,8 @@
       }
     } ],
     "title" : "Get Collection Item",
-    "workflowNodeDescription" : null,
     "perform" : null,
+    "workflowNodeDescription" : null,
     "processErrorResponse" : null
   } ],
   "dataStream" : null,

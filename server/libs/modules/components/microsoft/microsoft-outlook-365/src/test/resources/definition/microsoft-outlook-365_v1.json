@@ -45,7 +45,7 @@
           "options" : null,
           "properties" : [ {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "ID for an event across calendars,",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -65,7 +65,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "ID of the event.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -85,7 +85,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "The text of the event's subject line.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -105,7 +105,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "Start time of the event.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -122,7 +122,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "End time of the event.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -139,7 +139,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "The attendees for the event.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -153,7 +153,7 @@
             "placeholder" : null,
             "items" : [ {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "The email address of the person or entity.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -180,7 +180,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "Indicates whether the event is an online meeting.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -204,7 +204,7 @@
             "controlType" : "SELECT"
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "URL for an online meeting.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -224,7 +224,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "The number of minutes before the event start time that the reminder alert occurs.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -272,7 +272,7 @@
         "options" : null,
         "properties" : [ {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "ID for an event across calendars,",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -292,7 +292,7 @@
           "optionsDataSource" : null
         }, {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "ID of the event.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -312,7 +312,7 @@
           "optionsDataSource" : null
         }, {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "The text of the event's subject line.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -332,7 +332,7 @@
           "optionsDataSource" : null
         }, {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "Start time of the event.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -349,7 +349,7 @@
           "optionsDataSource" : null
         }, {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "End time of the event.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -366,7 +366,7 @@
           "optionsDataSource" : null
         }, {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "The attendees for the event.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -380,7 +380,7 @@
           "placeholder" : null,
           "items" : [ {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "The email address of the person or entity.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -407,7 +407,7 @@
           "optionsDataSource" : null
         }, {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "Indicates whether the event is an online meeting.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -431,7 +431,7 @@
           "controlType" : "SELECT"
         }, {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "URL for an online meeting.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -451,7 +451,7 @@
           "optionsDataSource" : null
         }, {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "The number of minutes before the event start time that the reminder alert occurs.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -805,7 +805,7 @@
             "options" : null,
             "properties" : [ {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "ID for an event across calendars,",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -825,7 +825,7 @@
               "optionsDataSource" : null
             }, {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "ID of the event.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -845,7 +845,7 @@
               "optionsDataSource" : null
             }, {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "The text of the event's subject line.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -865,7 +865,7 @@
               "optionsDataSource" : null
             }, {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "Start time of the event.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -882,7 +882,7 @@
               "optionsDataSource" : null
             }, {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "End time of the event.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -899,7 +899,7 @@
               "optionsDataSource" : null
             }, {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "The attendees for the event.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -913,7 +913,7 @@
               "placeholder" : null,
               "items" : [ {
                 "advancedOption" : null,
-                "description" : null,
+                "description" : "The email address of the person or entity.",
                 "displayCondition" : null,
                 "expressionEnabled" : null,
                 "hidden" : null,
@@ -940,7 +940,7 @@
               "optionsDataSource" : null
             }, {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "Indicates whether the event is an online meeting.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -964,7 +964,7 @@
               "controlType" : "SELECT"
             }, {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "URL for an online meeting.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -984,7 +984,7 @@
               "optionsDataSource" : null
             }, {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "The number of minutes before the event start time that the reminder alert occurs.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -1053,7 +1053,7 @@
           "options" : null,
           "properties" : [ {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "ID for an event across calendars,",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -1073,7 +1073,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "ID of the event.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -1093,7 +1093,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "The text of the event's subject line.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -1113,7 +1113,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "Start time of the event.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -1130,7 +1130,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "End time of the event.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -1147,7 +1147,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "The attendees for the event.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -1161,7 +1161,7 @@
             "placeholder" : null,
             "items" : [ {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "The email address of the person or entity.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -1188,7 +1188,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "Indicates whether the event is an online meeting.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -1212,7 +1212,7 @@
             "controlType" : "SELECT"
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "URL for an online meeting.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -1232,7 +1232,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "The number of minutes before the event start time that the reminder alert occurs.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -1392,7 +1392,7 @@
             "options" : null,
             "properties" : [ {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "Start time of the free time slot.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -1409,7 +1409,7 @@
               "optionsDataSource" : null
             }, {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "End time of the free time slot.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -1471,7 +1471,7 @@
           "options" : null,
           "properties" : [ {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "Start time of the free time slot.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -1488,7 +1488,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "End time of the free time slot.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -1627,7 +1627,7 @@
           "options" : null,
           "properties" : [ {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "ID of the message.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -1647,7 +1647,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "Subject of the message.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -1667,7 +1667,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "The first 255 characters of the message body.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -1687,7 +1687,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "The body of the message. It can be in HTML or text format.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -1704,7 +1704,7 @@
             "options" : null,
             "properties" : [ {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "The content type of the message body.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -1724,7 +1724,7 @@
               "optionsDataSource" : null
             }, {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "The content of the message body.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -1747,7 +1747,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "The owner of the mailbox from which the message is sent.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -1764,7 +1764,7 @@
             "options" : null,
             "properties" : [ {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "The recipient's email address.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -1781,7 +1781,7 @@
               "options" : null,
               "properties" : [ {
                 "advancedOption" : null,
-                "description" : null,
+                "description" : "The display name of the sender.",
                 "displayCondition" : null,
                 "expressionEnabled" : null,
                 "hidden" : null,
@@ -1801,7 +1801,7 @@
                 "optionsDataSource" : null
               }, {
                 "advancedOption" : null,
-                "description" : null,
+                "description" : "The email address of the sender.",
                 "displayCondition" : null,
                 "expressionEnabled" : null,
                 "hidden" : null,
@@ -1851,7 +1851,7 @@
         "options" : null,
         "properties" : [ {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "ID of the message.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -1871,7 +1871,7 @@
           "optionsDataSource" : null
         }, {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "Subject of the message.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -1891,7 +1891,7 @@
           "optionsDataSource" : null
         }, {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "The first 255 characters of the message body.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -1911,7 +1911,7 @@
           "optionsDataSource" : null
         }, {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "The body of the message. It can be in HTML or text format.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -1928,7 +1928,7 @@
           "options" : null,
           "properties" : [ {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "The content type of the message body.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -1948,7 +1948,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "The content of the message body.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -1971,7 +1971,7 @@
           "optionsDataSource" : null
         }, {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "The owner of the mailbox from which the message is sent.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -1988,7 +1988,7 @@
           "options" : null,
           "properties" : [ {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "The recipient's email address.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -2005,7 +2005,7 @@
             "options" : null,
             "properties" : [ {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "The display name of the sender.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -2025,7 +2025,7 @@
               "optionsDataSource" : null
             }, {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "The email address of the sender.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -2182,7 +2182,7 @@
             "options" : null,
             "properties" : [ {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "ID of the message.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -2202,7 +2202,7 @@
               "optionsDataSource" : null
             }, {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "Subject of the message.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -2222,7 +2222,7 @@
               "optionsDataSource" : null
             }, {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "The first 255 characters of the message body.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -2242,7 +2242,7 @@
               "optionsDataSource" : null
             }, {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "The body of the message. It can be in HTML or text format.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -2259,7 +2259,7 @@
               "options" : null,
               "properties" : [ {
                 "advancedOption" : null,
-                "description" : null,
+                "description" : "The content type of the message body.",
                 "displayCondition" : null,
                 "expressionEnabled" : null,
                 "hidden" : null,
@@ -2279,7 +2279,7 @@
                 "optionsDataSource" : null
               }, {
                 "advancedOption" : null,
-                "description" : null,
+                "description" : "The content of the message body.",
                 "displayCondition" : null,
                 "expressionEnabled" : null,
                 "hidden" : null,
@@ -2302,7 +2302,7 @@
               "optionsDataSource" : null
             }, {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "The owner of the mailbox from which the message is sent.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -2319,7 +2319,7 @@
               "options" : null,
               "properties" : [ {
                 "advancedOption" : null,
-                "description" : null,
+                "description" : "The recipient's email address.",
                 "displayCondition" : null,
                 "expressionEnabled" : null,
                 "hidden" : null,
@@ -2336,7 +2336,7 @@
                 "options" : null,
                 "properties" : [ {
                   "advancedOption" : null,
-                  "description" : null,
+                  "description" : "The display name of the sender.",
                   "displayCondition" : null,
                   "expressionEnabled" : null,
                   "hidden" : null,
@@ -2356,7 +2356,7 @@
                   "optionsDataSource" : null
                 }, {
                   "advancedOption" : null,
-                  "description" : null,
+                  "description" : "The email address of the sender.",
                   "displayCondition" : null,
                   "expressionEnabled" : null,
                   "hidden" : null,
@@ -2427,7 +2427,7 @@
           "options" : null,
           "properties" : [ {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "ID of the message.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -2447,7 +2447,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "Subject of the message.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -2467,7 +2467,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "The first 255 characters of the message body.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -2487,7 +2487,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "The body of the message. It can be in HTML or text format.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -2504,7 +2504,7 @@
             "options" : null,
             "properties" : [ {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "The content type of the message body.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -2524,7 +2524,7 @@
               "optionsDataSource" : null
             }, {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "The content of the message body.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -2547,7 +2547,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "The owner of the mailbox from which the message is sent.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -2564,7 +2564,7 @@
             "options" : null,
             "properties" : [ {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "The recipient's email address.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -2581,7 +2581,7 @@
               "options" : null,
               "properties" : [ {
                 "advancedOption" : null,
-                "description" : null,
+                "description" : "The display name of the sender.",
                 "displayCondition" : null,
                 "expressionEnabled" : null,
                 "hidden" : null,
@@ -2601,7 +2601,7 @@
                 "optionsDataSource" : null
               }, {
                 "advancedOption" : null,
-                "description" : null,
+                "description" : "The email address of the sender.",
                 "displayCondition" : null,
                 "expressionEnabled" : null,
                 "hidden" : null,
@@ -3484,7 +3484,7 @@
             "options" : null,
             "properties" : [ {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "ID of the message.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -3504,7 +3504,7 @@
               "optionsDataSource" : null
             }, {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "Subject of the message.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -3524,7 +3524,7 @@
               "optionsDataSource" : null
             }, {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "The first 255 characters of the message body.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -3544,7 +3544,7 @@
               "optionsDataSource" : null
             }, {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "The body of the message. It can be in HTML or text format.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -3561,7 +3561,7 @@
               "options" : null,
               "properties" : [ {
                 "advancedOption" : null,
-                "description" : null,
+                "description" : "The content type of the message body.",
                 "displayCondition" : null,
                 "expressionEnabled" : null,
                 "hidden" : null,
@@ -3581,7 +3581,7 @@
                 "optionsDataSource" : null
               }, {
                 "advancedOption" : null,
-                "description" : null,
+                "description" : "The content of the message body.",
                 "displayCondition" : null,
                 "expressionEnabled" : null,
                 "hidden" : null,
@@ -3604,7 +3604,7 @@
               "optionsDataSource" : null
             }, {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "The owner of the mailbox from which the message is sent.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -3621,7 +3621,7 @@
               "options" : null,
               "properties" : [ {
                 "advancedOption" : null,
-                "description" : null,
+                "description" : "The recipient's email address.",
                 "displayCondition" : null,
                 "expressionEnabled" : null,
                 "hidden" : null,
@@ -3638,7 +3638,7 @@
                 "options" : null,
                 "properties" : [ {
                   "advancedOption" : null,
-                  "description" : null,
+                  "description" : "The display name of the sender.",
                   "displayCondition" : null,
                   "expressionEnabled" : null,
                   "hidden" : null,
@@ -3658,7 +3658,7 @@
                   "optionsDataSource" : null
                 }, {
                   "advancedOption" : null,
-                  "description" : null,
+                  "description" : "The email address of the sender.",
                   "displayCondition" : null,
                   "expressionEnabled" : null,
                   "hidden" : null,
@@ -3729,7 +3729,7 @@
           "options" : null,
           "properties" : [ {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "ID of the message.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -3749,7 +3749,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "Subject of the message.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -3769,7 +3769,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "The first 255 characters of the message body.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -3789,7 +3789,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "The body of the message. It can be in HTML or text format.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -3806,7 +3806,7 @@
             "options" : null,
             "properties" : [ {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "The content type of the message body.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -3826,7 +3826,7 @@
               "optionsDataSource" : null
             }, {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "The content of the message body.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -3849,7 +3849,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "The owner of the mailbox from which the message is sent.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -3866,7 +3866,7 @@
             "options" : null,
             "properties" : [ {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "The recipient's email address.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -3883,7 +3883,7 @@
               "options" : null,
               "properties" : [ {
                 "advancedOption" : null,
-                "description" : null,
+                "description" : "The display name of the sender.",
                 "displayCondition" : null,
                 "expressionEnabled" : null,
                 "hidden" : null,
@@ -3903,7 +3903,7 @@
                 "optionsDataSource" : null
               }, {
                 "advancedOption" : null,
-                "description" : null,
+                "description" : "The email address of the sender.",
                 "displayCondition" : null,
                 "expressionEnabled" : null,
                 "hidden" : null,

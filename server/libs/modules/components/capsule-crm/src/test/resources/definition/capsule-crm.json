@@ -542,7 +542,7 @@
           "options" : null,
           "properties" : [ {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "The ID of the new task.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -561,7 +561,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "The description of the task.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -581,7 +581,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "The due date of the task.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -598,7 +598,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "Details of the new task.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -618,7 +618,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "The category of the new task.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -635,7 +635,27 @@
             "options" : null,
             "properties" : [ {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "ID of the category.",
+              "displayCondition" : null,
+              "expressionEnabled" : null,
+              "hidden" : null,
+              "metadata" : { },
+              "required" : null,
+              "name" : "id",
+              "type" : "STRING",
+              "defaultValue" : null,
+              "exampleValue" : null,
+              "label" : null,
+              "placeholder" : null,
+              "controlType" : "TEXT",
+              "languageId" : null,
+              "maxLength" : null,
+              "minLength" : null,
+              "options" : null,
+              "optionsDataSource" : null
+            }, {
+              "advancedOption" : null,
+              "description" : "Name of the category.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -655,7 +675,7 @@
               "optionsDataSource" : null
             }, {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "The hex colour code of the category.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -702,7 +722,7 @@
         "options" : null,
         "properties" : [ {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "The ID of the new task.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -721,7 +741,7 @@
           "optionsDataSource" : null
         }, {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "The description of the task.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -741,7 +761,7 @@
           "optionsDataSource" : null
         }, {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "The due date of the task.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -758,7 +778,7 @@
           "optionsDataSource" : null
         }, {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "Details of the new task.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -778,7 +798,7 @@
           "optionsDataSource" : null
         }, {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "The category of the new task.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -795,7 +815,27 @@
           "options" : null,
           "properties" : [ {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "ID of the category.",
+            "displayCondition" : null,
+            "expressionEnabled" : null,
+            "hidden" : null,
+            "metadata" : { },
+            "required" : null,
+            "name" : "id",
+            "type" : "STRING",
+            "defaultValue" : null,
+            "exampleValue" : null,
+            "label" : null,
+            "placeholder" : null,
+            "controlType" : "TEXT",
+            "languageId" : null,
+            "maxLength" : null,
+            "minLength" : null,
+            "options" : null,
+            "optionsDataSource" : null
+          }, {
+            "advancedOption" : null,
+            "description" : "Name of the category.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -815,7 +855,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "The hex colour code of the category.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -998,16 +1038,16 @@
       "title" : "Bearer Token",
       "type" : "BEARER_TOKEN",
       "acquire" : null,
+      "pkce" : null,
+      "refresh" : null,
+      "scopes" : null,
       "apply" : null,
       "authorizationCallback" : null,
       "authorizationUrl" : null,
       "clientId" : null,
       "clientSecret" : null,
       "oauth2AuthorizationExtraQueryParameters" : null,
-      "pkce" : null,
-      "refresh" : null,
       "refreshUrl" : null,
-      "scopes" : null,
       "refreshToken" : null,
       "tokenUrl" : null
     } ],
