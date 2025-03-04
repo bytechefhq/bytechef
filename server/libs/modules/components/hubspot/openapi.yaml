@@ -48,26 +48,7 @@ paths:
           content:
             application/json:
               schema:
-                type: "object"
-                properties:
-                  id:
-                    type: "string"
-                  properties:
-                    type: "object"
-                    properties:
-                      firstname:
-                        type: "string"
-                      lastname:
-                        type: "string"
-                      email:
-                        type: "string"
-                      phone:
-                        type: "string"
-                      company:
-                        type: "string"
-                      website:
-                        type: "string"
-  /crm/v3/objects/contacts/{contactId}:
+                $ref: "#/components/schemas/Contact"
     delete:
       summary: "Delete Contact"
       description: "Move Contact to the recycling bin."
@@ -101,25 +82,7 @@ paths:
           content:
             application/json:
               schema:
-                type: "object"
-                properties:
-                  id:
-                    type: "string"
-                  properties:
-                    type: "object"
-                    properties:
-                      firstname:
-                        type: "string"
-                      lastname:
-                        type: "string"
-                      email:
-                        type: "string"
-                      phone:
-                        type: "string"
-                      company:
-                        type: "string"
-                      website:
-                        type: "string"
+                $ref: "#/components/schemas/Contact"
     patch:
       summary: "Update Contact"
       description: "Update Contact properties."
@@ -169,25 +132,7 @@ paths:
           content:
             application/json:
               schema:
-                type: "object"
-                properties:
-                  id:
-                    type: "string"
-                  properties:
-                    type: "object"
-                    properties:
-                      firstname:
-                        type: "string"
-                      lastname:
-                        type: "string"
-                      email:
-                        type: "string"
-                      phone:
-                        type: "string"
-                      company:
-                        type: "string"
-                      website:
-                        type: "string"
+                $ref: "#/components/schemas/Contact"
   /crm/v3/objects/deals:
     post:
       summary: "Create Deal"
@@ -236,24 +181,30 @@ paths:
                 properties:
                   id:
                     type: "string"
+                    description: "ID of the deal."
                   properties:
                     type: "object"
                     properties:
                       dealname:
                         type: "string"
-                        title: "Deal name"
+                        description: "The name of the deal."
                       amount:
                         type: "number"
+                        description: "The monetary value associated with the deal."
                       closedate:
                         type: "string"
                         format: "date"
+                        description: "he date when the deal is expected to close."
                       pipeline:
                         type: "string"
                         title: "Pipeline"
+                        description: "The sales pipeline to which the deal belongs, indicating its workflow path."
                       dealstage:
                         type: "string"
+                        description: "The current stage of the deal within its pipeline, reflecting its progress."
                       hubspot_owner_id:
                         type: "string"
+                        description: "ID for the HubSpot user responsible for managing the deal."
   /crm/v3/objects/tickets/{ticketId}:
     get:
       summary: "Get Ticket"
@@ -278,22 +229,56 @@ paths:
                 properties:
                   id:
                     type: "string"
+                    description: "ID of the ticket"
                   properties:
                     type: "object"
                     properties:
                       content:
                         type: "string"
+                        description: "The main content or body of the ticket, detailing the issue or request."
                       hs_object_id:
                         type: "string"
+                        description: "ID for the HubSpot object associated with the ticket."
                       hs_pipeline:
                         type: "string"
+                        description: "The pipeline to which the ticket belongs, indicating its workflow stage."
                       hs_pipeline_stage:
                         type: "string"
+                        description: "The current stage of the ticket within its pipeline, reflecting its progress."
                       hs_ticket_priority:
                         type: "string"
+                        description: "The priority level assigned to the ticket, such as high, medium, or low."
                       subject:
                         type: "string"
+                        description: "The subject or title of the ticket, summarizing the issue or request."
 components:
+  schemas:
+    Contact:
+      properties:
+        id:
+          type: "string"
+          description: "ID of the newly created contact."
+        properties:
+          type: "object"
+          properties:
+            firstname:
+              type: "string"
+              description: "First name of the contact."
+            lastname:
+              type: "string"
+              description: "Last name of the contact."
+            email:
+              type: "string"
+              description: "Email address of the contact."
+            phone:
+              type: "string"
+              description: "Phone number of the contact."
+            company:
+              type: "string"
+              description: "Company contact belongs to."
+            website:
+              type: "string"
+              description: "Website of the contact."
   securitySchemes:
     oauth2:
       type: "oauth2"

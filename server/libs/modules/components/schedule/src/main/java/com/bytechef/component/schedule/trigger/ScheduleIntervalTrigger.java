@@ -43,18 +43,22 @@ import java.util.Map;
 public class ScheduleIntervalTrigger {
     public final ModifiableTriggerDefinition triggerDefinition = trigger("interval")
         .title("Interval")
-        .description(
-            "Trigger off periodically, for example every minute or day, based on a set interval.")
+        .description("Trigger off periodically, for example every minute or day, based on a set interval.")
         .type(TriggerType.LISTENER)
         .properties(
             integer(INTERVAL)
                 .label("Interval")
-                .description("The hour at which a workflow will be triggered.")
+                .description(
+                    "Specifies the frequency at which the workflow is triggered, based on the selected time unit. " +
+                        "For example, an interval of 5 with a time unit of 'Minute' triggers the workflow every " +
+                        "5 minutes.")
                 .required(true)
                 .minValue(1),
             integer(TIME_UNIT)
-                .label("Day of Week")
-                .description("Days at which a workflow will be triggered.")
+                .label("Time Unit")
+                .description(
+                    "Specifies the unit of time used in conjunction with the interval to determine the frequency " +
+                        "of workflow triggers.")
                 .options(
                     option("Minute", 1),
                     option("Hour", 2),
@@ -65,9 +69,18 @@ public class ScheduleIntervalTrigger {
             outputSchema(
                 object()
                     .properties(
-                        string(DATETIME),
-                        integer(INTERVAL),
-                        integer(TIME_UNIT))))
+                        string(DATETIME)
+                            .description(
+                                "The exact date and time when the trigger was activated, formatted according to the " +
+                                    "specified timezone."),
+                        integer(INTERVAL)
+                            .description(
+                                "The interval value that determines how frequently the workflow is triggered, " +
+                                    "based on the selected time unit."),
+                        integer(TIME_UNIT)
+                            .description(
+                                "The unit of time (e.g., minute, hour, day, month) used in conjunction with the " +
+                                    "interval to schedule the trigger."))))
         .listenerDisable(this::listenerDisable)
         .listenerEnable(this::listenerEnable);
 

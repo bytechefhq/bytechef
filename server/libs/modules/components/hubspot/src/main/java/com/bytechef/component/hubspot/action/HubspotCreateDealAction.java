@@ -67,13 +67,23 @@ public class HubspotCreateDealAction {
                     "type", PropertyType.BODY))
             .label("Properties")
             .required(false))
-        .output(outputSchema(object()
-            .properties(string("id").required(false),
-                object("properties")
-                    .properties(string("dealname").required(false), number("amount").required(false),
-                        date("closedate").required(false), string("pipeline").required(false),
-                        string("dealstage").required(false), string("hubspot_owner_id").required(false))
+        .output(outputSchema(object().properties(string("id").description("ID of the deal.")
+            .required(false),
+            object("properties").properties(string("dealname").description("The name of the deal.")
+                .required(false),
+                number("amount").description("The monetary value associated with the deal.")
+                    .required(false),
+                date("closedate").description("he date when the deal is expected to close.")
+                    .required(false),
+                string("pipeline")
+                    .description("The sales pipeline to which the deal belongs, indicating its workflow path.")
+                    .required(false),
+                string("dealstage")
+                    .description("The current stage of the deal within its pipeline, reflecting its progress.")
+                    .required(false),
+                string("hubspot_owner_id").description("ID for the HubSpot user responsible for managing the deal.")
                     .required(false))
+                .required(false))
             .metadata(
                 Map.of(
                     "responseType", ResponseType.JSON))));

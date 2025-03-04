@@ -25,6 +25,7 @@ import static com.bytechef.component.definition.Context.Http.BodyContentType;
 import static com.bytechef.component.definition.Context.Http.ResponseType;
 
 import com.bytechef.component.definition.ComponentDsl;
+import com.bytechef.component.hubspot.property.HubspotContactProperties;
 import java.util.Map;
 
 /**
@@ -62,13 +63,7 @@ public class HubspotCreateContactAction {
                     "type", PropertyType.BODY))
             .label("Properties")
             .required(false))
-        .output(outputSchema(object()
-            .properties(string("id").required(false),
-                object("properties")
-                    .properties(string("firstname").required(false), string("lastname").required(false),
-                        string("email").required(false), string("phone").required(false),
-                        string("company").required(false), string("website").required(false))
-                    .required(false))
+        .output(outputSchema(object().properties(HubspotContactProperties.PROPERTIES)
             .metadata(
                 Map.of(
                     "responseType", ResponseType.JSON))));

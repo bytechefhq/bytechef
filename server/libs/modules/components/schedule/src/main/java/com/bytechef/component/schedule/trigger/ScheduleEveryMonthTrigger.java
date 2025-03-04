@@ -66,20 +66,32 @@ public class ScheduleEveryMonthTrigger {
                 .description("The day of the month  at which a workflow will be triggered.")
                 .required(true)
                 .minValue(1)
-                .maxValue(31),
+                .maxValue(31)
+                .required(true),
             string(TIMEZONE)
                 .label("Timezone")
                 .description("The timezone at which the cron expression will be scheduled.")
-                .options(ScheduleUtils.getTimeZoneOptions()))
+                .options(ScheduleUtils.getTimeZoneOptions())
+                .required(true))
         .output(
             outputSchema(
                 object()
                     .properties(
-                        string(DATETIME),
-                        integer(HOUR),
-                        integer(MINUTE),
-                        integer(DAY_OF_MONTH),
-                        string(TIMEZONE))))
+                        string(DATETIME)
+                            .description(
+                                "The exact date and time when the trigger was activated, formatted according to the " +
+                                    "specified timezone."),
+                        integer(HOUR)
+                            .description("The hour of the day (0-23) at which the workflow was set to trigger."),
+                        integer(MINUTE)
+                            .description("The minute of the hour (0-59) at which the workflow was set to trigger."),
+                        integer(DAY_OF_MONTH)
+                            .description(
+                                "The specific day of the month (1-31) on which the workflow was set to trigger."),
+                        string(TIMEZONE)
+                            .description(
+                                "The timezone used for scheduling the cron expression, ensuring the trigger " +
+                                    "fires at the correct local time."))))
         .listenerDisable(this::listenerDisable)
         .listenerEnable(this::listenerEnable);
 
@@ -103,7 +115,7 @@ public class ScheduleEveryMonthTrigger {
         int minute = inputParameters.getRequiredInteger(MINUTE);
         int hour = inputParameters.getRequiredInteger(HOUR);
         int dayOfMonth = inputParameters.getRequiredInteger(DAY_OF_MONTH);
-        String timezone = inputParameters.getString(TIMEZONE);
+        String timezone = inputParameters.getRequiredString(TIMEZONE);
 
         triggerScheduler.scheduleScheduleTrigger(
             "0 %s %s %s * ?".formatted(minute, hour, dayOfMonth),

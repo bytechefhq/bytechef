@@ -54,10 +54,14 @@ public class HubspotNewDealTrigger {
             outputSchema(
                 object()
                     .properties(
-                        string("eventId"),
-                        string("subscriptionId"),
-                        string("subscriptionType"),
-                        string("objectId"))))
+                        string("eventId")
+                            .description("ID of the event that triggered the workflow."),
+                        string("subscriptionId")
+                            .description("ID of the subscription associated with this webhook event."),
+                        string("subscriptionType")
+                            .description("Type of the subscription, indicating the nature of event."),
+                        string("objectId")
+                            .description("ID for the newly created deal."))))
         .webhookDisable(HubspotNewDealTrigger::webhookDisable)
         .webhookEnable(HubspotNewDealTrigger::webhookEnable)
         .webhookRequest(HubspotNewDealTrigger::webhookRequest);
