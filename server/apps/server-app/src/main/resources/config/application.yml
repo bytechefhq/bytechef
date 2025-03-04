@@ -140,11 +140,6 @@ spring:
           starttls:
             enable: ${bytechef.mail.starttls.enable:false}
             required: ${bytechef.mail.starttls.required:false}
-        smtps:
-          auth: true
-          starttls:
-            enable: ${bytechef.mail.starttls.enable:false}
-            required: ${bytechef.mail.starttls.required:false}
         transport:
           protocol: ${bytechef.mail.protocol:smtp}
     protocol: ${bytechef.mail.protocol:smtp}
