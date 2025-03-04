@@ -34,7 +34,13 @@ Decodes base64 encoded text into human readable plain text.
 
 #### Output
 
-The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
+
+
+Type: STRING
+
+
+
+
 
 #### JSON Example
 ```json
@@ -294,9 +300,9 @@ Type: ARRAY
 
 #### Properties
 
-|     Name     |     Type     |
-|:------------:|:------------:|
-|  | STRING |
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+|  | STRING |  |
 
 
 

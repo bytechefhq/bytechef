@@ -62,16 +62,16 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |
-|:------------:|:------------:|
-| id | INTEGER |
-| currency | STRING |
-| note | STRING |
-| email | STRING |
-| name | STRING |
-| phone | STRING |
-| tags | STRING |
-| line_items | ARRAY <details> <summary> Items </summary> [{STRING\(fulfillment_status), STRING\(grams), NUMBER\(price), INTEGER\(product_id), INTEGER\(variant_id), INTEGER\(quantity), STRING\(title)}] </details> |
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| id | INTEGER |  |
+| currency | STRING |  |
+| note | STRING |  |
+| email | STRING |  |
+| name | STRING |  |
+| phone | STRING |  |
+| tags | STRING |  |
+| line_items | ARRAY <details> <summary> Items </summary> [{STRING\(fulfillment_status), STRING\(grams), NUMBER\(price), INTEGER\(product_id), INTEGER\(variant_id), INTEGER\(quantity), STRING\(title)}] </details> |  |
 
 
 
@@ -151,16 +151,16 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |
-|:------------:|:------------:|
-| id | INTEGER |
-| currency | STRING |
-| note | STRING |
-| email | STRING |
-| name | STRING |
-| phone | STRING |
-| tags | STRING |
-| line_items | ARRAY <details> <summary> Items </summary> [{STRING\(fulfillment_status), STRING\(grams), NUMBER\(price), INTEGER\(product_id), INTEGER\(variant_id), INTEGER\(quantity), STRING\(title)}] </details> |
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| id | INTEGER |  |
+| currency | STRING |  |
+| note | STRING |  |
+| email | STRING |  |
+| name | STRING |  |
+| phone | STRING |  |
+| tags | STRING |  |
+| line_items | ARRAY <details> <summary> Items </summary> [{STRING\(fulfillment_status), STRING\(grams), NUMBER\(price), INTEGER\(product_id), INTEGER\(variant_id), INTEGER\(quantity), STRING\(title)}] </details> |  |
 
 
 
@@ -200,16 +200,16 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |
-|:------------:|:------------:|
-| id | INTEGER |
-| currency | STRING |
-| note | STRING |
-| email | STRING |
-| name | STRING |
-| phone | STRING |
-| tags | STRING |
-| line_items | ARRAY <details> <summary> Items </summary> [{STRING\(fulfillment_status), STRING\(grams), NUMBER\(price), INTEGER\(product_id), INTEGER\(variant_id), INTEGER\(quantity), STRING\(title)}] </details> |
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| id | INTEGER |  |
+| currency | STRING |  |
+| note | STRING |  |
+| email | STRING |  |
+| name | STRING |  |
+| phone | STRING |  |
+| tags | STRING |  |
+| line_items | ARRAY <details> <summary> Items </summary> [{STRING\(fulfillment_status), STRING\(grams), NUMBER\(price), INTEGER\(product_id), INTEGER\(variant_id), INTEGER\(quantity), STRING\(title)}] </details> |  |
 
 
 
@@ -254,16 +254,16 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |
-|:------------:|:------------:|
-| id | INTEGER |
-| currency | STRING |
-| note | STRING |
-| email | STRING |
-| name | STRING |
-| phone | STRING |
-| tags | STRING |
-| line_items | ARRAY <details> <summary> Items </summary> [{STRING\(fulfillment_status), STRING\(grams), NUMBER\(price), INTEGER\(product_id), INTEGER\(variant_id), INTEGER\(quantity), STRING\(title)}] </details> |
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| id | INTEGER |  |
+| currency | STRING |  |
+| note | STRING |  |
+| email | STRING |  |
+| name | STRING |  |
+| phone | STRING |  |
+| tags | STRING |  |
+| line_items | ARRAY <details> <summary> Items </summary> [{STRING\(fulfillment_status), STRING\(grams), NUMBER\(price), INTEGER\(product_id), INTEGER\(variant_id), INTEGER\(quantity), STRING\(title)}] </details> |  |
 
 
 
@@ -303,16 +303,16 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |
-|:------------:|:------------:|
-| id | INTEGER |
-| currency | STRING |
-| note | STRING |
-| email | STRING |
-| name | STRING |
-| phone | STRING |
-| tags | STRING |
-| line_items | ARRAY <details> <summary> Items </summary> [{STRING\(fulfillment_status), STRING\(grams), NUMBER\(price), INTEGER\(product_id), INTEGER\(variant_id), INTEGER\(quantity), STRING\(title)}] </details> |
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| id | INTEGER |  |
+| currency | STRING |  |
+| note | STRING |  |
+| email | STRING |  |
+| name | STRING |  |
+| phone | STRING |  |
+| tags | STRING |  |
+| line_items | ARRAY <details> <summary> Items </summary> [{STRING\(fulfillment_status), STRING\(grams), NUMBER\(price), INTEGER\(product_id), INTEGER\(variant_id), INTEGER\(quantity), STRING\(title)}] </details> |  |
 
 
 
@@ -344,16 +344,16 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |
-|:------------:|:------------:|
-| id | INTEGER |
-| currency | STRING |
-| note | STRING |
-| email | STRING |
-| name | STRING |
-| phone | STRING |
-| tags | STRING |
-| line_items | ARRAY <details> <summary> Items </summary> [{STRING\(fulfillment_status), STRING\(grams), NUMBER\(price), INTEGER\(product_id), INTEGER\(variant_id), INTEGER\(quantity), STRING\(title)}] </details> |
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| id | INTEGER |  |
+| currency | STRING |  |
+| note | STRING |  |
+| email | STRING |  |
+| name | STRING |  |
+| phone | STRING |  |
+| tags | STRING |  |
+| line_items | ARRAY <details> <summary> Items </summary> [{STRING\(fulfillment_status), STRING\(grams), NUMBER\(price), INTEGER\(product_id), INTEGER\(variant_id), INTEGER\(quantity), STRING\(title)}] </details> |  |
 
 
 
@@ -385,16 +385,16 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |
-|:------------:|:------------:|
-| id | INTEGER |
-| currency | STRING |
-| note | STRING |
-| email | STRING |
-| name | STRING |
-| phone | STRING |
-| tags | STRING |
-| line_items | ARRAY <details> <summary> Items </summary> [{STRING\(fulfillment_status), STRING\(grams), NUMBER\(price), INTEGER\(product_id), INTEGER\(variant_id), INTEGER\(quantity), STRING\(title)}] </details> |
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| id | INTEGER |  |
+| currency | STRING |  |
+| note | STRING |  |
+| email | STRING |  |
+| name | STRING |  |
+| phone | STRING |  |
+| tags | STRING |  |
+| line_items | ARRAY <details> <summary> Items </summary> [{STRING\(fulfillment_status), STRING\(grams), NUMBER\(price), INTEGER\(product_id), INTEGER\(variant_id), INTEGER\(quantity), STRING\(title)}] </details> |  |
 
 
 

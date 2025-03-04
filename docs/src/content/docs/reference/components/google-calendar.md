@@ -63,22 +63,22 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |
-|:------------:|:------------:|
-| iCalUID | STRING |
-| id | STRING |
-| summary | STRING |
-| startTime | DATE_TIME |
-| endTime | DATE_TIME |
-| etag | STRING |
-| eventType | STRING |
-| htmlLink | STRING |
-| status | STRING |
-| location | STRING |
-| hangoutLink | STRING |
-| attendees | ARRAY <details> <summary> Items </summary> [{INTEGER\(additionalGuests), STRING\(comment), STRING\(displayName), STRING\(email), STRING\(id), BOOLEAN\(optional), BOOLEAN\(organizer), BOOLEAN\(resource), STRING\(responseStatus), BOOLEAN\(self)}] </details> |
-| attachments | ARRAY <details> <summary> Items </summary> [{STRING\(fileId), STRING\(fileUrl), STRING\(iconLink), STRING\(mimeType), STRING\(title)}] </details> |
-| reminders | OBJECT <details> <summary> Properties </summary> {[{STRING\(method), INTEGER\(minutes)}]\(overrides), BOOLEAN\(useDefault)} </details> |
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| iCalUID | STRING | Event unique identifier as defined in RFC5545. It is used to uniquely identify events accross calendaring systems. |
+| id | STRING | Identifier of the event. |
+| summary | STRING | Title of the event. |
+| startTime | DATE_TIME | Start time of the event. |
+| endTime | DATE_TIME | End time of the event. |
+| etag | STRING | ETag of the resource. |
+| eventType | STRING | Specific type of the event. |
+| htmlLink | STRING | An absolute link to this event in the Google Calendar Web UI. |
+| status | STRING | Status of the event. |
+| location | STRING | Geographic location of the event as free-form text. |
+| hangoutLink | STRING | An absolute link to the Google Hangout associated with this event. |
+| attendees | ARRAY <details> <summary> Items </summary> [{INTEGER\(additionalGuests), STRING\(comment), STRING\(displayName), STRING\(email), STRING\(id), BOOLEAN\(optional), BOOLEAN\(organizer), BOOLEAN\(resource), STRING\(responseStatus), BOOLEAN\(self)}] </details> | The attendees of the event. |
+| attachments | ARRAY <details> <summary> Items </summary> [{STRING\(fileId), STRING\(fileUrl), STRING\(iconLink), STRING\(mimeType), STRING\(title)}] </details> | File attachments for the event. |
+| reminders | OBJECT <details> <summary> Properties </summary> {[{STRING\(method), INTEGER\(minutes)}]\(overrides), BOOLEAN\(useDefault)} </details> | Information about the event's reminders for the authenticated user. |
 
 
 
@@ -135,22 +135,22 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |
-|:------------:|:------------:|
-| iCalUID | STRING |
-| id | STRING |
-| summary | STRING |
-| startTime | DATE_TIME |
-| endTime | DATE_TIME |
-| etag | STRING |
-| eventType | STRING |
-| htmlLink | STRING |
-| status | STRING |
-| location | STRING |
-| hangoutLink | STRING |
-| attendees | ARRAY <details> <summary> Items </summary> [{INTEGER\(additionalGuests), STRING\(comment), STRING\(displayName), STRING\(email), STRING\(id), BOOLEAN\(optional), BOOLEAN\(organizer), BOOLEAN\(resource), STRING\(responseStatus), BOOLEAN\(self)}] </details> |
-| attachments | ARRAY <details> <summary> Items </summary> [{STRING\(fileId), STRING\(fileUrl), STRING\(iconLink), STRING\(mimeType), STRING\(title)}] </details> |
-| reminders | OBJECT <details> <summary> Properties </summary> {[{STRING\(method), INTEGER\(minutes)}]\(overrides), BOOLEAN\(useDefault)} </details> |
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| iCalUID | STRING | Event unique identifier as defined in RFC5545. It is used to uniquely identify events accross calendaring systems. |
+| id | STRING | Identifier of the event. |
+| summary | STRING | Title of the event. |
+| startTime | DATE_TIME | Start time of the event. |
+| endTime | DATE_TIME | End time of the event. |
+| etag | STRING | ETag of the resource. |
+| eventType | STRING | Specific type of the event. |
+| htmlLink | STRING | An absolute link to this event in the Google Calendar Web UI. |
+| status | STRING | Status of the event. |
+| location | STRING | Geographic location of the event as free-form text. |
+| hangoutLink | STRING | An absolute link to the Google Hangout associated with this event. |
+| attendees | ARRAY <details> <summary> Items </summary> [{INTEGER\(additionalGuests), STRING\(comment), STRING\(displayName), STRING\(email), STRING\(id), BOOLEAN\(optional), BOOLEAN\(organizer), BOOLEAN\(resource), STRING\(responseStatus), BOOLEAN\(self)}] </details> | The attendees of the event. |
+| attachments | ARRAY <details> <summary> Items </summary> [{STRING\(fileId), STRING\(fileUrl), STRING\(iconLink), STRING\(mimeType), STRING\(title)}] </details> | File attachments for the event. |
+| reminders | OBJECT <details> <summary> Properties </summary> {[{STRING\(method), INTEGER\(minutes)}]\(overrides), BOOLEAN\(useDefault)} </details> | Information about the event's reminders for the authenticated user. |
 
 
 
@@ -213,22 +213,22 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |
-|:------------:|:------------:|
-| iCalUID | STRING |
-| id | STRING |
-| summary | STRING |
-| startTime | DATE_TIME |
-| endTime | DATE_TIME |
-| etag | STRING |
-| eventType | STRING |
-| htmlLink | STRING |
-| status | STRING |
-| location | STRING |
-| hangoutLink | STRING |
-| attendees | ARRAY <details> <summary> Items </summary> [{INTEGER\(additionalGuests), STRING\(comment), STRING\(displayName), STRING\(email), STRING\(id), BOOLEAN\(optional), BOOLEAN\(organizer), BOOLEAN\(resource), STRING\(responseStatus), BOOLEAN\(self)}] </details> |
-| attachments | ARRAY <details> <summary> Items </summary> [{STRING\(fileId), STRING\(fileUrl), STRING\(iconLink), STRING\(mimeType), STRING\(title)}] </details> |
-| reminders | OBJECT <details> <summary> Properties </summary> {[{STRING\(method), INTEGER\(minutes)}]\(overrides), BOOLEAN\(useDefault)} </details> |
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| iCalUID | STRING | Event unique identifier as defined in RFC5545. It is used to uniquely identify events accross calendaring systems. |
+| id | STRING | Identifier of the event. |
+| summary | STRING | Title of the event. |
+| startTime | DATE_TIME | Start time of the event. |
+| endTime | DATE_TIME | End time of the event. |
+| etag | STRING | ETag of the resource. |
+| eventType | STRING | Specific type of the event. |
+| htmlLink | STRING | An absolute link to this event in the Google Calendar Web UI. |
+| status | STRING | Status of the event. |
+| location | STRING | Geographic location of the event as free-form text. |
+| hangoutLink | STRING | An absolute link to the Google Hangout associated with this event. |
+| attendees | ARRAY <details> <summary> Items </summary> [{INTEGER\(additionalGuests), STRING\(comment), STRING\(displayName), STRING\(email), STRING\(id), BOOLEAN\(optional), BOOLEAN\(organizer), BOOLEAN\(resource), STRING\(responseStatus), BOOLEAN\(self)}] </details> | The attendees of the event. |
+| attachments | ARRAY <details> <summary> Items </summary> [{STRING\(fileId), STRING\(fileUrl), STRING\(iconLink), STRING\(mimeType), STRING\(title)}] </details> | File attachments for the event. |
+| reminders | OBJECT <details> <summary> Properties </summary> {[{STRING\(method), INTEGER\(minutes)}]\(overrides), BOOLEAN\(useDefault)} </details> | Information about the event's reminders for the authenticated user. |
 
 
 
@@ -304,9 +304,9 @@ Type: ARRAY
 
 #### Properties
 
-|     Name     |     Type     |
-|:------------:|:------------:|
-|  | OBJECT <details> <summary> Properties </summary> {STRING\(iCalUID), STRING\(id), STRING\(summary), DATE_TIME\(startTime), DATE_TIME\(endTime), STRING\(etag), STRING\(eventType), STRING\(htmlLink), STRING\(status), STRING\(location), STRING\(hangoutLink), [{INTEGER\(additionalGuests), STRING\(comment), STRING\(displayName), STRING\(email), STRING\(id), BOOLEAN\(optional), BOOLEAN\(organizer), BOOLEAN\(resource), STRING\(responseStatus), BOOLEAN\(self)}]\(attendees), [{STRING\(fileId), STRING\(fileUrl), STRING\(iconLink), STRING\(mimeType), STRING\(title)}]\(attachments), {[{STRING\(method), INTEGER\(minutes)}]\(overrides), BOOLEAN\(useDefault)}\(reminders)} </details> |
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+|  | OBJECT <details> <summary> Properties </summary> {STRING\(iCalUID), STRING\(id), STRING\(summary), DATE_TIME\(startTime), DATE_TIME\(endTime), STRING\(etag), STRING\(eventType), STRING\(htmlLink), STRING\(status), STRING\(location), STRING\(hangoutLink), [{INTEGER\(additionalGuests), STRING\(comment), STRING\(displayName), STRING\(email), STRING\(id), BOOLEAN\(optional), BOOLEAN\(organizer), BOOLEAN\(resource), STRING\(responseStatus), BOOLEAN\(self)}]\(attendees), [{STRING\(fileId), STRING\(fileUrl), STRING\(iconLink), STRING\(mimeType), STRING\(title)}]\(attachments), {[{STRING\(method), INTEGER\(minutes)}]\(overrides), BOOLEAN\(useDefault)}\(reminders)} </details> |  |
 
 
 
@@ -353,9 +353,9 @@ Type: ARRAY
 
 #### Properties
 
-|     Name     |     Type     |
-|:------------:|:------------:|
-|  | OBJECT <details> <summary> Properties </summary> {DATE_TIME\(startTime), DATE_TIME\(endTime)} </details> |
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+|  | OBJECT <details> <summary> Properties </summary> {DATE_TIME\(startTime), DATE_TIME\(endTime)} </details> |  |
 
 
 
@@ -407,22 +407,22 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |
-|:------------:|:------------:|
-| iCalUID | STRING |
-| id | STRING |
-| summary | STRING |
-| startTime | DATE_TIME |
-| endTime | DATE_TIME |
-| etag | STRING |
-| eventType | STRING |
-| htmlLink | STRING |
-| status | STRING |
-| location | STRING |
-| hangoutLink | STRING |
-| attendees | ARRAY <details> <summary> Items </summary> [{INTEGER\(additionalGuests), STRING\(comment), STRING\(displayName), STRING\(email), STRING\(id), BOOLEAN\(optional), BOOLEAN\(organizer), BOOLEAN\(resource), STRING\(responseStatus), BOOLEAN\(self)}] </details> |
-| attachments | ARRAY <details> <summary> Items </summary> [{STRING\(fileId), STRING\(fileUrl), STRING\(iconLink), STRING\(mimeType), STRING\(title)}] </details> |
-| reminders | OBJECT <details> <summary> Properties </summary> {[{STRING\(method), INTEGER\(minutes)}]\(overrides), BOOLEAN\(useDefault)} </details> |
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| iCalUID | STRING | Event unique identifier as defined in RFC5545. It is used to uniquely identify events accross calendaring systems. |
+| id | STRING | Identifier of the event. |
+| summary | STRING | Title of the event. |
+| startTime | DATE_TIME | Start time of the event. |
+| endTime | DATE_TIME | End time of the event. |
+| etag | STRING | ETag of the resource. |
+| eventType | STRING | Specific type of the event. |
+| htmlLink | STRING | An absolute link to this event in the Google Calendar Web UI. |
+| status | STRING | Status of the event. |
+| location | STRING | Geographic location of the event as free-form text. |
+| hangoutLink | STRING | An absolute link to the Google Hangout associated with this event. |
+| attendees | ARRAY <details> <summary> Items </summary> [{INTEGER\(additionalGuests), STRING\(comment), STRING\(displayName), STRING\(email), STRING\(id), BOOLEAN\(optional), BOOLEAN\(organizer), BOOLEAN\(resource), STRING\(responseStatus), BOOLEAN\(self)}] </details> | The attendees of the event. |
+| attachments | ARRAY <details> <summary> Items </summary> [{STRING\(fileId), STRING\(fileUrl), STRING\(iconLink), STRING\(mimeType), STRING\(title)}] </details> | File attachments for the event. |
+| reminders | OBJECT <details> <summary> Properties </summary> {[{STRING\(method), INTEGER\(minutes)}]\(overrides), BOOLEAN\(useDefault)} </details> | Information about the event's reminders for the authenticated user. |
 
 
 
@@ -475,22 +475,22 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |
-|:------------:|:------------:|
-| iCalUID | STRING |
-| id | STRING |
-| summary | STRING |
-| startTime | DATE_TIME |
-| endTime | DATE_TIME |
-| etag | STRING |
-| eventType | STRING |
-| htmlLink | STRING |
-| status | STRING |
-| location | STRING |
-| hangoutLink | STRING |
-| attendees | ARRAY <details> <summary> Items </summary> [{INTEGER\(additionalGuests), STRING\(comment), STRING\(displayName), STRING\(email), STRING\(id), BOOLEAN\(optional), BOOLEAN\(organizer), BOOLEAN\(resource), STRING\(responseStatus), BOOLEAN\(self)}] </details> |
-| attachments | ARRAY <details> <summary> Items </summary> [{STRING\(fileId), STRING\(fileUrl), STRING\(iconLink), STRING\(mimeType), STRING\(title)}] </details> |
-| reminders | OBJECT <details> <summary> Properties </summary> {[{STRING\(method), INTEGER\(minutes)}]\(overrides), BOOLEAN\(useDefault)} </details> |
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| iCalUID | STRING | Event unique identifier as defined in RFC5545. It is used to uniquely identify events accross calendaring systems. |
+| id | STRING | Identifier of the event. |
+| summary | STRING | Title of the event. |
+| startTime | DATE_TIME | Start time of the event. |
+| endTime | DATE_TIME | End time of the event. |
+| etag | STRING | ETag of the resource. |
+| eventType | STRING | Specific type of the event. |
+| htmlLink | STRING | An absolute link to this event in the Google Calendar Web UI. |
+| status | STRING | Status of the event. |
+| location | STRING | Geographic location of the event as free-form text. |
+| hangoutLink | STRING | An absolute link to the Google Hangout associated with this event. |
+| attendees | ARRAY <details> <summary> Items </summary> [{INTEGER\(additionalGuests), STRING\(comment), STRING\(displayName), STRING\(email), STRING\(id), BOOLEAN\(optional), BOOLEAN\(organizer), BOOLEAN\(resource), STRING\(responseStatus), BOOLEAN\(self)}] </details> | The attendees of the event. |
+| attachments | ARRAY <details> <summary> Items </summary> [{STRING\(fileId), STRING\(fileUrl), STRING\(iconLink), STRING\(mimeType), STRING\(title)}] </details> | File attachments for the event. |
+| reminders | OBJECT <details> <summary> Properties </summary> {[{STRING\(method), INTEGER\(minutes)}]\(overrides), BOOLEAN\(useDefault)} </details> | Information about the event's reminders for the authenticated user. |
 
 
 

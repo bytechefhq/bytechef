@@ -60,10 +60,10 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |
-|:------------:|:------------:|
-| id | STRING |
-| name | STRING |
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| id | STRING |  |
+| name | STRING |  |
 
 
 
@@ -103,11 +103,11 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |
-|:------------:|:------------:|
-| id | STRING |
-| name | STRING |
-| domain | STRING |
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| id | STRING |  |
+| name | STRING |  |
+| domain | STRING |  |
 
 
 
@@ -149,12 +149,12 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |
-|:------------:|:------------:|
-| id | STRING |
-| first_name | STRING |
-| last_name | STRING |
-| emails | ARRAY <details> <summary> Items </summary> [STRING] </details> |
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| id | STRING |  |
+| first_name | STRING |  |
+| last_name | STRING |  |
+| emails | ARRAY <details> <summary> Items </summary> [STRING] </details> |  |
 
 
 

@@ -71,17 +71,17 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |
-|:------------:|:------------:|
-| iCalUId | STRING |
-| id | STRING |
-| subject | STRING |
-| startTime | DATE_TIME |
-| endTime | DATE_TIME |
-| attendees | ARRAY <details> <summary> Items </summary> [STRING] </details> |
-| isOnlineMeeting | BOOLEAN <details> <summary> Options </summary> true, false </details> |
-| onlineMeetingUrl | STRING |
-| reminderMinutesBeforeStart | BOOLEAN <details> <summary> Options </summary> true, false </details> |
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| iCalUId | STRING | ID for an event across calendars, |
+| id | STRING | ID of the event. |
+| subject | STRING | The text of the event's subject line. |
+| startTime | DATE_TIME | Start time of the event. |
+| endTime | DATE_TIME | End time of the event. |
+| attendees | ARRAY <details> <summary> Items </summary> [STRING] </details> | The attendees for the event. |
+| isOnlineMeeting | BOOLEAN <details> <summary> Options </summary> true, false </details> | Indicates whether the event is an online meeting. |
+| onlineMeetingUrl | STRING | URL for an online meeting. |
+| reminderMinutesBeforeStart | BOOLEAN <details> <summary> Options </summary> true, false </details> | The number of minutes before the event start time that the reminder alert occurs. |
 
 
 
@@ -159,9 +159,9 @@ Type: ARRAY
 
 #### Properties
 
-|     Name     |     Type     |
-|:------------:|:------------:|
-|  | OBJECT <details> <summary> Properties </summary> {STRING\(iCalUId), STRING\(id), STRING\(subject), DATE_TIME\(startTime), DATE_TIME\(endTime), [STRING]\(attendees), BOOLEAN\(isOnlineMeeting), STRING\(onlineMeetingUrl), BOOLEAN\(reminderMinutesBeforeStart)} </details> |
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+|  | OBJECT <details> <summary> Properties </summary> {STRING\(iCalUId), STRING\(id), STRING\(subject), DATE_TIME\(startTime), DATE_TIME\(endTime), [STRING]\(attendees), BOOLEAN\(isOnlineMeeting), STRING\(onlineMeetingUrl), BOOLEAN\(reminderMinutesBeforeStart)} </details> |  |
 
 
 
@@ -205,9 +205,9 @@ Type: ARRAY
 
 #### Properties
 
-|     Name     |     Type     |
-|:------------:|:------------:|
-|  | OBJECT <details> <summary> Properties </summary> {DATE_TIME\(startTime), DATE_TIME\(endTime)} </details> |
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+|  | OBJECT <details> <summary> Properties </summary> {DATE_TIME\(startTime), DATE_TIME\(endTime)} </details> |  |
 
 
 
@@ -250,13 +250,13 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |
-|:------------:|:------------:|
-| id | STRING |
-| subject | STRING |
-| bodyPreview | STRING |
-| body | OBJECT <details> <summary> Properties </summary> {STRING\(contentType), STRING\(content)} </details> |
-| from | OBJECT <details> <summary> Properties </summary> {{STRING\(name), STRING\(address)}\(emailAddress)} </details> |
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| id | STRING | ID of the message. |
+| subject | STRING | Subject of the message. |
+| bodyPreview | STRING | The first 255 characters of the message body. |
+| body | OBJECT <details> <summary> Properties </summary> {STRING\(contentType), STRING\(content)} </details> | The body of the message. It can be in HTML or text format. |
+| from | OBJECT <details> <summary> Properties </summary> {{STRING\(name), STRING\(address)}\(emailAddress)} </details> | The owner of the mailbox from which the message is sent. |
 
 
 
@@ -329,9 +329,9 @@ Type: ARRAY
 
 #### Properties
 
-|     Name     |     Type     |
-|:------------:|:------------:|
-|  | OBJECT <details> <summary> Properties </summary> {STRING\(id), STRING\(subject), STRING\(bodyPreview), {STRING\(contentType), STRING\(content)}\(body), {{STRING\(name), STRING\(address)}\(emailAddress)}\(from)} </details> |
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+|  | OBJECT <details> <summary> Properties </summary> {STRING\(id), STRING\(subject), STRING\(bodyPreview), {STRING\(contentType), STRING\(content)}\(body), {{STRING\(name), STRING\(address)}\(emailAddress)}\(from)} </details> |  |
 
 
 
@@ -445,9 +445,9 @@ Type: ARRAY
 
 #### Properties
 
-|     Name     |     Type     |
-|:------------:|:------------:|
-|  | OBJECT <details> <summary> Properties </summary> {STRING\(id), STRING\(subject), STRING\(bodyPreview), {STRING\(contentType), STRING\(content)}\(body), {{STRING\(name), STRING\(address)}\(emailAddress)}\(from)} </details> |
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+|  | OBJECT <details> <summary> Properties </summary> {STRING\(id), STRING\(subject), STRING\(bodyPreview), {STRING\(contentType), STRING\(content)}\(body), {{STRING\(name), STRING\(address)}\(emailAddress)}\(from)} </details> |  |
 
 
 

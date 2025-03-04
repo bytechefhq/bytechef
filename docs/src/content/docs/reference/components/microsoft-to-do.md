@@ -65,17 +65,17 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |
-|:------------:|:------------:|
-| @odata.etag | STRING |
-| importance | STRING |
-| isReminderOn | BOOLEAN <details> <summary> Options </summary> true, false </details> |
-| status | STRING |
-| title | STRING |
-| categories | STRING |
-| id | STRING |
-| body | OBJECT <details> <summary> Properties </summary> {STRING\(content), STRING\(contentType)} </details> |
-| linkedResources | OBJECT <details> <summary> Properties </summary> {STRING\(id), STRING\(webUrl), STRING\(applicationName), STRING\(displayName)} </details> |
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| @odata.etag | STRING |  |
+| importance | STRING | Importance of the task. |
+| isReminderOn | BOOLEAN <details> <summary> Options </summary> true, false </details> | Indicates whether an alert is set to reminder the user of the task. |
+| status | STRING | State or progress of the task. |
+| title | STRING | Title of the task. |
+| categories | STRING | The categories associated with the task. |
+| id | STRING | ID of the task. |
+| body | OBJECT <details> <summary> Properties </summary> {STRING\(content), STRING\(contentType)} </details> | Body of the task containing information about the task. |
+| linkedResources | OBJECT <details> <summary> Properties </summary> {STRING\(id), STRING\(webUrl), STRING\(applicationName), STRING\(displayName)} </details> |  |
 
 
 
@@ -117,15 +117,15 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |
-|:------------:|:------------:|
-| @odata.context | STRING |
-| @odata.etag | STRING |
-| id | STRING |
-| displayName | STRING |
-| isOwner | BOOLEAN <details> <summary> Options </summary> true, false </details> |
-| isShared | BOOLEAN <details> <summary> Options </summary> true, false </details> |
-| wellKnownListName | STRING |
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| @odata.context | STRING |  |
+| @odata.etag | STRING |  |
+| id | STRING |  |
+| displayName | STRING |  |
+| isOwner | BOOLEAN <details> <summary> Options </summary> true, false </details> |  |
+| isShared | BOOLEAN <details> <summary> Options </summary> true, false </details> |  |
+| wellKnownListName | STRING |  |
 
 
 
@@ -165,17 +165,17 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |
-|:------------:|:------------:|
-| @odata.etag | STRING |
-| importance | STRING |
-| isReminderOn | BOOLEAN <details> <summary> Options </summary> true, false </details> |
-| status | STRING |
-| title | STRING |
-| categories | STRING |
-| id | STRING |
-| body | OBJECT <details> <summary> Properties </summary> {STRING\(content), STRING\(contentType)} </details> |
-| linkedResources | OBJECT <details> <summary> Properties </summary> {STRING\(id), STRING\(webUrl), STRING\(applicationName), STRING\(displayName)} </details> |
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| @odata.etag | STRING |  |
+| importance | STRING | Importance of the task. |
+| isReminderOn | BOOLEAN <details> <summary> Options </summary> true, false </details> | Indicates whether an alert is set to reminder the user of the task. |
+| status | STRING | State or progress of the task. |
+| title | STRING | Title of the task. |
+| categories | STRING | The categories associated with the task. |
+| id | STRING | ID of the task. |
+| body | OBJECT <details> <summary> Properties </summary> {STRING\(content), STRING\(contentType)} </details> | Body of the task containing information about the task. |
+| linkedResources | OBJECT <details> <summary> Properties </summary> {STRING\(id), STRING\(webUrl), STRING\(applicationName), STRING\(displayName)} </details> |  |
 
 
 

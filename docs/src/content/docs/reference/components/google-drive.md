@@ -63,12 +63,12 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |
-|:------------:|:------------:|
-| id | STRING |
-| kind | STRING |
-| mimeType | STRING |
-| name | STRING |
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| id | STRING | The ID of the file. |
+| kind | STRING | Identifies what kind of resource this is. |
+| mimeType | STRING | The MIME type of the file. |
+| name | STRING | The name of the file. |
 
 
 
@@ -106,7 +106,7 @@ Creates a new empty folder in Google Drive.
 
 ___Sample Output:___
 
-```{id=1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr, mimeType=plain/text, name=new-file.txt}```
+```{name=new-file.txt, id=1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr, mimeType=plain/text}```
 
 
 
@@ -115,11 +115,12 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |
-|:------------:|:------------:|
-| id | STRING |
-| mimeType | STRING |
-| name | STRING |
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| id | STRING | The ID of the file. |
+| kind | STRING | Identifies what kind of resource this is. |
+| mimeType | STRING | The MIME type of the file. |
+| name | STRING | The name of the file. |
 
 
 
@@ -158,7 +159,7 @@ Creates a new text file in Google Drive.
 
 ___Sample Output:___
 
-```{id=1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr, mimeType=plain/text, name=new-file.txt}```
+```{name=new-file.txt, id=1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr, mimeType=plain/text}```
 
 
 
@@ -167,11 +168,12 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |
-|:------------:|:------------:|
-| id | STRING |
-| mimeType | STRING |
-| name | STRING |
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| id | STRING | The ID of the file. |
+| kind | STRING | Identifies what kind of resource this is. |
+| mimeType | STRING | The MIME type of the file. |
+| name | STRING | The name of the file. |
 
 
 
@@ -242,12 +244,12 @@ Type: FILE_ENTRY
 
 #### Properties
 
-|     Name     |     Type     |
-|:------------:|:------------:|
-| extension | STRING |
-| mimeType | STRING |
-| name | STRING |
-| url | STRING |
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| extension | STRING |  |
+| mimeType | STRING |  |
+| name | STRING |  |
+| url | STRING |  |
 
 
 
@@ -286,12 +288,12 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |
-|:------------:|:------------:|
-| id | STRING |
-| kind | STRING |
-| mimeType | STRING |
-| name | STRING |
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| id | STRING | The ID of the file. |
+| kind | STRING | Identifies what kind of resource this is. |
+| mimeType | STRING | The MIME type of the file. |
+| name | STRING | The name of the file. |
 
 
 
@@ -327,7 +329,7 @@ Uploads a file in your Google Drive.
 
 ___Sample Output:___
 
-```{id=1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr, mimeType=plain/text, name=new-file.txt}```
+```{name=new-file.txt, id=1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr, mimeType=plain/text}```
 
 
 
@@ -336,11 +338,12 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |
-|:------------:|:------------:|
-| id | STRING |
-| mimeType | STRING |
-| name | STRING |
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| id | STRING | The ID of the file. |
+| kind | STRING | Identifies what kind of resource this is. |
+| mimeType | STRING | The MIME type of the file. |
+| name | STRING | The name of the file. |
 
 
 
@@ -392,9 +395,9 @@ Type: ARRAY
 
 #### Properties
 
-|     Name     |     Type     |
-|:------------:|:------------:|
-|  | OBJECT <details> <summary> Properties </summary> {STRING\(id), STRING\(mimeType), STRING\(name)} </details> |
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+|  | OBJECT <details> <summary> Properties </summary> {STRING\(id), STRING\(kind), STRING\(mimeType), STRING\(name)} </details> |  |
 
 
 
@@ -435,9 +438,9 @@ Type: ARRAY
 
 #### Properties
 
-|     Name     |     Type     |
-|:------------:|:------------:|
-|  | OBJECT <details> <summary> Properties </summary> {STRING\(id), STRING\(mimeType), STRING\(name)} </details> |
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+|  | OBJECT <details> <summary> Properties </summary> {STRING\(id), STRING\(kind), STRING\(mimeType), STRING\(name)} </details> |  |
 
 
 

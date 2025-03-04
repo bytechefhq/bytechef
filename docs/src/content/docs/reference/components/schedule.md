@@ -34,8 +34,8 @@ Type: LISTENER
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | hour | Hour | INTEGER | The hour at which a workflow will be triggered. | true |
 | minute | Minute | INTEGER | The minute at which a workflow will be triggered. | true |
-| dayOfWeek | Day of Week | ARRAY <details> <summary> Items </summary> [INTEGER] </details> | Days at which a workflow will be triggered. | null |
-| timezone | Timezone | STRING <details> <summary> Options </summary> Etc/GMT+0, Etc/GMT-1, Etc/GMT-2, Etc/GMT-3, Etc/GMT-4, Etc/GMT-5, Etc/GMT-6, Etc/GMT-7, Etc/GMT-8, Etc/GMT-9, Etc/GMT-10, Etc/GMT-11, Etc/GMT-12, Etc/GMT-13, Etc/GMT-14, Etc/GMT+1, Etc/GMT+2, Etc/GMT+3, Etc/GMT+4, Etc/GMT+5, Etc/GMT+6, Etc/GMT+7, Etc/GMT+8, Etc/GMT+9, Etc/GMT+10, Etc/GMT+11, Etc/GMT+12 </details> | The timezone at which the cron expression will be scheduled. | null |
+| dayOfWeek | Day of Week | ARRAY <details> <summary> Items </summary> [INTEGER] </details> | Days at which a workflow will be triggered. | true |
+| timezone | Timezone | STRING <details> <summary> Options </summary> Etc/GMT+0, Etc/GMT-1, Etc/GMT-2, Etc/GMT-3, Etc/GMT-4, Etc/GMT-5, Etc/GMT-6, Etc/GMT-7, Etc/GMT-8, Etc/GMT-9, Etc/GMT-10, Etc/GMT-11, Etc/GMT-12, Etc/GMT-13, Etc/GMT-14, Etc/GMT+1, Etc/GMT+2, Etc/GMT+3, Etc/GMT+4, Etc/GMT+5, Etc/GMT+6, Etc/GMT+7, Etc/GMT+8, Etc/GMT+9, Etc/GMT+10, Etc/GMT+11, Etc/GMT+12 </details> | The timezone at which the cron expression will be scheduled. | true |
 
 
 #### Output
@@ -47,13 +47,13 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |
-|:------------:|:------------:|
-| datetime | STRING |
-| hour | INTEGER |
-| minute | INTEGER |
-| dayOfWeek | ARRAY <details> <summary> Items </summary> [INTEGER] </details> |
-| timezone | STRING |
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| datetime | STRING | The exact date and time when the trigger was activated, formatted according to the specified timezone. |
+| hour | INTEGER | The hour of the day (0-23) at which the workflow was set to trigger. |
+| minute | INTEGER | The minute of the hour (0-59) at which the workflow was set to trigger. |
+| dayOfWeek | ARRAY <details> <summary> Items </summary> [INTEGER] </details> | The specific days of the week (represented as integers) on which the workflow was set to trigger. |
+| timezone | STRING | The timezone used for scheduling the cron expression, ensuring the trigger fires at the correct local time. |
 
 
 
@@ -88,7 +88,7 @@ Type: LISTENER
 | hour | Hour | INTEGER | The hour at which a workflow will be triggered. | true |
 | minute | Minute | INTEGER | The minute at which a workflow will be triggered. | true |
 | dayOfWeek | Day of Week | INTEGER <details> <summary> Options </summary> 1, 2, 3, 4, 5, 6, 7 </details> | Days at which a workflow will be triggered. | true |
-| timezone | Timezone | STRING <details> <summary> Options </summary> Etc/GMT+0, Etc/GMT-1, Etc/GMT-2, Etc/GMT-3, Etc/GMT-4, Etc/GMT-5, Etc/GMT-6, Etc/GMT-7, Etc/GMT-8, Etc/GMT-9, Etc/GMT-10, Etc/GMT-11, Etc/GMT-12, Etc/GMT-13, Etc/GMT-14, Etc/GMT+1, Etc/GMT+2, Etc/GMT+3, Etc/GMT+4, Etc/GMT+5, Etc/GMT+6, Etc/GMT+7, Etc/GMT+8, Etc/GMT+9, Etc/GMT+10, Etc/GMT+11, Etc/GMT+12 </details> | The timezone at which the cron expression will be scheduled. | null |
+| timezone | Timezone | STRING <details> <summary> Options </summary> Etc/GMT+0, Etc/GMT-1, Etc/GMT-2, Etc/GMT-3, Etc/GMT-4, Etc/GMT-5, Etc/GMT-6, Etc/GMT-7, Etc/GMT-8, Etc/GMT-9, Etc/GMT-10, Etc/GMT-11, Etc/GMT-12, Etc/GMT-13, Etc/GMT-14, Etc/GMT+1, Etc/GMT+2, Etc/GMT+3, Etc/GMT+4, Etc/GMT+5, Etc/GMT+6, Etc/GMT+7, Etc/GMT+8, Etc/GMT+9, Etc/GMT+10, Etc/GMT+11, Etc/GMT+12 </details> | The timezone at which the cron expression will be scheduled. | true |
 
 
 #### Output
@@ -100,13 +100,13 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |
-|:------------:|:------------:|
-| datetime | STRING |
-| hour | INTEGER |
-| minute | INTEGER |
-| dayOfWeek | INTEGER |
-| timezone | STRING |
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| datetime | STRING | The exact date and time when the trigger was activated, formatted according to the specified timezone. |
+| hour | INTEGER | The hour of the day (0-23) at which the workflow was set to trigger. |
+| minute | INTEGER | The minute of the hour (0-59) at which the workflow was set to trigger. |
+| dayOfWeek | INTEGER | The day of the week (represented as integers) on which the workflow was set to trigger. |
+| timezone | STRING | The timezone used for scheduling the cron expression, ensuring the trigger fires at the correct local time. |
 
 
 
@@ -141,7 +141,7 @@ Type: LISTENER
 | hour | Hour | INTEGER | The hour at which a workflow will be triggered. | true |
 | minute | Minute | INTEGER | The minute at which a workflow will be triggered. | true |
 | dayOfMonth | Day of Month | INTEGER | The day of the month  at which a workflow will be triggered. | true |
-| timezone | Timezone | STRING <details> <summary> Options </summary> Etc/GMT+0, Etc/GMT-1, Etc/GMT-2, Etc/GMT-3, Etc/GMT-4, Etc/GMT-5, Etc/GMT-6, Etc/GMT-7, Etc/GMT-8, Etc/GMT-9, Etc/GMT-10, Etc/GMT-11, Etc/GMT-12, Etc/GMT-13, Etc/GMT-14, Etc/GMT+1, Etc/GMT+2, Etc/GMT+3, Etc/GMT+4, Etc/GMT+5, Etc/GMT+6, Etc/GMT+7, Etc/GMT+8, Etc/GMT+9, Etc/GMT+10, Etc/GMT+11, Etc/GMT+12 </details> | The timezone at which the cron expression will be scheduled. | null |
+| timezone | Timezone | STRING <details> <summary> Options </summary> Etc/GMT+0, Etc/GMT-1, Etc/GMT-2, Etc/GMT-3, Etc/GMT-4, Etc/GMT-5, Etc/GMT-6, Etc/GMT-7, Etc/GMT-8, Etc/GMT-9, Etc/GMT-10, Etc/GMT-11, Etc/GMT-12, Etc/GMT-13, Etc/GMT-14, Etc/GMT+1, Etc/GMT+2, Etc/GMT+3, Etc/GMT+4, Etc/GMT+5, Etc/GMT+6, Etc/GMT+7, Etc/GMT+8, Etc/GMT+9, Etc/GMT+10, Etc/GMT+11, Etc/GMT+12 </details> | The timezone at which the cron expression will be scheduled. | true |
 
 
 #### Output
@@ -153,13 +153,13 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |
-|:------------:|:------------:|
-| datetime | STRING |
-| hour | INTEGER |
-| minute | INTEGER |
-| dayOfMonth | INTEGER |
-| timezone | STRING |
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| datetime | STRING | The exact date and time when the trigger was activated, formatted according to the specified timezone. |
+| hour | INTEGER | The hour of the day (0-23) at which the workflow was set to trigger. |
+| minute | INTEGER | The minute of the hour (0-59) at which the workflow was set to trigger. |
+| dayOfMonth | INTEGER | The specific day of the month (1-31) on which the workflow was set to trigger. |
+| timezone | STRING | The timezone used for scheduling the cron expression, ensuring the trigger fires at the correct local time. |
 
 
 
@@ -191,8 +191,8 @@ Type: LISTENER
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| interval | Interval | INTEGER | The hour at which a workflow will be triggered. | true |
-| timeUnit | Day of Week | INTEGER <details> <summary> Options </summary> 1, 2, 3, 4 </details> | Days at which a workflow will be triggered. | true |
+| interval | Interval | INTEGER | Specifies the frequency at which the workflow is triggered, based on the selected time unit. For example, an interval of 5 with a time unit of 'Minute' triggers the workflow every 5 minutes. | true |
+| timeUnit | Time Unit | INTEGER <details> <summary> Options </summary> 1, 2, 3, 4 </details> | Specifies the unit of time used in conjunction with the interval to determine the frequency of workflow triggers. | true |
 
 
 #### Output
@@ -204,11 +204,11 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |
-|:------------:|:------------:|
-| datetime | STRING |
-| interval | INTEGER |
-| timeUnit | INTEGER |
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| datetime | STRING | The exact date and time when the trigger was activated, formatted according to the specified timezone. |
+| interval | INTEGER | The interval value that determines how frequently the workflow is triggered, based on the selected time unit. |
+| timeUnit | INTEGER | The unit of time (e.g., minute, hour, day, month) used in conjunction with the interval to schedule the trigger. |
 
 
 
@@ -239,7 +239,7 @@ Type: LISTENER
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | expression | Expression | STRING | The chron schedule expression. Format: [Minute] [Hour] [Day of Month] [Month] [Day of Week] | true |
-| timezone | Timezone | STRING <details> <summary> Options </summary> Etc/GMT+0, Etc/GMT-1, Etc/GMT-2, Etc/GMT-3, Etc/GMT-4, Etc/GMT-5, Etc/GMT-6, Etc/GMT-7, Etc/GMT-8, Etc/GMT-9, Etc/GMT-10, Etc/GMT-11, Etc/GMT-12, Etc/GMT-13, Etc/GMT-14, Etc/GMT+1, Etc/GMT+2, Etc/GMT+3, Etc/GMT+4, Etc/GMT+5, Etc/GMT+6, Etc/GMT+7, Etc/GMT+8, Etc/GMT+9, Etc/GMT+10, Etc/GMT+11, Etc/GMT+12 </details> | The timezone at which the cron expression will be scheduled. | null |
+| timezone | Timezone | STRING <details> <summary> Options </summary> Etc/GMT+0, Etc/GMT-1, Etc/GMT-2, Etc/GMT-3, Etc/GMT-4, Etc/GMT-5, Etc/GMT-6, Etc/GMT-7, Etc/GMT-8, Etc/GMT-9, Etc/GMT-10, Etc/GMT-11, Etc/GMT-12, Etc/GMT-13, Etc/GMT-14, Etc/GMT+1, Etc/GMT+2, Etc/GMT+3, Etc/GMT+4, Etc/GMT+5, Etc/GMT+6, Etc/GMT+7, Etc/GMT+8, Etc/GMT+9, Etc/GMT+10, Etc/GMT+11, Etc/GMT+12 </details> | The timezone at which the cron expression will be scheduled. | true |
 
 
 #### Output
@@ -251,11 +251,11 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |
-|:------------:|:------------:|
-| datetime | STRING |
-| expression | STRING |
-| timezone | STRING |
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| datetime | STRING | The exact date and time when the trigger was activated, formatted according to the specified timezone. |
+| expression | STRING | The cron schedule expression that defines the timing pattern for triggering the workflow. |
+| timezone | STRING | The timezone used for scheduling the cron expression, ensuring the trigger fires at the correct local time. |
 
 
 

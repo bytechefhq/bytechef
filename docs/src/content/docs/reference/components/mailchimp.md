@@ -72,7 +72,7 @@ Adds a new member to the list.
 
 ___Sample Output:___
 
-```{email_type=string, marketing_permissions=[{text=string, enabled=true, marketing_permission_id=string}], tags=[{name=string, id=0}], ip_signup=string, location={region=string, longitude=0, gmtoff=0, country_code=string, timezone=string, dstoff=0, latitude=0}, ip_opt=string, timestamp_opt=2019-08-24T14:15:22, unsubscribe_reason=string, status=subscribed, email_address=string, last_note={note=string, created_at=2019-08-24T14:15:22, note_id=0, created_by=string}, contact_id=string, stats={ecommerce_data={total_revenue=0, currency_code=USD, number_of_orders=0}, avg_open_rate=0, avg_click_rate=0}, merge_fields={property2=, property1=}, full_name=string, list_id=string, tags_count=0, unique_email_id=string, email_client=string, consents_to_one_to_one_messaging=true, source=string, last_changed=2019-08-24T14:15:22, vip=true, member_rating=0, web_id=0, _links=[{targetSchema=string, method=GET, rel=string, href=string, schema=string}], id=string, timestamp_signup=2019-08-24T14:15:22, interests={property2=true, property1=true}, language=string}```
+```{unsubscribe_reason=string, status=subscribed, email_address=string, last_note={note=string, created_at=2019-08-24T14:15:22, note_id=0, created_by=string}, contact_id=string, stats={ecommerce_data={currency_code=USD, number_of_orders=0, total_revenue=0}, avg_open_rate=0, avg_click_rate=0}, merge_fields={property2=, property1=}, full_name=string, list_id=string, tags_count=0, unique_email_id=string, email_client=string, consents_to_one_to_one_messaging=true, source=string, last_changed=2019-08-24T14:15:22, vip=true, member_rating=0, web_id=0, _links=[{rel=string, href=string, schema=string, targetSchema=string, method=GET}], id=string, timestamp_signup=2019-08-24T14:15:22, interests={property2=true, property1=true}, language=string, email_type=string, marketing_permissions=[{enabled=true, marketing_permission_id=string, text=string}], tags=[{name=string, id=0}], ip_signup=string, location={gmtoff=0, country_code=string, timezone=string, dstoff=0, latitude=0, region=string, longitude=0}, ip_opt=string, timestamp_opt=2019-08-24T14:15:22}```
 
 
 
@@ -81,38 +81,38 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |
-|:------------:|:------------:|
-| id | STRING |
-| email_address | STRING |
-| unique_email_id | STRING |
-| contact_id | STRING |
-| full_name | STRING |
-| web_id | STRING |
-| email_type | STRING |
-| status | STRING <details> <summary> Options </summary> subscribed, unsubscribed, cleaned, pending, transactional </details> |
-| unsubscribe_reason | STRING |
-| consents_to_one_to_one_messaging | BOOLEAN <details> <summary> Options </summary> true, false </details> |
-| merge_fields | OBJECT <details> <summary> Properties </summary> {} </details> |
-| interests | OBJECT <details> <summary> Properties </summary> {} </details> |
-| stats | OBJECT <details> <summary> Properties </summary> {NUMBER\(avg_open_rate), NUMBER\(avg_click_rate), {NUMBER\(total_revenue), NUMBER\(number_of_orders), STRING\(currency_code)}\(ecommerce_data)} </details> |
-| ip_signup | STRING |
-| timestamp_signup | STRING |
-| ip_opt | STRING |
-| timestamp_opt | STRING |
-| member_rating | INTEGER |
-| last_changed | STRING |
-| language | STRING |
-| vip | BOOLEAN <details> <summary> Options </summary> true, false </details> |
-| email_client | STRING |
-| location | OBJECT <details> <summary> Properties </summary> {NUMBER\(latitude), NUMBER\(longitude), INTEGER\(gmtoff), INTEGER\(dstoff), STRING\(country_code), STRING\(timezone), STRING\(region)} </details> |
-| marketing_permissions | ARRAY <details> <summary> Items </summary> [{STRING\(marketing_permission_id), STRING\(text), BOOLEAN\(enabled)}] </details> |
-| last_note | OBJECT <details> <summary> Properties </summary> {INTEGER\(note_id), STRING\(created_at), STRING\(created_by), STRING\(note)} </details> |
-| source | STRING |
-| tags_count | INTEGER |
-| tags | OBJECT <details> <summary> Properties </summary> {INTEGER\(id), STRING\(name)} </details> |
-| list_id | STRING |
-| _links | ARRAY <details> <summary> Items </summary> [{STRING\(rel), STRING\(href), STRING\(method), STRING\(targetSchema), STRING\(schema)}] </details> |
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| id | STRING | The MD5 hash of the lowercase version of the list member's email address. |
+| email_address | STRING | Email address for a subscriber. |
+| unique_email_id | STRING | An identifier for the address across all of Mailchimp. |
+| contact_id | STRING | As Mailchimp evolves beyond email, you may eventually have contacts without email addresses. While the id is the MD5 hash of their email address, this contact_id is agnostic of contact’s inclusion of an email address. |
+| full_name | STRING | The contact's full name. |
+| web_id | STRING | The ID used in the Mailchimp web application. View this member in your Mailchimp account at https://{dc}.admin.mailchimp.com/lists/members/view?id={web_id}. |
+| email_type | STRING | Type of email this member asked to get ('html' or 'text'). |
+| status | STRING <details> <summary> Options </summary> subscribed, unsubscribed, cleaned, pending, transactional </details> | Subscriber's current status. |
+| unsubscribe_reason | STRING | A subscriber's reason for unsubscribing. |
+| consents_to_one_to_one_messaging | BOOLEAN <details> <summary> Options </summary> true, false </details> | Indicates whether a contact consents to 1:1 messaging. |
+| merge_fields | OBJECT <details> <summary> Properties </summary> {} </details> | A dictionary of merge fields where the keys are the merge tags. See the Merge Fields documentation for more about the structure. |
+| interests | OBJECT <details> <summary> Properties </summary> {} </details> | The key of this object's properties is the ID of the interest in question. |
+| stats | OBJECT <details> <summary> Properties </summary> {NUMBER\(avg_open_rate), NUMBER\(avg_click_rate), {NUMBER\(total_revenue), NUMBER\(number_of_orders), STRING\(currency_code)}\(ecommerce_data)} </details> | Open and click rates for this subscriber. |
+| ip_signup | STRING | IP address the subscriber signed up from. |
+| timestamp_signup | STRING | The date and time the subscriber signed up for the list in ISO 8601 format. |
+| ip_opt | STRING | The IP address the subscriber used to confirm their opt-in status. |
+| timestamp_opt | STRING | The date and time the subscriber confirmed their opt-in status in ISO 8601 format. |
+| member_rating | INTEGER | Star rating for this member, between 1 and 5. |
+| last_changed | STRING | The date and time the member's info was last changed in ISO 8601 format. |
+| language | STRING | If set/detected, the subscriber's language. |
+| vip | BOOLEAN <details> <summary> Options </summary> true, false </details> | VIP status for subscriber. |
+| email_client | STRING | The list member's email client. |
+| location | OBJECT <details> <summary> Properties </summary> {NUMBER\(latitude), NUMBER\(longitude), INTEGER\(gmtoff), INTEGER\(dstoff), STRING\(country_code), STRING\(timezone), STRING\(region)} </details> | Subscriber location information. |
+| marketing_permissions | ARRAY <details> <summary> Items </summary> [{STRING\(marketing_permission_id), STRING\(text), BOOLEAN\(enabled)}] </details> | The marketing permissions for the subscriber. |
+| last_note | OBJECT <details> <summary> Properties </summary> {INTEGER\(note_id), STRING\(created_at), STRING\(created_by), STRING\(note)} </details> | The most recent Note added about this member. |
+| source | STRING | The source from which the subscriber was added to this list. |
+| tags_count | INTEGER | The number of tags applied to this member. |
+| tags | OBJECT <details> <summary> Properties </summary> {INTEGER\(id), STRING\(name)} </details> | Returns up to 50 tags applied to this member. |
+| list_id | STRING | The list id. |
+| _links | ARRAY <details> <summary> Items </summary> [{STRING\(rel), STRING\(href), STRING\(method), STRING\(targetSchema), STRING\(schema)}] </details> | The list of link types and descriptions for the API schema documents. |
 
 
 
@@ -179,11 +179,11 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |
-|:------------:|:------------:|
-| data | OBJECT <details> <summary> Properties </summary> {STRING\(email), STRING\(email_type), STRING\(id), STRING\(ip_opt), STRING\(ip_signup), STRING\(list_id), {STRING\(EMAIL), STRING\(FNAME), STRING\(INTERESTS), STRING\(LNAME)}\(merges)} </details> |
-| fired_at | DATE_TIME |
-| type | STRING |
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| data | OBJECT <details> <summary> Properties </summary> {STRING\(email), STRING\(email_type), STRING\(id), STRING\(ip_opt), STRING\(ip_signup), STRING\(list_id), {STRING\(EMAIL), STRING\(FNAME), STRING\(INTERESTS), STRING\(LNAME)}\(merges)} </details> |  |
+| fired_at | DATE_TIME |  |
+| type | STRING |  |
 
 
 

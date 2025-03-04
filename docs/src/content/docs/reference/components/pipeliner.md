@@ -64,10 +64,10 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |
-|:------------:|:------------:|
-| success | BOOLEAN <details> <summary> Options </summary> true, false </details> |
-| data | OBJECT <details> <summary> Properties </summary> {STRING\(id), STRING\(owner_id), STRING\(name)} </details> |
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| success | BOOLEAN <details> <summary> Options </summary> true, false </details> | True when response succeeded, false on error. |
+| data | OBJECT <details> <summary> Properties </summary> {STRING\(id), STRING\(owner_id), STRING\(name)} </details> |  |
 
 
 
@@ -109,10 +109,10 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |
-|:------------:|:------------:|
-| success | BOOLEAN <details> <summary> Options </summary> true, false </details> |
-| data | OBJECT <details> <summary> Properties </summary> {STRING\(id), STRING\(owner_id), STRING\(first_name), STRING\(last_name)} </details> |
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| success | BOOLEAN <details> <summary> Options </summary> true, false </details> | True when response succeeded, false on error. |
+| data | OBJECT <details> <summary> Properties </summary> {STRING\(id), STRING\(owner_id), STRING\(first_name), STRING\(last_name)} </details> |  |
 
 
 
@@ -156,10 +156,10 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |
-|:------------:|:------------:|
-| success | BOOLEAN <details> <summary> Options </summary> true, false </details> |
-| data | OBJECT <details> <summary> Properties </summary> {STRING\(id), STRING\(subject), STRING\(activity_type_id), STRING\(unit_id), STRING\(owner_id)} </details> |
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| success | BOOLEAN <details> <summary> Options </summary> true, false </details> |  |
+| data | OBJECT <details> <summary> Properties </summary> {STRING\(id), STRING\(subject), STRING\(activity_type_id), STRING\(unit_id), STRING\(owner_id)} </details> |  |
 
 
 

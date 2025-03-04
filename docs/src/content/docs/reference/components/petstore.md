@@ -75,14 +75,14 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |
-|:------------:|:------------:|
-| id | INTEGER |
-| name | STRING |
-| category | OBJECT <details> <summary> Properties </summary> {INTEGER\(id), STRING\(name)} </details> |
-| photoUrls | ARRAY <details> <summary> Items </summary> [STRING] </details> |
-| tags | ARRAY <details> <summary> Items </summary> [{INTEGER\(id), STRING\(name)}] </details> |
-| status | STRING <details> <summary> Options </summary> available, pending, sold </details> |
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| id | INTEGER |  |
+| name | STRING |  |
+| category | OBJECT <details> <summary> Properties </summary> {INTEGER\(id), STRING\(name)} </details> |  |
+| photoUrls | ARRAY <details> <summary> Items </summary> [STRING] </details> |  |
+| tags | ARRAY <details> <summary> Items </summary> [{INTEGER\(id), STRING\(name)}] </details> |  |
+| status | STRING <details> <summary> Options </summary> available, pending, sold </details> | pet status in the store |
 
 
 
@@ -137,14 +137,14 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |
-|:------------:|:------------:|
-| id | INTEGER |
-| name | STRING |
-| category | OBJECT <details> <summary> Properties </summary> {INTEGER\(id), STRING\(name)} </details> |
-| photoUrls | ARRAY <details> <summary> Items </summary> [STRING] </details> |
-| tags | ARRAY <details> <summary> Items </summary> [{INTEGER\(id), STRING\(name)}] </details> |
-| status | STRING <details> <summary> Options </summary> available, pending, sold </details> |
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| id | INTEGER |  |
+| name | STRING |  |
+| category | OBJECT <details> <summary> Properties </summary> {INTEGER\(id), STRING\(name)} </details> |  |
+| photoUrls | ARRAY <details> <summary> Items </summary> [STRING] </details> |  |
+| tags | ARRAY <details> <summary> Items </summary> [{INTEGER\(id), STRING\(name)}] </details> |  |
+| status | STRING <details> <summary> Options </summary> available, pending, sold </details> | pet status in the store |
 
 
 
@@ -194,9 +194,9 @@ Type: ARRAY
 
 #### Properties
 
-|     Name     |     Type     |
-|:------------:|:------------:|
-|  | OBJECT <details> <summary> Properties </summary> {INTEGER\(id), STRING\(name), {INTEGER\(id), STRING\(name)}\(category), [STRING]\(photoUrls), [{INTEGER\(id), STRING\(name)}]\(tags), STRING\(status)} </details> |
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+|  | OBJECT <details> <summary> Properties </summary> {INTEGER\(id), STRING\(name), {INTEGER\(id), STRING\(name)}\(category), [STRING]\(photoUrls), [{INTEGER\(id), STRING\(name)}]\(tags), STRING\(status)} </details> |  |
 
 
 
@@ -235,9 +235,9 @@ Type: ARRAY
 
 #### Properties
 
-|     Name     |     Type     |
-|:------------:|:------------:|
-|  | OBJECT <details> <summary> Properties </summary> {INTEGER\(id), STRING\(name), {INTEGER\(id), STRING\(name)}\(category), [STRING]\(photoUrls), [{INTEGER\(id), STRING\(name)}]\(tags), STRING\(status)} </details> |
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+|  | OBJECT <details> <summary> Properties </summary> {INTEGER\(id), STRING\(name), {INTEGER\(id), STRING\(name)}\(category), [STRING]\(photoUrls), [{INTEGER\(id), STRING\(name)}]\(tags), STRING\(status)} </details> |  |
 
 
 
@@ -307,14 +307,14 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |
-|:------------:|:------------:|
-| id | INTEGER |
-| name | STRING |
-| category | OBJECT <details> <summary> Properties </summary> {INTEGER\(id), STRING\(name)} </details> |
-| photoUrls | ARRAY <details> <summary> Items </summary> [STRING] </details> |
-| tags | ARRAY <details> <summary> Items </summary> [{INTEGER\(id), STRING\(name)}] </details> |
-| status | STRING <details> <summary> Options </summary> available, pending, sold </details> |
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| id | INTEGER |  |
+| name | STRING |  |
+| category | OBJECT <details> <summary> Properties </summary> {INTEGER\(id), STRING\(name)} </details> |  |
+| photoUrls | ARRAY <details> <summary> Items </summary> [STRING] </details> |  |
+| tags | ARRAY <details> <summary> Items </summary> [{INTEGER\(id), STRING\(name)}] </details> |  |
+| status | STRING <details> <summary> Options </summary> available, pending, sold </details> | pet status in the store |
 
 
 
@@ -388,11 +388,11 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |
-|:------------:|:------------:|
-| code | INTEGER |
-| type | STRING |
-| message | STRING |
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| code | INTEGER |  |
+| type | STRING |  |
+| message | STRING |  |
 
 
 
@@ -469,14 +469,14 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |
-|:------------:|:------------:|
-| id | INTEGER |
-| petId | INTEGER |
-| quantity | INTEGER |
-| shipDate | DATE_TIME |
-| status | STRING <details> <summary> Options </summary> placed, approved, delivered </details> |
-| complete | BOOLEAN <details> <summary> Options </summary> true, false </details> |
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| id | INTEGER |  |
+| petId | INTEGER |  |
+| quantity | INTEGER |  |
+| shipDate | DATE_TIME |  |
+| status | STRING <details> <summary> Options </summary> placed, approved, delivered </details> | Order Status |
+| complete | BOOLEAN <details> <summary> Options </summary> true, false </details> |  |
 
 
 
@@ -549,14 +549,14 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |
-|:------------:|:------------:|
-| id | INTEGER |
-| petId | INTEGER |
-| quantity | INTEGER |
-| shipDate | DATE_TIME |
-| status | STRING <details> <summary> Options </summary> placed, approved, delivered </details> |
-| complete | BOOLEAN <details> <summary> Options </summary> true, false </details> |
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| id | INTEGER |  |
+| petId | INTEGER |  |
+| quantity | INTEGER |  |
+| shipDate | DATE_TIME |  |
+| status | STRING <details> <summary> Options </summary> placed, approved, delivered </details> | Order Status |
+| complete | BOOLEAN <details> <summary> Options </summary> true, false </details> |  |
 
 
 
@@ -602,16 +602,16 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |
-|:------------:|:------------:|
-| id | INTEGER |
-| username | STRING |
-| firstName | STRING |
-| lastName | STRING |
-| email | STRING |
-| password | STRING |
-| phone | STRING |
-| userStatus | INTEGER |
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| id | INTEGER |  |
+| username | STRING |  |
+| firstName | STRING |  |
+| lastName | STRING |  |
+| email | STRING |  |
+| password | STRING |  |
+| phone | STRING |  |
+| userStatus | INTEGER | User Status |
 
 
 
@@ -657,9 +657,9 @@ Type: ARRAY
 
 #### Properties
 
-|     Name     |     Type     |
-|:------------:|:------------:|
-|  | OBJECT <details> <summary> Properties </summary> {INTEGER\(id), STRING\(username), STRING\(firstName), STRING\(lastName), STRING\(email), STRING\(password), STRING\(phone), INTEGER\(userStatus)} </details> |
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+|  | OBJECT <details> <summary> Properties </summary> {INTEGER\(id), STRING\(username), STRING\(firstName), STRING\(lastName), STRING\(email), STRING\(password), STRING\(phone), INTEGER\(userStatus)} </details> |  |
 
 
 
@@ -736,16 +736,16 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |
-|:------------:|:------------:|
-| id | INTEGER |
-| username | STRING |
-| firstName | STRING |
-| lastName | STRING |
-| email | STRING |
-| password | STRING |
-| phone | STRING |
-| userStatus | INTEGER |
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| id | INTEGER |  |
+| username | STRING |  |
+| firstName | STRING |  |
+| lastName | STRING |  |
+| email | STRING |  |
+| password | STRING |  |
+| phone | STRING |  |
+| userStatus | INTEGER | User Status |
 
 
 
@@ -792,16 +792,16 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |
-|:------------:|:------------:|
-| id | INTEGER |
-| username | STRING |
-| firstName | STRING |
-| lastName | STRING |
-| email | STRING |
-| password | STRING |
-| phone | STRING |
-| userStatus | INTEGER |
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| id | INTEGER |  |
+| username | STRING |  |
+| firstName | STRING |  |
+| lastName | STRING |  |
+| email | STRING |  |
+| password | STRING |  |
+| phone | STRING |  |
+| userStatus | INTEGER | User Status |
 
 
 

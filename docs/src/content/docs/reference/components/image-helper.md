@@ -42,12 +42,12 @@ Type: FILE_ENTRY
 
 #### Properties
 
-|     Name     |     Type     |
-|:------------:|:------------:|
-| extension | STRING |
-| mimeType | STRING |
-| name | STRING |
-| url | STRING |
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| extension | STRING |  |
+| mimeType | STRING |  |
+| name | STRING |  |
+| url | STRING |  |
 
 
 
@@ -98,12 +98,12 @@ Type: FILE_ENTRY
 
 #### Properties
 
-|     Name     |     Type     |
-|:------------:|:------------:|
-| extension | STRING |
-| mimeType | STRING |
-| name | STRING |
-| url | STRING |
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| extension | STRING |  |
+| mimeType | STRING |  |
+| name | STRING |  |
+| url | STRING |  |
 
 
 
@@ -231,12 +231,12 @@ Type: FILE_ENTRY
 
 #### Properties
 
-|     Name     |     Type     |
-|:------------:|:------------:|
-| extension | STRING |
-| mimeType | STRING |
-| name | STRING |
-| url | STRING |
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| extension | STRING |  |
+| mimeType | STRING |  |
+| name | STRING |  |
+| url | STRING |  |
 
 
 
@@ -285,12 +285,12 @@ Type: FILE_ENTRY
 
 #### Properties
 
-|     Name     |     Type     |
-|:------------:|:------------:|
-| extension | STRING |
-| mimeType | STRING |
-| name | STRING |
-| url | STRING |
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| extension | STRING |  |
+| mimeType | STRING |  |
+| name | STRING |  |
+| url | STRING |  |
 
 
 

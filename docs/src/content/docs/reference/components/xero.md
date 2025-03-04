@@ -67,17 +67,16 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |
-|:------------:|:------------:|
-| Type | STRING |
-| Reference | STRING |
-| Contact | OBJECT <details> <summary> Properties </summary> {STRING\(ContactID), STRING\(Name), STRING\(EmailAddress)} </details> |
-| DateString | STRING |
-| DueDateString | STRING |
-| Status | STRING |
-| LineAmountTypes | STRING |
-| LineItems | ARRAY <details> <summary> Items </summary> [{STRING\(Description), INTEGER\(Quantity), NUMBER\(UnitAmount)}] </details> |
-| CurrencyCode | STRING |
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| Type | STRING | Type of the invoice. |
+| Contact | OBJECT <details> <summary> Properties </summary> {STRING\(ContactID), STRING\(Name), STRING\(EmailAddress)} </details> | Contact associated with the invoice. |
+| DateString | STRING | Date of the invoice – YYYY-MM-DDThh-mm-ss |
+| DueDateString | STRING | Due date of the invoice – YYYY-MM-DDThh-mm-ss |
+| Status | STRING | Status of the invoice. |
+| LineAmountTypes | STRING | Line Amount Type |
+| LineItems | ARRAY <details> <summary> Items </summary> [{STRING\(Description), INTEGER\(Quantity), NUMBER\(UnitAmount)}] </details> | Line items on the invoice. |
+| CurrencyCode | STRING | The currency that invoice has been raised in. |
 
 
 
@@ -137,20 +136,20 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |
-|:------------:|:------------:|
-| ContactID | STRING |
-| CompanyNumber | STRING |
-| AccountNumber | STRING |
-| ContactStatus | STRING |
-| Name | STRING |
-| FirstName | STRING |
-| LastName | STRING |
-| EmailAddress | STRING |
-| BankAccountDetails | STRING |
-| TaxNumber | STRING |
-| Addresses | ARRAY <details> <summary> Items </summary> [{STRING\(AddressType), STRING\(City), STRING\(Region), STRING\(PostalCode), STRING\(Country)}] </details> |
-| Phones | ARRAY <details> <summary> Items </summary> [{STRING\(PhoneType), STRING\(PhoneNumber), STRING\(PhoneAreaCode), STRING\(PhoneCountryCode)}] </details> |
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| ContactID | STRING | ID of the contact. |
+| CompanyNumber | STRING | Company registration number. |
+| AccountNumber | STRING | A user defined account number. |
+| ContactStatus | STRING | Status of the contact. |
+| Name | STRING | Full name of contact/organisation. |
+| FirstName | STRING | First name of contact person. |
+| LastName | STRING | Last name of contact person. |
+| EmailAddress | STRING | Email address of contact person. |
+| BankAccountDetails | STRING | Bank account number of contact. |
+| TaxNumber | STRING | Tax number of contact. |
+| Addresses | ARRAY <details> <summary> Items </summary> [{STRING\(AddressType), STRING\(City), STRING\(Region), STRING\(PostalCode), STRING\(Country)}] </details> | List of addresses associated with the contact. |
+| Phones | ARRAY <details> <summary> Items </summary> [{STRING\(PhoneType), STRING\(PhoneNumber), STRING\(PhoneAreaCode), STRING\(PhoneCountryCode)}] </details> |  |
 
 
 
@@ -216,17 +215,16 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |
-|:------------:|:------------:|
-| Type | STRING |
-| Reference | STRING |
-| Contact | OBJECT <details> <summary> Properties </summary> {STRING\(ContactID), STRING\(Name), STRING\(EmailAddress)} </details> |
-| DateString | STRING |
-| DueDateString | STRING |
-| Status | STRING |
-| LineAmountTypes | STRING |
-| LineItems | ARRAY <details> <summary> Items </summary> [{STRING\(Description), INTEGER\(Quantity), NUMBER\(UnitAmount)}] </details> |
-| CurrencyCode | STRING |
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| Type | STRING | Type of the invoice. |
+| Contact | OBJECT <details> <summary> Properties </summary> {STRING\(ContactID), STRING\(Name), STRING\(EmailAddress)} </details> | Contact associated with the invoice. |
+| DateString | STRING | Date of the invoice – YYYY-MM-DDThh-mm-ss |
+| DueDateString | STRING | Due date of the invoice – YYYY-MM-DDThh-mm-ss |
+| Status | STRING | Status of the invoice. |
+| LineAmountTypes | STRING | Line Amount Type |
+| LineItems | ARRAY <details> <summary> Items </summary> [{STRING\(Description), INTEGER\(Quantity), NUMBER\(UnitAmount)}] </details> | Line items on the invoice. |
+| CurrencyCode | STRING | The currency that invoice has been raised in. |
 
 
 
@@ -287,22 +285,22 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |
-|:------------:|:------------:|
-| QuoteID | STRING |
-| QuoteNumber | STRING |
-| Reference | STRING |
-| Terms | STRING |
-| Contact | OBJECT <details> <summary> Properties </summary> {STRING\(ContactID), STRING\(Name), STRING\(EmailAddress)} </details> |
-| LineItems | ARRAY <details> <summary> Items </summary> [{STRING\(LineItemID), STRING\(Description), NUMBER\(UnitAmount), INTEGER\(DiscountRate), INTEGER\(Quantity)}] </details> |
-| DateString | STRING |
-| ExpiryDateString | STRING |
-| Status | STRING |
-| CurrencyCode | STRING |
-| Title | STRING |
-| BrandingThemeID | STRING |
-| Summary | STRING |
-| LineAmountTypes | STRING |
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| QuoteID | STRING |  |
+| QuoteNumber | STRING |  |
+| Reference | STRING |  |
+| Terms | STRING |  |
+| Contact | OBJECT <details> <summary> Properties </summary> {STRING\(ContactID), STRING\(Name), STRING\(EmailAddress)} </details> |  |
+| LineItems | ARRAY <details> <summary> Items </summary> [{STRING\(LineItemID), STRING\(Description), NUMBER\(UnitAmount), INTEGER\(DiscountRate), INTEGER\(Quantity)}] </details> |  |
+| DateString | STRING |  |
+| ExpiryDateString | STRING |  |
+| Status | STRING |  |
+| CurrencyCode | STRING |  |
+| Title | STRING |  |
+| BrandingThemeID | STRING |  |
+| Summary | STRING |  |
+| LineAmountTypes | STRING |  |
 
 
 
@@ -364,17 +362,16 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |
-|:------------:|:------------:|
-| Type | STRING |
-| Reference | STRING |
-| Contact | OBJECT <details> <summary> Properties </summary> {STRING\(ContactID), STRING\(Name), STRING\(EmailAddress)} </details> |
-| DateString | STRING |
-| DueDateString | STRING |
-| Status | STRING |
-| LineAmountTypes | STRING |
-| LineItems | ARRAY <details> <summary> Items </summary> [{STRING\(Description), INTEGER\(Quantity), NUMBER\(UnitAmount)}] </details> |
-| CurrencyCode | STRING |
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| Type | STRING | Type of the invoice. |
+| Contact | OBJECT <details> <summary> Properties </summary> {STRING\(ContactID), STRING\(Name), STRING\(EmailAddress)} </details> | Contact associated with the invoice. |
+| DateString | STRING | Date of the invoice – YYYY-MM-DDThh-mm-ss |
+| DueDateString | STRING | Due date of the invoice – YYYY-MM-DDThh-mm-ss |
+| Status | STRING | Status of the invoice. |
+| LineAmountTypes | STRING | Line Amount Type |
+| LineItems | ARRAY <details> <summary> Items </summary> [{STRING\(Description), INTEGER\(Quantity), NUMBER\(UnitAmount)}] </details> | Line items on the invoice. |
+| CurrencyCode | STRING | The currency that invoice has been raised in. |
 
 
 
@@ -415,20 +412,20 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |
-|:------------:|:------------:|
-| ContactID | STRING |
-| CompanyNumber | STRING |
-| AccountNumber | STRING |
-| ContactStatus | STRING |
-| Name | STRING |
-| FirstName | STRING |
-| LastName | STRING |
-| EmailAddress | STRING |
-| BankAccountDetails | STRING |
-| TaxNumber | STRING |
-| Addresses | ARRAY <details> <summary> Items </summary> [{STRING\(AddressType), STRING\(City), STRING\(Region), STRING\(PostalCode), STRING\(Country)}] </details> |
-| Phones | ARRAY <details> <summary> Items </summary> [{STRING\(PhoneType), STRING\(PhoneNumber), STRING\(PhoneAreaCode), STRING\(PhoneCountryCode)}] </details> |
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| ContactID | STRING | ID of the contact. |
+| CompanyNumber | STRING | Company registration number. |
+| AccountNumber | STRING | A user defined account number. |
+| ContactStatus | STRING | Status of the contact. |
+| Name | STRING | Full name of contact/organisation. |
+| FirstName | STRING | First name of contact person. |
+| LastName | STRING | Last name of contact person. |
+| EmailAddress | STRING | Email address of contact person. |
+| BankAccountDetails | STRING | Bank account number of contact. |
+| TaxNumber | STRING | Tax number of contact. |
+| Addresses | ARRAY <details> <summary> Items </summary> [{STRING\(AddressType), STRING\(City), STRING\(Region), STRING\(PostalCode), STRING\(Country)}] </details> | List of addresses associated with the contact. |
+| Phones | ARRAY <details> <summary> Items </summary> [{STRING\(PhoneType), STRING\(PhoneNumber), STRING\(PhoneAreaCode), STRING\(PhoneCountryCode)}] </details> |  |
 
 
 
@@ -469,17 +466,16 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |
-|:------------:|:------------:|
-| Type | STRING |
-| Reference | STRING |
-| Contact | OBJECT <details> <summary> Properties </summary> {STRING\(ContactID), STRING\(Name), STRING\(EmailAddress)} </details> |
-| DateString | STRING |
-| DueDateString | STRING |
-| Status | STRING |
-| LineAmountTypes | STRING |
-| LineItems | ARRAY <details> <summary> Items </summary> [{STRING\(Description), INTEGER\(Quantity), NUMBER\(UnitAmount)}] </details> |
-| CurrencyCode | STRING |
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| Type | STRING | Type of the invoice. |
+| Contact | OBJECT <details> <summary> Properties </summary> {STRING\(ContactID), STRING\(Name), STRING\(EmailAddress)} </details> | Contact associated with the invoice. |
+| DateString | STRING | Date of the invoice – YYYY-MM-DDThh-mm-ss |
+| DueDateString | STRING | Due date of the invoice – YYYY-MM-DDThh-mm-ss |
+| Status | STRING | Status of the invoice. |
+| LineAmountTypes | STRING | Line Amount Type |
+| LineItems | ARRAY <details> <summary> Items </summary> [{STRING\(Description), INTEGER\(Quantity), NUMBER\(UnitAmount)}] </details> | Line items on the invoice. |
+| CurrencyCode | STRING | The currency that invoice has been raised in. |
 
 
 

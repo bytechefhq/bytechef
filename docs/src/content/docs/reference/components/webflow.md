@@ -62,10 +62,10 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |
-|:------------:|:------------:|
-| orderId | STRING |
-| status | STRING |
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| orderId | STRING |  |
+| status | STRING |  |
 
 
 
@@ -107,10 +107,10 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |
-|:------------:|:------------:|
-| id | STRING |
-| fieldData | OBJECT <details> <summary> Properties </summary> {STRING\(name), STRING\(slug)} </details> |
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| id | STRING |  |
+| fieldData | OBJECT <details> <summary> Properties </summary> {STRING\(name), STRING\(slug)} </details> |  |
 
 
 

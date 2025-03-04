@@ -62,14 +62,14 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |
-|:------------:|:------------:|
-| ok | BOOLEAN <details> <summary> Options </summary> true, false </details> |
-| channel | STRING |
-| ts | STRING |
-| message | OBJECT <details> <summary> Properties </summary> {STRING\(user), STRING\(type), STRING\(ts), STRING\(text), STRING\(team), STRING\(subtype)} </details> |
-| warning | STRING |
-| responseMetadata | OBJECT <details> <summary> Properties </summary> {[STRING]\(messages)} </details> |
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| ok | BOOLEAN <details> <summary> Options </summary> true, false </details> | Indicates if the message was successfully sent. |
+| channel | STRING | ID of the channel the message was sent to. |
+| ts | STRING | Timestamp of the message. |
+| message | OBJECT <details> <summary> Properties </summary> {STRING\(user), STRING\(type), STRING\(ts), STRING\(text), STRING\(team), STRING\(subtype)} </details> | The sent message. |
+| warning | STRING |  |
+| responseMetadata | OBJECT <details> <summary> Properties </summary> {[STRING]\(messages)} </details> |  |
 
 
 
@@ -110,14 +110,14 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |
-|:------------:|:------------:|
-| ok | BOOLEAN <details> <summary> Options </summary> true, false </details> |
-| channel | STRING |
-| ts | STRING |
-| message | OBJECT <details> <summary> Properties </summary> {STRING\(user), STRING\(type), STRING\(ts), STRING\(text), STRING\(team), STRING\(subtype)} </details> |
-| warning | STRING |
-| responseMetadata | OBJECT <details> <summary> Properties </summary> {[STRING]\(messages)} </details> |
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| ok | BOOLEAN <details> <summary> Options </summary> true, false </details> | Indicates if the message was successfully sent. |
+| channel | STRING | ID of the channel the message was sent to. |
+| ts | STRING | Timestamp of the message. |
+| message | OBJECT <details> <summary> Properties </summary> {STRING\(user), STRING\(type), STRING\(ts), STRING\(text), STRING\(team), STRING\(subtype)} </details> | The sent message. |
+| warning | STRING |  |
+| responseMetadata | OBJECT <details> <summary> Properties </summary> {[STRING]\(messages)} </details> |  |
 
 
 
@@ -158,14 +158,14 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |
-|:------------:|:------------:|
-| ok | BOOLEAN <details> <summary> Options </summary> true, false </details> |
-| channel | STRING |
-| ts | STRING |
-| message | OBJECT <details> <summary> Properties </summary> {STRING\(user), STRING\(type), STRING\(ts), STRING\(text), STRING\(team), STRING\(subtype)} </details> |
-| warning | STRING |
-| responseMetadata | OBJECT <details> <summary> Properties </summary> {[STRING]\(messages)} </details> |
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| ok | BOOLEAN <details> <summary> Options </summary> true, false </details> | Indicates if the message was successfully sent. |
+| channel | STRING | ID of the channel the message was sent to. |
+| ts | STRING | Timestamp of the message. |
+| message | OBJECT <details> <summary> Properties </summary> {STRING\(user), STRING\(type), STRING\(ts), STRING\(text), STRING\(team), STRING\(subtype)} </details> | The sent message. |
+| warning | STRING |  |
+| responseMetadata | OBJECT <details> <summary> Properties </summary> {[STRING]\(messages)} </details> |  |
 
 
 

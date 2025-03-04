@@ -64,12 +64,12 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |
-|:------------:|:------------:|
-| id | STRING |
-| type | OBJECT <details> <summary> Properties </summary> {STRING\(category), STRING\(id)} </details> |
-| details | STRING |
-| parent | OBJECT <details> <summary> Properties </summary> {STRING\(type), STRING\(id)} </details> |
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| id | STRING | The ID of the new activity. |
+| type | OBJECT <details> <summary> Properties </summary> {STRING\(category), STRING\(id)} </details> | The type of the new activity. |
+| details | STRING | Text body of the new activity. |
+| parent | OBJECT <details> <summary> Properties </summary> {STRING\(type), STRING\(id)} </details> | The resource to which this new activity belongs. |
 
 
 
@@ -120,19 +120,19 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |
-|:------------:|:------------:|
-| id | STRING |
-| name | STRING |
-| address | OBJECT <details> <summary> Properties </summary> {STRING\(street), STRING\(city), STRING\(state), STRING\(postal_code), STRING\(country)} </details> |
-| assignee_id | STRING |
-| contact_type_id | STRING |
-| details | STRING |
-| email_domain | STRING |
-| phone_numbers | ARRAY <details> <summary> Items </summary> [{STRING\(number), STRING\(category)}] </details> |
-| socials | ARRAY <details> <summary> Items </summary> [{STRING\(url), STRING\(category)}] </details> |
-| tags | ARRAY <details> <summary> Items </summary> [STRING] </details> |
-| websites | ARRAY <details> <summary> Items </summary> [{STRING\(url), STRING\(category)}] </details> |
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| id | STRING | ID of the new company. |
+| name | STRING | Name of the new company. |
+| address | OBJECT <details> <summary> Properties </summary> {STRING\(street), STRING\(city), STRING\(state), STRING\(postal_code), STRING\(country)} </details> | Address of the new company. |
+| assignee_id | STRING | ID of the user that is owner of the new company. |
+| contact_type_id | STRING | ID of the contact type of the new company. |
+| details | STRING | Description of the new company. |
+| email_domain | STRING | Domain to which email addresses of the new company belong. |
+| phone_numbers | ARRAY <details> <summary> Items </summary> [{STRING\(number), STRING\(category)}] </details> | Phone numbers belonging to the new company. |
+| socials | ARRAY <details> <summary> Items </summary> [{STRING\(url), STRING\(category)}] </details> | Social profiles belonging to the company. |
+| tags | ARRAY <details> <summary> Items </summary> [STRING] </details> | Tags associated with the company. |
+| websites | ARRAY <details> <summary> Items </summary> [{STRING\(url), STRING\(category)}] </details> | Websites belonging to the company. |
 
 
 
@@ -206,21 +206,22 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |
-|:------------:|:------------:|
-| id | STRING |
-| name | STRING |
-| address | OBJECT <details> <summary> Properties </summary> {STRING\(street), STRING\(city), STRING\(state), STRING\(postal_code), STRING\(country)} </details> |
-| assignee_id | STRING |
-| company_id | STRING |
-| contact_type_id | STRING |
-| details | STRING |
-| emails | ARRAY <details> <summary> Items </summary> [{STRING\(email), STRING\(category)}] </details> |
-| phone_numbers | ARRAY <details> <summary> Items </summary> [{STRING\(number), STRING\(category)}] </details> |
-| socials | ARRAY <details> <summary> Items </summary> [{STRING\(url), STRING\(category)}] </details> |
-| tags | ARRAY <details> <summary> Items </summary> [STRING] </details> |
-| title | STRING |
-| websites | ARRAY <details> <summary> Items </summary> [{STRING\(url), STRING\(category)}] </details> |
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| id | STRING | ID of the new person. |
+| name | STRING | First and last name of the new person. |
+| address | OBJECT <details> <summary> Properties </summary> {STRING\(street), STRING\(city), STRING\(state), STRING\(postal_code), STRING\(country)} </details> | Address of the new person. |
+| assignee_id | STRING | ID of the user that is owner of the new person. |
+| company_id | STRING | ID of the primary company with which the new person is associated. |
+| company_name | STRING | The name of the primary company with which the new person is associated. |
+| contact_type_id | STRING | ID of the contact type of the new person. |
+| details | STRING | Description of the new person. |
+| emails | ARRAY <details> <summary> Items </summary> [{STRING\(email), STRING\(category)}] </details> | Email addresses belonging to the new person. |
+| phone_numbers | ARRAY <details> <summary> Items </summary> [{STRING\(number), STRING\(category)}] </details> | Phone numbers belonging to the new person. |
+| socials | ARRAY <details> <summary> Items </summary> [{STRING\(url), STRING\(category)}] </details> | Social profiles belonging to the person. |
+| tags | ARRAY <details> <summary> Items </summary> [STRING] </details> | Tags associated with the person. |
+| title | STRING |  |
+| websites | ARRAY <details> <summary> Items </summary> [{STRING\(url), STRING\(category)}] </details> | Websites belonging to the person. |
 
 
 
@@ -295,22 +296,19 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |
-|:------------:|:------------:|
-| id | STRING |
-| name | STRING |
-| related_resource | OBJECT <details> <summary> Properties </summary> {STRING\(id), STRING\(type)} </details> |
-| assignee_id | STRING |
-| due_date | STRING |
-| reminder_date | STRING |
-| completed_date | STRING |
-| priority | STRING |
-| status | STRING |
-| details | STRING |
-| tags | ARRAY <details> <summary> Items </summary> [STRING] </details> |
-| custom_fields | ARRAY <details> <summary> Items </summary> [] </details> |
-| date_created | STRING |
-| date_modified | STRING |
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| id | STRING | ID of the new task. |
+| name | STRING | Name of the new task. |
+| related_resource | OBJECT <details> <summary> Properties </summary> {STRING\(id), STRING\(type)} </details> | Primary related resource for the new task. |
+| assignee_id | STRING | ID of the user that is owner of the new task. |
+| due_date | STRING | The due date of the new task. |
+| reminder_date | STRING | The reminder date of the new task. |
+| completed_date | STRING | The date the task was completed. |
+| priority | STRING | The priority of the new task. |
+| status | STRING | The status of the new task. |
+| details | STRING | Description of the new task. |
+| tags | ARRAY <details> <summary> Items </summary> [STRING] </details> | Tags associated with the new task. |
 
 
 

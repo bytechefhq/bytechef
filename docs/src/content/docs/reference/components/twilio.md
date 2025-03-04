@@ -63,28 +63,28 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |
-|:------------:|:------------:|
-| body | STRING |
-| numSegments | STRING |
-| direction | STRING |
-| from | OBJECT <details> <summary> Properties </summary> {STRING\(rawNumber)} </details> |
-| to | STRING |
-| dateUpdated | OBJECT <details> <summary> Properties </summary> {DATE_TIME\(dateTime), STRING\(zoneId)} </details> |
-| price | STRING |
-| errorMessage | STRING |
-| uri | STRING |
-| accountSid | STRING |
-| numMedia | STRING |
-| status | STRING |
-| messagingServiceSid | STRING |
-| sid | STRING |
-| dateSent | OBJECT <details> <summary> Properties </summary> {DATE_TIME\(dateTime), STRING\(zoneId)} </details> |
-| dateCreated | OBJECT <details> <summary> Properties </summary> {DATE_TIME\(dateTime), STRING\(zoneId)} </details> |
-| errorCode | INTEGER |
-| currency | OBJECT <details> <summary> Properties </summary> {STRING\(currencyCode), INTEGER\(defaultFractionDigits), INTEGER\(numericCode)} </details> |
-| apiVersion | STRING |
-| subresourceUris | OBJECT <details> <summary> Properties </summary> {} </details> |
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| body | STRING |  |
+| numSegments | STRING |  |
+| direction | STRING |  |
+| from | OBJECT <details> <summary> Properties </summary> {STRING\(rawNumber)} </details> |  |
+| to | STRING |  |
+| dateUpdated | OBJECT <details> <summary> Properties </summary> {DATE_TIME\(dateTime), STRING\(zoneId)} </details> |  |
+| price | STRING |  |
+| errorMessage | STRING |  |
+| uri | STRING |  |
+| accountSid | STRING |  |
+| numMedia | STRING |  |
+| status | STRING |  |
+| messagingServiceSid | STRING |  |
+| sid | STRING |  |
+| dateSent | OBJECT <details> <summary> Properties </summary> {DATE_TIME\(dateTime), STRING\(zoneId)} </details> |  |
+| dateCreated | OBJECT <details> <summary> Properties </summary> {DATE_TIME\(dateTime), STRING\(zoneId)} </details> |  |
+| errorCode | INTEGER |  |
+| currency | OBJECT <details> <summary> Properties </summary> {STRING\(currencyCode), INTEGER\(defaultFractionDigits), INTEGER\(numericCode)} </details> |  |
+| apiVersion | STRING |  |
+| subresourceUris | OBJECT <details> <summary> Properties </summary> {} </details> |  |
 
 
 

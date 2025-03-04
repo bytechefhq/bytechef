@@ -64,12 +64,12 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |
-|:------------:|:------------:|
-| id | STRING |
-| name | STRING |
-| folder | OBJECT <details> <summary> Properties </summary> {STRING\(id), STRING\(name)} </details> |
-| space | OBJECT <details> <summary> Properties </summary> {STRING\(id), STRING\(name)} </details> |
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| id | STRING |  |
+| name | STRING |  |
+| folder | OBJECT <details> <summary> Properties </summary> {STRING\(id), STRING\(name)} </details> |  |
+| space | OBJECT <details> <summary> Properties </summary> {STRING\(id), STRING\(name)} </details> |  |
 
 
 
@@ -116,15 +116,15 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |
-|:------------:|:------------:|
-| id | STRING |
-| name | STRING |
-| description | STRING |
-| url | STRING |
-| list | OBJECT <details> <summary> Properties </summary> {STRING\(id), STRING\(name)} </details> |
-| folder | OBJECT <details> <summary> Properties </summary> {STRING\(id), STRING\(name)} </details> |
-| space | OBJECT <details> <summary> Properties </summary> {STRING\(id)} </details> |
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| id | STRING |  |
+| name | STRING |  |
+| description | STRING |  |
+| url | STRING |  |
+| list | OBJECT <details> <summary> Properties </summary> {STRING\(id), STRING\(name)} </details> |  |
+| folder | OBJECT <details> <summary> Properties </summary> {STRING\(id), STRING\(name)} </details> |  |
+| space | OBJECT <details> <summary> Properties </summary> {STRING\(id)} </details> |  |
 
 
 
@@ -170,11 +170,11 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |
-|:------------:|:------------:|
-| id | STRING |
-| name | STRING |
-| space | OBJECT <details> <summary> Properties </summary> {STRING\(id), STRING\(name)} </details> |
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| id | STRING |  |
+| name | STRING |  |
+| space | OBJECT <details> <summary> Properties </summary> {STRING\(id), STRING\(name)} </details> |  |
 
 
 
@@ -222,12 +222,12 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |
-|:------------:|:------------:|
-| id | STRING |
-| name | STRING |
-| folder | OBJECT <details> <summary> Properties </summary> {STRING\(id), STRING\(name)} </details> |
-| space | OBJECT <details> <summary> Properties </summary> {STRING\(id), STRING\(name)} </details> |
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| id | STRING |  |
+| name | STRING |  |
+| folder | OBJECT <details> <summary> Properties </summary> {STRING\(id), STRING\(name)} </details> |  |
+| space | OBJECT <details> <summary> Properties </summary> {STRING\(id), STRING\(name)} </details> |  |
 
 
 
@@ -268,15 +268,15 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |
-|:------------:|:------------:|
-| id | STRING |
-| name | STRING |
-| description | STRING |
-| url | STRING |
-| list | OBJECT <details> <summary> Properties </summary> {STRING\(id), STRING\(name)} </details> |
-| folder | OBJECT <details> <summary> Properties </summary> {STRING\(id), STRING\(name)} </details> |
-| space | OBJECT <details> <summary> Properties </summary> {STRING\(id), STRING\(name)} </details> |
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| id | STRING |  |
+| name | STRING |  |
+| description | STRING |  |
+| url | STRING |  |
+| list | OBJECT <details> <summary> Properties </summary> {STRING\(id), STRING\(name)} </details> |  |
+| folder | OBJECT <details> <summary> Properties </summary> {STRING\(id), STRING\(name)} </details> |  |
+| space | OBJECT <details> <summary> Properties </summary> {STRING\(id), STRING\(name)} </details> |  |
 
 
 

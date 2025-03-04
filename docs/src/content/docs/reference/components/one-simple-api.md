@@ -62,13 +62,13 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |
-|:------------:|:------------:|
-| from_currency | STRING |
-| from_value | STRING |
-| to_currency | STRING |
-| to_value | NUMBER |
-| to_exchange_rate | STRING |
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| from_currency | STRING |  |
+| from_value | STRING |  |
+| to_currency | STRING |  |
+| to_value | NUMBER |  |
+| to_exchange_rate | STRING |  |
 
 
 
@@ -109,13 +109,13 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |
-|:------------:|:------------:|
-| url | STRING |
-| single_use | STRING |
-| temporary_redirect | STRING |
-| forward_params | STRING |
-| short_url | STRING |
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| url | STRING |  |
+| single_use | STRING |  |
+| temporary_redirect | STRING |  |
+| forward_params | STRING |  |
+| short_url | STRING |  |
 
 
 
@@ -154,11 +154,11 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |
-|:------------:|:------------:|
-| general | OBJECT <details> <summary> Properties </summary> {STRING\(title), STRING\(description), STRING\(canonical)} </details> |
-| twitter | OBJECT <details> <summary> Properties </summary> {STRING\(site), STRING\(title), STRING\(description)} </details> |
-| og | OBJECT <details> <summary> Properties </summary> {STRING\(title), STRING\(url), STRING\(image), STRING\(description), STRING\(type)} </details> |
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| general | OBJECT <details> <summary> Properties </summary> {STRING\(title), STRING\(description), STRING\(canonical)} </details> |  |
+| twitter | OBJECT <details> <summary> Properties </summary> {STRING\(site), STRING\(title), STRING\(description)} </details> |  |
+| og | OBJECT <details> <summary> Properties </summary> {STRING\(title), STRING\(url), STRING\(image), STRING\(description), STRING\(type)} </details> |  |
 
 
 

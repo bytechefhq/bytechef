@@ -19,103 +19,6 @@ Type: filesystem/v1
 ## Actions
 
 
-### Read File
-Name: readFile
-
-Reads all data from a specified file path and outputs it in file entry format.
-
-#### Properties
-
-|      Name       |      Label     |     Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| filename | File path | STRING | The path of the file to read. | true |
-
-
-#### Output
-
-
-
-Type: FILE_ENTRY
-
-
-#### Properties
-
-|     Name     |     Type     |
-|:------------:|:------------:|
-| extension | STRING |
-| mimeType | STRING |
-| name | STRING |
-| url | STRING |
-
-
-
-
-#### JSON Example
-```json
-{
-  "label" : "Read File",
-  "name" : "readFile",
-  "parameters" : {
-    "filename" : ""
-  },
-  "type" : "filesystem/v1/readFile"
-}
-```
-
-
-### Write to File
-Name: writeFile
-
-null
-
-#### Properties
-
-|      Name       |      Label     |     Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| fileEntry | File | FILE_ENTRY | File entry object to be written. | true |
-| filename | File path | STRING | The path to which the file should be written. | true |
-
-
-#### Output
-
-
-___Sample Output:___
-
-```{bytes=1024}```
-
-
-
-Type: OBJECT
-
-
-#### Properties
-
-|     Name     |     Type     |
-|:------------:|:------------:|
-| bytes | INTEGER |
-
-
-
-
-#### JSON Example
-```json
-{
-  "label" : "Write to File",
-  "name" : "writeFile",
-  "parameters" : {
-    "fileEntry" : {
-      "extension" : "",
-      "mimeType" : "",
-      "name" : "",
-      "url" : ""
-    },
-    "filename" : ""
-  },
-  "type" : "filesystem/v1/writeFile"
-}
-```
-
-
 ### Create Temp Directory
 Name: createTempDir
 
@@ -143,6 +46,46 @@ Type: STRING
   "label" : "Create Temp Directory",
   "name" : "createTempDir",
   "type" : "filesystem/v1/createTempDir"
+}
+```
+
+
+### Create
+Name: mkdir
+
+Creates a directory.
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| path | Path | STRING | The path of a directory. | true |
+
+
+#### Output
+
+
+___Sample Output:___
+
+```/sample_data```
+
+
+
+Type: STRING
+
+
+
+
+
+#### JSON Example
+```json
+{
+  "label" : "Create",
+  "name" : "mkdir",
+  "parameters" : {
+    "path" : ""
+  },
+  "type" : "filesystem/v1/mkdir"
 }
 ```
 
@@ -209,9 +152,9 @@ Type: ARRAY
 
 #### Properties
 
-|     Name     |     Type     |
-|:------------:|:------------:|
-|  | OBJECT <details> <summary> Properties </summary> {STRING\(fileName), STRING\(relativePath), INTEGER\(size)} </details> |
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+|  | OBJECT <details> <summary> Properties </summary> {STRING\(filename), STRING\(relativePath), INTEGER\(size)} </details> |  |
 
 
 
@@ -230,29 +173,33 @@ Type: ARRAY
 ```
 
 
-### Create
-Name: mkdir
+### Read File
+Name: readFile
 
-Creates a directory.
+Reads all data from a specified file path and outputs it in file entry format.
 
 #### Properties
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| path | Path | STRING | The path of a directory. | true |
+| filename | File path | STRING | The path of the file to read. | true |
 
 
 #### Output
 
 
-___Sample Output:___
 
-```/sample_data```
-
+Type: FILE_ENTRY
 
 
-Type: STRING
+#### Properties
 
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| extension | STRING |  |
+| mimeType | STRING |  |
+| name | STRING |  |
+| url | STRING |  |
 
 
 
@@ -260,12 +207,12 @@ Type: STRING
 #### JSON Example
 ```json
 {
-  "label" : "Create",
-  "name" : "mkdir",
+  "label" : "Read File",
+  "name" : "readFile",
   "parameters" : {
-    "path" : ""
+    "filename" : ""
   },
-  "type" : "filesystem/v1/mkdir"
+  "type" : "filesystem/v1/readFile"
 }
 ```
 
@@ -306,6 +253,59 @@ Type: BOOLEAN
     "path" : ""
   },
   "type" : "filesystem/v1/rm"
+}
+```
+
+
+### Write to File
+Name: writeFile
+
+null
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| fileEntry | File | FILE_ENTRY | File entry object to be written. | true |
+| filename | File path | STRING | The path to which the file should be written. | true |
+
+
+#### Output
+
+
+___Sample Output:___
+
+```{bytes=1024}```
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| bytes | INTEGER | Number of bytes written. |
+
+
+
+
+#### JSON Example
+```json
+{
+  "label" : "Write to File",
+  "name" : "writeFile",
+  "parameters" : {
+    "fileEntry" : {
+      "extension" : "",
+      "mimeType" : "",
+      "name" : "",
+      "url" : ""
+    },
+    "filename" : ""
+  },
+  "type" : "filesystem/v1/writeFile"
 }
 ```
 

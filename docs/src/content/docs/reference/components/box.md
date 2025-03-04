@@ -62,12 +62,12 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |
-|:------------:|:------------:|
-| type | STRING |
-| id | STRING |
-| name | STRING |
-| parent | OBJECT <details> <summary> Properties </summary> {STRING\(type), STRING\(id), STRING\(name)} </details> |
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| type | STRING | This is always set to folder. |
+| id | STRING | ID of the new folder. |
+| name | STRING | Name of the new folder. |
+| parent | OBJECT <details> <summary> Properties </summary> {STRING\(type), STRING\(id), STRING\(name)} </details> | Folder that new folder is located within. This value may be null for some folders such as the root folder or the trash folder. |
 
 
 
@@ -108,12 +108,12 @@ Type: FILE_ENTRY
 
 #### Properties
 
-|     Name     |     Type     |
-|:------------:|:------------:|
-| extension | STRING |
-| mimeType | STRING |
-| name | STRING |
-| url | STRING |
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| extension | STRING |  |
+| mimeType | STRING |  |
+| name | STRING |  |
+| url | STRING |  |
 
 
 
@@ -154,9 +154,9 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |
-|:------------:|:------------:|
-| entries | ARRAY <details> <summary> Items </summary> [{STRING\(type), STRING\(id), STRING\(name), {STRING\(type), STRING\(id), STRING\(name)}\(parent)}] </details> |
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| entries | ARRAY <details> <summary> Items </summary> [{STRING\(type), STRING\(id), STRING\(name), {STRING\(type), STRING\(id), STRING\(name)}\(parent)}] </details> | A list of files that were uploaded. |
 
 
 
@@ -208,12 +208,12 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |
-|:------------:|:------------:|
-| type | STRING |
-| id | STRING |
-| name | STRING |
-| parent | OBJECT <details> <summary> Properties </summary> {STRING\(type), STRING\(id), STRING\(name)} </details> |
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| type | STRING | This is always set to file. |
+| id | STRING | ID of the uploaded file. |
+| name | STRING | Name of the uploaded file. |
+| parent | OBJECT <details> <summary> Properties </summary> {STRING\(type), STRING\(id), STRING\(name)} </details> | Folder that uploaded file is located within. This value may be null for some folders such as the root folder or the trash folder. |
 
 
 
@@ -254,12 +254,12 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |
-|:------------:|:------------:|
-| type | STRING |
-| id | STRING |
-| name | STRING |
-| parent | OBJECT <details> <summary> Properties </summary> {STRING\(type), STRING\(id), STRING\(name)} </details> |
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| type | STRING | This is always set to folder. |
+| id | STRING | ID of the new folder. |
+| name | STRING | Name of the new folder. |
+| parent | OBJECT <details> <summary> Properties </summary> {STRING\(type), STRING\(id), STRING\(name)} </details> | Folder that new folder is located within. This value may be null for some folders such as the root folder or the trash folder. |
 
 
 

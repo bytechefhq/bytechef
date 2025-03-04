@@ -66,14 +66,14 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |
-|:------------:|:------------:|
-| type | STRING |
-| from | STRING |
-| to | ARRAY <details> <summary> Items </summary> [STRING] </details> |
-| subject | STRING |
-| text | STRING |
-| attachments | ARRAY <details> <summary> Items </summary> [FILE_ENTRY] </details> |
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| type | STRING |  |
+| from | STRING |  |
+| to | ARRAY <details> <summary> Items </summary> [STRING] </details> |  |
+| subject | STRING |  |
+| text | STRING |  |
+| attachments | ARRAY <details> <summary> Items </summary> [FILE_ENTRY] </details> |  |
 
 
 

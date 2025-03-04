@@ -62,10 +62,10 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |
-|:------------:|:------------:|
-| createdTime | DATE_TIME |
-| fields | OBJECT <details> <summary> Properties </summary> {} </details> |
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| createdTime | DATE_TIME |  |
+| fields | OBJECT <details> <summary> Properties </summary> {} </details> |  |
 
 
 
@@ -108,10 +108,10 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |
-|:------------:|:------------:|
-| id | STRING |
-| deleted | BOOLEAN <details> <summary> Options </summary> true, false </details> |
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| id | STRING |  |
+| deleted | BOOLEAN <details> <summary> Options </summary> true, false </details> |  |
 
 
 
@@ -154,11 +154,11 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |
-|:------------:|:------------:|
-| id | STRING |
-| createdTime | DATE_TIME |
-| fields | OBJECT <details> <summary> Properties </summary> {} </details> |
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| id | STRING |  |
+| createdTime | DATE_TIME |  |
+| fields | OBJECT <details> <summary> Properties </summary> {} </details> |  |
 
 
 

@@ -65,14 +65,14 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |
-|:------------:|:------------:|
-| type | STRING |
-| id | STRING |
-| role | STRING |
-| email | STRING |
-| phone | STRING |
-| name | STRING |
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| type | STRING | The type of the contact. |
+| id | STRING | ID of the contact. |
+| role | STRING | Role of the contact. |
+| email | STRING | Email of the contact. |
+| phone | STRING | The contacts phone. |
+| name | STRING | The contacts name. |
 
 
 
@@ -115,14 +115,14 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |
-|:------------:|:------------:|
-| type | STRING |
-| id | STRING |
-| role | STRING |
-| email | STRING |
-| phone | STRING |
-| name | STRING |
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| type | STRING | The type of the contact. |
+| id | STRING | ID of the contact. |
+| role | STRING | Role of the contact. |
+| email | STRING | Email of the contact. |
+| phone | STRING | The contacts phone. |
+| name | STRING | The contacts name. |
 
 
 
@@ -162,6 +162,17 @@ Send a new message
 
 Type: OBJECT
 
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| type | STRING | The type of the message. |
+| id | STRING | ID of the message. |
+| subject | STRING | The subject of the message. |
+| body | STRING | The message body, which may contain HTML. |
+| message_type | STRING | The type of message that was sent. |
+| conversation_id | STRING | The associated conversation_id. |
 
 
 

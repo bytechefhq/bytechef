@@ -63,12 +63,12 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |
-|:------------:|:------------:|
-| id | NUMBER |
-| name | STRING |
-| description | STRING |
-| note | STRING |
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| id | NUMBER |  |
+| name | STRING |  |
+| description | STRING |  |
+| note | STRING |  |
 
 
 
@@ -114,12 +114,12 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |
-|:------------:|:------------:|
-| description | STRING |
-| email | STRING |
-| id | NUMBER |
-| job_title | STRING |
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| description | STRING |  |
+| email | STRING |  |
+| id | NUMBER |  |
+| job_title | STRING |  |
 
 
 
@@ -167,13 +167,13 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |
-|:------------:|:------------:|
-| subject | STRING |
-| email | STRING |
-| description | STRING |
-| priority | INTEGER |
-| status | INTEGER |
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| subject | STRING |  |
+| email | STRING |  |
+| description | STRING |  |
+| priority | INTEGER | Priority of the ticket. |
+| status | INTEGER |  |
 
 
 

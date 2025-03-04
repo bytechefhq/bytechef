@@ -61,12 +61,12 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |
-|:------------:|:------------:|
-| name | STRING |
-| emailOne | STRING |
-| phone | STRING |
-| website | STRING |
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| name | STRING |  |
+| emailOne | STRING |  |
+| phone | STRING |  |
+| website | STRING |  |
 
 
 
@@ -111,11 +111,11 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |
-|:------------:|:------------:|
-| name | STRING |
-| description | STRING |
-| dueAt | STRING |
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| name | STRING |  |
+| description | STRING |  |
+| dueAt | STRING |  |
 
 
 

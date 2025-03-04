@@ -76,9 +76,9 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |
-|:------------:|:------------:|
-| opportunity | OBJECT <details> <summary> Properties </summary> {STRING\(id), STRING\(team_id), STRING\(owner_id), NUMBER\(amount), DATE\(closed_date), STRING\(account_id), STRING\(description), STRING\(name), {STRING\(name), STRING\(iso_code), STRING\(symbol)}\(currency)} </details> |
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| opportunity | OBJECT <details> <summary> Properties </summary> {STRING\(id), STRING\(team_id), STRING\(owner_id), NUMBER\(amount), DATE\(closed_date), STRING\(account_id), STRING\(description), STRING\(name), {STRING\(name), STRING\(iso_code), STRING\(symbol)}\(currency)} </details> |  |
 
 
 
@@ -125,9 +125,9 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |
-|:------------:|:------------:|
-| opportunity | OBJECT <details> <summary> Properties </summary> {STRING\(id), STRING\(team_id), STRING\(owner_id), NUMBER\(amount), DATE\(closed_date), STRING\(account_id), STRING\(description), STRING\(name), {STRING\(name), STRING\(iso_code), STRING\(symbol)}\(currency)} </details> |
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| opportunity | OBJECT <details> <summary> Properties </summary> {STRING\(id), STRING\(team_id), STRING\(owner_id), NUMBER\(amount), DATE\(closed_date), STRING\(account_id), STRING\(description), STRING\(name), {STRING\(name), STRING\(iso_code), STRING\(symbol)}\(currency)} </details> |  |
 
 
 
@@ -176,9 +176,9 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |
-|:------------:|:------------:|
-| person | OBJECT <details> <summary> Properties </summary> {STRING\(id), STRING\(first_name), STRING\(last_name), STRING\(name), STRING\(linkedin_url), STRING\(title), STRING\(email_status), STRING\(photo_url), STRING\(twitter_url), STRING\(github_url), STRING\(facebook_url), STRING\(headline), STRING\(email), STRING\(organization_id)} </details> |
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| person | OBJECT <details> <summary> Properties </summary> {STRING\(id), STRING\(first_name), STRING\(last_name), STRING\(name), STRING\(linkedin_url), STRING\(title), STRING\(email_status), STRING\(photo_url), STRING\(twitter_url), STRING\(github_url), STRING\(facebook_url), STRING\(headline), STRING\(email), STRING\(organization_id)} </details> |  |
 
 
 
@@ -223,9 +223,9 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |
-|:------------:|:------------:|
-| organization | OBJECT <details> <summary> Properties </summary> {STRING\(id), STRING\(name), STRING\(website_url), STRING\(blog_url), STRING\(linkedin_url), STRING\(twitter_url), STRING\(facebook_url), STRING\(phone), STRING\(logo_url), STRING\(primary_domain), STRING\(industry), [STRING]\(keywords)} </details> |
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| organization | OBJECT <details> <summary> Properties </summary> {STRING\(id), STRING\(name), STRING\(website_url), STRING\(blog_url), STRING\(linkedin_url), STRING\(twitter_url), STRING\(facebook_url), STRING\(phone), STRING\(logo_url), STRING\(primary_domain), STRING\(industry), [STRING]\(keywords)} </details> |  |
 
 
 

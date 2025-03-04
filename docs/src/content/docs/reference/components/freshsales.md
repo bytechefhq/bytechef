@@ -63,12 +63,9 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |
-|:------------:|:------------:|
-| id | NUMBER |
-| name | STRING |
-| website | STRING |
-| phone | STRING |
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| sales_account | OBJECT <details> <summary> Properties </summary> {NUMBER\(id), STRING\(name), STRING\(website), STRING\(phone)} </details> |  |
 
 
 
@@ -123,24 +120,9 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |
-|:------------:|:------------:|
-| id | NUMBER |
-| first_name | STRING |
-| last_name | STRING |
-| job_title | STRING |
-| city | STRING |
-| state | STRING |
-| zipcode | STRING |
-| country | STRING |
-| email | STRING |
-| work_number | STRING |
-| mobile_number | STRING |
-| address | STRING |
-| medium | STRING |
-| facebook | STRING |
-| twitter | STRING |
-| linkedin | STRING |
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| contact | OBJECT <details> <summary> Properties </summary> {NUMBER\(id), STRING\(first_name), STRING\(last_name), STRING\(job_title), STRING\(city), STRING\(state), STRING\(zipcode), STRING\(country), STRING\(email), STRING\(work_number), STRING\(mobile_number), STRING\(address), STRING\(medium), STRING\(facebook), STRING\(twitter), STRING\(linkedin)} </details> |  |
 
 
 
@@ -195,12 +177,9 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |
-|:------------:|:------------:|
-| id | NUMBER |
-| email | STRING |
-| first_name | STRING |
-| last_name | STRING |
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| lead | OBJECT <details> <summary> Properties </summary> {NUMBER\(id), STRING\(email), STRING\(first_name), STRING\(last_name)} </details> |  |
 
 
 

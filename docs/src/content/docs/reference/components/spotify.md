@@ -96,9 +96,9 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |
-|:------------:|:------------:|
-| snapshot_id | STRING |
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| snapshot_id | STRING |  |
 
 
 
@@ -142,18 +142,18 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |
-|:------------:|:------------:|
-| collaborative | BOOLEAN <details> <summary> Options </summary> true, false </details> |
-| description | STRING |
-| external_urls | OBJECT <details> <summary> Properties </summary> {STRING\(spotify)} </details> |
-| href | STRING |
-| id | STRING |
-| name | STRING |
-| type | STRING |
-| uri | STRING |
-| owner | OBJECT <details> <summary> Properties </summary> {STRING\(href), STRING\(id), STRING\(type), STRING\(uri)} </details> |
-| public | BOOLEAN <details> <summary> Options </summary> true, false </details> |
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| collaborative | BOOLEAN <details> <summary> Options </summary> true, false </details> |  |
+| description | STRING |  |
+| external_urls | OBJECT <details> <summary> Properties </summary> {STRING\(spotify)} </details> |  |
+| href | STRING |  |
+| id | STRING |  |
+| name | STRING |  |
+| type | STRING |  |
+| uri | STRING |  |
+| owner | OBJECT <details> <summary> Properties </summary> {STRING\(href), STRING\(id), STRING\(type), STRING\(uri)} </details> |  |
+| public | BOOLEAN <details> <summary> Options </summary> true, false </details> |  |
 
 
 

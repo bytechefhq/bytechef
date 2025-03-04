@@ -95,13 +95,13 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |
-|:------------:|:------------:|
-| id | STRING |
-| desc | STRING |
-| idBoard | STRING |
-| idList | STRING |
-| name | STRING |
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| id | STRING | ID of the card. |
+| desc | STRING | Description of the card. |
+| idBoard | STRING | ID of the board the card belongs to. |
+| idList | STRING | ID of the list the card belongs to. |
+| name | STRING | Name of the card. |
 
 
 
@@ -144,13 +144,13 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |
-|:------------:|:------------:|
-| id | STRING |
-| desc | STRING |
-| idBoard | STRING |
-| idList | STRING |
-| name | STRING |
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| id | STRING | ID of the card. |
+| desc | STRING | Description of the card. |
+| idBoard | STRING | ID of the board the card belongs to. |
+| idList | STRING | ID of the list the card belongs to. |
+| name | STRING | Name of the card. |
 
 
 
@@ -198,13 +198,13 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |
-|:------------:|:------------:|
-| id | STRING |
-| desc | STRING |
-| idBoard | STRING |
-| idList | STRING |
-| name | STRING |
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| id | STRING | ID of the card. |
+| desc | STRING | Description of the card. |
+| idBoard | STRING | ID of the board the card belongs to. |
+| idList | STRING | ID of the list the card belongs to. |
+| name | STRING | Name of the card. |
 
 
 

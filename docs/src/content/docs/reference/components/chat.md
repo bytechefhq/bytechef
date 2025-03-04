@@ -83,11 +83,11 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |
-|:------------:|:------------:|
-| conversationId | STRING |
-| message | STRING |
-| attachments | ARRAY <details> <summary> Items </summary> [FILE_ENTRY] </details> |
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| conversationId | STRING |  |
+| message | STRING |  |
+| attachments | ARRAY <details> <summary> Items </summary> [FILE_ENTRY] </details> |  |
 
 
 

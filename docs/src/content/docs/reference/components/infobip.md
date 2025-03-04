@@ -63,10 +63,10 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |
-|:------------:|:------------:|
-| bulkId | STRING |
-| messages | ARRAY <details> <summary> Items </summary> [{STRING\(messageId), {INTEGER\(groupId), STRING\(groupName), INTEGER\(id), STRING\(name), STRING\(description), STRING\(action)}\(status), STRING\(destination), {INTEGER\(messageCount)}\(details)}] </details> |
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| bulkId | STRING | ID assigned to the request if messaging multiple recipients or sending multiple messages via a single API request. |
+| messages | ARRAY <details> <summary> Items </summary> [{STRING\(messageId), {INTEGER\(groupId), STRING\(groupName), INTEGER\(id), STRING\(name), STRING\(description), STRING\(action)}\(status), STRING\(destination), {INTEGER\(messageCount)}\(details)}] </details> | An array of message objects of a single message or multiple messages sent under one bulk ID. |
 
 
 
@@ -109,12 +109,12 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |
-|:------------:|:------------:|
-| to | STRING |
-| messageCount | INTEGER |
-| messageId | STRING |
-| status | OBJECT <details> <summary> Properties </summary> {INTEGER\(groupId), STRING\(groupName), INTEGER\(id), STRING\(name), STRING\(description), STRING\(action)} </details> |
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| to | STRING | The destination address of the message. |
+| messageCount | INTEGER | Number of messages required to deliver. |
+| messageId | STRING | ID of the message sent. |
+| status | OBJECT <details> <summary> Properties </summary> {INTEGER\(groupId), STRING\(groupName), INTEGER\(id), STRING\(name), STRING\(description), STRING\(action)} </details> | Status of the message. |
 
 
 

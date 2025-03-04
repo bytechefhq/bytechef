@@ -62,11 +62,11 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |
-|:------------:|:------------:|
-| id | STRING |
-| labelIds | ARRAY <details> <summary> Items </summary> [STRING] </details> |
-| threadId | STRING |
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| id | STRING | The ID of the message. |
+| threadId | STRING | The ID of the thread the message belongs to. |
+| labelIds | ARRAY <details> <summary> Items </summary> [STRING] </details> | List of IDs of labels applied to this message. |
 
 
 
@@ -206,11 +206,11 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |
-|:------------:|:------------:|
-| id | STRING |
-| labelIds | ARRAY <details> <summary> Items </summary> [STRING] </details> |
-| threadId | STRING |
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| id | STRING | The ID of the message. |
+| threadId | STRING | The ID of the thread the message belongs to. |
+| labelIds | ARRAY <details> <summary> Items </summary> [STRING] </details> | List of IDs of labels applied to this message. |
 
 
 
@@ -266,11 +266,11 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |
-|:------------:|:------------:|
-| messages | ARRAY <details> <summary> Items </summary> [{STRING\(id), STRING\(threadId)}] </details> |
-| nextPageToken | STRING |
-| resultSizeEstimate | NUMBER |
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| messages | ARRAY <details> <summary> Items </summary> [{STRING\(id), STRING\(threadId)}] </details> |  |
+| nextPageToken | STRING |  |
+| resultSizeEstimate | NUMBER | Estimated number of messages. |
 
 
 
@@ -322,11 +322,11 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |
-|:------------:|:------------:|
-| id | STRING |
-| labelIds | ARRAY <details> <summary> Items </summary> [STRING] </details> |
-| threadId | STRING |
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| id | STRING | The ID of the message. |
+| threadId | STRING | The ID of the thread the message belongs to. |
+| labelIds | ARRAY <details> <summary> Items </summary> [STRING] </details> | List of IDs of labels applied to this message. |
 
 
 
@@ -372,23 +372,12 @@ Type: STATIC_WEBHOOK
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | topicName | Topic Name | STRING | Must be 3-255 characters, start with a letter, and contain only the following characters: letters, numbers, dashes (-), periods (.), underscores (_), tildes (~), percents (%) or plus signs (+). Cannot start with goog. | true |
+| format | Format | STRING <details> <summary> Options </summary> simple, minimal, full, raw, metadata </details> | The format to return the message in. | false |
 
 
 #### Output
 
-
-
-Type: ARRAY
-
-
-#### Properties
-
-|     Name     |     Type     |
-|:------------:|:------------:|
-|  | OBJECT <details> <summary> Properties </summary> {STRING\(id), STRING\(threadId), [STRING]\(labelIds), STRING\(snippet), STRING\(historyId), NUMBER\(internalDate), {STRING\(partId), STRING\(mimeType), STRING\(filename), [{STRING\(name), STRING\(value)}]\(headers), {STRING\(attachmentId), INTEGER\(size), STRING\(data)}\(body), []\(parts)}\(payload), INTEGER\(sizeEstimate), STRING\(raw)} </details> |
-
-
-
+The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
 
 #### JSON Example
 ```json
@@ -396,7 +385,8 @@ Type: ARRAY
   "label" : "New Email",
   "name" : "newEmail",
   "parameters" : {
-    "topicName" : ""
+    "topicName" : "",
+    "format" : ""
   },
   "type" : "googleMail/v1/newEmail"
 }
@@ -420,9 +410,9 @@ Type: ARRAY
 
 #### Properties
 
-|     Name     |     Type     |
-|:------------:|:------------:|
-|  | OBJECT <details> <summary> Properties </summary> {STRING\(id), STRING\(threadId)} </details> |
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+|  | OBJECT <details> <summary> Properties </summary> {STRING\(id), STRING\(threadId)} </details> |  |
 
 
 

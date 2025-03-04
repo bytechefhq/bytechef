@@ -65,14 +65,14 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |
-|:------------:|:------------:|
-| CONTACT_ID | INTEGER |
-| FIRST_NAME | STRING |
-| LAST_NAME | STRING |
-| EMAIL_ADDRESS | STRING |
-| PHONE | STRING |
-| TITLE | STRING |
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| CONTACT_ID | INTEGER |  |
+| FIRST_NAME | STRING |  |
+| LAST_NAME | STRING |  |
+| EMAIL_ADDRESS | STRING |  |
+| PHONE | STRING |  |
+| TITLE | STRING |  |
 
 
 
@@ -117,12 +117,12 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |
-|:------------:|:------------:|
-| ORGANISATION_ID | INTEGER |
-| ORGANISATION_NAME | STRING |
-| PHONE | STRING |
-| WEBSITE | STRING |
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| ORGANISATION_ID | INTEGER |  |
+| ORGANISATION_NAME | STRING |  |
+| PHONE | STRING |  |
+| WEBSITE | STRING |  |
 
 
 
@@ -164,11 +164,11 @@ Type: OBJECT
 
 #### Properties
 
-|     Name     |     Type     |
-|:------------:|:------------:|
-| TASK_ID | INTEGER |
-| TITLE | STRING |
-| STATUS | STRING |
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| TASK_ID | INTEGER |  |
+| TITLE | STRING |  |
+| STATUS | STRING |  |
 
 
 
