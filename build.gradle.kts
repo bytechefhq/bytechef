@@ -36,7 +36,7 @@ reporting {
     reports {
         @Suppress("UnstableApiUsage")
         val jacocoRootReport by registering(JacocoCoverageReport::class) {
-            testSuiteName = "test"
+            testType.set(TestSuiteType.UNIT_TEST)
 
             dependencies {
                 project.subprojects
