@@ -18,7 +18,11 @@ const WorkflowComponentsIcons = ({
     const taskDispatcherDefinition = workflowTaskDispatcherDefinitions[name];
 
     return (
-        <div className="mr-2 flex items-center justify-center rounded-full border bg-background p-1" key={name}>
+        <div
+            aria-label="Workflow component icon"
+            className="mr-2 flex items-center justify-center rounded-full border bg-background p-1"
+            key={name}
+        >
             <Tooltip>
                 <TooltipTrigger asChild>
                     {componentDefinition?.icon || taskDispatcherDefinition?.icon ? (

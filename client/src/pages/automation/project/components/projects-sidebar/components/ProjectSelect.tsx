@@ -38,7 +38,10 @@ const ProjectSelect = ({projectId, projects, selectedProjectId, setSelectedProje
         >
             <Tooltip>
                 <TooltipTrigger asChild>
-                    <SelectTrigger className="[&>span]:line-clamp-0 w-80 border-stroke-neutral-secondary bg-background px-3 py-2 shadow-none hover:bg-surface-neutral-primary-hover [&>span]:truncate [&>svg]:min-w-4">
+                    <SelectTrigger
+                        aria-label="Select project"
+                        className="[&>span]:line-clamp-0 w-80 border-stroke-neutral-secondary bg-background px-3 py-2 shadow-none hover:bg-surface-neutral-primary-hover [&>span]:truncate [&>svg]:min-w-4"
+                    >
                         <SelectValue placeholder="Select a project">
                             {selectedProjectId === projectId ? 'Current project' : currentProjectName || 'All projects'}
                         </SelectValue>
