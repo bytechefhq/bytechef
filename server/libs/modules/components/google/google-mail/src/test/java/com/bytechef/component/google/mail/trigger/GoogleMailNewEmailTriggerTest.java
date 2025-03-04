@@ -175,7 +175,7 @@ class GoogleMailNewEmailTriggerTest {
         when(mockedGet.execute())
             .thenReturn(message);
 
-        List<Message> messages = GoogleMailNewEmailTrigger.webhookRequest(
+        List<Object> messages = GoogleMailNewEmailTrigger.webhookRequest(
             parameters, parameters, mockedHttpHeaders, mockedHttpParameters, mockedWebhookBody,
             mockedWebhookMethod, mockedWebhookEnableOutput, mockedTriggerContext);
 
