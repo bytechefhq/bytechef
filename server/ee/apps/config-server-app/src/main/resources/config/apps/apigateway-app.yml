@@ -24,7 +24,7 @@ spring:
               - Path=/webhooks/**
   mail:
     base-url: https://www.bytechef.io
-    from: noreply@bytechef.io
+    from: noreply@app.bytechef.io
 
 server:
   servlet:
