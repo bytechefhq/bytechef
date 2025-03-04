@@ -31,6 +31,7 @@ const WorkflowsListFilter = ({searchValue, setSearchValue, setSortBy, sortBy}: W
                     <DropdownMenuTrigger asChild>
                         <TooltipTrigger asChild>
                             <Button
+                                aria-label="Sort by"
                                 className="border-stroke-neutral-secondary p-2 shadow-none hover:bg-surface-neutral-primary-hover data-[state=open]:border-stroke-brand-secondary data-[state=open]:bg-surface-brand-secondary data-[state=open]:text-content-brand-primary"
                                 size="icon"
                                 variant="outline"
