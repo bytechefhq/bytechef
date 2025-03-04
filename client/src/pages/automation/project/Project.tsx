@@ -13,9 +13,10 @@ import useWorkflowEditorStore from '@/pages/platform/workflow-editor/stores/useW
 import {ConnectionReactQueryProvider} from '@/shared/components/connection/providers/connectionReactQueryProvider';
 import {useCreateConnectionMutation} from '@/shared/mutations/automation/connections.mutations';
 import {ConnectionKeys, useGetConnectionTagsQuery} from '@/shared/queries/automation/connections.queries';
+import {useEffect} from 'react';
 
 const Project = () => {
-    const {projectLeftSidebarOpen} = useProjectsLeftSidebarStore();
+    const {projectLeftSidebarOpen, setProjectLeftSidebarOpen} = useProjectsLeftSidebarStore();
     const {workflowIsRunning, workflowTestExecution} = useWorkflowEditorStore();
     const {workflow} = useWorkflowDataStore();
 
@@ -33,6 +34,12 @@ const Project = () => {
         useGetConnectionsQuery,
     } = useProject();
     const {runDisabled} = useWorkflowLayout();
+
+    useEffect(() => {
+        return () => {
+            setProjectLeftSidebarOpen(false);
+        };
+    }, [setProjectLeftSidebarOpen]);
 
     return (
         <div className="flex w-full flex-col">
