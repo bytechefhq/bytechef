@@ -98,7 +98,7 @@ bytechef:
       basedir: ${user.home}/bytechef/data/file-storage
   mail:
     base-url: ${bytechef.public-url}
-    from: noreply@bytechef.io
+    from: noreply@app.bytechef.io
     host:
     port: 25
   message-broker:

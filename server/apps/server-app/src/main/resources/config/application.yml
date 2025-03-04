@@ -234,7 +234,7 @@ bytechef:
       basedir: ${user.home}/bytechef/data/file-storage
   mail:
     base-url: ${bytechef.public-url}
-    from: noreply@bytechef.io
+    from: noreply@app.bytechef.io
   message-broker:
     # Messaging provider between Coordinator and Workers (amqp | jms | kafka | redis) default: jms
     provider: jms
