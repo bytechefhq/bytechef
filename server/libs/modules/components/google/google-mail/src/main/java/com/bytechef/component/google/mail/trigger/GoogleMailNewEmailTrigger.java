@@ -17,15 +17,17 @@
 package com.bytechef.component.google.mail.trigger;
 
 import static com.bytechef.component.definition.ComponentDsl.ModifiableTriggerDefinition;
-import static com.bytechef.component.definition.ComponentDsl.array;
-import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.ComponentDsl.trigger;
 import static com.bytechef.component.definition.TriggerContext.Data.Scope.WORKFLOW;
-import static com.bytechef.component.google.mail.constant.GoogleMailConstants.FULL_MESSAGE_OUTPUT_PROPERTY;
+import static com.bytechef.component.google.mail.constant.GoogleMailConstants.FORMAT;
+import static com.bytechef.component.google.mail.constant.GoogleMailConstants.FORMAT_PROPERTY;
+import static com.bytechef.component.google.mail.constant.GoogleMailConstants.FULL;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.HISTORY_ID;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.ME;
+import static com.bytechef.component.google.mail.constant.GoogleMailConstants.SIMPLE;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.TOPIC_NAME;
+import static com.bytechef.component.google.mail.util.GoogleMailUtils.getSimpleMessage;
 
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TriggerContext;
@@ -36,6 +38,7 @@ import com.bytechef.component.definition.TriggerDefinition.WebhookBody;
 import com.bytechef.component.definition.TriggerDefinition.WebhookEnableOutput;
 import com.bytechef.component.definition.TriggerDefinition.WebhookMethod;
 import com.bytechef.component.exception.ProviderException;
+import com.bytechef.component.google.mail.util.GoogleMailUtils;
 import com.bytechef.google.commons.GoogleServices;
 import com.google.api.services.gmail.Gmail;
 import com.google.api.services.gmail.model.History;
@@ -69,11 +72,9 @@ public class GoogleMailNewEmailTrigger {
                         "plus signs (+). Cannot start with goog.")
                 .maxLength(255)
                 .minLength(3)
-                .required(true))
-        .output(
-            outputSchema(
-                array()
-                    .items(FULL_MESSAGE_OUTPUT_PROPERTY)))
+                .required(true),
+            FORMAT_PROPERTY)
+        .output(GoogleMailUtils::getMessageOutput)
         .webhookEnable(GoogleMailNewEmailTrigger::webhookEnable)
         .webhookDisable(GoogleMailNewEmailTrigger::webhookDisable)
         .webhookRequest(GoogleMailNewEmailTrigger::webhookRequest);
@@ -119,7 +120,7 @@ public class GoogleMailNewEmailTrigger {
         }
     }
 
-    protected static List<Message> webhookRequest(
+    protected static List<Object> webhookRequest(
         Parameters inputParameters, Parameters connectionParameters, HttpHeaders headers,
         HttpParameters parameters, WebhookBody body, WebhookMethod method, WebhookEnableOutput output,
         TriggerContext context) throws IOException {
@@ -141,7 +142,7 @@ public class GoogleMailNewEmailTrigger {
             .setStartHistoryId(historyId)
             .execute();
 
-        List<Message> newEmails = new ArrayList<>();
+        List<Object> newEmails = new ArrayList<>();
 
         List<History> historyList = listHistoryResponse.getHistory();
 
@@ -151,15 +152,22 @@ public class GoogleMailNewEmailTrigger {
             List<HistoryMessageAdded> messagesAdded = lastHistory.getMessagesAdded();
 
             if (messagesAdded != null && !messagesAdded.isEmpty()) {
+                String format = inputParameters.getString(FORMAT, SIMPLE);
+
                 for (HistoryMessageAdded historyMessageAdded : messagesAdded) {
                     Message historyMessage = historyMessageAdded.getMessage();
 
                     Message message = gmail.users()
                         .messages()
                         .get(ME, historyMessage.getId())
+                        .setFormat(format.equals(SIMPLE) ? FULL : format)
                         .execute();
 
-                    newEmails.add(message);
+                    if (format.equals(SIMPLE)) {
+                        newEmails.add(getSimpleMessage(message, context, gmail));
+                    } else {
+                        newEmails.add(message);
+                    }
                 }
             }
         }

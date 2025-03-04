@@ -23,7 +23,6 @@ import static com.bytechef.component.google.mail.constant.GoogleMailConstants.FO
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.ID;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.METADATA_HEADERS_PROPERTY;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.SIMPLE;
-import static com.bytechef.component.google.mail.util.GoogleMailUtils.getMessageOutputProperty;
 import static com.bytechef.component.google.mail.util.GoogleMailUtils.getSimpleMessage;
 
 import com.bytechef.component.definition.ActionContext;
@@ -31,7 +30,6 @@ import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition
 import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.google.mail.util.GoogleMailUtils;
-import com.bytechef.definition.BaseOutputDefinition.OutputResponse;
 import com.bytechef.google.commons.GoogleServices;
 import com.google.api.services.gmail.Gmail;
 import com.google.api.services.gmail.model.Message;
@@ -53,7 +51,7 @@ public class GoogleMailGetMailAction {
                 .required(true),
             FORMAT_PROPERTY,
             METADATA_HEADERS_PROPERTY)
-        .output(GoogleMailGetMailAction::getOutput)
+        .output(GoogleMailUtils::getMessageOutput)
         .perform(GoogleMailGetMailAction::perform);
 
     private GoogleMailGetMailAction() {
@@ -74,9 +72,4 @@ public class GoogleMailGetMailAction {
         }
     }
 
-    public static OutputResponse getOutput(
-        Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) {
-
-        return OutputResponse.of(getMessageOutputProperty(inputParameters.getRequiredString(FORMAT)));
-    }
 }

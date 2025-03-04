@@ -231,35 +231,35 @@ class GoogleMailUtilsTest {
     }
 
     @Test
-    void testGetOutputForSimpleFormat() {
+    void tesGetMessageOutputForSimpleFormat() {
         ModifiableObjectProperty messageOutputProperty = GoogleMailUtils.getMessageOutputProperty(SIMPLE);
 
         assertEquals(SIMPLE_MESSAGE_OUTPUT_PROPERTY, messageOutputProperty);
     }
 
     @Test
-    void testGetOutputForRawFormat() {
+    void testGetMessageOutputForRawFormat() {
         ModifiableObjectProperty messageOutputProperty = GoogleMailUtils.getMessageOutputProperty(RAW);
 
         assertEquals(RAW_MESSAGE_OUTPUT_PROPERTY, messageOutputProperty);
     }
 
     @Test
-    void testGetOutputForMinimalFormat() {
+    void testGetMessageOutputForMinimalFormat() {
         ModifiableObjectProperty messageOutputProperty = GoogleMailUtils.getMessageOutputProperty(MINIMAL);
 
         assertEquals(MINIMAL_MESSAGE_OUTPUT_PROPERTY, messageOutputProperty);
     }
 
     @Test
-    void testGetOutputForMetadataFormat() {
+    void testGetMessageOutputForMetadataFormat() {
         ModifiableObjectProperty messageOutputProperty = GoogleMailUtils.getMessageOutputProperty(METADATA);
 
         assertEquals(METADATA_MESSAGE_OUTPUT_PROPERTY, messageOutputProperty);
     }
 
     @Test
-    void testGetOutputForFullFormat() {
+    void testGetMessageOutputForFullFormat() {
         ModifiableObjectProperty messageOutputProperty = GoogleMailUtils.getMessageOutputProperty(FULL);
 
         assertEquals(FULL_MESSAGE_OUTPUT_PROPERTY, messageOutputProperty);

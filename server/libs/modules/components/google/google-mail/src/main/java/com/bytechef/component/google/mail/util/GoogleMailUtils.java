@@ -54,9 +54,11 @@ import static com.bytechef.component.google.mail.constant.GoogleMailConstants.VA
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableObjectProperty;
+import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.FileEntry;
 import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Parameters;
+import com.bytechef.definition.BaseOutputDefinition.OutputResponse;
 import com.bytechef.google.commons.GoogleServices;
 import com.google.api.services.gmail.Gmail;
 import com.google.api.services.gmail.model.Label;
@@ -339,6 +341,12 @@ public class GoogleMailUtils {
         return options;
     }
 
+    public static OutputResponse getMessageOutput(
+        Parameters inputParameters, Parameters connectionParameters, Context context) {
+
+        return OutputResponse.of(getMessageOutputProperty(inputParameters.getRequiredString(FORMAT)));
+    }
+
     public static ModifiableObjectProperty getMessageOutputProperty(String format) {
         return switch (format) {
             case SIMPLE -> SIMPLE_MESSAGE_OUTPUT_PROPERTY;
@@ -349,7 +357,7 @@ public class GoogleMailUtils {
         };
     }
 
-    public static SimpleMessage getSimpleMessage(Message message, ActionContext actionContext, Gmail service)
+    public static SimpleMessage getSimpleMessage(Message message, Context context, Gmail service)
         throws IOException {
         MessagePart payload = message.getPayload();
         List<MessagePart> parts = payload.getParts();
@@ -394,7 +402,7 @@ public class GoogleMailUtils {
             }
         }
 
-        List<FileEntry> fileEntries = getFileEntries(message, actionContext, service);
+        List<FileEntry> fileEntries = getFileEntries(message, context, service);
 
         return createSimpleMessage(message, messagePartHeaders, bodyPlain, bodyHtml, fileEntries);
     }
@@ -434,8 +442,7 @@ public class GoogleMailUtils {
             bodyHtml, fileEntries);
     }
 
-    private static List<FileEntry> getFileEntries(
-        Message message, ActionContext actionContext, Gmail service)
+    private static List<FileEntry> getFileEntries(Message message, Context context, Gmail service)
         throws IOException {
 
         MessagePart payload = message.getPayload();
@@ -454,7 +461,7 @@ public class GoogleMailUtils {
                 MessagePartBody attachment = getAttachment(service, message.getId(),
                     messagePartBody.getAttachmentId());
 
-                fileEntries.add(actionContext.file(
+                fileEntries.add(context.file(
                     file -> file.storeContent(
                         messagePart.getFilename(), new ByteArrayInputStream(attachment.decodeData()))));
             }
