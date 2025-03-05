@@ -55,6 +55,20 @@ Creates a new task.
 | importance | Importance | STRING <details> <summary> Options </summary> low, normal, high </details> | Importance of the task | false |
 | isReminderOn | Reminder | BOOLEAN <details> <summary> Options </summary> true, false </details> | Set to true if an alert is set to remind the user of the task. | false |
 
+#### Example JSON Structure
+```json
+{
+  "label" : "Create Task",
+  "name" : "createTask",
+  "parameters" : {
+    "taskListId" : "",
+    "title" : "",
+    "importance" : "",
+    "isReminderOn" : false
+  },
+  "type" : "microsoftToDo/v1/createTask"
+}
+```
 
 #### Output
 
@@ -80,18 +94,26 @@ Type: OBJECT
 
 
 
-#### JSON Example
+#### Output Example
 ```json
 {
-  "label" : "Create Task",
-  "name" : "createTask",
-  "parameters" : {
-    "taskListId" : "",
-    "title" : "",
-    "importance" : "",
-    "isReminderOn" : false
+  "@odata.etag" : "",
+  "importance" : "",
+  "isReminderOn" : false,
+  "status" : "",
+  "title" : "",
+  "categories" : "",
+  "id" : "",
+  "body" : {
+    "content" : "",
+    "contentType" : ""
   },
-  "type" : "microsoftToDo/v1/createTask"
+  "linkedResources" : {
+    "id" : "",
+    "webUrl" : "",
+    "applicationName" : "",
+    "displayName" : ""
+  }
 }
 ```
 
@@ -107,6 +129,17 @@ Creates a new task list.
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | displayName | Title | STRING | Title of the task list. | true |
 
+#### Example JSON Structure
+```json
+{
+  "label" : "Create Task List",
+  "name" : "createTaskList",
+  "parameters" : {
+    "displayName" : ""
+  },
+  "type" : "microsoftToDo/v1/createTaskList"
+}
+```
 
 #### Output
 
@@ -130,15 +163,16 @@ Type: OBJECT
 
 
 
-#### JSON Example
+#### Output Example
 ```json
 {
-  "label" : "Create Task List",
-  "name" : "createTaskList",
-  "parameters" : {
-    "displayName" : ""
-  },
-  "type" : "microsoftToDo/v1/createTaskList"
+  "@odata.context" : "",
+  "@odata.etag" : "",
+  "id" : "",
+  "displayName" : "",
+  "isOwner" : false,
+  "isShared" : false,
+  "wellKnownListName" : ""
 }
 ```
 
@@ -155,6 +189,18 @@ Gets task by ID.
 | taskListId | Task List ID | STRING | ID of the task list where the task will be created. | true |
 | taskId | Task ID | STRING <details> <summary> Depends On </summary> taskListId </details> | ID of the task to retrieve. | true |
 
+#### Example JSON Structure
+```json
+{
+  "label" : "Get Task",
+  "name" : "getTask",
+  "parameters" : {
+    "taskListId" : "",
+    "taskId" : ""
+  },
+  "type" : "microsoftToDo/v1/getTask"
+}
+```
 
 #### Output
 
@@ -180,16 +226,26 @@ Type: OBJECT
 
 
 
-#### JSON Example
+#### Output Example
 ```json
 {
-  "label" : "Get Task",
-  "name" : "getTask",
-  "parameters" : {
-    "taskListId" : "",
-    "taskId" : ""
+  "@odata.etag" : "",
+  "importance" : "",
+  "isReminderOn" : false,
+  "status" : "",
+  "title" : "",
+  "categories" : "",
+  "id" : "",
+  "body" : {
+    "content" : "",
+    "contentType" : ""
   },
-  "type" : "microsoftToDo/v1/getTask"
+  "linkedResources" : {
+    "id" : "",
+    "webUrl" : "",
+    "applicationName" : "",
+    "displayName" : ""
+  }
 }
 ```
 

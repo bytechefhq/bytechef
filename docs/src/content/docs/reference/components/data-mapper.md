@@ -34,12 +34,7 @@ Transform an object or array of objects into an array of key-value pairs.
 | fieldKey | Field Key | STRING | Property key of each newly created object in the array. Its property value will be a property key from the input. | true |
 | valueKey | Value Key | STRING | Property key of each newly created object in the array. Its property value will be a property value from the input. | true |
 
-
-#### Output
-
-The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
-
-#### JSON Example
+#### Example JSON Structure
 ```json
 {
   "label" : "Map Objects to Array",
@@ -53,6 +48,12 @@ The output for this action is dynamic and may vary depending on the input parame
   "type" : "dataMapper/v1/mapObjectsToArray"
 }
 ```
+
+#### Output
+
+The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
+
+
 
 
 ### Map Objects to Object
@@ -72,12 +73,7 @@ Creates a new object with the chosen input properties. You can also rename the p
 | includeNulls | Include Nulls | BOOLEAN <details> <summary> Options </summary> true, false </details> | Should fields that have null values be included in the new object? | null |
 | includeEmptyStrings | Include Empty strings | BOOLEAN <details> <summary> Options </summary> true, false </details> | Should fields with empty string values be included in the new object? | null |
 
-
-#### Output
-
-The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
-
-#### JSON Example
+#### Example JSON Structure
 ```json
 {
   "label" : "Map Objects to Object",
@@ -98,6 +94,12 @@ The output for this action is dynamic and may vary depending on the input parame
 }
 ```
 
+#### Output
+
+The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
+
+
+
 
 ### Merge and Pivot Properties by Key
 Name: mergeAndPivotPropertiesByKey
@@ -112,12 +114,7 @@ Creates a new object out of all objects that have the same key as the specified 
 | fieldKey | Field Key | STRING | The key of the newly created object. | true |
 | fieldValue | Field Value | STRING | The value of each property in the newly created objects value. | true |
 
-
-#### Output
-
-The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
-
-#### JSON Example
+#### Example JSON Structure
 ```json
 {
   "label" : "Merge and Pivot Properties by Key",
@@ -130,6 +127,12 @@ The output for this action is dynamic and may vary depending on the input parame
   "type" : "dataMapper/v1/mergeAndPivotPropertiesByKey"
 }
 ```
+
+#### Output
+
+The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
+
+
 
 
 ### Rename Keys
@@ -144,12 +147,7 @@ The action renames keys of an input object defined by mappings.
 | input | Input | OBJECT <details> <summary> Properties </summary> {} </details> | The input object that contains property keys and values. | true |
 | mappings | Mappings | ARRAY <details> <summary> Items </summary> [{STRING\(from), STRING\(to)}] </details> | An array of objects that contains properties 'From Path' and 'To'. | true |
 
-
-#### Output
-
-The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
-
-#### JSON Example
+#### Example JSON Structure
 ```json
 {
   "label" : "Rename Keys",
@@ -164,6 +162,12 @@ The output for this action is dynamic and may vary depending on the input parame
   "type" : "dataMapper/v1/renameKeys"
 }
 ```
+
+#### Output
+
+The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
+
+
 
 
 ### Replace All Specified Values
@@ -189,12 +193,7 @@ Goes through all object parameters and replaces all specified input parameter va
 | mappings | Mappings | ARRAY <details> <summary> Items </summary> [{STRING\(from), STRING\(to)}] </details> | An array of objects that contains properties 'from' and 'to'. | null |
 | mappings | Mappings | ARRAY <details> <summary> Items </summary> [{TIME\(from), TIME\(to)}] </details> | An array of objects that contains properties 'from' and 'to'. | null |
 
-
-#### Output
-
-The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
-
-#### JSON Example
+#### Example JSON Structure
 ```json
 {
   "label" : "Replace All Specified Values",
@@ -212,6 +211,12 @@ The output for this action is dynamic and may vary depending on the input parame
 }
 ```
 
+#### Output
+
+The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
+
+
+
 
 ### Replace Multiple Values by Key
 Name: replaceMultipleValuesByKey
@@ -226,12 +231,7 @@ Replaces all values specified by the keys in the input object with the values sp
 | output | Output | OBJECT <details> <summary> Properties </summary> {} </details> | An object containing one or more properties. | true |
 | mappings | Mappings | ARRAY <details> <summary> Items </summary> [{STRING\(from), STRING\(to)}] </details> | Object that contains properties 'from' and 'to'. | true |
 
-
-#### Output
-
-The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
-
-#### JSON Example
+#### Example JSON Structure
 ```json
 {
   "label" : "Replace Multiple Values by Key",
@@ -247,6 +247,12 @@ The output for this action is dynamic and may vary depending on the input parame
   "type" : "dataMapper/v1/replaceMultipleValuesByKey"
 }
 ```
+
+#### Output
+
+The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
+
+
 
 
 ### Replace Value
@@ -288,12 +294,7 @@ Replaces a given value with the specified value defined in mappings. In case the
 | mappings | Mappings | ARRAY <details> <summary> Items </summary> [{STRING\(from), STRING\(to)}] </details> | An array of objects that contains properties 'from' and 'to'. | null |
 | mappings | Mappings | ARRAY <details> <summary> Items </summary> [{TIME\(from), TIME\(to)}] </details> | An array of objects that contains properties 'from' and 'to'. | null |
 
-
-#### Output
-
-The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
-
-#### JSON Example
+#### Example JSON Structure
 ```json
 {
   "label" : "Replace Value",
@@ -310,6 +311,12 @@ The output for this action is dynamic and may vary depending on the input parame
   "type" : "dataMapper/v1/replaceValue"
 }
 ```
+
+#### Output
+
+The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
+
+
 
 
 

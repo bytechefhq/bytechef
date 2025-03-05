@@ -55,6 +55,20 @@ Creates a new company.
 | phone | Phone | STRING | A contact phone number for the company. | false |
 | comments | Comments | STRING | Any comments or notes made against the company. | false |
 
+#### Example JSON Structure
+```json
+{
+  "label" : "Create Company",
+  "name" : "createCompany",
+  "parameters" : {
+    "name" : "",
+    "website" : "",
+    "phone" : "",
+    "comments" : ""
+  },
+  "type" : "accelo/v1/createCompany"
+}
+```
 
 #### Output
 
@@ -73,18 +87,18 @@ Type: OBJECT
 
 
 
-#### JSON Example
+#### Output Example
 ```json
 {
-  "label" : "Create Company",
-  "name" : "createCompany",
-  "parameters" : {
-    "name" : "",
-    "website" : "",
-    "phone" : "",
-    "comments" : ""
+  "response" : {
+    "id" : "",
+    "name" : ""
   },
-  "type" : "accelo/v1/createCompany"
+  "meta" : {
+    "more_info" : "",
+    "status" : "",
+    "message" : ""
+  }
 }
 ```
 
@@ -104,6 +118,21 @@ Creates a new contact.
 | phone | Phone | STRING | The contact's phone number in their role in the associated company. | false |
 | email | Email | STRING | The contact's position in the associated company. | false |
 
+#### Example JSON Structure
+```json
+{
+  "label" : "Create Contact",
+  "name" : "createContact",
+  "parameters" : {
+    "firstname" : "",
+    "surname" : "",
+    "company_id" : "",
+    "phone" : "",
+    "email" : ""
+  },
+  "type" : "accelo/v1/createContact"
+}
+```
 
 #### Output
 
@@ -122,19 +151,20 @@ Type: OBJECT
 
 
 
-#### JSON Example
+#### Output Example
 ```json
 {
-  "label" : "Create Contact",
-  "name" : "createContact",
-  "parameters" : {
+  "response" : {
+    "id" : "",
     "firstname" : "",
-    "surname" : "",
-    "company_id" : "",
-    "phone" : "",
+    "lastname" : "",
     "email" : ""
   },
-  "type" : "accelo/v1/createContact"
+  "meta" : {
+    "more_info" : "",
+    "status" : "",
+    "message" : ""
+  }
 }
 ```
 
@@ -153,6 +183,20 @@ Creates a new task.
 | against_id | Against Object ID | STRING <details> <summary> Depends On </summary> against_type </details> | ID of the object the task is against. | true |
 | date_started | Start Date | DATE | The date the task is is scheduled to start. | true |
 
+#### Example JSON Structure
+```json
+{
+  "label" : "Create Task",
+  "name" : "createTask",
+  "parameters" : {
+    "title" : "",
+    "against_type" : "",
+    "against_id" : "",
+    "date_started" : "2021-01-01"
+  },
+  "type" : "accelo/v1/createTask"
+}
+```
 
 #### Output
 
@@ -171,18 +215,18 @@ Type: OBJECT
 
 
 
-#### JSON Example
+#### Output Example
 ```json
 {
-  "label" : "Create Task",
-  "name" : "createTask",
-  "parameters" : {
-    "title" : "",
-    "against_type" : "",
-    "against_id" : "",
-    "date_started" : "2021-01-01"
+  "response" : {
+    "id" : "",
+    "title" : ""
   },
-  "type" : "accelo/v1/createTask"
+  "meta" : {
+    "more_info" : "",
+    "status" : "",
+    "message" : ""
+  }
 }
 ```
 

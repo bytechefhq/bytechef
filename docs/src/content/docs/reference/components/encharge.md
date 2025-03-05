@@ -54,6 +54,20 @@ Create email template
 | fromEmail | From Email | STRING | From address to send the email from | true |
 | replyEmail | Reply Email | STRING | Address that recipients will reply to by default. | false |
 
+#### Example JSON Structure
+```json
+{
+  "label" : "Create Email Template",
+  "name" : "createEmail",
+  "parameters" : {
+    "name" : "",
+    "subject" : "",
+    "fromEmail" : "",
+    "replyEmail" : ""
+  },
+  "type" : "encharge/v1/createEmail"
+}
+```
 
 #### Output
 
@@ -71,18 +85,16 @@ Type: OBJECT
 
 
 
-#### JSON Example
+#### Output Example
 ```json
 {
-  "label" : "Create Email Template",
-  "name" : "createEmail",
-  "parameters" : {
+  "email" : {
+    "id" : 1,
     "name" : "",
     "subject" : "",
     "fromEmail" : "",
     "replyEmail" : ""
-  },
-  "type" : "encharge/v1/createEmail"
+  }
 }
 ```
 
@@ -98,24 +110,7 @@ Creates new People
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | people | People | ARRAY <details> <summary> Items </summary> [{STRING\(email), STRING\(firstName), STRING\(lastName), STRING\(website), STRING\(title), STRING\(phone)}] </details> |  | true |
 
-
-#### Output
-
-
-
-Type: OBJECT
-
-
-#### Properties
-
-|     Name     |     Type     |     Description     |
-|:------------:|:------------:|:-------------------:|
-| users | ARRAY <details> <summary> Items </summary> [{STRING\(email), STRING\(firstName), STRING\(lastName), STRING\(website), STRING\(title), STRING\(id), STRING\(phone)}] </details> |  |
-
-
-
-
-#### JSON Example
+#### Example JSON Structure
 ```json
 {
   "label" : "Create People",
@@ -134,6 +129,37 @@ Type: OBJECT
 }
 ```
 
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| users | ARRAY <details> <summary> Items </summary> [{STRING\(email), STRING\(firstName), STRING\(lastName), STRING\(website), STRING\(title), STRING\(id), STRING\(phone)}] </details> |  |
+
+
+
+
+#### Output Example
+```json
+{
+  "users" : [ {
+    "email" : "",
+    "firstName" : "",
+    "lastName" : "",
+    "website" : "",
+    "title" : "",
+    "id" : "",
+    "phone" : ""
+  } ]
+}
+```
+
 
 ### Add Tag
 Name: addTag
@@ -147,12 +173,7 @@ Add tag(s) to an existing user.
 | tag | Tag | STRING | Tag(s) to add. To add multiple tags, use a comma-separated list, e.g. tag1,tag2 | true |
 | email | Email | STRING | Email of the person. | true |
 
-
-#### Output
-
-This action does not produce any output.
-
-#### JSON Example
+#### Example JSON Structure
 ```json
 {
   "label" : "Add Tag",
@@ -164,6 +185,12 @@ This action does not produce any output.
   "type" : "encharge/v1/addTag"
 }
 ```
+
+#### Output
+
+This action does not produce any output.
+
+
 
 
 

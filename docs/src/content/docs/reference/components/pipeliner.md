@@ -54,6 +54,18 @@ Creates new account.
 | owner_id | Owner ID | STRING | Id of the user in Pipeliner Application that will become the owner of the newly created account. | true |
 | name | Name | STRING | Account name | true |
 
+#### Example JSON Structure
+```json
+{
+  "label" : "Create Account",
+  "name" : "createAccount",
+  "parameters" : {
+    "owner_id" : "",
+    "name" : ""
+  },
+  "type" : "pipeliner/v1/createAccount"
+}
+```
 
 #### Output
 
@@ -72,16 +84,15 @@ Type: OBJECT
 
 
 
-#### JSON Example
+#### Output Example
 ```json
 {
-  "label" : "Create Account",
-  "name" : "createAccount",
-  "parameters" : {
+  "success" : false,
+  "data" : {
+    "id" : "",
     "owner_id" : "",
     "name" : ""
-  },
-  "type" : "pipeliner/v1/createAccount"
+  }
 }
 ```
 
@@ -99,6 +110,19 @@ Creates new Contact
 | first_name | First Name | STRING | The firstname of the contact. | false |
 | last_name | Last Name | STRING | The lastname of the contact. | true |
 
+#### Example JSON Structure
+```json
+{
+  "label" : "Create Contact",
+  "name" : "createContact",
+  "parameters" : {
+    "owner_id" : "",
+    "first_name" : "",
+    "last_name" : ""
+  },
+  "type" : "pipeliner/v1/createContact"
+}
+```
 
 #### Output
 
@@ -117,17 +141,16 @@ Type: OBJECT
 
 
 
-#### JSON Example
+#### Output Example
 ```json
 {
-  "label" : "Create Contact",
-  "name" : "createContact",
-  "parameters" : {
+  "success" : false,
+  "data" : {
+    "id" : "",
     "owner_id" : "",
     "first_name" : "",
     "last_name" : ""
-  },
-  "type" : "pipeliner/v1/createContact"
+  }
 }
 ```
 
@@ -146,6 +169,20 @@ Creates new Task
 | unit_id | Unit ID | STRING | Sales Unit ID | true |
 | owner_id | Owner ID | STRING |  | true |
 
+#### Example JSON Structure
+```json
+{
+  "label" : "Create Task",
+  "name" : "createTask",
+  "parameters" : {
+    "subject" : "",
+    "activity_type_id" : "",
+    "unit_id" : "",
+    "owner_id" : ""
+  },
+  "type" : "pipeliner/v1/createTask"
+}
+```
 
 #### Output
 
@@ -164,18 +201,17 @@ Type: OBJECT
 
 
 
-#### JSON Example
+#### Output Example
 ```json
 {
-  "label" : "Create Task",
-  "name" : "createTask",
-  "parameters" : {
+  "success" : false,
+  "data" : {
+    "id" : "",
     "subject" : "",
     "activity_type_id" : "",
     "unit_id" : "",
     "owner_id" : ""
-  },
-  "type" : "pipeliner/v1/createTask"
+  }
 }
 ```
 

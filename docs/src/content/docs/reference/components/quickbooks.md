@@ -53,6 +53,17 @@ Creates a new category.
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | name | Name | STRING | Name of the category. | true |
 
+#### Example JSON Structure
+```json
+{
+  "label" : "Create Category",
+  "name" : "createCategory",
+  "parameters" : {
+    "name" : ""
+  },
+  "type" : "quickbooks/v1/createCategory"
+}
+```
 
 #### Output
 
@@ -70,15 +81,17 @@ Type: OBJECT
 
 
 
-#### JSON Example
+#### Output Example
 ```json
 {
-  "label" : "Create Category",
-  "name" : "createCategory",
-  "parameters" : {
-    "name" : ""
-  },
-  "type" : "quickbooks/v1/createCategory"
+  "item" : {
+    "domain" : "",
+    "id" : "",
+    "name" : "",
+    "active" : "",
+    "fullyQualifiedName" : "",
+    "type" : ""
+  }
 }
 ```
 
@@ -99,6 +112,22 @@ Creates a new customer.
 | title | Title | STRING | Title of the person. | false |
 | middleName | Middle Name | STRING | Middle name of the person. | false |
 
+#### Example JSON Structure
+```json
+{
+  "label" : "Create Customer",
+  "name" : "createCustomer",
+  "parameters" : {
+    "displayName" : "",
+    "givenName" : "",
+    "familyName" : "",
+    "suffix" : "",
+    "title" : "",
+    "middleName" : ""
+  },
+  "type" : "quickbooks/v1/createCustomer"
+}
+```
 
 #### Output
 
@@ -116,20 +145,21 @@ Type: OBJECT
 
 
 
-#### JSON Example
+#### Output Example
 ```json
 {
-  "label" : "Create Customer",
-  "name" : "createCustomer",
-  "parameters" : {
-    "displayName" : "",
+  "customer" : {
+    "domain" : "",
+    "id" : "",
+    "title" : "",
     "givenName" : "",
+    "middleName" : "",
     "familyName" : "",
     "suffix" : "",
-    "title" : "",
-    "middleName" : ""
-  },
-  "type" : "quickbooks/v1/createCustomer"
+    "fullyQualifiedName" : "",
+    "displayName" : "",
+    "active" : ""
+  }
 }
 ```
 
@@ -149,6 +179,21 @@ Creates a new item.
 | expenseAccountRef | Expense Account | STRING |  | true |
 | qtyOnHand | Quantity on Hand | NUMBER | Current quantity of the inventory items available for sale. | true |
 
+#### Example JSON Structure
+```json
+{
+  "label" : "Create Item",
+  "name" : "createItem",
+  "parameters" : {
+    "name" : "",
+    "type" : "",
+    "account" : { },
+    "expenseAccountRef" : "",
+    "qtyOnHand" : 0.0
+  },
+  "type" : "quickbooks/v1/createItem"
+}
+```
 
 #### Output
 
@@ -166,19 +211,26 @@ Type: OBJECT
 
 
 
-#### JSON Example
+#### Output Example
 ```json
 {
-  "label" : "Create Item",
-  "name" : "createItem",
-  "parameters" : {
+  "item" : {
+    "domain" : "",
+    "id" : "",
     "name" : "",
+    "active" : "",
+    "fullyQualifiedName" : "",
     "type" : "",
-    "account" : { },
-    "expenseAccountRef" : "",
-    "qtyOnHand" : 0.0
-  },
-  "type" : "quickbooks/v1/createItem"
+    "incomeAccountRef" : {
+      "name" : ""
+    },
+    "assetAccountRef" : {
+      "name" : ""
+    },
+    "expenseAccountRef" : {
+      "name" : ""
+    }
+  }
 }
 ```
 
@@ -195,6 +247,18 @@ Creates a new payment.
 | customer | Customer | STRING |  | true |
 | totalAmt | Total Amount | NUMBER | Total amount of the transaction. | true |
 
+#### Example JSON Structure
+```json
+{
+  "label" : "Create Payment",
+  "name" : "createPayment",
+  "parameters" : {
+    "customer" : "",
+    "totalAmt" : 0.0
+  },
+  "type" : "quickbooks/v1/createPayment"
+}
+```
 
 #### Output
 
@@ -212,16 +276,20 @@ Type: OBJECT
 
 
 
-#### JSON Example
+#### Output Example
 ```json
 {
-  "label" : "Create Payment",
-  "name" : "createPayment",
-  "parameters" : {
-    "customer" : "",
-    "totalAmt" : 0.0
-  },
-  "type" : "quickbooks/v1/createPayment"
+  "payment" : {
+    "domain" : "",
+    "id" : "",
+    "CurrencyRef" : {
+      "name" : ""
+    },
+    "customerRef" : {
+      "name" : ""
+    },
+    "totalAmt" : ""
+  }
 }
 ```
 
@@ -237,6 +305,17 @@ Gets details about a specific customer.
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | customer | Customer ID | STRING | ID of the customer to get. | true |
 
+#### Example JSON Structure
+```json
+{
+  "label" : "Get Customer",
+  "name" : "getCustomer",
+  "parameters" : {
+    "customer" : ""
+  },
+  "type" : "quickbooks/v1/getCustomer"
+}
+```
 
 #### Output
 
@@ -254,15 +333,21 @@ Type: OBJECT
 
 
 
-#### JSON Example
+#### Output Example
 ```json
 {
-  "label" : "Get Customer",
-  "name" : "getCustomer",
-  "parameters" : {
-    "customer" : ""
-  },
-  "type" : "quickbooks/v1/getCustomer"
+  "customer" : {
+    "domain" : "",
+    "id" : "",
+    "title" : "",
+    "givenName" : "",
+    "middleName" : "",
+    "familyName" : "",
+    "suffix" : "",
+    "fullyQualifiedName" : "",
+    "displayName" : "",
+    "active" : ""
+  }
 }
 ```
 
@@ -278,6 +363,17 @@ Gets details about a specific invoice.
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | invoice | Invoice ID | STRING | ID of the invoice to get. | true |
 
+#### Example JSON Structure
+```json
+{
+  "label" : "Get Invoice",
+  "name" : "getInvoice",
+  "parameters" : {
+    "invoice" : ""
+  },
+  "type" : "quickbooks/v1/getInvoice"
+}
+```
 
 #### Output
 
@@ -295,15 +391,18 @@ Type: OBJECT
 
 
 
-#### JSON Example
+#### Output Example
 ```json
 {
-  "label" : "Get Invoice",
-  "name" : "getInvoice",
-  "parameters" : {
-    "invoice" : ""
-  },
-  "type" : "quickbooks/v1/getInvoice"
+  "invoice" : {
+    "domain" : "",
+    "id" : "",
+    "DocNumber" : "",
+    "customerRef" : {
+      "name" : ""
+    },
+    "Balance" : ""
+  }
 }
 ```
 
@@ -319,6 +418,17 @@ Gets details about a specific item.
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | item | Item ID | STRING | ID of the item to get. | true |
 
+#### Example JSON Structure
+```json
+{
+  "label" : "Get Item",
+  "name" : "getItem",
+  "parameters" : {
+    "item" : ""
+  },
+  "type" : "quickbooks/v1/getItem"
+}
+```
 
 #### Output
 
@@ -336,15 +446,26 @@ Type: OBJECT
 
 
 
-#### JSON Example
+#### Output Example
 ```json
 {
-  "label" : "Get Item",
-  "name" : "getItem",
-  "parameters" : {
-    "item" : ""
-  },
-  "type" : "quickbooks/v1/getItem"
+  "item" : {
+    "domain" : "",
+    "id" : "",
+    "name" : "",
+    "active" : "",
+    "fullyQualifiedName" : "",
+    "type" : "",
+    "incomeAccountRef" : {
+      "name" : ""
+    },
+    "assetAccountRef" : {
+      "name" : ""
+    },
+    "expenseAccountRef" : {
+      "name" : ""
+    }
+  }
 }
 ```
 
@@ -360,6 +481,17 @@ Gets details about a specific payment.
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | payment | Payment ID | STRING | ID of the payment to get. | true |
 
+#### Example JSON Structure
+```json
+{
+  "label" : "Get Payment",
+  "name" : "getPayment",
+  "parameters" : {
+    "payment" : ""
+  },
+  "type" : "quickbooks/v1/getPayment"
+}
+```
 
 #### Output
 
@@ -377,15 +509,20 @@ Type: OBJECT
 
 
 
-#### JSON Example
+#### Output Example
 ```json
 {
-  "label" : "Get Payment",
-  "name" : "getPayment",
-  "parameters" : {
-    "payment" : ""
-  },
-  "type" : "quickbooks/v1/getPayment"
+  "payment" : {
+    "domain" : "",
+    "id" : "",
+    "CurrencyRef" : {
+      "name" : ""
+    },
+    "customerRef" : {
+      "name" : ""
+    },
+    "totalAmt" : ""
+  }
 }
 ```
 

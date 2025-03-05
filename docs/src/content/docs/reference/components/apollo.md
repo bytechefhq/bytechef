@@ -66,6 +66,21 @@ Updates the details of existing deals within your team's Apollo account.
 | closed_date | Close Date | DATE | Updated estimated close date for the deal. This can be a future or past date. | false |
 | account_id | Account ID | STRING | The ID for the account within your Apollo instance. This is the company that you are targeting as part of the deal being created. | false |
 
+#### Example JSON Structure
+```json
+{
+  "label" : "Update Deal",
+  "name" : "updateDeal",
+  "parameters" : {
+    "opportunity_id" : "",
+    "owner_id" : "",
+    "name" : "",
+    "closed_date" : "2021-01-01",
+    "account_id" : ""
+  },
+  "type" : "apollo/v1/updateDeal"
+}
+```
 
 #### Output
 
@@ -83,19 +98,24 @@ Type: OBJECT
 
 
 
-#### JSON Example
+#### Output Example
 ```json
 {
-  "label" : "Update Deal",
-  "name" : "updateDeal",
-  "parameters" : {
-    "opportunity_id" : "",
+  "opportunity" : {
+    "id" : "",
+    "team_id" : "",
     "owner_id" : "",
-    "name" : "",
+    "amount" : 0.0,
     "closed_date" : "2021-01-01",
-    "account_id" : ""
-  },
-  "type" : "apollo/v1/updateDeal"
+    "account_id" : "",
+    "description" : "",
+    "name" : "",
+    "currency" : {
+      "name" : "",
+      "iso_code" : "",
+      "symbol" : ""
+    }
+  }
 }
 ```
 
@@ -115,6 +135,21 @@ Creates new deal for an Apollo account.
 | amount | Amount | STRING | The monetary value of the deal being created. Do not enter commas or currency symbols for the value.  | false |
 | closed_date | Close Date | DATE | The estimated close date for the deal. This can be a future or past date. | false |
 
+#### Example JSON Structure
+```json
+{
+  "label" : "Create Deal",
+  "name" : "createDeal",
+  "parameters" : {
+    "name" : "",
+    "owner_id" : "",
+    "account_id" : "",
+    "amount" : "",
+    "closed_date" : "2021-01-01"
+  },
+  "type" : "apollo/v1/createDeal"
+}
+```
 
 #### Output
 
@@ -132,19 +167,24 @@ Type: OBJECT
 
 
 
-#### JSON Example
+#### Output Example
 ```json
 {
-  "label" : "Create Deal",
-  "name" : "createDeal",
-  "parameters" : {
-    "name" : "",
+  "opportunity" : {
+    "id" : "",
+    "team_id" : "",
     "owner_id" : "",
+    "amount" : 0.0,
+    "closed_date" : "2021-01-01",
     "account_id" : "",
-    "amount" : "",
-    "closed_date" : "2021-01-01"
-  },
-  "type" : "apollo/v1/createDeal"
+    "description" : "",
+    "name" : "",
+    "currency" : {
+      "name" : "",
+      "iso_code" : "",
+      "symbol" : ""
+    }
+  }
 }
 ```
 
@@ -166,24 +206,7 @@ Enriches data for a person.
 | domain | Domain | STRING | The domain name for the person's employer. This can be the current employer or a previous employer. Do not include www., the @ symbol, or similar. | false |
 | linkedin_url | LinkedIn URL | STRING | The URL for the person's LinkedIn profile. | false |
 
-
-#### Output
-
-
-
-Type: OBJECT
-
-
-#### Properties
-
-|     Name     |     Type     |     Description     |
-|:------------:|:------------:|:-------------------:|
-| person | OBJECT <details> <summary> Properties </summary> {STRING\(id), STRING\(first_name), STRING\(last_name), STRING\(name), STRING\(linkedin_url), STRING\(title), STRING\(email_status), STRING\(photo_url), STRING\(twitter_url), STRING\(github_url), STRING\(facebook_url), STRING\(headline), STRING\(email), STRING\(organization_id)} </details> |  |
-
-
-
-
-#### JSON Example
+#### Example JSON Structure
 ```json
 {
   "label" : "Enrich Person",
@@ -201,6 +224,44 @@ Type: OBJECT
 }
 ```
 
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| person | OBJECT <details> <summary> Properties </summary> {STRING\(id), STRING\(first_name), STRING\(last_name), STRING\(name), STRING\(linkedin_url), STRING\(title), STRING\(email_status), STRING\(photo_url), STRING\(twitter_url), STRING\(github_url), STRING\(facebook_url), STRING\(headline), STRING\(email), STRING\(organization_id)} </details> |  |
+
+
+
+
+#### Output Example
+```json
+{
+  "person" : {
+    "id" : "",
+    "first_name" : "",
+    "last_name" : "",
+    "name" : "",
+    "linkedin_url" : "",
+    "title" : "",
+    "email_status" : "",
+    "photo_url" : "",
+    "twitter_url" : "",
+    "github_url" : "",
+    "facebook_url" : "",
+    "headline" : "",
+    "email" : "",
+    "organization_id" : ""
+  }
+}
+```
+
 
 ### Enrich Company
 Name: enrichCompany
@@ -213,6 +274,17 @@ Enriches data for company.
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | domain | Domain | STRING | The domain of the company that you want to enrich. Do not include www., the @ symbol, or similar. | true |
 
+#### Example JSON Structure
+```json
+{
+  "label" : "Enrich Company",
+  "name" : "enrichCompany",
+  "parameters" : {
+    "domain" : ""
+  },
+  "type" : "apollo/v1/enrichCompany"
+}
+```
 
 #### Output
 
@@ -230,15 +302,23 @@ Type: OBJECT
 
 
 
-#### JSON Example
+#### Output Example
 ```json
 {
-  "label" : "Enrich Company",
-  "name" : "enrichCompany",
-  "parameters" : {
-    "domain" : ""
-  },
-  "type" : "apollo/v1/enrichCompany"
+  "organization" : {
+    "id" : "",
+    "name" : "",
+    "website_url" : "",
+    "blog_url" : "",
+    "linkedin_url" : "",
+    "twitter_url" : "",
+    "facebook_url" : "",
+    "phone" : "",
+    "logo_url" : "",
+    "primary_domain" : "",
+    "industry" : "",
+    "keywords" : [ "" ]
+  }
 }
 ```
 

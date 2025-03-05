@@ -52,12 +52,7 @@ Move Contact to the recycling bin.
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | contactId | Contact ID | STRING |  | true |
 
-
-#### Output
-
-This action does not produce any output.
-
-#### JSON Example
+#### Example JSON Structure
 ```json
 {
   "label" : "Delete Contact",
@@ -68,6 +63,12 @@ This action does not produce any output.
   "type" : "hubspot/v1/deleteContact"
 }
 ```
+
+#### Output
+
+This action does not produce any output.
+
+
 
 
 ### Get Contact
@@ -81,6 +82,17 @@ Get contact details.
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | contactId | Contact ID | STRING |  | true |
 
+#### Example JSON Structure
+```json
+{
+  "label" : "Get Contact",
+  "name" : "getContact",
+  "parameters" : {
+    "contactId" : ""
+  },
+  "type" : "hubspot/v1/getContact"
+}
+```
 
 #### Output
 
@@ -99,15 +111,18 @@ Type: OBJECT
 
 
 
-#### JSON Example
+#### Output Example
 ```json
 {
-  "label" : "Get Contact",
-  "name" : "getContact",
-  "parameters" : {
-    "contactId" : ""
-  },
-  "type" : "hubspot/v1/getContact"
+  "id" : "",
+  "properties" : {
+    "firstname" : "",
+    "lastname" : "",
+    "email" : "",
+    "phone" : "",
+    "company" : "",
+    "website" : ""
+  }
 }
 ```
 
@@ -124,25 +139,7 @@ Update Contact properties.
 | contactId | Contact | STRING |  | true |
 | properties | Properties | OBJECT <details> <summary> Properties </summary> {STRING\(firstname), STRING\(lastname), STRING\(email), STRING\(phone), STRING\(company), STRING\(website)} </details> |  | false |
 
-
-#### Output
-
-
-
-Type: OBJECT
-
-
-#### Properties
-
-|     Name     |     Type     |     Description     |
-|:------------:|:------------:|:-------------------:|
-| id | STRING | ID of the newly created contact. |
-| properties | OBJECT <details> <summary> Properties </summary> {STRING\(firstname), STRING\(lastname), STRING\(email), STRING\(phone), STRING\(company), STRING\(website)} </details> |  |
-
-
-
-
-#### JSON Example
+#### Example JSON Structure
 ```json
 {
   "label" : "Update Contact",
@@ -162,19 +159,6 @@ Type: OBJECT
 }
 ```
 
-
-### Create Contact
-Name: createContact
-
-Create a contact with the given properties.
-
-#### Properties
-
-|      Name       |      Label     |     Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| properties | Properties | OBJECT <details> <summary> Properties </summary> {STRING\(firstname), STRING\(lastname), STRING\(email), STRING\(phone), STRING\(company), STRING\(website)} </details> |  | false |
-
-
 #### Output
 
 
@@ -192,7 +176,34 @@ Type: OBJECT
 
 
 
-#### JSON Example
+#### Output Example
+```json
+{
+  "id" : "",
+  "properties" : {
+    "firstname" : "",
+    "lastname" : "",
+    "email" : "",
+    "phone" : "",
+    "company" : "",
+    "website" : ""
+  }
+}
+```
+
+
+### Create Contact
+Name: createContact
+
+Create a contact with the given properties.
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| properties | Properties | OBJECT <details> <summary> Properties </summary> {STRING\(firstname), STRING\(lastname), STRING\(email), STRING\(phone), STRING\(company), STRING\(website)} </details> |  | false |
+
+#### Example JSON Structure
 ```json
 {
   "label" : "Create Contact",
@@ -211,6 +222,38 @@ Type: OBJECT
 }
 ```
 
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| id | STRING | ID of the newly created contact. |
+| properties | OBJECT <details> <summary> Properties </summary> {STRING\(firstname), STRING\(lastname), STRING\(email), STRING\(phone), STRING\(company), STRING\(website)} </details> |  |
+
+
+
+
+#### Output Example
+```json
+{
+  "id" : "",
+  "properties" : {
+    "firstname" : "",
+    "lastname" : "",
+    "email" : "",
+    "phone" : "",
+    "company" : "",
+    "website" : ""
+  }
+}
+```
+
 
 ### Create Deal
 Name: createDeal
@@ -223,25 +266,7 @@ Creates a new deal.
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | properties | Properties | OBJECT <details> <summary> Properties </summary> {STRING\(dealname), NUMBER\(amount), DATE\(closedate), STRING\(pipeline), STRING\(dealstage), STRING\(hubspot_owner_id)} </details> |  | false |
 
-
-#### Output
-
-
-
-Type: OBJECT
-
-
-#### Properties
-
-|     Name     |     Type     |     Description     |
-|:------------:|:------------:|:-------------------:|
-| id | STRING | ID of the deal. |
-| properties | OBJECT <details> <summary> Properties </summary> {STRING\(dealname), NUMBER\(amount), DATE\(closedate), STRING\(pipeline), STRING\(dealstage), STRING\(hubspot_owner_id)} </details> |  |
-
-
-
-
-#### JSON Example
+#### Example JSON Structure
 ```json
 {
   "label" : "Create Deal",
@@ -260,6 +285,38 @@ Type: OBJECT
 }
 ```
 
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| id | STRING | ID of the deal. |
+| properties | OBJECT <details> <summary> Properties </summary> {STRING\(dealname), NUMBER\(amount), DATE\(closedate), STRING\(pipeline), STRING\(dealstage), STRING\(hubspot_owner_id)} </details> |  |
+
+
+
+
+#### Output Example
+```json
+{
+  "id" : "",
+  "properties" : {
+    "dealname" : "",
+    "amount" : 0.0,
+    "closedate" : "2021-01-01",
+    "pipeline" : "",
+    "dealstage" : "",
+    "hubspot_owner_id" : ""
+  }
+}
+```
+
 
 ### Get Ticket
 Name: getTicket
@@ -272,6 +329,17 @@ Gets ticket details.
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | ticketId | Ticket ID | STRING |  | true |
 
+#### Example JSON Structure
+```json
+{
+  "label" : "Get Ticket",
+  "name" : "getTicket",
+  "parameters" : {
+    "ticketId" : ""
+  },
+  "type" : "hubspot/v1/getTicket"
+}
+```
 
 #### Output
 
@@ -290,15 +358,18 @@ Type: OBJECT
 
 
 
-#### JSON Example
+#### Output Example
 ```json
 {
-  "label" : "Get Ticket",
-  "name" : "getTicket",
-  "parameters" : {
-    "ticketId" : ""
-  },
-  "type" : "hubspot/v1/getTicket"
+  "id" : "",
+  "properties" : {
+    "content" : "",
+    "hs_object_id" : "",
+    "hs_pipeline" : "",
+    "hs_pipeline_stage" : "",
+    "hs_ticket_priority" : "",
+    "subject" : ""
+  }
 }
 ```
 

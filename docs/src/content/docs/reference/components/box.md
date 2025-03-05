@@ -52,6 +52,18 @@ Creates a new empty folder within the specified parent folder.
 | name | Folder Name | STRING | The name for the new folder. | true |
 | id | Parent Folder ID | STRING | ID of the folder where the new folder will be created; if no folder is selected, the folder will be created in the root folder. | true |
 
+#### Example JSON Structure
+```json
+{
+  "label" : "Create Folder",
+  "name" : "createFolder",
+  "parameters" : {
+    "name" : "",
+    "id" : ""
+  },
+  "type" : "box/v1/createFolder"
+}
+```
 
 #### Output
 
@@ -72,16 +84,17 @@ Type: OBJECT
 
 
 
-#### JSON Example
+#### Output Example
 ```json
 {
-  "label" : "Create Folder",
-  "name" : "createFolder",
-  "parameters" : {
-    "name" : "",
-    "id" : ""
-  },
-  "type" : "box/v1/createFolder"
+  "type" : "",
+  "id" : "",
+  "name" : "",
+  "parent" : {
+    "type" : "",
+    "id" : "",
+    "name" : ""
+  }
 }
 ```
 
@@ -98,6 +111,18 @@ Download a selected file.
 | id | Parent Folder ID | STRING | ID of the folder from which you want to download the file. | true |
 | fileId | File ID | STRING <details> <summary> Depends On </summary> id </details> | ID of the file to download. | true |
 
+#### Example JSON Structure
+```json
+{
+  "label" : "Download File",
+  "name" : "downloadFile",
+  "parameters" : {
+    "id" : "",
+    "fileId" : ""
+  },
+  "type" : "box/v1/downloadFile"
+}
+```
 
 #### Output
 
@@ -118,16 +143,13 @@ Type: FILE_ENTRY
 
 
 
-#### JSON Example
+#### Output Example
 ```json
 {
-  "label" : "Download File",
-  "name" : "downloadFile",
-  "parameters" : {
-    "id" : "",
-    "fileId" : ""
-  },
-  "type" : "box/v1/downloadFile"
+  "extension" : "",
+  "mimeType" : "",
+  "name" : "",
+  "url" : ""
 }
 ```
 
@@ -144,6 +166,23 @@ Uploads a small file to Box.
 | id | Parent Folder ID | STRING | ID of the folder where the file should be uploaded; if no folder is selected, the file will be uploaded in the root folder. | true |
 | file | File | FILE_ENTRY |  | true |
 
+#### Example JSON Structure
+```json
+{
+  "label" : "Upload File",
+  "name" : "uploadFile",
+  "parameters" : {
+    "id" : "",
+    "file" : {
+      "extension" : "",
+      "mimeType" : "",
+      "name" : "",
+      "url" : ""
+    }
+  },
+  "type" : "box/v1/uploadFile"
+}
+```
 
 #### Output
 
@@ -161,21 +200,19 @@ Type: OBJECT
 
 
 
-#### JSON Example
+#### Output Example
 ```json
 {
-  "label" : "Upload File",
-  "name" : "uploadFile",
-  "parameters" : {
+  "entries" : [ {
+    "type" : "",
     "id" : "",
-    "file" : {
-      "extension" : "",
-      "mimeType" : "",
-      "name" : "",
-      "url" : ""
+    "name" : "",
+    "parent" : {
+      "type" : "",
+      "id" : "",
+      "name" : ""
     }
-  },
-  "type" : "box/v1/uploadFile"
+  } ]
 }
 ```
 

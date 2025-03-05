@@ -51,12 +51,7 @@ Get all responses of a form.
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | formId | Form ID | STRING | ID of the form whose responses to retrieve. | true |
 
-
-#### Output
-
-The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
-
-#### JSON Example
+#### Example JSON Structure
 ```json
 {
   "label" : "Get All Responses",
@@ -67,6 +62,12 @@ The output for this action is dynamic and may vary depending on the input parame
   "type" : "googleForms/v1/getAllResponses"
 }
 ```
+
+#### Output
+
+The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
+
+
 
 
 ### Get Form
@@ -80,12 +81,7 @@ Get the information about a form.
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | formId | Form ID | STRING | ID of the form to retrieve. | true |
 
-
-#### Output
-
-The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
-
-#### JSON Example
+#### Example JSON Structure
 ```json
 {
   "label" : "Get Form",
@@ -96,6 +92,12 @@ The output for this action is dynamic and may vary depending on the input parame
   "type" : "googleForms/v1/getForm"
 }
 ```
+
+#### Output
+
+The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
+
+
 
 
 ### Get Response
@@ -110,12 +112,7 @@ Get the response of a form.
 | formId | Form ID | STRING | ID of the form whose response to retrieve. | true |
 | responseId | Response ID | STRING <details> <summary> Depends On </summary> formId </details> | ID of the response to retrieve. | true |
 
-
-#### Output
-
-The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
-
-#### JSON Example
+#### Example JSON Structure
 ```json
 {
   "label" : "Get Response",
@@ -127,6 +124,12 @@ The output for this action is dynamic and may vary depending on the input parame
   "type" : "googleForms/v1/getResponse"
 }
 ```
+
+#### Output
+
+The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
+
+
 
 
 

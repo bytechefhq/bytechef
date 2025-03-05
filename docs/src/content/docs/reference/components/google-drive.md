@@ -53,6 +53,19 @@ Copy a selected file to a different location within Google Drive.
 | fileName | New File Name | STRING | The name of the new file created as a result of the copy operation. | true |
 | folderId | Destination Folder ID | STRING | The ID of the folder where the copied file will be stored. | true |
 
+#### Example JSON Structure
+```json
+{
+  "label" : "Copy File",
+  "name" : "copyFile",
+  "parameters" : {
+    "fileId" : "",
+    "fileName" : "",
+    "folderId" : ""
+  },
+  "type" : "googleDrive/v1/copyFile"
+}
+```
 
 #### Output
 
@@ -73,17 +86,13 @@ Type: OBJECT
 
 
 
-#### JSON Example
+#### Output Example
 ```json
 {
-  "label" : "Copy File",
-  "name" : "copyFile",
-  "parameters" : {
-    "fileId" : "",
-    "fileName" : "",
-    "folderId" : ""
-  },
-  "type" : "googleDrive/v1/copyFile"
+  "id" : "",
+  "kind" : "",
+  "mimeType" : "",
+  "name" : ""
 }
 ```
 
@@ -100,6 +109,18 @@ Creates a new empty folder in Google Drive.
 | folderName | Folder Name | STRING | The name of the new folder. | true |
 | folderId | Parent Folder ID | STRING | ID of the folder where the new folder will be created; if no folder is selected, the folder will be created in the root folder. | false |
 
+#### Example JSON Structure
+```json
+{
+  "label" : "Create New Folder",
+  "name" : "createNewFolder",
+  "parameters" : {
+    "folderName" : "",
+    "folderId" : ""
+  },
+  "type" : "googleDrive/v1/createNewFolder"
+}
+```
 
 #### Output
 
@@ -125,16 +146,13 @@ Type: OBJECT
 
 
 
-#### JSON Example
+#### Output Example
 ```json
 {
-  "label" : "Create New Folder",
-  "name" : "createNewFolder",
-  "parameters" : {
-    "folderName" : "",
-    "folderId" : ""
-  },
-  "type" : "googleDrive/v1/createNewFolder"
+  "id" : "",
+  "kind" : "",
+  "mimeType" : "",
+  "name" : ""
 }
 ```
 
@@ -153,6 +171,20 @@ Creates a new text file in Google Drive.
 | mimeType | File Type | STRING <details> <summary> Options </summary> plain/text, text/csv, text/xml </details> | Select file type. | true |
 | folderId | Parent Folder ID | STRING | ID of the folder where the file should be created; if no folder is selected, the file will be created in the root folder. | false |
 
+#### Example JSON Structure
+```json
+{
+  "label" : "Create New Text File",
+  "name" : "createNewTextFile",
+  "parameters" : {
+    "fileName" : "",
+    "text" : "",
+    "mimeType" : "",
+    "folderId" : ""
+  },
+  "type" : "googleDrive/v1/createNewTextFile"
+}
+```
 
 #### Output
 
@@ -178,18 +210,13 @@ Type: OBJECT
 
 
 
-#### JSON Example
+#### Output Example
 ```json
 {
-  "label" : "Create New Text File",
-  "name" : "createNewTextFile",
-  "parameters" : {
-    "fileName" : "",
-    "text" : "",
-    "mimeType" : "",
-    "folderId" : ""
-  },
-  "type" : "googleDrive/v1/createNewTextFile"
+  "id" : "",
+  "kind" : "",
+  "mimeType" : "",
+  "name" : ""
 }
 ```
 
@@ -205,12 +232,7 @@ Delete a selected file from Google Drive.
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | fileId | File ID | STRING | The id of a file to delete. | true |
 
-
-#### Output
-
-This action does not produce any output.
-
-#### JSON Example
+#### Example JSON Structure
 ```json
 {
   "label" : "Delete File",
@@ -221,6 +243,12 @@ This action does not produce any output.
   "type" : "googleDrive/v1/deleteFile"
 }
 ```
+
+#### Output
+
+This action does not produce any output.
+
+
 
 
 ### Download File
@@ -234,6 +262,17 @@ Download selected file from Google Drive.
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | fileId | File ID | STRING | ID of the file to download. | true |
 
+#### Example JSON Structure
+```json
+{
+  "label" : "Download File",
+  "name" : "downloadFile",
+  "parameters" : {
+    "fileId" : ""
+  },
+  "type" : "googleDrive/v1/downloadFile"
+}
+```
 
 #### Output
 
@@ -254,15 +293,13 @@ Type: FILE_ENTRY
 
 
 
-#### JSON Example
+#### Output Example
 ```json
 {
-  "label" : "Download File",
-  "name" : "downloadFile",
-  "parameters" : {
-    "fileId" : ""
-  },
-  "type" : "googleDrive/v1/downloadFile"
+  "extension" : "",
+  "mimeType" : "",
+  "name" : "",
+  "url" : ""
 }
 ```
 
@@ -278,6 +315,17 @@ Retrieve a specified file from your Google Drive.
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | fileId | File ID | STRING | ID of the file to be retrieved. | true |
 
+#### Example JSON Structure
+```json
+{
+  "label" : "Get File",
+  "name" : "getFile",
+  "parameters" : {
+    "fileId" : ""
+  },
+  "type" : "googleDrive/v1/getFile"
+}
+```
 
 #### Output
 
@@ -298,15 +346,13 @@ Type: OBJECT
 
 
 
-#### JSON Example
+#### Output Example
 ```json
 {
-  "label" : "Get File",
-  "name" : "getFile",
-  "parameters" : {
-    "fileId" : ""
-  },
-  "type" : "googleDrive/v1/getFile"
+  "id" : "",
+  "kind" : "",
+  "mimeType" : "",
+  "name" : ""
 }
 ```
 
@@ -323,6 +369,23 @@ Uploads a file in your Google Drive.
 | fileEntry | File | FILE_ENTRY | The object property which contains a reference to the file to upload. | true |
 | folderId | Parent Folder ID | STRING | ID of the folder where the file will be uploaded; if no folder is selected, the file will be uploaded to the root folder. | false |
 
+#### Example JSON Structure
+```json
+{
+  "label" : "Upload File",
+  "name" : "uploadFile",
+  "parameters" : {
+    "fileEntry" : {
+      "extension" : "",
+      "mimeType" : "",
+      "name" : "",
+      "url" : ""
+    },
+    "folderId" : ""
+  },
+  "type" : "googleDrive/v1/uploadFile"
+}
+```
 
 #### Output
 
@@ -348,21 +411,13 @@ Type: OBJECT
 
 
 
-#### JSON Example
+#### Output Example
 ```json
 {
-  "label" : "Upload File",
-  "name" : "uploadFile",
-  "parameters" : {
-    "fileEntry" : {
-      "extension" : "",
-      "mimeType" : "",
-      "name" : "",
-      "url" : ""
-    },
-    "folderId" : ""
-  },
-  "type" : "googleDrive/v1/uploadFile"
+  "id" : "",
+  "kind" : "",
+  "mimeType" : "",
+  "name" : ""
 }
 ```
 
@@ -393,11 +448,17 @@ Type: POLLING
 Type: ARRAY
 
 
-#### Properties
+Items Type: OBJECT
 
+
+#### Properties
 |     Name     |     Type     |     Description     |
 |:------------:|:------------:|:-------------------:|
-|  | OBJECT <details> <summary> Properties </summary> {STRING\(id), STRING\(kind), STRING\(mimeType), STRING\(name)} </details> |  |
+| id | STRING | The ID of the file. |
+| kind | STRING | Identifies what kind of resource this is. |
+| mimeType | STRING | The MIME type of the file. |
+| name | STRING | The name of the file. |
+
 
 
 
@@ -436,11 +497,17 @@ Type: POLLING
 Type: ARRAY
 
 
-#### Properties
+Items Type: OBJECT
 
+
+#### Properties
 |     Name     |     Type     |     Description     |
 |:------------:|:------------:|:-------------------:|
-|  | OBJECT <details> <summary> Properties </summary> {STRING\(id), STRING\(kind), STRING\(mimeType), STRING\(name)} </details> |  |
+| id | STRING | The ID of the file. |
+| kind | STRING | Identifies what kind of resource this is. |
+| mimeType | STRING | The MIME type of the file. |
+| name | STRING | The name of the file. |
+
 
 
 

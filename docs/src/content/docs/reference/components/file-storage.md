@@ -30,23 +30,7 @@ Reads data from the file as string.
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | fileEntry | File | FILE_ENTRY | The object property which contains a reference to the file to read from. | true |
 
-
-#### Output
-
-
-___Sample Output:___
-
-```Sample content```
-
-
-
-Type: STRING
-
-
-
-
-
-#### JSON Example
+#### Example JSON Structure
 ```json
 {
   "label" : "Read from File as String",
@@ -63,6 +47,23 @@ Type: STRING
 }
 ```
 
+#### Output
+
+
+___Sample Output:___
+
+```Sample content```
+
+
+
+Type: STRING
+
+
+
+
+
+
+
 
 ### Write to File
 Name: write
@@ -76,6 +77,18 @@ Writes the data to the file.
 | content | Content | STRING | String to write to the file. | true |
 | filename | Filename | STRING | Filename to set for data. By default, "file.txt" will be used. | null |
 
+#### Example JSON Structure
+```json
+{
+  "label" : "Write to File",
+  "name" : "write",
+  "parameters" : {
+    "content" : "",
+    "filename" : ""
+  },
+  "type" : "fileStorage/v1/write"
+}
+```
 
 #### Output
 
@@ -96,16 +109,13 @@ Type: FILE_ENTRY
 
 
 
-#### JSON Example
+#### Output Example
 ```json
 {
-  "label" : "Write to File",
-  "name" : "write",
-  "parameters" : {
-    "content" : "",
-    "filename" : ""
-  },
-  "type" : "fileStorage/v1/write"
+  "extension" : "",
+  "mimeType" : "",
+  "name" : "",
+  "url" : ""
 }
 ```
 
@@ -122,6 +132,18 @@ Download a file from the URL.
 | url | URL | STRING | The URL to download a file from. | true |
 | filename | Filename | STRING | Filename to set for data. By default, "file.txt" will be used. | null |
 
+#### Example JSON Structure
+```json
+{
+  "label" : "Download File",
+  "name" : "download",
+  "parameters" : {
+    "url" : "",
+    "filename" : ""
+  },
+  "type" : "fileStorage/v1/download"
+}
+```
 
 #### Output
 
@@ -142,16 +164,13 @@ Type: FILE_ENTRY
 
 
 
-#### JSON Example
+#### Output Example
 ```json
 {
-  "label" : "Download File",
-  "name" : "download",
-  "parameters" : {
-    "url" : "",
-    "filename" : ""
-  },
-  "type" : "fileStorage/v1/download"
+  "extension" : "",
+  "mimeType" : "",
+  "name" : "",
+  "url" : ""
 }
 ```
 

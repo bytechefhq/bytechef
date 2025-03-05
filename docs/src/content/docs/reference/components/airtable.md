@@ -52,25 +52,7 @@ Adds a record into an Airtable table.
 | tableId | Table ID | STRING <details> <summary> Depends On </summary> baseId </details> | The table where the record will be created. | true |
 | fields | | DYNAMIC_PROPERTIES <details> <summary> Depends On </summary> baseId, tableId </details> |  | false |
 
-
-#### Output
-
-
-
-Type: OBJECT
-
-
-#### Properties
-
-|     Name     |     Type     |     Description     |
-|:------------:|:------------:|:-------------------:|
-| createdTime | DATE_TIME |  |
-| fields | OBJECT <details> <summary> Properties </summary> {} </details> |  |
-
-
-
-
-#### JSON Example
+#### Example JSON Structure
 ```json
 {
   "label" : "Create Record",
@@ -83,6 +65,12 @@ Type: OBJECT
   "type" : "airtable/v1/createRecord"
 }
 ```
+
+#### Output
+
+The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
+
+
 
 
 ### Delete Record
@@ -98,6 +86,19 @@ Deletes a single record from a table.
 | tableId | Table ID | STRING <details> <summary> Depends On </summary> baseId </details> | ID of the table where the record is located. | true |
 | recordId | Record ID | STRING <details> <summary> Depends On </summary> tableId, baseId </details> | ID of the record that will be deleted. | true |
 
+#### Example JSON Structure
+```json
+{
+  "label" : "Delete Record",
+  "name" : "deleteRecord",
+  "parameters" : {
+    "baseId" : "",
+    "tableId" : "",
+    "recordId" : ""
+  },
+  "type" : "airtable/v1/deleteRecord"
+}
+```
 
 #### Output
 
@@ -116,17 +117,11 @@ Type: OBJECT
 
 
 
-#### JSON Example
+#### Output Example
 ```json
 {
-  "label" : "Delete Record",
-  "name" : "deleteRecord",
-  "parameters" : {
-    "baseId" : "",
-    "tableId" : "",
-    "recordId" : ""
-  },
-  "type" : "airtable/v1/deleteRecord"
+  "id" : "",
+  "deleted" : false
 }
 ```
 
@@ -144,26 +139,7 @@ Retrieves a single record.
 | tableId | Table ID | STRING <details> <summary> Depends On </summary> baseId </details> | ID of the table where the record is located. | true |
 | recordId | Record ID | STRING <details> <summary> Depends On </summary> tableId, baseId </details> | ID of the record that will be deleted. | true |
 
-
-#### Output
-
-
-
-Type: OBJECT
-
-
-#### Properties
-
-|     Name     |     Type     |     Description     |
-|:------------:|:------------:|:-------------------:|
-| id | STRING |  |
-| createdTime | DATE_TIME |  |
-| fields | OBJECT <details> <summary> Properties </summary> {} </details> |  |
-
-
-
-
-#### JSON Example
+#### Example JSON Structure
 ```json
 {
   "label" : "Get Record",
@@ -176,6 +152,12 @@ Type: OBJECT
   "type" : "airtable/v1/getRecord"
 }
 ```
+
+#### Output
+
+The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
+
+
 
 
 

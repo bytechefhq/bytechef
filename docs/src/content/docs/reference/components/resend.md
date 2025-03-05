@@ -61,24 +61,7 @@ Send an email
 | attachments | Attachments | ARRAY <details> <summary> Items </summary> [FILE_ENTRY] </details> | A list of attachments to send with the email. | false |
 | tags | | ARRAY <details> <summary> Items </summary> [{STRING\(name), STRING\(value)}] </details> |  | false |
 
-
-#### Output
-
-
-
-Type: OBJECT
-
-
-#### Properties
-
-|     Name     |     Type     |     Description     |
-|:------------:|:------------:|:-------------------:|
-| id | STRING |  |
-
-
-
-
-#### JSON Example
+#### Example JSON Structure
 ```json
 {
   "label" : "Send Email",
@@ -106,6 +89,29 @@ Type: OBJECT
     } ]
   },
   "type" : "resend/v1/sendEmail"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| id | STRING |  |
+
+
+
+
+#### Output Example
+```json
+{
+  "id" : ""
 }
 ```
 

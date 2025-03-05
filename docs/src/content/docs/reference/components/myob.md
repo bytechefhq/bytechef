@@ -58,12 +58,7 @@ Creates a new customer.
 | IsActive | Is Active? | BOOLEAN <details> <summary> Options </summary> true, false </details> | Is customer contact active? | true |
 | Addresses | Addresses | ARRAY <details> <summary> Items </summary> [{STRING\(Street), STRING\(City), STRING\(State), STRING\(PostCode), STRING\(Country), STRING\(Phone1), STRING\(Email), STRING\(Website)}] </details> | List of addresses for the customer contact. | false |
 
-
-#### Output
-
-This action does not produce any output.
-
-#### JSON Example
+#### Example JSON Structure
 ```json
 {
   "label" : "Create Customer",
@@ -90,6 +85,12 @@ This action does not produce any output.
 }
 ```
 
+#### Output
+
+This action does not produce any output.
+
+
+
 
 ### Create Customer Payment
 Name: createCustomerPayment
@@ -105,12 +106,7 @@ Creates a new customer payment.
 | Account | Account | STRING |  | true |
 | Customer | Customer UID | STRING <details> <summary> Depends On </summary> companyFile </details> |  | true |
 
-
-#### Output
-
-This action does not produce any output.
-
-#### JSON Example
+#### Example JSON Structure
 ```json
 {
   "label" : "Create Customer Payment",
@@ -124,6 +120,12 @@ This action does not produce any output.
   "type" : "myob/v1/createCustomerPayment"
 }
 ```
+
+#### Output
+
+This action does not produce any output.
+
+
 
 
 ### Create Supplier
@@ -143,12 +145,7 @@ Creates a new supplier.
 | IsActive | Is Active? | BOOLEAN <details> <summary> Options </summary> true, false </details> | Is supplier contact active? | false |
 | Addresses | Addresses | ARRAY <details> <summary> Items </summary> [{STRING\(Street), STRING\(City), STRING\(State), STRING\(PostCode), STRING\(Country), STRING\(Phone1), STRING\(Email), STRING\(Website)}] </details> | List of addresses for the customer contact. | false |
 
-
-#### Output
-
-This action does not produce any output.
-
-#### JSON Example
+#### Example JSON Structure
 ```json
 {
   "label" : "Create Supplier",
@@ -175,6 +172,12 @@ This action does not produce any output.
 }
 ```
 
+#### Output
+
+This action does not produce any output.
+
+
+
 
 ### Create Supplier Payment
 Name: createSupplierPayment
@@ -190,12 +193,7 @@ Creates a new supplier payment.
 | Account | Account | STRING |  | true |
 | Supplier | Supplier UID | STRING <details> <summary> Depends On </summary> companyFile </details> |  | true |
 
-
-#### Output
-
-This action does not produce any output.
-
-#### JSON Example
+#### Example JSON Structure
 ```json
 {
   "label" : "Create Supplier Payment",
@@ -209,6 +207,12 @@ This action does not produce any output.
   "type" : "myob/v1/createSupplierPayment"
 }
 ```
+
+#### Output
+
+This action does not produce any output.
+
+
 
 
 

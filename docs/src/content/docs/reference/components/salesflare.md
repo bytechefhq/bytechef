@@ -55,12 +55,7 @@ Creates new account.
 | phone_number | Phone Number | STRING |  | false |
 | social_profiles | Social Profiles | ARRAY <details> <summary> Items </summary> [STRING] </details> | Social profile URL | false |
 
-
-#### Output
-
-This action does not produce any output.
-
-#### JSON Example
+#### Example JSON Structure
 ```json
 {
   "label" : "Create Account",
@@ -77,6 +72,12 @@ This action does not produce any output.
 }
 ```
 
+#### Output
+
+This action does not produce any output.
+
+
+
 
 ### Create Contacts
 Name: createContacts
@@ -89,24 +90,7 @@ Creates new contacts.
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | contacts | Contacts | ARRAY <details> <summary> Items </summary> [{STRING\(email), STRING\(firstname), STRING\(lastname), STRING\(phone_number), STRING\(mobile_phone_number), STRING\(home_phone_number), STRING\(fax_number), [STRING]\(social_profiles)}] </details> |  | true |
 
-
-#### Output
-
-
-
-Type: ARRAY
-
-
-#### Properties
-
-|     Name     |     Type     |     Description     |
-|:------------:|:------------:|:-------------------:|
-|  | OBJECT <details> <summary> Properties </summary> {INTEGER\(id)} </details> |  |
-
-
-
-
-#### JSON Example
+#### Example JSON Structure
 ```json
 {
   "label" : "Create Contacts",
@@ -127,6 +111,32 @@ Type: ARRAY
 }
 ```
 
+#### Output
+
+
+
+Type: ARRAY
+
+
+Items Type: OBJECT
+
+
+#### Properties
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| id | INTEGER |  |
+
+
+
+
+
+#### Output Example
+```json
+[ {
+  "id" : 1
+} ]
+```
+
 
 ### Create Tasks
 Name: createTasks
@@ -139,24 +149,7 @@ Creates new tasks.
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | tasks | Tasks | ARRAY <details> <summary> Items </summary> [{STRING\(description), DATE\(reminder_date)}] </details> |  | true |
 
-
-#### Output
-
-
-
-Type: ARRAY
-
-
-#### Properties
-
-|     Name     |     Type     |     Description     |
-|:------------:|:------------:|:-------------------:|
-|  | OBJECT <details> <summary> Properties </summary> {INTEGER\(id)} </details> |  |
-
-
-
-
-#### JSON Example
+#### Example JSON Structure
 ```json
 {
   "label" : "Create Tasks",
@@ -169,6 +162,32 @@ Type: ARRAY
   },
   "type" : "salesflare/v1/createTasks"
 }
+```
+
+#### Output
+
+
+
+Type: ARRAY
+
+
+Items Type: OBJECT
+
+
+#### Properties
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| id | INTEGER |  |
+
+
+
+
+
+#### Output Example
+```json
+[ {
+  "id" : 1
+} ]
 ```
 
 

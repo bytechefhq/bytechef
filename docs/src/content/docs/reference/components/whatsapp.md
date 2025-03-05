@@ -52,6 +52,18 @@ Send a message via WhatsApp
 | body | Message | STRING | Message to send via WhatsApp | true |
 | to | Send Message To | STRING | Phone number to send the message. It must start with "+" sign | true |
 
+#### Example JSON Structure
+```json
+{
+  "label" : "Send Message",
+  "name" : "sendMessage",
+  "parameters" : {
+    "body" : "",
+    "to" : ""
+  },
+  "type" : "whatsApp/v1/sendMessage"
+}
+```
 
 #### Output
 
@@ -71,16 +83,17 @@ Type: OBJECT
 
 
 
-#### JSON Example
+#### Output Example
 ```json
 {
-  "label" : "Send Message",
-  "name" : "sendMessage",
-  "parameters" : {
-    "body" : "",
-    "to" : ""
+  "messaging_product" : "",
+  "contacts" : {
+    "input" : "",
+    "wa_id" : ""
   },
-  "type" : "whatsApp/v1/sendMessage"
+  "messages" : {
+    "id" : ""
+  }
 }
 ```
 

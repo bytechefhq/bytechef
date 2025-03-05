@@ -31,18 +31,7 @@ Generates a random integer value.
 | startInclusive | Start Inclusive | INTEGER | The minimum possible generated value. | true |
 | endInclusive | End Inclusive | INTEGER | The maximum possible generated value. | true |
 
-
-#### Output
-
-
-
-Type: INTEGER
-
-
-
-
-
-#### JSON Example
+#### Example JSON Structure
 ```json
 {
   "label" : "Random Integer",
@@ -54,6 +43,18 @@ Type: INTEGER
   "type" : "randomHelper/v1/randomInt"
 }
 ```
+
+#### Output
+
+
+
+Type: INTEGER
+
+
+
+
+
+
 
 
 ### Random Float
@@ -68,18 +69,7 @@ Generates a random float value.
 | startInclusive | Start Inclusive | INTEGER | The minimum possible generated value. | true |
 | endInclusive | End Inclusive | INTEGER | The maximum possible generated value. | true |
 
-
-#### Output
-
-
-
-Type: NUMBER
-
-
-
-
-
-#### JSON Example
+#### Example JSON Structure
 ```json
 {
   "label" : "Random Float",
@@ -91,6 +81,18 @@ Type: NUMBER
   "type" : "randomHelper/v1/randomFloat"
 }
 ```
+
+#### Output
+
+
+
+Type: NUMBER
+
+
+
+
+
+
 
 
 

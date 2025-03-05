@@ -28,6 +28,17 @@ Creates a temporary script that executes bash commands. The script is afterwards
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | script | Script | STRING | Script written in bash. Multiple commands are possible with the ';' separator. | true |
 
+#### Example JSON Structure
+```json
+{
+  "label" : "Execute",
+  "name" : "execute",
+  "parameters" : {
+    "script" : ""
+  },
+  "type" : "bash/v1/execute"
+}
+```
 
 #### Output
 
@@ -44,17 +55,7 @@ Type: STRING
 
 
 
-#### JSON Example
-```json
-{
-  "label" : "Execute",
-  "name" : "execute",
-  "parameters" : {
-    "script" : ""
-  },
-  "type" : "bash/v1/execute"
-}
-```
+
 
 
 

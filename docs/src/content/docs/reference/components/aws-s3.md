@@ -54,6 +54,18 @@ Get the AWS S3 object.
 | filename | Filename | STRING | Filename to set for binary data. | true |
 | key | Key | STRING | Key is most likely the name of the file. | true |
 
+#### Example JSON Structure
+```json
+{
+  "label" : "Get Object",
+  "name" : "getObject",
+  "parameters" : {
+    "filename" : "",
+    "key" : ""
+  },
+  "type" : "awsS3/v1/getObject"
+}
+```
 
 #### Output
 
@@ -74,16 +86,13 @@ Type: FILE_ENTRY
 
 
 
-#### JSON Example
+#### Output Example
 ```json
 {
-  "label" : "Get Object",
-  "name" : "getObject",
-  "parameters" : {
-    "filename" : "",
-    "key" : ""
-  },
-  "type" : "awsS3/v1/getObject"
+  "extension" : "",
+  "mimeType" : "",
+  "name" : "",
+  "url" : ""
 }
 ```
 
@@ -99,6 +108,17 @@ Get the url of an AWS S3 object.
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | key | Key or Entity Tag (Etag) | STRING | Key is most likely the name of the file. | true |
 
+#### Example JSON Structure
+```json
+{
+  "label" : "Get URL",
+  "name" : "getUrl",
+  "parameters" : {
+    "key" : ""
+  },
+  "type" : "awsS3/v1/getUrl"
+}
+```
 
 #### Output
 
@@ -115,17 +135,7 @@ Type: STRING
 
 
 
-#### JSON Example
-```json
-{
-  "label" : "Get URL",
-  "name" : "getUrl",
-  "parameters" : {
-    "key" : ""
-  },
-  "type" : "awsS3/v1/getUrl"
-}
-```
+
 
 
 ### List Objects
@@ -139,24 +149,7 @@ Get the list AWS S3 objects. Every object needs to have read permission in order
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | prefix | Prefix | STRING | The prefix of an AWS S3 objects. | true |
 
-
-#### Output
-
-
-
-Type: ARRAY
-
-
-#### Properties
-
-|     Name     |     Type     |     Description     |
-|:------------:|:------------:|:-------------------:|
-|  | OBJECT <details> <summary> Properties </summary> {STRING\(key), STRING\(suffix), STRING\(uri)} </details> |  |
-
-
-
-
-#### JSON Example
+#### Example JSON Structure
 ```json
 {
   "label" : "List Objects",
@@ -166,6 +159,36 @@ Type: ARRAY
   },
   "type" : "awsS3/v1/listObjects"
 }
+```
+
+#### Output
+
+
+
+Type: ARRAY
+
+
+Items Type: OBJECT
+
+
+#### Properties
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| key | STRING |  |
+| suffix | STRING |  |
+| uri | STRING |  |
+
+
+
+
+
+#### Output Example
+```json
+[ {
+  "key" : "",
+  "suffix" : "",
+  "uri" : ""
+} ]
 ```
 
 
@@ -181,18 +204,7 @@ You can share an object with a pre-signed URL for up to 12 hours or until your s
 | key | Key | STRING | Key is most likely the name of the file. | true |
 | signatureDuration | Signature Duration | STRING | Time interval until the pre-signed URL expires | true |
 
-
-#### Output
-
-
-
-Type: STRING
-
-
-
-
-
-#### JSON Example
+#### Example JSON Structure
 ```json
 {
   "label" : "Get Pre-signed Object",
@@ -204,6 +216,18 @@ Type: STRING
   "type" : "awsS3/v1/presignGetObject"
 }
 ```
+
+#### Output
+
+
+
+Type: STRING
+
+
+
+
+
+
 
 
 ### Put Object
@@ -219,18 +243,7 @@ Store an object to AWS S3.
 | key | Key | STRING | Key is most likely the name of the file. | true |
 | acl | ACL | STRING <details> <summary> Options </summary> authenticated-read, aws-exec-read, bucket-owner-read, bucket-owner-full-control, private, public-read, public-read-write </details> | The canned ACL to apply to the object. | null |
 
-
-#### Output
-
-
-
-Type: STRING
-
-
-
-
-
-#### JSON Example
+#### Example JSON Structure
 ```json
 {
   "label" : "Put Object",
@@ -248,6 +261,18 @@ Type: STRING
   "type" : "awsS3/v1/putObject"
 }
 ```
+
+#### Output
+
+
+
+Type: STRING
+
+
+
+
+
+
 
 
 

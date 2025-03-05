@@ -30,12 +30,7 @@ null
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | text | | STRING |  | null |
 
-
-#### Output
-
-This action does not produce any output.
-
-#### JSON Example
+#### Example JSON Structure
 ```json
 {
   "label" : "Debug",
@@ -46,6 +41,12 @@ This action does not produce any output.
   "type" : "logger/v1/debug"
 }
 ```
+
+#### Output
+
+This action does not produce any output.
+
+
 
 
 ### Error
@@ -59,12 +60,7 @@ null
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | text | | STRING |  | null |
 
-
-#### Output
-
-This action does not produce any output.
-
-#### JSON Example
+#### Example JSON Structure
 ```json
 {
   "label" : "Error",
@@ -75,6 +71,12 @@ This action does not produce any output.
   "type" : "logger/v1/error"
 }
 ```
+
+#### Output
+
+This action does not produce any output.
+
+
 
 
 ### Info
@@ -88,12 +90,7 @@ null
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | text | | STRING |  | null |
 
-
-#### Output
-
-This action does not produce any output.
-
-#### JSON Example
+#### Example JSON Structure
 ```json
 {
   "label" : "Info",
@@ -104,6 +101,12 @@ This action does not produce any output.
   "type" : "logger/v1/info"
 }
 ```
+
+#### Output
+
+This action does not produce any output.
+
+
 
 
 ### Warn
@@ -117,12 +120,7 @@ null
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | text | | STRING |  | null |
 
-
-#### Output
-
-This action does not produce any output.
-
-#### JSON Example
+#### Example JSON Structure
 ```json
 {
   "label" : "Warn",
@@ -133,6 +131,12 @@ This action does not produce any output.
   "type" : "logger/v1/warn"
 }
 ```
+
+#### Output
+
+This action does not produce any output.
+
+
 
 
 

@@ -51,24 +51,7 @@ Gets a list of comments left on the file.
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | fileKey | File Key | STRING | File to get comments from. Figma file key copy from Figma file URL. | true |
 
-
-#### Output
-
-
-
-Type: ARRAY
-
-
-#### Properties
-
-|     Name     |     Type     |     Description     |
-|:------------:|:------------:|:-------------------:|
-|  | OBJECT <details> <summary> Properties </summary> {STRING\(id), STRING\(file_key), STRING\(parent_id), {STRING\(id), STRING\(handle), STRING\(img_url), STRING\(email)}\(user)} </details> |  |
-
-
-
-
-#### JSON Example
+#### Example JSON Structure
 ```json
 {
   "label" : "Get Comments",
@@ -78,6 +61,43 @@ Type: ARRAY
   },
   "type" : "figma/v1/getComments"
 }
+```
+
+#### Output
+
+
+
+Type: ARRAY
+
+
+Items Type: OBJECT
+
+
+#### Properties
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| id | STRING |  |
+| file_key | STRING |  |
+| parent_id | STRING |  |
+| user | OBJECT <details> <summary> Properties </summary> {STRING\(id), STRING\(handle), STRING\(img_url), STRING\(email)} </details> |  |
+
+
+
+
+
+#### Output Example
+```json
+[ {
+  "id" : "",
+  "file_key" : "",
+  "parent_id" : "",
+  "user" : {
+    "id" : "",
+    "handle" : "",
+    "img_url" : "",
+    "email" : ""
+  }
+} ]
 ```
 
 
@@ -93,6 +113,18 @@ Posts a new comment on the file.
 | fileKey | File Key | STRING | File to add comments in. Figma file key copy from Figma file URL. | true |
 | message | Comment | STRING | Comment to post on the file. | true |
 
+#### Example JSON Structure
+```json
+{
+  "label" : "Post Comment",
+  "name" : "postComment",
+  "parameters" : {
+    "fileKey" : "",
+    "message" : ""
+  },
+  "type" : "figma/v1/postComment"
+}
+```
 
 #### Output
 
@@ -113,16 +145,13 @@ Type: OBJECT
 
 
 
-#### JSON Example
+#### Output Example
 ```json
 {
-  "label" : "Post Comment",
-  "name" : "postComment",
-  "parameters" : {
-    "fileKey" : "",
-    "message" : ""
-  },
-  "type" : "figma/v1/postComment"
+  "id" : "",
+  "file_key" : "",
+  "parent_id" : "",
+  "message" : ""
 }
 ```
 

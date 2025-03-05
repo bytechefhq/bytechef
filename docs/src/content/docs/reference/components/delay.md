@@ -30,12 +30,7 @@ Delay action execution.
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | millis | Millis | INTEGER | Time in milliseconds. | true |
 
-
-#### Output
-
-This action does not produce any output.
-
-#### JSON Example
+#### Example JSON Structure
 ```json
 {
   "label" : "Sleep",
@@ -46,6 +41,12 @@ This action does not produce any output.
   "type" : "delay/v1/sleep"
 }
 ```
+
+#### Output
+
+This action does not produce any output.
+
+
 
 
 

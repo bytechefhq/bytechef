@@ -55,6 +55,21 @@ Returns all deals.
 | status | Status | STRING <details> <summary> Options </summary> open, won, lost, deleted, all_not_deleted </details> |  | false |
 | sort | Sort | STRING | The field names and sorting mode separated by a comma. Only first-level field keys are supported (no nested keys). | false |
 
+#### Example JSON Structure
+```json
+{
+  "label" : "Get Deals",
+  "name" : "getDeals",
+  "parameters" : {
+    "user_id" : 1,
+    "filter_id" : 1,
+    "stage_id" : 1,
+    "status" : "",
+    "sort" : ""
+  },
+  "type" : "pipedrive/v1/getDeals"
+}
+```
 
 #### Output
 
@@ -72,19 +87,29 @@ Type: OBJECT
 
 
 
-#### JSON Example
+#### Output Example
 ```json
 {
-  "label" : "Get Deals",
-  "name" : "getDeals",
-  "parameters" : {
-    "user_id" : 1,
-    "filter_id" : 1,
+  "data" : [ {
+    "id" : 1,
+    "user_id" : {
+      "id" : 1,
+      "name" : "",
+      "email" : ""
+    },
+    "person_id" : {
+      "name" : ""
+    },
+    "org_id" : {
+      "name" : "",
+      "owner_id" : ""
+    },
     "stage_id" : 1,
-    "status" : "",
-    "sort" : ""
-  },
-  "type" : "pipedrive/v1/getDeals"
+    "title" : "",
+    "value" : 1,
+    "currency" : "",
+    "status" : ""
+  } ]
 }
 ```
 
@@ -111,24 +136,7 @@ Adds a new deal.
 | probability | Probability | NUMBER | The success probability percentage of the deal. Used/shown only when `deal_probability` for the pipeline of the deal is enabled. | false |
 | lost_reason | Lost Reason | STRING | The optional message about why the deal was lost. | false |
 
-
-#### Output
-
-
-
-Type: OBJECT
-
-
-#### Properties
-
-|     Name     |     Type     |     Description     |
-|:------------:|:------------:|:-------------------:|
-| data | OBJECT <details> <summary> Properties </summary> {INTEGER\(id), {INTEGER\(id), STRING\(name), STRING\(email)}\(user_id), {STRING\(name)}\(person_id), {STRING\(name), STRING\(owner_id)}\(org_id), INTEGER\(stage_id), STRING\(title), INTEGER\(value), STRING\(currency), STRING\(status)} </details> |  |
-
-
-
-
-#### JSON Example
+#### Example JSON Structure
 ```json
 {
   "label" : "Add Deal",
@@ -151,6 +159,48 @@ Type: OBJECT
 }
 ```
 
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| data | OBJECT <details> <summary> Properties </summary> {INTEGER\(id), {INTEGER\(id), STRING\(name), STRING\(email)}\(user_id), {STRING\(name)}\(person_id), {STRING\(name), STRING\(owner_id)}\(org_id), INTEGER\(stage_id), STRING\(title), INTEGER\(value), STRING\(currency), STRING\(status)} </details> |  |
+
+
+
+
+#### Output Example
+```json
+{
+  "data" : {
+    "id" : 1,
+    "user_id" : {
+      "id" : 1,
+      "name" : "",
+      "email" : ""
+    },
+    "person_id" : {
+      "name" : ""
+    },
+    "org_id" : {
+      "name" : "",
+      "owner_id" : ""
+    },
+    "stage_id" : 1,
+    "title" : "",
+    "value" : 1,
+    "currency" : "",
+    "status" : ""
+  }
+}
+```
+
 
 ### Search Deals
 Name: searchDeals
@@ -169,24 +219,7 @@ Searches all deals by title, notes and/or custom fields.
 | status | Status | STRING <details> <summary> Options </summary> open, won, lost </details> | Will filter deals by the provided specific status. | false |
 | include_fields | Include Fields | STRING <details> <summary> Options </summary> deal.cc_email </details> | Supports including optional fields in the results which are not provided by default. | false |
 
-
-#### Output
-
-
-
-Type: OBJECT
-
-
-#### Properties
-
-|     Name     |     Type     |     Description     |
-|:------------:|:------------:|:-------------------:|
-| data | OBJECT <details> <summary> Properties </summary> {[{STRING\(id), STRING\(type), {INTEGER\(id), STRING\(name), STRING\(email)}\(user_id), {STRING\(name)}\(person_id), {STRING\(name), STRING\(owner_id)}\(org_id), INTEGER\(stage_id), STRING\(title), INTEGER\(value), STRING\(currency), STRING\(status)}]\(items)} </details> |  |
-
-
-
-
-#### JSON Example
+#### Example JSON Structure
 ```json
 {
   "label" : "Search Deals",
@@ -204,6 +237,51 @@ Type: OBJECT
 }
 ```
 
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| data | OBJECT <details> <summary> Properties </summary> {[{STRING\(id), STRING\(type), {INTEGER\(id), STRING\(name), STRING\(email)}\(user_id), {STRING\(name)}\(person_id), {STRING\(name), STRING\(owner_id)}\(org_id), INTEGER\(stage_id), STRING\(title), INTEGER\(value), STRING\(currency), STRING\(status)}]\(items)} </details> |  |
+
+
+
+
+#### Output Example
+```json
+{
+  "data" : {
+    "items" : [ {
+      "id" : "",
+      "type" : "",
+      "user_id" : {
+        "id" : 1,
+        "name" : "",
+        "email" : ""
+      },
+      "person_id" : {
+        "name" : ""
+      },
+      "org_id" : {
+        "name" : "",
+        "owner_id" : ""
+      },
+      "stage_id" : 1,
+      "title" : "",
+      "value" : 1,
+      "currency" : "",
+      "status" : ""
+    } ]
+  }
+}
+```
+
 
 ### Delete Deal
 Name: deleteDeal
@@ -216,6 +294,17 @@ Marks a deal as deleted. After 30 days, the deal will be permanently deleted.
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | id | Deal ID | INTEGER | Id of the deal to delete. | true |
 
+#### Example JSON Structure
+```json
+{
+  "label" : "Delete Deal",
+  "name" : "deleteDeal",
+  "parameters" : {
+    "id" : 1
+  },
+  "type" : "pipedrive/v1/deleteDeal"
+}
+```
 
 #### Output
 
@@ -233,15 +322,12 @@ Type: OBJECT
 
 
 
-#### JSON Example
+#### Output Example
 ```json
 {
-  "label" : "Delete Deal",
-  "name" : "deleteDeal",
-  "parameters" : {
+  "data" : {
     "id" : 1
-  },
-  "type" : "pipedrive/v1/deleteDeal"
+  }
 }
 ```
 
@@ -257,6 +343,17 @@ Returns the details of a specific deal.
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | id | Deal | INTEGER |  | true |
 
+#### Example JSON Structure
+```json
+{
+  "label" : "Get Details of Deal",
+  "name" : "getDealDetails",
+  "parameters" : {
+    "id" : 1
+  },
+  "type" : "pipedrive/v1/getDealDetails"
+}
+```
 
 #### Output
 
@@ -274,15 +371,29 @@ Type: OBJECT
 
 
 
-#### JSON Example
+#### Output Example
 ```json
 {
-  "label" : "Get Details of Deal",
-  "name" : "getDealDetails",
-  "parameters" : {
-    "id" : 1
-  },
-  "type" : "pipedrive/v1/getDealDetails"
+  "data" : {
+    "id" : 1,
+    "user_id" : {
+      "id" : 1,
+      "name" : "",
+      "email" : ""
+    },
+    "person_id" : {
+      "name" : ""
+    },
+    "org_id" : {
+      "name" : "",
+      "owner_id" : ""
+    },
+    "stage_id" : 1,
+    "title" : "",
+    "value" : 1,
+    "currency" : "",
+    "status" : ""
+  }
 }
 ```
 
@@ -303,6 +414,22 @@ Returns multiple leads. Leads are sorted by the time they were created, from old
 | filter_id | Filter ID | INTEGER | Filter to use | false |
 | sort | Sort | STRING <details> <summary> Options </summary> id, title, owner_id, creator_id, was_seen, expected_close_date, next_activity_id, add_time, update_time </details> | The field names and sorting mode separated by a comma. Only first-level field keys are supported (no nested keys). | false |
 
+#### Example JSON Structure
+```json
+{
+  "label" : "Get Leads",
+  "name" : "getLeads",
+  "parameters" : {
+    "archived_status" : "",
+    "owner_id" : 1,
+    "person_id" : 1,
+    "organization_id" : 1,
+    "filter_id" : 1,
+    "sort" : ""
+  },
+  "type" : "pipedrive/v1/getLeads"
+}
+```
 
 #### Output
 
@@ -320,20 +447,20 @@ Type: OBJECT
 
 
 
-#### JSON Example
+#### Output Example
 ```json
 {
-  "label" : "Get Leads",
-  "name" : "getLeads",
-  "parameters" : {
-    "archived_status" : "",
+  "data" : [ {
+    "id" : "",
+    "title" : "",
     "owner_id" : 1,
-    "person_id" : 1,
-    "organization_id" : 1,
-    "filter_id" : 1,
-    "sort" : ""
-  },
-  "type" : "pipedrive/v1/getLeads"
+    "value" : {
+      "amount" : 1,
+      "currency" : ""
+    },
+    "expected_close_date" : "2021-01-01",
+    "person_id" : 1
+  } ]
 }
 ```
 
@@ -355,24 +482,7 @@ Creates a lead. A lead always has to be linked to a person or an organization or
 | value | Value | OBJECT <details> <summary> Properties </summary> {NUMBER\(amount), STRING\(currency)} </details> | The potential value of the lead | false |
 | expected_close_date | Expected Close Date | DATE | The date of when the deal which will be created from the lead is expected to be closed. In ISO 8601 format: YYYY-MM-DD. | false |
 
-
-#### Output
-
-
-
-Type: OBJECT
-
-
-#### Properties
-
-|     Name     |     Type     |     Description     |
-|:------------:|:------------:|:-------------------:|
-| data | OBJECT <details> <summary> Properties </summary> {STRING\(id), STRING\(title), INTEGER\(owner_id), {INTEGER\(amount), STRING\(currency)}\(value), DATE\(expected_close_date), INTEGER\(person_id)} </details> |  |
-
-
-
-
-#### JSON Example
+#### Example JSON Structure
 ```json
 {
   "label" : "Add Lead",
@@ -393,6 +503,39 @@ Type: OBJECT
 }
 ```
 
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| data | OBJECT <details> <summary> Properties </summary> {STRING\(id), STRING\(title), INTEGER\(owner_id), {INTEGER\(amount), STRING\(currency)}\(value), DATE\(expected_close_date), INTEGER\(person_id)} </details> |  |
+
+
+
+
+#### Output Example
+```json
+{
+  "data" : {
+    "id" : "",
+    "title" : "",
+    "owner_id" : 1,
+    "value" : {
+      "amount" : 1,
+      "currency" : ""
+    },
+    "expected_close_date" : "2021-01-01",
+    "person_id" : 1
+  }
+}
+```
+
 
 ### Delete Lead
 Name: deleteLead
@@ -405,6 +548,17 @@ Deletes a specific lead.
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | id | Lead ID | STRING | The ID of the lead | true |
 
+#### Example JSON Structure
+```json
+{
+  "label" : "Delete Lead",
+  "name" : "deleteLead",
+  "parameters" : {
+    "id" : ""
+  },
+  "type" : "pipedrive/v1/deleteLead"
+}
+```
 
 #### Output
 
@@ -422,15 +576,12 @@ Type: OBJECT
 
 
 
-#### JSON Example
+#### Output Example
 ```json
 {
-  "label" : "Delete Lead",
-  "name" : "deleteLead",
-  "parameters" : {
+  "data" : {
     "id" : ""
-  },
-  "type" : "pipedrive/v1/deleteLead"
+  }
 }
 ```
 
@@ -446,6 +597,17 @@ Returns details of a specific lead.
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | id | Lead ID | STRING |  | true |
 
+#### Example JSON Structure
+```json
+{
+  "label" : "Get Lead Details",
+  "name" : "getLeadDetails",
+  "parameters" : {
+    "id" : ""
+  },
+  "type" : "pipedrive/v1/getLeadDetails"
+}
+```
 
 #### Output
 
@@ -463,15 +625,20 @@ Type: OBJECT
 
 
 
-#### JSON Example
+#### Output Example
 ```json
 {
-  "label" : "Get Lead Details",
-  "name" : "getLeadDetails",
-  "parameters" : {
-    "id" : ""
-  },
-  "type" : "pipedrive/v1/getLeadDetails"
+  "data" : {
+    "id" : "",
+    "title" : "",
+    "owner_id" : 1,
+    "value" : {
+      "amount" : 1,
+      "currency" : ""
+    },
+    "expected_close_date" : "2021-01-01",
+    "person_id" : 1
+  }
 }
 ```
 
@@ -492,6 +659,22 @@ Searches all leads by title, notes and/or custom fields.
 | organization_id | Organization ID | INTEGER | Will filter leads by the provided organization ID. | false |
 | include_fields | Include Fields | STRING <details> <summary> Options </summary> lead.was_seen </details> | Supports including optional fields in the results which are not provided by default. | false |
 
+#### Example JSON Structure
+```json
+{
+  "label" : "Search Leads",
+  "name" : "searchLeads",
+  "parameters" : {
+    "term" : "",
+    "fields" : "",
+    "exact_match" : false,
+    "person_id" : 1,
+    "organization_id" : 1,
+    "include_fields" : ""
+  },
+  "type" : "pipedrive/v1/searchLeads"
+}
+```
 
 #### Output
 
@@ -509,20 +692,22 @@ Type: OBJECT
 
 
 
-#### JSON Example
+#### Output Example
 ```json
 {
-  "label" : "Search Leads",
-  "name" : "searchLeads",
-  "parameters" : {
-    "term" : "",
-    "fields" : "",
-    "exact_match" : false,
-    "person_id" : 1,
-    "organization_id" : 1,
-    "include_fields" : ""
-  },
-  "type" : "pipedrive/v1/searchLeads"
+  "data" : {
+    "items" : [ {
+      "id" : "",
+      "title" : "",
+      "owner_id" : 1,
+      "value" : {
+        "amount" : 1,
+        "currency" : ""
+      },
+      "expected_close_date" : "2021-01-01",
+      "person_id" : 1
+    } ]
+  }
 }
 ```
 
@@ -541,6 +726,20 @@ Returns all organizations.
 | first_char | First Characters | STRING | Organizations whose name starts with the specified letter will be returned (case insensitive) | false |
 | sort | Sort | STRING | The field names and sorting mode separated by a comma (`field_name_1ASC`, `field_name_2 DESC`). Only first-level field keys are supported (no nested keys). | false |
 
+#### Example JSON Structure
+```json
+{
+  "label" : "Get All Organizations",
+  "name" : "getOrganizations",
+  "parameters" : {
+    "user_id" : 1,
+    "filter_id" : 1,
+    "first_char" : "",
+    "sort" : ""
+  },
+  "type" : "pipedrive/v1/getOrganizations"
+}
+```
 
 #### Output
 
@@ -558,18 +757,19 @@ Type: OBJECT
 
 
 
-#### JSON Example
+#### Output Example
 ```json
 {
-  "label" : "Get All Organizations",
-  "name" : "getOrganizations",
-  "parameters" : {
-    "user_id" : 1,
-    "filter_id" : 1,
-    "first_char" : "",
-    "sort" : ""
-  },
-  "type" : "pipedrive/v1/getOrganizations"
+  "data" : [ {
+    "id" : 1,
+    "company_id" : 1,
+    "owner_id" : {
+      "id" : 1,
+      "name" : "",
+      "email" : ""
+    },
+    "name" : ""
+  } ]
 }
 ```
 
@@ -586,6 +786,18 @@ Adds a new organization.
 | name | Name | STRING | The name of the organization. | true |
 | owner_id | Owner ID | INTEGER | ID of the user who will be marked as the owner of this organization. | false |
 
+#### Example JSON Structure
+```json
+{
+  "label" : "Add Organization",
+  "name" : "addOrganization",
+  "parameters" : {
+    "name" : "",
+    "owner_id" : 1
+  },
+  "type" : "pipedrive/v1/addOrganization"
+}
+```
 
 #### Output
 
@@ -603,16 +815,19 @@ Type: OBJECT
 
 
 
-#### JSON Example
+#### Output Example
 ```json
 {
-  "label" : "Add Organization",
-  "name" : "addOrganization",
-  "parameters" : {
-    "name" : "",
-    "owner_id" : 1
-  },
-  "type" : "pipedrive/v1/addOrganization"
+  "data" : {
+    "id" : 1,
+    "company_id" : 1,
+    "owner_id" : {
+      "id" : 1,
+      "name" : "",
+      "email" : ""
+    },
+    "name" : ""
+  }
 }
 ```
 
@@ -630,6 +845,19 @@ Searches all organizations by name, address, notes and/or custom fields. This en
 | fields | Fields | STRING <details> <summary> Options </summary> address, custom_fields, notes, name </details> | A comma-separated string array. The fields to perform the search from. Defaults to all of them. | false |
 | exact_match | Exact Match | BOOLEAN <details> <summary> Options </summary> true, false </details> | When enabled, only full exact matches against the given term are returned. It is <b>not</b> case sensitive. | false |
 
+#### Example JSON Structure
+```json
+{
+  "label" : "Search Organizations",
+  "name" : "searchOrganization",
+  "parameters" : {
+    "term" : "",
+    "fields" : "",
+    "exact_match" : false
+  },
+  "type" : "pipedrive/v1/searchOrganization"
+}
+```
 
 #### Output
 
@@ -647,17 +875,21 @@ Type: OBJECT
 
 
 
-#### JSON Example
+#### Output Example
 ```json
 {
-  "label" : "Search Organizations",
-  "name" : "searchOrganization",
-  "parameters" : {
-    "term" : "",
-    "fields" : "",
-    "exact_match" : false
-  },
-  "type" : "pipedrive/v1/searchOrganization"
+  "data" : {
+    "items" : [ {
+      "id" : 1,
+      "company_id" : 1,
+      "owner_id" : {
+        "id" : 1,
+        "name" : "",
+        "email" : ""
+      },
+      "name" : ""
+    } ]
+  }
 }
 ```
 
@@ -673,6 +905,17 @@ Marks an organization as deleted. After 30 days, the organization will be perman
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | id | Organization | INTEGER | Organization to delete | true |
 
+#### Example JSON Structure
+```json
+{
+  "label" : "Delete Organization",
+  "name" : "deleteOrganization",
+  "parameters" : {
+    "id" : 1
+  },
+  "type" : "pipedrive/v1/deleteOrganization"
+}
+```
 
 #### Output
 
@@ -690,15 +933,12 @@ Type: OBJECT
 
 
 
-#### JSON Example
+#### Output Example
 ```json
 {
-  "label" : "Delete Organization",
-  "name" : "deleteOrganization",
-  "parameters" : {
+  "data" : {
     "id" : 1
-  },
-  "type" : "pipedrive/v1/deleteOrganization"
+  }
 }
 ```
 
@@ -714,6 +954,17 @@ Returns the details of an organization.
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | id | Organizaton | INTEGER | Organization to get details. | true |
 
+#### Example JSON Structure
+```json
+{
+  "label" : "Get Details of Organization",
+  "name" : "getOrganizationDetails",
+  "parameters" : {
+    "id" : 1
+  },
+  "type" : "pipedrive/v1/getOrganizationDetails"
+}
+```
 
 #### Output
 
@@ -731,15 +982,19 @@ Type: OBJECT
 
 
 
-#### JSON Example
+#### Output Example
 ```json
 {
-  "label" : "Get Details of Organization",
-  "name" : "getOrganizationDetails",
-  "parameters" : {
-    "id" : 1
-  },
-  "type" : "pipedrive/v1/getOrganizationDetails"
+  "data" : {
+    "id" : 1,
+    "company_id" : 1,
+    "owner_id" : {
+      "id" : 1,
+      "name" : "",
+      "email" : ""
+    },
+    "name" : ""
+  }
 }
 ```
 
@@ -758,6 +1013,20 @@ Returns all persons.
 | first_char | First Characters | STRING | Persons whose name starts with the specified letter will be returned (case insensitive) | false |
 | sort | Sort | STRING | The field names and sorting mode separated by a comma. Only first-level field keys are supported (no nested keys). | false |
 
+#### Example JSON Structure
+```json
+{
+  "label" : "Get Persons",
+  "name" : "getPersons",
+  "parameters" : {
+    "user_id" : 1,
+    "filter_id" : 1,
+    "first_char" : "",
+    "sort" : ""
+  },
+  "type" : "pipedrive/v1/getPersons"
+}
+```
 
 #### Output
 
@@ -775,18 +1044,34 @@ Type: OBJECT
 
 
 
-#### JSON Example
+#### Output Example
 ```json
 {
-  "label" : "Get Persons",
-  "name" : "getPersons",
-  "parameters" : {
-    "user_id" : 1,
-    "filter_id" : 1,
-    "first_char" : "",
-    "sort" : ""
-  },
-  "type" : "pipedrive/v1/getPersons"
+  "data" : [ {
+    "id" : 1,
+    "company_id" : 1,
+    "owner_id" : {
+      "id" : 1,
+      "name" : "",
+      "email" : ""
+    },
+    "org_id" : {
+      "name" : "",
+      "owner_id" : 1,
+      "cc_email" : ""
+    },
+    "name" : "",
+    "phone" : [ {
+      "value" : "",
+      "primary" : false,
+      "label" : ""
+    } ],
+    "email" : [ {
+      "value" : "",
+      "primary" : false,
+      "label" : ""
+    } ]
+  } ]
 }
 ```
 
@@ -806,24 +1091,7 @@ Adds a new person.
 | email | Email | ARRAY <details> <summary> Items </summary> [{STRING\(value), BOOLEAN\(primary), STRING\(label)}] </details> | An email addresses related to the person. | false |
 | phone | Phone | ARRAY <details> <summary> Items </summary> [{STRING\(value), BOOLEAN\(primary), STRING\(label)}] </details> | A phone numbers related to the person. | false |
 
-
-#### Output
-
-
-
-Type: OBJECT
-
-
-#### Properties
-
-|     Name     |     Type     |     Description     |
-|:------------:|:------------:|:-------------------:|
-| data | OBJECT <details> <summary> Properties </summary> {INTEGER\(id), INTEGER\(company_id), {INTEGER\(id), STRING\(name), STRING\(email)}\(owner_id), {STRING\(name), INTEGER\(owner_id), STRING\(cc_email)}\(org_id), STRING\(name), [{STRING\(value), BOOLEAN\(primary), STRING\(label)}]\(phone), [{STRING\(value), BOOLEAN\(primary), STRING\(label)}]\(email)} </details> |  |
-
-
-
-
-#### JSON Example
+#### Example JSON Structure
 ```json
 {
   "label" : "Add Person",
@@ -847,6 +1115,53 @@ Type: OBJECT
 }
 ```
 
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| data | OBJECT <details> <summary> Properties </summary> {INTEGER\(id), INTEGER\(company_id), {INTEGER\(id), STRING\(name), STRING\(email)}\(owner_id), {STRING\(name), INTEGER\(owner_id), STRING\(cc_email)}\(org_id), STRING\(name), [{STRING\(value), BOOLEAN\(primary), STRING\(label)}]\(phone), [{STRING\(value), BOOLEAN\(primary), STRING\(label)}]\(email)} </details> |  |
+
+
+
+
+#### Output Example
+```json
+{
+  "data" : {
+    "id" : 1,
+    "company_id" : 1,
+    "owner_id" : {
+      "id" : 1,
+      "name" : "",
+      "email" : ""
+    },
+    "org_id" : {
+      "name" : "",
+      "owner_id" : 1,
+      "cc_email" : ""
+    },
+    "name" : "",
+    "phone" : [ {
+      "value" : "",
+      "primary" : false,
+      "label" : ""
+    } ],
+    "email" : [ {
+      "value" : "",
+      "primary" : false,
+      "label" : ""
+    } ]
+  }
+}
+```
+
 
 ### Search Persons
 Name: searchPersons
@@ -862,6 +1177,20 @@ Searches all persons by name, email, phone, notes and/or custom fields.
 | exact_match | Exact Match | BOOLEAN <details> <summary> Options </summary> true, false </details> | When enabled, only full exact matches against the given term are returned. It is <b>not</b> case sensitive. | false |
 | organization_id | Organization ID | INTEGER | Will filter persons by the provided organization. | false |
 
+#### Example JSON Structure
+```json
+{
+  "label" : "Search Persons",
+  "name" : "searchPersons",
+  "parameters" : {
+    "term" : "",
+    "fields" : "",
+    "exact_match" : false,
+    "organization_id" : 1
+  },
+  "type" : "pipedrive/v1/searchPersons"
+}
+```
 
 #### Output
 
@@ -879,18 +1208,36 @@ Type: OBJECT
 
 
 
-#### JSON Example
+#### Output Example
 ```json
 {
-  "label" : "Search Persons",
-  "name" : "searchPersons",
-  "parameters" : {
-    "term" : "",
-    "fields" : "",
-    "exact_match" : false,
-    "organization_id" : 1
-  },
-  "type" : "pipedrive/v1/searchPersons"
+  "data" : {
+    "items" : [ {
+      "id" : 1,
+      "company_id" : 1,
+      "owner_id" : {
+        "id" : 1,
+        "name" : "",
+        "email" : ""
+      },
+      "org_id" : {
+        "name" : "",
+        "owner_id" : 1,
+        "cc_email" : ""
+      },
+      "name" : "",
+      "phone" : [ {
+        "value" : "",
+        "primary" : false,
+        "label" : ""
+      } ],
+      "email" : [ {
+        "value" : "",
+        "primary" : false,
+        "label" : ""
+      } ]
+    } ]
+  }
 }
 ```
 
@@ -906,6 +1253,17 @@ Marks a person as deleted. After 30 days, the person will be permanently deleted
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | id | Person | INTEGER | Person to delete | true |
 
+#### Example JSON Structure
+```json
+{
+  "label" : "Delete Person",
+  "name" : "deletePerson",
+  "parameters" : {
+    "id" : 1
+  },
+  "type" : "pipedrive/v1/deletePerson"
+}
+```
 
 #### Output
 
@@ -923,15 +1281,12 @@ Type: OBJECT
 
 
 
-#### JSON Example
+#### Output Example
 ```json
 {
-  "label" : "Delete Person",
-  "name" : "deletePerson",
-  "parameters" : {
+  "data" : {
     "id" : 1
-  },
-  "type" : "pipedrive/v1/deletePerson"
+  }
 }
 ```
 
@@ -947,6 +1302,17 @@ Returns the details of a person. This also returns some additional fields which 
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | id | Person | INTEGER | Person to get details | true |
 
+#### Example JSON Structure
+```json
+{
+  "label" : "Get Details of Person",
+  "name" : "getPersonDetails",
+  "parameters" : {
+    "id" : 1
+  },
+  "type" : "pipedrive/v1/getPersonDetails"
+}
+```
 
 #### Output
 
@@ -964,15 +1330,34 @@ Type: OBJECT
 
 
 
-#### JSON Example
+#### Output Example
 ```json
 {
-  "label" : "Get Details of Person",
-  "name" : "getPersonDetails",
-  "parameters" : {
-    "id" : 1
-  },
-  "type" : "pipedrive/v1/getPersonDetails"
+  "data" : {
+    "id" : 1,
+    "company_id" : 1,
+    "owner_id" : {
+      "id" : 1,
+      "name" : "",
+      "email" : ""
+    },
+    "org_id" : {
+      "name" : "",
+      "owner_id" : 1,
+      "cc_email" : ""
+    },
+    "name" : "",
+    "phone" : [ {
+      "value" : "",
+      "primary" : false,
+      "label" : ""
+    } ],
+    "email" : [ {
+      "value" : "",
+      "primary" : false,
+      "label" : ""
+    } ]
+  }
 }
 ```
 

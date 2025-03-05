@@ -51,6 +51,22 @@ Creates a new company.
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | company | Company | OBJECT <details> <summary> Properties </summary> {STRING\(name), STRING\(emailOne), STRING\(phone), STRING\(website)} </details> |  | false |
 
+#### Example JSON Structure
+```json
+{
+  "label" : "Create Company",
+  "name" : "createCompany",
+  "parameters" : {
+    "company" : {
+      "name" : "",
+      "emailOne" : "",
+      "phone" : "",
+      "website" : ""
+    }
+  },
+  "type" : "teamwork/v1/createCompany"
+}
+```
 
 #### Output
 
@@ -71,20 +87,13 @@ Type: OBJECT
 
 
 
-#### JSON Example
+#### Output Example
 ```json
 {
-  "label" : "Create Company",
-  "name" : "createCompany",
-  "parameters" : {
-    "company" : {
-      "name" : "",
-      "emailOne" : "",
-      "phone" : "",
-      "website" : ""
-    }
-  },
-  "type" : "teamwork/v1/createCompany"
+  "name" : "",
+  "emailOne" : "",
+  "phone" : "",
+  "website" : ""
 }
 ```
 
@@ -101,6 +110,22 @@ Create a new task
 | tasklistId | Task List ID | INTEGER | Task list where new task is added | true |
 | task | Task | OBJECT <details> <summary> Properties </summary> {STRING\(name), STRING\(description), DATE\(dueAt)} </details> |  | false |
 
+#### Example JSON Structure
+```json
+{
+  "label" : "Create Task",
+  "name" : "createTask",
+  "parameters" : {
+    "tasklistId" : 1,
+    "task" : {
+      "name" : "",
+      "description" : "",
+      "dueAt" : "2021-01-01"
+    }
+  },
+  "type" : "teamwork/v1/createTask"
+}
+```
 
 #### Output
 
@@ -120,20 +145,12 @@ Type: OBJECT
 
 
 
-#### JSON Example
+#### Output Example
 ```json
 {
-  "label" : "Create Task",
-  "name" : "createTask",
-  "parameters" : {
-    "tasklistId" : 1,
-    "task" : {
-      "name" : "",
-      "description" : "",
-      "dueAt" : "2021-01-01"
-    }
-  },
-  "type" : "teamwork/v1/createTask"
+  "name" : "",
+  "description" : "",
+  "dueAt" : ""
 }
 ```
 

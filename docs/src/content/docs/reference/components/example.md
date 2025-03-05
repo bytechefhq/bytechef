@@ -35,6 +35,14 @@ Name: dummyAction
 
 Description
 
+#### Example JSON Structure
+```json
+{
+  "label" : "Title",
+  "name" : "dummyAction",
+  "type" : "example/v1/dummyAction"
+}
+```
 
 #### Output
 
@@ -46,14 +54,7 @@ Type: STRING
 
 
 
-#### JSON Example
-```json
-{
-  "label" : "Title",
-  "name" : "dummyAction",
-  "type" : "example/v1/dummyAction"
-}
-```
+
 
 
 

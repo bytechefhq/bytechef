@@ -52,6 +52,18 @@ Add labels to an email in your Gmail account.
 | id | Message ID | STRING | ID of the message to add labels | true |
 | labelIds | Labels | ARRAY <details> <summary> Items </summary> [STRING] </details> | Labels to add to this message. You can add up to 100 labels with each update. | true |
 
+#### Example JSON Structure
+```json
+{
+  "label" : "Add Labels",
+  "name" : "addLabels",
+  "parameters" : {
+    "id" : "",
+    "labelIds" : [ "" ]
+  },
+  "type" : "googleMail/v1/addLabels"
+}
+```
 
 #### Output
 
@@ -71,16 +83,12 @@ Type: OBJECT
 
 
 
-#### JSON Example
+#### Output Example
 ```json
 {
-  "label" : "Add Labels",
-  "name" : "addLabels",
-  "parameters" : {
-    "id" : "",
-    "labelIds" : [ "" ]
-  },
-  "type" : "googleMail/v1/addLabels"
+  "id" : "",
+  "threadId" : "",
+  "labelIds" : [ "" ]
 }
 ```
 
@@ -96,12 +104,7 @@ Delete an email from your Gmail account permanently via Id
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | id | Message ID | STRING | The ID of the message to delete. | true |
 
-
-#### Output
-
-This action does not produce any output.
-
-#### JSON Example
+#### Example JSON Structure
 ```json
 {
   "label" : "Delete Mail",
@@ -112,6 +115,12 @@ This action does not produce any output.
   "type" : "googleMail/v1/deleteMail"
 }
 ```
+
+#### Output
+
+This action does not produce any output.
+
+
 
 
 ### Get Mail
@@ -127,12 +136,7 @@ Get an email from your Gmail account via Id
 | format | Format | STRING <details> <summary> Options </summary> simple, minimal, full, raw, metadata </details> | The format to return the message in. | false |
 | metadataHeaders | Metadata headers | ARRAY <details> <summary> Items </summary> [STRING] </details> | When given and format is METADATA, only include headers specified. | false |
 
-
-#### Output
-
-The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
-
-#### JSON Example
+#### Example JSON Structure
 ```json
 {
   "label" : "Get Mail",
@@ -145,6 +149,12 @@ The output for this action is dynamic and may vary depending on the input parame
   "type" : "googleMail/v1/getMail"
 }
 ```
+
+#### Output
+
+The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
+
+
 
 
 ### Get Thread
@@ -160,12 +170,7 @@ Gets the specified thread.
 | format | Format | STRING <details> <summary> Options </summary> simple, minimal, full, raw, metadata </details> | The format to return the message in. | false |
 | metadataHeaders | Metadata headers | ARRAY <details> <summary> Items </summary> [STRING] </details> | When given and format is METADATA, only include headers specified. | false |
 
-
-#### Output
-
-The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
-
-#### JSON Example
+#### Example JSON Structure
 ```json
 {
   "label" : "Get Thread",
@@ -178,6 +183,12 @@ The output for this action is dynamic and may vary depending on the input parame
   "type" : "googleMail/v1/getThread"
 }
 ```
+
+#### Output
+
+The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
+
+
 
 
 ### Reply to Email
@@ -196,6 +207,27 @@ Send a reply to an email message.
 | body | Body | STRING | Body text of the email | true |
 | attachments | Attachments | ARRAY <details> <summary> Items </summary> [FILE_ENTRY] </details> | A list of attachments to send with the email. | null |
 
+#### Example JSON Structure
+```json
+{
+  "label" : "Reply to Email",
+  "name" : "replyToEmail",
+  "parameters" : {
+    "id" : "",
+    "to" : [ "" ],
+    "bcc" : [ "" ],
+    "cc" : [ "" ],
+    "body" : "",
+    "attachments" : [ {
+      "extension" : "",
+      "mimeType" : "",
+      "name" : "",
+      "url" : ""
+    } ]
+  },
+  "type" : "googleMail/v1/replyToEmail"
+}
+```
 
 #### Output
 
@@ -215,25 +247,12 @@ Type: OBJECT
 
 
 
-#### JSON Example
+#### Output Example
 ```json
 {
-  "label" : "Reply to Email",
-  "name" : "replyToEmail",
-  "parameters" : {
-    "id" : "",
-    "to" : [ "" ],
-    "bcc" : [ "" ],
-    "cc" : [ "" ],
-    "body" : "",
-    "attachments" : [ {
-      "extension" : "",
-      "mimeType" : "",
-      "name" : "",
-      "url" : ""
-    } ]
-  },
-  "type" : "googleMail/v1/replyToEmail"
+  "id" : "",
+  "threadId" : "",
+  "labelIds" : [ "" ]
 }
 ```
 
@@ -256,6 +275,24 @@ Lists the messages in the user's mailbox.
 | labelIds | Labels | ARRAY <details> <summary> Items </summary> [STRING] </details> | Only return messages with labels that match all of the specified label IDs. Messages in a thread might have labels that other messages in the same thread don't have. | false |
 | includeSpamTrash | Include Spam Trash | BOOLEAN <details> <summary> Options </summary> true, false </details> | Include messages from SPAM and TRASH in the results. | false |
 
+#### Example JSON Structure
+```json
+{
+  "label" : "Search Email",
+  "name" : "searchEmail",
+  "parameters" : {
+    "maxResults" : 0.0,
+    "pageToken" : "",
+    "from" : "",
+    "to" : "",
+    "subject" : "",
+    "category" : "",
+    "labelIds" : [ "" ],
+    "includeSpamTrash" : false
+  },
+  "type" : "googleMail/v1/searchEmail"
+}
+```
 
 #### Output
 
@@ -275,22 +312,15 @@ Type: OBJECT
 
 
 
-#### JSON Example
+#### Output Example
 ```json
 {
-  "label" : "Search Email",
-  "name" : "searchEmail",
-  "parameters" : {
-    "maxResults" : 0.0,
-    "pageToken" : "",
-    "from" : "",
-    "to" : "",
-    "subject" : "",
-    "category" : "",
-    "labelIds" : [ "" ],
-    "includeSpamTrash" : false
-  },
-  "type" : "googleMail/v1/searchEmail"
+  "messages" : [ {
+    "id" : "",
+    "threadId" : ""
+  } ],
+  "nextPageToken" : "",
+  "resultSizeEstimate" : 0.0
 }
 ```
 
@@ -312,26 +342,7 @@ Sends the specified message to the recipients in the To, Cc, and Bcc headers.
 | body | Body | STRING | Body text of the email | true |
 | attachments | Attachments | ARRAY <details> <summary> Items </summary> [FILE_ENTRY] </details> | A list of attachments to send with the email. | null |
 
-
-#### Output
-
-
-
-Type: OBJECT
-
-
-#### Properties
-
-|     Name     |     Type     |     Description     |
-|:------------:|:------------:|:-------------------:|
-| id | STRING | The ID of the message. |
-| threadId | STRING | The ID of the thread the message belongs to. |
-| labelIds | ARRAY <details> <summary> Items </summary> [STRING] </details> | List of IDs of labels applied to this message. |
-
-
-
-
-#### JSON Example
+#### Example JSON Structure
 ```json
 {
   "label" : "Send Email",
@@ -351,6 +362,33 @@ Type: OBJECT
     } ]
   },
   "type" : "googleMail/v1/sendEmail"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| id | STRING | The ID of the message. |
+| threadId | STRING | The ID of the thread the message belongs to. |
+| labelIds | ARRAY <details> <summary> Items </summary> [STRING] </details> | List of IDs of labels applied to this message. |
+
+
+
+
+#### Output Example
+```json
+{
+  "id" : "",
+  "threadId" : "",
+  "labelIds" : [ "" ]
 }
 ```
 
@@ -408,11 +446,15 @@ Type: POLLING
 Type: ARRAY
 
 
-#### Properties
+Items Type: OBJECT
 
+
+#### Properties
 |     Name     |     Type     |     Description     |
 |:------------:|:------------:|:-------------------:|
-|  | OBJECT <details> <summary> Properties </summary> {STRING\(id), STRING\(threadId)} </details> |  |
+| id | STRING | ID of the message. |
+| threadId | STRING | The ID of the thread the message belongs to. |
+
 
 
 

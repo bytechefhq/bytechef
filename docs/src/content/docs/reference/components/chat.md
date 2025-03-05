@@ -31,12 +31,7 @@ Converts the response to chat request.
 | message | Message | STRING | The message of the response. | null |
 | attachments | Attachments | ARRAY <details> <summary> Items </summary> [FILE_ENTRY] </details> | The attachments of the response. | null |
 
-
-#### Output
-
-The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
-
-#### JSON Example
+#### Example JSON Structure
 ```json
 {
   "label" : "Response to Chat Request",
@@ -53,6 +48,12 @@ The output for this action is dynamic and may vary depending on the input parame
   "type" : "chat/v1/responseToRequest"
 }
 ```
+
+#### Output
+
+The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
+
+
 
 
 

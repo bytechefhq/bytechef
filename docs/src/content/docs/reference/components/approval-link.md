@@ -24,12 +24,7 @@ Name: createApprovalLinks
 
 Creates approval/disapproval links.
 
-
-#### Output
-
-The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
-
-#### JSON Example
+#### Example JSON Structure
 ```json
 {
   "label" : "Create Approval Links",
@@ -37,6 +32,12 @@ The output for this action is dynamic and may vary depending on the input parame
   "type" : "approvalLink/v1/createApprovalLinks"
 }
 ```
+
+#### Output
+
+The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
+
+
 
 
 

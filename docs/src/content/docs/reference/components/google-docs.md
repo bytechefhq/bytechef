@@ -52,12 +52,7 @@ Create a document on Google Docs.
 | title | Title | STRING | Document title. | true |
 | body | Content | STRING | Document content. | true |
 
-
-#### Output
-
-The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
-
-#### JSON Example
+#### Example JSON Structure
 ```json
 {
   "label" : "Create Document",
@@ -69,6 +64,12 @@ The output for this action is dynamic and may vary depending on the input parame
   "type" : "googleDocs/v1/createDocument"
 }
 ```
+
+#### Output
+
+The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
+
+
 
 
 ### Create Document From Template
@@ -86,12 +87,7 @@ Creates a new document based on an existing one and can replace any placeholder 
 | values | Variables | OBJECT <details> <summary> Properties </summary> {} </details> | Don't include the "[[]]", only the key name and its value. | false |
 | images | Images | OBJECT <details> <summary> Properties </summary> {} </details> | Key: Image ID (get it manually from the Read File Action), Value: Image URL. | false |
 
-
-#### Output
-
-The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
-
-#### JSON Example
+#### Example JSON Structure
 ```json
 {
   "label" : "Create Document From Template",
@@ -107,6 +103,12 @@ The output for this action is dynamic and may vary depending on the input parame
 }
 ```
 
+#### Output
+
+The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
+
+
+
 
 ### Get Document
 Name: getDocument
@@ -119,12 +121,7 @@ Retrieve a specified document from your Google Drive.
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | documentId | Document Id | STRING | The ID of the document to read. | true |
 
-
-#### Output
-
-The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
-
-#### JSON Example
+#### Example JSON Structure
 ```json
 {
   "label" : "Get Document",
@@ -135,6 +132,12 @@ The output for this action is dynamic and may vary depending on the input parame
   "type" : "googleDocs/v1/getDocument"
 }
 ```
+
+#### Output
+
+The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
+
+
 
 
 

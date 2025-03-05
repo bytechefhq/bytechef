@@ -30,18 +30,7 @@ Extracts text from a PDF file.
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | file | PDF File | FILE_ENTRY | The PDF file from which to extract text. | true |
 
-
-#### Output
-
-
-
-Type: STRING
-
-
-
-
-
-#### JSON Example
+#### Example JSON Structure
 ```json
 {
   "label" : "Extract Text",
@@ -57,6 +46,18 @@ Type: STRING
   "type" : "pdfHelper/v1/extractText"
 }
 ```
+
+#### Output
+
+
+
+Type: STRING
+
+
+
+
+
+
 
 
 

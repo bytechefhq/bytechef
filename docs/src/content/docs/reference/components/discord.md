@@ -53,6 +53,20 @@ Post a new message to a specific #channel you choose.
 | content | Message Text | STRING | Message contents (up to 2000 characters) | true |
 | tts | Text to Speech | BOOLEAN <details> <summary> Options </summary> true, false </details> | True if this is a TTS message | false |
 
+#### Example JSON Structure
+```json
+{
+  "label" : "Send Channel Message",
+  "name" : "sendChannelMessage",
+  "parameters" : {
+    "guildId" : "",
+    "channelId" : "",
+    "content" : "",
+    "tts" : false
+  },
+  "type" : "discord/v1/sendChannelMessage"
+}
+```
 
 #### Output
 
@@ -72,18 +86,12 @@ Type: OBJECT
 
 
 
-#### JSON Example
+#### Output Example
 ```json
 {
-  "label" : "Send Channel Message",
-  "name" : "sendChannelMessage",
-  "parameters" : {
-    "guildId" : "",
-    "channelId" : "",
-    "content" : "",
-    "tts" : false
-  },
-  "type" : "discord/v1/sendChannelMessage"
+  "id" : "",
+  "content" : "",
+  "tts" : false
 }
 ```
 
@@ -101,6 +109,19 @@ Create a new channel
 | name | Name | STRING | The name of the new channel | true |
 | type | Type | INTEGER <details> <summary> Options </summary> 0, 2, 4 </details> |  | false |
 
+#### Example JSON Structure
+```json
+{
+  "label" : "Create Channel",
+  "name" : "createChannel",
+  "parameters" : {
+    "guildId" : "",
+    "name" : "",
+    "type" : 1
+  },
+  "type" : "discord/v1/createChannel"
+}
+```
 
 #### Output
 
@@ -120,17 +141,12 @@ Type: OBJECT
 
 
 
-#### JSON Example
+#### Output Example
 ```json
 {
-  "label" : "Create Channel",
-  "name" : "createChannel",
-  "parameters" : {
-    "guildId" : "",
-    "name" : "",
-    "type" : 1
-  },
-  "type" : "discord/v1/createChannel"
+  "id" : "",
+  "type" : 1,
+  "name" : ""
 }
 ```
 
@@ -149,6 +165,20 @@ Send direct message guild member.
 | content | Message Text | STRING | Message contents (up to 2000 characters) | true |
 | tts | Text to Speech | BOOLEAN <details> <summary> Options </summary> true, false </details> | True if this is a TTS message | false |
 
+#### Example JSON Structure
+```json
+{
+  "label" : "Send Direct Message",
+  "name" : "sendDirectMessage",
+  "parameters" : {
+    "guildId" : "",
+    "recipient_id" : "",
+    "content" : "",
+    "tts" : false
+  },
+  "type" : "discord/v1/sendDirectMessage"
+}
+```
 
 #### Output
 
@@ -166,18 +196,12 @@ Type: OBJECT
 
 
 
-#### JSON Example
+#### Output Example
 ```json
 {
-  "label" : "Send Direct Message",
-  "name" : "sendDirectMessage",
-  "parameters" : {
-    "guildId" : "",
-    "recipient_id" : "",
-    "content" : "",
-    "tts" : false
-  },
-  "type" : "discord/v1/sendDirectMessage"
+  "body" : {
+    "id" : ""
+  }
 }
 ```
 

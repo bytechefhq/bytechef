@@ -31,18 +31,7 @@ Decodes base64 encoded text into human readable plain text.
 | encodingSchema | Encoding Scheme | STRING <details> <summary> Options </summary> base64, base64Url </details> |  | true |
 | content | Base64 Content | STRING | The Base64 encoded content that needs to be decoded. | true |
 
-
-#### Output
-
-
-
-Type: STRING
-
-
-
-
-
-#### JSON Example
+#### Example JSON Structure
 ```json
 {
   "label" : "Base64 Decode",
@@ -54,6 +43,18 @@ Type: STRING
   "type" : "textHelper/v1/base64Decode"
 }
 ```
+
+#### Output
+
+
+
+Type: STRING
+
+
+
+
+
+
 
 
 ### Concatenate
@@ -68,18 +69,7 @@ Concatenate two or more texts.
 | texts | Texts | ARRAY <details> <summary> Items </summary> [STRING\($text)] </details> |  | true |
 | separator | Separator | STRING | The text that separates the texts you want to concatenate. | false |
 
-
-#### Output
-
-
-
-Type: STRING
-
-
-
-
-
-#### JSON Example
+#### Example JSON Structure
 ```json
 {
   "label" : "Concatenate",
@@ -91,6 +81,18 @@ Type: STRING
   "type" : "textHelper/v1/concatenate"
 }
 ```
+
+#### Output
+
+
+
+Type: STRING
+
+
+
+
+
+
 
 
 ### Extract Content from HTML
@@ -108,12 +110,7 @@ Extract content from the HTML content.
 | attribute | Attribute | STRING | The name of the attribute to return the value of | true |
 | returnArray | Return Array | BOOLEAN <details> <summary> Options </summary> true, false </details> | If selected, then extracted individual items are returned as an array. If you don't set this, all values are returned as a single string. | null |
 
-
-#### Output
-
-The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
-
-#### JSON Example
+#### Example JSON Structure
 ```json
 {
   "label" : "Extract Content from HTML",
@@ -129,6 +126,12 @@ The output for this action is dynamic and may vary depending on the input parame
 }
 ```
 
+#### Output
+
+The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
+
+
+
 
 ### Find
 Name: find
@@ -142,18 +145,7 @@ Find substring
 | text | Text | STRING |  | true |
 | expression | Expression | STRING | Text to search for. | true |
 
-
-#### Output
-
-
-
-Type: BOOLEAN
-
-
-
-
-
-#### JSON Example
+#### Example JSON Structure
 ```json
 {
   "label" : "Find",
@@ -165,6 +157,18 @@ Type: BOOLEAN
   "type" : "textHelper/v1/find"
 }
 ```
+
+#### Output
+
+
+
+Type: BOOLEAN
+
+
+
+
+
+
 
 
 ### HTML to Markdown
@@ -178,6 +182,17 @@ Converts HTML to markdown.
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | html | HTML Content | STRING | HTML content to be converted to markdown. | true |
 
+#### Example JSON Structure
+```json
+{
+  "label" : "HTML to Markdown",
+  "name" : "HTMLToMarkdown",
+  "parameters" : {
+    "html" : ""
+  },
+  "type" : "textHelper/v1/HTMLToMarkdown"
+}
+```
 
 #### Output
 
@@ -189,17 +204,7 @@ Type: STRING
 
 
 
-#### JSON Example
-```json
-{
-  "label" : "HTML to Markdown",
-  "name" : "HTMLToMarkdown",
-  "parameters" : {
-    "html" : ""
-  },
-  "type" : "textHelper/v1/HTMLToMarkdown"
-}
-```
+
 
 
 ### Markdown to HTML
@@ -213,6 +218,17 @@ Converts markdown to HTML.
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | markdown | Markdown content | STRING | Markdown content to convert to HTML. | true |
 
+#### Example JSON Structure
+```json
+{
+  "label" : "Markdown to HTML",
+  "name" : "markdownToHTML",
+  "parameters" : {
+    "markdown" : ""
+  },
+  "type" : "textHelper/v1/markdownToHTML"
+}
+```
 
 #### Output
 
@@ -224,17 +240,7 @@ Type: STRING
 
 
 
-#### JSON Example
-```json
-{
-  "label" : "Markdown to HTML",
-  "name" : "markdownToHTML",
-  "parameters" : {
-    "markdown" : ""
-  },
-  "type" : "textHelper/v1/markdownToHTML"
-}
-```
+
 
 
 ### Replace
@@ -251,18 +257,7 @@ Replace all instances of any word, character, or phrase in text with another.
 | replaceValue | Replace Value | STRING | Leave blank to remove the search value. | false |
 | replaceOnlyFirst | Replace Only First Match | BOOLEAN <details> <summary> Options </summary> true, false </details> |  | true |
 
-
-#### Output
-
-
-
-Type: STRING
-
-
-
-
-
-#### JSON Example
+#### Example JSON Structure
 ```json
 {
   "label" : "Replace",
@@ -277,6 +272,18 @@ Type: STRING
 }
 ```
 
+#### Output
+
+
+
+Type: STRING
+
+
+
+
+
+
+
 
 ### Split
 Name: split
@@ -290,24 +297,7 @@ Split the text by delimiter.
 | text | Text | STRING |  | true |
 | delimiter | Delimiter | STRING | Delimiter used for splitting the text. | true |
 
-
-#### Output
-
-
-
-Type: ARRAY
-
-
-#### Properties
-
-|     Name     |     Type     |     Description     |
-|:------------:|:------------:|:-------------------:|
-|  | STRING |  |
-
-
-
-
-#### JSON Example
+#### Example JSON Structure
 ```json
 {
   "label" : "Split",
@@ -318,6 +308,25 @@ Type: ARRAY
   },
   "type" : "textHelper/v1/split"
 }
+```
+
+#### Output
+
+
+
+Type: ARRAY
+
+
+Items Type: STRING
+
+
+
+
+
+
+#### Output Example
+```json
+[ "" ]
 ```
 
 

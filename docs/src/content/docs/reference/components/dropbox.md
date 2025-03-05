@@ -50,9 +50,22 @@ Copy a file or folder to a different location in the user's Dropbox. If the sour
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | filename | Filename | STRING | Name of the file with the extension. Don't fill in if you want a folder. | false |
-| from_path | Source Path | STRING | The path which the file or folder should be copyed from.  Root is /. | true |
-| to_path | Destination Path | STRING | The path which the file or folder should be copyed to.  Root is /. | true |
+| from_path | Source Path | STRING | The path which the file or folder should be copied from.  Root is /. | true |
+| to_path | Destination Path | STRING | The path which the file or folder should be copied to.  Root is /. | true |
 
+#### Example JSON Structure
+```json
+{
+  "label" : "Copy",
+  "name" : "copy",
+  "parameters" : {
+    "filename" : "",
+    "from_path" : "",
+    "to_path" : ""
+  },
+  "type" : "dropbox/v1/copy"
+}
+```
 
 #### Output
 
@@ -65,22 +78,20 @@ Type: OBJECT
 
 |     Name     |     Type     |     Description     |
 |:------------:|:------------:|:-------------------:|
-| metadata | OBJECT <details> <summary> Properties </summary> {STRING\(.tag), STRING\(name), STRING\(path_lower), STRING\(path_display), STRING\(id)} </details> |  |
+| metadata | OBJECT <details> <summary> Properties </summary> {STRING\(name), STRING\(path_lower), STRING\(path_display), STRING\(id)} </details> | Metadata containing details about the copied file or folder. |
 
 
 
 
-#### JSON Example
+#### Output Example
 ```json
 {
-  "label" : "Copy",
-  "name" : "copy",
-  "parameters" : {
-    "filename" : "",
-    "from_path" : "",
-    "to_path" : ""
-  },
-  "type" : "dropbox/v1/copy"
+  "metadata" : {
+    "name" : "",
+    "path_lower" : "",
+    "path_display" : "",
+    "id" : ""
+  }
 }
 ```
 
@@ -96,6 +107,17 @@ Create a folder at a given path.
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | path | Folder Path/Name | STRING | The path of the new folder. Root is /. | true |
 
+#### Example JSON Structure
+```json
+{
+  "label" : "Create New Folder",
+  "name" : "createFolder",
+  "parameters" : {
+    "path" : ""
+  },
+  "type" : "dropbox/v1/createFolder"
+}
+```
 
 #### Output
 
@@ -108,20 +130,20 @@ Type: OBJECT
 
 |     Name     |     Type     |     Description     |
 |:------------:|:------------:|:-------------------:|
-| metadata | OBJECT <details> <summary> Properties </summary> {STRING\(name), STRING\(path_lower), STRING\(path_display), STRING\(id)} </details> |  |
+| metadata | OBJECT <details> <summary> Properties </summary> {STRING\(name), STRING\(path_lower), STRING\(path_display), STRING\(id)} </details> | Metadata containing details about the newly created folder. |
 
 
 
 
-#### JSON Example
+#### Output Example
 ```json
 {
-  "label" : "Create New Folder",
-  "name" : "createFolder",
-  "parameters" : {
-    "path" : ""
-  },
-  "type" : "dropbox/v1/createFolder"
+  "metadata" : {
+    "name" : "",
+    "path_lower" : "",
+    "path_display" : "",
+    "id" : ""
+  }
 }
 ```
 
@@ -142,27 +164,7 @@ Create a new .paper file on which you can write at a given path
 | mute | Mute | BOOLEAN <details> <summary> Options </summary> true, false </details> | Normally, users are made aware of any file modifications in their Dropbox account via notifications in the client software. If true, this tells the clients that this modification shouldn't result in a user notification. | false |
 | strict_conflict | Strict Conflict | BOOLEAN <details> <summary> Options </summary> true, false </details> | Be more strict about how each WriteMode detects conflict. For example, always return a conflict error when mode = WriteMode.update and the given "rev" doesn't match the existing file's "rev", even if the existing file has been deleted. | false |
 
-
-#### Output
-
-
-
-Type: OBJECT
-
-
-#### Properties
-
-|     Name     |     Type     |     Description     |
-|:------------:|:------------:|:-------------------:|
-| url | STRING |  |
-| resultPath | STRING |  |
-| fileId | STRING |  |
-| paperRevision | INTEGER |  |
-
-
-
-
-#### JSON Example
+#### Example JSON Structure
 ```json
 {
   "label" : "Create New Paper File",
@@ -179,6 +181,41 @@ Type: OBJECT
 }
 ```
 
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| name | STRING | The name of the newly created file, including its extension. This is the last component of the path. |
+| path_lower | STRING | The full path to the file in lowercase, as stored in the user's Dropbox. |
+| path_display | STRING | The display-friendly version of the file's path, preserving original casing for readability. |
+| id | STRING | ID of the file within Dropbox. |
+| size | INTEGER | The size of the file in bytes, representing the total amount of data it contains. |
+| is_downloadable | BOOLEAN <details> <summary> Options </summary> true, false </details> | Indicates whether the file can be directly downloaded from Dropbox. |
+| content_hash | STRING | A hash value representing the content of the file, used for verifying data integrity. |
+
+
+
+
+#### Output Example
+```json
+{
+  "name" : "",
+  "path_lower" : "",
+  "path_display" : "",
+  "id" : "",
+  "size" : 1,
+  "is_downloadable" : false,
+  "content_hash" : ""
+}
+```
+
 
 ### Delete
 Name: delete
@@ -192,6 +229,18 @@ Delete the file or folder at a given path. If the path is a folder, all its cont
 | path | Path | STRING | Path of the file or folder. Root is /. | true |
 | filename | Filename | STRING | Name of the file. Leave empty if you want to delete a folder. | false |
 
+#### Example JSON Structure
+```json
+{
+  "label" : "Delete",
+  "name" : "delete",
+  "parameters" : {
+    "path" : "",
+    "filename" : ""
+  },
+  "type" : "dropbox/v1/delete"
+}
+```
 
 #### Output
 
@@ -204,21 +253,20 @@ Type: OBJECT
 
 |     Name     |     Type     |     Description     |
 |:------------:|:------------:|:-------------------:|
-| metadata | OBJECT <details> <summary> Properties </summary> {STRING\(.tag), STRING\(name), STRING\(path_lower), STRING\(path_display), STRING\(id)} </details> |  |
+| metadata | OBJECT <details> <summary> Properties </summary> {STRING\(name), STRING\(path_lower), STRING\(path_display), STRING\(id)} </details> | Metadata containing details about the deleted file or folder. |
 
 
 
 
-#### JSON Example
+#### Output Example
 ```json
 {
-  "label" : "Delete",
-  "name" : "delete",
-  "parameters" : {
-    "path" : "",
-    "filename" : ""
-  },
-  "type" : "dropbox/v1/delete"
+  "metadata" : {
+    "name" : "",
+    "path_lower" : "",
+    "path_display" : "",
+    "id" : ""
+  }
 }
 ```
 
@@ -235,6 +283,18 @@ Get a temporary link to stream content of a file. This link will expire in four 
 | path | Namepath to the File | STRING | The path to the file you want a temporary link to.  Root is /. | true |
 | filename | Filename | STRING | Name of the file with the extension. Needs to have a streamable extension (.mp4, .mov, .webm, ect) | true |
 
+#### Example JSON Structure
+```json
+{
+  "label" : "Get File Link",
+  "name" : "getFileLink",
+  "parameters" : {
+    "path" : "",
+    "filename" : ""
+  },
+  "type" : "dropbox/v1/getFileLink"
+}
+```
 
 #### Output
 
@@ -248,21 +308,21 @@ Type: OBJECT
 |     Name     |     Type     |     Description     |
 |:------------:|:------------:|:-------------------:|
 | metadata | OBJECT <details> <summary> Properties </summary> {STRING\(name), STRING\(path_lower), STRING\(path_display), STRING\(id)} </details> |  |
-| link | STRING |  |
+| link | STRING | A temporary URL that can be used to stream the content of the file. This link expires after four hours. |
 
 
 
 
-#### JSON Example
+#### Output Example
 ```json
 {
-  "label" : "Get File Link",
-  "name" : "getFileLink",
-  "parameters" : {
-    "path" : "",
-    "filename" : ""
+  "metadata" : {
+    "name" : "",
+    "path_lower" : "",
+    "path_display" : "",
+    "id" : ""
   },
-  "type" : "dropbox/v1/getFileLink"
+  "link" : ""
 }
 ```
 
@@ -278,6 +338,17 @@ List the contents of a folder.
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | path | Path | STRING | Path of the filename. Inputting nothing searches root. | false |
 
+#### Example JSON Structure
+```json
+{
+  "label" : "List Folder",
+  "name" : "listFolder",
+  "parameters" : {
+    "path" : ""
+  },
+  "type" : "dropbox/v1/listFolder"
+}
+```
 
 #### Output
 
@@ -290,20 +361,20 @@ Type: OBJECT
 
 |     Name     |     Type     |     Description     |
 |:------------:|:------------:|:-------------------:|
-| entries | ARRAY <details> <summary> Items </summary> [{{STRING\(.tag), STRING\(name), STRING\(path_lower), STRING\(path_Display), STRING\(id)}\(f)}] </details> |  |
+| entries | ARRAY <details> <summary> Items </summary> [{STRING\(name), STRING\(path_lower), STRING\(path_display), STRING\(id)}] </details> |  |
 
 
 
 
-#### JSON Example
+#### Output Example
 ```json
 {
-  "label" : "List Folder",
-  "name" : "listFolder",
-  "parameters" : {
-    "path" : ""
-  },
-  "type" : "dropbox/v1/listFolder"
+  "entries" : [ {
+    "name" : "",
+    "path_lower" : "",
+    "path_display" : "",
+    "id" : ""
+  } ]
 }
 ```
 
@@ -321,6 +392,19 @@ Move a file or folder to a different location in the user's Dropbox. If the sour
 | from_path | Source Path | STRING | Path in the user's Dropbox to be moved.  Root is /. | true |
 | to_path | Destination Path | STRING | Path in the user's Dropbox that is the destination. Root is /. | true |
 
+#### Example JSON Structure
+```json
+{
+  "label" : "Move",
+  "name" : "move",
+  "parameters" : {
+    "filename" : "",
+    "from_path" : "",
+    "to_path" : ""
+  },
+  "type" : "dropbox/v1/move"
+}
+```
 
 #### Output
 
@@ -333,22 +417,20 @@ Type: OBJECT
 
 |     Name     |     Type     |     Description     |
 |:------------:|:------------:|:-------------------:|
-| metadata | OBJECT <details> <summary> Properties </summary> {STRING\(.tag), STRING\(name), STRING\(path_lower), STRING\(path_display), STRING\(id)} </details> |  |
+| metadata | OBJECT <details> <summary> Properties </summary> {STRING\(name), STRING\(path_lower), STRING\(path_display), STRING\(id)} </details> | Metadata containing details about the moved file or folder. |
 
 
 
 
-#### JSON Example
+#### Output Example
 ```json
 {
-  "label" : "Move",
-  "name" : "move",
-  "parameters" : {
-    "filename" : "",
-    "from_path" : "",
-    "to_path" : ""
-  },
-  "type" : "dropbox/v1/move"
+  "metadata" : {
+    "name" : "",
+    "path_lower" : "",
+    "path_display" : "",
+    "id" : ""
+  }
 }
 ```
 
@@ -364,6 +446,17 @@ Searches for files and folders. Can only be used to retrieve a maximum of 10,000
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | query | Search String | STRING | The string to search for. May match across multiple fields based on the request arguments. | true |
 
+#### Example JSON Structure
+```json
+{
+  "label" : "Search",
+  "name" : "search",
+  "parameters" : {
+    "query" : ""
+  },
+  "type" : "dropbox/v1/search"
+}
+```
 
 #### Output
 
@@ -376,20 +469,22 @@ Type: OBJECT
 
 |     Name     |     Type     |     Description     |
 |:------------:|:------------:|:-------------------:|
-| matches | ARRAY <details> <summary> Items </summary> [{{STRING\(.tag)}\(match_type), {STRING\(.tag), STRING\(id), STRING\(name), STRING\(path_display), STRING\(path_lower)}\(metadata)}] </details> |  |
+| matches | ARRAY <details> <summary> Items </summary> [{{STRING\(name), STRING\(path_lower), STRING\(path_display), STRING\(id)}\(metadata)}] </details> | A list (possibly empty) of matches for the query. |
 
 
 
 
-#### JSON Example
+#### Output Example
 ```json
 {
-  "label" : "Search",
-  "name" : "search",
-  "parameters" : {
-    "query" : ""
-  },
-  "type" : "dropbox/v1/search"
+  "matches" : [ {
+    "metadata" : {
+      "name" : "",
+      "path_lower" : "",
+      "path_display" : "",
+      "id" : ""
+    }
+  } ]
 }
 ```
 
@@ -410,36 +505,7 @@ Create a new file up to a size of 150MB with the contents provided in the reques
 | mute | Mute | BOOLEAN <details> <summary> Options </summary> true, false </details> | Normally, users are made aware of any file modifications in their Dropbox account via notifications in the client software. If true, this tells the clients that this modification shouldn't result in a user notification. | false |
 | strict_conflict | Strict Conflict | BOOLEAN <details> <summary> Options </summary> true, false </details> | Be more strict about how each WriteMode detects conflict. For example, always return a conflict error when mode = WriteMode.update and the given "rev" doesn't match the existing file's "rev", even if the existing file has been deleted. | false |
 
-
-#### Output
-
-
-
-Type: OBJECT
-
-
-#### Properties
-
-|     Name     |     Type     |     Description     |
-|:------------:|:------------:|:-------------------:|
-| id | STRING |  |
-| clientModified | DATE |  |
-| serverModified | DATE |  |
-| rev | STRING |  |
-| size | INTEGER |  |
-| symlinkInfo | OBJECT <details> <summary> Properties </summary> {STRING\(target)} </details> |  |
-| sharingInfo | OBJECT <details> <summary> Properties </summary> {STRING\(parentSharedFolderId), STRING\(modifiedBy)} </details> |  |
-| isDownloadable | BOOLEAN <details> <summary> Options </summary> true, false </details> |  |
-| exportInfo | OBJECT <details> <summary> Properties </summary> {STRING\(exportAs), [STRING]\(exportOptions)} </details> |  |
-| propertyGroups | ARRAY <details> <summary> Items </summary> [{STRING\(templateId), [{STRING\(name), STRING\(value)}]\(fields)}] </details> |  |
-| hasExplicitSharedMembers | BOOLEAN <details> <summary> Options </summary> true, false </details> |  |
-| contentHash | STRING |  |
-| fileLockInfo | OBJECT <details> <summary> Properties </summary> {BOOLEAN\(isLockholder), STRING\(lockholderName), STRING\(lockholderAccountId), DATE\(created)} </details> |  |
-
-
-
-
-#### JSON Example
+#### Example JSON Structure
 ```json
 {
   "label" : "Upload File",
@@ -458,6 +524,41 @@ Type: OBJECT
     "strict_conflict" : false
   },
   "type" : "dropbox/v1/uploadFile"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| name | STRING | Name of the file. The last component of the path (including extension). |
+| path_lower | STRING | The lowercased full path in the user's Dropbox. |
+| path_display | STRING | The cased path to be used for display purposes only. |
+| id | STRING | ID of the folder. |
+| size | INTEGER | The file size in bytes. |
+| is_downloadable | BOOLEAN <details> <summary> Options </summary> true, false </details> | If file can be downloaded directly. |
+| content_hash | STRING | A hash of the file content. |
+
+
+
+
+#### Output Example
+```json
+{
+  "name" : "",
+  "path_lower" : "",
+  "path_display" : "",
+  "id" : "",
+  "size" : 1,
+  "is_downloadable" : false,
+  "content_hash" : ""
 }
 ```
 

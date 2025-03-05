@@ -54,6 +54,19 @@ Creates a new contact.
 | lastname | Last Name | STRING | Last name of the contact. | true |
 | email | Email | STRING | Email address of the contact. | true |
 
+#### Example JSON Structure
+```json
+{
+  "label" : "Create Contact",
+  "name" : "createContact",
+  "parameters" : {
+    "firstname" : "",
+    "lastname" : "",
+    "email" : ""
+  },
+  "type" : "vtiger/v1/createContact"
+}
+```
 
 #### Output
 
@@ -71,17 +84,17 @@ Type: OBJECT
 
 
 
-#### JSON Example
+#### Output Example
 ```json
 {
-  "label" : "Create Contact",
-  "name" : "createContact",
-  "parameters" : {
+  "result" : {
     "firstname" : "",
     "lastname" : "",
-    "email" : ""
-  },
-  "type" : "vtiger/v1/createContact"
+    "email" : "",
+    "phone" : "",
+    "assigned_user_id" : "",
+    "id" : ""
+  }
 }
 ```
 
@@ -98,6 +111,18 @@ Creates a new product for your CRM.
 | productname | Product Name | STRING | Name of the product. | true |
 | product_type | Product Type | STRING <details> <summary> Options </summary> Solo, Fixed Bundle </details> | Type of the product. | true |
 
+#### Example JSON Structure
+```json
+{
+  "label" : "Create Product",
+  "name" : "createProduct",
+  "parameters" : {
+    "productname" : "",
+    "product_type" : ""
+  },
+  "type" : "vtiger/v1/createProduct"
+}
+```
 
 #### Output
 
@@ -115,16 +140,15 @@ Type: OBJECT
 
 
 
-#### JSON Example
+#### Output Example
 ```json
 {
-  "label" : "Create Product",
-  "name" : "createProduct",
-  "parameters" : {
+  "results" : {
     "productname" : "",
-    "product_type" : ""
-  },
-  "type" : "vtiger/v1/createProduct"
+    "product_type" : "",
+    "assigned_user_id" : "",
+    "id" : ""
+  }
 }
 ```
 
@@ -134,6 +158,14 @@ Name: getMe
 
 Get more information about yourself.
 
+#### Example JSON Structure
+```json
+{
+  "label" : "Get Me",
+  "name" : "getMe",
+  "type" : "vtiger/v1/getMe"
+}
+```
 
 #### Output
 
@@ -151,12 +183,28 @@ Type: OBJECT
 
 
 
-#### JSON Example
+#### Output Example
 ```json
 {
-  "label" : "Get Me",
-  "name" : "getMe",
-  "type" : "vtiger/v1/getMe"
+  "result" : {
+    "id" : "",
+    "user_name" : "",
+    "user_type" : "",
+    "email" : "",
+    "phone_home" : "",
+    "phone_work" : "",
+    "phone_mobile" : "",
+    "userlable" : "",
+    "address_street" : "",
+    "address_city" : "",
+    "address_state" : "",
+    "address_country" : "",
+    "roleid" : "",
+    "language" : "",
+    "is_admin" : "",
+    "is_owner" : "",
+    "status" : ""
+  }
 }
 ```
 

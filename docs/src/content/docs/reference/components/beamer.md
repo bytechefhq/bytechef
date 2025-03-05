@@ -52,6 +52,19 @@ Creates a new feature request.
 | content | Feature Request Content | STRING | The content of the new feature request. | false |
 | userEmail | User Email | STRING | The email of the user that is creating the new feature request. | false |
 
+#### Example JSON Structure
+```json
+{
+  "label" : "Create Feature Request",
+  "name" : "createFeatureRequest",
+  "parameters" : {
+    "title" : "",
+    "content" : "",
+    "userEmail" : ""
+  },
+  "type" : "beamer/v1/createFeatureRequest"
+}
+```
 
 #### Output
 
@@ -85,17 +98,33 @@ Type: OBJECT
 
 
 
-#### JSON Example
+#### Output Example
 ```json
 {
-  "label" : "Create Feature Request",
-  "name" : "createFeatureRequest",
-  "parameters" : {
+  "id" : "",
+  "date" : "",
+  "visible" : "",
+  "category" : "",
+  "status" : "",
+  "translations" : [ {
     "title" : "",
     "content" : "",
-    "userEmail" : ""
-  },
-  "type" : "beamer/v1/createFeatureRequest"
+    "contentHtml" : "",
+    "language" : "",
+    "permalink" : "",
+    "images" : [ "" ]
+  } ],
+  "votesCount" : 1,
+  "commentsCount" : "",
+  "notes" : "",
+  "filters" : "",
+  "internalUserEmail" : "",
+  "internalUserFirstname" : "",
+  "internalUserLastname" : "",
+  "userId" : "",
+  "userEmail" : "",
+  "userFirstname" : "",
+  "userLastname" : ""
 }
 ```
 
@@ -114,6 +143,20 @@ Creates a new post.
 | category | Category | STRING <details> <summary> Options </summary> new, improvement, fix, comingsoon, announcement, other </details> | Category of the new post. | true |
 | userEmail | User Email | STRING | Email of the user that is creating the new post. | false |
 
+#### Example JSON Structure
+```json
+{
+  "label" : "Create Post",
+  "name" : "createPost",
+  "parameters" : {
+    "title" : "",
+    "content" : "",
+    "category" : "",
+    "userEmail" : ""
+  },
+  "type" : "beamer/v1/createPost"
+}
+```
 
 #### Output
 
@@ -138,18 +181,26 @@ Type: OBJECT
 
 
 
-#### JSON Example
+#### Output Example
 ```json
 {
-  "label" : "Create Post",
-  "name" : "createPost",
-  "parameters" : {
+  "id" : "",
+  "date" : "",
+  "dueDate" : "",
+  "published" : "",
+  "category" : "",
+  "feedbackEnabled" : "",
+  "reactionsEnabled" : "",
+  "translations" : [ {
     "title" : "",
     "content" : "",
+    "contentHtml" : "",
+    "language" : "",
     "category" : "",
-    "userEmail" : ""
-  },
-  "type" : "beamer/v1/createPost"
+    "linkUrl" : "",
+    "linkText" : "",
+    "images" : [ "" ]
+  } ]
 }
 ```
 
@@ -159,6 +210,14 @@ Name: getFeed
 
 Get the URL for your feed.
 
+#### Example JSON Structure
+```json
+{
+  "label" : "Get Feed",
+  "name" : "getFeed",
+  "type" : "beamer/v1/getFeed"
+}
+```
 
 #### Output
 
@@ -176,12 +235,10 @@ Type: OBJECT
 
 
 
-#### JSON Example
+#### Output Example
 ```json
 {
-  "label" : "Get Feed",
-  "name" : "getFeed",
-  "type" : "beamer/v1/getFeed"
+  "url" : ""
 }
 ```
 
@@ -202,6 +259,22 @@ Creates a new comment on selected post.
 | userFirstname | User First Name | STRING | First name of the user that is creating the new comment. | false |
 | userLastname | User Last Name | STRING | Last name of the user that is creating the new comment. | false |
 
+#### Example JSON Structure
+```json
+{
+  "label" : "New Comment",
+  "name" : "newComment",
+  "parameters" : {
+    "postId" : "",
+    "text" : "",
+    "userId" : "",
+    "userEmail" : "",
+    "userFirstname" : "",
+    "userLastname" : ""
+  },
+  "type" : "beamer/v1/newComment"
+}
+```
 
 #### Output
 
@@ -227,20 +300,18 @@ Type: OBJECT
 
 
 
-#### JSON Example
+#### Output Example
 ```json
 {
-  "label" : "New Comment",
-  "name" : "newComment",
-  "parameters" : {
-    "postId" : "",
-    "text" : "",
-    "userId" : "",
-    "userEmail" : "",
-    "userFirstname" : "",
-    "userLastname" : ""
-  },
-  "type" : "beamer/v1/newComment"
+  "id" : "",
+  "date" : "",
+  "text" : "",
+  "postTitle" : "",
+  "userId" : "",
+  "userEmail" : "",
+  "userFirstname" : "",
+  "userLastname" : "",
+  "url" : ""
 }
 ```
 
@@ -260,6 +331,21 @@ Creates a new vote on selected feature request.
 | userFirstname | User First Name | STRING | First name of the user that is creating the new vote. | false |
 | userLastname | User Last Name | STRING | Last name of the user that is creating the new vote. | false |
 
+#### Example JSON Structure
+```json
+{
+  "label" : "New Vote",
+  "name" : "newVote",
+  "parameters" : {
+    "requestId" : "",
+    "userId" : "",
+    "userEmail" : "",
+    "userFirstname" : "",
+    "userLastname" : ""
+  },
+  "type" : "beamer/v1/newVote"
+}
+```
 
 #### Output
 
@@ -284,19 +370,17 @@ Type: OBJECT
 
 
 
-#### JSON Example
+#### Output Example
 ```json
 {
-  "label" : "New Vote",
-  "name" : "newVote",
-  "parameters" : {
-    "requestId" : "",
-    "userId" : "",
-    "userEmail" : "",
-    "userFirstname" : "",
-    "userLastname" : ""
-  },
-  "type" : "beamer/v1/newVote"
+  "id" : "",
+  "date" : "",
+  "featureRequestTitle" : "",
+  "userId" : "",
+  "userEmail" : "",
+  "userFirstname" : "",
+  "userLastname" : "",
+  "url" : ""
 }
 ```
 

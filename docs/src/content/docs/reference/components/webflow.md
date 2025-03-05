@@ -52,6 +52,18 @@ Updates an order's status to fulfilled.
 | siteId | Site ID | STRING |  | true |
 | orderId | Order ID | STRING <details> <summary> Depends On </summary> siteId </details> |  | true |
 
+#### Example JSON Structure
+```json
+{
+  "label" : "Fulfill Order",
+  "name" : "fulfillOrder",
+  "parameters" : {
+    "siteId" : "",
+    "orderId" : ""
+  },
+  "type" : "webflow/v1/fulfillOrder"
+}
+```
 
 #### Output
 
@@ -70,16 +82,11 @@ Type: OBJECT
 
 
 
-#### JSON Example
+#### Output Example
 ```json
 {
-  "label" : "Fulfill Order",
-  "name" : "fulfillOrder",
-  "parameters" : {
-    "siteId" : "",
-    "orderId" : ""
-  },
-  "type" : "webflow/v1/fulfillOrder"
+  "orderId" : "",
+  "status" : ""
 }
 ```
 
@@ -97,6 +104,19 @@ Get collection item in a collection.
 | collectionId | Collection ID | STRING <details> <summary> Depends On </summary> siteId </details> |  | true |
 | itemId | Item  ID | STRING <details> <summary> Depends On </summary> collectionId, siteId </details> |  | true |
 
+#### Example JSON Structure
+```json
+{
+  "label" : "Get Collection Item",
+  "name" : "getCollectionItem",
+  "parameters" : {
+    "siteId" : "",
+    "collectionId" : "",
+    "itemId" : ""
+  },
+  "type" : "webflow/v1/getCollectionItem"
+}
+```
 
 #### Output
 
@@ -115,17 +135,14 @@ Type: OBJECT
 
 
 
-#### JSON Example
+#### Output Example
 ```json
 {
-  "label" : "Get Collection Item",
-  "name" : "getCollectionItem",
-  "parameters" : {
-    "siteId" : "",
-    "collectionId" : "",
-    "itemId" : ""
-  },
-  "type" : "webflow/v1/getCollectionItem"
+  "id" : "",
+  "fieldData" : {
+    "name" : "",
+    "slug" : ""
+  }
 }
 ```
 

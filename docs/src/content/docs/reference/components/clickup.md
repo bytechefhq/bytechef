@@ -54,6 +54,20 @@ Creates a new List in specified Folder.
 | folderId | Folder ID | STRING <details> <summary> Depends On </summary> spaceId, workspaceId </details> | ID of the folder where new list will be created. | true |
 | name | Name | STRING | The name of the list. | true |
 
+#### Example JSON Structure
+```json
+{
+  "label" : "Create List",
+  "name" : "createList",
+  "parameters" : {
+    "workspaceId" : "",
+    "spaceId" : "",
+    "folderId" : "",
+    "name" : ""
+  },
+  "type" : "clickup/v1/createList"
+}
+```
 
 #### Output
 
@@ -74,18 +88,19 @@ Type: OBJECT
 
 
 
-#### JSON Example
+#### Output Example
 ```json
 {
-  "label" : "Create List",
-  "name" : "createList",
-  "parameters" : {
-    "workspaceId" : "",
-    "spaceId" : "",
-    "folderId" : "",
+  "id" : "",
+  "name" : "",
+  "folder" : {
+    "id" : "",
     "name" : ""
   },
-  "type" : "clickup/v1/createList"
+  "space" : {
+    "id" : "",
+    "name" : ""
+  }
 }
 ```
 
@@ -106,6 +121,22 @@ Create a new task in a ClickUp workspace and list.
 | name | Name | STRING | The name of the task. | true |
 | description | Description | STRING | The description of task. | false |
 
+#### Example JSON Structure
+```json
+{
+  "label" : "Create Task",
+  "name" : "createTask",
+  "parameters" : {
+    "workspaceId" : "",
+    "spaceId" : "",
+    "folderId" : "",
+    "listId" : "",
+    "name" : "",
+    "description" : ""
+  },
+  "type" : "clickup/v1/createTask"
+}
+```
 
 #### Output
 
@@ -129,20 +160,24 @@ Type: OBJECT
 
 
 
-#### JSON Example
+#### Output Example
 ```json
 {
-  "label" : "Create Task",
-  "name" : "createTask",
-  "parameters" : {
-    "workspaceId" : "",
-    "spaceId" : "",
-    "folderId" : "",
-    "listId" : "",
-    "name" : "",
-    "description" : ""
+  "id" : "",
+  "name" : "",
+  "description" : "",
+  "url" : "",
+  "list" : {
+    "id" : "",
+    "name" : ""
   },
-  "type" : "clickup/v1/createTask"
+  "folder" : {
+    "id" : "",
+    "name" : ""
+  },
+  "space" : {
+    "id" : ""
+  }
 }
 ```
 
@@ -160,6 +195,19 @@ Creates a new folder in a ClickUp workspace.
 | spaceId | Space ID | STRING <details> <summary> Depends On </summary> workspaceId </details> | ID of the space where new folder will be created. | true |
 | name | Name | STRING | The name of the folder. | true |
 
+#### Example JSON Structure
+```json
+{
+  "label" : "Create Folder",
+  "name" : "createFolder",
+  "parameters" : {
+    "workspaceId" : "",
+    "spaceId" : "",
+    "name" : ""
+  },
+  "type" : "clickup/v1/createFolder"
+}
+```
 
 #### Output
 
@@ -179,17 +227,15 @@ Type: OBJECT
 
 
 
-#### JSON Example
+#### Output Example
 ```json
 {
-  "label" : "Create Folder",
-  "name" : "createFolder",
-  "parameters" : {
-    "workspaceId" : "",
-    "spaceId" : "",
+  "id" : "",
+  "name" : "",
+  "space" : {
+    "id" : "",
     "name" : ""
-  },
-  "type" : "clickup/v1/createFolder"
+  }
 }
 ```
 

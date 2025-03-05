@@ -52,6 +52,20 @@ Creates a new account.
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | account | Account | OBJECT <details> <summary> Properties </summary> {STRING\(name), STRING\(accountUrl)} </details> |  | false |
 
+#### Example JSON Structure
+```json
+{
+  "label" : "Create Account",
+  "name" : "createAccount",
+  "parameters" : {
+    "account" : {
+      "name" : "",
+      "accountUrl" : ""
+    }
+  },
+  "type" : "active-campaign/v1/createAccount"
+}
+```
 
 #### Output
 
@@ -69,18 +83,13 @@ Type: OBJECT
 
 
 
-#### JSON Example
+#### Output Example
 ```json
 {
-  "label" : "Create Account",
-  "name" : "createAccount",
-  "parameters" : {
-    "account" : {
-      "name" : "",
-      "accountUrl" : ""
-    }
-  },
-  "type" : "active-campaign/v1/createAccount"
+  "account" : {
+    "name" : "",
+    "accountUrl" : ""
+  }
 }
 ```
 
@@ -96,6 +105,22 @@ Creates a new contact.
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | contact | Contact | OBJECT <details> <summary> Properties </summary> {STRING\(email), STRING\(firstName), STRING\(lastName), STRING\(phone)} </details> |  | false |
 
+#### Example JSON Structure
+```json
+{
+  "label" : "Create Contact",
+  "name" : "createContact",
+  "parameters" : {
+    "contact" : {
+      "email" : "",
+      "firstName" : "",
+      "lastName" : "",
+      "phone" : ""
+    }
+  },
+  "type" : "active-campaign/v1/createContact"
+}
+```
 
 #### Output
 
@@ -113,20 +138,15 @@ Type: OBJECT
 
 
 
-#### JSON Example
+#### Output Example
 ```json
 {
-  "label" : "Create Contact",
-  "name" : "createContact",
-  "parameters" : {
-    "contact" : {
-      "email" : "",
-      "firstName" : "",
-      "lastName" : "",
-      "phone" : ""
-    }
-  },
-  "type" : "active-campaign/v1/createContact"
+  "contact" : {
+    "email" : "",
+    "firstName" : "",
+    "lastName" : "",
+    "phone" : ""
+  }
 }
 ```
 
@@ -142,6 +162,22 @@ Creates a new task.
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | dealTask | Deal Task | OBJECT <details> <summary> Properties </summary> {STRING\(title), INTEGER\(relid), DATE\(duedate), INTEGER\(dealTasktype)} </details> |  | false |
 
+#### Example JSON Structure
+```json
+{
+  "label" : "Create Task",
+  "name" : "createTask",
+  "parameters" : {
+    "dealTask" : {
+      "title" : "",
+      "relid" : 1,
+      "duedate" : "2021-01-01",
+      "dealTasktype" : 1
+    }
+  },
+  "type" : "active-campaign/v1/createTask"
+}
+```
 
 #### Output
 
@@ -159,20 +195,16 @@ Type: OBJECT
 
 
 
-#### JSON Example
+#### Output Example
 ```json
 {
-  "label" : "Create Task",
-  "name" : "createTask",
-  "parameters" : {
-    "dealTask" : {
-      "title" : "",
-      "relid" : 1,
-      "duedate" : "2021-01-01",
-      "dealTasktype" : 1
-    }
-  },
-  "type" : "active-campaign/v1/createTask"
+  "dealTask" : {
+    "id" : "",
+    "title" : "",
+    "relid" : 1,
+    "duedate" : "2021-01-01",
+    "dealTasktype" : 1
+  }
 }
 ```
 

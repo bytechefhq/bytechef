@@ -55,29 +55,7 @@ Create new contact
 | phone | Contact Phone | STRING | Phone of the contact must start with a "+" sign | false |
 | avatar | Contact Image | STRING | Image of the contact | false |
 
-
-#### Output
-
-
-
-Type: OBJECT
-
-
-#### Properties
-
-|     Name     |     Type     |     Description     |
-|:------------:|:------------:|:-------------------:|
-| type | STRING | The type of the contact. |
-| id | STRING | ID of the contact. |
-| role | STRING | Role of the contact. |
-| email | STRING | Email of the contact. |
-| phone | STRING | The contacts phone. |
-| name | STRING | The contacts name. |
-
-
-
-
-#### JSON Example
+#### Example JSON Structure
 ```json
 {
   "label" : "Create Contact",
@@ -93,6 +71,39 @@ Type: OBJECT
 }
 ```
 
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| type | STRING | The type of the contact. |
+| id | STRING | ID of the contact. |
+| role | STRING | Role of the contact. |
+| email | STRING | Email of the contact. |
+| phone | STRING | The contacts phone. |
+| name | STRING | The contacts name. |
+
+
+
+
+#### Output Example
+```json
+{
+  "type" : "",
+  "id" : "",
+  "role" : "",
+  "email" : "",
+  "phone" : "",
+  "name" : ""
+}
+```
+
 
 ### Get Contact
 Name: getContact
@@ -105,6 +116,17 @@ Get a single Contact
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | id | Contact ID | STRING |  | true |
 
+#### Example JSON Structure
+```json
+{
+  "label" : "Get Contact",
+  "name" : "getContact",
+  "parameters" : {
+    "id" : ""
+  },
+  "type" : "intercom/v1/getContact"
+}
+```
 
 #### Output
 
@@ -127,15 +149,15 @@ Type: OBJECT
 
 
 
-#### JSON Example
+#### Output Example
 ```json
 {
-  "label" : "Get Contact",
-  "name" : "getContact",
-  "parameters" : {
-    "id" : ""
-  },
-  "type" : "intercom/v1/getContact"
+  "type" : "",
+  "id" : "",
+  "role" : "",
+  "email" : "",
+  "phone" : "",
+  "name" : ""
 }
 ```
 
@@ -155,6 +177,21 @@ Send a new message
 | template | Template | STRING <details> <summary> Options </summary> plain, personal </details> | The style of the outgoing message | true |
 | to | To | STRING | ID of the contact to send the message to. | true |
 
+#### Example JSON Structure
+```json
+{
+  "label" : "Send Message",
+  "name" : "sendMessage",
+  "parameters" : {
+    "message_type" : "",
+    "subject" : "",
+    "body" : "",
+    "template" : "",
+    "to" : ""
+  },
+  "type" : "intercom/v1/sendMessage"
+}
+```
 
 #### Output
 
@@ -177,19 +214,15 @@ Type: OBJECT
 
 
 
-#### JSON Example
+#### Output Example
 ```json
 {
-  "label" : "Send Message",
-  "name" : "sendMessage",
-  "parameters" : {
-    "message_type" : "",
-    "subject" : "",
-    "body" : "",
-    "template" : "",
-    "to" : ""
-  },
-  "type" : "intercom/v1/sendMessage"
+  "type" : "",
+  "id" : "",
+  "subject" : "",
+  "body" : "",
+  "message_type" : "",
+  "conversation_id" : ""
 }
 ```
 

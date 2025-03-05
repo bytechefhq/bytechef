@@ -52,6 +52,17 @@ Get all submissions for a specific form.
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | formId | Form ID | STRING | ID of the form to retrieve submissions for. | true |
 
+#### Example JSON Structure
+```json
+{
+  "label" : "Get Form Submissions",
+  "name" : "getFormSubmissions",
+  "parameters" : {
+    "formId" : ""
+  },
+  "type" : "jotform/v1/getFormSubmissions"
+}
+```
 
 #### Output
 
@@ -69,15 +80,17 @@ Type: OBJECT
 
 
 
-#### JSON Example
+#### Output Example
 ```json
 {
-  "label" : "Get Form Submissions",
-  "name" : "getFormSubmissions",
-  "parameters" : {
-    "formId" : ""
-  },
-  "type" : "jotform/v1/getFormSubmissions"
+  "content" : [ {
+    "id" : "",
+    "form_id" : "",
+    "status" : "",
+    "new" : "",
+    "flag" : "",
+    "notes" : ""
+  } ]
 }
 ```
 

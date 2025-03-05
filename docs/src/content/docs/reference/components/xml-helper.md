@@ -30,6 +30,17 @@ Converts the XML string to object/array.
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | source | Source | STRING | The XML string to convert to the data. | true |
 
+#### Example JSON Structure
+```json
+{
+  "label" : "Convert from XML String",
+  "name" : "parse",
+  "parameters" : {
+    "source" : ""
+  },
+  "type" : "xmlHelper/v1/parse"
+}
+```
 
 #### Output
 
@@ -41,17 +52,7 @@ Type: OBJECT
 
 
 
-#### JSON Example
-```json
-{
-  "label" : "Convert from XML String",
-  "name" : "parse",
-  "parameters" : {
-    "source" : ""
-  },
-  "type" : "xmlHelper/v1/parse"
-}
-```
+
 
 
 ### Convert to XML String
@@ -67,18 +68,7 @@ Writes the object/array to a XML string.
 | source | Source | OBJECT <details> <summary> Properties </summary> {} </details> | The object to convert to XML string. | true |
 | source | Source | ARRAY <details> <summary> Items </summary> [] </details> | The array to convert to XML string. | true |
 
-
-#### Output
-
-
-
-Type: STRING
-
-
-
-
-
-#### JSON Example
+#### Example JSON Structure
 ```json
 {
   "label" : "Convert to XML String",
@@ -90,6 +80,18 @@ Type: STRING
   "type" : "xmlHelper/v1/stringify"
 }
 ```
+
+#### Output
+
+
+
+Type: STRING
+
+
+
+
+
+
 
 
 

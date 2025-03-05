@@ -58,12 +58,7 @@ Send an email to any address.
 | content | Content | STRING | Your email content. Will be sent as a HTML email. | null |
 | attachments | Attachments | ARRAY <details> <summary> Items </summary> [FILE_ENTRY] </details> | A list of attachments to send with the email. | null |
 
-
-#### Output
-
-This action does not produce any output.
-
-#### JSON Example
+#### Example JSON Structure
 ```json
 {
   "label" : "Send",
@@ -86,6 +81,12 @@ This action does not produce any output.
   "type" : "email/v1/send"
 }
 ```
+
+#### Output
+
+This action does not produce any output.
+
+
 
 
 

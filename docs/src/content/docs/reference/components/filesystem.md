@@ -24,6 +24,14 @@ Name: createTempDir
 
 Creates a file in the temporary directory on the filesystem. Returns the created directory's full path.
 
+#### Example JSON Structure
+```json
+{
+  "label" : "Create Temp Directory",
+  "name" : "createTempDir",
+  "type" : "filesystem/v1/createTempDir"
+}
+```
 
 #### Output
 
@@ -40,14 +48,7 @@ Type: STRING
 
 
 
-#### JSON Example
-```json
-{
-  "label" : "Create Temp Directory",
-  "name" : "createTempDir",
-  "type" : "filesystem/v1/createTempDir"
-}
-```
+
 
 
 ### Create
@@ -61,6 +62,17 @@ Creates a directory.
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | path | Path | STRING | The path of a directory. | true |
 
+#### Example JSON Structure
+```json
+{
+  "label" : "Create",
+  "name" : "mkdir",
+  "parameters" : {
+    "path" : ""
+  },
+  "type" : "filesystem/v1/mkdir"
+}
+```
 
 #### Output
 
@@ -77,17 +89,7 @@ Type: STRING
 
 
 
-#### JSON Example
-```json
-{
-  "label" : "Create",
-  "name" : "mkdir",
-  "parameters" : {
-    "path" : ""
-  },
-  "type" : "filesystem/v1/mkdir"
-}
-```
+
 
 
 ### Get Parent Folder
@@ -101,6 +103,17 @@ Gets the path of the parent folder of the file. If the file doesn't exist, it th
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | filename | File path | STRING | The path to full filename. | true |
 
+#### Example JSON Structure
+```json
+{
+  "label" : "Get Parent Folder",
+  "name" : "getFilePath",
+  "parameters" : {
+    "filename" : ""
+  },
+  "type" : "filesystem/v1/getFilePath"
+}
+```
 
 #### Output
 
@@ -117,17 +130,7 @@ Type: STRING
 
 
 
-#### JSON Example
-```json
-{
-  "label" : "Get Parent Folder",
-  "name" : "getFilePath",
-  "parameters" : {
-    "filename" : ""
-  },
-  "type" : "filesystem/v1/getFilePath"
-}
-```
+
 
 
 ### List
@@ -142,24 +145,7 @@ Lists the content of a directory for the given path.
 | path | Path | STRING | The path of a directory. | true |
 | recursive | Recursive | BOOLEAN <details> <summary> Options </summary> true, false </details> | Should the subdirectories be included? | null |
 
-
-#### Output
-
-
-
-Type: ARRAY
-
-
-#### Properties
-
-|     Name     |     Type     |     Description     |
-|:------------:|:------------:|:-------------------:|
-|  | OBJECT <details> <summary> Properties </summary> {STRING\(filename), STRING\(relativePath), INTEGER\(size)} </details> |  |
-
-
-
-
-#### JSON Example
+#### Example JSON Structure
 ```json
 {
   "label" : "List",
@@ -170,6 +156,36 @@ Type: ARRAY
   },
   "type" : "filesystem/v1/ls"
 }
+```
+
+#### Output
+
+
+
+Type: ARRAY
+
+
+Items Type: OBJECT
+
+
+#### Properties
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| filename | STRING | Name of the file. |
+| relativePath | STRING | Relative path of the file. |
+| size | INTEGER | Size of the file. |
+
+
+
+
+
+#### Output Example
+```json
+[ {
+  "filename" : "",
+  "relativePath" : "",
+  "size" : 1
+} ]
 ```
 
 
@@ -184,6 +200,17 @@ Reads all data from a specified file path and outputs it in file entry format.
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | filename | File path | STRING | The path of the file to read. | true |
 
+#### Example JSON Structure
+```json
+{
+  "label" : "Read File",
+  "name" : "readFile",
+  "parameters" : {
+    "filename" : ""
+  },
+  "type" : "filesystem/v1/readFile"
+}
+```
 
 #### Output
 
@@ -204,15 +231,13 @@ Type: FILE_ENTRY
 
 
 
-#### JSON Example
+#### Output Example
 ```json
 {
-  "label" : "Read File",
-  "name" : "readFile",
-  "parameters" : {
-    "filename" : ""
-  },
-  "type" : "filesystem/v1/readFile"
+  "extension" : "",
+  "mimeType" : "",
+  "name" : "",
+  "url" : ""
 }
 ```
 
@@ -228,6 +253,17 @@ Permanently removes the content of a directory.
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | path | Path | STRING | The path of a directory. | true |
 
+#### Example JSON Structure
+```json
+{
+  "label" : "Remove",
+  "name" : "rm",
+  "parameters" : {
+    "path" : ""
+  },
+  "type" : "filesystem/v1/rm"
+}
+```
 
 #### Output
 
@@ -244,17 +280,7 @@ Type: BOOLEAN
 
 
 
-#### JSON Example
-```json
-{
-  "label" : "Remove",
-  "name" : "rm",
-  "parameters" : {
-    "path" : ""
-  },
-  "type" : "filesystem/v1/rm"
-}
-```
+
 
 
 ### Write to File
@@ -269,6 +295,23 @@ null
 | fileEntry | File | FILE_ENTRY | File entry object to be written. | true |
 | filename | File path | STRING | The path to which the file should be written. | true |
 
+#### Example JSON Structure
+```json
+{
+  "label" : "Write to File",
+  "name" : "writeFile",
+  "parameters" : {
+    "fileEntry" : {
+      "extension" : "",
+      "mimeType" : "",
+      "name" : "",
+      "url" : ""
+    },
+    "filename" : ""
+  },
+  "type" : "filesystem/v1/writeFile"
+}
+```
 
 #### Output
 
@@ -291,21 +334,10 @@ Type: OBJECT
 
 
 
-#### JSON Example
+#### Output Example
 ```json
 {
-  "label" : "Write to File",
-  "name" : "writeFile",
-  "parameters" : {
-    "fileEntry" : {
-      "extension" : "",
-      "mimeType" : "",
-      "name" : "",
-      "url" : ""
-    },
-    "filename" : ""
-  },
-  "type" : "filesystem/v1/writeFile"
+  "bytes" : 1
 }
 ```
 

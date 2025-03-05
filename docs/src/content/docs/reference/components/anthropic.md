@@ -57,12 +57,7 @@ Ask anything you want.
 | topK | Top K | INTEGER | Specify the number of token choices the generative uses to generate the next token. | null |
 | stop | Stop | ARRAY <details> <summary> Items </summary> [STRING] </details> | Up to 4 sequences where the API will stop generating further tokens. | null |
 
-
-#### Output
-
-The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
-
-#### JSON Example
+#### Example JSON Structure
 ```json
 {
   "label" : "Ask",
@@ -92,6 +87,12 @@ The output for this action is dynamic and may vary depending on the input parame
   "type" : "anthropic/v1/ask"
 }
 ```
+
+#### Output
+
+The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
+
+
 
 
 

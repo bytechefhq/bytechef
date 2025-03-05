@@ -62,12 +62,7 @@ Ask anything you want.
 | stop | Stop | ARRAY <details> <summary> Items </summary> [STRING] </details> | Up to 4 sequences where the API will stop generating further tokens. | null |
 | user | User | STRING | A unique identifier representing your end-user, which can help admins to monitor and detect abuse. | false |
 
-
-#### Output
-
-The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
-
-#### JSON Example
+#### Example JSON Structure
 ```json
 {
   "label" : "Ask",
@@ -102,6 +97,12 @@ The output for this action is dynamic and may vary depending on the input parame
 }
 ```
 
+#### Output
+
+The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
+
+
+
 
 ### Create Image
 Name: createImage
@@ -120,25 +121,7 @@ Create an image using text-to-image models
 | style | Style | STRING <details> <summary> Options </summary> VIVID, NATURAL </details> | The style of the generated images. Must be one of vivid or natural. Vivid causes the model to lean towards generating hyper-real and dramatic images. Natural causes the model to produce more natural, less hyper-real looking images. This parameter is only supported for dall-e-3. | null |
 | user | User | STRING | A unique identifier representing your end-user, which can help admins to monitor and detect abuse. | false |
 
-
-#### Output
-
-
-
-Type: OBJECT
-
-
-#### Properties
-
-|     Name     |     Type     |     Description     |
-|:------------:|:------------:|:-------------------:|
-| url | STRING |  |
-| b64Json | STRING |  |
-
-
-
-
-#### JSON Example
+#### Example JSON Structure
 ```json
 {
   "label" : "Create Image",
@@ -159,6 +142,31 @@ Type: OBJECT
 }
 ```
 
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| url | STRING |  |
+| b64Json | STRING |  |
+
+
+
+
+#### Output Example
+```json
+{
+  "url" : "",
+  "b64Json" : ""
+}
+```
+
 
 ### Create Transcriptions
 Name: createTranscription
@@ -176,12 +184,7 @@ Transcribes audio into the input language.
 | responseFormat | Response Format | STRING <details> <summary> Options </summary> JSON, SRT, TEXT, VERBOSE_JSON, VTT </details> | The format of the transcript output | true |
 | temperature | Temperature | NUMBER | The sampling temperature, between 0 and 1. Higher values like will make the output more random, while lower values will make it more focused and deterministic.  | false |
 
-
-#### Output
-
-The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
-
-#### JSON Example
+#### Example JSON Structure
 ```json
 {
   "label" : "Create Transcriptions",
@@ -202,6 +205,12 @@ The output for this action is dynamic and may vary depending on the input parame
   "type" : "azureOpenAi/v1/createTranscription"
 }
 ```
+
+#### Output
+
+The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
+
+
 
 
 
