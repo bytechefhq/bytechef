@@ -19,10 +19,10 @@
   "actions" : [ {
     "batch" : null,
     "deprecated" : null,
-    "description" : "Send approval message to a channel and then wait until the message is approved or disapproved.",
+    "description" : "Sends approval message to a channel.",
     "help" : null,
     "metadata" : null,
-    "name" : "requestApprovalMessage",
+    "name" : "sendApprovalMessage",
     "outputDefinition" : {
       "output" : null,
       "outputResponse" : {
@@ -687,7 +687,7 @@
       "options" : null,
       "optionsDataSource" : null
     } ],
-    "title" : "Request Approval in a Channel",
+    "title" : "Send Approval Message",
     "perform" : { },
     "processErrorResponse" : null,
     "workflowNodeDescription" : null
