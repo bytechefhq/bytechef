@@ -52,12 +52,7 @@ Creates a new record in datasheet.
 | datasheetId | Datasheet ID | STRING <details> <summary> Depends On </summary> spaceId </details> | AITable Datasheet ID | true |
 | fields | | DYNAMIC_PROPERTIES <details> <summary> Depends On </summary> datasheetId </details> |  | null |
 
-
-#### Output
-
-The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
-
-#### JSON Example
+#### Example JSON Structure
 ```json
 {
   "label" : "Create Record",
@@ -70,6 +65,12 @@ The output for this action is dynamic and may vary depending on the input parame
   "type" : "aitable/v1/createRecord"
 }
 ```
+
+#### Output
+
+The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
+
+
 
 
 ### Find Records
@@ -87,12 +88,7 @@ Find records in datasheet
 | recordIds | Record IDs | ARRAY <details> <summary> Items </summary> [STRING] </details> | The IDs of the records to find. | false |
 | maxRecords | Max Records | INTEGER | How many records are returned in total | false |
 
-
-#### Output
-
-The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
-
-#### JSON Example
+#### Example JSON Structure
 ```json
 {
   "label" : "Find Records",
@@ -107,6 +103,12 @@ The output for this action is dynamic and may vary depending on the input parame
   "type" : "aitable/v1/findRecords"
 }
 ```
+
+#### Output
+
+The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
+
+
 
 
 ### Update Record
@@ -123,12 +125,7 @@ Update record in datasheet
 | recordId | Record ID | STRING <details> <summary> Depends On </summary> datasheetId </details> | ID of the record to update. | true |
 | fields | | DYNAMIC_PROPERTIES <details> <summary> Depends On </summary> datasheetId </details> |  | null |
 
-
-#### Output
-
-The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
-
-#### JSON Example
+#### Example JSON Structure
 ```json
 {
   "label" : "Update Record",
@@ -142,6 +139,12 @@ The output for this action is dynamic and may vary depending on the input parame
   "type" : "aitable/v1/updateRecord"
 }
 ```
+
+#### Output
+
+The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
+
+
 
 
 

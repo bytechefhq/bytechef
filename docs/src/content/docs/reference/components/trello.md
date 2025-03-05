@@ -52,12 +52,7 @@ Creates a new board.
 | name | Name | STRING | The new name for the board. | true |
 | desc | Description | STRING | A new description for the board. | false |
 
-
-#### Output
-
-This action does not produce any output.
-
-#### JSON Example
+#### Example JSON Structure
 ```json
 {
   "label" : "Create Board",
@@ -69,6 +64,12 @@ This action does not produce any output.
   "type" : "trello/v1/createBoard"
 }
 ```
+
+#### Output
+
+This action does not produce any output.
+
+
 
 
 ### Create Card
@@ -85,6 +86,20 @@ Creates a new card.
 | name | Name | STRING | The name for the card. | false |
 | desc | Description | STRING | The description for the card. | false |
 
+#### Example JSON Structure
+```json
+{
+  "label" : "Create Card",
+  "name" : "createCard",
+  "parameters" : {
+    "idBoard" : "",
+    "idList" : "",
+    "name" : "",
+    "desc" : ""
+  },
+  "type" : "trello/v1/createCard"
+}
+```
 
 #### Output
 
@@ -106,18 +121,14 @@ Type: OBJECT
 
 
 
-#### JSON Example
+#### Output Example
 ```json
 {
-  "label" : "Create Card",
-  "name" : "createCard",
-  "parameters" : {
-    "idBoard" : "",
-    "idList" : "",
-    "name" : "",
-    "desc" : ""
-  },
-  "type" : "trello/v1/createCard"
+  "id" : "",
+  "desc" : "",
+  "idBoard" : "",
+  "idList" : "",
+  "name" : ""
 }
 ```
 
@@ -134,6 +145,18 @@ Gets a card details.
 | idBoard | Board ID | STRING | ID of the board where card is located. | true |
 | id | Card ID | STRING <details> <summary> Depends On </summary> idBoard </details> |  | true |
 
+#### Example JSON Structure
+```json
+{
+  "label" : "Get Card",
+  "name" : "getCard",
+  "parameters" : {
+    "idBoard" : "",
+    "id" : ""
+  },
+  "type" : "trello/v1/getCard"
+}
+```
 
 #### Output
 
@@ -155,16 +178,14 @@ Type: OBJECT
 
 
 
-#### JSON Example
+#### Output Example
 ```json
 {
-  "label" : "Get Card",
-  "name" : "getCard",
-  "parameters" : {
-    "idBoard" : "",
-    "id" : ""
-  },
-  "type" : "trello/v1/getCard"
+  "id" : "",
+  "desc" : "",
+  "idBoard" : "",
+  "idList" : "",
+  "name" : ""
 }
 ```
 

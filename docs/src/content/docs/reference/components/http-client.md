@@ -138,12 +138,7 @@ The request method to use.
 | proxy | Proxy | STRING | HTTP proxy to use. | null |
 | timeout | Timeout | INTEGER | Time in ms to wait for the server to send a response before aborting the request. | null |
 
-
-#### Output
-
-The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
-
-#### JSON Example
+#### Example JSON Structure
 ```json
 {
   "label" : "GET",
@@ -165,6 +160,12 @@ The output for this action is dynamic and may vary depending on the input parame
   "type" : "httpClient/v1/get"
 }
 ```
+
+#### Output
+
+The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
+
+
 
 
 ### POST
@@ -190,12 +191,7 @@ The request method to use.
 | proxy | Proxy | STRING | HTTP proxy to use. | null |
 | timeout | Timeout | INTEGER | Time in ms to wait for the server to send a response before aborting the request. | null |
 
-
-#### Output
-
-The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
-
-#### JSON Example
+#### Example JSON Structure
 ```json
 {
   "label" : "POST",
@@ -228,6 +224,12 @@ The output for this action is dynamic and may vary depending on the input parame
 }
 ```
 
+#### Output
+
+The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
+
+
+
 
 ### PUT
 Name: put
@@ -252,12 +254,7 @@ The request method to use.
 | proxy | Proxy | STRING | HTTP proxy to use. | null |
 | timeout | Timeout | INTEGER | Time in ms to wait for the server to send a response before aborting the request. | null |
 
-
-#### Output
-
-The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
-
-#### JSON Example
+#### Example JSON Structure
 ```json
 {
   "label" : "PUT",
@@ -290,6 +287,12 @@ The output for this action is dynamic and may vary depending on the input parame
 }
 ```
 
+#### Output
+
+The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
+
+
+
 
 ### PATCH
 Name: patch
@@ -314,12 +317,7 @@ The request method to use.
 | proxy | Proxy | STRING | HTTP proxy to use. | null |
 | timeout | Timeout | INTEGER | Time in ms to wait for the server to send a response before aborting the request. | null |
 
-
-#### Output
-
-The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
-
-#### JSON Example
+#### Example JSON Structure
 ```json
 {
   "label" : "PATCH",
@@ -352,6 +350,12 @@ The output for this action is dynamic and may vary depending on the input parame
 }
 ```
 
+#### Output
+
+The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
+
+
+
 
 ### DELETE
 Name: delete
@@ -375,12 +379,7 @@ The request method to use.
 | proxy | Proxy | STRING | HTTP proxy to use. | null |
 | timeout | Timeout | INTEGER | Time in ms to wait for the server to send a response before aborting the request. | null |
 
-
-#### Output
-
-The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
-
-#### JSON Example
+#### Example JSON Structure
 ```json
 {
   "label" : "DELETE",
@@ -402,6 +401,12 @@ The output for this action is dynamic and may vary depending on the input parame
   "type" : "httpClient/v1/delete"
 }
 ```
+
+#### Output
+
+The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
+
+
 
 
 ### HEAD
@@ -426,12 +431,7 @@ The request method to use.
 | proxy | Proxy | STRING | HTTP proxy to use. | null |
 | timeout | Timeout | INTEGER | Time in ms to wait for the server to send a response before aborting the request. | null |
 
-
-#### Output
-
-The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
-
-#### JSON Example
+#### Example JSON Structure
 ```json
 {
   "label" : "HEAD",
@@ -453,6 +453,12 @@ The output for this action is dynamic and may vary depending on the input parame
   "type" : "httpClient/v1/head"
 }
 ```
+
+#### Output
+
+The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
+
+
 
 
 

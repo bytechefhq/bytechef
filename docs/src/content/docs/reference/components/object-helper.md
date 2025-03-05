@@ -42,12 +42,7 @@ Add value to the object by key if it exists. Otherwise, update the value
 | value | Value | STRING | Value to be added or updated. | true |
 | value | Value | TIME | Value to be added or updated. | true |
 
-
-#### Output
-
-The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
-
-#### JSON Example
+#### Example JSON Structure
 ```json
 {
   "label" : "Add Value to the Object by Key",
@@ -61,6 +56,12 @@ The output for this action is dynamic and may vary depending on the input parame
   "type" : "objectHelper/v1/addValueByKey"
 }
 ```
+
+#### Output
+
+The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
+
+
 
 
 ### Add Key-Value Pairs to Object or Array
@@ -77,12 +78,7 @@ Add values from list to object or array. If the source is object, the items in t
 | source | Source | OBJECT <details> <summary> Properties </summary> {} </details> | Source object to be added or updated | true |
 | value | Key-Value Pairs | OBJECT <details> <summary> Properties </summary> {} </details> | Key-Value pairs to be added or updated. | true |
 
-
-#### Output
-
-The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
-
-#### JSON Example
+#### Example JSON Structure
 ```json
 {
   "label" : "Add Key-Value Pairs to Object or Array",
@@ -95,6 +91,12 @@ The output for this action is dynamic and may vary depending on the input parame
   "type" : "objectHelper/v1/addKeyValuePairs"
 }
 ```
+
+#### Output
+
+The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
+
+
 
 
 ### Contains
@@ -109,18 +111,7 @@ Checks if the given key exists in the given object.
 | input | Input | OBJECT <details> <summary> Properties </summary> {} </details> | Object that you'd like to check. | true |
 | key | Key | STRING | Key to check for existence. | true |
 
-
-#### Output
-
-
-
-Type: BOOLEAN
-
-
-
-
-
-#### JSON Example
+#### Example JSON Structure
 ```json
 {
   "label" : "Contains",
@@ -132,6 +123,18 @@ Type: BOOLEAN
   "type" : "objectHelper/v1/contains"
 }
 ```
+
+#### Output
+
+
+
+Type: BOOLEAN
+
+
+
+
+
+
 
 
 ### Delete Key-Value Pair
@@ -146,12 +149,7 @@ Deletes a key-value pair in the given object by the specified key. Returns the m
 | input | Input | OBJECT <details> <summary> Properties </summary> {} </details> | The object from which to delete the key-value pair. | true |
 | key | Key | STRING | The key of the key-value pair to delete. | true |
 
-
-#### Output
-
-The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
-
-#### JSON Example
+#### Example JSON Structure
 ```json
 {
   "label" : "Delete Key-Value Pair",
@@ -163,6 +161,12 @@ The output for this action is dynamic and may vary depending on the input parame
   "type" : "objectHelper/v1/deleteKeyValuePair"
 }
 ```
+
+#### Output
+
+The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
+
+
 
 
 ### Equals
@@ -177,18 +181,7 @@ Compares two objects and returns true if they are equal.
 | source | Source | OBJECT <details> <summary> Properties </summary> {} </details> | The source object to compare. | true |
 | target | Target | OBJECT <details> <summary> Properties </summary> {} </details> | The target object to compare against. | true |
 
-
-#### Output
-
-
-
-Type: BOOLEAN
-
-
-
-
-
-#### JSON Example
+#### Example JSON Structure
 ```json
 {
   "label" : "Equals",
@@ -200,6 +193,18 @@ Type: BOOLEAN
   "type" : "objectHelper/v1/equals"
 }
 ```
+
+#### Output
+
+
+
+Type: BOOLEAN
+
+
+
+
+
+
 
 
 ### Merge Two Objects
@@ -214,12 +219,7 @@ Merge two objects into one. If there is any property with the same name, the sou
 | source | Source | OBJECT <details> <summary> Properties </summary> {} </details> | The source object to merge. | true |
 | target | Target | OBJECT <details> <summary> Properties </summary> {} </details> | The target object to merge into. | true |
 
-
-#### Output
-
-The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
-
-#### JSON Example
+#### Example JSON Structure
 ```json
 {
   "label" : "Merge Two Objects",
@@ -231,6 +231,12 @@ The output for this action is dynamic and may vary depending on the input parame
   "type" : "objectHelper/v1/mergeTwoObjects"
 }
 ```
+
+#### Output
+
+The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
+
+
 
 
 

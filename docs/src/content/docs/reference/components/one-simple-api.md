@@ -52,6 +52,19 @@ Convert currency from one to another.
 | to_currency | To Currency | STRING <details> <summary> Options </summary> AED, AFN, ALL, AMD, ANG, AOA, ARS, AUD, AWG, AZN, BAM, BBD, BDT, BGN, BHD, BIF, BMD, BND, BOB, BRL, BSD, BTN, BWP, BYN, BZD, CAD, CDF, CHF, CLP, CNY, COP, CRC, CUC, CUP, CVE, CZK, DJF, DKK, DOP, DZD, EGP, ERN, ETB, EUR, FJD, FKP, FOK, GBP, GEL, GGP, GHS, GIP, GMD, GNF, GTQ, GYD, HKD, HNL, HRK, HTG, HUF, IDR, ILS, IMP, INR, IQD, IRR, ISK, JMD, JOD, JPY, KES, KGS, KHR, KID, KMF, KRW, KWD, KYD, KZT, LAK, LBP, LKR, LRD, LSL, LYD, MAD, MDL, MGA, MKD, MMK, MNT, MOP, MRU, MUR, MVR, MWK, MXN, MYR, MZN, NAD, NGN, NIO, NOK, NPR, NZD, OMR, PAB, PEN, PGK, PHP, PKR, PLN, PYG, QAR, RON, RSD, RUB, RWF, SAR, SBD, SCR, SDG, SEK, SGD, SHP, SLL, SOS, SRD, SSP, STN, SYP, SZL, THB, TJS, TMT, TND, TOP, TRY, TTD, TVD, TWD, TZS, UAH, UGX, USD, UYU, UZS, VES, VND, VUV, WST, XAF, XCD, XDR, XOF, XPF, YER, ZAR, ZMW </details> | Currency to which you want to convert. | true |
 | from_value | Value | NUMBER | Value to convert. | true |
 
+#### Example JSON Structure
+```json
+{
+  "label" : "Currency Converter",
+  "name" : "currencyConverter",
+  "parameters" : {
+    "from_currency" : "",
+    "to_currency" : "",
+    "from_value" : 0.0
+  },
+  "type" : "oneSimpleAPI/v1/currencyConverter"
+}
+```
 
 #### Output
 
@@ -73,17 +86,14 @@ Type: OBJECT
 
 
 
-#### JSON Example
+#### Output Example
 ```json
 {
-  "label" : "Currency Converter",
-  "name" : "currencyConverter",
-  "parameters" : {
-    "from_currency" : "",
-    "to_currency" : "",
-    "from_value" : 0.0
-  },
-  "type" : "oneSimpleAPI/v1/currencyConverter"
+  "from_currency" : "",
+  "from_value" : "",
+  "to_currency" : "",
+  "to_value" : 0.0,
+  "to_exchange_rate" : ""
 }
 ```
 
@@ -99,6 +109,17 @@ Shorten your desired URL
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | url | URL | STRING | Place the URL you want to shorten | true |
 
+#### Example JSON Structure
+```json
+{
+  "label" : "URL Shortener",
+  "name" : "urlShortener",
+  "parameters" : {
+    "url" : ""
+  },
+  "type" : "oneSimpleAPI/v1/urlShortener"
+}
+```
 
 #### Output
 
@@ -120,15 +141,14 @@ Type: OBJECT
 
 
 
-#### JSON Example
+#### Output Example
 ```json
 {
-  "label" : "URL Shortener",
-  "name" : "urlShortener",
-  "parameters" : {
-    "url" : ""
-  },
-  "type" : "oneSimpleAPI/v1/urlShortener"
+  "url" : "",
+  "single_use" : "",
+  "temporary_redirect" : "",
+  "forward_params" : "",
+  "short_url" : ""
 }
 ```
 
@@ -144,6 +164,17 @@ Get information about a certain webpage
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | url | URL | STRING | Place the web page url you want to get info from | true |
 
+#### Example JSON Structure
+```json
+{
+  "label" : "Web Page Information",
+  "name" : "webInformation",
+  "parameters" : {
+    "url" : ""
+  },
+  "type" : "oneSimpleAPI/v1/webInformation"
+}
+```
 
 #### Output
 
@@ -163,15 +194,26 @@ Type: OBJECT
 
 
 
-#### JSON Example
+#### Output Example
 ```json
 {
-  "label" : "Web Page Information",
-  "name" : "webInformation",
-  "parameters" : {
-    "url" : ""
+  "general" : {
+    "title" : "",
+    "description" : "",
+    "canonical" : ""
   },
-  "type" : "oneSimpleAPI/v1/webInformation"
+  "twitter" : {
+    "site" : "",
+    "title" : "",
+    "description" : ""
+  },
+  "og" : {
+    "title" : "",
+    "url" : "",
+    "image" : "",
+    "description" : "",
+    "type" : ""
+  }
 }
 ```
 

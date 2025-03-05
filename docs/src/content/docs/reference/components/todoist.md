@@ -54,6 +54,20 @@ Creates a new task.
 | project_id | Project ID | STRING | Task project ID. If not set, task is put to user's Inbox. | false |
 | priority | Priority | INTEGER <details> <summary> Options </summary> 1, 2, 3, 4 </details> | Task priority from 1 (normal) to 4 (urgent). | false |
 
+#### Example JSON Structure
+```json
+{
+  "label" : "Create Task",
+  "name" : "createTask",
+  "parameters" : {
+    "content" : "",
+    "description" : "",
+    "project_id" : "",
+    "priority" : 1
+  },
+  "type" : "todoist/v1/createTask"
+}
+```
 
 #### Output
 
@@ -75,18 +89,14 @@ Type: OBJECT
 
 
 
-#### JSON Example
+#### Output Example
 ```json
 {
-  "label" : "Create Task",
-  "name" : "createTask",
-  "parameters" : {
-    "content" : "",
-    "description" : "",
-    "project_id" : "",
-    "priority" : 1
-  },
-  "type" : "todoist/v1/createTask"
+  "id" : "",
+  "project_id" : "",
+  "content" : "",
+  "description" : "",
+  "priority" : 1
 }
 ```
 
@@ -102,12 +112,7 @@ Mark a tas as being completed.
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | taskId | Task ID | STRING | ID of the task to be closed. | true |
 
-
-#### Output
-
-This action does not produce any output.
-
-#### JSON Example
+#### Example JSON Structure
 ```json
 {
   "label" : "Mark Task as Completed",
@@ -118,6 +123,12 @@ This action does not produce any output.
   "type" : "todoist/v1/markTaskCompleted"
 }
 ```
+
+#### Output
+
+This action does not produce any output.
+
+
 
 
 ### Create Project
@@ -133,6 +144,19 @@ Creates a new project.
 | color | Color | STRING <details> <summary> Options </summary> beryy_red, red, orange, yellow, olive_green, lime_green, green, mint_green, teal, sky_blue, light_blue, blue, grape, violet, lavender, magenta, salmon, charcoal, grey, taupe </details> |  | false |
 | is_favorite | Is Project a Favorite? | BOOLEAN <details> <summary> Options </summary> true, false </details> | Whether the project is a favorite. | false |
 
+#### Example JSON Structure
+```json
+{
+  "label" : "Create Project",
+  "name" : "createProject",
+  "parameters" : {
+    "name" : "",
+    "color" : "",
+    "is_favorite" : false
+  },
+  "type" : "todoist/v1/createProject"
+}
+```
 
 #### Output
 
@@ -154,17 +178,14 @@ Type: OBJECT
 
 
 
-#### JSON Example
+#### Output Example
 ```json
 {
-  "label" : "Create Project",
-  "name" : "createProject",
-  "parameters" : {
-    "name" : "",
-    "color" : "",
-    "is_favorite" : false
-  },
-  "type" : "todoist/v1/createProject"
+  "id" : "",
+  "name" : "",
+  "color" : "",
+  "is_favorite" : "",
+  "url" : ""
 }
 ```
 

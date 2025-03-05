@@ -55,6 +55,21 @@ Creates new contact.
 | PHONE | Phone | STRING | Phone number of the contact. | false |
 | TITLE | Title | STRING | The contact's title in company. | false |
 
+#### Example JSON Structure
+```json
+{
+  "label" : "Create Contact",
+  "name" : "createContact",
+  "parameters" : {
+    "FIRST_NAME" : "",
+    "LAST_NAME" : "",
+    "EMAIL_ADDRESS" : "",
+    "PHONE" : "",
+    "TITLE" : ""
+  },
+  "type" : "insightly/v1/createContact"
+}
+```
 
 #### Output
 
@@ -77,19 +92,15 @@ Type: OBJECT
 
 
 
-#### JSON Example
+#### Output Example
 ```json
 {
-  "label" : "Create Contact",
-  "name" : "createContact",
-  "parameters" : {
-    "FIRST_NAME" : "",
-    "LAST_NAME" : "",
-    "EMAIL_ADDRESS" : "",
-    "PHONE" : "",
-    "TITLE" : ""
-  },
-  "type" : "insightly/v1/createContact"
+  "CONTACT_ID" : 1,
+  "FIRST_NAME" : "",
+  "LAST_NAME" : "",
+  "EMAIL_ADDRESS" : "",
+  "PHONE" : "",
+  "TITLE" : ""
 }
 ```
 
@@ -107,6 +118,19 @@ Creates new organization.
 | PHONE | Phone | STRING | A contact phone number for the organization. | false |
 | WEBSITE | Website | STRING | The organization's website. | false |
 
+#### Example JSON Structure
+```json
+{
+  "label" : "Create Organization",
+  "name" : "createOrganization",
+  "parameters" : {
+    "ORGANISATION_NAME" : "",
+    "PHONE" : "",
+    "WEBSITE" : ""
+  },
+  "type" : "insightly/v1/createOrganization"
+}
+```
 
 #### Output
 
@@ -127,17 +151,13 @@ Type: OBJECT
 
 
 
-#### JSON Example
+#### Output Example
 ```json
 {
-  "label" : "Create Organization",
-  "name" : "createOrganization",
-  "parameters" : {
-    "ORGANISATION_NAME" : "",
-    "PHONE" : "",
-    "WEBSITE" : ""
-  },
-  "type" : "insightly/v1/createOrganization"
+  "ORGANISATION_ID" : 1,
+  "ORGANISATION_NAME" : "",
+  "PHONE" : "",
+  "WEBSITE" : ""
 }
 ```
 
@@ -154,6 +174,18 @@ Creates new task.
 | TITLE | Title | STRING |  | true |
 | STATUS | Status | STRING <details> <summary> Options </summary> Not Started, In Progress, Completed, Deferred, Waiting </details> | Task status | false |
 
+#### Example JSON Structure
+```json
+{
+  "label" : "Create Task",
+  "name" : "createTask",
+  "parameters" : {
+    "TITLE" : "",
+    "STATUS" : ""
+  },
+  "type" : "insightly/v1/createTask"
+}
+```
 
 #### Output
 
@@ -173,16 +205,12 @@ Type: OBJECT
 
 
 
-#### JSON Example
+#### Output Example
 ```json
 {
-  "label" : "Create Task",
-  "name" : "createTask",
-  "parameters" : {
-    "TITLE" : "",
-    "STATUS" : ""
-  },
-  "type" : "insightly/v1/createTask"
+  "TASK_ID" : 1,
+  "TITLE" : "",
+  "STATUS" : ""
 }
 ```
 

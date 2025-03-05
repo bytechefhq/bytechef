@@ -54,6 +54,20 @@ Creates a new activity.
 | type | Parent Type | STRING <details> <summary> Options </summary> lead, person, company, opportunity </details> | Parent type to associate this activity with. | true |
 | id | Parent ID | STRING <details> <summary> Depends On </summary> type </details> | ID of the parent this activity will be associated with. | true |
 
+#### Example JSON Structure
+```json
+{
+  "label" : "Create Activity",
+  "name" : "createActivity",
+  "parameters" : {
+    "activity_type" : "",
+    "details" : "",
+    "type" : "",
+    "id" : ""
+  },
+  "type" : "copper/v1/createActivity"
+}
+```
 
 #### Output
 
@@ -74,18 +88,19 @@ Type: OBJECT
 
 
 
-#### JSON Example
+#### Output Example
 ```json
 {
-  "label" : "Create Activity",
-  "name" : "createActivity",
-  "parameters" : {
-    "activity_type" : "",
-    "details" : "",
-    "type" : "",
+  "id" : "",
+  "type" : {
+    "category" : "",
     "id" : ""
   },
-  "type" : "copper/v1/createActivity"
+  "details" : "",
+  "parent" : {
+    "type" : "",
+    "id" : ""
+  }
 }
 ```
 
@@ -110,34 +125,7 @@ Creates a new company.
 | address | Address | OBJECT <details> <summary> Properties </summary> {STRING\(street), STRING\(city), STRING\(state), STRING\(postal_code), STRING\(country)} </details> | Company's street, city, state, postal code, and country. | false |
 | tags | Tags | ARRAY <details> <summary> Items </summary> [STRING] </details> | Tags associated with the company | false |
 
-
-#### Output
-
-
-
-Type: OBJECT
-
-
-#### Properties
-
-|     Name     |     Type     |     Description     |
-|:------------:|:------------:|:-------------------:|
-| id | STRING | ID of the new company. |
-| name | STRING | Name of the new company. |
-| address | OBJECT <details> <summary> Properties </summary> {STRING\(street), STRING\(city), STRING\(state), STRING\(postal_code), STRING\(country)} </details> | Address of the new company. |
-| assignee_id | STRING | ID of the user that is owner of the new company. |
-| contact_type_id | STRING | ID of the contact type of the new company. |
-| details | STRING | Description of the new company. |
-| email_domain | STRING | Domain to which email addresses of the new company belong. |
-| phone_numbers | ARRAY <details> <summary> Items </summary> [{STRING\(number), STRING\(category)}] </details> | Phone numbers belonging to the new company. |
-| socials | ARRAY <details> <summary> Items </summary> [{STRING\(url), STRING\(category)}] </details> | Social profiles belonging to the company. |
-| tags | ARRAY <details> <summary> Items </summary> [STRING] </details> | Tags associated with the company. |
-| websites | ARRAY <details> <summary> Items </summary> [{STRING\(url), STRING\(category)}] </details> | Websites belonging to the company. |
-
-
-
-
-#### JSON Example
+#### Example JSON Structure
 ```json
 {
   "label" : "Create Company",
@@ -173,6 +161,64 @@ Type: OBJECT
 }
 ```
 
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| id | STRING | ID of the new company. |
+| name | STRING | Name of the new company. |
+| address | OBJECT <details> <summary> Properties </summary> {STRING\(street), STRING\(city), STRING\(state), STRING\(postal_code), STRING\(country)} </details> | Address of the new company. |
+| assignee_id | STRING | ID of the user that is owner of the new company. |
+| contact_type_id | STRING | ID of the contact type of the new company. |
+| details | STRING | Description of the new company. |
+| email_domain | STRING | Domain to which email addresses of the new company belong. |
+| phone_numbers | ARRAY <details> <summary> Items </summary> [{STRING\(number), STRING\(category)}] </details> | Phone numbers belonging to the new company. |
+| socials | ARRAY <details> <summary> Items </summary> [{STRING\(url), STRING\(category)}] </details> | Social profiles belonging to the company. |
+| tags | ARRAY <details> <summary> Items </summary> [STRING] </details> | Tags associated with the company. |
+| websites | ARRAY <details> <summary> Items </summary> [{STRING\(url), STRING\(category)}] </details> | Websites belonging to the company. |
+
+
+
+
+#### Output Example
+```json
+{
+  "id" : "",
+  "name" : "",
+  "address" : {
+    "street" : "",
+    "city" : "",
+    "state" : "",
+    "postal_code" : "",
+    "country" : ""
+  },
+  "assignee_id" : "",
+  "contact_type_id" : "",
+  "details" : "",
+  "email_domain" : "",
+  "phone_numbers" : [ {
+    "number" : "",
+    "category" : ""
+  } ],
+  "socials" : [ {
+    "url" : "",
+    "category" : ""
+  } ],
+  "tags" : [ "" ],
+  "websites" : [ {
+    "url" : "",
+    "category" : ""
+  } ]
+}
+```
+
 
 ### Create Person
 Name: createPerson
@@ -196,37 +242,7 @@ Creates a new person.
 | address | Address | OBJECT <details> <summary> Properties </summary> {STRING\(street), STRING\(city), STRING\(state), STRING\(postal_code), STRING\(country)} </details> | Person's street, city, state, postal code, and country. | false |
 | tags | Tags | ARRAY <details> <summary> Items </summary> [STRING] </details> | Tags associated with the person. | false |
 
-
-#### Output
-
-
-
-Type: OBJECT
-
-
-#### Properties
-
-|     Name     |     Type     |     Description     |
-|:------------:|:------------:|:-------------------:|
-| id | STRING | ID of the new person. |
-| name | STRING | First and last name of the new person. |
-| address | OBJECT <details> <summary> Properties </summary> {STRING\(street), STRING\(city), STRING\(state), STRING\(postal_code), STRING\(country)} </details> | Address of the new person. |
-| assignee_id | STRING | ID of the user that is owner of the new person. |
-| company_id | STRING | ID of the primary company with which the new person is associated. |
-| company_name | STRING | The name of the primary company with which the new person is associated. |
-| contact_type_id | STRING | ID of the contact type of the new person. |
-| details | STRING | Description of the new person. |
-| emails | ARRAY <details> <summary> Items </summary> [{STRING\(email), STRING\(category)}] </details> | Email addresses belonging to the new person. |
-| phone_numbers | ARRAY <details> <summary> Items </summary> [{STRING\(number), STRING\(category)}] </details> | Phone numbers belonging to the new person. |
-| socials | ARRAY <details> <summary> Items </summary> [{STRING\(url), STRING\(category)}] </details> | Social profiles belonging to the person. |
-| tags | ARRAY <details> <summary> Items </summary> [STRING] </details> | Tags associated with the person. |
-| title | STRING |  |
-| websites | ARRAY <details> <summary> Items </summary> [{STRING\(url), STRING\(category)}] </details> | Websites belonging to the person. |
-
-
-
-
-#### JSON Example
+#### Example JSON Structure
 ```json
 {
   "label" : "Create Person",
@@ -267,6 +283,73 @@ Type: OBJECT
 }
 ```
 
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| id | STRING | ID of the new person. |
+| name | STRING | First and last name of the new person. |
+| address | OBJECT <details> <summary> Properties </summary> {STRING\(street), STRING\(city), STRING\(state), STRING\(postal_code), STRING\(country)} </details> | Address of the new person. |
+| assignee_id | STRING | ID of the user that is owner of the new person. |
+| company_id | STRING | ID of the primary company with which the new person is associated. |
+| company_name | STRING | The name of the primary company with which the new person is associated. |
+| contact_type_id | STRING | ID of the contact type of the new person. |
+| details | STRING | Description of the new person. |
+| emails | ARRAY <details> <summary> Items </summary> [{STRING\(email), STRING\(category)}] </details> | Email addresses belonging to the new person. |
+| phone_numbers | ARRAY <details> <summary> Items </summary> [{STRING\(number), STRING\(category)}] </details> | Phone numbers belonging to the new person. |
+| socials | ARRAY <details> <summary> Items </summary> [{STRING\(url), STRING\(category)}] </details> | Social profiles belonging to the person. |
+| tags | ARRAY <details> <summary> Items </summary> [STRING] </details> | Tags associated with the person. |
+| title | STRING |  |
+| websites | ARRAY <details> <summary> Items </summary> [{STRING\(url), STRING\(category)}] </details> | Websites belonging to the person. |
+
+
+
+
+#### Output Example
+```json
+{
+  "id" : "",
+  "name" : "",
+  "address" : {
+    "street" : "",
+    "city" : "",
+    "state" : "",
+    "postal_code" : "",
+    "country" : ""
+  },
+  "assignee_id" : "",
+  "company_id" : "",
+  "company_name" : "",
+  "contact_type_id" : "",
+  "details" : "",
+  "emails" : [ {
+    "email" : "",
+    "category" : ""
+  } ],
+  "phone_numbers" : [ {
+    "number" : "",
+    "category" : ""
+  } ],
+  "socials" : [ {
+    "url" : "",
+    "category" : ""
+  } ],
+  "tags" : [ "" ],
+  "title" : "",
+  "websites" : [ {
+    "url" : "",
+    "category" : ""
+  } ]
+}
+```
+
 
 ### Create Task
 Name: createTask
@@ -286,6 +369,24 @@ Creates a new task in Copper.
 | tags | Tags | ARRAY <details> <summary> Items </summary> [STRING] </details> |  | false |
 | status | Status | STRING <details> <summary> Options </summary> Open, Completed </details> | The status of the task. | true |
 
+#### Example JSON Structure
+```json
+{
+  "label" : "Create Task",
+  "name" : "createTask",
+  "parameters" : {
+    "name" : "",
+    "assignee_id" : "",
+    "due_date" : "2021-01-01",
+    "reminder_date" : "2021-01-01",
+    "details" : "",
+    "priority" : "",
+    "tags" : [ "" ],
+    "status" : ""
+  },
+  "type" : "copper/v1/createTask"
+}
+```
 
 #### Output
 
@@ -313,22 +414,23 @@ Type: OBJECT
 
 
 
-#### JSON Example
+#### Output Example
 ```json
 {
-  "label" : "Create Task",
-  "name" : "createTask",
-  "parameters" : {
-    "name" : "",
-    "assignee_id" : "",
-    "due_date" : "2021-01-01",
-    "reminder_date" : "2021-01-01",
-    "details" : "",
-    "priority" : "",
-    "tags" : [ "" ],
-    "status" : ""
+  "id" : "",
+  "name" : "",
+  "related_resource" : {
+    "id" : "",
+    "type" : ""
   },
-  "type" : "copper/v1/createTask"
+  "assignee_id" : "",
+  "due_date" : "",
+  "reminder_date" : "",
+  "completed_date" : "",
+  "priority" : "",
+  "status" : "",
+  "details" : "",
+  "tags" : [ "" ]
 }
 ```
 

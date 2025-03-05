@@ -83,12 +83,7 @@ Ask anything you want.
 | penalizeNewLine | Penalize new line | BOOLEAN <details> <summary> Options </summary> true, false </details> |  | null |
 | truncate | Truncate | BOOLEAN <details> <summary> Options </summary> true, false </details> |  | null |
 
-
-#### Output
-
-The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
-
-#### JSON Example
+#### Example JSON Structure
 ```json
 {
   "label" : "Ask",
@@ -144,6 +139,12 @@ The output for this action is dynamic and may vary depending on the input parame
   "type" : "ollama/v1/ask"
 }
 ```
+
+#### Output
+
+The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
+
+
 
 
 

@@ -37,18 +37,7 @@ Add time to the date.
 | minute | Minute | INTEGER | Minutes to add. | false |
 | second | Second | INTEGER | Seconds to add. | false |
 
-
-#### Output
-
-
-
-Type: STRING
-
-
-
-
-
-#### JSON Example
+#### Example JSON Structure
 ```json
 {
   "label" : "Add Time",
@@ -67,6 +56,18 @@ Type: STRING
 }
 ```
 
+#### Output
+
+
+
+Type: STRING
+
+
+
+
+
+
+
 
 ### Convert Date Timestamp
 Name: convertUnixTimestampToIso8601
@@ -80,18 +81,7 @@ Converts UNIX timestamp to ISO8601 format.
 | dateTimestamp | UNIX Timestamp | NUMBER | UNIX Timestamp in seconds (10 digits) or milliseconds (13 digits) | true |
 | dateFormat | Date Format | STRING <details> <summary> Options </summary> yyyy-MM-dd'T'HH:mm:ss.SSSZ, yyyy-MM-dd </details> | Formatting that should be applied the text representation of date. | true |
 
-
-#### Output
-
-
-
-Type: STRING
-
-
-
-
-
-#### JSON Example
+#### Example JSON Structure
 ```json
 {
   "label" : "Convert Date Timestamp",
@@ -103,6 +93,18 @@ Type: STRING
   "type" : "dateHelper/v1/convertUnixTimestampToIso8601"
 }
 ```
+
+#### Output
+
+
+
+Type: STRING
+
+
+
+
+
+
 
 
 ### Date Difference
@@ -118,18 +120,7 @@ Get the difference between two dates.
 | endDate | End Date | DATE_TIME |  | true |
 | unit | Unit | STRING <details> <summary> Options </summary> year, month, day, hour, minute, second </details> | The unit of difference between the two dates. | true |
 
-
-#### Output
-
-
-
-Type: NUMBER
-
-
-
-
-
-#### JSON Example
+#### Example JSON Structure
 ```json
 {
   "label" : "Date Difference",
@@ -142,6 +133,18 @@ Type: NUMBER
   "type" : "dateHelper/v1/dateDifference"
 }
 ```
+
+#### Output
+
+
+
+Type: NUMBER
+
+
+
+
+
+
 
 
 ### Extract Date Units
@@ -156,18 +159,7 @@ Extract date units (year/month/day/hour/minute/second/day of week/month name) fr
 | inputDate | Date | DATE_TIME |  | true |
 | unit | Unit to Extract | STRING <details> <summary> Options </summary> year, month, day, hour, minute, second, dayOfWeek, monthName </details> | Unit to extract from date. | true |
 
-
-#### Output
-
-
-
-Type: STRING
-
-
-
-
-
-#### JSON Example
+#### Example JSON Structure
 ```json
 {
   "label" : "Extract Date Units",
@@ -179,6 +171,18 @@ Type: STRING
   "type" : "dateHelper/v1/extractDateUnits"
 }
 ```
+
+#### Output
+
+
+
+Type: STRING
+
+
+
+
+
+
 
 
 ### Get Current Date
@@ -193,18 +197,7 @@ Get current date in the specified format.
 | timeZone | Time Zone | STRING | Time zone to use when formatting date. | true |
 | dateFormat | Date Format | STRING <details> <summary> Options </summary> EEE MMM dd yyyy HH:mm:ss, EEE MMM dd HH:mm:ss yyyy, MMMM dd yyyy HH:mm:ss, MMMM dd yyyy, MMM dd yyyy, yyyy-MM-dd'T'HH:mm:ss, yyyy-MM-dd HH:mm:ss, yyyy-MM-dd, MM-dd-yyyy, MM/dd/yyyy, MM/dd/yy, dd-MM-yyyy, dd/MM/yyyy, dd/MM/yy, UnixTimestamp </details> | Here's what each part of the format (eg. YYYY) means: yyyy : Year (4 digits) yy : Year (2 digits) MMMM : Month (full name) MMM : Month (short name) MM : Month (2 digits) EEE : Day (short name) dd : Day (2 digits) HH : Hour (2 digits) mm : Minute (2 digits) ss : Second (2 digits). | true |
 
-
-#### Output
-
-
-
-Type: STRING
-
-
-
-
-
-#### JSON Example
+#### Example JSON Structure
 ```json
 {
   "label" : "Get Current Date",
@@ -216,6 +209,18 @@ Type: STRING
   "type" : "dateHelper/v1/getCurrentDate"
 }
 ```
+
+#### Output
+
+
+
+Type: STRING
+
+
+
+
+
+
 
 
 ### Subtract Time
@@ -236,18 +241,7 @@ Subtract time from date
 | minute | Minute | INTEGER | Minutes to subtract. | false |
 | second | Second | INTEGER | Seconds to subtract. | false |
 
-
-#### Output
-
-
-
-Type: DATE_TIME
-
-
-
-
-
-#### JSON Example
+#### Example JSON Structure
 ```json
 {
   "label" : "Subtract Time",
@@ -265,6 +259,18 @@ Type: DATE_TIME
   "type" : "dateHelper/v1/subtractTime"
 }
 ```
+
+#### Output
+
+
+
+Type: DATE_TIME
+
+
+
+
+
+
 
 
 

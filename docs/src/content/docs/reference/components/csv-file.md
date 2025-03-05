@@ -37,12 +37,7 @@ Reads data from a csv file.
 | pageNumber | Page Number | INTEGER | The page number to get. | null |
 | readAsString | Read as String | BOOLEAN <details> <summary> Options </summary> true, false </details> | In some cases and file formats, it is necessary to read data specifically as string, otherwise some special characters are interpreted the wrong way. | null |
 
-
-#### Output
-
-The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
-
-#### JSON Example
+#### Example JSON Structure
 ```json
 {
   "label" : "Read from File",
@@ -66,6 +61,12 @@ The output for this action is dynamic and may vary depending on the input parame
 }
 ```
 
+#### Output
+
+The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
+
+
+
 
 ### Write to CSV File
 Name: write
@@ -79,6 +80,18 @@ Writes the data records into a CSV file. Record values are assembled into line a
 | rows | Rows | ARRAY <details> <summary> Items </summary> [{}] </details> | The array of rows to write to the file. | true |
 | filename | Filename | STRING | Filename to set for binary data. By default, "file.csv" will be used. | null |
 
+#### Example JSON Structure
+```json
+{
+  "label" : "Write to CSV File",
+  "name" : "write",
+  "parameters" : {
+    "rows" : [ { } ],
+    "filename" : ""
+  },
+  "type" : "csvFile/v1/write"
+}
+```
 
 #### Output
 
@@ -99,16 +112,13 @@ Type: FILE_ENTRY
 
 
 
-#### JSON Example
+#### Output Example
 ```json
 {
-  "label" : "Write to CSV File",
-  "name" : "write",
-  "parameters" : {
-    "rows" : [ { } ],
-    "filename" : ""
-  },
-  "type" : "csvFile/v1/write"
+  "extension" : "",
+  "mimeType" : "",
+  "name" : "",
+  "url" : ""
 }
 ```
 

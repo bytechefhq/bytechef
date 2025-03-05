@@ -50,6 +50,17 @@ Creates a new opportunity.
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | name | Name | STRING | The name of the opportunity. | true |
 
+#### Example JSON Structure
+```json
+{
+  "label" : "Create Opportunity",
+  "name" : "createOpportunity",
+  "parameters" : {
+    "name" : ""
+  },
+  "type" : "affinity/v1/createOpportunity"
+}
+```
 
 #### Output
 
@@ -68,15 +79,11 @@ Type: OBJECT
 
 
 
-#### JSON Example
+#### Output Example
 ```json
 {
-  "label" : "Create Opportunity",
-  "name" : "createOpportunity",
-  "parameters" : {
-    "name" : ""
-  },
-  "type" : "affinity/v1/createOpportunity"
+  "id" : "",
+  "name" : ""
 }
 ```
 
@@ -93,6 +100,18 @@ Creates a new organization.
 | name | Name | STRING | The name of the organization. | true |
 | domain | Domain | STRING | The domain name of the organization. | false |
 
+#### Example JSON Structure
+```json
+{
+  "label" : "Create Organization",
+  "name" : "createOrganization",
+  "parameters" : {
+    "name" : "",
+    "domain" : ""
+  },
+  "type" : "affinity/v1/createOrganization"
+}
+```
 
 #### Output
 
@@ -112,16 +131,12 @@ Type: OBJECT
 
 
 
-#### JSON Example
+#### Output Example
 ```json
 {
-  "label" : "Create Organization",
-  "name" : "createOrganization",
-  "parameters" : {
-    "name" : "",
-    "domain" : ""
-  },
-  "type" : "affinity/v1/createOrganization"
+  "id" : "",
+  "name" : "",
+  "domain" : ""
 }
 ```
 
@@ -139,6 +154,19 @@ Creates a new person.
 | last_name | Last Name | STRING | The last name of the person. | true |
 | emails | Emails | ARRAY <details> <summary> Items </summary> [STRING] </details> | The email addresses of the person. | false |
 
+#### Example JSON Structure
+```json
+{
+  "label" : "Create Person",
+  "name" : "createPerson",
+  "parameters" : {
+    "first_name" : "",
+    "last_name" : "",
+    "emails" : [ "" ]
+  },
+  "type" : "affinity/v1/createPerson"
+}
+```
 
 #### Output
 
@@ -159,17 +187,13 @@ Type: OBJECT
 
 
 
-#### JSON Example
+#### Output Example
 ```json
 {
-  "label" : "Create Person",
-  "name" : "createPerson",
-  "parameters" : {
-    "first_name" : "",
-    "last_name" : "",
-    "emails" : [ "" ]
-  },
-  "type" : "affinity/v1/createPerson"
+  "id" : "",
+  "first_name" : "",
+  "last_name" : "",
+  "emails" : [ "" ]
 }
 ```
 

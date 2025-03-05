@@ -53,6 +53,19 @@ Creates a new project issue.
 | title | Title | STRING | The title of an issue. | true |
 | description | Description | STRING | The description of an issue. | false |
 
+#### Example JSON Structure
+```json
+{
+  "label" : "Create Issue",
+  "name" : "createIssue",
+  "parameters" : {
+    "projectId" : "",
+    "title" : "",
+    "description" : ""
+  },
+  "type" : "gitlab/v1/createIssue"
+}
+```
 
 #### Output
 
@@ -75,17 +88,15 @@ Type: OBJECT
 
 
 
-#### JSON Example
+#### Output Example
 ```json
 {
-  "label" : "Create Issue",
-  "name" : "createIssue",
-  "parameters" : {
-    "projectId" : "",
-    "title" : "",
-    "description" : ""
-  },
-  "type" : "gitlab/v1/createIssue"
+  "id" : 1,
+  "iid" : 1,
+  "project_id" : 1,
+  "title" : "",
+  "description" : "",
+  "web_url" : ""
 }
 ```
 
@@ -103,6 +114,19 @@ Adds a comment to the specified issue.
 | issueId | Issue ID | INTEGER <details> <summary> Depends On </summary> projectId </details> | ID of the issue to comment on. | true |
 | body | Comment | STRING | The comment to add to the issue. | true |
 
+#### Example JSON Structure
+```json
+{
+  "label" : "Create Comment on Issue",
+  "name" : "createCommentOnIssue",
+  "parameters" : {
+    "projectId" : "",
+    "issueId" : 1,
+    "body" : ""
+  },
+  "type" : "gitlab/v1/createCommentOnIssue"
+}
+```
 
 #### Output
 
@@ -121,17 +145,11 @@ Type: OBJECT
 
 
 
-#### JSON Example
+#### Output Example
 ```json
 {
-  "label" : "Create Comment on Issue",
-  "name" : "createCommentOnIssue",
-  "parameters" : {
-    "projectId" : "",
-    "issueId" : 1,
-    "body" : ""
-  },
-  "type" : "gitlab/v1/createCommentOnIssue"
+  "id" : 1,
+  "body" : ""
 }
 ```
 

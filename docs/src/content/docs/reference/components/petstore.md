@@ -65,29 +65,7 @@ Add a new pet to the store
 | tags | Tags | ARRAY <details> <summary> Items </summary> [{INTEGER\(id), STRING\(name)}] </details> |  | false |
 | status | Status | STRING <details> <summary> Options </summary> available, pending, sold </details> | pet status in the store | false |
 
-
-#### Output
-
-
-
-Type: OBJECT
-
-
-#### Properties
-
-|     Name     |     Type     |     Description     |
-|:------------:|:------------:|:-------------------:|
-| id | INTEGER |  |
-| name | STRING |  |
-| category | OBJECT <details> <summary> Properties </summary> {INTEGER\(id), STRING\(name)} </details> |  |
-| photoUrls | ARRAY <details> <summary> Items </summary> [STRING] </details> |  |
-| tags | ARRAY <details> <summary> Items </summary> [{INTEGER\(id), STRING\(name)}] </details> |  |
-| status | STRING <details> <summary> Options </summary> available, pending, sold </details> | pet status in the store |
-
-
-
-
-#### JSON Example
+#### Example JSON Structure
 ```json
 {
   "label" : "Add a new pet to the store",
@@ -110,24 +88,6 @@ Type: OBJECT
 }
 ```
 
-
-### Update an existing pet
-Name: updatePet
-
-Update an existing pet by Id
-
-#### Properties
-
-|      Name       |      Label     |     Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| id | Id | INTEGER |  | false |
-| name | Name | STRING |  | true |
-| category | Category | OBJECT <details> <summary> Properties </summary> {INTEGER\(id), STRING\(name)} </details> |  | false |
-| photoUrls | Photo Urls | ARRAY <details> <summary> Items </summary> [STRING] </details> |  | true |
-| tags | Tags | ARRAY <details> <summary> Items </summary> [{INTEGER\(id), STRING\(name)}] </details> |  | false |
-| status | Status | STRING <details> <summary> Options </summary> available, pending, sold </details> | pet status in the store | false |
-
-
 #### Output
 
 
@@ -149,7 +109,42 @@ Type: OBJECT
 
 
 
-#### JSON Example
+#### Output Example
+```json
+{
+  "id" : 1,
+  "name" : "",
+  "category" : {
+    "id" : 1,
+    "name" : ""
+  },
+  "photoUrls" : [ "" ],
+  "tags" : [ {
+    "id" : 1,
+    "name" : ""
+  } ],
+  "status" : ""
+}
+```
+
+
+### Update an existing pet
+Name: updatePet
+
+Update an existing pet by Id
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| id | Id | INTEGER |  | false |
+| name | Name | STRING |  | true |
+| category | Category | OBJECT <details> <summary> Properties </summary> {INTEGER\(id), STRING\(name)} </details> |  | false |
+| photoUrls | Photo Urls | ARRAY <details> <summary> Items </summary> [STRING] </details> |  | true |
+| tags | Tags | ARRAY <details> <summary> Items </summary> [{INTEGER\(id), STRING\(name)}] </details> |  | false |
+| status | Status | STRING <details> <summary> Options </summary> available, pending, sold </details> | pet status in the store | false |
+
+#### Example JSON Structure
 ```json
 {
   "label" : "Update an existing pet",
@@ -172,6 +167,45 @@ Type: OBJECT
 }
 ```
 
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| id | INTEGER |  |
+| name | STRING |  |
+| category | OBJECT <details> <summary> Properties </summary> {INTEGER\(id), STRING\(name)} </details> |  |
+| photoUrls | ARRAY <details> <summary> Items </summary> [STRING] </details> |  |
+| tags | ARRAY <details> <summary> Items </summary> [{INTEGER\(id), STRING\(name)}] </details> |  |
+| status | STRING <details> <summary> Options </summary> available, pending, sold </details> | pet status in the store |
+
+
+
+
+#### Output Example
+```json
+{
+  "id" : 1,
+  "name" : "",
+  "category" : {
+    "id" : 1,
+    "name" : ""
+  },
+  "photoUrls" : [ "" ],
+  "tags" : [ {
+    "id" : 1,
+    "name" : ""
+  } ],
+  "status" : ""
+}
+```
+
 
 ### Finds Pets by status
 Name: findPetsByStatus
@@ -184,24 +218,7 @@ Multiple status values can be provided with comma separated strings
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | status | Status | STRING <details> <summary> Options </summary> available, pending, sold </details> | Status values that need to be considered for filter | false |
 
-
-#### Output
-
-
-
-Type: ARRAY
-
-
-#### Properties
-
-|     Name     |     Type     |     Description     |
-|:------------:|:------------:|:-------------------:|
-|  | OBJECT <details> <summary> Properties </summary> {INTEGER\(id), STRING\(name), {INTEGER\(id), STRING\(name)}\(category), [STRING]\(photoUrls), [{INTEGER\(id), STRING\(name)}]\(tags), STRING\(status)} </details> |  |
-
-
-
-
-#### JSON Example
+#### Example JSON Structure
 ```json
 {
   "label" : "Finds Pets by status",
@@ -211,6 +228,48 @@ Type: ARRAY
   },
   "type" : "petstore/v1/findPetsByStatus"
 }
+```
+
+#### Output
+
+
+
+Type: ARRAY
+
+
+Items Type: OBJECT
+
+
+#### Properties
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| id | INTEGER |  |
+| name | STRING |  |
+| category | OBJECT <details> <summary> Properties </summary> {INTEGER\(id), STRING\(name)} </details> |  |
+| photoUrls | ARRAY <details> <summary> Items </summary> [STRING] </details> |  |
+| tags | ARRAY <details> <summary> Items </summary> [{INTEGER\(id), STRING\(name)}] </details> |  |
+| status | STRING <details> <summary> Options </summary> available, pending, sold </details> | pet status in the store |
+
+
+
+
+
+#### Output Example
+```json
+[ {
+  "id" : 1,
+  "name" : "",
+  "category" : {
+    "id" : 1,
+    "name" : ""
+  },
+  "photoUrls" : [ "" ],
+  "tags" : [ {
+    "id" : 1,
+    "name" : ""
+  } ],
+  "status" : ""
+} ]
 ```
 
 
@@ -225,24 +284,7 @@ Multiple tags can be provided with comma separated strings. Use tag1, tag2, tag3
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | tags | Tags | ARRAY <details> <summary> Items </summary> [STRING] </details> | Tags to filter by | false |
 
-
-#### Output
-
-
-
-Type: ARRAY
-
-
-#### Properties
-
-|     Name     |     Type     |     Description     |
-|:------------:|:------------:|:-------------------:|
-|  | OBJECT <details> <summary> Properties </summary> {INTEGER\(id), STRING\(name), {INTEGER\(id), STRING\(name)}\(category), [STRING]\(photoUrls), [{INTEGER\(id), STRING\(name)}]\(tags), STRING\(status)} </details> |  |
-
-
-
-
-#### JSON Example
+#### Example JSON Structure
 ```json
 {
   "label" : "Finds Pets by tags",
@@ -252,6 +294,48 @@ Type: ARRAY
   },
   "type" : "petstore/v1/findPetsByTags"
 }
+```
+
+#### Output
+
+
+
+Type: ARRAY
+
+
+Items Type: OBJECT
+
+
+#### Properties
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| id | INTEGER |  |
+| name | STRING |  |
+| category | OBJECT <details> <summary> Properties </summary> {INTEGER\(id), STRING\(name)} </details> |  |
+| photoUrls | ARRAY <details> <summary> Items </summary> [STRING] </details> |  |
+| tags | ARRAY <details> <summary> Items </summary> [{INTEGER\(id), STRING\(name)}] </details> |  |
+| status | STRING <details> <summary> Options </summary> available, pending, sold </details> | pet status in the store |
+
+
+
+
+
+#### Output Example
+```json
+[ {
+  "id" : 1,
+  "name" : "",
+  "category" : {
+    "id" : 1,
+    "name" : ""
+  },
+  "photoUrls" : [ "" ],
+  "tags" : [ {
+    "id" : 1,
+    "name" : ""
+  } ],
+  "status" : ""
+} ]
 ```
 
 
@@ -267,12 +351,7 @@ delete a pet
 | api_key | Api Key | STRING |  | false |
 | petId | Pet Id | INTEGER | Pet id to delete | true |
 
-
-#### Output
-
-This action does not produce any output.
-
-#### JSON Example
+#### Example JSON Structure
 ```json
 {
   "label" : "Deletes a pet",
@@ -284,6 +363,12 @@ This action does not produce any output.
   "type" : "petstore/v1/deletePet"
 }
 ```
+
+#### Output
+
+This action does not produce any output.
+
+
 
 
 ### Find pet by ID
@@ -297,6 +382,17 @@ Returns a single pet
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | petId | Pet Id | INTEGER | ID of pet to return | true |
 
+#### Example JSON Structure
+```json
+{
+  "label" : "Find pet by ID",
+  "name" : "getPetById",
+  "parameters" : {
+    "petId" : 1
+  },
+  "type" : "petstore/v1/getPetById"
+}
+```
 
 #### Output
 
@@ -319,15 +415,21 @@ Type: OBJECT
 
 
 
-#### JSON Example
+#### Output Example
 ```json
 {
-  "label" : "Find pet by ID",
-  "name" : "getPetById",
-  "parameters" : {
-    "petId" : 1
+  "id" : 1,
+  "name" : "",
+  "category" : {
+    "id" : 1,
+    "name" : ""
   },
-  "type" : "petstore/v1/getPetById"
+  "photoUrls" : [ "" ],
+  "tags" : [ {
+    "id" : 1,
+    "name" : ""
+  } ],
+  "status" : ""
 }
 ```
 
@@ -345,12 +447,7 @@ Name: updatePetWithForm
 | name | Name | STRING | Name of pet that needs to be updated | false |
 | status | Status | STRING | Status of pet that needs to be updated | false |
 
-
-#### Output
-
-This action does not produce any output.
-
-#### JSON Example
+#### Example JSON Structure
 ```json
 {
   "label" : "Updates a pet in the store with form data",
@@ -363,6 +460,12 @@ This action does not produce any output.
   "type" : "petstore/v1/updatePetWithForm"
 }
 ```
+
+#### Output
+
+This action does not produce any output.
+
+
 
 
 ### uploads an image
@@ -378,6 +481,24 @@ Name: uploadFile
 | additionalMetadata | Additional Metadata | STRING | Additional Metadata | false |
 | fileEntry | | FILE_ENTRY |  | null |
 
+#### Example JSON Structure
+```json
+{
+  "label" : "uploads an image",
+  "name" : "uploadFile",
+  "parameters" : {
+    "petId" : 1,
+    "additionalMetadata" : "",
+    "fileEntry" : {
+      "extension" : "",
+      "mimeType" : "",
+      "name" : "",
+      "url" : ""
+    }
+  },
+  "type" : "petstore/v1/uploadFile"
+}
+```
 
 #### Output
 
@@ -397,22 +518,12 @@ Type: OBJECT
 
 
 
-#### JSON Example
+#### Output Example
 ```json
 {
-  "label" : "uploads an image",
-  "name" : "uploadFile",
-  "parameters" : {
-    "petId" : 1,
-    "additionalMetadata" : "",
-    "fileEntry" : {
-      "extension" : "",
-      "mimeType" : "",
-      "name" : "",
-      "url" : ""
-    }
-  },
-  "type" : "petstore/v1/uploadFile"
+  "code" : 1,
+  "type" : "",
+  "message" : ""
 }
 ```
 
@@ -422,6 +533,14 @@ Name: getInventory
 
 Returns a map of status codes to quantities
 
+#### Example JSON Structure
+```json
+{
+  "label" : "Returns pet inventories by status",
+  "name" : "getInventory",
+  "type" : "petstore/v1/getInventory"
+}
+```
 
 #### Output
 
@@ -433,14 +552,7 @@ Type: OBJECT
 
 
 
-#### JSON Example
-```json
-{
-  "label" : "Returns pet inventories by status",
-  "name" : "getInventory",
-  "type" : "petstore/v1/getInventory"
-}
-```
+
 
 
 ### Place an order for a pet
@@ -459,29 +571,7 @@ Place a new order in the store
 | status | Status | STRING <details> <summary> Options </summary> placed, approved, delivered </details> | Order Status | false |
 | complete | Complete | BOOLEAN <details> <summary> Options </summary> true, false </details> |  | false |
 
-
-#### Output
-
-
-
-Type: OBJECT
-
-
-#### Properties
-
-|     Name     |     Type     |     Description     |
-|:------------:|:------------:|:-------------------:|
-| id | INTEGER |  |
-| petId | INTEGER |  |
-| quantity | INTEGER |  |
-| shipDate | DATE_TIME |  |
-| status | STRING <details> <summary> Options </summary> placed, approved, delivered </details> | Order Status |
-| complete | BOOLEAN <details> <summary> Options </summary> true, false </details> |  |
-
-
-
-
-#### JSON Example
+#### Example JSON Structure
 ```json
 {
   "label" : "Place an order for a pet",
@@ -498,6 +588,39 @@ Type: OBJECT
 }
 ```
 
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| id | INTEGER |  |
+| petId | INTEGER |  |
+| quantity | INTEGER |  |
+| shipDate | DATE_TIME |  |
+| status | STRING <details> <summary> Options </summary> placed, approved, delivered </details> | Order Status |
+| complete | BOOLEAN <details> <summary> Options </summary> true, false </details> |  |
+
+
+
+
+#### Output Example
+```json
+{
+  "id" : 1,
+  "petId" : 1,
+  "quantity" : 1,
+  "shipDate" : "2021-01-01T00:00:00",
+  "status" : "",
+  "complete" : false
+}
+```
+
 
 ### Delete purchase order by ID
 Name: deleteOrder
@@ -510,12 +633,7 @@ For valid response try integer IDs with value < 1000. Anything above 1000 or non
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | orderId | Order Id | INTEGER | ID of the order that needs to be deleted | true |
 
-
-#### Output
-
-This action does not produce any output.
-
-#### JSON Example
+#### Example JSON Structure
 ```json
 {
   "label" : "Delete purchase order by ID",
@@ -526,6 +644,12 @@ This action does not produce any output.
   "type" : "petstore/v1/deleteOrder"
 }
 ```
+
+#### Output
+
+This action does not produce any output.
+
+
 
 
 ### Find purchase order by ID
@@ -539,6 +663,17 @@ For valid response try integer IDs with value <= 5 or > 10. Other values will ge
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | orderId | Order Id | INTEGER | ID of order that needs to be fetched | true |
 
+#### Example JSON Structure
+```json
+{
+  "label" : "Find purchase order by ID",
+  "name" : "getOrderById",
+  "parameters" : {
+    "orderId" : 1
+  },
+  "type" : "petstore/v1/getOrderById"
+}
+```
 
 #### Output
 
@@ -561,15 +696,15 @@ Type: OBJECT
 
 
 
-#### JSON Example
+#### Output Example
 ```json
 {
-  "label" : "Find purchase order by ID",
-  "name" : "getOrderById",
-  "parameters" : {
-    "orderId" : 1
-  },
-  "type" : "petstore/v1/getOrderById"
+  "id" : 1,
+  "petId" : 1,
+  "quantity" : 1,
+  "shipDate" : "2021-01-01T00:00:00",
+  "status" : "",
+  "complete" : false
 }
 ```
 
@@ -592,6 +727,24 @@ This can only be done by the logged in user.
 | phone | Phone | STRING |  | false |
 | userStatus | User Status | INTEGER | User Status | false |
 
+#### Example JSON Structure
+```json
+{
+  "label" : "Create user",
+  "name" : "createUser",
+  "parameters" : {
+    "id" : 1,
+    "username" : "",
+    "firstName" : "",
+    "lastName" : "",
+    "email" : "",
+    "password" : "",
+    "phone" : "",
+    "userStatus" : 1
+  },
+  "type" : "petstore/v1/createUser"
+}
+```
 
 #### Output
 
@@ -616,22 +769,17 @@ Type: OBJECT
 
 
 
-#### JSON Example
+#### Output Example
 ```json
 {
-  "label" : "Create user",
-  "name" : "createUser",
-  "parameters" : {
-    "id" : 1,
-    "username" : "",
-    "firstName" : "",
-    "lastName" : "",
-    "email" : "",
-    "password" : "",
-    "phone" : "",
-    "userStatus" : 1
-  },
-  "type" : "petstore/v1/createUser"
+  "id" : 1,
+  "username" : "",
+  "firstName" : "",
+  "lastName" : "",
+  "email" : "",
+  "password" : "",
+  "phone" : "",
+  "userStatus" : 1
 }
 ```
 
@@ -647,24 +795,7 @@ Creates list of users with given input array
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | __items | Items | ARRAY <details> <summary> Items </summary> [{INTEGER\(id), STRING\(username), STRING\(firstName), STRING\(lastName), STRING\(email), STRING\(password), STRING\(phone), INTEGER\(userStatus)}] </details> |  | null |
 
-
-#### Output
-
-
-
-Type: ARRAY
-
-
-#### Properties
-
-|     Name     |     Type     |     Description     |
-|:------------:|:------------:|:-------------------:|
-|  | OBJECT <details> <summary> Properties </summary> {INTEGER\(id), STRING\(username), STRING\(firstName), STRING\(lastName), STRING\(email), STRING\(password), STRING\(phone), INTEGER\(userStatus)} </details> |  |
-
-
-
-
-#### JSON Example
+#### Example JSON Structure
 ```json
 {
   "label" : "Creates list of users with given input array",
@@ -685,6 +816,46 @@ Type: ARRAY
 }
 ```
 
+#### Output
+
+
+
+Type: ARRAY
+
+
+Items Type: OBJECT
+
+
+#### Properties
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| id | INTEGER |  |
+| username | STRING |  |
+| firstName | STRING |  |
+| lastName | STRING |  |
+| email | STRING |  |
+| password | STRING |  |
+| phone | STRING |  |
+| userStatus | INTEGER | User Status |
+
+
+
+
+
+#### Output Example
+```json
+[ {
+  "id" : 1,
+  "username" : "",
+  "firstName" : "",
+  "lastName" : "",
+  "email" : "",
+  "password" : "",
+  "phone" : "",
+  "userStatus" : 1
+} ]
+```
+
 
 ### Delete user
 Name: deleteUser
@@ -697,12 +868,7 @@ This can only be done by the logged in user.
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | username | Username | STRING | The name that needs to be deleted | true |
 
-
-#### Output
-
-This action does not produce any output.
-
-#### JSON Example
+#### Example JSON Structure
 ```json
 {
   "label" : "Delete user",
@@ -713,6 +879,12 @@ This action does not produce any output.
   "type" : "petstore/v1/deleteUser"
 }
 ```
+
+#### Output
+
+This action does not produce any output.
+
+
 
 
 ### Get user by user name
@@ -726,6 +898,17 @@ Name: getUserByName
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | username | Username | STRING | The name that needs to be fetched. Use user1 for testing.  | true |
 
+#### Example JSON Structure
+```json
+{
+  "label" : "Get user by user name",
+  "name" : "getUserByName",
+  "parameters" : {
+    "username" : ""
+  },
+  "type" : "petstore/v1/getUserByName"
+}
+```
 
 #### Output
 
@@ -750,15 +933,17 @@ Type: OBJECT
 
 
 
-#### JSON Example
+#### Output Example
 ```json
 {
-  "label" : "Get user by user name",
-  "name" : "getUserByName",
-  "parameters" : {
-    "username" : ""
-  },
-  "type" : "petstore/v1/getUserByName"
+  "id" : 1,
+  "username" : "",
+  "firstName" : "",
+  "lastName" : "",
+  "email" : "",
+  "password" : "",
+  "phone" : "",
+  "userStatus" : 1
 }
 ```
 
@@ -782,6 +967,24 @@ This can only be done by the logged in user.
 | phone | Phone | STRING |  | false |
 | userStatus | User Status | INTEGER | User Status | false |
 
+#### Example JSON Structure
+```json
+{
+  "label" : "Update user",
+  "name" : "updateUser",
+  "parameters" : {
+    "username" : "",
+    "id" : 1,
+    "firstName" : "",
+    "lastName" : "",
+    "email" : "",
+    "password" : "",
+    "phone" : "",
+    "userStatus" : 1
+  },
+  "type" : "petstore/v1/updateUser"
+}
+```
 
 #### Output
 
@@ -806,22 +1009,17 @@ Type: OBJECT
 
 
 
-#### JSON Example
+#### Output Example
 ```json
 {
-  "label" : "Update user",
-  "name" : "updateUser",
-  "parameters" : {
-    "username" : "",
-    "id" : 1,
-    "firstName" : "",
-    "lastName" : "",
-    "email" : "",
-    "password" : "",
-    "phone" : "",
-    "userStatus" : 1
-  },
-  "type" : "petstore/v1/updateUser"
+  "id" : 1,
+  "username" : "",
+  "firstName" : "",
+  "lastName" : "",
+  "email" : "",
+  "password" : "",
+  "phone" : "",
+  "userStatus" : 1
 }
 ```
 

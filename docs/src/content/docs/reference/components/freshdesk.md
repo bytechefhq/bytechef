@@ -53,6 +53,19 @@ Creates a new company
 | description | Description | STRING | Description of the company | false |
 | note | Note | STRING | Any specific note about the company | false |
 
+#### Example JSON Structure
+```json
+{
+  "label" : "Create Company",
+  "name" : "createCompany",
+  "parameters" : {
+    "name" : "",
+    "description" : "",
+    "note" : ""
+  },
+  "type" : "freshdesk/v1/createCompany"
+}
+```
 
 #### Output
 
@@ -73,17 +86,13 @@ Type: OBJECT
 
 
 
-#### JSON Example
+#### Output Example
 ```json
 {
-  "label" : "Create Company",
-  "name" : "createCompany",
-  "parameters" : {
-    "name" : "",
-    "description" : "",
-    "note" : ""
-  },
-  "type" : "freshdesk/v1/createCompany"
+  "id" : 0.0,
+  "name" : "",
+  "description" : "",
+  "note" : ""
 }
 ```
 
@@ -104,6 +113,22 @@ Creates a new contact
 | description | Description | STRING | A small description of the contact | false |
 | job_title | Job Title | STRING | Job title of the contact | false |
 
+#### Example JSON Structure
+```json
+{
+  "label" : "Create Contact",
+  "name" : "createContact",
+  "parameters" : {
+    "name" : "",
+    "email" : "",
+    "phone" : "",
+    "mobile" : "",
+    "description" : "",
+    "job_title" : ""
+  },
+  "type" : "freshdesk/v1/createContact"
+}
+```
 
 #### Output
 
@@ -124,20 +149,13 @@ Type: OBJECT
 
 
 
-#### JSON Example
+#### Output Example
 ```json
 {
-  "label" : "Create Contact",
-  "name" : "createContact",
-  "parameters" : {
-    "name" : "",
-    "email" : "",
-    "phone" : "",
-    "mobile" : "",
-    "description" : "",
-    "job_title" : ""
-  },
-  "type" : "freshdesk/v1/createContact"
+  "description" : "",
+  "email" : "",
+  "id" : 0.0,
+  "job_title" : ""
 }
 ```
 
@@ -157,6 +175,21 @@ Creates a new ticket
 | priority | Priority | INTEGER <details> <summary> Options </summary> 1, 2, 3, 4 </details> | Priority of the ticket. | false |
 | status | Status | INTEGER <details> <summary> Options </summary> 2, 3, 4, 5 </details> | Status of the ticket. | false |
 
+#### Example JSON Structure
+```json
+{
+  "label" : "Create Ticket",
+  "name" : "createTicket",
+  "parameters" : {
+    "subject" : "",
+    "email" : "",
+    "description" : "",
+    "priority" : 1,
+    "status" : 1
+  },
+  "type" : "freshdesk/v1/createTicket"
+}
+```
 
 #### Output
 
@@ -178,19 +211,14 @@ Type: OBJECT
 
 
 
-#### JSON Example
+#### Output Example
 ```json
 {
-  "label" : "Create Ticket",
-  "name" : "createTicket",
-  "parameters" : {
-    "subject" : "",
-    "email" : "",
-    "description" : "",
-    "priority" : 1,
-    "status" : 1
-  },
-  "type" : "freshdesk/v1/createTicket"
+  "subject" : "",
+  "email" : "",
+  "description" : "",
+  "priority" : 1,
+  "status" : 1
 }
 ```
 

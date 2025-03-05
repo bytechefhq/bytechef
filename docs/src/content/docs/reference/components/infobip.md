@@ -53,6 +53,19 @@ Send a new SMS message
 | to | To | ARRAY <details> <summary> Items </summary> [STRING] </details> | Message recipient numbers. | true |
 | text | Text | STRING | Content of the message being sent. | true |
 
+#### Example JSON Structure
+```json
+{
+  "label" : "Send SMS",
+  "name" : "sendSMS",
+  "parameters" : {
+    "sender" : "",
+    "to" : [ "" ],
+    "text" : ""
+  },
+  "type" : "infobip/v1/sendSMS"
+}
+```
 
 #### Output
 
@@ -71,17 +84,25 @@ Type: OBJECT
 
 
 
-#### JSON Example
+#### Output Example
 ```json
 {
-  "label" : "Send SMS",
-  "name" : "sendSMS",
-  "parameters" : {
-    "sender" : "",
-    "to" : [ "" ],
-    "text" : ""
-  },
-  "type" : "infobip/v1/sendSMS"
+  "bulkId" : "",
+  "messages" : [ {
+    "messageId" : "",
+    "status" : {
+      "groupId" : 1,
+      "groupName" : "",
+      "id" : 1,
+      "name" : "",
+      "description" : "",
+      "action" : ""
+    },
+    "destination" : "",
+    "details" : {
+      "messageCount" : 1
+    }
+  } ]
 }
 ```
 
@@ -99,6 +120,19 @@ Send a new SMS message
 | to | To | STRING | Message recipient number. Must be in international format. | true |
 | text | Text | STRING | Content of the message being sent. | true |
 
+#### Example JSON Structure
+```json
+{
+  "label" : "Send Whatsapp Text Message",
+  "name" : "sendWhatsappTextMessage",
+  "parameters" : {
+    "from" : "",
+    "to" : "",
+    "text" : ""
+  },
+  "type" : "infobip/v1/sendWhatsappTextMessage"
+}
+```
 
 #### Output
 
@@ -119,17 +153,20 @@ Type: OBJECT
 
 
 
-#### JSON Example
+#### Output Example
 ```json
 {
-  "label" : "Send Whatsapp Text Message",
-  "name" : "sendWhatsappTextMessage",
-  "parameters" : {
-    "from" : "",
-    "to" : "",
-    "text" : ""
-  },
-  "type" : "infobip/v1/sendWhatsappTextMessage"
+  "to" : "",
+  "messageCount" : 1,
+  "messageId" : "",
+  "status" : {
+    "groupId" : 1,
+    "groupName" : "",
+    "id" : 1,
+    "name" : "",
+    "description" : "",
+    "action" : ""
+  }
 }
 ```
 

@@ -56,6 +56,28 @@ Sends an email.
 | type | Message Type | STRING <details> <summary> Options </summary> text/plain, text/html </details> | Message type for your content | true |
 | attachments | Attachments | ARRAY <details> <summary> Items </summary> [FILE_ENTRY] </details> | A list of attachments you want to include with the email. | false |
 
+#### Example JSON Structure
+```json
+{
+  "label" : "Send Email",
+  "name" : "sendEmail",
+  "parameters" : {
+    "from" : "",
+    "to" : [ "" ],
+    "cc" : [ "" ],
+    "subject" : "",
+    "text" : "",
+    "type" : "",
+    "attachments" : [ {
+      "extension" : "",
+      "mimeType" : "",
+      "name" : "",
+      "url" : ""
+    } ]
+  },
+  "type" : "sendgrid/v1/sendEmail"
+}
+```
 
 #### Output
 
@@ -78,26 +100,20 @@ Type: OBJECT
 
 
 
-#### JSON Example
+#### Output Example
 ```json
 {
-  "label" : "Send Email",
-  "name" : "sendEmail",
-  "parameters" : {
-    "from" : "",
-    "to" : [ "" ],
-    "cc" : [ "" ],
-    "subject" : "",
-    "text" : "",
-    "type" : "",
-    "attachments" : [ {
-      "extension" : "",
-      "mimeType" : "",
-      "name" : "",
-      "url" : ""
-    } ]
-  },
-  "type" : "sendgrid/v1/sendEmail"
+  "type" : "",
+  "from" : "",
+  "to" : [ "" ],
+  "subject" : "",
+  "text" : "",
+  "attachments" : [ {
+    "extension" : "",
+    "mimeType" : "",
+    "name" : "",
+    "url" : ""
+  } ]
 }
 ```
 

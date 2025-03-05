@@ -53,6 +53,19 @@ Creates new project.
 | description | Description | STRING | Description of the project's purpose, goals, or any other relevent information. | false |
 | template_id | Template ID | STRING | ID of template that can be used to pre-configure the project. | false |
 
+#### Example JSON Structure
+```json
+{
+  "label" : "Create Project",
+  "name" : "createProject",
+  "parameters" : {
+    "name" : "",
+    "description" : "",
+    "template_id" : ""
+  },
+  "type" : "nifty/v1/createProject"
+}
+```
 
 #### Output
 
@@ -73,17 +86,13 @@ Type: OBJECT
 
 
 
-#### JSON Example
+#### Output Example
 ```json
 {
-  "label" : "Create Project",
-  "name" : "createProject",
-  "parameters" : {
-    "name" : "",
-    "description" : "",
-    "template_id" : ""
-  },
-  "type" : "nifty/v1/createProject"
+  "id" : "",
+  "name" : "",
+  "description" : "",
+  "template_id" : ""
 }
 ```
 
@@ -103,6 +112,21 @@ Creates new task
 | description | Description | STRING | Description of the task. | false |
 | due_date | Due Date | DATE_TIME | Due date for the task. | false |
 
+#### Example JSON Structure
+```json
+{
+  "label" : "Create Task",
+  "name" : "createTask",
+  "parameters" : {
+    "project" : "",
+    "task_group_id" : "",
+    "name" : "",
+    "description" : "",
+    "due_date" : "2021-01-01T00:00:00"
+  },
+  "type" : "nifty/v1/createTask"
+}
+```
 
 #### Output
 
@@ -124,19 +148,14 @@ Type: OBJECT
 
 
 
-#### JSON Example
+#### Output Example
 ```json
 {
-  "label" : "Create Task",
-  "name" : "createTask",
-  "parameters" : {
-    "project" : "",
-    "task_group_id" : "",
-    "name" : "",
-    "description" : "",
-    "due_date" : "2021-01-01T00:00:00"
-  },
-  "type" : "nifty/v1/createTask"
+  "id" : "",
+  "name" : "",
+  "project" : "",
+  "description" : "",
+  "due_date" : "2021-01-01T00:00:00"
 }
 ```
 
@@ -152,6 +171,17 @@ Gets task details.
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | taskId | Task ID | STRING | ID of the task to get details for. | true |
 
+#### Example JSON Structure
+```json
+{
+  "label" : "Get Task",
+  "name" : "getTask",
+  "parameters" : {
+    "taskId" : ""
+  },
+  "type" : "nifty/v1/getTask"
+}
+```
 
 #### Output
 
@@ -172,15 +202,13 @@ Type: OBJECT
 
 
 
-#### JSON Example
+#### Output Example
 ```json
 {
-  "label" : "Get Task",
-  "name" : "getTask",
-  "parameters" : {
-    "taskId" : ""
-  },
-  "type" : "nifty/v1/getTask"
+  "id" : "",
+  "name" : "",
+  "project" : "",
+  "description" : ""
 }
 ```
 
@@ -197,6 +225,18 @@ Creates new status
 | name | Name | STRING | Name of the status. | true |
 | project_id | Project ID | STRING | Project ID that the status belongs to. | true |
 
+#### Example JSON Structure
+```json
+{
+  "label" : "Create Status",
+  "name" : "createStatus",
+  "parameters" : {
+    "name" : "",
+    "project_id" : ""
+  },
+  "type" : "nifty/v1/createStatus"
+}
+```
 
 #### Output
 
@@ -215,16 +255,18 @@ Type: OBJECT
 
 
 
-#### JSON Example
+#### Output Example
 ```json
 {
-  "label" : "Create Status",
-  "name" : "createStatus",
-  "parameters" : {
+  "message" : "",
+  "task_group" : {
+    "id" : "",
     "name" : "",
-    "project_id" : ""
-  },
-  "type" : "nifty/v1/createStatus"
+    "color" : "",
+    "created_by" : "",
+    "project" : "",
+    "order" : 1
+  }
 }
 ```
 
@@ -242,6 +284,19 @@ Gets tracked time report information.
 | start_date | Start Date | DATE_TIME | Start date for the report. | false |
 | end_date | End Date | DATE_TIME | Start date for the report. | false |
 
+#### Example JSON Structure
+```json
+{
+  "label" : "Get Tracked Time Report",
+  "name" : "getTrackedTimeReport",
+  "parameters" : {
+    "project_id" : "",
+    "start_date" : "2021-01-01T00:00:00",
+    "end_date" : "2021-01-01T00:00:00"
+  },
+  "type" : "nifty/v1/getTrackedTimeReport"
+}
+```
 
 #### Output
 
@@ -259,17 +314,20 @@ Type: OBJECT
 
 
 
-#### JSON Example
+#### Output Example
 ```json
 {
-  "label" : "Get Tracked Time Report",
-  "name" : "getTrackedTimeReport",
-  "parameters" : {
-    "project_id" : "",
-    "start_date" : "2021-01-01T00:00:00",
-    "end_date" : "2021-01-01T00:00:00"
-  },
-  "type" : "nifty/v1/getTrackedTimeReport"
+  "items" : [ {
+    "id" : "",
+    "project" : "",
+    "start" : "",
+    "manual" : false,
+    "user" : "",
+    "task" : "",
+    "end" : "",
+    "active" : false,
+    "duration" : ""
+  } ]
 }
 ```
 

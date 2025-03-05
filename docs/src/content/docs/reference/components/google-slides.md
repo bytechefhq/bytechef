@@ -54,12 +54,7 @@ Creates a new presentation based on an existing one and can replace any placehol
 | folderId | Folder ID | STRING | ID of the folder where the new presentation will be saved. If not provided, the new presentation will be saved in the same folder as the template presentation. | false |
 | values | Values | OBJECT <details> <summary> Properties </summary> {} </details> | Don't include the "[[]]", only the key name and its value. | true |
 
-
-#### Output
-
-The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
-
-#### JSON Example
+#### Example JSON Structure
 ```json
 {
   "label" : "Create Presentation Based on Template",
@@ -73,6 +68,12 @@ The output for this action is dynamic and may vary depending on the input parame
   "type" : "googleSlides/v1/createPresentationBasedOnTemplate"
 }
 ```
+
+#### Output
+
+The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
+
+
 
 
 

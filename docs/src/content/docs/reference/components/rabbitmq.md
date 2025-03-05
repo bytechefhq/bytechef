@@ -40,12 +40,7 @@ Send a new RabbitMQ message.
 | queue | null | STRING | The name of the queue to read from | true |
 | message | null | OBJECT <details> <summary> Properties </summary> {} </details> | The name of the queue to read from | true |
 
-
-#### Output
-
-This action does not produce any output.
-
-#### JSON Example
+#### Example JSON Structure
 ```json
 {
   "label" : "Send Message",
@@ -57,6 +52,12 @@ This action does not produce any output.
   "type" : "rabbitMQ/v1/sendMessage"
 }
 ```
+
+#### Output
+
+This action does not produce any output.
+
+
 
 
 

@@ -31,18 +31,7 @@ Add two numbers.
 | firstNumber | First Number | NUMBER |  | true |
 | secondNumber | Second Number | NUMBER |  | true |
 
-
-#### Output
-
-
-
-Type: NUMBER
-
-
-
-
-
-#### JSON Example
+#### Example JSON Structure
 ```json
 {
   "label" : "Addition",
@@ -54,6 +43,18 @@ Type: NUMBER
   "type" : "mathHelper/v1/addition"
 }
 ```
+
+#### Output
+
+
+
+Type: NUMBER
+
+
+
+
+
+
 
 
 ### Division
@@ -68,18 +69,7 @@ Divide two numbers.
 | firstNumber | First Number | NUMBER | Number to be divided. | true |
 | secondNumber | Second Number | NUMBER | Number to divide by. | true |
 
-
-#### Output
-
-
-
-Type: NUMBER
-
-
-
-
-
-#### JSON Example
+#### Example JSON Structure
 ```json
 {
   "label" : "Division",
@@ -91,6 +81,18 @@ Type: NUMBER
   "type" : "mathHelper/v1/division"
 }
 ```
+
+#### Output
+
+
+
+Type: NUMBER
+
+
+
+
+
+
 
 
 ### Modulo
@@ -105,18 +107,7 @@ Get the remainder of the division of two numbers.
 | firstNumber | First Number | NUMBER | Number to be divided. | true |
 | secondNumber | Second Number | NUMBER | Number to divide by. | true |
 
-
-#### Output
-
-
-
-Type: NUMBER
-
-
-
-
-
-#### JSON Example
+#### Example JSON Structure
 ```json
 {
   "label" : "Modulo",
@@ -128,6 +119,18 @@ Type: NUMBER
   "type" : "mathHelper/v1/modulo"
 }
 ```
+
+#### Output
+
+
+
+Type: NUMBER
+
+
+
+
+
+
 
 
 ### Multiplication
@@ -142,18 +145,7 @@ Multiply two numbers.
 | firstNumber | First Number | NUMBER |  | true |
 | secondNumber | Second Number | NUMBER |  | true |
 
-
-#### Output
-
-
-
-Type: NUMBER
-
-
-
-
-
-#### JSON Example
+#### Example JSON Structure
 ```json
 {
   "label" : "Multiplication",
@@ -165,6 +157,18 @@ Type: NUMBER
   "type" : "mathHelper/v1/multiplication"
 }
 ```
+
+#### Output
+
+
+
+Type: NUMBER
+
+
+
+
+
+
 
 
 ### Subtraction
@@ -179,18 +183,7 @@ Subtract two numbers.
 | firstNumber | First Number | NUMBER | Number to subtract from. | true |
 | secondNumber | Second Number | NUMBER | Number to subtract. | true |
 
-
-#### Output
-
-
-
-Type: NUMBER
-
-
-
-
-
-#### JSON Example
+#### Example JSON Structure
 ```json
 {
   "label" : "Subtraction",
@@ -202,6 +195,18 @@ Type: NUMBER
   "type" : "mathHelper/v1/subtraction"
 }
 ```
+
+#### Output
+
+
+
+Type: NUMBER
+
+
+
+
+
+
 
 
 

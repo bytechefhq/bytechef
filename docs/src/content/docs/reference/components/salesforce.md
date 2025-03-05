@@ -54,6 +54,19 @@ Creates a new record of a specified Salesforce object.
 | fields | | DYNAMIC_PROPERTIES <details> <summary> Depends On </summary> object </details> |  | true |
 | customFields | Custom Fields | OBJECT <details> <summary> Properties </summary> {} </details> |  | false |
 
+#### Example JSON Structure
+```json
+{
+  "label" : "Create Record",
+  "name" : "createRecord",
+  "parameters" : {
+    "object" : "",
+    "fields" : { },
+    "customFields" : { }
+  },
+  "type" : "salesforce/v1/createRecord"
+}
+```
 
 #### Output
 
@@ -71,17 +84,10 @@ Type: OBJECT
 
 
 
-#### JSON Example
+#### Output Example
 ```json
 {
-  "label" : "Create Record",
-  "name" : "createRecord",
-  "parameters" : {
-    "object" : "",
-    "fields" : { },
-    "customFields" : { }
-  },
-  "type" : "salesforce/v1/createRecord"
+  "id" : ""
 }
 ```
 
@@ -98,12 +104,7 @@ Deletes an existing record of a specified Salesforce object.
 | object | Salesforce Object | STRING |  | true |
 | id | Record ID | STRING <details> <summary> Depends On </summary> object </details> | ID of the object to delete. | true |
 
-
-#### Output
-
-This action does not produce any output.
-
-#### JSON Example
+#### Example JSON Structure
 ```json
 {
   "label" : "Delete Record",
@@ -115,6 +116,12 @@ This action does not produce any output.
   "type" : "salesforce/v1/deleteRecord"
 }
 ```
+
+#### Output
+
+This action does not produce any output.
+
+
 
 
 ### SOQL Query
@@ -128,12 +135,7 @@ Executes a raw SOQL query to  extract data from Salesforce.
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | q | Query | STRING | SOQL query to execute. | true |
 
-
-#### Output
-
-The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
-
-#### JSON Example
+#### Example JSON Structure
 ```json
 {
   "label" : "SOQL Query",
@@ -144,6 +146,12 @@ The output for this action is dynamic and may vary depending on the input parame
   "type" : "salesforce/v1/soqlQuery"
 }
 ```
+
+#### Output
+
+The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
+
+
 
 
 ### Update Record
@@ -160,12 +168,7 @@ Updates an existing record for a specified Salesforce object.
 | fields | | DYNAMIC_PROPERTIES <details> <summary> Depends On </summary> object </details> |  | true |
 | customFields | Custom Fields | OBJECT <details> <summary> Properties </summary> {} </details> |  | false |
 
-
-#### Output
-
-This action does not produce any output.
-
-#### JSON Example
+#### Example JSON Structure
 ```json
 {
   "label" : "Update Record",
@@ -179,6 +182,12 @@ This action does not produce any output.
   "type" : "salesforce/v1/updateRecord"
 }
 ```
+
+#### Output
+
+This action does not produce any output.
+
+
 
 
 

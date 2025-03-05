@@ -52,12 +52,7 @@ Start or resume current playback on an active device.
 | uris | Tracks | ARRAY <details> <summary> Items </summary> [STRING] </details> | Spotify track URIs to play. | false |
 | position_ms | Position | INTEGER | The position in milliseconds to start playback from. | false |
 
-
-#### Output
-
-This action does not produce any output.
-
-#### JSON Example
+#### Example JSON Structure
 ```json
 {
   "label" : "Play/Resume Playback",
@@ -71,6 +66,12 @@ This action does not produce any output.
   "type" : "spotify/v1/startResumePlayback"
 }
 ```
+
+#### Output
+
+This action does not produce any output.
+
+
 
 
 ### Add Items to a Playlist
@@ -86,6 +87,19 @@ Adds one or more items to your playlist.
 | uris | Tracks | ARRAY <details> <summary> Items </summary> [STRING] </details> |  | true |
 | position | Position | INTEGER | Position to insert the items, a zero-based index. | false |
 
+#### Example JSON Structure
+```json
+{
+  "label" : "Add Items to a Playlist",
+  "name" : "addItemsToPlaylist",
+  "parameters" : {
+    "playlist_id" : "",
+    "uris" : [ "" ],
+    "position" : 1
+  },
+  "type" : "spotify/v1/addItemsToPlaylist"
+}
+```
 
 #### Output
 
@@ -103,17 +117,10 @@ Type: OBJECT
 
 
 
-#### JSON Example
+#### Output Example
 ```json
 {
-  "label" : "Add Items to a Playlist",
-  "name" : "addItemsToPlaylist",
-  "parameters" : {
-    "playlist_id" : "",
-    "uris" : [ "" ],
-    "position" : 1
-  },
-  "type" : "spotify/v1/addItemsToPlaylist"
+  "snapshot_id" : ""
 }
 ```
 
@@ -132,6 +139,20 @@ Creates a new playlist
 | public | Public | BOOLEAN <details> <summary> Options </summary> true, false </details> | The public status for the new playlist. | true |
 | collaborative | Collaborative | BOOLEAN <details> <summary> Options </summary> true, false </details> | If the playlist is collaborative or not. | true |
 
+#### Example JSON Structure
+```json
+{
+  "label" : "Create Playlist",
+  "name" : "createPlaylist",
+  "parameters" : {
+    "name" : "",
+    "description" : "",
+    "public" : false,
+    "collaborative" : false
+  },
+  "type" : "spotify/v1/createPlaylist"
+}
+```
 
 #### Output
 
@@ -158,18 +179,26 @@ Type: OBJECT
 
 
 
-#### JSON Example
+#### Output Example
 ```json
 {
-  "label" : "Create Playlist",
-  "name" : "createPlaylist",
-  "parameters" : {
-    "name" : "",
-    "description" : "",
-    "public" : false,
-    "collaborative" : false
+  "collaborative" : false,
+  "description" : "",
+  "external_urls" : {
+    "spotify" : ""
   },
-  "type" : "spotify/v1/createPlaylist"
+  "href" : "",
+  "id" : "",
+  "name" : "",
+  "type" : "",
+  "uri" : "",
+  "owner" : {
+    "href" : "",
+    "id" : "",
+    "type" : "",
+    "uri" : ""
+  },
+  "public" : false
 }
 ```
 

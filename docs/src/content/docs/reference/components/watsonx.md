@@ -65,12 +65,7 @@ Ask anything you want.
 | stop | Stop | ARRAY <details> <summary> Items </summary> [STRING] </details> | Up to 4 sequences where the API will stop generating further tokens. | null |
 | seed | Seed | INTEGER | Keeping the same seed would output the same response. | null |
 
-
-#### Output
-
-The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
-
-#### JSON Example
+#### Example JSON Structure
 ```json
 {
   "label" : "Ask",
@@ -104,6 +99,12 @@ The output for this action is dynamic and may vary depending on the input parame
   "type" : "watsonx/v1/ask"
 }
 ```
+
+#### Output
+
+The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
+
+
 
 
 

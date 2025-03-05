@@ -50,6 +50,17 @@ Add a subscriber to a list.
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | list_id | List Id | INTEGER | List identifier. | true |
 
+#### Example JSON Structure
+```json
+{
+  "label" : "Add Subscriber",
+  "name" : "addSubscriber",
+  "parameters" : {
+    "list_id" : 1
+  },
+  "type" : "acumbamail/v1/addSubscriber"
+}
+```
 
 #### Output
 
@@ -61,17 +72,7 @@ Type: INTEGER
 
 
 
-#### JSON Example
-```json
-{
-  "label" : "Add Subscriber",
-  "name" : "addSubscriber",
-  "parameters" : {
-    "list_id" : 1
-  },
-  "type" : "acumbamail/v1/addSubscriber"
-}
-```
+
 
 
 ### Delete Subscriber
@@ -86,12 +87,7 @@ Removes a subscriber from a list.
 | list_id | List Id | INTEGER | List identifier. | true |
 | email | Email | STRING <details> <summary> Depends On </summary> list_id </details> | Subscriber email address. | true |
 
-
-#### Output
-
-This action does not produce any output.
-
-#### JSON Example
+#### Example JSON Structure
 ```json
 {
   "label" : "Delete Subscriber",
@@ -103,6 +99,12 @@ This action does not produce any output.
   "type" : "acumbamail/v1/deleteSubscriber"
 }
 ```
+
+#### Output
+
+This action does not produce any output.
+
+
 
 
 ### Create Subscriber List
@@ -122,18 +124,7 @@ Creates a new subscribers list.
 | address | Address | STRING | Address of the company | false |
 | phone | Phone | STRING | Phone number of the company | false |
 
-
-#### Output
-
-
-
-Type: INTEGER
-
-
-
-
-
-#### JSON Example
+#### Example JSON Structure
 ```json
 {
   "label" : "Create Subscriber List",
@@ -151,6 +142,18 @@ Type: INTEGER
 }
 ```
 
+#### Output
+
+
+
+Type: INTEGER
+
+
+
+
+
+
+
 
 ### Delete Subscriber List
 Name: deleteSubscriberList
@@ -163,12 +166,7 @@ Deletes a list of subscribers.
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | list_id | List Id | INTEGER | List identifier. | true |
 
-
-#### Output
-
-This action does not produce any output.
-
-#### JSON Example
+#### Example JSON Structure
 ```json
 {
   "label" : "Delete Subscriber List",
@@ -179,6 +177,12 @@ This action does not produce any output.
   "type" : "acumbamail/v1/deleteSubscriberList"
 }
 ```
+
+#### Output
+
+This action does not produce any output.
+
+
 
 
 

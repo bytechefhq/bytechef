@@ -53,6 +53,18 @@ Download a file from your Microsoft OneDrive.
 | parentId | Parent Folder ID | STRING | ID of the folder from which you want to download the file. | false |
 | id | File ID | STRING <details> <summary> Depends On </summary> parentId </details> | ID of the file to download. | true |
 
+#### Example JSON Structure
+```json
+{
+  "label" : "Download File",
+  "name" : "downloadFile",
+  "parameters" : {
+    "parentId" : "",
+    "id" : ""
+  },
+  "type" : "microsoftOneDrive/v1/downloadFile"
+}
+```
 
 #### Output
 
@@ -73,16 +85,13 @@ Type: FILE_ENTRY
 
 
 
-#### JSON Example
+#### Output Example
 ```json
 {
-  "label" : "Download File",
-  "name" : "downloadFile",
-  "parameters" : {
-    "parentId" : "",
-    "id" : ""
-  },
-  "type" : "microsoftOneDrive/v1/downloadFile"
+  "extension" : "",
+  "mimeType" : "",
+  "name" : "",
+  "url" : ""
 }
 ```
 
@@ -98,24 +107,7 @@ List files in a OneDrive folder.
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | parentId | Parent Folder ID | STRING | ID of the folder from which you want to list files. If no folder is specified, the root folder will be used. | false |
 
-
-#### Output
-
-
-
-Type: ARRAY
-
-
-#### Properties
-
-|     Name     |     Type     |     Description     |
-|:------------:|:------------:|:-------------------:|
-|  | OBJECT <details> <summary> Properties </summary> {STRING\(id), STRING\(name)} </details> |  |
-
-
-
-
-#### JSON Example
+#### Example JSON Structure
 ```json
 {
   "label" : "List Files",
@@ -125,6 +117,34 @@ Type: ARRAY
   },
   "type" : "microsoftOneDrive/v1/listFiles"
 }
+```
+
+#### Output
+
+
+
+Type: ARRAY
+
+
+Items Type: OBJECT
+
+
+#### Properties
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| id | STRING |  |
+| name | STRING |  |
+
+
+
+
+
+#### Output Example
+```json
+[ {
+  "id" : "",
+  "name" : ""
+} ]
 ```
 
 
@@ -139,24 +159,7 @@ List folders in a OneDrive folder.
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | parentId | Parent Folder ID | STRING | ID of the Folder from which you want to list folders. If no folder is specified, the root folder will be used. | false |
 
-
-#### Output
-
-
-
-Type: ARRAY
-
-
-#### Properties
-
-|     Name     |     Type     |     Description     |
-|:------------:|:------------:|:-------------------:|
-|  | OBJECT <details> <summary> Properties </summary> {STRING\(id), STRING\(name)} </details> |  |
-
-
-
-
-#### JSON Example
+#### Example JSON Structure
 ```json
 {
   "label" : "List Folders",
@@ -166,6 +169,34 @@ Type: ARRAY
   },
   "type" : "microsoftOneDrive/v1/listFolders"
 }
+```
+
+#### Output
+
+
+
+Type: ARRAY
+
+
+Items Type: OBJECT
+
+
+#### Properties
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| id | STRING |  |
+| name | STRING |  |
+
+
+
+
+
+#### Output Example
+```json
+[ {
+  "id" : "",
+  "name" : ""
+} ]
 ```
 
 
@@ -181,6 +212,23 @@ Upload a file to your Microsoft OneDrive.
 | parentId | Parent Folder ID | STRING | ID of the Folder where the file should be uploaded; if no folder is selected, the file will be uploaded in the root folder. | false |
 | file | File | FILE_ENTRY | File to upload. | true |
 
+#### Example JSON Structure
+```json
+{
+  "label" : "Upload File",
+  "name" : "uploadFile",
+  "parameters" : {
+    "parentId" : "",
+    "file" : {
+      "extension" : "",
+      "mimeType" : "",
+      "name" : "",
+      "url" : ""
+    }
+  },
+  "type" : "microsoftOneDrive/v1/uploadFile"
+}
+```
 
 #### Output
 
@@ -199,21 +247,11 @@ Type: OBJECT
 
 
 
-#### JSON Example
+#### Output Example
 ```json
 {
-  "label" : "Upload File",
-  "name" : "uploadFile",
-  "parameters" : {
-    "parentId" : "",
-    "file" : {
-      "extension" : "",
-      "mimeType" : "",
-      "name" : "",
-      "url" : ""
-    }
-  },
-  "type" : "microsoftOneDrive/v1/uploadFile"
+  "id" : "",
+  "name" : ""
 }
 ```
 
@@ -244,11 +282,15 @@ Type: POLLING
 Type: ARRAY
 
 
-#### Properties
+Items Type: OBJECT
 
+
+#### Properties
 |     Name     |     Type     |     Description     |
 |:------------:|:------------:|:-------------------:|
-|  | OBJECT <details> <summary> Properties </summary> {STRING\(id), STRING\(name)} </details> |  |
+| id | STRING |  |
+| name | STRING |  |
+
 
 
 

@@ -52,6 +52,18 @@ Creates a new contact.
 | bookId | Book ID | STRING | ID of the book where new contact will be created. | true |
 | name | Name | STRING | The name of the contact. | true |
 
+#### Example JSON Structure
+```json
+{
+  "label" : "Create Contact",
+  "name" : "createContact",
+  "parameters" : {
+    "bookId" : "",
+    "name" : ""
+  },
+  "type" : "reckon/v1/createContact"
+}
+```
 
 #### Output
 
@@ -69,16 +81,10 @@ Type: OBJECT
 
 
 
-#### JSON Example
+#### Output Example
 ```json
 {
-  "label" : "Create Contact",
-  "name" : "createContact",
-  "parameters" : {
-    "bookId" : "",
-    "name" : ""
-  },
-  "type" : "reckon/v1/createContact"
+  "id" : ""
 }
 ```
 
@@ -98,6 +104,23 @@ Creates a new invoice.
 | amountTaxStatus | Amount Tax Status | STRING <details> <summary> Options </summary> NonTaxed, Inclusive, Exclusive </details> | The amount tax status of the amounts in the invoice. | true |
 | lineItems | Line Items | ARRAY <details> <summary> Items </summary> [{INTEGER\(lineNumber)}] </details> | The individual items that make up the invoice. | true |
 
+#### Example JSON Structure
+```json
+{
+  "label" : "Create Invoice",
+  "name" : "createInvoice",
+  "parameters" : {
+    "bookId" : "",
+    "customer" : "",
+    "invoiceDate" : "2021-01-01",
+    "amountTaxStatus" : "",
+    "lineItems" : [ {
+      "lineNumber" : 1
+    } ]
+  },
+  "type" : "reckon/v1/createInvoice"
+}
+```
 
 #### Output
 
@@ -115,21 +138,10 @@ Type: OBJECT
 
 
 
-#### JSON Example
+#### Output Example
 ```json
 {
-  "label" : "Create Invoice",
-  "name" : "createInvoice",
-  "parameters" : {
-    "bookId" : "",
-    "customer" : "",
-    "invoiceDate" : "2021-01-01",
-    "amountTaxStatus" : "",
-    "lineItems" : [ {
-      "lineNumber" : 1
-    } ]
-  },
-  "type" : "reckon/v1/createInvoice"
+  "id" : ""
 }
 ```
 
@@ -148,6 +160,20 @@ Creates a new payment.
 | paymentDate | Payment Date | DATE | The date of the payment. | true |
 | totalAmount | Total Amount | NUMBER | The total amount of the payment applied. | true |
 
+#### Example JSON Structure
+```json
+{
+  "label" : "Create Payment",
+  "name" : "createPayment",
+  "parameters" : {
+    "bookId" : "",
+    "supplier" : "",
+    "paymentDate" : "2021-01-01",
+    "totalAmount" : 0.0
+  },
+  "type" : "reckon/v1/createPayment"
+}
+```
 
 #### Output
 
@@ -165,18 +191,10 @@ Type: OBJECT
 
 
 
-#### JSON Example
+#### Output Example
 ```json
 {
-  "label" : "Create Payment",
-  "name" : "createPayment",
-  "parameters" : {
-    "bookId" : "",
-    "supplier" : "",
-    "paymentDate" : "2021-01-01",
-    "totalAmount" : 0.0
-  },
-  "type" : "reckon/v1/createPayment"
+  "id" : ""
 }
 ```
 
@@ -207,11 +225,19 @@ Type: POLLING
 Type: ARRAY
 
 
-#### Properties
+Items Type: OBJECT
 
+
+#### Properties
 |     Name     |     Type     |     Description     |
 |:------------:|:------------:|:-------------------:|
-|  | OBJECT <details> <summary> Properties </summary> {STRING\(id), STRING\(invoiceNumber), {STRING\(id), STRING\(name)}\(customer), DATE\(invoiceDate), STRING\(amountTaxStatus), [{INTEGER\(lineNumber)}]\(lineItems)} </details> |  |
+| id | STRING |  |
+| invoiceNumber | STRING |  |
+| customer | OBJECT <details> <summary> Properties </summary> {STRING\(id), STRING\(name)} </details> |  |
+| invoiceDate | DATE |  |
+| amountTaxStatus | STRING |  |
+| lineItems | ARRAY <details> <summary> Items </summary> [{INTEGER\(lineNumber)}] </details> |  |
+
 
 
 
@@ -250,11 +276,18 @@ Type: POLLING
 Type: ARRAY
 
 
-#### Properties
+Items Type: OBJECT
 
+
+#### Properties
 |     Name     |     Type     |     Description     |
 |:------------:|:------------:|:-------------------:|
-|  | OBJECT <details> <summary> Properties </summary> {STRING\(id), STRING\(paymentNumber), {STRING\(id), STRING\(name)}\(supplier), DATE\(paymentDate), NUMBER\(totalAmount)} </details> |  |
+| id | STRING |  |
+| paymentNumber | STRING |  |
+| supplier | OBJECT <details> <summary> Properties </summary> {STRING\(id), STRING\(name)} </details> |  |
+| paymentDate | DATE |  |
+| totalAmount | NUMBER |  |
+
 
 
 

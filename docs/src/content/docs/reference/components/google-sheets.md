@@ -53,12 +53,7 @@ Clear a sheet of all values while preserving formats.
 | sheetId | Sheet ID | INTEGER <details> <summary> Depends On </summary> spreadsheetId </details> | The ID of the sheet. | true |
 | isTheFirstRowHeader | Is the First Row Headers? | BOOLEAN <details> <summary> Options </summary> true, false </details> | If the first row is header. | true |
 
-
-#### Output
-
-This action does not produce any output.
-
-#### JSON Example
+#### Example JSON Structure
 ```json
 {
   "label" : "Clear Sheet",
@@ -71,6 +66,12 @@ This action does not produce any output.
   "type" : "googleSheets/v1/clearSheet"
 }
 ```
+
+#### Output
+
+This action does not produce any output.
+
+
 
 
 ### Create Column
@@ -86,6 +87,19 @@ Append a new column to the end of the sheet.
 | sheetName | Sheet Name | STRING <details> <summary> Depends On </summary> spreadsheetId </details> | The name of the sheet. | true |
 | columnName | Column Name | STRING | Name of the new column. | true |
 
+#### Example JSON Structure
+```json
+{
+  "label" : "Create Column",
+  "name" : "createColumn",
+  "parameters" : {
+    "spreadsheetId" : "",
+    "sheetName" : "",
+    "columnName" : ""
+  },
+  "type" : "googleSheets/v1/createColumn"
+}
+```
 
 #### Output
 
@@ -105,17 +119,12 @@ Type: OBJECT
 
 
 
-#### JSON Example
+#### Output Example
 ```json
 {
-  "label" : "Create Column",
-  "name" : "createColumn",
-  "parameters" : {
-    "spreadsheetId" : "",
-    "sheetName" : "",
-    "columnName" : ""
-  },
-  "type" : "googleSheets/v1/createColumn"
+  "spreadsheetId" : "",
+  "sheetName" : "",
+  "headers" : [ "" ]
 }
 ```
 
@@ -133,6 +142,19 @@ Create a blank sheet with title. Optionally, provide headers.
 | sheetName | Sheet Name | STRING | The name of the new sheet. | true |
 | headers | Headers | ARRAY <details> <summary> Items </summary> [STRING] </details> | The headers of the new sheet. | false |
 
+#### Example JSON Structure
+```json
+{
+  "label" : "Create Sheet",
+  "name" : "createSheet",
+  "parameters" : {
+    "spreadsheetId" : "",
+    "sheetName" : "",
+    "headers" : [ "" ]
+  },
+  "type" : "googleSheets/v1/createSheet"
+}
+```
 
 #### Output
 
@@ -152,17 +174,12 @@ Type: OBJECT
 
 
 
-#### JSON Example
+#### Output Example
 ```json
 {
-  "label" : "Create Sheet",
-  "name" : "createSheet",
-  "parameters" : {
-    "spreadsheetId" : "",
-    "sheetName" : "",
-    "headers" : [ "" ]
-  },
-  "type" : "googleSheets/v1/createSheet"
+  "spreadsheetId" : "",
+  "sheetName" : "",
+  "headers" : [ "" ]
 }
 ```
 
@@ -180,12 +197,7 @@ Delete column on an existing sheet.
 | sheetId | Sheet ID | INTEGER <details> <summary> Depends On </summary> spreadsheetId </details> | The ID of the sheet. | true |
 | label | Column Label | STRING | The label of the column to be deleted. | true |
 
-
-#### Output
-
-This action does not produce any output.
-
-#### JSON Example
+#### Example JSON Structure
 ```json
 {
   "label" : "Delete Column",
@@ -198,6 +210,12 @@ This action does not produce any output.
   "type" : "googleSheets/v1/deleteColumn"
 }
 ```
+
+#### Output
+
+This action does not produce any output.
+
+
 
 
 ### Create Spreadsheet
@@ -212,12 +230,7 @@ Create a new spreadsheet in a specified folder.
 | title | Title | STRING | Title of the new spreadsheet to be created. | true |
 | folderId | Folder ID | STRING | ID of the folder where the new spreadsheet will be stored. If no folder is selected, the folder will be created in the root folder. | false |
 
-
-#### Output
-
-The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
-
-#### JSON Example
+#### Example JSON Structure
 ```json
 {
   "label" : "Create Spreadsheet",
@@ -229,6 +242,12 @@ The output for this action is dynamic and may vary depending on the input parame
   "type" : "googleSheets/v1/createSpreadsheet"
 }
 ```
+
+#### Output
+
+The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
+
+
 
 
 ### Delete Row
@@ -244,12 +263,7 @@ Delete row on an existing sheet.
 | sheetId | Sheet ID | INTEGER <details> <summary> Depends On </summary> spreadsheetId </details> | The ID of the sheet. | true |
 | rowNumber | Row Number | INTEGER | The row number to delete. | true |
 
-
-#### Output
-
-This action does not produce any output.
-
-#### JSON Example
+#### Example JSON Structure
 ```json
 {
   "label" : "Delete Row",
@@ -262,6 +276,12 @@ This action does not produce any output.
   "type" : "googleSheets/v1/deleteRow"
 }
 ```
+
+#### Output
+
+This action does not produce any output.
+
+
 
 
 ### Delete Sheet
@@ -276,12 +296,7 @@ Delete a specified sheet from a spreadsheet.
 | spreadsheetId | Spreadsheet ID | STRING | The ID of the spreadsheet to apply the updates to. | true |
 | sheetId | Sheet ID | INTEGER <details> <summary> Depends On </summary> spreadsheetId </details> | The ID of the sheet. | true |
 
-
-#### Output
-
-This action does not produce any output.
-
-#### JSON Example
+#### Example JSON Structure
 ```json
 {
   "label" : "Delete Sheet",
@@ -293,6 +308,12 @@ This action does not produce any output.
   "type" : "googleSheets/v1/deleteSheet"
 }
 ```
+
+#### Output
+
+This action does not produce any output.
+
+
 
 
 ### Find Row by Number
@@ -309,12 +330,7 @@ Get a row in a Google Sheet by row number.
 | isTheFirstRowHeader | Is the First Row Headers? | BOOLEAN <details> <summary> Options </summary> true, false </details> | If the first row is header. | true |
 | rowNumber | Row Number | INTEGER | The row number to get from the sheet. | true |
 
-
-#### Output
-
-The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
-
-#### JSON Example
+#### Example JSON Structure
 ```json
 {
   "label" : "Find Row by Number",
@@ -328,6 +344,12 @@ The output for this action is dynamic and may vary depending on the input parame
   "type" : "googleSheets/v1/findRowByNum"
 }
 ```
+
+#### Output
+
+The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
+
+
 
 
 ### Insert Multiple Rows
@@ -345,12 +367,7 @@ Append rows to the end of the spreadsheet.
 | isTheFirstRowHeader | Is the First Row Headers? | BOOLEAN <details> <summary> Options </summary> true, false </details> | If the first row is header. | true |
 | rows | | DYNAMIC_PROPERTIES <details> <summary> Depends On </summary> spreadsheetId, sheetName, isTheFirstRowHeader </details> |  | true |
 
-
-#### Output
-
-The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
-
-#### JSON Example
+#### Example JSON Structure
 ```json
 {
   "label" : "Insert Multiple Rows",
@@ -365,6 +382,12 @@ The output for this action is dynamic and may vary depending on the input parame
   "type" : "googleSheets/v1/insertMultipleRows"
 }
 ```
+
+#### Output
+
+The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
+
+
 
 
 ### Insert Row
@@ -382,12 +405,7 @@ Append a row of values to an existing sheet.
 | isTheFirstRowHeader | Is the First Row Headers? | BOOLEAN <details> <summary> Options </summary> true, false </details> | If the first row is header. | true |
 | row | | DYNAMIC_PROPERTIES <details> <summary> Depends On </summary> spreadsheetId, sheetName, isTheFirstRowHeader </details> |  | true |
 
-
-#### Output
-
-The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
-
-#### JSON Example
+#### Example JSON Structure
 ```json
 {
   "label" : "Insert Row",
@@ -403,6 +421,12 @@ The output for this action is dynamic and may vary depending on the input parame
 }
 ```
 
+#### Output
+
+The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
+
+
+
 
 ### List Sheets
 Name: listSheets
@@ -415,24 +439,7 @@ Get all sheets from the spreadsheet.
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | spreadsheetId | Spreadsheet ID | STRING | The ID of the spreadsheet to apply the updates to. | true |
 
-
-#### Output
-
-
-
-Type: ARRAY
-
-
-#### Properties
-
-|     Name     |     Type     |     Description     |
-|:------------:|:------------:|:-------------------:|
-|  | OBJECT <details> <summary> Properties </summary> {STRING\(spreadsheetId), STRING\(sheetName), [STRING]\(headers)} </details> |  |
-
-
-
-
-#### JSON Example
+#### Example JSON Structure
 ```json
 {
   "label" : "List Sheets",
@@ -442,6 +449,36 @@ Type: ARRAY
   },
   "type" : "googleSheets/v1/listSheets"
 }
+```
+
+#### Output
+
+
+
+Type: ARRAY
+
+
+Items Type: OBJECT
+
+
+#### Properties
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| spreadsheetId | STRING | ID of the spreadsheet. |
+| sheetName | STRING | Name of the sheet. |
+| headers | ARRAY <details> <summary> Items </summary> [STRING] </details> | List of headers on the sheet. |
+
+
+
+
+
+#### Output Example
+```json
+[ {
+  "spreadsheetId" : "",
+  "sheetName" : "",
+  "headers" : [ "" ]
+} ]
 ```
 
 
@@ -461,12 +498,7 @@ Overwrite values in an existing row.
 | updateWholeRow | Update Whole Row | BOOLEAN <details> <summary> Options </summary> true, false </details> | Whether to update the whole row or just specific columns. | true |
 | row | | DYNAMIC_PROPERTIES <details> <summary> Depends On </summary> spreadsheetId, sheetName, isTheFirstRowHeader, updateWholeRow </details> |  | true |
 
-
-#### Output
-
-The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
-
-#### JSON Example
+#### Example JSON Structure
 ```json
 {
   "label" : "Update Row",
@@ -482,6 +514,12 @@ The output for this action is dynamic and may vary depending on the input parame
   "type" : "googleSheets/v1/updateRow"
 }
 ```
+
+#### Output
+
+The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
+
+
 
 
 

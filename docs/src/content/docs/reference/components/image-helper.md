@@ -32,6 +32,24 @@ Compress image with specified quality.
 | quality | Quality | NUMBER | Compression quality of the image. | true |
 | resultFileName | Result File Name | STRING | Specifies the output file name for the result image. | true |
 
+#### Example JSON Structure
+```json
+{
+  "label" : "Compress Image",
+  "name" : "compressImage",
+  "parameters" : {
+    "image" : {
+      "extension" : "",
+      "mimeType" : "",
+      "name" : "",
+      "url" : ""
+    },
+    "quality" : 0.0,
+    "resultFileName" : ""
+  },
+  "type" : "imageHelper/v1/compressImage"
+}
+```
 
 #### Output
 
@@ -52,22 +70,13 @@ Type: FILE_ENTRY
 
 
 
-#### JSON Example
+#### Output Example
 ```json
 {
-  "label" : "Compress Image",
-  "name" : "compressImage",
-  "parameters" : {
-    "image" : {
-      "extension" : "",
-      "mimeType" : "",
-      "name" : "",
-      "url" : ""
-    },
-    "quality" : 0.0,
-    "resultFileName" : ""
-  },
-  "type" : "imageHelper/v1/compressImage"
+  "extension" : "",
+  "mimeType" : "",
+  "name" : "",
+  "url" : ""
 }
 ```
 
@@ -88,27 +97,7 @@ Crops an image to the specified dimensions.
 | height | Height | INTEGER | Height of the crop area | true |
 | resultFileName | Result File Name | STRING | Specifies the output file name for the result image. | true |
 
-
-#### Output
-
-
-
-Type: FILE_ENTRY
-
-
-#### Properties
-
-|     Name     |     Type     |     Description     |
-|:------------:|:------------:|:-------------------:|
-| extension | STRING |  |
-| mimeType | STRING |  |
-| name | STRING |  |
-| url | STRING |  |
-
-
-
-
-#### JSON Example
+#### Example JSON Structure
 ```json
 {
   "label" : "Crop Image",
@@ -130,98 +119,6 @@ Type: FILE_ENTRY
 }
 ```
 
-
-### Get Image Metadata
-Name: getImageMetadata
-
-Get metadata of the image.
-
-#### Properties
-
-|      Name       |      Label     |     Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| image | Image | FILE_ENTRY |  | true |
-| resultFileName | Result File Name | STRING | Specifies the output file name for the result image. | true |
-
-
-#### Output
-
-The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
-
-#### JSON Example
-```json
-{
-  "label" : "Get Image Metadata",
-  "name" : "getImageMetadata",
-  "parameters" : {
-    "image" : {
-      "extension" : "",
-      "mimeType" : "",
-      "name" : "",
-      "url" : ""
-    },
-    "resultFileName" : ""
-  },
-  "type" : "imageHelper/v1/getImageMetadata"
-}
-```
-
-
-### Image to Base64
-Name: imageToBase64
-
-Converts image to Base64 string.
-
-#### Properties
-
-|      Name       |      Label     |     Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| image | Image | FILE_ENTRY |  | true |
-
-
-#### Output
-
-
-
-Type: STRING
-
-
-
-
-
-#### JSON Example
-```json
-{
-  "label" : "Image to Base64",
-  "name" : "imageToBase64",
-  "parameters" : {
-    "image" : {
-      "extension" : "",
-      "mimeType" : "",
-      "name" : "",
-      "url" : ""
-    }
-  },
-  "type" : "imageHelper/v1/imageToBase64"
-}
-```
-
-
-### Resize Image
-Name: resizeImage
-
-Resizes an image to the specified width and height.
-
-#### Properties
-
-|      Name       |      Label     |     Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| image | Image | FILE_ENTRY |  | true |
-| width | Width | INTEGER | Width in pixels | true |
-| height | Height | INTEGER | Height in pixels | true |
-| resultFileName | Result File Name | STRING | Specifies the output file name for the result image. | true |
-
-
 #### Output
 
 
@@ -241,7 +138,110 @@ Type: FILE_ENTRY
 
 
 
-#### JSON Example
+#### Output Example
+```json
+{
+  "extension" : "",
+  "mimeType" : "",
+  "name" : "",
+  "url" : ""
+}
+```
+
+
+### Get Image Metadata
+Name: getImageMetadata
+
+Get metadata of the image.
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| image | Image | FILE_ENTRY |  | true |
+| resultFileName | Result File Name | STRING | Specifies the output file name for the result image. | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Get Image Metadata",
+  "name" : "getImageMetadata",
+  "parameters" : {
+    "image" : {
+      "extension" : "",
+      "mimeType" : "",
+      "name" : "",
+      "url" : ""
+    },
+    "resultFileName" : ""
+  },
+  "type" : "imageHelper/v1/getImageMetadata"
+}
+```
+
+#### Output
+
+The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
+
+
+
+
+### Image to Base64
+Name: imageToBase64
+
+Converts image to Base64 string.
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| image | Image | FILE_ENTRY |  | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Image to Base64",
+  "name" : "imageToBase64",
+  "parameters" : {
+    "image" : {
+      "extension" : "",
+      "mimeType" : "",
+      "name" : "",
+      "url" : ""
+    }
+  },
+  "type" : "imageHelper/v1/imageToBase64"
+}
+```
+
+#### Output
+
+
+
+Type: STRING
+
+
+
+
+
+
+
+
+### Resize Image
+Name: resizeImage
+
+Resizes an image to the specified width and height.
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| image | Image | FILE_ENTRY |  | true |
+| width | Width | INTEGER | Width in pixels | true |
+| height | Height | INTEGER | Height in pixels | true |
+| resultFileName | Result File Name | STRING | Specifies the output file name for the result image. | true |
+
+#### Example JSON Structure
 ```json
 {
   "label" : "Resize Image",
@@ -261,6 +261,35 @@ Type: FILE_ENTRY
 }
 ```
 
+#### Output
+
+
+
+Type: FILE_ENTRY
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| extension | STRING |  |
+| mimeType | STRING |  |
+| name | STRING |  |
+| url | STRING |  |
+
+
+
+
+#### Output Example
+```json
+{
+  "extension" : "",
+  "mimeType" : "",
+  "name" : "",
+  "url" : ""
+}
+```
+
 
 ### Rotate Image
 Name: rotateImage
@@ -275,6 +304,24 @@ Rotates an image by a specified degree.
 | degree | Degree | INTEGER <details> <summary> Options </summary> 90, 180, 270 </details> | Specifies the degree of clockwise rotation applied to the image. | true |
 | resultFileName | Result File Name | STRING | Specifies the output file name for the result image. | true |
 
+#### Example JSON Structure
+```json
+{
+  "label" : "Rotate Image",
+  "name" : "rotateImage",
+  "parameters" : {
+    "image" : {
+      "extension" : "",
+      "mimeType" : "",
+      "name" : "",
+      "url" : ""
+    },
+    "degree" : 1,
+    "resultFileName" : ""
+  },
+  "type" : "imageHelper/v1/rotateImage"
+}
+```
 
 #### Output
 
@@ -295,22 +342,13 @@ Type: FILE_ENTRY
 
 
 
-#### JSON Example
+#### Output Example
 ```json
 {
-  "label" : "Rotate Image",
-  "name" : "rotateImage",
-  "parameters" : {
-    "image" : {
-      "extension" : "",
-      "mimeType" : "",
-      "name" : "",
-      "url" : ""
-    },
-    "degree" : 1,
-    "resultFileName" : ""
-  },
-  "type" : "imageHelper/v1/rotateImage"
+  "extension" : "",
+  "mimeType" : "",
+  "name" : "",
+  "url" : ""
 }
 ```
 

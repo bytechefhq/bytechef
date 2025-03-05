@@ -36,12 +36,7 @@ Converts the response to the webhook request.
 | body | Body | FILE_ENTRY | The body of the response. | true |
 | statusCode | Status Code | INTEGER | The status code of the response. | null |
 
-
-#### Output
-
-The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
-
-#### JSON Example
+#### Example JSON Structure
 ```json
 {
   "label" : "Response to Webhook Request",
@@ -60,6 +55,12 @@ The output for this action is dynamic and may vary depending on the input parame
   "type" : "webhook/v1/responseToWebhookRequest"
 }
 ```
+
+#### Output
+
+The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
+
+
 
 
 

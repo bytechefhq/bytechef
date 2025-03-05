@@ -54,29 +54,7 @@ Creates a new customer.
 | phone | Phone | STRING |  | false |
 | address | Address | OBJECT <details> <summary> Properties </summary> {STRING\(city), STRING\(country), STRING\(line1), STRING\(line2), STRING\(postal_code), STRING\(state)} </details> |  | false |
 
-
-#### Output
-
-
-
-Type: OBJECT
-
-
-#### Properties
-
-|     Name     |     Type     |     Description     |
-|:------------:|:------------:|:-------------------:|
-| id | STRING |  |
-| description | STRING |  |
-| email | STRING |  |
-| name | STRING |  |
-| phone | STRING |  |
-| address | OBJECT <details> <summary> Properties </summary> {STRING\(city), STRING\(country), STRING\(line1), STRING\(line2), STRING\(postal_code), STRING\(state)} </details> |  |
-
-
-
-
-#### JSON Example
+#### Example JSON Structure
 ```json
 {
   "label" : "Create Customer",
@@ -99,6 +77,46 @@ Type: OBJECT
 }
 ```
 
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| id | STRING |  |
+| description | STRING |  |
+| email | STRING |  |
+| name | STRING |  |
+| phone | STRING |  |
+| address | OBJECT <details> <summary> Properties </summary> {STRING\(city), STRING\(country), STRING\(line1), STRING\(line2), STRING\(postal_code), STRING\(state)} </details> |  |
+
+
+
+
+#### Output Example
+```json
+{
+  "id" : "",
+  "description" : "",
+  "email" : "",
+  "name" : "",
+  "phone" : "",
+  "address" : {
+    "city" : "",
+    "country" : "",
+    "line1" : "",
+    "line2" : "",
+    "postal_code" : "",
+    "state" : ""
+  }
+}
+```
+
 
 ### Create Invoice
 Name: createInvoice
@@ -113,6 +131,19 @@ Creates a new invoice.
 | currency | Currency | STRING | Currency used for invoice. | true |
 | description | Description | STRING | Description for the invoice. | false |
 
+#### Example JSON Structure
+```json
+{
+  "label" : "Create Invoice",
+  "name" : "createInvoice",
+  "parameters" : {
+    "customer" : "",
+    "currency" : "",
+    "description" : ""
+  },
+  "type" : "stripe/v1/createInvoice"
+}
+```
 
 #### Output
 
@@ -133,17 +164,13 @@ Type: OBJECT
 
 
 
-#### JSON Example
+#### Output Example
 ```json
 {
-  "label" : "Create Invoice",
-  "name" : "createInvoice",
-  "parameters" : {
-    "customer" : "",
-    "currency" : "",
-    "description" : ""
-  },
-  "type" : "stripe/v1/createInvoice"
+  "id" : "",
+  "customer" : "",
+  "currency" : "",
+  "description" : ""
 }
 ```
 

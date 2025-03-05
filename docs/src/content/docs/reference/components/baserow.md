@@ -52,12 +52,7 @@ Creates a new row.
 | user_field_names | User Field Names | BOOLEAN <details> <summary> Options </summary> true, false </details> | The field names returned by this endpoint will be the actual names of the fields. | false |
 | fields | | DYNAMIC_PROPERTIES <details> <summary> Depends On </summary> tableId </details> |  | true |
 
-
-#### Output
-
-The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
-
-#### JSON Example
+#### Example JSON Structure
 ```json
 {
   "label" : "Create Row",
@@ -70,6 +65,12 @@ The output for this action is dynamic and may vary depending on the input parame
   "type" : "baserow/v1/createRow"
 }
 ```
+
+#### Output
+
+The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
+
+
 
 
 ### Delete Row
@@ -84,12 +85,7 @@ Deletes the specified row.
 | tableId | Table ID | INTEGER | ID of the table containing the row to be deleted. | true |
 | rowId | Row ID | INTEGER | ID of the row to be deleted. | true |
 
-
-#### Output
-
-This action does not produce any output.
-
-#### JSON Example
+#### Example JSON Structure
 ```json
 {
   "label" : "Delete Row",
@@ -101,6 +97,12 @@ This action does not produce any output.
   "type" : "baserow/v1/deleteRow"
 }
 ```
+
+#### Output
+
+This action does not produce any output.
+
+
 
 
 ### Get Row
@@ -116,12 +118,7 @@ Fetches a single table row.
 | rowId | Row ID | INTEGER | ID of the row to get. | true |
 | user_field_names | User Field Names | BOOLEAN <details> <summary> Options </summary> true, false </details> | The field names returned by this endpoint will be the actual names of the fields. | false |
 
-
-#### Output
-
-The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
-
-#### JSON Example
+#### Example JSON Structure
 ```json
 {
   "label" : "Get Row",
@@ -134,6 +131,12 @@ The output for this action is dynamic and may vary depending on the input parame
   "type" : "baserow/v1/getRow"
 }
 ```
+
+#### Output
+
+The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
+
+
 
 
 ### List Rows
@@ -150,12 +153,7 @@ Lists table rows.
 | order_by | Order By | STRING | If provided rows will be order by specific field. Use - sign for descending ordering. | false |
 | user_field_names | User Field Names | BOOLEAN <details> <summary> Options </summary> true, false </details> | The field names returned by this endpoint will be the actual names of the fields. | false |
 
-
-#### Output
-
-The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
-
-#### JSON Example
+#### Example JSON Structure
 ```json
 {
   "label" : "List Rows",
@@ -169,6 +167,12 @@ The output for this action is dynamic and may vary depending on the input parame
   "type" : "baserow/v1/listRows"
 }
 ```
+
+#### Output
+
+The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
+
+
 
 
 ### Update Row
@@ -185,12 +189,7 @@ Updates the specified row.
 | user_field_names | User Field Names | BOOLEAN <details> <summary> Options </summary> true, false </details> | The field names returned by this endpoint will be the actual names of the fields. | false |
 | fields | | DYNAMIC_PROPERTIES <details> <summary> Depends On </summary> tableId </details> |  | true |
 
-
-#### Output
-
-The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
-
-#### JSON Example
+#### Example JSON Structure
 ```json
 {
   "label" : "Update Row",
@@ -204,6 +203,12 @@ The output for this action is dynamic and may vary depending on the input parame
   "type" : "baserow/v1/updateRow"
 }
 ```
+
+#### Output
+
+The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
+
+
 
 
 

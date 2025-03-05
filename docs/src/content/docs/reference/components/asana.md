@@ -51,6 +51,22 @@ Creates a new project in a workspace or team.
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | data | Data | OBJECT <details> <summary> Properties </summary> {STRING\(workspace), STRING\(name), STRING\(notes), STRING\(team)} </details> |  | false |
 
+#### Example JSON Structure
+```json
+{
+  "label" : "Create Project",
+  "name" : "createProject",
+  "parameters" : {
+    "data" : {
+      "workspace" : "",
+      "name" : "",
+      "notes" : "",
+      "team" : ""
+    }
+  },
+  "type" : "asana/v1/createProject"
+}
+```
 
 #### Output
 
@@ -68,20 +84,22 @@ Type: OBJECT
 
 
 
-#### JSON Example
+#### Output Example
 ```json
 {
-  "label" : "Create Project",
-  "name" : "createProject",
-  "parameters" : {
-    "data" : {
-      "workspace" : "",
-      "name" : "",
-      "notes" : "",
-      "team" : ""
+  "data" : {
+    "gid" : "",
+    "name" : "",
+    "notes" : "",
+    "team" : {
+      "gid" : "",
+      "name" : ""
+    },
+    "workspace" : {
+      "gid" : "",
+      "name" : ""
     }
-  },
-  "type" : "asana/v1/createProject"
+  }
 }
 ```
 
@@ -97,6 +115,25 @@ Creates a new task
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | data | Data | OBJECT <details> <summary> Properties </summary> {STRING\(workspace), STRING\(project), STRING\(name), STRING\(notes), DATE\(due_on), [STRING]\(tags), STRING\(assignee)} </details> |  | false |
 
+#### Example JSON Structure
+```json
+{
+  "label" : "Create Task",
+  "name" : "createTask",
+  "parameters" : {
+    "data" : {
+      "workspace" : "",
+      "project" : "",
+      "name" : "",
+      "notes" : "",
+      "due_on" : "2021-01-01",
+      "tags" : [ "" ],
+      "assignee" : ""
+    }
+  },
+  "type" : "asana/v1/createTask"
+}
+```
 
 #### Output
 
@@ -114,23 +151,27 @@ Type: OBJECT
 
 
 
-#### JSON Example
+#### Output Example
 ```json
 {
-  "label" : "Create Task",
-  "name" : "createTask",
-  "parameters" : {
-    "data" : {
-      "workspace" : "",
-      "project" : "",
-      "name" : "",
-      "notes" : "",
-      "due_on" : "2021-01-01",
-      "tags" : [ "" ],
-      "assignee" : ""
+  "data" : {
+    "gid" : "",
+    "due_on" : "2021-01-01",
+    "notes" : "",
+    "name" : "",
+    "workspace" : {
+      "gid" : "",
+      "name" : ""
+    },
+    "tags" : [ {
+      "gid" : "",
+      "name" : ""
+    } ],
+    "assignee" : {
+      "gid" : "",
+      "name" : ""
     }
-  },
-  "type" : "asana/v1/createTask"
+  }
 }
 ```
 

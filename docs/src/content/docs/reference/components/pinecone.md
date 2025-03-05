@@ -52,12 +52,7 @@ Query data from a Pinecone vector store using OpenAI embeddings.
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | query | Query | STRING | The query to be executed. | true |
 
-
-#### Output
-
-The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
-
-#### JSON Example
+#### Example JSON Structure
 ```json
 {
   "label" : "Data Query",
@@ -68,6 +63,12 @@ The output for this action is dynamic and may vary depending on the input parame
   "type" : "pinecone/v1/dataQuery"
 }
 ```
+
+#### Output
+
+The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
+
+
 
 
 ### Load Data
@@ -89,12 +90,7 @@ Loads data into a Pinecone vector store using OpenAI embeddings.
 | useSummaryEnricher | Use Summary Metadata Enricher | BOOLEAN <details> <summary> Options </summary> true, false </details> | Whether to use the summary enricher. | true |
 | summaryMetadataEnricher | Summary Metadata Enricher | OBJECT <details> <summary> Properties </summary> {[STRING]\(summaryTypes)} </details> | Summarize the document content and add the summaries as metadata. | true |
 
-
-#### Output
-
-This action does not produce any output.
-
-#### JSON Example
+#### Example JSON Structure
 ```json
 {
   "label" : "Load Data",
@@ -128,6 +124,12 @@ This action does not produce any output.
   "type" : "pinecone/v1/loadData"
 }
 ```
+
+#### Output
+
+This action does not produce any output.
+
+
 
 
 

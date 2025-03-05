@@ -54,6 +54,20 @@ Creates a new task on the specified task list.
 | status | Status | STRING <details> <summary> Options </summary> needsAction, completed </details> | Status of the task. | true |
 | notes | Notes | STRING | Notes describing the task. | false |
 
+#### Example JSON Structure
+```json
+{
+  "label" : "Create Task",
+  "name" : "createTask",
+  "parameters" : {
+    "title" : "",
+    "listId" : "",
+    "status" : "",
+    "notes" : ""
+  },
+  "type" : "googleTasks/v1/createTask"
+}
+```
 
 #### Output
 
@@ -74,18 +88,13 @@ Type: OBJECT
 
 
 
-#### JSON Example
+#### Output Example
 ```json
 {
-  "label" : "Create Task",
-  "name" : "createTask",
-  "parameters" : {
-    "title" : "",
-    "listId" : "",
-    "status" : "",
-    "notes" : ""
-  },
-  "type" : "googleTasks/v1/createTask"
+  "id" : "",
+  "title" : "",
+  "notes" : "",
+  "status" : ""
 }
 ```
 
@@ -102,24 +111,7 @@ Returns all tasks in the specified task list.
 | listId | List ID | STRING | ID of the list where tasks are stored. | true |
 | showCompleted | Show completed | BOOLEAN <details> <summary> Options </summary> true, false </details> | Show also completed tasks. By default both completed task and task that needs action will be shown. | true |
 
-
-#### Output
-
-
-
-Type: ARRAY
-
-
-#### Properties
-
-|     Name     |     Type     |     Description     |
-|:------------:|:------------:|:-------------------:|
-|  | OBJECT <details> <summary> Properties </summary> {STRING\(id), STRING\(title), STRING\(notes), STRING\(status)} </details> |  |
-
-
-
-
-#### JSON Example
+#### Example JSON Structure
 ```json
 {
   "label" : "List Tasks",
@@ -130,6 +122,38 @@ Type: ARRAY
   },
   "type" : "googleTasks/v1/listTasks"
 }
+```
+
+#### Output
+
+
+
+Type: ARRAY
+
+
+Items Type: OBJECT
+
+
+#### Properties
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| id | STRING | Task identifier. |
+| title | STRING | Title of the task. |
+| notes | STRING | Notes describing the task. |
+| status | STRING | Status of the task. |
+
+
+
+
+
+#### Output Example
+```json
+[ {
+  "id" : "",
+  "title" : "",
+  "notes" : "",
+  "status" : ""
+} ]
 ```
 
 
@@ -148,6 +172,21 @@ Updates a specific task on the specified task list.
 | status | Status | STRING <details> <summary> Options </summary> needsAction, completed </details> | Status of the task. If empty, status will not be changed. | false |
 | notes | Notes | STRING | Notes describing the task. If empty, notes will not be changed. | false |
 
+#### Example JSON Structure
+```json
+{
+  "label" : "Update Task",
+  "name" : "updateTask",
+  "parameters" : {
+    "listId" : "",
+    "taskId" : "",
+    "title" : "",
+    "status" : "",
+    "notes" : ""
+  },
+  "type" : "googleTasks/v1/updateTask"
+}
+```
 
 #### Output
 
@@ -168,19 +207,13 @@ Type: OBJECT
 
 
 
-#### JSON Example
+#### Output Example
 ```json
 {
-  "label" : "Update Task",
-  "name" : "updateTask",
-  "parameters" : {
-    "listId" : "",
-    "taskId" : "",
-    "title" : "",
-    "status" : "",
-    "notes" : ""
-  },
-  "type" : "googleTasks/v1/updateTask"
+  "id" : "",
+  "title" : "",
+  "notes" : "",
+  "status" : ""
 }
 ```
 

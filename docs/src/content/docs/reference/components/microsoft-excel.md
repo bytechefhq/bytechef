@@ -55,12 +55,7 @@ Append a row of values to an existing worksheet.
 | isTheFirstRowHeader | Is the First Row Header? | BOOLEAN <details> <summary> Options </summary> true, false </details> | If the first row is header. | true |
 | row | | DYNAMIC_PROPERTIES <details> <summary> Depends On </summary> isTheFirstRowHeader, worksheetName, workbookId </details> |  | true |
 
-
-#### Output
-
-The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
-
-#### JSON Example
+#### Example JSON Structure
 ```json
 {
   "label" : "Append Row",
@@ -74,6 +69,12 @@ The output for this action is dynamic and may vary depending on the input parame
   "type" : "microsoftExcel/v1/appendRow"
 }
 ```
+
+#### Output
+
+The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
+
+
 
 
 ### Clear Worksheet
@@ -89,12 +90,7 @@ Clear a worksheet of all values.
 | worksheetName | Worksheet | STRING <details> <summary> Depends On </summary> workbookId </details> |  | true |
 | isTheFirstRowHeader | Is the First Row Header? | BOOLEAN <details> <summary> Options </summary> true, false </details> | If the first row is header. | true |
 
-
-#### Output
-
-This action does not produce any output.
-
-#### JSON Example
+#### Example JSON Structure
 ```json
 {
   "label" : "Clear Worksheet",
@@ -107,6 +103,12 @@ This action does not produce any output.
   "type" : "microsoftExcel/v1/clearWorksheet"
 }
 ```
+
+#### Output
+
+This action does not produce any output.
+
+
 
 
 ### Delete Row
@@ -122,12 +124,7 @@ Delete row on an existing sheet.
 | worksheetName | Worksheet | STRING <details> <summary> Depends On </summary> workbookId </details> |  | true |
 | rowNumber | Row Number | INTEGER | The row number to delete. | true |
 
-
-#### Output
-
-This action does not produce any output.
-
-#### JSON Example
+#### Example JSON Structure
 ```json
 {
   "label" : "Delete Row",
@@ -140,6 +137,12 @@ This action does not produce any output.
   "type" : "microsoftExcel/v1/deleteRow"
 }
 ```
+
+#### Output
+
+This action does not produce any output.
+
+
 
 
 ### Find Row by Number
@@ -156,12 +159,7 @@ Get row values from the worksheet by the row number.
 | isTheFirstRowHeader | Is the First Row Header? | BOOLEAN <details> <summary> Options </summary> true, false </details> | If the first row is header. | true |
 | rowNumber | Row Number | INTEGER | The row number to get the values from. | true |
 
-
-#### Output
-
-The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
-
-#### JSON Example
+#### Example JSON Structure
 ```json
 {
   "label" : "Find Row by Number",
@@ -175,6 +173,12 @@ The output for this action is dynamic and may vary depending on the input parame
   "type" : "microsoftExcel/v1/findRowByNum"
 }
 ```
+
+#### Output
+
+The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
+
+
 
 
 ### Update Row
@@ -192,12 +196,7 @@ Update a row in a worksheet.
 | isTheFirstRowHeader | Is the First Row Header? | BOOLEAN <details> <summary> Options </summary> true, false </details> | If the first row is header. | true |
 | row | | DYNAMIC_PROPERTIES <details> <summary> Depends On </summary> isTheFirstRowHeader, worksheetName, workbookId </details> |  | true |
 
-
-#### Output
-
-The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
-
-#### JSON Example
+#### Example JSON Structure
 ```json
 {
   "label" : "Update Row",
@@ -212,6 +211,12 @@ The output for this action is dynamic and may vary depending on the input parame
   "type" : "microsoftExcel/v1/updateRow"
 }
 ```
+
+#### Output
+
+The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
+
+
 
 
 

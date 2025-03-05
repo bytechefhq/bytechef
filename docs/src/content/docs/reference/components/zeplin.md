@@ -53,12 +53,7 @@ Updates an existing project.
 | name | Name | STRING | New name for the project. | true |
 | description | Description | STRING | New description for the project. | false |
 
-
-#### Output
-
-This action does not produce any output.
-
-#### JSON Example
+#### Example JSON Structure
 ```json
 {
   "label" : "Update Project",
@@ -71,6 +66,12 @@ This action does not produce any output.
   "type" : "zeplin/v1/updateProject"
 }
 ```
+
+#### Output
+
+This action does not produce any output.
+
+
 
 
 

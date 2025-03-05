@@ -53,6 +53,19 @@ Creates a new account.
 | website | Website | STRING | Website of the account. | false |
 | phone | Phone | STRING | Phone number of the account. | false |
 
+#### Example JSON Structure
+```json
+{
+  "label" : "Create Account",
+  "name" : "createAccount",
+  "parameters" : {
+    "name" : "",
+    "website" : "",
+    "phone" : ""
+  },
+  "type" : "freshsales/v1/createAccount"
+}
+```
 
 #### Output
 
@@ -70,17 +83,15 @@ Type: OBJECT
 
 
 
-#### JSON Example
+#### Output Example
 ```json
 {
-  "label" : "Create Account",
-  "name" : "createAccount",
-  "parameters" : {
+  "sales_account" : {
+    "id" : 0.0,
     "name" : "",
     "website" : "",
     "phone" : ""
-  },
-  "type" : "freshsales/v1/createAccount"
+  }
 }
 ```
 
@@ -110,24 +121,7 @@ Add new contact in Freshsales CRM.
 | twitter | Twitter | STRING | Twitter username of the contact. | false |
 | linkedin | LinkedIn | STRING | LinkedIn account of the contact. | false |
 
-
-#### Output
-
-
-
-Type: OBJECT
-
-
-#### Properties
-
-|     Name     |     Type     |     Description     |
-|:------------:|:------------:|:-------------------:|
-| contact | OBJECT <details> <summary> Properties </summary> {NUMBER\(id), STRING\(first_name), STRING\(last_name), STRING\(job_title), STRING\(city), STRING\(state), STRING\(zipcode), STRING\(country), STRING\(email), STRING\(work_number), STRING\(mobile_number), STRING\(address), STRING\(medium), STRING\(facebook), STRING\(twitter), STRING\(linkedin)} </details> |  |
-
-
-
-
-#### JSON Example
+#### Example JSON Structure
 ```json
 {
   "label" : "Create Contact",
@@ -153,6 +147,46 @@ Type: OBJECT
 }
 ```
 
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| contact | OBJECT <details> <summary> Properties </summary> {NUMBER\(id), STRING\(first_name), STRING\(last_name), STRING\(job_title), STRING\(city), STRING\(state), STRING\(zipcode), STRING\(country), STRING\(email), STRING\(work_number), STRING\(mobile_number), STRING\(address), STRING\(medium), STRING\(facebook), STRING\(twitter), STRING\(linkedin)} </details> |  |
+
+
+
+
+#### Output Example
+```json
+{
+  "contact" : {
+    "id" : 0.0,
+    "first_name" : "",
+    "last_name" : "",
+    "job_title" : "",
+    "city" : "",
+    "state" : "",
+    "zipcode" : "",
+    "country" : "",
+    "email" : "",
+    "work_number" : "",
+    "mobile_number" : "",
+    "address" : "",
+    "medium" : "",
+    "facebook" : "",
+    "twitter" : "",
+    "linkedin" : ""
+  }
+}
+```
+
 
 ### Create Lead
 Name: createLead
@@ -167,6 +201,19 @@ Creates a new lead.
 | last_name | Last Name | STRING | Last name of the lead. | false |
 | email | Email | STRING | Primary email address of the lead. | true |
 
+#### Example JSON Structure
+```json
+{
+  "label" : "Create Lead",
+  "name" : "createLead",
+  "parameters" : {
+    "first_name" : "",
+    "last_name" : "",
+    "email" : ""
+  },
+  "type" : "freshsales/v1/createLead"
+}
+```
 
 #### Output
 
@@ -184,17 +231,15 @@ Type: OBJECT
 
 
 
-#### JSON Example
+#### Output Example
 ```json
 {
-  "label" : "Create Lead",
-  "name" : "createLead",
-  "parameters" : {
+  "lead" : {
+    "id" : 0.0,
+    "email" : "",
     "first_name" : "",
-    "last_name" : "",
-    "email" : ""
-  },
-  "type" : "freshsales/v1/createLead"
+    "last_name" : ""
+  }
 }
 ```
 

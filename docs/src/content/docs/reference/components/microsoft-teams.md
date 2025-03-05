@@ -54,6 +54,19 @@ Creates a new channel within a team.
 | displayName | Channel Name | STRING |  | true |
 | description | Description | STRING | Description for the channel. | false |
 
+#### Example JSON Structure
+```json
+{
+  "label" : "Create Channel",
+  "name" : "createChannel",
+  "parameters" : {
+    "teamId" : "",
+    "displayName" : "",
+    "description" : ""
+  },
+  "type" : "microsoftTeams/v1/createChannel"
+}
+```
 
 #### Output
 
@@ -73,17 +86,12 @@ Type: OBJECT
 
 
 
-#### JSON Example
+#### Output Example
 ```json
 {
-  "label" : "Create Channel",
-  "name" : "createChannel",
-  "parameters" : {
-    "teamId" : "",
-    "displayName" : "",
-    "description" : ""
-  },
-  "type" : "microsoftTeams/v1/createChannel"
+  "id" : "",
+  "displayName" : "",
+  "description" : ""
 }
 ```
 
@@ -102,6 +110,20 @@ Sends a message to a channel.
 | contentType | Message Text Format | STRING <details> <summary> Options </summary> text, html </details> |  | true |
 | content | Message Text | STRING |  | true |
 
+#### Example JSON Structure
+```json
+{
+  "label" : "Send Channel Message",
+  "name" : "sendChannelMessage",
+  "parameters" : {
+    "teamId" : "",
+    "channelId" : "",
+    "contentType" : "",
+    "content" : ""
+  },
+  "type" : "microsoftTeams/v1/sendChannelMessage"
+}
+```
 
 #### Output
 
@@ -121,18 +143,18 @@ Type: OBJECT
 
 
 
-#### JSON Example
+#### Output Example
 ```json
 {
-  "label" : "Send Channel Message",
-  "name" : "sendChannelMessage",
-  "parameters" : {
-    "teamId" : "",
-    "channelId" : "",
+  "id" : "",
+  "body" : {
     "contentType" : "",
     "content" : ""
   },
-  "type" : "microsoftTeams/v1/sendChannelMessage"
+  "channelIdentity" : {
+    "teamId" : "",
+    "channelId" : ""
+  }
 }
 ```
 
@@ -150,6 +172,19 @@ Sends a message in an existing chat.
 | contentType | Message Text Format | STRING <details> <summary> Options </summary> text, html </details> |  | true |
 | content | Message Text | STRING |  | true |
 
+#### Example JSON Structure
+```json
+{
+  "label" : "Send Chat Message",
+  "name" : "sendChatMessage",
+  "parameters" : {
+    "chatId" : "",
+    "contentType" : "",
+    "content" : ""
+  },
+  "type" : "microsoftTeams/v1/sendChatMessage"
+}
+```
 
 #### Output
 
@@ -169,17 +204,15 @@ Type: OBJECT
 
 
 
-#### JSON Example
+#### Output Example
 ```json
 {
-  "label" : "Send Chat Message",
-  "name" : "sendChatMessage",
-  "parameters" : {
-    "chatId" : "",
+  "id" : "",
+  "chatId" : "",
+  "body" : {
     "contentType" : "",
     "content" : ""
-  },
-  "type" : "microsoftTeams/v1/sendChatMessage"
+  }
 }
 ```
 

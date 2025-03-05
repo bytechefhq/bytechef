@@ -30,12 +30,7 @@ Converts the JSON string to object/array.
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | source | Source | STRING | The JSON string to convert to the data. | true |
 
-
-#### Output
-
-The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
-
-#### JSON Example
+#### Example JSON Structure
 ```json
 {
   "label" : "Convert from JSON String",
@@ -46,6 +41,12 @@ The output for this action is dynamic and may vary depending on the input parame
   "type" : "jsonHelper/v1/parse"
 }
 ```
+
+#### Output
+
+The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
+
+
 
 
 ### Convert to JSON String
@@ -61,12 +62,7 @@ Writes the object/array to a JSON string.
 | source | Source | OBJECT <details> <summary> Properties </summary> {} </details> | The data to convert to JSON string. | true |
 | source | Source | ARRAY <details> <summary> Items </summary> [] </details> | The data to convert to JSON string. | true |
 
-
-#### Output
-
-The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
-
-#### JSON Example
+#### Example JSON Structure
 ```json
 {
   "label" : "Convert to JSON String",
@@ -78,6 +74,12 @@ The output for this action is dynamic and may vary depending on the input parame
   "type" : "jsonHelper/v1/stringify"
 }
 ```
+
+#### Output
+
+The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
+
+
 
 
 

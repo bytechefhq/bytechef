@@ -54,6 +54,19 @@ Creates a new folder at path you specify.
 | parentFolder | Parent Folder ID | STRING <details> <summary> Depends On </summary> siteId </details> | If no folder is selected, file will be uploaded to root folder. | false |
 | name | Folder Name | STRING |  | true |
 
+#### Example JSON Structure
+```json
+{
+  "label" : "Create Folder",
+  "name" : "createFolder",
+  "parameters" : {
+    "siteId" : "",
+    "parentFolder" : "",
+    "name" : ""
+  },
+  "type" : "microsoftSharePoint/v1/createFolder"
+}
+```
 
 #### Output
 
@@ -72,17 +85,11 @@ Type: OBJECT
 
 
 
-#### JSON Example
+#### Output Example
 ```json
 {
-  "label" : "Create Folder",
-  "name" : "createFolder",
-  "parameters" : {
-    "siteId" : "",
-    "parentFolder" : "",
-    "name" : ""
-  },
-  "type" : "microsoftSharePoint/v1/createFolder"
+  "id" : "",
+  "name" : ""
 }
 ```
 
@@ -100,6 +107,19 @@ Creates a new list
 | displayName | List Name | STRING |  | true |
 | description | List Description | STRING |  | true |
 
+#### Example JSON Structure
+```json
+{
+  "label" : "Create List",
+  "name" : "createList",
+  "parameters" : {
+    "siteId" : "",
+    "displayName" : "",
+    "description" : ""
+  },
+  "type" : "microsoftSharePoint/v1/createList"
+}
+```
 
 #### Output
 
@@ -119,17 +139,12 @@ Type: OBJECT
 
 
 
-#### JSON Example
+#### Output Example
 ```json
 {
-  "label" : "Create List",
-  "name" : "createList",
-  "parameters" : {
-    "siteId" : "",
-    "displayName" : "",
-    "description" : ""
-  },
-  "type" : "microsoftSharePoint/v1/createList"
+  "id" : "",
+  "description" : "",
+  "displayName" : ""
 }
 ```
 
@@ -147,6 +162,19 @@ Creates a new item in a list.
 | listId | List ID | STRING <details> <summary> Depends On </summary> siteId </details> |  | true |
 | columns | | DYNAMIC_PROPERTIES <details> <summary> Depends On </summary> siteId, listId </details> |  | null |
 
+#### Example JSON Structure
+```json
+{
+  "label" : "Create List Item",
+  "name" : "createListItem",
+  "parameters" : {
+    "siteId" : "",
+    "listId" : "",
+    "columns" : { }
+  },
+  "type" : "microsoftSharePoint/v1/createListItem"
+}
+```
 
 #### Output
 
@@ -164,17 +192,10 @@ Type: OBJECT
 
 
 
-#### JSON Example
+#### Output Example
 ```json
 {
-  "label" : "Create List Item",
-  "name" : "createListItem",
-  "parameters" : {
-    "siteId" : "",
-    "listId" : "",
-    "columns" : { }
-  },
-  "type" : "microsoftSharePoint/v1/createListItem"
+  "id" : ""
 }
 ```
 
@@ -192,6 +213,24 @@ Upload file to Microsoft SharePoint folder.
 | parentFolder | Parent Folder ID | STRING <details> <summary> Depends On </summary> siteId </details> | If no folder is selected, file will be uploaded to root folder | false |
 | file | File | FILE_ENTRY | File to upload. | true |
 
+#### Example JSON Structure
+```json
+{
+  "label" : "Upload File",
+  "name" : "uploadFile",
+  "parameters" : {
+    "siteId" : "",
+    "parentFolder" : "",
+    "file" : {
+      "extension" : "",
+      "mimeType" : "",
+      "name" : "",
+      "url" : ""
+    }
+  },
+  "type" : "microsoftSharePoint/v1/uploadFile"
+}
+```
 
 #### Output
 
@@ -209,22 +248,10 @@ Type: OBJECT
 
 
 
-#### JSON Example
+#### Output Example
 ```json
 {
-  "label" : "Upload File",
-  "name" : "uploadFile",
-  "parameters" : {
-    "siteId" : "",
-    "parentFolder" : "",
-    "file" : {
-      "extension" : "",
-      "mimeType" : "",
-      "name" : "",
-      "url" : ""
-    }
-  },
-  "type" : "microsoftSharePoint/v1/uploadFile"
+  "id" : ""
 }
 ```
 

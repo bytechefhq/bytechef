@@ -31,12 +31,7 @@ Executes custom JavaScript code.
 | input | Input | OBJECT <details> <summary> Properties </summary> {} </details> | Initialize parameter values used in the custom code. | null |
 | script | JavaScript Code | STRING | Add your JavaScript custom logic here. | true |
 
-
-#### Output
-
-The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
-
-#### JSON Example
+#### Example JSON Structure
 ```json
 {
   "label" : "JavaScript",
@@ -48,6 +43,12 @@ The output for this action is dynamic and may vary depending on the input parame
   "type" : "script/v1/javascript"
 }
 ```
+
+#### Output
+
+The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
+
+
 
 
 ### Python
@@ -62,12 +63,7 @@ Executes custom Python code.
 | input | Input | OBJECT <details> <summary> Properties </summary> {} </details> | Initialize parameter values used in the custom code. | null |
 | script | Python Code | STRING | Add your Python custom logic here. | true |
 
-
-#### Output
-
-The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
-
-#### JSON Example
+#### Example JSON Structure
 ```json
 {
   "label" : "Python",
@@ -79,6 +75,12 @@ The output for this action is dynamic and may vary depending on the input parame
   "type" : "script/v1/python"
 }
 ```
+
+#### Output
+
+The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
+
+
 
 
 ### Ruby
@@ -93,12 +95,7 @@ Executes custom Ruby code.
 | input | Input | OBJECT <details> <summary> Properties </summary> {} </details> | Initialize parameter values used in the custom code. | null |
 | script | Ruby Code | STRING | Add your Ruby custom logic here. | true |
 
-
-#### Output
-
-The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
-
-#### JSON Example
+#### Example JSON Structure
 ```json
 {
   "label" : "Ruby",
@@ -110,6 +107,12 @@ The output for this action is dynamic and may vary depending on the input parame
   "type" : "script/v1/ruby"
 }
 ```
+
+#### Output
+
+The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
+
+
 
 
 

@@ -56,6 +56,23 @@ Creates new contact. A contact may represent a single individual or an organizat
 | website | Website | STRING |  | false |
 | email | Email | STRING |  | false |
 
+#### Example JSON Structure
+```json
+{
+  "label" : "Create Contact",
+  "name" : "createContact",
+  "parameters" : {
+    "is_organization" : false,
+    "name" : "",
+    "first_name" : "",
+    "last_name" : "",
+    "title" : "",
+    "website" : "",
+    "email" : ""
+  },
+  "type" : "zendeskSell/v1/createContact"
+}
+```
 
 #### Output
 
@@ -74,21 +91,20 @@ Type: OBJECT
 
 
 
-#### JSON Example
+#### Output Example
 ```json
 {
-  "label" : "Create Contact",
-  "name" : "createContact",
-  "parameters" : {
+  "data" : {
+    "id" : "",
     "is_organization" : false,
-    "name" : "",
-    "first_name" : "",
-    "last_name" : "",
     "title" : "",
     "website" : "",
     "email" : ""
   },
-  "type" : "zendeskSell/v1/createContact"
+  "meta" : {
+    "version" : 1,
+    "type" : ""
+  }
 }
 ```
 
@@ -105,6 +121,18 @@ Creates new task.
 | content | Task Name | STRING |  | true |
 | due_date | Due Date | DATE |  | false |
 
+#### Example JSON Structure
+```json
+{
+  "label" : "Create Task",
+  "name" : "createTask",
+  "parameters" : {
+    "content" : "",
+    "due_date" : "2021-01-01"
+  },
+  "type" : "zendeskSell/v1/createTask"
+}
+```
 
 #### Output
 
@@ -123,16 +151,17 @@ Type: OBJECT
 
 
 
-#### JSON Example
+#### Output Example
 ```json
 {
-  "label" : "Create Task",
-  "name" : "createTask",
-  "parameters" : {
+  "data" : {
+    "id" : 1,
     "content" : "",
     "due_date" : "2021-01-01"
   },
-  "type" : "zendeskSell/v1/createTask"
+  "meta" : {
+    "type" : ""
+  }
 }
 ```
 

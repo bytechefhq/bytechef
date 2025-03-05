@@ -40,10 +40,10 @@ Version: 1
 ## Actions
 
 
-### Request Approval in a Channel
-Name: requestApprovalMessage
+### Send Approval Message
+Name: sendApprovalMessage
 
-Send approval message to a channel and then wait until the message is approved or disapproved.
+Sends approval message to a channel.
 
 #### Properties
 
@@ -52,6 +52,18 @@ Send approval message to a channel and then wait until the message is approved o
 | channel | Channel | STRING | Channel, private group, or IM channel to send message to. | true |
 | text | Message | STRING | The text of your message. | true |
 
+#### Example JSON Structure
+```json
+{
+  "label" : "Send Approval Message",
+  "name" : "sendApprovalMessage",
+  "parameters" : {
+    "channel" : "",
+    "text" : ""
+  },
+  "type" : "slack/v1/sendApprovalMessage"
+}
+```
 
 #### Output
 
@@ -74,16 +86,24 @@ Type: OBJECT
 
 
 
-#### JSON Example
+#### Output Example
 ```json
 {
-  "label" : "Request Approval in a Channel",
-  "name" : "requestApprovalMessage",
-  "parameters" : {
-    "channel" : "",
-    "text" : ""
+  "ok" : false,
+  "channel" : "",
+  "ts" : "",
+  "message" : {
+    "user" : "",
+    "type" : "",
+    "ts" : "",
+    "text" : "",
+    "team" : "",
+    "subtype" : ""
   },
-  "type" : "slack/v1/requestApprovalMessage"
+  "warning" : "",
+  "responseMetadata" : {
+    "messages" : [ "" ]
+  }
 }
 ```
 
@@ -100,6 +120,18 @@ Sends a message to a public channel, private channel, or existing direct message
 | channel | Channel ID | STRING | ID of the channel, private group, or IM channel to send message to. | true |
 | text | Message | STRING | The text of your message. | true |
 
+#### Example JSON Structure
+```json
+{
+  "label" : "Send message",
+  "name" : "sendMessage",
+  "parameters" : {
+    "channel" : "",
+    "text" : ""
+  },
+  "type" : "slack/v1/sendMessage"
+}
+```
 
 #### Output
 
@@ -122,16 +154,24 @@ Type: OBJECT
 
 
 
-#### JSON Example
+#### Output Example
 ```json
 {
-  "label" : "Send message",
-  "name" : "sendMessage",
-  "parameters" : {
-    "channel" : "",
-    "text" : ""
+  "ok" : false,
+  "channel" : "",
+  "ts" : "",
+  "message" : {
+    "user" : "",
+    "type" : "",
+    "ts" : "",
+    "text" : "",
+    "team" : "",
+    "subtype" : ""
   },
-  "type" : "slack/v1/sendMessage"
+  "warning" : "",
+  "responseMetadata" : {
+    "messages" : [ "" ]
+  }
 }
 ```
 
@@ -148,6 +188,18 @@ Sends a direct message to another user in a workspace. If it hasn't already, a d
 | channel | User ID | STRING | ID of the user to send the direct message to. | true |
 | text | Message | STRING | The text of your message. | true |
 
+#### Example JSON Structure
+```json
+{
+  "label" : "Send Direct Message",
+  "name" : "sendDirectMessage",
+  "parameters" : {
+    "channel" : "",
+    "text" : ""
+  },
+  "type" : "slack/v1/sendDirectMessage"
+}
+```
 
 #### Output
 
@@ -170,16 +222,24 @@ Type: OBJECT
 
 
 
-#### JSON Example
+#### Output Example
 ```json
 {
-  "label" : "Send Direct Message",
-  "name" : "sendDirectMessage",
-  "parameters" : {
-    "channel" : "",
-    "text" : ""
+  "ok" : false,
+  "channel" : "",
+  "ts" : "",
+  "message" : {
+    "user" : "",
+    "type" : "",
+    "ts" : "",
+    "text" : "",
+    "team" : "",
+    "subtype" : ""
   },
-  "type" : "slack/v1/sendDirectMessage"
+  "warning" : "",
+  "responseMetadata" : {
+    "messages" : [ "" ]
+  }
 }
 ```
 

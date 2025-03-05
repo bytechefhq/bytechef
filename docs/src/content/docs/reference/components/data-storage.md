@@ -43,12 +43,7 @@ Append value to the end of a list. If the list does not exist, it will be create
 | value | Value | TIME | The value to set under given key. | true |
 | appendListAsSingleItem | Append a List as a Single Item | BOOLEAN <details> <summary> Options </summary> true, false </details> | When set to true, and the value is a list, it will be added as a single value rather than concatenating the lists. | null |
 
-
-#### Output
-
-This action does not produce any output.
-
-#### JSON Example
+#### Example JSON Structure
 ```json
 {
   "label" : "Append Value to List",
@@ -64,6 +59,12 @@ This action does not produce any output.
 }
 ```
 
+#### Output
+
+This action does not produce any output.
+
+
+
 
 ### Atomic Increment
 Name: atomicIncrement
@@ -78,18 +79,7 @@ The numeric value can be incremented atomically, and the action can be used conc
 | scope | Scope | STRING <details> <summary> Options </summary> CURRENT_EXECUTION, WORKFLOW, ACCOUNT </details> | The namespace to obtain a value from. | true |
 | valueToAdd | Value to Add | INTEGER | The value that can be added to the existing numeric value, which may have a negative value. | null |
 
-
-#### Output
-
-
-
-Type: INTEGER
-
-
-
-
-
-#### JSON Example
+#### Example JSON Structure
 ```json
 {
   "label" : "Atomic Increment",
@@ -102,6 +92,18 @@ Type: INTEGER
   "type" : "dataStorage/v1/atomicIncrement"
 }
 ```
+
+#### Output
+
+
+
+Type: INTEGER
+
+
+
+
+
+
 
 
 ### Await Get Value
@@ -128,12 +130,7 @@ Wait for a value under a specified key, until it's available.
 | defaultValue | Default Value | TIME | The default value to return if no value exists under the given key. | true |
 | timeout | Timeout | INTEGER | If a value is not found within the specified time, the action returns a null value. Therefore, the maximum wait time should be set accordingly. | true |
 
-
-#### Output
-
-The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
-
-#### JSON Example
+#### Example JSON Structure
 ```json
 {
   "label" : "Await Get Value",
@@ -149,6 +146,12 @@ The output for this action is dynamic and may vary depending on the input parame
 }
 ```
 
+#### Output
+
+The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
+
+
+
 
 ### Delete Value
 Name: deleteValue
@@ -162,12 +165,7 @@ Remove a value associated with a key in the specified scope.
 | key | Key | STRING | The identifier of a value to delete, stored earlier in the selected scope. | true |
 | scope | Scope | STRING <details> <summary> Options </summary> CURRENT_EXECUTION, WORKFLOW, ACCOUNT </details> | The namespace to delete a value from. The value should have been previously accessible, either in the present workflow execution, or the workflow itself for all the executions, or the user account for all the workflows the user has. | true |
 
-
-#### Output
-
-This action does not produce any output.
-
-#### JSON Example
+#### Example JSON Structure
 ```json
 {
   "label" : "Delete Value",
@@ -179,6 +177,12 @@ This action does not produce any output.
   "type" : "dataStorage/v1/deleteValue"
 }
 ```
+
+#### Output
+
+This action does not produce any output.
+
+
 
 
 ### Delete Value from List
@@ -194,12 +198,7 @@ Delete a value from the given index in a list.
 | scope | Scope | STRING <details> <summary> Options </summary> CURRENT_EXECUTION, WORKFLOW, ACCOUNT </details> | The namespace to delete a value from. The value should have been previously accessible, either in the present workflow execution, or the workflow itself for all the executions, or the user account for all the workflows the user has. | true |
 | index | Index | INTEGER | The specified index in the list will be removed, and if it doesn't exist, the list will remain unaltered. | true |
 
-
-#### Output
-
-This action does not produce any output.
-
-#### JSON Example
+#### Example JSON Structure
 ```json
 {
   "label" : "Delete Value from List",
@@ -213,6 +212,12 @@ This action does not produce any output.
 }
 ```
 
+#### Output
+
+This action does not produce any output.
+
+
+
 
 ### Get All Entries(Keys and Values)
 Name: getAllEntries
@@ -225,24 +230,7 @@ Retrieve all the currently existing keys from storage, along with their values w
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | scope | Scope | STRING <details> <summary> Options </summary> CURRENT_EXECUTION, WORKFLOW, ACCOUNT </details> | The namespace to get keys from. | true |
 
-
-#### Output
-
-
-
-Type: ARRAY
-
-
-#### Properties
-
-|     Name     |     Type     |     Description     |
-|:------------:|:------------:|:-------------------:|
-|  | OBJECT <details> <summary> Properties </summary> {} </details> |  |
-
-
-
-
-#### JSON Example
+#### Example JSON Structure
 ```json
 {
   "label" : "Get All Entries(Keys and Values)",
@@ -253,6 +241,12 @@ Type: ARRAY
   "type" : "dataStorage/v1/getAllEntries"
 }
 ```
+
+#### Output
+
+The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
+
+
 
 
 ### Get Value
@@ -278,12 +272,7 @@ Retrieve a previously assigned value within the specified scope using its corres
 | defaultValue | Default Value | STRING | The default value to return if no value exists under the given key. | true |
 | defaultValue | Default Value | TIME | The default value to return if no value exists under the given key. | true |
 
-
-#### Output
-
-The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
-
-#### JSON Example
+#### Example JSON Structure
 ```json
 {
   "label" : "Get Value",
@@ -297,6 +286,12 @@ The output for this action is dynamic and may vary depending on the input parame
   "type" : "dataStorage/v1/getValue"
 }
 ```
+
+#### Output
+
+The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
+
+
 
 
 ### Set Value
@@ -322,12 +317,7 @@ Set a value under a key, in the specified scope.
 | value | Value | STRING | The value to set under the specified key. | true |
 | value | Value | TIME | The value to set under the specified key. | true |
 
-
-#### Output
-
-This action does not produce any output.
-
-#### JSON Example
+#### Example JSON Structure
 ```json
 {
   "label" : "Set Value",
@@ -341,6 +331,12 @@ This action does not produce any output.
   "type" : "dataStorage/v1/setValue"
 }
 ```
+
+#### Output
+
+This action does not produce any output.
+
+
 
 
 ### Set Value in List
@@ -367,12 +363,7 @@ Set value under a specified index in a list.
 | value | Value | STRING | The value to set under the specified list's key. | true |
 | value | Value | TIME | The value to set under the specified list's key. | true |
 
-
-#### Output
-
-This action does not produce any output.
-
-#### JSON Example
+#### Example JSON Structure
 ```json
 {
   "label" : "Set Value in List",
@@ -387,6 +378,12 @@ This action does not produce any output.
   "type" : "dataStorage/v1/setValueInList"
 }
 ```
+
+#### Output
+
+This action does not produce any output.
+
+
 
 
 

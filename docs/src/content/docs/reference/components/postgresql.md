@@ -50,12 +50,7 @@ Execute an SQL query.
 | query | Query | STRING | The raw SQL query to execute. You can use :property1 and :property2 in conjunction with parameters. | true |
 | parameters | Parameters | OBJECT <details> <summary> Properties </summary> {} </details> | The list of properties which should be used as query parameters. | null |
 
-
-#### Output
-
-The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
-
-#### JSON Example
+#### Example JSON Structure
 ```json
 {
   "label" : "Query",
@@ -67,6 +62,12 @@ The output for this action is dynamic and may vary depending on the input parame
   "type" : "postgresql/v1/query"
 }
 ```
+
+#### Output
+
+The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
+
+
 
 
 ### Insert
@@ -83,12 +84,7 @@ Insert rows in database.
 | columns | Fields | ARRAY <details> <summary> Items </summary> [STRING] </details> | The list of the table field names where corresponding values would be inserted. | null |
 | rows | Values | ARRAY <details> <summary> Items </summary> [{}] </details> | List of field values for corresponding field names | null |
 
-
-#### Output
-
-The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
-
-#### JSON Example
+#### Example JSON Structure
 ```json
 {
   "label" : "Insert",
@@ -102,6 +98,12 @@ The output for this action is dynamic and may vary depending on the input parame
   "type" : "postgresql/v1/insert"
 }
 ```
+
+#### Output
+
+The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
+
+
 
 
 ### Update
@@ -119,12 +121,7 @@ Update rows in database.
 | updateKey | Update Key | STRING | The field name used as criteria to decide which rows in the database should be updated. | null |
 | rows | Values | ARRAY <details> <summary> Items </summary> [{}] </details> | List of field values for corresponding field names. | null |
 
-
-#### Output
-
-The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
-
-#### JSON Example
+#### Example JSON Structure
 ```json
 {
   "label" : "Update",
@@ -139,6 +136,12 @@ The output for this action is dynamic and may vary depending on the input parame
   "type" : "postgresql/v1/update"
 }
 ```
+
+#### Output
+
+The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
+
+
 
 
 ### Delete
@@ -155,12 +158,7 @@ Delete rows from database.
 | deleteKey | Delete Key | STRING | Name of the field which decides which rows in the database should be deleted. | null |
 | rows | Criteria Values | ARRAY <details> <summary> Items </summary> [{}] </details> | List of values that are used to test delete key. | null |
 
-
-#### Output
-
-The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
-
-#### JSON Example
+#### Example JSON Structure
 ```json
 {
   "label" : "Delete",
@@ -174,6 +172,12 @@ The output for this action is dynamic and may vary depending on the input parame
   "type" : "postgresql/v1/delete"
 }
 ```
+
+#### Output
+
+The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
+
+
 
 
 ### Execute
@@ -189,12 +193,7 @@ Execute an SQL DML or DML statement.
 | columns | Fields to select | ARRAY <details> <summary> Items </summary> [{}] </details> | List of fields to select from. | null |
 | parameters | Parameters | OBJECT <details> <summary> Properties </summary> {} </details> | The list of values which should be used to replace corresponding criteria parameters. | null |
 
-
-#### Output
-
-The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
-
-#### JSON Example
+#### Example JSON Structure
 ```json
 {
   "label" : "Execute",
@@ -207,6 +206,12 @@ The output for this action is dynamic and may vary depending on the input parame
   "type" : "postgresql/v1/execute"
 }
 ```
+
+#### Output
+
+The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
+
+
 
 
 

@@ -57,6 +57,28 @@ Creates draft bill (Accounts Payable).
 | CurrencyCode | Currency | STRING | Currency that bill is raised in. | false |
 | Reference | Invoice Reference | STRING | Reference number of the bill. | false |
 
+#### Example JSON Structure
+```json
+{
+  "label" : "Create Bill",
+  "name" : "createBill",
+  "parameters" : {
+    "ContactID" : "",
+    "Date" : "2021-01-01",
+    "DueDate" : "2021-01-01",
+    "LineAmountTypes" : "",
+    "LineItems" : [ {
+      "Description" : "",
+      "Quantity" : 0.0,
+      "UnitAmount" : 0.0,
+      "AccountCode" : ""
+    } ],
+    "CurrencyCode" : "",
+    "Reference" : ""
+  },
+  "type" : "xero/v1/createBill"
+}
+```
 
 #### Output
 
@@ -81,26 +103,25 @@ Type: OBJECT
 
 
 
-#### JSON Example
+#### Output Example
 ```json
 {
-  "label" : "Create Bill",
-  "name" : "createBill",
-  "parameters" : {
+  "Type" : "",
+  "Contact" : {
     "ContactID" : "",
-    "Date" : "2021-01-01",
-    "DueDate" : "2021-01-01",
-    "LineAmountTypes" : "",
-    "LineItems" : [ {
-      "Description" : "",
-      "Quantity" : 0.0,
-      "UnitAmount" : 0.0,
-      "AccountCode" : ""
-    } ],
-    "CurrencyCode" : "",
-    "Reference" : ""
+    "Name" : "",
+    "EmailAddress" : ""
   },
-  "type" : "xero/v1/createBill"
+  "DateString" : "",
+  "DueDateString" : "",
+  "Status" : "",
+  "LineAmountTypes" : "",
+  "LineItems" : [ {
+    "Description" : "",
+    "Quantity" : 1,
+    "UnitAmount" : 0.0
+  } ],
+  "CurrencyCode" : ""
 }
 ```
 
@@ -126,35 +147,7 @@ Creates a new contact.
 | Phones | Phones | ARRAY <details> <summary> Items </summary> [{STRING\(PhoneType), STRING\(PhoneNumber), STRING\(PhoneAreaCode), STRING\(PhoneCountryCode)}] </details> |  | false |
 | Addresses | Addresses | ARRAY <details> <summary> Items </summary> [{STRING\(AddressType), STRING\(City), STRING\(Region), STRING\(PostalCode), STRING\(Country)}] </details> |  | false |
 
-
-#### Output
-
-
-
-Type: OBJECT
-
-
-#### Properties
-
-|     Name     |     Type     |     Description     |
-|:------------:|:------------:|:-------------------:|
-| ContactID | STRING | ID of the contact. |
-| CompanyNumber | STRING | Company registration number. |
-| AccountNumber | STRING | A user defined account number. |
-| ContactStatus | STRING | Status of the contact. |
-| Name | STRING | Full name of contact/organisation. |
-| FirstName | STRING | First name of contact person. |
-| LastName | STRING | Last name of contact person. |
-| EmailAddress | STRING | Email address of contact person. |
-| BankAccountDetails | STRING | Bank account number of contact. |
-| TaxNumber | STRING | Tax number of contact. |
-| Addresses | ARRAY <details> <summary> Items </summary> [{STRING\(AddressType), STRING\(City), STRING\(Region), STRING\(PostalCode), STRING\(Country)}] </details> | List of addresses associated with the contact. |
-| Phones | ARRAY <details> <summary> Items </summary> [{STRING\(PhoneType), STRING\(PhoneNumber), STRING\(PhoneAreaCode), STRING\(PhoneCountryCode)}] </details> |  |
-
-
-
-
-#### JSON Example
+#### Example JSON Structure
 ```json
 {
   "label" : "Create Contact",
@@ -187,6 +180,62 @@ Type: OBJECT
 }
 ```
 
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| ContactID | STRING | ID of the contact. |
+| CompanyNumber | STRING | Company registration number. |
+| AccountNumber | STRING | A user defined account number. |
+| ContactStatus | STRING | Status of the contact. |
+| Name | STRING | Full name of contact/organisation. |
+| FirstName | STRING | First name of contact person. |
+| LastName | STRING | Last name of contact person. |
+| EmailAddress | STRING | Email address of contact person. |
+| BankAccountDetails | STRING | Bank account number of contact. |
+| TaxNumber | STRING | Tax number of contact. |
+| Addresses | ARRAY <details> <summary> Items </summary> [{STRING\(AddressType), STRING\(City), STRING\(Region), STRING\(PostalCode), STRING\(Country)}] </details> | List of addresses associated with the contact. |
+| Phones | ARRAY <details> <summary> Items </summary> [{STRING\(PhoneType), STRING\(PhoneNumber), STRING\(PhoneAreaCode), STRING\(PhoneCountryCode)}] </details> |  |
+
+
+
+
+#### Output Example
+```json
+{
+  "ContactID" : "",
+  "CompanyNumber" : "",
+  "AccountNumber" : "",
+  "ContactStatus" : "",
+  "Name" : "",
+  "FirstName" : "",
+  "LastName" : "",
+  "EmailAddress" : "",
+  "BankAccountDetails" : "",
+  "TaxNumber" : "",
+  "Addresses" : [ {
+    "AddressType" : "",
+    "City" : "",
+    "Region" : "",
+    "PostalCode" : "",
+    "Country" : ""
+  } ],
+  "Phones" : [ {
+    "PhoneType" : "",
+    "PhoneNumber" : "",
+    "PhoneAreaCode" : "",
+    "PhoneCountryCode" : ""
+  } ]
+}
+```
+
 
 ### Create Invoice
 Name: createSalesInvoice
@@ -205,6 +254,28 @@ Creates draft invoice (Acount Receivable).
 | CurrencyCode | Currency Code | STRING | Currency code that invoice is raised in. | false |
 | Reference | Invoice Reference | STRING | Reference number of the invoice. | false |
 
+#### Example JSON Structure
+```json
+{
+  "label" : "Create Invoice",
+  "name" : "createSalesInvoice",
+  "parameters" : {
+    "ContactID" : "",
+    "Date" : "2021-01-01",
+    "DueDate" : "2021-01-01",
+    "LineAmountTypes" : "",
+    "LineItems" : [ {
+      "Description" : "",
+      "Quantity" : 1,
+      "UnitAmount" : 0.0,
+      "DiscountRate" : 0.0
+    } ],
+    "CurrencyCode" : "",
+    "Reference" : ""
+  },
+  "type" : "xero/v1/createSalesInvoice"
+}
+```
 
 #### Output
 
@@ -229,26 +300,25 @@ Type: OBJECT
 
 
 
-#### JSON Example
+#### Output Example
 ```json
 {
-  "label" : "Create Invoice",
-  "name" : "createSalesInvoice",
-  "parameters" : {
+  "Type" : "",
+  "Contact" : {
     "ContactID" : "",
-    "Date" : "2021-01-01",
-    "DueDate" : "2021-01-01",
-    "LineAmountTypes" : "",
-    "LineItems" : [ {
-      "Description" : "",
-      "Quantity" : 1,
-      "UnitAmount" : 0.0,
-      "DiscountRate" : 0.0
-    } ],
-    "CurrencyCode" : "",
-    "Reference" : ""
+    "Name" : "",
+    "EmailAddress" : ""
   },
-  "type" : "xero/v1/createSalesInvoice"
+  "DateString" : "",
+  "DueDateString" : "",
+  "Status" : "",
+  "LineAmountTypes" : "",
+  "LineItems" : [ {
+    "Description" : "",
+    "Quantity" : 1,
+    "UnitAmount" : 0.0
+  } ],
+  "CurrencyCode" : ""
 }
 ```
 
@@ -275,6 +345,33 @@ Creates a new quote draft.
 | Summary | Summary | STRING | The summary of the quote. | false |
 | Terms | Terms | STRING | The terms of the quote. | false |
 
+#### Example JSON Structure
+```json
+{
+  "label" : "Create Quote",
+  "name" : "createQuote",
+  "parameters" : {
+    "ContactID" : "",
+    "Date" : "2021-01-01",
+    "LineItems" : [ {
+      "Description" : "",
+      "Quantity" : 1,
+      "UnitAmount" : 0.0,
+      "DiscountRate" : 0.0
+    } ],
+    "LineAmountTypes" : "",
+    "ExpiryDate" : "2021-01-01",
+    "CurrencyCode" : "",
+    "QuoteNumber" : "",
+    "Reference" : "",
+    "BrandingThemeID" : "",
+    "Title" : "",
+    "Summary" : "",
+    "Terms" : ""
+  },
+  "type" : "xero/v1/createQuote"
+}
+```
 
 #### Output
 
@@ -305,31 +402,33 @@ Type: OBJECT
 
 
 
-#### JSON Example
+#### Output Example
 ```json
 {
-  "label" : "Create Quote",
-  "name" : "createQuote",
-  "parameters" : {
+  "QuoteID" : "",
+  "QuoteNumber" : "",
+  "Reference" : "",
+  "Terms" : "",
+  "Contact" : {
     "ContactID" : "",
-    "Date" : "2021-01-01",
-    "LineItems" : [ {
-      "Description" : "",
-      "Quantity" : 1,
-      "UnitAmount" : 0.0,
-      "DiscountRate" : 0.0
-    } ],
-    "LineAmountTypes" : "",
-    "ExpiryDate" : "2021-01-01",
-    "CurrencyCode" : "",
-    "QuoteNumber" : "",
-    "Reference" : "",
-    "BrandingThemeID" : "",
-    "Title" : "",
-    "Summary" : "",
-    "Terms" : ""
+    "Name" : "",
+    "EmailAddress" : ""
   },
-  "type" : "xero/v1/createQuote"
+  "LineItems" : [ {
+    "LineItemID" : "",
+    "Description" : "",
+    "UnitAmount" : 0.0,
+    "DiscountRate" : 1,
+    "Quantity" : 1
+  } ],
+  "DateString" : "",
+  "ExpiryDateString" : "",
+  "Status" : "",
+  "CurrencyCode" : "",
+  "Title" : "",
+  "BrandingThemeID" : "",
+  "Summary" : "",
+  "LineAmountTypes" : ""
 }
 ```
 

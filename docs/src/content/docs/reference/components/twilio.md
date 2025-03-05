@@ -53,6 +53,19 @@ Send a new SMS message
 | From | From | STRING | The sender's Twilio phone number (in E.164 format), alphanumeric sender ID, Wireless SIM, short code, or channel address (e.g., whatsapp:+15554449999). The value of the from parameter must be a sender that is hosted within Twilio and belongs to the Account creating the Message. If you are using messaging_service_sid, this parameter can be empty (Twilio assigns a from value from the Messaging Service's Sender Pool) or you can provide a specific sender from your Sender Pool. | true |
 | Body | Body | STRING | The text content of the outgoing message. SMS only: If the body contains more than 160 GSM-7 characters (or 70 UCS-2 characters), the message is segmented and charged accordingly. For long body text, consider using the send_as_mms parameter. | true |
 
+#### Example JSON Structure
+```json
+{
+  "label" : "Send SMS",
+  "name" : "sendSMS",
+  "parameters" : {
+    "To" : "",
+    "From" : "",
+    "Body" : ""
+  },
+  "type" : "twilio/v1/sendSMS"
+}
+```
 
 #### Output
 
@@ -89,17 +102,44 @@ Type: OBJECT
 
 
 
-#### JSON Example
+#### Output Example
 ```json
 {
-  "label" : "Send SMS",
-  "name" : "sendSMS",
-  "parameters" : {
-    "To" : "",
-    "From" : "",
-    "Body" : ""
+  "body" : "",
+  "numSegments" : "",
+  "direction" : "",
+  "from" : {
+    "rawNumber" : ""
   },
-  "type" : "twilio/v1/sendSMS"
+  "to" : "",
+  "dateUpdated" : {
+    "dateTime" : "2021-01-01T00:00:00",
+    "zoneId" : ""
+  },
+  "price" : "",
+  "errorMessage" : "",
+  "uri" : "",
+  "accountSid" : "",
+  "numMedia" : "",
+  "status" : "",
+  "messagingServiceSid" : "",
+  "sid" : "",
+  "dateSent" : {
+    "dateTime" : "2021-01-01T00:00:00",
+    "zoneId" : ""
+  },
+  "dateCreated" : {
+    "dateTime" : "2021-01-01T00:00:00",
+    "zoneId" : ""
+  },
+  "errorCode" : 1,
+  "currency" : {
+    "currencyCode" : "",
+    "defaultFractionDigits" : 1,
+    "numericCode" : 1
+  },
+  "apiVersion" : "",
+  "subresourceUris" : { }
 }
 ```
 

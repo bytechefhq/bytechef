@@ -53,18 +53,7 @@ Creates a new form
 | type | Type | STRING <details> <summary> Options </summary> quiz, classification, score, branching, classification_branching, score_branching </details> | Form type for the typeform. | false |
 | workspace | Workspace | STRING | Workspace where the form will be created. | false |
 
-
-#### Output
-
-
-
-Type: OBJECT
-
-
-
-
-
-#### JSON Example
+#### Example JSON Structure
 ```json
 {
   "label" : "Create Form",
@@ -77,6 +66,18 @@ Type: OBJECT
   "type" : "typeform/v1/createForm"
 }
 ```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+
+
+
+
 
 
 

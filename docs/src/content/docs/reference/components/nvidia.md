@@ -61,12 +61,7 @@ Ask anything you want.
 | stop | Stop | ARRAY <details> <summary> Items </summary> [STRING] </details> | Up to 4 sequences where the API will stop generating further tokens. | null |
 | user | User | STRING | A unique identifier representing your end-user, which can help admins to monitor and detect abuse. | false |
 
-
-#### Output
-
-The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
-
-#### JSON Example
+#### Example JSON Structure
 ```json
 {
   "label" : "Ask",
@@ -100,6 +95,12 @@ The output for this action is dynamic and may vary depending on the input parame
   "type" : "nvidia/v1/ask"
 }
 ```
+
+#### Output
+
+The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
+
+
 
 
 

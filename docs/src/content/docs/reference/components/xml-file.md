@@ -34,12 +34,7 @@ Reads data from a XML file.
 | pageSize | Page Size | INTEGER | The amount of child elements to return in a page. | null |
 | pageNumber | Page Number | INTEGER | The page number to get. | null |
 
-
-#### Output
-
-The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
-
-#### JSON Example
+#### Example JSON Structure
 ```json
 {
   "label" : "Read from File",
@@ -60,6 +55,12 @@ The output for this action is dynamic and may vary depending on the input parame
 }
 ```
 
+#### Output
+
+The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
+
+
+
 
 ### Write to File
 Name: write
@@ -75,6 +76,19 @@ Writes the data to a XML file.
 | source | Source | ARRAY <details> <summary> Items </summary> [] </details> | The aray to write to the file. | true |
 | filename | Filename | STRING | Filename to set for binary data. By default, "file.xml" will be used. | true |
 
+#### Example JSON Structure
+```json
+{
+  "label" : "Write to File",
+  "name" : "write",
+  "parameters" : {
+    "type" : "",
+    "source" : [ ],
+    "filename" : ""
+  },
+  "type" : "xmlFile/v1/write"
+}
+```
 
 #### Output
 
@@ -95,17 +109,13 @@ Type: FILE_ENTRY
 
 
 
-#### JSON Example
+#### Output Example
 ```json
 {
-  "label" : "Write to File",
-  "name" : "write",
-  "parameters" : {
-    "type" : "",
-    "source" : [ ],
-    "filename" : ""
-  },
-  "type" : "xmlFile/v1/write"
+  "extension" : "",
+  "mimeType" : "",
+  "name" : "",
+  "url" : ""
 }
 ```
 

@@ -57,6 +57,23 @@ Creates a new contact.
 | email | Email | STRING | The email addresses of the contact. | false |
 | phoneNumber | Phone Number | STRING | The phone numbers of the contact. | false |
 
+#### Example JSON Structure
+```json
+{
+  "label" : "Create Contact",
+  "name" : "createContact",
+  "parameters" : {
+    "givenName" : "",
+    "middleName" : "",
+    "familyName" : "",
+    "title" : "",
+    "name" : "",
+    "email" : "",
+    "phoneNumber" : ""
+  },
+  "type" : "googleContacts/v1/createContact"
+}
+```
 
 #### Output
 
@@ -77,21 +94,24 @@ Type: OBJECT
 
 
 
-#### JSON Example
+#### Output Example
 ```json
 {
-  "label" : "Create Contact",
-  "name" : "createContact",
-  "parameters" : {
-    "givenName" : "",
-    "middleName" : "",
+  "names" : [ {
     "familyName" : "",
-    "title" : "",
+    "givenName" : "",
+    "middleName" : ""
+  } ],
+  "organizations" : [ {
     "name" : "",
-    "email" : "",
-    "phoneNumber" : ""
-  },
-  "type" : "googleContacts/v1/createContact"
+    "title" : ""
+  } ],
+  "emailAddresses" : [ {
+    "value" : ""
+  } ],
+  "phoneNumbers" : [ {
+    "value" : ""
+  } ]
 }
 ```
 
@@ -107,6 +127,17 @@ Creates a new group.
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | name | Group Name | STRING | The name of the group. | true |
 
+#### Example JSON Structure
+```json
+{
+  "label" : "Create Group",
+  "name" : "createGroup",
+  "parameters" : {
+    "name" : ""
+  },
+  "type" : "googleContacts/v1/createGroup"
+}
+```
 
 #### Output
 
@@ -124,15 +155,10 @@ Type: OBJECT
 
 
 
-#### JSON Example
+#### Output Example
 ```json
 {
-  "label" : "Create Group",
-  "name" : "createGroup",
-  "parameters" : {
-    "name" : ""
-  },
-  "type" : "googleContacts/v1/createGroup"
+  "name" : ""
 }
 ```
 
@@ -155,6 +181,24 @@ Modifies an existing contact.
 | email | Email Address | STRING | Updated email address of the contact. | false |
 | phoneNumber | Phone Number | STRING | Updated phone number of the contact. | false |
 
+#### Example JSON Structure
+```json
+{
+  "label" : "Update Contact",
+  "name" : "updateContact",
+  "parameters" : {
+    "resourceName" : "",
+    "givenName" : "",
+    "middleName" : "",
+    "familyName" : "",
+    "title" : "",
+    "name" : "",
+    "email" : "",
+    "phoneNumber" : ""
+  },
+  "type" : "googleContacts/v1/updateContact"
+}
+```
 
 #### Output
 
@@ -175,22 +219,24 @@ Type: OBJECT
 
 
 
-#### JSON Example
+#### Output Example
 ```json
 {
-  "label" : "Update Contact",
-  "name" : "updateContact",
-  "parameters" : {
-    "resourceName" : "",
-    "givenName" : "",
-    "middleName" : "",
+  "names" : [ {
     "familyName" : "",
-    "title" : "",
+    "givenName" : "",
+    "middleName" : ""
+  } ],
+  "organizations" : [ {
     "name" : "",
-    "email" : "",
-    "phoneNumber" : ""
-  },
-  "type" : "googleContacts/v1/updateContact"
+    "title" : ""
+  } ],
+  "emailAddresses" : [ {
+    "value" : ""
+  } ],
+  "phoneNumbers" : [ {
+    "value" : ""
+  } ]
 }
 ```
 
@@ -208,24 +254,7 @@ Searches the contacts in Google Contacts account.
 | readMask | Read Mask | ARRAY <details> <summary> Items </summary> [STRING] </details> | A field mask to restrict which fields on each person are returned.. | true |
 | pageSize | Page Size | INTEGER | The number of results to return per page. | true |
 
-
-#### Output
-
-
-
-Type: ARRAY
-
-
-#### Properties
-
-|     Name     |     Type     |     Description     |
-|:------------:|:------------:|:-------------------:|
-|  | OBJECT <details> <summary> Properties </summary> {[{STRING\(familyName), STRING\(givenName), STRING\(middleName)}]\(names), [{STRING\(name), STRING\(title)}]\(organizations), [{STRING\(value)}]\(emailAddresses), [{STRING\(value)}]\(phoneNumbers)} </details> |  |
-
-
-
-
-#### JSON Example
+#### Example JSON Structure
 ```json
 {
   "label" : "Search Contacts",
@@ -237,6 +266,49 @@ Type: ARRAY
   },
   "type" : "googleContacts/v1/searchContacts"
 }
+```
+
+#### Output
+
+
+
+Type: ARRAY
+
+
+Items Type: OBJECT
+
+
+#### Properties
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| names | ARRAY <details> <summary> Items </summary> [{STRING\(familyName), STRING\(givenName), STRING\(middleName)}] </details> | The person's names. |
+| organizations | ARRAY <details> <summary> Items </summary> [{STRING\(name), STRING\(title)}] </details> | The person's past or current organizations. |
+| emailAddresses | ARRAY <details> <summary> Items </summary> [{STRING\(value)}] </details> | The person's email addresses. |
+| phoneNumbers | ARRAY <details> <summary> Items </summary> [{STRING\(value)}] </details> | The person's phone numbers. |
+
+
+
+
+
+#### Output Example
+```json
+[ {
+  "names" : [ {
+    "familyName" : "",
+    "givenName" : "",
+    "middleName" : ""
+  } ],
+  "organizations" : [ {
+    "name" : "",
+    "title" : ""
+  } ],
+  "emailAddresses" : [ {
+    "value" : ""
+  } ],
+  "phoneNumbers" : [ {
+    "value" : ""
+  } ]
+} ]
 ```
 
 

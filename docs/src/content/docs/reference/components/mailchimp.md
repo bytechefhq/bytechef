@@ -66,6 +66,38 @@ Adds a new member to the list.
 | timestamp_opt | Timestamp Opt | STRING | The date and time the subscriber confirmed their opt-in status in ISO 8601 format. | false |
 | tags | Tags | ARRAY <details> <summary> Items </summary> [STRING] </details> | The tags that are associated with a member. | false |
 
+#### Example JSON Structure
+```json
+{
+  "label" : "Add Member to List",
+  "name" : "addMemberToList",
+  "parameters" : {
+    "listId" : "",
+    "skip_merge_validation" : false,
+    "email_address" : "",
+    "status" : "",
+    "email_type" : "",
+    "merge_fields" : { },
+    "interests" : { },
+    "language" : "",
+    "vip" : false,
+    "location" : {
+      "latitude" : 0.0,
+      "longitude" : 0.0
+    },
+    "marketing_permissions" : [ {
+      "marketing_permission_id" : "",
+      "enabled" : false
+    } ],
+    "ip_signup" : "",
+    "timestamp_signup" : "",
+    "ip_opt" : "",
+    "timestamp_opt" : "",
+    "tags" : [ "" ]
+  },
+  "type" : "mailchimp/v1/addMemberToList"
+}
+```
 
 #### Output
 
@@ -117,36 +149,73 @@ Type: OBJECT
 
 
 
-#### JSON Example
+#### Output Example
 ```json
 {
-  "label" : "Add Member to List",
-  "name" : "addMemberToList",
-  "parameters" : {
-    "listId" : "",
-    "skip_merge_validation" : false,
-    "email_address" : "",
-    "status" : "",
-    "email_type" : "",
-    "merge_fields" : { },
-    "interests" : { },
-    "language" : "",
-    "vip" : false,
-    "location" : {
-      "latitude" : 0.0,
-      "longitude" : 0.0
-    },
-    "marketing_permissions" : [ {
-      "marketing_permission_id" : "",
-      "enabled" : false
-    } ],
-    "ip_signup" : "",
-    "timestamp_signup" : "",
-    "ip_opt" : "",
-    "timestamp_opt" : "",
-    "tags" : [ "" ]
+  "id" : "",
+  "email_address" : "",
+  "unique_email_id" : "",
+  "contact_id" : "",
+  "full_name" : "",
+  "web_id" : "",
+  "email_type" : "",
+  "status" : "",
+  "unsubscribe_reason" : "",
+  "consents_to_one_to_one_messaging" : false,
+  "merge_fields" : { },
+  "interests" : { },
+  "stats" : {
+    "avg_open_rate" : 0.0,
+    "avg_click_rate" : 0.0,
+    "ecommerce_data" : {
+      "total_revenue" : 0.0,
+      "number_of_orders" : 0.0,
+      "currency_code" : ""
+    }
   },
-  "type" : "mailchimp/v1/addMemberToList"
+  "ip_signup" : "",
+  "timestamp_signup" : "",
+  "ip_opt" : "",
+  "timestamp_opt" : "",
+  "member_rating" : 1,
+  "last_changed" : "",
+  "language" : "",
+  "vip" : false,
+  "email_client" : "",
+  "location" : {
+    "latitude" : 0.0,
+    "longitude" : 0.0,
+    "gmtoff" : 1,
+    "dstoff" : 1,
+    "country_code" : "",
+    "timezone" : "",
+    "region" : ""
+  },
+  "marketing_permissions" : [ {
+    "marketing_permission_id" : "",
+    "text" : "",
+    "enabled" : false
+  } ],
+  "last_note" : {
+    "note_id" : 1,
+    "created_at" : "",
+    "created_by" : "",
+    "note" : ""
+  },
+  "source" : "",
+  "tags_count" : 1,
+  "tags" : {
+    "id" : 1,
+    "name" : ""
+  },
+  "list_id" : "",
+  "_links" : [ {
+    "rel" : "",
+    "href" : "",
+    "method" : "",
+    "targetSchema" : "",
+    "schema" : ""
+  } ]
 }
 ```
 

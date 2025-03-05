@@ -61,6 +61,24 @@ Creates an event in the specified calendar.
 | isOnlineMeeting | Is Online Meeting? | BOOLEAN <details> <summary> Options </summary> true, false </details> | Is the event an online meeting? | false |
 | reminderMinutesBeforeStart | Reminder Minutes Before Start | INTEGER | The number of minutes before the event start time that the reminder alert occurs. | false |
 
+#### Example JSON Structure
+```json
+{
+  "label" : "Create Event",
+  "name" : "createEvent",
+  "parameters" : {
+    "calendar" : "",
+    "subject" : "",
+    "allDay" : false,
+    "start" : "2021-01-01T00:00:00",
+    "end" : "2021-01-01T00:00:00",
+    "attendees" : [ "" ],
+    "isOnlineMeeting" : false,
+    "reminderMinutesBeforeStart" : 1
+  },
+  "type" : "microsoftOutlook365/v1/createEvent"
+}
+```
 
 #### Output
 
@@ -86,22 +104,18 @@ Type: OBJECT
 
 
 
-#### JSON Example
+#### Output Example
 ```json
 {
-  "label" : "Create Event",
-  "name" : "createEvent",
-  "parameters" : {
-    "calendar" : "",
-    "subject" : "",
-    "allDay" : false,
-    "start" : "2021-01-01T00:00:00",
-    "end" : "2021-01-01T00:00:00",
-    "attendees" : [ "" ],
-    "isOnlineMeeting" : false,
-    "reminderMinutesBeforeStart" : 1
-  },
-  "type" : "microsoftOutlook365/v1/createEvent"
+  "iCalUId" : "",
+  "id" : "",
+  "subject" : "",
+  "startTime" : "2021-01-01T00:00:00",
+  "endTime" : "2021-01-01T00:00:00",
+  "attendees" : [ "" ],
+  "isOnlineMeeting" : false,
+  "onlineMeetingUrl" : "",
+  "reminderMinutesBeforeStart" : false
 }
 ```
 
@@ -118,12 +132,7 @@ Deletes an event from the specified calendar.
 | calendar | Calendar ID | STRING |  | true |
 | event | Event ID | STRING <details> <summary> Depends On </summary> calendar </details> | Id of the event to delete. | true |
 
-
-#### Output
-
-This action does not produce any output.
-
-#### JSON Example
+#### Example JSON Structure
 ```json
 {
   "label" : "Delete Event",
@@ -135,6 +144,12 @@ This action does not produce any output.
   "type" : "microsoftOutlook365/v1/deleteEvent"
 }
 ```
+
+#### Output
+
+This action does not produce any output.
+
+
 
 
 ### Get Events
@@ -149,24 +164,7 @@ Gets a list of events in specified calendar.
 | calendar | Calendar ID | STRING |  | true |
 | dateRange | Date Range | OBJECT <details> <summary> Properties </summary> {DATE_TIME\(from), DATE_TIME\(to)} </details> | Date range to find events that exist in this range. | false |
 
-
-#### Output
-
-
-
-Type: ARRAY
-
-
-#### Properties
-
-|     Name     |     Type     |     Description     |
-|:------------:|:------------:|:-------------------:|
-|  | OBJECT <details> <summary> Properties </summary> {STRING\(iCalUId), STRING\(id), STRING\(subject), DATE_TIME\(startTime), DATE_TIME\(endTime), [STRING]\(attendees), BOOLEAN\(isOnlineMeeting), STRING\(onlineMeetingUrl), BOOLEAN\(reminderMinutesBeforeStart)} </details> |  |
-
-
-
-
-#### JSON Example
+#### Example JSON Structure
 ```json
 {
   "label" : "Get Events",
@@ -182,6 +180,48 @@ Type: ARRAY
 }
 ```
 
+#### Output
+
+
+
+Type: ARRAY
+
+
+Items Type: OBJECT
+
+
+#### Properties
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| iCalUId | STRING | ID for an event across calendars, |
+| id | STRING | ID of the event. |
+| subject | STRING | The text of the event's subject line. |
+| startTime | DATE_TIME | Start time of the event. |
+| endTime | DATE_TIME | End time of the event. |
+| attendees | ARRAY <details> <summary> Items </summary> [STRING] </details> | The attendees for the event. |
+| isOnlineMeeting | BOOLEAN <details> <summary> Options </summary> true, false </details> | Indicates whether the event is an online meeting. |
+| onlineMeetingUrl | STRING | URL for an online meeting. |
+| reminderMinutesBeforeStart | BOOLEAN <details> <summary> Options </summary> true, false </details> | The number of minutes before the event start time that the reminder alert occurs. |
+
+
+
+
+
+#### Output Example
+```json
+[ {
+  "iCalUId" : "",
+  "id" : "",
+  "subject" : "",
+  "startTime" : "2021-01-01T00:00:00",
+  "endTime" : "2021-01-01T00:00:00",
+  "attendees" : [ "" ],
+  "isOnlineMeeting" : false,
+  "onlineMeetingUrl" : "",
+  "reminderMinutesBeforeStart" : false
+} ]
+```
+
 
 ### Get Free Time Slots
 Name: getFreeTimeSlots
@@ -195,24 +235,7 @@ Get free time slots from the Microsoft Outlook 365 calendar.
 | calendar | Calendar ID | STRING |  | true |
 | dateRange | Date Range | OBJECT <details> <summary> Properties </summary> {DATE_TIME\(from), DATE_TIME\(to)} </details> | Date range to find free time. | true |
 
-
-#### Output
-
-
-
-Type: ARRAY
-
-
-#### Properties
-
-|     Name     |     Type     |     Description     |
-|:------------:|:------------:|:-------------------:|
-|  | OBJECT <details> <summary> Properties </summary> {DATE_TIME\(startTime), DATE_TIME\(endTime)} </details> |  |
-
-
-
-
-#### JSON Example
+#### Example JSON Structure
 ```json
 {
   "label" : "Get Free Time Slots",
@@ -228,6 +251,34 @@ Type: ARRAY
 }
 ```
 
+#### Output
+
+
+
+Type: ARRAY
+
+
+Items Type: OBJECT
+
+
+#### Properties
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| startTime | DATE_TIME | Start time of the free time slot. |
+| endTime | DATE_TIME | End time of the free time slot. |
+
+
+
+
+
+#### Output Example
+```json
+[ {
+  "startTime" : "2021-01-01T00:00:00",
+  "endTime" : "2021-01-01T00:00:00"
+} ]
+```
+
 
 ### Get Mail
 Name: getMail
@@ -240,6 +291,17 @@ Get a specific message
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | id | Message Id | STRING | Id of the message. | true |
 
+#### Example JSON Structure
+```json
+{
+  "label" : "Get Mail",
+  "name" : "getMail",
+  "parameters" : {
+    "id" : ""
+  },
+  "type" : "microsoftOutlook365/v1/getMail"
+}
+```
 
 #### Output
 
@@ -261,15 +323,22 @@ Type: OBJECT
 
 
 
-#### JSON Example
+#### Output Example
 ```json
 {
-  "label" : "Get Mail",
-  "name" : "getMail",
-  "parameters" : {
-    "id" : ""
+  "id" : "",
+  "subject" : "",
+  "bodyPreview" : "",
+  "body" : {
+    "contentType" : "",
+    "content" : ""
   },
-  "type" : "microsoftOutlook365/v1/getMail"
+  "from" : {
+    "emailAddress" : {
+      "name" : "",
+      "address" : ""
+    }
+  }
 }
 ```
 
@@ -286,12 +355,7 @@ Creates a new reply to email.
 | id | Message ID | STRING | Id of the message to reply to. | true |
 | comment | Comment | STRING | Content of the reply to the email. | true |
 
-
-#### Output
-
-This action does not produce any output.
-
-#### JSON Example
+#### Example JSON Structure
 ```json
 {
   "label" : "Reply to Email",
@@ -303,6 +367,12 @@ This action does not produce any output.
   "type" : "microsoftOutlook365/v1/replyToEmail"
 }
 ```
+
+#### Output
+
+This action does not produce any output.
+
+
 
 
 ### Search Email
@@ -319,24 +389,7 @@ Get the messages in the signed-in user's mailbox
 | subject | Subject | STRING | Words in the subject line | false |
 | category | Category | STRING | Messages in a certain category | false |
 
-
-#### Output
-
-
-
-Type: ARRAY
-
-
-#### Properties
-
-|     Name     |     Type     |     Description     |
-|:------------:|:------------:|:-------------------:|
-|  | OBJECT <details> <summary> Properties </summary> {STRING\(id), STRING\(subject), STRING\(bodyPreview), {STRING\(contentType), STRING\(content)}\(body), {{STRING\(name), STRING\(address)}\(emailAddress)}\(from)} </details> |  |
-
-
-
-
-#### JSON Example
+#### Example JSON Structure
 ```json
 {
   "label" : "Search Email",
@@ -349,6 +402,48 @@ Type: ARRAY
   },
   "type" : "microsoftOutlook365/v1/searchEmail"
 }
+```
+
+#### Output
+
+
+
+Type: ARRAY
+
+
+Items Type: OBJECT
+
+
+#### Properties
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| id | STRING | ID of the message. |
+| subject | STRING | Subject of the message. |
+| bodyPreview | STRING | The first 255 characters of the message body. |
+| body | OBJECT <details> <summary> Properties </summary> {STRING\(contentType), STRING\(content)} </details> | The body of the message. It can be in HTML or text format. |
+| from | OBJECT <details> <summary> Properties </summary> {{STRING\(name), STRING\(address)}\(emailAddress)} </details> | The owner of the mailbox from which the message is sent. |
+
+
+
+
+
+#### Output Example
+```json
+[ {
+  "id" : "",
+  "subject" : "",
+  "bodyPreview" : "",
+  "body" : {
+    "contentType" : "",
+    "content" : ""
+  },
+  "from" : {
+    "emailAddress" : {
+      "name" : "",
+      "address" : ""
+    }
+  }
+} ]
 ```
 
 
@@ -369,12 +464,7 @@ Send the message.
 | replyTo | Reply To | ARRAY <details> <summary> Items </summary> [{{STRING\(address), STRING\(name)}\(emailAddress)}] </details> | The email addresses to use when replying. | false |
 | body | Body | OBJECT <details> <summary> Properties </summary> {STRING\(contentType), STRING\(content), STRING\(content)} </details> | The body of the message. It can be in HTML or text format. | true |
 
-
-#### Output
-
-This action does not produce any output.
-
-#### JSON Example
+#### Example JSON Structure
 ```json
 {
   "label" : "Send Email",
@@ -422,6 +512,12 @@ This action does not produce any output.
 }
 ```
 
+#### Output
+
+This action does not produce any output.
+
+
+
 
 
 
@@ -443,11 +539,18 @@ Type: POLLING
 Type: ARRAY
 
 
-#### Properties
+Items Type: OBJECT
 
+
+#### Properties
 |     Name     |     Type     |     Description     |
 |:------------:|:------------:|:-------------------:|
-|  | OBJECT <details> <summary> Properties </summary> {STRING\(id), STRING\(subject), STRING\(bodyPreview), {STRING\(contentType), STRING\(content)}\(body), {{STRING\(name), STRING\(address)}\(emailAddress)}\(from)} </details> |  |
+| id | STRING | ID of the message. |
+| subject | STRING | Subject of the message. |
+| bodyPreview | STRING | The first 255 characters of the message body. |
+| body | OBJECT <details> <summary> Properties </summary> {STRING\(contentType), STRING\(content)} </details> | The body of the message. It can be in HTML or text format. |
+| from | OBJECT <details> <summary> Properties </summary> {{STRING\(name), STRING\(address)}\(emailAddress)} </details> | The owner of the mailbox from which the message is sent. |
+
 
 
 

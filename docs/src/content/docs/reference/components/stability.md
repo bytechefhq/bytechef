@@ -61,25 +61,7 @@ Create an image using text-to-image models
 | sampler | Sampler | STRING | Which sampler to use for the diffusion process. If this value is omitted, an appropriate sampler will be automatically selected. | null |
 | seed | Seed | NUMBER | Random noise seed (omit this option or use 0 for a random seed). Valid range: 0 to 4294967295. | null |
 
-
-#### Output
-
-
-
-Type: OBJECT
-
-
-#### Properties
-
-|     Name     |     Type     |     Description     |
-|:------------:|:------------:|:-------------------:|
-| url | STRING |  |
-| b64Json | STRING |  |
-
-
-
-
-#### JSON Example
+#### Example JSON Structure
 ```json
 {
   "label" : "Create Image",
@@ -102,6 +84,31 @@ Type: OBJECT
     "seed" : 0.0
   },
   "type" : "stability/v1/createImage"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| url | STRING |  |
+| b64Json | STRING |  |
+
+
+
+
+#### Output Example
+```json
+{
+  "url" : "",
+  "b64Json" : ""
 }
 ```
 

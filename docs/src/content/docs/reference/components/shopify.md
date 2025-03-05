@@ -52,31 +52,7 @@ Adds an order into a Shopify store.
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | order | Order | OBJECT <details> <summary> Properties </summary> {[{STRING\(fulfillment_status), STRING\(grams), NUMBER\(price), INTEGER\(product_id), INTEGER\(variant_id), INTEGER\(quantity), STRING\(title)}]\(line_items), STRING\(total_tax), STRING\(currency)} </details> |  | false |
 
-
-#### Output
-
-
-
-Type: OBJECT
-
-
-#### Properties
-
-|     Name     |     Type     |     Description     |
-|:------------:|:------------:|:-------------------:|
-| id | INTEGER |  |
-| currency | STRING |  |
-| note | STRING |  |
-| email | STRING |  |
-| name | STRING |  |
-| phone | STRING |  |
-| tags | STRING |  |
-| line_items | ARRAY <details> <summary> Items </summary> [{STRING\(fulfillment_status), STRING\(grams), NUMBER\(price), INTEGER\(product_id), INTEGER\(variant_id), INTEGER\(quantity), STRING\(title)}] </details> |  |
-
-
-
-
-#### JSON Example
+#### Example JSON Structure
 ```json
 {
   "label" : "Create Order",
@@ -100,6 +76,51 @@ Type: OBJECT
 }
 ```
 
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| id | INTEGER |  |
+| currency | STRING |  |
+| note | STRING |  |
+| email | STRING |  |
+| name | STRING |  |
+| phone | STRING |  |
+| tags | STRING |  |
+| line_items | ARRAY <details> <summary> Items </summary> [{STRING\(fulfillment_status), STRING\(grams), NUMBER\(price), INTEGER\(product_id), INTEGER\(variant_id), INTEGER\(quantity), STRING\(title)}] </details> |  |
+
+
+
+
+#### Output Example
+```json
+{
+  "id" : 1,
+  "currency" : "",
+  "note" : "",
+  "email" : "",
+  "name" : "",
+  "phone" : "",
+  "tags" : "",
+  "line_items" : [ {
+    "fulfillment_status" : "",
+    "grams" : "",
+    "price" : 0.0,
+    "product_id" : 1,
+    "variant_id" : 1,
+    "quantity" : 1,
+    "title" : ""
+  } ]
+}
+```
+
 
 ### Delete Order
 Name: deleteOrder
@@ -112,12 +133,7 @@ Deletes an order. Orders that interact with an online gateway can't be deleted.
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | orderId | Order ID | INTEGER | ID of the order to delete. | true |
 
-
-#### Output
-
-This action does not produce any output.
-
-#### JSON Example
+#### Example JSON Structure
 ```json
 {
   "label" : "Delete Order",
@@ -128,6 +144,12 @@ This action does not produce any output.
   "type" : "shopify/v1/deleteOrder"
 }
 ```
+
+#### Output
+
+This action does not produce any output.
+
+
 
 
 ### Cancel an order
@@ -141,6 +163,17 @@ Cancels an order. Orders that are paid and have fulfillments can't be canceled.
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | orderId | Order ID | INTEGER | ID of the order to cancel. | true |
 
+#### Example JSON Structure
+```json
+{
+  "label" : "Cancel an order",
+  "name" : "cancelOrder",
+  "parameters" : {
+    "orderId" : 1
+  },
+  "type" : "shopify/v1/cancelOrder"
+}
+```
 
 #### Output
 
@@ -165,15 +198,25 @@ Type: OBJECT
 
 
 
-#### JSON Example
+#### Output Example
 ```json
 {
-  "label" : "Cancel an order",
-  "name" : "cancelOrder",
-  "parameters" : {
-    "orderId" : 1
-  },
-  "type" : "shopify/v1/cancelOrder"
+  "id" : 1,
+  "currency" : "",
+  "note" : "",
+  "email" : "",
+  "name" : "",
+  "phone" : "",
+  "tags" : "",
+  "line_items" : [ {
+    "fulfillment_status" : "",
+    "grams" : "",
+    "price" : 0.0,
+    "product_id" : 1,
+    "variant_id" : 1,
+    "quantity" : 1,
+    "title" : ""
+  } ]
 }
 ```
 
@@ -190,31 +233,7 @@ Update an existing order.
 | orderId | Order ID | INTEGER | ID of the order to update. | true |
 | order | Order | OBJECT <details> <summary> Properties </summary> {STRING\(note), STRING\(email), STRING\(phone), STRING\(tags)} </details> |  | false |
 
-
-#### Output
-
-
-
-Type: OBJECT
-
-
-#### Properties
-
-|     Name     |     Type     |     Description     |
-|:------------:|:------------:|:-------------------:|
-| id | INTEGER |  |
-| currency | STRING |  |
-| note | STRING |  |
-| email | STRING |  |
-| name | STRING |  |
-| phone | STRING |  |
-| tags | STRING |  |
-| line_items | ARRAY <details> <summary> Items </summary> [{STRING\(fulfillment_status), STRING\(grams), NUMBER\(price), INTEGER\(product_id), INTEGER\(variant_id), INTEGER\(quantity), STRING\(title)}] </details> |  |
-
-
-
-
-#### JSON Example
+#### Example JSON Structure
 ```json
 {
   "label" : "Update Order",
@@ -232,6 +251,51 @@ Type: OBJECT
 }
 ```
 
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| id | INTEGER |  |
+| currency | STRING |  |
+| note | STRING |  |
+| email | STRING |  |
+| name | STRING |  |
+| phone | STRING |  |
+| tags | STRING |  |
+| line_items | ARRAY <details> <summary> Items </summary> [{STRING\(fulfillment_status), STRING\(grams), NUMBER\(price), INTEGER\(product_id), INTEGER\(variant_id), INTEGER\(quantity), STRING\(title)}] </details> |  |
+
+
+
+
+#### Output Example
+```json
+{
+  "id" : 1,
+  "currency" : "",
+  "note" : "",
+  "email" : "",
+  "name" : "",
+  "phone" : "",
+  "tags" : "",
+  "line_items" : [ {
+    "fulfillment_status" : "",
+    "grams" : "",
+    "price" : 0.0,
+    "product_id" : 1,
+    "variant_id" : 1,
+    "quantity" : 1,
+    "title" : ""
+  } ]
+}
+```
+
 
 ### Close Order
 Name: closeOrder
@@ -244,6 +308,17 @@ Closes an order. A closed order is one that has no more work to be done. All ite
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | orderId | Order ID | INTEGER | ID of the order to close. | true |
 
+#### Example JSON Structure
+```json
+{
+  "label" : "Close Order",
+  "name" : "closeOrder",
+  "parameters" : {
+    "orderId" : 1
+  },
+  "type" : "shopify/v1/closeOrder"
+}
+```
 
 #### Output
 
@@ -268,15 +343,25 @@ Type: OBJECT
 
 
 
-#### JSON Example
+#### Output Example
 ```json
 {
-  "label" : "Close Order",
-  "name" : "closeOrder",
-  "parameters" : {
-    "orderId" : 1
-  },
-  "type" : "shopify/v1/closeOrder"
+  "id" : 1,
+  "currency" : "",
+  "note" : "",
+  "email" : "",
+  "name" : "",
+  "phone" : "",
+  "tags" : "",
+  "line_items" : [ {
+    "fulfillment_status" : "",
+    "grams" : "",
+    "price" : 0.0,
+    "product_id" : 1,
+    "variant_id" : 1,
+    "quantity" : 1,
+    "title" : ""
+  } ]
 }
 ```
 
