@@ -40,13 +40,15 @@ public class SlackUtils {
     private SlackUtils() {
     }
 
-    public static Object sendMessage(Parameters inputParameters, ActionContext actionContext) {
+    public static Object
+        sendMessage(String channel, String text, List<Map<String, Object>> blocks, ActionContext actionContext) {
         return actionContext
             .http(http -> http.post("/chat.postMessage"))
             .body(
                 Http.Body.of(
-                    CHANNEL, inputParameters.getRequiredString(CHANNEL),
-                    TEXT, inputParameters.getRequiredString(TEXT)))
+                    CHANNEL, channel,
+                    TEXT, text,
+                    "blocks", blocks))
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});

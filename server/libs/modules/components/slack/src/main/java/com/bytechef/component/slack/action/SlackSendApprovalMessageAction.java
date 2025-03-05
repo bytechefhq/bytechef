@@ -24,13 +24,12 @@ import static com.bytechef.component.slack.constant.SlackConstants.CHANNEL;
 import static com.bytechef.component.slack.constant.SlackConstants.CHAT_POST_MESSAGE_RESPONSE_PROPERTY;
 import static com.bytechef.component.slack.constant.SlackConstants.TEXT;
 import static com.bytechef.component.slack.constant.SlackConstants.TEXT_PROPERTY;
+import static com.bytechef.component.slack.util.SlackUtils.sendMessage;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ActionContext.Approval;
-import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.slack.util.SlackUtils;
 import java.util.List;
 import java.util.Map;
@@ -60,31 +59,22 @@ public class SlackSendApprovalMessageAction {
         Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) {
 
         Approval.Links links = actionContext.approval(Approval::generateLinks);
+        String text = "%s%n%n Approve: ${approvalLink}%n%n Disapprove: ${disapprovalLink}"
+            .formatted(inputParameters.getRequiredString(TEXT));
+        List<Map<String, Object>> blocks = List.of(
+            Map.of(
+                "type", "section", TEXT,
+                Map.of("type", "mrkdwn", TEXT, inputParameters.getRequiredString(TEXT))),
+            Map.of(
+                "type", "actions", "block_id", "actions", "elements",
+                List.of(
+                    Map.of(
+                        "type", "button", "text", Map.of("type", "plain_text", "text", "Approve"),
+                        "style", "primary", "url", links.approvalLink()),
+                    Map.of(
+                        "type", "button", "text", Map.of("type", "plain_text", "text", "Disapprove"),
+                        "style", "danger", "url", links.disapprovalLink()))));
 
-        return actionContext
-            .http(http -> http.post("/chat.postMessage"))
-            .body(
-                Http.Body.of(
-                    CHANNEL, inputParameters.getRequiredString(CHANNEL),
-                    TEXT,
-                    "%s%n%n Approve: ${approvalLink}%n%n Disapprove: ${disapprovalLink}".formatted(
-                        inputParameters.getRequiredString(TEXT)),
-                    "blocks",
-                    List.of(
-                        Map.of(
-                            "type", "section", TEXT,
-                            Map.of("type", "mrkdwn", TEXT, inputParameters.getRequiredString(TEXT))),
-                        Map.of(
-                            "type", "actions", "block_id", "actions", "elements",
-                            List.of(
-                                Map.of(
-                                    "type", "button", "text", Map.of("type", "plain_text", "text", "Approve"),
-                                    "style", "primary", "url", links.approvalLink()),
-                                Map.of(
-                                    "type", "button", "text", Map.of("type", "plain_text", "text", "Disapprove"),
-                                    "style", "danger", "url", links.disapprovalLink()))))))
-            .configuration(Http.responseType(Http.ResponseType.JSON))
-            .execute()
-            .getBody(new TypeReference<>() {});
+        return sendMessage(inputParameters.getRequiredString(CHANNEL), text, blocks, actionContext);
     }
 }

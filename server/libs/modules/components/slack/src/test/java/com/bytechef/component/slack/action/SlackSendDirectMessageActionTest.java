@@ -17,7 +17,9 @@
 package com.bytechef.component.slack.action;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
+import java.util.List;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -28,8 +30,11 @@ class SlackSendDirectMessageActionTest extends AbstractSlackActionTest {
 
     @Test
     void testPerform() {
-        Object result = SlackSendDirectMessageAction.perform(mockedParameters, mockedParameters, mockedContext);
+        Object result = SlackSendDirectMessageAction.perform(mockedParameters, mockedParameters, mockedActionContext);
 
         assertEquals(mockedObject, result);
+        assertEquals(List.of("abc", "efg"), stringArgumentCaptor.getAllValues());
+        assertNull(listArgumentCaptor.getValue());
+        assertEquals(mockedActionContext, actionContextArgumentCaptor.getValue());
     }
 }

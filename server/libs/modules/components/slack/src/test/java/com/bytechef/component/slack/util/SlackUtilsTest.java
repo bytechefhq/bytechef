@@ -65,14 +65,10 @@ class SlackUtilsTest {
 
     @Test
     void testSendMessage() {
-        when(mockedParameters.getRequiredString(CHANNEL))
-            .thenReturn("general");
-        when(mockedParameters.getRequiredString(TEXT))
-            .thenReturn("hello");
         when(mockedResponse.getBody(any(TypeReference.class)))
             .thenReturn(mockedObject);
 
-        Object result = SlackUtils.sendMessage(mockedParameters, mockedActionContext);
+        Object result = SlackUtils.sendMessage("general", "hello", null, mockedActionContext);
 
         assertEquals(mockedObject, result);
 

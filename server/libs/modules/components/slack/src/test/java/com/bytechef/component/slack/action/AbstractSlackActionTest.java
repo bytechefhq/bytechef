@@ -16,14 +16,20 @@
 
 package com.bytechef.component.slack.action;
 
+import static com.bytechef.component.slack.constant.SlackConstants.CHANNEL;
+import static com.bytechef.component.slack.constant.SlackConstants.TEXT;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.slack.util.SlackUtils;
+import com.bytechef.component.test.definition.MockParametersFactory;
+import java.util.List;
+import java.util.Map;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.mockito.ArgumentCaptor;
 import org.mockito.MockedStatic;
 
 /**
@@ -32,23 +38,26 @@ import org.mockito.MockedStatic;
  */
 abstract class AbstractSlackActionTest {
 
-    protected ActionContext mockedContext = mock(ActionContext.class);
+    protected ActionContext mockedActionContext = mock(ActionContext.class);
     protected Object mockedObject = mock(Object.class);
-    protected Parameters mockedParameters = mock(Parameters.class);
+    protected Parameters mockedParameters = MockParametersFactory.create(Map.of(CHANNEL, "abc", TEXT, "efg"));
+    protected ArgumentCaptor<String> stringArgumentCaptor = ArgumentCaptor.forClass(String.class);
+    protected ArgumentCaptor<ActionContext> actionContextArgumentCaptor = ArgumentCaptor.forClass(ActionContext.class);
+    protected ArgumentCaptor<List> listArgumentCaptor = ArgumentCaptor.forClass(List.class);
     protected MockedStatic<SlackUtils> shopifyUtilsMockedStatic;
 
     @BeforeEach
-    public void beforeEach() {
+    void beforeEach() {
         shopifyUtilsMockedStatic = mockStatic(SlackUtils.class);
 
         shopifyUtilsMockedStatic.when(
-            () -> SlackUtils.sendMessage(mockedParameters, mockedContext))
+            () -> SlackUtils.sendMessage(stringArgumentCaptor.capture(), stringArgumentCaptor.capture(),
+                listArgumentCaptor.capture(), actionContextArgumentCaptor.capture()))
             .thenReturn(mockedObject);
-
     }
 
     @AfterEach
-    public void afterEach() {
+    void afterEach() {
         shopifyUtilsMockedStatic.close();
     }
 }

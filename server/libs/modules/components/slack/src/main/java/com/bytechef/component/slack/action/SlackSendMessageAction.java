@@ -22,6 +22,7 @@ import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.slack.constant.SlackConstants.CHANNEL;
 import static com.bytechef.component.slack.constant.SlackConstants.CHAT_POST_MESSAGE_RESPONSE_PROPERTY;
+import static com.bytechef.component.slack.constant.SlackConstants.TEXT;
 import static com.bytechef.component.slack.constant.SlackConstants.TEXT_PROPERTY;
 import static com.bytechef.component.slack.util.SlackUtils.sendMessage;
 
@@ -52,10 +53,11 @@ public class SlackSendMessageAction {
     private SlackSendMessageAction() {
     }
 
-    public static Object perform(
+    protected static Object perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) {
 
-        return sendMessage(inputParameters, actionContext);
+        return sendMessage(
+            inputParameters.getRequiredString(CHANNEL), inputParameters.getRequiredString(TEXT), null, actionContext);
     }
 
 }
