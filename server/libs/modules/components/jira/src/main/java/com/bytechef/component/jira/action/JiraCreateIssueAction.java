@@ -17,6 +17,7 @@
 package com.bytechef.component.jira.action;
 
 import static com.bytechef.component.definition.ComponentDsl.action;
+import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.jira.constant.JiraConstants.ASSIGNEE;
@@ -25,10 +26,11 @@ import static com.bytechef.component.jira.constant.JiraConstants.DESCRIPTION;
 import static com.bytechef.component.jira.constant.JiraConstants.FIELDS;
 import static com.bytechef.component.jira.constant.JiraConstants.ID;
 import static com.bytechef.component.jira.constant.JiraConstants.ISSUETYPE;
-import static com.bytechef.component.jira.constant.JiraConstants.ISSUE_OUTPUT_PROPERTY;
+import static com.bytechef.component.jira.constant.JiraConstants.KEY;
 import static com.bytechef.component.jira.constant.JiraConstants.PARENT;
 import static com.bytechef.component.jira.constant.JiraConstants.PRIORITY;
 import static com.bytechef.component.jira.constant.JiraConstants.PROJECT;
+import static com.bytechef.component.jira.constant.JiraConstants.SELF;
 import static com.bytechef.component.jira.constant.JiraConstants.SUMMARY;
 import static com.bytechef.component.jira.constant.JiraConstants.TEXT;
 import static com.bytechef.component.jira.constant.JiraConstants.TYPE;
@@ -92,7 +94,16 @@ public class JiraCreateIssueAction {
                 .description("Description of the issue.")
                 .controlType(ControlType.TEXT_AREA)
                 .required(false))
-        .output(outputSchema(ISSUE_OUTPUT_PROPERTY))
+        .output(
+            outputSchema(
+                object()
+                    .properties(
+                        string(ID)
+                            .description("The ID of the created issue or subtask."),
+                        string(KEY)
+                            .description("The key of the created issue or subtask."),
+                        string(SELF)
+                            .description("The URL of the created issue or subtask."))))
         .perform(JiraCreateIssueAction::perform);
 
     private JiraCreateIssueAction() {

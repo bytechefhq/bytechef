@@ -16,7 +16,6 @@
 
 package com.bytechef.component.jira.constant;
 
-import static com.bytechef.component.definition.ComponentDsl.array;
 import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.string;
 
@@ -44,6 +43,7 @@ public class JiraConstants {
     public static final String PARENT = "parent";
     public static final String PRIORITY = "priority";
     public static final String PROJECT = "project";
+    public static final String SELF = "self";
     public static final String SUMMARY = "summary";
     public static final String TEXT = "text";
     public static final String TYPE = "type";
@@ -51,40 +51,40 @@ public class JiraConstants {
 
     public static final ModifiableObjectProperty ISSUE_OUTPUT_PROPERTY = object()
         .properties(
-            string(ID),
-            string(KEY),
+            string(ID)
+                .description("The ID of the issue."),
+            string(KEY)
+                .description("The key of the issue."),
+            string(SELF)
+                .description("The URL of the issue details."),
             object(FIELDS)
                 .properties(
                     object(ISSUETYPE)
                         .properties(
-                            string(ID),
-                            string(NAME)),
+                            string(ID)
+                                .description("ID of the issue type."),
+                            string(NAME)
+                                .description("Name of the issue type.")),
                     object(PROJECT)
                         .properties(
-                            string(ID),
-                            string(NAME)),
+                            string(ID)
+                                .description("ID of the project."),
+                            string(NAME)
+                                .description("Name of the project.")),
                     object(PRIORITY)
                         .properties(
-                            string(ID),
-                            string(NAME)),
+                            string(ID)
+                                .description("ID of the priority."),
+                            string(NAME)
+                                .description("Name of the priority.")),
                     object(ASSIGNEE)
                         .properties(
-                            string(ID),
-                            string(NAME)),
-                    object(DESCRIPTION)
-                        .properties(
-                            string(TYPE),
-                            array(CONTENT)
-                                .items(
-                                    object()
-                                        .properties(
-                                            array(CONTENT)
-                                                .items(
-                                                    object()
-                                                        .properties(
-                                                            string(TEXT),
-                                                            string(TYPE))),
-                                            string(TYPE))))));
+                            string("accountId")
+                                .description("Account ID of the assignee."),
+                            string("displayName")
+                                .description("Display name of the assignee.")),
+                    string(SUMMARY)
+                        .description("Summary of the issue.")));
 
     private JiraConstants() {
     }

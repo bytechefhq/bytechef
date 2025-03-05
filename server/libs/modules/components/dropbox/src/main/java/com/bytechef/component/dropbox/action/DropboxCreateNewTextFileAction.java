@@ -86,10 +86,26 @@ public class DropboxCreateNewTextFileAction {
             outputSchema(
                 object()
                     .properties(
-                        string("url"),
-                        string("resultPath"),
-                        string("fileId"),
-                        integer("paperRevision"))))
+                        string("name")
+                            .description(
+                                "The name of the newly created file, including its extension. This is the last " +
+                                    "component of the path."),
+                        string("path_lower")
+                            .description("The full path to the file in lowercase, as stored in the user's Dropbox."),
+                        string("path_display")
+                            .description(
+                                "The display-friendly version of the file's path, preserving original casing for " +
+                                    "readability."),
+                        string("id")
+                            .description("ID of the file within Dropbox."),
+                        integer("size")
+                            .description(
+                                "The size of the file in bytes, representing the total amount of data it contains."),
+                        bool("is_downloadable")
+                            .description("Indicates whether the file can be directly downloaded from Dropbox."),
+                        string("content_hash")
+                            .description(
+                                "A hash value representing the content of the file, used for verifying data integrity."))))
         .perform(DropboxCreateNewTextFileAction::perform);
 
     private DropboxCreateNewTextFileAction() {

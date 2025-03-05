@@ -55,19 +55,27 @@ public class DropboxSearchAction {
                 object()
                     .properties(
                         array("matches")
+                            .description("A list (possibly empty) of matches for the query.")
                             .items(
                                 object()
                                     .properties(
-                                        object("match_type")
-                                            .properties(
-                                                string(".tag")),
                                         object("metadata")
+                                            .description("The metadata for the matched file or folder.")
                                             .properties(
-                                                string(".tag"),
-                                                string("id"),
-                                                string("name"),
-                                                string("path_display"),
-                                                string("path_lower")))))))
+                                                string("name")
+                                                    .description(
+                                                        "The name of the file or folder, including its extension. " +
+                                                            "This is the last component of the path."),
+                                                string("path_lower")
+                                                    .description(
+                                                        "The full path to the file or folder in lowercase, as stored " +
+                                                            "in the user's Dropbox."),
+                                                string("path_display")
+                                                    .description(
+                                                        "The display-friendly version of the path to the file or " +
+                                                            "folder, preserving original casing."),
+                                                string("id")
+                                                    .description("ID of the file or folder.")))))))
         .perform(DropboxSearchAction::perform);
 
     protected static final ContextFunction<Http, Http.Executor> POST_SEARCH_CONTEXT_FUNCTION =

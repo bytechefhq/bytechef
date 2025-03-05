@@ -51,16 +51,27 @@ public class DropboxDeleteAction {
                 .label("Filename")
                 .description("Name of the file. Leave empty if you want to delete a folder.")
                 .required(false))
-        .output(outputSchema(
-            object()
-                .properties(
-                    object("metadata")
-                        .properties(
-                            string(".tag"),
-                            string("name"),
-                            string("path_lower"),
-                            string("path_display"),
-                            string("id")))))
+        .output(
+            outputSchema(
+                object()
+                    .properties(
+                        object("metadata")
+                            .description("Metadata containing details about the deleted file or folder.")
+                            .properties(
+                                string("name")
+                                    .description(
+                                        "The name of the deleted file or folder, including its extension. This is " +
+                                            "the last component of the path."),
+                                string("path_lower")
+                                    .description(
+                                        "The full path to the deleted file or folder in lowercase, as stored in the " +
+                                            "user's Dropbox."),
+                                string("path_display")
+                                    .description(
+                                        "The display-friendly version of the path to the deleted file or folder, " +
+                                            "preserving original casing."),
+                                string("id")
+                                    .description("ID of the deleted file or folder.")))))
         .perform(DropboxDeleteAction::perform);
 
     protected static final ContextFunction<Http, Http.Executor> POST_DELETE_CONTEXT_FUNCTION =

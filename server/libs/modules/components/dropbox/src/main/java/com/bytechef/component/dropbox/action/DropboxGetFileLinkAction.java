@@ -60,11 +60,24 @@ public class DropboxGetFileLinkAction {
                     .properties(
                         object("metadata")
                             .properties(
-                                string("name"),
-                                string("path_lower"),
-                                string("path_display"),
-                                string("id")),
-                        string("link"))))
+                                string("name")
+                                    .description(
+                                        "The name of the file, including its extension. This is the last component " +
+                                            "of the path."),
+                                string("path_lower")
+                                    .description(
+                                        "The complete path to the file in lowercase, as stored in the user's Dropbox " +
+                                            "account."),
+                                string("path_display")
+                                    .description(
+                                        "A user-friendly version of the file's path, preserving the original casing " +
+                                            "for better readability."),
+                                string("id")
+                                    .description("ID of the file within Dropbox.")),
+                        string("link")
+                            .description(
+                                "A temporary URL that can be used to stream the content of the file. This link " +
+                                    "expires after four hours."))))
         .perform(DropboxGetFileLinkAction::perform);
 
     protected static final ContextFunction<Http, Http.Executor> POST_TEMPORARY_LINK_CONTEXT_FUNCTION =
