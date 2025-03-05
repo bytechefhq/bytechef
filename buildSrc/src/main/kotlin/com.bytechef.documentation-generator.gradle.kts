@@ -310,11 +310,11 @@ Name: $name
 
 $description
 $propertiesSection
-${getOutputDefinitionString()}
 #### JSON Example
 ```json
 $formattedJson
 ```
+${getOutputDefinitionString()}
 """
         }
 
