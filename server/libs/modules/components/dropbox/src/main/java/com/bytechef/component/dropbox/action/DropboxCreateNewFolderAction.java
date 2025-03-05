@@ -48,11 +48,21 @@ public class DropboxCreateNewFolderAction {
                 object()
                     .properties(
                         object("metadata")
+                            .description("Metadata containing details about the newly created folder.")
                             .properties(
-                                string("name"),
-                                string("path_lower"),
-                                string("path_display"),
-                                string("id")))))
+                                string("name")
+                                    .description(
+                                        "The name of the newly created folder. This is the last component of the path."),
+                                string("path_lower")
+                                    .description(
+                                        "The full path to the newly created folder in lowercase, as stored in the " +
+                                            "user's Dropbox."),
+                                string("path_display")
+                                    .description(
+                                        "The display-friendly version of the path to the newly created folder, " +
+                                            "preserving original casing."),
+                                string("id")
+                                    .description("ID for the newly created folder within Dropbox.")))))
         .perform(DropboxCreateNewFolderAction::perform);
 
     protected static final ContextFunction<Http, Http.Executor> POST_CREATE_FOLDER_CONTEXT_FUNCTION =

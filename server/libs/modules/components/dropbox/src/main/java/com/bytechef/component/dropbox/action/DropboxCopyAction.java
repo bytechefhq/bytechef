@@ -50,23 +50,33 @@ public class DropboxCopyAction {
                 .required(false),
             string(FROM_PATH)
                 .label("Source Path")
-                .description("The path which the file or folder should be copyed from.  Root is /.")
+                .description("The path which the file or folder should be copied from.  Root is /.")
                 .required(true),
             string(TO_PATH)
                 .label("Destination Path")
-                .description("The path which the file or folder should be copyed to.  Root is /.")
+                .description("The path which the file or folder should be copied to.  Root is /.")
                 .required(true))
         .output(
             outputSchema(
                 object()
                     .properties(
                         object("metadata")
+                            .description("Metadata containing details about the copied file or folder.")
                             .properties(
-                                string(".tag"),
-                                string("name"),
-                                string("path_lower"),
-                                string("path_display"),
-                                string("id")))))
+                                string("name")
+                                    .description(
+                                        "The name of the copied file or folder, including its extension. This is the " +
+                                            "last component of the path."),
+                                string("path_lower")
+                                    .description(
+                                        "The full path to the copied file or folder in lowercase, as stored in the " +
+                                            "user's Dropbox."),
+                                string("path_display")
+                                    .description(
+                                        "The display-friendly version of the path to the copied file or folder, " +
+                                            "preserving original casing."),
+                                string("id")
+                                    .description("ID of the copied file or folder.")))))
         .perform(DropboxCopyAction::perform);
 
     protected static final ContextFunction<Http, Http.Executor> POST_COPY_CONTEXT_FUNCTION =

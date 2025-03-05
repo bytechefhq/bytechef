@@ -17,9 +17,7 @@
 package com.bytechef.component.dropbox.action;
 
 import static com.bytechef.component.definition.ComponentDsl.action;
-import static com.bytechef.component.definition.ComponentDsl.array;
 import static com.bytechef.component.definition.ComponentDsl.bool;
-import static com.bytechef.component.definition.ComponentDsl.date;
 import static com.bytechef.component.definition.ComponentDsl.fileEntry;
 import static com.bytechef.component.definition.ComponentDsl.integer;
 import static com.bytechef.component.definition.ComponentDsl.object;
@@ -88,43 +86,20 @@ public class DropboxUploadFileAction {
             outputSchema(
                 object()
                     .properties(
-                        string("id"),
-                        date("clientModified"),
-                        date("serverModified"),
-                        string("rev"),
-                        integer("size"),
-                        object("symlinkInfo")
-                            .properties(
-                                string("target")),
-                        object("sharingInfo")
-                            .properties(
-                                string("parentSharedFolderId"),
-                                string("modifiedBy")),
-                        bool("isDownloadable"),
-                        object("exportInfo")
-                            .properties(
-                                string("exportAs"),
-                                array("exportOptions")
-                                    .items(string())),
-                        array("propertyGroups")
-                            .items(
-                                object()
-                                    .properties(
-                                        string("templateId"),
-                                        array("fields")
-                                            .items(
-                                                object()
-                                                    .properties(
-                                                        string("name"),
-                                                        string("value"))))),
-                        bool("hasExplicitSharedMembers"),
-                        string("contentHash"),
-                        object("fileLockInfo")
-                            .properties(
-                                bool("isLockholder"),
-                                string("lockholderName"),
-                                string("lockholderAccountId"),
-                                date("created")))))
+                        string("name")
+                            .description("Name of the file. The last component of the path (including extension)."),
+                        string("path_lower")
+                            .description("The lowercased full path in the user's Dropbox."),
+                        string("path_display")
+                            .description("The cased path to be used for display purposes only."),
+                        string("id")
+                            .description("ID of the folder."),
+                        integer("size")
+                            .description("The file size in bytes."),
+                        bool("is_downloadable")
+                            .description("If file can be downloaded directly."),
+                        string("content_hash")
+                            .description("A hash of the file content."))))
         .perform(DropboxUploadFileAction::perform);
 
     private DropboxUploadFileAction() {
