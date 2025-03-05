@@ -38,11 +38,11 @@ import java.util.Map;
 /**
  * @author Monika Kušter
  */
-public class SlackRequestApprovalMessageAction {
+public class SlackSendApprovalMessageAction {
 
-    public static final ModifiableActionDefinition ACTION_DEFINITION = action("requestApprovalMessage")
-        .title("Request Approval in a Channel")
-        .description("Send approval message to a channel and then wait until the message is approved or disapproved.")
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action("sendApprovalMessage")
+        .title("Send Approval Message")
+        .description("Sends approval message to a channel.")
         .properties(
             string(CHANNEL)
                 .label("Channel")
@@ -51,9 +51,9 @@ public class SlackRequestApprovalMessageAction {
                 .required(true),
             TEXT_PROPERTY)
         .output(outputSchema(CHAT_POST_MESSAGE_RESPONSE_PROPERTY))
-        .perform(SlackRequestApprovalMessageAction::perform);
+        .perform(SlackSendApprovalMessageAction::perform);
 
-    private SlackRequestApprovalMessageAction() {
+    private SlackSendApprovalMessageAction() {
     }
 
     protected static Object perform(
