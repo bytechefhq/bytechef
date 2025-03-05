@@ -121,7 +121,7 @@ open class FindJsonFilesTask : DefaultTask() {
         fun toJsonKeyValuePair(): String {
             val key = name;
             val value = getJsonValue(type, properties)
-            return "\"$key\": $value"
+            return  if(name.isNullOrEmpty()) "$value" else "\"$key\": $value"
         }
 
         private fun getJsonValue(type: String?, properties: Array<Properties>?): Any {
@@ -211,13 +211,23 @@ open class FindJsonFilesTask : DefaultTask() {
 |:------------:|:------------:|:-------------------:|
 ${properties?.joinToString("\n") { it.getOutputString() }}
 """
-            } else if (!items.isNullOrEmpty()) {
+            } else if (!items.isNullOrEmpty() && items?.size == 1) {
+                """
+Items Type: ${items!![0].type}
+
+${s()}
+"""
+            } else ""
+        }
+
+        private fun s(): String {
+
+            return if (items!![0].type == "OBJECT") {
                 """
 #### Properties
-
 |     Name     |     Type     |     Description     |
 |:------------:|:------------:|:-------------------:|
-${items?.joinToString("\n") { it.getOutputString() }}
+${items!![0].properties?.joinToString("\n") { it.getOutputString() }}
 """
             } else ""
         }
@@ -229,6 +239,20 @@ Type: $type
 ${getPropertiesString()}
 
 """
+        }
+
+        fun getOutputJson(): String {
+            return if (!properties.isNullOrEmpty()) {
+                """ {
+                   ${properties?.joinToString(",\n") { it.toJsonKeyValuePair() }}
+                    }
+               """.trimIndent()
+            } else if (!items.isNullOrEmpty()) {
+                """ [
+                   ${items?.joinToString(",\n") { it.toJsonKeyValuePair()}}
+                    ]
+               """.trimIndent()
+            } else ""
         }
     }
 
@@ -256,6 +280,14 @@ ${getSampleOutputString()}
 $outputSchema
 """
         }
+
+        fun getOutputJson(): String {
+            if (outputSchema == null) {
+                return ""
+            }
+
+            return outputSchema!!.getOutputJson()
+        }
     }
 
     @JsonIgnoreProperties(ignoreUnknown = true)
@@ -274,6 +306,10 @@ The output for this action is dynamic and may vary depending on the input parame
 
         override fun toString(): String {
             return getOutputString();
+        }
+
+         fun getOutputJson(): String {
+             return outputResponse?.getOutputJson() ?: "";
         }
     }
 
@@ -300,21 +336,21 @@ This action does not produce any output.
         }
 
         override fun toString(): String {
+            val propertiesSection = createPropertiesSection()
             val jsonExample = createJsonExample()
             val formattedJson = formatJson(jsonExample)
-            val propertiesSection = createPropertiesSection()
-
             return """
 ### $title
 Name: $name
 
 $description
 $propertiesSection
-#### JSON Example
+#### Example JSON Structure
 ```json
 $formattedJson
 ```
 ${getOutputDefinitionString()}
+${createOutputJson()}
 """
         }
 
@@ -333,6 +369,21 @@ ${getOutputDefinitionString()}
                     "parameters": { ${properties?.joinToString(",\n") { it.toJsonKeyValuePair() }} },
                     "type": "$componentName/v$componentVersion/$name" }
                 """.trimIndent()
+            }
+        }
+
+        private fun createOutputJson(): String {
+            val outputJson = outputDefinition?.getOutputJson()
+
+            return if (!outputJson.isNullOrEmpty()) {
+                """
+#### Output Example
+```json
+${formatJson(outputJson)}
+```
+""".trimIndent()
+            } else {
+                ""
             }
         }
 
