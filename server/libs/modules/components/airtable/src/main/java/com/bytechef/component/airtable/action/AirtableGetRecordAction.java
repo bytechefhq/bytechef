@@ -18,18 +18,7 @@ package com.bytechef.component.airtable.action;
 
 import static com.bytechef.component.OpenApiComponentHandler.PropertyType;
 import static com.bytechef.component.definition.ComponentDsl.action;
-import static com.bytechef.component.definition.ComponentDsl.array;
-import static com.bytechef.component.definition.ComponentDsl.bool;
-import static com.bytechef.component.definition.ComponentDsl.date;
-import static com.bytechef.component.definition.ComponentDsl.dateTime;
-import static com.bytechef.component.definition.ComponentDsl.integer;
-import static com.bytechef.component.definition.ComponentDsl.nullable;
-import static com.bytechef.component.definition.ComponentDsl.number;
-import static com.bytechef.component.definition.ComponentDsl.object;
-import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
-import static com.bytechef.component.definition.ComponentDsl.time;
-import static com.bytechef.component.definition.Context.Http.ResponseType;
 
 import com.bytechef.component.airtable.util.AirtableUtils;
 import com.bytechef.component.definition.ComponentDsl;
@@ -74,14 +63,7 @@ public class AirtableGetRecordAction {
                 .metadata(
                     Map.of(
                         "type", PropertyType.PATH)))
-        .output(outputSchema(object()
-            .properties(string("id").required(false), dateTime("createdTime").required(false),
-                object("fields").additionalProperties(
-                    array(), bool(), date(), dateTime(), integer(), nullable(), number(), object(), string(), time())
-                    .required(false))
-            .metadata(
-                Map.of(
-                    "responseType", ResponseType.JSON))));
+        .output();
 
     private AirtableGetRecordAction() {
     }

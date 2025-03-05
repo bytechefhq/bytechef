@@ -47,17 +47,7 @@ paths:
       responses:
         "200":
           description: "Successful operation"
-          content:
-            application/json:
-              schema:
-                type: "object"
-                properties:
-                  createdTime:
-                    type: "string"
-                    format: "date-time"
-                  fields:
-                    type: "object"
-                    additionalProperties: true
+          x-dynamic-output: true
   /{baseId}/{tableId}/{recordId}:
     delete:
       summary: "Delete Record"
@@ -142,19 +132,7 @@ paths:
       responses:
         200:
           description: "Successful operation"
-          content:
-            application/json:
-              schema:
-                type: "object"
-                properties:
-                  id:
-                    type: "string"
-                  createdTime:
-                    type: "string"
-                    format: "date-time"
-                  fields:
-                    type: "object"
-                    additionalProperties: true
+          x-dynamic-output: true
 components:
   securitySchemes:
     api_key:
