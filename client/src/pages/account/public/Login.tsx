@@ -10,9 +10,9 @@ import {useAuthenticationStore} from '@/shared/stores/useAuthenticationStore';
 import {useFeatureFlagsStore} from '@/shared/stores/useFeatureFlagsStore';
 import {zodResolver} from '@hookform/resolvers/zod';
 import {Eye, EyeOff} from 'lucide-react';
-import {useState} from 'react';
+import {useEffect, useState} from 'react';
 import {useForm} from 'react-hook-form';
-import {Link, Navigate, useLocation} from 'react-router-dom';
+import {Link, Navigate, useLocation, useNavigate} from 'react-router-dom';
 import {z} from 'zod';
 
 import githubLogo from '../images/github-logo.svg';
@@ -27,13 +27,15 @@ const formSchema = z.object({
 const Login = () => {
     const [showPassword, setShowPassword] = useState(false);
 
-    const {authenticated, login} = useAuthenticationStore();
+    const {authenticated, login, loginError, reset} = useAuthenticationStore();
 
     const ff_1874 = useFeatureFlagsStore()('ff-1874');
 
     const analytics = useAnalytics();
 
     const pageLocation = useLocation();
+
+    const navigate = useNavigate();
 
     const form = useForm<z.infer<typeof formSchema>>({
         defaultValues: {
@@ -58,6 +60,19 @@ const Login = () => {
     };
 
     const {from} = pageLocation.state || {from: {pathname: '/', search: pageLocation.search}};
+
+    useEffect(() => {
+        if (loginError && !authenticated) {
+            navigate('/account-error', {
+                state: {
+                    error: 'Failed to sign in, please check your credentials and try again.',
+                    fromInternalFlow: true,
+                },
+            });
+
+            reset();
+        }
+    }, [authenticated, loginError, navigate, reset]);
 
     if (authenticated) {
         return <Navigate replace to={from} />;
