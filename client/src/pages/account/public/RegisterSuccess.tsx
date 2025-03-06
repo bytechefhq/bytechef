@@ -23,7 +23,7 @@ const RegisterSuccess = () => {
         }
 
         if (key && activationFailure) {
-            navigate('/account-error');
+            navigate('/account-error', {state: {fromInternalFlow: true}});
         }
     }, [activate, activationFailure, key, navigate]);
 
