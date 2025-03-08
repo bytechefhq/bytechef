@@ -3,10 +3,13 @@ import ApiClients from '@/ee/pages/automation/api-platform/api-clients/ApiClient
 import ApiCollections from '@/ee/pages/automation/api-platform/api-collections/ApiCollections';
 import ApiConnectors from '@/ee/pages/settings/platform/api-connectors/ApiConnectors';
 import CustomComponents from '@/ee/pages/settings/platform/custom-components/CustomComponents';
+import AccountErrorPage from '@/pages/account/public/AccountErrorPage';
 import Login from '@/pages/account/public/Login';
+import PasswordResetEmailSent from '@/pages/account/public/PasswordResetEmailSent';
 import PasswordResetFinish from '@/pages/account/public/PasswordResetFinish';
 import PasswordResetInit from '@/pages/account/public/PasswordResetInit';
 import Register from '@/pages/account/public/Register';
+import RegisterSuccess from '@/pages/account/public/RegisterSuccess';
 import VerifyEmail from '@/pages/account/public/VerifyEmail';
 import AccountProfile from '@/pages/account/settings/AccountProfile';
 import Appearance from '@/pages/account/settings/Appearance';
@@ -30,6 +33,7 @@ import ApiKeys from '@/pages/platform/settings/api-keys/ApiKeys';
 import GitConfiguration from '@/pages/platform/settings/git-configuration/GitConfiguration';
 import Workspaces from '@/pages/settings/automation/workspaces/Workspaces';
 import SigningKeys from '@/pages/settings/embedded/signing-keys/SigningKeys';
+import {AccessControl} from '@/shared/auth/AccessControl';
 import PrivateRoute from '@/shared/auth/PrivateRoute';
 import OAuthPopup from '@/shared/components/connection/oauth2/OAuthPopup';
 import {AUTHORITIES} from '@/shared/constants';
@@ -43,10 +47,6 @@ import {ProjectKeys} from '@/shared/queries/automation/projects.queries';
 import {IntegrationKeys} from '@/shared/queries/embedded/integrations.queries';
 import {QueryClient} from '@tanstack/react-query';
 import {createBrowserRouter, redirect} from 'react-router-dom';
-
-import AccountErrorPage from './pages/account/public/AccountErrorPage';
-import PasswordResetEmailSent from './pages/account/public/PasswordResetEmailSent';
-import RegisterSuccess from './pages/account/public/RegisterSuccess';
 
 const getAccountRoutes = (path: string) => ({
     children: [
@@ -190,10 +190,6 @@ export const getRouter = (queryClient: QueryClient) =>
         {
             children: [
                 {
-                    element: <RegisterSuccess />,
-                    path: '/activate',
-                },
-                {
                     element: <Login />,
                     path: '/login',
                 },
@@ -202,28 +198,47 @@ export const getRouter = (queryClient: QueryClient) =>
                     path: '/register',
                 },
                 {
-                    children: [
-                        {
-                            element: <PasswordResetInit />,
-                            path: 'init',
-                        },
-                        {
-                            element: <PasswordResetFinish />,
-                            path: 'finish',
-                        },
-                        {
-                            element: <PasswordResetEmailSent />,
-                            path: 'email',
-                        },
-                    ],
-                    path: 'password-reset',
+                    element: <PasswordResetInit />,
+                    path: '/password-reset/init',
                 },
                 {
-                    element: <VerifyEmail />,
+                    element: (
+                        <AccessControl requiresFlow requiresKey>
+                            <RegisterSuccess />
+                        </AccessControl>
+                    ),
+                    path: '/activate',
+                },
+                {
+                    element: (
+                        <AccessControl requiresKey>
+                            <PasswordResetFinish />
+                        </AccessControl>
+                    ),
+                    path: '/password-reset/finish',
+                },
+                {
+                    element: (
+                        <AccessControl requiresFlow>
+                            <PasswordResetEmailSent />
+                        </AccessControl>
+                    ),
+                    path: '/password-reset/email',
+                },
+                {
+                    element: (
+                        <AccessControl requiresFlow>
+                            <VerifyEmail />
+                        </AccessControl>
+                    ),
                     path: '/verify-email',
                 },
                 {
-                    element: <AccountErrorPage />,
+                    element: (
+                        <AccessControl requiresFlow>
+                            <AccountErrorPage />
+                        </AccessControl>
+                    ),
                     path: '/account-error',
                 },
                 {

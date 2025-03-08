@@ -5,6 +5,8 @@ import {MailCheck} from 'lucide-react';
 import {useEffect, useState} from 'react';
 import {useLocation, useNavigate} from 'react-router-dom';
 
+const STORAGE_KEY_PREFIX = 'passwordReset_';
+
 const PasswordResetEmailSent = () => {
     const [disabled, setDisabled] = useState(false);
     const [countdown, setCountdown] = useState(60);
@@ -13,6 +15,23 @@ const PasswordResetEmailSent = () => {
 
     const location = useLocation();
     const navigate = useNavigate();
+
+    useEffect(() => {
+        const storedDisabled = localStorage.getItem(`${STORAGE_KEY_PREFIX}resendDisabled`);
+        const storedExpiry = localStorage.getItem(`${STORAGE_KEY_PREFIX}resendExpiry`);
+
+        if (storedDisabled === 'true' && storedExpiry) {
+            const remainingTime = Math.floor((Number(storedExpiry) - Date.now()) / 1000);
+
+            if (remainingTime > 0) {
+                setDisabled(true);
+                setCountdown(remainingTime);
+            } else {
+                localStorage.removeItem(`${STORAGE_KEY_PREFIX}resendDisabled`);
+                localStorage.removeItem(`${STORAGE_KEY_PREFIX}resendExpiry`);
+            }
+        }
+    }, []);
 
     useEffect(() => {
         let timer: ReturnType<typeof setInterval> | undefined;
@@ -25,6 +44,9 @@ const PasswordResetEmailSent = () => {
                         setDisabled(false);
                         setCountdown(60);
 
+                        localStorage.removeItem(`${STORAGE_KEY_PREFIX}resendDisabled`);
+                        localStorage.removeItem(`${STORAGE_KEY_PREFIX}resendExpiry`);
+
                         return 60;
                     }
 
@@ -36,19 +58,23 @@ const PasswordResetEmailSent = () => {
         return () => clearInterval(timer);
     }, [disabled]);
 
-    function handleResendEmail() {
-        resetPasswordInit(location.state.email);
-
-        setDisabled(true);
-    }
-
     useEffect(() => {
         if (resetPasswordFailure) {
-            navigate('/account-error');
+            navigate('/account-error', {state: {fromInternalFlow: true}});
         }
 
         reset();
     }, [resetPasswordFailure, navigate, reset]);
+
+    function handleResendEmail() {
+        resetPasswordInit(location.state.email);
+
+        setDisabled(true);
+        setCountdown(60);
+
+        localStorage.setItem(`${STORAGE_KEY_PREFIX}resendDisabled`, 'true');
+        localStorage.setItem(`${STORAGE_KEY_PREFIX}resendExpiry`, (Date.now() + 60 * 1000).toString());
+    }
 
     return (
         <PublicLayoutContainer>

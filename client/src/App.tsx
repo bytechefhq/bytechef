@@ -25,7 +25,7 @@ import {
     ZapIcon,
 } from 'lucide-react';
 import {useEffect, useState} from 'react';
-import {Outlet, useLocation, useNavigate, useSearchParams} from 'react-router-dom';
+import {Outlet, useLocation} from 'react-router-dom';
 
 const user = {
     email: 'emily.selman@example.com',
@@ -105,10 +105,8 @@ function App() {
         account,
         authenticated,
         getAccount,
-        loginError,
         reset: resetAuthentication,
         sessionHasBeenFetched,
-        showLogin,
     } = useAuthenticationStore();
 
     const {copilotPanelOpen} = useCopilotStore();
@@ -118,11 +116,6 @@ function App() {
     const helpHub = useHelpHub();
 
     const location = useLocation();
-
-    const navigate = useNavigate();
-
-    const [searchParams] = useSearchParams();
-    const key = searchParams.get('key');
 
     const queryClient = useQueryClient();
 
@@ -178,27 +171,6 @@ function App() {
     useEffect(() => {
         getApplicationInfo();
     }, [getApplicationInfo]);
-
-    // Prevent URL hopping
-    useEffect(() => {
-        if (showLogin && !key) {
-            navigate('/login');
-        }
-    }, [showLogin, navigate, key]);
-
-    useEffect(() => {
-        if (sessionHasBeenFetched && !authenticated && !key && !loginError) {
-            navigate('/login');
-        }
-    }, [authenticated, sessionHasBeenFetched, key, navigate, loginError]);
-
-    useEffect(() => {
-        if (loginError) {
-            navigate('/account-error', {
-                state: {error: 'Failed to sign in, please check your credentials and try again.'},
-            });
-        }
-    }, [loginError, navigate]);
 
     useEffect(() => {
         if (!authenticated) {

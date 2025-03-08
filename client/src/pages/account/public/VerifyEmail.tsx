@@ -5,6 +5,8 @@ import {MailCheck} from 'lucide-react';
 import {useEffect, useState} from 'react';
 import {useLocation} from 'react-router-dom';
 
+const STORAGE_KEY_PREFIX = 'verifyEmail_';
+
 const VerifyEmail = () => {
     const [disabled, setDisabled] = useState(false);
     const [countdown, setCountdown] = useState(60);
@@ -12,6 +14,32 @@ const VerifyEmail = () => {
     const {register} = useRegisterStore();
 
     const location = useLocation();
+
+    function handleResendEmail() {
+        register(location.state.email, location.state.password);
+
+        setDisabled(true);
+
+        localStorage.setItem(`${STORAGE_KEY_PREFIX}resendDisabled`, 'true');
+        localStorage.setItem(`${STORAGE_KEY_PREFIX}resendExpiry`, (Date.now() + 60 * 1000).toString());
+    }
+
+    useEffect(() => {
+        const storedDisabled = localStorage.getItem(`${STORAGE_KEY_PREFIX}resendDisabled`);
+        const storedExpiry = localStorage.getItem(`${STORAGE_KEY_PREFIX}resendExpiry`);
+
+        if (storedDisabled === 'true' && storedExpiry) {
+            const remainingTime = Math.floor((Number(storedExpiry) - Date.now()) / 1000);
+
+            if (remainingTime > 0) {
+                setDisabled(true);
+                setCountdown(remainingTime);
+            } else {
+                localStorage.removeItem(`${STORAGE_KEY_PREFIX}resendDisabled`);
+                localStorage.removeItem(`${STORAGE_KEY_PREFIX}resendExpiry`);
+            }
+        }
+    }, []);
 
     useEffect(() => {
         let timer: ReturnType<typeof setInterval> | undefined;
@@ -24,6 +52,9 @@ const VerifyEmail = () => {
                         setDisabled(false);
                         setCountdown(60);
 
+                        localStorage.removeItem(`${STORAGE_KEY_PREFIX}resendDisabled`);
+                        localStorage.removeItem(`${STORAGE_KEY_PREFIX}resendExpiry`);
+
                         return 60;
                     }
 
@@ -34,12 +65,6 @@ const VerifyEmail = () => {
 
         return () => clearInterval(timer);
     }, [disabled]);
-
-    function handleResendEmail() {
-        register(location.state.email, location.state.password);
-
-        setDisabled(true);
-    }
 
     return (
         <PublicLayoutContainer>
