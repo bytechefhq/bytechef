@@ -1434,15 +1434,24 @@ public class ApplicationProperties {
      */
     public static class Mail {
 
+        private boolean auth;
         private String from;
         private String host;
         private String baseUrl;
         private String password;
+        private String protocol;
         private int port = 25;
-        private Smtp smtp = new Smtp();
+        private Starttls starttls = new Starttls();
         private Ssl ssl = new Ssl();
-        private Transport transport = new Transport();
         private String username;
+
+        public boolean isAuth() {
+            return auth;
+        }
+
+        public void setAuth(boolean auth) {
+            this.auth = auth;
+        }
 
         public String getBaseUrl() {
             return baseUrl;
@@ -1484,12 +1493,12 @@ public class ApplicationProperties {
             this.port = port;
         }
 
-        public Smtp getSmtp() {
-            return smtp;
+        public String getProtocol() {
+            return protocol;
         }
 
-        public void setSmtp(Smtp smtp) {
-            this.smtp = smtp;
+        public void setProtocol(String protocol) {
+            this.protocol = protocol;
         }
 
         public Ssl getSsl() {
@@ -1500,12 +1509,12 @@ public class ApplicationProperties {
             this.ssl = ssl;
         }
 
-        public Transport getTransport() {
-            return transport;
+        public Starttls getStarttls() {
+            return starttls;
         }
 
-        public void setTransport(Transport transport) {
-            this.transport = transport;
+        public void setStarttls(Starttls starttls) {
+            this.starttls = starttls;
         }
 
         public String getUsername() {
@@ -1514,50 +1523,6 @@ public class ApplicationProperties {
 
         public void setUsername(String username) {
             this.username = username;
-        }
-
-        public static class Smtp {
-
-            private boolean auth;
-            private Starttls starttls = new Starttls();
-
-            public boolean isAuth() {
-                return auth;
-            }
-
-            public void setAuth(boolean auth) {
-                this.auth = auth;
-            }
-
-            public Starttls getStarttls() {
-                return starttls;
-            }
-
-            public void setStarttls(Starttls starttls) {
-                this.starttls = starttls;
-            }
-
-            public static class Starttls {
-
-                private boolean enable;
-                private boolean required;
-
-                public boolean isEnable() {
-                    return enable;
-                }
-
-                public void setEnable(boolean enable) {
-                    this.enable = enable;
-                }
-
-                public boolean isRequired() {
-                    return required;
-                }
-
-                public void setRequired(boolean required) {
-                    this.required = required;
-                }
-            }
         }
 
         public static class Ssl {
@@ -1573,16 +1538,25 @@ public class ApplicationProperties {
             }
         }
 
-        public static class Transport {
+        public static class Starttls {
 
-            private String protocol;
+            private boolean enable;
+            private boolean required;
 
-            public String getProtocol() {
-                return protocol;
+            public boolean isEnable() {
+                return enable;
             }
 
-            public void setProtocol(String protocol) {
-                this.protocol = protocol;
+            public void setEnable(boolean enable) {
+                this.enable = enable;
+            }
+
+            public boolean isRequired() {
+                return required;
+            }
+
+            public void setRequired(boolean required) {
+                this.required = required;
             }
         }
     }

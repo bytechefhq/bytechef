@@ -77,10 +77,12 @@ public class MailServiceImpl implements MailService {
         if (StringUtils.isBlank(mail.getHost()) && log.isWarnEnabled()) {
             log.warn("Mail server is not configured, not sending mails");
         } else {
-            log.info("Listing mail server properties:");
+            if (log.isDebugEnabled()) {
+                log.debug("Listing mail server properties:");
 
-            for (String propertyName : PROPERTY_NAMES) {
-                log.info("{}: {}", propertyName, environment.getProperty(propertyName));
+                for (String propertyName : PROPERTY_NAMES) {
+                    log.debug("{}: {}", propertyName, environment.getProperty(propertyName));
+                }
             }
         }
     }
