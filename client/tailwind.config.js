@@ -54,7 +54,6 @@ module.exports = {
                 content: {
                     brand: {
                         primary: 'hsl(var(--content-brand-primary))',
-                        'primary-pressed': 'hsl(var(--content-brand-primary-pressed))',
                     },
                     destructive: 'hsl(var(--content-destructive))',
                     neutral: {
@@ -113,10 +112,15 @@ module.exports = {
                 surface: {
                     brand: {
                         primary: 'hsl(var(--surface-brand-primary))',
+                        'primary-active': 'hsl(var(--surface-brand-primary-active))',
                         'primary-hover': 'hsl(var(--surface-brand-primary-hover))',
-                        'primary-pressed': 'hsl(var(--surface-brand-primary-pressed))',
                         secondary: 'hsl(var(--surface-brand-secondary))',
                         'secondary-hover': 'hsl(var(--surface-brand-secondary-hover))',
+                    },
+                    destructive: {
+                        primary: 'hsl(var(--surface-destructive-primary))',
+                        'primary-active': 'hsl(var(--surface-destructive-primary-active))',
+                        'primary-hover': 'hsl(var(--surface-destructive-primary-hover))',
                     },
                     error: {
                         secondary: 'hsl(var(--surface-error-secondary))',
