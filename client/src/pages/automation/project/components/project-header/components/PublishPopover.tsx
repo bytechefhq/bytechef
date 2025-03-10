@@ -45,7 +45,7 @@ const PublishPopover = ({
                 <PopoverTrigger asChild>
                     <TooltipTrigger asChild>
                         <Button
-                            className="shadow-none hover:border-stroke-neutral-primary-hover hover:bg-surface-neutral-primary-hover active:border-stroke-brand-primary-pressed active:bg-surface-brand-secondary active:text-content-brand-primary-pressed [&[data-state=open]]:border-stroke-brand-primary-pressed [&[data-state=open]]:bg-surface-brand-secondary [&[data-state=open]]:text-content-brand-primary-pressed"
+                            className="shadow-none hover:border-stroke-neutral-secondary hover:bg-surface-neutral-primary-hover [&[data-state=open]]:border-stroke-brand-secondary [&[data-state=open]]:bg-surface-brand-secondary [&[data-state=open]]:text-content-brand-primary"
                             variant="outline"
                         >
                             <SendIcon /> Publish
@@ -82,7 +82,7 @@ const PublishPopover = ({
                         <div className="flex justify-end">
                             <Button
                                 aria-label="Publish button"
-                                className="bg-surface-brand-primary shadow-none hover:bg-surface-brand-primary-hover active:bg-surface-brand-primary-pressed"
+                                className="active:bg-surface-brand-primary-active bg-surface-brand-primary shadow-none hover:bg-surface-brand-primary-hover"
                                 disabled={isPending}
                                 size="sm"
                                 type="submit"
