@@ -1,0 +1,51 @@
+.radio-card-label {
+    @apply flex;
+    @apply cursor-pointer;
+    @apply rounded-md;
+    @apply border;
+    @apply border-stroke-neutral-secondary;
+    @apply hover:border-stroke-brand-secondary;
+
+    &.is-checked {
+        @apply border-stroke-brand-primary;
+    }
+}
+
+.radio-card-indicator-container {
+    @apply flex;
+    @apply items-center;
+    @apply rounded-e-md;
+    @apply border-l;
+    @apply border-stroke-neutral-secondary;
+    @apply bg-surface-neutral-secondary;
+    @apply p-4;
+
+    &.is-checked {
+        @apply border-stroke-brand-primary;
+        @apply bg-surface-brand-secondary;
+    }
+
+    &.is-unchecked {
+        @apply group-hover:border-stroke-brand-secondary;
+        @apply group-hover:bg-surface-brand-secondary;
+    }
+
+    &.is-unchecked > button {
+        @apply group-hover:!border-stroke-brand-secondary;
+    }
+}
+
+.radio-card-indicator {
+    @apply !border-stroke-neutral-secondary;
+    @apply bg-background;
+
+    &.is-checked {
+        @apply !border-stroke-brand-primary;
+    }
+
+    &.is-checked > span > svg {
+        @apply absolute;
+        @apply !size-6;
+        @apply text-surface-brand-primary;
+    }
+}
