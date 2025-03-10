@@ -75,7 +75,7 @@ public class MicrosoftOutlook365GetFreeTimeSlotsAction {
     private MicrosoftOutlook365GetFreeTimeSlotsAction() {
     }
 
-    public static List<Interval> perform(
+    protected static List<Interval> perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) {
 
         List<CustomEvent> customEvents = new ArrayList<>(retrieveCustomEvents(inputParameters, actionContext));

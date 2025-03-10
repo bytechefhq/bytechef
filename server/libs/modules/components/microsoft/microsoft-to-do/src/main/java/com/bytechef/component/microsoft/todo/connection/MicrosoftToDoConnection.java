@@ -26,7 +26,6 @@ import java.util.List;
 public class MicrosoftToDoConnection {
 
     public static final ModifiableConnectionDefinition CONNECTION_DEFINITION = MicrosoftConnection.createConnection(
-        "https://graph.microsoft.com/v1.0",
         (connection, context) -> List.of("Tasks.ReadWrite", "offline_access"));
 
     private MicrosoftToDoConnection() {

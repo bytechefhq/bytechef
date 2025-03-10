@@ -66,7 +66,7 @@ public class MicrosoftSharePointCreateListAction {
     public static Object perform(Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
 
         return context
-            .http(http -> http.post("/" + inputParameters.getRequiredString(SITE_ID) + "/lists"))
+            .http(http -> http.post("/sites/" + inputParameters.getRequiredString(SITE_ID) + "/lists"))
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .body(
                 Http.Body.of(

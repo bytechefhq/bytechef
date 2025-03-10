@@ -19,14 +19,14 @@ package com.bytechef.component.microsoft.outlook.action;
 import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.array;
 import static com.bytechef.component.definition.ComponentDsl.object;
+import static com.bytechef.component.definition.ComponentDsl.option;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.ADDRESS;
 import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.BCC_RECIPIENTS;
 import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.BODY;
 import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.CC_RECIPIENTS;
-import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.CONTENT_PROPERTY_HTML;
-import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.CONTENT_PROPERTY_TEXT;
-import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.CONTENT_TYPE_PROPERTY;
+import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.CONTENT;
+import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.CONTENT_TYPE;
 import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.EMAIL_ADDRESS;
 import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.FROM;
 import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.NAME;
@@ -40,9 +40,11 @@ import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Parameters;
+import com.bytechef.component.definition.Property.ControlType;
+import com.bytechef.component.microsoft.outlook.constant.ContentType;
 
 /**
- * @author Monika Domiter
+ * @author Monika Kušter
  */
 public class MicrosoftOutlook365SendEmailAction {
 
@@ -98,9 +100,26 @@ public class MicrosoftOutlook365SendEmailAction {
                 .label("Body")
                 .description("The body of the message. It can be in HTML or text format.")
                 .properties(
-                    CONTENT_TYPE_PROPERTY,
-                    CONTENT_PROPERTY_HTML,
-                    CONTENT_PROPERTY_TEXT)
+                    string(CONTENT_TYPE)
+                        .label("Content Type")
+                        .description("The type of the content.")
+                        .options(
+                            option("Text", ContentType.TEXT.name()),
+                            option("HTML", ContentType.HTML.name()))
+                        .defaultValue(ContentType.TEXT.name())
+                        .required(false),
+                    string(CONTENT)
+                        .label("HTML Content")
+                        .description("The content of the item.")
+                        .controlType(ControlType.RICH_TEXT)
+                        .displayCondition("body.contentType == '%s'".formatted(ContentType.HTML))
+                        .required(false),
+                    string(CONTENT)
+                        .label("Text Content")
+                        .description("The content of the item.")
+                        .controlType(ControlType.TEXT_AREA)
+                        .displayCondition("body.contentType == '%s'".formatted(ContentType.TEXT))
+                        .required(false))
                 .required(true))
         .perform(MicrosoftOutlook365SendEmailAction::perform);
 
@@ -110,7 +129,7 @@ public class MicrosoftOutlook365SendEmailAction {
     public static Object perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) {
 
-        actionContext.http(http -> http.post("/sendMail"))
+        actionContext.http(http -> http.post("/me/sendMail"))
             .body(
                 Http.Body.of(
                     "message",

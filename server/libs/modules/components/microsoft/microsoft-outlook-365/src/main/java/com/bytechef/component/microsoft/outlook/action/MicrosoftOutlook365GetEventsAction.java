@@ -63,7 +63,7 @@ public class MicrosoftOutlook365GetEventsAction {
     private MicrosoftOutlook365GetEventsAction() {
     }
 
-    public static List<CustomEvent> perform(
+    protected static List<CustomEvent> perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) {
 
         return retrieveCustomEvents(inputParameters, actionContext);

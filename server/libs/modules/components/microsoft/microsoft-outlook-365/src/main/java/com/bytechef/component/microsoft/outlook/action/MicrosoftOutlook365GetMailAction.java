@@ -51,9 +51,9 @@ public class MicrosoftOutlook365GetMailAction {
     }
 
     public static Object perform(
-        Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
+        Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) {
 
-        return context.http(http -> http.get("/messages/" + inputParameters.getRequiredString(ID)))
+        return actionContext.http(http -> http.get("/me/messages/%s".formatted(inputParameters.getRequiredString(ID))))
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});

@@ -27,7 +27,7 @@ import com.bytechef.component.definition.Property.DynamicPropertiesProperty;
 import com.bytechef.component.microsoft.excel.util.MicrosoftExcelUtils;
 
 /**
- * @author Monika Domiter
+ * @author Monika Kušter
  */
 public class MicrosoftExcelConstants {
 
@@ -40,7 +40,6 @@ public class MicrosoftExcelConstants {
     public static final String VALUES = "values";
     public static final String WORKBOOK_ID = "workbookId";
     public static final String WORKSHEET_NAME = "worksheetName";
-    public static final String WORKBOOK_WORKSHEETS_PATH = "/workbook/worksheets/";
 
     public static final ModifiableBooleanProperty IS_THE_FIRST_ROW_HEADER_PROPERTY = bool(IS_THE_FIRST_ROW_HEADER)
         .label("Is the First Row Header?")

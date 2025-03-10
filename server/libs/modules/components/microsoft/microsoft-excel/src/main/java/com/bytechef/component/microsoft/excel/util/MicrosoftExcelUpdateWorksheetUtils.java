@@ -18,7 +18,6 @@ package com.bytechef.component.microsoft.excel.util;
 
 import static com.bytechef.component.microsoft.excel.constant.MicrosoftExcelConstants.VALUES;
 import static com.bytechef.component.microsoft.excel.constant.MicrosoftExcelConstants.WORKBOOK_ID;
-import static com.bytechef.component.microsoft.excel.constant.MicrosoftExcelConstants.WORKBOOK_WORKSHEETS_PATH;
 import static com.bytechef.component.microsoft.excel.constant.MicrosoftExcelConstants.WORKSHEET_NAME;
 import static com.bytechef.component.microsoft.excel.util.MicrosoftExcelUtils.columnToLabel;
 import static com.bytechef.component.microsoft.excel.util.MicrosoftExcelUtils.getMapOfValuesForRow;
@@ -38,18 +37,19 @@ public class MicrosoftExcelUpdateWorksheetUtils {
     }
 
     public static Map<String, Object> updateRange(
-        Parameters inputParameters, ActionContext context, int rowNumber, List<Object> rowValues) {
+        Parameters inputParameters, ActionContext actionContext, int rowNumber, List<Object> rowValues) {
 
         String range = "A" + rowNumber + ":" + columnToLabel(rowValues.size(), false) + rowNumber;
 
-        context
+        actionContext
             .http(http -> http.patch(
-                "/" + inputParameters.getRequiredString(WORKBOOK_ID) + WORKBOOK_WORKSHEETS_PATH +
-                    inputParameters.getRequiredString(WORKSHEET_NAME) + "/range(address='" + range + "')"))
+                "/me/drive/items/%s/workbook/worksheets/%s/range(address='%s')"
+                    .formatted(inputParameters.getRequiredString(WORKBOOK_ID),
+                        inputParameters.getRequiredString(WORKSHEET_NAME), range)))
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .body(Http.Body.of(VALUES, List.of(rowValues)))
             .execute();
 
-        return getMapOfValuesForRow(inputParameters, context, rowValues);
+        return getMapOfValuesForRow(inputParameters, actionContext, rowValues);
     }
 }

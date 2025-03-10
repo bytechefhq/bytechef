@@ -72,7 +72,8 @@ public class MicrosoftOneDriveListFilesAction {
         Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
 
         Map<String, ?> body = context
-            .http(http -> http.get("/items/" + getFolderId(inputParameters.getString(PARENT_ID)) + "/children"))
+            .http(http -> http.get(
+                "/me/drive/items/%s/children".formatted(getFolderId(inputParameters.getString(PARENT_ID)))))
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});

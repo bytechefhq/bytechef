@@ -70,7 +70,8 @@ public class MicrosoftOneDriveListFoldersAction {
         Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
 
         Map<String, ?> body = context
-            .http(http -> http.get("/items/" + getFolderId(inputParameters.getString(PARENT_ID)) + "/children"))
+            .http(http -> http.get(
+                "/me/drive/items/%s/children".formatted(getFolderId(inputParameters.getString(PARENT_ID)))))
             .queryParameters("$filter", "folder ne null")
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute()

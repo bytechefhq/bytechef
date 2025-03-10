@@ -28,7 +28,6 @@ import java.util.List;
 public class MicrosoftOutlook365Connection {
 
     public static final ModifiableConnectionDefinition CONNECTION_DEFINITION = MicrosoftConnection.createConnection(
-        "https://graph.microsoft.com/v1.0/me",
         (connection, context) -> List.of(
             "Mail.Read", "MailboxSettings.Read", "Mail.Send", "offline_access", "Calendars.ReadWrite"));
 

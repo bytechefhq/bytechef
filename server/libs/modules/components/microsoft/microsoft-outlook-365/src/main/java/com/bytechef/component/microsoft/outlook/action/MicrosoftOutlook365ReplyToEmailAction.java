@@ -55,7 +55,7 @@ public class MicrosoftOutlook365ReplyToEmailAction {
     public static Object perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) {
 
-        actionContext.http(http -> http.post("/messages/" + inputParameters.getRequiredString(ID) + "/reply"))
+        actionContext.http(http -> http.post("/me/messages/%s/reply".formatted(inputParameters.getRequiredString(ID))))
             .body(
                 Http.Body.of(
                     Map.of(COMMENT, inputParameters.getString(COMMENT))))

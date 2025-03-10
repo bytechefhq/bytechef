@@ -31,7 +31,7 @@ import com.bytechef.component.definition.Parameters;
 import java.util.List;
 
 /**
- * @author Monika Domiter
+ * @author Monika Kušter
  */
 public class MicrosoftExcelFindRowByNumAction {
 
@@ -52,12 +52,12 @@ public class MicrosoftExcelFindRowByNumAction {
     private MicrosoftExcelFindRowByNumAction() {
     }
 
-    public static Object perform(
-        Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
+    protected static Object perform(
+        Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) {
 
         List<Object> row = getRowFromWorksheet(
-            inputParameters, context, inputParameters.getRequiredInteger(ROW_NUMBER));
+            inputParameters, actionContext, inputParameters.getRequiredInteger(ROW_NUMBER));
 
-        return getMapOfValuesForRow(inputParameters, context, row);
+        return getMapOfValuesForRow(inputParameters, actionContext, row);
     }
 }

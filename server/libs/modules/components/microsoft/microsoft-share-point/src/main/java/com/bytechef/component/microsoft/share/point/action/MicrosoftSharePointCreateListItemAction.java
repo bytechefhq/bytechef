@@ -80,7 +80,7 @@ public class MicrosoftSharePointCreateListItemAction {
 
         return context
             .http(http -> http.post(
-                "/" + inputParameters.getRequiredString(SITE_ID) + "/lists/" +
+                "/sites/" + inputParameters.getRequiredString(SITE_ID) + "/lists/" +
                     inputParameters.getRequiredString(LIST_ID) + "/items"))
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .body(Http.Body.of(FIELDS, objects.toArray()))
