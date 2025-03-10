@@ -20,8 +20,6 @@ const ProjectBreadcrumb = ({
     return (
         <Breadcrumb>
             <BreadcrumbList>
-                <BreadcrumbSeparator />
-
                 <BreadcrumbItem>
                     <ProjectTitle project={project} />
                 </BreadcrumbItem>

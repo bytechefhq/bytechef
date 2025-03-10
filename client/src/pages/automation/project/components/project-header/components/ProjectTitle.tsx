@@ -13,7 +13,7 @@ const ProjectTitle = ({project}: {project: Project}) => {
 
                     {project && (
                         <Badge
-                            className="flex space-x-1"
+                            className="flex space-x-1 bg-white"
                             variant={project.lastStatus === ProjectStatus.Published ? 'success' : 'outline'}
                         >
                             <span>V{project.lastVersion}</span>

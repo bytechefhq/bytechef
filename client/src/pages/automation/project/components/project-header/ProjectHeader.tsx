@@ -1,3 +1,4 @@
+import {Separator} from '@/components/ui/separator';
 import LeftSidebarButton from '@/pages/automation/project/components/project-header/components/LeftSidebarButton';
 import LoaderNotification from '@/pages/automation/project/components/project-header/components/LoaderNotification';
 import OutputPanelButton from '@/pages/automation/project/components/project-header/components/OutputButton';
@@ -60,6 +61,8 @@ const ProjectHeader = ({
         <header className="flex items-center justify-between bg-surface-main px-3 py-2.5">
             <div className="flex items-center">
                 <LeftSidebarButton onLeftSidebarOpenClick={() => setProjectLeftSidebarOpen(!projectLeftSidebarOpen)} />
+
+                <Separator className="ml-2 mr-4 h-4" orientation="vertical" />
 
                 {projectWorkflows && (
                     <ProjectBreadcrumb
