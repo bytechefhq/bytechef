@@ -456,12 +456,11 @@ Send the message.
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| from | From | OBJECT <details> <summary> Properties </summary> {{{STRING\(address), STRING\(name)}\(emailAddress)}\(recipient)} </details> | The owner of the mailbox from which the message is sent. In most cases, this value is the same as the sender property, except for sharing or delegation scenarios. The value must correspond to the actual mailbox used. | null |
-| toRecipients | To Recipients | ARRAY <details> <summary> Items </summary> [{{STRING\(address), STRING\(name)}\(emailAddress)}] </details> | The To: recipients for the message. | true |
+| toRecipients | To Recipients | ARRAY <details> <summary> Items </summary> [STRING] </details> | The To: recipients for the message. | true |
 | subject | Subject | STRING | The subject of the message. | true |
-| bccRecipients | Bcc Recipients | ARRAY <details> <summary> Items </summary> [{{STRING\(address), STRING\(name)}\(emailAddress)}] </details> | The Bcc recipients for the message. | false |
-| ccRecipients | Cc Recipients | ARRAY <details> <summary> Items </summary> [{{STRING\(address), STRING\(name)}\(emailAddress)}] </details> | The Cc recipients for the message. | false |
-| replyTo | Reply To | ARRAY <details> <summary> Items </summary> [{{STRING\(address), STRING\(name)}\(emailAddress)}] </details> | The email addresses to use when replying. | false |
+| bccRecipients | Bcc Recipients | ARRAY <details> <summary> Items </summary> [STRING] </details> | The Bcc recipients for the message. | false |
+| ccRecipients | Cc Recipients | ARRAY <details> <summary> Items </summary> [STRING] </details> | The Cc recipients for the message. | false |
+| replyTo | Reply To | ARRAY <details> <summary> Items </summary> [STRING] </details> | The email addresses to use when replying. | false |
 | body | Body | OBJECT <details> <summary> Properties </summary> {STRING\(contentType), STRING\(content), STRING\(content)} </details> | The body of the message. It can be in HTML or text format. | true |
 
 #### Example JSON Structure
@@ -470,39 +469,11 @@ Send the message.
   "label" : "Send Email",
   "name" : "sendEmail",
   "parameters" : {
-    "from" : {
-      "recipient" : {
-        "emailAddress" : {
-          "address" : "",
-          "name" : ""
-        }
-      }
-    },
-    "toRecipients" : [ {
-      "emailAddress" : {
-        "address" : "",
-        "name" : ""
-      }
-    } ],
+    "toRecipients" : [ "" ],
     "subject" : "",
-    "bccRecipients" : [ {
-      "emailAddress" : {
-        "address" : "",
-        "name" : ""
-      }
-    } ],
-    "ccRecipients" : [ {
-      "emailAddress" : {
-        "address" : "",
-        "name" : ""
-      }
-    } ],
-    "replyTo" : [ {
-      "emailAddress" : {
-        "address" : "",
-        "name" : ""
-      }
-    } ],
+    "bccRecipients" : [ "" ],
+    "ccRecipients" : [ "" ],
+    "replyTo" : [ "" ],
     "body" : {
       "contentType" : "",
       "content" : ""
