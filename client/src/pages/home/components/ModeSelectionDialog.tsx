@@ -1,3 +1,5 @@
+import './radioCard.css';
+
 import {Button} from '@/components/ui/button';
 import {
     Dialog,
@@ -11,7 +13,7 @@ import {
 import {Label} from '@/components/ui/label';
 import {RadioGroup, RadioGroupItem} from '@/components/ui/radio-group';
 import {BotIcon, CodeIcon} from 'lucide-react';
-import React, {useCallback, useEffect, useState} from 'react';
+import React, {useCallback, useEffect, useMemo, useState} from 'react';
 import {useNavigate} from 'react-router-dom';
 import {twMerge} from 'tailwind-merge';
 
@@ -29,7 +31,10 @@ const ModeSelectionDialog = ({handleDialogClose, isDialogOpen}: ModeSelectionDia
 
     const navigate = useNavigate();
 
-    const radioValue = (selectedType ?? currentType ?? '').toString();
+    const radioValue = useMemo(() => (selectedType ?? currentType ?? '').toString(), [currentType, selectedType]);
+
+    const isEmbeddedChecked = useMemo(() => radioValue === ModeType.EMBEDDED.toString(), [radioValue]);
+    const isAutomationChecked = useMemo(() => radioValue === ModeType.AUTOMATION.toString(), [radioValue]);
 
     const handleChangeModeType = useCallback(() => {
         if (selectedType === currentType) {
@@ -60,18 +65,15 @@ const ModeSelectionDialog = ({handleDialogClose, isDialogOpen}: ModeSelectionDia
     return (
         <Dialog onOpenChange={handleDialogClose} open={isDialogOpen}>
             <DialogContent
-                className={twMerge(
-                    'gap- flex w-fit flex-col p-6',
-                    currentType === undefined && '[&>button:last-child]:hidden'
-                )}
+                className={twMerge('flex flex-col p-6', currentType === undefined && '[&>button:last-child]:hidden')}
                 onEscapeKeyDown={(event) => currentType === undefined && event.preventDefault()}
                 onInteractOutside={(event) => currentType === undefined && event.preventDefault()}
             >
                 <DialogHeader className="flex flex-row items-center justify-between space-y-0">
                     <div className="flex flex-col space-y-1">
-                        <DialogTitle className="text-xl">Select how you will use ByteChef</DialogTitle>
+                        <DialogTitle>Select how you will use ByteChef</DialogTitle>
 
-                        <DialogDescription>You can change always change this configuration</DialogDescription>
+                        <DialogDescription>You can always change this configuration</DialogDescription>
                     </div>
 
                     <DialogCloseButton />
@@ -83,14 +85,16 @@ const ModeSelectionDialog = ({handleDialogClose, isDialogOpen}: ModeSelectionDia
                     value={radioValue}
                 >
                     <Label
-                        className="group flex cursor-pointer rounded-lg border border-stroke-neutral-primary hover:border-stroke-brand-secondary-hover [&:has([data-state=checked])]:border-stroke-brand-primary"
+                        className={twMerge('radio-card-label group', isEmbeddedChecked && 'is-checked')}
                         htmlFor="embedded"
                     >
-                        <div className="flex items-center gap-6 p-4 pr-2">
-                            <CodeIcon size={48} />
+                        <div className="flex items-center gap-4 p-4 pr-2">
+                            <div>
+                                <CodeIcon size={48} />
+                            </div>
 
                             <div className="flex grow flex-col gap-1">
-                                <p className="text-xl font-bold">Embedded</p>
+                                <p className="text-base font-semibold">Embedded</p>
 
                                 <p className="text-sm font-normal text-content-neutral-secondary">
                                     Allow your users to integrate your product with applications they use.
@@ -98,9 +102,14 @@ const ModeSelectionDialog = ({handleDialogClose, isDialogOpen}: ModeSelectionDia
                             </div>
                         </div>
 
-                        <div className="flex items-center rounded-e-lg border-l border-stroke-neutral-primary bg-surface-neutral-secondary p-4 [&:has([data-state=checked])]:border-stroke-brand-primary [&:has([data-state=checked])]:bg-surface-brand-secondary group-hover:[&:has([data-state=unchecked])]:border-stroke-brand-secondary-hover">
+                        <div
+                            className={twMerge(
+                                'radio-card-indicator-container',
+                                isEmbeddedChecked ? 'is-checked' : 'is-unchecked'
+                            )}
+                        >
                             <RadioGroupItem
-                                className="border-stroke-neutral-secondary bg-background hover:border-stroke-brand-secondary-hover [&:has([data-state=checked])>span>svg]:absolute [&:has([data-state=checked])>span>svg]:size-6 [&:has([data-state=checked])>span>svg]:text-surface-brand-primary [&:has([data-state=checked])]:border-stroke-brand-primary"
+                                className={twMerge('radio-card-indicator', isEmbeddedChecked && 'is-checked')}
                                 data-testid="embedded"
                                 id="embedded"
                                 value={ModeType.EMBEDDED.toString()}
@@ -109,14 +118,16 @@ const ModeSelectionDialog = ({handleDialogClose, isDialogOpen}: ModeSelectionDia
                     </Label>
 
                     <Label
-                        className="group flex cursor-pointer rounded-lg border border-stroke-neutral-primary hover:border-stroke-brand-secondary-hover [&:has([data-state=checked])]:border-stroke-brand-primary"
+                        className={twMerge('radio-card-label group', isAutomationChecked && 'is-checked')}
                         htmlFor="automation"
                     >
                         <div className="flex items-center gap-6 p-4 pr-2">
-                            <BotIcon size={48} />
+                            <div>
+                                <BotIcon size={48} />
+                            </div>
 
                             <div className="flex grow flex-col gap-1">
-                                <p className="text-xl font-bold">Automation</p>
+                                <p className="text-base font-semibold">Automation</p>
 
                                 <p className="text-sm font-normal text-content-neutral-secondary">
                                     Integrate applications and automate processes inside your organization.
@@ -124,9 +135,14 @@ const ModeSelectionDialog = ({handleDialogClose, isDialogOpen}: ModeSelectionDia
                             </div>
                         </div>
 
-                        <div className="flex items-center rounded-e-lg border-l border-stroke-neutral-primary bg-surface-neutral-secondary p-4 [&:has([data-state=checked])]:border-stroke-brand-primary [&:has([data-state=checked])]:bg-surface-brand-secondary group-hover:[&:has([data-state=unchecked])]:border-stroke-brand-secondary-hover">
+                        <div
+                            className={twMerge(
+                                'radio-card-indicator-container',
+                                isAutomationChecked ? 'is-checked' : 'is-unchecked'
+                            )}
+                        >
                             <RadioGroupItem
-                                className="border-stroke-neutral-secondary bg-background hover:border-stroke-brand-secondary-hover [&:has([data-state=checked])>span>svg]:absolute [&:has([data-state=checked])>span>svg]:size-6 [&:has([data-state=checked])>span>svg]:text-surface-brand-primary [&:has([data-state=checked])]:border-stroke-brand-primary"
+                                className={twMerge('radio-card-indicator', isAutomationChecked && 'is-checked')}
                                 data-testid="automation"
                                 id="automation"
                                 value={ModeType.AUTOMATION.toString()}
@@ -144,7 +160,7 @@ const ModeSelectionDialog = ({handleDialogClose, isDialogOpen}: ModeSelectionDia
 
                     <Button
                         aria-label="confirm"
-                        className="bg-surface-brand-primary hover:bg-surface-brand-primary-hover active:bg-surface-brand-primary-pressed"
+                        className="bg-surface-brand-primary hover:bg-surface-brand-primary-hover active:bg-surface-brand-primary-active"
                         disabled={selectedType === undefined}
                         onClick={handleChangeModeType}
                         type="button"
