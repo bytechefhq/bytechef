@@ -1,15 +1,14 @@
 import {Card, CardDescription, CardHeader, CardTitle} from '@/components/ui/card';
+import {useResendEmail} from '@/pages/account/public/hooks/resendButton-utils';
 import {useRegisterStore} from '@/pages/account/public/stores/useRegisterStore';
 import PublicLayoutContainer from '@/shared/layout/PublicLayoutContainer';
 import {MailCheck} from 'lucide-react';
-import {useEffect, useState} from 'react';
 import {useLocation} from 'react-router-dom';
 
 const STORAGE_KEY_PREFIX = 'verifyEmail_';
 
 const VerifyEmail = () => {
-    const [disabled, setDisabled] = useState(false);
-    const [countdown, setCountdown] = useState(60);
+    const {countdown, disabled, startCountdown} = useResendEmail(STORAGE_KEY_PREFIX, 60);
 
     const {register} = useRegisterStore();
 
@@ -18,53 +17,8 @@ const VerifyEmail = () => {
     function handleResendEmail() {
         register(location.state.email, location.state.password);
 
-        setDisabled(true);
-
-        localStorage.setItem(`${STORAGE_KEY_PREFIX}resendDisabled`, 'true');
-        localStorage.setItem(`${STORAGE_KEY_PREFIX}resendExpiry`, (Date.now() + 60 * 1000).toString());
+        startCountdown();
     }
-
-    useEffect(() => {
-        const storedDisabled = localStorage.getItem(`${STORAGE_KEY_PREFIX}resendDisabled`);
-        const storedExpiry = localStorage.getItem(`${STORAGE_KEY_PREFIX}resendExpiry`);
-
-        if (storedDisabled === 'true' && storedExpiry) {
-            const remainingTime = Math.floor((Number(storedExpiry) - Date.now()) / 1000);
-
-            if (remainingTime > 0) {
-                setDisabled(true);
-                setCountdown(remainingTime);
-            } else {
-                localStorage.removeItem(`${STORAGE_KEY_PREFIX}resendDisabled`);
-                localStorage.removeItem(`${STORAGE_KEY_PREFIX}resendExpiry`);
-            }
-        }
-    }, []);
-
-    useEffect(() => {
-        let timer: ReturnType<typeof setInterval> | undefined;
-
-        if (disabled) {
-            timer = setInterval(() => {
-                setCountdown((currentCountValue) => {
-                    if (currentCountValue <= 1) {
-                        clearInterval(timer);
-                        setDisabled(false);
-                        setCountdown(60);
-
-                        localStorage.removeItem(`${STORAGE_KEY_PREFIX}resendDisabled`);
-                        localStorage.removeItem(`${STORAGE_KEY_PREFIX}resendExpiry`);
-
-                        return 60;
-                    }
-
-                    return currentCountValue - 1;
-                });
-            }, 1000);
-        }
-
-        return () => clearInterval(timer);
-    }, [disabled]);
 
     return (
         <PublicLayoutContainer>
