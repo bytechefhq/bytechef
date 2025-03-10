@@ -28,10 +28,6 @@ import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook
 import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.CONTENT;
 import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.CONTENT_TYPE;
 import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.EMAIL_ADDRESS;
-import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.FROM;
-import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.NAME;
-import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.RECIPIENT;
-import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.RECIPIENT_PROPERTY;
 import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.REPLY_TO;
 import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.SUBJECT;
 import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.TO_RECIPIENTS;
@@ -42,6 +38,8 @@ import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.Property.ControlType;
 import com.bytechef.component.microsoft.outlook.constant.ContentType;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author Monika Kušter
@@ -52,30 +50,10 @@ public class MicrosoftOutlook365SendEmailAction {
         .title("Send Email")
         .description("Send the message.")
         .properties(
-            object(FROM)
-                .label("From")
-                .description(
-                    "The owner of the mailbox from which the message is sent. In most cases, this value is " +
-                        "the same as the sender property, except for sharing or delegation scenarios. The " +
-                        "value must correspond to the actual mailbox used.")
-                .properties(
-                    object(RECIPIENT)
-                        .label("Recipient")
-                        .properties(
-                            object(EMAIL_ADDRESS)
-                                .properties(
-                                    string(ADDRESS)
-                                        .label("Address")
-                                        .description("The email address of the person or entity.")
-                                        .required(false),
-                                    string(NAME)
-                                        .label("Name")
-                                        .description("The display name of the person or entity.")
-                                        .required(false)))),
             array(TO_RECIPIENTS)
                 .label("To Recipients")
                 .description("The To: recipients for the message.")
-                .items(RECIPIENT_PROPERTY)
+                .items(string().controlType(ControlType.EMAIL))
                 .required(true),
             string(SUBJECT)
                 .label("Subject")
@@ -84,17 +62,17 @@ public class MicrosoftOutlook365SendEmailAction {
             array(BCC_RECIPIENTS)
                 .label("Bcc Recipients")
                 .description("The Bcc recipients for the message.")
-                .items(RECIPIENT_PROPERTY)
+                .items(string().controlType(ControlType.EMAIL))
                 .required(false),
             array(CC_RECIPIENTS)
                 .label("Cc Recipients")
                 .description("The Cc recipients for the message.")
-                .items(RECIPIENT_PROPERTY)
+                .items(string().controlType(ControlType.EMAIL))
                 .required(false),
             array(REPLY_TO)
                 .label("Reply To")
                 .description("The email addresses to use when replying.")
-                .items(RECIPIENT_PROPERTY)
+                .items(string().controlType(ControlType.EMAIL))
                 .required(false),
             object(BODY)
                 .label("Body")
@@ -126,7 +104,7 @@ public class MicrosoftOutlook365SendEmailAction {
     private MicrosoftOutlook365SendEmailAction() {
     }
 
-    public static Object perform(
+    protected static Object perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) {
 
         actionContext.http(http -> http.post("/me/sendMail"))
@@ -134,17 +112,28 @@ public class MicrosoftOutlook365SendEmailAction {
                 Http.Body.of(
                     "message",
                     new Object[] {
-                        FROM, inputParameters.get(FROM),
                         SUBJECT, inputParameters.getRequiredString(SUBJECT),
                         BODY, inputParameters.get(BODY),
-                        TO_RECIPIENTS, inputParameters.getArray(TO_RECIPIENTS),
-                        CC_RECIPIENTS, inputParameters.getArray(CC_RECIPIENTS),
-                        BCC_RECIPIENTS, inputParameters.getArray(BCC_RECIPIENTS),
-                        REPLY_TO, inputParameters.getArray(REPLY_TO)
+                        TO_RECIPIENTS, getRecipients(inputParameters.getList(TO_RECIPIENTS, String.class)),
+                        CC_RECIPIENTS, getRecipients(inputParameters.getList(CC_RECIPIENTS, String.class)),
+                        BCC_RECIPIENTS, getRecipients(inputParameters.getList(BCC_RECIPIENTS, String.class)),
+                        REPLY_TO, getRecipients(inputParameters.getList(REPLY_TO, String.class))
                     }))
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute();
 
         return null;
     }
+
+    private static List<Map<String, Map<String, String>>> getRecipients(List<String> recipients) {
+        if (recipients == null) {
+            return null;
+        }
+
+        return recipients
+            .stream()
+            .map(recipient -> Map.of(EMAIL_ADDRESS, Map.of(ADDRESS, recipient)))
+            .toList();
+    }
+
 }

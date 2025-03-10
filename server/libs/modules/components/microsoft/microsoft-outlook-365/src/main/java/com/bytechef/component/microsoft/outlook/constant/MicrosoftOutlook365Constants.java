@@ -117,20 +117,6 @@ public class MicrosoftOutlook365Constants {
                             string(ADDRESS)
                                 .description("The email address of the sender."))));
 
-    public static final ModifiableObjectProperty RECIPIENT_PROPERTY = object()
-        .label("Recipient")
-        .properties(
-            object(EMAIL_ADDRESS)
-                .properties(
-                    string(ADDRESS)
-                        .label("Address")
-                        .description("The email address of the person or entity.")
-                        .required(false),
-                    string(NAME)
-                        .label("Name")
-                        .description("The display name of the person or entity.")
-                        .required(false)));
-
     private MicrosoftOutlook365Constants() {
     }
 }
