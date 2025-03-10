@@ -21,12 +21,15 @@ const WorkflowActionsButton = ({
         <TooltipTrigger asChild>
             <div className="w-20">
                 {workflowIsRunning ? (
-                    <Button className="w-full shadow-none" onClick={onStopClick} variant="destructive">
+                    <Button
+                        className="bg-surface-destructive-primary hover:bg-surface-destructive-primary-hover active:bg-surface-destructive-primary-active w-full shadow-none"
+                        onClick={onStopClick}
+                    >
                         <SquareIcon /> Stop
                     </Button>
                 ) : (
                     <Button
-                        className="w-full bg-surface-brand-primary shadow-none hover:bg-surface-brand-primary-hover active:bg-surface-brand-primary-pressed disabled:pointer-events-auto"
+                        className="active:bg-surface-brand-primary-active w-full bg-surface-brand-primary shadow-none hover:bg-surface-brand-primary-hover disabled:pointer-events-auto"
                         disabled={runDisabled}
                         onClick={() => onRunClick()}
                     >
