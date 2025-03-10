@@ -205,7 +205,7 @@ const Login = () => {
 
                             <Button
                                 aria-label="log in button"
-                                className="w-full bg-surface-brand-primary py-5 hover:bg-surface-brand-primary-hover active:bg-surface-brand-primary-pressed"
+                                className="active:bg-surface-brand-primary-active w-full bg-surface-brand-primary py-5 hover:bg-surface-brand-primary-hover"
                                 disabled={isSubmitting}
                                 type="submit"
                             >
