@@ -1,5 +1,5 @@
 import {Card, CardDescription, CardHeader, CardTitle} from '@/components/ui/card';
-import {useResendEmail} from '@/pages/account/public/hooks/resendButton-utils';
+import {useResendEmail} from '@/pages/account/public/hooks/useResendEmail';
 import {useRegisterStore} from '@/pages/account/public/stores/useRegisterStore';
 import PublicLayoutContainer from '@/shared/layout/PublicLayoutContainer';
 import {MailCheck} from 'lucide-react';
