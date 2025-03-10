@@ -307,7 +307,7 @@ const Register = () => {
                                     />
 
                                     <Button
-                                        className="w-full bg-surface-brand-primary py-5 hover:bg-surface-brand-primary-hover active:bg-surface-brand-primary-pressed"
+                                        className="active:bg-surface-brand-primary-active w-full bg-surface-brand-primary py-5 hover:bg-surface-brand-primary-hover"
                                         disabled={isSubmitting}
                                         type="submit"
                                     >
@@ -319,7 +319,7 @@ const Register = () => {
 
                             {!emailIsValid && (
                                 <Button
-                                    className="w-full bg-surface-brand-primary py-5 hover:bg-surface-brand-primary-hover active:bg-surface-brand-primary-pressed"
+                                    className="active:bg-surface-brand-primary-active w-full bg-surface-brand-primary py-5 hover:bg-surface-brand-primary-hover"
                                     onClick={handleValidateEmailInput}
                                 >
                                     Continue
