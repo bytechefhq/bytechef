@@ -17,12 +17,9 @@
 package com.bytechef.component.google.mail.action;
 
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.FORMAT;
-import static com.bytechef.component.google.mail.constant.GoogleMailConstants.FULL;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.ID;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.ME;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.METADATA_HEADERS;
-import static com.bytechef.component.google.mail.constant.GoogleMailConstants.MINIMAL;
-import static com.bytechef.component.google.mail.constant.GoogleMailConstants.SIMPLE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
@@ -30,6 +27,7 @@ import static org.mockito.Mockito.when;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.Parameters;
+import com.bytechef.component.google.mail.definition.Format;
 import com.bytechef.component.google.mail.util.GoogleMailUtils;
 import com.bytechef.component.google.mail.util.GoogleMailUtils.SimpleMessage;
 import com.bytechef.component.test.definition.MockParametersFactory;
@@ -71,7 +69,7 @@ class GoogleMailGetThreadActionTest {
     @SuppressWarnings("unchecked")
     void testPerform() throws IOException {
         Parameters parameters = MockParametersFactory.create(
-            Map.of(ID, "id", FORMAT, MINIMAL, METADATA_HEADERS, List.of("metadata")));
+            Map.of(ID, "id", FORMAT, Format.MINIMAL, METADATA_HEADERS, List.of("metadata")));
 
         try (MockedStatic<GoogleServices> googleServicesMockedStatic = mockStatic(GoogleServices.class)) {
             googleServicesMockedStatic.when(() -> GoogleServices.getMail(parametersArgumentCaptor.capture()))
@@ -94,7 +92,7 @@ class GoogleMailGetThreadActionTest {
             assertEquals(mockedThread, result);
 
             assertEquals(parameters, parametersArgumentCaptor.getValue());
-            assertEquals(List.of(ME, "id", MINIMAL), stringArgumentCaptor.getAllValues());
+            assertEquals(List.of(ME, "id", Format.MINIMAL), stringArgumentCaptor.getAllValues());
             assertEquals(parameters.getList(METADATA_HEADERS), listArgumentCaptor.getValue());
         }
     }
@@ -103,7 +101,7 @@ class GoogleMailGetThreadActionTest {
     @SuppressWarnings("unchecked")
     void testPerformForSimpleFormat() throws IOException {
         Parameters parameters = MockParametersFactory.create(
-            Map.of(ID, "id", FORMAT, SIMPLE, METADATA_HEADERS, List.of("metadata")));
+            Map.of(ID, "id", FORMAT, Format.SIMPLE, METADATA_HEADERS, List.of("metadata")));
 
         try (MockedStatic<GoogleServices> googleServicesMockedStatic = mockStatic(GoogleServices.class);
             MockedStatic<GoogleMailUtils> googleMailUtilsMockedStatic = mockStatic(GoogleMailUtils.class)) {
@@ -143,7 +141,7 @@ class GoogleMailGetThreadActionTest {
             assertEquals(mockedActionContext, actionContextArgumentCaptor.getValue());
             assertEquals(mockedGmail, gmailArgumentCaptor.getValue());
             assertEquals(parameters, parametersArgumentCaptor.getValue());
-            assertEquals(List.of(ME, "id", FULL), stringArgumentCaptor.getAllValues());
+            assertEquals(List.of(ME, "id", Format.FULL), stringArgumentCaptor.getAllValues());
             assertEquals(parameters.getList(METADATA_HEADERS), listArgumentCaptor.getValue());
         }
     }

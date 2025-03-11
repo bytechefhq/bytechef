@@ -18,10 +18,10 @@ package com.bytechef.platform.component.definition;
 
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.component.definition.ActionDefinition;
+import com.bytechef.component.definition.ClusterElementDefinition;
 import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.component.definition.ConnectionDefinition;
-import com.bytechef.component.definition.DataStreamDefinition;
 import com.bytechef.component.definition.Help;
 import com.bytechef.component.definition.Resources;
 import com.bytechef.component.definition.TriggerDefinition;
@@ -40,11 +40,11 @@ import java.util.Optional;
 public abstract class AbstractComponentDefinitionWrapper implements ComponentDefinition {
 
     protected final List<? extends ActionDefinition> actions;
-    protected final List<ComponentCategory> categories;
+    protected final List<ComponentCategory> componentCategories;
     protected final ConnectionDefinition connection;
     protected final Boolean customAction;
     protected final Help customActionHelp;
-    protected final DataStreamDefinition dataStreamDefinition;
+    protected final List<? extends ClusterElementDefinition<?>> clusterElements;
     protected final String description;
     protected final String icon;
     protected final List<String> tags;
@@ -58,11 +58,11 @@ public abstract class AbstractComponentDefinitionWrapper implements ComponentDef
 
     public AbstractComponentDefinitionWrapper(ComponentDefinition componentDefinition) {
         this.actions = OptionalUtils.orElse(componentDefinition.getActions(), List.of());
-        this.categories = OptionalUtils.orElse(componentDefinition.getCategories(), List.of());
+        this.componentCategories = OptionalUtils.orElse(componentDefinition.getComponentCategories(), List.of());
         this.connection = OptionalUtils.orElse(componentDefinition.getConnection(), null);
         this.customAction = OptionalUtils.orElse(componentDefinition.getCustomAction(), null);
         this.customActionHelp = OptionalUtils.orElse(componentDefinition.getCustomActionHelp(), null);
-        this.dataStreamDefinition = OptionalUtils.orElse(componentDefinition.getDataStream(), null);
+        this.clusterElements = OptionalUtils.orElse(componentDefinition.getClusterElements(), null);
         this.description = OptionalUtils.orElse(componentDefinition.getDescription(), null);
         this.icon = OptionalUtils.orElse(componentDefinition.getIcon(), null);
         this.tags = OptionalUtils.orElse(componentDefinition.getTags(), null);
@@ -81,8 +81,13 @@ public abstract class AbstractComponentDefinitionWrapper implements ComponentDef
     }
 
     @Override
-    public Optional<List<ComponentCategory>> getCategories() {
-        return Optional.ofNullable(categories == null ? null : new ArrayList<>(categories));
+    public Optional<List<ComponentCategory>> getComponentCategories() {
+        return Optional.ofNullable(componentCategories == null ? null : new ArrayList<>(componentCategories));
+    }
+
+    @Override
+    public Optional<List<? extends ClusterElementDefinition<?>>> getClusterElements() {
+        return Optional.ofNullable(clusterElements);
     }
 
     @Override
@@ -98,11 +103,6 @@ public abstract class AbstractComponentDefinitionWrapper implements ComponentDef
     @Override
     public Optional<Help> getCustomActionHelp() {
         return Optional.ofNullable(customActionHelp);
-    }
-
-    @Override
-    public Optional<DataStreamDefinition> getDataStream() {
-        return Optional.ofNullable(dataStreamDefinition);
     }
 
     @Override

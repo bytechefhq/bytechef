@@ -16,10 +16,13 @@
 
 package com.bytechef.platform.configuration.web.rest.mapper;
 
+import com.bytechef.component.definition.ClusterElementDefinition.ClusterElementType;
 import com.bytechef.platform.component.domain.ComponentDefinition;
 import com.bytechef.platform.configuration.web.rest.mapper.config.PlatformConfigurationMapperSpringConfig;
 import com.bytechef.platform.configuration.web.rest.model.ComponentDefinitionBasicModel;
 import com.bytechef.platform.configuration.web.rest.model.ComponentDefinitionModel;
+import java.util.List;
+import java.util.stream.Collectors;
 import org.mapstruct.Mapper;
 import org.springframework.core.convert.converter.Converter;
 
@@ -30,6 +33,12 @@ public class ComponentDefinitionMapper {
         extends Converter<ComponentDefinition, ComponentDefinitionModel> {
 
         ComponentDefinitionModel convert(ComponentDefinition componentDefinition);
+
+        default List<String> map(List<ClusterElementType> clusterElementTypes) {
+            return clusterElementTypes.stream()
+                .map(ClusterElementType::name)
+                .collect(Collectors.toList());
+        }
     }
 
     @Mapper(config = PlatformConfigurationMapperSpringConfig.class)

@@ -7,8 +7,7 @@
 
 package com.bytechef.ee.platform.configuration.facade;
 
-import com.bytechef.component.ai.llm.constant.LLMConstants;
-import com.bytechef.component.ai.llm.constant.Provider;
+import com.bytechef.component.ai.llm.Provider;
 import com.bytechef.ee.platform.configuration.dto.AiProviderDTO;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.component.domain.ComponentDefinition;
@@ -17,6 +16,7 @@ import com.bytechef.platform.configuration.domain.Property;
 import com.bytechef.platform.configuration.domain.Property.Scope;
 import com.bytechef.platform.configuration.service.PropertyService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import org.springframework.stereotype.Service;
@@ -56,14 +56,12 @@ public class AiProviderFacadeImpl implements AiProviderFacade {
         List<ComponentDefinition> componentDefinitions = componentDefinitionService.getComponentDefinitions();
 
         List<Property> properties = propertyService.getProperties(
-            LLMConstants.PROVIDERS
-                .stream()
+            Arrays.stream(Provider.values())
                 .map(Provider::getKey)
                 .toList(),
             Scope.PLATFORM, null);
 
-        return LLMConstants.PROVIDERS
-            .stream()
+        return Arrays.stream(Provider.values())
             .map(provider -> {
                 ComponentDefinition componentDefinition = componentDefinitions
                     .stream()
@@ -108,7 +106,7 @@ public class AiProviderFacadeImpl implements AiProviderFacade {
     }
 
     private static Provider getProvider(int id) {
-        return LLMConstants.PROVIDERS.stream()
+        return Arrays.stream(Provider.values())
             .filter(curProvider -> curProvider.getId() == id)
             .findFirst()
             .orElseThrow(() -> new IllegalArgumentException("Provider not found for id: " + id));

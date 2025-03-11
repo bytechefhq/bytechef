@@ -24,7 +24,7 @@ import com.bytechef.component.definition.Authorization;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.exception.ProviderException;
 import com.bytechef.exception.ErrorType;
-import com.bytechef.platform.component.domain.ComponentConnection;
+import com.bytechef.platform.component.ComponentConnection;
 import com.bytechef.platform.component.service.ConnectionDefinitionService;
 import com.bytechef.platform.connection.domain.Connection;
 import com.bytechef.platform.connection.service.ConnectionService;

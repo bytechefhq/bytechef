@@ -29,7 +29,6 @@ import static com.bytechef.component.google.mail.constant.GoogleMailConstants.BO
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.CC;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.FORMAT;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.FROM;
-import static com.bytechef.component.google.mail.constant.GoogleMailConstants.FULL;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.FULL_MESSAGE_OUTPUT_PROPERTY;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.HEADERS;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.HISTORY_ID;
@@ -37,20 +36,19 @@ import static com.bytechef.component.google.mail.constant.GoogleMailConstants.ID
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.INTERNAL_DATE;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.LABEL_IDS;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.ME;
-import static com.bytechef.component.google.mail.constant.GoogleMailConstants.METADATA;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.METADATA_HEADERS;
-import static com.bytechef.component.google.mail.constant.GoogleMailConstants.MINIMAL;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.NAME;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.PAYLOAD;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.RAW;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.REPLY_TO;
-import static com.bytechef.component.google.mail.constant.GoogleMailConstants.SIMPLE;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.SIZE_ESTIMATE;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.SNIPPET;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.SUBJECT;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.THREAD_ID;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.TO;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.VALUE;
+import static com.bytechef.component.google.mail.definition.Format.FULL;
+import static com.bytechef.component.google.mail.definition.Format.SIMPLE;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableObjectProperty;
@@ -58,6 +56,7 @@ import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.FileEntry;
 import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Parameters;
+import com.bytechef.component.google.mail.definition.Format;
 import com.bytechef.definition.BaseOutputDefinition.OutputResponse;
 import com.bytechef.google.commons.GoogleServices;
 import com.google.api.services.gmail.Gmail;
@@ -199,8 +198,7 @@ public class GoogleMailUtils {
     private GoogleMailUtils() {
     }
 
-    public static String getEncodedEmail(
-        Parameters inputParameters, ActionContext actionContext, Message messageToReply)
+    public static String getEncodedEmail(Parameters inputParameters, Context context, Message messageToReply)
         throws MessagingException, IOException {
 
         MimeMessage mimeMessage = getMimeMessage(inputParameters, messageToReply);
@@ -219,7 +217,7 @@ public class GoogleMailUtils {
             attachmentBodyPart.setDataHandler(
                 new DataHandler(
                     new ByteArrayDataSource(
-                        (InputStream) actionContext.file(file -> file.getStream(fileEntry)), fileEntry.getMimeType())));
+                        (InputStream) context.file(file -> file.getStream(fileEntry)), fileEntry.getMimeType())));
             attachmentBodyPart.setFileName(fileEntry.getName());
 
             multipart.addBodyPart(attachmentBodyPart);
@@ -310,12 +308,12 @@ public class GoogleMailUtils {
     }
 
     public static Message getMessage(Parameters inputParameters, Gmail service) throws IOException {
-        String format = inputParameters.getString(FORMAT, SIMPLE);
+        Format format = inputParameters.get(FORMAT, Format.class, SIMPLE);
 
         return service.users()
             .messages()
             .get(ME, inputParameters.getRequiredString(ID))
-            .setFormat(format == null || format.equals(SIMPLE) ? FULL : format)
+            .setFormat(format == null || format == SIMPLE ? FULL.getMapping() : format.getMapping())
             .setMetadataHeaders(inputParameters.getList(METADATA_HEADERS, String.class, List.of()))
             .execute();
     }
@@ -344,10 +342,10 @@ public class GoogleMailUtils {
     public static OutputResponse getMessageOutput(
         Parameters inputParameters, Parameters connectionParameters, Context context) {
 
-        return OutputResponse.of(getMessageOutputProperty(inputParameters.getRequiredString(FORMAT)));
+        return OutputResponse.of(getMessageOutputProperty(inputParameters.getRequired(FORMAT, Format.class)));
     }
 
-    public static ModifiableObjectProperty getMessageOutputProperty(String format) {
+    public static ModifiableObjectProperty getMessageOutputProperty(Format format) {
         return switch (format) {
             case SIMPLE -> SIMPLE_MESSAGE_OUTPUT_PROPERTY;
             case RAW -> RAW_MESSAGE_OUTPUT_PROPERTY;
@@ -418,21 +416,20 @@ public class GoogleMailUtils {
         List<String> bcc = new ArrayList<>();
 
         for (MessagePartHeader messagePartHeader : messagePartHeaders) {
+            String value = messagePartHeader.getValue();
+
             if ("Subject".equals(messagePartHeader.getName())) {
-                subject = messagePartHeader.getValue();
+                subject = value;
             } else if ("From".equals(messagePartHeader.getName())) {
-                from = messagePartHeader.getValue();
+                from = value;
             } else if ("To".equals(messagePartHeader.getName())) {
-                to = Arrays.stream(messagePartHeader.getValue()
-                    .split(","))
+                to = Arrays.stream(value.split(","))
                     .toList();
             } else if ("Cc".equals(messagePartHeader.getName())) {
-                cc = Arrays.stream(messagePartHeader.getValue()
-                    .split(","))
+                cc = Arrays.stream(value.split(","))
                     .toList();
             } else if ("Bcc".equals(messagePartHeader.getName())) {
-                bcc = Arrays.stream(messagePartHeader.getValue()
-                    .split(","))
+                bcc = Arrays.stream(value.split(","))
                     .toList();
             }
         }

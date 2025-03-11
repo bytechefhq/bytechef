@@ -45,7 +45,7 @@ public class WebflowComponentHandler extends AbstractWebflowComponentHandler {
             if (Objects.equals(modifiableActionDefinition.getName(), "getCollectionItem")) {
                 Optional<List<? extends Property>> propertiesOptional = modifiableActionDefinition.getProperties();
 
-                List<Property> properties = new ArrayList<>(propertiesOptional.get());
+                List<Property> properties = new ArrayList<>(propertiesOptional.orElse(List.of()));
 
                 properties.addFirst(
                     string(SITE_ID)

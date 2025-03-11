@@ -16,11 +16,26 @@
 
 package com.bytechef.platform.component.definition;
 
-public interface AiAgentComponentDefinition extends ClusterRootComponentDefinition, AiComponentDefinition {
+import static com.bytechef.component.definition.aiagent.ToolFunction.TOOL;
+import static com.bytechef.platform.component.definition.aiagent.MemoryFunction.MEMORY;
+import static com.bytechef.platform.component.definition.aiagent.ModelFunction.MODEL;
+import static com.bytechef.platform.component.definition.aiagent.RetrievalFunction.RETRIEVAL;
+
+import com.bytechef.component.definition.ClusterElementDefinition.ClusterElementType;
+import java.util.List;
+
+/**
+ * @author Ivica Cardic
+ */
+public interface AiAgentComponentDefinition extends ClusterRootComponentDefinition {
 
     /**
      *
      */
     String AI_AGENT = "aiAgent";
 
+    @Override
+    default List<ClusterElementType> getElementTypes() {
+        return List.of(MODEL, MEMORY, RETRIEVAL, TOOL);
+    }
 }

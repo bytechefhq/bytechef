@@ -247,7 +247,7 @@ public class JobSyncExecutor {
             .map(lastTaskExecution -> {
                 WorkflowNodeType workflowNodeType = WorkflowNodeType.ofType(lastTaskExecution.getType());
 
-                if (WEBHOOK_COMPONENTS.contains(workflowNodeType.componentName())) {
+                if (WEBHOOK_COMPONENTS.contains(workflowNodeType.name())) {
                     job.setOutputs(
                         taskFileStorage.storeJobOutputs(
                             jobId,

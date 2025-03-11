@@ -17,9 +17,9 @@
 package com.bytechef.platform.configuration.dto;
 
 import com.bytechef.atlas.configuration.domain.WorkflowTask;
+import com.bytechef.platform.configuration.domain.ClusterElements;
 import com.bytechef.platform.configuration.domain.ComponentConnection;
-import com.bytechef.platform.configuration.domain.DataStream;
-import com.bytechef.platform.configuration.domain.DataStream.DataStreamComponent;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -31,8 +31,8 @@ import java.util.Objects;
 public final class WorkflowTaskDTO {
 
     private final List<ComponentConnection> connections;
+    private final ClusterElements clusterElements;
     private final String description;
-    private final DataStreamComponent destination;
     private final List<WorkflowTask> finalize;
     private final String label;
     private final int maxRetries;
@@ -42,20 +42,20 @@ public final class WorkflowTaskDTO {
     private final Map<String, ?> parameters;
     private final List<WorkflowTask> post;
     private final List<WorkflowTask> pre;
-    private final DataStreamComponent source;
     private final int taskNumber;
     private final String timeout;
     private final String type;
 
+    @SuppressFBWarnings("EI")
     public WorkflowTaskDTO(
-        List<ComponentConnection> connections, String description, DataStreamComponent destination,
+        ClusterElements clusterElements, List<ComponentConnection> connections, String description,
         List<WorkflowTask> finalize, String label, int maxRetries, Map<String, ?> metadata, String name, String node,
-        Map<String, ?> parameters, List<WorkflowTask> post, List<WorkflowTask> pre, DataStreamComponent source,
-        int taskNumber, String timeout, String type) {
+        Map<String, ?> parameters, List<WorkflowTask> post, List<WorkflowTask> pre, int taskNumber, String timeout,
+        String type) {
 
+        this.clusterElements = clusterElements;
         this.connections = Collections.unmodifiableList(connections);
         this.description = description;
-        this.destination = destination;
         this.finalize = Collections.unmodifiableList(finalize);
         this.label = label;
         this.maxRetries = maxRetries;
@@ -65,19 +65,25 @@ public final class WorkflowTaskDTO {
         this.parameters = Collections.unmodifiableMap(parameters);
         this.post = Collections.unmodifiableList(post);
         this.pre = Collections.unmodifiableList(pre);
-        this.source = source;
         this.taskNumber = taskNumber;
         this.timeout = timeout;
         this.type = type;
     }
 
-    public WorkflowTaskDTO(WorkflowTask workflowTask, List<ComponentConnection> connections, DataStream dataStream) {
+    @SuppressFBWarnings("EI")
+    public WorkflowTaskDTO(
+        WorkflowTask workflowTask, ClusterElements clusterElements, List<ComponentConnection> connections) {
+
         this(
-            connections, workflowTask.getDescription(), dataStream == null ? null : dataStream.destination(),
-            workflowTask.getFinalize(), workflowTask.getLabel(), workflowTask.getMaxRetries(),
-            workflowTask.getMetadata(), workflowTask.getName(), workflowTask.getNode(), workflowTask.getParameters(),
-            workflowTask.getPost(), workflowTask.getPre(), dataStream == null ? null : dataStream.source(),
+            clusterElements, connections, workflowTask.getDescription(), workflowTask.getFinalize(),
+            workflowTask.getLabel(), workflowTask.getMaxRetries(), workflowTask.getMetadata(), workflowTask.getName(),
+            workflowTask.getNode(), workflowTask.getParameters(), workflowTask.getPost(), workflowTask.getPre(),
             workflowTask.getTaskNumber(), workflowTask.getTimeout(), workflowTask.getType());
+    }
+
+    @SuppressFBWarnings("EI")
+    public ClusterElements getClusterElements() {
+        return clusterElements;
     }
 
     public List<ComponentConnection> getConnections() {
@@ -86,10 +92,6 @@ public final class WorkflowTaskDTO {
 
     public String getDescription() {
         return description;
-    }
-
-    public DataStreamComponent getDestination() {
-        return destination;
     }
 
     public List<WorkflowTask> getFinalize() {
@@ -128,10 +130,6 @@ public final class WorkflowTaskDTO {
         return pre;
     }
 
-    public DataStreamComponent getSource() {
-        return source;
-    }
-
     public int getTaskNumber() {
         return taskNumber;
     }
@@ -156,23 +154,21 @@ public final class WorkflowTaskDTO {
 
         WorkflowTaskDTO that = (WorkflowTaskDTO) obj;
 
-        return Objects.equals(this.connections, that.connections) &&
-            Objects.equals(this.description, that.description) &&
-            Objects.equals(this.destination, that.destination) &&
+        return Objects.equals(this.clusterElements, that.clusterElements) &&
+            Objects.equals(this.connections, that.connections) && Objects.equals(this.description, that.description) &&
             Objects.equals(this.finalize, that.finalize) && Objects.equals(this.label, that.label) &&
             this.maxRetries == that.maxRetries && Objects.equals(this.name, that.name) &&
             Objects.equals(this.metadata, that.metadata) && Objects.equals(this.node, that.node) &&
             Objects.equals(this.parameters, that.parameters) && Objects.equals(this.post, that.post) &&
-            Objects.equals(this.pre, that.pre) && Objects.equals(this.source, that.source) &&
-            this.taskNumber == that.taskNumber && Objects.equals(this.timeout, that.timeout) &&
-            Objects.equals(this.type, that.type);
+            Objects.equals(this.pre, that.pre) && this.taskNumber == that.taskNumber &&
+            Objects.equals(this.timeout, that.timeout) && Objects.equals(this.type, that.type);
     }
 
     @Override
     public int hashCode() {
         return Objects.hash(
-            connections, description, destination, finalize, label, maxRetries, metadata, name, node, parameters, post,
-            pre, source, taskNumber, timeout, type);
+            connections, description, finalize, label, maxRetries, metadata, name, node, parameters, post, pre,
+            taskNumber, timeout, type);
     }
 
     @Override
@@ -180,7 +176,6 @@ public final class WorkflowTaskDTO {
         return "WorkflowTaskDTO[" +
             "connections=" + connections + ", " +
             "description=" + description + ", " +
-            "destination=" + destination + ", " +
             "finalize=" + finalize + ", " +
             "label=" + label + ", " +
             "maxRetries=" + maxRetries + ", " +
@@ -189,7 +184,6 @@ public final class WorkflowTaskDTO {
             "parameters=" + parameters + ", " +
             "post=" + post + ", " +
             "pre=" + pre + ", " +
-            "source=" + source + ", " +
             "taskNumber=" + taskNumber + ", " +
             "timeout=" + timeout + ", " +
             "type=" + type + ", " +

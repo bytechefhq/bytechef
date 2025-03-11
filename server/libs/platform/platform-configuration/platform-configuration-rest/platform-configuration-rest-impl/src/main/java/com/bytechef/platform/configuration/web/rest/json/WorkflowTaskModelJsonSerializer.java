@@ -49,10 +49,6 @@ public class WorkflowTaskModelJsonSerializer extends JsonSerializer<WorkflowTask
             jsonGenerator.writeStringField("description", value.getDescription());
         }
 
-        if (value.getDestination() != null) {
-            jsonGenerator.writeObjectField("destination", value.getDestination());
-        }
-
         jsonGenerator.writeArrayFieldStart("finalize");
 
         for (WorkflowTaskModel workflowTaskModel : value.getFinalize()) {
@@ -81,10 +77,6 @@ public class WorkflowTaskModelJsonSerializer extends JsonSerializer<WorkflowTask
         }
 
         jsonGenerator.writeEndArray();
-
-        if (value.getSource() != null) {
-            jsonGenerator.writeObjectField("source", value.getSource());
-        }
 
         if (value.getTimeout() != null) {
             jsonGenerator.writeStringField("timeout", value.getTimeout());

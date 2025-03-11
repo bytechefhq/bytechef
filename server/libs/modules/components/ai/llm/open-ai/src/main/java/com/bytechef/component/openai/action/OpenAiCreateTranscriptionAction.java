@@ -31,7 +31,7 @@ import static com.bytechef.component.definition.ComponentDsl.number;
 import static com.bytechef.component.definition.ComponentDsl.string;
 
 import com.bytechef.component.ai.llm.AudioTranscriptionModel;
-import com.bytechef.component.ai.llm.constant.Language;
+import com.bytechef.component.ai.llm.definition.Language;
 import com.bytechef.component.ai.llm.util.LLMUtils;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
@@ -102,6 +102,7 @@ public class OpenAiCreateTranscriptionAction {
             return new OpenAiAudioTranscriptionModel(
                 OpenAiAudioApi.builder()
                     .apiKey(connectionParameters.getString(TOKEN))
+                    .restClientBuilder(LLMUtils.getRestClientBuilder())
                     .build(),
                 OpenAiAudioTranscriptionOptions.builder()
                     .model(inputParameters.getRequiredString(MODEL))

@@ -134,7 +134,7 @@ public class IntegrationServiceImpl implements IntegrationService {
     public Integration update(Integration integration) {
         Integration curIntegration = getIntegration(Validate.notNull(integration.getId(), "id"));
 
-        curIntegration.setAllowMultipleInstances(integration.isAllowMultipleInstances());
+        curIntegration.setMultipleInstances(integration.isMultipleInstances());
         curIntegration.setCategoryId(integration.getCategoryId());
         curIntegration.setDescription(integration.getDescription());
         curIntegration.setName(integration.getName());

@@ -40,15 +40,14 @@ import com.bytechef.component.definition.TriggerDefinition.WebhookEnableFunction
 import com.bytechef.component.definition.TriggerDefinition.WebhookEnableOutput;
 import com.bytechef.component.definition.TriggerDefinition.WebhookRequestFunction;
 import com.bytechef.component.definition.TriggerDefinition.WebhookValidateResponse;
-import com.bytechef.component.definition.TriggerWorkflowNodeDescriptionFunction;
 import com.bytechef.component.exception.ProviderException;
 import com.bytechef.definition.BaseOutputDefinition;
+import com.bytechef.platform.component.ComponentConnection;
 import com.bytechef.platform.component.ComponentDefinitionRegistry;
 import com.bytechef.platform.component.definition.HttpHeadersImpl;
 import com.bytechef.platform.component.definition.HttpParametersImpl;
 import com.bytechef.platform.component.definition.ParametersFactory;
 import com.bytechef.platform.component.definition.PropertyFactory;
-import com.bytechef.platform.component.domain.ComponentConnection;
 import com.bytechef.platform.component.domain.Option;
 import com.bytechef.platform.component.domain.Property;
 import com.bytechef.platform.component.domain.TriggerDefinition;
@@ -358,8 +357,9 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
         String componentName, int componentVersion, String triggerName,
         Map<String, ?> inputParameters, TriggerContext context) {
 
-        TriggerWorkflowNodeDescriptionFunction workflowNodeDescriptionFunction = getWorkflowNodeDescriptionFunction(
-            componentName, componentVersion, triggerName);
+        com.bytechef.component.definition.TriggerDefinition.TriggerWorkflowNodeDescriptionFunction workflowNodeDescriptionFunction =
+            getWorkflowNodeDescriptionFunction(
+                componentName, componentVersion, triggerName);
 
         try {
             return workflowNodeDescriptionFunction.apply(ParametersFactory.createParameters(inputParameters), context);
@@ -568,8 +568,9 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
             .orElse(null);
     }
 
-    private TriggerWorkflowNodeDescriptionFunction getWorkflowNodeDescriptionFunction(
-        String componentName, int componentVersion, String triggerName) {
+    private com.bytechef.component.definition.TriggerDefinition.TriggerWorkflowNodeDescriptionFunction
+        getWorkflowNodeDescriptionFunction(
+            String componentName, int componentVersion, String triggerName) {
 
         ComponentDefinition componentDefinition = componentDefinitionRegistry.getComponentDefinition(
             componentName, componentVersion);

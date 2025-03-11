@@ -16,20 +16,21 @@
 
 package com.bytechef.component.ai.text.constant;
 
+import static com.bytechef.component.ai.llm.Provider.AMAZON_BEDROCK_ANTHROPIC2;
+import static com.bytechef.component.ai.llm.Provider.AMAZON_BEDROCK_ANTHROPIC3;
+import static com.bytechef.component.ai.llm.Provider.AMAZON_BEDROCK_COHERE;
+import static com.bytechef.component.ai.llm.Provider.AMAZON_BEDROCK_JURASSIC2;
+import static com.bytechef.component.ai.llm.Provider.AMAZON_BEDROCK_LLAMA;
+import static com.bytechef.component.ai.llm.Provider.AMAZON_BEDROCK_TITAN;
+import static com.bytechef.component.ai.llm.Provider.ANTHROPIC;
+import static com.bytechef.component.ai.llm.Provider.AZURE_OPEN_AI;
+import static com.bytechef.component.ai.llm.Provider.GROQ;
+import static com.bytechef.component.ai.llm.Provider.MISTRAL;
+import static com.bytechef.component.ai.llm.Provider.NVIDIA;
+import static com.bytechef.component.ai.llm.Provider.OPEN_AI;
+import static com.bytechef.component.ai.llm.Provider.VERTEX_GEMINI;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.MODEL;
-import static com.bytechef.component.ai.llm.constant.Provider.AMAZON_BEDROCK_ANTHROPIC2;
-import static com.bytechef.component.ai.llm.constant.Provider.AMAZON_BEDROCK_ANTHROPIC3;
-import static com.bytechef.component.ai.llm.constant.Provider.AMAZON_BEDROCK_COHERE;
-import static com.bytechef.component.ai.llm.constant.Provider.AMAZON_BEDROCK_JURASSIC2;
-import static com.bytechef.component.ai.llm.constant.Provider.AMAZON_BEDROCK_LLAMA;
-import static com.bytechef.component.ai.llm.constant.Provider.AMAZON_BEDROCK_TITAN;
-import static com.bytechef.component.ai.llm.constant.Provider.ANTHROPIC;
-import static com.bytechef.component.ai.llm.constant.Provider.AZURE_OPEN_AI;
-import static com.bytechef.component.ai.llm.constant.Provider.GROQ;
-import static com.bytechef.component.ai.llm.constant.Provider.MISTRAL;
-import static com.bytechef.component.ai.llm.constant.Provider.NVIDIA;
-import static com.bytechef.component.ai.llm.constant.Provider.OPEN_AI;
-import static com.bytechef.component.ai.llm.constant.Provider.VERTEX_GEMINI;
+import static com.bytechef.component.ai.llm.constant.LLMConstants.PROVIDER;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.config.ApplicationProperties.Ai;
 
@@ -57,7 +58,6 @@ public class AiTextConstants {
     public static final String IS_DECIMAL = "isDecimal";
     public static final String NUM_RESULTS = "numResults";
     public static final String CHUNK_SIZE = "chunkSize";
-    public static final String PROVIDER = "provider";
     public static final String SUMMARIZE_TEXT = "summarizeText";
     public static final String TEXT_GENERATION = "textGeneration";
     public static final String SIMILARITY_SEARCH = "similaritySearch";

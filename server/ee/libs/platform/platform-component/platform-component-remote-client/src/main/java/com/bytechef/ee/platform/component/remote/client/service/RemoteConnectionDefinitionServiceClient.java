@@ -16,7 +16,7 @@ import com.bytechef.component.definition.Context;
 import com.bytechef.ee.discovery.util.WorkerDiscoveryUtils;
 import com.bytechef.ee.platform.component.remote.client.AbstractWorkerClient;
 import com.bytechef.ee.remote.client.DefaultRestClient;
-import com.bytechef.platform.component.domain.ComponentConnection;
+import com.bytechef.platform.component.ComponentConnection;
 import com.bytechef.platform.component.domain.ConnectionDefinition;
 import com.bytechef.platform.component.domain.OAuth2AuthorizationParameters;
 import com.bytechef.platform.component.service.ConnectionDefinitionService;

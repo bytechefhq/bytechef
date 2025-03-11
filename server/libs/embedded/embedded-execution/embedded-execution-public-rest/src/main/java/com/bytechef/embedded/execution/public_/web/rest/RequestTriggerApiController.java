@@ -135,7 +135,7 @@ public class RequestTriggerApiController extends AbstractWebhookTriggerControlle
             .map(workflowTrigger -> {
                 WorkflowNodeType workflowNodeType = WorkflowNodeType.ofType(workflowTrigger.getType());
 
-                if (Objects.equals(workflowNodeType.componentName(), "request")) {
+                if (Objects.equals(workflowNodeType.name(), "request")) {
                     return workflowTrigger.getName();
                 }
 

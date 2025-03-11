@@ -19,9 +19,9 @@ package com.bytechef.platform.component.facade;
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.exception.ProviderException;
+import com.bytechef.platform.component.ComponentConnection;
 import com.bytechef.platform.component.definition.ActionContextAware;
 import com.bytechef.platform.component.definition.ContextFactory;
-import com.bytechef.platform.component.domain.ComponentConnection;
 import com.bytechef.platform.component.domain.Option;
 import com.bytechef.platform.component.domain.Property;
 import com.bytechef.platform.component.exception.ActionDefinitionErrorType;
@@ -110,13 +110,15 @@ public class ActionDefinitionFacadeImpl implements ActionDefinitionFacade {
         ExecuteFunctionData executeFunctionData = getExecuteFunctionData(
             componentName, componentVersion, actionName, connectionIds);
 
-        ActionContext actionContext = contextFactory.createActionContext(
-            componentName, componentVersion, actionName, null, null, null, null, null,
-            executeFunctionData.componentConnection(), true);
-
         if (executeFunctionData.singleConnectionPerform()) {
+            ComponentConnection singleComponentConnection = executeFunctionData.getSingleComponentConnection();
+
+            ActionContext actionContext = contextFactory.createActionContext(
+                componentName, componentVersion, actionName, null, null, null, null, null, singleComponentConnection,
+                true);
+
             return tokenRefreshHelper.executeSingleConnectionFunction(
-                componentName, componentVersion, executeFunctionData.componentConnection(), actionContext,
+                componentName, componentVersion, singleComponentConnection, actionContext,
                 ActionDefinitionErrorType.EXECUTE_OUTPUT,
                 (componentConnection1, actionContext1) -> actionDefinitionService.executeSingleConnectionOutput(
                     componentName, componentVersion, actionName, inputParameters, componentConnection1,
@@ -125,6 +127,9 @@ public class ActionDefinitionFacadeImpl implements ActionDefinitionFacade {
                     componentName, componentVersion, actionName, null, null, null, null, null, componentConnection1,
                     true));
         } else {
+            ActionContext actionContext = contextFactory.createActionContext(
+                componentName, componentVersion, actionName, null, null, null, null, null, null, true);
+
             return actionDefinitionService.executeMultipleConnectionsOutput(
                 componentName, componentVersion, actionName, inputParameters,
                 executeFunctionData.componentConnections(), Map.of(), actionContext);
@@ -140,14 +145,15 @@ public class ActionDefinitionFacadeImpl implements ActionDefinitionFacade {
         ExecuteFunctionData executeFunctionData = getExecuteFunctionData(
             componentName, componentVersion, actionName, connectionIds);
 
-        ActionContext actionContext = contextFactory.createActionContext(
-            componentName, componentVersion, actionName, type, jobPrincipalId, jobPrincipalWorkflowId, workflowId,
-            jobId,
-            executeFunctionData.componentConnection, editorEnvironment);
-
         if (executeFunctionData.singleConnectionPerform) {
+            ComponentConnection singleComponentConnection = executeFunctionData.getSingleComponentConnection();
+
+            ActionContext actionContext = contextFactory.createActionContext(
+                componentName, componentVersion, actionName, type, jobPrincipalId, jobPrincipalWorkflowId, workflowId,
+                jobId, singleComponentConnection, editorEnvironment);
+
             return tokenRefreshHelper.executeSingleConnectionFunction(
-                componentName, componentVersion, executeFunctionData.componentConnection, actionContext,
+                componentName, componentVersion, singleComponentConnection, actionContext,
                 ActionDefinitionErrorType.EXECUTE_PERFORM,
                 (componentConnection1, actionContext1) -> actionDefinitionService.executeSingleConnectionPerform(
                     componentName, componentVersion, actionName, inputParameters, componentConnection1,
@@ -158,6 +164,10 @@ public class ActionDefinitionFacadeImpl implements ActionDefinitionFacade {
                     jobId,
                     componentConnection1, editorEnvironment));
         } else {
+            ActionContext actionContext = contextFactory.createActionContext(
+                componentName, componentVersion, actionName, type, jobPrincipalId, jobPrincipalWorkflowId, workflowId,
+                jobId, null, editorEnvironment);
+
             return actionDefinitionService.executeMultipleConnectionsPerform(
                 componentName, componentVersion, actionName, inputParameters, executeFunctionData.componentConnections,
                 extensions, actionContext);
@@ -177,7 +187,7 @@ public class ActionDefinitionFacadeImpl implements ActionDefinitionFacade {
             (componentConnection1, actionContext1) -> actionDefinitionService.executeSingleConnectionPerform(
                 componentName, componentVersion, actionName, inputParameters, componentConnection1, actionContext1),
             componentConnection1 -> contextFactory.createActionContext(
-                componentName, componentVersion, actionName, actionContextAware.getType(),
+                componentName, componentVersion, actionName, actionContextAware.getModeType(),
                 actionContextAware.getJobPrincipalId(), actionContextAware.getJobPrincipalWorkflowId(),
                 actionContextAware.getWorkflowId(), actionContextAware.getJobId(), componentConnection1,
                 actionContextAware.isEditorEnvironment()));
@@ -209,15 +219,10 @@ public class ActionDefinitionFacadeImpl implements ActionDefinitionFacade {
 
         Map<String, ComponentConnection> componentConnections = getComponentConnections(connectionIds);
 
-        Set<Map.Entry<String, ComponentConnection>> entries = componentConnections.entrySet();
-
         boolean singleConnectionPerform = actionDefinitionService.isSingleConnectionPerform(
             componentName, componentVersion, actionName);
 
-        ComponentConnection componentConnection = singleConnectionPerform && !entries.isEmpty()
-            ? CollectionUtils.getFirstMap(entries, Map.Entry::getValue) : null;
-
-        return new ExecuteFunctionData(componentConnections, componentConnection, singleConnectionPerform);
+        return new ExecuteFunctionData(componentConnections, singleConnectionPerform);
     }
 
     private ComponentConnection getComponentConnection(Long connectionId) {
@@ -249,7 +254,13 @@ public class ActionDefinitionFacadeImpl implements ActionDefinitionFacade {
     }
 
     private record ExecuteFunctionData(
-        Map<String, ComponentConnection> componentConnections, ComponentConnection componentConnection,
-        boolean singleConnectionPerform) {
+        Map<String, ComponentConnection> componentConnections, boolean singleConnectionPerform) {
+
+        ComponentConnection getSingleComponentConnection() {
+            Set<Map.Entry<String, ComponentConnection>> entries = componentConnections.entrySet();
+
+            return singleConnectionPerform && !entries.isEmpty()
+                ? CollectionUtils.getFirstMap(entries, Map.Entry::getValue) : null;
+        }
     }
 }

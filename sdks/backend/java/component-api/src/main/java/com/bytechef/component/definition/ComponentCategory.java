@@ -19,10 +19,10 @@ package com.bytechef.component.definition;
 /**
  * @author Monika Domiter
  */
-public record ComponentCategory(String key, String label) {
+public record ComponentCategory(String name, String label) {
 
-    public ComponentCategory(String key) {
-        this(key, key);
+    public ComponentCategory(String name) {
+        this(name, name);
     }
 
     public static final ComponentCategory ACCOUNTING = new ComponentCategory("accounting");
@@ -47,12 +47,12 @@ public record ComponentCategory(String key, String label) {
     public static final ComponentCategory SOCIAL_MEDIA = new ComponentCategory("social-media");
     public static final ComponentCategory SURVEYS_AND_FEEDBACK = new ComponentCategory("surveys-and-feedback");
 
-    public String getKey() {
-        return key;
+    public String getName() {
+        return name;
     }
 
     @Override
     public String toString() {
-        return String.valueOf(key);
+        return String.valueOf(name);
     }
 }

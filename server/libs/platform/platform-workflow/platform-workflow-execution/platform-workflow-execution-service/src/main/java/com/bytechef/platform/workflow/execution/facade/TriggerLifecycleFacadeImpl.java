@@ -61,8 +61,8 @@ public class TriggerLifecycleFacadeImpl implements TriggerLifecycleFacade {
         Map<String, ?> triggerParameters, Long connectionId) {
 
         TriggerDefinition triggerDefinition = triggerDefinitionService.getTriggerDefinition(
-            triggerWorkflowNodeType.componentName(), triggerWorkflowNodeType.componentVersion(),
-            triggerWorkflowNodeType.componentOperationName());
+            triggerWorkflowNodeType.name(), triggerWorkflowNodeType.version(),
+            triggerWorkflowNodeType.operation());
 
         switch (triggerDefinition.getType()) {
             case HYBRID, DYNAMIC_WEBHOOK -> {
@@ -71,16 +71,16 @@ public class TriggerLifecycleFacadeImpl implements TriggerLifecycleFacade {
                     WebhookEnableOutput::parameters, Map.of());
 
                 triggerDefinitionFacade.executeWebhookDisable(
-                    triggerWorkflowNodeType.componentName(), triggerWorkflowNodeType.componentVersion(),
-                    triggerWorkflowNodeType.componentOperationName(), triggerParameters, workflowExecutionId.toString(),
+                    triggerWorkflowNodeType.name(), triggerWorkflowNodeType.version(),
+                    triggerWorkflowNodeType.operation(), triggerParameters, workflowExecutionId.toString(),
                     parameters, connectionId);
 
                 triggerScheduler.cancelDynamicWebhookTriggerRefresh(workflowExecutionId.toString());
                 triggerStateService.delete(workflowExecutionId);
             }
             case LISTENER -> triggerDefinitionFacade.executeListenerDisable(
-                triggerWorkflowNodeType.componentName(), triggerWorkflowNodeType.componentVersion(),
-                triggerWorkflowNodeType.componentOperationName(), triggerParameters,
+                triggerWorkflowNodeType.name(), triggerWorkflowNodeType.version(),
+                triggerWorkflowNodeType.operation(), triggerParameters,
                 workflowExecutionId.toString(), connectionId);
             case POLLING -> triggerScheduler.cancelPollingTrigger(workflowExecutionId.toString());
             default -> {
@@ -100,15 +100,15 @@ public class TriggerLifecycleFacadeImpl implements TriggerLifecycleFacade {
         Map<String, ?> triggerParameters, Long connectionId, String webhookUrl) {
 
         TriggerDefinition triggerDefinition = triggerDefinitionService.getTriggerDefinition(
-            triggerWorkflowNodeType.componentName(), triggerWorkflowNodeType.componentVersion(),
-            triggerWorkflowNodeType.componentOperationName());
+            triggerWorkflowNodeType.name(), triggerWorkflowNodeType.version(),
+            triggerWorkflowNodeType.operation());
 
         switch (triggerDefinition.getType()) {
             case DYNAMIC_WEBHOOK, HYBRID, STATIC_WEBHOOK -> {
                 WebhookEnableOutput output =
                     triggerDefinitionFacade.executeWebhookEnable(
-                        triggerWorkflowNodeType.componentName(), triggerWorkflowNodeType.componentVersion(),
-                        triggerWorkflowNodeType.componentOperationName(), triggerParameters,
+                        triggerWorkflowNodeType.name(), triggerWorkflowNodeType.version(),
+                        triggerWorkflowNodeType.operation(), triggerParameters,
                         workflowExecutionId.toString(), connectionId, webhookUrl);
 
                 if (output != null) {
@@ -116,14 +116,14 @@ public class TriggerLifecycleFacadeImpl implements TriggerLifecycleFacade {
 
                     if (output.webhookExpirationDate() != null) {
                         triggerScheduler.scheduleDynamicWebhookTriggerRefresh(
-                            output.webhookExpirationDate(), triggerWorkflowNodeType.componentName(),
-                            triggerWorkflowNodeType.componentVersion(), workflowExecutionId, connectionId);
+                            output.webhookExpirationDate(), triggerWorkflowNodeType.name(),
+                            triggerWorkflowNodeType.version(), workflowExecutionId, connectionId);
                     }
                 }
             }
             case LISTENER -> triggerDefinitionFacade.executeListenerEnable(
-                triggerWorkflowNodeType.componentName(), triggerWorkflowNodeType.componentVersion(),
-                triggerWorkflowNodeType.componentOperationName(), triggerParameters, workflowExecutionId.toString(),
+                triggerWorkflowNodeType.name(), triggerWorkflowNodeType.version(),
+                triggerWorkflowNodeType.operation(), triggerParameters, workflowExecutionId.toString(),
                 connectionId);
             case POLLING -> triggerScheduler.schedulePollingTrigger(workflowExecutionId);
             default -> {

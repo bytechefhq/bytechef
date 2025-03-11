@@ -20,10 +20,10 @@ import com.bytechef.commons.data.jdbc.converter.EncryptedMapWrapperToStringConve
 import com.bytechef.commons.data.jdbc.converter.EncryptedStringToMapWrapperConverter;
 import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.definition.ActionDefinition;
+import com.bytechef.component.definition.ClusterElementDefinition;
 import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.component.definition.ConnectionDefinition;
-import com.bytechef.component.definition.DataStreamDefinition;
 import com.bytechef.component.definition.Help;
 import com.bytechef.component.definition.Resources;
 import com.bytechef.component.definition.TriggerDefinition;
@@ -68,7 +68,12 @@ public class ConnectionIntTestConfiguration {
             }
 
             @Override
-            public Optional<List<ComponentCategory>> getCategories() {
+            public Optional<List<ComponentCategory>> getComponentCategories() {
+                return Optional.empty();
+            }
+
+            @Override
+            public Optional<List<? extends ClusterElementDefinition<?>>> getClusterElements() {
                 return Optional.empty();
             }
 
@@ -84,11 +89,6 @@ public class ConnectionIntTestConfiguration {
 
             @Override
             public Optional<Help> getCustomActionHelp() {
-                return Optional.empty();
-            }
-
-            @Override
-            public Optional<DataStreamDefinition> getDataStream() {
                 return Optional.empty();
             }
 

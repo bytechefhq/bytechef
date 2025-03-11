@@ -17,8 +17,6 @@
 package com.bytechef.component.definition;
 
 import com.bytechef.component.definition.Authorization.AuthorizationType;
-import com.bytechef.component.definition.DataStreamReaderDefinition.DataStreamItemReaderSupplier;
-import com.bytechef.component.definition.DataStreamWriterDefinition.DataStreamItemWriterSupplier;
 import com.bytechef.component.definition.OptionsDataSource.OptionsFunction;
 import com.bytechef.component.definition.PropertiesDataSource.ActionPropertiesFunction;
 import com.bytechef.component.definition.PropertiesDataSource.TriggerPropertiesFunction;
@@ -42,6 +40,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.function.Supplier;
 
 /**
  * @author Ivica Cardic
@@ -82,58 +81,8 @@ public final class ComponentDsl {
         return new ModifiableConnectionDefinition();
     }
 
-    public static ModifiableDataStreamDefinition dataStream(DataStreamReaderDefinition reader) {
-        return new ModifiableDataStreamDefinition(reader, null);
-    }
-
-    public static ModifiableDataStreamDefinition dataStream(
-        DataStreamReaderDefinition reader, DataStreamWriterDefinition writer) {
-
-        return new ModifiableDataStreamDefinition(reader, writer);
-    }
-
-    public static ModifiableDataStreamDefinition dataStream(DataStreamWriterDefinition writer) {
-        return new ModifiableDataStreamDefinition(null, writer);
-    }
-
-    public static ModifiableDataStreamReaderDefinition dataStreamReader(
-        Class<? extends DataStreamItemReader> dataStreamItemReader) {
-
-        return new ModifiableDataStreamReaderDefinition(() -> {
-            try {
-                return dataStreamItemReader.getDeclaredConstructor()
-                    .newInstance();
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
-        });
-    }
-
-    public static ModifiableDataStreamReaderDefinition dataStreamReader(
-        DataStreamItemReaderSupplier dataStreamItemReader) {
-
-        return new ModifiableDataStreamReaderDefinition(dataStreamItemReader);
-    }
-
-    public static ModifiableDataStreamWriterDefinition dataStreamWriter(
-        Class<? extends DataStreamItemWriter> dataStreamItemReaderClass) {
-
-        return new ModifiableDataStreamWriterDefinition(() -> {
-            try {
-                Constructor<? extends DataStreamItemWriter> declaredConstructor = dataStreamItemReaderClass
-                    .getDeclaredConstructor();
-
-                return declaredConstructor.newInstance();
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
-        });
-    }
-
-    public static ModifiableDataStreamWriterDefinition dataStreamWriter(
-        DataStreamItemWriterSupplier dataStreamItemWriter) {
-
-        return new ModifiableDataStreamWriterDefinition(dataStreamItemWriter);
+    public static <T> ModifiableClusterElementDefinition<T> clusterElement(String name) {
+        return new ModifiableClusterElementDefinition<>(name);
     }
 
     public static ModifiableDateProperty date() {
@@ -292,7 +241,7 @@ public final class ComponentDsl {
         return new ModifiableTriggerDefinition(name);
     }
 
-    public static ModifiableUnifiedApiDefinition unifiedApi(UnifiedApiDefinition.Category category) {
+    public static ModifiableUnifiedApiDefinition unifiedApi(UnifiedApiDefinition.UnifiedApiCategory category) {
         return new ModifiableUnifiedApiDefinition(category);
     }
 
@@ -389,7 +338,7 @@ public final class ComponentDsl {
             return this;
         }
 
-        public <P extends ModifiableValueProperty<?, ?>> ModifiableActionDefinition output(
+        public <P extends ValueProperty<?>> ModifiableActionDefinition output(
             OutputSchema<P> outputSchema) {
 
             this.outputDefinition = OutputDefinition.of(outputSchema.outputSchema());
@@ -409,7 +358,7 @@ public final class ComponentDsl {
             return this;
         }
 
-        public <P extends ModifiableValueProperty<?, ?>> ModifiableActionDefinition output(
+        public <P extends ValueProperty<?>> ModifiableActionDefinition output(
             OutputSchema<P> outputSchema, SampleOutput sampleOutput) {
 
             this.outputDefinition = OutputDefinition.of(outputSchema.outputSchema(), sampleOutput.sampleOutput());
@@ -570,7 +519,7 @@ public final class ComponentDsl {
     public static final class ModifiableArrayProperty
         extends ModifiableValueProperty<List<?>, ModifiableArrayProperty> implements Property.ArrayProperty {
 
-        private List<? extends ModifiableValueProperty<?, ?>> items;
+        private List<? extends ValueProperty<?>> items;
         private List<String> optionsLookupDependsOn;
         private Long maxItems;
         private Long minItems;
@@ -673,11 +622,11 @@ public final class ComponentDsl {
         }
 
         @SafeVarargs
-        public final <P extends ModifiableValueProperty<?, ?>> ModifiableArrayProperty items(P... properties) {
+        public final <P extends ValueProperty<?>> ModifiableArrayProperty items(P... properties) {
             return items(properties == null ? List.of() : List.of(properties));
         }
 
-        public <P extends ModifiableValueProperty<?, ?>> ModifiableArrayProperty items(List<P> properties) {
+        public <P extends ValueProperty<?>> ModifiableArrayProperty items(List<P> properties) {
             if (properties != null) {
                 this.items = new ArrayList<>(properties);
             }
@@ -1176,12 +1125,12 @@ public final class ComponentDsl {
 
         private List<? extends ActionDefinition> actionDefinitions;
         private Boolean additionalConnections;
-        private List<ComponentCategory> categories;
+        private List<ComponentCategory> componentCategories;
         private ConnectionDefinition connectionDefinition;
         private Boolean connectionRequired;
         private Boolean customAction;
         private Help customActionHelp;
-        private DataStreamDefinition dataStreamDefinition;
+        private List<? extends ClusterElementDefinition<?>> clusterElementDefinitions;
         private String description;
         private String icon;
         private List<String> tags;
@@ -1224,13 +1173,19 @@ public final class ComponentDsl {
         }
 
         public ModifiableComponentDefinition categories(List<ComponentCategory> categories) {
-            this.categories = new ArrayList<>(categories);
+            this.componentCategories = new ArrayList<>(categories);
 
             return this;
         }
 
         public ModifiableComponentDefinition categories(ComponentCategory... category) {
-            this.categories = List.of(category);
+            this.componentCategories = List.of(category);
+
+            return this;
+        }
+
+        public ModifiableComponentDefinition clusterElements(ClusterElementDefinition<?>... clusterElements) {
+            this.clusterElementDefinitions = List.of(clusterElements);
 
             return this;
         }
@@ -1255,12 +1210,6 @@ public final class ComponentDsl {
 
         public ModifiableComponentDefinition customActionHelp(Help customActionHelp) {
             this.customActionHelp = customActionHelp;
-
-            return this;
-        }
-
-        public ModifiableComponentDefinition dataStream(DataStreamDefinition dataStream) {
-            this.dataStreamDefinition = dataStream;
 
             return this;
         }
@@ -1357,8 +1306,8 @@ public final class ComponentDsl {
         }
 
         @Override
-        public Optional<List<ComponentCategory>> getCategories() {
-            return Optional.ofNullable(categories);
+        public Optional<List<ComponentCategory>> getComponentCategories() {
+            return Optional.ofNullable(componentCategories);
         }
 
         @Override
@@ -1377,8 +1326,8 @@ public final class ComponentDsl {
         }
 
         @Override
-        public Optional<DataStreamDefinition> getDataStream() {
-            return Optional.ofNullable(dataStreamDefinition);
+        public Optional<List<? extends ClusterElementDefinition<?>>> getClusterElements() {
+            return Optional.ofNullable(clusterElementDefinitions);
         }
 
         @Override
@@ -1444,12 +1393,12 @@ public final class ComponentDsl {
 
             return Objects.equals(actionDefinitions, that.actionDefinitions) &&
                 Objects.equals(additionalConnections, that.additionalConnections) &&
-                Objects.equals(categories, that.categories) &&
+                Objects.equals(componentCategories, that.componentCategories) &&
                 Objects.equals(connectionDefinition, that.connectionDefinition) &&
                 Objects.equals(connectionRequired, that.connectionRequired) &&
                 Objects.equals(customAction, that.customAction) &&
                 Objects.equals(customActionHelp, that.customActionHelp) &&
-                Objects.equals(dataStreamDefinition, that.dataStreamDefinition) &&
+                Objects.equals(clusterElementDefinitions, that.clusterElementDefinitions) &&
                 Objects.equals(description, that.description) && Objects.equals(icon, that.icon) &&
                 Objects.equals(tags, that.tags) && Objects.equals(metadata, that.metadata) &&
                 Objects.equals(name, that.name) && Objects.equals(resources, that.resources) &&
@@ -1458,20 +1407,9 @@ public final class ComponentDsl {
 
         @Override
         public int hashCode() {
-            return Objects.hash(actionDefinitions, categories, connectionDefinition, customAction, customActionHelp,
+            return Objects.hash(actionDefinitions, componentCategories, connectionDefinition, customAction,
+                customActionHelp,
                 description, icon, tags, metadata, name, resources, version, title, triggerDefinitions);
-        }
-
-        void setActions(List<ModifiableActionDefinition> actionDefinitions) {
-            this.actionDefinitions = actionDefinitions;
-        }
-
-        void setConnection(ModifiableConnectionDefinition connectionDefinition) {
-            this.connectionDefinition = connectionDefinition;
-        }
-
-        void setTriggers(List<ModifiableTriggerDefinition> triggerDefinitions) {
-            this.triggerDefinitions = triggerDefinitions;
         }
 
         @Override
@@ -1483,11 +1421,11 @@ public final class ComponentDsl {
                 ", description='" + description + '\'' +
                 ", connectionDefinition=" + connectionDefinition +
                 ", additionalConnections=" + additionalConnections +
-                ", categories='" + categories + '\'' +
+                ", categories='" + componentCategories + '\'' +
                 ", connectionRequired=" + connectionRequired +
                 ", customAction=" + customAction +
                 ", customActionHelp=" + customActionHelp +
-                ", dataStream=" + dataStreamDefinition +
+                ", clusterElementDefinitions=" + clusterElementDefinitions +
                 ", metadata=" + metadata +
                 ", resources=" + resources +
                 ", tags=" + tags +
@@ -1627,59 +1565,93 @@ public final class ComponentDsl {
         }
     }
 
-    public static final class ModifiableDataStreamDefinition implements DataStreamDefinition {
+    public static final class ModifiableClusterElementDefinition<T> implements ClusterElementDefinition<T> {
 
-        private final DataStreamReaderDefinition dataStreamReaderDefinition;
-        private final DataStreamWriterDefinition dataStreamWriterDefinition;
-
-        public ModifiableDataStreamDefinition(
-            DataStreamReaderDefinition dataStreamReaderDefinition,
-            DataStreamWriterDefinition dataStreamWriterDefinition) {
-
-            this.dataStreamReaderDefinition = dataStreamReaderDefinition;
-            this.dataStreamWriterDefinition = dataStreamWriterDefinition;
-        }
-
-        @Override
-        public boolean equals(Object o) {
-            if (this == o) {
-                return true;
-            }
-
-            if (!(o instanceof ModifiableDataStreamDefinition that)) {
-                return false;
-            }
-
-            return Objects.equals(dataStreamReaderDefinition, that.dataStreamReaderDefinition)
-                && Objects.equals(dataStreamWriterDefinition, that.dataStreamWriterDefinition);
-        }
-
-        @Override
-        public int hashCode() {
-            return Objects.hash(dataStreamReaderDefinition, dataStreamWriterDefinition);
-        }
-
-        @Override
-        public Optional<DataStreamReaderDefinition> getReader() {
-            return Optional.ofNullable(dataStreamReaderDefinition);
-        }
-
-        @Override
-        public Optional<DataStreamWriterDefinition> getWriter() {
-            return Optional.ofNullable(dataStreamWriterDefinition);
-        }
-    }
-
-    public static final class ModifiableDataStreamReaderDefinition implements DataStreamReaderDefinition {
-
-        private final DataStreamItemReaderSupplier dataStreamItemReaderSupplier;
+        private Supplier<T> objectSupplier;
+        private String description;
+        private ClusterElementType clusterElementType;
+        private final String name;
+        private OutputDefinition outputDefinition;
         private List<? extends Property> properties;
+        private String title;
 
-        public ModifiableDataStreamReaderDefinition(DataStreamItemReaderSupplier dataStreamItemReaderSupplier) {
-            this.dataStreamItemReaderSupplier = dataStreamItemReaderSupplier;
+        public ModifiableClusterElementDefinition(String name) {
+            this.name = name;
         }
 
-        public ModifiableDataStreamReaderDefinition properties(Property... properties) {
+        public ModifiableClusterElementDefinition<T> object(Supplier<T> supplier) {
+            this.objectSupplier = supplier;
+
+            return this;
+        }
+
+        public ModifiableClusterElementDefinition<T> object(Class<T> element) {
+            this.objectSupplier = () -> {
+                try {
+                    Constructor<T> declaredConstructor = element.getDeclaredConstructor();
+
+                    return declaredConstructor.newInstance();
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
+                }
+            };
+
+            return this;
+        }
+
+        public ModifiableClusterElementDefinition<T> description(String description) {
+            this.description = description;
+
+            return this;
+        }
+
+        public ModifiableClusterElementDefinition<T> output() {
+            this.outputDefinition = OutputDefinition.of();
+
+            return this;
+        }
+
+        public <P extends ValueProperty<?>> ModifiableClusterElementDefinition<T> output(
+            OutputSchema<P> outputSchema) {
+
+            this.outputDefinition = OutputDefinition.of(outputSchema.outputSchema());
+
+            return this;
+        }
+
+        public ModifiableClusterElementDefinition<T> output(SampleOutput sampleOutput) {
+            this.outputDefinition = OutputDefinition.of(sampleOutput.sampleOutput());
+
+            return this;
+        }
+
+        public ModifiableClusterElementDefinition<T> output(Placeholder placeholder) {
+            this.outputDefinition = OutputDefinition.of(null, null, placeholder.placeholder());
+
+            return this;
+        }
+
+        public <P extends ValueProperty<?>> ModifiableClusterElementDefinition<T> output(
+            OutputSchema<P> outputSchema, SampleOutput sampleOutput) {
+
+            this.outputDefinition = OutputDefinition.of(outputSchema.outputSchema(), sampleOutput.sampleOutput());
+
+            return this;
+        }
+
+        public ModifiableClusterElementDefinition<T> output(BaseOutputFunction output) {
+            this.outputDefinition = OutputDefinition.of(output);
+
+            return this;
+        }
+
+        public ModifiableClusterElementDefinition<T> output(ClusterElementDefinition.OutputFunction output) {
+            this.outputDefinition = OutputDefinition.of(output);
+
+            return this;
+        }
+
+        public ModifiableClusterElementDefinition<T> properties(Property... properties) {
             if (properties != null) {
                 this.properties = List.of(properties);
             }
@@ -1687,23 +1659,50 @@ public final class ComponentDsl {
             return this;
         }
 
+        public ModifiableClusterElementDefinition<T> title(String title) {
+            this.title = title;
+
+            return this;
+        }
+
+        public ModifiableClusterElementDefinition<T> type(ClusterElementType type) {
+            this.clusterElementType = type;
+
+            return this;
+        }
+
         @Override
         public boolean equals(Object o) {
-            if (this == o) {
-                return true;
-            }
-
-            if (!(o instanceof ModifiableDataStreamReaderDefinition that)) {
+            if (!(o instanceof ModifiableClusterElementDefinition<?> that)) {
                 return false;
             }
 
-            return Objects.equals(dataStreamItemReaderSupplier, that.dataStreamItemReaderSupplier)
-                && Objects.equals(properties, that.properties);
+            return Objects.equals(objectSupplier, that.objectSupplier) &&
+                Objects.equals(description, that.description) && Objects.equals(name, that.name) &&
+                Objects.equals(outputDefinition, that.outputDefinition) &&
+                Objects.equals(properties, that.properties) && Objects.equals(title, that.title) &&
+                Objects.equals(clusterElementType, that.clusterElementType);
         }
 
         @Override
         public int hashCode() {
-            return Objects.hash(dataStreamItemReaderSupplier, properties);
+            return Objects.hash(
+                objectSupplier, description, name, outputDefinition, properties, title, clusterElementType);
+        }
+
+        @Override
+        public Optional<String> getDescription() {
+            return Optional.ofNullable(description);
+        }
+
+        @Override
+        public T getObject() {
+            return objectSupplier.get();
+        }
+
+        @Override
+        public String getName() {
+            return name;
         }
 
         @Override
@@ -1712,69 +1711,31 @@ public final class ComponentDsl {
         }
 
         @Override
-        public DataStreamItemReaderSupplier getDataStreamItemReader() {
-            return Objects.requireNonNull(dataStreamItemReaderSupplier);
-        }
-    }
-
-    public static final class ModifiableDataStreamWriterDefinition implements DataStreamWriterDefinition {
-
-        private final DataStreamItemWriterSupplier dataStreamItemWriterSupplier;
-        private List<? extends Property> properties;
-        private List<StreamType> streamTypes;
-
-        private ModifiableDataStreamWriterDefinition(DataStreamItemWriterSupplier dataStreamItemWriterSupplier) {
-            this.dataStreamItemWriterSupplier = dataStreamItemWriterSupplier;
-        }
-
-        public ModifiableDataStreamWriterDefinition properties(Property... properties) {
-            if (properties != null) {
-                this.properties = List.of(properties);
-            }
-
-            return this;
-        }
-
-        public ModifiableDataStreamWriterDefinition syncType(StreamType... streamTypes) {
-            if (streamTypes != null) {
-                this.streamTypes = List.of(streamTypes);
-            }
-
-            return this;
+        public Optional<OutputDefinition> getOutputDefinition() {
+            return Optional.ofNullable(outputDefinition);
         }
 
         @Override
-        public boolean equals(Object o) {
-            if (this == o) {
-                return true;
-            }
-
-            if (!(o instanceof ModifiableDataStreamWriterDefinition that)) {
-                return false;
-            }
-
-            return Objects.equals(dataStreamItemWriterSupplier, that.dataStreamItemWriterSupplier)
-                && Objects.equals(properties, that.properties) && Objects.equals(streamTypes, that.streamTypes);
+        public Optional<String> getTitle() {
+            return Optional.ofNullable(title);
         }
 
         @Override
-        public int hashCode() {
-            return Objects.hash(dataStreamItemWriterSupplier, properties, streamTypes);
+        public ClusterElementType getType() {
+            return clusterElementType;
         }
 
         @Override
-        public Optional<List<? extends Property>> getProperties() {
-            return Optional.ofNullable(properties);
-        }
-
-        @Override
-        public Optional<List<StreamType>> getStreamTypes() {
-            return Optional.ofNullable(streamTypes);
-        }
-
-        @Override
-        public DataStreamItemWriterSupplier getDataStreamItemWriter() {
-            return Objects.requireNonNull(dataStreamItemWriterSupplier);
+        public String toString() {
+            return "ModifiableClusterElementDefinition{" +
+                "name='" + name + '\'' +
+                ", title='" + title + '\'' +
+                ", type=" + clusterElementType +
+                ", description='" + description + '\'' +
+                ", object=" + objectSupplier +
+                ", outputDefinition=" + outputDefinition +
+                ", properties=" + properties +
+                '}';
         }
     }
 
@@ -2465,12 +2426,12 @@ public final class ComponentDsl {
         extends ModifiableValueProperty<Map<String, ?>, ModifiableObjectProperty>
         implements ObjectProperty {
 
-        private List<? extends ModifiableValueProperty<?, ?>> additionalProperties;
+        private List<? extends ValueProperty<?>> additionalProperties;
         private List<String> optionsLookupDependsOn;
         private Boolean multipleValues;
         private List<? extends Option<Object>> options;
         private OptionsFunction optionsFunction;
-        private List<? extends ModifiableValueProperty<?, ?>> properties;
+        private List<? extends ValueProperty<?>> properties;
 
         private ModifiableObjectProperty() {
             this(null);
@@ -2493,13 +2454,13 @@ public final class ComponentDsl {
         }
 
         @SafeVarargs
-        public final <P extends ModifiableValueProperty<?, ?>> ModifiableObjectProperty additionalProperties(
+        public final <P extends ValueProperty<?>> ModifiableObjectProperty additionalProperties(
             P... properties) {
 
             return additionalProperties(properties == null ? List.of() : List.of(properties));
         }
 
-        public <P extends ModifiableValueProperty<?, ?>> ModifiableObjectProperty additionalProperties(
+        public <P extends ValueProperty<?>> ModifiableObjectProperty additionalProperties(
             List<? extends P> properties) {
 
             if (properties != null) {
@@ -2545,13 +2506,13 @@ public final class ComponentDsl {
         }
 
         @SafeVarargs
-        public final <P extends ModifiableValueProperty<?, ?>> ModifiableObjectProperty properties(
+        public final <P extends ValueProperty<?>> ModifiableObjectProperty properties(
             P... properties) {
 
             return properties(List.of(properties));
         }
 
-        public <P extends ModifiableValueProperty<?, ?>> ModifiableObjectProperty properties(List<P> properties) {
+        public <P extends ValueProperty<?>> ModifiableObjectProperty properties(List<P> properties) {
             if (properties != null) {
                 this.properties = Collections.unmodifiableList(properties);
             }
@@ -3107,7 +3068,7 @@ public final class ComponentDsl {
         private String name;
         private OutputDefinition outputDefinition;
         private PollFunction pollFunction;
-        private List<? extends Property> properties;
+        private List<Property> properties;
         private String title;
         private TriggerType type;
         private Boolean webhookRawBody;
@@ -3484,12 +3445,12 @@ public final class ComponentDsl {
 
     public static class ModifiableUnifiedApiDefinition implements UnifiedApiDefinition {
 
-        private final Category category;
+        private final UnifiedApiCategory category;
 
         private List<? extends ProviderModelAdapter<?, ?>> providerAdapters;
         private List<? extends ProviderModelMapper<?, ?, ?, ?>> providerMappers;
 
-        public ModifiableUnifiedApiDefinition(Category category) {
+        public ModifiableUnifiedApiDefinition(UnifiedApiCategory category) {
             this.category = category;
         }
 
@@ -3513,7 +3474,7 @@ public final class ComponentDsl {
         }
 
         @Override
-        public Category getCategory() {
+        public UnifiedApiCategory getCategory() {
             return category;
         }
 

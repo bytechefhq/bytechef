@@ -17,7 +17,7 @@
 package com.bytechef.platform.component.facade;
 
 import com.bytechef.component.definition.ActionContext;
-import com.bytechef.platform.component.domain.ComponentConnection;
+import com.bytechef.platform.component.ComponentConnection;
 import com.bytechef.platform.component.domain.Option;
 import com.bytechef.platform.component.domain.Property;
 import com.bytechef.platform.constant.ModeType;

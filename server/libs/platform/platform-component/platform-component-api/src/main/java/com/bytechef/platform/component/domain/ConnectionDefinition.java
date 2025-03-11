@@ -22,15 +22,21 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import org.springframework.lang.Nullable;
 
 /**
  * @author Ivica Cardic
  */
 @SuppressFBWarnings("EI")
-public class ConnectionDefinition extends ConnectionDefinitionBasic {
+public class ConnectionDefinition {
 
+    private boolean authorizationRequired;
     private List<Authorization> authorizations;
+    private String componentDescription;
+    private String componentName;
+    private String componentTitle;
     private List<? extends Property> properties;
+    private int version;
 
     private ConnectionDefinition() {
     }
@@ -39,56 +45,78 @@ public class ConnectionDefinition extends ConnectionDefinitionBasic {
         com.bytechef.component.definition.ConnectionDefinition connectionDefinition, String componentName,
         String componentTitle, String componentDescription) {
 
-        super(connectionDefinition, componentName, componentTitle, componentDescription);
-
+        this.authorizationRequired = OptionalUtils.orElse(connectionDefinition.getAuthorizationRequired(), true);
         this.authorizations = toAuthorizationDTOs(
             OptionalUtils.orElse(connectionDefinition.getAuthorizations(), Collections.emptyList()));
+        this.componentDescription = componentDescription;
+        this.componentName = componentName;
+        this.componentTitle = componentTitle;
         this.properties = CollectionUtils.map(
             OptionalUtils.orElse(connectionDefinition.getProperties(), Collections.emptyList()),
             valueProperty -> (ValueProperty<?>) Property.toProperty(valueProperty));
+        this.version = connectionDefinition.getVersion();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (!(o instanceof ConnectionDefinition that)) {
+            return false;
+        }
+
+        return authorizationRequired == that.authorizationRequired && version == that.version &&
+            Objects.equals(authorizations, that.authorizations) &&
+            Objects.equals(componentDescription, that.componentDescription) &&
+            Objects.equals(componentName, that.componentName) && Objects.equals(componentTitle, that.componentTitle) &&
+            Objects.equals(properties, that.properties);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(
+            authorizationRequired, authorizations, componentDescription, componentName, componentTitle, properties,
+            version);
     }
 
     public List<Authorization> getAuthorizations() {
         return authorizations;
     }
 
+    @Nullable
+    public String getComponentDescription() {
+        return componentDescription;
+    }
+
+    public String getComponentName() {
+        return componentName;
+    }
+
+    public String getComponentTitle() {
+        return componentTitle;
+    }
+
     public List<? extends Property> getProperties() {
         return properties;
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-
-        if (!(o instanceof ConnectionDefinition that)) {
-            return false;
-        }
-
-        if (!super.equals(o)) {
-            return false;
-        }
-
-        return Objects.equals(authorizations, that.authorizations) && Objects.equals(properties, that.properties);
+    public int getVersion() {
+        return version;
     }
 
-    @Override
-    public int hashCode() {
-        return Objects.hash(super.hashCode(), authorizations, properties);
+    public boolean isAuthorizationRequired() {
+        return authorizationRequired;
     }
 
     @Override
     public String toString() {
         return "ConnectionDefinition{" +
-            "authorizations=" + authorizations +
-            ", properties=" + properties +
-            ", authorizationRequired=" + authorizationRequired +
-            ", componentDescription='" + componentDescription + '\'' +
-            ", componentName='" + componentName + '\'' +
-            ", componentTitle='" + componentTitle + '\'' +
+            "componentName='" + componentName + '\'' +
             ", version=" + version +
-            "} ";
+            ", componentTitle='" + componentTitle + '\'' +
+            ", componentDescription='" + componentDescription + '\'' +
+            ", authorizationRequired=" + authorizationRequired +
+            ", properties=" + properties +
+            ", authorizations=" + authorizations +
+            '}';
     }
 
     private static List<Authorization> toAuthorizationDTOs(

@@ -16,5 +16,17 @@
 
 package com.bytechef.platform.component.definition;
 
+import com.bytechef.component.definition.ClusterElementDefinition.ClusterElementType;
+import java.util.List;
+
+/**
+ * @author Ivica Cardic
+ */
 public interface ClusterRootComponentDefinition extends PlatformComponentDefinition {
+
+    /**
+     *
+     * @return
+     */
+    List<ClusterElementType> getElementTypes();
 }

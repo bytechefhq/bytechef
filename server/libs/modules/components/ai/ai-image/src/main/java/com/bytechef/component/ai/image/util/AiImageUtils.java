@@ -16,15 +16,14 @@
 
 package com.bytechef.component.ai.image.util;
 
-import static com.bytechef.component.ai.image.constant.AiImageConstants.PROVIDER;
-import static com.bytechef.component.ai.llm.constant.Provider.AZURE_OPEN_AI;
-import static com.bytechef.component.ai.llm.constant.Provider.OPEN_AI;
-import static com.bytechef.component.ai.llm.constant.Provider.STABILITY;
+import static com.bytechef.component.ai.llm.Provider.AZURE_OPEN_AI;
+import static com.bytechef.component.ai.llm.Provider.OPEN_AI;
+import static com.bytechef.component.ai.llm.Provider.STABILITY;
+import static com.bytechef.component.ai.llm.constant.LLMConstants.PROVIDER;
 import static com.bytechef.component.definition.ComponentDsl.option;
 
+import com.bytechef.component.ai.llm.Provider;
 import com.bytechef.component.ai.llm.azure.openai.constant.AzureOpenAiConstants;
-import com.bytechef.component.ai.llm.constant.LLMConstants;
-import com.bytechef.component.ai.llm.constant.Provider;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Parameters;
@@ -33,6 +32,7 @@ import com.bytechef.config.ApplicationProperties.Ai;
 import com.bytechef.platform.configuration.domain.Property;
 import com.bytechef.platform.configuration.domain.Property.Scope;
 import com.bytechef.platform.configuration.service.PropertyService;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Predicate;
@@ -62,7 +62,7 @@ public class AiImageUtils {
         Ai.Provider aiProvider, PropertyService propertyService) {
 
         List<String> activeProviderKeys = propertyService.getProperties(
-            LLMConstants.PROVIDERS.stream()
+            Arrays.stream(Provider.values())
                 .map(Provider::getKey)
                 .toList(),
             Scope.PLATFORM, null)
@@ -71,7 +71,7 @@ public class AiImageUtils {
             .map(Property::getKey)
             .toList();
 
-        return LLMConstants.PROVIDERS.stream()
+        return Arrays.stream(Provider.values())
             .filter(filter(aiProvider, activeProviderKeys))
             .map(provider -> option(provider.getLabel(), String.valueOf(provider)))
             .toList();

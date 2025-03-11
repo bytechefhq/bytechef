@@ -58,13 +58,13 @@ public class WorkflowExecutionId implements Serializable {
     }
 
     public static WorkflowExecutionId of(
-        ModeType type, long principalId, String workflowReferenceCode, String triggerName) {
+        ModeType type, long jobPrincipalId, String workflowReferenceCode, String triggerName) {
 
         Validate.notBlank(workflowReferenceCode, "'workflowReferenceCode' must not be blank");
         Validate.notBlank(triggerName, "'triggerName' must not be blank");
 
         return new WorkflowExecutionId(
-            TenantContext.getCurrentTenantId(), type, principalId, workflowReferenceCode, triggerName);
+            TenantContext.getCurrentTenantId(), type, jobPrincipalId, workflowReferenceCode, triggerName);
     }
 
     public static WorkflowExecutionId parse(String id) {

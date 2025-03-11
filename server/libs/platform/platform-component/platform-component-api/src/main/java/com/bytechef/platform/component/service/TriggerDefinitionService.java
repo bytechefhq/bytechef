@@ -21,7 +21,7 @@ import com.bytechef.component.definition.TriggerContext;
 import com.bytechef.component.definition.TriggerDefinition.WebhookEnableOutput;
 import com.bytechef.component.definition.TriggerDefinition.WebhookValidateResponse;
 import com.bytechef.component.exception.ProviderException;
-import com.bytechef.platform.component.domain.ComponentConnection;
+import com.bytechef.platform.component.ComponentConnection;
 import com.bytechef.platform.component.domain.Option;
 import com.bytechef.platform.component.domain.Property;
 import com.bytechef.platform.component.domain.TriggerDefinition;

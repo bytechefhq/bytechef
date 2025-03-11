@@ -145,8 +145,8 @@ public class WorkflowNodeTestOutputFacadeImpl implements WorkflowNodeTestOutputF
             WorkflowNodeType triggerWorkflowNodeType = WorkflowNodeType.ofType(workflowTrigger.getType());
 
             TriggerOutput triggerOutput = triggerDefinitionFacade.executeTrigger(
-                triggerWorkflowNodeType.componentName(), triggerWorkflowNodeType.componentVersion(),
-                triggerWorkflowNodeType.componentOperationName(), workflowExecutionId.getType(), null,
+                triggerWorkflowNodeType.name(), triggerWorkflowNodeType.version(),
+                triggerWorkflowNodeType.operation(), workflowExecutionId.getType(), null,
                 workflowExecutionId.getWorkflowReferenceCode(), Map.of(), Map.of(), webhookRequest, null, true);
 
             saveWorkflowNodeTestOutput(workflowId, workflowTrigger.getName(), triggerOutput.value());
@@ -171,8 +171,8 @@ public class WorkflowNodeTestOutputFacadeImpl implements WorkflowNodeTestOutputF
             MapUtils.concat((Map<String, Object>) inputs, (Map<String, Object>) outputs));
 
         Object object = actionDefinitionFacade.executePerform(
-            workflowNodeType.componentName(), workflowNodeType.componentVersion(),
-            workflowNodeType.componentOperationName(), null, null, null, null, null, inputParameters,
+            workflowNodeType.name(), workflowNodeType.version(),
+            workflowNodeType.operation(), null, null, null, null, null, inputParameters,
             connectionIds, Map.of(), true);
 
         BaseOutputDefinition.OutputResponse definitionOutputResponse = BaseOutputDefinition.OutputResponse.of(
@@ -199,8 +199,8 @@ public class WorkflowNodeTestOutputFacadeImpl implements WorkflowNodeTestOutputF
         Map<String, ?> inputs = workflowTestConfigurationService.getWorkflowTestConfigurationInputs(workflowId);
 
         TriggerOutput triggerOutput = triggerDefinitionFacade.executeTrigger(
-            workflowNodeType.componentName(), workflowNodeType.componentVersion(),
-            workflowNodeType.componentOperationName(), null, null, null, workflowTrigger.evaluateParameters(inputs),
+            workflowNodeType.name(), workflowNodeType.version(),
+            workflowNodeType.operation(), null, null, null, workflowTrigger.evaluateParameters(inputs),
             null, null, connectionId, true);
 
         Object value = triggerOutput.value();

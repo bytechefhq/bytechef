@@ -175,8 +175,7 @@ public abstract class AbstractWebhookTriggerController {
         WorkflowNodeType workflowNodeType = getComponentOperation(workflowExecutionId);
 
         return triggerDefinitionService.getWebhookTriggerFlags(
-            workflowNodeType.componentName(), workflowNodeType.componentVersion(),
-            workflowNodeType.componentOperationName());
+            workflowNodeType.name(), workflowNodeType.version(), workflowNodeType.operation());
     }
 
     protected boolean isWorkflowDisabled(WorkflowExecutionId workflowExecutionId) {

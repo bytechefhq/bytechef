@@ -84,18 +84,21 @@ public class MistralChatAction {
             RESPONSE + "." + RESPONSE_FORMAT, ResponseFormat.class, ResponseFormat.TEXT) == ResponseFormat.TEXT
                 ? "text" : "json_object";
 
-        return new MistralAiChatModel(
-            new MistralAiApi(connectionParameters.getString(TOKEN)),
-            MistralAiChatOptions.builder()
-                .model(inputParameters.getRequiredString(MODEL))
-                .temperature(inputParameters.getDouble(TEMPERATURE))
-                .maxTokens(inputParameters.getInteger(MAX_TOKENS))
-                .topP(inputParameters.getDouble(TOP_P))
-                .stop(inputParameters.getList(STOP, new TypeReference<>() {}))
-                .safePrompt(inputParameters.getBoolean(SAFE_PROMPT))
-                .randomSeed(inputParameters.getInteger(SEED))
-                .responseFormat(new MistralAiApi.ChatCompletionRequest.ResponseFormat(type))
-                .build());
+        return MistralAiChatModel.builder()
+            .mistralAiApi(
+                new MistralAiApi(connectionParameters.getString(TOKEN)))
+            .defaultOptions(
+                MistralAiChatOptions.builder()
+                    .model(inputParameters.getRequiredString(MODEL))
+                    .temperature(inputParameters.getDouble(TEMPERATURE))
+                    .maxTokens(inputParameters.getInteger(MAX_TOKENS))
+                    .topP(inputParameters.getDouble(TOP_P))
+                    .stop(inputParameters.getList(STOP, new TypeReference<>() {}))
+                    .safePrompt(inputParameters.getBoolean(SAFE_PROMPT))
+                    .randomSeed(inputParameters.getInteger(SEED))
+                    .responseFormat(new MistralAiApi.ChatCompletionRequest.ResponseFormat(type))
+                    .build())
+            .build();
     };
 
     private MistralChatAction() {

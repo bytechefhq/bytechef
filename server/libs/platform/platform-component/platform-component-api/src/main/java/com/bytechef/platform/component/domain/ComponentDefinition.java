@@ -19,9 +19,11 @@ package com.bytechef.platform.component.domain;
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.IconUtils;
 import com.bytechef.commons.util.OptionalUtils;
+import com.bytechef.component.definition.ClusterElementDefinition.ClusterElementType;
 import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.UnifiedApiDefinition;
-import com.bytechef.component.definition.UnifiedApiDefinition.Category;
+import com.bytechef.component.definition.UnifiedApiDefinition.UnifiedApiCategory;
+import com.bytechef.platform.component.definition.ClusterRootComponentDefinition;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Collections;
 import java.util.List;
@@ -35,19 +37,21 @@ import org.springframework.lang.Nullable;
 @SuppressFBWarnings("EI")
 public class ComponentDefinition {
 
-    private List<ActionDefinitionBasic> actions;
-    private List<ComponentCategory> categories;
-    private ConnectionDefinitionBasic connection;
+    private List<ActionDefinition> actions;
+    private List<ComponentCategory> componentCategories;
+    private boolean clusterElement;
+    private List<ClusterElementType> clusterElementTypes;
+    private boolean clusterRoot;
+    private ConnectionDefinition connection;
     private boolean connectionRequired;
-    private boolean dataStreamSupported;
     private String description;
     private String icon;
     private String name;
     private Resources resources;
     private List<String> tags;
-    private List<TriggerDefinitionBasic> triggers;
+    private List<TriggerDefinition> triggers;
     private String title;
-    private Category category;
+    private UnifiedApiCategory unifiedApiCategory;
     private int version;
 
     private ComponentDefinition() {
@@ -62,17 +66,24 @@ public class ComponentDefinition {
 
     public ComponentDefinition(com.bytechef.component.definition.ComponentDefinition componentDefinition) {
         this.actions = getActions(componentDefinition);
-        this.categories = OptionalUtils.orElse(componentDefinition.getCategories(), List.of());
+
+        this.clusterElement = OptionalUtils.orElse(componentDefinition.getClusterElements(), List.of())
+            .isEmpty();
+        if (componentDefinition instanceof ClusterRootComponentDefinition clusterRootComponentDefinition) {
+            this.clusterElementTypes = clusterRootComponentDefinition.getElementTypes();
+        } else {
+            this.clusterElementTypes = List.of();
+        }
+
+        this.clusterRoot = !clusterElementTypes.isEmpty();
+        this.componentCategories = OptionalUtils.orElse(componentDefinition.getComponentCategories(), List.of());
         this.connection = getConnection(componentDefinition);
-        this.connectionRequired = componentDefinition
-            .getConnection()
+        this.connectionRequired = componentDefinition.getConnection()
             .map(connectionDefinition -> CollectionUtils.anyMatch(
                 OptionalUtils.orElse(connectionDefinition.getProperties(), List.of()),
                 property -> OptionalUtils.orElse(property.getRequired(), false)) ||
                 OptionalUtils.orElse(connectionDefinition.getAuthorizationRequired(), true))
             .orElse(false);
-        this.dataStreamSupported = OptionalUtils.mapOrElse(
-            componentDefinition.getDataStream(), dataStreamDefinition -> true, false);
         this.description = OptionalUtils.orElse(componentDefinition.getDescription(), null);
         this.icon = OptionalUtils.mapOrElse(componentDefinition.getIcon(), IconUtils::readIcon, null);
         this.name = componentDefinition.getName();
@@ -81,16 +92,24 @@ public class ComponentDefinition {
         this.triggers = getTriggers(componentDefinition);
         this.title = getTitle(
             componentDefinition.getName(), OptionalUtils.orElse(componentDefinition.getTitle(), null));
-        this.category = OptionalUtils.mapOrElse(
+        this.unifiedApiCategory = OptionalUtils.mapOrElse(
             componentDefinition.getUnifiedApi(), UnifiedApiDefinition::getCategory, null);
         this.version = componentDefinition.getVersion();
+    }
+
+    public boolean isClusterElement() {
+        return clusterElement;
+    }
+
+    public boolean isClusterRoot() {
+        return clusterRoot;
     }
 
     public boolean isConnectionRequired() {
         return connectionRequired;
     }
 
-    public List<ActionDefinitionBasic> getActions() {
+    public List<ActionDefinition> getActions() {
         return actions;
     }
 
@@ -98,17 +117,17 @@ public class ComponentDefinition {
         return actions.size();
     }
 
-    public List<ComponentCategory> getCategories() {
-        return categories;
+    public List<ComponentCategory> getComponentCategories() {
+        return componentCategories;
+    }
+
+    public List<ClusterElementType> getClusterElementTypes() {
+        return clusterElementTypes;
     }
 
     @Nullable
-    public ConnectionDefinitionBasic getConnection() {
+    public ConnectionDefinition getConnection() {
         return connection;
-    }
-
-    public boolean isDataStreamSupported() {
-        return dataStreamSupported;
     }
 
     @Nullable
@@ -139,7 +158,7 @@ public class ComponentDefinition {
         return title;
     }
 
-    public List<TriggerDefinitionBasic> getTriggers() {
+    public List<TriggerDefinition> getTriggers() {
         return triggers;
     }
 
@@ -148,8 +167,8 @@ public class ComponentDefinition {
     }
 
     @Nullable
-    public Category getUnifiedApiCategory() {
-        return category;
+    public UnifiedApiCategory getUnifiedApiCategory() {
+        return unifiedApiCategory;
     }
 
     public int getVersion() {
@@ -166,20 +185,21 @@ public class ComponentDefinition {
             return false;
         }
 
-        return Objects.equals(actions, that.actions) && Objects.equals(categories, that.categories) &&
+        return Objects.equals(actions, that.actions) && clusterElement == that.clusterElement &&
+            clusterRoot == that.clusterRoot && Objects.equals(componentCategories, that.componentCategories) &&
             Objects.equals(connection, that.connection) && connectionRequired == that.connectionRequired &&
-            dataStreamSupported == that.dataStreamSupported && Objects.equals(description, that.description) &&
-            Objects.equals(icon, that.icon) && Objects.equals(name, that.name) &&
-            Objects.equals(resources, that.resources) && Objects.equals(tags, that.tags) &&
-            Objects.equals(triggers, that.triggers) && Objects.equals(category, that.category) &&
-            Objects.equals(title, that.title) && version == that.version;
+            Objects.equals(description, that.description) && Objects.equals(icon, that.icon) &&
+            Objects.equals(name, that.name) && Objects.equals(resources, that.resources) &&
+            Objects.equals(tags, that.tags) && Objects.equals(triggers, that.triggers) &&
+            Objects.equals(unifiedApiCategory, that.unifiedApiCategory) && Objects.equals(title, that.title) &&
+            version == that.version;
     }
 
     @Override
     public int hashCode() {
         return Objects.hash(
-            actions, categories, connection, connectionRequired, dataStreamSupported, description, icon, name,
-            resources, tags, triggers, title, category, version);
+            actions, clusterElement, clusterRoot, componentCategories, connection, connectionRequired, description,
+            icon, name, resources, tags, triggers, title, unifiedApiCategory, version);
     }
 
     @Override
@@ -191,29 +211,28 @@ public class ComponentDefinition {
             ", connection=" + connection +
             ", connectionRequired=" + connectionRequired +
             ", connectionRequired=" + connectionRequired +
-            ", dataStreamSupported=" + dataStreamSupported +
-            ", unifiedApiCategory=" + category +
+            ", unifiedApiCategory=" + unifiedApiCategory +
             ", description='" + description + '\'' +
             ", icon='" + icon + '\'' +
             ", actions=" + actions +
             ", triggers=" + triggers +
-            ", categories='" + categories + '\'' +
+            ", categories='" + componentCategories + '\'' +
             ", resources=" + resources +
             ", tags=" + tags +
             '}';
     }
 
-    private static List<ActionDefinitionBasic> getActions(
+    private static List<ActionDefinition> getActions(
         com.bytechef.component.definition.ComponentDefinition componentDefinition) {
 
         return OptionalUtils.mapOrElse(
             componentDefinition.getActions(),
-            actionDefinitions -> CollectionUtils.map(actionDefinitions, actionDefinition -> new ActionDefinitionBasic(
+            actionDefinitions -> CollectionUtils.map(actionDefinitions, actionDefinition -> new ActionDefinition(
                 actionDefinition, componentDefinition.getName(), componentDefinition.getVersion())),
             Collections.emptyList());
     }
 
-    private static ConnectionDefinitionBasic getConnection(
+    private static ConnectionDefinition getConnection(
         com.bytechef.component.definition.ComponentDefinition componentDefinition) {
 
         Optional<String> descriptionOptional = componentDefinition.getDescription();
@@ -221,7 +240,7 @@ public class ComponentDefinition {
 
         return OptionalUtils.mapOrElse(
             componentDefinition.getConnection(),
-            connectionDefinition -> new ConnectionDefinitionBasic(
+            connectionDefinition -> new ConnectionDefinition(
                 connectionDefinition, componentDefinition.getName(),
                 titleOptional.orElse(componentDefinition.getName()), descriptionOptional.orElse(null)),
             null);
@@ -231,13 +250,13 @@ public class ComponentDefinition {
         return componentTitle == null ? componentName : componentTitle;
     }
 
-    private static List<TriggerDefinitionBasic> getTriggers(
+    private static List<TriggerDefinition> getTriggers(
         com.bytechef.component.definition.ComponentDefinition componentDefinition) {
 
         return OptionalUtils.mapOrElse(
             componentDefinition.getTriggers(),
             triggerDefinitions -> CollectionUtils.map(triggerDefinitions,
-                triggerDefinition -> new TriggerDefinitionBasic(
+                triggerDefinition -> new TriggerDefinition(
                     triggerDefinition, componentDefinition.getName(), componentDefinition.getVersion())),
             Collections.emptyList());
     }

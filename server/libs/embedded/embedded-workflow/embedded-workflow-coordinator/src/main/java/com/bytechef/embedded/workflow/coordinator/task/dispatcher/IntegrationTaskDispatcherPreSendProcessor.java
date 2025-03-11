@@ -93,7 +93,7 @@ public class IntegrationTaskDispatcherPreSendProcessor extends AbstractDispatche
 
         Integration integration = integrationService.getIntegrationInstanceIntegration(integrationInstanceId);
 
-        if (Objects.equals(integration.getComponentName(), workflowNodeType.componentName())) {
+        if (Objects.equals(integration.getComponentName(), workflowNodeType.name())) {
             connectionIdMap = MapUtils.concat(
                 connectionIdMap, Map.of(workflowTask.getName(), integrationInstance.getConnectionId()));
         }

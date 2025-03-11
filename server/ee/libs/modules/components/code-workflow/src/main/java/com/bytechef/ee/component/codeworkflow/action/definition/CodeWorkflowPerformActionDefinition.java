@@ -11,10 +11,10 @@ import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ActionDefinition;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.ee.component.codeworkflow.task.CodeWorkflowTaskExecutor;
+import com.bytechef.platform.component.ComponentConnection;
 import com.bytechef.platform.component.constant.MetadataConstants;
 import com.bytechef.platform.component.definition.AbstractActionDefinitionWrapper;
 import com.bytechef.platform.component.definition.MultipleConnectionsPerformFunction;
-import com.bytechef.platform.component.definition.ParameterConnection;
 import com.bytechef.platform.constant.ModeType;
 import java.util.Map;
 import java.util.Optional;
@@ -42,7 +42,7 @@ public class CodeWorkflowPerformActionDefinition extends AbstractActionDefinitio
     }
 
     protected Object perform(
-        Parameters inputParameters, Map<String, ? extends ParameterConnection> connectionParameters,
+        Parameters inputParameters, Map<String, ? extends ComponentConnection> connectionParameters,
         Parameters extensions, ActionContext actionContext) {
 
         return codeWorkflowTaskExecutor.executePerform(

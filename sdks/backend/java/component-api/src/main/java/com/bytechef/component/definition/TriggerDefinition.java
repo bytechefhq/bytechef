@@ -45,54 +45,6 @@ public interface TriggerDefinition {
     /**
      *
      */
-    @FunctionalInterface
-    interface WebhookDisableConsumer {
-
-        /**
-         *
-         * @param inputParameters
-         * @param connectionParameters
-         * @param outputParameters
-         * @param workflowExecutionId
-         */
-        void accept(
-            Parameters inputParameters, Parameters connectionParameters, Parameters outputParameters,
-            String workflowExecutionId, TriggerContext context);
-
-    }
-
-    /**
-     *
-     */
-    @FunctionalInterface
-    interface WebhookEnableFunction {
-
-        /**
-         *
-         * @param inputParameters
-         * @param connectionParameters
-         * @param webhookUrl
-         * @param workflowExecutionId
-         * @return
-         */
-        WebhookEnableOutput apply(
-            Parameters inputParameters, Parameters connectionParameters, String webhookUrl, String workflowExecutionId,
-            TriggerContext context);
-
-    }
-
-    /**
-     *
-     * @param parameters
-     * @param webhookExpirationDate
-     */
-    @SuppressFBWarnings("EI")
-    record WebhookEnableOutput(Map<String, ?> parameters, LocalDateTime webhookExpirationDate) {
-    }
-
-    /**
-     *
-     */
     enum WebhookMethod {
         DELETE,
         GET,
@@ -404,16 +356,6 @@ public interface TriggerDefinition {
 
     /**
      *
-     * @param records
-     * @param closureParameters
-     * @param pollImmediately
-     */
-    @SuppressFBWarnings("EI")
-    record PollOutput(List<?> records, Map<String, ?> closureParameters, boolean pollImmediately) {
-    }
-
-    /**
-     *
      */
     @FunctionalInterface
     interface ProcessErrorResponseFunction {
@@ -426,6 +368,20 @@ public interface TriggerDefinition {
          * @return
          */
         ProviderException apply(int statusCode, Object body, Context context) throws Exception;
+    }
+
+    /**
+     *
+     */
+    @FunctionalInterface
+    interface TriggerWorkflowNodeDescriptionFunction {
+
+        /**
+         * @param inputParameters
+         * @param context
+         * @return
+         */
+        String apply(Parameters inputParameters, TriggerContext context) throws Exception;
     }
 
     /**
@@ -493,6 +449,45 @@ public interface TriggerDefinition {
      *
      */
     @FunctionalInterface
+    interface WebhookDisableConsumer {
+
+        /**
+         *
+         * @param inputParameters
+         * @param connectionParameters
+         * @param outputParameters
+         * @param workflowExecutionId
+         */
+        void accept(
+            Parameters inputParameters, Parameters connectionParameters, Parameters outputParameters,
+            String workflowExecutionId, TriggerContext context);
+
+    }
+
+    /**
+     *
+     */
+    @FunctionalInterface
+    interface WebhookEnableFunction {
+
+        /**
+         *
+         * @param inputParameters
+         * @param connectionParameters
+         * @param webhookUrl
+         * @param workflowExecutionId
+         * @return
+         */
+        WebhookEnableOutput apply(
+            Parameters inputParameters, Parameters connectionParameters, String webhookUrl, String workflowExecutionId,
+            TriggerContext context);
+
+    }
+
+    /**
+     *
+     */
+    @FunctionalInterface
     interface WebhookRequestFunction {
 
         /**
@@ -553,6 +548,25 @@ public interface TriggerDefinition {
             Parameters inputParameters, HttpHeaders headers, HttpParameters parameters, WebhookBody body,
             WebhookMethod method, TriggerContext context);
 
+    }
+
+    /**
+     *
+     * @param records
+     * @param closureParameters
+     * @param pollImmediately
+     */
+    @SuppressFBWarnings("EI")
+    record PollOutput(List<?> records, Map<String, ?> closureParameters, boolean pollImmediately) {
+    }
+
+    /**
+     *
+     * @param parameters
+     * @param webhookExpirationDate
+     */
+    @SuppressFBWarnings("EI")
+    record WebhookEnableOutput(Map<String, ?> parameters, LocalDateTime webhookExpirationDate) {
     }
 
     @SuppressFBWarnings("EI")

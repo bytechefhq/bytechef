@@ -8,20 +8,9 @@
 package com.bytechef.ee.platform.component.remote.client.service;
 
 import com.bytechef.commons.util.CollectionUtils;
-import com.bytechef.component.definition.DataStreamItemReader;
-import com.bytechef.component.definition.DataStreamItemWriter;
-import com.bytechef.component.definition.UnifiedApiDefinition.Category;
-import com.bytechef.component.definition.UnifiedApiDefinition.ModelType;
-import com.bytechef.component.definition.unified.base.adapter.ProviderModelAdapter;
-import com.bytechef.component.definition.unified.base.mapper.ProviderModelMapper;
-import com.bytechef.component.definition.unified.base.model.ProviderInputModel;
-import com.bytechef.component.definition.unified.base.model.ProviderOutputModel;
-import com.bytechef.component.definition.unified.base.model.UnifiedInputModel;
-import com.bytechef.component.definition.unified.base.model.UnifiedOutputModel;
 import com.bytechef.ee.discovery.util.WorkerDiscoveryUtils;
 import com.bytechef.ee.platform.component.remote.client.AbstractWorkerClient;
 import com.bytechef.ee.remote.client.DefaultRestClient;
-import com.bytechef.platform.component.definition.DataStreamComponentDefinition.ComponentType;
 import com.bytechef.platform.component.domain.ComponentDefinition;
 import com.bytechef.platform.component.service.ComponentDefinitionService;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -110,45 +99,6 @@ public class RemoteComponentDefinitionServiceClient extends AbstractWorkerClient
 
     @Override
     public ComponentDefinition getConnectionComponentDefinition(String name, int connectionVersion) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public List<ComponentDefinition> getDataStreamComponentDefinitions(ComponentType componentType) {
-        // TODO
-
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public DataStreamItemReader getDataStreamItemReader(String componentName, int componentVersion) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public DataStreamItemWriter getDataStreamItemWriter(String componentName, int componentVersion) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public List<ComponentDefinition> getUnifiedApiComponentDefinitions(Category category) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public ProviderModelAdapter<? super ProviderInputModel, ? extends ProviderOutputModel>
-        getUnifiedApiProviderModelAdapter(
-            String componentName, Category category, ModelType modelType) {
-
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public
-        ProviderModelMapper<? super UnifiedInputModel, ? extends UnifiedOutputModel, ? extends ProviderInputModel, ? super ProviderOutputModel>
-        getUnifiedApiProviderModelMapper(
-            String componentName, Category category, ModelType modelTyp) {
-
         throw new UnsupportedOperationException();
     }
 

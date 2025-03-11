@@ -165,8 +165,8 @@ public class AppEventTriggerApiController extends AbstractWebhookTriggerControll
             .map(workflowTrigger -> {
                 WorkflowNodeType workflowNodeType = WorkflowNodeType.ofType(workflowTrigger.getType());
 
-                if (Objects.equals(workflowNodeType.componentName(), APP_EVENT) &&
-                    Objects.equals(workflowNodeType.componentOperationName(), NEW_EVENT)) {
+                if (Objects.equals(workflowNodeType.name(), APP_EVENT) &&
+                    Objects.equals(workflowNodeType.operation(), NEW_EVENT)) {
 
                     return workflowTrigger.getName();
                 }

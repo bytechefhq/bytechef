@@ -22,11 +22,11 @@ import static com.bytechef.component.definition.ComponentDsl.trigger;
 import static com.bytechef.component.definition.TriggerContext.Data.Scope.WORKFLOW;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.FORMAT;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.FORMAT_PROPERTY;
-import static com.bytechef.component.google.mail.constant.GoogleMailConstants.FULL;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.HISTORY_ID;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.ME;
-import static com.bytechef.component.google.mail.constant.GoogleMailConstants.SIMPLE;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.TOPIC_NAME;
+import static com.bytechef.component.google.mail.definition.Format.FULL;
+import static com.bytechef.component.google.mail.definition.Format.SIMPLE;
 import static com.bytechef.component.google.mail.util.GoogleMailUtils.getSimpleMessage;
 
 import com.bytechef.component.definition.Parameters;
@@ -38,6 +38,7 @@ import com.bytechef.component.definition.TriggerDefinition.WebhookBody;
 import com.bytechef.component.definition.TriggerDefinition.WebhookEnableOutput;
 import com.bytechef.component.definition.TriggerDefinition.WebhookMethod;
 import com.bytechef.component.exception.ProviderException;
+import com.bytechef.component.google.mail.definition.Format;
 import com.bytechef.component.google.mail.util.GoogleMailUtils;
 import com.bytechef.google.commons.GoogleServices;
 import com.google.api.services.gmail.Gmail;
@@ -152,7 +153,7 @@ public class GoogleMailNewEmailTrigger {
             List<HistoryMessageAdded> messagesAdded = lastHistory.getMessagesAdded();
 
             if (messagesAdded != null && !messagesAdded.isEmpty()) {
-                String format = inputParameters.getString(FORMAT, SIMPLE);
+                Format format = inputParameters.get(FORMAT, Format.class, SIMPLE);
 
                 for (HistoryMessageAdded historyMessageAdded : messagesAdded) {
                     Message historyMessage = historyMessageAdded.getMessage();
@@ -160,7 +161,7 @@ public class GoogleMailNewEmailTrigger {
                     Message message = gmail.users()
                         .messages()
                         .get(ME, historyMessage.getId())
-                        .setFormat(format.equals(SIMPLE) ? FULL : format)
+                        .setFormat(format == SIMPLE ? FULL.getMapping() : format.getMapping())
                         .execute();
 
                     if (format.equals(SIMPLE)) {

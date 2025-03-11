@@ -210,7 +210,7 @@ public class ApiCollectionFacadeImpl implements ApiCollectionFacade {
 
             WorkflowNodeType workflowNodeType = WorkflowNodeType.ofType(workflowTrigger.getType());
 
-            if (!Objects.equals(workflowNodeType.componentOperationName(), "newApiRequest")) {
+            if (!Objects.equals(workflowNodeType.operation(), "newApiRequest")) {
                 throw new IllegalArgumentException("Invalid workflow trigger type");
             }
 

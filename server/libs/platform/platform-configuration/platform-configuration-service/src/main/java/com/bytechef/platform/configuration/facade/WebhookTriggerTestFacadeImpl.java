@@ -122,8 +122,8 @@ public class WebhookTriggerTestFacadeImpl implements WebhookTriggerTestFacade {
             .orElse(null);
 
         return triggerDefinitionFacade.executeWebhookValidateOnEnable(
-            workflowNodeType.componentName(), workflowNodeType.componentVersion(),
-            workflowNodeType.componentOperationName(), triggerParameters, webhookRequest, connectionId);
+            workflowNodeType.name(), workflowNodeType.version(),
+            workflowNodeType.operation(), triggerParameters, webhookRequest, connectionId);
     }
 
     private String executeTrigger(String workflowId, ModeType type, boolean enable) {
@@ -166,21 +166,21 @@ public class WebhookTriggerTestFacadeImpl implements WebhookTriggerTestFacade {
         Map<String, ?> triggerParameters, Long connectionId) {
 
         TriggerDefinition triggerDefinition = triggerDefinitionService.getTriggerDefinition(
-            triggerWorkflowNodeType.componentName(), triggerWorkflowNodeType.componentVersion(),
-            triggerWorkflowNodeType.componentOperationName());
+            triggerWorkflowNodeType.name(), triggerWorkflowNodeType.version(),
+            triggerWorkflowNodeType.operation());
 
         switch (triggerDefinition.getType()) {
             case HYBRID, DYNAMIC_WEBHOOK -> {
                 Cache cache = getWebhookEnableOutputCache();
 
                 triggerDefinitionFacade.executeWebhookDisable(
-                    triggerWorkflowNodeType.componentName(), triggerWorkflowNodeType.componentVersion(),
-                    triggerWorkflowNodeType.componentOperationName(), triggerParameters, workflowExecutionId.toString(),
+                    triggerWorkflowNodeType.name(), triggerWorkflowNodeType.version(),
+                    triggerWorkflowNodeType.operation(), triggerParameters, workflowExecutionId.toString(),
                     cache.get(workflowExecutionId.toString(), (Callable<Map<String, ?>>) Map::of), connectionId);
             }
             case LISTENER -> triggerDefinitionFacade.executeListenerDisable(
-                triggerWorkflowNodeType.componentName(), triggerWorkflowNodeType.componentVersion(),
-                triggerWorkflowNodeType.componentOperationName(), triggerParameters, workflowExecutionId.toString(),
+                triggerWorkflowNodeType.name(), triggerWorkflowNodeType.version(),
+                triggerWorkflowNodeType.operation(), triggerParameters, workflowExecutionId.toString(),
                 connectionId);
             default -> {
             }
@@ -198,14 +198,14 @@ public class WebhookTriggerTestFacadeImpl implements WebhookTriggerTestFacade {
         Map<String, ?> triggerParameters, Long connectionId) {
 
         TriggerDefinition triggerDefinition = triggerDefinitionService.getTriggerDefinition(
-            triggerWorkflowNodeType.componentName(), triggerWorkflowNodeType.componentVersion(),
-            triggerWorkflowNodeType.componentOperationName());
+            triggerWorkflowNodeType.name(), triggerWorkflowNodeType.version(),
+            triggerWorkflowNodeType.operation());
 
         switch (triggerDefinition.getType()) {
             case DYNAMIC_WEBHOOK, HYBRID, STATIC_WEBHOOK -> {
                 WebhookEnableOutput webhookEnableOutput = triggerDefinitionFacade.executeWebhookEnable(
-                    triggerWorkflowNodeType.componentName(), triggerWorkflowNodeType.componentVersion(),
-                    triggerWorkflowNodeType.componentOperationName(), triggerParameters,
+                    triggerWorkflowNodeType.name(), triggerWorkflowNodeType.version(),
+                    triggerWorkflowNodeType.operation(), triggerParameters,
                     workflowExecutionId.toString(), connectionId, getWebhookUrl(workflowExecutionId));
 
                 if (webhookEnableOutput != null) {
@@ -215,8 +215,8 @@ public class WebhookTriggerTestFacadeImpl implements WebhookTriggerTestFacade {
                 }
             }
             case LISTENER -> triggerDefinitionFacade.executeListenerEnable(
-                triggerWorkflowNodeType.componentName(), triggerWorkflowNodeType.componentVersion(),
-                triggerWorkflowNodeType.componentOperationName(), triggerParameters, workflowExecutionId.toString(),
+                triggerWorkflowNodeType.name(), triggerWorkflowNodeType.version(),
+                triggerWorkflowNodeType.operation(), triggerParameters, workflowExecutionId.toString(),
                 connectionId);
             default -> {
             }

@@ -40,7 +40,7 @@ public class RuntimeTaskDispatcherPreSendProcessor implements TaskDispatcherPreS
 
         WorkflowNodeType workflowNodeType = WorkflowNodeType.ofType(workflowTask.getType());
 
-        String componentName = workflowNodeType.componentName();
+        String componentName = workflowNodeType.name();
 
         String name = workflowTask.getName();
         String parameters = environment.getProperty(CONNECTION_ENV_VARIABLE.formatted(workflowTask.getName()));

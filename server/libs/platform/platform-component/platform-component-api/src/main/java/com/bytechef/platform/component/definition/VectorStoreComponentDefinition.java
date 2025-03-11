@@ -16,5 +16,23 @@
 
 package com.bytechef.platform.component.definition;
 
-public interface VectorStoreComponentDefinition extends ClusterRootComponentDefinition, AiComponentDefinition {
+import static com.bytechef.platform.component.definition.vectorstore.EmbeddingFunction.EMBEDDING;
+
+import com.bytechef.component.definition.ClusterElementDefinition;
+import java.util.List;
+
+/**
+ * @author Ivica Cardic
+ */
+public interface VectorStoreComponentDefinition extends ClusterRootComponentDefinition {
+
+    /**
+     *
+     */
+    String VECTOR_STORE = "vectorStore";
+
+    @Override
+    default List<ClusterElementDefinition.ClusterElementType> getElementTypes() {
+        return List.of(EMBEDDING);
+    }
 }

@@ -26,13 +26,13 @@ public interface ActionContextAware extends ActionContext {
 
     String getActionName();
 
-    ModeType getType();
-
     Long getJobPrincipalId();
 
     Long getJobPrincipalWorkflowId();
 
     Long getJobId();
+
+    ModeType getModeType();
 
     String getWorkflowId();
 

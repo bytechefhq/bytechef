@@ -19,7 +19,7 @@ package com.bytechef.platform.component.definition;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.TriggerContext;
-import com.bytechef.platform.component.domain.ComponentConnection;
+import com.bytechef.platform.component.ComponentConnection;
 import com.bytechef.platform.constant.ModeType;
 import javax.annotation.Nullable;
 
@@ -33,7 +33,9 @@ public interface ContextFactory {
         @Nullable Long jobPrincipalId, @Nullable Long jobPrincipalWorkflowId, @Nullable String workflowId,
         @Nullable Long jobId, @Nullable ComponentConnection connection, boolean editorEnvironment);
 
-    Context createContext(String componentName, ComponentConnection connection);
+    Context createContext(String componentName, @Nullable ComponentConnection connection);
+
+    Context createContext(String componentName, @Nullable ComponentConnection connection, boolean editorEnvironment);
 
     TriggerContext createTriggerContext(
         String componentName, int componentVersion, String triggerName, @Nullable ModeType type,

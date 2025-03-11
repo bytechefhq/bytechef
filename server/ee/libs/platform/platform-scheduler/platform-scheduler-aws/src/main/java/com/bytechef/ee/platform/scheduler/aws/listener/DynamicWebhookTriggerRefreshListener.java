@@ -95,8 +95,8 @@ public class DynamicWebhookTriggerRefreshListener {
         LocalDateTime webhookExpirationDate = null;
 
         output = remoteTriggerDefinitionFacade.executeDynamicWebhookRefresh(
-            workflowNodeType.componentName(), workflowNodeType.componentVersion(),
-            workflowNodeType.componentOperationName(), output.parameters(), connectionId);
+            workflowNodeType.name(), workflowNodeType.version(),
+            workflowNodeType.operation(), output.parameters(), connectionId);
 
         if (output != null) {
             triggerStateService.save(workflowExecutionId, output);

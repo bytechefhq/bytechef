@@ -35,7 +35,7 @@ import static org.springframework.ai.azure.openai.AzureOpenAiAudioTranscriptionO
 import com.azure.ai.openai.OpenAIClientBuilder;
 import com.azure.core.credential.KeyCredential;
 import com.bytechef.component.ai.llm.AudioTranscriptionModel;
-import com.bytechef.component.ai.llm.constant.Language;
+import com.bytechef.component.ai.llm.definition.Language;
 import com.bytechef.component.ai.llm.util.LLMUtils;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;

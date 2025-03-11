@@ -21,7 +21,8 @@ import static com.bytechef.component.definition.ComponentDsl.component;
 import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.csv.file.action.CsvFileReadAction;
 import com.bytechef.component.csv.file.action.CsvFileWriteAction;
-import com.bytechef.component.csv.file.datastream.CsvFileDataStream;
+import com.bytechef.component.csv.file.datastream.CsvFileItemReader;
+import com.bytechef.component.csv.file.datastream.CsvFileItemStreamWriter;
 import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDefinition;
 import com.google.auto.service.AutoService;
@@ -37,8 +38,12 @@ public class CsvFileComponentHandler implements ComponentHandler {
         .description("Reads and writes data from a csv file.")
         .icon("path:assets/csv-file.svg")
         .categories(ComponentCategory.HELPERS)
-        .actions(CsvFileReadAction.ACTION_DEFINITION, CsvFileWriteAction.ACTION_DEFINITION)
-        .dataStream(CsvFileDataStream.DATA_STREAM_DEFINITION);
+        .actions(
+            CsvFileReadAction.ACTION_DEFINITION,
+            CsvFileWriteAction.ACTION_DEFINITION)
+        .clusterElements(
+            CsvFileItemReader.CLUSTER_ELEMENT_DEFINITION,
+            CsvFileItemStreamWriter.CLUSTER_ELEMENT_DEFINITION);
 
     @Override
     public ComponentDefinition getDefinition() {

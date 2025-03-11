@@ -37,8 +37,6 @@ public class WorkflowTaskMapper {
 
         @Named(value = "workflowTaskToWorkflowTaskModelMapper")
         @Mapping(target = "connections", ignore = true)
-        @Mapping(target = "destination", ignore = true)
-        @Mapping(target = "source", ignore = true)
         WorkflowTaskModel convert(WorkflowTask workflowTask);
 
         @IterableMapping(qualifiedByName = "workflowTaskToWorkflowTaskModelMapper")

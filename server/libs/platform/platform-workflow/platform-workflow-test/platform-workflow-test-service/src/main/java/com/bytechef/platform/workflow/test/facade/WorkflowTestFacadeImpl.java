@@ -23,7 +23,7 @@ import com.bytechef.commons.util.MapUtils;
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.platform.component.constant.MetadataConstants;
 import com.bytechef.platform.component.domain.ComponentDefinition;
-import com.bytechef.platform.component.domain.TriggerDefinitionBasic;
+import com.bytechef.platform.component.domain.TriggerDefinition;
 import com.bytechef.platform.component.service.ComponentDefinitionService;
 import com.bytechef.platform.configuration.domain.WorkflowTestConfiguration;
 import com.bytechef.platform.configuration.domain.WorkflowTestConfigurationConnection;
@@ -122,7 +122,7 @@ public class WorkflowTestFacadeImpl implements WorkflowTestFacade {
                     .build();
 
                 ComponentDefinition componentDefinition = componentDefinitionService.getComponentDefinition(
-                    workflowNodeType.componentName(), workflowNodeType.componentVersion());
+                    workflowNodeType.name(), workflowNodeType.version());
 
                 Map<String, ?> workflowTestConfigurationInputs = OptionalUtils.mapOrElse(
                     workflowTestConfigurationOptional, WorkflowTestConfiguration::getInputs, Map.of());
@@ -133,10 +133,10 @@ public class WorkflowTestFacadeImpl implements WorkflowTestFacade {
 
                 WorkflowNodeType triggerNodeType = WorkflowNodeType.ofType(workflowTrigger.getType());
 
-                TriggerDefinitionBasic triggerDefinition = componentDefinition.getTriggers()
+                TriggerDefinition triggerDefinition = componentDefinition.getTriggers()
                     .stream()
                     .filter(curTriggerDefinition -> Objects.equals(
-                        curTriggerDefinition.getName(), triggerNodeType.componentOperationName()))
+                        curTriggerDefinition.getName(), triggerNodeType.operation()))
                     .findFirst()
                     .orElseThrow(() -> new IllegalStateException("Trigger definition not found"));
 

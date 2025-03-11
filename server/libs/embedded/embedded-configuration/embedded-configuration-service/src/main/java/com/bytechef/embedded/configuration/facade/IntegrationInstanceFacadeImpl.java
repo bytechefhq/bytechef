@@ -301,7 +301,7 @@ public class IntegrationInstanceFacadeImpl implements IntegrationInstanceFacade 
 
         WorkflowNodeType workflowNodeType = WorkflowNodeType.ofType(workflowTrigger.getType());
 
-        if (Objects.equals(integration.getComponentName(), workflowNodeType.componentName())) {
+        if (Objects.equals(integration.getComponentName(), workflowNodeType.name())) {
             IntegrationInstance integrationInstance = integrationInstanceService.getIntegrationInstance(
                 integrationInstanceId);
 

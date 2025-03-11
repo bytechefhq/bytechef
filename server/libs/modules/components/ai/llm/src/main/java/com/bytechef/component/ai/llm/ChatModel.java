@@ -16,23 +16,13 @@
 
 package com.bytechef.component.ai.llm;
 
-import static com.bytechef.component.ai.llm.constant.LLMConstants.MESSAGES;
-import static com.bytechef.component.ai.llm.constant.LLMConstants.RESPONSE;
-import static com.bytechef.component.ai.llm.constant.LLMConstants.RESPONSE_FORMAT;
-import static com.bytechef.component.ai.llm.constant.LLMConstants.RESPONSE_SCHEMA;
-import static com.bytechef.component.ai.llm.util.LLMUtils.createMessage;
-
-import com.bytechef.component.ai.llm.converter.JsonSchemaStructuredOutputConverter;
+import com.bytechef.component.ai.llm.util.LLMUtils;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.FileEntry;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.definition.TypeReference;
-import com.bytechef.component.exception.ProviderException;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
-import java.util.Objects;
 import org.springframework.ai.chat.client.ChatClient;
-import org.springframework.ai.chat.messages.SystemMessage;
 import org.springframework.lang.Nullable;
 
 /**
@@ -45,7 +35,7 @@ public interface ChatModel {
     }
 
     enum Role {
-        ASSISTANT, SYSTEM, TOOL, USER
+        ASSISTANT, SYSTEM, /* TOOL, */ USER
     }
 
     org.springframework.ai.chat.model.ChatModel createChatModel(
@@ -57,67 +47,18 @@ public interface ChatModel {
 
         org.springframework.ai.chat.model.ChatModel chatModel = createChatModel(inputParameters, connectionParameters);
 
-        List<org.springframework.ai.chat.messages.Message> messages = getMessages(inputParameters, actionContext);
+        List<org.springframework.ai.chat.messages.Message> messages =
+            LLMUtils.getMessages(inputParameters, actionContext);
 
-        ChatClient.CallResponseSpec call = ChatClient.create(chatModel)
+        ChatClient.CallResponseSpec callResponseSpec = ChatClient.create(chatModel)
             .prompt()
             .messages(messages)
             .call();
 
-        return returnChatEntity(inputParameters, call, actionContext);
-    }
-
-    private List<org.springframework.ai.chat.messages.Message> getMessages(
-        Parameters inputParameters, ActionContext actionContext) {
-
-        List<Message> messages = inputParameters.getList(MESSAGES, new TypeReference<>() {});
-
-        List<org.springframework.ai.chat.messages.Message> aiChatMessages = new java.util.ArrayList<>(
-            messages.stream()
-                .map(message -> createMessage(message, actionContext))
-                .toList());
-
-        String responseSchema = inputParameters.getString(RESPONSE_SCHEMA);
-
-        if (responseSchema != null && !responseSchema.isEmpty()) {
-            aiChatMessages.add(new SystemMessage(responseSchema));
-        }
-
-        return aiChatMessages;
-    }
-
-    @SuppressFBWarnings("NP")
-    @Nullable
-    private Object returnChatEntity(
-        Parameters parameters, ChatClient.CallResponseSpec call, ActionContext actionContext) {
-
-        ResponseFormat responseFormat = parameters.getFromPath(
-            RESPONSE + "." + RESPONSE_FORMAT, ResponseFormat.class, ResponseFormat.TEXT);
-
-        if (responseFormat == ResponseFormat.TEXT) {
-            try {
-                return Objects.requireNonNull(call.chatResponse())
-                    .getResult()
-                    .getOutput()
-                    .getText();
-            } catch (org.springframework.ai.retry.NonTransientAiException e) {
-                String message = e.getMessage();
-
-                String providerMessage = actionContext.json(
-                    json -> json.read(
-                        message.substring(message.indexOf("{"), message.lastIndexOf("}") + 1), "error.message",
-                        new TypeReference<>() {}));
-
-                throw new ProviderException(providerMessage);
-            }
-        } else {
-            return call.entity(
-                new JsonSchemaStructuredOutputConverter(
-                    parameters.getFromPath(RESPONSE + "." + RESPONSE_SCHEMA, String.class), actionContext));
-        }
+        return LLMUtils.getChatResponse(callResponseSpec, inputParameters, actionContext);
     }
 
     @SuppressFBWarnings("EI")
-    record Message(String content, List<FileEntry> attachments, Role role) {
+    record Message(String content, @Nullable List<FileEntry> attachments, Role role) {
     }
 }

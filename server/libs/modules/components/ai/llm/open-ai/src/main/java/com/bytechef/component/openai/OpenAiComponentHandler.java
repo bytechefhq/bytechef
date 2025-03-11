@@ -25,6 +25,7 @@ import com.bytechef.component.openai.action.OpenAiChatAction;
 import com.bytechef.component.openai.action.OpenAiCreateImageAction;
 import com.bytechef.component.openai.action.OpenAiCreateSpeechAction;
 import com.bytechef.component.openai.action.OpenAiCreateTranscriptionAction;
+import com.bytechef.component.openai.aiagent.OpenAiModel;
 import com.bytechef.component.openai.connection.OpenAiConnection;
 import com.google.auto.service.AutoService;
 
@@ -47,7 +48,8 @@ public class OpenAiComponentHandler implements ComponentHandler {
             OpenAiChatAction.ACTION_DEFINITION,
             OpenAiCreateImageAction.ACTION_DEFINITION,
             OpenAiCreateSpeechAction.ACTION_DEFINITION,
-            OpenAiCreateTranscriptionAction.ACTION_DEFINITION);
+            OpenAiCreateTranscriptionAction.ACTION_DEFINITION)
+        .clusterElements(OpenAiModel.CLUSTER_ELEMENT_DEFINITION);
 
     @Override
     public ComponentDefinition getDefinition() {

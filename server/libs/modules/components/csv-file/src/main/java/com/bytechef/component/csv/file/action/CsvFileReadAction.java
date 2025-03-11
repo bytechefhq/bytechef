@@ -16,19 +16,9 @@
 
 package com.bytechef.component.csv.file.action;
 
-import static com.bytechef.component.csv.file.constant.CsvFileConstants.DELIMITER;
-import static com.bytechef.component.csv.file.constant.CsvFileConstants.ENCLOSING_CHARACTER;
 import static com.bytechef.component.csv.file.constant.CsvFileConstants.FILE_ENTRY;
-import static com.bytechef.component.csv.file.constant.CsvFileConstants.HEADER_ROW;
-import static com.bytechef.component.csv.file.constant.CsvFileConstants.INCLUDE_EMPTY_CELLS;
-import static com.bytechef.component.csv.file.constant.CsvFileConstants.PAGE_NUMBER;
-import static com.bytechef.component.csv.file.constant.CsvFileConstants.PAGE_SIZE;
-import static com.bytechef.component.csv.file.constant.CsvFileConstants.READ_AS_STRING;
+import static com.bytechef.component.csv.file.constant.CsvFileConstants.READ_PROPERTIES;
 import static com.bytechef.component.definition.ComponentDsl.action;
-import static com.bytechef.component.definition.ComponentDsl.bool;
-import static com.bytechef.component.definition.ComponentDsl.fileEntry;
-import static com.bytechef.component.definition.ComponentDsl.integer;
-import static com.bytechef.component.definition.ComponentDsl.string;
 
 import com.bytechef.component.csv.file.util.CsvFileReadUtils;
 import com.bytechef.component.csv.file.util.ReadConfiguration;
@@ -55,48 +45,7 @@ public class CsvFileReadAction {
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("read")
         .title("Read from File")
         .description("Reads data from a csv file.")
-        .properties(
-            fileEntry(FILE_ENTRY)
-                .label("File")
-                .description("The object property which contains a reference to the csv file to read from.")
-                .required(true),
-            string(DELIMITER)
-                .label("Delimiter")
-                .description("Character used to separate values within the line red from the CSV file.")
-                .defaultValue(",")
-                .advancedOption(true),
-            string(ENCLOSING_CHARACTER)
-                .label("Enclosing Character")
-                .description(
-                    "Character used to wrap/enclose values. It is usually applied to complex CSV files where values " +
-                        "may include delimiter characters.")
-                .placeholder("\" ' / ")
-                .advancedOption(true),
-            bool(HEADER_ROW)
-                .label("Header Row")
-                .description("The first row of the file contains the header names.")
-                .defaultValue(true)
-                .advancedOption(true),
-            bool(INCLUDE_EMPTY_CELLS)
-                .label("Include Empty Cells")
-                .description("When reading from file the empty cells will be filled with an empty string.")
-                .defaultValue(false)
-                .advancedOption(true),
-            integer(PAGE_SIZE)
-                .label("Page Size")
-                .description("The amount of child elements to return in a page.")
-                .advancedOption(true),
-            integer(PAGE_NUMBER)
-                .label("Page Number")
-                .description("The page number to get.")
-                .advancedOption(true),
-            bool(READ_AS_STRING)
-                .label("Read as String")
-                .description(
-                    "In some cases and file formats, it is necessary to read data specifically as string, " +
-                        "otherwise some special characters are interpreted the wrong way.")
-                .defaultValue(false)
-                .advancedOption(true))
+        .properties(READ_PROPERTIES)
         .output()
         .perform(CsvFileReadAction::perform);
 
@@ -129,13 +78,11 @@ public class CsvFileReadAction {
 
             if (configuration.headerRow()) {
                 while (iterator.hasNext()) {
-                    Map<String, String> row = (Map<String, String>) iterator.nextValue();
-
-                    context.log(log -> log.trace("row: {}", row));
+                    Map<?, ?> row = (Map<?, ?>) iterator.nextValue();
 
                     if (count >= configuration.rangeStartRow() && count < configuration.rangeEndRow()) {
                         Map<String, Object> map = CsvFileReadUtils.getHeaderRow(
-                            configuration, context, row, enclosingCharacter);
+                            configuration, row, enclosingCharacter);
 
                         rows.add(map);
                     } else {
@@ -148,13 +95,13 @@ public class CsvFileReadAction {
                 }
             } else {
                 while (iterator.hasNext()) {
-                    List<String> row = (List<String>) iterator.nextValue();
+                    List<?> row = (List<?>) iterator.nextValue();
 
                     context.log(log -> log.trace("row: {}", row));
 
                     if (count >= configuration.rangeStartRow() && count < configuration.rangeEndRow()) {
                         Map<String, Object> map = CsvFileReadUtils.getColumnRow(
-                            configuration, context, row, enclosingCharacter);
+                            configuration, row, enclosingCharacter);
 
                         rows.add(map);
                     } else {

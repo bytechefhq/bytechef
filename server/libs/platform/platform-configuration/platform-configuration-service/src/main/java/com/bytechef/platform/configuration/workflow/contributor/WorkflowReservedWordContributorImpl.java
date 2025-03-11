@@ -28,8 +28,8 @@ public class WorkflowReservedWordContributorImpl implements WorkflowReservedWord
     @Override
     public List<String> getReservedWords() {
         return List.of(
-            WorkflowExtConstants.AUTHORIZATION_REQUIRED, "category", WorkflowExtConstants.COMPONENT_NAME,
-            WorkflowExtConstants.COMPONENT_VERSION, WorkflowExtConstants.CONNECTIONS, WorkflowExtConstants.DESTINATION,
-            WorkflowExtConstants.SOURCE, "tags", WorkflowExtConstants.TRIGGERS);
+            WorkflowExtConstants.AUTHORIZATION_REQUIRED, "category", WorkflowExtConstants.CLUSTER_ELEMENTS,
+            WorkflowExtConstants.COMPONENT_NAME, WorkflowExtConstants.COMPONENT_VERSION,
+            WorkflowExtConstants.CONNECTIONS, "tags", WorkflowExtConstants.TRIGGERS);
     }
 }

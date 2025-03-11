@@ -18,28 +18,46 @@ package com.bytechef.component.ai.llm.util;
 
 import static com.bytechef.component.ai.llm.ChatModel.ResponseFormat.JSON;
 import static com.bytechef.component.ai.llm.ChatModel.ResponseFormat.TEXT;
+import static com.bytechef.component.ai.llm.constant.LLMConstants.MESSAGES;
+import static com.bytechef.component.ai.llm.constant.LLMConstants.RESPONSE;
+import static com.bytechef.component.ai.llm.constant.LLMConstants.RESPONSE_FORMAT;
+import static com.bytechef.component.ai.llm.constant.LLMConstants.RESPONSE_SCHEMA;
 import static com.bytechef.component.definition.ComponentDsl.option;
 import static com.bytechef.component.definition.ComponentDsl.string;
 
 import com.bytechef.component.ai.llm.ChatModel;
 import com.bytechef.component.ai.llm.ChatModel.ResponseFormat;
+import com.bytechef.component.ai.llm.converter.JsonSchemaStructuredOutputConverter;
 import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.FileEntry;
 import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Parameters;
+import com.bytechef.component.definition.TypeReference;
+import com.bytechef.component.exception.ProviderException;
 import com.bytechef.definition.BaseOutputDefinition;
 import com.bytechef.definition.BaseProperty;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.time.Duration;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.messages.AssistantMessage;
 import org.springframework.ai.chat.messages.Message;
 import org.springframework.ai.chat.messages.SystemMessage;
-import org.springframework.ai.chat.messages.ToolResponseMessage;
 import org.springframework.ai.chat.messages.UserMessage;
+import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.ai.model.Media;
+import org.springframework.boot.http.client.ClientHttpRequestFactoryBuilder;
+import org.springframework.boot.http.client.ClientHttpRequestFactorySettings;
+import org.springframework.boot.ssl.SslBundle;
 import org.springframework.core.io.ByteArrayResource;
+import org.springframework.http.client.ClientHttpRequestFactory;
+import org.springframework.lang.Nullable;
 import org.springframework.util.MimeTypeUtils;
+import org.springframework.web.client.RestClient;
 
 /**
  * @author Monika Kušter
@@ -50,13 +68,106 @@ public class LLMUtils {
     private LLMUtils() {
     }
 
-    public static Message createMessage(ChatModel.Message message, ActionContext actionContext) {
+    @SuppressFBWarnings("NP")
+    @Nullable
+    public static Object getChatResponse(
+        ChatClient.CallResponseSpec callResponseSpec, Parameters parameters, Context context) {
+
+        Object response = null;
+        ResponseFormat responseFormat = parameters.getFromPath(
+            RESPONSE + "." + RESPONSE_FORMAT, ResponseFormat.class, TEXT);
+
+        if (responseFormat == TEXT) {
+            try {
+                ChatResponse chatResponse = callResponseSpec.chatResponse();
+
+                if (chatResponse != null) {
+                    response = chatResponse.getResult()
+                        .getOutput()
+                        .getText();
+                }
+            } catch (org.springframework.ai.retry.NonTransientAiException e) {
+                String message = e.getMessage();
+
+                String providerMessage = context.json(
+                    json -> json.read(
+                        message.substring(message.indexOf("{"), message.lastIndexOf("}") + 1), "error.message",
+                        new TypeReference<>() {}));
+
+                throw new ProviderException(providerMessage);
+            }
+        } else {
+            response = callResponseSpec.entity(
+                new JsonSchemaStructuredOutputConverter(
+                    parameters.getFromPath(RESPONSE + "." + RESPONSE_SCHEMA, String.class), context));
+        }
+
+        return response;
+    }
+
+    @SuppressWarnings("unchecked")
+    public static <R> List<Option<R>> getEnumOptions(Map<String, R> map) {
+        return map.entrySet()
+            .stream()
+            .sorted(Map.Entry.comparingByKey())
+            .map(entry -> (Option<R>) option(entry.getKey(), entry.getValue()))
+            .toList();
+    }
+
+    public static List<Message> getMessages(Parameters inputParameters, ActionContext actionContext) {
+        List<ChatModel.Message> chatModelMessages = inputParameters.getList(MESSAGES, new TypeReference<>() {});
+
+        List<Message> messages = new ArrayList<>(
+            chatModelMessages.stream()
+                .map(chatModelMessage -> createMessage(chatModelMessage, actionContext))
+                .toList());
+
+        String responseSchema = inputParameters.getString(RESPONSE_SCHEMA);
+
+        if (responseSchema != null && !responseSchema.isEmpty()) {
+            messages.add(new SystemMessage(responseSchema));
+        }
+
+        return messages;
+    }
+
+    public static RestClient.Builder getRestClientBuilder() {
+        ClientHttpRequestFactorySettings requestFactorySettings = new ClientHttpRequestFactorySettings(
+            null, Duration.of(1, ChronoUnit.MINUTES), Duration.of(1, ChronoUnit.MINUTES), SslBundle.of(null));
+
+        ClientHttpRequestFactory requestFactory = ClientHttpRequestFactoryBuilder.jdk()
+            .build(requestFactorySettings);
+
+        return RestClient.builder()
+            .requestFactory(requestFactory);
+    }
+
+    public static BaseOutputDefinition.OutputResponse output(
+        Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) {
+
+        BaseProperty.BaseValueProperty<?> outputSchemaProperty = string();
+
+        if (inputParameters.getFromPath(RESPONSE + "." + RESPONSE_FORMAT, ResponseFormat.class, TEXT) == JSON) {
+            if (!inputParameters.containsPath(RESPONSE + "." + RESPONSE_SCHEMA)) {
+                return null;
+            }
+
+            String responseSchema = inputParameters.getRequiredFromPath(RESPONSE + "." + RESPONSE_SCHEMA, String.class);
+
+            outputSchemaProperty = actionContext.outputSchema(
+                outputSchema -> outputSchema.getOutputSchema(responseSchema));
+        }
+
+        return new BaseOutputDefinition.OutputResponse(outputSchemaProperty);
+    }
+
+    private static Message createMessage(ChatModel.Message message, ActionContext actionContext) {
         String messageContent = processText(message.content());
 
         return switch (message.role()) {
             case ASSISTANT -> new AssistantMessage(messageContent);
             case SYSTEM -> new SystemMessage(messageContent);
-            case TOOL -> new ToolResponseMessage(new ArrayList<>());
+//            case TOOL -> new ToolResponseMessage(new ArrayList<>());
             case USER -> {
                 List<FileEntry> attachments = message.attachments();
                 StringBuilder content = new StringBuilder(messageContent);
@@ -87,34 +198,6 @@ public class LLMUtils {
                 }
             }
         };
-    }
-
-    @SuppressWarnings("unchecked")
-    public static <R> List<Option<R>> getEnumOptions(Map<String, R> map) {
-        return map.entrySet()
-            .stream()
-            .sorted(Map.Entry.comparingByKey())
-            .map(entry -> (Option<R>) option(entry.getKey(), entry.getValue()))
-            .toList();
-    }
-
-    public static BaseOutputDefinition.OutputResponse output(
-        Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) {
-
-        BaseProperty.BaseValueProperty<?> outputSchemaProperty = string();
-
-        if (inputParameters.getFromPath("response.responseFormat", ResponseFormat.class, TEXT) == JSON) {
-            if (!inputParameters.containsPath("response.responseSchema")) {
-                return null;
-            }
-
-            String responseSchema = inputParameters.getRequiredFromPath("response.responseSchema", String.class);
-
-            outputSchemaProperty = actionContext.outputSchema(
-                outputSchema -> outputSchema.getOutputSchema(responseSchema));
-        }
-
-        return new BaseOutputDefinition.OutputResponse(outputSchemaProperty);
     }
 
     private static String processText(String messageContent) {

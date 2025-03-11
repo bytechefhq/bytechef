@@ -17,7 +17,7 @@
 package com.bytechef.component.ai.image;
 
 import static com.bytechef.component.definition.ComponentDsl.component;
-import static com.bytechef.platform.component.definition.AiComponentDefinition.AI_IMAGE;
+import static com.bytechef.platform.component.definition.AiUniversalComponentDefinition.AI_IMAGE;
 
 import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.ai.image.action.GenerateImageAction;
@@ -25,7 +25,7 @@ import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.config.ApplicationProperties;
 import com.bytechef.platform.component.definition.AbstractComponentDefinitionWrapper;
-import com.bytechef.platform.component.definition.AiComponentDefinition;
+import com.bytechef.platform.component.definition.AiUniversalComponentDefinition;
 import com.bytechef.platform.configuration.service.PropertyService;
 import org.springframework.stereotype.Component;
 
@@ -35,7 +35,7 @@ import org.springframework.stereotype.Component;
 @Component(AI_IMAGE + "_v1_ComponentHandler")
 public class AiImageComponentHandler implements ComponentHandler {
 
-    private final AiComponentDefinition componentDefinition;
+    private final AiUniversalComponentDefinition componentDefinition;
 
     public AiImageComponentHandler(ApplicationProperties applicationProperties, PropertyService propertyService) {
         ApplicationProperties.Ai ai = applicationProperties.getAi();
@@ -49,7 +49,7 @@ public class AiImageComponentHandler implements ComponentHandler {
     }
 
     private static class AiImageComponentDefinitionImpl
-        extends AbstractComponentDefinitionWrapper implements AiComponentDefinition {
+        extends AbstractComponentDefinitionWrapper implements AiUniversalComponentDefinition {
 
         private AiImageComponentDefinitionImpl(
             ApplicationProperties.Ai.Provider provider, PropertyService propertyService) {

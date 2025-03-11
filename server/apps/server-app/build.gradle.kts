@@ -131,6 +131,7 @@ dependencies {
     implementation(project(":server:libs:modules:components:ai:llm:stability"))
     implementation(project(":server:libs:modules:components:ai:llm:vertex:gemini"))
     implementation(project(":server:libs:modules:components:ai:llm:watsonx"))
+    implementation(project(":server:libs:modules:components:ai:memory:in-memory"))
     implementation(project(":server:libs:modules:components:ai:vector-store:pinecone"))
     implementation(project(":server:libs:modules:components:ai:vector-store:weaviate"))
     implementation(project(":server:libs:modules:components:airtable"))

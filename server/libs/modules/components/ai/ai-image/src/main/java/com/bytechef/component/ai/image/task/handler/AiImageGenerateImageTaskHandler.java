@@ -17,7 +17,7 @@
 package com.bytechef.component.ai.image.task.handler;
 
 import static com.bytechef.component.ai.image.constant.AiImageConstants.GENERATE_IMAGE;
-import static com.bytechef.platform.component.definition.AiComponentDefinition.AI_IMAGE;
+import static com.bytechef.platform.component.definition.AiUniversalComponentDefinition.AI_IMAGE;
 
 import com.bytechef.platform.component.facade.ActionDefinitionFacade;
 import com.bytechef.platform.workflow.worker.task.handler.AbstractTaskHandler;

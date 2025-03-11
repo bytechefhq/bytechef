@@ -80,20 +80,27 @@ public class NvidiaChatAction {
         .output(LLMUtils::output)
         .perform(NvidiaChatAction::perform);
 
-    public static final ChatModel CHAT_MODEL = (inputParameters, connectionParameters) -> new OpenAiChatModel(
-        new OpenAiApi("https://integrate.api.nvidia.com/", connectionParameters.getString(TOKEN)),
-        OpenAiChatOptions.builder()
-            .model(inputParameters.getRequiredString(MODEL))
-            .frequencyPenalty(inputParameters.getDouble(FREQUENCY_PENALTY))
-            .logitBias(inputParameters.getMap(LOGIT_BIAS, new TypeReference<>() {}))
-            .maxTokens(inputParameters.getInteger(MAX_TOKENS))
-            .N(inputParameters.getInteger(N))
-            .presencePenalty(inputParameters.getDouble(PRESENCE_PENALTY))
-            .stop(inputParameters.getList(STOP, new TypeReference<>() {}))
-            .temperature(inputParameters.getDouble(TEMPERATURE))
-            .topP(inputParameters.getDouble(TOP_P))
-            .user(inputParameters.getString(USER))
-            .build());
+    public static final ChatModel CHAT_MODEL = (inputParameters, connectionParameters) -> OpenAiChatModel.builder()
+        .openAiApi(
+            OpenAiApi.builder()
+                .apiKey(connectionParameters.getString(TOKEN))
+                .baseUrl("https://integrate.api.nvidia.com/")
+                .restClientBuilder(LLMUtils.getRestClientBuilder())
+                .build())
+        .defaultOptions(
+            OpenAiChatOptions.builder()
+                .model(inputParameters.getRequiredString(MODEL))
+                .frequencyPenalty(inputParameters.getDouble(FREQUENCY_PENALTY))
+                .logitBias(inputParameters.getMap(LOGIT_BIAS, new TypeReference<>() {}))
+                .maxTokens(inputParameters.getInteger(MAX_TOKENS))
+                .N(inputParameters.getInteger(N))
+                .presencePenalty(inputParameters.getDouble(PRESENCE_PENALTY))
+                .stop(inputParameters.getList(STOP, new TypeReference<>() {}))
+                .temperature(inputParameters.getDouble(TEMPERATURE))
+                .topP(inputParameters.getDouble(TOP_P))
+                .user(inputParameters.getString(USER))
+                .build())
+        .build();
 
     private NvidiaChatAction() {
     }

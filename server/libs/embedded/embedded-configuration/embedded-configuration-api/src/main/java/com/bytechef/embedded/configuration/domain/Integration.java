@@ -49,7 +49,7 @@ import org.springframework.data.relational.core.mapping.Table;
 public final class Integration {
 
     @Column("allow_multiple_instances")
-    private boolean allowMultipleInstances;
+    private boolean multipleInstances;
 
     @Column("category_id")
     private AggregateReference<Category, Long> categoryId;
@@ -200,8 +200,8 @@ public final class Integration {
         return version;
     }
 
-    public boolean isAllowMultipleInstances() {
-        return allowMultipleInstances;
+    public boolean isMultipleInstances() {
+        return multipleInstances;
     }
 
     public boolean isPublished() {
@@ -223,8 +223,8 @@ public final class Integration {
         return newVersion;
     }
 
-    public void setAllowMultipleInstances(boolean allowMultipleInstances) {
-        this.allowMultipleInstances = allowMultipleInstances;
+    public void setMultipleInstances(boolean multipleInstances) {
+        this.multipleInstances = multipleInstances;
     }
 
     public void setCategory(Category category) {
@@ -288,7 +288,7 @@ public final class Integration {
             ", description='" + description + '\'' +
             ", categoryId=" + getCategoryId() +
             ", integrationTags=" + integrationTags +
-            ", allowMultipleInstances=" + allowMultipleInstances +
+            ", multipleInstances=" + multipleInstances +
             ", version=" + version +
             ", createdBy='" + createdBy + '\'' +
             ", createdDate=" + createdDate +

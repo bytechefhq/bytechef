@@ -16,7 +16,7 @@
 
 package com.bytechef.component.ai.agent.task.handler;
 
-import static com.bytechef.component.ai.agent.constant.AiAgentConstant.CHAT;
+import static com.bytechef.component.ai.agent.constant.AiAgentConstants.CHAT;
 import static com.bytechef.platform.component.definition.AiAgentComponentDefinition.AI_AGENT;
 
 import com.bytechef.platform.component.facade.ActionDefinitionFacade;

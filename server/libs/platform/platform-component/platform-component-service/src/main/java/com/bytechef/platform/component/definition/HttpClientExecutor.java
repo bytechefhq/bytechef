@@ -32,7 +32,7 @@ import com.bytechef.component.definition.Context.Http.RequestMethod;
 import com.bytechef.component.definition.Context.Http.Response;
 import com.bytechef.component.definition.FileEntry;
 import com.bytechef.component.definition.TriggerContext;
-import com.bytechef.platform.component.domain.ComponentConnection;
+import com.bytechef.platform.component.ComponentConnection;
 import com.bytechef.platform.component.facade.ActionDefinitionFacade;
 import com.bytechef.platform.component.facade.OperationDefinitionFacade;
 import com.bytechef.platform.component.facade.TriggerDefinitionFacade;

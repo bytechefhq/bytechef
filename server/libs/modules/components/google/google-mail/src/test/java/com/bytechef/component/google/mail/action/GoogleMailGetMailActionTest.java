@@ -17,14 +17,13 @@
 package com.bytechef.component.google.mail.action;
 
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.FORMAT;
-import static com.bytechef.component.google.mail.constant.GoogleMailConstants.MINIMAL;
-import static com.bytechef.component.google.mail.constant.GoogleMailConstants.SIMPLE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.Parameters;
+import com.bytechef.component.google.mail.definition.Format;
 import com.bytechef.component.google.mail.util.GoogleMailUtils;
 import com.bytechef.component.test.definition.MockParametersFactory;
 import com.bytechef.google.commons.GoogleServices;
@@ -54,7 +53,7 @@ class GoogleMailGetMailActionTest {
 
     @Test
     void testPerform() throws IOException {
-        Parameters parameters = MockParametersFactory.create(Map.of(FORMAT, MINIMAL));
+        Parameters parameters = MockParametersFactory.create(Map.of(FORMAT, Format.MINIMAL));
 
         try (MockedStatic<GoogleServices> googleServicesMockedStatic = mockStatic(GoogleServices.class);
             MockedStatic<GoogleMailUtils> googleMailUtilsMockedStatic = mockStatic(GoogleMailUtils.class)) {
@@ -75,7 +74,7 @@ class GoogleMailGetMailActionTest {
 
     @Test
     void testPerformForSimpleFormat() throws IOException {
-        Parameters parameters = MockParametersFactory.create(Map.of(FORMAT, SIMPLE));
+        Parameters parameters = MockParametersFactory.create(Map.of(FORMAT, Format.SIMPLE));
 
         try (MockedStatic<GoogleServices> googleServicesMockedStatic = mockStatic(GoogleServices.class);
             MockedStatic<GoogleMailUtils> googleMailUtilsMockedStatic = mockStatic(GoogleMailUtils.class)) {

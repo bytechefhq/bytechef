@@ -25,7 +25,7 @@ import com.bytechef.component.definition.FileEntry;
 import com.bytechef.component.definition.Property.ValueProperty;
 import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.exception.ProviderException;
-import com.bytechef.platform.component.domain.ComponentConnection;
+import com.bytechef.platform.component.ComponentConnection;
 import com.bytechef.platform.component.util.JsonSchemaUtils;
 import com.bytechef.platform.file.storage.FilesFileStorage;
 import com.bytechef.platform.util.SchemaUtils;

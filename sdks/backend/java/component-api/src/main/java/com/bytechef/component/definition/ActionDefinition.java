@@ -106,6 +106,20 @@ public interface ActionDefinition {
     /**
      *
      */
+    @FunctionalInterface
+    interface ActionWorkflowNodeDescriptionFunction {
+
+        /**
+         * @param inputParameters
+         * @param context
+         * @return
+         */
+        String apply(Parameters inputParameters, ActionContext context) throws Exception;
+    }
+
+    /**
+     *
+     */
     interface PerformFunction {
     }
 

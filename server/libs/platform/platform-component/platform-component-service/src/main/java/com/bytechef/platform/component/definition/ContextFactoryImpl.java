@@ -20,12 +20,13 @@ import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.TriggerContext;
 import com.bytechef.config.ApplicationProperties;
-import com.bytechef.platform.component.domain.ComponentConnection;
+import com.bytechef.platform.component.ComponentConnection;
 import com.bytechef.platform.component.service.ConnectionDefinitionService;
 import com.bytechef.platform.constant.ModeType;
 import com.bytechef.platform.data.storage.DataStorage;
 import com.bytechef.platform.file.storage.FilesFileStorage;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import javax.annotation.Nullable;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
@@ -70,9 +71,14 @@ class ContextFactoryImpl implements ContextFactory {
     }
 
     @Override
-    public Context createContext(String componentName, ComponentConnection connection) {
+    public Context createContext(String componentName, @Nullable ComponentConnection connection) {
+        return createContext(componentName, connection, false);
+    }
+
+    @Override
+    public Context createContext(String componentName, ComponentConnection connection, boolean editorEnvironment) {
         return new ContextImpl(
-            componentName, -1, null, filesFileStorage, connection, getHttpClientExecutor(false));
+            componentName, -1, null, filesFileStorage, connection, getHttpClientExecutor(editorEnvironment));
     }
 
     @Override

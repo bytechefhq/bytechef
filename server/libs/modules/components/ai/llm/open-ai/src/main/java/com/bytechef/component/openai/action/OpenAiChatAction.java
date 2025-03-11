@@ -40,7 +40,7 @@ import static com.bytechef.component.ai.llm.constant.LLMConstants.USER;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.USER_PROPERTY;
 import static com.bytechef.component.definition.Authorization.TOKEN;
 import static com.bytechef.component.definition.ComponentDsl.action;
-import static com.bytechef.component.definition.ComponentDsl.string;
+import static com.bytechef.component.openai.constant.OpenAiConstants.MODEL_PROPERTY;
 
 import com.bytechef.component.ai.llm.ChatModel;
 import com.bytechef.component.ai.llm.util.LLMUtils;
@@ -48,7 +48,6 @@ import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
-import com.bytechef.component.openai.constant.OpenAiConstants;
 import org.springframework.ai.openai.OpenAiChatModel;
 import org.springframework.ai.openai.OpenAiChatOptions;
 import org.springframework.ai.openai.api.OpenAiApi;
@@ -63,11 +62,7 @@ public class OpenAiChatAction {
         .title("Ask")
         .description("Ask anything you want.")
         .properties(
-            string(MODEL)
-                .label("Model")
-                .description("ID of the model to use.")
-                .required(true)
-                .options(OpenAiConstants.TEXT_MODELS),
+            MODEL_PROPERTY,
             MESSAGES_PROPERTY,
             RESPONSE_PROPERTY,
             MAX_TOKENS_PROPERTY,
@@ -82,20 +77,26 @@ public class OpenAiChatAction {
         .output(LLMUtils::output)
         .perform(OpenAiChatAction::perform);
 
-    public static final ChatModel CHAT_MODEL = (inputParameters, connectionParameters) -> new OpenAiChatModel(
-        new OpenAiApi(connectionParameters.getString(TOKEN)),
-        OpenAiChatOptions.builder()
-            .model(inputParameters.getRequiredString(MODEL))
-            .frequencyPenalty(inputParameters.getDouble(FREQUENCY_PENALTY))
-            .logitBias(inputParameters.getMap(LOGIT_BIAS, new TypeReference<>() {}))
-            .maxTokens(inputParameters.getInteger(MAX_TOKENS))
-            .N(inputParameters.getInteger(N))
-            .presencePenalty(inputParameters.getDouble(PRESENCE_PENALTY))
-            .stop(inputParameters.getList(STOP, new TypeReference<>() {}))
-            .temperature(inputParameters.getDouble(TEMPERATURE))
-            .topP(inputParameters.getDouble(TOP_P))
-            .user(inputParameters.getString(USER))
-            .build());
+    public static final ChatModel CHAT_MODEL = (inputParameters, connectionParameters) -> OpenAiChatModel.builder()
+        .openAiApi(
+            OpenAiApi.builder()
+                .apiKey(connectionParameters.getString(TOKEN))
+                .restClientBuilder(LLMUtils.getRestClientBuilder())
+                .build())
+        .defaultOptions(
+            OpenAiChatOptions.builder()
+                .model(inputParameters.getRequiredString(MODEL))
+                .frequencyPenalty(inputParameters.getDouble(FREQUENCY_PENALTY))
+                .logitBias(inputParameters.getMap(LOGIT_BIAS, new TypeReference<>() {}))
+                .maxTokens(inputParameters.getInteger(MAX_TOKENS))
+                .N(inputParameters.getInteger(N))
+                .presencePenalty(inputParameters.getDouble(PRESENCE_PENALTY))
+                .stop(inputParameters.getList(STOP, new TypeReference<>() {}))
+                .temperature(inputParameters.getDouble(TEMPERATURE))
+                .topP(inputParameters.getDouble(TOP_P))
+                .user(inputParameters.getString(USER))
+                .build())
+        .build();
 
     private OpenAiChatAction() {
     }
