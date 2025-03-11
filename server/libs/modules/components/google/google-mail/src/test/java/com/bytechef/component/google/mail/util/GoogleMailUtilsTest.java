@@ -138,7 +138,7 @@ class GoogleMailUtilsTest {
         Message result = GoogleMailUtils.getMessage(parameters, mockedGmail);
 
         assertEquals(message, result);
-        assertEquals(List.of(ME, "id", Format.FULL), stringArgumentCaptor.getAllValues());
+        assertEquals(List.of(ME, "id", Format.FULL.getMapping()), stringArgumentCaptor.getAllValues());
         assertEquals(List.of("metadata"), listArgumentCaptor.getValue());
     }
 

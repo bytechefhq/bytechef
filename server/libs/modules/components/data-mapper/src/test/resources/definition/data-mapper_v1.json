@@ -1,6 +1,6 @@
 {
-  "categories" : [ {
-    "key" : "helpers",
+  "componentCategories" : [ {
+    "name" : "helpers",
     "label" : "helpers"
   } ],
   "customAction" : null,
@@ -13,6 +13,7 @@
   "resources" : null,
   "version" : 1,
   "title" : "Data Mapper",
+  "connection" : null,
   "actions" : [ {
     "batch" : null,
     "deprecated" : null,
@@ -157,9 +158,9 @@
       "optionsDataSource" : null
     } ],
     "title" : "Map Objects to Array",
-    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "perform" : { }
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -441,9 +442,9 @@
       "controlType" : "SELECT"
     } ],
     "title" : "Map Objects to Object",
-    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "perform" : { }
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -540,9 +541,9 @@
       "optionsDataSource" : null
     } ],
     "title" : "Merge and Pivot Properties by Key",
-    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "perform" : { }
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -659,9 +660,9 @@
       "optionsDataSource" : null
     } ],
     "title" : "Rename Keys",
-    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "perform" : { }
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -1545,9 +1546,9 @@
       "optionsDataSource" : null
     } ],
     "title" : "Replace All Specified Values",
-    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "perform" : { }
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -1684,9 +1685,9 @@
       "optionsDataSource" : null
     } ],
     "title" : "Replace Multiple Values by Key",
-    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "perform" : { }
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -3042,12 +3043,11 @@
       "optionsDataSource" : null
     } ],
     "title" : "Replace Value",
-    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "perform" : { }
   } ],
-  "connection" : null,
   "triggers" : null,
-  "dataStream" : null,
-  "unifiedApi" : null
+  "unifiedApi" : null,
+  "clusterElements" : null
 }

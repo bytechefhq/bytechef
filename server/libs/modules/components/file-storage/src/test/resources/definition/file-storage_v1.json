@@ -1,9 +1,9 @@
 {
-  "categories" : [ {
-    "key" : "file-storage",
+  "componentCategories" : [ {
+    "name" : "file-storage",
     "label" : "file-storage"
   }, {
-    "key" : "helpers",
+    "name" : "helpers",
     "label" : "helpers"
   } ],
   "customAction" : null,
@@ -16,6 +16,7 @@
   "resources" : null,
   "version" : 1,
   "title" : "File Storage",
+  "connection" : null,
   "actions" : [ {
     "batch" : null,
     "deprecated" : null,
@@ -683,8 +684,7 @@
     "processErrorResponse" : null,
     "workflowNodeDescription" : null
   } ],
-  "dataStream" : null,
   "triggers" : null,
   "unifiedApi" : null,
-  "connection" : null
+  "clusterElements" : null
 }

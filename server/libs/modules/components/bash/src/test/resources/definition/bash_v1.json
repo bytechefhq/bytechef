@@ -1,5 +1,5 @@
 {
-  "categories" : null,
+  "componentCategories" : null,
   "customAction" : null,
   "customActionHelp" : null,
   "description" : "Allows you to run arbitrary Bash scripts.",
@@ -10,6 +10,7 @@
   "resources" : null,
   "version" : 1,
   "title" : "Bash",
+  "connection" : null,
   "actions" : [ {
     "batch" : null,
     "deprecated" : null,
@@ -93,8 +94,7 @@
     "processErrorResponse" : null,
     "workflowNodeDescription" : null
   } ],
-  "connection" : null,
-  "dataStream" : null,
+  "clusterElements" : null,
   "triggers" : null,
   "unifiedApi" : null
 }

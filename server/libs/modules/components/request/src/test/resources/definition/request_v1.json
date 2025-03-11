@@ -1,6 +1,6 @@
 {
-  "categories" : [ {
-    "key" : "helpers",
+  "componentCategories" : [ {
+    "name" : "helpers",
     "label" : "helpers"
   } ],
   "customAction" : null,
@@ -13,9 +13,9 @@
   "resources" : null,
   "version" : 1,
   "title" : "Request",
-  "actions" : null,
   "connection" : null,
-  "dataStream" : null,
+  "actions" : null,
+  "clusterElements" : null,
   "triggers" : [ {
     "batch" : null,
     "deprecated" : null,
@@ -33,16 +33,16 @@
     "type" : "STATIC_WEBHOOK",
     "webhookRawBody" : null,
     "workflowSyncExecution" : null,
-    "poll" : null,
     "webhookDisable" : null,
     "webhookEnable" : null,
-    "dynamicWebhookRefresh" : null,
     "webhookRequest" : { },
     "listenerDisable" : null,
     "listenerEnable" : null,
-    "deduplicate" : null,
-    "processErrorResponse" : null,
     "webhookValidate" : null,
+    "deduplicate" : null,
+    "poll" : null,
+    "dynamicWebhookRefresh" : null,
+    "processErrorResponse" : null,
     "webhookValidateOnEnable" : null,
     "workflowNodeDescription" : null
   }, {
@@ -74,23 +74,23 @@
       "maxValue" : null,
       "minValue" : null,
       "options" : null,
-      "controlType" : "INTEGER",
-      "optionsDataSource" : null
+      "optionsDataSource" : null,
+      "controlType" : "INTEGER"
     } ],
     "title" : "Await Workflow and Respond",
     "type" : "STATIC_WEBHOOK",
     "webhookRawBody" : null,
     "workflowSyncExecution" : true,
-    "poll" : null,
     "webhookDisable" : null,
     "webhookEnable" : null,
-    "dynamicWebhookRefresh" : null,
     "webhookRequest" : { },
     "listenerDisable" : null,
     "listenerEnable" : null,
-    "deduplicate" : null,
-    "processErrorResponse" : null,
     "webhookValidate" : null,
+    "deduplicate" : null,
+    "poll" : null,
+    "dynamicWebhookRefresh" : null,
+    "processErrorResponse" : null,
     "webhookValidateOnEnable" : null,
     "workflowNodeDescription" : null
   } ],

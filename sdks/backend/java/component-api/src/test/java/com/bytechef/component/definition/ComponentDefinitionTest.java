@@ -99,8 +99,8 @@ public class ComponentDefinitionTest {
 
         jsonAssertEquals(
             """
-                {"categories":null,"customAction":null,"customActionHelp":null,"description":"description","icon":"icon","tags":null,"metadata":null,"name":"name","resources":null,"version":1,"title":"title","connection":null,"actions":null,"dataStream":null,"triggers":null,"unifiedApi":null}
-                  """,
+                {"componentCategories":null,"customAction":null,"customActionHelp":null,"description":"description","icon":"icon","tags":null,"metadata":null,"name":"name","resources":null,"version":1,"title":"title","connection":null,"actions":null,"triggers":null,"unifiedApi":null,"clusterElements":null}
+                """,
             componentDefinition);
     }
 
@@ -132,7 +132,7 @@ public class ComponentDefinitionTest {
         jsonAssertEquals(
             """
                 {"advancedOption":null,"description":"description","displayCondition":null,"expressionEnabled":null,"hidden":null,"label":"label","metadata":{},"placeholder":"placeholder","required":true,"name":"name","type":"DATE_TIME","defaultValue":"-999999999-01-01T00:00:00","exampleValue":null,"options":null,"controlType":"DATE_TIME","optionsDataSource":null}
-                 """,
+                """,
             property);
     }
 
@@ -148,7 +148,7 @@ public class ComponentDefinitionTest {
         jsonAssertEquals(
             """
                 {"advancedOption":null,"description":"description","displayCondition":null,"expressionEnabled":null,"hidden":null,"label":"label","metadata":{},"placeholder":"placeholder","required":true,"name":"name","type":"INTEGER","defaultValue":2,"exampleValue":null,"maxValue":null,"minValue":null,"options":null,"controlType":"INTEGER","optionsDataSource":null}
-                 """,
+                """,
             property);
     }
 
@@ -165,7 +165,7 @@ public class ComponentDefinitionTest {
         jsonAssertEquals(
             """
                 {"advancedOption":null,"description":"description","displayCondition":null,"expressionEnabled":null,"hidden":null,"label":"label","maxNumberPrecision":null,"minNumberPrecision":null,"metadata":{},"placeholder":"placeholder","required":true,"name":"name","type":"NUMBER","defaultValue":2.0,"exampleValue":null,"maxValue":null,"minValue":null,"numberPrecision":null,"options":[{"description":null,"label":"option1","value":1.0},{"description":null,"label":"option2","value":2.0}],"controlType":"SELECT","optionsDataSource":null}
-                 """,
+                """,
             property);
     }
 
@@ -203,7 +203,7 @@ public class ComponentDefinitionTest {
 
     @Test
     public void testPropertyOption() throws JSONException, JsonProcessingException {
-        Option option = ComponentDsl.option("label", 1);
+        Option<?> option = ComponentDsl.option("label", 1);
 
         jsonAssertEquals(
             """
