@@ -66,7 +66,7 @@
             "options" : null,
             "properties" : [ {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "Globally unique identifier for the project.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -86,7 +86,7 @@
               "optionsDataSource" : null
             }, {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "Name of the project.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -106,7 +106,7 @@
               "optionsDataSource" : null
             }, {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "Free-form textual information associated with the project (ie., its description).",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -126,7 +126,7 @@
               "optionsDataSource" : null
             }, {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "The team that this project is shared with.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -143,7 +143,7 @@
               "options" : null,
               "properties" : [ {
                 "advancedOption" : null,
-                "description" : null,
+                "description" : "Globally unique identifier for the team.",
                 "displayCondition" : null,
                 "expressionEnabled" : null,
                 "hidden" : null,
@@ -163,7 +163,7 @@
                 "optionsDataSource" : null
               }, {
                 "advancedOption" : null,
-                "description" : null,
+                "description" : "Name of the team.",
                 "displayCondition" : null,
                 "expressionEnabled" : null,
                 "hidden" : null,
@@ -186,7 +186,7 @@
               "optionsDataSource" : null
             }, {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "The workspace or organization that the project is associated with.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -203,7 +203,7 @@
               "options" : null,
               "properties" : [ {
                 "advancedOption" : null,
-                "description" : null,
+                "description" : "Globally unique identifier for the workspace.",
                 "displayCondition" : null,
                 "expressionEnabled" : null,
                 "hidden" : null,
@@ -223,7 +223,7 @@
                 "optionsDataSource" : null
               }, {
                 "advancedOption" : null,
-                "description" : null,
+                "description" : "Name of the workspace.",
                 "displayCondition" : null,
                 "expressionEnabled" : null,
                 "hidden" : null,
@@ -292,7 +292,7 @@
           "options" : null,
           "properties" : [ {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "Globally unique identifier for the project.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -312,7 +312,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "Name of the project.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -332,7 +332,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "Free-form textual information associated with the project (ie., its description).",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -352,7 +352,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "The team that this project is shared with.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -369,7 +369,7 @@
             "options" : null,
             "properties" : [ {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "Globally unique identifier for the team.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -389,7 +389,7 @@
               "optionsDataSource" : null
             }, {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "Name of the team.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -412,7 +412,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "The workspace or organization that the project is associated with.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -429,7 +429,7 @@
             "options" : null,
             "properties" : [ {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "Globally unique identifier for the workspace.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -449,7 +449,7 @@
               "optionsDataSource" : null
             }, {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "Name of the workspace.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -645,7 +645,7 @@
             "options" : null,
             "properties" : [ {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "Globally unique identifier for the task.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -665,7 +665,7 @@
               "optionsDataSource" : null
             }, {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "The date on which this task is due.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -682,7 +682,7 @@
               "optionsDataSource" : null
             }, {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "Free-form textual information associated with the task (i.e. its description).",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -702,7 +702,7 @@
               "optionsDataSource" : null
             }, {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "Name of the task.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -722,7 +722,7 @@
               "optionsDataSource" : null
             }, {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "The workspace or organization that the task is associated with.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -739,7 +739,7 @@
               "options" : null,
               "properties" : [ {
                 "advancedOption" : null,
-                "description" : null,
+                "description" : "Globally unique identifier for the workspace.",
                 "displayCondition" : null,
                 "expressionEnabled" : null,
                 "hidden" : null,
@@ -759,7 +759,7 @@
                 "optionsDataSource" : null
               }, {
                 "advancedOption" : null,
-                "description" : null,
+                "description" : "Name of the workspace.",
                 "displayCondition" : null,
                 "expressionEnabled" : null,
                 "hidden" : null,
@@ -782,7 +782,7 @@
               "optionsDataSource" : null
             }, {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "Tags associated with the task.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -796,7 +796,7 @@
               "placeholder" : null,
               "items" : [ {
                 "advancedOption" : null,
-                "description" : null,
+                "description" : "Tags associated with the task.",
                 "displayCondition" : null,
                 "expressionEnabled" : null,
                 "hidden" : null,
@@ -813,7 +813,7 @@
                 "options" : null,
                 "properties" : [ {
                   "advancedOption" : null,
-                  "description" : null,
+                  "description" : "Globally unique identifier for the tag.",
                   "displayCondition" : null,
                   "expressionEnabled" : null,
                   "hidden" : null,
@@ -833,7 +833,7 @@
                   "optionsDataSource" : null
                 }, {
                   "advancedOption" : null,
-                  "description" : null,
+                  "description" : "Name of the tag.",
                   "displayCondition" : null,
                   "expressionEnabled" : null,
                   "hidden" : null,
@@ -863,7 +863,7 @@
               "optionsDataSource" : null
             }, {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "User assigned to the task.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -880,7 +880,7 @@
               "options" : null,
               "properties" : [ {
                 "advancedOption" : null,
-                "description" : null,
+                "description" : "Globally unique identifier for the user.",
                 "displayCondition" : null,
                 "expressionEnabled" : null,
                 "hidden" : null,
@@ -900,7 +900,7 @@
                 "optionsDataSource" : null
               }, {
                 "advancedOption" : null,
-                "description" : null,
+                "description" : "Name of the user.",
                 "displayCondition" : null,
                 "expressionEnabled" : null,
                 "hidden" : null,
@@ -969,7 +969,7 @@
           "options" : null,
           "properties" : [ {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "Globally unique identifier for the task.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -989,7 +989,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "The date on which this task is due.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -1006,7 +1006,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "Free-form textual information associated with the task (i.e. its description).",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -1026,7 +1026,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "Name of the task.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -1046,7 +1046,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "The workspace or organization that the task is associated with.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -1063,7 +1063,7 @@
             "options" : null,
             "properties" : [ {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "Globally unique identifier for the workspace.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -1083,7 +1083,7 @@
               "optionsDataSource" : null
             }, {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "Name of the workspace.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -1106,7 +1106,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "Tags associated with the task.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -1120,7 +1120,7 @@
             "placeholder" : null,
             "items" : [ {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "Tags associated with the task.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -1137,7 +1137,7 @@
               "options" : null,
               "properties" : [ {
                 "advancedOption" : null,
-                "description" : null,
+                "description" : "Globally unique identifier for the tag.",
                 "displayCondition" : null,
                 "expressionEnabled" : null,
                 "hidden" : null,
@@ -1157,7 +1157,7 @@
                 "optionsDataSource" : null
               }, {
                 "advancedOption" : null,
-                "description" : null,
+                "description" : "Name of the tag.",
                 "displayCondition" : null,
                 "expressionEnabled" : null,
                 "hidden" : null,
@@ -1187,7 +1187,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "User assigned to the task.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -1204,7 +1204,7 @@
             "options" : null,
             "properties" : [ {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "Globally unique identifier for the user.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -1224,7 +1224,7 @@
               "optionsDataSource" : null
             }, {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "Name of the user.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -1452,6 +1452,9 @@
     "perform" : null,
     "processErrorResponse" : null
   } ],
+  "triggers" : [ ],
+  "unifiedApi" : null,
+  "dataStream" : null,
   "connection" : {
     "authorizations" : [ {
       "detectOn" : null,
@@ -1520,8 +1523,5 @@
     "authorizationRequired" : null,
     "baseUri" : { },
     "test" : null
-  },
-  "triggers" : [ ],
-  "dataStream" : null,
-  "unifiedApi" : null
+  }
 }

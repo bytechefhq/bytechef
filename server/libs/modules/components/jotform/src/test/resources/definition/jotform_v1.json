@@ -78,7 +78,7 @@
               "options" : null,
               "properties" : [ {
                 "advancedOption" : null,
-                "description" : null,
+                "description" : "The ID of the submission.",
                 "displayCondition" : null,
                 "expressionEnabled" : null,
                 "hidden" : null,
@@ -98,7 +98,7 @@
                 "optionsDataSource" : null
               }, {
                 "advancedOption" : null,
-                "description" : null,
+                "description" : "The ID of the form.",
                 "displayCondition" : null,
                 "expressionEnabled" : null,
                 "hidden" : null,
@@ -118,7 +118,7 @@
                 "optionsDataSource" : null
               }, {
                 "advancedOption" : null,
-                "description" : null,
+                "description" : "The status of the submission.",
                 "displayCondition" : null,
                 "expressionEnabled" : null,
                 "hidden" : null,
@@ -138,7 +138,7 @@
                 "optionsDataSource" : null
               }, {
                 "advancedOption" : null,
-                "description" : null,
+                "description" : "Is 1 if the submission is not read yet.",
                 "displayCondition" : null,
                 "expressionEnabled" : null,
                 "hidden" : null,
@@ -158,27 +158,7 @@
                 "optionsDataSource" : null
               }, {
                 "advancedOption" : null,
-                "description" : null,
-                "displayCondition" : null,
-                "expressionEnabled" : null,
-                "hidden" : null,
-                "metadata" : { },
-                "required" : false,
-                "name" : "flag",
-                "type" : "STRING",
-                "defaultValue" : null,
-                "exampleValue" : null,
-                "label" : null,
-                "placeholder" : null,
-                "controlType" : "TEXT",
-                "languageId" : null,
-                "maxLength" : null,
-                "minLength" : null,
-                "options" : null,
-                "optionsDataSource" : null
-              }, {
-                "advancedOption" : null,
-                "description" : null,
+                "description" : "The notes of the submission.",
                 "displayCondition" : null,
                 "expressionEnabled" : null,
                 "hidden" : null,
@@ -265,7 +245,7 @@
             "options" : null,
             "properties" : [ {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "The ID of the submission.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -285,7 +265,7 @@
               "optionsDataSource" : null
             }, {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "The ID of the form.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -305,7 +285,7 @@
               "optionsDataSource" : null
             }, {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "The status of the submission.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -325,7 +305,7 @@
               "optionsDataSource" : null
             }, {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "Is 1 if the submission is not read yet.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -345,27 +325,7 @@
               "optionsDataSource" : null
             }, {
               "advancedOption" : null,
-              "description" : null,
-              "displayCondition" : null,
-              "expressionEnabled" : null,
-              "hidden" : null,
-              "metadata" : { },
-              "required" : false,
-              "name" : "flag",
-              "type" : "STRING",
-              "defaultValue" : null,
-              "exampleValue" : null,
-              "label" : null,
-              "placeholder" : null,
-              "controlType" : "TEXT",
-              "languageId" : null,
-              "maxLength" : null,
-              "minLength" : null,
-              "options" : null,
-              "optionsDataSource" : null
-            }, {
-              "advancedOption" : null,
-              "description" : null,
+              "description" : "The notes of the submission.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -426,13 +386,13 @@
       }
     } ],
     "title" : "Get Form Submissions",
-    "processErrorResponse" : null,
     "workflowNodeDescription" : null,
-    "perform" : null
+    "perform" : null,
+    "processErrorResponse" : null
   } ],
+  "unifiedApi" : null,
   "triggers" : [ ],
   "dataStream" : null,
-  "unifiedApi" : null,
   "connection" : {
     "authorizations" : [ {
       "detectOn" : null,

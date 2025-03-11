@@ -64,7 +64,7 @@
             "options" : null,
             "properties" : [ {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "The ID of the deal.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -84,7 +84,7 @@
               "optionsDataSource" : null
             }, {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "The ID of the team within your Apollo account.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -104,7 +104,7 @@
               "optionsDataSource" : null
             }, {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "The ID of the deal owner within your team's Apollo account.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -124,7 +124,7 @@
               "optionsDataSource" : null
             }, {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "The monetary value of the deal.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -146,7 +146,7 @@
               "optionsDataSource" : null
             }, {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "The estimated close date for the deal.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -163,7 +163,7 @@
               "optionsDataSource" : null
             }, {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "The ID of the account associated with the deal.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -183,7 +183,7 @@
               "optionsDataSource" : null
             }, {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "The description of the deal.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -203,7 +203,7 @@
               "optionsDataSource" : null
             }, {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "The name of the deal.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -240,7 +240,7 @@
               "options" : null,
               "properties" : [ {
                 "advancedOption" : null,
-                "description" : null,
+                "description" : "The name of the currency.",
                 "displayCondition" : null,
                 "expressionEnabled" : null,
                 "hidden" : null,
@@ -260,7 +260,7 @@
                 "optionsDataSource" : null
               }, {
                 "advancedOption" : null,
-                "description" : null,
+                "description" : "The ISO code for the currency.",
                 "displayCondition" : null,
                 "expressionEnabled" : null,
                 "hidden" : null,
@@ -280,7 +280,7 @@
                 "optionsDataSource" : null
               }, {
                 "advancedOption" : null,
-                "description" : null,
+                "description" : "The symbol for the currency.",
                 "displayCondition" : null,
                 "expressionEnabled" : null,
                 "hidden" : null,
@@ -349,7 +349,7 @@
           "options" : null,
           "properties" : [ {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "The ID of the deal.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -369,7 +369,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "The ID of the team within your Apollo account.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -389,7 +389,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "The ID of the deal owner within your team's Apollo account.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -409,7 +409,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "The monetary value of the deal.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -431,7 +431,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "The estimated close date for the deal.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -448,7 +448,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "The ID of the account associated with the deal.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -468,7 +468,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "The description of the deal.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -488,7 +488,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "The name of the deal.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -525,7 +525,7 @@
             "options" : null,
             "properties" : [ {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "The name of the currency.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -545,7 +545,7 @@
               "optionsDataSource" : null
             }, {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "The ISO code for the currency.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -565,7 +565,7 @@
               "optionsDataSource" : null
             }, {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "The symbol for the currency.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -710,8 +710,8 @@
       "optionsDataSource" : null
     } ],
     "title" : "Update Deal",
-    "perform" : null,
     "workflowNodeDescription" : null,
+    "perform" : null,
     "processErrorResponse" : null
   }, {
     "batch" : null,
@@ -764,7 +764,7 @@
             "options" : null,
             "properties" : [ {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "The ID of the deal.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -784,7 +784,7 @@
               "optionsDataSource" : null
             }, {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "The ID of the team within your Apollo account.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -804,7 +804,7 @@
               "optionsDataSource" : null
             }, {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "The ID of the deal owner within your team's Apollo account.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -824,7 +824,7 @@
               "optionsDataSource" : null
             }, {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "The monetary value of the deal.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -846,7 +846,7 @@
               "optionsDataSource" : null
             }, {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "The estimated close date for the deal.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -863,7 +863,7 @@
               "optionsDataSource" : null
             }, {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "The ID of the account associated with the deal.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -883,7 +883,7 @@
               "optionsDataSource" : null
             }, {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "The description of the deal.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -903,7 +903,7 @@
               "optionsDataSource" : null
             }, {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "The name of the deal.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -940,7 +940,7 @@
               "options" : null,
               "properties" : [ {
                 "advancedOption" : null,
-                "description" : null,
+                "description" : "The name of the currency.",
                 "displayCondition" : null,
                 "expressionEnabled" : null,
                 "hidden" : null,
@@ -960,7 +960,7 @@
                 "optionsDataSource" : null
               }, {
                 "advancedOption" : null,
-                "description" : null,
+                "description" : "The ISO code for the currency.",
                 "displayCondition" : null,
                 "expressionEnabled" : null,
                 "hidden" : null,
@@ -980,7 +980,7 @@
                 "optionsDataSource" : null
               }, {
                 "advancedOption" : null,
-                "description" : null,
+                "description" : "The symbol for the currency.",
                 "displayCondition" : null,
                 "expressionEnabled" : null,
                 "hidden" : null,
@@ -1049,7 +1049,7 @@
           "options" : null,
           "properties" : [ {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "The ID of the deal.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -1069,7 +1069,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "The ID of the team within your Apollo account.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -1089,7 +1089,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "The ID of the deal owner within your team's Apollo account.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -1109,7 +1109,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "The monetary value of the deal.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -1131,7 +1131,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "The estimated close date for the deal.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -1148,7 +1148,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "The ID of the account associated with the deal.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -1168,7 +1168,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "The description of the deal.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -1188,7 +1188,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "The name of the deal.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -1225,7 +1225,7 @@
             "options" : null,
             "properties" : [ {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "The name of the currency.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -1245,7 +1245,7 @@
               "optionsDataSource" : null
             }, {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "The ISO code for the currency.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -1265,7 +1265,7 @@
               "optionsDataSource" : null
             }, {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "The symbol for the currency.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -1410,8 +1410,8 @@
       "optionsDataSource" : null
     } ],
     "title" : "Create Deal",
-    "perform" : null,
     "workflowNodeDescription" : null,
+    "perform" : null,
     "processErrorResponse" : null
   }, {
     "batch" : null,
@@ -1464,7 +1464,7 @@
             "options" : null,
             "properties" : [ {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "The ID of the person.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -1484,7 +1484,7 @@
               "optionsDataSource" : null
             }, {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "The first name of the person.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -1504,7 +1504,7 @@
               "optionsDataSource" : null
             }, {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "The last name of the person.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -1524,7 +1524,7 @@
               "optionsDataSource" : null
             }, {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "The full name of the person.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -1544,7 +1544,7 @@
               "optionsDataSource" : null
             }, {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "The URL for the person's LinkedIn profile.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -1564,7 +1564,7 @@
               "optionsDataSource" : null
             }, {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "The person's job title.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -1584,7 +1584,7 @@
               "optionsDataSource" : null
             }, {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "The status of the person's email address.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -1604,7 +1604,7 @@
               "optionsDataSource" : null
             }, {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "The URL for the person's profile photo.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -1624,7 +1624,7 @@
               "optionsDataSource" : null
             }, {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "The URL for the person's Twitter profile.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -1644,7 +1644,7 @@
               "optionsDataSource" : null
             }, {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "The URL for the person's GitHub profile.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -1664,7 +1664,7 @@
               "optionsDataSource" : null
             }, {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "The URL for the person's Facebook profile.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -1684,7 +1684,7 @@
               "optionsDataSource" : null
             }, {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "The person's headline or summary.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -1704,7 +1704,7 @@
               "optionsDataSource" : null
             }, {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "The person's email address.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -1724,7 +1724,7 @@
               "optionsDataSource" : null
             }, {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "The ID of the person's employer.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -1790,7 +1790,7 @@
           "options" : null,
           "properties" : [ {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "The ID of the person.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -1810,7 +1810,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "The first name of the person.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -1830,7 +1830,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "The last name of the person.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -1850,7 +1850,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "The full name of the person.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -1870,7 +1870,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "The URL for the person's LinkedIn profile.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -1890,7 +1890,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "The person's job title.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -1910,7 +1910,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "The status of the person's email address.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -1930,7 +1930,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "The URL for the person's profile photo.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -1950,7 +1950,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "The URL for the person's Twitter profile.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -1970,7 +1970,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "The URL for the person's GitHub profile.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -1990,7 +1990,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "The URL for the person's Facebook profile.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -2010,7 +2010,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "The person's headline or summary.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -2030,7 +2030,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "The person's email address.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -2050,7 +2050,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "The ID of the person's employer.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -2233,8 +2233,8 @@
       "optionsDataSource" : null
     } ],
     "title" : "Enrich Person",
-    "perform" : null,
     "workflowNodeDescription" : null,
+    "perform" : null,
     "processErrorResponse" : null
   }, {
     "batch" : null,
@@ -2287,7 +2287,7 @@
             "options" : null,
             "properties" : [ {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "The ID of the company.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -2307,7 +2307,7 @@
               "optionsDataSource" : null
             }, {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "The name of the company.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -2327,7 +2327,7 @@
               "optionsDataSource" : null
             }, {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "The URL for the company's website.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -2347,7 +2347,7 @@
               "optionsDataSource" : null
             }, {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "The URL for the company's blog.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -2367,7 +2367,7 @@
               "optionsDataSource" : null
             }, {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "The URL for the company's LinkedIn profile.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -2387,7 +2387,7 @@
               "optionsDataSource" : null
             }, {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "The URL for the company's Twitter profile.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -2407,7 +2407,7 @@
               "optionsDataSource" : null
             }, {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "The URL for the company's Facebook profile.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -2427,7 +2427,7 @@
               "optionsDataSource" : null
             }, {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "The phone number of the company.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -2447,7 +2447,7 @@
               "optionsDataSource" : null
             }, {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "The URL for the company's logo.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -2467,7 +2467,7 @@
               "optionsDataSource" : null
             }, {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "The primary domain of the company.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -2487,7 +2487,7 @@
               "optionsDataSource" : null
             }, {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "The industry of the company.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -2507,7 +2507,7 @@
               "optionsDataSource" : null
             }, {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "Keywords associated with the company.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -2521,7 +2521,7 @@
               "placeholder" : null,
               "items" : [ {
                 "advancedOption" : null,
-                "description" : null,
+                "description" : "Keywords associated with the company.",
                 "displayCondition" : null,
                 "expressionEnabled" : null,
                 "hidden" : null,
@@ -2594,7 +2594,7 @@
           "options" : null,
           "properties" : [ {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "The ID of the company.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -2614,7 +2614,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "The name of the company.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -2634,7 +2634,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "The URL for the company's website.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -2654,7 +2654,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "The URL for the company's blog.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -2674,7 +2674,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "The URL for the company's LinkedIn profile.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -2694,7 +2694,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "The URL for the company's Twitter profile.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -2714,7 +2714,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "The URL for the company's Facebook profile.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -2734,7 +2734,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "The phone number of the company.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -2754,7 +2754,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "The URL for the company's logo.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -2774,7 +2774,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "The primary domain of the company.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -2794,7 +2794,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "The industry of the company.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -2814,7 +2814,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "Keywords associated with the company.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -2828,7 +2828,7 @@
             "placeholder" : null,
             "items" : [ {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "Keywords associated with the company.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -2886,13 +2886,10 @@
       "optionsDataSource" : null
     } ],
     "title" : "Enrich Company",
-    "perform" : null,
     "workflowNodeDescription" : null,
+    "perform" : null,
     "processErrorResponse" : null
   } ],
-  "triggers" : [ ],
-  "dataStream" : null,
-  "unifiedApi" : null,
   "connection" : {
     "authorizations" : [ {
       "detectOn" : null,
@@ -3022,5 +3019,8 @@
     "authorizationRequired" : null,
     "baseUri" : { },
     "test" : null
-  }
+  },
+  "triggers" : [ ],
+  "unifiedApi" : null,
+  "dataStream" : null
 }

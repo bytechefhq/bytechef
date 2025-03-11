@@ -49,7 +49,7 @@
           "options" : null,
           "properties" : [ {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "ID of the company.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -71,7 +71,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "Name of the company.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -91,7 +91,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "Description of the company.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -111,7 +111,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "Note about the company.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -157,7 +157,7 @@
         "options" : null,
         "properties" : [ {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "ID of the company.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -179,7 +179,7 @@
           "optionsDataSource" : null
         }, {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "Name of the company.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -199,7 +199,7 @@
           "optionsDataSource" : null
         }, {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "Description of the company.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -219,7 +219,7 @@
           "optionsDataSource" : null
         }, {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "Note about the company.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -245,7 +245,7 @@
     },
     "properties" : [ {
       "advancedOption" : null,
-      "description" : "Name of the company",
+      "description" : "Name of the company.",
       "displayCondition" : null,
       "expressionEnabled" : null,
       "hidden" : null,
@@ -267,7 +267,7 @@
       "optionsDataSource" : null
     }, {
       "advancedOption" : null,
-      "description" : "Description of the company",
+      "description" : "Description of the company.",
       "displayCondition" : null,
       "expressionEnabled" : null,
       "hidden" : null,
@@ -289,7 +289,7 @@
       "optionsDataSource" : null
     }, {
       "advancedOption" : null,
-      "description" : "Any specific note about the company",
+      "description" : "Any specific note about the company.",
       "displayCondition" : null,
       "expressionEnabled" : null,
       "hidden" : null,
@@ -311,8 +311,8 @@
       "optionsDataSource" : null
     } ],
     "title" : "Create Company",
-    "perform" : null,
     "processErrorResponse" : null,
+    "perform" : null,
     "workflowNodeDescription" : null
   }, {
     "batch" : null,
@@ -350,7 +350,7 @@
           "options" : null,
           "properties" : [ {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "A small description of the contact.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -370,7 +370,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "Primary email address of the contact.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -390,7 +390,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "ID of the contact.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -412,7 +412,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "Job title of the contact.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -458,7 +458,7 @@
         "options" : null,
         "properties" : [ {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "A small description of the contact.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -478,7 +478,7 @@
           "optionsDataSource" : null
         }, {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "Primary email address of the contact.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -498,7 +498,7 @@
           "optionsDataSource" : null
         }, {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "ID of the contact.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -520,7 +520,7 @@
           "optionsDataSource" : null
         }, {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "Job title of the contact.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -590,7 +590,7 @@
       "optionsDataSource" : null
     }, {
       "advancedOption" : null,
-      "description" : "Telephone number of the contact",
+      "description" : "Telephone number of the contact.",
       "displayCondition" : null,
       "expressionEnabled" : null,
       "hidden" : null,
@@ -612,7 +612,7 @@
       "optionsDataSource" : null
     }, {
       "advancedOption" : null,
-      "description" : "Mobile number of the contact",
+      "description" : "Mobile number of the contact.",
       "displayCondition" : null,
       "expressionEnabled" : null,
       "hidden" : null,
@@ -634,7 +634,7 @@
       "optionsDataSource" : null
     }, {
       "advancedOption" : null,
-      "description" : "A small description of the contact",
+      "description" : "A small description of the contact.",
       "displayCondition" : null,
       "expressionEnabled" : null,
       "hidden" : null,
@@ -656,7 +656,7 @@
       "optionsDataSource" : null
     }, {
       "advancedOption" : null,
-      "description" : "Job title of the contact",
+      "description" : "Job title of the contact.",
       "displayCondition" : null,
       "expressionEnabled" : null,
       "hidden" : null,
@@ -678,8 +678,8 @@
       "optionsDataSource" : null
     } ],
     "title" : "Create Contact",
-    "perform" : null,
     "processErrorResponse" : null,
+    "perform" : null,
     "workflowNodeDescription" : null
   }, {
     "batch" : null,
@@ -717,7 +717,7 @@
           "options" : null,
           "properties" : [ {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "Subject of the ticket.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -737,7 +737,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "Email address of the requester.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -757,7 +757,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "HTML content of the ticket.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -796,7 +796,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "Status of the ticket.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -841,7 +841,7 @@
         "options" : null,
         "properties" : [ {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "Subject of the ticket.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -861,7 +861,7 @@
           "optionsDataSource" : null
         }, {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "Email address of the requester.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -881,7 +881,7 @@
           "optionsDataSource" : null
         }, {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "HTML content of the ticket.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -920,7 +920,7 @@
           "optionsDataSource" : null
         }, {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "Status of the ticket.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -1085,13 +1085,10 @@
       "optionsDataSource" : null
     } ],
     "title" : "Create Ticket",
-    "perform" : null,
     "processErrorResponse" : null,
+    "perform" : null,
     "workflowNodeDescription" : null
   } ],
-  "dataStream" : null,
-  "unifiedApi" : null,
-  "triggers" : [ ],
   "connection" : {
     "authorizations" : [ {
       "detectOn" : null,
@@ -1142,23 +1139,26 @@
       "title" : "Basic Auth",
       "type" : "BASIC_AUTH",
       "acquire" : null,
-      "apply" : null,
-      "authorizationCallback" : null,
+      "scopes" : null,
       "authorizationUrl" : null,
+      "tokenUrl" : null,
+      "refreshUrl" : null,
+      "apply" : null,
+      "pkce" : null,
+      "authorizationCallback" : null,
       "clientId" : null,
       "clientSecret" : null,
       "oauth2AuthorizationExtraQueryParameters" : null,
-      "pkce" : null,
       "refresh" : null,
-      "refreshUrl" : null,
-      "scopes" : null,
-      "refreshToken" : null,
-      "tokenUrl" : null
+      "refreshToken" : null
     } ],
     "properties" : null,
     "version" : 1,
     "authorizationRequired" : null,
     "baseUri" : { },
     "test" : null
-  }
+  },
+  "triggers" : [ ],
+  "unifiedApi" : null,
+  "dataStream" : null
 }

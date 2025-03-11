@@ -52,7 +52,7 @@
           "options" : null,
           "properties" : [ {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "ID of the project.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -72,7 +72,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "Name of the project.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -92,7 +92,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "Description of the project.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -112,7 +112,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "ID of the template used to create the project.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -158,7 +158,7 @@
         "options" : null,
         "properties" : [ {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "ID of the project.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -178,7 +178,7 @@
           "optionsDataSource" : null
         }, {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "Name of the project.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -198,7 +198,7 @@
           "optionsDataSource" : null
         }, {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "Description of the project.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -218,7 +218,7 @@
           "optionsDataSource" : null
         }, {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "ID of the template used to create the project.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -352,7 +352,7 @@
           "options" : null,
           "properties" : [ {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "ID of the task.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -372,7 +372,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "Name of the task.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -392,7 +392,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "ID of the project the task belongs to.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -412,7 +412,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "Description of the task.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -432,7 +432,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "Due date for the task.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -475,7 +475,7 @@
         "options" : null,
         "properties" : [ {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "ID of the task.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -495,7 +495,7 @@
           "optionsDataSource" : null
         }, {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "Name of the task.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -515,7 +515,7 @@
           "optionsDataSource" : null
         }, {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "ID of the project the task belongs to.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -535,7 +535,7 @@
           "optionsDataSource" : null
         }, {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "Description of the task.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -555,7 +555,7 @@
           "optionsDataSource" : null
         }, {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "Due date for the task.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -726,7 +726,7 @@
           "options" : null,
           "properties" : [ {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "ID of the task.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -746,7 +746,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "Name of the task.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -766,7 +766,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "ID of the project the task belongs to.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -786,7 +786,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "Description of the task.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -832,7 +832,7 @@
         "options" : null,
         "properties" : [ {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "ID of the task.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -852,7 +852,7 @@
           "optionsDataSource" : null
         }, {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "Name of the task.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -872,7 +872,7 @@
           "optionsDataSource" : null
         }, {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "ID of the project the task belongs to.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -892,7 +892,7 @@
           "optionsDataSource" : null
         }, {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "Description of the task.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -1019,7 +1019,7 @@
             "options" : null,
             "properties" : [ {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "ID of the status.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -1039,7 +1039,7 @@
               "optionsDataSource" : null
             }, {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "Name of the status.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -1059,7 +1059,7 @@
               "optionsDataSource" : null
             }, {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "Color of the status.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -1079,7 +1079,7 @@
               "optionsDataSource" : null
             }, {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "ID of the user that created the status.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -1099,7 +1099,7 @@
               "optionsDataSource" : null
             }, {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "ID of the project the status belongs to.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -1119,7 +1119,7 @@
               "optionsDataSource" : null
             }, {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "Order of the status in the project.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -1204,7 +1204,7 @@
           "options" : null,
           "properties" : [ {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "ID of the status.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -1224,7 +1224,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "Name of the status.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -1244,7 +1244,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "Color of the status.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -1264,7 +1264,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "ID of the user that created the status.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -1284,7 +1284,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "ID of the project the status belongs to.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -1304,7 +1304,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "Order of the status in the project.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -1447,7 +1447,7 @@
               "options" : null,
               "properties" : [ {
                 "advancedOption" : null,
-                "description" : null,
+                "description" : "ID of the tracked time entry.",
                 "displayCondition" : null,
                 "expressionEnabled" : null,
                 "hidden" : null,
@@ -1467,7 +1467,7 @@
                 "optionsDataSource" : null
               }, {
                 "advancedOption" : null,
-                "description" : null,
+                "description" : "ID of the project the tracked time entry belongs to.",
                 "displayCondition" : null,
                 "expressionEnabled" : null,
                 "hidden" : null,
@@ -1487,7 +1487,7 @@
                 "optionsDataSource" : null
               }, {
                 "advancedOption" : null,
-                "description" : null,
+                "description" : "Start time of the tracked time entry.",
                 "displayCondition" : null,
                 "expressionEnabled" : null,
                 "hidden" : null,
@@ -1507,7 +1507,7 @@
                 "optionsDataSource" : null
               }, {
                 "advancedOption" : null,
-                "description" : null,
+                "description" : "Whether the tracked time entry was manually added.",
                 "displayCondition" : null,
                 "expressionEnabled" : null,
                 "hidden" : null,
@@ -1531,7 +1531,7 @@
                 "controlType" : "SELECT"
               }, {
                 "advancedOption" : null,
-                "description" : null,
+                "description" : "ID of the user that tracked the time.",
                 "displayCondition" : null,
                 "expressionEnabled" : null,
                 "hidden" : null,
@@ -1551,7 +1551,7 @@
                 "optionsDataSource" : null
               }, {
                 "advancedOption" : null,
-                "description" : null,
+                "description" : "ID of the task the tracked time entry belongs to.",
                 "displayCondition" : null,
                 "expressionEnabled" : null,
                 "hidden" : null,
@@ -1571,7 +1571,7 @@
                 "optionsDataSource" : null
               }, {
                 "advancedOption" : null,
-                "description" : null,
+                "description" : "End time of the tracked time entry.",
                 "displayCondition" : null,
                 "expressionEnabled" : null,
                 "hidden" : null,
@@ -1591,7 +1591,7 @@
                 "optionsDataSource" : null
               }, {
                 "advancedOption" : null,
-                "description" : null,
+                "description" : "Whether the tracked time entry is currently active.",
                 "displayCondition" : null,
                 "expressionEnabled" : null,
                 "hidden" : null,
@@ -1615,7 +1615,7 @@
                 "controlType" : "SELECT"
               }, {
                 "advancedOption" : null,
-                "description" : null,
+                "description" : "Duration of the tracked time entry.",
                 "displayCondition" : null,
                 "expressionEnabled" : null,
                 "hidden" : null,
@@ -1702,7 +1702,7 @@
             "options" : null,
             "properties" : [ {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "ID of the tracked time entry.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -1722,7 +1722,7 @@
               "optionsDataSource" : null
             }, {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "ID of the project the tracked time entry belongs to.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -1742,7 +1742,7 @@
               "optionsDataSource" : null
             }, {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "Start time of the tracked time entry.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -1762,7 +1762,7 @@
               "optionsDataSource" : null
             }, {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "Whether the tracked time entry was manually added.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -1786,7 +1786,7 @@
               "controlType" : "SELECT"
             }, {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "ID of the user that tracked the time.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -1806,7 +1806,7 @@
               "optionsDataSource" : null
             }, {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "ID of the task the tracked time entry belongs to.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -1826,7 +1826,7 @@
               "optionsDataSource" : null
             }, {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "End time of the tracked time entry.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -1846,7 +1846,7 @@
               "optionsDataSource" : null
             }, {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "Whether the tracked time entry is currently active.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -1870,7 +1870,7 @@
               "controlType" : "SELECT"
             }, {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "Duration of the tracked time entry.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -1973,8 +1973,6 @@
     "perform" : null,
     "processErrorResponse" : null
   } ],
-  "dataStream" : null,
-  "unifiedApi" : null,
   "triggers" : [ {
     "batch" : null,
     "deprecated" : null,
@@ -2003,7 +2001,7 @@
           "options" : null,
           "properties" : [ {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "ID pod the task.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -2023,7 +2021,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "Project under which the task is created.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -2043,7 +2041,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "Order of the task.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -2063,7 +2061,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "Milestone of the task.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -2107,7 +2105,7 @@
         "options" : null,
         "properties" : [ {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "ID pod the task.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -2127,7 +2125,7 @@
           "optionsDataSource" : null
         }, {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "Project under which the task is created.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -2147,7 +2145,7 @@
           "optionsDataSource" : null
         }, {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "Order of the task.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -2167,7 +2165,7 @@
           "optionsDataSource" : null
         }, {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "Milestone of the task.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -2221,7 +2219,6 @@
     "workflowSyncExecution" : null,
     "workflowNodeDescription" : null,
     "processErrorResponse" : null,
-    "poll" : null,
     "deduplicate" : null,
     "webhookDisable" : { },
     "webhookEnable" : { },
@@ -2230,8 +2227,11 @@
     "listenerEnable" : null,
     "webhookRequest" : { },
     "webhookValidate" : null,
-    "webhookValidateOnEnable" : null
+    "webhookValidateOnEnable" : null,
+    "poll" : null
   } ],
+  "dataStream" : null,
+  "unifiedApi" : null,
   "connection" : {
     "authorizations" : [ {
       "detectOn" : null,
