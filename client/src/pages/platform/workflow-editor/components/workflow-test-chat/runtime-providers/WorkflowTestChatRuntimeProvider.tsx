@@ -28,7 +28,7 @@ export function WorkflowTestChatRuntimeProvider({
 
     const {setWorkflowIsRunning, setWorkflowTestExecution} = useWorkflowEditorStore();
     const {workflow} = useWorkflowDataStore();
-    const {messages, setMessage} = useWorkflowTestChatStore();
+    const {conversationId, messages, setMessage} = useWorkflowTestChatStore();
 
     const onNew = async (message: AppendMessage) => {
         if (message.content[0]?.type !== 'text') {
@@ -48,6 +48,7 @@ export function WorkflowTestChatRuntimeProvider({
                     inputs: {
                         trigger_1: {
                             attachments: message.attachments,
+                            conversationId,
                             message: input,
                         },
                     },

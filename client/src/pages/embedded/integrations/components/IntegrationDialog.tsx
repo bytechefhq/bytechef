@@ -46,7 +46,6 @@ const IntegrationDialog = ({integration, onClose, triggerNode}: IntegrationDialo
 
     const form = useForm<Integration>({
         defaultValues: {
-            allowMultipleInstances: false,
             category: integration?.category
                 ? {
                       label: integration?.category?.name,
@@ -55,6 +54,7 @@ const IntegrationDialog = ({integration, onClose, triggerNode}: IntegrationDialo
                 : undefined,
             componentName: integration?.componentName || '',
             description: integration?.description || '',
+            multipleInstances: false,
             name: integration?.name || '',
             tags:
                 integration?.tags?.map((tag: Tag) => ({

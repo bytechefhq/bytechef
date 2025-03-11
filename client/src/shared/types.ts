@@ -106,7 +106,7 @@ export type ClickedOperationType = {
     version: number;
 };
 
-export type TabNameType = 'description' | 'dataStreamComponents' | 'connection' | 'properties' | 'output';
+export type TabNameType = 'description' | 'clusterElements' | 'connection' | 'properties' | 'output';
 
 export type NodeDataType = {
     componentName: string;
