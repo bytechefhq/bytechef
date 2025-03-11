@@ -12,7 +12,6 @@ models/AppEvent.ts
 models/Category.ts
 models/ComponentConnection.ts
 models/CreateIntegrationInstanceConfigurationWorkflowJob200Response.ts
-models/DataStreamComponent.ts
 models/Environment.ts
 models/Integration.ts
 models/IntegrationBasic.ts

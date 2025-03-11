@@ -28,12 +28,6 @@ import {
  */
 export interface IntegrationBasic {
     /**
-     * If multiple instances of an integration are allowed or not.
-     * @type {boolean}
-     * @memberof IntegrationBasic
-     */
-    allowMultipleInstances: boolean;
-    /**
      * The name of the integration's component.
      * @type {string}
      * @memberof IntegrationBasic
@@ -100,6 +94,12 @@ export interface IntegrationBasic {
      */
     readonly lastVersion?: number;
     /**
+     * If multiple instances of an integration are allowed or not.
+     * @type {boolean}
+     * @memberof IntegrationBasic
+     */
+    multipleInstances: boolean;
+    /**
      * The name of an integration.
      * @type {string}
      * @memberof IntegrationBasic
@@ -113,8 +113,8 @@ export interface IntegrationBasic {
  * Check if a given object implements the IntegrationBasic interface.
  */
 export function instanceOfIntegrationBasic(value: object): value is IntegrationBasic {
-    if (!('allowMultipleInstances' in value) || value['allowMultipleInstances'] === undefined) return false;
     if (!('componentName' in value) || value['componentName'] === undefined) return false;
+    if (!('multipleInstances' in value) || value['multipleInstances'] === undefined) return false;
     return true;
 }
 
@@ -128,7 +128,6 @@ export function IntegrationBasicFromJSONTyped(json: any, ignoreDiscriminator: bo
     }
     return {
         
-        'allowMultipleInstances': json['allowMultipleInstances'],
         'componentName': json['componentName'],
         'createdBy': json['createdBy'] == null ? undefined : json['createdBy'],
         'createdDate': json['createdDate'] == null ? undefined : (new Date(json['createdDate'])),
@@ -140,6 +139,7 @@ export function IntegrationBasicFromJSONTyped(json: any, ignoreDiscriminator: bo
         'lastPublishedDate': json['lastPublishedDate'] == null ? undefined : (new Date(json['lastPublishedDate'])),
         'lastStatus': json['lastStatus'] == null ? undefined : IntegrationStatusFromJSON(json['lastStatus']),
         'lastVersion': json['lastVersion'] == null ? undefined : json['lastVersion'],
+        'multipleInstances': json['multipleInstances'],
         'name': json['name'] == null ? undefined : json['name'],
     };
 }
@@ -155,11 +155,11 @@ export function IntegrationBasicToJSONTyped(value?: Omit<IntegrationBasic, 'crea
 
     return {
         
-        'allowMultipleInstances': value['allowMultipleInstances'],
         'componentName': value['componentName'],
         'description': value['description'],
         'icon': value['icon'],
         'lastStatus': IntegrationStatusToJSON(value['lastStatus']),
+        'multipleInstances': value['multipleInstances'],
         'name': value['name'],
     };
 }

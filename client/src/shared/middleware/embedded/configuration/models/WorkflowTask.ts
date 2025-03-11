@@ -20,13 +20,6 @@ import {
     ComponentConnectionToJSON,
     ComponentConnectionToJSONTyped,
 } from './ComponentConnection';
-import type { DataStreamComponent } from './DataStreamComponent';
-import {
-    DataStreamComponentFromJSON,
-    DataStreamComponentFromJSONTyped,
-    DataStreamComponentToJSON,
-    DataStreamComponentToJSONTyped,
-} from './DataStreamComponent';
 
 /**
  * Represents a definition of a workflow task.
@@ -46,12 +39,6 @@ export interface WorkflowTask {
      * @memberof WorkflowTask
      */
     description?: string;
-    /**
-     * 
-     * @type {DataStreamComponent}
-     * @memberof WorkflowTask
-     */
-    destination?: DataStreamComponent;
     /**
      * The (optional) list of tasks that are to be executed after execution of a task -- regardless of whether it had failed or not.
      * @type {Array<WorkflowTask>}
@@ -101,12 +88,6 @@ export interface WorkflowTask {
      */
     pre?: Array<WorkflowTask>;
     /**
-     * 
-     * @type {DataStreamComponent}
-     * @memberof WorkflowTask
-     */
-    source?: DataStreamComponent;
-    /**
      * The timeout expression which describes when a task should be deemed as timed-out.
      * @type {string}
      * @memberof WorkflowTask
@@ -141,7 +122,6 @@ export function WorkflowTaskFromJSONTyped(json: any, ignoreDiscriminator: boolea
         
         'connections': json['connections'] == null ? undefined : ((json['connections'] as Array<any>).map(ComponentConnectionFromJSON)),
         'description': json['description'] == null ? undefined : json['description'],
-        'destination': json['destination'] == null ? undefined : DataStreamComponentFromJSON(json['destination']),
         'finalize': json['finalize'] == null ? undefined : ((json['finalize'] as Array<any>).map(WorkflowTaskFromJSON)),
         'label': json['label'] == null ? undefined : json['label'],
         'metadata': json['metadata'] == null ? undefined : json['metadata'],
@@ -150,7 +130,6 @@ export function WorkflowTaskFromJSONTyped(json: any, ignoreDiscriminator: boolea
         'parameters': json['parameters'] == null ? undefined : json['parameters'],
         'post': json['post'] == null ? undefined : ((json['post'] as Array<any>).map(WorkflowTaskFromJSON)),
         'pre': json['pre'] == null ? undefined : ((json['pre'] as Array<any>).map(WorkflowTaskFromJSON)),
-        'source': json['source'] == null ? undefined : DataStreamComponentFromJSON(json['source']),
         'timeout': json['timeout'] == null ? undefined : json['timeout'],
         'type': json['type'],
     };
@@ -168,7 +147,6 @@ export function WorkflowTaskToJSONTyped(value?: Omit<WorkflowTask, 'connections'
     return {
         
         'description': value['description'],
-        'destination': DataStreamComponentToJSON(value['destination']),
         'finalize': value['finalize'] == null ? undefined : ((value['finalize'] as Array<any>).map(WorkflowTaskToJSON)),
         'label': value['label'],
         'metadata': value['metadata'],
@@ -177,7 +155,6 @@ export function WorkflowTaskToJSONTyped(value?: Omit<WorkflowTask, 'connections'
         'parameters': value['parameters'],
         'post': value['post'] == null ? undefined : ((value['post'] as Array<any>).map(WorkflowTaskToJSON)),
         'pre': value['pre'] == null ? undefined : ((value['pre'] as Array<any>).map(WorkflowTaskToJSON)),
-        'source': DataStreamComponentToJSON(value['source']),
         'timeout': value['timeout'],
         'type': value['type'],
     };

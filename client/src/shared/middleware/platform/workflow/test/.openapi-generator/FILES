@@ -2,7 +2,6 @@ apis/WorkflowTestApi.ts
 apis/index.ts
 index.ts
 models/ComponentConnection.ts
-models/DataStreamComponent.ts
 models/ExecutionError.ts
 models/Job.ts
 models/TaskExecution.ts
