@@ -1,49 +1,77 @@
-import {CONDITION_CASE_FALSE, CONDITION_CASE_TRUE} from '@/shared/constants';
+import {CONDITION_CASE_FALSE, CONDITION_CASE_TRUE, DEFAULT_NODE_POSITION} from '@/shared/constants';
 import {Node} from '@xyflow/react';
 
-const baseNode = {
-    position: {x: 0, y: 0},
-    type: 'placeholder',
+type ConditionNodeOptionsType = {
+    createLeftPlaceholder?: boolean;
+    createRightPlaceholder?: boolean;
+    createBottomGhost?: boolean;
 };
 
+type CreateConditionNodePropsType = {
+    allNodes: Array<Node>;
+    isNestedCondition?: boolean;
+    options?: ConditionNodeOptionsType;
+    taskNode: Node;
+};
+
+/**
+ * Creates a placeholder node for a condition branch
+ */
+function createPlaceholderNode(taskNodeId: string, conditionCase: string, suffix: string): Node {
+    return {
+        data: {
+            conditionCase,
+            conditionId: taskNodeId,
+            label: '+',
+        },
+        id: `${taskNodeId}-${suffix}-placeholder-0`,
+        position: DEFAULT_NODE_POSITION,
+        type: 'placeholder',
+    };
+}
+
+/**
+ * Creates a bottom ghost node for a condition
+ */
+function createBottomGhostNode(taskNodeId: string, isNested: boolean = false): Node {
+    return {
+        data: {
+            conditionId: taskNodeId,
+            isNestedConditionBottomGhost: isNested,
+            taskDispatcherId: taskNodeId,
+        },
+        id: `${taskNodeId}-condition-bottom-ghost`,
+        position: DEFAULT_NODE_POSITION,
+        type: 'taskDispatcherBottomGhostNode',
+    };
+}
+
+/**
+ * Creates all necessary auxiliary nodes for a condition task node
+ */
 export default function createConditionNode({
     allNodes,
-    belowPlaceholderNode,
-    sourcePlaceholderIndex,
+    isNestedCondition = false,
+    options = {
+        createBottomGhost: true,
+        createLeftPlaceholder: true,
+        createRightPlaceholder: true,
+    },
     taskNode,
-}: {
-    allNodes: Array<Node>;
-    belowPlaceholderNode?: Node;
-    sourcePlaceholderIndex?: number;
-    taskNode: Node;
-}): Array<Node> {
-    const leftPlaceholderNode: Node = {
-        ...baseNode,
-        data: {conditionCase: CONDITION_CASE_TRUE, conditionId: taskNode.id, label: '+'},
-        id: `${taskNode.id}-left-placeholder-0`,
-    };
+}: CreateConditionNodePropsType): Node[] {
+    const nodesWithCondition = [...allNodes];
 
-    const rightPlaceholderNode: Node = {
-        ...baseNode,
-        data: {conditionCase: CONDITION_CASE_FALSE, conditionId: taskNode.id, label: '+'},
-        id: `${taskNode.id}-right-placeholder-0`,
-    };
-
-    if (taskNode.data.conditionData && belowPlaceholderNode && sourcePlaceholderIndex) {
-        allNodes.splice(sourcePlaceholderIndex + 1, 0, leftPlaceholderNode, rightPlaceholderNode, belowPlaceholderNode);
-
-        return allNodes;
+    if (options.createLeftPlaceholder) {
+        nodesWithCondition.push(createPlaceholderNode(taskNode.id, CONDITION_CASE_TRUE, 'left'));
     }
 
-    const bottomPlaceholderNode: Node = {
-        ...baseNode,
-        data: {label: '+'},
-        id: `${taskNode.id}-bottom-placeholder`,
-    };
+    if (options.createRightPlaceholder) {
+        nodesWithCondition.push(createPlaceholderNode(taskNode.id, CONDITION_CASE_FALSE, 'right'));
+    }
 
-    const insertIndex = allNodes.findIndex((node) => node.id === taskNode.id) + 1;
+    if (options.createBottomGhost) {
+        nodesWithCondition.push(createBottomGhostNode(taskNode.id, isNestedCondition));
+    }
 
-    allNodes.splice(insertIndex, 0, leftPlaceholderNode, rightPlaceholderNode, bottomPlaceholderNode);
-
-    return allNodes;
+    return nodesWithCondition;
 }
