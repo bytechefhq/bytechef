@@ -19,6 +19,8 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -71,9 +73,14 @@ public class AiProviderFacadeImpl implements AiProviderFacade {
                         return name.contains(curComponentDefinition.getName());
                     })
                     .findFirst()
-                    .orElseThrow(
-                        () -> new IllegalStateException(
-                            "Component definition not found for provider: " + provider.getKey()));
+                    .orElse(null);
+//                    .orElseThrow(
+//                        () -> new IllegalStateException(
+//                            "Component definition not found for provider: " + provider.getKey()));
+
+                if (componentDefinition == null) {
+                    return null;
+                }
 
                 Property property = properties
                     .stream()
@@ -88,6 +95,7 @@ public class AiProviderFacadeImpl implements AiProviderFacade {
                 return new AiProviderDTO(
                     provider.getId(), provider.getLabel(), componentDefinition.getIcon(), apiKey, enabled);
             })
+            .filter(Objects::nonNull)
             .toList();
     }
 
