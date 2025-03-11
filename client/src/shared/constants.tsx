@@ -57,6 +57,23 @@ export const PATH_DIGIT_PREFIX = '_DIGIT_';
 export const PATH_DASH_REPLACEMENT = '_DASH_';
 export const PATH_HASH_REPLACEMENT = '_HASH_';
 
+export const NODE_WIDTH = 240;
+export const NODE_HEIGHT = 100;
+export const PLACEHOLDER_NODE_HEIGHT = 28;
+export const DIRECTION = 'TB';
+
+export const TASK_DISPATCHER_NAMES = [
+    'branch',
+    'condition',
+    'each',
+    'fork-join',
+    'loop',
+    'loop-break',
+    'map',
+    'parallel',
+    'subflow',
+];
+
 export const SORT_OPTIONS = [
     {
         label: 'Last edited',
