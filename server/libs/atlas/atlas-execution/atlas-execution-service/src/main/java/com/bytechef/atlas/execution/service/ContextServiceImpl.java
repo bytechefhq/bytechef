@@ -20,8 +20,8 @@ import com.bytechef.atlas.execution.domain.Context;
 import com.bytechef.atlas.execution.repository.ContextRepository;
 import com.bytechef.file.storage.domain.FileEntry;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import org.apache.commons.lang3.Validate;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.Assert;
 
 @Transactional
 public class ContextServiceImpl implements ContextService {
@@ -35,8 +35,8 @@ public class ContextServiceImpl implements ContextService {
 
     @Override
     public void push(long stackId, Context.Classname classname, FileEntry value) {
-        Validate.notNull(classname, "'classname' must not be null");
-        Validate.notNull(value, "'value' must not be null");
+        Assert.notNull(classname, "'classname' must not be null");
+        Assert.notNull(value, "'value' must not be null");
 
         Context context = new Context(stackId, classname, value);
 
@@ -45,8 +45,8 @@ public class ContextServiceImpl implements ContextService {
 
     @Override
     public void push(long stackId, int subStackId, Context.Classname classname, FileEntry value) {
-        Validate.notNull(classname, "'classname' must not be null");
-        Validate.notNull(value, "'value' must not be null");
+        Assert.notNull(classname, "'classname' must not be null");
+        Assert.notNull(value, "'value' must not be null");
 
         Context context = new Context(stackId, subStackId, classname, value);
 

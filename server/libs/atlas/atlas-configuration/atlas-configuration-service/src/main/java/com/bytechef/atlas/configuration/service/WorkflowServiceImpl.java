@@ -38,6 +38,7 @@ import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
 import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.Assert;
 
 /**
  * @author Ivica Cardic
@@ -68,9 +69,9 @@ public class WorkflowServiceImpl implements WorkflowService {
     public Workflow create(
         String definition, Format format, SourceType sourceType) {
 
-        Validate.notNull(definition, "'definition' must not be null");
-        Validate.notNull(format, "'format' must not be null");
-        Validate.notNull(sourceType, "'sourceType' must not be null");
+        Assert.notNull(definition, "'definition' must not be null");
+        Assert.notNull(format, "'format' must not be null");
+        Assert.notNull(sourceType, "'sourceType' must not be null");
 
         // TODO Validate definition considering format value
 
@@ -89,7 +90,7 @@ public class WorkflowServiceImpl implements WorkflowService {
 
     @Override
     public void delete(String id) {
-        Validate.notNull(id, "'id' must not be null");
+        Assert.notNull(id, "'id' must not be null");
 
         workflowCrudRepositories
             .stream()
@@ -115,7 +116,7 @@ public class WorkflowServiceImpl implements WorkflowService {
     @Override
     @Transactional(readOnly = true)
     public Workflow getWorkflow(String id) {
-        Validate.notNull(id, "'id' must not be null");
+        Assert.notNull(id, "'id' must not be null");
 
         Cache cacheOne = Validate.notNull(cacheManager.getCache(CACHE_ONE), "cacheOne");
 
@@ -207,7 +208,7 @@ public class WorkflowServiceImpl implements WorkflowService {
 
     @Override
     public void refreshCache(String id) {
-        Validate.notNull(id, "'id' must not be null");
+        Assert.notNull(id, "'id' must not be null");
 
         Workflow workflow = null;
 
@@ -265,8 +266,8 @@ public class WorkflowServiceImpl implements WorkflowService {
 
     @Override
     public Workflow update(String id, String definition, int version) {
-        Validate.notNull(id, "'id' must not be null");
-        Validate.notNull(definition, "'definition' must not be null");
+        Assert.notNull(id, "'id' must not be null");
+        Assert.notNull(definition, "'definition' must not be null");
 
         final Workflow workflow = getWorkflow(id);
 

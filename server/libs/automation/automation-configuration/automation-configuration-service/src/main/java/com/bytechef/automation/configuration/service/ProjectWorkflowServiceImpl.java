@@ -23,9 +23,9 @@ import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.platform.exception.ConfigurationException;
 import java.util.List;
 import java.util.UUID;
-import org.apache.commons.lang3.Validate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.Assert;
 
 /**
  * @author Ivica Cardic
@@ -49,7 +49,7 @@ public class ProjectWorkflowServiceImpl implements ProjectWorkflowService {
     public ProjectWorkflow addWorkflow(
         long projectId, int projectVersion, String workflowId, String workflowReferenceCode) {
 
-        Validate.notNull(workflowId, "'workflowId' must not be null");
+        Assert.notNull(workflowId, "'workflowId' must not be null");
 
         ProjectWorkflow project = new ProjectWorkflow(projectId, projectVersion, workflowId, workflowReferenceCode);
 
@@ -140,8 +140,8 @@ public class ProjectWorkflowServiceImpl implements ProjectWorkflowService {
 
     @Override
     public ProjectWorkflow update(ProjectWorkflow projectWorkflow) {
-        Validate.notNull(projectWorkflow, "'projectWorkflow' must not be null");
-        Validate.notNull(projectWorkflow.getId(), "'id' must not be null");
+        Assert.notNull(projectWorkflow, "'projectWorkflow' must not be null");
+        Assert.notNull(projectWorkflow.getId(), "'id' must not be null");
 
         ProjectWorkflow curProjectWorkflow = OptionalUtils.get(
             projectWorkflowRepository.findById(projectWorkflow.getId()));

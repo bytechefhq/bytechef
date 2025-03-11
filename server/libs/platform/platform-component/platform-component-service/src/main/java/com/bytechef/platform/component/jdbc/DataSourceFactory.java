@@ -19,8 +19,8 @@ package com.bytechef.platform.component.jdbc;
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.platform.component.jdbc.constant.JdbcConstants;
 import java.util.Map;
-import org.apache.commons.lang3.Validate;
 import org.springframework.jdbc.datasource.SingleConnectionDataSource;
+import org.springframework.util.Assert;
 
 /**
  * @author Ivica Cardic
@@ -30,8 +30,8 @@ public class DataSourceFactory {
     public static SingleConnectionDataSource getDataSource(
         Map<String, ?> connectionParameters, String databaseJdbcName, String jdbcDriverClassName) {
 
-        Validate.notNull(databaseJdbcName, "'databaseJdbcName' must not be null");
-        Validate.notNull(jdbcDriverClassName, "'jdbcDriverClassName' must not be null");
+        Assert.notNull(databaseJdbcName, "'databaseJdbcName' must not be null");
+        Assert.notNull(jdbcDriverClassName, "'jdbcDriverClassName' must not be null");
 
         String url = "jdbc:" + databaseJdbcName + "://"
             + MapUtils.getString(connectionParameters, JdbcConstants.HOST)

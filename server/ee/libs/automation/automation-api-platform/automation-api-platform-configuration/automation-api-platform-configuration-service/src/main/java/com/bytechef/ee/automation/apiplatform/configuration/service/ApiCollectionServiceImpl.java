@@ -12,9 +12,9 @@ import com.bytechef.ee.automation.apiplatform.configuration.domain.ApiCollection
 import com.bytechef.ee.automation.apiplatform.configuration.repository.ApiCollectionRepository;
 import com.bytechef.platform.constant.Environment;
 import java.util.List;
-import org.apache.commons.lang3.Validate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.Assert;
 
 /**
  * @version ee
@@ -33,11 +33,11 @@ public class ApiCollectionServiceImpl implements ApiCollectionService {
 
     @Override
     public ApiCollection create(ApiCollection apiCollection) {
-        Validate.notNull(apiCollection, "'openApiCollection' must not be null");
-        Validate.notNull(apiCollection.getCollectionVersion(), "'collectionVersion' must not be null");
-        Validate.isTrue(apiCollection.getId() == null, "'id' must be null");
-        Validate.notNull(apiCollection.getName(), "'name' must not be null");
-        Validate.notNull(apiCollection.getProjectDeploymentId(), "'projectDeploymentId' must not be null");
+        Assert.notNull(apiCollection, "'openApiCollection' must not be null");
+        Assert.notNull(apiCollection.getCollectionVersion(), "'collectionVersion' must not be null");
+        Assert.isTrue(apiCollection.getId() == null, "'id' must be null");
+        Assert.notNull(apiCollection.getName(), "'name' must not be null");
+        Assert.notNull(apiCollection.getProjectDeploymentId(), "'projectDeploymentId' must not be null");
 
         return apiCollectionRepository.save(apiCollection);
     }
@@ -74,11 +74,12 @@ public class ApiCollectionServiceImpl implements ApiCollectionService {
 
     @Override
     public ApiCollection update(ApiCollection apiCollection) {
-        Validate.notNull(apiCollection, "'openApiCollection' must not be null");
-        Validate.notNull(apiCollection.getCollectionVersion(), "'collectionVersion' must not be null");
-        Validate.notNull(apiCollection.getName(), "name");
+        Assert.notNull(apiCollection, "'openApiCollection' must not be null");
+        Assert.notNull(apiCollection.getCollectionVersion(), "'collectionVersion' must not be null");
+        Assert.notNull(apiCollection.getId(), "id");
+        Assert.notNull(apiCollection.getName(), "name");
 
-        ApiCollection curApiCollection = getApiCollection(Validate.notNull(apiCollection.getId(), "id"));
+        ApiCollection curApiCollection = getApiCollection(apiCollection.getId());
 
         curApiCollection.setCollectionVersion(apiCollection.getCollectionVersion());
         curApiCollection.setContextPath(apiCollection.getContextPath());

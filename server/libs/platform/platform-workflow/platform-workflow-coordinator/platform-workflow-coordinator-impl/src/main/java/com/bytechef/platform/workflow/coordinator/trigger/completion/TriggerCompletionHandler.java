@@ -31,10 +31,10 @@ import com.bytechef.platform.workflow.execution.service.TriggerStateService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Collection;
 import java.util.Map;
-import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
+import org.springframework.util.Assert;
 
 /**
  * @author Ivica Cardic
@@ -65,8 +65,8 @@ public class TriggerCompletionHandler {
 
     @SuppressWarnings("unchecked")
     public void handle(TriggerExecution triggerExecution) {
-        Validate.notNull(triggerExecution, "'triggerExecution' must not be null");
-        Validate.notNull(triggerExecution.getId(), "'triggerExecution.id' must not be null");
+        Assert.notNull(triggerExecution, "'triggerExecution' must not be null");
+        Assert.notNull(triggerExecution.getId(), "'triggerExecution.id' must not be null");
 
         if (logger.isDebugEnabled()) {
             logger.debug("handle: triggerExecution={}", triggerExecution);

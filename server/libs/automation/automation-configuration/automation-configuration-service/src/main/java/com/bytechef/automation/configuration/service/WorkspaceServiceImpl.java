@@ -22,9 +22,9 @@ import com.bytechef.automation.configuration.repository.WorkspaceRepository;
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.platform.exception.ConfigurationException;
 import java.util.List;
-import org.apache.commons.lang3.Validate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.Assert;
 
 /**
  * @author Ivica Cardic
@@ -41,8 +41,8 @@ public class WorkspaceServiceImpl implements WorkspaceService {
 
     @Override
     public Workspace create(Workspace workspace) {
-        Validate.notNull(workspace, "'workspace' must not be null");
-        Validate.isTrue(workspace.getId() == null, "'workspace.id' must be null");
+        Assert.notNull(workspace, "'workspace' must not be null");
+        Assert.isTrue(workspace.getId() == null, "'workspace.id' must be null");
 
         return workspaceRepository.save(workspace);
     }
@@ -74,8 +74,8 @@ public class WorkspaceServiceImpl implements WorkspaceService {
 
     @Override
     public Workspace update(Workspace workspace) {
-        Validate.notNull(workspace, "'workspace' must not be null");
-        Validate.isTrue(workspace.getId() != null, "'workspace.id' must not be null");
+        Assert.notNull(workspace, "'workspace' must not be null");
+        Assert.isTrue(workspace.getId() != null, "'workspace.id' must not be null");
 
         if (workspace.getId() == Workspace.DEFAULT_WORKSPACE_ID) {
             throw new ConfigurationException(

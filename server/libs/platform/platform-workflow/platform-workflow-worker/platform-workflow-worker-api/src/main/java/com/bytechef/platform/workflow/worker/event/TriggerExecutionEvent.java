@@ -21,7 +21,7 @@ import com.bytechef.message.event.MessageEvent;
 import com.bytechef.platform.workflow.execution.domain.TriggerExecution;
 import com.bytechef.platform.workflow.worker.message.route.TriggerWorkerMessageRoute;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import org.apache.commons.lang3.Validate;
+import org.springframework.util.Assert;
 
 /**
  * @author Ivica Cardic
@@ -38,7 +38,7 @@ public class TriggerExecutionEvent extends AbstractEvent
     public TriggerExecutionEvent(TriggerExecution triggerExecution) {
         super();
 
-        Validate.notNull(triggerExecution, "'triggerExecution' must not be null");
+        Assert.notNull(triggerExecution, "'triggerExecution' must not be null");
 
         this.triggerExecution = triggerExecution;
     }

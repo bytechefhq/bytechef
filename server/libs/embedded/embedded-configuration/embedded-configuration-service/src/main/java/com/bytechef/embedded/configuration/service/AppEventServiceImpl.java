@@ -24,6 +24,7 @@ import org.apache.commons.lang3.Validate;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.Assert;
 
 /**
  * @author Ivica Cardic
@@ -40,10 +41,10 @@ public class AppEventServiceImpl implements AppEventService {
 
     @Override
     public AppEvent create(AppEvent appEvent) {
-        Validate.notNull(appEvent, "'appEvent' must not be null");
-        Validate.isTrue(appEvent.getId() == null, "'id' must be null");
-        Validate.notNull(appEvent.getName(), "'name' must not be null");
-        Validate.notNull(appEvent.getSchema(), "'schema' must not be null");
+        Assert.notNull(appEvent, "'appEvent' must not be null");
+        Assert.isTrue(appEvent.getId() == null, "'id' must be null");
+        Assert.notNull(appEvent.getName(), "'name' must not be null");
+        Assert.notNull(appEvent.getSchema(), "'schema' must not be null");
 
         return appEventRepository.save(appEvent);
     }
@@ -67,7 +68,7 @@ public class AppEventServiceImpl implements AppEventService {
 
     @Override
     public AppEvent update(AppEvent appEvent) {
-        Validate.notNull(appEvent, "'appEvent' must not be null");
+        Assert.notNull(appEvent, "'appEvent' must not be null");
 
         AppEvent curAppEvent = getAppEvent(Validate.notNull(appEvent.getId(), "id"));
 

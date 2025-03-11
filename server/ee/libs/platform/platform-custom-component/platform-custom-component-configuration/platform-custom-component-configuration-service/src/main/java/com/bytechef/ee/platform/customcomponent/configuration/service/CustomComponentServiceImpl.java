@@ -13,10 +13,10 @@ import com.bytechef.ee.platform.customcomponent.configuration.repository.CustomC
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import java.util.List;
 import java.util.Optional;
-import org.apache.commons.lang3.Validate;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.Assert;
 
 /**
  * @version ee
@@ -36,9 +36,9 @@ public class CustomComponentServiceImpl implements CustomComponentService {
 
     @Override
     public CustomComponent create(CustomComponent customComponent) {
-        Validate.notNull(customComponent, "'customComponent' must not be null");
-        Validate.isTrue(customComponent.getId() == null, "'id' must be null");
-        Validate.notNull(customComponent.getName(), "'componentName' must not be null");
+        Assert.notNull(customComponent, "'customComponent' must not be null");
+        Assert.isTrue(customComponent.getId() == null, "'id' must be null");
+        Assert.notNull(customComponent.getName(), "'componentName' must not be null");
 
         return customComponentRepository.save(customComponent);
     }
@@ -76,9 +76,10 @@ public class CustomComponentServiceImpl implements CustomComponentService {
 
     @Override
     public CustomComponent update(CustomComponent customComponent) {
-        Validate.notNull(customComponent, "'customComponent' must not be null");
+        Assert.notNull(customComponent, "'customComponent' must not be null");
+        Assert.notNull(customComponent.getId(), "id");
 
-        CustomComponent curCustomComponent = getCustomComponent(Validate.notNull(customComponent.getId(), "id"));
+        CustomComponent curCustomComponent = getCustomComponent(customComponent.getId());
 
         curCustomComponent.setDescription(customComponent.getDescription());
         curCustomComponent.setIcon(customComponent.getIcon());

@@ -43,6 +43,7 @@ import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.util.Assert;
 
 /**
  * @author Arik Cohen
@@ -83,8 +84,8 @@ public class DefaultTaskCompletionHandler implements TaskCompletionHandler {
 
     @Override
     public void handle(TaskExecution taskExecution) {
-        Validate.notNull(taskExecution, "'taskExecution' must not be null");
-        Validate.notNull(taskExecution.getId(), "'taskExecution.id' must not be null");
+        Assert.notNull(taskExecution, "'taskExecution' must not be null");
+        Assert.notNull(taskExecution.getId(), "'taskExecution.id' must not be null");
 
         if (logger.isTraceEnabled()) {
             logger.trace("handle: taskExecution={}", taskExecution);
@@ -131,7 +132,7 @@ public class DefaultTaskCompletionHandler implements TaskCompletionHandler {
     }
 
     private void complete(Job job) {
-        Validate.notNull(job, "'job' must not be null");
+        Assert.notNull(job, "'job' must not be null");
 
         if (logger.isTraceEnabled()) {
             logger.trace("complete: job={}", job);
@@ -148,8 +149,7 @@ public class DefaultTaskCompletionHandler implements TaskCompletionHandler {
         job.setEndDate(Instant.now());
         job.setStatus(Job.Status.COMPLETED);
         job.setOutputs(
-            taskFileStorage.storeJobOutputs(
-                Validate.notNull(job.getId(), "id"), Evaluator.evaluate(source, context)));
+            taskFileStorage.storeJobOutputs(Validate.notNull(job.getId(), "id"), Evaluator.evaluate(source, context)));
 
         job = jobService.update(job);
 

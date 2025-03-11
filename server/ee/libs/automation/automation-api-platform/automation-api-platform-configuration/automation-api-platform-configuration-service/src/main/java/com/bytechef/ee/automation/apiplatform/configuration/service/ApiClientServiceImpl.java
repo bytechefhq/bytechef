@@ -13,9 +13,9 @@ import com.bytechef.ee.automation.apiplatform.configuration.repository.ApiClient
 import com.bytechef.tenant.domain.TenantKey;
 import java.util.List;
 import java.util.Optional;
-import org.apache.commons.lang3.Validate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.Assert;
 
 /**
  * @version ee
@@ -34,8 +34,8 @@ public class ApiClientServiceImpl implements ApiClientService {
 
     @Override
     public String create(ApiClient apiKey) {
-        Validate.isTrue(apiKey.getId() == null, "'id' must be null");
-        Validate.notNull(apiKey.getName(), "'name' must not be null");
+        Assert.isTrue(apiKey.getId() == null, "'id' must be null");
+        Assert.notNull(apiKey.getName(), "'name' must not be null");
 
         apiKey.setSecretKey(String.valueOf(TenantKey.of()));
 
@@ -69,9 +69,12 @@ public class ApiClientServiceImpl implements ApiClientService {
 
     @Override
     public ApiClient update(ApiClient apiClient) {
-        ApiClient curApiClient = getApiClient(Validate.notNull(apiClient.getId(), "id"));
+        Assert.notNull(apiClient.getId(), "id");
+        Assert.notNull(apiClient.getName(), "name");
 
-        curApiClient.setName(Validate.notNull(apiClient.getName(), "name"));
+        ApiClient curApiClient = getApiClient(apiClient.getId());
+
+        curApiClient.setName(apiClient.getName());
 
         return apiClientRepository.save(curApiClient);
     }

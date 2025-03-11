@@ -27,6 +27,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.apache.commons.lang3.Validate;
+import org.springframework.util.Assert;
 
 /**
  * a simple, non-thread-safe implementation of the {@link MessageBroker} interface. Useful for testing.
@@ -40,11 +41,11 @@ public class SyncMessageBroker implements MessageBroker {
 
     @Override
     public void send(MessageRoute messageRoute, Object message) {
-        Validate.notNull(messageRoute, "'messageRoute' must not be null");
+        Assert.notNull(messageRoute, "'messageRoute' must not be null");
 
         List<Receiver> receivers = receiverMap.get(messageRoute);
 
-        Validate.isTrue(receivers != null && !receivers.isEmpty(), "no listeners subscribed for: " + messageRoute);
+        Assert.isTrue(receivers != null && !receivers.isEmpty(), "no listeners subscribed for: " + messageRoute);
 
         for (Receiver receiver : Validate.notNull(receivers, "receivers")) {
             receiver.receive(

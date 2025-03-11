@@ -34,10 +34,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.ServiceConfigurationError;
 import java.util.ServiceLoader;
-import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.io.Resource;
+import org.springframework.util.Assert;
 
 /**
  * @author Matija Petanjek
@@ -141,8 +141,8 @@ abstract class AbstractWorkflowMapper implements WorkflowMapper {
         for (int i = 0; outputs != null && i < outputs.size(); i++) {
             Map<String, Object> output = outputs.get(i);
 
-            Validate.notNull(output.get(WorkflowConstants.NAME), "output definition must specify a 'name'");
-            Validate.notNull(output.get(WorkflowConstants.VALUE), "output definition must specify a 'value'");
+            Assert.notNull(output.get(WorkflowConstants.NAME), "output definition must specify a 'name'");
+            Assert.notNull(output.get(WorkflowConstants.VALUE), "output definition must specify a 'value'");
         }
     }
 
@@ -152,7 +152,7 @@ abstract class AbstractWorkflowMapper implements WorkflowMapper {
             String k = entry.getKey();
             Object v = entry.getValue();
 
-            Validate.isTrue(
+            Assert.isTrue(
                 CollectionUtils.contains(
                     CollectionUtils.concat(
                         WorkflowConstants.WORKFLOW_DEFINITION_CONSTANTS, additionalWorkflowReservedWords),

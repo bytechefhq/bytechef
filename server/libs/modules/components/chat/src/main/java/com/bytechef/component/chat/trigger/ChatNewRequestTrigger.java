@@ -41,7 +41,7 @@ import com.bytechef.component.definition.TriggerDefinition.WebhookMethod;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-import org.apache.commons.lang3.Validate;
+import org.springframework.util.Assert;
 
 /**
  * @author Ivica Cardic
@@ -76,7 +76,7 @@ public class ChatNewRequestTrigger {
         Parameters inputParameters, Parameters connectionParameters, HttpHeaders headers, HttpParameters parameters,
         WebhookBody body, WebhookMethod method, WebhookEnableOutput webhookEnableOutput, TriggerContext context) {
 
-        Validate.notNull(body.getContent(), "Body content is required.");
+        Assert.notNull(body.getContent(), "Body content is required.");
 
         Map<String, Object> content = checkMap((Map<?, ?>) body.getContent());
 

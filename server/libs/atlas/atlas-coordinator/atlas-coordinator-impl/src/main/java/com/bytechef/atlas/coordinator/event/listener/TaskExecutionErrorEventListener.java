@@ -34,6 +34,7 @@ import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.util.Assert;
 
 /**
  * @author Arik Cohen
@@ -67,7 +68,7 @@ public class TaskExecutionErrorEventListener implements ErrorEventListener {
 
             ExecutionError error = taskExecution.getError();
 
-            Validate.notNull(error, "'error' must not be null");
+            Assert.notNull(error, "'error' must not be null");
 
             logger.error(
                 "Task id={}: message={}\nstackTrace={}", taskExecution.getId(), error.getMessage(),

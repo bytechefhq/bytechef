@@ -36,7 +36,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import org.apache.commons.lang3.Validate;
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
@@ -47,6 +46,7 @@ import org.springframework.data.domain.Persistable;
 import org.springframework.data.jdbc.core.mapping.AggregateReference;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
+import org.springframework.util.Assert;
 
 /**
  * Wraps the {@link WorkflowTask} instance to add execution semantics to the task.
@@ -309,7 +309,7 @@ public final class TaskExecution
 
     @JsonIgnore
     public Map<String, ?> getParameters() {
-        Validate.notNull(workflowTask, "workflowTask");
+        Assert.notNull(workflowTask, "workflowTask");
 
         return workflowTask.getParameters();
     }
@@ -409,7 +409,7 @@ public final class TaskExecution
     @Override
     @JsonIgnore
     public String getType() {
-        Validate.notNull(workflowTask.getType(), "Type must not be null");
+        Assert.notNull(workflowTask.getType(), "Type must not be null");
 
         return workflowTask.getType();
     }
@@ -640,7 +640,7 @@ public final class TaskExecution
         }
 
         public Builder workflowTask(WorkflowTask workflowTask) {
-            Validate.notNull(workflowTask, "'workflowTask' must not be null");
+            Assert.notNull(workflowTask, "'workflowTask' must not be null");
 
             this.workflowTask = workflowTask;
             return this;

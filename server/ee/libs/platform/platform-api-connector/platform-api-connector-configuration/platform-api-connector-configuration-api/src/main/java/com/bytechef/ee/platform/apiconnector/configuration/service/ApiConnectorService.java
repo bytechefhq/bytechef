@@ -30,5 +30,5 @@ public interface ApiConnectorService {
 
     ApiConnector update(ApiConnector apiConnector);
 
-    ApiConnector enableApiConnector(Long id, boolean enable);
+    ApiConnector enableApiConnector(long id, boolean enable);
 }

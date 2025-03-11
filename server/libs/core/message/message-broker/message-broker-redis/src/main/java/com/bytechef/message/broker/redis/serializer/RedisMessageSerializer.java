@@ -19,8 +19,8 @@ package com.bytechef.message.broker.redis.serializer;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import org.apache.commons.lang3.Validate;
 import org.springframework.data.redis.serializer.SerializationException;
+import org.springframework.util.Assert;
 
 /**
  * @author Ivica Cardic
@@ -35,7 +35,7 @@ public class RedisMessageSerializer {
     }
 
     public String serialize(Object object) throws SerializationException {
-        Validate.notNull(object, "'object' must not be null");
+        Assert.notNull(object, "'object' must not be null");
 
         try {
             Class<?> messageClass = object.getClass();

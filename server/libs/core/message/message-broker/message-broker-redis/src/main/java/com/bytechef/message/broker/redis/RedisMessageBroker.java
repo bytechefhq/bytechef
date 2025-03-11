@@ -23,10 +23,10 @@ import com.bytechef.message.route.MessageRoute;
 import com.oblac.jrsmq.RedisSMQ;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.concurrent.TimeUnit;
-import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.util.Assert;
 
 /**
  * @author Ivica Cardic
@@ -50,7 +50,7 @@ public class RedisMessageBroker implements MessageBroker {
 
     @Override
     public void send(MessageRoute messageRoute, Object message) {
-        Validate.notNull(messageRoute, "'messageRoute' must not be null");
+        Assert.notNull(messageRoute, "'messageRoute' must not be null");
 
         if (message instanceof Retryable retryable) {
             delay(retryable.getRetryDelayMillis());

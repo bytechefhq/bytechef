@@ -34,6 +34,7 @@ import java.util.Map;
 import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.util.Assert;
 
 /**
  * @author Arik Cohen
@@ -76,7 +77,7 @@ public class JobExecutor {
     }
 
     private void executeNextTask(Job job, Workflow workflow) {
-        Validate.notNull(job.getId(), "'job.id' must not be null");
+        Assert.notNull(job.getId(), "'job.id' must not be null");
 
         if (logger.isTraceEnabled()) {
             logger.trace("executeNextTask: job={}, workflow={}", job, workflow);
@@ -113,7 +114,7 @@ public class JobExecutor {
 
         WorkflowTask workflowTask = workflowTasks.get(job.getCurrentTask());
 
-        Validate.notNull(job.getId(), "'job.id' must not be null");
+        Assert.notNull(job.getId(), "'job.id' must not be null");
 
         TaskExecution taskExecution = TaskExecution.builder()
             .jobId(job.getId())

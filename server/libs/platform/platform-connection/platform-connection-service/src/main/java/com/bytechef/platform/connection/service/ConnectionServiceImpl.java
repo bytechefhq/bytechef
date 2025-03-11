@@ -28,10 +28,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.Validate;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.Assert;
 
 /**
  * @author Ivica Cardic
@@ -49,10 +49,10 @@ public class ConnectionServiceImpl implements ConnectionService {
 
     @Override
     public Connection create(Connection connection) {
-        Validate.notNull(connection, "'connection' must not be null");
-        Validate.notBlank(connection.getComponentName(), "'componentName' must not be empty");
-        Validate.notBlank(connection.getName(), "'name' must not be empty");
-        Validate.isTrue(connection.getId() == null, "'id' must be null");
+        Assert.notNull(connection, "'connection' must not be null");
+        Assert.hasText(connection.getComponentName(), "'componentName' must not be empty");
+        Assert.hasText(connection.getName(), "'name' must not be empty");
+        Assert.isTrue(connection.getId() == null, "'id' must be null");
 
         return connectionRepository.save(connection);
     }
@@ -149,7 +149,7 @@ public class ConnectionServiceImpl implements ConnectionService {
 
     @Override
     public Connection updateConnectionCredentialStatus(long connectionId, CredentialStatus status) {
-        Validate.notNull(status, "'status' must not be null");
+        Assert.notNull(status, "'status' must not be null");
 
         Connection connection = getConnection(connectionId);
 
@@ -160,7 +160,7 @@ public class ConnectionServiceImpl implements ConnectionService {
 
     @Override
     public Connection updateConnectionParameters(long connectionId, Map<String, ?> parameters) {
-        Validate.notNull(parameters, "'parameters' must not be null");
+        Assert.notNull(parameters, "'parameters' must not be null");
 
         Connection connection = getConnection(connectionId);
 
