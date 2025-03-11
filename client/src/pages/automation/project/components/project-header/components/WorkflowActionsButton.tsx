@@ -22,14 +22,14 @@ const WorkflowActionsButton = ({
             <div className="w-20">
                 {workflowIsRunning ? (
                     <Button
-                        className="bg-surface-destructive-primary hover:bg-surface-destructive-primary-hover active:bg-surface-destructive-primary-active w-full shadow-none"
+                        className="w-full bg-surface-destructive-primary shadow-none hover:bg-surface-destructive-primary-hover active:bg-surface-destructive-primary-active"
                         onClick={onStopClick}
                     >
                         <SquareIcon /> Stop
                     </Button>
                 ) : (
                     <Button
-                        className="active:bg-surface-brand-primary-active w-full bg-surface-brand-primary shadow-none hover:bg-surface-brand-primary-hover disabled:pointer-events-auto"
+                        className="w-full bg-surface-brand-primary shadow-none hover:bg-surface-brand-primary-hover active:bg-surface-brand-primary-active disabled:pointer-events-auto"
                         disabled={runDisabled}
                         onClick={() => onRunClick()}
                     >

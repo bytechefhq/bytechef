@@ -22,7 +22,7 @@ const AccountErrorPage = () => {
                 </CardHeader>
 
                 <Link to="/login">
-                    <Button className="active:bg-surface-brand-primary-active w-fit space-x-2 bg-surface-brand-primary py-5 hover:bg-surface-brand-primary-hover">
+                    <Button className="w-fit space-x-2 bg-surface-brand-primary py-5 hover:bg-surface-brand-primary-hover active:bg-surface-brand-primary-active">
                         Go back
                     </Button>
                 </Link>
