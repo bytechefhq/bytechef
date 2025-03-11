@@ -22,7 +22,7 @@ const PropertyJsonSchemaBuilderSheet = ({locale, onChange, onClose, schema}: Pro
                 onPointerDownOutside={(event) => event.preventDefault()}
             >
                 <Tabs className="flex size-full flex-col" defaultValue="designer">
-                    <SheetHeader className="flex flex-row items-center justify-between space-y-0 p-4">
+                    <SheetHeader className="flex flex-row items-center justify-between space-y-0 p-3">
                         <div className="flex flex-col">
                             <SheetTitle>JSON Schema Builder</SheetTitle>
 

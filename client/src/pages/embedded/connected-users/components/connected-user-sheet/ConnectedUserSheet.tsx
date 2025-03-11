@@ -15,7 +15,7 @@ const ConnectedUserSheet = () => {
     return (
         <Sheet onOpenChange={() => setConnectedUserSheetOpen(!connectedUserSheetOpen)} open={connectedUserSheetOpen}>
             <SheetContent className="flex w-11/12 flex-col gap-0 p-0 sm:max-w-screen-md">
-                <SheetHeader className="flex flex-row items-center justify-between space-y-0 p-4">
+                <SheetHeader className="flex flex-row items-center justify-between space-y-0 p-3">
                     <SheetTitle className="flex justify-between">
                         {connectedUser && <ConnectedUserSheetTitle connectedUser={connectedUser} />}
                     </SheetTitle>

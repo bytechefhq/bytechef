@@ -23,7 +23,7 @@ const WorkflowExecutionSheetWorkflowPanel = ({workflowExecution}: {workflowExecu
 
     return (
         <div className="flex size-full flex-col bg-muted/50">
-            <SheetHeader className="flex flex-row items-center justify-between space-y-0 p-4">
+            <SheetHeader className="flex flex-row items-center justify-between space-y-0 p-3">
                 <SheetTitle>
                     <span>{project?.name}</span>
 
