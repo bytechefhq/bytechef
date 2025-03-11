@@ -36,8 +36,9 @@ public class MicrosoftExcelRowUtils {
     private MicrosoftExcelRowUtils() {
     }
 
-    public static List<Object>
-        getRowFromWorksheet(Parameters inputParameters, ActionContext context, Integer rowNumber) {
+    public static List<Object> getRowFromWorksheet(
+        Parameters inputParameters, ActionContext context, Integer rowNumber) {
+
         String range =
             "A" + rowNumber + ":" + MicrosoftExcelUtils.getLastUsedColumnLabel(inputParameters, context) + rowNumber;
 
@@ -59,5 +60,4 @@ public class MicrosoftExcelRowUtils {
 
         return row;
     }
-
 }

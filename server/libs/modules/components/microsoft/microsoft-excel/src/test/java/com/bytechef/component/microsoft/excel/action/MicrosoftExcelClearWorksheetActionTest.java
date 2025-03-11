@@ -23,7 +23,10 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.component.definition.Context.Http;
+import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.microsoft.excel.util.MicrosoftExcelUtils;
+import com.bytechef.component.test.definition.MockParametersFactory;
+import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -34,12 +37,11 @@ import org.mockito.ArgumentCaptor;
 class MicrosoftExcelClearWorksheetActionTest extends AbstractMicrosoftExcelActionTest {
 
     private final ArgumentCaptor<Http.Body> bodyArgumentCaptor = ArgumentCaptor.forClass(Http.Body.class);
+    private final Parameters mockedParameters = MockParametersFactory.create(Map.of(IS_THE_FIRST_ROW_HEADER, true));
 
     @Test
     void testPerform() {
-        when(mockedParameters.getRequiredBoolean(IS_THE_FIRST_ROW_HEADER))
-            .thenReturn(true);
-        when(mockedContext.http(any()))
+        when(mockedActionContext.http(any()))
             .thenReturn(mockedExecutor);
         when(mockedExecutor.configuration(any()))
             .thenReturn(mockedExecutor);
@@ -47,18 +49,23 @@ class MicrosoftExcelClearWorksheetActionTest extends AbstractMicrosoftExcelActio
             .thenReturn(mockedExecutor);
 
         microsoftExcelUtilsMockedStatic
-            .when(() -> MicrosoftExcelUtils.getLastUsedColumnLabel(mockedParameters, mockedContext))
+            .when(() -> MicrosoftExcelUtils.getLastUsedColumnLabel(
+                parametersArgumentCaptor.capture(), actionContextArgumentCaptor.capture()))
             .thenReturn("C");
         microsoftExcelUtilsMockedStatic
-            .when(() -> MicrosoftExcelUtils.getLastUsedRowIndex(mockedParameters, mockedContext))
+            .when(() -> MicrosoftExcelUtils.getLastUsedRowIndex(
+                parametersArgumentCaptor.capture(), actionContextArgumentCaptor.capture()))
             .thenReturn(3);
 
-        Object result = MicrosoftExcelClearWorksheetAction.perform(mockedParameters, mockedParameters, mockedContext);
+        Object result =
+            MicrosoftExcelClearWorksheetAction.perform(mockedParameters, mockedParameters, mockedActionContext);
 
         assertNull(result);
 
         Http.Body body = bodyArgumentCaptor.getValue();
 
         assertEquals(Map.of("applyTo", "Contents"), body.getContent());
+        assertEquals(List.of(mockedParameters, mockedParameters), parametersArgumentCaptor.getAllValues());
+        assertEquals(List.of(mockedActionContext, mockedActionContext), actionContextArgumentCaptor.getAllValues());
     }
 }

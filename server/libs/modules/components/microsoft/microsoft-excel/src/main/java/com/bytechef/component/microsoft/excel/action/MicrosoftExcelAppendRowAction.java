@@ -17,17 +17,22 @@
 package com.bytechef.component.microsoft.excel.action;
 
 import static com.bytechef.component.definition.ComponentDsl.action;
+import static com.bytechef.component.definition.ComponentDsl.dynamicProperties;
+import static com.bytechef.component.microsoft.excel.constant.MicrosoftExcelConstants.IS_THE_FIRST_ROW_HEADER;
 import static com.bytechef.component.microsoft.excel.constant.MicrosoftExcelConstants.IS_THE_FIRST_ROW_HEADER_PROPERTY;
-import static com.bytechef.component.microsoft.excel.constant.MicrosoftExcelConstants.ROW_DYNAMIC_PROPERTY;
+import static com.bytechef.component.microsoft.excel.constant.MicrosoftExcelConstants.ROW;
+import static com.bytechef.component.microsoft.excel.constant.MicrosoftExcelConstants.WORKBOOK_ID;
 import static com.bytechef.component.microsoft.excel.constant.MicrosoftExcelConstants.WORKBOOK_ID_PROPERTY;
+import static com.bytechef.component.microsoft.excel.constant.MicrosoftExcelConstants.WORKSHEET_NAME;
 import static com.bytechef.component.microsoft.excel.constant.MicrosoftExcelConstants.WORKSHEET_NAME_PROPERTY;
 import static com.bytechef.component.microsoft.excel.util.MicrosoftExcelUpdateWorksheetUtils.updateRange;
 import static com.bytechef.component.microsoft.excel.util.MicrosoftExcelUtils.getLastUsedRowIndex;
-import static com.bytechef.component.microsoft.excel.util.MicrosoftExcelUtils.getRowInputValues;
+import static com.bytechef.component.microsoft.excel.util.MicrosoftExcelUtils.getRowValues;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Parameters;
+import com.bytechef.component.microsoft.excel.util.MicrosoftExcelUtils;
 
 /**
  * @author Monika Kušter
@@ -41,7 +46,10 @@ public class MicrosoftExcelAppendRowAction {
             WORKBOOK_ID_PROPERTY,
             WORKSHEET_NAME_PROPERTY,
             IS_THE_FIRST_ROW_HEADER_PROPERTY,
-            ROW_DYNAMIC_PROPERTY)
+            dynamicProperties(ROW)
+                .propertiesLookupDependsOn(IS_THE_FIRST_ROW_HEADER, WORKSHEET_NAME, WORKBOOK_ID)
+                .properties(MicrosoftExcelUtils::createPropertiesForNewRow)
+                .required(true))
         .output()
         .perform(MicrosoftExcelAppendRowAction::perform);
 
@@ -53,6 +61,6 @@ public class MicrosoftExcelAppendRowAction {
 
         return updateRange(
             inputParameters, actionContext, getLastUsedRowIndex(inputParameters, actionContext) + 1,
-            getRowInputValues(inputParameters));
+            getRowValues(inputParameters));
     }
 }

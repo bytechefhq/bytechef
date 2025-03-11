@@ -17,13 +17,11 @@
 package com.bytechef.component.microsoft.excel.constant;
 
 import static com.bytechef.component.definition.ComponentDsl.bool;
-import static com.bytechef.component.definition.ComponentDsl.dynamicProperties;
 import static com.bytechef.component.definition.ComponentDsl.string;
 
 import com.bytechef.component.definition.ComponentDsl.ModifiableBooleanProperty;
 import com.bytechef.component.definition.ComponentDsl.ModifiableStringProperty;
 import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
-import com.bytechef.component.definition.Property.DynamicPropertiesProperty;
 import com.bytechef.component.microsoft.excel.util.MicrosoftExcelUtils;
 
 /**
@@ -31,11 +29,13 @@ import com.bytechef.component.microsoft.excel.util.MicrosoftExcelUtils;
  */
 public class MicrosoftExcelConstants {
 
+    public static final String COLUMN = "column";
     public static final String ID = "id";
     public static final String IS_THE_FIRST_ROW_HEADER = "isTheFirstRowHeader";
     public static final String NAME = "name";
     public static final String ROW = "row";
     public static final String ROW_NUMBER = "rowNumber";
+    public static final String UPDATE_WHOLE_ROW = "updateWholeRow";
     public static final String VALUE = "value";
     public static final String VALUES = "values";
     public static final String WORKBOOK_ID = "workbookId";
@@ -45,11 +45,6 @@ public class MicrosoftExcelConstants {
         .label("Is the First Row Header?")
         .description("If the first row is header.")
         .defaultValue(false)
-        .required(true);
-
-    public static final DynamicPropertiesProperty ROW_DYNAMIC_PROPERTY = dynamicProperties(ROW)
-        .propertiesLookupDependsOn(IS_THE_FIRST_ROW_HEADER, WORKSHEET_NAME, WORKBOOK_ID)
-        .properties(MicrosoftExcelUtils::createInputPropertyForRow)
         .required(true);
 
     public static final ModifiableStringProperty WORKBOOK_ID_PROPERTY = string(WORKBOOK_ID)
