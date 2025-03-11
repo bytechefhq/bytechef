@@ -29,7 +29,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import org.apache.commons.lang3.Validate;
+import org.springframework.util.Assert;
 
 /**
  * @author Arik Cohen
@@ -55,7 +55,7 @@ public class WorkflowTask implements Task, Serializable {
 
     @SuppressWarnings("unchecked")
     public WorkflowTask(Map<String, ?> source) {
-        Validate.notNull(source, "'source' must not be null");
+        Assert.notNull(source, "'source' must not be null");
 
         for (Map.Entry<String, ?> entry : source.entrySet()) {
             if (WorkflowConstants.DESCRIPTION.equals(entry.getKey())) {
@@ -98,8 +98,8 @@ public class WorkflowTask implements Task, Serializable {
             }
         }
 
-        Validate.notNull(name, "'name' must not be null");
-        Validate.notNull(type, "'type' must not be null");
+        Assert.notNull(name, "'name' must not be null");
+        Assert.notNull(type, "'type' must not be null");
     }
 
     private WorkflowTask() {

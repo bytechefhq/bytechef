@@ -22,9 +22,9 @@ import com.bytechef.embedded.configuration.repository.IntegrationWorkflowReposit
 import com.bytechef.platform.constant.Environment;
 import java.util.List;
 import java.util.UUID;
-import org.apache.commons.lang3.Validate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.Assert;
 
 /**
  * @author Ivica Cardic
@@ -48,7 +48,7 @@ public class IntegrationWorkflowServiceImpl implements IntegrationWorkflowServic
     public IntegrationWorkflow addWorkflow(
         long integrationId, int integrationVersion, String workflowId, String workflowReferenceCode) {
 
-        Validate.notNull(workflowId, "'workflowId' must not be null");
+        Assert.notNull(workflowId, "'workflowId' must not be null");
 
         IntegrationWorkflow integrationWorkflow = new IntegrationWorkflow(
             integrationId, integrationVersion, workflowId, workflowReferenceCode);
@@ -138,8 +138,8 @@ public class IntegrationWorkflowServiceImpl implements IntegrationWorkflowServic
 
     @Override
     public IntegrationWorkflow update(IntegrationWorkflow integrationWorkflow) {
-        Validate.notNull(integrationWorkflow, "'IntegrationWorkflow' must not be null");
-        Validate.notNull(integrationWorkflow.getId(), "'id' must not be null");
+        Assert.notNull(integrationWorkflow, "'IntegrationWorkflow' must not be null");
+        Assert.notNull(integrationWorkflow.getId(), "'id' must not be null");
 
         IntegrationWorkflow curIntegrationWorkflow = OptionalUtils.get(integrationWorkflowRepository.findById(
             integrationWorkflow.getId()));

@@ -19,7 +19,7 @@ package com.bytechef.platform.workflow.worker.event;
 import com.bytechef.message.event.MessageEvent;
 import com.bytechef.platform.configuration.domain.CancelControlTrigger;
 import com.bytechef.platform.workflow.worker.message.route.TriggerWorkerMessageRoute;
-import org.apache.commons.lang3.Validate;
+import org.springframework.util.Assert;
 
 /**
  * @author Ivica Cardic
@@ -32,7 +32,7 @@ public class CancelControlTriggerEvent extends AbstractEvent implements MessageE
     }
 
     public CancelControlTriggerEvent(CancelControlTrigger controlTrigger) {
-        Validate.notNull(controlTrigger, "'controlTrigger' must not be null");
+        Assert.notNull(controlTrigger, "'controlTrigger' must not be null");
 
         this.controlTrigger = controlTrigger;
     }

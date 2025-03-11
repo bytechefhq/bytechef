@@ -35,6 +35,7 @@ import java.util.List;
 import org.apache.commons.lang3.Validate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.Assert;
 
 /**
  * @author Ivica Cardic
@@ -66,10 +67,10 @@ public class SigningKeyServiceImpl implements SigningKeyService {
 
     @Override
     public String create(SigningKey signingKey) {
-        Validate.notNull(signingKey, "'signingKey' must not be null");
-        Validate.isTrue(signingKey.getId() == null, "'id' must be null");
-        Validate.notNull(signingKey.getName(), "'name' must not be null");
-        Validate.notNull(signingKey.getType(), "'type' must not be null");
+        Assert.notNull(signingKey, "'signingKey' must not be null");
+        Assert.isTrue(signingKey.getId() == null, "'id' must be null");
+        Assert.notNull(signingKey.getName(), "'name' must not be null");
+        Assert.notNull(signingKey.getType(), "'type' must not be null");
 
         KeyPair keyPair = keyPairGenerator.generateKeyPair();
 
@@ -113,7 +114,7 @@ public class SigningKeyServiceImpl implements SigningKeyService {
 
     @Override
     public SigningKey update(SigningKey signingKey) {
-        Validate.notNull(signingKey, "'signingKey' must not be null");
+        Assert.notNull(signingKey, "'signingKey' must not be null");
 
         SigningKey curSigningKey = getSigningKey(Validate.notNull(signingKey.getId(), "id"));
 

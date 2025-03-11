@@ -25,10 +25,10 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.Instant;
 import java.util.Map;
 import java.util.Optional;
-import org.apache.commons.lang3.Validate;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.Assert;
 
 /**
  * @author Ivica Cardic
@@ -47,11 +47,11 @@ public class JobServiceImpl implements JobService {
 
     @Override
     public Job create(JobParametersDTO jobParametersDTO, Workflow workflow) {
-        Validate.notNull(jobParametersDTO, "'jobParameters' must not be null");
+        Assert.notNull(jobParametersDTO, "'jobParameters' must not be null");
 
         String workflowId = jobParametersDTO.getWorkflowId();
 
-        Validate.notNull(workflow, String.format("Unknown workflow: %s", workflowId));
+        Assert.notNull(workflow, String.format("Unknown workflow: %s", workflowId));
 
         validate(jobParametersDTO, workflow);
 
@@ -104,8 +104,8 @@ public class JobServiceImpl implements JobService {
     public Job resumeToStatusStarted(long id) {
         Job job = OptionalUtils.get(jobRepository.findById(id), String.format("Unknown job %s", id));
 
-        Validate.isTrue(job.getParentTaskExecutionId() == null, "Can't resume a subflow");
-        Validate.isTrue(isRestartable(job), "can't resume job " + id + " as it is " + job.getStatus());
+        Assert.isTrue(job.getParentTaskExecutionId() == null, "Can't resume a subflow");
+        Assert.isTrue(isRestartable(job), "can't resume job " + id + " as it is " + job.getStatus());
 
         job.setStatus(Job.Status.STARTED);
 
@@ -131,7 +131,7 @@ public class JobServiceImpl implements JobService {
     public Job setStatusToStopped(long id) {
         Job job = OptionalUtils.get(jobRepository.findById(id), String.format("Unknown job %s", id));
 
-        Validate.isTrue(
+        Assert.isTrue(
             job.getStatus() == Job.Status.STARTED, "Job id=" + id + " can not be stopped as it is " + job.getStatus());
 
         job.setStatus(Job.Status.STOPPED);
@@ -172,15 +172,15 @@ public class JobServiceImpl implements JobService {
 
         for (Workflow.Input input : workflow.getInputs()) {
             if (input.required()) {
-                Validate.isTrue(inputs.containsKey(input.name()), "Missing required param: " + input.name());
+                Assert.isTrue(inputs.containsKey(input.name()), "Missing required param: " + input.name());
             }
         }
 
         // validate webhooks
 
         for (Job.Webhook webhook : jobParametersDTO.getWebhooks()) {
-            Validate.notNull(webhook.type(), "must define 'type' on webhook");
-            Validate.notNull(webhook.url(), "must define 'url' on webhook");
+            Assert.notNull(webhook.type(), "must define 'type' on webhook");
+            Assert.notNull(webhook.url(), "must define 'url' on webhook");
         }
     }
 }

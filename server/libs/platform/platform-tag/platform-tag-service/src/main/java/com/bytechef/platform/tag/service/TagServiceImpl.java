@@ -29,6 +29,7 @@ import org.apache.commons.lang3.Validate;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.Assert;
 
 /**
  * @author Ivica Cardic
@@ -46,8 +47,8 @@ public class TagServiceImpl implements TagService {
 
     @Override
     public Tag create(Tag tag) {
-        Validate.notNull(tag, "'tag' must not be null");
-        Validate.isTrue(tag.getId() == null, "'tag.id' must be null");
+        Assert.notNull(tag, "'tag' must not be null");
+        Assert.isTrue(tag.getId() == null, "'tag.id' must be null");
 
         return tagRepository.save(tag);
     }
@@ -72,7 +73,7 @@ public class TagServiceImpl implements TagService {
     @Override
     @Transactional(readOnly = true)
     public List<Tag> getTags(List<Long> ids) {
-        Validate.notNull(ids, "'ids' must not be null");
+        Assert.notNull(ids, "'ids' must not be null");
 
         if (ids.isEmpty()) {
             return Collections.emptyList();
@@ -86,12 +87,12 @@ public class TagServiceImpl implements TagService {
 
     @Override
     public List<Tag> save(List<Tag> tags) {
-        Validate.notNull(tags, "'tags' must not be null");
+        Assert.notNull(tags, "'tags' must not be null");
 
         List<Tag> resultTags = new ArrayList<>();
 
         for (Tag tag : tags) {
-            Validate.notNull(tag.getName(), "'name' must no be null");
+            Assert.notNull(tag.getName(), "'name' must no be null");
 
             if (tag.isNew()) {
                 OptionalUtils.ifPresentOrElse(
@@ -117,8 +118,8 @@ public class TagServiceImpl implements TagService {
 
     @Override
     public Tag update(Tag tag) {
-        Validate.notNull(tag, "'tag' must not be null");
-        Validate.notNull(tag.getId(), "'tag.id' must not be null");
+        Assert.notNull(tag, "'tag' must not be null");
+        Assert.notNull(tag.getId(), "'tag.id' must not be null");
 
         return tagRepository.save(tag);
     }

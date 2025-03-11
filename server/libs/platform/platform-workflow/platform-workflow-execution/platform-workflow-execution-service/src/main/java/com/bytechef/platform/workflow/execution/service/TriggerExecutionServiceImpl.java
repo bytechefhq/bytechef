@@ -23,6 +23,7 @@ import java.util.Optional;
 import org.apache.commons.lang3.Validate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.Assert;
 
 /**
  * @author Ivica Cardic
@@ -39,8 +40,8 @@ public class TriggerExecutionServiceImpl implements TriggerExecutionService {
 
     @Override
     public TriggerExecution create(TriggerExecution triggerExecution) {
-        Validate.notNull(triggerExecution, "'triggerExecution' must not be null");
-        Validate.isTrue(triggerExecution.getId() == null, "'triggerExecution.id' must be null");
+        Assert.notNull(triggerExecution, "'triggerExecution' must not be null");
+        Assert.isTrue(triggerExecution.getId() == null, "'triggerExecution.id' must be null");
 
         return triggerExecutionRepository.save(triggerExecution);
     }
@@ -70,7 +71,7 @@ public class TriggerExecutionServiceImpl implements TriggerExecutionService {
 
     @Override
     public TriggerExecution update(TriggerExecution triggerExecution) {
-        Validate.notNull(triggerExecution, "'triggerExecution' must not be null");
+        Assert.notNull(triggerExecution, "'triggerExecution' must not be null");
 
         TriggerExecution currentTriggerExecution = OptionalUtils.get(
             triggerExecutionRepository.findByIdForUpdate(Validate.notNull(triggerExecution.getId(), "id")));

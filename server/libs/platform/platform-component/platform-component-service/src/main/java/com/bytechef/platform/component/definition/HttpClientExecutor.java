@@ -74,10 +74,10 @@ import javax.net.ssl.SSLEngine;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509ExtendedTrustManager;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
+import org.springframework.util.Assert;
 
 /**
  * @author Ivica Cardic
@@ -383,7 +383,7 @@ class HttpClientExecutor {
 
     private void processParameters(String prefix, Map<?, ?> parameters, FormBodyPublisher.Builder builder) {
         parameters.forEach((key, value) -> {
-            Validate.notNull(value, "Expected value for " + key);
+            Assert.notNull(value, "Expected value for " + key);
 
             String newKey = prefix.isEmpty() ? key.toString() : prefix + "[" + key + "]";
 

@@ -22,7 +22,7 @@ import com.bytechef.commons.util.MimeTypeUtils;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
 import java.util.Objects;
-import org.apache.commons.lang3.Validate;
+import org.springframework.util.Assert;
 
 /**
  * @author Ivica Cardic
@@ -46,8 +46,8 @@ public class FileEntry {
     }
 
     public FileEntry(String filename, String url) {
-        Validate.notNull(filename, "'filename' must not be null");
-        Validate.notNull(url, "'url' must not be null");
+        Assert.notNull(filename, "'filename' must not be null");
+        Assert.notNull(url, "'url' must not be null");
 
         this.name = filename.substring(indexOfLastSeparator(filename) + 1);
 
@@ -61,8 +61,8 @@ public class FileEntry {
     }
 
     public FileEntry(String name, String extension, String mimeType, String url) {
-        Validate.notNull(name, "'name' must not be null");
-        Validate.notNull(url, "'url' must not be null");
+        Assert.notNull(name, "'name' must not be null");
+        Assert.notNull(url, "'url' must not be null");
 
         this.name = name;
         this.extension = extension;

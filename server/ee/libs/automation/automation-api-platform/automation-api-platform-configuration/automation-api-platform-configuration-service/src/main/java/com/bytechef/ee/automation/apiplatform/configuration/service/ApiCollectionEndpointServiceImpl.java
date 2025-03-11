@@ -11,9 +11,9 @@ import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.ee.automation.apiplatform.configuration.domain.ApiCollectionEndpoint;
 import com.bytechef.ee.automation.apiplatform.configuration.repository.ApiEndpointRepository;
 import java.util.List;
-import org.apache.commons.lang3.Validate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.Assert;
 
 /**
  * @version ee
@@ -32,12 +32,12 @@ public class ApiCollectionEndpointServiceImpl implements ApiCollectionEndpointSe
 
     @Override
     public ApiCollectionEndpoint create(ApiCollectionEndpoint apiCollectionEndpoint) {
-        Validate.notNull(apiCollectionEndpoint, "'apiCollectionEndpoint' must not be null");
-        Validate.notNull(apiCollectionEndpoint.getApiCollectionId(), "'apiCollectionId' must not be null");
-        Validate.notNull(apiCollectionEndpoint.getHttpMethod(), "'httpMethod' must not be null");
-        Validate.isTrue(apiCollectionEndpoint.getId() == null, "'id' must be null");
-        Validate.notNull(apiCollectionEndpoint.getPath(), "'path' must not be null");
-        Validate.notNull(apiCollectionEndpoint.getWorkflowReferenceCode(), "'workflowReferenceCode' must not be null");
+        Assert.notNull(apiCollectionEndpoint, "'apiCollectionEndpoint' must not be null");
+        Assert.notNull(apiCollectionEndpoint.getApiCollectionId(), "'apiCollectionId' must not be null");
+        Assert.notNull(apiCollectionEndpoint.getHttpMethod(), "'httpMethod' must not be null");
+        Assert.isTrue(apiCollectionEndpoint.getId() == null, "'id' must be null");
+        Assert.notNull(apiCollectionEndpoint.getPath(), "'path' must not be null");
+        Assert.notNull(apiCollectionEndpoint.getWorkflowReferenceCode(), "'workflowReferenceCode' must not be null");
 
         return apiEndpointRepository.save(apiCollectionEndpoint);
     }
@@ -61,10 +61,10 @@ public class ApiCollectionEndpointServiceImpl implements ApiCollectionEndpointSe
 
     @Override
     public ApiCollectionEndpoint update(ApiCollectionEndpoint apiCollectionEndpoint) {
-        Validate.notNull(apiCollectionEndpoint, "'apiCollectionEndpoint' must not be null");
+        Assert.notNull(apiCollectionEndpoint, "'apiCollectionEndpoint' must not be null");
+        Assert.notNull(apiCollectionEndpoint.getId(), "id");
 
-        ApiCollectionEndpoint curApiCollectionEndpoint =
-            getOpenApiEndpoint(Validate.notNull(apiCollectionEndpoint.getId(), "id"));
+        ApiCollectionEndpoint curApiCollectionEndpoint = getOpenApiEndpoint(apiCollectionEndpoint.getId());
 
         curApiCollectionEndpoint.setHttpMethod(apiCollectionEndpoint.getHttpMethod());
         curApiCollectionEndpoint.setName(apiCollectionEndpoint.getName());

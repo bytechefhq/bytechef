@@ -21,8 +21,8 @@ import com.bytechef.platform.constant.ModeType;
 import com.bytechef.tenant.TenantContext;
 import java.io.Serializable;
 import java.util.Objects;
-import org.apache.commons.lang3.Validate;
 import org.springframework.lang.Nullable;
+import org.springframework.util.Assert;
 
 /**
  * @author Ivica Cardic
@@ -60,8 +60,8 @@ public class WorkflowExecutionId implements Serializable {
     public static WorkflowExecutionId of(
         ModeType type, long jobPrincipalId, String workflowReferenceCode, String triggerName) {
 
-        Validate.notBlank(workflowReferenceCode, "'workflowReferenceCode' must not be blank");
-        Validate.notBlank(triggerName, "'triggerName' must not be blank");
+        Assert.hasText(workflowReferenceCode, "'workflowReferenceCode' must not be blank");
+        Assert.hasText(triggerName, "'triggerName' must not be blank");
 
         return new WorkflowExecutionId(
             TenantContext.getCurrentTenantId(), type, jobPrincipalId, workflowReferenceCode, triggerName);

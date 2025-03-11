@@ -24,6 +24,7 @@ import java.util.List;
 import org.apache.commons.lang3.Validate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.Assert;
 
 /**
  * @author Ivica Cardic
@@ -42,9 +43,9 @@ public class IntegrationInstanceConfigurationServiceImpl implements IntegrationI
 
     @Override
     public IntegrationInstanceConfiguration create(IntegrationInstanceConfiguration integrationInstanceConfiguration) {
-        Validate.notNull(integrationInstanceConfiguration, "'integrationInstance' must not be null");
-        Validate.isTrue(integrationInstanceConfiguration.getId() == null, "'id' must be null");
-        Validate.notNull(integrationInstanceConfiguration.getIntegrationId(), "'integrationId' must not be null");
+        Assert.notNull(integrationInstanceConfiguration, "'integrationInstance' must not be null");
+        Assert.isTrue(integrationInstanceConfiguration.getId() == null, "'id' must be null");
+        Assert.notNull(integrationInstanceConfiguration.getIntegrationId(), "'integrationId' must not be null");
 
         integrationInstanceConfiguration.setEnabled(false);
 
@@ -134,8 +135,8 @@ public class IntegrationInstanceConfigurationServiceImpl implements IntegrationI
 
     @Override
     public IntegrationInstanceConfiguration update(IntegrationInstanceConfiguration integrationInstanceConfiguration) {
-        Validate.notNull(integrationInstanceConfiguration, "'integrationInstance' must not be null");
-        Validate.notNull(integrationInstanceConfiguration.getIntegrationId(), "'integrationId' must not be null");
+        Assert.notNull(integrationInstanceConfiguration, "'integrationInstance' must not be null");
+        Assert.notNull(integrationInstanceConfiguration.getIntegrationId(), "'integrationId' must not be null");
 
         IntegrationInstanceConfiguration curIntegrationInstanceConfiguration =
             getIntegrationInstanceConfiguration(Validate.notNull(integrationInstanceConfiguration.getId(), "id"));

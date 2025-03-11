@@ -21,7 +21,6 @@ import com.bytechef.platform.data.storage.domain.DataStorageScope;
 import com.bytechef.platform.data.storage.domain.ValueWrapper;
 import java.time.Instant;
 import java.util.Objects;
-import org.apache.commons.lang3.Validate;
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
@@ -30,6 +29,7 @@ import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.annotation.Version;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
+import org.springframework.util.Assert;
 
 /**
  * @author Ivica Cardic
@@ -164,7 +164,7 @@ public class DataEntry {
     }
 
     public void setValue(Object value) {
-        Validate.notNull(value, "'value' must not be null");
+        Assert.notNull(value, "'value' must not be null");
 
         this.value = new ValueWrapper(value);
     }

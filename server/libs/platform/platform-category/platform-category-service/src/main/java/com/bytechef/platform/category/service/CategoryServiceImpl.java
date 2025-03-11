@@ -28,6 +28,7 @@ import org.apache.commons.lang3.Validate;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.Assert;
 
 /**
  * @author Ivica Cardic
@@ -44,8 +45,8 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     public Category create(Category category) {
-        Validate.notNull(category, "'category' must not be null");
-        Validate.isTrue(category.getId() == null, "'category.id' must be null");
+        Assert.notNull(category, "'category' must not be null");
+        Assert.isTrue(category.getId() == null, "'category.id' must be null");
 
         return categoryRepository.save(category);
     }
@@ -73,7 +74,7 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     @Transactional(readOnly = true)
     public List<Category> getCategories(List<Long> ids) {
-        Validate.notNull(ids, "'ids' must not be null");
+        Assert.notNull(ids, "'ids' must not be null");
 
         if (ids.isEmpty()) {
             return Collections.emptyList();
@@ -112,8 +113,8 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     public Category update(Category category) {
-        Validate.notNull(category, "'category' must not be null");
-        Validate.notNull(category.getId(), "'category.id' must not be null");
+        Assert.notNull(category, "'category' must not be null");
+        Assert.notNull(category.getId(), "'category.id' must not be null");
 
         return categoryRepository.save(category);
     }

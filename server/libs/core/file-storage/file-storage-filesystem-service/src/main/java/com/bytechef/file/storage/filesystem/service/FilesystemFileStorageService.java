@@ -38,7 +38,7 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.Validate;
+import org.springframework.util.Assert;
 
 /**
  * @author Ivica Cardic
@@ -178,9 +178,9 @@ public class FilesystemFileStorageService implements FileStorageService {
     public FileEntry storeFileContent(String directoryPath, String filename, byte[] data)
         throws FileStorageException {
 
-        Validate.notNull(directoryPath, "directory is required");
-        Validate.notNull(filename, "fileName is required");
-        Validate.notNull(data, "data is required");
+        Assert.notNull(directoryPath, "directory is required");
+        Assert.notNull(filename, "fileName is required");
+        Assert.notNull(data, "data is required");
 
         return doStoreFileContent(directoryPath, filename, new ByteArrayInputStream(data), true);
     }
@@ -190,9 +190,9 @@ public class FilesystemFileStorageService implements FileStorageService {
         String directoryPath, String filename, byte[] data, boolean randomFilename)
         throws FileStorageException {
 
-        Validate.notNull(directoryPath, "directory is required");
-        Validate.notNull(filename, "fileName is required");
-        Validate.notNull(data, "data is required");
+        Assert.notNull(directoryPath, "directory is required");
+        Assert.notNull(filename, "fileName is required");
+        Assert.notNull(data, "data is required");
 
         return doStoreFileContent(directoryPath, filename, new ByteArrayInputStream(data), randomFilename);
     }
@@ -209,9 +209,9 @@ public class FilesystemFileStorageService implements FileStorageService {
         String directoryPath, String filename, String data, boolean randomFilename)
         throws FileStorageException {
 
-        Validate.notNull(directoryPath, "directory is required");
-        Validate.notNull(filename, "fileName is required");
-        Validate.notNull(data, "data is required");
+        Assert.notNull(directoryPath, "directory is required");
+        Assert.notNull(filename, "fileName is required");
+        Assert.notNull(data, "data is required");
 
         return doStoreFileContent(
             directoryPath, filename, new ByteArrayInputStream(data.getBytes(StandardCharsets.UTF_8)), randomFilename);
@@ -230,9 +230,9 @@ public class FilesystemFileStorageService implements FileStorageService {
         String directoryPath, String filename, InputStream inputStream,
         boolean randomFilename) throws FileStorageException {
 
-        Validate.notNull(directoryPath, "directory is required");
-        Validate.notNull(filename, "fileName is required");
-        Validate.notNull(inputStream, "inputStream is required");
+        Assert.notNull(directoryPath, "directory is required");
+        Assert.notNull(filename, "fileName is required");
+        Assert.notNull(inputStream, "inputStream is required");
 
         return doStoreFileContent(directoryPath, filename, inputStream, randomFilename);
     }

@@ -26,11 +26,11 @@ import com.bytechef.commons.util.OptionalUtils;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import org.apache.commons.lang3.Validate;
 import org.springframework.context.ApplicationContext;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.Assert;
 
 /**
  * @author Ivica Cardic
@@ -54,9 +54,9 @@ public class ProjectServiceImpl implements ProjectService {
 
     @Override
     public Project create(Project project) {
-        Validate.notNull(project, "'project' must not be null");
-        Validate.isTrue(project.getId() == null, "'id' must be null");
-        Validate.notNull(project.getName(), "'name' must not be null");
+        Assert.notNull(project, "'project' must not be null");
+        Assert.isTrue(project.getId() == null, "'id' must be null");
+        Assert.notNull(project.getName(), "'name' must not be null");
 
         return projectRepository.save(project);
     }
@@ -155,13 +155,15 @@ public class ProjectServiceImpl implements ProjectService {
 
     @Override
     public Project update(Project project) {
-        Validate.notNull(project, "'project' must not be null");
+        Assert.notNull(project, "'project' must not be null");
+        Assert.notNull(project.getId(), "id");
+        Assert.notNull(project.getName(), "name");
 
-        Project curProject = getProject(Validate.notNull(project.getId(), "id"));
+        Project curProject = getProject(project.getId());
 
         curProject.setCategoryId(project.getCategoryId());
         curProject.setDescription(project.getDescription());
-        curProject.setName(Validate.notNull(project.getName(), "name"));
+        curProject.setName(project.getName());
         curProject.setTagIds(project.getTagIds());
         curProject.setVersion(project.getVersion());
 

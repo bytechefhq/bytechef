@@ -20,7 +20,7 @@ import com.bytechef.error.ExecutionError;
 import com.bytechef.platform.workflow.coordinator.message.route.TriggerCoordinatorMessageRoute;
 import com.bytechef.platform.workflow.execution.domain.TriggerExecution;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import org.apache.commons.lang3.Validate;
+import org.springframework.util.Assert;
 
 /**
  * @author Ivica Cardic
@@ -36,7 +36,7 @@ public class TriggerExecutionErrorEvent extends AbstractEvent implements ErrorEv
     public TriggerExecutionErrorEvent(TriggerExecution triggerExecution) {
         super(TriggerCoordinatorMessageRoute.ERROR_EVENTS);
 
-        Validate.notNull(triggerExecution, "'triggerExecution' must not be null");
+        Assert.notNull(triggerExecution, "'triggerExecution' must not be null");
 
         this.triggerExecution = triggerExecution;
     }

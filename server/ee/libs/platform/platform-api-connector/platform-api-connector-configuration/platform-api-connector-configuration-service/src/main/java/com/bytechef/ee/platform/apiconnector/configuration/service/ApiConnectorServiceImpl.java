@@ -13,10 +13,10 @@ import com.bytechef.ee.platform.apiconnector.configuration.repository.ApiConnect
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import java.util.List;
 import java.util.Optional;
-import org.apache.commons.lang3.Validate;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.Assert;
 
 /**
  * @version ee
@@ -36,11 +36,11 @@ public class ApiConnectorServiceImpl implements ApiConnectorService {
 
     @Override
     public ApiConnector create(ApiConnector apiConnector) {
-        Validate.notNull(apiConnector, "'openApiConnector' must not be null");
-        Validate.notNull(apiConnector.getDefinition(), "'definition' must not be null");
-        Validate.isTrue(apiConnector.getId() == null, "'id' must be null");
-        Validate.notNull(apiConnector.getName(), "'componentName' must not be null");
-        Validate.notNull(apiConnector.getSpecification(), "'specification' must not be null");
+        Assert.notNull(apiConnector, "'openApiConnector' must not be null");
+        Assert.notNull(apiConnector.getDefinition(), "'definition' must not be null");
+        Assert.isTrue(apiConnector.getId() == null, "'id' must be null");
+        Assert.notNull(apiConnector.getName(), "'componentName' must not be null");
+        Assert.notNull(apiConnector.getSpecification(), "'specification' must not be null");
 
         return apiConnectorRepository.save(apiConnector);
     }
@@ -69,21 +69,23 @@ public class ApiConnectorServiceImpl implements ApiConnectorService {
 
     @Override
     public ApiConnector update(ApiConnector apiConnector) {
-        Validate.notNull(apiConnector, "'openApiConnector' must not be null");
+        Assert.notNull(apiConnector, "'openApiConnector' must not be null");
+        Assert.notNull(apiConnector.getName(), "name");
+        Assert.notNull(apiConnector.getId(), "id");
 
-        ApiConnector curApiConnector = getApiConnector(Validate.notNull(apiConnector.getId(), "id"));
+        ApiConnector curApiConnector = getApiConnector(apiConnector.getId());
 
         curApiConnector.setDescription(apiConnector.getDescription());
         curApiConnector.setSpecification(apiConnector.getSpecification());
         curApiConnector.setIcon(curApiConnector.getIcon());
-        curApiConnector.setName(Validate.notNull(apiConnector.getName(), "componentName"));
+        curApiConnector.setName(apiConnector.getName());
 
         return apiConnectorRepository.save(curApiConnector);
     }
 
     @Override
-    public ApiConnector enableApiConnector(Long id, boolean enable) {
-        ApiConnector apiConnector = getApiConnector(Validate.notNull(id, "id"));
+    public ApiConnector enableApiConnector(long id, boolean enable) {
+        ApiConnector apiConnector = getApiConnector(id);
 
         apiConnector.setEnabled(enable);
 

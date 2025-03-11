@@ -27,6 +27,7 @@ import org.apache.commons.lang3.Validate;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.Assert;
 
 /**
  * @author Ivica Cardic
@@ -43,9 +44,9 @@ public class IntegrationServiceImpl implements IntegrationService {
 
     @Override
     public Integration create(Integration integration) {
-        Validate.notNull(integration, "'integration' must not be null");
-        Validate.isTrue(integration.getId() == null, "'id' must be null");
-        Validate.notNull(integration.getComponentName(), "'componentName' must not be null");
+        Assert.notNull(integration, "'integration' must not be null");
+        Assert.isTrue(integration.getId() == null, "'id' must be null");
+        Assert.notNull(integration.getComponentName(), "'componentName' must not be null");
 
         return integrationRepository.save(integration);
     }

@@ -28,6 +28,7 @@ import java.util.Optional;
 import org.apache.commons.lang3.Validate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.Assert;
 
 /**
  * @author Ivica Cardic
@@ -62,9 +63,10 @@ public class ProjectDeploymentWorkflowServiceImpl implements ProjectDeploymentWo
 
     @Override
     @Transactional(readOnly = true)
-    public Optional<ProjectDeploymentWorkflow>
-        fetchProjectDeploymentWorkflow(long projectDeploymentId, String workflowId) {
-        Validate.notNull(workflowId, "'workflowId' must not be null");
+    public Optional<ProjectDeploymentWorkflow> fetchProjectDeploymentWorkflow(
+        long projectDeploymentId, String workflowId) {
+
+        Assert.notNull(workflowId, "'workflowId' must not be null");
 
         return projectDeploymentWorkflowRepository.findByProjectDeploymentIdAndWorkflowId(
             projectDeploymentId, workflowId);
@@ -106,7 +108,7 @@ public class ProjectDeploymentWorkflowServiceImpl implements ProjectDeploymentWo
     @Override
     @Transactional(readOnly = true)
     public ProjectDeploymentWorkflow getProjectDeploymentWorkflow(long projectDeploymentId, String workflowId) {
-        Validate.notNull(workflowId, "'workflowId' must not be null");
+        Assert.notNull(workflowId, "'workflowId' must not be null");
 
         return OptionalUtils.get(
             projectDeploymentWorkflowRepository.findByProjectDeploymentIdAndWorkflowId(
@@ -122,7 +124,7 @@ public class ProjectDeploymentWorkflowServiceImpl implements ProjectDeploymentWo
     @Override
     @Transactional(readOnly = true)
     public List<ProjectDeploymentWorkflow> getProjectDeploymentWorkflows(List<Long> projectDeploymentIds) {
-        Validate.notNull(projectDeploymentIds, "'projectDeploymentIds' must not be null");
+        Assert.notNull(projectDeploymentIds, "'projectDeploymentIds' must not be null");
 
         return projectDeploymentWorkflowRepository.findAllByProjectDeploymentIdIn(projectDeploymentIds);
     }
@@ -160,7 +162,7 @@ public class ProjectDeploymentWorkflowServiceImpl implements ProjectDeploymentWo
 
     @Override
     public List<ProjectDeploymentWorkflow> update(List<ProjectDeploymentWorkflow> projectDeploymentWorkflows) {
-        Validate.notNull(projectDeploymentWorkflows, "'projectDeploymentWorkflows' must not be null");
+        Assert.notNull(projectDeploymentWorkflows, "'projectDeploymentWorkflows' must not be null");
 
         List<ProjectDeploymentWorkflow> updatedProjectDeploymentWorkflows = new ArrayList<>();
 

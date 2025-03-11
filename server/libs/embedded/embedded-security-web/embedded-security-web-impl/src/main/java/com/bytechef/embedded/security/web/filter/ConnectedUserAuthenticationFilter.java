@@ -21,9 +21,9 @@ import com.bytechef.platform.security.web.filter.AbstractPublicApiAuthentication
 import com.bytechef.tenant.domain.TenantKey;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import jakarta.servlet.http.HttpServletRequest;
-import org.apache.commons.lang3.Validate;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.Authentication;
+import org.springframework.util.Assert;
 
 /**
  * @author Ivica Cardic
@@ -42,7 +42,7 @@ public class ConnectedUserAuthenticationFilter extends AbstractPublicApiAuthenti
 
         TenantKey tenantKey = TenantKey.parse(token);
 
-        Validate.notNull(request.getParameterValues("externalUserId"), "externalUserId parameter is required");
+        Assert.notNull(request.getParameterValues("externalUserId"), "externalUserId parameter is required");
 
         return new ConnectedUserAuthenticationToken(
             request.getParameterValues("externalUserId")[0], getEnvironment(request), tenantKey.getTenantId());

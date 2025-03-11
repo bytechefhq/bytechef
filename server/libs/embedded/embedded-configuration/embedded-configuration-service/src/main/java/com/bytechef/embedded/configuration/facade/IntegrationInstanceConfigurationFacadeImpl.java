@@ -76,6 +76,7 @@ import org.apache.commons.lang3.Validate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.Assert;
 
 /**
  * @author Ivica Cardic
@@ -863,8 +864,8 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
     private void validateIntegrationInstanceConfigurationWorkflowInputs(Map<String, ?> inputs, Workflow workflow) {
         for (Workflow.Input input : workflow.getInputs()) {
             if (input.required()) {
-                Validate.isTrue(inputs.containsKey(input.name()), "Missing required param: " + input.name());
-                Validate.notEmpty((String) inputs.get(input.name()), "Missing required param: " + input.name());
+                Assert.isTrue(inputs.containsKey(input.name()), "Missing required param: " + input.name());
+                Assert.hasText((String) inputs.get(input.name()), "Missing required param: " + input.name());
             }
         }
     }

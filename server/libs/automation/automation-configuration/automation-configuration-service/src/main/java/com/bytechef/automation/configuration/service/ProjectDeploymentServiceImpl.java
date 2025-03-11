@@ -24,6 +24,7 @@ import java.util.List;
 import org.apache.commons.lang3.Validate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.Assert;
 
 /**
  * @author Ivica Cardic
@@ -41,10 +42,10 @@ public class ProjectDeploymentServiceImpl implements ProjectDeploymentService {
 
     @Override
     public ProjectDeployment create(ProjectDeployment projectDeployment) {
-        Validate.notNull(projectDeployment, "'projectDeployment' must not be null");
-        Validate.isTrue(projectDeployment.getId() == null, "'id' must be null");
-        Validate.notNull(projectDeployment.getProjectId(), "'projectId' must not be null");
-        Validate.notNull(projectDeployment.getName(), "'projectId' must not be null");
+        Assert.notNull(projectDeployment, "'projectDeployment' must not be null");
+        Assert.isTrue(projectDeployment.getId() == null, "'id' must be null");
+        Assert.notNull(projectDeployment.getProjectId(), "'projectId' must not be null");
+        Assert.notNull(projectDeployment.getName(), "'projectId' must not be null");
 
         projectDeployment.setEnabled(false);
 
@@ -109,9 +110,9 @@ public class ProjectDeploymentServiceImpl implements ProjectDeploymentService {
 
     @Override
     public ProjectDeployment update(ProjectDeployment projectDeployment) {
-        Validate.notNull(projectDeployment, "'projectDeployment' must not be null");
-        Validate.notNull(projectDeployment.getProjectId(), "'projectId' must not be null");
-        Validate.notNull(projectDeployment.getName(), "'name' must not be null");
+        Assert.notNull(projectDeployment, "'projectDeployment' must not be null");
+        Assert.notNull(projectDeployment.getProjectId(), "'projectId' must not be null");
+        Assert.notNull(projectDeployment.getName(), "'name' must not be null");
 
         ProjectDeployment curProjectDeployment =
             getProjectDeployment(Validate.notNull(projectDeployment.getId(), "id"));

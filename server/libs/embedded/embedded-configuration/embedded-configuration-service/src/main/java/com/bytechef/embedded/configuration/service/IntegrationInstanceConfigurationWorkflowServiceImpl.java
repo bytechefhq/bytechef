@@ -28,6 +28,7 @@ import java.util.Optional;
 import org.apache.commons.lang3.Validate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.Assert;
 
 /**
  * @author Ivica Cardic
@@ -114,7 +115,7 @@ public class IntegrationInstanceConfigurationWorkflowServiceImpl
     public IntegrationInstanceConfigurationWorkflow getIntegrationInstanceConfigurationWorkflow(
         long integrationInstanceConfigurationId, String workflowId) {
 
-        Validate.notNull(workflowId, "'workflowId' must not be null");
+        Assert.notNull(workflowId, "'workflowId' must not be null");
 
         return OptionalUtils.get(
             integrationInstanceConfigurationWorkflowRepository.findByIntegrationInstanceConfigurationIdAndWorkflowId(
@@ -135,7 +136,7 @@ public class IntegrationInstanceConfigurationWorkflowServiceImpl
     public List<IntegrationInstanceConfigurationWorkflow> getIntegrationInstanceConfigurationWorkflows(
         List<Long> integrationInstanceConfigurationIds) {
 
-        Validate.notNull(integrationInstanceConfigurationIds, "'integrationInstanceIds' must not be null");
+        Assert.notNull(integrationInstanceConfigurationIds, "'integrationInstanceIds' must not be null");
 
         return integrationInstanceConfigurationWorkflowRepository.findAllByIntegrationInstanceConfigurationIdIn(
             integrationInstanceConfigurationIds);
@@ -181,7 +182,7 @@ public class IntegrationInstanceConfigurationWorkflowServiceImpl
     public List<IntegrationInstanceConfigurationWorkflow> update(
         List<IntegrationInstanceConfigurationWorkflow> integrationInstanceConfigurationWorkflows) {
 
-        Validate.notNull(integrationInstanceConfigurationWorkflows, "'integrationInstanceWorkflows' must not be null");
+        Assert.notNull(integrationInstanceConfigurationWorkflows, "'integrationInstanceWorkflows' must not be null");
 
         List<IntegrationInstanceConfigurationWorkflow> updatedIntegrationInstanceConfigurationWorkflows =
             new ArrayList<>();
