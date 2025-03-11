@@ -1,6 +1,8 @@
+import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {TYPE_ICONS} from '@/shared/typeIcons';
 import {PropertyAllType} from '@/shared/types';
-import {ClipboardCheck, ClipboardIcon} from 'lucide-react';
+import {ClipboardCheck, ClipboardIcon, InfoIcon} from 'lucide-react';
+import {twMerge} from 'tailwind-merge';
 
 import getNestedObject from '../utils/getNestedObject';
 
@@ -39,33 +41,63 @@ const PropertyField = ({
     valueToCopy = valueToCopy || `$\{${workflowNodeName}.${selector}}`;
 
     return (
-        <div className="group inline-flex w-full items-center gap-2 rounded-md p-1 text-sm hover:bg-gray-100">
-            {label !== '[index]' && (
-                <span title={property.type}>{TYPE_ICONS[property.type as keyof typeof TYPE_ICONS]}</span>
-            )}
-
-            {label === '[index]' && <span title={property.type}>{TYPE_ICONS.INTEGER}</span>}
-
-            <span>{label}</span>
-
-            <div className="flex truncate">
-                {sampleValue === null && <span className="flex-1 truncate text-xs text-muted-foreground">null</span>}
-
-                {(sampleValue || sampleValue === 0 || sampleValue === false) && typeof sampleValue !== 'object' && (
-                    <span className="flex-1 truncate text-xs text-muted-foreground">
-                        {sampleValue === true ? 'true' : sampleValue === false ? 'false' : sampleValue}
-                    </span>
+        <div className="group inline-flex w-full items-center justify-between rounded-md p-1 text-sm hover:bg-surface-neutral-primary-hover">
+            <div className="flex items-center gap-2">
+                {label !== '[index]' && (
+                    <span title={property.type}>{TYPE_ICONS[property.type as keyof typeof TYPE_ICONS]}</span>
                 )}
 
+                {label === '[index]' && <span title={property.type}>{TYPE_ICONS.INTEGER}</span>}
+
+                <span>{label}</span>
+
+                <div className="flex truncate">
+                    {sampleValue === null && (
+                        <span className="flex-1 truncate text-xs text-content-neutral-secondary">null</span>
+                    )}
+
+                    {(sampleValue || sampleValue === 0 || sampleValue === false) && typeof sampleValue !== 'object' && (
+                        <span className="flex-1 truncate text-xs text-content-neutral-secondary">
+                            {sampleValue === true ? 'true' : sampleValue === false ? 'false' : sampleValue}
+                        </span>
+                    )}
+                </div>
+            </div>
+
+            <div className="flex items-center">
                 {copiedValue === valueToCopy ? (
-                    <ClipboardCheck className="mx-2 size-4 cursor-pointer text-green-600 hover:text-green-500" />
+                    <ClipboardCheck className="mx-2 size-4 cursor-pointer text-success" />
                 ) : (
                     <ClipboardIcon
                         aria-hidden="true"
-                        className="invisible mx-2 size-4 cursor-pointer text-gray-400 hover:text-gray-800 group-hover:visible"
+                        className="invisible mx-2 size-4 cursor-pointer text-content-neutral-secondary hover:text-content-neutral-primary group-hover:visible"
                         onClick={() => copyToClipboard(valueToCopy!)}
                     />
                 )}
+
+                <Tooltip>
+                    <TooltipTrigger>
+                        <div
+                            className={twMerge(
+                                'cursor-auto rounded-md p-0.5',
+                                property.description && 'cursor-pointer hover:bg-surface-neutral-tertiary'
+                            )}
+                        >
+                            <InfoIcon
+                                className={twMerge(
+                                    'invisible size-4 text-content-neutral-secondary',
+                                    property.description && 'group-hover:visible'
+                                )}
+                            />
+                        </div>
+                    </TooltipTrigger>
+
+                    {property.description && (
+                        <TooltipContent className="mr-2 max-w-72 whitespace-normal break-normal">
+                            <span className="block">{property.description}</span>
+                        </TooltipContent>
+                    )}
+                </Tooltip>
             </div>
         </div>
     );

@@ -83,6 +83,7 @@
                     "bg-surface-main",
                     "bg-surface-neutral-primary-hover",
                     "bg-surface-neutral-secondary",
+                    "bg-surface-neutral-tertiary",
                     "border-accent",
                     "border-content-neutral-tertiary",
                     "border-input",
