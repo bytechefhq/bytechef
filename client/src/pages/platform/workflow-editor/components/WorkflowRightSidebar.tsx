@@ -69,7 +69,10 @@ const WorkflowRightSidebar = ({
 
     return (
         <aside>
-            <RightSidebar className="mx-3 mt-4 rounded-lg border" navigation={rightSidebarNavigation} />
+            <RightSidebar
+                className="mx-3 mt-4 rounded-lg border border-border/50"
+                navigation={rightSidebarNavigation}
+            />
         </aside>
     );
 };

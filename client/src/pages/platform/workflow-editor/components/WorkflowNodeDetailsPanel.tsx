@@ -653,7 +653,7 @@ const WorkflowNodeDetailsPanel = ({
 
     return (
         <div
-            className="absolute inset-y-4 right-[70px] z-10 w-screen max-w-workflow-node-details-panel-width overflow-hidden rounded-lg border border-border/50 bg-background"
+            className="absolute inset-y-4 right-[69px] z-10 w-screen max-w-workflow-node-details-panel-width overflow-hidden rounded-lg border border-border/50 bg-background"
             key={currentNode?.workflowNodeName}
         >
             {currentNode?.workflowNodeName && currentWorkflowNode && (
