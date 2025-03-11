@@ -5,28 +5,31 @@ import getParentConditionTask from './getParentConditionTask';
 
 interface InsertConditionSubtasksProps {
     conditionId: string;
-    tasks: Array<WorkflowTask>;
     newTask: WorkflowTask;
-    placeholderId: string;
+    placeholderId?: string;
+    taskDispatcherContext?: Record<string, unknown>;
+    tasks: Array<WorkflowTask>;
 }
 
 export default function insertNewConditionSubtask({
     conditionId,
     newTask,
     placeholderId,
+    taskDispatcherContext,
     tasks,
 }: InsertConditionSubtasksProps): Array<WorkflowTask> {
+    let taskIndex: number | undefined;
+    let conditionCase: string | undefined;
+
     let conditionTask = tasks.find((task) => task.name === conditionId);
 
     if (!conditionTask) {
-        conditionTask = getParentConditionTask(tasks, conditionId);
+        conditionTask = getParentConditionTask(tasks, conditionId as string);
     }
 
     if (!conditionTask) {
         return tasks;
     }
-
-    const conditionCase = placeholderId?.split('-')[1] === 'left' ? CONDITION_CASE_TRUE : CONDITION_CASE_FALSE;
 
     if (!conditionTask.parameters) {
         conditionTask.parameters = {
@@ -35,10 +38,18 @@ export default function insertNewConditionSubtask({
         };
     }
 
+    if (placeholderId) {
+        taskIndex = parseInt(placeholderId.split('-').pop() || '-1');
+        conditionCase = placeholderId?.split('-')[1] === 'left' ? CONDITION_CASE_TRUE : CONDITION_CASE_FALSE;
+    }
+
+    if (taskDispatcherContext) {
+        taskIndex = taskDispatcherContext.index as number;
+        conditionCase = taskDispatcherContext.conditionCase as string;
+    }
+
     const caseTasks: Array<WorkflowTask> =
         conditionCase === CONDITION_CASE_TRUE ? conditionTask.parameters.caseTrue : conditionTask.parameters.caseFalse;
-
-    const taskIndex = parseInt(placeholderId.split('-').pop() || '-1');
 
     if (taskIndex === undefined || taskIndex === -1 || typeof taskIndex !== 'number') {
         caseTasks.push(newTask);
@@ -47,7 +58,7 @@ export default function insertNewConditionSubtask({
 
         conditionTask.parameters = {
             ...conditionTask.parameters,
-            [conditionCase]: caseTasks,
+            [conditionCase as string]: caseTasks,
         };
     }
 

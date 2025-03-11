@@ -1,4 +1,4 @@
-import {TaskDispatcherDefinitionApi, Workflow} from '@/shared/middleware/platform/configuration';
+import {TaskDispatcherDefinitionApi, Workflow, WorkflowTask} from '@/shared/middleware/platform/configuration';
 import {TaskDispatcherKeys} from '@/shared/queries/platform/taskDispatcherDefinitions.queries';
 import {ClickedDefinitionType, NodeDataType, PropertyAllType, UpdateWorkflowMutationType} from '@/shared/types';
 import {Component1Icon} from '@radix-ui/react-icons';
@@ -13,20 +13,22 @@ import saveWorkflowDefinition from './saveWorkflowDefinition';
 
 interface HandleConditionClickProps {
     clickedItem: ClickedDefinitionType;
-    edge?: boolean;
+    edgeId?: string;
     projectId: number;
     queryClient: QueryClient;
-    sourceNodeId: string;
+    sourceNodeId?: string;
+    taskDispatcherContext?: Record<string, unknown>;
     updateWorkflowMutation: UpdateWorkflowMutationType;
     workflow: Workflow & WorkflowTaskDataType;
 }
 
 export default async function handleConditionClick({
     clickedItem,
-    edge,
     projectId,
+    edgeId,
     queryClient,
     sourceNodeId,
+    taskDispatcherContext,
     updateWorkflowMutation,
     workflow,
 }: HandleConditionClickProps) {
@@ -42,7 +44,7 @@ export default async function handleConditionClick({
         }),
     });
 
-    if (!conditionDefinition) {
+    if (!conditionDefinition || !workflow.definition) {
         return;
     }
 
@@ -67,19 +69,31 @@ export default async function handleConditionClick({
         workflowNodeName,
     };
 
-    const {tasks} = workflow;
+    const tasks: Array<WorkflowTask> = JSON.parse(workflow.definition).tasks;
 
     let taskIndex = tasks?.length;
 
-    if (edge && tasks) {
-        sourceNodeId = sourceNodeId.split('=>')[0];
-
-        taskIndex = tasks.findIndex((task) => task.name === sourceNodeId) + 1;
-    }
+    const isSourceConditionPlaceholderNode =
+        sourceNodeId?.includes('condition') && sourceNodeId?.includes('placeholder');
 
     let conditionId: string | undefined;
 
-    if (sourceNodeId.includes('condition') && sourceNodeId.includes('placeholder')) {
+    const hasTaskDispatcherContextValues =
+        taskDispatcherContext && Object.values(taskDispatcherContext).filter(Boolean).length;
+
+    if (hasTaskDispatcherContextValues && !sourceNodeId?.includes('condition-bottom-ghost')) {
+        conditionId = taskDispatcherContext.conditionId as string;
+
+        if (!conditionId || !tasks) {
+            return;
+        }
+
+        taskIndex = tasks.findIndex((task) => task.name === conditionId) + 1;
+    } else if (sourceNodeId && isSourceConditionPlaceholderNode) {
+        if (edgeId && tasks) {
+            taskIndex = tasks.findIndex((task) => task.name === sourceNodeId) + 1;
+        }
+
         conditionId = sourceNodeId.split('-')[0];
 
         if (!conditionId || !tasks) {
@@ -93,6 +107,23 @@ export default async function handleConditionClick({
         } else {
             conditionId = undefined;
         }
+    } else if (sourceNodeId && !isSourceConditionPlaceholderNode) {
+        if (edgeId && tasks) {
+            const targetTaskId = edgeId.split('=>')[1];
+
+            taskIndex = tasks.findIndex((task) => task.name === targetTaskId);
+        }
+    }
+
+    // Handle adding condition inside another condition
+    if (taskDispatcherContext && taskDispatcherContext.conditionId) {
+        conditionId = taskDispatcherContext.conditionId as string;
+
+        newConditionNodeData.conditionData = {
+            conditionCase: taskDispatcherContext.conditionCase as 'caseTrue' | 'caseFalse',
+            conditionId: taskDispatcherContext.conditionId as string,
+            index: (taskDispatcherContext.index ?? 0) as number,
+        };
     }
 
     saveWorkflowDefinition({
@@ -115,9 +146,10 @@ export default async function handleConditionClick({
                 queryClient,
                 workflow,
             }),
-        placeholderId: sourceNodeId,
+        placeholderId: taskDispatcherContext ? undefined : sourceNodeId,
         projectId,
         queryClient,
+        taskDispatcherContext,
         updateWorkflowMutation,
     });
 }
