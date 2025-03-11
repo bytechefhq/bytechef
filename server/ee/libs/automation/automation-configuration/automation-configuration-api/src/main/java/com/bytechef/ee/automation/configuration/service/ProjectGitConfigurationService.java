@@ -18,6 +18,8 @@ import java.util.Optional;
  */
 public interface ProjectGitConfigurationService {
 
+    void delete(long projectId);
+
     Optional<ProjectGitConfiguration> fetchProjectGitConfiguration(long projectId);
 
     ProjectGitConfiguration getProjectGitConfiguration(long projectId);
@@ -25,4 +27,5 @@ public interface ProjectGitConfigurationService {
     List<ProjectGitConfiguration> getWorkspaceProjectGitConfigurations(long workspaceId);
 
     void save(ProjectGitConfiguration projectGitConfiguration);
+
 }

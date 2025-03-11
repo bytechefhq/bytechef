@@ -24,7 +24,6 @@ import org.springframework.stereotype.Service;
 public class ProjectGitService {
 
     public GitWorkflows getWorkflows(String url, String branch, String username, String password) {
-
         GitWorkflowRepository gitWorkflowRepository = new GitWorkflowRepository(url, branch, username, password);
 
         return gitWorkflowRepository.findAllWithGitInfo();
