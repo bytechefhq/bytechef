@@ -58,7 +58,7 @@ public class GitConfigurationFacadeImpl implements GitConfigurationFacade {
         fetchGitConfiguration(workspaceId).ifPresentOrElse(
             curGitConfigurationDTO -> {
                 Map<String, Object> map = new HashMap<>(
-                    ConvertUtils.convertValue(curGitConfigurationDTO, new TypeReference<>() {}));
+                    ConvertUtils.convertValue(gitConfigurationDTO, new TypeReference<>() {}));
 
                 if (gitConfigurationDTO.password() == null) {
                     map.put("password", curGitConfigurationDTO.password());
