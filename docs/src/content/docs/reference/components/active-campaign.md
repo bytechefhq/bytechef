@@ -78,7 +78,7 @@ Type: OBJECT
 
 |     Name     |     Type     |     Description     |
 |:------------:|:------------:|:-------------------:|
-| account | OBJECT <details> <summary> Properties </summary> {STRING\(name), STRING\(accountUrl)} </details> |  |
+| account | OBJECT <details> <summary> Properties </summary> {STRING\(name), STRING\(accountUrl), STRING\(id)} </details> |  |
 
 
 
@@ -88,7 +88,8 @@ Type: OBJECT
 {
   "account" : {
     "name" : "",
-    "accountUrl" : ""
+    "accountUrl" : "",
+    "id" : ""
   }
 }
 ```
@@ -133,7 +134,7 @@ Type: OBJECT
 
 |     Name     |     Type     |     Description     |
 |:------------:|:------------:|:-------------------:|
-| contact | OBJECT <details> <summary> Properties </summary> {STRING\(email), STRING\(firstName), STRING\(lastName), STRING\(phone)} </details> |  |
+| contact | OBJECT <details> <summary> Properties </summary> {STRING\(email), STRING\(firstName), STRING\(lastName), STRING\(phone), STRING\(id)} </details> |  |
 
 
 
@@ -145,7 +146,8 @@ Type: OBJECT
     "email" : "",
     "firstName" : "",
     "lastName" : "",
-    "phone" : ""
+    "phone" : "",
+    "id" : ""
   }
 }
 ```

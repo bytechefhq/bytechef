@@ -78,10 +78,10 @@ Type: OBJECT
 
 |     Name     |     Type     |     Description     |
 |:------------:|:------------:|:-------------------:|
-| id | STRING |  |
-| name | STRING |  |
-| description | STRING |  |
-| template_id | STRING |  |
+| id | STRING | ID of the project. |
+| name | STRING | Name of the project. |
+| description | STRING | Description of the project. |
+| template_id | STRING | ID of the template used to create the project. |
 
 
 
@@ -139,11 +139,11 @@ Type: OBJECT
 
 |     Name     |     Type     |     Description     |
 |:------------:|:------------:|:-------------------:|
-| id | STRING |  |
-| name | STRING |  |
-| project | STRING |  |
-| description | STRING |  |
-| due_date | DATE_TIME |  |
+| id | STRING | ID of the task. |
+| name | STRING | Name of the task. |
+| project | STRING | ID of the project the task belongs to. |
+| description | STRING | Description of the task. |
+| due_date | DATE_TIME | Due date for the task. |
 
 
 
@@ -194,10 +194,10 @@ Type: OBJECT
 
 |     Name     |     Type     |     Description     |
 |:------------:|:------------:|:-------------------:|
-| id | STRING |  |
-| name | STRING |  |
-| project | STRING |  |
-| description | STRING |  |
+| id | STRING | ID of the task. |
+| name | STRING | Name of the task. |
+| project | STRING | ID of the project the task belongs to. |
+| description | STRING | Description of the task. |
 
 
 
@@ -362,10 +362,10 @@ Type: OBJECT
 
 |     Name     |     Type     |     Description     |
 |:------------:|:------------:|:-------------------:|
-| id | STRING |  |
-| project | STRING |  |
-| order | STRING |  |
-| milestone | STRING |  |
+| id | STRING | ID pod the task. |
+| project | STRING | Project under which the task is created. |
+| order | STRING | Order of the task. |
+| milestone | STRING | Milestone of the task. |
 
 
 

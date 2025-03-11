@@ -76,10 +76,10 @@ Items Type: OBJECT
 #### Properties
 |     Name     |     Type     |     Description     |
 |:------------:|:------------:|:-------------------:|
-| id | STRING |  |
-| file_key | STRING |  |
-| parent_id | STRING |  |
-| user | OBJECT <details> <summary> Properties </summary> {STRING\(id), STRING\(handle), STRING\(img_url), STRING\(email)} </details> |  |
+| id | STRING | ID of the comment. |
+| file_key | STRING | File key of the file the comment is on. |
+| parent_id | STRING | ID of comment this comment is a reply to. |
+| user | OBJECT <details> <summary> Properties </summary> {STRING\(id), STRING\(handle), STRING\(img_url), STRING\(email)} </details> | User who posted the comment. |
 
 
 
@@ -137,10 +137,10 @@ Type: OBJECT
 
 |     Name     |     Type     |     Description     |
 |:------------:|:------------:|:-------------------:|
-| id | STRING |  |
-| file_key | STRING |  |
-| parent_id | STRING |  |
-| message | STRING |  |
+| id | STRING | ID of the comment. |
+| file_key | STRING | File key of the file the comment is on. |
+| parent_id | STRING | ID of comment this comment is a reply to. |
+| message | STRING | Message of the comment. |
 
 
 

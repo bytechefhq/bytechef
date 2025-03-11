@@ -80,10 +80,10 @@ Type: OBJECT
 
 |     Name     |     Type     |     Description     |
 |:------------:|:------------:|:-------------------:|
-| id | STRING |  |
-| name | STRING |  |
-| folder | OBJECT <details> <summary> Properties </summary> {STRING\(id), STRING\(name)} </details> |  |
-| space | OBJECT <details> <summary> Properties </summary> {STRING\(id), STRING\(name)} </details> |  |
+| id | STRING | The ID of the list. |
+| name | STRING | The name of the list. |
+| folder | OBJECT <details> <summary> Properties </summary> {STRING\(id), STRING\(name)} </details> | The folder where the list is located. |
+| space | OBJECT <details> <summary> Properties </summary> {STRING\(id), STRING\(name)} </details> | The space where the folder is located. |
 
 
 
@@ -149,13 +149,13 @@ Type: OBJECT
 
 |     Name     |     Type     |     Description     |
 |:------------:|:------------:|:-------------------:|
-| id | STRING |  |
-| name | STRING |  |
-| description | STRING |  |
-| url | STRING |  |
-| list | OBJECT <details> <summary> Properties </summary> {STRING\(id), STRING\(name)} </details> |  |
-| folder | OBJECT <details> <summary> Properties </summary> {STRING\(id), STRING\(name)} </details> |  |
-| space | OBJECT <details> <summary> Properties </summary> {STRING\(id)} </details> |  |
+| id | STRING | The ID of the task. |
+| name | STRING | The name of the task. |
+| description | STRING | The description of the task. |
+| url | STRING | The URL of the task. |
+| list | OBJECT <details> <summary> Properties </summary> {STRING\(id), STRING\(name)} </details> | The list where the task is located. |
+| folder | OBJECT <details> <summary> Properties </summary> {STRING\(id), STRING\(name)} </details> | The folder where the list is located. |
+| space | OBJECT <details> <summary> Properties </summary> {STRING\(id)} </details> | The space where the folder is located. |
 
 
 
@@ -220,9 +220,9 @@ Type: OBJECT
 
 |     Name     |     Type     |     Description     |
 |:------------:|:------------:|:-------------------:|
-| id | STRING |  |
-| name | STRING |  |
-| space | OBJECT <details> <summary> Properties </summary> {STRING\(id), STRING\(name)} </details> |  |
+| id | STRING | The ID of the folder. |
+| name | STRING | The name of the folder. |
+| space | OBJECT <details> <summary> Properties </summary> {STRING\(id), STRING\(name)} </details> | The space where the folder is located. |
 
 
 
@@ -270,10 +270,10 @@ Type: OBJECT
 
 |     Name     |     Type     |     Description     |
 |:------------:|:------------:|:-------------------:|
-| id | STRING |  |
-| name | STRING |  |
-| folder | OBJECT <details> <summary> Properties </summary> {STRING\(id), STRING\(name)} </details> |  |
-| space | OBJECT <details> <summary> Properties </summary> {STRING\(id), STRING\(name)} </details> |  |
+| id | STRING | The ID of the list. |
+| name | STRING | The name of the list. |
+| folder | OBJECT <details> <summary> Properties </summary> {STRING\(id), STRING\(name)} </details> | The folder the list is in. |
+| space | OBJECT <details> <summary> Properties </summary> {STRING\(id), STRING\(name)} </details> | The space the list is in. |
 
 
 
@@ -316,13 +316,13 @@ Type: OBJECT
 
 |     Name     |     Type     |     Description     |
 |:------------:|:------------:|:-------------------:|
-| id | STRING |  |
-| name | STRING |  |
-| description | STRING |  |
-| url | STRING |  |
-| list | OBJECT <details> <summary> Properties </summary> {STRING\(id), STRING\(name)} </details> |  |
-| folder | OBJECT <details> <summary> Properties </summary> {STRING\(id), STRING\(name)} </details> |  |
-| space | OBJECT <details> <summary> Properties </summary> {STRING\(id), STRING\(name)} </details> |  |
+| id | STRING | The ID of the task. |
+| name | STRING | The name of the task. |
+| description | STRING | The description of the task. |
+| url | STRING | The URL of the task. |
+| list | OBJECT <details> <summary> Properties </summary> {STRING\(id), STRING\(name)} </details> | The list the task is in. |
+| folder | OBJECT <details> <summary> Properties </summary> {STRING\(id), STRING\(name)} </details> | The folder the task is in. |
+| space | OBJECT <details> <summary> Properties </summary> {STRING\(id), STRING\(name)} </details> | The space the task is in. |
 
 
 

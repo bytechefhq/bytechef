@@ -111,8 +111,8 @@ Type: OBJECT
 
 |     Name     |     Type     |     Description     |
 |:------------:|:------------:|:-------------------:|
-| id | STRING |  |
-| deleted | BOOLEAN <details> <summary> Options </summary> true, false </details> |  |
+| id | STRING | The ID of the deleted record. |
+| deleted | BOOLEAN <details> <summary> Options </summary> true, false </details> | Indicates if the record was deleted. |
 
 
 
