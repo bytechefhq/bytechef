@@ -100,7 +100,7 @@ const WorkflowCodeEditorSheet = ({
                     onFocusOutside={(event) => event.preventDefault()}
                     onPointerDownOutside={(event) => event.preventDefault()}
                 >
-                    <SheetHeader className="flex flex-row items-center justify-between space-y-0 p-4">
+                    <SheetHeader className="flex flex-row items-center justify-between space-y-0 p-3">
                         <SheetTitle>Edit Workflow</SheetTitle>
 
                         <div className="flex items-center gap-1">

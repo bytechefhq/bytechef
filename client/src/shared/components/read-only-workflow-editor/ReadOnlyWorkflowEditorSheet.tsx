@@ -32,7 +32,7 @@ const ReadOnlyWorkflowEditorSheet = ({
             open={readOnlyWorkflowEditorSheetOpen}
         >
             <SheetContent className="flex flex-col bg-white p-0 sm:max-w-workflow-read-only-project-deployment-workflow-sheet-width">
-                <SheetHeader className="flex flex-row items-center justify-between space-y-0 p-4">
+                <SheetHeader className="flex flex-row items-center justify-between space-y-0 p-3">
                     <SheetTitle>{workflow?.label}</SheetTitle>
 
                     <SheetCloseButton />
