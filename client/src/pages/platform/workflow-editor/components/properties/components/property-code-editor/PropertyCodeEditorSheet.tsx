@@ -76,7 +76,7 @@ const PropertyCodeEditorSheet = ({
                     onFocusOutside={(event) => event.preventDefault()}
                     onPointerDownOutside={(event) => event.preventDefault()}
                 >
-                    <SheetHeader className="flex flex-row items-center justify-between space-y-0 p-3">
+                    <SheetHeader className="flex flex-row items-center justify-between space-y-0 border-b border-b-border/50 p-3">
                         <SheetTitle>Edit Script</SheetTitle>
 
                         <div className="flex items-center gap-1">
@@ -119,7 +119,7 @@ const PropertyCodeEditorSheet = ({
                         </div>
                     </SheetHeader>
 
-                    <div className="flex h-full border-y border-y-border/50">
+                    <div className="flex h-full">
                         <ResizablePanelGroup className="flex-1" direction="vertical">
                             <ResizablePanel defaultSize={75}>
                                 <Editor
