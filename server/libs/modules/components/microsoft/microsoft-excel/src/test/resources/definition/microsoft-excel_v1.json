@@ -114,8 +114,8 @@
     } ],
     "title" : "Append Row",
     "perform" : { },
-    "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "processErrorResponse" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -197,8 +197,8 @@
     } ],
     "title" : "Clear Worksheet",
     "perform" : { },
-    "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "processErrorResponse" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -275,8 +275,8 @@
     } ],
     "title" : "Delete Row",
     "perform" : { },
-    "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "processErrorResponse" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -382,8 +382,8 @@
     } ],
     "title" : "Find Row by Number",
     "perform" : { },
-    "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "processErrorResponse" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -488,6 +488,30 @@
       "controlType" : "SELECT"
     }, {
       "advancedOption" : null,
+      "description" : "Whether to update the whole row or just specific columns.",
+      "displayCondition" : null,
+      "expressionEnabled" : null,
+      "hidden" : null,
+      "metadata" : { },
+      "required" : true,
+      "name" : "updateWholeRow",
+      "type" : "BOOLEAN",
+      "defaultValue" : true,
+      "exampleValue" : null,
+      "label" : "Update Whole Row",
+      "placeholder" : null,
+      "options" : [ {
+        "description" : null,
+        "label" : "True",
+        "value" : true
+      }, {
+        "description" : null,
+        "label" : "False",
+        "value" : false
+      } ],
+      "controlType" : "SELECT"
+    }, {
+      "advancedOption" : null,
       "description" : null,
       "displayCondition" : null,
       "expressionEnabled" : null,
@@ -498,14 +522,14 @@
       "type" : "DYNAMIC_PROPERTIES",
       "header" : null,
       "dynamicPropertiesDataSource" : {
-        "propertiesLookupDependsOn" : [ "isTheFirstRowHeader", "worksheetName", "workbookId" ],
+        "propertiesLookupDependsOn" : [ "workbookId", "worksheetName", "isTheFirstRowHeader", "updateWholeRow" ],
         "properties" : { }
       }
     } ],
     "title" : "Update Row",
     "perform" : { },
-    "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "processErrorResponse" : null
   } ],
   "dataStream" : null,
   "triggers" : null,
