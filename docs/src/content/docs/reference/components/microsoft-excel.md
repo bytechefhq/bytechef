@@ -194,7 +194,8 @@ Update a row in a worksheet.
 | worksheetName | Worksheet | STRING <details> <summary> Depends On </summary> workbookId </details> |  | true |
 | rowNumber | Row Number | INTEGER | The row number to update. | true |
 | isTheFirstRowHeader | Is the First Row Header? | BOOLEAN <details> <summary> Options </summary> true, false </details> | If the first row is header. | true |
-| row | | DYNAMIC_PROPERTIES <details> <summary> Depends On </summary> isTheFirstRowHeader, worksheetName, workbookId </details> |  | true |
+| updateWholeRow | Update Whole Row | BOOLEAN <details> <summary> Options </summary> true, false </details> | Whether to update the whole row or just specific columns. | true |
+| row | | DYNAMIC_PROPERTIES <details> <summary> Depends On </summary> workbookId, worksheetName, isTheFirstRowHeader, updateWholeRow </details> |  | true |
 
 #### Example JSON Structure
 ```json
@@ -206,6 +207,7 @@ Update a row in a worksheet.
     "worksheetName" : "",
     "rowNumber" : 1,
     "isTheFirstRowHeader" : false,
+    "updateWholeRow" : false,
     "row" : { }
   },
   "type" : "microsoftExcel/v1/updateRow"
