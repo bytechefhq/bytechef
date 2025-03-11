@@ -75,19 +75,25 @@ public class AcceloCreateContactAction {
                 .label("Email")
                 .description("The contact's position in the associated company.")
                 .required(false))
-        .output(outputSchema(object()
-            .properties(
-                object("response")
-                    .properties(string("id").required(false), string("firstname").required(false),
-                        string("lastname").required(false), string("email").required(false))
-                    .required(false),
-                object("meta")
-                    .properties(string("more_info").required(false), string("status").required(false),
-                        string("message").required(false))
-                    .required(false))
-            .metadata(
-                Map.of(
-                    "responseType", ResponseType.JSON))));
+        .output(
+            outputSchema(object()
+                .properties(
+                    object("response").properties(string("id").description("The ID of the newly created contact.")
+                        .required(false),
+                        string("firstname").description("The first name of the newly created contact.")
+                            .required(false),
+                        string("lastname").description("The last name of the newly created contact.")
+                            .required(false),
+                        string("email").description("The email address of the newly created contact.")
+                            .required(false))
+                        .required(false),
+                    object("meta")
+                        .properties(string("more_info").required(false), string("status").required(false),
+                            string("message").required(false))
+                        .required(false))
+                .metadata(
+                    Map.of(
+                        "responseType", ResponseType.JSON))));
 
     private AcceloCreateContactAction() {
     }

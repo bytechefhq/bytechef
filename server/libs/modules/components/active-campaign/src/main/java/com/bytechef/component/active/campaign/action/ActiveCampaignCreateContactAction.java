@@ -60,14 +60,24 @@ public class ActiveCampaignCreateContactAction {
                     "type", PropertyType.BODY))
             .label("Contact")
             .required(false))
-        .output(outputSchema(object()
-            .properties(object("contact")
-                .properties(string("email").required(false), string("firstName").required(false),
-                    string("lastName").required(false), string("phone").required(false))
-                .required(false))
-            .metadata(
-                Map.of(
-                    "responseType", ResponseType.JSON))));
+        .output(
+            outputSchema(
+                object()
+                    .properties(object("contact")
+                        .properties(string("email").description("Email address of the contact.")
+                            .required(false),
+                            string("firstName").description("First name of the contact.")
+                                .required(false),
+                            string("lastName").description("Last name of the contact.")
+                                .required(false),
+                            string("phone").description("Phone number of the contact.")
+                                .required(false),
+                            string("id").description("ID of the contact.")
+                                .required(false))
+                        .required(false))
+                    .metadata(
+                        Map.of(
+                            "responseType", ResponseType.JSON))));
 
     private ActiveCampaignCreateContactAction() {
     }

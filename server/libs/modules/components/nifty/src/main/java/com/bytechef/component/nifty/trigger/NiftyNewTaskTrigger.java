@@ -60,10 +60,14 @@ public class NiftyNewTaskTrigger {
             outputSchema(
                 object()
                     .properties(
-                        string(ID),
-                        string(PROJECT),
-                        string("order"),
-                        string("milestone"))))
+                        string(ID)
+                            .description("ID pod the task."),
+                        string(PROJECT)
+                            .description("Project under which the task is created."),
+                        string("order")
+                            .description("Order of the task."),
+                        string("milestone")
+                            .description("Milestone of the task."))))
         .webhookEnable(NiftyNewTaskTrigger::webhookEnable)
         .webhookDisable(NiftyNewTaskTrigger::webhookDisable)
         .webhookRequest(NiftyNewTaskTrigger::webhookRequest);

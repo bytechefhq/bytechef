@@ -33,10 +33,12 @@ paths:
               schema:
                 type: "object"
                 properties:
-                      id:
-                        type: "string"
-                      name:
-                        type: "string"
+                  id:
+                    type: "string"
+                    description: "The ID of the newly created opportunity."
+                  name:
+                    type: "string"
+                    description: "The name of the newly created opportunity."
   /organizations:
     post:
       summary: "Create Organization"
@@ -69,10 +71,13 @@ paths:
                 properties:
                   id:
                     type: "string"
+                    description: "The ID of the organization."
                   name:
                     type: "string"
+                    description: "The name of the organization."
                   domain:
                     type: "string"
+                    description: "The domain name of the organization."
   /persons:
     post:
       summary: "Create Person"
@@ -112,12 +117,16 @@ paths:
                 properties:
                   id:
                     type: "string"
+                    description: "The ID of the person."
                   first_name:
                     type: "string"
+                    description: "The first name of the person."
                   last_name:
                     type: "string"
+                    description: "The last name of the person."
                   emails:
                     type: "array"
+                    description: "The email addresses of the person."
                     items:
                       type: "string"
 components:

@@ -77,11 +77,16 @@ public class FreshdeskCreateTicketAction {
                 .description("Status of the ticket.")
                 .options(option("2", 2), option("3", 3), option("4", 4), option("5", 5))
                 .required(false))
-        .output(outputSchema(object()
-            .properties(string("subject").required(false), string("email").required(false),
-                string("description").required(false), integer("priority").description("Priority of the ticket.")
-                    .required(false),
-                integer("status").required(false))
+        .output(outputSchema(object().properties(string("subject").description("Subject of the ticket.")
+            .required(false),
+            string("email").description("Email address of the requester.")
+                .required(false),
+            string("description").description("HTML content of the ticket.")
+                .required(false),
+            integer("priority").description("Priority of the ticket.")
+                .required(false),
+            integer("status").description("Status of the ticket.")
+                .required(false))
             .metadata(
                 Map.of(
                     "responseType", ResponseType.JSON))));

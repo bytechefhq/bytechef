@@ -58,24 +58,33 @@ paths:
                     properties:
                       gid:
                         type: "string"
+                        description: "Globally unique identifier for the project."
                       name:
                         type: "string"
+                        description: "Name of the project."
                       notes:
                         type: "string"
+                        description: "Free-form textual information associated with the project (ie., its description)."
                       team:
                         type: "object"
+                        description: "The team that this project is shared with."
                         properties:
                           gid:
                             type: "string"
+                            description: "Globally unique identifier for the team."
                           name:
                             type: "string"
+                            description: "Name of the team."
                       workspace:
                         type: "object"
+                        description: "The workspace or organization that the project is associated with."
                         properties:
                           gid:
                             type: "string"
+                            description: "Globally unique identifier for the workspace."
                           name:
                             type: "string"
+                            description: "Name of the workspace."
   /tasks:
     post:
       tags:
@@ -144,36 +153,49 @@ paths:
                     properties:
                       gid:
                         type: "string"
+                        description: "Globally unique identifier for the task."
                       due_on:
                         type: "string"
                         format: "date"
+                        description: "The date on which this task is due."
                       notes:
                         type: "string"
+                        description: "Free-form textual information associated with the task (i.e. its description)."
                       name:
                         type: "string"
+                        description: "Name of the task."
                       workspace:
                         type: "object"
+                        description: "The workspace or organization that the task is associated with."
                         properties:
                           gid:
                             type: "string"
+                            description: "Globally unique identifier for the workspace."
                           name:
                             type: "string"
+                            description: "Name of the workspace."
                       tags:
                         type: "array"
+                        description: "Tags associated with the task."
                         items:
                           type: "object"
                           properties:
                             gid:
                               type: "string"
+                              description: "Globally unique identifier for the tag."
                             name:
                               type: "string"
+                              description: "Name of the tag."
                       assignee:
                         type: "object"
+                        description: "User assigned to the task."
                         properties:
                           gid:
                             type: "string"
+                            description: "Globally unique identifier for the user."
                           name:
                             type: "string"
+                            description: "Name of the user."
 components:
   securitySchemes:
     oauth2:

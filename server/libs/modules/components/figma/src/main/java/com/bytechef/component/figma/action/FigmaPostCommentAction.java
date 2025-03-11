@@ -55,9 +55,14 @@ public class FigmaPostCommentAction {
                 .label("Comment")
                 .description("Comment to post on the file.")
                 .required(true))
-        .output(outputSchema(object()
-            .properties(string("id").required(false), string("file_key").required(false),
-                string("parent_id").required(false), string("message").required(false))
+        .output(outputSchema(object().properties(string("id").description("ID of the comment.")
+            .required(false),
+            string("file_key").description("File key of the file the comment is on.")
+                .required(false),
+            string("parent_id").description("ID of comment this comment is a reply to.")
+                .required(false),
+            string("message").description("Message of the comment.")
+                .required(false))
             .metadata(
                 Map.of(
                     "responseType", ResponseType.JSON))));

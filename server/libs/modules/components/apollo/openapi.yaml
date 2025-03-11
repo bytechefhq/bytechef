@@ -65,30 +65,41 @@ paths:
                     properties:
                       id:
                         type: "string"
+                        description: "The ID of the deal."
                       team_id:
                         type: "string"
+                        description: "The ID of the team within your Apollo account."
                       owner_id:
                         type: "string"
+                        description: "The ID of the deal owner within your team's Apollo account."
                       amount:
                         type: "number"
+                        description: "The monetary value of the deal."
                       closed_date:
                         type: "string"
                         format: "date"
+                        description: "The estimated close date for the deal."
                       account_id:
                         type: "string"
+                        description: "The ID of the account associated with the deal."
                       description:
                         type: "string"
+                        description: "The description of the deal."
                       name:
                         type: "string"
+                        description: "The name of the deal."
                       currency:
                         type: "object"
                         properties:
                           name:
                             type: "string"
+                            description: "The name of the currency."
                           iso_code:
                             type: "string"
+                            description: "The ISO code for the currency."
                           symbol:
                             type: "string"
+                            description: "The symbol for the currency."
     patch:
       summary: "Update Deal"
       description: "Updates the details of existing deals within your team's Apollo account."
@@ -145,30 +156,41 @@ paths:
                     properties:
                       id:
                         type: "string"
+                        description: "The ID of the deal."
                       team_id:
                         type: "string"
+                        description: "The ID of the team within your Apollo account."
                       owner_id:
                         type: "string"
+                        description: "The ID of the deal owner within your team's Apollo account."
                       amount:
                         type: "number"
+                        description: "The monetary value of the deal."
                       closed_date:
                         type: "string"
                         format: "date"
+                        description: "The estimated close date for the deal."
                       account_id:
                         type: "string"
+                        description: "The ID of the account associated with the deal."
                       description:
                         type: "string"
+                        description: "The description of the deal."
                       name:
                         type: "string"
+                        description: "The name of the deal."
                       currency:
                         type: "object"
                         properties:
                           name:
                             type: "string"
+                            description: "The name of the currency."
                           iso_code:
                             type: "string"
+                            description: "The ISO code for the currency."
                           symbol:
                             type: "string"
+                            description: "The symbol for the currency."
   /people/match:
     post:
       summary: "Enrich Person"
@@ -239,32 +261,46 @@ paths:
                     properties:
                       id:
                         type: "string"
+                        description: "The ID of the person."
                       first_name:
                         type: "string"
+                        description: "The first name of the person."
                       last_name:
                         type: "string"
+                        description: "The last name of the person."
                       name:
                         type: "string"
+                        description: "The full name of the person."
                       linkedin_url:
                         type: "string"
+                        description: "The URL for the person's LinkedIn profile."
                       title:
                         type: "string"
+                        description: "The person's job title."
                       email_status:
                         type: "string"
+                        description: "The status of the person's email address."
                       photo_url:
                         type: "string"
+                        description: "The URL for the person's profile photo."
                       twitter_url:
                         type: "string"
+                        description: "The URL for the person's Twitter profile."
                       github_url:
                         type: "string"
+                        description: "The URL for the person's GitHub profile."
                       facebook_url:
                         type: "string"
+                        description: "The URL for the person's Facebook profile."
                       headline:
                         type: "string"
+                        description: "The person's headline or summary."
                       email:
                         type: "string"
+                        description: "The person's email address."
                       organization_id:
                         type: "string"
+                        description: "The ID of the person's employer."
   /organizations/enrich:
     get:
       summary: "Enrich Company"
@@ -292,28 +328,40 @@ paths:
                     properties:
                       id:
                         type: "string"
+                        description: "The ID of the company."
                       name:
                         type: "string"
+                        description: "The name of the company."
                       website_url:
                         type: "string"
+                        description: "The URL for the company's website."
                       blog_url:
                         type: "string"
+                        description: "The URL for the company's blog."
                       linkedin_url:
                         type: "string"
+                        description: "The URL for the company's LinkedIn profile."
                       twitter_url:
                         type: "string"
+                        description: "The URL for the company's Twitter profile."
                       facebook_url:
                         type: "string"
+                        description: "The URL for the company's Facebook profile."
                       phone:
                         type: "string"
+                        description: "The phone number of the company."
                       logo_url:
                         type: "string"
+                        description: "The URL for the company's logo."
                       primary_domain:
                         type: "string"
+                        description: "The primary domain of the company."
                       industry:
                         type: "string"
+                        description: "The industry of the company."
                       keywords:
                         type: "array"
+                        description: "Keywords associated with the company."
                         items:
                           type: "string"
 components:

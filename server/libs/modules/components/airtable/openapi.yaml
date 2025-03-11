@@ -93,8 +93,10 @@ paths:
                 properties:
                   id:
                     type: "string"
+                    description: "The ID of the deleted record."
                   deleted:
                     type: "boolean"
+                    description: "Indicates if the record was deleted."
     get:
       summary: "Get Record"
       description: "Retrieves a single record."

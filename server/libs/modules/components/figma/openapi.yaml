@@ -27,26 +27,35 @@ paths:
             application/json:
               schema:
                 type: "array"
+                description: "List of comments."
                 items:
                   type: "object"
                   properties:
                     id:
                       type: "string"
+                      description: "ID of the comment."
                     file_key:
                       type: "string"
+                      description: "File key of the file the comment is on."
                     parent_id:
                       type: "string"
+                      description: "ID of comment this comment is a reply to."
                     user:
                       type: "object"
+                      description: "User who posted the comment."
                       properties:
                         id:
                           type: "string"
+                          description: "ID of the user."
                         handle:
                           type: "string"
+                          description: "Name of the user."
                         img_url:
                           type: "string"
+                          description: "URL of the user's profile image."
                         email:
                           type: "string"
+                          description: "Email of the user."
     post:
       summary: "Post Comment"
       description: "Posts a new comment on the file."
@@ -83,12 +92,16 @@ paths:
                 properties:
                   id:
                     type: "string"
+                    description: "ID of the comment."
                   file_key:
                     type: "string"
+                    description: "File key of the file the comment is on."
                   parent_id:
                     type: "string"
+                    description: "ID of comment this comment is a reply to."
                   message:
                     type: "string"
+                    description: "Message of the comment."
 components:
   securitySchemes:
     oauth2:

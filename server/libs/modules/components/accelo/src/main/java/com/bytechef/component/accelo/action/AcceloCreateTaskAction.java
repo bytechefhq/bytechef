@@ -70,8 +70,10 @@ public class AcceloCreateTaskAction {
                     .properties(
                         object("response")
                             .properties(
-                                string("id"),
-                                string(TITLE)),
+                                string("id")
+                                    .description("The ID of the created task."),
+                                string(TITLE)
+                                    .description("The title of the created task.")),
                         object("meta")
                             .properties(
                                 string("more_info"),

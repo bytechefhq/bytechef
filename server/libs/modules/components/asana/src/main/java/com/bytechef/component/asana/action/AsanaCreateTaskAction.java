@@ -81,21 +81,43 @@ public class AsanaCreateTaskAction {
         .output(
             outputSchema(
                 object()
-                    .properties(
-                        object("data")
-                            .properties(string("gid").required(false), date("due_on").required(false),
-                                string("notes").required(false), string("name").required(false),
-                                object("workspace")
-                                    .properties(string("gid").required(false), string("name").required(false))
+                    .properties(object("data")
+                        .properties(string("gid").description("Globally unique identifier for the task.")
+                            .required(false),
+                            date("due_on").description("The date on which this task is due.")
+                                .required(false),
+                            string("notes")
+                                .description(
+                                    "Free-form textual information associated with the task (i.e. its description).")
+                                .required(false),
+                            string("name").description("Name of the task.")
+                                .required(false),
+                            object(
+                                "workspace")
+                                    .properties(
+                                        string("gid").description("Globally unique identifier for the workspace.")
+                                            .required(false),
+                                        string("name").description("Name of the workspace.")
+                                            .required(false))
+                                    .description("The workspace or organization that the task is associated with.")
                                     .required(false),
-                                array("tags")
-                                    .items(object().properties(string("gid").required(false),
-                                        string("name").required(false)))
+                            array("tags")
+                                .items(object()
+                                    .properties(string("gid").description("Globally unique identifier for the tag.")
+                                        .required(false),
+                                        string("name").description("Name of the tag.")
+                                            .required(false))
+                                    .description("Tags associated with the task."))
+                                .description("Tags associated with the task.")
+                                .required(false),
+                            object("assignee")
+                                .properties(string("gid").description("Globally unique identifier for the user.")
                                     .required(false),
-                                object("assignee")
-                                    .properties(string("gid").required(false), string("name").required(false))
-                                    .required(false))
-                            .required(false))
+                                    string("name").description("Name of the user.")
+                                        .required(false))
+                                .description("User assigned to the task.")
+                                .required(false))
+                        .required(false))
                     .metadata(
                         Map.of(
                             "responseType", ResponseType.JSON))));

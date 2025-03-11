@@ -60,10 +60,18 @@ public class NiftyCreateStatusAction {
                 .options((OptionsDataSource.ActionOptionsFunction<String>) NiftyUtils::getProjectIdOptions))
         .output(outputSchema(object()
             .properties(string("message").required(false),
-                object("task_group")
-                    .properties(string("id").required(false), string("name").required(false),
-                        string("color").required(false), string("created_by").required(false),
-                        string("project").required(false), integer("order").required(false))
+                object("task_group").properties(string("id").description("ID of the status.")
+                    .required(false),
+                    string("name").description("Name of the status.")
+                        .required(false),
+                    string("color").description("Color of the status.")
+                        .required(false),
+                    string("created_by").description("ID of the user that created the status.")
+                        .required(false),
+                    string("project").description("ID of the project the status belongs to.")
+                        .required(false),
+                    integer("order").description("Order of the status in the project.")
+                        .required(false))
                     .required(false))
             .metadata(
                 Map.of(

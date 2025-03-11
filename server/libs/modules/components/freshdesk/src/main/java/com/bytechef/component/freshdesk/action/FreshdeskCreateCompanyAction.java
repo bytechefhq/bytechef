@@ -47,23 +47,28 @@ public class FreshdeskCreateCompanyAction {
             Map.of(
                 "type", PropertyType.BODY))
             .label("Name")
-            .description("Name of the company")
+            .description("Name of the company.")
             .required(true),
             string("description").metadata(
                 Map.of(
                     "type", PropertyType.BODY))
                 .label("Description")
-                .description("Description of the company")
+                .description("Description of the company.")
                 .required(false),
             string("note").metadata(
                 Map.of(
                     "type", PropertyType.BODY))
                 .label("Note")
-                .description("Any specific note about the company")
+                .description("Any specific note about the company.")
                 .required(false))
-        .output(outputSchema(object()
-            .properties(number("id").required(false), string("name").required(false),
-                string("description").required(false), string("note").required(false))
+        .output(outputSchema(object().properties(number("id").description("ID of the company.")
+            .required(false),
+            string("name").description("Name of the company.")
+                .required(false),
+            string("description").description("Description of the company.")
+                .required(false),
+            string("note").description("Note about the company.")
+                .required(false))
             .metadata(
                 Map.of(
                     "responseType", ResponseType.JSON))));

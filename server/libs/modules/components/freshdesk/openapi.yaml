@@ -25,16 +25,16 @@ paths:
               properties:
                 name:
                   type: "string"
-                  description: "Name of the company"
+                  description: "Name of the company."
                 description:
                   type: "string"
-                  description: "Description of the company"
+                  description: "Description of the company."
                 note:
                   type: "string"
-                  description: "Any specific note about the company"
+                  description: "Any specific note about the company."
       responses:
         201:
-          description: "Successful operation. Returns created Contact"
+          description: "Successful operation."
           content:
             application/json:
               schema:
@@ -42,12 +42,16 @@ paths:
                 properties:
                   id:
                     type: "number"
+                    description: "ID of the company."
                   name:
                     type: "string"
+                    description: "Name of the company."
                   description:
                     type: "string"
+                    description: "Description of the company."
                   note:
                     type: "string"
+                    description: "Note about the company."
   /contacts:
     post:
       tags:
@@ -75,19 +79,19 @@ paths:
                 phone:
                   type: "string"
                   title: "Work Phone"
-                  description: "Telephone number of the contact"
+                  description: "Telephone number of the contact."
                 mobile:
                   type: "string"
-                  description: "Mobile number of the contact"
+                  description: "Mobile number of the contact."
                 description:
                   type: "string"
-                  description: "A small description of the contact"
+                  description: "A small description of the contact."
                 job_title:
                   type: "string"
-                  description: "Job title of the contact"
+                  description: "Job title of the contact."
       responses:
         201:
-          description: "Successful operation. Returns created Contact"
+          description: "Successful operation."
           content:
             application/json:
               schema:
@@ -95,12 +99,16 @@ paths:
                 properties:
                   description:
                     type: "string"
+                    description: "A small description of the contact."
                   email:
                     type: "string"
+                    description: "Primary email address of the contact."
                   id:
                     type: "number"
+                    description: "ID of the contact."
                   job_title:
                     type: "string"
+                    description: "Job title of the contact."
 
   /tickets:
     post:
@@ -150,7 +158,7 @@ paths:
                     - "5"
       responses:
         201:
-          description: "Successful operation. Returns created Contact"
+          description: "Successful operation."
           content:
             application/json:
               schema:
@@ -158,16 +166,20 @@ paths:
                 properties:
                   subject:
                     type: "string"
+                    description: "Subject of the ticket."
                   email:
                     type: "string"
                     format: "email"
+                    description: "Email address of the requester."
                   description:
                     type: "string"
+                    description: "HTML content of the ticket."
                   priority:
                     type: "integer"
                     description: "Priority of the ticket."
                   status:
                     type: "integer"
+                    description: "Status of the ticket."
 components:
   securitySchemes:
     basicAuth:

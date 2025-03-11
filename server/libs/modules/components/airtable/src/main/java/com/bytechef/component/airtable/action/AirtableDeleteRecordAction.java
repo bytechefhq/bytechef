@@ -67,7 +67,10 @@ public class AirtableDeleteRecordAction {
                 .metadata(
                     Map.of(
                         "type", PropertyType.PATH)))
-        .output(outputSchema(object().properties(string("id").required(false), bool("deleted").required(false))
+        .output(outputSchema(object().properties(string("id").description("The ID of the deleted record.")
+            .required(false),
+            bool("deleted").description("Indicates if the record was deleted.")
+                .required(false))
             .metadata(
                 Map.of(
                     "responseType", ResponseType.JSON))));

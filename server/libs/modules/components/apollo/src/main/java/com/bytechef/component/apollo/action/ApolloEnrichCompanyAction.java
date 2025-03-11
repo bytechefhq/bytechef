@@ -51,14 +51,31 @@ public class ApolloEnrichCompanyAction {
                 Map.of(
                     "type", PropertyType.QUERY)))
         .output(outputSchema(object()
-            .properties(object("organization")
-                .properties(string("id").required(false), string("name").required(false),
-                    string("website_url").required(false), string("blog_url").required(false),
-                    string("linkedin_url").required(false), string("twitter_url").required(false),
-                    string("facebook_url").required(false), string("phone").required(false),
-                    string("logo_url").required(false), string("primary_domain").required(false),
-                    string("industry").required(false), array("keywords").items(string())
-                        .required(false))
+            .properties(object("organization").properties(string("id").description("The ID of the company.")
+                .required(false),
+                string("name").description("The name of the company.")
+                    .required(false),
+                string("website_url").description("The URL for the company's website.")
+                    .required(false),
+                string("blog_url").description("The URL for the company's blog.")
+                    .required(false),
+                string("linkedin_url").description("The URL for the company's LinkedIn profile.")
+                    .required(false),
+                string("twitter_url").description("The URL for the company's Twitter profile.")
+                    .required(false),
+                string("facebook_url").description("The URL for the company's Facebook profile.")
+                    .required(false),
+                string("phone").description("The phone number of the company.")
+                    .required(false),
+                string("logo_url").description("The URL for the company's logo.")
+                    .required(false),
+                string("primary_domain").description("The primary domain of the company.")
+                    .required(false),
+                string("industry").description("The industry of the company.")
+                    .required(false),
+                array("keywords").items(string().description("Keywords associated with the company."))
+                    .description("Keywords associated with the company.")
+                    .required(false))
                 .required(false))
             .metadata(
                 Map.of(

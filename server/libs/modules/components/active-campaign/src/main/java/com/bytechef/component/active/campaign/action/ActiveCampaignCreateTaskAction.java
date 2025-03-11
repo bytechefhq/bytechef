@@ -61,10 +61,18 @@ public class ActiveCampaignCreateTaskAction {
                     "type", PropertyType.BODY))
             .label("Deal Task")
             .required(false))
-        .output(outputSchema(object().properties(object("dealTask")
-            .properties(string("id").required(false), string("title").required(false), integer("relid").required(false),
-                date("duedate").required(false), integer("dealTasktype").required(false))
-            .required(false))
+        .output(outputSchema(object()
+            .properties(object("dealTask").properties(string("id").description("ID of the task.")
+                .required(false),
+                string("title").description("Title of the task.")
+                    .required(false),
+                integer("relid").description("ID of the relational object for this task.")
+                    .required(false),
+                date("duedate").description("Due date of the task.")
+                    .required(false),
+                integer("dealTasktype").description("ID of the task type.")
+                    .required(false))
+                .required(false))
             .metadata(
                 Map.of(
                     "responseType", ResponseType.JSON))));

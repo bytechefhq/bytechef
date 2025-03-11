@@ -52,14 +52,19 @@ paths:
                     properties:
                       id:
                         type: "integer"
+                        description: "ID of the email template."
                       name:
                         type: "string"
+                        description: "Name of the email template."
                       subject:
                         type: "string"
+                        description: "Subject of the email."
                       fromEmail:
                         type: "string"
+                        description: "From address to send the email from."
                       replyEmail:
                         type: "string"
+                        description: "Address that recipients will reply to by default."
   /people:
     post:
       tags:
@@ -94,10 +99,10 @@ paths:
                     description: "The person's website."
                   title:
                     type: "string"
-                    description: "Title of the person"
+                    description: "Title of the person."
                   phone:
                     type: "string"
-                    description: "The person's phone number"
+                    description: "The person's phone number."
       responses:
         200:
           description: "Creation confirmation. Returns created people"
@@ -113,18 +118,25 @@ paths:
                       properties:
                         email:
                           type: "string"
+                          description: "Email address of the person."
                         firstName:
                           type: "string"
+                          description: "First name of the person."
                         lastName:
                           type: "string"
+                          description: "Last name of the person."
                         website:
                           type: "string"
+                          description: "Website of the person."
                         title:
                           type: "string"
+                          description: "Title of the person."
                         id:
                           type: "string"
+                          description: "ID of the person."
                         phone:
                           type: "string"
+                          description: "Phone number of the person."
   /tags:
     post:
       tags:

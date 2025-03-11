@@ -44,12 +44,16 @@ paths:
                 properties:
                   id:
                     type: "string"
+                    description: "ID of the project."
                   name:
                     type: "string"
+                    description: "Name of the project."
                   description:
                     type: "string"
+                    description: "Description of the project."
                   template_id:
                     type: "string"
+                    description: "ID of the template used to create the project."
   /tasks:
     post:
       summary: "Create Task"
@@ -94,15 +98,20 @@ paths:
                 properties:
                   id:
                     type: "string"
+                    description: "ID of the task."
                   name:
                     type: "string"
+                    description: "Name of the task."
                   project:
                     type: "string"
+                    description: "ID of the project the task belongs to."
                   description:
                     type: "string"
+                    description: "Description of the task."
                   due_date:
                     type: "string"
                     format: "date-time"
+                    description: "Due date for the task."
   /tasks/{taskId}:
     get:
       summary: "Get Task"
@@ -127,12 +136,16 @@ paths:
                 properties:
                   id:
                     type: "string"
+                    description: "ID of the task."
                   name:
                     type: "string"
+                    description: "Name of the task."
                   project:
                     type: "string"
+                    description: "ID of the project the task belongs to."
                   description:
                     type: "string"
+                    description: "Description of the task."
   /taskgroups:
     post:
       summary: "Create Status"
@@ -172,16 +185,22 @@ paths:
                     properties:
                       id:
                         type: "string"
+                        description: "ID of the status."
                       name:
                         type: "string"
+                        description: "Name of the status."
                       color:
                         type: "string"
+                        description: "Color of the status."
                       created_by:
                         type: "string"
+                        description: "ID of the user that created the status."
                       project:
                         type: "string"
+                        description: "ID of the project the status belongs to."
                       order:
                         type: "integer"
+                        description: "Order of the status in the project."
   /time:
     get:
       summary: "Get Tracked Time Report"
@@ -225,23 +244,31 @@ paths:
                       properties:
                         id:
                           type: "string"
+                          description: "ID of the tracked time entry."
                         project:
                           type: "string"
+                          description: "ID of the project the tracked time entry belongs to."
                         start:
                           type: "string"
+                          description: "Start time of the tracked time entry."
                         manual:
                           type: "boolean"
+                          description: "Whether the tracked time entry was manually added."
                         user:
                           type: "string"
+                          description: "ID of the user that tracked the time."
                         task:
                           type: "string"
+                          description: "ID of the task the tracked time entry belongs to."
                         end:
                           type: "string"
+                          description: "End time of the tracked time entry."
                         active:
                           type: "boolean"
+                          description: "Whether the tracked time entry is currently active."
                         duration:
                           type: "string"
-
+                          description: "Duration of the tracked time entry."
 components:
   securitySchemes:
     oauth2:

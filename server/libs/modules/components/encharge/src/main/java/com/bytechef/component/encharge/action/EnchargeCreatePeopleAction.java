@@ -56,10 +56,10 @@ public class EnchargeCreatePeopleAction {
                 .description("The person's website.")
                 .required(false),
             string("title").label("Title")
-                .description("Title of the person")
+                .description("Title of the person.")
                 .required(false),
             string("phone").label("Phone")
-                .description("The person's phone number")
+                .description("The person's phone number.")
                 .required(false)))
             .placeholder("Add to People")
             .metadata(
@@ -69,9 +69,20 @@ public class EnchargeCreatePeopleAction {
             .required(true))
         .output(outputSchema(object()
             .properties(array("users")
-                .items(object().properties(string("email").required(false), string("firstName").required(false),
-                    string("lastName").required(false), string("website").required(false),
-                    string("title").required(false), string("id").required(false), string("phone").required(false)))
+                .items(object().properties(string("email").description("Email address of the person.")
+                    .required(false),
+                    string("firstName").description("First name of the person.")
+                        .required(false),
+                    string("lastName").description("Last name of the person.")
+                        .required(false),
+                    string("website").description("Website of the person.")
+                        .required(false),
+                    string("title").description("Title of the person.")
+                        .required(false),
+                    string("id").description("ID of the person.")
+                        .required(false),
+                    string("phone").description("Phone number of the person.")
+                        .required(false)))
                 .required(false))
             .metadata(
                 Map.of(

@@ -81,15 +81,29 @@ public class ApolloCreateDealAction {
                     Map.of(
                         "type", PropertyType.QUERY)))
         .output(outputSchema(object()
-            .properties(object("opportunity")
-                .properties(string("id").required(false), string("team_id").required(false),
-                    string("owner_id").required(false), number("amount").required(false),
-                    date("closed_date").required(false), string("account_id").required(false),
-                    string("description").required(false), string("name").required(false),
-                    object("currency")
-                        .properties(string("name").required(false), string("iso_code").required(false),
-                            string("symbol").required(false))
+            .properties(object("opportunity").properties(string("id").description("The ID of the deal.")
+                .required(false),
+                string("team_id").description("The ID of the team within your Apollo account.")
+                    .required(false),
+                string("owner_id").description("The ID of the deal owner within your team's Apollo account.")
+                    .required(false),
+                number("amount").description("The monetary value of the deal.")
+                    .required(false),
+                date("closed_date").description("The estimated close date for the deal.")
+                    .required(false),
+                string("account_id").description("The ID of the account associated with the deal.")
+                    .required(false),
+                string("description").description("The description of the deal.")
+                    .required(false),
+                string("name").description("The name of the deal.")
+                    .required(false),
+                object("currency").properties(string("name").description("The name of the currency.")
+                    .required(false),
+                    string("iso_code").description("The ISO code for the currency.")
+                        .required(false),
+                    string("symbol").description("The symbol for the currency.")
                         .required(false))
+                    .required(false))
                 .required(false))
             .metadata(
                 Map.of(

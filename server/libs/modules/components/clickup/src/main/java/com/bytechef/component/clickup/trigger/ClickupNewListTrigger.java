@@ -58,16 +58,24 @@ public class ClickupNewListTrigger {
             outputSchema(
                 object()
                     .properties(
-                        string(ID),
-                        string(NAME),
+                        string(ID)
+                            .description("The ID of the list."),
+                        string(NAME)
+                            .description("The name of the list."),
                         object("folder")
+                            .description("The folder the list is in.")
                             .properties(
-                                string(ID),
-                                string(NAME)),
+                                string(ID)
+                                    .description("The ID of the folder."),
+                                string(NAME)
+                                    .description("The name of the folder.")),
                         object("space")
+                            .description("The space the list is in.")
                             .properties(
-                                string(ID),
-                                string(NAME)))))
+                                string(ID)
+                                    .description("The ID of the space."),
+                                string(NAME)
+                                    .description("The name of the space.")))))
         .webhookEnable(ClickupNewListTrigger::webhookEnable)
         .webhookDisable(ClickupNewListTrigger::webhookDisable)
         .webhookRequest(ClickupNewListTrigger::webhookRequest);

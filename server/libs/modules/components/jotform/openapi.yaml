@@ -23,7 +23,7 @@ paths:
             x-dynamic-options: true
       responses:
         201:
-          description: "Creation confirmation. Returns created Account"
+          description: "Creation confirmation."
           content:
             application/json:
               schema:
@@ -36,16 +36,19 @@ paths:
                       properties:
                         id:
                           type: "string"
+                          description: "The ID of the submission."
                         form_id:
                           type: "string"
+                          description: "The ID of the form."
                         status:
                           type: "string"
+                          description: "The status of the submission."
                         new:
                           type: "string"
-                        flag:
-                          type: "string"
+                          description: "Is 1 if the submission is not read yet."
                         notes:
                           type: "string"
+                          description: "The notes of the submission."
 components:
   securitySchemes:
     ApiKeyAuth:

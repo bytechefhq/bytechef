@@ -59,29 +59,35 @@ public class FreshdeskCreateContactAction {
                 Map.of(
                     "type", PropertyType.BODY))
                 .label("Work Phone")
-                .description("Telephone number of the contact")
+                .description("Telephone number of the contact.")
                 .required(false),
             string("mobile").metadata(
                 Map.of(
                     "type", PropertyType.BODY))
                 .label("Mobile")
-                .description("Mobile number of the contact")
+                .description("Mobile number of the contact.")
                 .required(false),
             string("description").metadata(
                 Map.of(
                     "type", PropertyType.BODY))
                 .label("Description")
-                .description("A small description of the contact")
+                .description("A small description of the contact.")
                 .required(false),
             string("job_title").metadata(
                 Map.of(
                     "type", PropertyType.BODY))
                 .label("Job Title")
-                .description("Job title of the contact")
+                .description("Job title of the contact.")
                 .required(false))
         .output(outputSchema(object()
-            .properties(string("description").required(false), string("email").required(false),
-                number("id").required(false), string("job_title").required(false))
+            .properties(string("description").description("A small description of the contact.")
+                .required(false),
+                string("email").description("Primary email address of the contact.")
+                    .required(false),
+                number("id").description("ID of the contact.")
+                    .required(false),
+                string("job_title").description("Job title of the contact.")
+                    .required(false))
             .metadata(
                 Map.of(
                     "responseType", ResponseType.JSON))));

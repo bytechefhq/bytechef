@@ -51,15 +51,23 @@ public class JotformGetFormSubmissionsAction {
             .metadata(
                 Map.of(
                     "type", PropertyType.PATH)))
-        .output(outputSchema(object()
-            .properties(array("content")
-                .items(object().properties(string("id").required(false), string("form_id").required(false),
-                    string("status").required(false), string("new").required(false), string("flag").required(false),
-                    string("notes").required(false)))
-                .required(false))
-            .metadata(
-                Map.of(
-                    "responseType", ResponseType.JSON))));
+        .output(
+            outputSchema(object()
+                .properties(array("content")
+                    .items(object().properties(string("id").description("The ID of the submission.")
+                        .required(false),
+                        string("form_id").description("The ID of the form.")
+                            .required(false),
+                        string("status").description("The status of the submission.")
+                            .required(false),
+                        string("new").description("Is 1 if the submission is not read yet.")
+                            .required(false),
+                        string("notes").description("The notes of the submission.")
+                            .required(false)))
+                    .required(false))
+                .metadata(
+                    Map.of(
+                        "responseType", ResponseType.JSON))));
 
     private JotformGetFormSubmissionsAction() {
     }
