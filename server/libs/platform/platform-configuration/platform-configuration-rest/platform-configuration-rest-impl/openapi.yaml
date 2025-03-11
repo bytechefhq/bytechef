@@ -8,6 +8,8 @@ servers:
 tags:
   - name: "action-definition"
     description: "The Platform Action Definition Internal API"
+  - name: "cluster-element-definition"
+    description: "The Platform Cluster Element Definition Internal API"
   - name: "component-definition"
     description: "The Platform Component Definition Internal API"
   - name: "connection-definition"
@@ -285,10 +287,78 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ActionDefinition"
+  /component-definitions/{componentName}/versions/{componentVersion}/cluster-element-definition/{clusterElementType}:
+    get:
+      description: "Get a cluster element definition of a component."
+      summary: "Get a cluster element definition of a component"
+      tags:
+        - "cluster-element-definition"
+      operationId: "getComponentClusterElementDefinition"
+      parameters:
+        - name: "componentName"
+          description: "The name of a component."
+          required: true
+          in: "path"
+          schema:
+            type: "string"
+        - name: "componentVersion"
+          description: "The version of a component."
+          required: true
+          in: "path"
+          schema:
+            type: "integer"
+        - name: "clusterElementType"
+          description: "The name of a cluster elements to get."
+          required: true
+          in: "path"
+          schema:
+            type: "string"
+      responses:
+        "200":
+          description: "Successful operation."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ClusterElementDefinition"
+  /component-definitions/{rootComponentName}/versions/{rootComponentVersion}/cluster-element-definitions/{clusterElementType}:
+    get:
+      description: "Get an cluster element definitions of a root component."
+      summary: "Get an cluster element definitions of a root component."
+      tags:
+        - "cluster-element-definition"
+      operationId: "getRootComponentClusterElementDefinitions"
+      parameters:
+        - name: "rootComponentName"
+          description: "The name of a component."
+          required: true
+          in: "path"
+          schema:
+            type: "string"
+        - name: "rootComponentVersion"
+          description: "The version of a component."
+          required: true
+          in: "path"
+          schema:
+            type: "integer"
+        - name: "clusterElementType"
+          description: "The name of a cluster elements to get."
+          required: true
+          in: "path"
+          schema:
+            type: "string"
+      responses:
+        "200":
+          description: "Successful operation."
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ClusterElementDefinitionBasic"
   /component-definitions/{componentName}/versions/{componentVersion}/trigger-definitions:
     get:
-      description: "Get a list of trigger definitionss for a component."
-      summary: "Get a list of trigger definitionss for a component"
+      description: "Get a list of trigger definitions for a component."
+      summary: "Get a list of trigger definitions for a component"
       tags:
       - "trigger-definition"
       operationId: "getComponentTriggerDefinitions"
@@ -347,32 +417,6 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/TriggerDefinition"
-  /data-streams/{componentType}/component-definitions:
-    get:
-      description: "Get all compatible component definitions for a data stream component type."
-      summary: "Get all compatible component definitions for a data stream component type"
-      tags:
-        - "component-definition"
-      operationId: "getDataStreamComponentDefinitions"
-      parameters:
-        - name: "componentType"
-          description: "The name of a component type."
-          required: true
-          in: "path"
-          schema:
-            type: "string"
-            enum:
-              - "SOURCE"
-              - "DESTINATION"
-      responses:
-        "200":
-          description: "Successful operation."
-          content:
-            application/json:
-              schema:
-                type: "array"
-                items:
-                  $ref: "#/components/schemas/ComponentDefinitionBasic"
   /oauth2/authorization-parameters:
     post:
       description: "Retrieves oauth2 authorization parameters."
@@ -1362,12 +1406,68 @@ components:
             type: "array"
             items:
               $ref: "#/components/schemas/Option"
+    ClusterElementDefinition:
+      description: "A cluster element definition."
+      type: "object"
+      allOf:
+        - $ref: "#/components/schemas/ClusterElementDefinitionBasic"
+        - type: "object"
+          required:
+            - "componentName"
+            - "componentVersion"
+            - "elementType"
+            - "outputDefined"
+          properties:
+            properties:
+              description: "The list of action properties."
+              type: "array"
+              items:
+                $ref: "#/components/schemas/Property"
+    ClusterElementDefinitionBasic:
+      description: "A cluster element basic definition."
+      type: "object"
+      required:
+        - "componentName"
+        - "componentVersion"
+        - "elementType"
+        - "outputDefined"
+      properties:
+        componentName:
+          description: "The component name."
+          type: "string"
+        componentVersion:
+          description: "The component version."
+          type: "integer"
+        elementType:
+          description: "The cluster element type."
+          type: "string"
+        outputDefined:
+          description: "Does action define output schema."
+          type: "boolean"
+    ClusterElementType:
+      description: "A type of a cluster element."
+      type: "object"
+      properties:
+        name:
+          description: "The name of a cluster element type."
+          type: "string"
+        label:
+          description: "The label of a cluster element type."
+          type: "string"
+        required:
+          description: "If the cluster element type is required."
+          type: "boolean"
+        multipleElements:
+          description: "If multiple elements can be added."
+          type: "boolean"
     ComponentDefinition:
       description: "A component contains a set of reusable code(actions) that accomplish\
         \ specific tasks, triggers and connections if there is a need for a connection\
         \ to an outside service."
       type: "object"
       required:
+      - "clusterElement"
+      - "clusterRoot"
       - "name"
       - "version"
       - "connectionRequired"
@@ -1377,7 +1477,18 @@ components:
           type: "array"
           items:
             $ref: "#/components/schemas/ActionDefinitionBasic"
-        categories:
+        clusterElement:
+          description: "Is the component cluster element."
+          type: "boolean"
+        clusterElementTypes:
+          description: "The list of cluster element types."
+          type: "array"
+          items:
+            $ref: "#/components/schemas/ClusterElementType"
+        clusterRoot:
+          description: "Is the component cluster root."
+          type: "boolean"
+        componentCategories:
           description: "The list of categories the component belongs to."
           type: "array"
           items:
@@ -1386,9 +1497,6 @@ components:
           $ref: "#/components/schemas/ConnectionDefinitionBasic"
         connectionRequired:
           description: "If connection is required or not if it is defined."
-          type: "boolean"
-        dataStreamSupported:
-          description: "If the component supports data stream."
           type: "boolean"
         description:
           description: "The description."
@@ -1449,16 +1557,6 @@ components:
         version:
           description: "The version of a component."
           type: "integer"
-    DataStreamComponent:
-      description: "The source/destination data stream component."
-      type: "object"
-      properties:
-        componentName:
-          description: "The name of a component."
-          type: "string"
-        componentVersion:
-          description: "The version of a component."
-          type: "integer"
     ConnectionDefinition:
       description: "Definition of a connection to an outside service."
       type: "object"
@@ -1499,10 +1597,10 @@ components:
       description: "A category of component."
       type: "object"
       required:
-        - "key"
+        - "name"
       properties:
-        key:
-          description: "The key of a category."
+        name:
+          description: "The name of a category."
           type: "string"
         label:
           description: "The label of a category."
@@ -2470,8 +2568,6 @@ components:
         description:
           description: "The description of the task."
           type: "string"
-        destination:
-          $ref: '#/components/schemas/DataStreamComponent'
         finalize:
           description: "The (optional) list of tasks that are to be executed after\
             \ execution of a task -- regardless of whether it had failed or not."
@@ -2511,8 +2607,6 @@ components:
           type: "array"
           items:
             $ref: "#/components/schemas/WorkflowTask"
-        source:
-          $ref: '#/components/schemas/DataStreamComponent'
         timeout:
           description: "The timeout expression which describes when a task should\
             \ be deemed as timed-out."

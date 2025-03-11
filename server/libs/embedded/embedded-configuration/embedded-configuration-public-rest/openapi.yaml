@@ -188,9 +188,9 @@ components:
       description: "A group of workflows that make one logical integration."
       type: "object"
       required:
-        - "allowMultipleInstances"
         - "icon"
         - "componentName"
+        - "multipleInstances"
       properties:
         id:
           description: "The id of an integration."
@@ -217,7 +217,7 @@ components:
           description: "The version of an integration."
           type: "integer"
           readOnly: true
-        allowMultipleInstances:
+        multipleInstances:
           description: "If multiple instances of an integration are allowed or not."
           type: "boolean"
           default: false
