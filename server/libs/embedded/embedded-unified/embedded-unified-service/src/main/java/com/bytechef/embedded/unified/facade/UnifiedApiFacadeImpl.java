@@ -18,8 +18,8 @@ package com.bytechef.embedded.unified.facade;
 
 import com.bytechef.commons.util.EncodingUtils;
 import com.bytechef.commons.util.JsonUtils;
-import com.bytechef.component.definition.UnifiedApiDefinition.Category;
 import com.bytechef.component.definition.UnifiedApiDefinition.ModelType;
+import com.bytechef.component.definition.UnifiedApiDefinition.UnifiedApiCategory;
 import com.bytechef.component.definition.unified.base.adapter.ProviderModelAdapter;
 import com.bytechef.component.definition.unified.base.adapter.ProviderModelAdapter.Page;
 import com.bytechef.component.definition.unified.base.mapper.ProviderModelMapper;
@@ -34,11 +34,11 @@ import com.bytechef.embedded.connected.user.service.ConnectedUserService;
 import com.bytechef.embedded.unified.exception.CursorPaginationException;
 import com.bytechef.embedded.unified.pagination.CursorPageSlice;
 import com.bytechef.embedded.unified.pagination.CursorPageable;
+import com.bytechef.platform.component.ComponentConnection;
 import com.bytechef.platform.component.definition.ContextFactory;
 import com.bytechef.platform.component.definition.ParametersFactory;
-import com.bytechef.platform.component.domain.ComponentConnection;
 import com.bytechef.platform.component.domain.ComponentDefinition;
-import com.bytechef.platform.component.service.ComponentDefinitionService;
+import com.bytechef.platform.component.service.UnifiedApiDefinitionService;
 import com.bytechef.platform.connection.domain.Connection;
 import com.bytechef.platform.connection.domain.ConnectionEnvironment;
 import com.bytechef.platform.connection.service.ConnectionService;
@@ -64,40 +64,40 @@ public class UnifiedApiFacadeImpl implements UnifiedApiFacade {
 
     private static final Logger log = LoggerFactory.getLogger(UnifiedApiFacadeImpl.class);
 
-    private final ComponentDefinitionService componentDefinitionService;
     private final ConnectedUserService connectedUserService;
     private final ConnectionService connectionService;
     private final ContextFactory contextFactory;
     private final IntegrationInstanceService integrationInstanceService;
+    private final UnifiedApiDefinitionService unifiedApiDefinitionService;
 
     @SuppressFBWarnings("EI")
     public UnifiedApiFacadeImpl(
-        ComponentDefinitionService componentDefinitionService, ConnectedUserService connectedUserService,
-        ConnectionService connectionService, ContextFactory contextFactory,
-        IntegrationInstanceService integrationInstanceService) {
+        ConnectedUserService connectedUserService, ConnectionService connectionService, ContextFactory contextFactory,
+        IntegrationInstanceService integrationInstanceService,
+        UnifiedApiDefinitionService unifiedApiDefinitionService) {
 
-        this.componentDefinitionService = componentDefinitionService;
         this.connectedUserService = connectedUserService;
         this.connectionService = connectionService;
         this.contextFactory = contextFactory;
         this.integrationInstanceService = integrationInstanceService;
+        this.unifiedApiDefinitionService = unifiedApiDefinitionService;
     }
 
     @Override
     public String create(
-        UnifiedInputModel unifiedInputModel, Category category, ModelType modelType,
-        Environment environment, Long instanceId) {
+        UnifiedInputModel unifiedInputModel, UnifiedApiCategory category, ModelType modelType,
+        Environment environment, Long integrationInstanceId) {
 
-        ComponentConnection connection = getComponentConnection(environment, category, instanceId);
+        ComponentConnection connection = getComponentConnection(environment, category, integrationInstanceId);
 
         String componentName = connection.getComponentName();
 
         ProviderModelAdapter<? super ProviderInputModel, ? extends ProviderOutputModel> providerModelAdapter =
-            componentDefinitionService.getUnifiedApiProviderModelAdapter(
+            unifiedApiDefinitionService.getUnifiedApiProviderModelAdapter(
                 componentName, category, modelType);
 
         ProviderModelMapper<? super UnifiedInputModel, ? extends UnifiedOutputModel, ? extends ProviderInputModel, ? super ProviderOutputModel> providerModelMapper =
-            componentDefinitionService.getUnifiedApiProviderModelMapper(componentName, category, modelType);
+            unifiedApiDefinitionService.getUnifiedApiProviderModelMapper(componentName, category, modelType);
 
         ProviderInputModel providerInputModel = providerModelMapper.desunify(unifiedInputModel, List.of());
 
@@ -108,14 +108,15 @@ public class UnifiedApiFacadeImpl implements UnifiedApiFacade {
 
     @Override
     public void delete(
-        String id, Category category, ModelType modelType, Environment environment, Long instanceId) {
+        String id, UnifiedApiCategory category, ModelType modelType, Environment environment,
+        Long integrationInstanceId) {
 
-        ComponentConnection connection = getComponentConnection(environment, category, instanceId);
+        ComponentConnection connection = getComponentConnection(environment, category, integrationInstanceId);
 
         String componentName = connection.getComponentName();
 
         ProviderModelAdapter<? super ProviderInputModel, ? extends ProviderOutputModel> providerModelAdapter =
-            componentDefinitionService.getUnifiedApiProviderModelAdapter(
+            unifiedApiDefinitionService.getUnifiedApiProviderModelAdapter(
                 componentName, category, modelType);
 
         providerModelAdapter.delete(
@@ -125,19 +126,19 @@ public class UnifiedApiFacadeImpl implements UnifiedApiFacade {
 
     @Override
     public UnifiedOutputModel get(
-        String id, Category category, ModelType modelType, Environment environment,
-        Long instanceId) {
+        String id, UnifiedApiCategory category, ModelType modelType, Environment environment,
+        Long integrationInstanceId) {
 
-        ComponentConnection connection = getComponentConnection(environment, category, instanceId);
+        ComponentConnection connection = getComponentConnection(environment, category, integrationInstanceId);
 
         String componentName = connection.getComponentName();
 
         ProviderModelAdapter<? super ProviderInputModel, ? extends ProviderOutputModel> providerModelAdapter =
-            componentDefinitionService.getUnifiedApiProviderModelAdapter(
+            unifiedApiDefinitionService.getUnifiedApiProviderModelAdapter(
                 componentName, category, modelType);
 
         ProviderModelMapper<? super UnifiedInputModel, ? extends UnifiedOutputModel, ? extends ProviderInputModel, ? super ProviderOutputModel> providerModelMapper =
-            componentDefinitionService.getUnifiedApiProviderModelMapper(componentName, category, modelType);
+            unifiedApiDefinitionService.getUnifiedApiProviderModelMapper(componentName, category, modelType);
 
         ProviderOutputModel providerOutputModel = providerModelAdapter.get(
             id, ParametersFactory.createParameters(connection.getParameters()),
@@ -148,8 +149,8 @@ public class UnifiedApiFacadeImpl implements UnifiedApiFacade {
 
     @Override
     public CursorPageSlice<? extends UnifiedOutputModel> getPage(
-        CursorPageable cursorPageable, Category category, ModelType modelType,
-        Environment environment, Long instanceId) {
+        CursorPageable cursorPageable, UnifiedApiCategory category, ModelType modelType, Environment environment,
+        Long integrationInstanceId) {
 
         boolean isSorted = StringUtils.hasText(cursorPageable.getSort());
 
@@ -158,16 +159,16 @@ public class UnifiedApiFacadeImpl implements UnifiedApiFacade {
 //            throw new IllegalArgumentException("Sorting is only allowed on fields: " + sortableFields);
 //        }
 
-        ComponentConnection connection = getComponentConnection(environment, category, instanceId);
+        ComponentConnection connection = getComponentConnection(environment, category, integrationInstanceId);
 
         String componentName = connection.getComponentName();
 
         ProviderModelAdapter<? super ProviderInputModel, ? extends ProviderOutputModel> providerModelAdapter =
-            componentDefinitionService.getUnifiedApiProviderModelAdapter(
+            unifiedApiDefinitionService.getUnifiedApiProviderModelAdapter(
                 componentName, category, modelType);
 
         ProviderModelMapper<? super UnifiedInputModel, ? extends UnifiedOutputModel, ? extends ProviderInputModel, ? super ProviderOutputModel> providerModelMapper =
-            componentDefinitionService.getUnifiedApiProviderModelMapper(componentName, category, modelType);
+            unifiedApiDefinitionService.getUnifiedApiProviderModelMapper(componentName, category, modelType);
 
         String hashed = getHash(cursorPageable);
 
@@ -231,19 +232,19 @@ public class UnifiedApiFacadeImpl implements UnifiedApiFacade {
 
     @Override
     public void update(
-        String id, UnifiedInputModel unifiedInputModel, Category category,
-        ModelType modelType, Environment environment, Long instanceId) {
+        String id, UnifiedInputModel unifiedInputModel, UnifiedApiCategory category,
+        ModelType modelType, Environment environment, Long integrationInstanceId) {
 
-        ComponentConnection connection = getComponentConnection(environment, category, instanceId);
+        ComponentConnection connection = getComponentConnection(environment, category, integrationInstanceId);
 
         String componentName = connection.getComponentName();
 
         ProviderModelAdapter<? super ProviderInputModel, ? extends ProviderOutputModel> providerModelAdapter =
-            componentDefinitionService.getUnifiedApiProviderModelAdapter(
+            unifiedApiDefinitionService.getUnifiedApiProviderModelAdapter(
                 componentName, category, modelType);
 
         ProviderModelMapper<? super UnifiedInputModel, ? extends UnifiedOutputModel, ? extends ProviderInputModel, ? super ProviderOutputModel> providerModelMapper =
-            componentDefinitionService.getUnifiedApiProviderModelMapper(componentName, category, modelType);
+            unifiedApiDefinitionService.getUnifiedApiProviderModelMapper(componentName, category, modelType);
 
         ProviderInputModel providerInputModel = providerModelMapper.desunify(unifiedInputModel, List.of());
 
@@ -274,11 +275,10 @@ public class UnifiedApiFacadeImpl implements UnifiedApiFacade {
     }
 
     private ComponentConnection getComponentConnection(
-        Environment environment, Category category, Long instanceId) {
+        Environment environment, UnifiedApiCategory category, Long integrationInstanceId) {
 
-        if (instanceId == null) {
-            List<String> componentNames = componentDefinitionService
-                .getUnifiedApiComponentDefinitions(category)
+        if (integrationInstanceId == null) {
+            List<String> componentNames = unifiedApiDefinitionService.getUnifiedApiComponentDefinitions(category)
                 .stream()
                 .map(ComponentDefinition::getName)
                 .toList();
@@ -295,10 +295,11 @@ public class UnifiedApiFacadeImpl implements UnifiedApiFacade {
             IntegrationInstance integrationInstance = integrationInstanceService.getIntegrationInstance(
                 connectedUser.getId(), componentNames, environment);
 
-            instanceId = integrationInstance.getId();
+            integrationInstanceId = integrationInstance.getId();
         }
 
-        IntegrationInstance integrationInstance = integrationInstanceService.getIntegrationInstance(instanceId);
+        IntegrationInstance integrationInstance =
+            integrationInstanceService.getIntegrationInstance(integrationInstanceId);
 
         long connectionId = integrationInstance.getConnectionId();
 

@@ -17,7 +17,7 @@
 package com.bytechef.component.xero.unified;
 
 import static com.bytechef.component.definition.ComponentDsl.unifiedApi;
-import static com.bytechef.component.definition.UnifiedApiDefinition.Category.ACCOUNTING;
+import static com.bytechef.component.definition.UnifiedApiDefinition.UnifiedApiCategory.ACCOUNTING;
 
 import com.bytechef.component.definition.UnifiedApiDefinition;
 import com.bytechef.component.xero.unified.adapter.XeroAccountAdapter;

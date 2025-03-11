@@ -17,7 +17,7 @@
 package com.bytechef.embedded.unified.web.rest.crm;
 
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
-import com.bytechef.component.definition.UnifiedApiDefinition.Category;
+import com.bytechef.component.definition.UnifiedApiDefinition;
 import com.bytechef.component.definition.unified.crm.CrmModelType;
 import com.bytechef.component.definition.unified.crm.model.AccountUnifiedInputModel;
 import com.bytechef.embedded.unified.facade.UnifiedApiFacade;
@@ -60,7 +60,8 @@ public class CrmAccountApiController implements AccountApi {
         return ResponseEntity.ok(
             new CreatedModel(
                 unifiedApiFacade.create(
-                    conversionService.convert(createUpdateAccountModel, AccountUnifiedInputModel.class), Category.CRM,
+                    conversionService.convert(createUpdateAccountModel, AccountUnifiedInputModel.class),
+                    UnifiedApiDefinition.UnifiedApiCategory.CRM,
                     CrmModelType.ACCOUNT, Environment.valueOf(StringUtils.upperCase(environment)),
                     xInstanceId)));
     }
@@ -72,7 +73,7 @@ public class CrmAccountApiController implements AccountApi {
         return ResponseEntity.ok(
             conversionService.convert(
                 unifiedApiFacade.get(
-                    accountId, Category.CRM, CrmModelType.ACCOUNT,
+                    accountId, UnifiedApiDefinition.UnifiedApiCategory.CRM, CrmModelType.ACCOUNT,
                     Environment.valueOf(StringUtils.upperCase(environment)), xInstanceId),
                 AccountModel.class));
     }
@@ -85,7 +86,8 @@ public class CrmAccountApiController implements AccountApi {
         return ResponseEntity.ok(
             unifiedApiFacade
                 .getPage(
-                    conversionService.convert(pageable, CursorPageRequest.class), Category.CRM, CrmModelType.ACCOUNT,
+                    conversionService.convert(pageable, CursorPageRequest.class),
+                    UnifiedApiDefinition.UnifiedApiCategory.CRM, CrmModelType.ACCOUNT,
                     Environment.valueOf(StringUtils.upperCase(environment)), xInstanceId)
                 .map(unifiedOutputModel -> conversionService.convert(unifiedOutputModel, AccountModel.class)));
     }
@@ -97,7 +99,8 @@ public class CrmAccountApiController implements AccountApi {
 
         unifiedApiFacade.update(
             accountId, conversionService.convert(createUpdateAccountModel, AccountUnifiedInputModel.class),
-            Category.CRM, CrmModelType.ACCOUNT, Environment.valueOf(StringUtils.upperCase(environment)),
+            UnifiedApiDefinition.UnifiedApiCategory.CRM, CrmModelType.ACCOUNT,
+            Environment.valueOf(StringUtils.upperCase(environment)),
             xInstanceId);
 
         return ResponseEntity.noContent()

@@ -16,8 +16,8 @@
 
 package com.bytechef.embedded.unified.facade;
 
-import com.bytechef.component.definition.UnifiedApiDefinition.Category;
 import com.bytechef.component.definition.UnifiedApiDefinition.ModelType;
+import com.bytechef.component.definition.UnifiedApiDefinition.UnifiedApiCategory;
 import com.bytechef.component.definition.unified.base.model.UnifiedInputModel;
 import com.bytechef.component.definition.unified.base.model.UnifiedOutputModel;
 import com.bytechef.embedded.unified.pagination.CursorPageSlice;
@@ -30,22 +30,22 @@ import com.bytechef.platform.constant.Environment;
 public interface UnifiedApiFacade {
 
     String create(
-        UnifiedInputModel unifiedInputModel, Category category, ModelType modelType,
-        Environment environment, Long instanceId);
+        UnifiedInputModel unifiedInputModel, UnifiedApiCategory category, ModelType modelType, Environment environment,
+        Long integrationInstanceId);
 
     void delete(
-        String id, Category category, ModelType modelType, Environment environment,
-        Long instanceId);
+        String id, UnifiedApiCategory category, ModelType modelType, Environment environment,
+        Long integrationInstanceId);
 
     UnifiedOutputModel get(
-        String id, Category category, ModelType modelType, Environment environment,
-        Long instanceId);
+        String id, UnifiedApiCategory category, ModelType modelType, Environment environment,
+        Long integrationInstanceId);
 
     CursorPageSlice<? extends UnifiedOutputModel> getPage(
-        CursorPageable cursorPageable, Category category, ModelType modelType,
-        Environment environment, Long instanceId);
+        CursorPageable cursorPageable, UnifiedApiCategory category, ModelType modelType, Environment environment,
+        Long integrationInstanceId);
 
     void update(
-        String id, UnifiedInputModel unifiedInputModel, Category category,
-        ModelType modelType, Environment environment, Long instanceId);
+        String id, UnifiedInputModel unifiedInputModel, UnifiedApiCategory category, ModelType modelType,
+        Environment environment, Long integrationInstanceId);
 }
