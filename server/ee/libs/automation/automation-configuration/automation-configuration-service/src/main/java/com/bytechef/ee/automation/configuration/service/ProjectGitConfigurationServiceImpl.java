@@ -32,6 +32,13 @@ public class ProjectGitConfigurationServiceImpl implements ProjectGitConfigurati
     }
 
     @Override
+    public void delete(long projectId) {
+        projectGitConfigurationRepository.findByProjectId(projectId)
+            .ifPresent(projectGitConfiguration -> projectGitConfigurationRepository.deleteById(
+                projectGitConfiguration.getId()));
+    }
+
+    @Override
     public Optional<ProjectGitConfiguration> fetchProjectGitConfiguration(long projectId) {
         return projectGitConfigurationRepository.findByProjectId(projectId);
     }
