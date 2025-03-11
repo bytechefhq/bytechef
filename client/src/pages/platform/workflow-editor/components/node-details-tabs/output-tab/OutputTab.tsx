@@ -29,8 +29,8 @@ import {AlertCircleIcon, ClipboardIcon, PenIcon} from 'lucide-react';
 import {useCallback, useEffect, useRef, useState} from 'react';
 import {twMerge} from 'tailwind-merge';
 
-import PropertyField from '../PropertyField';
-import SchemaProperties from '../SchemaProperties';
+import PropertyField from '../../PropertyField';
+import SchemaProperties from '../../SchemaProperties';
 import OutputTabSampleDataDialog from './OutputTabSampleDataDialog';
 
 interface OutputTabProps {
@@ -363,7 +363,7 @@ const OutputTab = ({connectionMissing, currentNode, outputDefined = false, workf
                                 'flex-col gap-2'
                         )}
                     >
-                        <div className="flex items-center justify-center">
+                        <div className={twMerge('flex items-center justify-center', !currentNode.trigger && 'w-full')}>
                             <LoadingIcon />
 
                             <span className="text-lg">{`Testing ${currentNode.trigger ? 'Trigger' : 'Action'}`}</span>

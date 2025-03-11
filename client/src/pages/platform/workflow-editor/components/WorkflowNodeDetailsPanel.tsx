@@ -3,7 +3,6 @@ import {Button} from '@/components/ui/button';
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/ui/select';
 import {Skeleton} from '@/components/ui/skeleton';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
-import DataStreamComponentsTab from '@/pages/platform/workflow-editor/components/node-details-tabs/DataStreamComponentsTab';
 import Properties from '@/pages/platform/workflow-editor/components/properties/Properties';
 import {CONDITION_CASE_FALSE, CONDITION_CASE_TRUE} from '@/shared/constants';
 import {
@@ -53,9 +52,9 @@ import getParametersWithDefaultValues from '../utils/getParametersWithDefaultVal
 import saveWorkflowDefinition from '../utils/saveWorkflowDefinition';
 import updateRootConditionNode from '../utils/updateRootConditionNode';
 import CurrentOperationSelect from './CurrentOperationSelect';
-import ConnectionTab from './node-details-tabs/ConnectionTab';
 import DescriptionTab from './node-details-tabs/DescriptionTab';
-import OutputTab from './node-details-tabs/OutputTab';
+import ConnectionTab from './node-details-tabs/connection-tab/ConnectionTab';
+import OutputTab from './node-details-tabs/output-tab/OutputTab';
 
 const TABS: Array<{label: string; name: TabNameType}> = [
     {
@@ -63,13 +62,13 @@ const TABS: Array<{label: string; name: TabNameType}> = [
         name: 'description',
     },
     {
-        label: 'Components',
-        name: 'dataStreamComponents',
-    },
-    {
         label: 'Connection',
         name: 'connection',
     },
+    // {
+    //     label: 'Elements',
+    //     name: 'clusterElements',
+    // },
     {
         label: 'Properties',
         name: 'properties',
@@ -240,9 +239,9 @@ const WorkflowNodeDetailsPanel = ({
                 return currentWorkflowNodeConnections.length > 0;
             }
 
-            if (name === 'dataStreamComponents') {
-                return currentComponentDefinition?.name === 'dataStream';
-            }
+            // if (name === 'clusterElements') {
+            //     return currentComponentDefinition?.clusterRoot;
+            // }
 
             if (name === 'output') {
                 return hasOutputData;
@@ -258,14 +257,13 @@ const WorkflowNodeDetailsPanel = ({
         });
     }, [
         currentWorkflowNodeConnections,
-        currentComponentDefinition,
         hasOutputData,
         currentNode,
         currentTaskDispatcherDefinition,
         currentOperationProperties,
     ]);
 
-    const currentTaskData = useMemo(
+    const currentWorkflowNode = useMemo(
         () => currentComponentDefinition || currentTaskDispatcherDefinition,
         [currentComponentDefinition, currentTaskDispatcherDefinition]
     );
@@ -297,8 +295,10 @@ const WorkflowNodeDetailsPanel = ({
     );
 
     const currentTaskDataOperations = useMemo(
-        () => (currentTaskData as ComponentDefinition)?.actions ?? (currentTaskData as ComponentDefinition)?.triggers,
-        [currentTaskData]
+        () =>
+            (currentWorkflowNode as ComponentDefinition)?.actions ??
+            (currentWorkflowNode as ComponentDefinition)?.triggers,
+        [currentWorkflowNode]
     );
 
     const handleOperationSelectChange = useCallback(
@@ -501,10 +501,6 @@ const WorkflowNodeDetailsPanel = ({
             setActiveTab('description');
         }
 
-        if (activeTab === 'dataStreamComponents' && currentComponentDefinition?.name !== 'dataStream') {
-            setActiveTab('description');
-        }
-
         if (currentComponentDefinition?.name === 'manual') {
             setActiveTab('description');
         }
@@ -660,14 +656,14 @@ const WorkflowNodeDetailsPanel = ({
             className="absolute inset-y-4 right-[70px] z-10 w-screen max-w-workflow-node-details-panel-width overflow-hidden rounded-lg border border-border/50 bg-background"
             key={currentNode?.workflowNodeName}
         >
-            {currentNode?.workflowNodeName && currentTaskData && (
+            {currentNode?.workflowNodeName && currentWorkflowNode && (
                 <div className="flex h-full flex-col divide-y divide-gray-100 bg-white">
                     <header className="flex items-center p-4 text-lg font-medium">
-                        {currentTaskData.icon && (
+                        {currentWorkflowNode.icon && (
                             <InlineSVG
                                 className="mr-2 size-6"
                                 loader={<LoadingIcon className="ml-0 mr-2 size-6 text-muted-foreground" />}
-                                src={currentTaskData.icon}
+                                src={currentWorkflowNode.icon}
                             />
                         )}
 
@@ -675,7 +671,7 @@ const WorkflowNodeDetailsPanel = ({
 
                         <span className="mx-2 text-sm text-gray-500">({currentNode?.workflowNodeName})</span>
 
-                        {currentTaskData.description && (
+                        {currentWorkflowNode.description && (
                             <Tooltip delayDuration={500}>
                                 <TooltipTrigger>
                                     <InfoCircledIcon className="size-4" />
@@ -760,7 +756,7 @@ const WorkflowNodeDetailsPanel = ({
                         )}
 
                         <div className="relative h-full overflow-y-scroll">
-                            {currentTaskData && (
+                            {currentWorkflowNode && (
                                 <div className="absolute left-0 top-0 size-full">
                                     {activeTab === 'description' &&
                                         (nodeDefinition ? (
@@ -785,15 +781,12 @@ const WorkflowNodeDetailsPanel = ({
                                             </div>
                                         ))}
 
-                                    {activeTab === 'dataStreamComponents' && <DataStreamComponentsTab />}
-
                                     {activeTab === 'connection' &&
                                         currentWorkflowNodeConnections.length > 0 &&
                                         currentNode &&
                                         currentComponentDefinition && (
                                             <ConnectionTab
                                                 componentConnections={currentWorkflowNodeConnections}
-                                                componentDefinition={currentComponentDefinition}
                                                 key={`${currentNode?.workflowNodeName}_connection`}
                                                 workflowId={workflow.id!}
                                                 workflowNodeName={currentNode?.workflowNodeName}
@@ -802,6 +795,22 @@ const WorkflowNodeDetailsPanel = ({
                                                 }
                                             />
                                         )}
+
+                                    {/*{activeTab === 'clusterElements' &&*/}
+
+                                    {/*    currentComponentDefinition?.clusterElementTypes && (*/}
+
+                                    {/*        <ClusterElementsTab*/}
+
+                                    {/*            clusterElementTypes={currentComponentDefinition.clusterElementTypes}*/}
+
+                                    {/*            componentName={currentComponentDefinition.name}*/}
+
+                                    {/*            componentVersion={currentComponentDefinition.version}*/}
+
+                                    {/*        />*/}
+
+                                    {/*    )}*/}
 
                                     {activeTab === 'properties' &&
                                         (!operationDataMissing && currentOperationProperties?.length ? (
@@ -840,7 +849,7 @@ const WorkflowNodeDetailsPanel = ({
                     </main>
 
                     <footer className="z-50 mt-auto flex bg-white px-4 py-2">
-                        <Select defaultValue={currentTaskData?.version.toString()}>
+                        <Select defaultValue={currentWorkflowNode?.version.toString()}>
                             <SelectTrigger className="w-auto border-none shadow-none">
                                 <SelectValue placeholder="Choose version..." />
                             </SelectTrigger>

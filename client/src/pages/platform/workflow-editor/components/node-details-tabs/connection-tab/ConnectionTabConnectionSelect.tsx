@@ -63,8 +63,8 @@ const ConnectionTabConnectionSelect = ({
 
     const {data: componentConnections} = useGetConnectionsQuery!(
         {
-            componentName: componentDefinition?.name,
-            connectionVersion: componentDefinition?.connection?.version,
+            componentName: componentConnection?.componentName,
+            connectionVersion: componentConnection?.componentVersion,
         },
         !!componentDefinition
     );
@@ -139,15 +139,17 @@ const ConnectionTabConnectionSelect = ({
     return (
         <div className="flex flex-col gap-6">
             <div className="space-y-1">
-                {componentDefinition && (
-                    <Label className="mb-2 font-normal">
-                        {componentDefinition.title}
+                <div className="flex items-center gap-1">
+                    {componentDefinition && (
+                        <Label className="font-normal">
+                            {componentDefinition.title}
 
-                        {required && <RequiredMark />}
-                    </Label>
-                )}
+                            {required && <RequiredMark />}
+                        </Label>
+                    )}
 
-                {componentConnectionsCount > 1 && <Label className="text-sm text-muted-foreground">{key}</Label>}
+                    {componentConnectionsCount > 1 && <Label className="text-sm text-muted-foreground">{key}</Label>}
+                </div>
 
                 <Select
                     onValueChange={(value) => handleValueChange(+value, key)}

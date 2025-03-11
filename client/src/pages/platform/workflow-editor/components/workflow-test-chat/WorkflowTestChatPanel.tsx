@@ -2,20 +2,26 @@ import {WorkflowTestChatRuntimeProvider} from '@/pages/platform/workflow-editor/
 import useWorkflowTestChatStore from '@/pages/platform/workflow-editor/stores/useWorkflowTestChatStore';
 import {Thread} from '@assistant-ui/react';
 import {Cross2Icon} from '@radix-ui/react-icons';
+import {useEffect} from 'react';
 
 const WorkflowTestChatPanel = () => {
-    const {setWorkflowTestChatPanelOpen, workflowTestChatPanelOpen} = useWorkflowTestChatStore();
+    const {generateConversationId, setWorkflowTestChatPanelOpen, workflowTestChatPanelOpen} =
+        useWorkflowTestChatStore();
 
     const handlePanelClose = () => {
         setWorkflowTestChatPanelOpen(false);
     };
+
+    useEffect(() => {
+        generateConversationId();
+    }, [generateConversationId, workflowTestChatPanelOpen]);
 
     if (!workflowTestChatPanelOpen) {
         return <></>;
     }
 
     return (
-        <div className="absolute bottom-4 right-16 top-0 z-10 w-screen max-w-workflow-node-details-panel-width overflow-hidden rounded-xl border border-border/50 bg-background">
+        <div className="absolute inset-y-4 right-[70px] z-10 w-screen max-w-workflow-node-details-panel-width overflow-hidden rounded-xl border border-border/50 bg-background">
             <div className="flex h-full flex-col divide-y divide-gray-100 bg-white">
                 <header className="flex items-center p-4 text-lg font-medium">
                     <span>Playground</span>
