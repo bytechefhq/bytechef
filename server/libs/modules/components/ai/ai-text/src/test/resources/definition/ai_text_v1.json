@@ -238,13 +238,13 @@
     "title" : "Classify Text",
     "perform" : { },
     "processErrorResponse" : null,
+    "workflowNodeDescription" : null,
     "outputDefinition" : {
       "output" : null,
       "outputResponse" : null,
       "outputSchema" : null,
       "sampleOutput" : null
-    },
-    "workflowNodeDescription" : null
+    }
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -403,13 +403,13 @@
     "title" : "Sentiment Analysis",
     "perform" : { },
     "processErrorResponse" : null,
+    "workflowNodeDescription" : null,
     "outputDefinition" : {
       "output" : null,
       "outputResponse" : null,
       "outputSchema" : null,
       "sampleOutput" : null
-    },
-    "workflowNodeDescription" : null
+    }
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -697,13 +697,13 @@
     "title" : "Score",
     "perform" : { },
     "processErrorResponse" : null,
+    "workflowNodeDescription" : null,
     "outputDefinition" : {
       "output" : null,
       "outputResponse" : null,
       "outputSchema" : null,
       "sampleOutput" : null
-    },
-    "workflowNodeDescription" : null
+    }
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -922,13 +922,13 @@
     "title" : "Summarize Text",
     "perform" : { },
     "processErrorResponse" : null,
+    "workflowNodeDescription" : null,
     "outputDefinition" : {
       "output" : null,
       "outputResponse" : null,
       "outputSchema" : null,
       "sampleOutput" : null
-    },
-    "workflowNodeDescription" : null
+    }
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -1145,13 +1145,13 @@
     "title" : "Similarity Search",
     "perform" : { },
     "processErrorResponse" : null,
+    "workflowNodeDescription" : null,
     "outputDefinition" : {
       "output" : null,
       "outputResponse" : null,
       "outputSchema" : null,
       "sampleOutput" : null
-    },
-    "workflowNodeDescription" : null
+    }
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -1310,6 +1310,7 @@
     "title" : "Text Generation",
     "perform" : { },
     "processErrorResponse" : null,
+    "workflowNodeDescription" : null,
     "outputDefinition" : {
       "output" : null,
       "outputResponse" : {
@@ -1359,16 +1360,16 @@
         "optionsDataSource" : null
       },
       "sampleOutput" : "Generated text."
-    },
-    "workflowNodeDescription" : null
+    }
   } ],
-  "categories" : [ {
-    "key" : "artificial-intelligence",
+  "componentCategories" : [ {
+    "name" : "artificial-intelligence",
     "label" : "artificial-intelligence"
   } ],
   "connection" : null,
   "customAction" : null,
   "customActionHelp" : null,
+  "clusterElements" : null,
   "description" : "AI Helper component for text analysis and generation.",
   "icon" : "path:assets/ai-text.svg",
   "tags" : null,
@@ -1378,6 +1379,5 @@
   "title" : "AI Text",
   "triggers" : null,
   "unifiedApi" : null,
-  "version" : 1,
-  "dataStream" : null
+  "version" : 1
 }

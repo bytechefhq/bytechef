@@ -181,7 +181,7 @@ class GoogleMailNewEmailTriggerTest {
 
         assertEquals(List.of(message), messages);
 
-        assertEquals(List.of(ME, ME, "2", Format.FULL), stringArgumentCaptor.getAllValues());
+        assertEquals(List.of(ME, ME, "2", Format.FULL.getMapping()), stringArgumentCaptor.getAllValues());
         assertEquals(new BigInteger("123"), bigIntegerArgumentCaptor.getValue());
     }
 }

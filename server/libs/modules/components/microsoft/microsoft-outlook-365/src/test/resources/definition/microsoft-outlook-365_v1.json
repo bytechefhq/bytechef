@@ -1,9 +1,9 @@
 {
-  "categories" : [ {
-    "key" : "communication",
+  "componentCategories" : [ {
+    "name" : "communication",
     "label" : "communication"
   }, {
-    "key" : "calendars-and-scheduling",
+    "name" : "calendars-and-scheduling",
     "label" : "calendars-and-scheduling"
   } ],
   "customAction" : true,
@@ -16,6 +16,95 @@
   "resources" : null,
   "version" : 1,
   "title" : "Microsoft Outlook 365",
+  "connection" : {
+    "authorizations" : [ {
+      "detectOn" : null,
+      "description" : null,
+      "name" : "oauth2_authorization_code",
+      "properties" : [ {
+        "advancedOption" : null,
+        "description" : null,
+        "displayCondition" : null,
+        "expressionEnabled" : null,
+        "hidden" : null,
+        "metadata" : { },
+        "required" : true,
+        "name" : "clientId",
+        "type" : "STRING",
+        "defaultValue" : null,
+        "exampleValue" : null,
+        "label" : "Client Id",
+        "placeholder" : null,
+        "controlType" : "TEXT",
+        "languageId" : null,
+        "maxLength" : null,
+        "minLength" : null,
+        "options" : null,
+        "optionsDataSource" : null
+      }, {
+        "advancedOption" : null,
+        "description" : null,
+        "displayCondition" : null,
+        "expressionEnabled" : null,
+        "hidden" : null,
+        "metadata" : { },
+        "required" : true,
+        "name" : "clientSecret",
+        "type" : "STRING",
+        "defaultValue" : null,
+        "exampleValue" : null,
+        "label" : "Client Secret",
+        "placeholder" : null,
+        "controlType" : "TEXT",
+        "languageId" : null,
+        "maxLength" : null,
+        "minLength" : null,
+        "options" : null,
+        "optionsDataSource" : null
+      }, {
+        "advancedOption" : null,
+        "description" : null,
+        "displayCondition" : null,
+        "expressionEnabled" : null,
+        "hidden" : null,
+        "metadata" : { },
+        "required" : true,
+        "name" : "tenantId",
+        "type" : "STRING",
+        "defaultValue" : "common",
+        "exampleValue" : null,
+        "label" : "Tenant Id",
+        "placeholder" : null,
+        "controlType" : "TEXT",
+        "languageId" : null,
+        "maxLength" : null,
+        "minLength" : null,
+        "options" : null,
+        "optionsDataSource" : null
+      } ],
+      "refreshOn" : null,
+      "title" : "OAuth2 Authorization Code",
+      "type" : "OAUTH2_AUTHORIZATION_CODE",
+      "acquire" : null,
+      "authorizationUrl" : { },
+      "clientSecret" : null,
+      "refreshToken" : null,
+      "apply" : null,
+      "clientId" : null,
+      "pkce" : null,
+      "refresh" : null,
+      "refreshUrl" : { },
+      "scopes" : { },
+      "tokenUrl" : { },
+      "oauth2AuthorizationExtraQueryParameters" : null,
+      "authorizationCallback" : null
+    } ],
+    "properties" : null,
+    "version" : 1,
+    "authorizationRequired" : null,
+    "baseUri" : { },
+    "test" : null
+  },
   "actions" : [ {
     "batch" : null,
     "deprecated" : null,
@@ -118,8 +207,8 @@
             "label" : null,
             "placeholder" : null,
             "options" : null,
-            "controlType" : "DATE_TIME",
-            "optionsDataSource" : null
+            "optionsDataSource" : null,
+            "controlType" : "DATE_TIME"
           }, {
             "advancedOption" : null,
             "description" : "End time of the event.",
@@ -135,8 +224,8 @@
             "label" : null,
             "placeholder" : null,
             "options" : null,
-            "controlType" : "DATE_TIME",
-            "optionsDataSource" : null
+            "optionsDataSource" : null,
+            "controlType" : "DATE_TIME"
           }, {
             "advancedOption" : null,
             "description" : "The attendees for the event.",
@@ -176,8 +265,8 @@
             "minItems" : null,
             "multipleValues" : null,
             "options" : null,
-            "controlType" : "ARRAY_BUILDER",
-            "optionsDataSource" : null
+            "optionsDataSource" : null,
+            "controlType" : "ARRAY_BUILDER"
           }, {
             "advancedOption" : null,
             "description" : "Indicates whether the event is an online meeting.",
@@ -247,8 +336,8 @@
             } ],
             "controlType" : "SELECT"
           } ],
-          "controlType" : "OBJECT_BUILDER",
-          "optionsDataSource" : null
+          "optionsDataSource" : null,
+          "controlType" : "OBJECT_BUILDER"
         },
         "sampleOutput" : null,
         "placeholder" : null
@@ -345,8 +434,8 @@
           "label" : null,
           "placeholder" : null,
           "options" : null,
-          "controlType" : "DATE_TIME",
-          "optionsDataSource" : null
+          "optionsDataSource" : null,
+          "controlType" : "DATE_TIME"
         }, {
           "advancedOption" : null,
           "description" : "End time of the event.",
@@ -362,8 +451,8 @@
           "label" : null,
           "placeholder" : null,
           "options" : null,
-          "controlType" : "DATE_TIME",
-          "optionsDataSource" : null
+          "optionsDataSource" : null,
+          "controlType" : "DATE_TIME"
         }, {
           "advancedOption" : null,
           "description" : "The attendees for the event.",
@@ -403,8 +492,8 @@
           "minItems" : null,
           "multipleValues" : null,
           "options" : null,
-          "controlType" : "ARRAY_BUILDER",
-          "optionsDataSource" : null
+          "optionsDataSource" : null,
+          "controlType" : "ARRAY_BUILDER"
         }, {
           "advancedOption" : null,
           "description" : "Indicates whether the event is an online meeting.",
@@ -474,8 +563,8 @@
           } ],
           "controlType" : "SELECT"
         } ],
-        "controlType" : "OBJECT_BUILDER",
-        "optionsDataSource" : null
+        "optionsDataSource" : null,
+        "controlType" : "OBJECT_BUILDER"
       },
       "sampleOutput" : null
     },
@@ -561,8 +650,8 @@
       "label" : "Start Date",
       "placeholder" : null,
       "options" : null,
-      "controlType" : "DATE",
-      "optionsDataSource" : null
+      "optionsDataSource" : null,
+      "controlType" : "DATE"
     }, {
       "advancedOption" : null,
       "description" : "The end date of the event.",
@@ -578,8 +667,8 @@
       "label" : "End Date",
       "placeholder" : null,
       "options" : null,
-      "controlType" : "DATE",
-      "optionsDataSource" : null
+      "optionsDataSource" : null,
+      "controlType" : "DATE"
     }, {
       "advancedOption" : null,
       "description" : "The start time of the event.",
@@ -595,8 +684,8 @@
       "label" : "Start Date Time",
       "placeholder" : null,
       "options" : null,
-      "controlType" : "DATE_TIME",
-      "optionsDataSource" : null
+      "optionsDataSource" : null,
+      "controlType" : "DATE_TIME"
     }, {
       "advancedOption" : null,
       "description" : "The end time of the event.",
@@ -612,8 +701,8 @@
       "label" : "End Date Time",
       "placeholder" : null,
       "options" : null,
-      "controlType" : "DATE_TIME",
-      "optionsDataSource" : null
+      "optionsDataSource" : null,
+      "controlType" : "DATE_TIME"
     }, {
       "advancedOption" : null,
       "description" : "The attendees of the event.",
@@ -653,8 +742,8 @@
       "minItems" : null,
       "multipleValues" : null,
       "options" : null,
-      "controlType" : "ARRAY_BUILDER",
-      "optionsDataSource" : null
+      "optionsDataSource" : null,
+      "controlType" : "ARRAY_BUILDER"
     }, {
       "advancedOption" : null,
       "description" : "Is the event an online meeting?",
@@ -696,8 +785,8 @@
       "maxValue" : null,
       "minValue" : null,
       "options" : null,
-      "controlType" : "INTEGER",
-      "optionsDataSource" : null
+      "optionsDataSource" : null,
+      "controlType" : "INTEGER"
     } ],
     "title" : "Create Event",
     "perform" : { },
@@ -878,8 +967,8 @@
               "label" : null,
               "placeholder" : null,
               "options" : null,
-              "controlType" : "DATE_TIME",
-              "optionsDataSource" : null
+              "optionsDataSource" : null,
+              "controlType" : "DATE_TIME"
             }, {
               "advancedOption" : null,
               "description" : "End time of the event.",
@@ -895,8 +984,8 @@
               "label" : null,
               "placeholder" : null,
               "options" : null,
-              "controlType" : "DATE_TIME",
-              "optionsDataSource" : null
+              "optionsDataSource" : null,
+              "controlType" : "DATE_TIME"
             }, {
               "advancedOption" : null,
               "description" : "The attendees for the event.",
@@ -936,8 +1025,8 @@
               "minItems" : null,
               "multipleValues" : null,
               "options" : null,
-              "controlType" : "ARRAY_BUILDER",
-              "optionsDataSource" : null
+              "optionsDataSource" : null,
+              "controlType" : "ARRAY_BUILDER"
             }, {
               "advancedOption" : null,
               "description" : "Indicates whether the event is an online meeting.",
@@ -1007,15 +1096,15 @@
               } ],
               "controlType" : "SELECT"
             } ],
-            "controlType" : "OBJECT_BUILDER",
-            "optionsDataSource" : null
+            "optionsDataSource" : null,
+            "controlType" : "OBJECT_BUILDER"
           } ],
           "maxItems" : null,
           "minItems" : null,
           "multipleValues" : null,
           "options" : null,
-          "controlType" : "ARRAY_BUILDER",
-          "optionsDataSource" : null
+          "optionsDataSource" : null,
+          "controlType" : "ARRAY_BUILDER"
         },
         "sampleOutput" : null,
         "placeholder" : null
@@ -1126,8 +1215,8 @@
             "label" : null,
             "placeholder" : null,
             "options" : null,
-            "controlType" : "DATE_TIME",
-            "optionsDataSource" : null
+            "optionsDataSource" : null,
+            "controlType" : "DATE_TIME"
           }, {
             "advancedOption" : null,
             "description" : "End time of the event.",
@@ -1143,8 +1232,8 @@
             "label" : null,
             "placeholder" : null,
             "options" : null,
-            "controlType" : "DATE_TIME",
-            "optionsDataSource" : null
+            "optionsDataSource" : null,
+            "controlType" : "DATE_TIME"
           }, {
             "advancedOption" : null,
             "description" : "The attendees for the event.",
@@ -1184,8 +1273,8 @@
             "minItems" : null,
             "multipleValues" : null,
             "options" : null,
-            "controlType" : "ARRAY_BUILDER",
-            "optionsDataSource" : null
+            "optionsDataSource" : null,
+            "controlType" : "ARRAY_BUILDER"
           }, {
             "advancedOption" : null,
             "description" : "Indicates whether the event is an online meeting.",
@@ -1255,15 +1344,15 @@
             } ],
             "controlType" : "SELECT"
           } ],
-          "controlType" : "OBJECT_BUILDER",
-          "optionsDataSource" : null
+          "optionsDataSource" : null,
+          "controlType" : "OBJECT_BUILDER"
         } ],
         "maxItems" : null,
         "minItems" : null,
         "multipleValues" : null,
         "options" : null,
-        "controlType" : "ARRAY_BUILDER",
-        "optionsDataSource" : null
+        "optionsDataSource" : null,
+        "controlType" : "ARRAY_BUILDER"
       },
       "sampleOutput" : null
     },
@@ -1322,8 +1411,8 @@
         "label" : "From",
         "placeholder" : null,
         "options" : null,
-        "controlType" : "DATE_TIME",
-        "optionsDataSource" : null
+        "optionsDataSource" : null,
+        "controlType" : "DATE_TIME"
       }, {
         "advancedOption" : null,
         "description" : "End of the time range.",
@@ -1339,11 +1428,11 @@
         "label" : "To",
         "placeholder" : null,
         "options" : null,
-        "controlType" : "DATE_TIME",
-        "optionsDataSource" : null
+        "optionsDataSource" : null,
+        "controlType" : "DATE_TIME"
       } ],
-      "controlType" : "OBJECT_BUILDER",
-      "optionsDataSource" : null
+      "optionsDataSource" : null,
+      "controlType" : "OBJECT_BUILDER"
     } ],
     "title" : "Get Events",
     "perform" : { },
@@ -1405,8 +1494,8 @@
               "label" : null,
               "placeholder" : null,
               "options" : null,
-              "controlType" : "DATE_TIME",
-              "optionsDataSource" : null
+              "optionsDataSource" : null,
+              "controlType" : "DATE_TIME"
             }, {
               "advancedOption" : null,
               "description" : "End time of the free time slot.",
@@ -1422,18 +1511,18 @@
               "label" : null,
               "placeholder" : null,
               "options" : null,
-              "controlType" : "DATE_TIME",
-              "optionsDataSource" : null
+              "optionsDataSource" : null,
+              "controlType" : "DATE_TIME"
             } ],
-            "controlType" : "OBJECT_BUILDER",
-            "optionsDataSource" : null
+            "optionsDataSource" : null,
+            "controlType" : "OBJECT_BUILDER"
           } ],
           "maxItems" : null,
           "minItems" : null,
           "multipleValues" : null,
           "options" : null,
-          "controlType" : "ARRAY_BUILDER",
-          "optionsDataSource" : null
+          "optionsDataSource" : null,
+          "controlType" : "ARRAY_BUILDER"
         },
         "sampleOutput" : null,
         "placeholder" : null
@@ -1484,8 +1573,8 @@
             "label" : null,
             "placeholder" : null,
             "options" : null,
-            "controlType" : "DATE_TIME",
-            "optionsDataSource" : null
+            "optionsDataSource" : null,
+            "controlType" : "DATE_TIME"
           }, {
             "advancedOption" : null,
             "description" : "End time of the free time slot.",
@@ -1501,18 +1590,18 @@
             "label" : null,
             "placeholder" : null,
             "options" : null,
-            "controlType" : "DATE_TIME",
-            "optionsDataSource" : null
+            "optionsDataSource" : null,
+            "controlType" : "DATE_TIME"
           } ],
-          "controlType" : "OBJECT_BUILDER",
-          "optionsDataSource" : null
+          "optionsDataSource" : null,
+          "controlType" : "OBJECT_BUILDER"
         } ],
         "maxItems" : null,
         "minItems" : null,
         "multipleValues" : null,
         "options" : null,
-        "controlType" : "ARRAY_BUILDER",
-        "optionsDataSource" : null
+        "optionsDataSource" : null,
+        "controlType" : "ARRAY_BUILDER"
       },
       "sampleOutput" : null
     },
@@ -1571,8 +1660,8 @@
         "label" : "From",
         "placeholder" : null,
         "options" : null,
-        "controlType" : "DATE_TIME",
-        "optionsDataSource" : null
+        "optionsDataSource" : null,
+        "controlType" : "DATE_TIME"
       }, {
         "advancedOption" : null,
         "description" : "End of the time range.",
@@ -1588,11 +1677,11 @@
         "label" : "To",
         "placeholder" : null,
         "options" : null,
-        "controlType" : "DATE_TIME",
-        "optionsDataSource" : null
+        "optionsDataSource" : null,
+        "controlType" : "DATE_TIME"
       } ],
-      "controlType" : "OBJECT_BUILDER",
-      "optionsDataSource" : null
+      "optionsDataSource" : null,
+      "controlType" : "OBJECT_BUILDER"
     } ],
     "title" : "Get Free Time Slots",
     "perform" : { },
@@ -1743,8 +1832,8 @@
               "options" : null,
               "optionsDataSource" : null
             } ],
-            "controlType" : "OBJECT_BUILDER",
-            "optionsDataSource" : null
+            "optionsDataSource" : null,
+            "controlType" : "OBJECT_BUILDER"
           }, {
             "advancedOption" : null,
             "description" : "The owner of the mailbox from which the message is sent.",
@@ -1820,14 +1909,14 @@
                 "options" : null,
                 "optionsDataSource" : null
               } ],
-              "controlType" : "OBJECT_BUILDER",
-              "optionsDataSource" : null
+              "optionsDataSource" : null,
+              "controlType" : "OBJECT_BUILDER"
             } ],
-            "controlType" : "OBJECT_BUILDER",
-            "optionsDataSource" : null
+            "optionsDataSource" : null,
+            "controlType" : "OBJECT_BUILDER"
           } ],
-          "controlType" : "OBJECT_BUILDER",
-          "optionsDataSource" : null
+          "optionsDataSource" : null,
+          "controlType" : "OBJECT_BUILDER"
         },
         "sampleOutput" : null,
         "placeholder" : null
@@ -1967,8 +2056,8 @@
             "options" : null,
             "optionsDataSource" : null
           } ],
-          "controlType" : "OBJECT_BUILDER",
-          "optionsDataSource" : null
+          "optionsDataSource" : null,
+          "controlType" : "OBJECT_BUILDER"
         }, {
           "advancedOption" : null,
           "description" : "The owner of the mailbox from which the message is sent.",
@@ -2044,14 +2133,14 @@
               "options" : null,
               "optionsDataSource" : null
             } ],
-            "controlType" : "OBJECT_BUILDER",
-            "optionsDataSource" : null
+            "optionsDataSource" : null,
+            "controlType" : "OBJECT_BUILDER"
           } ],
-          "controlType" : "OBJECT_BUILDER",
-          "optionsDataSource" : null
+          "optionsDataSource" : null,
+          "controlType" : "OBJECT_BUILDER"
         } ],
-        "controlType" : "OBJECT_BUILDER",
-        "optionsDataSource" : null
+        "optionsDataSource" : null,
+        "controlType" : "OBJECT_BUILDER"
       },
       "sampleOutput" : null
     },
@@ -2298,8 +2387,8 @@
                 "options" : null,
                 "optionsDataSource" : null
               } ],
-              "controlType" : "OBJECT_BUILDER",
-              "optionsDataSource" : null
+              "optionsDataSource" : null,
+              "controlType" : "OBJECT_BUILDER"
             }, {
               "advancedOption" : null,
               "description" : "The owner of the mailbox from which the message is sent.",
@@ -2375,21 +2464,21 @@
                   "options" : null,
                   "optionsDataSource" : null
                 } ],
-                "controlType" : "OBJECT_BUILDER",
-                "optionsDataSource" : null
+                "optionsDataSource" : null,
+                "controlType" : "OBJECT_BUILDER"
               } ],
-              "controlType" : "OBJECT_BUILDER",
-              "optionsDataSource" : null
+              "optionsDataSource" : null,
+              "controlType" : "OBJECT_BUILDER"
             } ],
-            "controlType" : "OBJECT_BUILDER",
-            "optionsDataSource" : null
+            "optionsDataSource" : null,
+            "controlType" : "OBJECT_BUILDER"
           } ],
           "maxItems" : null,
           "minItems" : null,
           "multipleValues" : null,
           "options" : null,
-          "controlType" : "ARRAY_BUILDER",
-          "optionsDataSource" : null
+          "optionsDataSource" : null,
+          "controlType" : "ARRAY_BUILDER"
         },
         "sampleOutput" : null,
         "placeholder" : null
@@ -2543,8 +2632,8 @@
               "options" : null,
               "optionsDataSource" : null
             } ],
-            "controlType" : "OBJECT_BUILDER",
-            "optionsDataSource" : null
+            "optionsDataSource" : null,
+            "controlType" : "OBJECT_BUILDER"
           }, {
             "advancedOption" : null,
             "description" : "The owner of the mailbox from which the message is sent.",
@@ -2620,21 +2709,21 @@
                 "options" : null,
                 "optionsDataSource" : null
               } ],
-              "controlType" : "OBJECT_BUILDER",
-              "optionsDataSource" : null
+              "optionsDataSource" : null,
+              "controlType" : "OBJECT_BUILDER"
             } ],
-            "controlType" : "OBJECT_BUILDER",
-            "optionsDataSource" : null
+            "optionsDataSource" : null,
+            "controlType" : "OBJECT_BUILDER"
           } ],
-          "controlType" : "OBJECT_BUILDER",
-          "optionsDataSource" : null
+          "optionsDataSource" : null,
+          "controlType" : "OBJECT_BUILDER"
         } ],
         "maxItems" : null,
         "minItems" : null,
         "multipleValues" : null,
         "options" : null,
-        "controlType" : "ARRAY_BUILDER",
-        "optionsDataSource" : null
+        "optionsDataSource" : null,
+        "controlType" : "ARRAY_BUILDER"
       },
       "sampleOutput" : null
     },
@@ -2773,8 +2862,8 @@
       "minItems" : null,
       "multipleValues" : null,
       "options" : null,
-      "controlType" : "ARRAY_BUILDER",
-      "optionsDataSource" : null
+      "optionsDataSource" : null,
+      "controlType" : "ARRAY_BUILDER"
     }, {
       "advancedOption" : null,
       "description" : "The subject of the message.",
@@ -2834,8 +2923,8 @@
       "minItems" : null,
       "multipleValues" : null,
       "options" : null,
-      "controlType" : "ARRAY_BUILDER",
-      "optionsDataSource" : null
+      "optionsDataSource" : null,
+      "controlType" : "ARRAY_BUILDER"
     }, {
       "advancedOption" : null,
       "description" : "The Cc recipients for the message.",
@@ -2875,8 +2964,8 @@
       "minItems" : null,
       "multipleValues" : null,
       "options" : null,
-      "controlType" : "ARRAY_BUILDER",
-      "optionsDataSource" : null
+      "optionsDataSource" : null,
+      "controlType" : "ARRAY_BUILDER"
     }, {
       "advancedOption" : null,
       "description" : "The email addresses to use when replying.",
@@ -2916,8 +3005,8 @@
       "minItems" : null,
       "multipleValues" : null,
       "options" : null,
-      "controlType" : "ARRAY_BUILDER",
-      "optionsDataSource" : null
+      "optionsDataSource" : null,
+      "controlType" : "ARRAY_BUILDER"
     }, {
       "advancedOption" : null,
       "description" : "The body of the message. It can be in HTML or text format.",
@@ -3004,15 +3093,15 @@
         "options" : null,
         "optionsDataSource" : null
       } ],
-      "controlType" : "OBJECT_BUILDER",
-      "optionsDataSource" : null
+      "optionsDataSource" : null,
+      "controlType" : "OBJECT_BUILDER"
     } ],
     "title" : "Send Email",
     "perform" : { },
     "processErrorResponse" : null,
     "workflowNodeDescription" : null
   } ],
-  "dataStream" : null,
+  "clusterElements" : null,
   "triggers" : [ {
     "batch" : null,
     "deprecated" : null,
@@ -3171,8 +3260,8 @@
                 "options" : null,
                 "optionsDataSource" : null
               } ],
-              "controlType" : "OBJECT_BUILDER",
-              "optionsDataSource" : null
+              "optionsDataSource" : null,
+              "controlType" : "OBJECT_BUILDER"
             }, {
               "advancedOption" : null,
               "description" : "The owner of the mailbox from which the message is sent.",
@@ -3248,21 +3337,21 @@
                   "options" : null,
                   "optionsDataSource" : null
                 } ],
-                "controlType" : "OBJECT_BUILDER",
-                "optionsDataSource" : null
+                "optionsDataSource" : null,
+                "controlType" : "OBJECT_BUILDER"
               } ],
-              "controlType" : "OBJECT_BUILDER",
-              "optionsDataSource" : null
+              "optionsDataSource" : null,
+              "controlType" : "OBJECT_BUILDER"
             } ],
-            "controlType" : "OBJECT_BUILDER",
-            "optionsDataSource" : null
+            "optionsDataSource" : null,
+            "controlType" : "OBJECT_BUILDER"
           } ],
           "maxItems" : null,
           "minItems" : null,
           "multipleValues" : null,
           "options" : null,
-          "controlType" : "ARRAY_BUILDER",
-          "optionsDataSource" : null
+          "optionsDataSource" : null,
+          "controlType" : "ARRAY_BUILDER"
         },
         "sampleOutput" : null,
         "placeholder" : null
@@ -3416,8 +3505,8 @@
               "options" : null,
               "optionsDataSource" : null
             } ],
-            "controlType" : "OBJECT_BUILDER",
-            "optionsDataSource" : null
+            "optionsDataSource" : null,
+            "controlType" : "OBJECT_BUILDER"
           }, {
             "advancedOption" : null,
             "description" : "The owner of the mailbox from which the message is sent.",
@@ -3493,21 +3582,21 @@
                 "options" : null,
                 "optionsDataSource" : null
               } ],
-              "controlType" : "OBJECT_BUILDER",
-              "optionsDataSource" : null
+              "optionsDataSource" : null,
+              "controlType" : "OBJECT_BUILDER"
             } ],
-            "controlType" : "OBJECT_BUILDER",
-            "optionsDataSource" : null
+            "optionsDataSource" : null,
+            "controlType" : "OBJECT_BUILDER"
           } ],
-          "controlType" : "OBJECT_BUILDER",
-          "optionsDataSource" : null
+          "optionsDataSource" : null,
+          "controlType" : "OBJECT_BUILDER"
         } ],
         "maxItems" : null,
         "minItems" : null,
         "multipleValues" : null,
         "options" : null,
-        "controlType" : "ARRAY_BUILDER",
-        "optionsDataSource" : null
+        "optionsDataSource" : null,
+        "controlType" : "ARRAY_BUILDER"
       },
       "sampleOutput" : null
     },
@@ -3516,107 +3605,18 @@
     "type" : "POLLING",
     "webhookRawBody" : null,
     "workflowSyncExecution" : null,
-    "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
-    "poll" : { },
-    "deduplicate" : null,
     "webhookDisable" : null,
     "webhookEnable" : null,
-    "dynamicWebhookRefresh" : null,
     "webhookRequest" : null,
     "listenerDisable" : null,
     "listenerEnable" : null,
     "webhookValidate" : null,
+    "deduplicate" : null,
+    "poll" : { },
+    "processErrorResponse" : null,
+    "workflowNodeDescription" : null,
+    "dynamicWebhookRefresh" : null,
     "webhookValidateOnEnable" : null
   } ],
-  "unifiedApi" : null,
-  "connection" : {
-    "authorizations" : [ {
-      "detectOn" : null,
-      "description" : null,
-      "name" : "oauth2_authorization_code",
-      "properties" : [ {
-        "advancedOption" : null,
-        "description" : null,
-        "displayCondition" : null,
-        "expressionEnabled" : null,
-        "hidden" : null,
-        "metadata" : { },
-        "required" : true,
-        "name" : "clientId",
-        "type" : "STRING",
-        "defaultValue" : null,
-        "exampleValue" : null,
-        "label" : "Client Id",
-        "placeholder" : null,
-        "controlType" : "TEXT",
-        "languageId" : null,
-        "maxLength" : null,
-        "minLength" : null,
-        "options" : null,
-        "optionsDataSource" : null
-      }, {
-        "advancedOption" : null,
-        "description" : null,
-        "displayCondition" : null,
-        "expressionEnabled" : null,
-        "hidden" : null,
-        "metadata" : { },
-        "required" : true,
-        "name" : "clientSecret",
-        "type" : "STRING",
-        "defaultValue" : null,
-        "exampleValue" : null,
-        "label" : "Client Secret",
-        "placeholder" : null,
-        "controlType" : "TEXT",
-        "languageId" : null,
-        "maxLength" : null,
-        "minLength" : null,
-        "options" : null,
-        "optionsDataSource" : null
-      }, {
-        "advancedOption" : null,
-        "description" : null,
-        "displayCondition" : null,
-        "expressionEnabled" : null,
-        "hidden" : null,
-        "metadata" : { },
-        "required" : true,
-        "name" : "tenantId",
-        "type" : "STRING",
-        "defaultValue" : "common",
-        "exampleValue" : null,
-        "label" : "Tenant Id",
-        "placeholder" : null,
-        "controlType" : "TEXT",
-        "languageId" : null,
-        "maxLength" : null,
-        "minLength" : null,
-        "options" : null,
-        "optionsDataSource" : null
-      } ],
-      "refreshOn" : null,
-      "title" : "OAuth2 Authorization Code",
-      "type" : "OAUTH2_AUTHORIZATION_CODE",
-      "acquire" : null,
-      "apply" : null,
-      "authorizationCallback" : null,
-      "authorizationUrl" : { },
-      "clientId" : null,
-      "clientSecret" : null,
-      "oauth2AuthorizationExtraQueryParameters" : null,
-      "pkce" : null,
-      "refresh" : null,
-      "refreshUrl" : { },
-      "scopes" : { },
-      "refreshToken" : null,
-      "tokenUrl" : { }
-    } ],
-    "properties" : null,
-    "version" : 1,
-    "authorizationRequired" : null,
-    "baseUri" : { },
-    "test" : null
-  }
+  "unifiedApi" : null
 }

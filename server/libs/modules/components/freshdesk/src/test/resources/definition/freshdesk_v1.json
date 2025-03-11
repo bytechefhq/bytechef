@@ -1,6 +1,6 @@
 {
-  "categories" : [ {
-    "key" : "customer-support",
+  "componentCategories" : [ {
+    "name" : "customer-support",
     "label" : "customer-support"
   } ],
   "customAction" : true,
@@ -13,6 +13,75 @@
   "resources" : null,
   "version" : 1,
   "title" : "Freshdesk",
+  "connection" : {
+    "authorizations" : [ {
+      "detectOn" : null,
+      "description" : null,
+      "name" : "basic_auth",
+      "properties" : [ {
+        "advancedOption" : null,
+        "description" : "Your helpdesk domain name, e.g. https://{your_domain}.freshdesk.com/api/v2",
+        "displayCondition" : null,
+        "expressionEnabled" : null,
+        "hidden" : null,
+        "metadata" : { },
+        "required" : true,
+        "name" : "domain",
+        "type" : "STRING",
+        "defaultValue" : null,
+        "exampleValue" : null,
+        "label" : "Domain",
+        "placeholder" : null,
+        "controlType" : "TEXT",
+        "languageId" : null,
+        "maxLength" : null,
+        "minLength" : null,
+        "options" : null,
+        "optionsDataSource" : null
+      }, {
+        "advancedOption" : null,
+        "description" : null,
+        "displayCondition" : null,
+        "expressionEnabled" : null,
+        "hidden" : null,
+        "metadata" : { },
+        "required" : true,
+        "name" : "username",
+        "type" : "STRING",
+        "defaultValue" : null,
+        "exampleValue" : null,
+        "label" : "API key",
+        "placeholder" : null,
+        "controlType" : "TEXT",
+        "languageId" : null,
+        "maxLength" : null,
+        "minLength" : null,
+        "options" : null,
+        "optionsDataSource" : null
+      } ],
+      "refreshOn" : null,
+      "title" : "Basic Auth",
+      "type" : "BASIC_AUTH",
+      "acquire" : null,
+      "authorizationCallback" : null,
+      "oauth2AuthorizationExtraQueryParameters" : null,
+      "authorizationUrl" : null,
+      "clientSecret" : null,
+      "refreshToken" : null,
+      "apply" : null,
+      "clientId" : null,
+      "pkce" : null,
+      "refresh" : null,
+      "refreshUrl" : null,
+      "scopes" : null,
+      "tokenUrl" : null
+    } ],
+    "properties" : null,
+    "version" : 1,
+    "authorizationRequired" : null,
+    "baseUri" : { },
+    "test" : null
+  },
   "actions" : [ {
     "batch" : null,
     "deprecated" : null,
@@ -67,8 +136,8 @@
             "minValue" : null,
             "numberPrecision" : null,
             "options" : null,
-            "controlType" : "NUMBER",
-            "optionsDataSource" : null
+            "optionsDataSource" : null,
+            "controlType" : "NUMBER"
           }, {
             "advancedOption" : null,
             "description" : "Name of the company.",
@@ -130,8 +199,8 @@
             "options" : null,
             "optionsDataSource" : null
           } ],
-          "controlType" : "OBJECT_BUILDER",
-          "optionsDataSource" : null
+          "optionsDataSource" : null,
+          "controlType" : "OBJECT_BUILDER"
         },
         "sampleOutput" : null,
         "placeholder" : null
@@ -175,8 +244,8 @@
           "minValue" : null,
           "numberPrecision" : null,
           "options" : null,
-          "controlType" : "NUMBER",
-          "optionsDataSource" : null
+          "optionsDataSource" : null,
+          "controlType" : "NUMBER"
         }, {
           "advancedOption" : null,
           "description" : "Name of the company.",
@@ -238,8 +307,8 @@
           "options" : null,
           "optionsDataSource" : null
         } ],
-        "controlType" : "OBJECT_BUILDER",
-        "optionsDataSource" : null
+        "optionsDataSource" : null,
+        "controlType" : "OBJECT_BUILDER"
       },
       "sampleOutput" : null
     },
@@ -312,8 +381,8 @@
     } ],
     "title" : "Create Company",
     "processErrorResponse" : null,
-    "perform" : null,
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "perform" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -408,8 +477,8 @@
             "minValue" : null,
             "numberPrecision" : null,
             "options" : null,
-            "controlType" : "NUMBER",
-            "optionsDataSource" : null
+            "optionsDataSource" : null,
+            "controlType" : "NUMBER"
           }, {
             "advancedOption" : null,
             "description" : "Job title of the contact.",
@@ -431,8 +500,8 @@
             "options" : null,
             "optionsDataSource" : null
           } ],
-          "controlType" : "OBJECT_BUILDER",
-          "optionsDataSource" : null
+          "optionsDataSource" : null,
+          "controlType" : "OBJECT_BUILDER"
         },
         "sampleOutput" : null,
         "placeholder" : null
@@ -516,8 +585,8 @@
           "minValue" : null,
           "numberPrecision" : null,
           "options" : null,
-          "controlType" : "NUMBER",
-          "optionsDataSource" : null
+          "optionsDataSource" : null,
+          "controlType" : "NUMBER"
         }, {
           "advancedOption" : null,
           "description" : "Job title of the contact.",
@@ -539,8 +608,8 @@
           "options" : null,
           "optionsDataSource" : null
         } ],
-        "controlType" : "OBJECT_BUILDER",
-        "optionsDataSource" : null
+        "optionsDataSource" : null,
+        "controlType" : "OBJECT_BUILDER"
       },
       "sampleOutput" : null
     },
@@ -679,8 +748,8 @@
     } ],
     "title" : "Create Contact",
     "processErrorResponse" : null,
-    "perform" : null,
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "perform" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -792,8 +861,8 @@
             "maxValue" : null,
             "minValue" : null,
             "options" : null,
-            "controlType" : "INTEGER",
-            "optionsDataSource" : null
+            "optionsDataSource" : null,
+            "controlType" : "INTEGER"
           }, {
             "advancedOption" : null,
             "description" : "Status of the ticket.",
@@ -811,11 +880,11 @@
             "maxValue" : null,
             "minValue" : null,
             "options" : null,
-            "controlType" : "INTEGER",
-            "optionsDataSource" : null
+            "optionsDataSource" : null,
+            "controlType" : "INTEGER"
           } ],
-          "controlType" : "OBJECT_BUILDER",
-          "optionsDataSource" : null
+          "optionsDataSource" : null,
+          "controlType" : "OBJECT_BUILDER"
         },
         "sampleOutput" : null,
         "placeholder" : null
@@ -916,8 +985,8 @@
           "maxValue" : null,
           "minValue" : null,
           "options" : null,
-          "controlType" : "INTEGER",
-          "optionsDataSource" : null
+          "optionsDataSource" : null,
+          "controlType" : "INTEGER"
         }, {
           "advancedOption" : null,
           "description" : "Status of the ticket.",
@@ -935,11 +1004,11 @@
           "maxValue" : null,
           "minValue" : null,
           "options" : null,
-          "controlType" : "INTEGER",
-          "optionsDataSource" : null
+          "optionsDataSource" : null,
+          "controlType" : "INTEGER"
         } ],
-        "controlType" : "OBJECT_BUILDER",
-        "optionsDataSource" : null
+        "optionsDataSource" : null,
+        "controlType" : "OBJECT_BUILDER"
       },
       "sampleOutput" : null
     },
@@ -1044,8 +1113,8 @@
         "label" : "Urgent",
         "value" : 4
       } ],
-      "controlType" : "SELECT",
-      "optionsDataSource" : null
+      "optionsDataSource" : null,
+      "controlType" : "SELECT"
     }, {
       "advancedOption" : null,
       "description" : "Status of the ticket.",
@@ -1081,84 +1150,15 @@
         "label" : "Closed",
         "value" : 5
       } ],
-      "controlType" : "SELECT",
-      "optionsDataSource" : null
+      "optionsDataSource" : null,
+      "controlType" : "SELECT"
     } ],
     "title" : "Create Ticket",
     "processErrorResponse" : null,
-    "perform" : null,
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "perform" : null
   } ],
-  "connection" : {
-    "authorizations" : [ {
-      "detectOn" : null,
-      "description" : null,
-      "name" : "basic_auth",
-      "properties" : [ {
-        "advancedOption" : null,
-        "description" : "Your helpdesk domain name, e.g. https://{your_domain}.freshdesk.com/api/v2",
-        "displayCondition" : null,
-        "expressionEnabled" : null,
-        "hidden" : null,
-        "metadata" : { },
-        "required" : true,
-        "name" : "domain",
-        "type" : "STRING",
-        "defaultValue" : null,
-        "exampleValue" : null,
-        "label" : "Domain",
-        "placeholder" : null,
-        "controlType" : "TEXT",
-        "languageId" : null,
-        "maxLength" : null,
-        "minLength" : null,
-        "options" : null,
-        "optionsDataSource" : null
-      }, {
-        "advancedOption" : null,
-        "description" : null,
-        "displayCondition" : null,
-        "expressionEnabled" : null,
-        "hidden" : null,
-        "metadata" : { },
-        "required" : true,
-        "name" : "username",
-        "type" : "STRING",
-        "defaultValue" : null,
-        "exampleValue" : null,
-        "label" : "API key",
-        "placeholder" : null,
-        "controlType" : "TEXT",
-        "languageId" : null,
-        "maxLength" : null,
-        "minLength" : null,
-        "options" : null,
-        "optionsDataSource" : null
-      } ],
-      "refreshOn" : null,
-      "title" : "Basic Auth",
-      "type" : "BASIC_AUTH",
-      "acquire" : null,
-      "scopes" : null,
-      "authorizationUrl" : null,
-      "tokenUrl" : null,
-      "refreshUrl" : null,
-      "apply" : null,
-      "pkce" : null,
-      "authorizationCallback" : null,
-      "clientId" : null,
-      "clientSecret" : null,
-      "oauth2AuthorizationExtraQueryParameters" : null,
-      "refresh" : null,
-      "refreshToken" : null
-    } ],
-    "properties" : null,
-    "version" : 1,
-    "authorizationRequired" : null,
-    "baseUri" : { },
-    "test" : null
-  },
+  "clusterElements" : null,
   "triggers" : [ ],
-  "unifiedApi" : null,
-  "dataStream" : null
+  "unifiedApi" : null
 }

@@ -1,6 +1,6 @@
 {
-  "categories" : [ {
-    "key" : "artificial-intelligence",
+  "componentCategories" : [ {
+    "name" : "artificial-intelligence",
     "label" : "artificial-intelligence"
   } ],
   "customAction" : null,
@@ -13,6 +13,55 @@
   "resources" : null,
   "version" : 1,
   "title" : "OpenAI",
+  "connection" : {
+    "authorizations" : [ {
+      "detectOn" : null,
+      "description" : null,
+      "name" : "bearer_token",
+      "properties" : [ {
+        "advancedOption" : null,
+        "description" : null,
+        "displayCondition" : null,
+        "expressionEnabled" : null,
+        "hidden" : null,
+        "metadata" : { },
+        "required" : true,
+        "name" : "token",
+        "type" : "STRING",
+        "defaultValue" : null,
+        "exampleValue" : null,
+        "label" : "Token",
+        "placeholder" : null,
+        "controlType" : "TEXT",
+        "languageId" : null,
+        "maxLength" : null,
+        "minLength" : null,
+        "options" : null,
+        "optionsDataSource" : null
+      } ],
+      "refreshOn" : null,
+      "title" : "Bearer Token",
+      "type" : "BEARER_TOKEN",
+      "acquire" : null,
+      "apply" : null,
+      "clientId" : null,
+      "pkce" : null,
+      "refresh" : null,
+      "refreshUrl" : null,
+      "scopes" : null,
+      "tokenUrl" : null,
+      "authorizationUrl" : null,
+      "clientSecret" : null,
+      "refreshToken" : null,
+      "authorizationCallback" : null,
+      "oauth2AuthorizationExtraQueryParameters" : null
+    } ],
+    "properties" : null,
+    "version" : 1,
+    "authorizationRequired" : null,
+    "baseUri" : { },
+    "test" : null
+  },
   "actions" : [ {
     "batch" : null,
     "deprecated" : null,
@@ -179,10 +228,6 @@
             "description" : null,
             "label" : "Assistant",
             "value" : "ASSISTANT"
-          }, {
-            "description" : null,
-            "label" : "Tool",
-            "value" : "TOOL"
           } ],
           "optionsDataSource" : null
         }, {
@@ -631,8 +676,8 @@
       "optionsDataSource" : null
     } ],
     "title" : "Ask",
-    "processErrorResponse" : null,
     "perform" : { },
+    "processErrorResponse" : null,
     "workflowNodeDescription" : null
   }, {
     "batch" : null,
@@ -1047,8 +1092,8 @@
       "optionsDataSource" : null
     } ],
     "title" : "Create Image",
-    "processErrorResponse" : null,
     "perform" : { },
+    "processErrorResponse" : null,
     "workflowNodeDescription" : null
   }, {
     "batch" : null,
@@ -1423,8 +1468,8 @@
       "optionsDataSource" : null
     } ],
     "title" : "Text-To-Speech",
-    "processErrorResponse" : null,
     "perform" : { },
+    "processErrorResponse" : null,
     "workflowNodeDescription" : null
   }, {
     "batch" : null,
@@ -1891,31 +1936,303 @@
       "optionsDataSource" : null
     } ],
     "title" : "Create Transcriptions",
-    "processErrorResponse" : null,
     "perform" : { },
+    "processErrorResponse" : null,
     "workflowNodeDescription" : null
   } ],
-  "dataStream" : null,
   "triggers" : null,
   "unifiedApi" : null,
-  "connection" : {
-    "authorizations" : [ {
-      "detectOn" : null,
-      "description" : null,
-      "name" : "bearer_token",
-      "properties" : [ {
+  "clusterElements" : [ {
+    "description" : "OpenAI model.",
+    "name" : "model",
+    "outputDefinition" : null,
+    "properties" : [ {
+      "advancedOption" : null,
+      "description" : "ID of the model to use.",
+      "displayCondition" : null,
+      "expressionEnabled" : null,
+      "hidden" : null,
+      "metadata" : { },
+      "required" : true,
+      "name" : "model",
+      "type" : "STRING",
+      "defaultValue" : null,
+      "exampleValue" : null,
+      "label" : "Model",
+      "placeholder" : null,
+      "controlType" : "SELECT",
+      "languageId" : null,
+      "maxLength" : null,
+      "minLength" : null,
+      "options" : [ {
+        "description" : null,
+        "label" : "chatgpt-4o-latest",
+        "value" : "chatgpt-4o-latest"
+      }, {
+        "description" : null,
+        "label" : "gpt-3.5-turbo",
+        "value" : "gpt-3.5-turbo"
+      }, {
+        "description" : null,
+        "label" : "gpt-3.5-turbo-instruct",
+        "value" : "gpt-3.5-turbo-instruct"
+      }, {
+        "description" : null,
+        "label" : "gpt-4",
+        "value" : "gpt-4"
+      }, {
+        "description" : null,
+        "label" : "gpt-4-0125-preview",
+        "value" : "gpt-4-0125-preview"
+      }, {
+        "description" : null,
+        "label" : "gpt-4-0314",
+        "value" : "gpt-4-0314"
+      }, {
+        "description" : null,
+        "label" : "gpt-4-0613",
+        "value" : "gpt-4-0613"
+      }, {
+        "description" : null,
+        "label" : "gpt-4-1106-preview",
+        "value" : "gpt-4-1106-preview"
+      }, {
+        "description" : null,
+        "label" : "gpt-4-turbo",
+        "value" : "gpt-4-turbo"
+      }, {
+        "description" : null,
+        "label" : "gpt-4-turbo-preview",
+        "value" : "gpt-4-turbo-preview"
+      }, {
+        "description" : null,
+        "label" : "gpt-4o",
+        "value" : "gpt-4o"
+      }, {
+        "description" : null,
+        "label" : "gpt-4o-audio-preview",
+        "value" : "gpt-4o-audio-preview"
+      }, {
+        "description" : null,
+        "label" : "gpt-4o-mini",
+        "value" : "gpt-4o-mini"
+      }, {
+        "description" : null,
+        "label" : "gpt-4o-mini-audio-preview",
+        "value" : "gpt-4o-mini-audio-preview"
+      }, {
+        "description" : null,
+        "label" : "o1",
+        "value" : "o1"
+      }, {
+        "description" : null,
+        "label" : "o1-mini",
+        "value" : "o1-mini"
+      }, {
+        "description" : null,
+        "label" : "o1-preview",
+        "value" : "o1-preview"
+      }, {
+        "description" : null,
+        "label" : "o3-mini",
+        "value" : "o3-mini"
+      } ],
+      "optionsDataSource" : null
+    }, {
+      "advancedOption" : true,
+      "description" : "The maximum number of tokens to generate in the chat completion.",
+      "displayCondition" : null,
+      "expressionEnabled" : null,
+      "hidden" : null,
+      "metadata" : { },
+      "required" : null,
+      "name" : "maxTokens",
+      "type" : "INTEGER",
+      "defaultValue" : null,
+      "exampleValue" : null,
+      "label" : "Max Tokens",
+      "placeholder" : null,
+      "maxValue" : null,
+      "minValue" : null,
+      "options" : null,
+      "controlType" : "INTEGER",
+      "optionsDataSource" : null
+    }, {
+      "advancedOption" : true,
+      "description" : "How many chat completion choices to generate for each input message.",
+      "displayCondition" : null,
+      "expressionEnabled" : null,
+      "hidden" : null,
+      "metadata" : { },
+      "required" : null,
+      "name" : "n",
+      "type" : "INTEGER",
+      "defaultValue" : 1,
+      "exampleValue" : null,
+      "label" : "Number of Chat Completion Choices",
+      "placeholder" : null,
+      "maxValue" : null,
+      "minValue" : null,
+      "options" : null,
+      "controlType" : "INTEGER",
+      "optionsDataSource" : null
+    }, {
+      "advancedOption" : true,
+      "description" : "Controls randomness:  Higher values will make the output more random, while lower values like will make it more focused and deterministic.",
+      "displayCondition" : null,
+      "expressionEnabled" : null,
+      "hidden" : null,
+      "metadata" : { },
+      "required" : null,
+      "name" : "temperature",
+      "type" : "NUMBER",
+      "defaultValue" : 1.0,
+      "exampleValue" : null,
+      "label" : "Temperature",
+      "placeholder" : null,
+      "maxNumberPrecision" : null,
+      "maxValue" : 2.0,
+      "minNumberPrecision" : null,
+      "minValue" : 0.0,
+      "numberPrecision" : null,
+      "options" : null,
+      "controlType" : "NUMBER",
+      "optionsDataSource" : null
+    }, {
+      "advancedOption" : true,
+      "description" : "An alternative to sampling with temperature, called nucleus sampling,  where the model considers the results of the tokens with top_p probability mass. So 0.1 means only the tokens comprising the top 10% probability mass are considered.",
+      "displayCondition" : null,
+      "expressionEnabled" : null,
+      "hidden" : null,
+      "metadata" : { },
+      "required" : null,
+      "name" : "topP",
+      "type" : "NUMBER",
+      "defaultValue" : 1.0,
+      "exampleValue" : null,
+      "label" : "Top P",
+      "placeholder" : null,
+      "maxNumberPrecision" : null,
+      "maxValue" : null,
+      "minNumberPrecision" : null,
+      "minValue" : null,
+      "numberPrecision" : null,
+      "options" : null,
+      "controlType" : "NUMBER",
+      "optionsDataSource" : null
+    }, {
+      "advancedOption" : true,
+      "description" : "Number between -2.0 and 2.0. Positive values penalize new tokens based on their existing frequency in the text so far, decreasing the model's likelihood to repeat the same line verbatim.",
+      "displayCondition" : null,
+      "expressionEnabled" : null,
+      "hidden" : null,
+      "metadata" : { },
+      "required" : null,
+      "name" : "frequencyPenalty",
+      "type" : "NUMBER",
+      "defaultValue" : 0.0,
+      "exampleValue" : null,
+      "label" : "Frequency Penalty",
+      "placeholder" : null,
+      "maxNumberPrecision" : null,
+      "maxValue" : 2.0,
+      "minNumberPrecision" : null,
+      "minValue" : -2.0,
+      "numberPrecision" : null,
+      "options" : null,
+      "controlType" : "NUMBER",
+      "optionsDataSource" : null
+    }, {
+      "advancedOption" : true,
+      "description" : "Number between -2.0 and 2.0. Positive values penalize new tokens based on whether they appear in the text so far, increasing the model's likelihood to talk about new topics.",
+      "displayCondition" : null,
+      "expressionEnabled" : null,
+      "hidden" : null,
+      "metadata" : { },
+      "required" : null,
+      "name" : "presencePenalty",
+      "type" : "NUMBER",
+      "defaultValue" : 0.0,
+      "exampleValue" : null,
+      "label" : "Presence Penalty",
+      "placeholder" : null,
+      "maxNumberPrecision" : null,
+      "maxValue" : 2.0,
+      "minNumberPrecision" : null,
+      "minValue" : -2.0,
+      "numberPrecision" : null,
+      "options" : null,
+      "controlType" : "NUMBER",
+      "optionsDataSource" : null
+    }, {
+      "advancedOption" : true,
+      "description" : "Modify the likelihood of specified tokens appearing in the completion.",
+      "displayCondition" : null,
+      "expressionEnabled" : null,
+      "hidden" : null,
+      "metadata" : { },
+      "required" : null,
+      "name" : "logitBias",
+      "type" : "OBJECT",
+      "defaultValue" : null,
+      "exampleValue" : null,
+      "label" : "Logit Bias",
+      "placeholder" : null,
+      "additionalProperties" : [ {
         "advancedOption" : null,
         "description" : null,
         "displayCondition" : null,
         "expressionEnabled" : null,
         "hidden" : null,
         "metadata" : { },
-        "required" : true,
-        "name" : "token",
+        "required" : null,
+        "name" : null,
+        "type" : "NUMBER",
+        "defaultValue" : null,
+        "exampleValue" : null,
+        "label" : null,
+        "placeholder" : null,
+        "maxNumberPrecision" : null,
+        "maxValue" : null,
+        "minNumberPrecision" : null,
+        "minValue" : null,
+        "numberPrecision" : null,
+        "options" : null,
+        "controlType" : "NUMBER",
+        "optionsDataSource" : null
+      } ],
+      "multipleValues" : null,
+      "options" : null,
+      "properties" : null,
+      "controlType" : "OBJECT_BUILDER",
+      "optionsDataSource" : null
+    }, {
+      "advancedOption" : true,
+      "description" : "Up to 4 sequences where the API will stop generating further tokens.",
+      "displayCondition" : null,
+      "expressionEnabled" : null,
+      "hidden" : null,
+      "metadata" : { },
+      "required" : null,
+      "name" : "stop",
+      "type" : "ARRAY",
+      "defaultValue" : null,
+      "exampleValue" : null,
+      "label" : "Stop",
+      "placeholder" : null,
+      "items" : [ {
+        "advancedOption" : null,
+        "description" : null,
+        "displayCondition" : null,
+        "expressionEnabled" : null,
+        "hidden" : null,
+        "metadata" : { },
+        "required" : null,
+        "name" : null,
         "type" : "STRING",
         "defaultValue" : null,
         "exampleValue" : null,
-        "label" : "Token",
+        "label" : null,
         "placeholder" : null,
         "controlType" : "TEXT",
         "languageId" : null,
@@ -1924,27 +2241,41 @@
         "options" : null,
         "optionsDataSource" : null
       } ],
-      "refreshOn" : null,
-      "title" : "Bearer Token",
-      "type" : "BEARER_TOKEN",
-      "acquire" : null,
-      "apply" : null,
-      "authorizationCallback" : null,
-      "authorizationUrl" : null,
-      "clientId" : null,
-      "clientSecret" : null,
-      "oauth2AuthorizationExtraQueryParameters" : null,
-      "pkce" : null,
-      "refresh" : null,
-      "refreshUrl" : null,
-      "scopes" : null,
-      "refreshToken" : null,
-      "tokenUrl" : null
+      "maxItems" : null,
+      "minItems" : null,
+      "multipleValues" : null,
+      "options" : null,
+      "controlType" : "ARRAY_BUILDER",
+      "optionsDataSource" : null
+    }, {
+      "advancedOption" : true,
+      "description" : "A unique identifier representing your end-user, which can help admins to monitor and detect abuse.",
+      "displayCondition" : null,
+      "expressionEnabled" : null,
+      "hidden" : null,
+      "metadata" : { },
+      "required" : false,
+      "name" : "user",
+      "type" : "STRING",
+      "defaultValue" : null,
+      "exampleValue" : null,
+      "label" : "User",
+      "placeholder" : null,
+      "controlType" : "TEXT",
+      "languageId" : null,
+      "maxLength" : null,
+      "minLength" : null,
+      "options" : null,
+      "optionsDataSource" : null
     } ],
-    "properties" : null,
-    "version" : 1,
-    "authorizationRequired" : null,
-    "baseUri" : { },
-    "test" : null
-  }
+    "title" : "Model",
+    "type" : {
+      "name" : "model",
+      "label" : "Model",
+      "multipleElements" : false,
+      "required" : true,
+      "local" : true
+    },
+    "object" : { }
+  } ]
 }

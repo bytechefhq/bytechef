@@ -92,7 +92,7 @@ class GoogleMailGetThreadActionTest {
             assertEquals(mockedThread, result);
 
             assertEquals(parameters, parametersArgumentCaptor.getValue());
-            assertEquals(List.of(ME, "id", Format.MINIMAL), stringArgumentCaptor.getAllValues());
+            assertEquals(List.of(ME, "id", Format.MINIMAL.getMapping()), stringArgumentCaptor.getAllValues());
             assertEquals(parameters.getList(METADATA_HEADERS), listArgumentCaptor.getValue());
         }
     }
@@ -141,7 +141,7 @@ class GoogleMailGetThreadActionTest {
             assertEquals(mockedActionContext, actionContextArgumentCaptor.getValue());
             assertEquals(mockedGmail, gmailArgumentCaptor.getValue());
             assertEquals(parameters, parametersArgumentCaptor.getValue());
-            assertEquals(List.of(ME, "id", Format.FULL), stringArgumentCaptor.getAllValues());
+            assertEquals(List.of(ME, "id", Format.FULL.getMapping()), stringArgumentCaptor.getAllValues());
             assertEquals(parameters.getList(METADATA_HEADERS), listArgumentCaptor.getValue());
         }
     }

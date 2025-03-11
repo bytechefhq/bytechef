@@ -1,6 +1,6 @@
 {
-  "categories" : [ {
-    "key" : "helpers",
+  "componentCategories" : [ {
+    "name" : "helpers",
     "label" : "helpers"
   } ],
   "customAction" : null,
@@ -13,6 +13,7 @@
   "resources" : null,
   "version" : 1,
   "title" : "JSON Helper",
+  "connection" : null,
   "actions" : [ {
     "batch" : null,
     "deprecated" : null,
@@ -139,8 +140,7 @@
     "processErrorResponse" : null,
     "workflowNodeDescription" : null
   } ],
-  "dataStream" : null,
   "triggers" : null,
   "unifiedApi" : null,
-  "connection" : null
+  "clusterElements" : null
 }

@@ -1,12 +1,13 @@
 {
   "actions" : [ ],
-  "categories" : [ {
-    "key" : "helpers",
+  "componentCategories" : [ {
+    "name" : "helpers",
     "label" : "helpers"
   } ],
   "connection" : null,
   "customAction" : null,
   "customActionHelp" : null,
+  "clusterElements" : null,
   "description" : "Use one event from your app tot trigger workflows across any integrations.",
   "icon" : "path:assets/app-event.svg",
   "tags" : null,
@@ -23,8 +24,8 @@
     "outputDefinition" : {
       "output" : { },
       "outputResponse" : null,
-      "outputSchema" : null,
-      "sampleOutput" : null
+      "sampleOutput" : null,
+      "outputSchema" : null
     },
     "properties" : [ {
       "advancedOption" : null,
@@ -43,30 +44,29 @@
       "maxValue" : null,
       "minValue" : null,
       "options" : null,
-      "controlType" : "SELECT",
       "optionsDataSource" : {
         "optionsLookupDependsOn" : null,
         "options" : { }
-      }
+      },
+      "controlType" : "SELECT"
     } ],
     "title" : "New Event",
     "type" : "STATIC_WEBHOOK",
     "webhookRawBody" : null,
     "workflowSyncExecution" : null,
-    "deduplicate" : null,
     "webhookDisable" : null,
     "webhookEnable" : null,
-    "dynamicWebhookRefresh" : null,
     "webhookRequest" : { },
     "listenerDisable" : null,
     "listenerEnable" : null,
-    "poll" : null,
-    "processErrorResponse" : null,
     "webhookValidate" : null,
+    "deduplicate" : null,
+    "poll" : null,
+    "dynamicWebhookRefresh" : null,
+    "processErrorResponse" : null,
     "webhookValidateOnEnable" : null,
     "workflowNodeDescription" : null
   } ],
   "unifiedApi" : null,
-  "version" : 1,
-  "dataStream" : null
+  "version" : 1
 }
