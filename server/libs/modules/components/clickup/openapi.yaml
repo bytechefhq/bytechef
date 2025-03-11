@@ -43,22 +43,30 @@ paths:
                 properties:
                   id:
                     type: "string"
+                    description: "The ID of the list."
                   name:
                     type: "string"
+                    description: "The name of the list."
                   folder:
                     type: "object"
+                    description: "The folder where the list is located."
                     properties:
                       id:
                         type: "string"
+                        description: "The ID of the folder."
                       name:
                         type: "string"
+                        description: "The name of the folder."
                   space:
                     type: "object"
+                    description: "The space where the folder is located."
                     properties:
                       id:
                         type: "string"
+                        description: "The ID of the space."
                       name:
                         type: "string"
+                        description: "The name of the space."
   /list/{listId}/task:
     post:
       summary: "Create Task"
@@ -98,31 +106,43 @@ paths:
                 properties:
                   id:
                     type: "string"
+                    description: "The ID of the task."
                   name:
                     type: "string"
+                    description: "The name of the task."
                   description:
                     type: "string"
+                    description: "The description of the task."
                   url:
                     type: "string"
+                    description: "The URL of the task."
                   list:
                     type: "object"
+                    description: "The list where the task is located."
                     properties:
                       id:
                         type: "string"
+                        description: "The ID of the list."
                       name:
                         type: "string"
+                        description: "The name of the list."
                   folder:
                     type: "object"
+                    description: "The folder where the list is located."
                     properties:
                       id:
                         type: "string"
+                        description: "The ID of the folder."
                       name:
                         type: "string"
+                        description: "The name of the folder."
                   space:
                     type: "object"
+                    description: "The space where the folder is located."
                     properties:
                       id:
                         type: "string"
+                        description: "The ID of the space."
   /space/{spaceId}/folder:
     post:
       summary: "Create Folder"
@@ -159,15 +179,20 @@ paths:
                 properties:
                   id:
                     type: "string"
+                    description: "The ID of the folder."
                   name:
                     type: "string"
+                    description: "The name of the folder."
                   space:
                     type: "object"
+                    description: "The space where the folder is located."
                     properties:
                       id:
                         type: "string"
+                        description: "The ID of the space."
                       name:
                         type: "string"
+                        description: "The name of the space."
 components:
   securitySchemes:
     oauth2:

@@ -63,15 +63,30 @@ public class ClickupCreateTaskAction {
                 .label("Description")
                 .description("The description of task.")
                 .required(false))
-        .output(outputSchema(object()
-            .properties(string("id").required(false), string("name").required(false),
-                string("description").required(false), string("url").required(false),
-                object("list").properties(string("id").required(false), string("name").required(false))
-                    .required(false),
-                object("folder").properties(string("id").required(false), string("name").required(false))
-                    .required(false),
-                object("space").properties(string("id").required(false))
+        .output(outputSchema(object().properties(string("id").description("The ID of the task.")
+            .required(false),
+            string("name").description("The name of the task.")
+                .required(false),
+            string("description").description("The description of the task.")
+                .required(false),
+            string("url").description("The URL of the task.")
+                .required(false),
+            object("list").properties(string("id").description("The ID of the list.")
+                .required(false),
+                string("name").description("The name of the list.")
                     .required(false))
+                .description("The list where the task is located.")
+                .required(false),
+            object("folder").properties(string("id").description("The ID of the folder.")
+                .required(false),
+                string("name").description("The name of the folder.")
+                    .required(false))
+                .description("The folder where the list is located.")
+                .required(false),
+            object("space").properties(string("id").description("The ID of the space.")
+                .required(false))
+                .description("The space where the folder is located.")
+                .required(false))
             .metadata(
                 Map.of(
                     "responseType", ResponseType.JSON))));

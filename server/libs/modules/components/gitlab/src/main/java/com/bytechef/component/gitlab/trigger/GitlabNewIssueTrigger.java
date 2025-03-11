@@ -60,11 +60,16 @@ public class GitlabNewIssueTrigger {
             outputSchema(
                 object()
                     .properties(
-                        string("description"),
-                        integer(ID),
-                        integer("iid"),
-                        integer(PROJECT_ID),
-                        string("title"))))
+                        string("description")
+                            .description("The description of the issue."),
+                        integer(ID)
+                            .description("The ID of the issue."),
+                        integer("iid")
+                            .description("The internal ID of the issue."),
+                        integer(PROJECT_ID)
+                            .description("The ID of the project."),
+                        string("title")
+                            .description("The title of the issue."))))
         .webhookEnable(GitlabNewIssueTrigger::dynamicWebhookEnable)
         .webhookDisable(GitlabNewIssueTrigger::dynamicWebhookDisable)
         .webhookRequest(GitlabNewIssueTrigger::dynamicWebhookRequest);

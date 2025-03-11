@@ -68,10 +68,16 @@ public class EnchargeCreateEmailAction {
                 .description("Address that recipients will reply to by default.")
                 .required(false))
         .output(outputSchema(object()
-            .properties(object("email")
-                .properties(integer("id").required(false), string("name").required(false),
-                    string("subject").required(false), string("fromEmail").required(false),
-                    string("replyEmail").required(false))
+            .properties(object("email").properties(integer("id").description("ID of the email template.")
+                .required(false),
+                string("name").description("Name of the email template.")
+                    .required(false),
+                string("subject").description("Subject of the email.")
+                    .required(false),
+                string("fromEmail").description("From address to send the email from.")
+                    .required(false),
+                string("replyEmail").description("Address that recipients will reply to by default.")
+                    .required(false))
                 .required(false))
             .metadata(
                 Map.of(

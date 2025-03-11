@@ -63,18 +63,36 @@ public class AsanaCreateProjectAction {
                     "type", PropertyType.BODY))
             .label("Data")
             .required(false))
-        .output(outputSchema(object()
-            .properties(object("data")
-                .properties(string("gid").required(false), string("name").required(false),
-                    string("notes").required(false),
-                    object("team").properties(string("gid").required(false), string("name").required(false))
-                        .required(false),
-                    object("workspace").properties(string("gid").required(false), string("name").required(false))
+        .output(
+            outputSchema(
+                object()
+                    .properties(object("data")
+                        .properties(string("gid").description("Globally unique identifier for the project.")
+                            .required(false),
+                            string("name").description("Name of the project.")
+                                .required(false),
+                            string("notes")
+                                .description(
+                                    "Free-form textual information associated with the project (ie., its description).")
+                                .required(false),
+                            object("team")
+                                .properties(string("gid").description("Globally unique identifier for the team.")
+                                    .required(false),
+                                    string("name").description("Name of the team.")
+                                        .required(false))
+                                .description("The team that this project is shared with.")
+                                .required(false),
+                            object("workspace")
+                                .properties(string("gid").description("Globally unique identifier for the workspace.")
+                                    .required(false),
+                                    string("name").description("Name of the workspace.")
+                                        .required(false))
+                                .description("The workspace or organization that the project is associated with.")
+                                .required(false))
                         .required(false))
-                .required(false))
-            .metadata(
-                Map.of(
-                    "responseType", ResponseType.JSON))));
+                    .metadata(
+                        Map.of(
+                            "responseType", ResponseType.JSON))));
 
     private AsanaCreateProjectAction() {
     }

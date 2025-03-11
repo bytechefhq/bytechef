@@ -58,22 +58,35 @@ public class ClickupNewTaskTrigger {
             outputSchema(
                 object()
                     .properties(
-                        string(ID),
-                        string(NAME),
-                        string("description"),
-                        string("url"),
+                        string(ID)
+                            .description("The ID of the task."),
+                        string(NAME)
+                            .description("The name of the task."),
+                        string("description")
+                            .description("The description of the task."),
+                        string("url")
+                            .description("The URL of the task."),
                         object("list")
+                            .description("The list the task is in.")
                             .properties(
-                                string(ID),
-                                string(NAME)),
+                                string(ID)
+                                    .description("The ID of the list."),
+                                string(NAME)
+                                    .description("The name of the list.")),
                         object("folder")
+                            .description("The folder the task is in.")
                             .properties(
-                                string(ID),
-                                string(NAME)),
+                                string(ID)
+                                    .description("The ID of the folder."),
+                                string(NAME)
+                                    .description("The name of the folder.")),
                         object("space")
+                            .description("The space the task is in.")
                             .properties(
-                                string(ID),
-                                string(NAME)))))
+                                string(ID)
+                                    .description("The ID of the space."),
+                                string(NAME)
+                                    .description("The name of the space.")))))
         .webhookEnable(ClickupNewTaskTrigger::webhookEnable)
         .webhookDisable(ClickupNewTaskTrigger::webhookDisable)
         .webhookRequest(ClickupNewTaskTrigger::webhookRequest);

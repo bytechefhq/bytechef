@@ -67,18 +67,20 @@ public class AcceloCreateCompanyAction {
                 .description("Any comments or notes made against the company.")
                 .required(false))
         .output(
-            outputSchema(
-                object()
-                    .properties(
-                        object("response").properties(string("id").required(false), string("name").required(false))
-                            .required(false),
-                        object("meta")
-                            .properties(string("more_info").required(false), string("status").required(false),
-                                string("message").required(false))
+            outputSchema(object()
+                .properties(
+                    object("response").properties(string("id").description("The ID of the newly created company.")
+                        .required(false),
+                        string("name").description("The name of the newly created company.")
                             .required(false))
-                    .metadata(
-                        Map.of(
-                            "responseType", ResponseType.JSON))));
+                        .required(false),
+                    object("meta")
+                        .properties(string("more_info").required(false), string("status").required(false),
+                            string("message").required(false))
+                        .required(false))
+                .metadata(
+                    Map.of(
+                        "responseType", ResponseType.JSON))));
 
     private AcceloCreateCompanyAction() {
     }

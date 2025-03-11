@@ -86,14 +86,34 @@ public class ApolloEnrichPersonAction {
                     Map.of(
                         "type", PropertyType.QUERY)))
         .output(outputSchema(object()
-            .properties(object("person")
-                .properties(string("id").required(false), string("first_name").required(false),
-                    string("last_name").required(false), string("name").required(false),
-                    string("linkedin_url").required(false), string("title").required(false),
-                    string("email_status").required(false), string("photo_url").required(false),
-                    string("twitter_url").required(false), string("github_url").required(false),
-                    string("facebook_url").required(false), string("headline").required(false),
-                    string("email").required(false), string("organization_id").required(false))
+            .properties(object("person").properties(string("id").description("The ID of the person.")
+                .required(false),
+                string("first_name").description("The first name of the person.")
+                    .required(false),
+                string("last_name").description("The last name of the person.")
+                    .required(false),
+                string("name").description("The full name of the person.")
+                    .required(false),
+                string("linkedin_url").description("The URL for the person's LinkedIn profile.")
+                    .required(false),
+                string("title").description("The person's job title.")
+                    .required(false),
+                string("email_status").description("The status of the person's email address.")
+                    .required(false),
+                string("photo_url").description("The URL for the person's profile photo.")
+                    .required(false),
+                string("twitter_url").description("The URL for the person's Twitter profile.")
+                    .required(false),
+                string("github_url").description("The URL for the person's GitHub profile.")
+                    .required(false),
+                string("facebook_url").description("The URL for the person's Facebook profile.")
+                    .required(false),
+                string("headline").description("The person's headline or summary.")
+                    .required(false),
+                string("email").description("The person's email address.")
+                    .required(false),
+                string("organization_id").description("The ID of the person's employer.")
+                    .required(false))
                 .required(false))
             .metadata(
                 Map.of(

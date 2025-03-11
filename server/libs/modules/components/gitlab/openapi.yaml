@@ -42,18 +42,24 @@ paths:
               schema:
                 type: "object"
                 properties:
-                      id:
-                        type: "integer"
-                      iid:
-                        type: "integer"
-                      project_id:
-                        type: "integer"
-                      title:
-                        type: "string"
-                      description:
-                        type: "string"
-                      web_url:
-                        type: "string"
+                  id:
+                    type: "integer"
+                    description: "The ID of the issue."
+                  iid:
+                    type: "integer"
+                    description: "The internal ID of the issue."
+                  project_id:
+                    type: "integer"
+                    description: "The ID of the project."
+                  title:
+                    type: "string"
+                    description: "The title of the issue."
+                  description:
+                    type: "string"
+                    description: "The description of the issue."
+                  web_url:
+                    type: "string"
+                    description: "The URL of the issue."
   /projects/{projectId}/issues/{issueId}/notes:
     post:
       summary: "Create Comment on Issue"
@@ -93,10 +99,12 @@ paths:
               schema:
                 type: "object"
                 properties:
-                      id:
-                        type: "integer"
-                      body:
-                        type: "string"
+                  id:
+                    type: "integer"
+                    description: "The ID of the comment."
+                  body:
+                    type: "string"
+                    description: "The body of the comment."
 components:
   securitySchemes:
     oauth2:

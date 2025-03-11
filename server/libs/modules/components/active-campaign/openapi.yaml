@@ -46,8 +46,13 @@ paths:
                     properties:
                       name:
                         type: "string"
+                        description: "Name of the account."
                       accountUrl:
                         type: "string"
+                        description: "Website of the account."
+                      id:
+                        type: "string"
+                        description: "ID of the account."
   /contacts:
     post:
       tags:
@@ -95,12 +100,19 @@ paths:
                       email:
                         type: "string"
                         format: "email"
+                        description: "Email address of the contact."
                       firstName:
                         type: "string"
+                        description: "First name of the contact."
                       lastName:
                         type: "string"
+                        description: "Last name of the contact."
                       phone:
                         type: "string"
+                        description: "Phone number of the contact."
+                      id:
+                        type: "string"
+                        description: "ID of the contact."
   /dealTasks:
     post:
       tags:
@@ -154,17 +166,22 @@ paths:
                     properties:
                       id:
                         type: "string"
+                        description: "ID of the task."
                       title:
                         type: "string"
+                        description: "Title of the task."
                       relid:
                         type: "integer"
                         format: "int32"
+                        description: "ID of the relational object for this task."
                       duedate:
                         type: "string"
                         format: "date"
+                        description: "Due date of the task."
                       dealTasktype:
                         type: "integer"
                         format: "int32"
+                        description: "ID of the task type."
 components:
   securitySchemes:
     ApiKeyAuth:

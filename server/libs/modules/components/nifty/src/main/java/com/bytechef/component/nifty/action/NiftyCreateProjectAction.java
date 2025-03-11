@@ -63,9 +63,14 @@ public class NiftyCreateProjectAction {
                 .description("ID of template that can be used to pre-configure the project.")
                 .required(false)
                 .options((OptionsDataSource.ActionOptionsFunction<String>) NiftyUtils::getTemplateIdOptions))
-        .output(outputSchema(object()
-            .properties(string("id").required(false), string("name").required(false),
-                string("description").required(false), string("template_id").required(false))
+        .output(outputSchema(object().properties(string("id").description("ID of the project.")
+            .required(false),
+            string("name").description("Name of the project.")
+                .required(false),
+            string("description").description("Description of the project.")
+                .required(false),
+            string("template_id").description("ID of the template used to create the project.")
+                .required(false))
             .metadata(
                 Map.of(
                     "responseType", ResponseType.JSON))));

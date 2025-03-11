@@ -67,10 +67,24 @@ public class NiftyGetTrackedTimeReportAction {
                         "type", PropertyType.QUERY)))
         .output(outputSchema(object()
             .properties(array("items")
-                .items(object().properties(string("id").required(false), string("project").required(false),
-                    string("start").required(false), bool("manual").required(false), string("user").required(false),
-                    string("task").required(false), string("end").required(false), bool("active").required(false),
-                    string("duration").required(false)))
+                .items(object().properties(string("id").description("ID of the tracked time entry.")
+                    .required(false),
+                    string("project").description("ID of the project the tracked time entry belongs to.")
+                        .required(false),
+                    string("start").description("Start time of the tracked time entry.")
+                        .required(false),
+                    bool("manual").description("Whether the tracked time entry was manually added.")
+                        .required(false),
+                    string("user").description("ID of the user that tracked the time.")
+                        .required(false),
+                    string("task").description("ID of the task the tracked time entry belongs to.")
+                        .required(false),
+                    string("end").description("End time of the tracked time entry.")
+                        .required(false),
+                    bool("active").description("Whether the tracked time entry is currently active.")
+                        .required(false),
+                    string("duration").description("Duration of the tracked time entry.")
+                        .required(false)))
                 .required(false))
             .metadata(
                 Map.of(

@@ -54,9 +54,13 @@ public class ActiveCampaignCreateAccountAction {
             .label("Account")
             .required(false))
         .output(outputSchema(object()
-            .properties(
-                object("account").properties(string("name").required(false), string("accountUrl").required(false))
+            .properties(object("account").properties(string("name").description("Name of the account.")
+                .required(false),
+                string("accountUrl").description("Website of the account.")
+                    .required(false),
+                string("id").description("ID of the account.")
                     .required(false))
+                .required(false))
             .metadata(
                 Map.of(
                     "responseType", ResponseType.JSON))));

@@ -58,12 +58,22 @@ public class ClickupCreateListAction {
                 .label("Name")
                 .description("The name of the list.")
                 .required(true))
-        .output(outputSchema(object()
-            .properties(string("id").required(false), string("name").required(false),
-                object("folder").properties(string("id").required(false), string("name").required(false))
-                    .required(false),
-                object("space").properties(string("id").required(false), string("name").required(false))
+        .output(outputSchema(object().properties(string("id").description("The ID of the list.")
+            .required(false),
+            string("name").description("The name of the list.")
+                .required(false),
+            object("folder").properties(string("id").description("The ID of the folder.")
+                .required(false),
+                string("name").description("The name of the folder.")
                     .required(false))
+                .description("The folder where the list is located.")
+                .required(false),
+            object("space").properties(string("id").description("The ID of the space.")
+                .required(false),
+                string("name").description("The name of the space.")
+                    .required(false))
+                .description("The space where the folder is located.")
+                .required(false))
             .metadata(
                 Map.of(
                     "responseType", ResponseType.JSON))));
