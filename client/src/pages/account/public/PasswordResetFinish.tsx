@@ -184,7 +184,7 @@ const PasswordResetFinish = () => {
                     />
 
                     <Button
-                        className="active:bg-surface-brand-primary-active w-full bg-surface-brand-primary py-5 hover:bg-surface-brand-primary-hover"
+                        className="w-full bg-surface-brand-primary py-5 hover:bg-surface-brand-primary-hover active:bg-surface-brand-primary-active"
                         data-cy="submit"
                         type="submit"
                     >
