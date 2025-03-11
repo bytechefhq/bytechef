@@ -22,11 +22,15 @@ import static com.bytechef.component.definition.ComponentDsl.number;
 import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.option;
 import static com.bytechef.component.definition.ComponentDsl.string;
+import static com.bytechef.component.google.mail.definition.Format.FULL;
+import static com.bytechef.component.google.mail.definition.Format.MINIMAL;
+import static com.bytechef.component.google.mail.definition.Format.SIMPLE;
 
 import com.bytechef.component.definition.ComponentDsl.ModifiableArrayProperty;
 import com.bytechef.component.definition.ComponentDsl.ModifiableObjectProperty;
 import com.bytechef.component.definition.ComponentDsl.ModifiableStringProperty;
 import com.bytechef.component.definition.Property;
+import com.bytechef.component.google.mail.definition.Format;
 
 /**
  * @author Monika Kušter
@@ -43,20 +47,18 @@ public class GoogleMailConstants {
     public static final String CC = "cc";
     public static final String FORMAT = "format";
     public static final String FROM = "from";
-    public static final String FULL = "full";
     public static final String HEADERS = "headers";
     public static final String HISTORY_ID = "historyId";
     public static final String ID = "id";
     public static final String INCLUDE_SPAM_TRASH = "includeSpamTrash";
     public static final String INTERNAL_DATE = "internalDate";
-    public static final String LABEL = "label";
     public static final String LABEL_IDS = "labelIds";
     public static final String MAX_RESULTS = "maxResults";
     public static final String ME = "me";
     public static final String MESSAGES = "messages";
     public static final String METADATA = "metadata";
     public static final String METADATA_HEADERS = "metadataHeaders";
-    public static final String MINIMAL = "minimal";
+
     public static final String NAME = "name";
     public static final String NEXT_PAGE_TOKEN = "nextPageToken";
     public static final String PAGE_TOKEN = "pageToken";
@@ -64,7 +66,6 @@ public class GoogleMailConstants {
     public static final String RAW = "raw";
     public static final String REPLY_TO = "replyTo";
     public static final String RESULT_SIZE_ESTIMATE = "resultSizeEstimate";
-    public static final String SIMPLE = "simple";
     public static final String SIZE_ESTIMATE = "sizeEstimate";
     public static final String SNIPPET = "snippet";
     public static final String SUBJECT = "subject";
@@ -81,15 +82,15 @@ public class GoogleMailConstants {
         .label("Format")
         .description("The format to return the message in.")
         .options(
-            option("Simple", SIMPLE, "Returns email message's from, to, subject, body and attachments."),
-            option("Minimal", MINIMAL,
+            option("Simple", SIMPLE.name(), "Returns email message's from, to, subject, body and attachments."),
+            option("Minimal", MINIMAL.name(),
                 "Returns only email message ID and labels; does not return the email headers, body, or payload."),
-            option("Full", FULL,
+            option("Full", FULL.name(),
                 "Returns the full email message data with body content parsed in the payload field; the raw field is not used. Format cannot be used when accessing the api using the gmail.metadata scope."),
-            option("Raw", RAW,
+            option("Raw", Format.RAW.name(),
                 "Returns the full email message data with body content in the raw field as a base64url encoded string; the payload field is not used. Format cannot be used when accessing the api using the gmail.metadata scope."),
             option("Metadata", "metadata", "Returns only email message ID, labels, and email headers."))
-        .defaultValue(SIMPLE)
+        .defaultValue(SIMPLE.name())
         .required(false);
 
     public static final ModifiableObjectProperty FULL_MESSAGE_OUTPUT_PROPERTY = object()
@@ -142,7 +143,7 @@ public class GoogleMailConstants {
                         .items()),
             integer(SIZE_ESTIMATE)
                 .description("Estimated size in bytes of the message."),
-            string(RAW)
+            string(Format.RAW.name())
                 .description("The entire email message in an RFC 2822 formatted and base64url encoded string."));
 
     public static final ModifiableArrayProperty METADATA_HEADERS_PROPERTY = array(METADATA_HEADERS)

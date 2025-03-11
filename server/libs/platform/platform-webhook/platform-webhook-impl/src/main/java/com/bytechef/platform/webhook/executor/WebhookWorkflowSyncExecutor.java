@@ -95,8 +95,8 @@ public class WebhookWorkflowSyncExecutor {
             triggerExecution.getMetadata(), MetadataConstants.CONNECTION_IDS, Long.class, Map.of());
 
         TriggerOutput triggerOutput = triggerDefinitionFacade.executeTrigger(
-            workflowNodeType.componentName(), workflowNodeType.componentVersion(),
-            workflowNodeType.componentOperationName(), workflowExecutionId.getType(),
+            workflowNodeType.name(), workflowNodeType.version(),
+            workflowNodeType.operation(), workflowExecutionId.getType(),
             workflowExecutionId.getJobPrincipalId(), workflowExecutionId.getWorkflowReferenceCode(),
             triggerExecution.getParameters(), triggerExecution.getState(),
             MapUtils.get(triggerExecution.getMetadata(), WebhookRequest.WEBHOOK_REQUEST, WebhookRequest.class),
@@ -126,8 +126,8 @@ public class WebhookWorkflowSyncExecutor {
 
         Map<String, Long> connectIdMap = result.connectIdMap();
         return triggerDefinitionFacade.executeWebhookValidate(
-            workflowNodeType.componentName(), workflowNodeType.componentVersion(),
-            workflowNodeType.componentOperationName(), triggerExecution.getParameters(),
+            workflowNodeType.name(), workflowNodeType.version(),
+            workflowNodeType.operation(), triggerExecution.getParameters(),
             webhookRequest, OptionalUtils.orElse(CollectionUtils.findFirst(connectIdMap.values()), null));
     }
 
@@ -141,8 +141,8 @@ public class WebhookWorkflowSyncExecutor {
         WorkflowNodeType workflowNodeType = result.workflowNodeType();
 
         return triggerDefinitionFacade.executeWebhookValidateOnEnable(
-            workflowNodeType.componentName(), workflowNodeType.componentVersion(),
-            workflowNodeType.componentOperationName(), triggerExecution.getParameters(),
+            workflowNodeType.name(), workflowNodeType.version(),
+            workflowNodeType.operation(), triggerExecution.getParameters(),
             webhookRequest, OptionalUtils.orElse(CollectionUtils.findFirst(connectIdMap.values()), null));
     }
 

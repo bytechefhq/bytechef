@@ -17,7 +17,6 @@
 package com.bytechef.platform.configuration.web.rest.mapper;
 
 import com.bytechef.platform.component.domain.ConnectionDefinition;
-import com.bytechef.platform.component.domain.ConnectionDefinitionBasic;
 import com.bytechef.platform.configuration.web.rest.mapper.config.PlatformConfigurationMapperSpringConfig;
 import com.bytechef.platform.configuration.web.rest.model.ConnectionDefinitionBasicModel;
 import com.bytechef.platform.configuration.web.rest.model.ConnectionDefinitionModel;
@@ -29,14 +28,6 @@ import org.springframework.core.convert.converter.Converter;
  * @author Ivica Cardic
  */
 public class ConnectionDefinitionMapper {
-
-    @Mapper(config = PlatformConfigurationMapperSpringConfig.class)
-    public interface ConnectionDefinitionBasicToConnectionDefinitionModelMapper
-        extends Converter<ConnectionDefinitionBasic, ConnectionDefinitionBasicModel> {
-
-        @Override
-        ConnectionDefinitionBasicModel convert(ConnectionDefinitionBasic connectionDefinition);
-    }
 
     @Mapper(config = PlatformConfigurationMapperSpringConfig.class)
     public interface ConnectionDefinitionToConnectionDefinitionModelMapper

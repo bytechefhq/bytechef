@@ -18,22 +18,34 @@ package com.bytechef.platform.component.domain;
 
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.OptionalUtils;
+import com.bytechef.component.definition.TriggerDefinition.TriggerType;
 import com.bytechef.platform.component.definition.PropertyFactory;
 import com.bytechef.platform.domain.OutputResponse;
 import com.bytechef.platform.util.SchemaUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Objects;
+import org.apache.commons.lang3.Validate;
 import org.springframework.lang.Nullable;
 
 /**
  * @author Ivica Cardic
  */
 @SuppressFBWarnings("EI")
-public class TriggerDefinition extends TriggerDefinitionBasic {
+public class TriggerDefinition {
 
+    protected boolean batch;
+    protected String description;
+    protected String componentName;
+    protected int componentVersion;
+    protected Help help;
+    protected String name;
+    protected boolean outputFunctionDefined;
+    protected boolean outputDefined;
     private OutputResponse outputResponse;
     private List<? extends Property> properties;
+    protected String title;
+    protected TriggerType type;
     private boolean webhookRawBody;
     private boolean workflowNodeDescriptionDefined;
     private boolean workflowSyncExecution;
@@ -47,12 +59,23 @@ public class TriggerDefinition extends TriggerDefinitionBasic {
         com.bytechef.component.definition.TriggerDefinition triggerDefinition, String componentName,
         int componentVersion) {
 
-        super(triggerDefinition, componentName, componentVersion);
-
+        this.batch = OptionalUtils.orElse(triggerDefinition.getBatch(), false);
+        this.componentName = componentName;
+        this.componentVersion = componentVersion;
+        this.description = Validate.notNull(getDescription(triggerDefinition), "description");
+        this.help = OptionalUtils.mapOrElse(triggerDefinition.getHelp(), Help::new, null);
+        this.name = Validate.notNull(triggerDefinition.getName(), "name");
+        this.outputDefined = OptionalUtils.mapOrElse(
+            triggerDefinition.getOutputDefinition(), outputDefinition -> true, false);
+        this.outputFunctionDefined = OptionalUtils.mapOrElse(
+            triggerDefinition.getOutputDefinition(),
+            outputDefinition -> OptionalUtils.mapOrElse(outputDefinition.getOutput(), output -> true, false), false);
         this.outputResponse = OptionalUtils.mapOrElse(
             triggerDefinition.getOutputDefinition(), TriggerDefinition::toOutputResponse, null);
         this.properties = CollectionUtils.map(
             OptionalUtils.orElse(triggerDefinition.getProperties(), List.of()), Property::toProperty);
+        this.title = Validate.notNull(getTitle(triggerDefinition), "title");
+        this.type = Validate.notNull(triggerDefinition.getType(), "type");
         this.webhookRawBody = OptionalUtils.orElse(triggerDefinition.getWebhookRawBody(), false);
         this.workflowNodeDescriptionDefined = OptionalUtils.mapOrElse(
             triggerDefinition.getWorkflowNodeDescription(), nodeDescriptionFunction -> true, false);
@@ -64,33 +87,49 @@ public class TriggerDefinition extends TriggerDefinitionBasic {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-
         if (!(o instanceof TriggerDefinition that)) {
             return false;
         }
 
-        if (!super.equals(o)) {
-            return false;
-        }
-
-        return outputDefined == that.outputDefined && outputFunctionDefined == that.outputFunctionDefined &&
-            Objects.equals(outputResponse, that.outputResponse) && Objects.equals(properties, that.properties) &&
+        return batch == that.batch && componentVersion == that.componentVersion &&
+            outputFunctionDefined == that.outputFunctionDefined && outputDefined == that.outputDefined &&
             webhookRawBody == that.webhookRawBody &&
             workflowNodeDescriptionDefined == that.workflowNodeDescriptionDefined &&
             workflowSyncExecution == that.workflowSyncExecution &&
             workflowSyncValidation == that.workflowSyncValidation &&
-            workflowSyncOnEnableValidation == that.workflowSyncOnEnableValidation;
+            workflowSyncOnEnableValidation == that.workflowSyncOnEnableValidation &&
+            Objects.equals(description, that.description) && Objects.equals(componentName, that.componentName) &&
+            Objects.equals(help, that.help) && Objects.equals(name, that.name) &&
+            Objects.equals(outputResponse, that.outputResponse) && Objects.equals(properties, that.properties) &&
+            Objects.equals(title, that.title) && type == that.type;
     }
 
     @Override
     public int hashCode() {
         return Objects.hash(
-            super.hashCode(), outputDefined, outputFunctionDefined, outputResponse, properties, webhookRawBody,
-            workflowNodeDescriptionDefined, workflowSyncExecution, workflowSyncValidation,
-            workflowSyncOnEnableValidation);
+            batch, description, componentName, componentVersion, help, name, outputFunctionDefined, outputDefined,
+            outputResponse, properties, title, type, webhookRawBody, workflowNodeDescriptionDefined,
+            workflowSyncExecution, workflowSyncValidation, workflowSyncOnEnableValidation);
+    }
+
+    public String getComponentName() {
+        return componentName;
+    }
+
+    public int getComponentVersion() {
+        return componentVersion;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public Help getHelp() {
+        return help;
+    }
+
+    public String getName() {
+        return name;
     }
 
     @Nullable
@@ -100,6 +139,26 @@ public class TriggerDefinition extends TriggerDefinitionBasic {
 
     public List<? extends Property> getProperties() {
         return properties;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public TriggerType getType() {
+        return type;
+    }
+
+    public boolean isBatch() {
+        return batch;
+    }
+
+    public boolean isOutputDefined() {
+        return outputDefined;
+    }
+
+    public boolean isOutputFunctionDefined() {
+        return outputFunctionDefined;
     }
 
     public boolean isWebhookRawBody() {
@@ -129,18 +188,28 @@ public class TriggerDefinition extends TriggerDefinitionBasic {
             ", componentName='" + componentName + '\'' +
             ", componentVersion=" + componentVersion +
             ", type=" + type +
-            ", batch=" + batch +
             ", title='" + title + '\'' +
             ", description='" + description + '\'' +
-            ", outputDefined=" + outputDefined +
-            ", outputDefinition=" + outputResponse +
             ", properties=" + properties +
+            ", batch=" + batch +
+            ", outputDefined=" + outputDefined +
+            ", outputFunctionDefined=" + outputFunctionDefined +
+            ", outputResponse=" + outputResponse +
             ", webhookRawBody=" + webhookRawBody +
             ", workflowSyncExecution=" + workflowSyncExecution +
             ", workflowSyncValidation=" + workflowSyncValidation +
-            ", help=" + help +
+            ", workflowSyncOnEnableValidation=" + workflowSyncOnEnableValidation +
             ", workflowNodeDescriptionDefined=" + workflowNodeDescriptionDefined +
-            "} ";
+            ", help=" + help +
+            '}';
+    }
+
+    private static String getDescription(com.bytechef.component.definition.TriggerDefinition triggerDefinition) {
+        return OptionalUtils.orElse(triggerDefinition.getDescription(), getTitle(triggerDefinition));
+    }
+
+    private static String getTitle(com.bytechef.component.definition.TriggerDefinition triggerDefinition) {
+        return OptionalUtils.orElse(triggerDefinition.getTitle(), triggerDefinition.getName());
     }
 
     private static OutputResponse toOutputResponse(

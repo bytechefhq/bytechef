@@ -95,13 +95,21 @@ public interface Context {
      */
     <R> R xml(ContextFunction<Xml, R> xmlFunction);
 
+    /**
+     *
+     * @param <T>
+     */
     @FunctionalInterface
     interface ContextConsumer<T> {
 
         void accept(T t) throws Exception;
-
     }
 
+    /**
+     *
+     * @param <T>
+     * @param <R>
+     */
     @FunctionalInterface
     interface ContextFunction<T, R> {
 

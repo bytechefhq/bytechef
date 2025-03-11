@@ -17,7 +17,7 @@
 package com.bytechef.component.ai.text.task.handler;
 
 import static com.bytechef.component.ai.text.constant.AiTextConstants.SENTIMENT_ANALYSIS;
-import static com.bytechef.platform.component.definition.AiComponentDefinition.AI_TEXT;
+import static com.bytechef.platform.component.definition.AiUniversalComponentDefinition.AI_TEXT;
 
 import com.bytechef.platform.component.facade.ActionDefinitionFacade;
 import com.bytechef.platform.workflow.worker.task.handler.AbstractTaskHandler;

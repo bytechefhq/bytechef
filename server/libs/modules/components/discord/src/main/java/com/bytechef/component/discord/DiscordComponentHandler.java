@@ -61,7 +61,7 @@ public class DiscordComponentHandler extends AbstractDiscordComponentHandler {
             if (Objects.equals(modifiableActionDefinition.getName(), "sendChannelMessage")) {
                 Optional<List<? extends Property>> propertiesOptional = modifiableActionDefinition.getProperties();
 
-                List<Property> properties = new ArrayList<>(propertiesOptional.get());
+                List<Property> properties = new ArrayList<>(propertiesOptional.orElse(List.of()));
 
                 properties.addFirst(GUILD_ID_PROPERTY);
 

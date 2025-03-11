@@ -19,11 +19,12 @@ package com.bytechef.platform.component.service;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.exception.ProviderException;
+import com.bytechef.platform.component.ComponentConnection;
 import com.bytechef.platform.component.domain.ActionDefinition;
-import com.bytechef.platform.component.domain.ComponentConnection;
 import com.bytechef.platform.component.domain.Option;
 import com.bytechef.platform.component.domain.Property;
 import com.bytechef.platform.domain.OutputResponse;
+import com.bytechef.platform.exception.ExecutionException;
 import java.util.List;
 import java.util.Map;
 import org.springframework.lang.Nullable;
@@ -117,7 +118,7 @@ public interface ActionDefinitionService {
      */
     Object executeSingleConnectionPerform(
         String componentName, int componentVersion, String actionName, Map<String, ?> inputParameters,
-        @Nullable ComponentConnection connection, ActionContext context);
+        @Nullable ComponentConnection connection, ActionContext context) throws ExecutionException;
 
     String executeWorkflowNodeDescription(
         String componentName, int componentVersion, String actionName, Map<String, ?> inputParameters,

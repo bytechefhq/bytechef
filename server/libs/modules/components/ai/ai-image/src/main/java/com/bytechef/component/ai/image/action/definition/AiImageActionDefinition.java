@@ -16,17 +16,16 @@
 
 package com.bytechef.component.ai.image.action.definition;
 
-import static com.bytechef.component.ai.image.constant.AiImageConstants.PROVIDER;
-import static com.bytechef.component.ai.llm.constant.Provider.AZURE_OPEN_AI;
-import static com.bytechef.component.ai.llm.constant.Provider.OPEN_AI;
-import static com.bytechef.component.ai.llm.constant.Provider.STABILITY;
+import static com.bytechef.component.ai.llm.Provider.AZURE_OPEN_AI;
+import static com.bytechef.component.ai.llm.Provider.OPEN_AI;
+import static com.bytechef.component.ai.llm.Provider.STABILITY;
+import static com.bytechef.component.ai.llm.constant.LLMConstants.PROVIDER;
 import static com.bytechef.component.definition.Authorization.TOKEN;
 
 import com.bytechef.component.ai.image.action.AiImageAction;
 import com.bytechef.component.ai.llm.ImageModel;
+import com.bytechef.component.ai.llm.Provider;
 import com.bytechef.component.ai.llm.azure.openai.action.AzureOpenAiCreateImageAction;
-import com.bytechef.component.ai.llm.constant.LLMConstants;
-import com.bytechef.component.ai.llm.constant.Provider;
 import com.bytechef.component.ai.llm.stability.action.StabilityCreateImageAction;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ActionDefinition;
@@ -39,6 +38,7 @@ import com.bytechef.platform.configuration.domain.Property;
 import com.bytechef.platform.configuration.domain.Property.Scope;
 import com.bytechef.platform.configuration.service.PropertyService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -76,7 +76,7 @@ public class AiImageActionDefinition extends AbstractActionDefinitionWrapper {
         Map<String, String> modelConnectionParametersMap = new HashMap<>();
 
         List<String> activeProviderKeys = propertyService.getProperties(
-            LLMConstants.PROVIDERS.stream()
+            Arrays.stream(Provider.values())
                 .map(Provider::getKey)
                 .toList(),
             Scope.PLATFORM, null)

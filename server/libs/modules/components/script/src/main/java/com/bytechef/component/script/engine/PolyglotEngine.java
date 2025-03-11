@@ -22,8 +22,7 @@ import static com.bytechef.platform.component.definition.ScriptComponentDefiniti
 import com.bytechef.commons.util.ConvertUtils;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.platform.component.definition.ParameterConnection;
-import com.bytechef.platform.component.domain.ComponentConnection;
+import com.bytechef.platform.component.ComponentConnection;
 import com.bytechef.platform.component.domain.ComponentDefinition;
 import com.bytechef.platform.component.facade.ActionDefinitionFacade;
 import com.bytechef.platform.component.service.ComponentDefinitionService;
@@ -68,7 +67,7 @@ public class PolyglotEngine {
     }
 
     public Object execute(
-        String languageId, Parameters inputParameters, Map<String, ? extends ParameterConnection> parameterConnections,
+        String languageId, Parameters inputParameters, Map<String, ComponentConnection> componentConnections,
         ActionContext actionContext) {
 
         try (Context polyglotContext = getContext()) {
@@ -86,7 +85,7 @@ public class PolyglotEngine {
                 .getMember("perform")
                 .execute(
                     copyToGuestValue(inputParameters.getMap(INPUT, Object.class), languageId),
-                    new ContextProxyObject(actionContext, applicationContext, languageId, parameterConnections));
+                    new ContextProxyObject(actionContext, applicationContext, languageId, componentConnections));
 
             return copyFromPolyglotContext(copyToJavaValue(value));
         }
@@ -222,7 +221,7 @@ public class PolyglotEngine {
 
     private record ActionProxyObject(
         ActionContext actionContext, ApplicationContext applicationContext, ComponentDefinition componentDefinition,
-        String languageId, Map<String, ? extends ParameterConnection> parameterConnections) implements ProxyObject {
+        String languageId, Map<String, ComponentConnection> componentConnections) implements ProxyObject {
 
         @Override
         @SuppressWarnings({
@@ -238,7 +237,7 @@ public class PolyglotEngine {
 
                 ComponentConnection componentConnection = null;
 
-                if (!parameterConnections.isEmpty()) {
+                if (!componentConnections.isEmpty()) {
                     Map.Entry<String, ComponentConnection> entry;
 
                     if (arguments.length < 2) {
@@ -285,7 +284,7 @@ public class PolyglotEngine {
         }
 
         private Map.Entry<String, ComponentConnection> getComponentConnectionEntry(String connectionName) {
-            return parameterConnections
+            return componentConnections
                 .entrySet()
                 .stream()
                 .filter(entry -> Objects.equals(entry.getKey(), connectionName))
@@ -296,23 +295,23 @@ public class PolyglotEngine {
         }
 
         private Map.Entry<String, ComponentConnection> getFirstComponentConnectionEntry() {
-            return parameterConnections.entrySet()
+            return componentConnections.entrySet()
                 .stream()
                 .filter(entry -> {
-                    ParameterConnection parameterConnection = entry.getValue();
+                    ComponentConnection componentConnection = entry.getValue();
 
-                    return Objects.equals(parameterConnection.getComponentName(), componentDefinition.getName());
+                    return Objects.equals(componentConnection.getComponentName(), componentDefinition.getName());
                 })
                 .findFirst()
                 .map(entry -> Map.entry(entry.getKey(), toComponentConnection(entry.getValue())))
                 .orElse(null);
         }
 
-        private ComponentConnection toComponentConnection(ParameterConnection parameterConnection) {
+        private ComponentConnection toComponentConnection(ComponentConnection componentConnection) {
             return new ComponentConnection(
-                parameterConnection.getComponentName(), parameterConnection.getVersion(),
-                parameterConnection.getConnectionId(), parameterConnection.getParameters(),
-                parameterConnection.getAuthorizationName());
+                componentConnection.getComponentName(), componentConnection.getVersion(),
+                componentConnection.getConnectionId(), componentConnection.getParameters(),
+                componentConnection.getAuthorizationName());
         }
     }
 
@@ -322,23 +321,23 @@ public class PolyglotEngine {
         private final ApplicationContext applicationContext;
         private final Map<String, ComponentDefinition> componentDefinitionMap = new ConcurrentHashMap<>();
         private final String languageId;
-        private final Map<String, ? extends ParameterConnection> parameterConnections;
+        private final Map<String, ComponentConnection> componentConnections;
 
         private ComponentProxyObject(
             ActionContext actionContext, ApplicationContext applicationContext, String languageId,
-            Map<String, ? extends ParameterConnection> parameterConnections) {
+            Map<String, ComponentConnection> componentConnections) {
 
             this.actionContext = actionContext;
             this.applicationContext = applicationContext;
             this.languageId = languageId;
-            this.parameterConnections = parameterConnections;
+            this.componentConnections = componentConnections;
         }
 
         @Override
         public Object getMember(String componentName) {
             return new ActionProxyObject(
                 actionContext, applicationContext, componentDefinitionMap.get(componentName), languageId,
-                parameterConnections);
+                componentConnections);
         }
 
         @Override
@@ -365,12 +364,12 @@ public class PolyglotEngine {
 
     private record ContextProxyObject(
         ActionContext actionContext, ApplicationContext applicationContext, String languageId,
-        Map<String, ? extends ParameterConnection> parameterConnections) implements ProxyObject {
+        Map<String, ComponentConnection> componentConnections) implements ProxyObject {
 
         @Override
         public Object getMember(String name) {
             if (Objects.equals(name, "component")) {
-                return new ComponentProxyObject(actionContext, applicationContext, languageId, parameterConnections);
+                return new ComponentProxyObject(actionContext, applicationContext, languageId, componentConnections);
             }
 
             return null;

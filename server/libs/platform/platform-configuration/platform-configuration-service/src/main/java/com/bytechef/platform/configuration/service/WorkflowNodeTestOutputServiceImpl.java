@@ -113,7 +113,7 @@ public class WorkflowNodeTestOutputServiceImpl implements WorkflowNodeTestOutput
                         WorkflowNodeType workflowNodeType = WorkflowNodeType.ofType(workflowTrigger.getType());
 
                         if (!Objects.equals(
-                            workflowNodeType.componentOperationName(),
+                            workflowNodeType.operation(),
                             workflowNodeTestOutput.getComponentOperationName())) {
 
                             workflowNodeTestOutputRepository.delete(workflowNodeTestOutput);
@@ -145,9 +145,9 @@ public class WorkflowNodeTestOutputServiceImpl implements WorkflowNodeTestOutput
             workflowNodeTestOutputRepository.findByWorkflowIdAndWorkflowNodeName(workflowId, workflowNodeName),
             new WorkflowNodeTestOutput());
 
-        workflowNodeTestOutput.setComponentName(workflowNodeType.componentName());
-        workflowNodeTestOutput.setComponentOperationName(workflowNodeType.componentOperationName());
-        workflowNodeTestOutput.setComponentVersion(workflowNodeType.componentVersion());
+        workflowNodeTestOutput.setComponentName(workflowNodeType.name());
+        workflowNodeTestOutput.setComponentOperationName(workflowNodeType.operation());
+        workflowNodeTestOutput.setComponentVersion(workflowNodeType.version());
         workflowNodeTestOutput.setOutputSchema(outputSchema);
         workflowNodeTestOutput.setSampleOutput(sampleOutput);
         workflowNodeTestOutput.setWorkflowId(workflowId);

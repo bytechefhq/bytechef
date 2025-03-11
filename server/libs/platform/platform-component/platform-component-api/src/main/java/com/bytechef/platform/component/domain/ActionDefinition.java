@@ -24,16 +24,27 @@ import com.bytechef.platform.util.SchemaUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Objects;
+import org.apache.commons.lang3.Validate;
 import org.springframework.lang.Nullable;
 
 /**
  * @author Ivica Cardic
  */
 @SuppressFBWarnings("EI")
-public class ActionDefinition extends ActionDefinitionBasic {
+public class ActionDefinition {
 
+    private boolean batch;
+    private String componentName;
+    private int componentVersion;
+    private String description;
+    private Help help;
+    private String name;
+    private boolean outputDefined;
+    private boolean outputFunctionDefined;
     private OutputResponse outputResponse;
     private List<? extends Property> properties;
+    boolean singleConnection;
+    private String title;
     private boolean workflowNodeDescriptionDefined;
 
     private ActionDefinition() {
@@ -43,40 +54,71 @@ public class ActionDefinition extends ActionDefinitionBasic {
         com.bytechef.component.definition.ActionDefinition actionDefinition, String componentName,
         int componentVersion) {
 
-        super(actionDefinition, componentName, componentVersion);
-
+        this.batch = OptionalUtils.orElse(actionDefinition.getBatch(), false);
+        this.componentName = componentName;
+        this.componentVersion = componentVersion;
+        this.description = Validate.notNull(getDescription(actionDefinition), "description");
+        this.help = OptionalUtils.mapOrElse(actionDefinition.getHelp(), Help::new, null);
+        this.name = Validate.notNull(actionDefinition.getName(), "name");
+        this.outputDefined = OptionalUtils.mapOrElse(
+            actionDefinition.getOutputDefinition(), outputDefinition -> true, false);
+        this.outputFunctionDefined = OptionalUtils.mapOrElse(
+            actionDefinition.getOutputDefinition(),
+            outputDefinition -> OptionalUtils.mapOrElse(outputDefinition.getOutput(), output -> true, false), false);
         this.outputResponse = OptionalUtils.mapOrElse(
             actionDefinition.getOutputDefinition(), ActionDefinition::toOutputResponse, null);
         this.properties = CollectionUtils.map(
             OptionalUtils.orElse(actionDefinition.getProperties(), List.of()), Property::toProperty);
+        this.singleConnection = OptionalUtils.mapOrElse(
+            actionDefinition.getPerform(),
+            perform -> perform instanceof com.bytechef.component.definition.ActionDefinition.SingleConnectionPerformFunction,
+            false);
+        this.title = Validate.notNull(getTitle(actionDefinition), "title");
         this.workflowNodeDescriptionDefined = OptionalUtils.mapOrElse(
             actionDefinition.getWorkflowNodeDescription(), workflowNodeDescriptionFunction -> true, false);
     }
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
 
         if (!(o instanceof ActionDefinition that)) {
             return false;
         }
 
-        if (!super.equals(o)) {
-            return false;
-        }
-
-        return outputDefined == that.outputDefined && outputFunctionDefined == that.outputFunctionDefined &&
+        return batch == that.batch && componentVersion == that.componentVersion &&
+            outputDefined == that.outputDefined && outputFunctionDefined == that.outputFunctionDefined &&
+            workflowNodeDescriptionDefined == that.workflowNodeDescriptionDefined &&
+            Objects.equals(componentName, that.componentName) && Objects.equals(description, that.description) &&
+            Objects.equals(help, that.help) && Objects.equals(name, that.name) &&
             Objects.equals(outputResponse, that.outputResponse) && Objects.equals(properties, that.properties) &&
-            workflowNodeDescriptionDefined == that.workflowNodeDescriptionDefined;
+            Objects.equals(title, that.title);
     }
 
     @Override
     public int hashCode() {
         return Objects.hash(
-            super.hashCode(), outputDefined, outputFunctionDefined, outputResponse, properties,
-            workflowNodeDescriptionDefined);
+            batch, componentName, componentVersion, description, help, name, outputDefined, outputFunctionDefined,
+            outputResponse, properties, title, workflowNodeDescriptionDefined);
+    }
+
+    public String getComponentName() {
+        return componentName;
+    }
+
+    public int getComponentVersion() {
+        return componentVersion;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public Help getHelp() {
+        return help;
+    }
+
+    public String getName() {
+        return name;
     }
 
     @Nullable
@@ -86,6 +128,26 @@ public class ActionDefinition extends ActionDefinitionBasic {
 
     public List<? extends Property> getProperties() {
         return properties;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public boolean isBatch() {
+        return batch;
+    }
+
+    public boolean isOutputDefined() {
+        return outputDefined;
+    }
+
+    public boolean isOutputFunctionDefined() {
+        return outputFunctionDefined;
+    }
+
+    public boolean isSingleConnection() {
+        return singleConnection;
     }
 
     public boolean isWorkflowNodeDescriptionDefined() {
@@ -98,15 +160,27 @@ public class ActionDefinition extends ActionDefinitionBasic {
             "name='" + name + '\'' +
             ", componentName='" + componentName + '\'' +
             ", componentVersion=" + componentVersion +
-            ", batch=" + batch +
             ", title='" + title + '\'' +
             ", description='" + description + '\'' +
-            ", outputDefined=" + outputDefined +
-            ", outputResponse=" + outputResponse +
             ", properties=" + properties +
+            ", batch=" + batch +
+            ", batch=" + batch +
+            ", outputDefined=" + outputDefined +
+            ", outputFunctionDefined=" + outputFunctionDefined +
+            ", outputResponse=" + outputResponse +
             ", help=" + help +
             ", workflowNodeDescriptionDefined=" + workflowNodeDescriptionDefined +
-            "} ";
+            '}';
+    }
+
+    private static String getDescription(com.bytechef.component.definition.ActionDefinition actionDefinition) {
+        return OptionalUtils.orElse(
+            actionDefinition.getDescription(),
+            OptionalUtils.orElse(actionDefinition.getTitle(), actionDefinition.getName()));
+    }
+
+    private static String getTitle(com.bytechef.component.definition.ActionDefinition actionDefinition) {
+        return OptionalUtils.orElse(actionDefinition.getTitle(), actionDefinition.getName());
     }
 
     private static OutputResponse toOutputResponse(

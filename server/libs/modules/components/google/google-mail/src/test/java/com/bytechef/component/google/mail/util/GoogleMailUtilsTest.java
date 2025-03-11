@@ -19,15 +19,10 @@ package com.bytechef.component.google.mail.util;
 import static com.bytechef.component.definition.Authorization.ACCESS_TOKEN;
 import static com.bytechef.component.definition.ComponentDsl.option;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.FORMAT;
-import static com.bytechef.component.google.mail.constant.GoogleMailConstants.FULL;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.FULL_MESSAGE_OUTPUT_PROPERTY;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.ID;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.ME;
-import static com.bytechef.component.google.mail.constant.GoogleMailConstants.METADATA;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.METADATA_HEADERS;
-import static com.bytechef.component.google.mail.constant.GoogleMailConstants.MINIMAL;
-import static com.bytechef.component.google.mail.constant.GoogleMailConstants.RAW;
-import static com.bytechef.component.google.mail.constant.GoogleMailConstants.SIMPLE;
 import static com.bytechef.component.google.mail.util.GoogleMailUtils.METADATA_MESSAGE_OUTPUT_PROPERTY;
 import static com.bytechef.component.google.mail.util.GoogleMailUtils.MINIMAL_MESSAGE_OUTPUT_PROPERTY;
 import static com.bytechef.component.google.mail.util.GoogleMailUtils.RAW_MESSAGE_OUTPUT_PROPERTY;
@@ -42,6 +37,7 @@ import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableObjectProperty;
 import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Parameters;
+import com.bytechef.component.google.mail.definition.Format;
 import com.bytechef.component.test.definition.MockParametersFactory;
 import com.bytechef.google.commons.GoogleServices;
 import com.google.api.services.gmail.Gmail;
@@ -122,7 +118,7 @@ class GoogleMailUtilsTest {
     @SuppressWarnings("unchecked")
     void testGetMessage() throws IOException {
         parameters = MockParametersFactory.create(
-            Map.of(FORMAT, FULL, ID, "id", METADATA_HEADERS, List.of("metadata")));
+            Map.of(FORMAT, Format.FULL, ID, "id", METADATA_HEADERS, List.of("metadata")));
 
         Message message = new Message().setId("id");
 
@@ -142,7 +138,7 @@ class GoogleMailUtilsTest {
         Message result = GoogleMailUtils.getMessage(parameters, mockedGmail);
 
         assertEquals(message, result);
-        assertEquals(List.of(ME, "id", FULL), stringArgumentCaptor.getAllValues());
+        assertEquals(List.of(ME, "id", Format.FULL), stringArgumentCaptor.getAllValues());
         assertEquals(List.of("metadata"), listArgumentCaptor.getValue());
     }
 
@@ -232,35 +228,35 @@ class GoogleMailUtilsTest {
 
     @Test
     void tesGetMessageOutputForSimpleFormat() {
-        ModifiableObjectProperty messageOutputProperty = GoogleMailUtils.getMessageOutputProperty(SIMPLE);
+        ModifiableObjectProperty messageOutputProperty = GoogleMailUtils.getMessageOutputProperty(Format.SIMPLE);
 
         assertEquals(SIMPLE_MESSAGE_OUTPUT_PROPERTY, messageOutputProperty);
     }
 
     @Test
     void testGetMessageOutputForRawFormat() {
-        ModifiableObjectProperty messageOutputProperty = GoogleMailUtils.getMessageOutputProperty(RAW);
+        ModifiableObjectProperty messageOutputProperty = GoogleMailUtils.getMessageOutputProperty(Format.RAW);
 
         assertEquals(RAW_MESSAGE_OUTPUT_PROPERTY, messageOutputProperty);
     }
 
     @Test
     void testGetMessageOutputForMinimalFormat() {
-        ModifiableObjectProperty messageOutputProperty = GoogleMailUtils.getMessageOutputProperty(MINIMAL);
+        ModifiableObjectProperty messageOutputProperty = GoogleMailUtils.getMessageOutputProperty(Format.MINIMAL);
 
         assertEquals(MINIMAL_MESSAGE_OUTPUT_PROPERTY, messageOutputProperty);
     }
 
     @Test
     void testGetMessageOutputForMetadataFormat() {
-        ModifiableObjectProperty messageOutputProperty = GoogleMailUtils.getMessageOutputProperty(METADATA);
+        ModifiableObjectProperty messageOutputProperty = GoogleMailUtils.getMessageOutputProperty(Format.METADATA);
 
         assertEquals(METADATA_MESSAGE_OUTPUT_PROPERTY, messageOutputProperty);
     }
 
     @Test
     void testGetMessageOutputForFullFormat() {
-        ModifiableObjectProperty messageOutputProperty = GoogleMailUtils.getMessageOutputProperty(FULL);
+        ModifiableObjectProperty messageOutputProperty = GoogleMailUtils.getMessageOutputProperty(Format.FULL);
 
         assertEquals(FULL_MESSAGE_OUTPUT_PROPERTY, messageOutputProperty);
     }

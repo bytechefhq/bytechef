@@ -44,7 +44,7 @@ import com.bytechef.component.ai.llm.ImageModel;
 import com.bytechef.component.ai.llm.ImageModel.ResponseFormat;
 import com.bytechef.component.ai.llm.ImageModel.Style;
 import com.bytechef.component.ai.llm.azure.openai.constant.AzureOpenAiConstants;
-import com.bytechef.component.ai.llm.azure.openai.constant.Size;
+import com.bytechef.component.ai.llm.azure.openai.definition.Size;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Parameters;

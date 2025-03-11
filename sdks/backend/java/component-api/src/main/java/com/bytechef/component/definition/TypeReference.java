@@ -22,6 +22,8 @@ import java.lang.reflect.Type;
 
 /**
  * @param <T>
+ *
+ * @author Ivica Cardic
  */
 public abstract class TypeReference<T> implements Comparable<TypeReference<T>> {
 

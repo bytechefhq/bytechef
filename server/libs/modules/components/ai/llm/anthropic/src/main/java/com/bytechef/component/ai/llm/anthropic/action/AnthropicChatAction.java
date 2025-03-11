@@ -72,16 +72,19 @@ public class AnthropicChatAction {
         .output(LLMUtils::output)
         .perform(AnthropicChatAction::perform);
 
-    public static final ChatModel CHAT_MODEL = (inputParameters, connectionParameters) -> new AnthropicChatModel(
-        new AnthropicApi(connectionParameters.getString(TOKEN)),
-        AnthropicChatOptions.builder()
-            .model(inputParameters.getRequiredString(MODEL))
-            .temperature(inputParameters.getDouble(TEMPERATURE))
-            .maxTokens(inputParameters.getInteger(MAX_TOKENS))
-            .topP(inputParameters.getDouble(TOP_P))
-            .stopSequences(inputParameters.getList(STOP, new TypeReference<>() {}))
-            .topK(inputParameters.getInteger(TOP_K))
-            .build());
+    public static final ChatModel CHAT_MODEL = (inputParameters, connectionParameters) -> AnthropicChatModel.builder()
+        .anthropicApi(
+            new AnthropicApi(connectionParameters.getString(TOKEN)))
+        .defaultOptions(
+            AnthropicChatOptions.builder()
+                .model(inputParameters.getRequiredString(MODEL))
+                .temperature(inputParameters.getDouble(TEMPERATURE))
+                .maxTokens(inputParameters.getInteger(MAX_TOKENS))
+                .topP(inputParameters.getDouble(TOP_P))
+                .stopSequences(inputParameters.getList(STOP, new TypeReference<>() {}))
+                .topK(inputParameters.getInteger(TOP_K))
+                .build())
+        .build();
 
     private AnthropicChatAction() {
     }

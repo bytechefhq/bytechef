@@ -34,9 +34,15 @@ public interface ComponentDefinition {
     Optional<List<? extends ActionDefinition>> getActions();
 
     /**
+     *
      * @return
      */
-    Optional<List<ComponentCategory>> getCategories();
+    Optional<List<? extends ClusterElementDefinition<?>>> getClusterElements();
+
+    /**
+     * @return
+     */
+    Optional<List<ComponentCategory>> getComponentCategories();
 
     /**
      *
@@ -55,12 +61,6 @@ public interface ComponentDefinition {
      * @return
      */
     Optional<Help> getCustomActionHelp();
-
-    /**
-     *
-     * @return
-     */
-    Optional<DataStreamDefinition> getDataStream();
 
     /**
      *

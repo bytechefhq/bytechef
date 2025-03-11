@@ -18,7 +18,6 @@ package com.bytechef.platform.component.definition;
 
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.component.definition.ActionDefinition;
-import com.bytechef.component.definition.ActionWorkflowNodeDescriptionFunction;
 import com.bytechef.component.definition.Help;
 import com.bytechef.component.definition.OutputDefinition;
 import com.bytechef.component.definition.Property;

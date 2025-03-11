@@ -20,6 +20,7 @@ import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.definition.BaseOutputDefinition.OutputResponse;
 import com.bytechef.definition.BaseOutputFunction;
+import com.bytechef.platform.component.ComponentConnection;
 import java.util.Map;
 
 /**
@@ -31,12 +32,12 @@ public interface MultipleConnectionsOutputFunction extends BaseOutputFunction {
     /**
      *
      * @param inputParameters
-     * @param parameterConnections
+     * @param componentConnections
      * @param context
      * @return
      * @throws Exception
      */
     OutputResponse apply(
-        Parameters inputParameters, Map<String, ? extends ParameterConnection> parameterConnections,
+        Parameters inputParameters, Map<String, ? extends ComponentConnection> componentConnections,
         Parameters extensions, ActionContext context) throws Exception;
 }

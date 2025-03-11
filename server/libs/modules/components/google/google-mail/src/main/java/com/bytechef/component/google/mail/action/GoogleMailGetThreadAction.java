@@ -22,15 +22,14 @@ import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.FORMAT;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.FORMAT_PROPERTY;
-import static com.bytechef.component.google.mail.constant.GoogleMailConstants.FULL;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.HISTORY_ID;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.ID;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.ME;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.MESSAGES;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.METADATA_HEADERS;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.METADATA_HEADERS_PROPERTY;
-import static com.bytechef.component.google.mail.constant.GoogleMailConstants.SIMPLE;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.SNIPPET;
+import static com.bytechef.component.google.mail.definition.Format.SIMPLE;
 import static com.bytechef.component.google.mail.util.GoogleMailUtils.getMessageOutputProperty;
 import static com.bytechef.component.google.mail.util.GoogleMailUtils.getSimpleMessage;
 
@@ -38,6 +37,7 @@ import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.Parameters;
+import com.bytechef.component.google.mail.definition.Format;
 import com.bytechef.component.google.mail.util.GoogleMailUtils;
 import com.bytechef.component.google.mail.util.GoogleMailUtils.SimpleMessage;
 import com.bytechef.definition.BaseOutputDefinition.OutputResponse;
@@ -78,11 +78,11 @@ public class GoogleMailGetThreadAction {
 
         Gmail gmail = GoogleServices.getMail(connectionParameters);
 
-        String format = inputParameters.getRequiredString(FORMAT);
+        Format format = inputParameters.getRequired(FORMAT, Format.class);
 
         Thread thread = getThread(inputParameters, gmail, format);
 
-        if (format.equals(SIMPLE)) {
+        if (format == SIMPLE) {
             List<SimpleMessage> simpleMessages = new ArrayList<>();
 
             for (Message message : thread.getMessages()) {
@@ -95,11 +95,11 @@ public class GoogleMailGetThreadAction {
         }
     }
 
-    private static Thread getThread(Parameters inputParameters, Gmail gmail, String format) throws IOException {
+    private static Thread getThread(Parameters inputParameters, Gmail gmail, Format format) throws IOException {
         return gmail.users()
             .threads()
             .get(ME, inputParameters.getRequiredString(ID))
-            .setFormat(format.equals(SIMPLE) ? FULL : format)
+            .setFormat(format == SIMPLE ? Format.FULL.getMapping() : format.getMapping())
             .setMetadataHeaders(inputParameters.getList(METADATA_HEADERS, String.class, List.of()))
             .execute();
     }
@@ -123,6 +123,6 @@ public class GoogleMailGetThreadAction {
                         .description("The ID of the last history record that modified this thread."),
                     array(MESSAGES)
                         .description("List of messages in the thread.")
-                        .items(getMessageOutputProperty(inputParameters.getRequiredString(FORMAT)))));
+                        .items(getMessageOutputProperty(inputParameters.getRequired(FORMAT, Format.class)))));
     }
 }

@@ -54,7 +54,6 @@ import com.bytechef.component.definition.TypeReference;
 import org.springframework.ai.watsonx.WatsonxAiChatModel;
 import org.springframework.ai.watsonx.WatsonxAiChatOptions;
 import org.springframework.ai.watsonx.api.WatsonxAiApi;
-import org.springframework.web.client.RestClient;
 
 /**
  * @author Marko Kriskovic
@@ -100,7 +99,7 @@ public class WatsonxChatAction {
             connectionParameters.getString(URL),
             connectionParameters.getString(STREAM_ENDPOINT), connectionParameters.getString(TEXT_ENDPOINT),
             null, connectionParameters.getString(PROJECT_ID), connectionParameters.getString(TOKEN),
-            RestClient.builder()),
+            LLMUtils.getRestClientBuilder()),
         WatsonxAiChatOptions.builder()
             .model(inputParameters.getString(MODEL))
             .temperature(inputParameters.getDouble(TEMPERATURE))

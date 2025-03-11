@@ -40,6 +40,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * @author Marko Kriskovic
+ */
 public class SentimentAction implements AiTextAction {
 
     public final AiTextActionDefinition actionDefinition;

@@ -16,17 +16,6 @@
 
 package com.bytechef.platform.component.service;
 
-import com.bytechef.component.definition.DataStreamItemReader;
-import com.bytechef.component.definition.DataStreamItemWriter;
-import com.bytechef.component.definition.UnifiedApiDefinition.Category;
-import com.bytechef.component.definition.UnifiedApiDefinition.ModelType;
-import com.bytechef.component.definition.unified.base.adapter.ProviderModelAdapter;
-import com.bytechef.component.definition.unified.base.mapper.ProviderModelMapper;
-import com.bytechef.component.definition.unified.base.model.ProviderInputModel;
-import com.bytechef.component.definition.unified.base.model.ProviderOutputModel;
-import com.bytechef.component.definition.unified.base.model.UnifiedInputModel;
-import com.bytechef.component.definition.unified.base.model.UnifiedOutputModel;
-import com.bytechef.platform.component.definition.DataStreamComponentDefinition.ComponentType;
 import com.bytechef.platform.component.domain.ComponentDefinition;
 import java.util.List;
 import java.util.Optional;
@@ -48,21 +37,6 @@ public interface ComponentDefinitionService {
     List<ComponentDefinition> getComponentDefinitionVersions(String name);
 
     ComponentDefinition getConnectionComponentDefinition(String name, int connectionVersion);
-
-    List<ComponentDefinition> getDataStreamComponentDefinitions(ComponentType componentType);
-
-    DataStreamItemReader getDataStreamItemReader(String componentName, int componentVersion);
-
-    DataStreamItemWriter getDataStreamItemWriter(String componentName, int componentVersion);
-
-    List<ComponentDefinition> getUnifiedApiComponentDefinitions(Category category);
-
-    ProviderModelAdapter<? super ProviderInputModel, ? extends ProviderOutputModel> getUnifiedApiProviderModelAdapter(
-        String componentName, Category category, ModelType modelType);
-
-    ProviderModelMapper<? super UnifiedInputModel, ? extends UnifiedOutputModel, ? extends ProviderInputModel, ? super ProviderOutputModel>
-        getUnifiedApiProviderModelMapper(
-            String componentName, Category category, ModelType modelType);
 
     boolean hasComponentDefinition(String name, Integer version);
 }

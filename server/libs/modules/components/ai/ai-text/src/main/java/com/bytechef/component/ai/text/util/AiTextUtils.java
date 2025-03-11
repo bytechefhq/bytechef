@@ -16,27 +16,26 @@
 
 package com.bytechef.component.ai.text.util;
 
-import static com.bytechef.component.ai.llm.constant.Provider.AMAZON_BEDROCK_ANTHROPIC2;
-import static com.bytechef.component.ai.llm.constant.Provider.AMAZON_BEDROCK_ANTHROPIC3;
-import static com.bytechef.component.ai.llm.constant.Provider.AMAZON_BEDROCK_COHERE;
-import static com.bytechef.component.ai.llm.constant.Provider.AMAZON_BEDROCK_JURASSIC2;
-import static com.bytechef.component.ai.llm.constant.Provider.AMAZON_BEDROCK_LLAMA;
-import static com.bytechef.component.ai.llm.constant.Provider.AMAZON_BEDROCK_TITAN;
-import static com.bytechef.component.ai.llm.constant.Provider.ANTHROPIC;
-import static com.bytechef.component.ai.llm.constant.Provider.AZURE_OPEN_AI;
-import static com.bytechef.component.ai.llm.constant.Provider.GROQ;
-import static com.bytechef.component.ai.llm.constant.Provider.HUGGING_FACE;
-import static com.bytechef.component.ai.llm.constant.Provider.MISTRAL;
-import static com.bytechef.component.ai.llm.constant.Provider.NVIDIA;
-import static com.bytechef.component.ai.llm.constant.Provider.OPEN_AI;
-import static com.bytechef.component.ai.llm.constant.Provider.VERTEX_GEMINI;
-import static com.bytechef.component.ai.text.constant.AiTextConstants.PROVIDER;
+import static com.bytechef.component.ai.llm.Provider.AMAZON_BEDROCK_ANTHROPIC2;
+import static com.bytechef.component.ai.llm.Provider.AMAZON_BEDROCK_ANTHROPIC3;
+import static com.bytechef.component.ai.llm.Provider.AMAZON_BEDROCK_COHERE;
+import static com.bytechef.component.ai.llm.Provider.AMAZON_BEDROCK_JURASSIC2;
+import static com.bytechef.component.ai.llm.Provider.AMAZON_BEDROCK_LLAMA;
+import static com.bytechef.component.ai.llm.Provider.AMAZON_BEDROCK_TITAN;
+import static com.bytechef.component.ai.llm.Provider.ANTHROPIC;
+import static com.bytechef.component.ai.llm.Provider.AZURE_OPEN_AI;
+import static com.bytechef.component.ai.llm.Provider.GROQ;
+import static com.bytechef.component.ai.llm.Provider.HUGGING_FACE;
+import static com.bytechef.component.ai.llm.Provider.MISTRAL;
+import static com.bytechef.component.ai.llm.Provider.NVIDIA;
+import static com.bytechef.component.ai.llm.Provider.OPEN_AI;
+import static com.bytechef.component.ai.llm.Provider.VERTEX_GEMINI;
+import static com.bytechef.component.ai.llm.constant.LLMConstants.PROVIDER;
 import static com.bytechef.component.definition.ComponentDsl.option;
 
+import com.bytechef.component.ai.llm.Provider;
 import com.bytechef.component.ai.llm.anthropic.constant.AnthropicConstants;
 import com.bytechef.component.ai.llm.azure.openai.constant.AzureOpenAiConstants;
-import com.bytechef.component.ai.llm.constant.LLMConstants;
-import com.bytechef.component.ai.llm.constant.Provider;
 import com.bytechef.component.ai.llm.mistral.constant.MistralConstants;
 import com.bytechef.component.ai.llm.vertex.gemini.constant.VertexGeminiConstants;
 import com.bytechef.component.definition.ActionContext;
@@ -55,6 +54,7 @@ import com.bytechef.config.ApplicationProperties.Ai.Provider.VertexGemini;
 import com.bytechef.platform.configuration.domain.Property;
 import com.bytechef.platform.configuration.domain.Property.Scope;
 import com.bytechef.platform.configuration.service.PropertyService;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Predicate;
@@ -93,7 +93,7 @@ public class AiTextUtils {
         Ai.Provider aiProvider, PropertyService propertyService) {
 
         List<String> activeProviderKeys = propertyService.getProperties(
-            LLMConstants.PROVIDERS.stream()
+            Arrays.stream(Provider.values())
                 .map(Provider::getKey)
                 .toList(),
             Scope.PLATFORM, null)
@@ -102,7 +102,7 @@ public class AiTextUtils {
             .map(Property::getKey)
             .toList();
 
-        return LLMConstants.PROVIDERS.stream()
+        return Arrays.stream(Provider.values())
             .filter(filter(aiProvider, activeProviderKeys))
             .map(provider -> option(provider.getLabel(), String.valueOf(provider)))
             .toList();

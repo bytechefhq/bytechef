@@ -16,8 +16,12 @@
 
 package com.bytechef.component.openai.constant;
 
+import static com.bytechef.component.ai.llm.constant.LLMConstants.MODEL;
+import static com.bytechef.component.definition.ComponentDsl.string;
+
 import com.bytechef.component.ai.llm.util.LLMUtils;
 import com.bytechef.component.definition.Option;
+import com.bytechef.component.definition.Property;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -32,15 +36,21 @@ public final class OpenAiConstants {
 
     public static final String QUALITY = "quality";
 
-    public static final List<Option<String>> TEXT_MODELS = LLMUtils.getEnumOptions(
-        Arrays.stream(OpenAiApi.ChatModel.values())
-            .collect(Collectors.toMap(OpenAiApi.ChatModel::getValue, OpenAiApi.ChatModel::getValue)));
-
     public static final List<Option<String>> IMAGE_MODELS = LLMUtils.getEnumOptions(
         Arrays.stream(OpenAiImageApi.ImageModel.values())
             .collect(
                 Collectors.toMap(
                     OpenAiImageApi.ImageModel::getValue, OpenAiImageApi.ImageModel::getValue)));
+
+    public static final List<Option<String>> TEXT_MODELS = LLMUtils.getEnumOptions(
+        Arrays.stream(OpenAiApi.ChatModel.values())
+            .collect(Collectors.toMap(OpenAiApi.ChatModel::getValue, OpenAiApi.ChatModel::getValue)));
+
+    public static final Property MODEL_PROPERTY = string(MODEL)
+        .label("Model")
+        .description("ID of the model to use.")
+        .required(true)
+        .options(TEXT_MODELS);
 
     private OpenAiConstants() {
     }

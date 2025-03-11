@@ -29,6 +29,9 @@ import com.bytechef.component.google.mail.action.GoogleMailGetThreadAction;
 import com.bytechef.component.google.mail.action.GoogleMailReplyToEmailAction;
 import com.bytechef.component.google.mail.action.GoogleMailSearchEmailAction;
 import com.bytechef.component.google.mail.action.GoogleMailSendEmailAction;
+import com.bytechef.component.google.mail.aiagent.GoogleMailGetMailTool;
+import com.bytechef.component.google.mail.aiagent.GoogleMailSearchEmailTool;
+import com.bytechef.component.google.mail.aiagent.GoogleMailSendEmailTool;
 import com.bytechef.component.google.mail.trigger.GoogleMailNewEmailPollingTrigger;
 import com.bytechef.component.google.mail.trigger.GoogleMailNewEmailTrigger;
 import com.google.auto.service.AutoService;
@@ -58,7 +61,11 @@ public class GoogleMailComponentHandler implements ComponentHandler {
             GoogleMailSendEmailAction.ACTION_DEFINITION)
         .triggers(
             GoogleMailNewEmailTrigger.TRIGGER_DEFINITION,
-            GoogleMailNewEmailPollingTrigger.TRIGGER_DEFINITION);
+            GoogleMailNewEmailPollingTrigger.TRIGGER_DEFINITION)
+        .clusterElements(
+            GoogleMailGetMailTool.CLUSTER_ELEMENT_DEFINITION,
+            GoogleMailSearchEmailTool.CLUSTER_ELEMENT_DEFINITION,
+            GoogleMailSendEmailTool.CLUSTER_ELEMENT_DEFINITION);
 
     @Override
     public ComponentDefinition getDefinition() {

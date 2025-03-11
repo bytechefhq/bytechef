@@ -18,17 +18,18 @@ package com.bytechef.component.ai.image.action;
 
 import static com.bytechef.component.ai.image.constant.AiImageConstants.MODEL_NO_OPTIONS_PROPERTY;
 import static com.bytechef.component.ai.image.constant.AiImageConstants.MODEL_OPTIONS_PROPERTY;
-import static com.bytechef.component.ai.image.constant.AiImageConstants.PROMPT;
 import static com.bytechef.component.ai.image.constant.AiImageConstants.PROVIDER_PROPERTY;
+import static com.bytechef.component.ai.llm.Provider.AZURE_OPEN_AI;
+import static com.bytechef.component.ai.llm.Provider.OPEN_AI;
+import static com.bytechef.component.ai.llm.Provider.STABILITY;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.CONTENT;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.IMAGE_MESSAGES;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.IMAGE_N_PROPERTY;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.IMAGE_RESPONSE_PROPERTY;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.MODEL;
+import static com.bytechef.component.ai.llm.constant.LLMConstants.PROMPT;
+import static com.bytechef.component.ai.llm.constant.LLMConstants.PROVIDER;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.SIZE;
-import static com.bytechef.component.ai.llm.constant.Provider.AZURE_OPEN_AI;
-import static com.bytechef.component.ai.llm.constant.Provider.OPEN_AI;
-import static com.bytechef.component.ai.llm.constant.Provider.STABILITY;
 import static com.bytechef.component.ai.llm.stability.constant.StabilityConstants.HEIGHT;
 import static com.bytechef.component.ai.llm.stability.constant.StabilityConstants.WIDTH;
 import static com.bytechef.component.definition.ComponentDsl.action;
@@ -41,9 +42,9 @@ import static com.bytechef.component.definition.Property.ControlType.TEXT_AREA;
 
 import com.bytechef.component.ai.image.action.definition.AiImageActionDefinition;
 import com.bytechef.component.ai.image.constant.AiImageConstants;
-import com.bytechef.component.ai.llm.constant.Provider;
+import com.bytechef.component.ai.llm.Provider;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.openai.constant.Size;
+import com.bytechef.component.openai.definition.Size;
 import com.bytechef.config.ApplicationProperties;
 import com.bytechef.platform.component.definition.ParametersFactory;
 import com.bytechef.platform.configuration.service.PropertyService;
@@ -111,7 +112,7 @@ public class GenerateImageAction implements AiImageAction {
     public Parameters createParameters(Parameters inputParameters) {
         Map<String, Object> modelInputParametersMap = new HashMap<>();
 
-        Provider provider = Provider.valueOf(inputParameters.getString(AiImageConstants.PROVIDER));
+        Provider provider = Provider.valueOf(inputParameters.getString(PROVIDER));
 
         if (provider == STABILITY) {
             modelInputParametersMap.put(HEIGHT, inputParameters.getRequired(HEIGHT, Size.class));

@@ -30,7 +30,7 @@ import org.springframework.core.convert.converter.Converter;
 public interface FrontendIntegrationMapper extends Converter<IntegrationInstanceConfigurationDTO, IntegrationModel> {
 
     @Override
-    @Mapping(target = "allowMultipleInstances", source = "integration.allowMultipleInstances")
+    @Mapping(target = "multipleInstances", source = "integration.multipleInstances")
     @Mapping(target = "componentName", source = "integration.componentName")
     @Mapping(target = "description", source = "integration.description")
     @Mapping(target = "icon", source = "integration.icon")

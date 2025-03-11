@@ -232,16 +232,16 @@ public class IntegrationWorkflowExecutionFacadeImpl implements WorkflowExecution
         WorkflowNodeType workflowNodeType = WorkflowNodeType.ofType(type);
 
         if (componentDefinitionService.hasComponentDefinition(
-            workflowNodeType.componentName(), workflowNodeType.componentVersion())) {
+            workflowNodeType.name(), workflowNodeType.version())) {
 
             ComponentDefinition componentDefinition = componentDefinitionService.getComponentDefinition(
-                workflowNodeType.componentName(), workflowNodeType.componentVersion());
+                workflowNodeType.name(), workflowNodeType.version());
 
             return new DefinitionResult(componentDefinition.getTitle(), componentDefinition.getIcon());
         }
 
         TaskDispatcherDefinition taskDispatcherDefinition = taskDispatcherDefinitionService.getTaskDispatcherDefinition(
-            workflowNodeType.componentName(), workflowNodeType.componentVersion());
+            workflowNodeType.name(), workflowNodeType.version());
 
         return new DefinitionResult(taskDispatcherDefinition.getTitle(), taskDispatcherDefinition.getIcon());
     }

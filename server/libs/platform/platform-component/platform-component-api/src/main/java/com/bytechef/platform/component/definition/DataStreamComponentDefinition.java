@@ -16,20 +16,24 @@
 
 package com.bytechef.platform.component.definition;
 
+import static com.bytechef.component.definition.datastream.ItemReader.SOURCE;
+import static com.bytechef.component.definition.datastream.ItemWriter.DESTINATION;
+
+import com.bytechef.component.definition.ClusterElementDefinition;
+import java.util.List;
+
 /**
  * @author Ivica Cardic
  */
-public interface DataStreamComponentDefinition extends PlatformComponentDefinition {
+public interface DataStreamComponentDefinition extends ClusterRootComponentDefinition {
 
     /**
      *
      */
     String DATA_STREAM = "dataStream";
 
-    /**
-     *
-     */
-    enum ComponentType {
-        SOURCE, DESTINATION
+    @Override
+    default List<ClusterElementDefinition.ClusterElementType> getElementTypes() {
+        return List.of(SOURCE, DESTINATION);
     }
 }

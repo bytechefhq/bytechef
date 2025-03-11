@@ -17,7 +17,7 @@
 package com.bytechef.component.ai.text;
 
 import static com.bytechef.component.definition.ComponentDsl.component;
-import static com.bytechef.platform.component.definition.AiComponentDefinition.AI_TEXT;
+import static com.bytechef.platform.component.definition.AiUniversalComponentDefinition.AI_TEXT;
 
 import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.ai.text.action.ClassifyTextAction;
@@ -30,7 +30,7 @@ import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.config.ApplicationProperties;
 import com.bytechef.platform.component.definition.AbstractComponentDefinitionWrapper;
-import com.bytechef.platform.component.definition.AiComponentDefinition;
+import com.bytechef.platform.component.definition.AiUniversalComponentDefinition;
 import com.bytechef.platform.configuration.service.PropertyService;
 import org.springframework.stereotype.Component;
 
@@ -40,7 +40,7 @@ import org.springframework.stereotype.Component;
 @Component(AI_TEXT + "_v1_ComponentHandler")
 public class AiTextComponentHandler implements ComponentHandler {
 
-    private final AiComponentDefinition componentDefinition;
+    private final AiUniversalComponentDefinition componentDefinition;
 
     public AiTextComponentHandler(ApplicationProperties applicationProperties, PropertyService propertyService) {
         ApplicationProperties.Ai ai = applicationProperties.getAi();
@@ -54,7 +54,7 @@ public class AiTextComponentHandler implements ComponentHandler {
     }
 
     private static class AiTextComponentDefinitionImpl
-        extends AbstractComponentDefinitionWrapper implements AiComponentDefinition {
+        extends AbstractComponentDefinitionWrapper implements AiUniversalComponentDefinition {
 
         private AiTextComponentDefinitionImpl(
             ApplicationProperties.Ai.Provider provider, PropertyService propertyService) {

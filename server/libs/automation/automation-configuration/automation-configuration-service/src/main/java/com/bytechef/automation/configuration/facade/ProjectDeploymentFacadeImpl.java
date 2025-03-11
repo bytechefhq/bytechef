@@ -512,7 +512,7 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
         for (WorkflowTrigger workflowTrigger : workflowTriggers) {
             WorkflowNodeType workflowNodeType = WorkflowNodeType.ofType(workflowTrigger.getType());
 
-            if (Objects.equals(workflowNodeType.componentName(), "manual")) {
+            if (Objects.equals(workflowNodeType.name(), "manual")) {
                 continue;
             }
 
@@ -630,8 +630,8 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
             WorkflowNodeType triggerWorkflowNodeType = WorkflowNodeType.ofType(workflowTrigger.getType());
 
             TriggerDefinition triggerDefinition = triggerDefinitionService.getTriggerDefinition(
-                triggerWorkflowNodeType.componentName(), triggerWorkflowNodeType.componentVersion(),
-                triggerWorkflowNodeType.componentOperationName());
+                triggerWorkflowNodeType.name(), triggerWorkflowNodeType.version(),
+                triggerWorkflowNodeType.operation());
 
             if (triggerDefinition.getType() == TriggerType.STATIC_WEBHOOK &&
                 !Objects.equals(triggerDefinition.getName(), "manual")) {

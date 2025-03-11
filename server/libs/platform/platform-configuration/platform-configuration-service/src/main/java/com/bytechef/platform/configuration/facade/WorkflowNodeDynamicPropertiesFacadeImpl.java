@@ -73,8 +73,8 @@ public class WorkflowNodeDynamicPropertiesFacadeImpl implements WorkflowNodeDyna
                 WorkflowNodeType workflowNodeType = WorkflowNodeType.ofType(workflowTrigger.getType());
 
                 return triggerDefinitionFacade.executeDynamicProperties(
-                    workflowNodeType.componentName(), workflowNodeType.componentVersion(),
-                    workflowNodeType.componentOperationName(), propertyName, workflowTrigger.evaluateParameters(inputs),
+                    workflowNodeType.name(), workflowNodeType.version(),
+                    workflowNodeType.operation(), propertyName, workflowTrigger.evaluateParameters(inputs),
                     lookupDependsOnPaths, connectionId);
             })
             .orElseGet(() -> {
@@ -85,8 +85,8 @@ public class WorkflowNodeDynamicPropertiesFacadeImpl implements WorkflowNodeDyna
                 WorkflowNodeType workflowNodeType = WorkflowNodeType.ofType(workflowTask.getType());
 
                 return actionDefinitionFacade.executeDynamicProperties(
-                    workflowNodeType.componentName(), workflowNodeType.componentVersion(),
-                    workflowNodeType.componentOperationName(), propertyName, workflowId,
+                    workflowNodeType.name(), workflowNodeType.version(),
+                    workflowNodeType.operation(), propertyName, workflowId,
                     workflowTask.evaluateParameters(
                         MapUtils.concat((Map<String, Object>) inputs, (Map<String, Object>) outputs)),
                     lookupDependsOnPaths, connectionId);

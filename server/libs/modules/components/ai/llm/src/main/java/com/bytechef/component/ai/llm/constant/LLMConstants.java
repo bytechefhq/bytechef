@@ -34,9 +34,9 @@ import static com.bytechef.component.definition.Property.ControlType.TEXT_AREA;
 
 import com.bytechef.component.ai.llm.ChatModel;
 import com.bytechef.component.ai.llm.ChatModel.Role;
+import com.bytechef.component.ai.llm.definition.Language;
 import com.bytechef.component.definition.ComponentDsl;
 import java.util.Arrays;
-import java.util.List;
 
 /**
  * @author Marko Kriskovic
@@ -62,6 +62,7 @@ public class LLMConstants {
     public static final String N = "n";
     public static final String PRESENCE_PENALTY = "presencePenalty";
     public static final String PROMPT = "prompt";
+    public static final String PROVIDER = "provider";
     public static final String RESPONSE = "response";
     public static final String RESPONSE_FORMAT = "responseFormat";
     public static final String RESPONSE_SCHEMA = "responseSchema";
@@ -77,8 +78,6 @@ public class LLMConstants {
     public static final String VOICE = "voice";
     public static final String SPEED = "speed";
     public static final String WEIGHT = "weight";
-
-    public static final List<Provider> PROVIDERS = Arrays.asList(Provider.values());
 
     public static final ModifiableNumberProperty FREQUENCY_PENALTY_PROPERTY = number(FREQUENCY_PENALTY)
         .label("Frequency Penalty")
@@ -139,8 +138,8 @@ public class LLMConstants {
                         .options(
                             option("System", Role.SYSTEM.name()),
                             option("User", Role.USER.name()),
-                            option("Assistant", Role.ASSISTANT.name()),
-                            option("Tool", Role.TOOL.name()))
+                            option("Assistant", Role.ASSISTANT.name()))
+//                            option("Tool", Role.TOOL.name())
                         .required(true),
                     string(CONTENT)
                         .label("Content")

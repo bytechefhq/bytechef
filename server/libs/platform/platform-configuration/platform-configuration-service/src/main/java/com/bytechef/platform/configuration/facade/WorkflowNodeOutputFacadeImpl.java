@@ -179,8 +179,8 @@ public class WorkflowNodeOutputFacadeImpl implements WorkflowNodeOutputFacade {
                 .orElse(null);
 
             outputResponse = triggerDefinitionFacade.executeOutput(
-                workflowNodeType.componentName(), workflowNodeType.componentVersion(),
-                workflowNodeType.componentOperationName(), inputParameters, connectionId);
+                workflowNodeType.name(), workflowNodeType.version(),
+                workflowNodeType.operation(), inputParameters, connectionId);
         } else {
             WorkflowNodeType workflowNodeType = WorkflowNodeType.ofType(workflowTask.getType());
 
@@ -195,8 +195,8 @@ public class WorkflowNodeOutputFacadeImpl implements WorkflowNodeOutputFacade {
                 WorkflowTestConfigurationConnection::getWorkflowConnectionKey,
                 WorkflowTestConfigurationConnection::getConnectionId);
 
-            if (workflowNodeType.componentOperationName() == null) {
-                if (Objects.equals(workflowNodeType.componentName(), "loop")) {
+            if (workflowNodeType.operation() == null) {
+                if (Objects.equals(workflowNodeType.name(), "loop")) {
                     List<Map<String, ?>> childWorkflowTasks = MapUtils.getList(
                         workflowTask.getParameters(), "iteratee", new TypeReference<>() {}, List.of());
 
@@ -214,16 +214,16 @@ public class WorkflowNodeOutputFacadeImpl implements WorkflowNodeOutputFacade {
                         }
                     } else {
                         outputResponse = taskDispatcherDefinitionService.executeOutput(
-                            workflowNodeType.componentName(), workflowNodeType.componentVersion(), inputParameters);
+                            workflowNodeType.name(), workflowNodeType.version(), inputParameters);
                     }
                 } else {
                     outputResponse = taskDispatcherDefinitionService.executeOutput(
-                        workflowNodeType.componentName(), workflowNodeType.componentVersion(), inputParameters);
+                        workflowNodeType.name(), workflowNodeType.version(), inputParameters);
                 }
             } else {
                 outputResponse = actionDefinitionFacade.executeOutput(
-                    workflowNodeType.componentName(), workflowNodeType.componentVersion(),
-                    workflowNodeType.componentOperationName(), inputParameters, connectionIds);
+                    workflowNodeType.name(), workflowNodeType.version(),
+                    workflowNodeType.operation(), inputParameters, connectionIds);
             }
         }
 
@@ -264,15 +264,15 @@ public class WorkflowNodeOutputFacadeImpl implements WorkflowNodeOutputFacade {
         TaskDispatcherDefinition taskDispatcherDefinition = null;
         OutputResponse outputResponse;
 
-        if (workflowNodeType.componentOperationName() == null) {
+        if (workflowNodeType.operation() == null) {
             taskDispatcherDefinition = taskDispatcherDefinitionService.getTaskDispatcherDefinition(
-                workflowNodeType.componentName(), workflowNodeType.componentVersion());
+                workflowNodeType.name(), workflowNodeType.version());
 
             outputResponse = taskDispatcherDefinition.getOutputResponse();
         } else {
             actionDefinition = actionDefinitionService.getActionDefinition(
-                workflowNodeType.componentName(), workflowNodeType.componentVersion(),
-                workflowNodeType.componentOperationName());
+                workflowNodeType.name(), workflowNodeType.version(),
+                workflowNodeType.operation());
 
             outputResponse = actionDefinition.getOutputResponse();
         }
@@ -292,8 +292,8 @@ public class WorkflowNodeOutputFacadeImpl implements WorkflowNodeOutputFacade {
         WorkflowNodeType workflowNodeType = WorkflowNodeType.ofType(workflowTrigger.getType());
 
         TriggerDefinition triggerDefinition = triggerDefinitionService.getTriggerDefinition(
-            workflowNodeType.componentName(), workflowNodeType.componentVersion(),
-            workflowNodeType.componentOperationName());
+            workflowNodeType.name(), workflowNodeType.version(),
+            workflowNodeType.operation());
 
         OutputResponse outputResponse = workflowNodeTestOutputService
             .fetchWorkflowTestNodeOutput(workflowId, workflowTrigger.getName())

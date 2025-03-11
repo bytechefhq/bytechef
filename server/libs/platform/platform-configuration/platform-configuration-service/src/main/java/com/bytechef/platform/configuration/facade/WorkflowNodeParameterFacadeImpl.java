@@ -698,20 +698,20 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
             WorkflowNodeType workflowNodeType = WorkflowNodeType.ofType(
                 (String) taskMap.get(WorkflowConstants.TYPE));
 
-            if (workflowNodeType.componentOperationName() == null) {
+            if (workflowNodeType.operation() == null) {
                 operationType = WorkflowNodeStructure.OperationType.TASK_DISPATCHER;
 
                 TaskDispatcherDefinition taskDispatcherDefinition =
                     taskDispatcherDefinitionService.getTaskDispatcherDefinition(
-                        workflowNodeType.componentName(), workflowNodeType.componentVersion());
+                        workflowNodeType.name(), workflowNodeType.version());
 
                 properties = taskDispatcherDefinition.getProperties();
             } else {
                 operationType = WorkflowNodeStructure.OperationType.TASK;
 
                 ActionDefinition actionDefinition = actionDefinitionService.getActionDefinition(
-                    workflowNodeType.componentName(), workflowNodeType.componentVersion(),
-                    workflowNodeType.componentOperationName());
+                    workflowNodeType.name(), workflowNodeType.version(),
+                    workflowNodeType.operation());
 
                 properties = actionDefinition.getProperties();
             }
@@ -722,8 +722,8 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
                 (String) triggerMap.get(WorkflowConstants.TYPE));
 
             TriggerDefinition triggerDefinition = triggerDefinitionService.getTriggerDefinition(
-                workflowNodeType.componentName(), workflowNodeType.componentVersion(),
-                workflowNodeType.componentOperationName());
+                workflowNodeType.name(), workflowNodeType.version(),
+                workflowNodeType.operation());
 
             properties = triggerDefinition.getProperties();
         }

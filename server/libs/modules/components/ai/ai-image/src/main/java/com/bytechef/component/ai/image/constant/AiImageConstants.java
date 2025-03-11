@@ -16,10 +16,11 @@
 
 package com.bytechef.component.ai.image.constant;
 
+import static com.bytechef.component.ai.llm.Provider.AZURE_OPEN_AI;
+import static com.bytechef.component.ai.llm.Provider.OPEN_AI;
+import static com.bytechef.component.ai.llm.Provider.STABILITY;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.MODEL;
-import static com.bytechef.component.ai.llm.constant.Provider.AZURE_OPEN_AI;
-import static com.bytechef.component.ai.llm.constant.Provider.OPEN_AI;
-import static com.bytechef.component.ai.llm.constant.Provider.STABILITY;
+import static com.bytechef.component.ai.llm.constant.LLMConstants.PROVIDER;
 import static com.bytechef.component.definition.ComponentDsl.string;
 
 import com.bytechef.component.ai.image.util.AiImageUtils;
@@ -35,8 +36,6 @@ import java.util.function.BiFunction;
 public class AiImageConstants {
 
     public static final String GENERATE_IMAGE = "generateImage";
-    public static final String PROMPT = "prompt";
-    public static final String PROVIDER = "provider";
 
     public static final BiFunction<Ai.Provider, PropertyService, ModifiableStringProperty> PROVIDER_PROPERTY =
         (aiProvider, propertyService) -> string(PROVIDER)

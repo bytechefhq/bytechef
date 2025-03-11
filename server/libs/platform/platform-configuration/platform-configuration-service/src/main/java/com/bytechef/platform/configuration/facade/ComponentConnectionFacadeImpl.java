@@ -84,12 +84,12 @@ public class ComponentConnectionFacadeImpl implements ComponentConnectionFacade 
 
         WorkflowNodeType workflowNodeType = WorkflowNodeType.ofType(type);
 
-        if (workflowNodeType.componentOperationName() == null) {
+        if (workflowNodeType.operation() == null) {
             return Collections.emptyList();
         }
 
         return componentDefinitionService
-            .fetchComponentDefinition(workflowNodeType.componentName(), workflowNodeType.componentVersion())
+            .fetchComponentDefinition(workflowNodeType.name(), workflowNodeType.version())
             .map(componentDefinition -> componentConnectionFactoryResolver.resolve(componentDefinition)
                 .map(workflowConnectionFactory -> workflowConnectionFactory.create(
                     workflowNodeName, extensions, componentDefinition))

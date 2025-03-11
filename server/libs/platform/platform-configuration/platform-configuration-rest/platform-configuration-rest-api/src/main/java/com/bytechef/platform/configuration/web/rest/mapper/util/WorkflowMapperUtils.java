@@ -44,12 +44,12 @@ public class WorkflowMapperUtils {
                 workflowTaskDTOs
                     .stream()
                     .map(workflowTask -> WorkflowNodeType.ofType(workflowTask.getType()))
-                    .map(WorkflowNodeType::componentName)
+                    .map(WorkflowNodeType::name)
                     .collect(Collectors.toSet())));
 
         List<String> workflowTriggerComponentNames = workflowTriggerDTOs.stream()
             .map(workflowTrigger -> WorkflowNodeType.ofType(workflowTrigger.type()))
-            .map(WorkflowNodeType::componentName)
+            .map(WorkflowNodeType::name)
             .toList();
 
         workflowModel.setWorkflowTriggerComponentNames(

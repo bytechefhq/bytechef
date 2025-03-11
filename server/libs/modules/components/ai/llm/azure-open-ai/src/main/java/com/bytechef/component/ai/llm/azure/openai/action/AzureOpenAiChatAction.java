@@ -89,30 +89,31 @@ public class AzureOpenAiChatAction {
         .perform(AzureOpenAiChatAction::perform);
 
     public static final ChatModel CHAT_MODEL = (inputParameters, connectionParameters) -> {
-        OpenAIClientBuilder openAIClientBuilder = new OpenAIClientBuilder()
-            .credential(new KeyCredential(connectionParameters.getString(TOKEN)))
-            .endpoint(connectionParameters.getString(ENDPOINT));
-
         AzureOpenAiResponseFormat format =
             inputParameters.getFromPath(
                 RESPONSE + "." + RESPONSE_FORMAT, ResponseFormat.class, ResponseFormat.TEXT) == ResponseFormat.TEXT
                     ? TEXT : JSON;
 
-        return new AzureOpenAiChatModel(
-            openAIClientBuilder,
-            AzureOpenAiChatOptions.builder()
-                .deploymentName(inputParameters.getRequiredString(MODEL))
-                .frequencyPenalty(inputParameters.getDouble(FREQUENCY_PENALTY))
-                .logitBias(inputParameters.getMap(LOGIT_BIAS, new TypeReference<>() {}))
-                .maxTokens(inputParameters.getInteger(MAX_TOKENS))
-                .N(inputParameters.getInteger(N))
-                .presencePenalty(inputParameters.getDouble(PRESENCE_PENALTY))
-                .stop(inputParameters.getList(STOP, new TypeReference<>() {}))
-                .temperature(inputParameters.getDouble(TEMPERATURE))
-                .topP(inputParameters.getDouble(TOP_P))
-                .user(inputParameters.getString(USER))
-                .responseFormat(format)
-                .build());
+        return AzureOpenAiChatModel.builder()
+            .openAIClientBuilder(
+                new OpenAIClientBuilder()
+                    .credential(new KeyCredential(connectionParameters.getString(TOKEN)))
+                    .endpoint(connectionParameters.getString(ENDPOINT)))
+            .defaultOptions(
+                AzureOpenAiChatOptions.builder()
+                    .deploymentName(inputParameters.getRequiredString(MODEL))
+                    .frequencyPenalty(inputParameters.getDouble(FREQUENCY_PENALTY))
+                    .logitBias(inputParameters.getMap(LOGIT_BIAS, new TypeReference<>() {}))
+                    .maxTokens(inputParameters.getInteger(MAX_TOKENS))
+                    .N(inputParameters.getInteger(N))
+                    .presencePenalty(inputParameters.getDouble(PRESENCE_PENALTY))
+                    .stop(inputParameters.getList(STOP, new TypeReference<>() {}))
+                    .temperature(inputParameters.getDouble(TEMPERATURE))
+                    .topP(inputParameters.getDouble(TOP_P))
+                    .user(inputParameters.getString(USER))
+                    .responseFormat(format)
+                    .build())
+            .build();
     };
 
     private AzureOpenAiChatAction() {

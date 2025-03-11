@@ -32,7 +32,7 @@ import org.apache.commons.lang3.StringUtils;
  */
 @SuppressFBWarnings("EI")
 public record IntegrationDTO(
-    boolean allowMultipleInstances, Category category, String componentName, String createdBy,
+    boolean multipleInstances, Category category, String componentName, String createdBy,
     Instant createdDate, String description, String icon, Long id, List<IntegrationVersion> integrationVersions,
     List<Long> integrationWorkflowIds, String lastModifiedBy, Instant lastModifiedDate,
     Instant lastPublishedDate, Status lastStatus, Integer lastVersion, String name, List<Tag> tags, String title,
@@ -40,7 +40,7 @@ public record IntegrationDTO(
 
     public IntegrationDTO(Integration integration) {
         this(
-            integration.isAllowMultipleInstances(),
+            integration.isMultipleInstances(),
             integration.getCategoryId() == null ? null : new Category(integration.getCategoryId()),
             integration.getComponentName(), integration.getCreatedBy(), integration.getCreatedDate(),
             integration.getDescription(), null, integration.getId(), integration.getIntegrationVersions(), null,
@@ -54,7 +54,7 @@ public record IntegrationDTO(
         List<Long> integrationWorkflowIds, List<Tag> tags) {
 
         this(
-            integration.isAllowMultipleInstances(), category, integration.getComponentName(),
+            integration.isMultipleInstances(), category, integration.getComponentName(),
             integration.getCreatedBy(), integration.getCreatedDate(), getDescription(componentDefinition, integration),
             componentDefinition.getIcon(), integration.getId(), integration.getIntegrationVersions(),
             integrationWorkflowIds, integration.getLastModifiedBy(), integration.getLastModifiedDate(),
@@ -69,7 +69,7 @@ public record IntegrationDTO(
     public Integration toIntegration() {
         Integration integration = new Integration();
 
-        integration.setAllowMultipleInstances(allowMultipleInstances);
+        integration.setMultipleInstances(multipleInstances);
         integration.setComponentName(componentName);
         integration.setCategory(category);
         integration.setDescription(description);
@@ -84,7 +84,8 @@ public record IntegrationDTO(
 
     @SuppressFBWarnings("EI")
     public static final class Builder {
-        private boolean allowMultipleInstances;
+
+        private boolean multipleInstances;
         private Category category;
         private String componentName;
         private String createdBy;
@@ -105,8 +106,8 @@ public record IntegrationDTO(
         private Builder() {
         }
 
-        public Builder allowMultipleInstances(boolean allowMultipleInstances) {
-            this.allowMultipleInstances = allowMultipleInstances;
+        public Builder multipleInstances(boolean multipleInstances) {
+            this.multipleInstances = multipleInstances;
 
             return this;
         }
@@ -209,7 +210,7 @@ public record IntegrationDTO(
 
         public IntegrationDTO build() {
             return new IntegrationDTO(
-                allowMultipleInstances, category, componentName, createdBy, createdDate, description, null, id,
+                multipleInstances, category, componentName, createdBy, createdDate, description, null, id,
                 integrationVersions, integrationWorkflowIds, lastModifiedBy, lastModifiedDate, lastPublishedDate,
                 lastStatus, lastVersion, name, tags, null, version);
         }

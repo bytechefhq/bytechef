@@ -19,7 +19,7 @@ package com.bytechef.platform.component.definition;
 import com.bytechef.atlas.coordinator.event.TaskProgressedApplicationEvent;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ActionContext.Approval.Links;
-import com.bytechef.platform.component.domain.ComponentConnection;
+import com.bytechef.platform.component.ComponentConnection;
 import com.bytechef.platform.constant.ModeType;
 import com.bytechef.platform.data.storage.DataStorage;
 import com.bytechef.platform.data.storage.domain.DataStorageScope;
@@ -40,17 +40,17 @@ class ActionContextImpl extends ContextImpl implements ActionContext, ActionCont
     private final String actionName;
     private Approval approval;
     private final Data data;
+    private final boolean editorEnvironment;
     private final Event event;
     private final Long jobPrincipalId;
     private final Long jobPrincipalWorkflowId;
     private final Long jobId;
-    private final boolean editorEnvironment;
-    private final ModeType type;
+    private final ModeType modeType;
     private final String workflowId;
 
     @SuppressFBWarnings("EI")
     public ActionContextImpl(
-        String componentName, int componentVersion, String actionName, ModeType type, Long jobPrincipalId,
+        String componentName, int componentVersion, String actionName, ModeType modeType, Long jobPrincipalId,
         Long jobPrincipalWorkflowId, String workflowId, Long jobId, ComponentConnection connection,
         String publicUrl, DataStorage dataStorage, ApplicationEventPublisher eventPublisher,
         FilesFileStorage filesFileStorage, HttpClientExecutor httpClientExecutor, boolean editorEnvironment) {
@@ -64,14 +64,14 @@ class ActionContextImpl extends ContextImpl implements ActionContext, ActionCont
         }
 
         this.data = new DataImpl(
-            componentName, componentVersion, actionName, type, jobPrincipalId, jobPrincipalWorkflowId, jobId,
+            componentName, componentVersion, actionName, modeType, jobPrincipalId, jobPrincipalWorkflowId, jobId,
             dataStorage);
         this.editorEnvironment = editorEnvironment;
         this.event = jobId == null ? progress -> {} : new EventImpl(eventPublisher, jobId);
         this.jobPrincipalId = jobPrincipalId;
         this.jobPrincipalWorkflowId = jobPrincipalWorkflowId;
         this.jobId = jobId;
-        this.type = type;
+        this.modeType = modeType;
         this.workflowId = workflowId;
     }
 
@@ -104,11 +104,6 @@ class ActionContextImpl extends ContextImpl implements ActionContext, ActionCont
     }
 
     @Override
-    public ModeType getType() {
-        return type;
-    }
-
-    @Override
     public Long getJobPrincipalId() {
         return jobPrincipalId;
     }
@@ -121,6 +116,11 @@ class ActionContextImpl extends ContextImpl implements ActionContext, ActionCont
     @Override
     public Long getJobId() {
         return jobId;
+    }
+
+    @Override
+    public ModeType getModeType() {
+        return modeType;
     }
 
     @Override

@@ -22,7 +22,6 @@ import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ActionDefinition.OutputFunction;
 import com.bytechef.component.definition.ActionDefinition.ProcessErrorResponseFunction;
 import com.bytechef.component.definition.ActionDefinition.SingleConnectionPerformFunction;
-import com.bytechef.component.definition.ActionWorkflowNodeDescriptionFunction;
 import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.DynamicOptionsProperty;
@@ -35,13 +34,13 @@ import com.bytechef.component.definition.PropertiesDataSource.ActionPropertiesFu
 import com.bytechef.component.definition.Property.DynamicPropertiesProperty;
 import com.bytechef.component.exception.ProviderException;
 import com.bytechef.definition.BaseOutputDefinition;
+import com.bytechef.platform.component.ComponentConnection;
 import com.bytechef.platform.component.ComponentDefinitionRegistry;
 import com.bytechef.platform.component.definition.MultipleConnectionsOutputFunction;
 import com.bytechef.platform.component.definition.MultipleConnectionsPerformFunction;
 import com.bytechef.platform.component.definition.ParametersFactory;
 import com.bytechef.platform.component.definition.PropertyFactory;
 import com.bytechef.platform.component.domain.ActionDefinition;
-import com.bytechef.platform.component.domain.ComponentConnection;
 import com.bytechef.platform.component.domain.Option;
 import com.bytechef.platform.component.domain.Property;
 import com.bytechef.platform.component.exception.ActionDefinitionErrorType;
@@ -128,9 +127,8 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
 
     @Override
     public Object executeMultipleConnectionsPerform(
-        String componentName, int componentVersion, String actionName,
-        Map<String, ?> inputParameters, Map<String, ComponentConnection> connections,
-        Map<String, ?> extensions, ActionContext context) {
+        String componentName, int componentVersion, String actionName, Map<String, ?> inputParameters,
+        Map<String, ComponentConnection> connections, Map<String, ?> extensions, ActionContext context) {
 
         com.bytechef.component.definition.ActionDefinition actionDefinition =
             componentDefinitionRegistry.getActionDefinition(componentName, componentVersion, actionName);
@@ -233,7 +231,7 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
     @Override
     public Object executeSingleConnectionPerform(
         String componentName, int componentVersion, String actionName, Map<String, ?> inputParameters,
-        @Nullable ComponentConnection connection, ActionContext context) {
+        @Nullable ComponentConnection connection, ActionContext context) throws ExecutionException {
 
         com.bytechef.component.definition.ActionDefinition actionDefinition =
             componentDefinitionRegistry.getActionDefinition(componentName, componentVersion, actionName);
@@ -261,8 +259,9 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
         String componentName, int componentVersion, String actionName,
         Map<String, ?> inputParameters, ActionContext context) {
 
-        ActionWorkflowNodeDescriptionFunction workflowNodeDescriptionFunction = getWorkflowNodeDescriptionFunction(
-            componentName, componentVersion, actionName);
+        com.bytechef.component.definition.ActionDefinition.ActionWorkflowNodeDescriptionFunction workflowNodeDescriptionFunction =
+            getWorkflowNodeDescriptionFunction(
+                componentName, componentVersion, actionName);
 
         try {
             return workflowNodeDescriptionFunction.apply(ParametersFactory.createParameters(inputParameters), context);
@@ -335,8 +334,9 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
         return (ActionPropertiesFunction) propertiesDataSource.getProperties();
     }
 
-    private ActionWorkflowNodeDescriptionFunction getWorkflowNodeDescriptionFunction(
-        String componentName, int componentVersion, String actionName) {
+    private com.bytechef.component.definition.ActionDefinition.ActionWorkflowNodeDescriptionFunction
+        getWorkflowNodeDescriptionFunction(
+            String componentName, int componentVersion, String actionName) {
 
         if (!componentDefinitionRegistry.hasComponentDefinition(componentName, componentVersion)) {
             componentName = "missing";

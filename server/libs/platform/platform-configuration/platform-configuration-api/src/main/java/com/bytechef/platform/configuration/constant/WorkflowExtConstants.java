@@ -22,10 +22,9 @@ package com.bytechef.platform.configuration.constant;
 public class WorkflowExtConstants {
 
     public static final String AUTHORIZATION_REQUIRED = "authorizationRequired";
+    public static final String CLUSTER_ELEMENTS = "clusterElements";
     public static final String COMPONENT_NAME = "componentName";
     public static final String COMPONENT_VERSION = "componentVersion";
     public static final String CONNECTIONS = "connections";
-    public static final String DESTINATION = "destination";
-    public static final String SOURCE = "source";
     public static final String TRIGGERS = "triggers";
 }

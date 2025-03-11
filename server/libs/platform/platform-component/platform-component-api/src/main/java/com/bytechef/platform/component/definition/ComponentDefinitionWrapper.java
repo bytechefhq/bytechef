@@ -29,7 +29,7 @@ import java.util.Optional;
  */
 public class ComponentDefinitionWrapper extends AbstractComponentDefinitionWrapper implements ComponentDefinition {
 
-    private final List<? extends ActionDefinition> actions;
+    private final List<ActionDefinition> actions;
 
     public ComponentDefinitionWrapper(
         ComponentDefinition componentDefinition, List<ActionDefinition> actionDefinitions) {
@@ -60,14 +60,14 @@ public class ComponentDefinitionWrapper extends AbstractComponentDefinitionWrapp
             ", title='" + title + '\'' +
             ", description='" + description + '\'' +
             ", connection=" + connection +
-            ", categories='" + categories + '\'' +
+            ", categories='" + componentCategories + '\'' +
+            ", clusterElements=" + clusterElements +
             ", customAction=" + customAction +
             ", customActionHelp=" + customActionHelp +
             ", actions=" + actions +
             ", triggers=" + triggers +
             ", resources=" + resources +
             ", tags=" + tags +
-            ", dataStreamDefinition=" + dataStreamDefinition +
             ", metadata=" + metadata +
             ", icon='" + icon + '\'' +
             "} ";

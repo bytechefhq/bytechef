@@ -75,8 +75,8 @@ public class WorkflowNodeOptionFacadeImpl implements WorkflowNodeOptionFacade {
                 WorkflowNodeType workflowNodeType = WorkflowNodeType.ofType(workflowTrigger.getType());
 
                 return triggerDefinitionFacade.executeOptions(
-                    workflowNodeType.componentName(), workflowNodeType.componentVersion(),
-                    workflowNodeType.componentOperationName(), propertyName, workflowTrigger.evaluateParameters(inputs),
+                    workflowNodeType.name(), workflowNodeType.version(),
+                    workflowNodeType.operation(), propertyName, workflowTrigger.evaluateParameters(inputs),
                     lookupDependsOnPaths, searchText, connectionId);
             })
             .orElseGet(
@@ -88,8 +88,8 @@ public class WorkflowNodeOptionFacadeImpl implements WorkflowNodeOptionFacade {
                     WorkflowNodeType workflowNodeType = WorkflowNodeType.ofType(workflowTask.getType());
 
                     return actionDefinitionFacade.executeOptions(
-                        workflowNodeType.componentName(), workflowNodeType.componentVersion(),
-                        workflowNodeType.componentOperationName(), propertyName,
+                        workflowNodeType.name(), workflowNodeType.version(),
+                        workflowNodeType.operation(), propertyName,
                         workflowTask.evaluateParameters(
                             MapUtils.concat((Map<String, Object>) inputs, (Map<String, Object>) outputs)),
                         lookupDependsOnPaths, searchText, connectionId);

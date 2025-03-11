@@ -44,11 +44,12 @@ import com.bytechef.component.ai.llm.ImageModel;
 import com.bytechef.component.ai.llm.ImageModel.Quality;
 import com.bytechef.component.ai.llm.ImageModel.ResponseFormat;
 import com.bytechef.component.ai.llm.ImageModel.Style;
+import com.bytechef.component.ai.llm.util.LLMUtils;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.openai.constant.OpenAiConstants;
-import com.bytechef.component.openai.constant.Size;
+import com.bytechef.component.openai.definition.Size;
 import org.springframework.ai.openai.OpenAiImageModel;
 import org.springframework.ai.openai.OpenAiImageOptions;
 import org.springframework.ai.openai.api.OpenAiImageApi;
@@ -118,6 +119,7 @@ public class OpenAiCreateImageAction {
         return new OpenAiImageModel(
             OpenAiImageApi.builder()
                 .apiKey(connectionParameters.getString(TOKEN))
+                .restClientBuilder(LLMUtils.getRestClientBuilder())
                 .build(),
             OpenAiImageOptions.builder()
                 .height(size.getDimensions()[1])

@@ -25,7 +25,6 @@ import static com.bytechef.component.csv.file.constant.CsvFileConstants.PAGE_NUM
 import static com.bytechef.component.csv.file.constant.CsvFileConstants.PAGE_SIZE;
 import static com.bytechef.component.csv.file.constant.CsvFileConstants.READ_AS_STRING;
 
-import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
 import com.fasterxml.jackson.databind.MappingIterator;
 import com.fasterxml.jackson.dataformat.csv.CsvParser;
@@ -42,8 +41,9 @@ import org.apache.commons.lang3.StringUtils;
  * @author Ivica Cardic
  */
 public class CsvFileReadUtils {
+
     public static Map<String, Object> getColumnRow(
-        ReadConfiguration configuration, Context context, List<String> row, char enclosingCharacter) {
+        ReadConfiguration configuration, List<?> row, char enclosingCharacter) {
 
         Map<String, Object> map = new LinkedHashMap<>();
 
@@ -51,9 +51,8 @@ public class CsvFileReadUtils {
             map.put(
                 "column_" + (i + 1),
                 processValue(
-                    row.get(i), enclosingCharacter, configuration.includeEmptyCells(),
-                    configuration.readAsString(),
-                    context));
+                    (String) row.get(i), enclosingCharacter, configuration.includeEmptyCells(),
+                    configuration.readAsString()));
         }
 
         return map;
@@ -72,16 +71,16 @@ public class CsvFileReadUtils {
     }
 
     public static Map<String, Object> getHeaderRow(
-        ReadConfiguration configuration, Context context, Map<String, String> row, char enclosingCharacter) {
+        ReadConfiguration configuration, Map<?, ?> row, char enclosingCharacter) {
 
         Map<String, Object> map = new LinkedHashMap<>();
 
-        for (Map.Entry<String, String> entry : row.entrySet()) {
+        for (Map.Entry<?, ?> entry : row.entrySet()) {
             map.put(
-                strip(entry.getKey(), enclosingCharacter),
+                strip((String) entry.getKey(), enclosingCharacter),
                 processValue(
-                    entry.getValue(), enclosingCharacter, configuration.includeEmptyCells(),
-                    configuration.readAsString(), context));
+                    (String) entry.getValue(), enclosingCharacter, configuration.includeEmptyCells(),
+                    configuration.readAsString()));
         }
 
         return map;
@@ -139,7 +138,7 @@ public class CsvFileReadUtils {
     }
 
     public static Object processValue(
-        String valueString, char enclosingCharacter, boolean includeEmptyCells, boolean readAsString, Context context) {
+        String valueString, char enclosingCharacter, boolean includeEmptyCells, boolean readAsString) {
 
         Object value = null;
 
@@ -155,7 +154,7 @@ public class CsvFileReadUtils {
             if (readAsString) {
                 value = valueString;
             } else {
-                value = valueOF(valueString, context);
+                value = valueOf(valueString);
             }
         }
 
@@ -168,20 +167,21 @@ public class CsvFileReadUtils {
         return StringUtils.removeEnd(valueString, String.valueOf(enclosingCharacter));
     }
 
-    public static Object valueOF(String string, Context context) {
+    @SuppressWarnings("PMD.EmptyCatchBlock")
+    public static Object valueOf(String string) {
         Object value = null;
 
         try {
             value = Integer.parseInt(string);
         } catch (NumberFormatException nfe) {
-            context.log(log -> log.trace(nfe.getMessage(), nfe));
+            // ignore
         }
 
         if (value == null) {
             try {
                 value = Long.parseLong(string);
             } catch (NumberFormatException nfe) {
-                context.log(log -> log.trace(nfe.getMessage(), nfe));
+                // ignore
             }
         }
 
@@ -189,7 +189,7 @@ public class CsvFileReadUtils {
             try {
                 value = Double.parseDouble(string);
             } catch (NumberFormatException nfe) {
-                context.log(log -> log.trace(nfe.getMessage(), nfe));
+                // ignore
             }
         }
 

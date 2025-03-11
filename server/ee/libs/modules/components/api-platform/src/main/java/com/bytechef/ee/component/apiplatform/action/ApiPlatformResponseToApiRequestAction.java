@@ -123,7 +123,7 @@ public class ApiPlatformResponseToApiRequestAction {
 
         WorkflowNodeType workflowNodeType = WorkflowNodeType.ofType(workflowTrigger.getType());
 
-        if (!Objects.equals(workflowNodeType.componentOperationName(), NEW_API_REQUEST)) {
+        if (!Objects.equals(workflowNodeType.operation(), NEW_API_REQUEST)) {
             return List.of();
         }
 

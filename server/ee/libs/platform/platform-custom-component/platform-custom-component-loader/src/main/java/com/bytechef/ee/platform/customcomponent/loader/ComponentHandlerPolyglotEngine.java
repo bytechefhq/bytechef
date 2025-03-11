@@ -10,11 +10,10 @@ package com.bytechef.ee.platform.customcomponent.loader;
 import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ActionDefinition;
-import com.bytechef.component.definition.ActionWorkflowNodeDescriptionFunction;
+import com.bytechef.component.definition.ClusterElementDefinition;
 import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.component.definition.ConnectionDefinition;
-import com.bytechef.component.definition.DataStreamDefinition;
 import com.bytechef.component.definition.Help;
 import com.bytechef.component.definition.OutputDefinition;
 import com.bytechef.component.definition.Parameters;
@@ -61,7 +60,9 @@ class ComponentHandlerPolyglotEngine {
         }
     }
 
-    @SuppressWarnings("PMD.UnusedFormalParameter")
+    @SuppressWarnings({
+        "PMD.UnusedFormalParameter", "unchecked"
+    })
     private static Object executePerform(
         String actionName, Parameters inputParameters, Parameters connectionParameters, ActionContext context,
         String languageId, String script) {
@@ -96,8 +97,9 @@ class ComponentHandlerPolyglotEngine {
     }
 
     private static <T> T getMember(Value value, String name, TypeLiteral<T> typeLiteral) {
-        return value.getMember(name)
-            .as(typeLiteral);
+        Value member = value.getMember(name);
+
+        return member.as(typeLiteral);
     }
 
     private static List<ActionDefinition> toActionDefinitions(
@@ -190,7 +192,12 @@ class ComponentHandlerPolyglotEngine {
         }
 
         @Override
-        public Optional<List<ComponentCategory>> getCategories() {
+        public Optional<List<ComponentCategory>> getComponentCategories() {
+            return Optional.empty();
+        }
+
+        @Override
+        public Optional<List<? extends ClusterElementDefinition<?>>> getClusterElements() {
             return Optional.empty();
         }
 
@@ -206,11 +213,6 @@ class ComponentHandlerPolyglotEngine {
 
         @Override
         public Optional<Help> getCustomActionHelp() {
-            return Optional.empty();
-        }
-
-        @Override
-        public Optional<DataStreamDefinition> getDataStream() {
             return Optional.empty();
         }
 
