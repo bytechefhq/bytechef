@@ -50,10 +50,6 @@ export interface GetConnectionComponentDefinitionRequest {
     connectionVersion: number;
 }
 
-export interface GetDataStreamComponentDefinitionsRequest {
-    componentType: GetDataStreamComponentDefinitionsComponentTypeEnum;
-}
-
 export interface GetUnifiedApiComponentDefinitionsRequest {
     category: UnifiedApiCategory;
 }
@@ -238,41 +234,6 @@ export class ComponentDefinitionApi extends runtime.BaseAPI {
     }
 
     /**
-     * Get all compatible component definitions for a data stream component type.
-     * Get all compatible component definitions for a data stream component type
-     */
-    async getDataStreamComponentDefinitionsRaw(requestParameters: GetDataStreamComponentDefinitionsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<ComponentDefinitionBasic>>> {
-        if (requestParameters['componentType'] == null) {
-            throw new runtime.RequiredError(
-                'componentType',
-                'Required parameter "componentType" was null or undefined when calling getDataStreamComponentDefinitions().'
-            );
-        }
-
-        const queryParameters: any = {};
-
-        const headerParameters: runtime.HTTPHeaders = {};
-
-        const response = await this.request({
-            path: `/data-streams/{componentType}/component-definitions`.replace(`{${"componentType"}}`, encodeURIComponent(String(requestParameters['componentType']))),
-            method: 'GET',
-            headers: headerParameters,
-            query: queryParameters,
-        }, initOverrides);
-
-        return new runtime.JSONApiResponse(response, (jsonValue) => jsonValue.map(ComponentDefinitionBasicFromJSON));
-    }
-
-    /**
-     * Get all compatible component definitions for a data stream component type.
-     * Get all compatible component definitions for a data stream component type
-     */
-    async getDataStreamComponentDefinitions(requestParameters: GetDataStreamComponentDefinitionsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<ComponentDefinitionBasic>> {
-        const response = await this.getDataStreamComponentDefinitionsRaw(requestParameters, initOverrides);
-        return await response.value();
-    }
-
-    /**
      * Get all compatible component definitions for a unified API category.
      * Get all compatible component definitions for a unified API category
      */
@@ -317,11 +278,3 @@ export const GetComponentDefinitionsModeTypeEnum = {
     EMBEDDED: 1
 } as const;
 export type GetComponentDefinitionsModeTypeEnum = typeof GetComponentDefinitionsModeTypeEnum[keyof typeof GetComponentDefinitionsModeTypeEnum];
-/**
- * @export
- */
-export const GetDataStreamComponentDefinitionsComponentTypeEnum = {
-    Source: 'SOURCE',
-    Destination: 'DESTINATION'
-} as const;
-export type GetDataStreamComponentDefinitionsComponentTypeEnum = typeof GetDataStreamComponentDefinitionsComponentTypeEnum[keyof typeof GetDataStreamComponentDefinitionsComponentTypeEnum];

@@ -1,4 +1,5 @@
 apis/ActionDefinitionApi.ts
+apis/ClusterElementDefinitionApi.ts
 apis/ComponentDefinitionApi.ts
 apis/ConnectionDefinitionApi.ts
 apis/Oauth2Api.ts
@@ -22,6 +23,9 @@ models/Authorization.ts
 models/AuthorizationType.ts
 models/BooleanProperty.ts
 models/CheckWorkflowNodeTestOutputExists200Response.ts
+models/ClusterElementDefinition.ts
+models/ClusterElementDefinitionBasic.ts
+models/ClusterElementType.ts
 models/ComponentCategory.ts
 models/ComponentConnection.ts
 models/ComponentDefinition.ts
@@ -29,7 +33,6 @@ models/ComponentDefinitionBasic.ts
 models/ConnectionDefinition.ts
 models/ConnectionDefinitionBasic.ts
 models/ControlType.ts
-models/DataStreamComponent.ts
 models/DateProperty.ts
 models/DateTimeProperty.ts
 models/DeleteWorkflowNodeParameter200Response.ts

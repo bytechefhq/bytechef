@@ -91,8 +91,8 @@ export class TriggerDefinitionApi extends runtime.BaseAPI {
     }
 
     /**
-     * Get a list of trigger definitionss for a component.
-     * Get a list of trigger definitionss for a component
+     * Get a list of trigger definitions for a component.
+     * Get a list of trigger definitions for a component
      */
     async getComponentTriggerDefinitionsRaw(requestParameters: GetComponentTriggerDefinitionsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<TriggerDefinitionBasic>>> {
         if (requestParameters['componentName'] == null) {
@@ -124,8 +124,8 @@ export class TriggerDefinitionApi extends runtime.BaseAPI {
     }
 
     /**
-     * Get a list of trigger definitionss for a component.
-     * Get a list of trigger definitionss for a component
+     * Get a list of trigger definitions for a component.
+     * Get a list of trigger definitions for a component
      */
     async getComponentTriggerDefinitions(requestParameters: GetComponentTriggerDefinitionsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<TriggerDefinitionBasic>> {
         const response = await this.getComponentTriggerDefinitionsRaw(requestParameters, initOverrides);

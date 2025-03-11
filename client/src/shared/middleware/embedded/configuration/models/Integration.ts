@@ -42,12 +42,6 @@ import {
  */
 export interface Integration {
     /**
-     * If multiple instances of an integration are allowed or not.
-     * @type {boolean}
-     * @memberof Integration
-     */
-    allowMultipleInstances: boolean;
-    /**
      * The name of the integration's component.
      * @type {string}
      * @memberof Integration
@@ -114,6 +108,12 @@ export interface Integration {
      */
     readonly lastVersion?: number;
     /**
+     * If multiple instances of an integration are allowed or not.
+     * @type {boolean}
+     * @memberof Integration
+     */
+    multipleInstances: boolean;
+    /**
      * The name of an integration.
      * @type {string}
      * @memberof Integration
@@ -151,8 +151,8 @@ export interface Integration {
  * Check if a given object implements the Integration interface.
  */
 export function instanceOfIntegration(value: object): value is Integration {
-    if (!('allowMultipleInstances' in value) || value['allowMultipleInstances'] === undefined) return false;
     if (!('componentName' in value) || value['componentName'] === undefined) return false;
+    if (!('multipleInstances' in value) || value['multipleInstances'] === undefined) return false;
     return true;
 }
 
@@ -166,7 +166,6 @@ export function IntegrationFromJSONTyped(json: any, ignoreDiscriminator: boolean
     }
     return {
         
-        'allowMultipleInstances': json['allowMultipleInstances'],
         'componentName': json['componentName'],
         'createdBy': json['createdBy'] == null ? undefined : json['createdBy'],
         'createdDate': json['createdDate'] == null ? undefined : (new Date(json['createdDate'])),
@@ -178,6 +177,7 @@ export function IntegrationFromJSONTyped(json: any, ignoreDiscriminator: boolean
         'lastPublishedDate': json['lastPublishedDate'] == null ? undefined : (new Date(json['lastPublishedDate'])),
         'lastStatus': json['lastStatus'] == null ? undefined : IntegrationStatusFromJSON(json['lastStatus']),
         'lastVersion': json['lastVersion'] == null ? undefined : json['lastVersion'],
+        'multipleInstances': json['multipleInstances'],
         'name': json['name'] == null ? undefined : json['name'],
         'category': json['category'] == null ? undefined : CategoryFromJSON(json['category']),
         'integrationWorkflowIds': json['integrationWorkflowIds'] == null ? undefined : json['integrationWorkflowIds'],
@@ -197,11 +197,11 @@ export function IntegrationToJSONTyped(value?: Omit<Integration, 'createdBy'|'cr
 
     return {
         
-        'allowMultipleInstances': value['allowMultipleInstances'],
         'componentName': value['componentName'],
         'description': value['description'],
         'icon': value['icon'],
         'lastStatus': IntegrationStatusToJSON(value['lastStatus']),
+        'multipleInstances': value['multipleInstances'],
         'name': value['name'],
         'category': CategoryToJSON(value['category']),
         'integrationWorkflowIds': value['integrationWorkflowIds'],

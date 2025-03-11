@@ -20,11 +20,11 @@ import { mapValues } from '../runtime';
  */
 export interface ComponentCategory {
     /**
-     * The key of a category.
+     * The name of a category.
      * @type {string}
      * @memberof ComponentCategory
      */
-    key: string;
+    name: string;
     /**
      * The label of a category.
      * @type {string}
@@ -37,7 +37,7 @@ export interface ComponentCategory {
  * Check if a given object implements the ComponentCategory interface.
  */
 export function instanceOfComponentCategory(value: object): value is ComponentCategory {
-    if (!('key' in value) || value['key'] === undefined) return false;
+    if (!('name' in value) || value['name'] === undefined) return false;
     return true;
 }
 
@@ -51,7 +51,7 @@ export function ComponentCategoryFromJSONTyped(json: any, ignoreDiscriminator: b
     }
     return {
         
-        'key': json['key'],
+        'name': json['name'],
         'label': json['label'] == null ? undefined : json['label'],
     };
 }
@@ -67,7 +67,7 @@ export function ComponentCategoryToJSONTyped(value?: ComponentCategory | null, i
 
     return {
         
-        'key': value['key'],
+        'name': value['name'],
         'label': value['label'],
     };
 }

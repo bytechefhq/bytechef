@@ -20,6 +20,13 @@ import {
     ConnectionDefinitionBasicToJSON,
     ConnectionDefinitionBasicToJSONTyped,
 } from './ConnectionDefinitionBasic';
+import type { ClusterElementType } from './ClusterElementType';
+import {
+    ClusterElementTypeFromJSON,
+    ClusterElementTypeFromJSONTyped,
+    ClusterElementTypeToJSON,
+    ClusterElementTypeToJSONTyped,
+} from './ClusterElementType';
 import type { ActionDefinitionBasic } from './ActionDefinitionBasic';
 import {
     ActionDefinitionBasicFromJSON,
@@ -69,11 +76,29 @@ export interface ComponentDefinition {
      */
     actions?: Array<ActionDefinitionBasic>;
     /**
+     * Is the component cluster element.
+     * @type {boolean}
+     * @memberof ComponentDefinition
+     */
+    clusterElement: boolean;
+    /**
+     * The list of cluster element types.
+     * @type {Array<ClusterElementType>}
+     * @memberof ComponentDefinition
+     */
+    clusterElementTypes?: Array<ClusterElementType>;
+    /**
+     * Is the component cluster root.
+     * @type {boolean}
+     * @memberof ComponentDefinition
+     */
+    clusterRoot: boolean;
+    /**
      * The list of categories the component belongs to.
      * @type {Array<ComponentCategory>}
      * @memberof ComponentDefinition
      */
-    categories?: Array<ComponentCategory>;
+    componentCategories?: Array<ComponentCategory>;
     /**
      * 
      * @type {ConnectionDefinitionBasic}
@@ -86,12 +111,6 @@ export interface ComponentDefinition {
      * @memberof ComponentDefinition
      */
     connectionRequired: boolean;
-    /**
-     * If the component supports data stream.
-     * @type {boolean}
-     * @memberof ComponentDefinition
-     */
-    dataStreamSupported?: boolean;
     /**
      * The description.
      * @type {string}
@@ -154,6 +173,8 @@ export interface ComponentDefinition {
  * Check if a given object implements the ComponentDefinition interface.
  */
 export function instanceOfComponentDefinition(value: object): value is ComponentDefinition {
+    if (!('clusterElement' in value) || value['clusterElement'] === undefined) return false;
+    if (!('clusterRoot' in value) || value['clusterRoot'] === undefined) return false;
     if (!('connectionRequired' in value) || value['connectionRequired'] === undefined) return false;
     if (!('name' in value) || value['name'] === undefined) return false;
     if (!('version' in value) || value['version'] === undefined) return false;
@@ -171,10 +192,12 @@ export function ComponentDefinitionFromJSONTyped(json: any, ignoreDiscriminator:
     return {
         
         'actions': json['actions'] == null ? undefined : ((json['actions'] as Array<any>).map(ActionDefinitionBasicFromJSON)),
-        'categories': json['categories'] == null ? undefined : ((json['categories'] as Array<any>).map(ComponentCategoryFromJSON)),
+        'clusterElement': json['clusterElement'],
+        'clusterElementTypes': json['clusterElementTypes'] == null ? undefined : ((json['clusterElementTypes'] as Array<any>).map(ClusterElementTypeFromJSON)),
+        'clusterRoot': json['clusterRoot'],
+        'componentCategories': json['componentCategories'] == null ? undefined : ((json['componentCategories'] as Array<any>).map(ComponentCategoryFromJSON)),
         'connection': json['connection'] == null ? undefined : ConnectionDefinitionBasicFromJSON(json['connection']),
         'connectionRequired': json['connectionRequired'],
-        'dataStreamSupported': json['dataStreamSupported'] == null ? undefined : json['dataStreamSupported'],
         'description': json['description'] == null ? undefined : json['description'],
         'icon': json['icon'] == null ? undefined : json['icon'],
         'name': json['name'],
@@ -199,10 +222,12 @@ export function ComponentDefinitionToJSONTyped(value?: ComponentDefinition | nul
     return {
         
         'actions': value['actions'] == null ? undefined : ((value['actions'] as Array<any>).map(ActionDefinitionBasicToJSON)),
-        'categories': value['categories'] == null ? undefined : ((value['categories'] as Array<any>).map(ComponentCategoryToJSON)),
+        'clusterElement': value['clusterElement'],
+        'clusterElementTypes': value['clusterElementTypes'] == null ? undefined : ((value['clusterElementTypes'] as Array<any>).map(ClusterElementTypeToJSON)),
+        'clusterRoot': value['clusterRoot'],
+        'componentCategories': value['componentCategories'] == null ? undefined : ((value['componentCategories'] as Array<any>).map(ComponentCategoryToJSON)),
         'connection': ConnectionDefinitionBasicToJSON(value['connection']),
         'connectionRequired': value['connectionRequired'],
-        'dataStreamSupported': value['dataStreamSupported'],
         'description': value['description'],
         'icon': value['icon'],
         'name': value['name'],

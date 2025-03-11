@@ -3,7 +3,6 @@
 export * from './Category';
 export * from './ComponentConnection';
 export * from './CreateProjectDeploymentWorkflowJob200Response';
-export * from './DataStreamComponent';
 export * from './Environment';
 export * from './Project';
 export * from './ProjectBasic';

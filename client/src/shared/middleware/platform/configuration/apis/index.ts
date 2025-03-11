@@ -1,6 +1,7 @@
 /* tslint:disable */
 /* eslint-disable */
 export * from './ActionDefinitionApi';
+export * from './ClusterElementDefinitionApi';
 export * from './ComponentDefinitionApi';
 export * from './ConnectionDefinitionApi';
 export * from './Oauth2Api';
