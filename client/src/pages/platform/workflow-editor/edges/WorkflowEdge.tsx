@@ -1,8 +1,13 @@
-import {EdgeProps, getSmoothStepPath} from '@xyflow/react';
-import {useState} from 'react';
+import {TASK_DISPATCHER_NAMES} from '@/shared/constants';
+import {NodeDataType} from '@/shared/types';
+import {BaseEdge, EdgeLabelRenderer, EdgeProps, getSmoothStepPath} from '@xyflow/react';
+import {PlusIcon} from 'lucide-react';
+import {useMemo, useState} from 'react';
 import {twMerge} from 'tailwind-merge';
+import {useShallow} from 'zustand/react/shallow';
 
 import WorkflowNodesPopoverMenu from '../components/WorkflowNodesPopoverMenu';
+import useWorkflowDataStore from '../stores/useWorkflowDataStore';
 
 export default function WorkflowEdge({
     id,
@@ -15,6 +20,12 @@ export default function WorkflowEdge({
     targetX,
     targetY,
 }: EdgeProps) {
+    const {nodes} = useWorkflowDataStore(
+        useShallow((state) => ({
+            nodes: state.nodes,
+        }))
+    );
+
     const [isDropzoneActive, setDropzoneActive] = useState<boolean>(false);
 
     const [edgePath, edgeCenterX, edgeCenterY] = getSmoothStepPath({
@@ -26,43 +37,81 @@ export default function WorkflowEdge({
         targetY,
     });
 
+    const sourceNodeId = useMemo(() => id.split('=>')[0], [id]);
+
+    const sourceNode = useMemo(() => nodes.find((node) => node.id === sourceNodeId), [nodes, sourceNodeId]);
+
+    const sourceNodeComponentName = useMemo(() => (sourceNode?.data as NodeDataType)?.componentName, [sourceNode]);
+
+    const buttonPosition = useMemo(() => {
+        const isVerticalEdge = Math.abs(sourceY - targetY) > Math.abs(sourceX - targetX);
+
+        if (isVerticalEdge) {
+            return {
+                x: edgeCenterX,
+                y: edgeCenterY,
+            };
+        }
+
+        let posX;
+        let posY;
+
+        if (sourceX < targetX) {
+            posY = Math.min(sourceY, targetY) + Math.abs(targetY - sourceY) * 0.5;
+        } else {
+            posY = Math.min(sourceY, targetY) + Math.abs(targetY - sourceY) * 0.5;
+        }
+
+        if (id.includes('bottom-ghost')) {
+            posX = sourceX;
+        } else if (sourceNodeComponentName && TASK_DISPATCHER_NAMES.includes(sourceNodeComponentName as string)) {
+            posX = targetX;
+        }
+
+        return {x: posX, y: posY};
+    }, [sourceY, targetY, sourceX, targetX, id, sourceNodeComponentName, edgeCenterX, edgeCenterY]);
+
     return (
         <>
-            <path
+            <BaseEdge
                 className="fill-none stroke-gray-300 stroke-2"
-                d={edgePath}
                 id={id}
                 markerEnd={markerEnd}
+                path={edgePath}
                 style={style}
             />
 
-            <WorkflowNodesPopoverMenu edge hideTriggerComponents sourceNodeId={id}>
-                <g
-                    onDragEnter={() => setDropzoneActive(true)}
-                    onDragLeave={() => setDropzoneActive(false)}
-                    onDragOver={(event) => event.preventDefault()}
-                    onDrop={() => setDropzoneActive(false)}
-                    transform={`translate(${edgeCenterX}, ${edgeCenterY})`}
-                >
-                    <rect
-                        className={twMerge(
-                            'react-flow__edge pointer-events-auto cursor-pointer fill-white stroke-gray-400 hover:scale-110 hover:fill-gray-200',
-                            isDropzoneActive && 'z-40 scale-150 fill-blue-100 stroke-blue-100'
-                        )}
-                        height={isDropzoneActive ? 72 : 24}
-                        id={id}
-                        rx={4}
-                        ry={4}
-                        width={isDropzoneActive ? 72 : 24}
-                        x={isDropzoneActive ? -36 : -12}
-                        y={isDropzoneActive ? -36 : -12}
-                    />
-
-                    <text className={twMerge('pointer-events-none select-none fill-gray-500')} x={-5} y={5}>
-                        +
-                    </text>
-                </g>
-            </WorkflowNodesPopoverMenu>
+            <EdgeLabelRenderer>
+                <WorkflowNodesPopoverMenu edgeId={id} hideTriggerComponents sourceNodeId={sourceNodeId}>
+                    <div
+                        className="nodrag nopan"
+                        onDragEnter={() => setDropzoneActive(true)}
+                        onDragLeave={() => setDropzoneActive(false)}
+                        onDragOver={(event) => event.preventDefault()}
+                        onDrop={() => setDropzoneActive(false)}
+                        style={{
+                            pointerEvents: 'all',
+                            position: 'absolute',
+                            transform: `translate(-50%, -50%) translate(${buttonPosition.x}px,${buttonPosition.y}px)`,
+                            zIndex: isDropzoneActive ? 40 : 'auto',
+                        }}
+                    >
+                        <div
+                            className={twMerge(
+                                'flex cursor-pointer items-center justify-center rounded border-2 border-gray-300 bg-white transition-all hover:scale-110 hover:border-gray-400',
+                                isDropzoneActive && 'scale-150 border-blue-100 bg-blue-100'
+                            )}
+                            id={`${id}-button`}
+                            style={{
+                                height: isDropzoneActive ? 72 : 24,
+                                width: isDropzoneActive ? 72 : 24,
+                            }}
+                        >
+                            <PlusIcon className="size-3.5 text-muted-foreground" />
+                        </div>
+                    </div>
+                </WorkflowNodesPopoverMenu>
+            </EdgeLabelRenderer>
         </>
     );
 }
