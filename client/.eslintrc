@@ -136,6 +136,7 @@
                     "min-w-workflow-execution-sheet-width",
                     "mx-placeholder-node-position",
                     "nodrag",
+                    "nopan",
                     "nowheel",
                     "outline-ring",
                     "pl-property-input-position",
