@@ -49,9 +49,9 @@ Creates a new company
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| name | Name | STRING | Name of the company | true |
-| description | Description | STRING | Description of the company | false |
-| note | Note | STRING | Any specific note about the company | false |
+| name | Name | STRING | Name of the company. | true |
+| description | Description | STRING | Description of the company. | false |
+| note | Note | STRING | Any specific note about the company. | false |
 
 #### Example JSON Structure
 ```json
@@ -78,10 +78,10 @@ Type: OBJECT
 
 |     Name     |     Type     |     Description     |
 |:------------:|:------------:|:-------------------:|
-| id | NUMBER |  |
-| name | STRING |  |
-| description | STRING |  |
-| note | STRING |  |
+| id | NUMBER | ID of the company. |
+| name | STRING | Name of the company. |
+| description | STRING | Description of the company. |
+| note | STRING | Note about the company. |
 
 
 
@@ -108,10 +108,10 @@ Creates a new contact
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | name | Name | STRING | Full name of the contact | true |
 | email | Email | STRING | Primary email address of the contact. | true |
-| phone | Work Phone | STRING | Telephone number of the contact | false |
-| mobile | Mobile | STRING | Mobile number of the contact | false |
-| description | Description | STRING | A small description of the contact | false |
-| job_title | Job Title | STRING | Job title of the contact | false |
+| phone | Work Phone | STRING | Telephone number of the contact. | false |
+| mobile | Mobile | STRING | Mobile number of the contact. | false |
+| description | Description | STRING | A small description of the contact. | false |
+| job_title | Job Title | STRING | Job title of the contact. | false |
 
 #### Example JSON Structure
 ```json
@@ -141,10 +141,10 @@ Type: OBJECT
 
 |     Name     |     Type     |     Description     |
 |:------------:|:------------:|:-------------------:|
-| description | STRING |  |
-| email | STRING |  |
-| id | NUMBER |  |
-| job_title | STRING |  |
+| description | STRING | A small description of the contact. |
+| email | STRING | Primary email address of the contact. |
+| id | NUMBER | ID of the contact. |
+| job_title | STRING | Job title of the contact. |
 
 
 
@@ -202,11 +202,11 @@ Type: OBJECT
 
 |     Name     |     Type     |     Description     |
 |:------------:|:------------:|:-------------------:|
-| subject | STRING |  |
-| email | STRING |  |
-| description | STRING |  |
+| subject | STRING | Subject of the ticket. |
+| email | STRING | Email address of the requester. |
+| description | STRING | HTML content of the ticket. |
 | priority | INTEGER | Priority of the ticket. |
-| status | INTEGER |  |
+| status | INTEGER | Status of the ticket. |
 
 
 

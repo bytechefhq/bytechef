@@ -75,7 +75,7 @@ Type: OBJECT
 
 |     Name     |     Type     |     Description     |
 |:------------:|:------------:|:-------------------:|
-| content | ARRAY <details> <summary> Items </summary> [{STRING\(id), STRING\(form_id), STRING\(status), STRING\(new), STRING\(flag), STRING\(notes)}] </details> |  |
+| content | ARRAY <details> <summary> Items </summary> [{STRING\(id), STRING\(form_id), STRING\(status), STRING\(new), STRING\(notes)}] </details> |  |
 
 
 
@@ -88,7 +88,6 @@ Type: OBJECT
     "form_id" : "",
     "status" : "",
     "new" : "",
-    "flag" : "",
     "notes" : ""
   } ]
 }

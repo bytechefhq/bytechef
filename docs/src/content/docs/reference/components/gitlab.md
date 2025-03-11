@@ -78,12 +78,12 @@ Type: OBJECT
 
 |     Name     |     Type     |     Description     |
 |:------------:|:------------:|:-------------------:|
-| id | INTEGER |  |
-| iid | INTEGER |  |
-| project_id | INTEGER |  |
-| title | STRING |  |
-| description | STRING |  |
-| web_url | STRING |  |
+| id | INTEGER | The ID of the issue. |
+| iid | INTEGER | The internal ID of the issue. |
+| project_id | INTEGER | The ID of the project. |
+| title | STRING | The title of the issue. |
+| description | STRING | The description of the issue. |
+| web_url | STRING | The URL of the issue. |
 
 
 
@@ -139,8 +139,8 @@ Type: OBJECT
 
 |     Name     |     Type     |     Description     |
 |:------------:|:------------:|:-------------------:|
-| id | INTEGER |  |
-| body | STRING |  |
+| id | INTEGER | The ID of the comment. |
+| body | STRING | The body of the comment. |
 
 
 
@@ -184,11 +184,11 @@ Type: OBJECT
 
 |     Name     |     Type     |     Description     |
 |:------------:|:------------:|:-------------------:|
-| description | STRING |  |
-| id | INTEGER |  |
-| iid | INTEGER |  |
-| projectId | INTEGER |  |
-| title | STRING |  |
+| description | STRING | The description of the issue. |
+| id | INTEGER | The ID of the issue. |
+| iid | INTEGER | The internal ID of the issue. |
+| projectId | INTEGER | The ID of the project. |
+| title | STRING | The title of the issue. |
 
 
 

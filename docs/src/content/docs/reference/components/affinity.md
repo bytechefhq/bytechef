@@ -73,8 +73,8 @@ Type: OBJECT
 
 |     Name     |     Type     |     Description     |
 |:------------:|:------------:|:-------------------:|
-| id | STRING |  |
-| name | STRING |  |
+| id | STRING | The ID of the newly created opportunity. |
+| name | STRING | The name of the newly created opportunity. |
 
 
 
@@ -124,9 +124,9 @@ Type: OBJECT
 
 |     Name     |     Type     |     Description     |
 |:------------:|:------------:|:-------------------:|
-| id | STRING |  |
-| name | STRING |  |
-| domain | STRING |  |
+| id | STRING | The ID of the organization. |
+| name | STRING | The name of the organization. |
+| domain | STRING | The domain name of the organization. |
 
 
 
@@ -179,10 +179,10 @@ Type: OBJECT
 
 |     Name     |     Type     |     Description     |
 |:------------:|:------------:|:-------------------:|
-| id | STRING |  |
-| first_name | STRING |  |
-| last_name | STRING |  |
-| emails | ARRAY <details> <summary> Items </summary> [STRING] </details> |  |
+| id | STRING | The ID of the person. |
+| first_name | STRING | The first name of the person. |
+| last_name | STRING | The last name of the person. |
+| emails | ARRAY <details> <summary> Items </summary> [STRING] </details> | The email addresses of the person. |
 
 
 
