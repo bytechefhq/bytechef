@@ -6,9 +6,11 @@ import {useQueryClient} from '@tanstack/react-query';
 import {PropsWithChildren, useCallback, useEffect, useMemo, useState} from 'react';
 import {useParams} from 'react-router-dom';
 import {twMerge} from 'tailwind-merge';
+import {useShallow} from 'zustand/react/shallow';
 
 import {useWorkflowMutation} from '../providers/workflowMutationProvider';
 import useWorkflowDataStore from '../stores/useWorkflowDataStore';
+import getTaskDispatcherContext from '../utils/getTaskDispatcherContext';
 import handleConditionClick from '../utils/handleConditionClick';
 import handleLoopClick from '../utils/handleLoopClick';
 import WorkflowNodesPopoverMenuComponentList from './WorkflowNodesPopoverMenuComponentList';
@@ -17,6 +19,7 @@ import WorkflowNodesPopoverMenuOperationList from './WorkflowNodesPopoverMenuOpe
 interface WorkflowNodesPopoverMenuProps extends PropsWithChildren {
     conditionId?: string;
     edge?: boolean;
+    edgeId?: string;
     hideActionComponents?: boolean;
     hideTriggerComponents?: boolean;
     hideTaskDispatchers?: boolean;
@@ -29,6 +32,7 @@ const WorkflowNodesPopoverMenu = ({
     children,
     conditionId,
     edge = false,
+    edgeId,
     hideActionComponents = false,
     hideTaskDispatchers = false,
     hideTriggerComponents = false,
@@ -43,6 +47,13 @@ const WorkflowNodesPopoverMenu = ({
 
     const {componentDefinitions, taskDispatcherDefinitions, workflow} = useWorkflowDataStore();
 
+    const {edges, nodes} = useWorkflowDataStore(
+        useShallow((state) => ({
+            edges: state.edges,
+            nodes: state.nodes,
+        }))
+    );
+
     const {updateWorkflowMutation} = useWorkflowMutation();
 
     const queryClient = useQueryClient();
@@ -51,6 +62,7 @@ const WorkflowNodesPopoverMenu = ({
 
     const memoizedComponentDefinitions = useMemo(() => componentDefinitions, [componentDefinitions]);
     const memoizedTaskDispatcherDefinitions = useMemo(() => taskDispatcherDefinitions, [taskDispatcherDefinitions]);
+    const sourceNode = useMemo(() => nodes.find((node) => node.id === sourceNodeId), [sourceNodeId, nodes]);
 
     const handleActionPanelClose = useCallback(() => {
         setActionPanelOpen(false);
@@ -60,18 +72,29 @@ const WorkflowNodesPopoverMenu = ({
 
     const handleComponentClick = useCallback(
         async (clickedItem: ClickedDefinitionType) => {
-            if (clickedItem.taskDispatcher) {
-                if (clickedItem.name.includes('condition')) {
+            const {componentVersion, name, taskDispatcher, trigger, version} = clickedItem;
+
+            if (taskDispatcher) {
+                if (name.includes('condition')) {
+                    const edge = edges.find((edge) => edge.id === edgeId);
+
+                    const taskDispatcherContext = getTaskDispatcherContext({
+                        edge: edge,
+                        node: edge?.type === 'workflow' ? undefined : sourceNode,
+                        nodes: nodes,
+                    });
+
                     await handleConditionClick({
                         clickedItem,
-                        edge,
+                        edgeId,
                         projectId: +projectId!,
                         queryClient,
                         sourceNodeId,
+                        taskDispatcherContext,
                         updateWorkflowMutation,
                         workflow,
                     });
-                } else if (clickedItem.name.includes('loop')) {
+                } else if (name.includes('loop')) {
                     await handleLoopClick({
                         clickedItem,
                         edge,
@@ -88,19 +111,19 @@ const WorkflowNodesPopoverMenu = ({
                 return;
             }
 
-            if (clickedItem.trigger) {
+            if (trigger) {
                 setTrigger(true);
             }
 
             const clickedComponentDefinition = await queryClient.fetchQuery({
                 queryFn: () =>
                     new ComponentDefinitionApi().getComponentDefinition({
-                        componentName: clickedItem.name,
-                        componentVersion: clickedItem.componentVersion || clickedItem.version,
+                        componentName: name,
+                        componentVersion: componentVersion || version,
                     }),
                 queryKey: ComponentDefinitionKeys.componentDefinition({
-                    componentName: clickedItem.name,
-                    componentVersion: clickedItem.componentVersion || clickedItem.version,
+                    componentName: name,
+                    componentVersion: componentVersion || version,
                 }),
             });
 
@@ -164,17 +187,17 @@ const WorkflowNodesPopoverMenu = ({
                         hideTaskDispatchers={hideTaskDispatchers}
                         hideTriggerComponents={hideTriggerComponents}
                         selectedComponentName={componentDefinitionToBeAdded?.name}
-                        sourceNodeId={sourceNodeId}
                     />
 
                     {actionPanelOpen && componentDefinitionToBeAdded && (
                         <WorkflowNodesPopoverMenuOperationList
                             componentDefinition={componentDefinitionToBeAdded}
                             conditionId={conditionId}
-                            edge={edge}
+                            edgeId={edgeId}
                             loopId={loopId}
                             setPopoverOpen={setPopoverOpen}
                             sourceNodeId={sourceNodeId}
+                            // taskDispatcherContext={taskDispatcherContext}
                             trigger={trigger}
                         />
                     )}

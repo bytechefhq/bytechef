@@ -14,6 +14,7 @@ import {useWorkflowMutation} from '../providers/workflowMutationProvider';
 import useWorkflowDataStore from '../stores/useWorkflowDataStore';
 import getFormattedName from '../utils/getFormattedName';
 import getParametersWithDefaultValues from '../utils/getParametersWithDefaultValues';
+import getTaskDispatcherContext from '../utils/getTaskDispatcherContext';
 import handleComponentAddedSuccess from '../utils/handleComponentAddedSuccess';
 import handleConditionChildOperationClick from '../utils/handleConditionChildOperationClick';
 import handleLoopChildOperationClick from '../utils/handleLoopChildOperationClick';
@@ -22,7 +23,7 @@ import saveWorkflowDefinition from '../utils/saveWorkflowDefinition';
 interface WorkflowNodesPopoverMenuOperationListProps {
     componentDefinition: ComponentDefinition;
     conditionId?: string;
-    edge?: boolean;
+    edgeId?: string;
     loopId?: string;
     setPopoverOpen: (open: boolean) => void;
     sourceNodeId: string;
@@ -32,7 +33,7 @@ interface WorkflowNodesPopoverMenuOperationListProps {
 const WorkflowNodesPopoverMenuOperationList = ({
     componentDefinition,
     conditionId,
-    edge,
+    edgeId,
     loopId,
     setPopoverOpen,
     sourceNodeId,
@@ -193,9 +194,25 @@ const WorkflowNodesPopoverMenuOperationList = ({
             };
 
             const handleEdgeCase = () => {
-                const clickedEdge = edges.find((edge) => edge.id === sourceNodeId);
+                const clickedEdge = edges.find((edge) => edge.id === edgeId);
 
                 if (!clickedEdge) {
+                    return;
+                }
+
+                const taskDispatcherContext = getTaskDispatcherContext({edge: clickedEdge, nodes});
+
+                if (taskDispatcherContext?.conditionId) {
+                    handleConditionChildOperationClick({
+                        conditionId: taskDispatcherContext.conditionId as string,
+                        operation: clickedOperation,
+                        operationDefinition: clickedComponentActionDefinition,
+                        queryClient,
+                        taskDispatcherContext,
+                        updateWorkflowMutation,
+                        workflow,
+                    });
+
                     return;
                 }
 
@@ -207,6 +224,10 @@ const WorkflowNodesPopoverMenuOperationList = ({
             };
 
             const handleNonEdgeCase = () => {
+                const sourceNode = nodes.find((node) => node.id === sourceNodeId);
+
+                const taskDispatcherContext = getTaskDispatcherContext({node: sourceNode});
+
                 if (loopId) {
                     handleLoopChildOperationClick({
                         loopId,
@@ -218,14 +239,15 @@ const WorkflowNodesPopoverMenuOperationList = ({
                         updateWorkflowMutation,
                         workflow,
                     });
-                } else if (conditionId) {
+                } else if (taskDispatcherContext?.conditionId || conditionId) {
                     handleConditionChildOperationClick({
-                        conditionId,
+                        conditionId: (taskDispatcherContext?.conditionId as string) ?? conditionId,
                         operation: clickedOperation,
                         operationDefinition: clickedComponentActionDefinition,
                         placeholderId: sourceNodeId,
                         projectId: +projectId!,
                         queryClient,
+                        taskDispatcherContext,
                         updateWorkflowMutation,
                         workflow,
                     });
@@ -240,7 +262,7 @@ const WorkflowNodesPopoverMenuOperationList = ({
 
                     let insertIndex: number | undefined = undefined;
 
-                    if (sourceNodeId.includes('bottom-placeholder')) {
+                    if (sourceNodeId?.includes('bottom-placeholder')) {
                         const sourceNodeIndex = nodes.findIndex((node) => node.id === sourceNodeId);
 
                         const nextNode = nodes[sourceNodeIndex + 1];
@@ -254,7 +276,7 @@ const WorkflowNodesPopoverMenuOperationList = ({
                 setPopoverOpen(false);
             };
 
-            if (edge) {
+            if (edgeId) {
                 handleEdgeCase();
             } else {
                 handleNonEdgeCase();
