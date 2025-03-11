@@ -151,7 +151,7 @@ const WorkflowNode = ({data, id}: {data: NodeDataType; id: string}) => {
                 type="target"
             />
 
-            {data.taskDispatcher && data.componentName === 'loop' ? (
+            {data.taskDispatcher ? (
                 <>
                     <Handle
                         className={twMerge('absolute top-3/4', styles.handle)}
@@ -183,9 +183,9 @@ const WorkflowNode = ({data, id}: {data: NodeDataType; id: string}) => {
 
             {data.name.includes('condition') && (
                 <div className="absolute bottom-0 left-0 font-bold text-muted-foreground">
-                    <span className="absolute -bottom-6 -left-32">TRUE</span>
+                    <span className="absolute -bottom-3 -left-24">TRUE</span>
 
-                    <span className="absolute -bottom-6 left-40">FALSE</span>
+                    <span className="absolute -bottom-3 left-32">FALSE</span>
                 </div>
             )}
         </div>
