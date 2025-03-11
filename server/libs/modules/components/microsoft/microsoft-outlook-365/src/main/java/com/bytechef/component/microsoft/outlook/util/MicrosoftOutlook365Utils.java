@@ -61,7 +61,7 @@ public class MicrosoftOutlook365Utils {
     }
 
     public static String getMailboxTimeZone(ActionContext actionContext) {
-        Map<String, String> body = actionContext.http(http -> http.get("/mailboxSettings/timeZone"))
+        Map<String, String> body = actionContext.http(http -> http.get("/me/mailboxSettings/timeZone"))
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});

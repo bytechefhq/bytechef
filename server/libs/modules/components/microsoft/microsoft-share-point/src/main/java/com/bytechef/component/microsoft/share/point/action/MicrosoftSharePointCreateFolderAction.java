@@ -71,7 +71,8 @@ public class MicrosoftSharePointCreateFolderAction {
 
         return context
             .http(http -> http.post(
-                "/" + inputParameters.getRequiredString(SITE_ID) + "/drive/items/" + getFolderId(inputParameters) +
+                "/sites/" + inputParameters.getRequiredString(SITE_ID) + "/drive/items/" + getFolderId(inputParameters)
+                    +
                     "/children"))
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .body(

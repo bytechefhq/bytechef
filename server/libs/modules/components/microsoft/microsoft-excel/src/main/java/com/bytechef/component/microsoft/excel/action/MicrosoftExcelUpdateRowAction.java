@@ -31,7 +31,7 @@ import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition
 import com.bytechef.component.definition.Parameters;
 
 /**
- * @author Monika Domiter
+ * @author Monika Kušter
  */
 public class MicrosoftExcelUpdateRowAction {
 
@@ -53,11 +53,11 @@ public class MicrosoftExcelUpdateRowAction {
     private MicrosoftExcelUpdateRowAction() {
     }
 
-    public static Object perform(
-        Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
+    protected static Object perform(
+        Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) {
 
         return updateRange(
-            inputParameters, context, inputParameters.getRequiredInteger(ROW_NUMBER),
+            inputParameters, actionContext, inputParameters.getRequiredInteger(ROW_NUMBER),
             getRowInputValues(inputParameters));
     }
 

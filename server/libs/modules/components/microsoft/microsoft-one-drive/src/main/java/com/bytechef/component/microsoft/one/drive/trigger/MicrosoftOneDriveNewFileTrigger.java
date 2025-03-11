@@ -84,7 +84,8 @@ public class MicrosoftOneDriveNewFileTrigger {
         LocalDateTime startDate = closureParameters.getLocalDateTime(LAST_TIME_CHECKED, now.minusHours(3));
 
         Map<String, Object> body = context
-            .http(http -> http.get("/items/" + getFolderId(inputParameters.getString(PARENT_ID)) + "/children"))
+            .http(http -> http
+                .get("/me/drive/items/%s/children".formatted(getFolderId(inputParameters.getString(PARENT_ID)))))
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});

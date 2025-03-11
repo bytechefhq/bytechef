@@ -29,7 +29,6 @@ import static com.bytechef.component.microsoft.excel.constant.MicrosoftExcelCons
 import static com.bytechef.component.microsoft.excel.constant.MicrosoftExcelConstants.VALUE;
 import static com.bytechef.component.microsoft.excel.constant.MicrosoftExcelConstants.VALUES;
 import static com.bytechef.component.microsoft.excel.constant.MicrosoftExcelConstants.WORKBOOK_ID;
-import static com.bytechef.component.microsoft.excel.constant.MicrosoftExcelConstants.WORKBOOK_WORKSHEETS_PATH;
 import static com.bytechef.component.microsoft.excel.constant.MicrosoftExcelConstants.WORKSHEET_NAME;
 
 import com.bytechef.component.definition.ActionContext;
@@ -62,9 +61,11 @@ public class MicrosoftExcelUtils {
 
         if (inputParameters.getRequiredBoolean(IS_THE_FIRST_ROW_HEADER)) {
             Map<String, Object> body = context
-                .http(http -> http
-                    .get("/" + inputParameters.getRequiredString(WORKBOOK_ID) + WORKBOOK_WORKSHEETS_PATH
-                        + inputParameters.getRequiredString(WORKSHEET_NAME) + "/usedRange(valuesOnly=true)"))
+                .http(http -> http.get(
+                    "/me/drive/items/%s/workbook/worksheets/%s/usedRange(valuesOnly=true)"
+                        .formatted(
+                            inputParameters.getRequiredString(WORKBOOK_ID),
+                            inputParameters.getRequiredString(WORKSHEET_NAME))))
                 .configuration(Http.responseType(Http.ResponseType.JSON))
                 .execute()
                 .getBody(new TypeReference<>() {});
@@ -97,8 +98,11 @@ public class MicrosoftExcelUtils {
 
     public static String getLastUsedColumnLabel(Parameters inputParameters, ActionContext context) {
         Map<String, Object> body = context
-            .http(http -> http.get("/" + inputParameters.getRequiredString(WORKBOOK_ID)
-                + WORKBOOK_WORKSHEETS_PATH + inputParameters.getRequiredString(WORKSHEET_NAME) + "/usedRange"))
+            .http(http -> http.get(
+                "/me/drive/items/%s/workbook/worksheets/%s/usedRange"
+                    .formatted(
+                        inputParameters.getRequiredString(WORKBOOK_ID),
+                        inputParameters.getRequiredString(WORKSHEET_NAME))))
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});
@@ -112,8 +116,9 @@ public class MicrosoftExcelUtils {
 
     public static Integer getLastUsedRowIndex(Parameters inputParameters, ActionContext context) {
         Map<String, Object> body = context
-            .http(http -> http.get("/" + inputParameters.getRequiredString(WORKBOOK_ID)
-                + WORKBOOK_WORKSHEETS_PATH + inputParameters.getRequiredString(WORKSHEET_NAME) + "/usedRange"))
+            .http(http -> http.get("/me/drive/items/%s/workbook/worksheets/%s/usedRange"
+                .formatted(inputParameters.getRequiredString(WORKBOOK_ID),
+                    inputParameters.getRequiredString(WORKSHEET_NAME))))
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});
@@ -179,7 +184,7 @@ public class MicrosoftExcelUtils {
         String searchText, ActionContext context) {
 
         Map<String, Object> body = context
-            .http(http -> http.get("/root/search(q='.xlsx')"))
+            .http(http -> http.get("/me/drive/items/root/search(q='.xlsx')"))
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});
@@ -193,7 +198,8 @@ public class MicrosoftExcelUtils {
 
         Map<String, Object> body = context
             .http(http -> http
-                .get("/" + inputParameters.getRequiredString(WORKBOOK_ID) + WORKBOOK_WORKSHEETS_PATH))
+                .get("/me/drive/items/%s//workbook/worksheets/"
+                    .formatted(inputParameters.getRequiredString(WORKBOOK_ID))))
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});

@@ -45,7 +45,8 @@ public class MicrosoftOneDriveUtils {
         String searchText, ActionContext context) {
 
         Map<String, Object> body = context
-            .http(http -> http.get("/items/" + getFolderId(inputParameters.getString(PARENT_ID)) + "/children"))
+            .http(
+                http -> http.get("/me/drive/items/" + getFolderId(inputParameters.getString(PARENT_ID)) + "/children"))
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});
@@ -71,7 +72,7 @@ public class MicrosoftOneDriveUtils {
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
         String searchText, Context context) {
 
-        Map<String, Object> body = context.http(http -> http.get("/items/root/children"))
+        Map<String, Object> body = context.http(http -> http.get("/me/drive/items/root/children"))
             .queryParameters("$filter", "folder ne null")
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute()

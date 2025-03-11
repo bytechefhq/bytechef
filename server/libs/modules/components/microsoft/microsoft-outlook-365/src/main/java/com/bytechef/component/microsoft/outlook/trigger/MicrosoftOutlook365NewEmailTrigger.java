@@ -68,7 +68,7 @@ public class MicrosoftOutlook365NewEmailTrigger {
         List<Map<?, ?>> maps = new ArrayList<>();
 
         Map<String, Object> body = context
-            .http(http -> http.get("/mailFolders/Inbox/messages"))
+            .http(http -> http.get("/me/mailFolders/Inbox/messages"))
             .queryParameters("$filter", "isRead eq false", "$orderby", "receivedDateTime desc")
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute()

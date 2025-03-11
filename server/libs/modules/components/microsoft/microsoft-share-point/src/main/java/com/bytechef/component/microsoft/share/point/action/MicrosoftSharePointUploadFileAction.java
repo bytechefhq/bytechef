@@ -72,7 +72,8 @@ public class MicrosoftSharePointUploadFileAction {
 
         return context
             .http(http -> http.put(
-                "/" + inputParameters.getRequiredString(SITE_ID) + "/drive/items/" + getFolderId(inputParameters) +
+                "/sites/" + inputParameters.getRequiredString(SITE_ID) + "/drive/items/" + getFolderId(inputParameters)
+                    +
                     ":/" + fileEntry.getName() + ":/content"))
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .body(Http.Body.of(fileEntry))

@@ -74,8 +74,8 @@ public class MicrosoftOneDriveUploadFileAction {
 
         return context
             .http(http -> http.put(
-                "/items/" + getFolderId(inputParameters.getString(PARENT_ID)) + ":/" + fileEntry.getName() +
-                    ":/content"))
+                "/me/drive/items/%s:/%s:/content"
+                    .formatted(getFolderId(inputParameters.getString(PARENT_ID)), fileEntry.getName())))
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .body(Http.Body.of(fileEntry))
             .execute()

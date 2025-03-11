@@ -30,7 +30,7 @@ import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition
 import com.bytechef.component.definition.Parameters;
 
 /**
- * @author Monika Domiter
+ * @author Monika Kušter
  */
 public class MicrosoftExcelAppendRowAction {
 
@@ -48,11 +48,11 @@ public class MicrosoftExcelAppendRowAction {
     private MicrosoftExcelAppendRowAction() {
     }
 
-    public static Object perform(
-        Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
+    protected static Object perform(
+        Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) {
 
         return updateRange(
-            inputParameters, context, getLastUsedRowIndex(inputParameters, context) + 1,
+            inputParameters, actionContext, getLastUsedRowIndex(inputParameters, actionContext) + 1,
             getRowInputValues(inputParameters));
     }
 }

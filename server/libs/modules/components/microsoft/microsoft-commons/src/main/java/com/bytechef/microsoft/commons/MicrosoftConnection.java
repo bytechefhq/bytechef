@@ -33,9 +33,9 @@ public class MicrosoftConnection {
 
     private static final String TENANT_ID = "tenantId";
 
-    public static ModifiableConnectionDefinition createConnection(String baseUri, Authorization.ScopesFunction scopes) {
+    public static ModifiableConnectionDefinition createConnection(Authorization.ScopesFunction scopes) {
         return connection()
-            .baseUri((connectionParameters, context) -> baseUri)
+            .baseUri((connectionParameters, context) -> "https://graph.microsoft.com/v1.0")
             .authorizations(authorization(
                 AuthorizationType.OAUTH2_AUTHORIZATION_CODE)
                     .title("OAuth2 Authorization Code")

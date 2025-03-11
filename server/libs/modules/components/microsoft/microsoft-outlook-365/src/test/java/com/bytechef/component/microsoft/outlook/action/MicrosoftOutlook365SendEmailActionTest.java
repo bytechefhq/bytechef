@@ -16,9 +16,13 @@
 
 package com.bytechef.component.microsoft.outlook.action;
 
+import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.ADDRESS;
 import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.BCC_RECIPIENTS;
 import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.BODY;
 import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.CC_RECIPIENTS;
+import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.CONTENT;
+import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.CONTENT_TYPE;
+import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.EMAIL_ADDRESS;
 import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.FROM;
 import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.REPLY_TO;
 import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.SUBJECT;
@@ -32,7 +36,7 @@ import static org.mockito.Mockito.when;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Parameters;
-import java.util.HashMap;
+import com.bytechef.component.test.definition.MockParametersFactory;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
@@ -46,30 +50,16 @@ class MicrosoftOutlook365SendEmailActionTest {
     private final ArgumentCaptor<Http.Body> bodyArgumentCaptor = ArgumentCaptor.forClass(Http.Body.class);
     private final ActionContext mockedContext = mock(ActionContext.class);
     private final Http.Executor mockedExecutor = mock(Http.Executor.class);
-    private final Parameters mockedParameters = mock(Parameters.class);
+    private final Parameters mockedParameters = MockParametersFactory.create(Map.of(
+        FROM, "testFrom", SUBJECT, "testSubject", BODY, Map.of(CONTENT, "test", CONTENT_TYPE, "text"),
+        TO_RECIPIENTS, List.of("address1"), CC_RECIPIENTS, List.of("address2"), BCC_RECIPIENTS, List.of("address3"),
+        REPLY_TO, List.of("address4")));
     private final Http.Response mockedResponse = mock(Http.Response.class);
 
     @Test
     void testPerform() {
-        Map<String, Object> propertyStubsMap = createPropertyStubsMap();
-
         when(mockedContext.http(any()))
             .thenReturn(mockedExecutor);
-        when(mockedParameters.get(FROM))
-            .thenReturn(propertyStubsMap.get(FROM));
-        when(mockedParameters.getRequiredString(SUBJECT))
-            .thenReturn((String) propertyStubsMap.get(SUBJECT));
-        when(mockedParameters.get(BODY))
-            .thenReturn(propertyStubsMap.get(BODY));
-        when(mockedParameters.getArray(TO_RECIPIENTS))
-            .thenReturn((Object[]) propertyStubsMap.get(TO_RECIPIENTS));
-        when(mockedParameters.getArray(CC_RECIPIENTS))
-            .thenReturn((Object[]) propertyStubsMap.get(CC_RECIPIENTS));
-        when(mockedParameters.getArray(BCC_RECIPIENTS))
-            .thenReturn((Object[]) propertyStubsMap.get(BCC_RECIPIENTS));
-        when(mockedParameters.getArray(REPLY_TO))
-            .thenReturn((Object[]) propertyStubsMap.get(REPLY_TO));
-
         when(mockedExecutor.body(bodyArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
         when(mockedExecutor.configuration(any()))
@@ -83,26 +73,16 @@ class MicrosoftOutlook365SendEmailActionTest {
 
         Http.Body body = bodyArgumentCaptor.getValue();
 
-        assertEquals(Map.of("message", propertyStubsMap), body.getContent());
-    }
+        Map<String, Map<String, Object>> expectedBody = Map.of(
+            "message",
+            Map.of(
+                SUBJECT, "testSubject",
+                BODY, Map.of(CONTENT, "test", CONTENT_TYPE, "text"),
+                TO_RECIPIENTS, List.of(Map.of(EMAIL_ADDRESS, Map.of(ADDRESS, "address1"))),
+                CC_RECIPIENTS, List.of(Map.of(EMAIL_ADDRESS, Map.of(ADDRESS, "address2"))),
+                BCC_RECIPIENTS, List.of(Map.of(EMAIL_ADDRESS, Map.of(ADDRESS, "address3"))),
+                REPLY_TO, List.of(Map.of(EMAIL_ADDRESS, Map.of(ADDRESS, "address4")))));
 
-    private static Map<String, Object> createPropertyStubsMap() {
-        Map<String, String> content = Map.of("content", "test", "contentType", "text");
-        Map<String, Map<String, String>> recipient = Map.of(
-            "emailAddress", Map.of("address", "address", "name", "name"));
-        Object[] array = List.of(recipient)
-            .toArray();
-
-        Map<String, Object> propertyStubsMap = new HashMap<>();
-
-        propertyStubsMap.put(FROM, "testFrom");
-        propertyStubsMap.put(SUBJECT, "testSubject");
-        propertyStubsMap.put(BODY, content);
-        propertyStubsMap.put(TO_RECIPIENTS, array);
-        propertyStubsMap.put(CC_RECIPIENTS, array);
-        propertyStubsMap.put(BCC_RECIPIENTS, array);
-        propertyStubsMap.put(REPLY_TO, array);
-
-        return propertyStubsMap;
+        assertEquals(expectedBody, body.getContent());
     }
 }

@@ -20,13 +20,11 @@ import static com.bytechef.component.definition.ComponentDsl.array;
 import static com.bytechef.component.definition.ComponentDsl.bool;
 import static com.bytechef.component.definition.ComponentDsl.dateTime;
 import static com.bytechef.component.definition.ComponentDsl.object;
-import static com.bytechef.component.definition.ComponentDsl.option;
 import static com.bytechef.component.definition.ComponentDsl.string;
 
 import com.bytechef.component.definition.ComponentDsl.ModifiableObjectProperty;
 import com.bytechef.component.definition.ComponentDsl.ModifiableStringProperty;
 import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
-import com.bytechef.component.definition.Property;
 import com.bytechef.component.microsoft.outlook.util.MicrosoftOutlook365OptionUtils;
 
 /**
@@ -70,29 +68,6 @@ public class MicrosoftOutlook365Constants {
         .label("Calendar ID")
         .options((ActionOptionsFunction<String>) MicrosoftOutlook365OptionUtils::getCalendarOptions)
         .required(true);
-
-    public static final ModifiableStringProperty CONTENT_PROPERTY_HTML = string(CONTENT)
-        .label("HTML Content")
-        .description("The content of the item.")
-        .controlType(Property.ControlType.RICH_TEXT)
-        .displayCondition("body.contentType == '%s'".formatted(ContentType.HTML))
-        .required(false);
-
-    public static final ModifiableStringProperty CONTENT_PROPERTY_TEXT = string(CONTENT)
-        .label("Text Content")
-        .description("The content of the item.")
-        .controlType(Property.ControlType.TEXT_AREA)
-        .displayCondition("body.contentType == '%s'".formatted(ContentType.TEXT))
-        .required(false);
-
-    public static final ModifiableStringProperty CONTENT_TYPE_PROPERTY = string(CONTENT_TYPE)
-        .label("Content Type")
-        .description("The type of the content.")
-        .options(
-            option("Text", ContentType.TEXT.name()),
-            option("HTML", ContentType.HTML.name()))
-        .defaultValue(ContentType.TEXT.name())
-        .required(false);
 
     public static final ModifiableObjectProperty CUSTOM_EVENT_OUTPUT_PROPERTY = object()
         .properties(
@@ -141,20 +116,6 @@ public class MicrosoftOutlook365Constants {
                                 .description("The display name of the sender."),
                             string(ADDRESS)
                                 .description("The email address of the sender."))));
-
-    public static final ModifiableObjectProperty RECIPIENT_PROPERTY = object()
-        .label("Recipient")
-        .properties(
-            object(EMAIL_ADDRESS)
-                .properties(
-                    string(ADDRESS)
-                        .label("Address")
-                        .description("The email address of the person or entity.")
-                        .required(false),
-                    string(NAME)
-                        .label("Name")
-                        .description("The display name of the person or entity.")
-                        .required(false)));
 
     private MicrosoftOutlook365Constants() {
     }

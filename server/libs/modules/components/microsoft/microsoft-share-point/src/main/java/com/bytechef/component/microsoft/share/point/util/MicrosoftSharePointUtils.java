@@ -69,7 +69,7 @@ public class MicrosoftSharePointUtils {
         ActionContext context) {
 
         Map<String, Object> body = context
-            .http(http -> http.get("/" + inputParameters.getRequiredString(SITE_ID) + "/lists/" +
+            .http(http -> http.get("/sites/" + inputParameters.getRequiredString(SITE_ID) + "/lists/" +
                 inputParameters.getRequiredString(LIST_ID) + "/columns"))
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute()
@@ -205,7 +205,7 @@ public class MicrosoftSharePointUtils {
         String encode = URLEncoder.encode("folder ne null", StandardCharsets.UTF_8);
 
         Map<String, ?> body = context
-            .http(http -> http.get("/" + inputParameters.getRequiredString(SITE_ID) +
+            .http(http -> http.get("/sites/" + inputParameters.getRequiredString(SITE_ID) +
                 "/drive/items/root/children?$filter=" + encode))
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute()
@@ -229,7 +229,7 @@ public class MicrosoftSharePointUtils {
         String searchText, ActionContext context) {
 
         Map<String, ?> body =
-            context.http(http -> http.get("/" + inputParameters.getRequiredString(SITE_ID) + "/lists"))
+            context.http(http -> http.get("/sites/" + inputParameters.getRequiredString(SITE_ID) + "/lists"))
                 .configuration(Http.responseType(Http.ResponseType.JSON))
                 .execute()
                 .getBody(new TypeReference<>() {});
@@ -241,7 +241,7 @@ public class MicrosoftSharePointUtils {
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
         String searchText, ActionContext context) {
 
-        Map<String, ?> body = context.http(http -> http.get("?search=*&select=displayName,id,name"))
+        Map<String, ?> body = context.http(http -> http.get("/sites?search=*&select=displayName,id,name"))
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});

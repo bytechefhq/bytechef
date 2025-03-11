@@ -21,7 +21,6 @@ import static com.bytechef.component.microsoft.excel.constant.MicrosoftExcelCons
 import static com.bytechef.component.microsoft.excel.constant.MicrosoftExcelConstants.IS_THE_FIRST_ROW_HEADER_PROPERTY;
 import static com.bytechef.component.microsoft.excel.constant.MicrosoftExcelConstants.WORKBOOK_ID;
 import static com.bytechef.component.microsoft.excel.constant.MicrosoftExcelConstants.WORKBOOK_ID_PROPERTY;
-import static com.bytechef.component.microsoft.excel.constant.MicrosoftExcelConstants.WORKBOOK_WORKSHEETS_PATH;
 import static com.bytechef.component.microsoft.excel.constant.MicrosoftExcelConstants.WORKSHEET_NAME;
 import static com.bytechef.component.microsoft.excel.constant.MicrosoftExcelConstants.WORKSHEET_NAME_PROPERTY;
 import static com.bytechef.component.microsoft.excel.util.MicrosoftExcelUtils.getLastUsedColumnLabel;
@@ -34,7 +33,7 @@ import com.bytechef.component.definition.Parameters;
 import java.util.List;
 
 /**
- * @author Monika Domiter
+ * @author Monika Kušter
  */
 public class MicrosoftExcelClearWorksheetAction {
 
@@ -50,18 +49,20 @@ public class MicrosoftExcelClearWorksheetAction {
     private MicrosoftExcelClearWorksheetAction() {
     }
 
-    public static Object perform(
-        Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
+    protected static Object perform(
+        Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) {
 
         String range = inputParameters.getRequiredBoolean(IS_THE_FIRST_ROW_HEADER)
-            ? "range(address='A2:" + getLastUsedColumnLabel(inputParameters, context)
-                + getLastUsedRowIndex(inputParameters, context) + "')"
+            ? "range(address='A2:" + getLastUsedColumnLabel(inputParameters, actionContext)
+                + getLastUsedRowIndex(inputParameters, actionContext) + "')"
             : "usedRange(valuesOnly=true)";
 
-        context.http(http -> http
+        actionContext.http(http -> http
             .post(
-                "/" + inputParameters.getRequiredString(WORKBOOK_ID) + WORKBOOK_WORKSHEETS_PATH +
-                    inputParameters.getRequiredString(WORKSHEET_NAME) + "/" + range + "/clear"))
+                "/me/drive/items/%s/workbook/worksheets/%s/%s/clear"
+                    .formatted(
+                        inputParameters.getRequiredString(WORKBOOK_ID),
+                        inputParameters.getRequiredString(WORKSHEET_NAME), range)))
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .body(Http.Body.of(
                 List.of("applyTo", "Contents")

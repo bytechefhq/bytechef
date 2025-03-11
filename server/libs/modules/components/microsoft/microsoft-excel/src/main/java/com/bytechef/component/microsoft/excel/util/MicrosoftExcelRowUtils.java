@@ -18,7 +18,6 @@ package com.bytechef.component.microsoft.excel.util;
 
 import static com.bytechef.component.microsoft.excel.constant.MicrosoftExcelConstants.VALUES;
 import static com.bytechef.component.microsoft.excel.constant.MicrosoftExcelConstants.WORKBOOK_ID;
-import static com.bytechef.component.microsoft.excel.constant.MicrosoftExcelConstants.WORKBOOK_WORKSHEETS_PATH;
 import static com.bytechef.component.microsoft.excel.constant.MicrosoftExcelConstants.WORKSHEET_NAME;
 
 import com.bytechef.component.definition.ActionContext;
@@ -30,7 +29,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * @author Monika Domiter
+ * @author Monika Kušter
  */
 public class MicrosoftExcelRowUtils {
 
@@ -44,8 +43,10 @@ public class MicrosoftExcelRowUtils {
 
         Map<String, Object> body = context
             .http(http -> http.get(
-                "/" + inputParameters.getRequiredString(WORKBOOK_ID) + WORKBOOK_WORKSHEETS_PATH +
-                    inputParameters.getRequiredString(WORKSHEET_NAME) + "/range(address='" + range + "')"))
+                "/me/drive/items/%s/workbook/worksheets/%s/range(address='%s')"
+                    .formatted(
+                        inputParameters.getRequiredString(WORKBOOK_ID),
+                        inputParameters.getRequiredString(WORKSHEET_NAME), range)))
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});

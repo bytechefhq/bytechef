@@ -21,7 +21,6 @@ import static com.bytechef.component.definition.ComponentDsl.integer;
 import static com.bytechef.component.microsoft.excel.constant.MicrosoftExcelConstants.ROW_NUMBER;
 import static com.bytechef.component.microsoft.excel.constant.MicrosoftExcelConstants.WORKBOOK_ID;
 import static com.bytechef.component.microsoft.excel.constant.MicrosoftExcelConstants.WORKBOOK_ID_PROPERTY;
-import static com.bytechef.component.microsoft.excel.constant.MicrosoftExcelConstants.WORKBOOK_WORKSHEETS_PATH;
 import static com.bytechef.component.microsoft.excel.constant.MicrosoftExcelConstants.WORKSHEET_NAME;
 import static com.bytechef.component.microsoft.excel.constant.MicrosoftExcelConstants.WORKSHEET_NAME_PROPERTY;
 import static com.bytechef.component.microsoft.excel.util.MicrosoftExcelUtils.getLastUsedColumnLabel;
@@ -52,17 +51,18 @@ public class MicrosoftExcelDeleteRowAction {
     private MicrosoftExcelDeleteRowAction() {
     }
 
-    public static Object perform(
-        Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
+    protected static Object perform(
+        Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) {
 
         int rowNumber = inputParameters.getRequiredInteger(ROW_NUMBER);
 
-        String range = "A" + rowNumber + ":" + getLastUsedColumnLabel(inputParameters, context) + rowNumber;
+        String range = "A" + rowNumber + ":" + getLastUsedColumnLabel(inputParameters, actionContext) + rowNumber;
 
-        context.http(http -> http
+        actionContext.http(http -> http
             .post(
-                "/" + inputParameters.getRequiredString(WORKBOOK_ID) + WORKBOOK_WORKSHEETS_PATH +
-                    inputParameters.getRequiredString(WORKSHEET_NAME) + "/range(address='" + range + "')/delete"))
+                "/me/drive/items/%s/workbook/worksheets/%s/range(address='%s')/delete"
+                    .formatted(inputParameters.getRequiredString(WORKBOOK_ID),
+                        inputParameters.getRequiredString(WORKSHEET_NAME), range)))
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .body(Http.Body.of(List.of("shift", "Up")
                 .toArray()))

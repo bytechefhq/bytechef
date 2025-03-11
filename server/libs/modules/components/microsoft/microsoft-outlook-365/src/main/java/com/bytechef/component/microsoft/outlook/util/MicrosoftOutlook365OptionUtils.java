@@ -46,7 +46,7 @@ public class MicrosoftOutlook365OptionUtils {
         String searchText, ActionContext actionContext) {
 
         Map<String, Object> body = actionContext
-            .http(http -> http.get("/calendars"))
+            .http(http -> http.get("/me/calendars"))
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});
@@ -59,7 +59,7 @@ public class MicrosoftOutlook365OptionUtils {
         String searchText, ActionContext actionContext) {
 
         Map<String, Object> body = actionContext
-            .http(http -> http.get("/outlook/masterCategories"))
+            .http(http -> http.get("/me/outlook/masterCategories"))
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});
@@ -72,7 +72,7 @@ public class MicrosoftOutlook365OptionUtils {
         String searchText, ActionContext actionContext) {
 
         Map<String, Object> body = actionContext
-            .http(http -> http.get("/calendars/" + inputParameters.getRequiredString(CALENDAR) + "/events"))
+            .http(http -> http.get("/me/calendars/" + inputParameters.getRequiredString(CALENDAR) + "/events"))
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});
@@ -84,7 +84,7 @@ public class MicrosoftOutlook365OptionUtils {
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
         String searchText, ActionContext actionContext) {
 
-        Map<String, Object> body = actionContext.http(http -> http.get("/messages"))
+        Map<String, Object> body = actionContext.http(http -> http.get("/me/messages"))
             .queryParameters("$top", 100)
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute()

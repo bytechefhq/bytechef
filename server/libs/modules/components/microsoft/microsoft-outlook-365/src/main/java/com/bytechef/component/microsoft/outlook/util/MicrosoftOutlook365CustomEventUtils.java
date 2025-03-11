@@ -85,7 +85,7 @@ public class MicrosoftOutlook365CustomEventUtils {
 
     public static List<CustomEvent> retrieveCustomEvents(Parameters inputParameters, ActionContext actionContext) {
         Map<String, Object> body = actionContext
-            .http(http -> http.get("/calendars/" + inputParameters.getRequiredString(CALENDAR) + "/events"))
+            .http(http -> http.get("/me/calendars/%s/events".formatted(inputParameters.getRequiredString(CALENDAR))))
             .header("Prefer", "outlook.timezone=\"" + MicrosoftOutlook365Utils.getMailboxTimeZone(actionContext) + "\"")
             .configuration(Context.Http.responseType(Context.Http.ResponseType.JSON))
             .execute()
