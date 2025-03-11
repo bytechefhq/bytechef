@@ -16,6 +16,7 @@
 
 package com.bytechef.component.datastream.task.handler;
 
+import static com.bytechef.component.datastream.constant.DataStreamConstants.STREAM;
 import static com.bytechef.platform.component.definition.DataStreamComponentDefinition.DATA_STREAM;
 
 import com.bytechef.platform.component.facade.ActionDefinitionFacade;
@@ -29,6 +30,6 @@ import org.springframework.stereotype.Component;
 public class DataStreamStreamTaskHandler extends AbstractTaskHandler {
 
     public DataStreamStreamTaskHandler(ActionDefinitionFacade actionDefinitionFacade) {
-        super("dataStream", 1, "stream", actionDefinitionFacade);
+        super(DATA_STREAM, 1, STREAM, actionDefinitionFacade);
     }
 }

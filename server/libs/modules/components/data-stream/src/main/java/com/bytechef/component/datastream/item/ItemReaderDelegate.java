@@ -16,11 +16,11 @@
 
 package com.bytechef.component.datastream.item;
 
-import static com.bytechef.component.datastream.constant.DataStreamConstants.SOURCE;
+import static com.bytechef.component.definition.datastream.ItemReader.SOURCE;
 
-import com.bytechef.component.definition.DataStreamItemReader;
+import com.bytechef.component.definition.datastream.ItemReader;
 import com.bytechef.platform.component.definition.ContextFactory;
-import com.bytechef.platform.component.service.ComponentDefinitionService;
+import com.bytechef.platform.component.service.ClusterElementDefinitionService;
 import com.bytechef.tenant.util.TenantUtils;
 import java.util.Map;
 import org.springframework.batch.core.StepExecution;
@@ -31,44 +31,48 @@ import org.springframework.batch.item.ItemStreamReader;
 /**
  * @author Ivica Cardic
  */
-public class DataStreamItemReaderDelegate extends AbstractDataStreamItemDelegate
+public class ItemReaderDelegate extends AbstractItemDelegate
     implements ItemStreamReader<Map<String, ?>> {
 
-    private final ComponentDefinitionService componentDefinitionService;
-    private DataStreamItemReader dataStreamItemReader;
+    private final ClusterElementDefinitionService clusterElementDefinitionService;
+    private ItemReader itemReader;
 
-    public DataStreamItemReaderDelegate(
-        ComponentDefinitionService componentDefinitionService, ContextFactory contextFactory) {
+    public ItemReaderDelegate(
+        ClusterElementDefinitionService clusterElementDefinitionService, ContextFactory contextFactory) {
 
         super(SOURCE, contextFactory);
 
-        this.componentDefinitionService = componentDefinitionService;
+        this.clusterElementDefinitionService = clusterElementDefinitionService;
     }
 
     @Override
     public void close() throws ItemStreamException {
-        if (dataStreamItemReader != null) {
-            dataStreamItemReader.close();
+        if (itemReader != null) {
+            itemReader.close();
         }
     }
 
     @Override
     public void open(ExecutionContext executionContext) throws ItemStreamException {
-        TenantUtils.runWithTenantId(
-            tenantId, () -> dataStreamItemReader.open(inputParameters, connectionParameters, context));
+        TenantUtils.runWithTenantId(tenantId, () -> itemReader.open(
+            inputParameters, connectionParameters,
+            new ExecutionContextImpl(
+                contextFactory.createContext(componentName, null, editorEnvironment), executionContext)));
     }
 
     @Override
     public Map<String, ?> read() {
-        return TenantUtils.callWithTenantId(tenantId, () -> dataStreamItemReader.read(context));
+        return TenantUtils.callWithTenantId(tenantId, () -> itemReader.read());
     }
 
     @Override
     public void update(ExecutionContext executionContext) throws ItemStreamException {
-        TenantUtils.runWithTenantId(tenantId, () -> dataStreamItemReader.update(context));
+        TenantUtils.runWithTenantId(tenantId, () -> itemReader.update(
+            new ExecutionContextImpl(
+                contextFactory.createContext(componentName, null, editorEnvironment), executionContext)));
     }
 
     protected void doBeforeStep(final StepExecution stepExecution) {
-        dataStreamItemReader = componentDefinitionService.getDataStreamItemReader(componentName, componentVersion);
+        itemReader = clusterElementDefinitionService.getClusterElementObject(componentName, componentVersion, SOURCE);
     }
 }

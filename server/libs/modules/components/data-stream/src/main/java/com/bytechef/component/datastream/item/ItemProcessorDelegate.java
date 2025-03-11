@@ -14,19 +14,18 @@
  * limitations under the License.
  */
 
-package com.bytechef.component.airtable.datastream;
+package com.bytechef.component.datastream.item;
 
-import static com.bytechef.component.definition.ComponentDsl.dataStream;
-import static com.bytechef.component.definition.ComponentDsl.dataStreamReader;
-import static com.bytechef.component.definition.ComponentDsl.dataStreamWriter;
-
-import com.bytechef.component.definition.DataStreamDefinition;
+import java.util.Map;
+import org.springframework.batch.item.ItemProcessor;
 
 /**
  * @author Ivica Cardic
  */
-public class AirtableDataStream {
+public class ItemProcessorDelegate implements ItemProcessor<Map<String, ?>, Map<String, ?>> {
 
-    public static final DataStreamDefinition DATA_STREAM_DEFINITION = dataStream(
-        dataStreamReader(AirtableDataStreamItemReader.class), dataStreamWriter(AirtableDataStreamItemWriter.class));
+    @Override
+    public Map<String, ?> process(Map<String, ?> item) throws Exception {
+        return item;
+    }
 }

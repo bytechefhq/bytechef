@@ -14,44 +14,17 @@
  * limitations under the License.
  */
 
-package com.bytechef.component.definition;
+package com.bytechef.component.definition.datastream;
 
-import java.util.List;
-import java.util.Optional;
+import com.bytechef.component.definition.ClusterElementDefinition.ClusterElementType;
+import java.util.Map;
 
 /**
  * @author Ivica Cardic
  */
-public interface DataStreamWriterDefinition {
+public interface ItemReader extends ItemStream {
 
-    enum StreamType {
-        CREATE, DELETE, UPDATE,
-    }
+    ClusterElementType SOURCE = new ClusterElementType("source", "Source", true);
 
-    /**
-     *
-     * @return
-     */
-    DataStreamItemWriterSupplier getDataStreamItemWriter();
-
-    /**
-     *
-     * @return
-     */
-    Optional<List<? extends Property>> getProperties();
-
-    /**
-     *
-     * @return
-     */
-    Optional<List<StreamType>> getStreamTypes();
-
-    /**
-     *
-     */
-    @FunctionalInterface
-    interface DataStreamItemWriterSupplier {
-
-        DataStreamItemWriter get();
-    }
+    Map<String, ?> read() throws Exception;
 }

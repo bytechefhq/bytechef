@@ -21,7 +21,7 @@ import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.integer;
 import static com.bytechef.component.definition.ComponentDsl.option;
 
-import com.bytechef.component.datastream.action.definition.SyncActionDefinition;
+import com.bytechef.component.datastream.action.definition.DataStreamStreamActionDefinition;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.launch.JobLauncher;
 
@@ -30,10 +30,10 @@ import org.springframework.batch.core.launch.JobLauncher;
  */
 public class DataStreamStreamAction {
 
-    public final SyncActionDefinition actionDefinition;
+    public final DataStreamStreamActionDefinition actionDefinition;
 
     public DataStreamStreamAction(Job job, JobLauncher jobLauncher) {
-        actionDefinition = new SyncActionDefinition(
+        actionDefinition = new DataStreamStreamActionDefinition(
             action(STREAM)
                 .title("Stream Data")
                 .description("Stream large volume of data between source and destination applications.")

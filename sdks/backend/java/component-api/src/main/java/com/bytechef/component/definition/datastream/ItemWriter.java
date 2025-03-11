@@ -14,19 +14,18 @@
  * limitations under the License.
  */
 
-package com.bytechef.component.definition;
+package com.bytechef.component.definition.datastream;
+
+import com.bytechef.component.definition.ClusterElementDefinition.ClusterElementType;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author Ivica Cardic
  */
-public interface DataStreamItemStream {
+public interface ItemWriter extends ItemStream {
 
-    default void open(Parameters inputParameters, Parameters connectionParameters, DataStreamContext context) {
-    }
+    ClusterElementType DESTINATION = new ClusterElementType("destination", "Destination", true);
 
-    default void update(DataStreamContext context) {
-    }
-
-    default void close() {
-    }
+    void write(List<? extends Map<String, ?>> items) throws Exception;
 }
