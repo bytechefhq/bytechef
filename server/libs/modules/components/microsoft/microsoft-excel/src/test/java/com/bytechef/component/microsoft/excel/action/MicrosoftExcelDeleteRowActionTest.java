@@ -23,23 +23,24 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.component.definition.Context.Http;
+import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.microsoft.excel.util.MicrosoftExcelUtils;
+import com.bytechef.component.test.definition.MockParametersFactory;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 
 /**
- * @author Monika Domiter
+ * @author Monika Kušter
  */
 class MicrosoftExcelDeleteRowActionTest extends AbstractMicrosoftExcelActionTest {
 
     private final ArgumentCaptor<Http.Body> bodyArgumentCaptor = ArgumentCaptor.forClass(Http.Body.class);
+    private final Parameters mockedParameters = MockParametersFactory.create(Map.of(ROW_NUMBER, 2));
 
     @Test
     void testPerform() {
-        when(mockedParameters.getRequiredInteger(ROW_NUMBER))
-            .thenReturn(2);
-        when(mockedContext.http(any()))
+        when(mockedActionContext.http(any()))
             .thenReturn(mockedExecutor);
         when(mockedExecutor.configuration(any()))
             .thenReturn(mockedExecutor);
@@ -47,16 +48,19 @@ class MicrosoftExcelDeleteRowActionTest extends AbstractMicrosoftExcelActionTest
             .thenReturn(mockedExecutor);
 
         microsoftExcelUtilsMockedStatic
-            .when(() -> MicrosoftExcelUtils.getLastUsedColumnLabel(mockedParameters, mockedContext))
+            .when(() -> MicrosoftExcelUtils.getLastUsedColumnLabel(
+                parametersArgumentCaptor.capture(), actionContextArgumentCaptor.capture()))
             .thenReturn("C");
 
-        Object result = MicrosoftExcelDeleteRowAction.perform(mockedParameters, mockedParameters, mockedContext);
+        Object result = MicrosoftExcelDeleteRowAction.perform(mockedParameters, mockedParameters, mockedActionContext);
 
         assertNull(result);
 
         Http.Body body = bodyArgumentCaptor.getValue();
 
         assertEquals(Map.of("shift", "Up"), body.getContent());
+        assertEquals(mockedParameters, parametersArgumentCaptor.getValue());
+        assertEquals(mockedActionContext, actionContextArgumentCaptor.getValue());
     }
 
 }

@@ -16,13 +16,22 @@
 
 package com.bytechef.component.microsoft.excel.util;
 
+import static com.bytechef.component.definition.ComponentDsl.array;
+import static com.bytechef.component.definition.ComponentDsl.bool;
+import static com.bytechef.component.definition.ComponentDsl.number;
+import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.option;
+import static com.bytechef.component.definition.ComponentDsl.string;
+import static com.bytechef.component.microsoft.excel.constant.MicrosoftExcelConstants.COLUMN;
 import static com.bytechef.component.microsoft.excel.constant.MicrosoftExcelConstants.ID;
 import static com.bytechef.component.microsoft.excel.constant.MicrosoftExcelConstants.IS_THE_FIRST_ROW_HEADER;
 import static com.bytechef.component.microsoft.excel.constant.MicrosoftExcelConstants.NAME;
 import static com.bytechef.component.microsoft.excel.constant.MicrosoftExcelConstants.ROW;
+import static com.bytechef.component.microsoft.excel.constant.MicrosoftExcelConstants.UPDATE_WHOLE_ROW;
 import static com.bytechef.component.microsoft.excel.constant.MicrosoftExcelConstants.VALUE;
 import static com.bytechef.component.microsoft.excel.constant.MicrosoftExcelConstants.VALUES;
+import static com.bytechef.component.microsoft.excel.constant.MicrosoftExcelConstants.WORKBOOK_ID;
+import static com.bytechef.component.microsoft.excel.constant.MicrosoftExcelConstants.WORKSHEET_NAME;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
@@ -37,101 +46,222 @@ import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.Property;
 import com.bytechef.component.definition.TypeReference;
+import com.bytechef.component.test.definition.MockParametersFactory;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.IntStream;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 import org.mockito.MockedStatic;
 
 /**
- * @author Monika Domiter
+ * @author Monika Kušter
  */
 class MicrosoftExcelUtilsTest {
 
-    private final ActionContext mockedContext = mock(ActionContext.class);
+    private final ArgumentCaptor<ActionContext> actionContextArgumentCaptor =
+        ArgumentCaptor.forClass(ActionContext.class);
+    private final ArgumentCaptor<Integer> integerArgumentCaptor = ArgumentCaptor.forClass(Integer.class);
+    private final ActionContext mockedActionContext = mock(ActionContext.class);
     private final Http.Executor mockedExecutor = mock(Http.Executor.class);
-    private final Parameters mockedParameters = mock(Parameters.class);
+    private Parameters mockedParameters = mock(Parameters.class);
     private final Http.Response mockedResponse = mock(Http.Response.class);
+    private final ArgumentCaptor<Parameters> parametersArgumentCaptor = ArgumentCaptor.forClass(Parameters.class);
 
     @Test
-    void testCreateInputPropertyForRowWhereFirstRowIsHeader() {
-        List<Object> row = List.of("firstName", "lastName", 1111, true);
+    void testCreatePropertiesForNewRowWhereFirstNewRowIsHeader() {
+        mockedParameters = MockParametersFactory.create(Map.of(IS_THE_FIRST_ROW_HEADER, true));
+        List<Object> firstRow = List.of("firstName", "lastName", 1111, true);
 
-        Map<String, Object> valuesMap = Map.of(VALUES, List.of(row));
+        try (MockedStatic<MicrosoftExcelRowUtils> microsoftExcelRowUtilsMockedStatic =
+            mockStatic(MicrosoftExcelRowUtils.class)) {
 
-        when(mockedParameters.getRequiredBoolean(IS_THE_FIRST_ROW_HEADER))
-            .thenReturn(true);
+            microsoftExcelRowUtilsMockedStatic
+                .when(() -> MicrosoftExcelRowUtils.getRowFromWorksheet(
+                    parametersArgumentCaptor.capture(), actionContextArgumentCaptor.capture(),
+                    integerArgumentCaptor.capture()))
+                .thenReturn(firstRow);
 
-        when(mockedContext.http(any()))
-            .thenReturn(mockedExecutor);
-        when(mockedExecutor.configuration(any()))
-            .thenReturn(mockedExecutor);
-        when(mockedExecutor.execute())
-            .thenReturn(mockedResponse);
-        when(mockedResponse.getBody(any(TypeReference.class)))
-            .thenReturn(valuesMap);
+            List<Property.ValueProperty<?>> result = MicrosoftExcelUtils.createPropertiesForNewRow(
+                mockedParameters, mockedParameters, Map.of(), mockedActionContext);
 
-        List<Property.ValueProperty<?>> result = MicrosoftExcelUtils.createInputPropertyForRow(
-            mockedParameters, mockedParameters, Map.of(), mockedContext);
+            ModifiableObjectProperty expectedProperty = object(VALUES)
+                .label("Values")
+                .properties(
+                    string("firstName")
+                        .label("firstName")
+                        .defaultValue(""),
+                    string("lastName")
+                        .label("lastName")
+                        .defaultValue(""),
+                    string("1111")
+                        .label("1111")
+                        .defaultValue(""),
+                    string("true")
+                        .label("true")
+                        .defaultValue(""))
+                .required(true);
 
-        assertEquals(1, result.size());
-
-        ModifiableObjectProperty first = (ModifiableObjectProperty) result.getFirst();
-
-        assertEquals(VALUES, first.getName());
-        assertEquals("Values", first.getLabel()
-            .get());
-
-        List<? extends Property.ValueProperty<?>> properties = first.getProperties()
-            .get();
-
-        assertEquals(4, properties.size());
-
-        IntStream.range(0, properties.size())
-            .forEach(i -> {
-                assertEquals(row.get(i)
-                    .toString(),
-                    properties.get(i)
-                        .getName());
-                assertEquals("", properties.get(i)
-                    .getDefaultValue()
-                    .get());
-            });
-
+            assertEquals(List.of(expectedProperty), result);
+            assertEquals(mockedParameters, parametersArgumentCaptor.getValue());
+            assertEquals(mockedActionContext, actionContextArgumentCaptor.getValue());
+            assertEquals(1, integerArgumentCaptor.getValue());
+        }
     }
 
     @Test
-    void testCreateInputPropertyForRowWhereFirstRowNotHeader() {
-        when(mockedParameters.getRequiredBoolean(IS_THE_FIRST_ROW_HEADER))
-            .thenReturn(false);
+    void testCreatePropertiesForNewRowWhereFirstNewRowNotHeader() {
+        mockedParameters = MockParametersFactory.create(Map.of(IS_THE_FIRST_ROW_HEADER, false));
 
-        List<Property.ValueProperty<?>> result = MicrosoftExcelUtils.createInputPropertyForRow(
-            mockedParameters, mockedParameters, Map.of(), mockedContext);
+        List<Property.ValueProperty<?>> result = MicrosoftExcelUtils.createPropertiesForNewRow(
+            mockedParameters, mockedParameters, Map.of(), mockedActionContext);
 
-        assertEquals(1, result.size());
+        ModifiableArrayProperty expectedProperty = array(VALUES)
+            .label("Values")
+            .items(bool(), number(), string())
+            .required(true);
 
-        Property.ValueProperty<?> array = result.getFirst();
+        assertEquals(List.of(expectedProperty), result);
+    }
 
-        assertEquals(3, ((ModifiableArrayProperty) array).getItems()
-            .get()
-            .size());
+    @Test
+    void createPropertiesToUpdateRowWhenFirstRowIsHeaderAndUpdatingWholeRow() {
+        mockedParameters = MockParametersFactory.create(
+            Map.of(IS_THE_FIRST_ROW_HEADER, true, UPDATE_WHOLE_ROW, true, WORKBOOK_ID, "workbookId", WORKSHEET_NAME,
+                "sheetName"));
 
-        assertEquals(VALUES, array.getName());
-        assertEquals("Values", array.getLabel()
-            .get());
-        assertEquals(true, array.getRequired()
-            .get());
+        try (MockedStatic<MicrosoftExcelRowUtils> microsoftExcelRowUtilsMockedStatic =
+            mockStatic(MicrosoftExcelRowUtils.class)) {
+
+            microsoftExcelRowUtilsMockedStatic
+                .when(() -> MicrosoftExcelRowUtils.getRowFromWorksheet(
+                    parametersArgumentCaptor.capture(), actionContextArgumentCaptor.capture(),
+                    integerArgumentCaptor.capture()))
+                .thenReturn(List.of("header 1", "header2", "header3"));
+
+            List<Property.ValueProperty<?>> propertiesToUpdateRow = MicrosoftExcelUtils
+                .createPropertiesToUpdateRow(mockedParameters, mockedParameters, Map.of(), mockedActionContext);
+
+            List<ModifiableObjectProperty> expectedProperties = List.of(
+                object(VALUES)
+                    .label("Values")
+                    .properties(
+                        string("header_1")
+                            .label("header 1")
+                            .defaultValue(""),
+                        string("header2")
+                            .label("header2")
+                            .defaultValue(""),
+                        string("header3")
+                            .label("header3")
+                            .defaultValue(""))
+                    .required(true));
+
+            assertEquals(expectedProperties, propertiesToUpdateRow);
+
+            assertEquals(mockedParameters, parametersArgumentCaptor.getValue());
+            assertEquals(mockedActionContext, actionContextArgumentCaptor.getValue());
+            assertEquals(1, integerArgumentCaptor.getValue());
+        }
+    }
+
+    @Test
+    void createPropertiesToUpdateRowWhenFirstRowIsHeaderAndUpdatingSelectedColumns() throws Exception {
+        mockedParameters = MockParametersFactory.create(
+            Map.of(IS_THE_FIRST_ROW_HEADER, true, UPDATE_WHOLE_ROW, false, WORKBOOK_ID, "workbookId", WORKSHEET_NAME,
+                "sheetName"));
+
+        try (MockedStatic<MicrosoftExcelRowUtils> microsoftExcelRowUtilsMockedStatic =
+            mockStatic(MicrosoftExcelRowUtils.class)) {
+
+            microsoftExcelRowUtilsMockedStatic
+                .when(() -> MicrosoftExcelRowUtils.getRowFromWorksheet(
+                    parametersArgumentCaptor.capture(), actionContextArgumentCaptor.capture(),
+                    integerArgumentCaptor.capture()))
+                .thenReturn(List.of("header 1", "header2", "header3"));
+
+            List<Property.ValueProperty<?>> propertiesToUpdateRow = MicrosoftExcelUtils
+                .createPropertiesToUpdateRow(mockedParameters, mockedParameters, Map.of(), mockedActionContext);
+
+            List<ModifiableArrayProperty> expectedProperties = List.of(
+                array(VALUES)
+                    .label("Values")
+                    .items(
+                        object()
+                            .properties(
+                                string(COLUMN)
+                                    .label("Column")
+                                    .description("Column to update.")
+                                    .options(
+                                        option("header 1", "header 1"),
+                                        option("header2", "header2"),
+                                        option("header3", "header3"))
+                                    .required(true),
+                                string(VALUE)
+                                    .label("Column Value")
+                                    .defaultValue("")
+                                    .required(true)))
+                    .required(true));
+
+            assertEquals(expectedProperties, propertiesToUpdateRow);
+
+            assertEquals(mockedParameters, parametersArgumentCaptor.getValue());
+            assertEquals(mockedActionContext, actionContextArgumentCaptor.getValue());
+            assertEquals(1, integerArgumentCaptor.getValue());
+        }
+    }
+
+    @Test
+    void createPropertiesToUpdateRowWhenFirstRowIsNotHeaderAndUpdatingWholeRow() throws Exception {
+        mockedParameters = MockParametersFactory.create(Map.of(IS_THE_FIRST_ROW_HEADER, false, UPDATE_WHOLE_ROW, true));
+
+        List<Property.ValueProperty<?>> propertiesToUpdateRow = MicrosoftExcelUtils
+            .createPropertiesToUpdateRow(mockedParameters, mockedParameters, Map.of(), mockedActionContext);
+
+        List<ModifiableArrayProperty> expectedProperties = List.of(
+            array(VALUES)
+                .label("Values")
+                .items(bool(), number(), string())
+                .required(true));
+
+        assertEquals(expectedProperties, propertiesToUpdateRow);
+    }
+
+    @Test
+    void createPropertiesToUpdateRowWhenFirstRowIsNotHeaderAndUpdatingSelectedColumns() {
+        mockedParameters =
+            MockParametersFactory.create(Map.of(IS_THE_FIRST_ROW_HEADER, false, UPDATE_WHOLE_ROW, false));
+
+        List<Property.ValueProperty<?>> propertiesToUpdateRow = MicrosoftExcelUtils
+            .createPropertiesToUpdateRow(mockedParameters, mockedParameters, Map.of(), mockedActionContext);
+
+        List<ModifiableArrayProperty> expectedProperties = List.of(
+            array(VALUES)
+                .label("Values")
+                .items(
+                    object()
+                        .properties(
+                            string(COLUMN)
+                                .label("Column Label")
+                                .description("Label of the column to update. Example: A, B, C, ...")
+                                .exampleValue("A")
+                                .required(true),
+                            string(VALUE)
+                                .label("Column Value")
+                                .defaultValue("")
+                                .required(true))));
+
+        assertEquals(expectedProperties, propertiesToUpdateRow);
     }
 
     @Test
     void testGetLastUsedColumnLabel() {
         Map<String, Object> map = Map.of("columnCount", 3);
 
-        when(mockedContext.http(any()))
+        when(mockedActionContext.http(any()))
             .thenReturn(mockedExecutor);
         when(mockedExecutor.configuration(any()))
             .thenReturn(mockedExecutor);
@@ -140,7 +270,7 @@ class MicrosoftExcelUtilsTest {
         when(mockedResponse.getBody(any(TypeReference.class)))
             .thenReturn(map);
 
-        String result = MicrosoftExcelUtils.getLastUsedColumnLabel(mockedParameters, mockedContext);
+        String result = MicrosoftExcelUtils.getLastUsedColumnLabel(mockedParameters, mockedActionContext);
 
         assertEquals("C", result);
     }
@@ -152,7 +282,7 @@ class MicrosoftExcelUtilsTest {
         map.put("rowCount", 2);
         map.put(VALUES, List.of(List.of("A", "B", "C"), List.of("D", "E", "F")));
 
-        when(mockedContext.http(any()))
+        when(mockedActionContext.http(any()))
             .thenReturn(mockedExecutor);
         when(mockedExecutor.configuration(any()))
             .thenReturn(mockedExecutor);
@@ -161,7 +291,7 @@ class MicrosoftExcelUtilsTest {
         when(mockedResponse.getBody(any(TypeReference.class)))
             .thenReturn(map);
 
-        Integer result = MicrosoftExcelUtils.getLastUsedRowIndex(mockedParameters, mockedContext);
+        Integer result = MicrosoftExcelUtils.getLastUsedRowIndex(mockedParameters, mockedActionContext);
 
         assertEquals(2, result);
     }
@@ -173,7 +303,7 @@ class MicrosoftExcelUtilsTest {
         map.put("rowCount", 1);
         map.put(VALUES, List.of(List.of()));
 
-        when(mockedContext.http(any()))
+        when(mockedActionContext.http(any()))
             .thenReturn(mockedExecutor);
         when(mockedExecutor.configuration(any()))
             .thenReturn(mockedExecutor);
@@ -182,7 +312,7 @@ class MicrosoftExcelUtilsTest {
         when(mockedResponse.getBody(any(TypeReference.class)))
             .thenReturn(map);
 
-        Integer result = MicrosoftExcelUtils.getLastUsedRowIndex(mockedParameters, mockedContext);
+        Integer result = MicrosoftExcelUtils.getLastUsedRowIndex(mockedParameters, mockedActionContext);
 
         assertEquals(0, result);
     }
@@ -194,7 +324,7 @@ class MicrosoftExcelUtilsTest {
         map.put("rowCount", 1);
         map.put(VALUES, List.of(List.of("A", "B")));
 
-        when(mockedContext.http(any()))
+        when(mockedActionContext.http(any()))
             .thenReturn(mockedExecutor);
         when(mockedExecutor.configuration(any()))
             .thenReturn(mockedExecutor);
@@ -203,25 +333,23 @@ class MicrosoftExcelUtilsTest {
         when(mockedResponse.getBody(any(TypeReference.class)))
             .thenReturn(map);
 
-        Integer result = MicrosoftExcelUtils.getLastUsedRowIndex(mockedParameters, mockedContext);
+        Integer result = MicrosoftExcelUtils.getLastUsedRowIndex(mockedParameters, mockedActionContext);
 
         assertEquals(1, result);
     }
 
     @Test
     void testGetMapOfValuesForRowWhereFirstRowIsHeader() {
+        mockedParameters = MockParametersFactory.create(Map.of(IS_THE_FIRST_ROW_HEADER, true));
         List<Object> row = Arrays.asList("value1", "value2", "value3");
-
-        when(mockedParameters.getRequiredBoolean(IS_THE_FIRST_ROW_HEADER))
-            .thenReturn(true);
 
         try (MockedStatic<MicrosoftExcelRowUtils> rowUtilsMockedStatic = mockStatic(MicrosoftExcelRowUtils.class)) {
             rowUtilsMockedStatic
-                .when(() -> MicrosoftExcelRowUtils.getRowFromWorksheet(mockedParameters, mockedContext, 1))
+                .when(() -> MicrosoftExcelRowUtils.getRowFromWorksheet(mockedParameters, mockedActionContext, 1))
                 .thenReturn(List.of("header1", "header2", "header3"));
 
             Map<String, Object> result =
-                MicrosoftExcelUtils.getMapOfValuesForRow(mockedParameters, mockedContext, row);
+                MicrosoftExcelUtils.getMapOfValuesForRow(mockedParameters, mockedActionContext, row);
 
             Map<String, Object> expectedValuesMap = new LinkedHashMap<>();
 
@@ -235,12 +363,11 @@ class MicrosoftExcelUtilsTest {
 
     @Test
     void testGetMapOfValuesForRowWhereFirstRowIsNotHeader() {
+        mockedParameters = MockParametersFactory.create(Map.of(IS_THE_FIRST_ROW_HEADER, false));
         List<Object> row = Arrays.asList("value1", "value2", "value3");
 
-        when(mockedParameters.getRequiredBoolean(IS_THE_FIRST_ROW_HEADER))
-            .thenReturn(false);
-
-        Map<String, Object> result = MicrosoftExcelUtils.getMapOfValuesForRow(mockedParameters, mockedContext, row);
+        Map<String, Object> result =
+            MicrosoftExcelUtils.getMapOfValuesForRow(mockedParameters, mockedActionContext, row);
 
         Map<String, Object> expectedValuesMap = new LinkedHashMap<>();
 
@@ -252,7 +379,7 @@ class MicrosoftExcelUtilsTest {
     }
 
     @Test
-    void testGetRowInputValuesForMap() {
+    void testGetRowValuesForMap() {
         Map<String, String> valuesMap = new LinkedHashMap<>();
 
         valuesMap.put("name", "A");
@@ -261,17 +388,17 @@ class MicrosoftExcelUtilsTest {
         when(mockedParameters.getRequiredMap(ROW, Object.class))
             .thenReturn(Map.of(VALUES, valuesMap));
 
-        List<Object> result = MicrosoftExcelUtils.getRowInputValues(mockedParameters);
+        List<Object> result = MicrosoftExcelUtils.getRowValues(mockedParameters);
 
         assertEquals(List.of("A", "B"), result);
     }
 
     @Test
-    void testGetRowInputValuesForList() {
+    void testGetRowValuesForList() {
         when(mockedParameters.getRequiredMap(ROW, Object.class))
             .thenReturn(Map.of(VALUES, List.of("A", "B")));
 
-        List<Object> result = MicrosoftExcelUtils.getRowInputValues(mockedParameters);
+        List<Object> result = MicrosoftExcelUtils.getRowValues(mockedParameters);
 
         assertEquals(List.of("A", "B"), result);
     }
@@ -280,7 +407,7 @@ class MicrosoftExcelUtilsTest {
     void testGetWorkbookIdOptions() {
         Map<String, Object> map = Map.of(VALUE, List.of(Map.of(NAME, "abc", ID, "123")));
 
-        when(mockedContext.http(any()))
+        when(mockedActionContext.http(any()))
             .thenReturn(mockedExecutor);
         when(mockedExecutor.configuration(any()))
             .thenReturn(mockedExecutor);
@@ -294,7 +421,7 @@ class MicrosoftExcelUtilsTest {
         expectedOptions.add(option("abc", "123"));
 
         List<Option<String>> result = MicrosoftExcelUtils.getWorkbookIdOptions(
-            mockedParameters, mockedParameters, Map.of(), "", mockedContext);
+            mockedParameters, mockedParameters, Map.of(), "", mockedActionContext);
 
         assertEquals(expectedOptions, result);
     }
@@ -303,7 +430,7 @@ class MicrosoftExcelUtilsTest {
     void testGetWorksheetNameOptions() {
         Map<String, Object> map = Map.of(VALUE, List.of(Map.of(NAME, "abc")));
 
-        when(mockedContext.http(any()))
+        when(mockedActionContext.http(any()))
             .thenReturn(mockedExecutor);
         when(mockedExecutor.configuration(any()))
             .thenReturn(mockedExecutor);
@@ -317,7 +444,7 @@ class MicrosoftExcelUtilsTest {
         expectedOptions.add(option("abc", "abc"));
 
         List<Option<String>> result = MicrosoftExcelUtils.getWorksheetNameOptions(
-            mockedParameters, mockedParameters, Map.of(), "", mockedContext);
+            mockedParameters, mockedParameters, Map.of(), "", mockedActionContext);
 
         assertEquals(expectedOptions, result);
     }

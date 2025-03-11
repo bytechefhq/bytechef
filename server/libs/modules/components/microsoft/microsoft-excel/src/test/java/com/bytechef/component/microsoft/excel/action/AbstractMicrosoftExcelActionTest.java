@@ -24,20 +24,26 @@ import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.microsoft.excel.util.MicrosoftExcelUpdateWorksheetUtils;
 import com.bytechef.component.microsoft.excel.util.MicrosoftExcelUtils;
+import java.util.List;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.mockito.ArgumentCaptor;
 import org.mockito.MockedStatic;
 
 /**
- * @author Monika Domiter
+ * @author Monika Kušter
  */
-public abstract class AbstractMicrosoftExcelActionTest {
+abstract class AbstractMicrosoftExcelActionTest {
 
+    protected ArgumentCaptor<ActionContext> actionContextArgumentCaptor = ArgumentCaptor.forClass(ActionContext.class);
+    protected ArgumentCaptor<Integer> integerArgumentCaptor = ArgumentCaptor.forClass(Integer.class);
+    @SuppressWarnings("rawtypes")
+    protected ArgumentCaptor<List> listArgumentCaptor = ArgumentCaptor.forClass(List.class);
     protected MockedStatic<MicrosoftExcelUtils> microsoftExcelUtilsMockedStatic;
     protected MockedStatic<MicrosoftExcelUpdateWorksheetUtils> updateWorksheetUtilsMockedStatic;
-    protected ActionContext mockedContext = mock(ActionContext.class);
+    protected ActionContext mockedActionContext = mock(ActionContext.class);
     protected Http.Executor mockedExecutor = mock(Http.Executor.class);
-    protected Parameters mockedParameters = mock(Parameters.class);
+    protected ArgumentCaptor<Parameters> parametersArgumentCaptor = ArgumentCaptor.forClass(Parameters.class);
 
     @BeforeEach
     void beforeEach() {

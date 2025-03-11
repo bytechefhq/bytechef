@@ -18,35 +18,44 @@ package com.bytechef.component.microsoft.excel.action;
 
 import static com.bytechef.component.microsoft.excel.constant.MicrosoftExcelConstants.ROW_NUMBER;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.when;
 
+import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.microsoft.excel.util.MicrosoftExcelUpdateWorksheetUtils;
 import com.bytechef.component.microsoft.excel.util.MicrosoftExcelUtils;
+import com.bytechef.component.test.definition.MockParametersFactory;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
 
 /**
- * @author Monika Domiter
+ * @author Monika Kušter
  */
 class MicrosoftExcelUpdateRowActionTest extends AbstractMicrosoftExcelActionTest {
 
+    private final Parameters mockedParameters = MockParametersFactory.create(Map.of(ROW_NUMBER, 2));
+
+    @SuppressWarnings("unchecked")
     @Test
     void testPerform() {
         List<Object> row = List.of("abc", "sheetName", false);
         Map<String, Object> map = Map.of("key", "value");
 
-        when(mockedParameters.getRequiredInteger(ROW_NUMBER))
-            .thenReturn(2);
         microsoftExcelUtilsMockedStatic
-            .when(() -> MicrosoftExcelUtils.getRowInputValues(mockedParameters))
+            .when(() -> MicrosoftExcelUtils.getUpdatedRowValues(
+                parametersArgumentCaptor.capture(), actionContextArgumentCaptor.capture()))
             .thenReturn(row);
         updateWorksheetUtilsMockedStatic
-            .when(() -> MicrosoftExcelUpdateWorksheetUtils.updateRange(mockedParameters, mockedContext, 2, row))
+            .when(() -> MicrosoftExcelUpdateWorksheetUtils.updateRange(
+                parametersArgumentCaptor.capture(), actionContextArgumentCaptor.capture(),
+                integerArgumentCaptor.capture(), listArgumentCaptor.capture()))
             .thenReturn(map);
 
-        Object result = MicrosoftExcelUpdateRowAction.perform(mockedParameters, mockedParameters, mockedContext);
+        Object result = MicrosoftExcelUpdateRowAction.perform(mockedParameters, mockedParameters, mockedActionContext);
 
         assertEquals(map, result);
+        assertEquals(List.of(mockedParameters, mockedParameters), parametersArgumentCaptor.getAllValues());
+        assertEquals(List.of(mockedActionContext, mockedActionContext), actionContextArgumentCaptor.getAllValues());
+        assertEquals(2, integerArgumentCaptor.getValue());
+        assertEquals(row, listArgumentCaptor.getValue());
     }
 }

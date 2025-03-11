@@ -19,20 +19,24 @@ package com.bytechef.component.microsoft.excel.action;
 import static com.bytechef.component.microsoft.excel.constant.MicrosoftExcelConstants.ROW_NUMBER;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mockStatic;
-import static org.mockito.Mockito.when;
 
+import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.microsoft.excel.util.MicrosoftExcelRowUtils;
 import com.bytechef.component.microsoft.excel.util.MicrosoftExcelUtils;
+import com.bytechef.component.test.definition.MockParametersFactory;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.mockito.MockedStatic;
 
 /**
- * @author Monika Domiter
+ * @author Monika Kušter
  */
 class MicrosoftExcelFindRowByNumActionTest extends AbstractMicrosoftExcelActionTest {
 
+    private final Parameters mockedParameters = MockParametersFactory.create(Map.of(ROW_NUMBER, 2));
+
+    @SuppressWarnings("unchecked")
     @Test
     void testPerform() {
         List<Object> row = List.of("abc", "sheetName", false);
@@ -41,18 +45,25 @@ class MicrosoftExcelFindRowByNumActionTest extends AbstractMicrosoftExcelActionT
         try (MockedStatic<MicrosoftExcelRowUtils> microsoftExcelRowUtilsMockedStatic =
             mockStatic(MicrosoftExcelRowUtils.class)) {
 
-            when(mockedParameters.getRequiredInteger(ROW_NUMBER))
-                .thenReturn(2);
             microsoftExcelRowUtilsMockedStatic
-                .when(() -> MicrosoftExcelRowUtils.getRowFromWorksheet(mockedParameters, mockedContext, 2))
+                .when(() -> MicrosoftExcelRowUtils.getRowFromWorksheet(
+                    parametersArgumentCaptor.capture(), actionContextArgumentCaptor.capture(),
+                    integerArgumentCaptor.capture()))
                 .thenReturn(row);
             microsoftExcelUtilsMockedStatic
-                .when(() -> MicrosoftExcelUtils.getMapOfValuesForRow(mockedParameters, mockedContext, row))
+                .when(() -> MicrosoftExcelUtils.getMapOfValuesForRow(
+                    parametersArgumentCaptor.capture(), actionContextArgumentCaptor.capture(),
+                    listArgumentCaptor.capture()))
                 .thenReturn(map);
 
-            Object result = MicrosoftExcelFindRowByNumAction.perform(mockedParameters, mockedParameters, mockedContext);
+            Object result =
+                MicrosoftExcelFindRowByNumAction.perform(mockedParameters, mockedParameters, mockedActionContext);
 
             assertEquals(map, result);
+            assertEquals(List.of(mockedParameters, mockedParameters), parametersArgumentCaptor.getAllValues());
+            assertEquals(List.of(mockedActionContext, mockedActionContext), actionContextArgumentCaptor.getAllValues());
+            assertEquals(2, integerArgumentCaptor.getValue());
+            assertEquals(row, listArgumentCaptor.getValue());
         }
     }
 }

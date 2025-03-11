@@ -17,18 +17,25 @@
 package com.bytechef.component.microsoft.excel.action;
 
 import static com.bytechef.component.definition.ComponentDsl.action;
+import static com.bytechef.component.definition.ComponentDsl.bool;
+import static com.bytechef.component.definition.ComponentDsl.dynamicProperties;
 import static com.bytechef.component.definition.ComponentDsl.integer;
+import static com.bytechef.component.microsoft.excel.constant.MicrosoftExcelConstants.IS_THE_FIRST_ROW_HEADER;
 import static com.bytechef.component.microsoft.excel.constant.MicrosoftExcelConstants.IS_THE_FIRST_ROW_HEADER_PROPERTY;
-import static com.bytechef.component.microsoft.excel.constant.MicrosoftExcelConstants.ROW_DYNAMIC_PROPERTY;
+import static com.bytechef.component.microsoft.excel.constant.MicrosoftExcelConstants.ROW;
 import static com.bytechef.component.microsoft.excel.constant.MicrosoftExcelConstants.ROW_NUMBER;
+import static com.bytechef.component.microsoft.excel.constant.MicrosoftExcelConstants.UPDATE_WHOLE_ROW;
+import static com.bytechef.component.microsoft.excel.constant.MicrosoftExcelConstants.WORKBOOK_ID;
 import static com.bytechef.component.microsoft.excel.constant.MicrosoftExcelConstants.WORKBOOK_ID_PROPERTY;
+import static com.bytechef.component.microsoft.excel.constant.MicrosoftExcelConstants.WORKSHEET_NAME;
 import static com.bytechef.component.microsoft.excel.constant.MicrosoftExcelConstants.WORKSHEET_NAME_PROPERTY;
 import static com.bytechef.component.microsoft.excel.util.MicrosoftExcelUpdateWorksheetUtils.updateRange;
-import static com.bytechef.component.microsoft.excel.util.MicrosoftExcelUtils.getRowInputValues;
+import static com.bytechef.component.microsoft.excel.util.MicrosoftExcelUtils.getUpdatedRowValues;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Parameters;
+import com.bytechef.component.microsoft.excel.util.MicrosoftExcelUtils;
 
 /**
  * @author Monika Kušter
@@ -46,7 +53,15 @@ public class MicrosoftExcelUpdateRowAction {
                 .description("The row number to update.")
                 .required(true),
             IS_THE_FIRST_ROW_HEADER_PROPERTY,
-            ROW_DYNAMIC_PROPERTY)
+            bool(UPDATE_WHOLE_ROW)
+                .label("Update Whole Row")
+                .description("Whether to update the whole row or just specific columns.")
+                .defaultValue(true)
+                .required(true),
+            dynamicProperties(ROW)
+                .propertiesLookupDependsOn(WORKBOOK_ID, WORKSHEET_NAME, IS_THE_FIRST_ROW_HEADER, UPDATE_WHOLE_ROW)
+                .properties(MicrosoftExcelUtils::createPropertiesToUpdateRow)
+                .required(true))
         .output()
         .perform(MicrosoftExcelUpdateRowAction::perform);
 
@@ -58,7 +73,7 @@ public class MicrosoftExcelUpdateRowAction {
 
         return updateRange(
             inputParameters, actionContext, inputParameters.getRequiredInteger(ROW_NUMBER),
-            getRowInputValues(inputParameters));
+            getUpdatedRowValues(inputParameters, actionContext));
     }
 
 }
