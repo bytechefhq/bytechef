@@ -17,7 +17,7 @@
 package com.bytechef.component.jira.unified;
 
 import static com.bytechef.component.definition.ComponentDsl.unifiedApi;
-import static com.bytechef.component.definition.UnifiedApiDefinition.Category.TICKETING;
+import static com.bytechef.component.definition.UnifiedApiDefinition.UnifiedApiCategory.TICKETING;
 
 import com.bytechef.component.definition.UnifiedApiDefinition;
 import com.bytechef.component.jira.unified.adapter.JiraAccountAdapter;

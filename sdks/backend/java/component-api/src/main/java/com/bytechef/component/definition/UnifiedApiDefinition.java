@@ -28,7 +28,7 @@ public interface UnifiedApiDefinition {
     /**
      *
      */
-    enum Category {
+    enum UnifiedApiCategory {
         ACCOUNTING, ATS, CRM, E_COMMERCE, FILE_STORAGE, HRIS, MARKETING_AUTOMATION, TICKETING
     }
 
@@ -36,7 +36,7 @@ public interface UnifiedApiDefinition {
      *
      * @return
      */
-    Category getCategory();
+    UnifiedApiCategory getCategory();
 
     /**
      *

@@ -17,7 +17,7 @@
 package com.bytechef.component.hubspot.unified;
 
 import static com.bytechef.component.definition.ComponentDsl.unifiedApi;
-import static com.bytechef.component.definition.UnifiedApiDefinition.Category.CRM;
+import static com.bytechef.component.definition.UnifiedApiDefinition.UnifiedApiCategory.CRM;
 
 import com.bytechef.component.definition.UnifiedApiDefinition;
 import com.bytechef.component.hubspot.unified.adapter.HubspotAccountAdapter;
