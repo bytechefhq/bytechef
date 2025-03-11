@@ -18,12 +18,12 @@ package com.bytechef.component.datastream.config;
 
 import com.bytechef.component.datastream.converter.MapToStringConverter;
 import com.bytechef.component.datastream.converter.StringToMapConverter;
-import com.bytechef.component.datastream.item.DataStreamItemProcessor;
-import com.bytechef.component.datastream.item.DataStreamItemReaderDelegate;
-import com.bytechef.component.datastream.item.DataStreamItemWriterDelegate;
+import com.bytechef.component.datastream.item.ItemProcessorDelegate;
+import com.bytechef.component.datastream.item.ItemReaderDelegate;
+import com.bytechef.component.datastream.item.ItemWriterDelegate;
 import com.bytechef.component.datastream.listener.DataStreamJobExecutionListener;
 import com.bytechef.platform.component.definition.ContextFactory;
-import com.bytechef.platform.component.service.ComponentDefinitionService;
+import com.bytechef.platform.component.service.ClusterElementDefinitionService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Map;
@@ -73,14 +73,14 @@ public class DataStreamConfiguration extends DefaultBatchConfiguration {
     @Bean
     @JobScope
     public Step step1(
-        ComponentDefinitionService componentDefinitionService, ContextFactory contextFactory,
+        ClusterElementDefinitionService clusterElementDefinitionService, ContextFactory contextFactory,
         JobRepository jobRepository, DataSourceTransactionManager transactionManager) {
 
         return new StepBuilder("step1", jobRepository)
             .<Map<String, ?>, Map<String, ?>>chunk(10, transactionManager)
-            .reader(new DataStreamItemReaderDelegate(componentDefinitionService, contextFactory))
-            .processor(new DataStreamItemProcessor())
-            .writer(new DataStreamItemWriterDelegate(componentDefinitionService, contextFactory))
+            .reader(new ItemReaderDelegate(clusterElementDefinitionService, contextFactory))
+            .processor(new ItemProcessorDelegate())
+            .writer(new ItemWriterDelegate(clusterElementDefinitionService, contextFactory))
             .build();
     }
 }

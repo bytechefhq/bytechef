@@ -16,18 +16,28 @@
 
 package com.bytechef.component.csv.file.datastream;
 
-import com.bytechef.component.definition.DataStreamContext;
-import com.bytechef.component.definition.DataStreamItemWriter;
+import static com.bytechef.component.csv.file.constant.CsvFileConstants.WRITE_PROPERTIES;
+
+import com.bytechef.component.definition.ClusterElementDefinition;
+import com.bytechef.component.definition.ComponentDsl;
+import com.bytechef.component.definition.datastream.ItemWriter;
 import java.util.List;
 import java.util.Map;
 
 /**
  * @author Ivica Cardic
  */
-public class CsvFileDataStreamItemWriter implements DataStreamItemWriter {
+public class CsvFileItemStreamWriter implements ItemWriter {
+
+    public static final ClusterElementDefinition<CsvFileItemStreamWriter> CLUSTER_ELEMENT_DEFINITION =
+        ComponentDsl.<CsvFileItemStreamWriter>clusterElement("writer")
+            .title("Write CSV file rows")
+            .type(DESTINATION)
+            .object(CsvFileItemStreamWriter.class)
+            .properties(WRITE_PROPERTIES);
 
     @Override
-    public void write(List<? extends Map<String, ?>> items, DataStreamContext context) throws Exception {
+    public void write(List<? extends Map<String, ?>> items) throws Exception {
         // TODO write items as stream
 
         System.out.println(items);

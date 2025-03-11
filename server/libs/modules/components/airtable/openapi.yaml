@@ -121,7 +121,7 @@ paths:
             x-dynamic-options-dependency:
               - "baseId"
         - name: "recordId"
-          description: "ID of the record that will be deleted."
+          description: "ID of the record that will be retrieved."
           in: "path"
           required: true
           schema:

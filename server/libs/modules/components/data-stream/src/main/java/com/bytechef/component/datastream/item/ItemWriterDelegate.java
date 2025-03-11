@@ -16,11 +16,11 @@
 
 package com.bytechef.component.datastream.item;
 
-import static com.bytechef.component.datastream.constant.DataStreamConstants.DESTINATION;
+import static com.bytechef.component.definition.datastream.ItemWriter.DESTINATION;
 
-import com.bytechef.component.definition.DataStreamItemWriter;
+import com.bytechef.component.definition.datastream.ItemWriter;
 import com.bytechef.platform.component.definition.ContextFactory;
-import com.bytechef.platform.component.service.ComponentDefinitionService;
+import com.bytechef.platform.component.service.ClusterElementDefinitionService;
 import com.bytechef.tenant.util.TenantUtils;
 import java.util.Map;
 import org.springframework.batch.core.StepExecution;
@@ -32,44 +32,49 @@ import org.springframework.batch.item.ItemStreamWriter;
 /**
  * @author Ivica Cardic
  */
-public class DataStreamItemWriterDelegate extends AbstractDataStreamItemDelegate
-    implements ItemStreamWriter<Map<String, ?>> {
+public class ItemWriterDelegate extends AbstractItemDelegate implements ItemStreamWriter<Map<String, ?>> {
 
-    private final ComponentDefinitionService componentDefinitionService;
-    private DataStreamItemWriter dataStreamItemWriter;
+    private final ClusterElementDefinitionService clusterElementDefinitionService;
+    private ItemWriter itemWriter;
 
-    public DataStreamItemWriterDelegate(
-        ComponentDefinitionService componentDefinitionService, ContextFactory contextFactory) {
+    public ItemWriterDelegate(
+        ClusterElementDefinitionService clusterElementDefinitionService, ContextFactory contextFactory) {
 
         super(DESTINATION, contextFactory);
 
-        this.componentDefinitionService = componentDefinitionService;
+        this.clusterElementDefinitionService = clusterElementDefinitionService;
     }
 
     @Override
     public void close() throws ItemStreamException {
-        if (dataStreamItemWriter != null) {
-            dataStreamItemWriter.close();
+        if (itemWriter != null) {
+            itemWriter.close();
         }
     }
 
     @Override
     public void open(ExecutionContext executionContext) throws ItemStreamException {
         TenantUtils.runWithTenantId(
-            tenantId, () -> dataStreamItemWriter.open(inputParameters, connectionParameters, context));
+            tenantId, () -> itemWriter.open(
+                inputParameters, connectionParameters,
+                new ExecutionContextImpl(
+                    contextFactory.createContext(componentName, null, editorEnvironment), executionContext)));
     }
 
     @Override
     public void update(ExecutionContext executionContext) throws ItemStreamException {
-        TenantUtils.runWithTenantId(tenantId, () -> dataStreamItemWriter.update(context));
+        TenantUtils.runWithTenantId(tenantId, () -> itemWriter.update(
+            new ExecutionContextImpl(
+                contextFactory.createContext(componentName, null, editorEnvironment), executionContext)));
     }
 
     @Override
     public void write(Chunk<? extends Map<String, ?>> chunk) {
-        TenantUtils.runWithTenantId(tenantId, () -> dataStreamItemWriter.write(chunk.getItems(), context));
+        TenantUtils.runWithTenantId(tenantId, () -> itemWriter.write(chunk.getItems()));
     }
 
     protected void doBeforeStep(final StepExecution stepExecution) {
-        dataStreamItemWriter = componentDefinitionService.getDataStreamItemWriter(componentName, componentVersion);
+        itemWriter = clusterElementDefinitionService.getClusterElementObject(
+            componentName, componentVersion, DESTINATION);
     }
 }

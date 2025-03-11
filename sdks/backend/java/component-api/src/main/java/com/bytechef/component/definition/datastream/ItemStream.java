@@ -14,15 +14,21 @@
  * limitations under the License.
  */
 
-package com.bytechef.component.definition;
+package com.bytechef.component.definition.datastream;
 
-import java.util.List;
-import java.util.Map;
+import com.bytechef.component.definition.Parameters;
 
 /**
  * @author Ivica Cardic
  */
-public interface DataStreamItemWriter extends DataStreamItemStream {
+public interface ItemStream {
 
-    void write(List<? extends Map<String, ?>> items, DataStreamContext context) throws Exception;
+    default void open(Parameters inputParameters, Parameters connectionParameters, ExecutionContext context) {
+    }
+
+    default void update(ExecutionContext context) {
+    }
+
+    default void close() {
+    }
 }

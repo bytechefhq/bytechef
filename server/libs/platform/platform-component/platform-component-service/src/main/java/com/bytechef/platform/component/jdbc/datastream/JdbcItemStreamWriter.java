@@ -16,10 +16,13 @@
 
 package com.bytechef.platform.component.jdbc.datastream;
 
+import static com.bytechef.component.definition.ComponentDsl.clusterElement;
+
 import com.bytechef.commons.util.MapUtils;
-import com.bytechef.component.definition.DataStreamContext;
-import com.bytechef.component.definition.DataStreamItemWriter;
+import com.bytechef.component.definition.ClusterElementDefinition;
 import com.bytechef.component.definition.Parameters;
+import com.bytechef.component.definition.datastream.ExecutionContext;
+import com.bytechef.component.definition.datastream.ItemWriter;
 import com.bytechef.platform.component.jdbc.DataSourceFactory;
 import com.bytechef.platform.component.jdbc.operation.InsertJdbcOperation;
 import java.util.List;
@@ -29,7 +32,7 @@ import org.springframework.jdbc.datasource.SingleConnectionDataSource;
 /**
  * @author Ivica Cardic
  */
-public class JdbcDataStreamItemWriter implements DataStreamItemWriter {
+public class JdbcItemStreamWriter implements ItemWriter {
 
     private final InsertJdbcOperation insertJdbcOperation;
     private Parameters inputParameters;
@@ -37,10 +40,19 @@ public class JdbcDataStreamItemWriter implements DataStreamItemWriter {
     private SingleConnectionDataSource dataSource;
     private final String jdbcDriverClassName;
 
-    public JdbcDataStreamItemWriter(String databaseJdbcName, String jdbcDriverClassName) {
+    public JdbcItemStreamWriter(String databaseJdbcName, String jdbcDriverClassName) {
         this.databaseJdbcName = databaseJdbcName;
         this.jdbcDriverClassName = jdbcDriverClassName;
         this.insertJdbcOperation = new InsertJdbcOperation();
+    }
+
+    public static ClusterElementDefinition clusterElementDefinition(
+        String databaseJdbcName, String jdbcDriverClassName) {
+
+        return clusterElement("writer")
+            .title("Write table rows")
+            .type(DESTINATION)
+            .object(() -> new JdbcItemStreamWriter(databaseJdbcName, jdbcDriverClassName));
     }
 
     @Override
@@ -56,13 +68,13 @@ public class JdbcDataStreamItemWriter implements DataStreamItemWriter {
     }
 
     @Override
-    public void open(Parameters inputParameters, Parameters connectionParameters, DataStreamContext context) {
+    public void open(Parameters inputParameters, Parameters connectionParameters, ExecutionContext context) {
         this.inputParameters = inputParameters;
         this.dataSource = DataSourceFactory.getDataSource(connectionParameters, databaseJdbcName, jdbcDriverClassName);
     }
 
     @Override
-    public void write(List<? extends Map<String, ?>> items, DataStreamContext context) throws Exception {
+    public void write(List<? extends Map<String, ?>> items) throws Exception {
         insertJdbcOperation.execute(MapUtils.concat(inputParameters, Map.of("rows", items)), dataSource);
     }
 }
