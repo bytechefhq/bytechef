@@ -66,7 +66,7 @@
             "options" : null,
             "properties" : [ {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "ID of the email template.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -81,11 +81,11 @@
               "maxValue" : null,
               "minValue" : null,
               "options" : null,
-              "controlType" : "INTEGER",
-              "optionsDataSource" : null
+              "optionsDataSource" : null,
+              "controlType" : "INTEGER"
             }, {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "Name of the email template.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -105,7 +105,7 @@
               "optionsDataSource" : null
             }, {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "Subject of the email.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -125,7 +125,7 @@
               "optionsDataSource" : null
             }, {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "From address to send the email from.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -145,7 +145,7 @@
               "optionsDataSource" : null
             }, {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "Address that recipients will reply to by default.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -164,16 +164,15 @@
               "options" : null,
               "optionsDataSource" : null
             } ],
-            "controlType" : "OBJECT_BUILDER",
-            "optionsDataSource" : null
+            "optionsDataSource" : null,
+            "controlType" : "OBJECT_BUILDER"
           } ],
-          "controlType" : "OBJECT_BUILDER",
-          "optionsDataSource" : null
+          "optionsDataSource" : null,
+          "controlType" : "OBJECT_BUILDER"
         },
         "sampleOutput" : null,
         "placeholder" : null
       },
-      "sampleOutput" : null,
       "outputSchema" : {
         "advancedOption" : null,
         "description" : null,
@@ -212,7 +211,7 @@
           "options" : null,
           "properties" : [ {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "ID of the email template.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -227,11 +226,11 @@
             "maxValue" : null,
             "minValue" : null,
             "options" : null,
-            "controlType" : "INTEGER",
-            "optionsDataSource" : null
+            "optionsDataSource" : null,
+            "controlType" : "INTEGER"
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "Name of the email template.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -251,7 +250,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "Subject of the email.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -271,7 +270,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "From address to send the email from.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -291,7 +290,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "Address that recipients will reply to by default.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -310,12 +309,13 @@
             "options" : null,
             "optionsDataSource" : null
           } ],
-          "controlType" : "OBJECT_BUILDER",
-          "optionsDataSource" : null
+          "optionsDataSource" : null,
+          "controlType" : "OBJECT_BUILDER"
         } ],
-        "controlType" : "OBJECT_BUILDER",
-        "optionsDataSource" : null
-      }
+        "optionsDataSource" : null,
+        "controlType" : "OBJECT_BUILDER"
+      },
+      "sampleOutput" : null
     },
     "properties" : [ {
       "advancedOption" : null,
@@ -407,9 +407,9 @@
       "optionsDataSource" : null
     } ],
     "title" : "Create Email Template",
-    "workflowNodeDescription" : null,
     "perform" : null,
-    "processErrorResponse" : null
+    "processErrorResponse" : null,
+    "workflowNodeDescription" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -477,7 +477,7 @@
               "options" : null,
               "properties" : [ {
                 "advancedOption" : null,
-                "description" : null,
+                "description" : "Email address of the person.",
                 "displayCondition" : null,
                 "expressionEnabled" : null,
                 "hidden" : null,
@@ -497,7 +497,7 @@
                 "optionsDataSource" : null
               }, {
                 "advancedOption" : null,
-                "description" : null,
+                "description" : "First name of the person.",
                 "displayCondition" : null,
                 "expressionEnabled" : null,
                 "hidden" : null,
@@ -517,7 +517,7 @@
                 "optionsDataSource" : null
               }, {
                 "advancedOption" : null,
-                "description" : null,
+                "description" : "Last name of the person.",
                 "displayCondition" : null,
                 "expressionEnabled" : null,
                 "hidden" : null,
@@ -537,7 +537,7 @@
                 "optionsDataSource" : null
               }, {
                 "advancedOption" : null,
-                "description" : null,
+                "description" : "Website of the person.",
                 "displayCondition" : null,
                 "expressionEnabled" : null,
                 "hidden" : null,
@@ -557,7 +557,7 @@
                 "optionsDataSource" : null
               }, {
                 "advancedOption" : null,
-                "description" : null,
+                "description" : "Title of the person.",
                 "displayCondition" : null,
                 "expressionEnabled" : null,
                 "hidden" : null,
@@ -577,7 +577,7 @@
                 "optionsDataSource" : null
               }, {
                 "advancedOption" : null,
-                "description" : null,
+                "description" : "ID of the person.",
                 "displayCondition" : null,
                 "expressionEnabled" : null,
                 "hidden" : null,
@@ -597,7 +597,7 @@
                 "optionsDataSource" : null
               }, {
                 "advancedOption" : null,
-                "description" : null,
+                "description" : "Phone number of the person.",
                 "displayCondition" : null,
                 "expressionEnabled" : null,
                 "hidden" : null,
@@ -616,23 +616,22 @@
                 "options" : null,
                 "optionsDataSource" : null
               } ],
-              "controlType" : "OBJECT_BUILDER",
-              "optionsDataSource" : null
+              "optionsDataSource" : null,
+              "controlType" : "OBJECT_BUILDER"
             } ],
             "maxItems" : null,
             "minItems" : null,
             "multipleValues" : null,
             "options" : null,
-            "controlType" : "ARRAY_BUILDER",
-            "optionsDataSource" : null
+            "optionsDataSource" : null,
+            "controlType" : "ARRAY_BUILDER"
           } ],
-          "controlType" : "OBJECT_BUILDER",
-          "optionsDataSource" : null
+          "optionsDataSource" : null,
+          "controlType" : "OBJECT_BUILDER"
         },
         "sampleOutput" : null,
         "placeholder" : null
       },
-      "sampleOutput" : null,
       "outputSchema" : {
         "advancedOption" : null,
         "description" : null,
@@ -685,7 +684,7 @@
             "options" : null,
             "properties" : [ {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "Email address of the person.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -705,7 +704,7 @@
               "optionsDataSource" : null
             }, {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "First name of the person.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -725,7 +724,7 @@
               "optionsDataSource" : null
             }, {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "Last name of the person.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -745,7 +744,7 @@
               "optionsDataSource" : null
             }, {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "Website of the person.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -765,7 +764,7 @@
               "optionsDataSource" : null
             }, {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "Title of the person.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -785,7 +784,7 @@
               "optionsDataSource" : null
             }, {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "ID of the person.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -805,7 +804,7 @@
               "optionsDataSource" : null
             }, {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "Phone number of the person.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -824,19 +823,20 @@
               "options" : null,
               "optionsDataSource" : null
             } ],
-            "controlType" : "OBJECT_BUILDER",
-            "optionsDataSource" : null
+            "optionsDataSource" : null,
+            "controlType" : "OBJECT_BUILDER"
           } ],
           "maxItems" : null,
           "minItems" : null,
           "multipleValues" : null,
           "options" : null,
-          "controlType" : "ARRAY_BUILDER",
-          "optionsDataSource" : null
+          "optionsDataSource" : null,
+          "controlType" : "ARRAY_BUILDER"
         } ],
-        "controlType" : "OBJECT_BUILDER",
-        "optionsDataSource" : null
-      }
+        "optionsDataSource" : null,
+        "controlType" : "OBJECT_BUILDER"
+      },
+      "sampleOutput" : null
     },
     "properties" : [ {
       "advancedOption" : null,
@@ -953,7 +953,7 @@
           "optionsDataSource" : null
         }, {
           "advancedOption" : null,
-          "description" : "Title of the person",
+          "description" : "Title of the person.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -973,7 +973,7 @@
           "optionsDataSource" : null
         }, {
           "advancedOption" : null,
-          "description" : "The person's phone number",
+          "description" : "The person's phone number.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -992,20 +992,20 @@
           "options" : null,
           "optionsDataSource" : null
         } ],
-        "controlType" : "OBJECT_BUILDER",
-        "optionsDataSource" : null
+        "optionsDataSource" : null,
+        "controlType" : "OBJECT_BUILDER"
       } ],
       "maxItems" : null,
       "minItems" : null,
       "multipleValues" : null,
       "options" : null,
-      "controlType" : "ARRAY_BUILDER",
-      "optionsDataSource" : null
+      "optionsDataSource" : null,
+      "controlType" : "ARRAY_BUILDER"
     } ],
     "title" : "Create People",
-    "workflowNodeDescription" : null,
     "perform" : null,
-    "processErrorResponse" : null
+    "processErrorResponse" : null,
+    "workflowNodeDescription" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -1068,13 +1068,10 @@
       }
     } ],
     "title" : "Add Tag",
-    "workflowNodeDescription" : null,
     "perform" : null,
-    "processErrorResponse" : null
+    "processErrorResponse" : null,
+    "workflowNodeDescription" : null
   } ],
-  "unifiedApi" : null,
-  "triggers" : [ ],
-  "dataStream" : null,
   "connection" : {
     "authorizations" : [ {
       "detectOn" : null,
@@ -1125,23 +1122,26 @@
       "title" : "API Key",
       "type" : "API_KEY",
       "acquire" : null,
+      "scopes" : null,
+      "authorizationUrl" : null,
+      "tokenUrl" : null,
+      "refreshUrl" : null,
       "apply" : null,
       "authorizationCallback" : null,
-      "authorizationUrl" : null,
       "clientId" : null,
       "clientSecret" : null,
       "oauth2AuthorizationExtraQueryParameters" : null,
       "pkce" : null,
       "refresh" : null,
-      "refreshUrl" : null,
-      "scopes" : null,
-      "refreshToken" : null,
-      "tokenUrl" : null
+      "refreshToken" : null
     } ],
     "properties" : null,
     "version" : 1,
     "authorizationRequired" : null,
     "baseUri" : { },
     "test" : null
-  }
+  },
+  "triggers" : [ ],
+  "dataStream" : null,
+  "unifiedApi" : null
 }

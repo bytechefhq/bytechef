@@ -69,7 +69,7 @@
             "options" : null,
             "properties" : [ {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "Name of the account.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -89,13 +89,33 @@
               "optionsDataSource" : null
             }, {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "Website of the account.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
               "metadata" : { },
               "required" : false,
               "name" : "accountUrl",
+              "type" : "STRING",
+              "defaultValue" : null,
+              "exampleValue" : null,
+              "label" : null,
+              "placeholder" : null,
+              "controlType" : "TEXT",
+              "languageId" : null,
+              "maxLength" : null,
+              "minLength" : null,
+              "options" : null,
+              "optionsDataSource" : null
+            }, {
+              "advancedOption" : null,
+              "description" : "ID of the account.",
+              "displayCondition" : null,
+              "expressionEnabled" : null,
+              "hidden" : null,
+              "metadata" : { },
+              "required" : false,
+              "name" : "id",
               "type" : "STRING",
               "defaultValue" : null,
               "exampleValue" : null,
@@ -155,7 +175,7 @@
           "options" : null,
           "properties" : [ {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "Name of the account.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -175,13 +195,33 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "Website of the account.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
             "metadata" : { },
             "required" : false,
             "name" : "accountUrl",
+            "type" : "STRING",
+            "defaultValue" : null,
+            "exampleValue" : null,
+            "label" : null,
+            "placeholder" : null,
+            "controlType" : "TEXT",
+            "languageId" : null,
+            "maxLength" : null,
+            "minLength" : null,
+            "options" : null,
+            "optionsDataSource" : null
+          }, {
+            "advancedOption" : null,
+            "description" : "ID of the account.",
+            "displayCondition" : null,
+            "expressionEnabled" : null,
+            "hidden" : null,
+            "metadata" : { },
+            "required" : false,
+            "name" : "id",
             "type" : "STRING",
             "defaultValue" : null,
             "exampleValue" : null,
@@ -322,7 +362,7 @@
             "options" : null,
             "properties" : [ {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "Email address of the contact.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -342,7 +382,7 @@
               "optionsDataSource" : null
             }, {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "First name of the contact.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -362,7 +402,7 @@
               "optionsDataSource" : null
             }, {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "Last name of the contact.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -382,13 +422,33 @@
               "optionsDataSource" : null
             }, {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "Phone number of the contact.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
               "metadata" : { },
               "required" : false,
               "name" : "phone",
+              "type" : "STRING",
+              "defaultValue" : null,
+              "exampleValue" : null,
+              "label" : null,
+              "placeholder" : null,
+              "controlType" : "TEXT",
+              "languageId" : null,
+              "maxLength" : null,
+              "minLength" : null,
+              "options" : null,
+              "optionsDataSource" : null
+            }, {
+              "advancedOption" : null,
+              "description" : "ID of the contact.",
+              "displayCondition" : null,
+              "expressionEnabled" : null,
+              "hidden" : null,
+              "metadata" : { },
+              "required" : false,
+              "name" : "id",
               "type" : "STRING",
               "defaultValue" : null,
               "exampleValue" : null,
@@ -448,7 +508,7 @@
           "options" : null,
           "properties" : [ {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "Email address of the contact.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -468,7 +528,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "First name of the contact.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -488,7 +548,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "Last name of the contact.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -508,13 +568,33 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "Phone number of the contact.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
             "metadata" : { },
             "required" : false,
             "name" : "phone",
+            "type" : "STRING",
+            "defaultValue" : null,
+            "exampleValue" : null,
+            "label" : null,
+            "placeholder" : null,
+            "controlType" : "TEXT",
+            "languageId" : null,
+            "maxLength" : null,
+            "minLength" : null,
+            "options" : null,
+            "optionsDataSource" : null
+          }, {
+            "advancedOption" : null,
+            "description" : "ID of the contact.",
+            "displayCondition" : null,
+            "expressionEnabled" : null,
+            "hidden" : null,
+            "metadata" : { },
+            "required" : false,
+            "name" : "id",
             "type" : "STRING",
             "defaultValue" : null,
             "exampleValue" : null,
@@ -695,7 +775,7 @@
             "options" : null,
             "properties" : [ {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "ID of the task.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -715,7 +795,7 @@
               "optionsDataSource" : null
             }, {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "Title of the task.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -735,7 +815,7 @@
               "optionsDataSource" : null
             }, {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "ID of the relational object for this task.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -754,7 +834,7 @@
               "optionsDataSource" : null
             }, {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "Due date of the task.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -771,7 +851,7 @@
               "optionsDataSource" : null
             }, {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "ID of the task type.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -836,7 +916,7 @@
           "options" : null,
           "properties" : [ {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "ID of the task.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -856,7 +936,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "Title of the task.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -876,7 +956,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "ID of the relational object for this task.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -895,7 +975,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "Due date of the task.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -912,7 +992,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "ID of the task type.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -1042,7 +1122,6 @@
     "workflowNodeDescription" : null
   } ],
   "dataStream" : null,
-  "triggers" : [ ],
   "unifiedApi" : null,
   "connection" : {
     "authorizations" : [ {
@@ -1114,23 +1193,24 @@
       "title" : "API Key",
       "type" : "API_KEY",
       "acquire" : null,
+      "scopes" : null,
+      "authorizationUrl" : null,
+      "tokenUrl" : null,
+      "refreshUrl" : null,
       "apply" : null,
       "authorizationCallback" : null,
-      "authorizationUrl" : null,
       "clientId" : null,
       "clientSecret" : null,
       "oauth2AuthorizationExtraQueryParameters" : null,
       "pkce" : null,
       "refresh" : null,
-      "refreshUrl" : null,
-      "scopes" : null,
-      "refreshToken" : null,
-      "tokenUrl" : null
+      "refreshToken" : null
     } ],
     "properties" : null,
     "version" : 1,
     "authorizationRequired" : null,
     "baseUri" : { },
     "test" : null
-  }
+  },
+  "triggers" : [ ]
 }

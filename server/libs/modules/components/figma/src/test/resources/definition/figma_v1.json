@@ -28,7 +28,7 @@
       "outputResponse" : {
         "outputSchema" : {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "List of comments.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -44,7 +44,7 @@
           "placeholder" : null,
           "items" : [ {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "List of comments.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -61,7 +61,7 @@
             "options" : null,
             "properties" : [ {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "ID of the comment.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -81,7 +81,7 @@
               "optionsDataSource" : null
             }, {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "File key of the file the comment is on.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -101,7 +101,7 @@
               "optionsDataSource" : null
             }, {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "ID of comment this comment is a reply to.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -121,7 +121,7 @@
               "optionsDataSource" : null
             }, {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "User who posted the comment.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -138,7 +138,7 @@
               "options" : null,
               "properties" : [ {
                 "advancedOption" : null,
-                "description" : null,
+                "description" : "ID of the user.",
                 "displayCondition" : null,
                 "expressionEnabled" : null,
                 "hidden" : null,
@@ -158,7 +158,7 @@
                 "optionsDataSource" : null
               }, {
                 "advancedOption" : null,
-                "description" : null,
+                "description" : "Name of the user.",
                 "displayCondition" : null,
                 "expressionEnabled" : null,
                 "hidden" : null,
@@ -178,7 +178,7 @@
                 "optionsDataSource" : null
               }, {
                 "advancedOption" : null,
-                "description" : null,
+                "description" : "URL of the user's profile image.",
                 "displayCondition" : null,
                 "expressionEnabled" : null,
                 "hidden" : null,
@@ -198,7 +198,7 @@
                 "optionsDataSource" : null
               }, {
                 "advancedOption" : null,
-                "description" : null,
+                "description" : "Email of the user.",
                 "displayCondition" : null,
                 "expressionEnabled" : null,
                 "hidden" : null,
@@ -217,25 +217,25 @@
                 "options" : null,
                 "optionsDataSource" : null
               } ],
-              "controlType" : "OBJECT_BUILDER",
-              "optionsDataSource" : null
+              "optionsDataSource" : null,
+              "controlType" : "OBJECT_BUILDER"
             } ],
-            "controlType" : "OBJECT_BUILDER",
-            "optionsDataSource" : null
+            "optionsDataSource" : null,
+            "controlType" : "OBJECT_BUILDER"
           } ],
           "maxItems" : null,
           "minItems" : null,
           "multipleValues" : null,
           "options" : null,
-          "controlType" : "ARRAY_BUILDER",
-          "optionsDataSource" : null
+          "optionsDataSource" : null,
+          "controlType" : "ARRAY_BUILDER"
         },
         "sampleOutput" : null,
         "placeholder" : null
       },
       "outputSchema" : {
         "advancedOption" : null,
-        "description" : null,
+        "description" : "List of comments.",
         "displayCondition" : null,
         "expressionEnabled" : null,
         "hidden" : null,
@@ -251,7 +251,7 @@
         "placeholder" : null,
         "items" : [ {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "List of comments.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -268,7 +268,7 @@
           "options" : null,
           "properties" : [ {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "ID of the comment.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -288,7 +288,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "File key of the file the comment is on.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -308,7 +308,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "ID of comment this comment is a reply to.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -328,7 +328,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "User who posted the comment.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -345,7 +345,7 @@
             "options" : null,
             "properties" : [ {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "ID of the user.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -365,7 +365,7 @@
               "optionsDataSource" : null
             }, {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "Name of the user.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -385,7 +385,7 @@
               "optionsDataSource" : null
             }, {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "URL of the user's profile image.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -405,7 +405,7 @@
               "optionsDataSource" : null
             }, {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "Email of the user.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -424,18 +424,18 @@
               "options" : null,
               "optionsDataSource" : null
             } ],
-            "controlType" : "OBJECT_BUILDER",
-            "optionsDataSource" : null
+            "optionsDataSource" : null,
+            "controlType" : "OBJECT_BUILDER"
           } ],
-          "controlType" : "OBJECT_BUILDER",
-          "optionsDataSource" : null
+          "optionsDataSource" : null,
+          "controlType" : "OBJECT_BUILDER"
         } ],
         "maxItems" : null,
         "minItems" : null,
         "multipleValues" : null,
         "options" : null,
-        "controlType" : "ARRAY_BUILDER",
-        "optionsDataSource" : null
+        "optionsDataSource" : null,
+        "controlType" : "ARRAY_BUILDER"
       },
       "sampleOutput" : null
     },
@@ -502,7 +502,7 @@
           "options" : null,
           "properties" : [ {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "ID of the comment.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -522,7 +522,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "File key of the file the comment is on.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -542,7 +542,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "ID of comment this comment is a reply to.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -562,7 +562,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "Message of the comment.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -581,8 +581,8 @@
             "options" : null,
             "optionsDataSource" : null
           } ],
-          "controlType" : "OBJECT_BUILDER",
-          "optionsDataSource" : null
+          "optionsDataSource" : null,
+          "controlType" : "OBJECT_BUILDER"
         },
         "sampleOutput" : null,
         "placeholder" : null
@@ -608,7 +608,7 @@
         "options" : null,
         "properties" : [ {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "ID of the comment.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -628,7 +628,7 @@
           "optionsDataSource" : null
         }, {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "File key of the file the comment is on.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -648,7 +648,7 @@
           "optionsDataSource" : null
         }, {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "ID of comment this comment is a reply to.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -668,7 +668,7 @@
           "optionsDataSource" : null
         }, {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "Message of the comment.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -687,8 +687,8 @@
           "options" : null,
           "optionsDataSource" : null
         } ],
-        "controlType" : "OBJECT_BUILDER",
-        "optionsDataSource" : null
+        "optionsDataSource" : null,
+        "controlType" : "OBJECT_BUILDER"
       },
       "sampleOutput" : null
     },
@@ -742,9 +742,6 @@
     "perform" : null,
     "processErrorResponse" : null
   } ],
-  "triggers" : [ ],
-  "dataStream" : null,
-  "unifiedApi" : null,
   "connection" : {
     "authorizations" : [ {
       "detectOn" : null,
@@ -795,23 +792,26 @@
       "title" : "OAuth2 Authorization Code",
       "type" : "OAUTH2_AUTHORIZATION_CODE",
       "acquire" : null,
+      "scopes" : { },
+      "authorizationUrl" : { },
+      "tokenUrl" : { },
+      "refreshUrl" : { },
       "apply" : null,
       "authorizationCallback" : null,
-      "authorizationUrl" : { },
       "clientId" : null,
       "clientSecret" : null,
       "oauth2AuthorizationExtraQueryParameters" : null,
       "pkce" : null,
       "refresh" : null,
-      "refreshUrl" : { },
-      "scopes" : { },
-      "refreshToken" : null,
-      "tokenUrl" : { }
+      "refreshToken" : null
     } ],
     "properties" : null,
     "version" : 1,
     "authorizationRequired" : null,
     "baseUri" : { },
     "test" : null
-  }
+  },
+  "triggers" : [ ],
+  "dataStream" : null,
+  "unifiedApi" : null
 }

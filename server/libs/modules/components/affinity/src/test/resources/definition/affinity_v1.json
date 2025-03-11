@@ -49,7 +49,7 @@
           "options" : null,
           "properties" : [ {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "The ID of the newly created opportunity.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -69,7 +69,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "The name of the newly created opportunity.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -115,7 +115,7 @@
         "options" : null,
         "properties" : [ {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "The ID of the newly created opportunity.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -135,7 +135,7 @@
           "optionsDataSource" : null
         }, {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "The name of the newly created opportunity.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -183,8 +183,8 @@
       "optionsDataSource" : null
     } ],
     "title" : "Create Opportunity",
-    "workflowNodeDescription" : null,
     "perform" : null,
+    "workflowNodeDescription" : null,
     "processErrorResponse" : null
   }, {
     "batch" : null,
@@ -222,7 +222,7 @@
           "options" : null,
           "properties" : [ {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "The ID of the organization.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -242,7 +242,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "The name of the organization.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -262,7 +262,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "The domain name of the organization.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -308,7 +308,7 @@
         "options" : null,
         "properties" : [ {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "The ID of the organization.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -328,7 +328,7 @@
           "optionsDataSource" : null
         }, {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "The name of the organization.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -348,7 +348,7 @@
           "optionsDataSource" : null
         }, {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "The domain name of the organization.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -418,8 +418,8 @@
       "optionsDataSource" : null
     } ],
     "title" : "Create Organization",
-    "workflowNodeDescription" : null,
     "perform" : null,
+    "workflowNodeDescription" : null,
     "processErrorResponse" : null
   }, {
     "batch" : null,
@@ -457,7 +457,7 @@
           "options" : null,
           "properties" : [ {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "The ID of the person.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -477,7 +477,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "The first name of the person.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -497,7 +497,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "The last name of the person.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -517,7 +517,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "The email addresses of the person.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -531,7 +531,7 @@
             "placeholder" : null,
             "items" : [ {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "The email addresses of the person.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -584,7 +584,7 @@
         "options" : null,
         "properties" : [ {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "The ID of the person.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -604,7 +604,7 @@
           "optionsDataSource" : null
         }, {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "The first name of the person.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -624,7 +624,7 @@
           "optionsDataSource" : null
         }, {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "The last name of the person.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -644,7 +644,7 @@
           "optionsDataSource" : null
         }, {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "The email addresses of the person.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -658,7 +658,7 @@
           "placeholder" : null,
           "items" : [ {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "The email addresses of the person.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -780,13 +780,10 @@
       "optionsDataSource" : null
     } ],
     "title" : "Create Person",
-    "workflowNodeDescription" : null,
     "perform" : null,
+    "workflowNodeDescription" : null,
     "processErrorResponse" : null
   } ],
-  "triggers" : [ ],
-  "unifiedApi" : null,
-  "dataStream" : null,
   "connection" : {
     "authorizations" : [ {
       "detectOn" : null,
@@ -817,23 +814,26 @@
       "title" : "Bearer Token",
       "type" : "BEARER_TOKEN",
       "acquire" : null,
+      "scopes" : null,
+      "authorizationUrl" : null,
+      "tokenUrl" : null,
+      "refreshUrl" : null,
       "apply" : null,
       "authorizationCallback" : null,
-      "authorizationUrl" : null,
       "clientId" : null,
       "clientSecret" : null,
       "oauth2AuthorizationExtraQueryParameters" : null,
       "pkce" : null,
       "refresh" : null,
-      "refreshUrl" : null,
-      "scopes" : null,
-      "refreshToken" : null,
-      "tokenUrl" : null
+      "refreshToken" : null
     } ],
     "properties" : null,
     "version" : 1,
     "authorizationRequired" : null,
     "baseUri" : { },
     "test" : null
-  }
+  },
+  "triggers" : [ ],
+  "dataStream" : null,
+  "unifiedApi" : null
 }

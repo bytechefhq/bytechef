@@ -137,7 +137,7 @@
           "options" : null,
           "properties" : [ {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "The ID of the deleted record.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -157,7 +157,7 @@
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "Indicates if the record was deleted.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -207,7 +207,7 @@
         "options" : null,
         "properties" : [ {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "The ID of the deleted record.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -227,7 +227,7 @@
           "optionsDataSource" : null
         }, {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "Indicates if the record was deleted.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
