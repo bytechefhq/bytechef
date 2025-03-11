@@ -6,7 +6,7 @@ import {
 } from '@/shared/middleware/platform/configuration';
 import {ProjectWorkflowKeys} from '@/shared/queries/automation/projectWorkflows.queries';
 import {ComponentDefinitionKeys} from '@/shared/queries/platform/componentDefinitions.queries';
-import {NodeDataType, WorkflowDefinitionType} from '@/shared/types';
+import {NodeDataType, TaskDispatcherContextType, WorkflowDefinitionType} from '@/shared/types';
 import {QueryClient, UseMutationResult} from '@tanstack/react-query';
 
 import useWorkflowDataStore from '../stores/useWorkflowDataStore';
@@ -31,6 +31,7 @@ interface SaveWorkflowDefinitionProps {
     projectId: number;
     queryClient: QueryClient;
     subtask?: boolean;
+    taskDispatcherContext?: TaskDispatcherContextType;
     updateWorkflowMutation: UseMutationResult<void, Error, UpdateWorkflowRequestType, unknown>;
 }
 
@@ -45,6 +46,7 @@ export default async function saveWorkflowDefinition({
     projectId,
     queryClient,
     subtask,
+    taskDispatcherContext,
     updateWorkflowMutation,
 }: SaveWorkflowDefinitionProps) {
     const {workflow} = useWorkflowDataStore.getState();
@@ -174,8 +176,8 @@ export default async function saveWorkflowDefinition({
     } else {
         tasks = [...(workflowDefinition.tasks || [])];
 
-        if (conditionId && placeholderId) {
-            tasks = insertNewConditionSubtask({conditionId, newTask, placeholderId, tasks});
+        if (conditionId) {
+            tasks = insertNewConditionSubtask({conditionId, newTask, placeholderId, taskDispatcherContext, tasks});
         } else if (loopId && placeholderId) {
             tasks = insertNewLoopSubtask({loopId, newTask, placeholderId, tasks});
         } else if (nodeIndex !== undefined && nodeIndex > -1) {
