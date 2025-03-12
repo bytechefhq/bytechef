@@ -58,7 +58,7 @@ const Project = () => {
             )}
 
             <div className="flex flex-1">
-                <ResizablePanelGroup className="flex-1" direction="vertical">
+                <ResizablePanelGroup className="flex-1 bg-surface-main" direction="vertical">
                     <ResizablePanel className="relative flex" defaultSize={65}>
                         {projectLeftSidebarOpen && projects && (
                             <ProjectsLeftSidebar
