@@ -64,9 +64,14 @@ public class StripeCreateInvoiceAction {
                 .label("Description")
                 .description("Description for the invoice.")
                 .required(false))
-        .output(outputSchema(object()
-            .properties(string("id").required(false), string("customer").required(false),
-                string("currency").required(false), string("description").required(false))
+        .output(outputSchema(object().properties(string("id").description("ID of the invoice.")
+            .required(false),
+            string("customer").description("ID of the customer who will be billed.")
+                .required(false),
+            string("currency").description("Currency used for invoice.")
+                .required(false),
+            string("description").description("Description for the invoice.")
+                .required(false))
             .metadata(
                 Map.of(
                     "responseType", ResponseType.JSON))));

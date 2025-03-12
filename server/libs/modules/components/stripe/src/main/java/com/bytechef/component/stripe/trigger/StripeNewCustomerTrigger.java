@@ -47,20 +47,33 @@ public class StripeNewCustomerTrigger {
             outputSchema(
                 object()
                     .properties(
-                        string(ID),
-                        string("object"),
-                        string("description"),
-                        string("email"),
-                        string("name"),
-                        string("phone"),
+                        string(ID)
+                            .description("ID of the customer."),
+                        string("object")
+                            .description("Value is 'customer'."),
+                        string("description")
+                            .description("Description of the customer."),
+                        string("email")
+                            .description("Email of the customer."),
+                        string("name")
+                            .description("Name of the customer."),
+                        string("phone")
+                            .description("Phone number of the customer."),
                         object("address")
+                            .description("Address of the customer.")
                             .properties(
-                                string("city"),
-                                string("country"),
-                                string("line1"),
-                                string("line2"),
-                                string("postal_code"),
-                                string("state")))))
+                                string("city")
+                                    .description("City, district, suburb, town, or village."),
+                                string("country")
+                                    .description("Country of the customer."),
+                                string("line1")
+                                    .description("Address line 1 (e.g., street, PO Box, or company name)."),
+                                string("line2")
+                                    .description("Address line 2 (e.g., apartment, suite, unit, or building)."),
+                                string("postal_code")
+                                    .description("ZIP or postal code."),
+                                string("state")
+                                    .description("State, county, province, or region.")))))
         .webhookEnable(StripeNewCustomerTrigger::webhookEnable)
         .webhookDisable(StripeNewCustomerTrigger::webhookDisable)
         .webhookRequest(StripeNewCustomerTrigger::webhookRequest);

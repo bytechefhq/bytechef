@@ -84,14 +84,30 @@ public class StripeCreateCustomerAction {
                         "type", PropertyType.BODY))
                 .label("Address")
                 .required(false))
-        .output(outputSchema(object()
-            .properties(string("id").required(false), string("description").required(false),
-                string("email").required(false), string("name").required(false), string("phone").required(false),
-                object("address")
-                    .properties(string("city").required(false), string("country").required(false),
-                        string("line1").required(false), string("line2").required(false),
-                        string("postal_code").required(false), string("state").required(false))
+        .output(outputSchema(object().properties(string("id").description("ID of the customer.")
+            .required(false),
+            string("description").description("Description of the customer.")
+                .required(false),
+            string("email").description("Email address of the customer.")
+                .required(false),
+            string("name").description("The customer's full name.")
+                .required(false),
+            string("phone").description("Phone number of the customer.")
+                .required(false),
+            object("address").properties(string("city").description("City, district, suburb, town, or village.")
+                .required(false),
+                string("country").description("Country.")
+                    .required(false),
+                string("line1").description("Address line 1 (e.g., street, PO Box, or company name).")
+                    .required(false),
+                string("line2").description("Address line 2 (e.g., apartment, suite, unit, or building).")
+                    .required(false),
+                string("postal_code").description("ZIP or postal code.")
+                    .required(false),
+                string("state").description("State, country, province, or region.")
                     .required(false))
+                .description("Customer's address.")
+                .required(false))
             .metadata(
                 Map.of(
                     "responseType", ResponseType.JSON))));

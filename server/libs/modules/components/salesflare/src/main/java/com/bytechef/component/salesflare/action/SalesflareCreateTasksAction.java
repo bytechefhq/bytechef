@@ -56,7 +56,10 @@ public class SalesflareCreateTasksAction {
                     "type", PropertyType.BODY))
             .label("Tasks")
             .required(true))
-        .output(outputSchema(array().items(object().properties(integer("id").required(false)))
+        .output(outputSchema(array().items(object().properties(integer("id").description("ID of the task.")
+            .required(false))
+            .description("List of created tasks."))
+            .description("List of created tasks.")
             .metadata(
                 Map.of(
                     "responseType", ResponseType.JSON))));

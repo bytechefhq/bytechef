@@ -46,12 +46,16 @@ paths:
                 properties:
                   name:
                     type: "string"
+                    description: "The name of the company."
                   emailOne:
                     type: "string"
+                    description: "Email address of the company."
                   phone:
                     type: "string"
+                    description: "Phone number for the company."
                   website:
                     type: "string"
+                    description: "The company's website."
   /tasklists/{tasklistId}/tasks.json:
     post:
       tags:
@@ -96,10 +100,13 @@ paths:
                 properties:
                   name:
                     type: "string"
+                    description: "Name of the task."
                   description:
                     type: "string"
+                    description: "Description of the task."
                   dueAt:
                     type: "string"
+                    description: "Due date of the task."
 components:
   securitySchemes:
     basicAuth:

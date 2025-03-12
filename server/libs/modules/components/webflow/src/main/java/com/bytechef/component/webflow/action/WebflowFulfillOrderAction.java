@@ -56,7 +56,10 @@ public class WebflowFulfillOrderAction {
                 .metadata(
                     Map.of(
                         "type", PropertyType.PATH)))
-        .output(outputSchema(object().properties(string("orderId").required(false), string("status").required(false))
+        .output(outputSchema(object().properties(string("orderId").description("ID of the order.")
+            .required(false),
+            string("status").description("Status of the order.")
+                .required(false))
             .metadata(
                 Map.of(
                     "responseType", ResponseType.JSON))));

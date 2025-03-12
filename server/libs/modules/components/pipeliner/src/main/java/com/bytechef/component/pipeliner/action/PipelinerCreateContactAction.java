@@ -38,7 +38,7 @@ import java.util.Map;
 public class PipelinerCreateContactAction {
     public static final ComponentDsl.ModifiableActionDefinition ACTION_DEFINITION = action("createContact")
         .title("Create Contact")
-        .description("Creates new Contact")
+        .description("Creates new contact.")
         .metadata(
             Map.of(
                 "method", "POST",
@@ -68,9 +68,15 @@ public class PipelinerCreateContactAction {
         .output(outputSchema(object()
             .properties(bool("success").description("True when response succeeded, false on error.")
                 .required(false),
-                object("data")
-                    .properties(string("id").required(false), string("owner_id").required(false),
-                        string("first_name").required(false), string("last_name").required(false))
+                object("data").properties(string("id").description("ID of the contact.")
+                    .required(false),
+                    string("owner_id")
+                        .description("ID of the user in Pipeliner Application that is the owner of the contact.")
+                        .required(false),
+                    string("first_name").description("First name of the contact.")
+                        .required(false),
+                    string("last_name").description("Last name of the contact.")
+                        .required(false))
                     .required(false))
             .metadata(
                 Map.of(

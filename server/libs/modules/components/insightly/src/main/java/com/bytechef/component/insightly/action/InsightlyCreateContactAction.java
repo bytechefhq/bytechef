@@ -78,10 +78,18 @@ public class InsightlyCreateContactAction {
                 .label("Title")
                 .description("The contact's title in company.")
                 .required(false))
-        .output(outputSchema(object()
-            .properties(integer("CONTACT_ID").required(false), string("FIRST_NAME").required(false),
-                string("LAST_NAME").required(false), string("EMAIL_ADDRESS").required(false),
-                string("PHONE").required(false), string("TITLE").required(false))
+        .output(outputSchema(object().properties(integer("CONTACT_ID").description("ID of the contact.")
+            .required(false),
+            string("FIRST_NAME").description("First name of the contact.")
+                .required(false),
+            string("LAST_NAME").description("Last name of the contact.")
+                .required(false),
+            string("EMAIL_ADDRESS").description("Email address of the contact.")
+                .required(false),
+            string("PHONE").description("Phone number of the contact.")
+                .required(false),
+            string("TITLE").description("The contact's title in company.")
+                .required(false))
             .metadata(
                 Map.of(
                     "responseType", ResponseType.JSON))));

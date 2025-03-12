@@ -53,17 +53,20 @@ paths:
                       id:
                         type: "string"
                         format: "uuid"
+                        description: "ID of the account."
                       owner_id:
                         type: "string"
                         format: "uuid"
+                        description: "ID of the user in Pipeliner Application that is the owner of the account."
                       name:
                         type: "string"
+                        description: "Account name."
   /entities/Contacts:
     post:
       tags:
         - "Contact"
       summary: "Create Contact"
-      description: "Creates new Contact"
+      description: "Creates new contact."
       operationId: "createContact"
       requestBody:
         description: "data of new Contact"
@@ -108,13 +111,17 @@ paths:
                       id:
                         type: "string"
                         format: "uuid"
+                        description: "ID of the contact."
                       owner_id:
                         type: "string"
                         format: "uuid"
+                        description: "ID of the user in Pipeliner Application that is the owner of the contact."
                       first_name:
                         type: "string"
+                        description: "First name of the contact."
                       last_name:
                         type: "string"
+                        description: "Last name of the contact."
   /entities/Tasks:
     post:
       tags:
@@ -172,17 +179,22 @@ paths:
                       id:
                         type: "string"
                         format: "uuid"
+                        description: "ID of the task."
                       subject:
                         type: "string"
+                        description: "Name of the entity and its default text representation."
                       activity_type_id:
                         type: "string"
                         format: "uuid"
+                        description: "Id of the activity type of task."
                       unit_id:
                         type: "string"
                         format: "uuid"
+                        description: "Sales Unit ID."
                       owner_id:
                         type: "string"
                         format: "uuid"
+                        description: "ID of the user in Pipeliner Application that is the owner of the task."
 components:
   securitySchemes:
     basicAuth:

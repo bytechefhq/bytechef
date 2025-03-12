@@ -107,11 +107,13 @@ paths:
             application/json:
               schema:
                 type: "array"
+                description: "List of created contacts."
                 items:
                   type: "object"
                   properties:
                     id:
                       type: "integer"
+                      description: "ID of the contact."
   /tasks:
     post:
       tags:
@@ -147,11 +149,13 @@ paths:
             application/json:
               schema:
                 type: "array"
+                description: "List of created tasks."
                 items:
                   type: "object"
                   properties:
                     id:
                       type: "integer"
+                      description: "ID of the task."
 components:
   securitySchemes:
     bearerAuth:

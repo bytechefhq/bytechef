@@ -39,8 +39,10 @@ paths:
                 properties:
                   orderId:
                     type: "string"
+                    description: "ID of the order."
                   status:
                     type: "string"
+                    description: "Status of the order."
   /collections/{collectionId}/items/{itemId}:
     get:
       summary: "Get Collection Item"
@@ -78,13 +80,16 @@ paths:
                 properties:
                   id:
                     type: "string"
+                    description: "ID of the item."
                   fieldData:
                     type: "object"
                     properties:
                       name:
                         type: "string"
+                        description: "Name of the item."
                       slug:
                         type: "string"
+                        description: "URL structure of the item in your site."
 components:
   securitySchemes:
     oauth2:

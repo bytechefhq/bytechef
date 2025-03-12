@@ -57,32 +57,43 @@ paths:
               schema:
                 type: "object"
                 properties:
-
                   id:
                     type: "string"
+                    description: "ID of the customer."
                   description:
                     type: "string"
+                    description: "Description of the customer."
                   email:
                     type: "string"
+                    description: "Email address of the customer."
                   name:
                     type: "string"
+                    description: "The customer's full name."
                   phone:
                     type: "string"
+                    description: "Phone number of the customer."
                   address:
                     type: "object"
+                    description: "Customer's address."
                     properties:
                       city:
                         type: "string"
+                        description: "City, district, suburb, town, or village."
                       country:
                         type: "string"
+                        description: "Country."
                       line1:
                         type: "string"
+                        description: "Address line 1 (e.g., street, PO Box, or company name)."
                       line2:
                         type: "string"
+                        description: "Address line 2 (e.g., apartment, suite, unit, or building)."
                       postal_code:
                         type: "string"
+                        description: "ZIP or postal code."
                       state:
                         type: "string"
+                        description: "State, country, province, or region."
   /invoices:
     post:
       summary: "Create Invoice"
@@ -119,12 +130,16 @@ paths:
                 properties:
                   id:
                     type: "string"
+                    description: "ID of the invoice."
                   customer:
                     type: "string"
+                    description: "ID of the customer who will be billed."
                   currency:
                     type: "string"
+                    description: "Currency used for invoice."
                   description:
                     type: "string"
+                    description: "Description for the invoice."
 components:
   securitySchemes:
     bearerAuth:
