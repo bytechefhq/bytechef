@@ -140,6 +140,7 @@ module.exports = {
             },
             inset: {
                 'data-pill-panel-placement': '540px',
+                'minimap-placement': '400px',
                 'node-handle-placement': '36px',
                 'task-dispatcher-node-handle-placement': '68px',
                 'workflow-node-popover-hover': '-40px',
