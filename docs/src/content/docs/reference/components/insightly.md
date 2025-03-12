@@ -82,12 +82,12 @@ Type: OBJECT
 
 |     Name     |     Type     |     Description     |
 |:------------:|:------------:|:-------------------:|
-| CONTACT_ID | INTEGER |  |
-| FIRST_NAME | STRING |  |
-| LAST_NAME | STRING |  |
-| EMAIL_ADDRESS | STRING |  |
-| PHONE | STRING |  |
-| TITLE | STRING |  |
+| CONTACT_ID | INTEGER | ID of the contact. |
+| FIRST_NAME | STRING | First name of the contact. |
+| LAST_NAME | STRING | Last name of the contact. |
+| EMAIL_ADDRESS | STRING | Email address of the contact. |
+| PHONE | STRING | Phone number of the contact. |
+| TITLE | STRING | The contact's title in company. |
 
 
 
@@ -143,10 +143,10 @@ Type: OBJECT
 
 |     Name     |     Type     |     Description     |
 |:------------:|:------------:|:-------------------:|
-| ORGANISATION_ID | INTEGER |  |
-| ORGANISATION_NAME | STRING |  |
-| PHONE | STRING |  |
-| WEBSITE | STRING |  |
+| ORGANISATION_ID | INTEGER | ID of the organization. |
+| ORGANISATION_NAME | STRING | The name of the organization. |
+| PHONE | STRING | A contact phone number for the organization. |
+| WEBSITE | STRING | The organization's website. |
 
 
 
@@ -198,9 +198,9 @@ Type: OBJECT
 
 |     Name     |     Type     |     Description     |
 |:------------:|:------------:|:-------------------:|
-| TASK_ID | INTEGER |  |
-| TITLE | STRING |  |
-| STATUS | STRING |  |
+| TASK_ID | INTEGER | ID of the task. |
+| TITLE | STRING | Title of the task. |
+| STATUS | STRING | Task status. |
 
 
 

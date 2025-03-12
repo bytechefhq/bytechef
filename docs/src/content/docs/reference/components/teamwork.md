@@ -79,10 +79,10 @@ Type: OBJECT
 
 |     Name     |     Type     |     Description     |
 |:------------:|:------------:|:-------------------:|
-| name | STRING |  |
-| emailOne | STRING |  |
-| phone | STRING |  |
-| website | STRING |  |
+| name | STRING | The name of the company. |
+| emailOne | STRING | Email address of the company. |
+| phone | STRING | Phone number for the company. |
+| website | STRING | The company's website. |
 
 
 
@@ -138,9 +138,9 @@ Type: OBJECT
 
 |     Name     |     Type     |     Description     |
 |:------------:|:------------:|:-------------------:|
-| name | STRING |  |
-| description | STRING |  |
-| dueAt | STRING |  |
+| name | STRING | Name of the task. |
+| description | STRING | Description of the task. |
+| dueAt | STRING | Due date of the task. |
 
 
 

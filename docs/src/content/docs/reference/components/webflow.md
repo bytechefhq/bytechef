@@ -76,8 +76,8 @@ Type: OBJECT
 
 |     Name     |     Type     |     Description     |
 |:------------:|:------------:|:-------------------:|
-| orderId | STRING |  |
-| status | STRING |  |
+| orderId | STRING | ID of the order. |
+| status | STRING | Status of the order. |
 
 
 
@@ -129,7 +129,7 @@ Type: OBJECT
 
 |     Name     |     Type     |     Description     |
 |:------------:|:------------:|:-------------------:|
-| id | STRING |  |
+| id | STRING | ID of the item. |
 | fieldData | OBJECT <details> <summary> Properties </summary> {STRING\(name), STRING\(slug)} </details> |  |
 
 

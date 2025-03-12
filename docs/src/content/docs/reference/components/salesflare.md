@@ -124,7 +124,7 @@ Items Type: OBJECT
 #### Properties
 |     Name     |     Type     |     Description     |
 |:------------:|:------------:|:-------------------:|
-| id | INTEGER |  |
+| id | INTEGER | ID of the contact. |
 
 
 
@@ -177,7 +177,7 @@ Items Type: OBJECT
 #### Properties
 |     Name     |     Type     |     Description     |
 |:------------:|:------------:|:-------------------:|
-| id | INTEGER |  |
+| id | INTEGER | ID of the task. |
 
 
 

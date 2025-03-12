@@ -58,25 +58,7 @@ Sends a notification.
 | url_title | Url Title | STRING | When the user taps on the notification in Pushover to expand it, the URL will be shown as the supplied url_title | false |
 | attachment_base64 | Attachment | FILE_ENTRY | The attachment to send. | false |
 
-
-#### Output
-
-
-
-Type: OBJECT
-
-
-#### Properties
-
-|     Name     |     Type     |
-|:------------:|:------------:|
-| status | INTEGER |
-| request | STRING |
-
-
-
-
-#### JSON Example
+#### Example JSON Structure
 ```json
 {
   "label" : "Send Notification",
@@ -97,6 +79,31 @@ Type: OBJECT
     }
   },
   "type" : "pushover/v1/sendNotification"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| status | INTEGER |  |
+| request | STRING |  |
+
+
+
+
+#### Output Example
+```json
+{
+  "status" : 1,
+  "request" : ""
 }
 ```
 

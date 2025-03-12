@@ -133,7 +133,7 @@ Get an email from your Gmail account via Id
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | id | Message ID | STRING | The ID of the message to retrieve. | true |
-| format | Format | STRING <details> <summary> Options </summary> simple, minimal, full, raw, metadata </details> | The format to return the message in. | false |
+| format | Format | STRING <details> <summary> Options </summary> SIMPLE, MINIMAL, FULL, RAW, metadata </details> | The format to return the message in. | false |
 | metadataHeaders | Metadata headers | ARRAY <details> <summary> Items </summary> [STRING] </details> | When given and format is METADATA, only include headers specified. | false |
 
 #### Example JSON Structure
@@ -167,7 +167,7 @@ Gets the specified thread.
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | id | Thread ID | STRING | The ID of the thread to retrieve. | true |
-| format | Format | STRING <details> <summary> Options </summary> simple, minimal, full, raw, metadata </details> | The format to return the message in. | false |
+| format | Format | STRING <details> <summary> Options </summary> SIMPLE, MINIMAL, FULL, RAW, metadata </details> | The format to return the message in. | false |
 | metadataHeaders | Metadata headers | ARRAY <details> <summary> Items </summary> [STRING] </details> | When given and format is METADATA, only include headers specified. | false |
 
 #### Example JSON Structure
@@ -410,7 +410,7 @@ Type: STATIC_WEBHOOK
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | topicName | Topic Name | STRING | Must be 3-255 characters, start with a letter, and contain only the following characters: letters, numbers, dashes (-), periods (.), underscores (_), tildes (~), percents (%) or plus signs (+). Cannot start with goog. | true |
-| format | Format | STRING <details> <summary> Options </summary> simple, minimal, full, raw, metadata </details> | The format to return the message in. | false |
+| format | Format | STRING <details> <summary> Options </summary> SIMPLE, MINIMAL, FULL, RAW, metadata </details> | The format to return the message in. | false |
 
 
 #### Output
