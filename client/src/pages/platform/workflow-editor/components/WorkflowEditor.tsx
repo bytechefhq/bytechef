@@ -242,7 +242,7 @@ const WorkflowEditor = ({
                 zoomOnScroll={false}
             >
                 <MiniMap
-                    className={twMerge('mb-2 mr-16', rightSidebarOpen && 'right-minimap-placement absolute')}
+                    className={twMerge('mb-2 mr-16', rightSidebarOpen && 'absolute right-minimap-placement')}
                     maskColor={'#f1f5f9'}
                     nodeBorderRadius={24}
                     nodeColor={'#e2e8f0'}
