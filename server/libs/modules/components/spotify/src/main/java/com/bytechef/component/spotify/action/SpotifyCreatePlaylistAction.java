@@ -67,23 +67,38 @@ public class SpotifyCreatePlaylistAction {
             outputSchema(
                 object()
                     .properties(
-                        bool(COLLABORATIVE),
-                        string(DESCRIPTION),
+                        bool(COLLABORATIVE)
+                            .description("Indicates if the owner allows other users to modify the playlist."),
+                        string(DESCRIPTION)
+                            .description("The playlist description."),
                         object("external_urls")
+                            .description("Known external URLs for this playlist.")
                             .properties(
-                                string("spotify")),
-                        string("href"),
-                        string(ID),
-                        string(NAME),
-                        string("type"),
-                        string("uri"),
+                                string("spotify")
+                                    .description("The Spotify URL for the playlist.")),
+                        string("href")
+                            .description("A link to the Web API endpoint providing full details of the playlist."),
+                        string(ID)
+                            .description("The Spotify ID for the playlist."),
+                        string(NAME)
+                            .description("The name of the playlist."),
+                        string("type")
+                            .description("The object type: 'playlist'."),
+                        string("uri")
+                            .description("The Spotify URI for the playlist."),
                         object("owner")
+                            .description("The user who owns the playlist.")
                             .properties(
-                                string("href"),
-                                string(ID),
-                                string("type"),
-                                string("uri")),
-                        bool(PUBLIC))))
+                                string("href")
+                                    .description("A link to the Web API endpoint providing full details of the user."),
+                                string(ID)
+                                    .description("The Spotify ID for the user."),
+                                string("type")
+                                    .description("The object type: 'user'."),
+                                string("uri")
+                                    .description("The Spotify URI for the user.")),
+                        bool(PUBLIC)
+                            .description("The playlist's public/private status."))))
         .perform(SpotifyCreatePlaylistAction::perform);
 
     private SpotifyCreatePlaylistAction() {

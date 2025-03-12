@@ -58,9 +58,14 @@ public class TeamworkCreateCompanyAction {
                     "type", PropertyType.BODY))
             .label("Company")
             .required(false))
-        .output(outputSchema(object()
-            .properties(string("name").required(false), string("emailOne").required(false),
-                string("phone").required(false), string("website").required(false))
+        .output(outputSchema(object().properties(string("name").description("The name of the company.")
+            .required(false),
+            string("emailOne").description("Email address of the company.")
+                .required(false),
+            string("phone").description("Phone number for the company.")
+                .required(false),
+            string("website").description("The company's website.")
+                .required(false))
             .metadata(
                 Map.of(
                     "responseType", ResponseType.JSON))));

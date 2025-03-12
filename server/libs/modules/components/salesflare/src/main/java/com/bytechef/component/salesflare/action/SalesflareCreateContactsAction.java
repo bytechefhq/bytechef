@@ -73,7 +73,10 @@ public class SalesflareCreateContactsAction {
                     "type", PropertyType.BODY))
             .label("Contacts")
             .required(true))
-        .output(outputSchema(array().items(object().properties(integer("id").required(false)))
+        .output(outputSchema(array().items(object().properties(integer("id").description("ID of the contact.")
+            .required(false))
+            .description("List of created contacts."))
+            .description("List of created contacts.")
             .metadata(
                 Map.of(
                     "responseType", ResponseType.JSON))));

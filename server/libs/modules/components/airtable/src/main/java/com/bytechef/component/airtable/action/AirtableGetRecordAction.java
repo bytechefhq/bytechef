@@ -56,7 +56,7 @@ public class AirtableGetRecordAction {
                     Map.of(
                         "type", PropertyType.PATH)),
             string("recordId").label("Record ID")
-                .description("ID of the record that will be deleted.")
+                .description("ID of the record that will be retrieved.")
                 .required(true)
                 .options((OptionsDataSource.ActionOptionsFunction<String>) AirtableUtils::getRecordIdOptions)
                 .optionsLookupDependsOn("tableId", "baseId")

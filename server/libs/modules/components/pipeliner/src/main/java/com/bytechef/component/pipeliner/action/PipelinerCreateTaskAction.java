@@ -72,12 +72,18 @@ public class PipelinerCreateTaskAction {
                 .required(true)
                 .options((OptionsDataSource.ActionOptionsFunction<String>) PipelinerUtils::getOwnerIdOptions))
         .output(outputSchema(object()
-            .properties(bool("success").required(false),
-                object("data")
-                    .properties(string("id").required(false), string("subject").required(false),
-                        string("activity_type_id").required(false), string("unit_id").required(false),
-                        string("owner_id").required(false))
+            .properties(bool("success").required(false), object("data").properties(
+                string("id").description("ID of the task.")
+                    .required(false),
+                string("subject").description("Name of the entity and its default text representation.")
+                    .required(false),
+                string("activity_type_id").description("Id of the activity type of task.")
+                    .required(false),
+                string("unit_id").description("Sales Unit ID.")
+                    .required(false),
+                string("owner_id").description("ID of the user in Pipeliner Application that is the owner of the task.")
                     .required(false))
+                .required(false))
             .metadata(
                 Map.of(
                     "responseType", ResponseType.JSON))));

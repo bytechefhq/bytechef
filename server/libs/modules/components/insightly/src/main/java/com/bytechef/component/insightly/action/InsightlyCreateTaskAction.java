@@ -58,9 +58,12 @@ public class InsightlyCreateTaskAction {
                 .options(option("Not Started", "Not Started"), option("In Progress", "In Progress"),
                     option("Completed", "Completed"), option("Deferred", "Deferred"), option("Waiting", "Waiting"))
                 .required(false))
-        .output(outputSchema(object()
-            .properties(integer("TASK_ID").required(false), string("TITLE").required(false),
-                string("STATUS").required(false))
+        .output(outputSchema(object().properties(integer("TASK_ID").description("ID of the task.")
+            .required(false),
+            string("TITLE").description("Title of the task.")
+                .required(false),
+            string("STATUS").description("Task status.")
+                .required(false))
             .metadata(
                 Map.of(
                     "responseType", ResponseType.JSON))));

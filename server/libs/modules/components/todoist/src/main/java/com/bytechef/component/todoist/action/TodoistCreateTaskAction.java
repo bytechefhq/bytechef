@@ -73,10 +73,16 @@ public class TodoistCreateTaskAction {
                 .description("Task priority from 1 (normal) to 4 (urgent).")
                 .options(option("1", 1), option("2", 2), option("3", 3), option("4", 4))
                 .required(false))
-        .output(outputSchema(object()
-            .properties(string("id").required(false), string("project_id").required(false),
-                string("content").required(false), string("description").required(false),
-                integer("priority").required(false))
+        .output(outputSchema(object().properties(string("id").description("ID of the task.")
+            .required(false),
+            string("project_id").description("ID of the project.")
+                .required(false),
+            string("content").description("Task content.")
+                .required(false),
+            string("description").description("Task description.")
+                .required(false),
+            integer("priority").description("Task priority.")
+                .required(false))
             .metadata(
                 Map.of(
                     "responseType", ResponseType.JSON))));

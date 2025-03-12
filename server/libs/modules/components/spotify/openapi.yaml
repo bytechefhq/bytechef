@@ -85,6 +85,7 @@ paths:
                 properties:
                   snapshot_id:
                     type: "string"
+                    description: "The snapshot ID of the playlist."
 components:
   securitySchemes:
     oauth2:

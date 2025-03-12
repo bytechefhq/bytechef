@@ -47,12 +47,18 @@ public class StripeNewInvoiceTrigger {
             outputSchema(
                 object()
                     .properties(
-                        string(ID),
-                        string("object"),
-                        string("currency"),
-                        string("customer"),
-                        string("customer_name"),
-                        string("description"))))
+                        string(ID)
+                            .description("ID of the invoice."),
+                        string("object")
+                            .description("Value is 'invoice'."),
+                        string("currency")
+                            .description("Currency of the invoice."),
+                        string("customer")
+                            .description("ID of the customer who will be billed."),
+                        string("customer_name")
+                            .description("Name of the customer who will be billed."),
+                        string("description")
+                            .description("Description of the invoice."))))
         .webhookEnable(StripeNewInvoiceTrigger::webhookEnable)
         .webhookDisable(StripeNewInvoiceTrigger::webhookDisable)
         .webhookRequest(StripeNewInvoiceTrigger::webhookRequest);

@@ -64,9 +64,14 @@ public class InsightlyCreateOrganizationAction {
                 .label("Website")
                 .description("The organization's website.")
                 .required(false))
-        .output(outputSchema(object()
-            .properties(integer("ORGANISATION_ID").required(false), string("ORGANISATION_NAME").required(false),
-                string("PHONE").required(false), string("WEBSITE").required(false))
+        .output(outputSchema(object().properties(integer("ORGANISATION_ID").description("ID of the organization.")
+            .required(false),
+            string("ORGANISATION_NAME").description("The name of the organization.")
+                .required(false),
+            string("PHONE").description("A contact phone number for the organization.")
+                .required(false),
+            string("WEBSITE").description("The organization's website.")
+                .required(false))
             .metadata(
                 Map.of(
                     "responseType", ResponseType.JSON))));

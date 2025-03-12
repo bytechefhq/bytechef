@@ -50,14 +50,19 @@ paths:
                 properties:
                   id:
                     type: "string"
+                    description: "ID of the task."
                   project_id:
                     type: "string"
+                    description: "ID of the project."
                   content:
                     type: "string"
+                    description: "Task content."
                   description:
                     type: "string"
+                    description: "Task description."
                   priority:
                     type: "integer"
+                    description: "Task priority."
   /tasks/{taskId}/close:
     post:
       summary: "Mark Task as Completed"
@@ -108,14 +113,19 @@ paths:
                 properties:
                   id:
                     type: "string"
+                    description: "ID of the project."
                   name:
                     type: "string"
+                    description: "Name of the project."
                   color:
                     type: "string"
+                    description: "Color of the project icon."
                   is_favorite:
                     type: "string"
+                    description: "Whether the project is a favorite."
                   url:
                     type: "string"
+                    description: "URL of the project."
 components:
   securitySchemes:
     oauth2:

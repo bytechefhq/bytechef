@@ -61,16 +61,22 @@ paths:
                 properties:
                   CONTACT_ID:
                     type: "integer"
+                    description: "ID of the contact."
                   FIRST_NAME:
                     type: "string"
+                    description: "First name of the contact."
                   LAST_NAME:
                     type: "string"
+                    description: "Last name of the contact."
                   EMAIL_ADDRESS:
                     type: "string"
+                    description: "Email address of the contact."
                   PHONE:
                     type: "string"
+                    description: "Phone number of the contact."
                   TITLE:
                     type: "string"
+                    description: "The contact's title in company."
   /Organisations:
     post:
       tags:
@@ -115,12 +121,16 @@ paths:
                 properties:
                   ORGANISATION_ID:
                     type: "integer"
+                    description: "ID of the organization."
                   ORGANISATION_NAME:
                     type: "string"
+                    description: "The name of the organization."
                   PHONE:
                     type: "string"
+                    description: "A contact phone number for the organization."
                   WEBSITE:
                     type: "string"
+                    description: "The organization's website."
   /Tasks:
     post:
       tags:
@@ -164,10 +174,13 @@ paths:
                 properties:
                   TASK_ID:
                     type: "integer"
+                    description: "ID of the task."
                   TITLE:
                     type: "string"
+                    description: "Title of the task."
                   STATUS:
                     type: "string"
+                    description: "Task status."
 components:
   securitySchemes:
     basicAuth:
