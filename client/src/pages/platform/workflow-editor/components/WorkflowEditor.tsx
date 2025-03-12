@@ -8,6 +8,7 @@ import {ComponentDefinitionBasic, TaskDispatcherDefinitionBasic} from '@/shared/
 import {ClickedDefinitionType} from '@/shared/types';
 import {Controls, MiniMap, ReactFlow, useReactFlow} from '@xyflow/react';
 import {DragEventHandler, useCallback, useEffect, useMemo} from 'react';
+import {twMerge} from 'tailwind-merge';
 import {useShallow} from 'zustand/react/shallow';
 
 import ConditionEdge from '../edges/ConditionEdge';
@@ -220,7 +221,7 @@ const WorkflowEditor = ({
     }, [workflow.id]);
 
     return (
-        <div className="flex h-full flex-1 flex-col">
+        <div className="flex h-full flex-1 flex-col rounded-lg bg-background">
             <ReactFlow
                 edgeTypes={edgeTypes}
                 edges={edges}
@@ -240,9 +241,18 @@ const WorkflowEditor = ({
                 zoomOnDoubleClick={false}
                 zoomOnScroll={false}
             >
-                <MiniMap />
+                <MiniMap
+                    className={twMerge('mb-2 mr-16', rightSidebarOpen && 'right-minimap-placement absolute')}
+                    maskColor={'#f1f5f9'}
+                    nodeBorderRadius={24}
+                    nodeColor={'#e2e8f0'}
+                />
 
-                <Controls fitViewOptions={{duration: 500, minZoom: 0.2}} showInteractive={false} />
+                <Controls
+                    className="m-2 rounded-md border border-stroke-neutral-secondary bg-background"
+                    fitViewOptions={{duration: 500, minZoom: 0.2}}
+                    showInteractive={false}
+                />
             </ReactFlow>
         </div>
     );
