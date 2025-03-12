@@ -121,7 +121,7 @@ open class FindJsonFilesTask : DefaultTask() {
         fun toJsonKeyValuePair(): String {
             val key = name;
             val value = getJsonValue(type, properties)
-            return  if(name.isNullOrEmpty()) "$value" else "\"$key\": $value"
+            return if (name.isNullOrEmpty()) "$value" else "\"$key\": $value"
         }
 
         private fun getJsonValue(type: String?, properties: Array<Properties>?): Any {
@@ -249,7 +249,7 @@ ${getPropertiesString()}
                """.trimIndent()
             } else if (!items.isNullOrEmpty()) {
                 """ [
-                   ${items?.joinToString(",\n") { it.toJsonKeyValuePair()}}
+                   ${items?.joinToString(",\n") { it.toJsonKeyValuePair() }}
                     ]
                """.trimIndent()
             } else ""
@@ -308,8 +308,8 @@ The output for this action is dynamic and may vary depending on the input parame
             return getOutputString();
         }
 
-         fun getOutputJson(): String {
-             return outputResponse?.getOutputJson() ?: "";
+        fun getOutputJson(): String {
+            return outputResponse?.getOutputJson() ?: "";
         }
     }
 
@@ -527,8 +527,8 @@ ${authorizations?.joinToString("\n")}
     }
 
     @JsonIgnoreProperties(ignoreUnknown = true)
-    class Category {
-        var key: String? = null
+    class ComponentCategory {
+        var name: String? = null
         var label: String? = null
 
         override fun toString(): String {
@@ -539,7 +539,7 @@ ${authorizations?.joinToString("\n")}
     @JsonIgnoreProperties(ignoreUnknown = true)
     class Component {
         var actions: Array<Action>? = null
-        var categories: Array<Category>? = null
+        var componentCategories: Array<ComponentCategory>? = null
         var connection: Connection? = null
         var description: String? = null
         var icon: String? = null
@@ -550,12 +550,12 @@ ${authorizations?.joinToString("\n")}
         var version: Int? = null
 
         private fun getCategoriesString(): String {
-            if (categories == null) {
+            if (componentCategories == null) {
                 return ""
             }
 
             return """
-Categories: ${categories?.joinToString(", ")}
+Categories: ${componentCategories?.joinToString(", ")}
 """
         }
 
