@@ -13,55 +13,6 @@
   "resources" : null,
   "version" : 1,
   "title" : "Salesflare",
-  "connection" : {
-    "authorizations" : [ {
-      "detectOn" : null,
-      "description" : null,
-      "name" : "bearer_token",
-      "properties" : [ {
-        "advancedOption" : null,
-        "description" : null,
-        "displayCondition" : null,
-        "expressionEnabled" : null,
-        "hidden" : null,
-        "metadata" : { },
-        "required" : true,
-        "name" : "token",
-        "type" : "STRING",
-        "defaultValue" : null,
-        "exampleValue" : null,
-        "label" : "Token",
-        "placeholder" : null,
-        "controlType" : "TEXT",
-        "languageId" : null,
-        "maxLength" : null,
-        "minLength" : null,
-        "options" : null,
-        "optionsDataSource" : null
-      } ],
-      "refreshOn" : null,
-      "title" : "Bearer Token",
-      "type" : "BEARER_TOKEN",
-      "acquire" : null,
-      "apply" : null,
-      "clientId" : null,
-      "pkce" : null,
-      "refresh" : null,
-      "refreshUrl" : null,
-      "scopes" : null,
-      "tokenUrl" : null,
-      "authorizationUrl" : null,
-      "clientSecret" : null,
-      "refreshToken" : null,
-      "oauth2AuthorizationExtraQueryParameters" : null,
-      "authorizationCallback" : null
-    } ],
-    "properties" : null,
-    "version" : 1,
-    "authorizationRequired" : null,
-    "baseUri" : { },
-    "test" : null
-  },
   "actions" : [ {
     "batch" : null,
     "deprecated" : null,
@@ -232,9 +183,9 @@
       "optionsDataSource" : null
     } ],
     "title" : "Create Account",
+    "workflowNodeDescription" : null,
     "perform" : null,
-    "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "processErrorResponse" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -252,7 +203,7 @@
       "outputResponse" : {
         "outputSchema" : {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "List of created contacts.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -268,7 +219,7 @@
           "placeholder" : null,
           "items" : [ {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "List of created contacts.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -285,7 +236,7 @@
             "options" : null,
             "properties" : [ {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "ID of the contact.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -318,7 +269,7 @@
       },
       "outputSchema" : {
         "advancedOption" : null,
-        "description" : null,
+        "description" : "List of created contacts.",
         "displayCondition" : null,
         "expressionEnabled" : null,
         "hidden" : null,
@@ -334,7 +285,7 @@
         "placeholder" : null,
         "items" : [ {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "List of created contacts.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -351,7 +302,7 @@
           "options" : null,
           "properties" : [ {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "ID of the contact.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -607,9 +558,9 @@
       "optionsDataSource" : null
     } ],
     "title" : "Create Contacts",
+    "workflowNodeDescription" : null,
     "perform" : null,
-    "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "processErrorResponse" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -627,7 +578,7 @@
       "outputResponse" : {
         "outputSchema" : {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "List of created tasks.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -643,7 +594,7 @@
           "placeholder" : null,
           "items" : [ {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "List of created tasks.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -660,7 +611,7 @@
             "options" : null,
             "properties" : [ {
               "advancedOption" : null,
-              "description" : null,
+              "description" : "ID of the task.",
               "displayCondition" : null,
               "expressionEnabled" : null,
               "hidden" : null,
@@ -693,7 +644,7 @@
       },
       "outputSchema" : {
         "advancedOption" : null,
-        "description" : null,
+        "description" : "List of created tasks.",
         "displayCondition" : null,
         "expressionEnabled" : null,
         "hidden" : null,
@@ -709,7 +660,7 @@
         "placeholder" : null,
         "items" : [ {
           "advancedOption" : null,
-          "description" : null,
+          "description" : "List of created tasks.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -726,7 +677,7 @@
           "options" : null,
           "properties" : [ {
             "advancedOption" : null,
-            "description" : null,
+            "description" : "ID of the task.",
             "displayCondition" : null,
             "expressionEnabled" : null,
             "hidden" : null,
@@ -838,11 +789,60 @@
       "optionsDataSource" : null
     } ],
     "title" : "Create Tasks",
+    "workflowNodeDescription" : null,
     "perform" : null,
-    "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "processErrorResponse" : null
   } ],
-  "unifiedApi" : null,
   "triggers" : [ ],
-  "clusterElements" : null
+  "clusterElements" : null,
+  "unifiedApi" : null,
+  "connection" : {
+    "authorizations" : [ {
+      "detectOn" : null,
+      "description" : null,
+      "name" : "bearer_token",
+      "properties" : [ {
+        "advancedOption" : null,
+        "description" : null,
+        "displayCondition" : null,
+        "expressionEnabled" : null,
+        "hidden" : null,
+        "metadata" : { },
+        "required" : true,
+        "name" : "token",
+        "type" : "STRING",
+        "defaultValue" : null,
+        "exampleValue" : null,
+        "label" : "Token",
+        "placeholder" : null,
+        "controlType" : "TEXT",
+        "languageId" : null,
+        "maxLength" : null,
+        "minLength" : null,
+        "options" : null,
+        "optionsDataSource" : null
+      } ],
+      "refreshOn" : null,
+      "title" : "Bearer Token",
+      "type" : "BEARER_TOKEN",
+      "acquire" : null,
+      "apply" : null,
+      "authorizationCallback" : null,
+      "authorizationUrl" : null,
+      "clientId" : null,
+      "clientSecret" : null,
+      "oauth2AuthorizationExtraQueryParameters" : null,
+      "pkce" : null,
+      "refresh" : null,
+      "refreshUrl" : null,
+      "scopes" : null,
+      "refreshToken" : null,
+      "tokenUrl" : null
+    } ],
+    "properties" : null,
+    "version" : 1,
+    "authorizationRequired" : null,
+    "baseUri" : { },
+    "test" : null
+  }
 }
