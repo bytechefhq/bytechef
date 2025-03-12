@@ -57,26 +57,24 @@ const WorkflowNodesSidebar = ({
     }, [componentDefinitions, filter, taskDispatcherDefinitions]);
 
     return (
-        <aside className="my-4 flex w-96">
-            <div className="flex h-full flex-1 flex-col rounded-lg border-border/50 bg-background pb-4">
-                <header className="p-3 text-center text-gray-600">
-                    <Input
-                        name="workflowNodeFilter"
-                        onChange={(event) => setFilter(event.target.value)}
-                        placeholder="Filter actions and flows"
-                        value={filter}
-                    />
-                </header>
+        <aside className="absolute inset-y-2 right-16 mx-1 flex w-96 flex-col overflow-hidden rounded-md border border-stroke-neutral-secondary bg-background pb-4">
+            <div className="p-3 text-center text-content-neutral-secondary">
+                <Input
+                    name="workflowNodeFilter"
+                    onChange={(event) => setFilter(event.target.value)}
+                    placeholder="Filter actions and flows"
+                    value={filter}
+                />
+            </div>
 
-                <main className="size-full pt-1">
-                    <WorkflowNodesTabs
-                        actionComponentDefinitions={filteredActionComponentDefinitions}
-                        hideTriggerComponents
-                        itemsDraggable
-                        taskDispatcherDefinitions={filteredTaskDispatcherDefinitions}
-                        triggerComponentDefinitions={filteredTriggerComponentDefinitions}
-                    />
-                </main>
+            <div className="flex flex-1 flex-col overflow-hidden px-3 pt-1">
+                <WorkflowNodesTabs
+                    actionComponentDefinitions={filteredActionComponentDefinitions}
+                    hideTriggerComponents
+                    itemsDraggable
+                    taskDispatcherDefinitions={filteredTaskDispatcherDefinitions}
+                    triggerComponentDefinitions={filteredTriggerComponentDefinitions}
+                />
             </div>
         </aside>
     );
