@@ -112,7 +112,7 @@ Type: OBJECT
 
 |     Name     |     Type     |     Description     |
 |:------------:|:------------:|:-------------------:|
-| snapshot_id | STRING |  |
+| snapshot_id | STRING | The snapshot ID of the playlist. |
 
 
 
@@ -165,16 +165,16 @@ Type: OBJECT
 
 |     Name     |     Type     |     Description     |
 |:------------:|:------------:|:-------------------:|
-| collaborative | BOOLEAN <details> <summary> Options </summary> true, false </details> |  |
-| description | STRING |  |
-| external_urls | OBJECT <details> <summary> Properties </summary> {STRING\(spotify)} </details> |  |
-| href | STRING |  |
-| id | STRING |  |
-| name | STRING |  |
-| type | STRING |  |
-| uri | STRING |  |
-| owner | OBJECT <details> <summary> Properties </summary> {STRING\(href), STRING\(id), STRING\(type), STRING\(uri)} </details> |  |
-| public | BOOLEAN <details> <summary> Options </summary> true, false </details> |  |
+| collaborative | BOOLEAN <details> <summary> Options </summary> true, false </details> | Indicates if the owner allows other users to modify the playlist. |
+| description | STRING | The playlist description. |
+| external_urls | OBJECT <details> <summary> Properties </summary> {STRING\(spotify)} </details> | Known external URLs for this playlist. |
+| href | STRING | A link to the Web API endpoint providing full details of the playlist. |
+| id | STRING | The Spotify ID for the playlist. |
+| name | STRING | The name of the playlist. |
+| type | STRING | The object type: 'playlist'. |
+| uri | STRING | The Spotify URI for the playlist. |
+| owner | OBJECT <details> <summary> Properties </summary> {STRING\(href), STRING\(id), STRING\(type), STRING\(uri)} </details> | The user who owns the playlist. |
+| public | BOOLEAN <details> <summary> Options </summary> true, false </details> | The playlist's public/private status. |
 
 
 

@@ -88,12 +88,12 @@ Type: OBJECT
 
 |     Name     |     Type     |     Description     |
 |:------------:|:------------:|:-------------------:|
-| id | STRING |  |
-| description | STRING |  |
-| email | STRING |  |
-| name | STRING |  |
-| phone | STRING |  |
-| address | OBJECT <details> <summary> Properties </summary> {STRING\(city), STRING\(country), STRING\(line1), STRING\(line2), STRING\(postal_code), STRING\(state)} </details> |  |
+| id | STRING | ID of the customer. |
+| description | STRING | Description of the customer. |
+| email | STRING | Email address of the customer. |
+| name | STRING | The customer's full name. |
+| phone | STRING | Phone number of the customer. |
+| address | OBJECT <details> <summary> Properties </summary> {STRING\(city), STRING\(country), STRING\(line1), STRING\(line2), STRING\(postal_code), STRING\(state)} </details> | Customer's address. |
 
 
 
@@ -156,10 +156,10 @@ Type: OBJECT
 
 |     Name     |     Type     |     Description     |
 |:------------:|:------------:|:-------------------:|
-| id | STRING |  |
-| customer | STRING |  |
-| currency | STRING |  |
-| description | STRING |  |
+| id | STRING | ID of the invoice. |
+| customer | STRING | ID of the customer who will be billed. |
+| currency | STRING | Currency used for invoice. |
+| description | STRING | Description for the invoice. |
 
 
 
@@ -199,13 +199,13 @@ Type: OBJECT
 
 |     Name     |     Type     |     Description     |
 |:------------:|:------------:|:-------------------:|
-| id | STRING |  |
-| object | STRING |  |
-| description | STRING |  |
-| email | STRING |  |
-| name | STRING |  |
-| phone | STRING |  |
-| address | OBJECT <details> <summary> Properties </summary> {STRING\(city), STRING\(country), STRING\(line1), STRING\(line2), STRING\(postal_code), STRING\(state)} </details> |  |
+| id | STRING | ID of the customer. |
+| object | STRING | Value is 'customer'. |
+| description | STRING | Description of the customer. |
+| email | STRING | Email of the customer. |
+| name | STRING | Name of the customer. |
+| phone | STRING | Phone number of the customer. |
+| address | OBJECT <details> <summary> Properties </summary> {STRING\(city), STRING\(country), STRING\(line1), STRING\(line2), STRING\(postal_code), STRING\(state)} </details> | Address of the customer. |
 
 
 
@@ -239,12 +239,12 @@ Type: OBJECT
 
 |     Name     |     Type     |     Description     |
 |:------------:|:------------:|:-------------------:|
-| id | STRING |  |
-| object | STRING |  |
-| currency | STRING |  |
-| customer | STRING |  |
-| customer_name | STRING |  |
-| description | STRING |  |
+| id | STRING | ID of the invoice. |
+| object | STRING | Value is 'invoice'. |
+| currency | STRING | Currency of the invoice. |
+| customer | STRING | ID of the customer who will be billed. |
+| customer_name | STRING | Name of the customer who will be billed. |
+| description | STRING | Description of the invoice. |
 
 
 

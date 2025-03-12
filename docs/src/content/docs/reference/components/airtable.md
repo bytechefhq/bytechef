@@ -137,7 +137,7 @@ Retrieves a single record.
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | baseId | Base ID | STRING | ID of the base where table is located. | true |
 | tableId | Table ID | STRING <details> <summary> Depends On </summary> baseId </details> | ID of the table where the record is located. | true |
-| recordId | Record ID | STRING <details> <summary> Depends On </summary> tableId, baseId </details> | ID of the record that will be deleted. | true |
+| recordId | Record ID | STRING <details> <summary> Depends On </summary> tableId, baseId </details> | ID of the record that will be retrieved. | true |
 
 #### Example JSON Structure
 ```json

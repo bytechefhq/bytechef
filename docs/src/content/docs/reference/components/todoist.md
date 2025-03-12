@@ -80,11 +80,11 @@ Type: OBJECT
 
 |     Name     |     Type     |     Description     |
 |:------------:|:------------:|:-------------------:|
-| id | STRING |  |
-| project_id | STRING |  |
-| content | STRING |  |
-| description | STRING |  |
-| priority | INTEGER |  |
+| id | STRING | ID of the task. |
+| project_id | STRING | ID of the project. |
+| content | STRING | Task content. |
+| description | STRING | Task description. |
+| priority | INTEGER | Task priority. |
 
 
 
@@ -169,11 +169,11 @@ Type: OBJECT
 
 |     Name     |     Type     |     Description     |
 |:------------:|:------------:|:-------------------:|
-| id | STRING |  |
-| name | STRING |  |
-| color | STRING |  |
-| is_favorite | STRING |  |
-| url | STRING |  |
+| id | STRING | ID of the project. |
+| name | STRING | Name of the project. |
+| color | STRING | Color of the project icon. |
+| is_favorite | STRING | Whether the project is a favorite. |
+| url | STRING | URL of the project. |
 
 
 

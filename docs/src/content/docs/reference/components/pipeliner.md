@@ -100,7 +100,7 @@ Type: OBJECT
 ### Create Contact
 Name: createContact
 
-Creates new Contact
+Creates new contact.
 
 #### Properties
 
