@@ -232,7 +232,7 @@ export function hasTaskInConditionBranches(conditionId: string, taskId: string, 
  */
 export default function createAllConditionEdges(conditionNode: Node, allNodes: Node[]): Edge[] {
     const edges: Edge[] = [];
-    const conditionNodeData: NodeDataType = conditionNode.data;
+    const conditionNodeData: NodeDataType = conditionNode.data as NodeDataType;
 
     const {conditionData, parameters} = conditionNodeData;
 
