@@ -24,8 +24,8 @@ interface HandleConditionClickProps {
 
 export default async function handleConditionClick({
     clickedItem,
-    projectId,
     edgeId,
+    projectId,
     queryClient,
     sourceNodeId,
     taskDispatcherContext,

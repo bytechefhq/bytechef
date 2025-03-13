@@ -207,6 +207,7 @@ const WorkflowNodesPopoverMenuOperationList = ({
                         conditionId: taskDispatcherContext.conditionId as string,
                         operation: clickedOperation,
                         operationDefinition: clickedComponentActionDefinition,
+                        projectId: +projectId!,
                         queryClient,
                         taskDispatcherContext,
                         updateWorkflowMutation,
