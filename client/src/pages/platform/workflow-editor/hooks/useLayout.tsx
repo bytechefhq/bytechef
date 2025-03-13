@@ -103,6 +103,7 @@ export default function useLayout({
 
             let taskNode: Node;
             let isConditionChild = false;
+            let isLoopChild = false;
 
             const taskDefinition = [...componentDefinitions, ...taskDispatcherDefinitions].find(
                 (definition) => definition.name === componentName
@@ -160,6 +161,8 @@ export default function useLayout({
                         },
                     };
 
+                    isLoopChild = true;
+
                     break;
                 }
             }
@@ -184,8 +187,46 @@ export default function useLayout({
                     allNodes: [...allNodes, taskNode],
                     taskNode,
                 });
+            } else if (isLoopChild) {
+                // Handle Loop child placeholder nodes
+                const loopId = Object.keys(loopChildTasks).find((key) =>
+                    loopChildTasks[key].iteratee.includes(taskNode.id)
+                );
+
+                if (!loopId) {
+                    return;
+                }
+
+                const index = loopChildTasks[loopId].iteratee.indexOf(taskNode.id);
+
+                const sourcePlaceholderIndex = allNodes.findIndex(
+                    (node) => node.id === `${loopId}-loop-placeholder-${index}`
+                );
+
+                if (sourcePlaceholderIndex === -1) {
+                    return;
+                }
+
+                const sourcePlaceholderNode = allNodes[sourcePlaceholderIndex];
+
+                const belowPlaceholderNodeId = getNextLoopPlaceholderId(sourcePlaceholderNode.id);
+
+                const belowPlaceholderNode = {
+                    data: {label: '+', loopId, taskDispatcherId: loopId},
+                    id: belowPlaceholderNodeId,
+                    position: {x: 0, y: 0},
+                    type: 'placeholder',
+                };
+
+                const loopChildTaskNode = {
+                    ...taskNode,
+                    data: {...taskNode.data, loopData: {index, loopId}},
+                };
+
+                allNodes.splice(sourcePlaceholderIndex + 1, 0, loopChildTaskNode, belowPlaceholderNode);
+
+                return;
             } else {
-                console.log('pushing taskNode', taskNode);
                 allNodes.push(taskNode);
             }
         });
@@ -230,7 +271,7 @@ export default function useLayout({
 
         // Create initial edges for the Loop node
         if (isLoopNode) {
-            const loopPlaceholderEdge: Edge = {
+            const edgeFromLoopToPlaceholder: Edge = {
                 id: `${node.id}=>${node.id}-loop-placeholder-0`,
                 source: node.id,
                 sourceHandle: `${node.id}-right-source-handle`,
@@ -239,16 +280,7 @@ export default function useLayout({
                 type: 'smoothstep',
             };
 
-            const loopToDecorativeGhostEdge: Edge = {
-                id: `${node.id}=>${node.id}-loop-left-ghost`,
-                source: node.id,
-                sourceHandle: `${node.id}-left-source-handle`,
-                style: EDGE_STYLES,
-                target: `${node.id}-loop-left-ghost`,
-                type: 'smoothstep',
-            };
-
-            const decorativeGhostToBottomGhostEdge: Edge = {
+            const edgeFromLeftGhostToBottomGhost: Edge = {
                 id: `${node.id}-loop-left-ghost=>${node.id}-loop-bottom-ghost`,
                 source: `${node.id}-loop-left-ghost`,
                 style: EDGE_STYLES,
@@ -257,32 +289,53 @@ export default function useLayout({
                 type: 'smoothstep',
             };
 
-            taskEdges.push(loopToDecorativeGhostEdge, decorativeGhostToBottomGhostEdge, loopPlaceholderEdge);
+            const edgeFromLoopToLeftGhost: Edge = {
+                id: `${node.id}=>${node.id}-loop-left-ghost`,
+                source: node.id,
+                sourceHandle: `${node.id}-left-source-handle`,
+                style: EDGE_STYLES,
+                target: `${node.id}-loop-left-ghost`,
+                // targetHandle: `${node.id}-loop-bottom-ghost-bottom-ghost-left`,
+                type: 'smoothstep',
+            };
+
+            const edgeFromPlaceholderToBottomGhost: Edge = {
+                id: `${node.id}-loop-placeholder-0=>${node.id}-loop-bottom-ghost`,
+                source: `${node.id}-loop-placeholder-0`,
+                style: EDGE_STYLES,
+                target: `${node.id}-loop-bottom-ghost`,
+                targetHandle: `${node.id}-loop-bottom-ghost-bottom-ghost-right`,
+                type: 'smoothstep',
+            };
+
+            taskEdges.push(edgeFromLoopToLeftGhost, edgeFromLoopToPlaceholder, edgeFromLeftGhostToBottomGhost);
+
+            if (!nodeData.parameters?.iteratee?.length) {
+                taskEdges.push(edgeFromPlaceholderToBottomGhost);
+            }
 
             return;
         }
 
-        // Create edges for the Loop child node
-        if (isLoopChildNode && !node.id.includes('ghost')) {
-            if (isLoopChildTask && !node.id.includes('placeholder')) {
-                const {index, loopId} = (nodeData as NodeDataType).loopData!;
+        // Create edges for the Loop child task
+        if (isLoopChildTask && !node.id.includes('placeholder')) {
+            const {index, loopId} = (nodeData as NodeDataType).loopData!;
 
-                const sourcePlaceholderId = `${loopId}-loop-placeholder-${index}`;
+            const sourcePlaceholderId = `${loopId}-loop-placeholder-${index}`;
 
-                const targetPlaceholderId = getNextLoopPlaceholderId(sourcePlaceholderId);
+            const targetPlaceholderId = getNextLoopPlaceholderId(sourcePlaceholderId);
 
-                const edgeFromTaskNodeToTargetNode = {
-                    id: `${node.id}=>${targetPlaceholderId}`,
-                    source: node.id,
-                    style: EDGE_STYLES,
-                    target: targetPlaceholderId,
-                    type: 'smoothstep',
-                };
+            const edgeFromTaskNodeToTargetNode = {
+                id: `${node.id}=>${targetPlaceholderId}`,
+                source: node.id,
+                style: EDGE_STYLES,
+                target: targetPlaceholderId,
+                type: 'smoothstep',
+            };
 
-                taskEdges.push(edgeFromTaskNodeToTargetNode);
+            taskEdges.push(edgeFromTaskNodeToTargetNode);
 
-                return;
-            }
+            return;
         }
 
         if (nextNode && tasks) {
