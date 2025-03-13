@@ -93,3 +93,6 @@ export const SORT_OPTIONS = [
         value: 'reverse-alphabetical',
     },
 ];
+
+export const MINIMAP_MASK_COLOR = '#f1f5f9';
+export const MINIMAP_NODE_COLOR = '#e2e8f0';
