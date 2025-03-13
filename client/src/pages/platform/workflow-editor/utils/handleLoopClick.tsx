@@ -17,7 +17,7 @@ interface HandleLoopClickProps {
     edge?: boolean;
     projectId: number;
     queryClient: QueryClient;
-    sourceNodeId: string;
+    sourceNodeId?: string;
     updateWorkflowMutation: UpdateWorkflowMutationType;
     workflow: Workflow & WorkflowTaskDataType;
 }
@@ -73,14 +73,14 @@ export default async function handleLoopClick({
     let taskIndex = tasks?.length;
 
     if (edge && tasks) {
-        sourceNodeId = sourceNodeId.split('=>')[0];
+        sourceNodeId = sourceNodeId?.split('=>')[0];
 
         taskIndex = tasks.findIndex((task) => task.name === sourceNodeId) + 1;
     }
 
     let loopId: string | undefined;
 
-    if (sourceNodeId.includes('loop') && sourceNodeId.includes('placeholder')) {
+    if (sourceNodeId && sourceNodeId.includes('loop') && sourceNodeId.includes('placeholder')) {
         loopId = sourceNodeId.split('-')[0];
 
         if (!loopId || !tasks) {

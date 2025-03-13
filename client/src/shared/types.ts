@@ -108,13 +108,16 @@ export type ClickedOperationType = {
 
 export type TabNameType = 'description' | 'clusterElements' | 'connection' | 'properties' | 'output';
 
+export type ConditionDataType = {
+    conditionCase: string;
+    conditionId: string;
+    index: number;
+};
+
 export type NodeDataType = {
     componentName: string;
-    conditionData?: {
-        conditionCase: string;
-        conditionId: string;
-        index: number;
-    };
+    conditionCase?: 'caseTrue' | 'caseFalse';
+    conditionData?: ConditionDataType;
     connection?: ConnectionDefinitionBasic;
     connections?: Array<ComponentConnection>;
     conditionId?: string;
@@ -246,3 +249,9 @@ export type PropertyAllType = Omit<PropertyTypeAllType, 'controlType'> & {
 };
 
 export type UpdateWorkflowMutationType = UseMutationResult<void, Error, UpdateWorkflowRequestI, unknown>;
+
+export type TaskDispatcherContextType = {
+    conditionCase?: string;
+    conditionId?: string;
+    index?: number;
+};
