@@ -2,8 +2,14 @@ import {Tabs, TabsContent, TabsList, TabsTrigger} from '@/components/ui/tabs';
 import {ComponentDefinitionBasic, TaskDispatcherDefinition} from '@/shared/middleware/platform/configuration';
 import {useFeatureFlagsStore} from '@/shared/stores/useFeatureFlagsStore';
 import {ClickedDefinitionType} from '@/shared/types';
+import {useMemo} from 'react';
 
 import WorkflowNodesTabsItem from './WorkflowNodesTabsItem';
+
+type DefinitionType = (ComponentDefinitionBasic | TaskDispatcherDefinition) & {
+    taskDispatcher: boolean;
+    trigger: boolean;
+};
 
 interface WorkflowNodesTabsProps {
     actionComponentDefinitions: Array<ComponentDefinitionBasic>;
@@ -30,8 +36,46 @@ const WorkflowNodesTabs = ({
 }: WorkflowNodesTabsProps) => {
     const ff_1057 = useFeatureFlagsStore()('ff-1057');
 
+    const defaultTabValue = useMemo(() => {
+        if (hideActionComponents) {
+            return 'triggers';
+        }
+
+        return 'components';
+    }, [hideActionComponents]);
+
+    const availableTriggers = useMemo(() => {
+        return triggerComponentDefinitions.map(
+            (triggerDefinition) =>
+                ({
+                    ...triggerDefinition,
+                    trigger: true,
+                }) as DefinitionType
+        );
+    }, [triggerComponentDefinitions]);
+
+    const availableTaskDispatchers = useMemo(() => {
+        let availableTaskDispatchers;
+
+        if (ff_1057) {
+            availableTaskDispatchers = taskDispatcherDefinitions;
+        } else {
+            availableTaskDispatchers = taskDispatcherDefinitions.filter(
+                (taskDispatcherDefinition) => taskDispatcherDefinition.name === 'condition'
+            );
+        }
+
+        return availableTaskDispatchers.map(
+            (dispatcher) =>
+                ({
+                    ...dispatcher,
+                    taskDispatcher: true,
+                }) as DefinitionType
+        );
+    }, [ff_1057, taskDispatcherDefinitions]);
+
     return (
-        <Tabs className="flex h-full flex-col" defaultValue={hideActionComponents ? 'triggers' : 'components'}>
+        <Tabs className="flex h-full flex-col" defaultValue={defaultTabValue}>
             <TabsList className="my-2 flex w-full justify-between">
                 {!hideTriggerComponents && (
                     <TabsTrigger className="w-full" value="triggers">
@@ -61,28 +105,16 @@ const WorkflowNodesTabs = ({
                             </span>
                         )}
 
-                        {triggerComponentDefinitions?.map((triggerDefinition) => {
-                            const clickedTriggerDefinition = {
-                                ...triggerDefinition,
-                                trigger: true,
-                            };
-
-                            return (
-                                <WorkflowNodesTabsItem
-                                    draggable={itemsDraggable}
-                                    handleClick={() =>
-                                        onItemClick && onItemClick(clickedTriggerDefinition as ClickedDefinitionType)
-                                    }
-                                    key={triggerDefinition.name}
-                                    node={
-                                        triggerDefinition as (ComponentDefinitionBasic | TaskDispatcherDefinition) & {
-                                            taskDispatcher: boolean;
-                                            trigger: boolean;
-                                        }
-                                    }
-                                />
-                            );
-                        })}
+                        {availableTriggers.map((triggerDefinition) => (
+                            <WorkflowNodesTabsItem
+                                draggable={itemsDraggable}
+                                handleClick={() =>
+                                    onItemClick && onItemClick(triggerDefinition as ClickedDefinitionType)
+                                }
+                                key={triggerDefinition.name}
+                                node={triggerDefinition as DefinitionType}
+                            />
+                        ))}
                     </ul>
                 </TabsContent>
             )}
@@ -103,12 +135,7 @@ const WorkflowNodesTabs = ({
                                     onItemClick && onItemClick(componentDefinition as ClickedDefinitionType)
                                 }
                                 key={componentDefinition.name}
-                                node={
-                                    componentDefinition as (ComponentDefinitionBasic | TaskDispatcherDefinition) & {
-                                        taskDispatcher: boolean;
-                                        trigger: boolean;
-                                    }
-                                }
+                                node={componentDefinition as DefinitionType}
                                 selected={selectedComponentName === componentDefinition.name}
                             />
                         ))}
@@ -119,42 +146,22 @@ const WorkflowNodesTabs = ({
             {!hideTaskDispatchers && (
                 <TabsContent className="mt-0 w-full flex-1 overflow-auto" value="taskDispatchers">
                     <ul className="space-y-2" role="list">
-                        {taskDispatcherDefinitions.length ? (
-                            taskDispatcherDefinitions
-                                .filter(
-                                    (taskDispatcherDefinition) =>
-                                        ff_1057 || taskDispatcherDefinition.name === 'condition'
-                                )
-                                .map(
-                                    (
-                                        taskDispatcherDefinition: TaskDispatcherDefinition & {
-                                            taskDispatcher?: boolean;
-                                        }
-                                    ) => (
-                                        <WorkflowNodesTabsItem
-                                            draggable={itemsDraggable}
-                                            handleClick={() =>
-                                                onItemClick &&
-                                                onItemClick({
-                                                    ...taskDispatcherDefinition,
-                                                    taskDispatcher: true,
-                                                } as ClickedDefinitionType)
-                                            }
-                                            key={taskDispatcherDefinition.name}
-                                            node={
-                                                taskDispatcherDefinition as (
-                                                    | ComponentDefinitionBasic
-                                                    | TaskDispatcherDefinition
-                                                ) & {taskDispatcher: boolean; trigger: boolean}
-                                            }
-                                        />
-                                    )
-                                )
-                        ) : (
+                        {!taskDispatcherDefinitions.length && (
                             <span className="block px-3 py-2 text-xs text-content-neutral-secondary">
                                 No flow controls found.
                             </span>
                         )}
+
+                        {availableTaskDispatchers.map((taskDispatcherDefinition) => (
+                            <WorkflowNodesTabsItem
+                                draggable={itemsDraggable}
+                                handleClick={() =>
+                                    onItemClick && onItemClick(taskDispatcherDefinition as ClickedDefinitionType)
+                                }
+                                key={taskDispatcherDefinition.name}
+                                node={taskDispatcherDefinition as DefinitionType}
+                            />
+                        ))}
                     </ul>
                 </TabsContent>
             )}
