@@ -192,10 +192,15 @@ export const getLayoutedElements = (nodes: Node[], edges: Edge[], canvasWidth: n
             return;
         }
 
-        const isConditionTaskNode =
-            source.includes('condition') && !source.includes('ghost') && !source.includes('placeholder');
+        const isSourceTaskNode = !source.includes('ghost') && !source.includes('placeholder');
 
-        if (isConditionTaskNode) {
+        const isSourceConditionTaskNode = source.includes('condition') && isSourceTaskNode;
+
+        const isSourceLoopTaskNode = source.includes('loop') && isSourceTaskNode;
+
+        const isLoopPlaceholderNode = source.includes('loop') && source.includes('placeholder');
+
+        if (isSourceConditionTaskNode || isSourceLoopTaskNode || isLoopPlaceholderNode) {
             filteredEdges.push(...sourceEdges);
         } else {
             filteredEdges.push(sourceEdges[0]);
@@ -225,7 +230,6 @@ export const createEdgeFromTaskDispatcherBottomGhostNode = (
     tasks: WorkflowTask[] = [],
     index: number = 0
 ): Edge | null => {
-    console.log('createEdgeFromTaskDispatcherBottomGhostNode');
     const nodeData = node.data as NodeDataType;
     const {conditionId} = nodeData;
 
