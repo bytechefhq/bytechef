@@ -4,6 +4,7 @@ import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWor
 import useWorkflowNodeDetailsPanelStore from '@/pages/platform/workflow-editor/stores/useWorkflowNodeDetailsPanelStore';
 import useWorkflowTestChatStore from '@/pages/platform/workflow-editor/stores/useWorkflowTestChatStore';
 import {useCopilotStore} from '@/shared/components/copilot/stores/useCopilotStore';
+import {MINIMAP_MASK_COLOR, MINIMAP_NODE_COLOR} from '@/shared/constants';
 import {ComponentDefinitionBasic, TaskDispatcherDefinitionBasic} from '@/shared/middleware/platform/configuration';
 import {ClickedDefinitionType} from '@/shared/types';
 import {Controls, MiniMap, ReactFlow, useReactFlow} from '@xyflow/react';
@@ -243,9 +244,9 @@ const WorkflowEditor = ({
             >
                 <MiniMap
                     className={twMerge('mb-2 mr-16', rightSidebarOpen && 'absolute right-minimap-placement')}
-                    maskColor={'#f1f5f9'}
+                    maskColor={MINIMAP_MASK_COLOR}
                     nodeBorderRadius={24}
-                    nodeColor={'#e2e8f0'}
+                    nodeColor={MINIMAP_NODE_COLOR}
                 />
 
                 <Controls
