@@ -35,7 +35,6 @@ import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.ComponentDsl.time;
 
-import com.bytechef.commons.util.ConvertUtils;
 import com.bytechef.component.data.storage.constant.DataStorageConstants;
 import com.bytechef.component.data.storage.constant.ValueType;
 import com.bytechef.component.data.storage.util.DataStorageUtils;
@@ -152,15 +151,20 @@ public class DataStorageAwaitGetValueAction {
         }
 
         if (optional.isEmpty()) {
-            if (ConvertUtils.canConvert(inputParameters.getRequiredString(DEFAULT_VALUE), type)) {
-                return ConvertUtils.convertValue(inputParameters.getRequiredString(DEFAULT_VALUE), type);
+            if (context.convert(
+                convert -> convert.canConvert(inputParameters.getRequiredString(DEFAULT_VALUE), type))) {
+
+                return context.convert(
+                    convert -> convert.value(inputParameters.getRequiredString(DEFAULT_VALUE), type));
             }
 
             return inputParameters.getRequiredString(DEFAULT_VALUE);
         }
 
-        if (ConvertUtils.canConvert(optional.get(), type)) {
-            return ConvertUtils.convertValue(optional.get(), type);
+        Optional<Object> finalOptional = optional;
+
+        if (context.convert(convert -> convert.canConvert(finalOptional.get(), type))) {
+            return context.convert(convert -> convert.value(finalOptional.get(), type));
         }
 
         return optional.get();

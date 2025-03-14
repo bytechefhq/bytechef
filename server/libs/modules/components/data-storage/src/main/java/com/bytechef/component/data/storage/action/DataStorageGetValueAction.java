@@ -35,7 +35,6 @@ import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.ComponentDsl.time;
 
-import com.bytechef.commons.util.ConvertUtils;
 import com.bytechef.component.data.storage.constant.ValueType;
 import com.bytechef.component.data.storage.util.DataStorageUtils;
 import com.bytechef.component.definition.ActionContext;
@@ -136,15 +135,15 @@ public class DataStorageGetValueAction {
             Scope.valueOf(inputParameters.getRequiredString(SCOPE)), inputParameters.getRequiredString(KEY)));
 
         if (optional.isEmpty()) {
-            if (ConvertUtils.canConvert(inputParameters.getRequired(DEFAULT_VALUE), type)) {
-                return ConvertUtils.convertValue(inputParameters.getRequired(DEFAULT_VALUE), type);
+            if (context.convert(convert -> convert.canConvert(inputParameters.getRequired(DEFAULT_VALUE), type))) {
+                return context.convert(convert -> convert.value(inputParameters.getRequired(DEFAULT_VALUE), type));
             }
 
             return inputParameters.getRequired(DEFAULT_VALUE);
         }
 
-        if (ConvertUtils.canConvert(optional.get(), type)) {
-            return ConvertUtils.convertValue(optional.get(), type);
+        if (context.convert(convert -> convert.canConvert(optional.get(), type))) {
+            return context.convert(convert -> convert.value(optional.get(), type));
         }
 
         return optional.get();
