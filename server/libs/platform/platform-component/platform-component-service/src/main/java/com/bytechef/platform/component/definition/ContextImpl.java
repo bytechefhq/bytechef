@@ -391,7 +391,7 @@ class ContextImpl implements Context {
             try {
                 return new FileEntryImpl(filesFileStorage.storeFileContent(fileName, inputStream));
             } catch (Exception exception) {
-                throw new RuntimeException("Unable to store file " + fileName);
+                throw new RuntimeException("Unable to store file " + fileName, exception);
             }
         }
 
