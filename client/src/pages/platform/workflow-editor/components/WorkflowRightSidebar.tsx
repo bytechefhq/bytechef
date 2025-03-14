@@ -69,7 +69,7 @@ const WorkflowRightSidebar = ({
     );
 
     return (
-        <aside className="absolute right-0 mx-3 my-2 flex flex-col items-center gap-1 rounded-md border border-stroke-neutral-secondary bg-background p-1">
+        <aside className="absolute right-0 m-2 flex flex-col items-center gap-1 rounded-md border border-stroke-neutral-secondary bg-background p-1">
             {rightSidebarNavigation.map((item) => (
                 <button
                     className={twMerge(

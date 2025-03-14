@@ -139,7 +139,7 @@ module.exports = {
                 'header-height': '34px',
             },
             inset: {
-                'data-pill-panel-placement': '540px',
+                'data-pill-panel-placement': '536px',
                 'minimap-placement': '400px',
                 'node-handle-placement': '36px',
                 'task-dispatcher-node-handle-placement': '68px',
