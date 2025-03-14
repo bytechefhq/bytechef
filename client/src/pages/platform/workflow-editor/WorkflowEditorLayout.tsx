@@ -67,7 +67,7 @@ const WorkflowEditorLayout = () => {
                 errors={[componentsError, taskDispatcherDefinitionsError]}
                 loading={componentsIsLoading || taskDispatcherDefinitionsLoading}
             >
-                <div className="relative mx-4 mb-4 flex w-full">
+                <div className="relative mx-3 mb-3 flex w-full">
                     {componentDefinitions && taskDispatcherDefinitions && (
                         <WorkflowEditor
                             componentDefinitions={componentDefinitions}
