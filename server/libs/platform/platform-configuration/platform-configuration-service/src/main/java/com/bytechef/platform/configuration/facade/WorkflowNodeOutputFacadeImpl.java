@@ -48,6 +48,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -57,6 +59,8 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @Transactional
 public class WorkflowNodeOutputFacadeImpl implements WorkflowNodeOutputFacade {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(WorkflowNodeOutputFacadeImpl.class);
 
     private final ActionDefinitionFacade actionDefinitionFacade;
     private final ActionDefinitionService actionDefinitionService;
@@ -203,7 +207,15 @@ public class WorkflowNodeOutputFacadeImpl implements WorkflowNodeOutputFacade {
                     if (containsChildWorkflowTasks(workflowTasks, childWorkflowTasks)) {
                         Map<String, ?> parameters = workflowTask.evaluateParameters(outputs);
 
-                        List<Object> items = MapUtils.getList(parameters, "items", Object.class, List.of());
+                        List<Object> items = List.of();
+
+                        try {
+                            items = MapUtils.getList(parameters, "items", Object.class, List.of());
+                        } catch (IllegalArgumentException e) {
+                            if (LOGGER.isTraceEnabled()) {
+                                LOGGER.trace("Failed to parse items from parameters: {}", parameters, e);
+                            }
+                        }
 
                         if (!items.isEmpty()) {
                             Object item = items.getFirst();
