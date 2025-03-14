@@ -81,14 +81,11 @@ export default function WorkflowEdge({
                 style={style}
             />
 
-            <EdgeLabelRenderer>
+            <EdgeLabelRenderer key={id}>
                 <WorkflowNodesPopoverMenu edgeId={id} hideTriggerComponents sourceNodeId={sourceNodeId}>
                     <div
                         className="nodrag nopan"
-                        onDragEnter={() => setDropzoneActive(true)}
-                        onDragLeave={() => setDropzoneActive(false)}
-                        onDragOver={(event) => event.preventDefault()}
-                        onDrop={() => setDropzoneActive(false)}
+                        id={id}
                         style={{
                             pointerEvents: 'all',
                             position: 'absolute',
@@ -98,14 +95,18 @@ export default function WorkflowEdge({
                     >
                         <div
                             className={twMerge(
-                                'flex cursor-pointer items-center justify-center rounded border-2 border-gray-300 bg-white transition-all hover:scale-110 hover:border-gray-400',
-                                isDropzoneActive && 'scale-150 border-blue-100 bg-blue-100'
+                                'flex size-6 cursor-pointer items-center justify-center rounded border-2 border-gray-300 bg-white transition-all hover:scale-110 hover:border-gray-400',
+                                isDropzoneActive && 'z-40 scale-150 border-blue-100 bg-blue-100'
                             )}
                             id={`${id}-button`}
-                            style={{
-                                height: isDropzoneActive ? 72 : 24,
-                                width: isDropzoneActive ? 72 : 24,
+                            onDragEnter={() => setDropzoneActive(true)}
+                            onDragLeave={() => setDropzoneActive(false)}
+                            onDragOver={() => {
+                                if (!isDropzoneActive) {
+                                    setDropzoneActive(true);
+                                }
                             }}
+                            onDrop={() => setDropzoneActive(false)}
                         >
                             <PlusIcon className="size-3.5 text-muted-foreground" />
                         </div>
