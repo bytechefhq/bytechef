@@ -48,8 +48,10 @@ public class DataFileStorageConfiguration {
             logger.info("Data storage provider type enabled: aws");
         }
 
-        return new DataStorageImpl(new DataFileStorageServiceImpl(
-            fileStorageServiceRegistry.getFileStorageService(ApplicationProperties.DataStorage.Provider.AWS.name())));
+        return new DataStorageImpl(
+            new DataFileStorageServiceImpl(
+                fileStorageServiceRegistry.getFileStorageService(
+                    ApplicationProperties.DataStorage.Provider.AWS.name())));
     }
 
     @Bean

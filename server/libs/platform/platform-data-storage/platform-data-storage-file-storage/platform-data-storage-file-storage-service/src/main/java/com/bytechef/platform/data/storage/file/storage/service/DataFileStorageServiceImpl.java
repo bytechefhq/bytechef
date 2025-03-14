@@ -44,8 +44,7 @@ public class DataFileStorageServiceImpl implements DataFileStorageService {
 
     @Override
     public void delete(
-        String componentName, DataStorageScope scope, String scopeId, String key,
-        ModeType type) {
+        String componentName, DataStorageScope scope, String scopeId, String key, ModeType type) {
 
         String directoryPath = getDirectoryPath(type);
 
@@ -58,8 +57,7 @@ public class DataFileStorageServiceImpl implements DataFileStorageService {
     @Override
     @SuppressWarnings("unchecked")
     public <T> Optional<T> fetch(
-        String componentName, DataStorageScope scope, String scopeId, String key,
-        ModeType type) {
+        String componentName, DataStorageScope scope, String scopeId, String key, ModeType type) {
 
         String directoryPath = getDirectoryPath(type);
 
@@ -78,10 +76,7 @@ public class DataFileStorageServiceImpl implements DataFileStorageService {
 
     @NonNull
     @Override
-    public <T> T get(
-        String componentName, DataStorageScope scope, String scopeId, String key,
-        ModeType type) {
-
+    public <T> T get(String componentName, DataStorageScope scope, String scopeId, String key, ModeType type) {
         return OptionalUtils.get(fetch(componentName, scope, scopeId, key, type));
     }
 
