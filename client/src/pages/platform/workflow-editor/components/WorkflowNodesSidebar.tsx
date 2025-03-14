@@ -67,7 +67,7 @@ const WorkflowNodesSidebar = ({
                 />
             </div>
 
-            <div className="flex flex-1 flex-col overflow-hidden px-3 pt-1">
+            <div className="flex flex-1 flex-col overflow-hidden pt-1">
                 <WorkflowNodesTabs
                     actionComponentDefinitions={filteredActionComponentDefinitions}
                     hideTriggerComponents
