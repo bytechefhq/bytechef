@@ -29,6 +29,7 @@ import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition
 import com.bytechef.component.definition.FileEntry;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
+import com.fasterxml.jackson.databind.ObjectWriter;
 import com.fasterxml.jackson.databind.SequenceWriter;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -69,9 +70,10 @@ public class CsvFileWriteAction {
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
         boolean headerRow = false;
 
+        ObjectWriter writer = CSV_MAPPER.writer();
+
         try (PrintWriter printWriter = new PrintWriter(byteArrayOutputStream, false, StandardCharsets.UTF_8);
-            SequenceWriter sequenceWriter = CSV_MAPPER.writer()
-                .writeValues(printWriter)) {
+            SequenceWriter sequenceWriter = writer.writeValues(printWriter)) {
 
             for (Map<String, ?> row : rows) {
                 if (!headerRow) {
