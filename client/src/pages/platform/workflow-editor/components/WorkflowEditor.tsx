@@ -139,8 +139,11 @@ const WorkflowEditor = ({
                 return;
             }
         } else {
-            if (event.target instanceof HTMLElement) {
-                const targetNodeElement = event.target.closest('.react-flow__node') as HTMLElement;
+            const isTargetNode = event.target instanceof HTMLElement;
+            const isTargetEdge = event.target instanceof SVGElement;
+
+            if (isTargetNode) {
+                const targetNodeElement = (event.target as HTMLElement).closest('.react-flow__node') as HTMLElement;
 
                 if (!targetNodeElement || targetNodeElement?.dataset.nodetype === 'trigger') {
                     return;
@@ -159,19 +162,35 @@ const WorkflowEditor = ({
 
                     handleDropOnPlaceholderNode(targetNode, droppedNode);
                 }
-            } else if (event.target instanceof SVGElement) {
-                const targetEdgeElement = event.target.closest('.react-flow__edge') as HTMLElement;
+            } else if (isTargetEdge) {
+                const getClosestEdgeElement = (element: HTMLElement): HTMLElement | null => {
+                    let current: HTMLElement | null = element;
 
-                if (
-                    !targetEdgeElement ||
-                    (targetEdgeElement.parentNode as HTMLElement).dataset?.nodetype === 'trigger'
-                ) {
+                    while (current) {
+                        if (
+                            current.tagName === 'DIV' &&
+                            current.id &&
+                            current.id.match(/^.+=>.+$/) &&
+                            !current.id.endsWith('-button')
+                        ) {
+                            return current;
+                        }
+
+                        current = current.parentElement;
+                    }
+
+                    return null;
+                };
+
+                const edgeElement = getClosestEdgeElement(event.target as HTMLElement);
+
+                if (!edgeElement) {
                     return;
                 }
 
                 const {edges} = useWorkflowDataStore.getState();
 
-                const targetEdge = edges.find((edge) => edge.id === targetEdgeElement.id);
+                const targetEdge = edges.find((edge) => edge.id === edgeElement.id);
 
                 if (targetEdge) {
                     handleDropOnWorkflowEdge(targetEdge, droppedNode);
@@ -243,7 +262,7 @@ const WorkflowEditor = ({
                 zoomOnScroll={false}
             >
                 <MiniMap
-                    className={twMerge('mb-2 mr-16', rightSidebarOpen && 'absolute right-minimap-placement')}
+                    className={twMerge('mb-2 mr-16', rightSidebarOpen && 'right-minimap-placement absolute')}
                     maskColor={MINIMAP_MASK_COLOR}
                     nodeBorderRadius={24}
                     nodeColor={MINIMAP_NODE_COLOR}
