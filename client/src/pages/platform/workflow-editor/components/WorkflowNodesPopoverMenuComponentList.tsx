@@ -87,7 +87,7 @@ const WorkflowNodesPopoverMenuComponentList = memo(
                     actionPanelOpen ? 'w-workflow-nodes-popover-component-menu-width' : 'w-full'
                 )}
             >
-                <header className="flex items-center gap-1 rounded-tl-lg bg-white p-3 text-center">
+                <header className="flex items-center gap-1 rounded-t-lg bg-white p-3 text-center">
                     <Input
                         name="workflowNodeFilter"
                         onChange={(event) => setFilter(event.target.value)}
@@ -98,7 +98,7 @@ const WorkflowNodesPopoverMenuComponentList = memo(
                     <CopilotButton source={Source.WORKFLOW_EDITOR_COMPONENTS_POPOVER_MENU} />
                 </header>
 
-                <div className="h-96 rounded-bl-lg pb-3">
+                <div className="h-96 rounded-b-lg pb-3">
                     <WorkflowNodesTabs
                         actionComponentDefinitions={filteredActionComponentDefinitions}
                         hideActionComponents={hideActionComponents}
