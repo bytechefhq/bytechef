@@ -8,6 +8,7 @@ import WorkflowExecutionsTestOutput from '@/pages/platform/workflow-editor/compo
 import {useWorkflowLayout} from '@/pages/platform/workflow-editor/hooks/useWorkflowLayout';
 import {WorkflowMutationProvider} from '@/pages/platform/workflow-editor/providers/workflowMutationProvider';
 import {WorkflowNodeParameterMutationProvider} from '@/pages/platform/workflow-editor/providers/workflowNodeParameterMutationProvider';
+import useRightSidebarStore from '@/pages/platform/workflow-editor/stores/useRightSidebarStore';
 import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWorkflowDataStore';
 import useWorkflowEditorStore from '@/pages/platform/workflow-editor/stores/useWorkflowEditorStore';
 import {ConnectionReactQueryProvider} from '@/shared/components/connection/providers/connectionReactQueryProvider';
@@ -17,6 +18,7 @@ import {useEffect} from 'react';
 
 const Project = () => {
     const {projectLeftSidebarOpen, setProjectLeftSidebarOpen} = useProjectsLeftSidebarStore();
+    const {setRightSidebarOpen} = useRightSidebarStore();
     const {workflowIsRunning, workflowTestExecution} = useWorkflowEditorStore();
     const {workflow} = useWorkflowDataStore();
 
@@ -38,8 +40,10 @@ const Project = () => {
     useEffect(() => {
         return () => {
             setProjectLeftSidebarOpen(false);
+
+            setRightSidebarOpen(false);
         };
-    }, [setProjectLeftSidebarOpen]);
+    }, [setProjectLeftSidebarOpen, setRightSidebarOpen]);
 
     return (
         <div className="flex w-full flex-col">
