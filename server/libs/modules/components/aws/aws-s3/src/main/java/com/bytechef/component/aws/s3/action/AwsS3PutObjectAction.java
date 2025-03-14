@@ -23,7 +23,6 @@ import static com.bytechef.component.aws.s3.constant.AwsS3Constants.KEY;
 import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.fileEntry;
 import static com.bytechef.component.definition.ComponentDsl.option;
-import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
 
 import com.bytechef.component.aws.s3.util.AwsS3Utils;
@@ -32,7 +31,6 @@ import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition
 import com.bytechef.component.definition.FileEntry;
 import com.bytechef.component.definition.Parameters;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
@@ -41,7 +39,6 @@ import java.nio.file.StandardCopyOption;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.ObjectCannedACL;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
-import software.amazon.awssdk.services.s3.model.PutObjectResponse;
 
 /**
  * @author Ivica Cardic
@@ -73,7 +70,6 @@ public class AwsS3PutObjectAction {
                     option("private", "private"),
                     option("public-read", "public-read"),
                     option("public-read-write", "public-read-write")))
-        .output(outputSchema(string()))
         .perform(AwsS3PutObjectAction::perform);
 
     @SuppressFBWarnings("RV")
@@ -83,28 +79,25 @@ public class AwsS3PutObjectAction {
         FileEntry fileEntry = inputParameters.getRequiredFileEntry(FILE_ENTRY);
 
         try (S3Client s3Client = AwsS3Utils.buildS3Client(connectionParameters)) {
-            File directory = new File("/tmp/bytechef/AWS");
+            Path tempDirPath = Files.createTempDirectory("aws_s3");
 
-            if (!directory.exists()) {
-                directory.mkdirs();
-            }
-
-            Path tempFilePath = Files.createTempFile(directory.toPath(), "", ".tmp");
+            Path tempFilePath = Files.createTempFile(tempDirPath, "", ".tmp");
 
             Files.copy((InputStream) context.file(file -> file.getStream(
                 fileEntry)), tempFilePath, StandardCopyOption.REPLACE_EXISTING);
 
-            PutObjectResponse putObjectResponse = s3Client.putObject(
+            s3Client.putObject(
                 PutObjectRequest.builder()
                     .bucket(connectionParameters.getRequiredString(BUCKET_NAME))
                     .key(inputParameters.getRequiredString(KEY))
-                    .acl(inputParameters.getString(ACL) != null
-                        ? ObjectCannedACL.fromValue(inputParameters.getString(ACL))
-                        : null)
+                    .acl(
+                        inputParameters.getString(ACL) != null
+                            ? ObjectCannedACL.fromValue(inputParameters.getString(ACL))
+                            : null)
                     .build(),
                 tempFilePath);
 
-            return putObjectResponse.versionId();
+            return null;
         }
     }
 }
