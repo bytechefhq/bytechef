@@ -138,6 +138,16 @@ public class SchemaUtils {
 
     @SuppressFBWarnings("DLS")
     private static Object getSampleOutput(BaseProperty definitionProperty) {
+        if (definitionProperty instanceof BaseProperty.BaseValueProperty<?> valueProperty) {
+            if (OptionalUtils.isPresent(valueProperty.getExampleValue())) {
+                return valueProperty.getExampleValue();
+            }
+
+            if (OptionalUtils.isPresent(valueProperty.getDefaultValue())) {
+                return valueProperty.getDefaultValue();
+            }
+        }
+
         return switch (definitionProperty) {
             case BaseArrayProperty<? extends BaseProperty> p -> {
                 List<Object> items = new ArrayList<>();
