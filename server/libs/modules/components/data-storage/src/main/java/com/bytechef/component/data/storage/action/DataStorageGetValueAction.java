@@ -71,53 +71,43 @@ public class DataStorageGetValueAction {
             array(DEFAULT_VALUE)
                 .label(DEFAULT_VALUE_LABEL)
                 .description("The default value to return if no value exists under the given key.")
-                .displayCondition("type == '%s'".formatted(ValueType.ARRAY))
-                .required(true),
+                .displayCondition("type == '%s'".formatted(ValueType.ARRAY)),
             bool(DEFAULT_VALUE)
                 .label(DEFAULT_VALUE_LABEL)
                 .description("The default value to return if no value exists under the given key.")
-                .displayCondition("type == '%s'".formatted(ValueType.BOOLEAN))
-                .required(true),
+                .displayCondition("type == '%s'".formatted(ValueType.BOOLEAN)),
             date(DEFAULT_VALUE)
                 .label(DEFAULT_VALUE_LABEL)
                 .description("The default value to return if no value exists under the given key.")
-                .displayCondition("type == '%s'".formatted(ValueType.DATE))
-                .required(true),
+                .displayCondition("type == '%s'".formatted(ValueType.DATE)),
             dateTime(DEFAULT_VALUE)
                 .label(DEFAULT_VALUE_LABEL)
                 .description("The default value to return if no value exists under the given key.")
-                .displayCondition("type == '%s'".formatted(ValueType.DATE_TIME))
-                .required(true),
+                .displayCondition("type == '%s'".formatted(ValueType.DATE_TIME)),
             integer(DEFAULT_VALUE)
                 .label(DEFAULT_VALUE_LABEL)
                 .description("The default value to return if no value exists under the given key.")
-                .displayCondition("type == '%s'".formatted(ValueType.INTEGER))
-                .required(true),
+                .displayCondition("type == '%s'".formatted(ValueType.INTEGER)),
             nullable(DEFAULT_VALUE)
                 .label(DEFAULT_VALUE_LABEL)
                 .description("The default value to return if no value exists under the given key.")
-                .displayCondition("type == '%s'".formatted(ValueType.NULL))
-                .required(true),
+                .displayCondition("type == '%s'".formatted(ValueType.NULL)),
             number(DEFAULT_VALUE)
                 .label(DEFAULT_VALUE_LABEL)
                 .description("The default value to return if no value exists under the given key.")
-                .displayCondition("type == '%s'".formatted(ValueType.NUMBER))
-                .required(true),
+                .displayCondition("type == '%s'".formatted(ValueType.NUMBER)),
             object(DEFAULT_VALUE)
                 .label(DEFAULT_VALUE_LABEL)
                 .description("The default value to return if no value exists under the given key.")
-                .displayCondition("type == '%s'".formatted(ValueType.OBJECT))
-                .required(true),
+                .displayCondition("type == '%s'".formatted(ValueType.OBJECT)),
             string(DEFAULT_VALUE)
                 .label(DEFAULT_VALUE_LABEL)
                 .description("The default value to return if no value exists under the given key.")
-                .displayCondition("type == '%s'".formatted(ValueType.STRING))
-                .required(true),
+                .displayCondition("type == '%s'".formatted(ValueType.STRING)),
             time(DEFAULT_VALUE)
                 .label(DEFAULT_VALUE_LABEL)
                 .description("The default value to return if no value exists under the given key.")
-                .displayCondition("type == '%s'".formatted(ValueType.TIME))
-                .required(true))
+                .displayCondition("type == '%s'".formatted(ValueType.TIME)))
         .output()
         .perform(DataStorageGetValueAction::perform);
 
@@ -135,11 +125,13 @@ public class DataStorageGetValueAction {
             Scope.valueOf(inputParameters.getRequiredString(SCOPE)), inputParameters.getRequiredString(KEY)));
 
         if (optional.isEmpty()) {
-            if (context.convert(convert -> convert.canConvert(inputParameters.getRequired(DEFAULT_VALUE), type))) {
-                return context.convert(convert -> convert.value(inputParameters.getRequired(DEFAULT_VALUE), type));
+            if (inputParameters.containsKey(DEFAULT_VALUE) &&
+                context.convert(convert -> convert.canConvert(inputParameters.get(DEFAULT_VALUE), type))) {
+
+                return context.convert(convert -> convert.value(inputParameters.get(DEFAULT_VALUE), type));
             }
 
-            return inputParameters.getRequired(DEFAULT_VALUE);
+            return inputParameters.get(DEFAULT_VALUE);
         }
 
         if (context.convert(convert -> convert.canConvert(optional.get(), type))) {
