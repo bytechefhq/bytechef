@@ -140,11 +140,14 @@ const PropertyComboBox = ({
             }));
         }
 
-        return initialOptions;
+        return initialOptions.map((option) => ({
+            ...option,
+            value: option.value?.toString() || '',
+        }));
     }, [optionsData, initialOptions]);
 
     const currentOption = useMemo(
-        () => (options as Array<ComboBoxItemType>)?.find((option) => option.value === value),
+        () => (options as Array<ComboBoxItemType>)?.find((option) => String(option.value) === String(value)),
         [options, value]
     );
 
