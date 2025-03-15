@@ -1,6 +1,11 @@
 import {useAnalytics} from '@/shared/hooks/useAnalytics';
-import {ActionDefinitionApi, ComponentDefinition} from '@/shared/middleware/platform/configuration';
+import {
+    ActionDefinitionApi,
+    ComponentDefinition,
+    TriggerDefinitionApi,
+} from '@/shared/middleware/platform/configuration';
 import {ActionDefinitionKeys} from '@/shared/queries/platform/actionDefinitions.queries';
+import {TriggerDefinitionKeys} from '@/shared/queries/platform/triggerDefinitions.queries';
 import {ClickedOperationType, NodeDataType, PropertyAllType} from '@/shared/types';
 import {Component1Icon} from '@radix-ui/react-icons';
 import {useQueryClient} from '@tanstack/react-query';
@@ -73,6 +78,18 @@ const WorkflowNodesPopoverMenuOperationList = ({
             if (trigger) {
                 captureComponentUsed(componentName, undefined, operationName);
 
+                const getTriggerDefinitionRequest = {
+                    componentName,
+                    componentVersion: version,
+                    triggerName: operationName,
+                };
+
+                const clickedComponentTriggerDefinition = await queryClient.fetchQuery({
+                    queryFn: () =>
+                        new TriggerDefinitionApi().getComponentTriggerDefinition(getTriggerDefinitionRequest),
+                    queryKey: TriggerDefinitionKeys.triggerDefinition(getTriggerDefinitionRequest),
+                });
+
                 const newTriggerNodeData: NodeDataType = {
                     componentName: componentName,
                     icon: (
@@ -88,7 +105,9 @@ const WorkflowNodesPopoverMenuOperationList = ({
                     metadata: undefined,
                     name: 'trigger_1',
                     operationName,
-                    parameters: undefined,
+                    parameters: getParametersWithDefaultValues({
+                        properties: clickedComponentTriggerDefinition?.properties as Array<PropertyAllType>,
+                    }),
                     trigger: true,
                     type: `${componentName}/v${version}/${operationName}`,
                     version,
@@ -113,23 +132,6 @@ const WorkflowNodesPopoverMenuOperationList = ({
                 return;
             }
 
-            const newWorkflowNodeData = {
-                componentName,
-                icon: icon ? (
-                    <InlineSVG className="size-9 text-gray-700" src={icon} />
-                ) : (
-                    <Component1Icon className="size-9 text-gray-700" />
-                ),
-                label: componentLabel,
-                metadata: undefined,
-                name: getFormattedName(componentName),
-                operationName,
-                parameters: {},
-                type: `${componentName}/v${version}/${operationName}`,
-                version,
-                workflowNodeName: getFormattedName(componentName),
-            };
-
             const getActionDefinitionRequest = {
                 actionName: operationName,
                 componentName,
@@ -141,14 +143,28 @@ const WorkflowNodesPopoverMenuOperationList = ({
                 queryKey: ActionDefinitionKeys.actionDefinition(getActionDefinitionRequest),
             });
 
+            const newWorkflowNodeData = {
+                componentName,
+                icon: icon ? (
+                    <InlineSVG className="size-9 text-gray-700" src={icon} />
+                ) : (
+                    <Component1Icon className="size-9 text-gray-700" />
+                ),
+                label: componentLabel,
+                metadata: undefined,
+                name: getFormattedName(componentName),
+                operationName,
+                parameters: getParametersWithDefaultValues({
+                    properties: clickedComponentActionDefinition?.properties as Array<PropertyAllType>,
+                }),
+                type: `${componentName}/v${version}/${operationName}`,
+                version,
+                workflowNodeName: getFormattedName(componentName),
+            };
+
             const saveNodeToDefinition = (nodeData: NodeDataType, nodeIndex?: number) => {
                 saveWorkflowDefinition({
-                    nodeData: {
-                        ...nodeData,
-                        parameters: getParametersWithDefaultValues({
-                            properties: clickedComponentActionDefinition?.properties as Array<PropertyAllType>,
-                        }),
-                    },
+                    nodeData,
                     nodeIndex,
                     onSuccess: () =>
                         handleComponentAddedSuccess({
