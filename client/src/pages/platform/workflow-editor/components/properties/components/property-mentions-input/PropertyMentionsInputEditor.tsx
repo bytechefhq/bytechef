@@ -57,6 +57,7 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
         ref: ForwardedRef<Editor>
     ) => {
         const [editorValue, setEditorValue] = useState<string | number | undefined>(value);
+        const [isLocalUpdate, setIsLocalUpdate] = useState(false);
         const [mentionOccurences, setMentionOccurences] = useState(0);
 
         const {currentNode} = useWorkflowNodeDetailsPanelStore();
@@ -182,6 +183,8 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
 
         const onUpdate = useCallback(
             ({editor}: {editor: Editor}) => {
+                setIsLocalUpdate(true);
+
                 let value = editor.getHTML();
 
                 value = value.replace(/\r\n/g, '\n');
@@ -285,12 +288,12 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
         }
 
         useEffect(() => {
-            if (editor) {
+            if (editor && !isLocalUpdate) {
                 editor.commands.setContent(getContent(editorValue as string)!, false, {
                     preserveWhitespace: 'full',
                 });
             }
-        }, [editor, getContent, editorValue]);
+        }, [editor, getContent, editorValue, isLocalUpdate]);
 
         // set propertyParameterValue on workflow definition change
         useEffect(() => {
