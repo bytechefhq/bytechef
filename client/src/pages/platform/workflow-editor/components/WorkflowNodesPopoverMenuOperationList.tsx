@@ -1,7 +1,9 @@
 import {useAnalytics} from '@/shared/hooks/useAnalytics';
 import {
+    ActionDefinition,
     ActionDefinitionApi,
     ComponentDefinition,
+    TriggerDefinition,
     TriggerDefinitionApi,
 } from '@/shared/middleware/platform/configuration';
 import {ActionDefinitionKeys} from '@/shared/queries/platform/actionDefinitions.queries';
@@ -65,13 +67,59 @@ const WorkflowNodesPopoverMenuOperationList = ({
 
     const {projectId} = useParams();
 
+    const getNodeData = useCallback(
+        (operation: ClickedOperationType, definition: ActionDefinition | TriggerDefinition) => {
+            const {componentLabel, componentName, icon, operationName, version} = operation;
+
+            return {
+                componentName,
+                icon: icon ? (
+                    <InlineSVG className="size-9 text-gray-700" src={icon} />
+                ) : (
+                    <Component1Icon className="size-9 text-gray-700" />
+                ),
+                label: componentLabel,
+                metadata: undefined,
+                name: trigger ? 'trigger_1' : getFormattedName(componentName),
+                operationName,
+                parameters: getParametersWithDefaultValues({
+                    properties: definition?.properties as Array<PropertyAllType>,
+                }),
+                trigger: trigger,
+                type: `${componentName}/v${version}/${operationName}`,
+                version,
+                workflowNodeName: trigger ? 'trigger_1' : getFormattedName(componentName),
+            };
+        },
+        [trigger]
+    );
+
+    const saveNodeToWorkflow = useCallback(
+        (nodeData: NodeDataType, nodeIndex?: number) => {
+            saveWorkflowDefinition({
+                nodeData,
+                nodeIndex,
+                onSuccess: () =>
+                    handleComponentAddedSuccess({
+                        nodeData,
+                        queryClient,
+                        workflow,
+                    }),
+                projectId: +projectId!,
+                queryClient,
+                updateWorkflowMutation,
+            });
+        },
+        [projectId, queryClient, updateWorkflowMutation, workflow]
+    );
+
     const handleOperationClick = useCallback(
         async (clickedOperation: ClickedOperationType) => {
             if (!componentDefinition) {
                 return;
             }
 
-            const {componentLabel, componentName, icon, operationName, version} = clickedOperation;
+            const {componentName, operationName, version} = clickedOperation;
 
             setLatestComponentDefinition(componentDefinition);
 
@@ -90,42 +138,9 @@ const WorkflowNodesPopoverMenuOperationList = ({
                     queryKey: TriggerDefinitionKeys.triggerDefinition(getTriggerDefinitionRequest),
                 });
 
-                const newTriggerNodeData: NodeDataType = {
-                    componentName: componentName,
-                    icon: (
-                        <>
-                            {icon ? (
-                                <InlineSVG className="size-9 text-gray-700" src={icon} />
-                            ) : (
-                                <Component1Icon className="size-9 text-gray-700" />
-                            )}
-                        </>
-                    ),
-                    label: componentLabel,
-                    metadata: undefined,
-                    name: 'trigger_1',
-                    operationName,
-                    parameters: getParametersWithDefaultValues({
-                        properties: clickedComponentTriggerDefinition?.properties as Array<PropertyAllType>,
-                    }),
-                    trigger: true,
-                    type: `${componentName}/v${version}/${operationName}`,
-                    version,
-                    workflowNodeName: 'trigger_1',
-                };
+                const newTriggerNodeData = getNodeData(clickedOperation, clickedComponentTriggerDefinition);
 
-                saveWorkflowDefinition({
-                    nodeData: newTriggerNodeData,
-                    onSuccess: () =>
-                        handleComponentAddedSuccess({
-                            nodeData: newTriggerNodeData,
-                            queryClient,
-                            workflow,
-                        }),
-                    projectId: +projectId!,
-                    queryClient,
-                    updateWorkflowMutation,
-                });
+                saveNodeToWorkflow(newTriggerNodeData, 0);
 
                 setPopoverOpen(false);
 
@@ -143,40 +158,7 @@ const WorkflowNodesPopoverMenuOperationList = ({
                 queryKey: ActionDefinitionKeys.actionDefinition(getActionDefinitionRequest),
             });
 
-            const newWorkflowNodeData = {
-                componentName,
-                icon: icon ? (
-                    <InlineSVG className="size-9 text-gray-700" src={icon} />
-                ) : (
-                    <Component1Icon className="size-9 text-gray-700" />
-                ),
-                label: componentLabel,
-                metadata: undefined,
-                name: getFormattedName(componentName),
-                operationName,
-                parameters: getParametersWithDefaultValues({
-                    properties: clickedComponentActionDefinition?.properties as Array<PropertyAllType>,
-                }),
-                type: `${componentName}/v${version}/${operationName}`,
-                version,
-                workflowNodeName: getFormattedName(componentName),
-            };
-
-            const saveNodeToDefinition = (nodeData: NodeDataType, nodeIndex?: number) => {
-                saveWorkflowDefinition({
-                    nodeData,
-                    nodeIndex,
-                    onSuccess: () =>
-                        handleComponentAddedSuccess({
-                            nodeData,
-                            queryClient,
-                            workflow,
-                        }),
-                    projectId: +projectId!,
-                    queryClient,
-                    updateWorkflowMutation,
-                });
-            };
+            const newWorkflowNodeData = getNodeData(clickedOperation, clickedComponentActionDefinition);
 
             const calculateNodeInsertIndex = (targetId: string) => {
                 const nextTaskIndex = workflow.tasks?.findIndex((task) => task.name === targetId) ?? 0;
@@ -237,7 +219,7 @@ const WorkflowNodesPopoverMenuOperationList = ({
 
                 const insertIndex = calculateNodeInsertIndex(clickedEdge.target);
 
-                saveNodeToDefinition(newWorkflowNodeData, insertIndex);
+                saveNodeToWorkflow(newWorkflowNodeData, insertIndex);
             };
 
             const handleNonEdgeCase = () => {
@@ -287,7 +269,7 @@ const WorkflowNodesPopoverMenuOperationList = ({
                         insertIndex = calculateNodeInsertIndex(nextNode?.id);
                     }
 
-                    saveNodeToDefinition(newWorkflowNodeData, insertIndex);
+                    saveNodeToWorkflow(newWorkflowNodeData, insertIndex);
                 }
 
                 setPopoverOpen(false);
@@ -299,8 +281,25 @@ const WorkflowNodesPopoverMenuOperationList = ({
                 handleNonEdgeCase();
             }
         },
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-        [componentDefinition, trigger]
+        [
+            componentDefinition,
+            getNodeData,
+            saveNodeToWorkflow,
+            trigger,
+            edgeId,
+            sourceNodeId,
+            loopId,
+            conditionId,
+            nodes,
+            edges,
+            workflow,
+            projectId,
+            queryClient,
+            updateWorkflowMutation,
+            captureComponentUsed,
+            setLatestComponentDefinition,
+            setPopoverOpen,
+        ]
     );
 
     return (
