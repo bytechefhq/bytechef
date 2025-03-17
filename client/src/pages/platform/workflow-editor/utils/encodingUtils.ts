@@ -89,3 +89,28 @@ export function encodePath(path: string): string {
 
     return encodedPath;
 }
+
+// Transforms datapills with object path strings (e.g., "${var_1.item-1}" → "${var_1['item-1']}")
+export function transformValueForObjectAccess(value: string): string {
+    return value.replace(/\${([^}]*)}/g, (match, expression) => {
+        if (!expression.includes('.')) {
+            return match;
+        }
+
+        const segments = expression.split('.').filter(Boolean);
+
+        if (segments.length === 0) {
+            return match;
+        }
+
+        const firstSegment = segments[0];
+
+        const subsequentSegments = segments.slice(1).map((segment: string) => {
+            const hasSpecialCharacters = /[^a-zA-Z0-9_$]/.test(segment);
+
+            return hasSpecialCharacters ? `['${segment}']` : `.${segment}`;
+        });
+
+        return `\${${firstSegment}${subsequentSegments.join('')}}`;
+    });
+}
