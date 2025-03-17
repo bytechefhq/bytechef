@@ -23,12 +23,13 @@ const DataPillPanel = ({
     const {currentNode, workflowNodeDetailsPanelOpen} = useWorkflowNodeDetailsPanelStore();
 
     const validWorkflowNodeOutputs = workflowNodeOutputs.filter((workflowNodeOutput) => {
-        const {actionDefinition, triggerDefinition, workflowNodeName} = workflowNodeOutput;
+        const {actionDefinition, taskDispatcherDefinition, triggerDefinition, workflowNodeName} = workflowNodeOutput;
 
-        return (
-            workflowNodeName !== currentNode?.name &&
-            (actionDefinition?.outputDefined || triggerDefinition?.outputDefined)
-        );
+        if (workflowNodeName === currentNode?.name) {
+            return false;
+        }
+
+        return actionDefinition?.outputDefined || triggerDefinition?.outputDefined || taskDispatcherDefinition;
     });
 
     const componentOperations = validWorkflowNodeOutputs.map((workflowNodeOutput) => {
@@ -45,6 +46,7 @@ const DataPillPanel = ({
             componentDefinition,
             outputSchema: workflowNodeOutput.outputSchema,
             sampleOutput: workflowNodeOutput.sampleOutput,
+            taskDispatcherDefinition: workflowNodeOutput.taskDispatcherDefinition,
             workflowNodeName: workflowNodeOutput.workflowNodeName,
         } as ComponentOperationType;
     });
@@ -59,6 +61,9 @@ const DataPillPanel = ({
     if (!dataPillPanelOpen) {
         return <></>;
     }
+
+    const hasAvailableDataPills =
+        (componentOperations && componentOperations.length > 0) || (workflow.inputs && workflow.inputs.length > 0);
 
     return (
         <div className="absolute bottom-6 right-data-pill-panel-placement top-2 z-10 w-screen max-w-data-pill-panel-width overflow-hidden rounded-md border border-stroke-neutral-secondary bg-background">
@@ -96,15 +101,14 @@ const DataPillPanel = ({
                         />
                     </div>
 
-                    {(componentOperations && !!componentOperations.length) ||
-                    (workflow.inputs && !!workflow.inputs.length) ? (
-                        <DataPillPanelBody
-                            componentOperations={componentOperations}
-                            dataPillFilterQuery={dataPillFilterQuery}
-                        />
-                    ) : (
+                    {!hasAvailableDataPills && (
                         <span className="p-4 text-sm text-muted-foreground">No available data pills.</span>
                     )}
+
+                    <DataPillPanelBody
+                        componentOperations={componentOperations}
+                        dataPillFilterQuery={dataPillFilterQuery}
+                    />
                 </main>
             </div>
         </div>
