@@ -22,7 +22,7 @@ const ClusterElementTypePanel = ({
         rootComponentName,
         rootComponentVersion,
     });
-    console.log(clusterElementDefinitions);
+
     return (
         <div className="flex h-full flex-col overflow-auto p-4">
             <fieldset className="space-y-2">
