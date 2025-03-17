@@ -6,7 +6,7 @@
         http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
 
     <!-- ChangeSet to create the vector extension -->
-    <changeSet id="0000000000000-1" author="Marko Kriskovic">
+    <changeSet id="00000000000001" author="Marko Kriskovic">
         <preConditions onFail="MARK_RAN">
             <not>
                 <sqlCheck expectedResult="0">
@@ -35,7 +35,7 @@
         </createTable>
         <!-- Create an index for vector similarity search -->
         <sql>
-            CREATE INDEX idx_documentation_embedding ON workflow USING hnsw (embedding vector_cosine_ops);
+            CREATE INDEX idx_documentation_embedding ON workflow_vector USING hnsw (embedding vector_cosine_ops);
         </sql>
     </changeSet>
 
