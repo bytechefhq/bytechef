@@ -1,3 +1,4 @@
+import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import useWorkflowNodeDetailsPanelStore from '@/pages/platform/workflow-editor/stores/useWorkflowNodeDetailsPanelStore';
 import getNestedObject from '@/pages/platform/workflow-editor/utils/getNestedObject';
 import {TYPE_ICONS} from '@/shared/typeIcons';
@@ -90,7 +91,7 @@ const DataPill = ({
             <div className="flex items-center space-x-2">
                 <div
                     className={twMerge(
-                        'inline-flex cursor-pointer items-center space-x-2 rounded-full border bg-gray-100 px-2 py-0.5 text-sm hover:bg-gray-50',
+                        'inline-flex cursor-pointer items-center space-x-2 rounded-full border bg-surface-neutral-secondary px-2 py-0.5 text-sm hover:bg-surface-main',
                         !mentionInput && 'cursor-not-allowed'
                     )}
                     draggable
@@ -118,32 +119,47 @@ const DataPill = ({
                     'flex flex-col space-y-2 border-0 bg-transparent p-0 hover:cursor-default hover:bg-transparent'
             )}
         >
-            <div
-                className={twMerge(
-                    'mr-auto flex cursor-pointer items-center rounded-full border bg-gray-100 px-2 py-0.5 text-sm hover:bg-gray-50',
-                    !mentionInput && 'cursor-not-allowed'
-                )}
-                data-name={property?.name || workflowNodeName}
-                draggable
-                onClick={() =>
-                    handleDataPillClick(workflowNodeName, property?.name || '[index]', parentProperty?.name, path)
-                }
-                onDragStart={(event) => event.dataTransfer.setData('name', property?.name || workflowNodeName)}
-            >
-                {property?.name && (
-                    <span className="mr-2" title={property?.type}>
-                        {TYPE_ICONS[property?.type as keyof typeof TYPE_ICONS]}
-                    </span>
-                )}
+            <Tooltip>
+                <TooltipTrigger asChild>
+                    <div
+                        className={twMerge(
+                            'mr-auto flex cursor-pointer items-center rounded-full border bg-surface-neutral-secondary px-2 py-0.5 text-sm hover:bg-surface-main',
+                            !mentionInput && 'cursor-not-allowed'
+                        )}
+                        data-name={property?.name || workflowNodeName}
+                        draggable
+                        onClick={() =>
+                            handleDataPillClick(
+                                workflowNodeName,
+                                property?.name || '[index]',
+                                parentProperty?.name,
+                                path
+                            )
+                        }
+                        onDragStart={(event) => event.dataTransfer.setData('name', property?.name || workflowNodeName)}
+                    >
+                        {property?.name && (
+                            <span className="mr-2" title={property?.type}>
+                                {TYPE_ICONS[property?.type as keyof typeof TYPE_ICONS]}
+                            </span>
+                        )}
 
-                {!property?.name && (
-                    <span className="mr-2" title={property?.type}>
-                        {TYPE_ICONS.INTEGER}
-                    </span>
-                )}
+                        {!property?.name && (
+                            <span className="mr-2" title={property?.type}>
+                                {TYPE_ICONS.INTEGER}
+                            </span>
+                        )}
 
-                {property?.name || '[index]'}
-            </div>
+                        {property?.name || '[index]'}
+                    </div>
+                </TooltipTrigger>
+
+                {property?.description && (
+                    <TooltipContent className="mr-2 max-w-72 whitespace-normal break-normal">
+                        <span className="block">{property.description}</span>
+                    </TooltipContent>
+                )}
+            </Tooltip>
 
             {!!subProperties?.length && (
                 <ul className="mt-2 flex flex-col space-y-2 border-l border-l-border/50 pl-4">
