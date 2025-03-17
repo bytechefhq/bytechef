@@ -90,27 +90,36 @@ export function encodePath(path: string): string {
     return encodedPath;
 }
 
-// Transforms datapills with object path strings (e.g., "${var_1.item-1}" → "${var_1['item-1']}")
-export function transformValueForObjectAccess(value: string): string {
-    return value.replace(/\${([^}]*)}/g, (match, expression) => {
-        if (!expression.includes('.')) {
-            return match;
-        }
+// Transform: "user.first-name" → "user['first-name']"
+export function transformPathForObjectAccess(path: string): string {
+    if (!path || !path.includes('.')) {
+        return path;
+    }
 
-        const segments = expression.split('.').filter(Boolean);
+    const segments = path.split('.').filter(Boolean);
 
-        if (segments.length === 0) {
-            return match;
-        }
+    if (segments.length === 0) return path;
 
-        const firstSegment = segments[0];
+    const firstSegment = segments[0];
 
-        const subsequentSegments = segments.slice(1).map((segment: string) => {
-            const hasSpecialCharacters = /[^a-zA-Z0-9_$]/.test(segment);
+    const formattedSegments = segments.slice(1).map((segment) => {
+        const hasHyphen = segment.includes('-');
 
-            return hasSpecialCharacters ? `['${segment}']` : `.${segment}`;
-        });
-
-        return `\${${firstSegment}${subsequentSegments.join('')}}`;
+        return hasHyphen ? `['${segment}']` : `.${segment}`;
     });
+
+    return `${firstSegment}${formattedSegments.join('')}`;
+}
+
+// Transform: "Value from ${user.first-name}" → "Value from ${user['first-name']}"
+export function transformValueForObjectAccess(value: string): string {
+    if (typeof value !== 'string') {
+        return value;
+    }
+
+    if (value.includes('${')) {
+        return value.replace(/\${([^}]*)}/g, (match, expression) => `\${${transformPathForObjectAccess(expression)}}`);
+    }
+
+    return transformPathForObjectAccess(value);
 }

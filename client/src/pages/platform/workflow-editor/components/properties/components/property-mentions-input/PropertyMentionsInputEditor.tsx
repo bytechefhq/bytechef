@@ -2,11 +2,7 @@ import PropertyMentionsInputBubbleMenu from '@/pages/platform/workflow-editor/co
 import {getSuggestionOptions} from '@/pages/platform/workflow-editor/components/properties/components/property-mentions-input/propertyMentionsInputEditorSuggestionOptions';
 import {useWorkflowNodeParameterMutation} from '@/pages/platform/workflow-editor/providers/workflowNodeParameterMutationProvider';
 import useWorkflowNodeDetailsPanelStore from '@/pages/platform/workflow-editor/stores/useWorkflowNodeDetailsPanelStore';
-import {
-    encodeParameters,
-    encodePath,
-    transformValueForObjectAccess,
-} from '@/pages/platform/workflow-editor/utils/encodingUtils';
+import {encodeParameters, encodePath} from '@/pages/platform/workflow-editor/utils/encodingUtils';
 import saveProperty from '@/pages/platform/workflow-editor/utils/saveProperty';
 import {ComponentDefinitionBasic, Workflow} from '@/shared/middleware/platform/configuration';
 import {DataPillType} from '@/shared/types';
@@ -173,8 +169,6 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
                 } else {
                     value = decode(value);
                 }
-
-                value = transformValueForObjectAccess(value);
             }
 
             saveProperty({
