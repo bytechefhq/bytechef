@@ -96,7 +96,7 @@ export default function WorkflowEdge({
                         <div
                             className={twMerge(
                                 'flex size-6 cursor-pointer items-center justify-center rounded border-2 border-gray-300 bg-white transition-all hover:scale-110 hover:border-gray-400',
-                                isDropzoneActive && 'z-40 scale-150 border-blue-100 bg-blue-100'
+                                isDropzoneActive && 'z-40 size-14 scale-150 border-blue-100 bg-blue-100'
                             )}
                             id={`${id}-button`}
                             onDragEnter={() => setDropzoneActive(true)}
