@@ -88,6 +88,8 @@ export const useSettingsMenu = ({project, workflow}: {project: Project; workflow
 
             queryClient.invalidateQueries({queryKey: ProjectKeys.project(project.id!)});
 
+            queryClient.invalidateQueries({queryKey: ProjectKeys.projects});
+
             if (hiddenFileInputRef.current) {
                 hiddenFileInputRef.current.value = '';
             }
