@@ -122,7 +122,9 @@ const ProjectWorkflowListItem = ({
                                         />
                                     </TooltipTrigger>
 
-                                    <TooltipContent side="top">{componentDefinition?.title}</TooltipContent>
+                                    <TooltipContent side="top">
+                                        {componentDefinition?.title ?? taskDispatcherDefinition?.title}
+                                    </TooltipContent>
                                 </Tooltip>
                             </div>
                         );
