@@ -1,5 +1,6 @@
 import {ComponentPropertiesType, DataPillType, PropertyAllType} from '@/shared/types';
 
+import {transformValueForObjectAccess} from './encodingUtils';
 import getSubProperties from './getSubProperties';
 
 const getExistingProperties = (properties: Array<PropertyAllType>): Array<PropertyAllType> =>
@@ -36,30 +37,38 @@ export default function getDataPillsFromProperties(
             componentIcon: componentDefinition.icon,
             id: nodeName,
             nodeName,
-            value: nodeName,
+            value: transformValueForObjectAccess(nodeName),
         });
 
-        const formattedProperties: Array<DataPillType> = existingProperties.map((property) => {
+        const allPropertiesFlat: Array<DataPillType> = [];
+
+        existingProperties.forEach((property) => {
             const {items, name, properties} = property;
 
             const subProperties = properties?.length ? properties : items;
 
-            const value = `${nodeName}.${name}`;
+            const value = `${nodeName}.${name ?? 'item'}`;
 
             if (subProperties?.length) {
-                return getSubProperties(componentDefinition.icon!, nodeName, subProperties, value);
-            }
+                const subResults = getSubProperties(componentDefinition.icon!, nodeName, subProperties, value);
 
-            return {
-                componentIcon: componentDefinition.icon,
-                id: name,
-                nodeName,
-                value,
-            };
+                allPropertiesFlat.push(subResults[0]);
+
+                if (subResults.length > 1) {
+                    allPropertiesFlat.push(...subResults.slice(1));
+                }
+            } else {
+                allPropertiesFlat.push({
+                    componentIcon: componentDefinition.icon,
+                    id: name ?? value,
+                    nodeName,
+                    value: transformValueForObjectAccess(value),
+                });
+            }
         });
 
-        if (existingProperties.length && formattedProperties.length) {
-            dataPills.push(...formattedProperties);
+        if (allPropertiesFlat.length) {
+            dataPills.push(...allPropertiesFlat);
         }
     });
 

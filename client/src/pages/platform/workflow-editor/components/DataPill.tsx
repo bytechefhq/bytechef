@@ -7,6 +7,8 @@ import resolvePath from 'object-resolve-path';
 import {MouseEvent} from 'react';
 import {twMerge} from 'tailwind-merge';
 
+import {transformPathForObjectAccess, transformValueForObjectAccess} from '../utils/encodingUtils';
+
 const DataPill = ({
     componentIcon,
     parentProperty,
@@ -59,7 +61,9 @@ const DataPill = ({
         if (Object.keys(parameters).length) {
             const attributes = mentionInput.view.props.attributes as {[name: string]: string};
 
-            const paramValue = resolvePath(parameters, attributes.path);
+            const path = transformPathForObjectAccess(attributes.path);
+
+            const paramValue = resolvePath(parameters, path);
 
             if (attributes.type !== 'STRING' && paramValue) {
                 return;
@@ -71,7 +75,7 @@ const DataPill = ({
             .focus()
             .insertContent({
                 attrs: {
-                    id: value,
+                    id: transformValueForObjectAccess(value),
                 },
                 type: 'mention',
             })
