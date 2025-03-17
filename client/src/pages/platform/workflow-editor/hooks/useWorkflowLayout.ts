@@ -4,7 +4,7 @@ import useWorkflowEditorStore from '@/pages/platform/workflow-editor/stores/useW
 import useWorkflowNodeDetailsPanelStore from '@/pages/platform/workflow-editor/stores/useWorkflowNodeDetailsPanelStore';
 import useWorkflowTestChatStore from '@/pages/platform/workflow-editor/stores/useWorkflowTestChatStore';
 import {Source, useCopilotStore} from '@/shared/components/copilot/stores/useCopilotStore';
-import {ComponentDefinitionBasic} from '@/shared/middleware/platform/configuration';
+import {ComponentDefinitionBasic, WorkflowNodeOutput} from '@/shared/middleware/platform/configuration';
 import {useGetComponentDefinitionsQuery} from '@/shared/queries/platform/componentDefinitions.queries';
 import {useGetTaskDispatcherDefinitionsQuery} from '@/shared/queries/platform/taskDispatcherDefinitions.queries';
 import {useGetPreviousWorkflowNodeOutputsQuery} from '@/shared/queries/platform/workflowNodeOutputs.queries';
@@ -101,20 +101,43 @@ export const useWorkflowLayout = () => {
     let filteredWorkflowNodeOutputs;
 
     if (!currentNode?.trigger && workflowNodeOutputs && componentDefinitions) {
-        filteredWorkflowNodeOutputs = workflowNodeOutputs.filter(
-            (workflowNodeOutput) => workflowNodeOutput.actionDefinition || workflowNodeOutput.triggerDefinition
+        const definitionsMap = new Map(
+            [...componentDefinitions, ...(taskDispatcherDefinitions ?? [])].map((def) => [def.name, def])
         );
 
-        previousComponentDefinitions = filteredWorkflowNodeOutputs
-            .map(
-                (workflowNodeOutput) =>
-                    componentDefinitions.filter(
-                        (componentDefinition) =>
-                            componentDefinition.name === workflowNodeOutput?.actionDefinition?.componentName ||
-                            componentDefinition.name === workflowNodeOutput?.triggerDefinition?.componentName
-                    )[0]
-            )
-            .filter((componentDefinition) => !!componentDefinition);
+        const result = workflowNodeOutputs.reduce(
+            (acc, output) => {
+                const {actionDefinition, taskDispatcherDefinition, triggerDefinition} = output;
+
+                if (!actionDefinition && !triggerDefinition && taskDispatcherDefinition?.name !== 'loop') {
+                    return acc;
+                }
+
+                let componentName: string | undefined;
+
+                if (actionDefinition?.componentName) {
+                    componentName = actionDefinition.componentName;
+                } else if (triggerDefinition?.componentName) {
+                    componentName = triggerDefinition.componentName;
+                } else if (taskDispatcherDefinition?.name === 'loop') {
+                    componentName = 'loop';
+                }
+
+                const matchingDefinition = componentName ? definitionsMap.get(componentName) : undefined;
+
+                if (matchingDefinition) {
+                    acc.definitions.push(matchingDefinition);
+
+                    acc.outputs.push(output);
+                }
+
+                return acc;
+            },
+            {definitions: [] as ComponentDefinitionBasic[], outputs: [] as WorkflowNodeOutput[]}
+        );
+
+        previousComponentDefinitions = result.definitions;
+        filteredWorkflowNodeOutputs = result.outputs;
     }
 
     const handleComponentsAndFlowControlsClick = () => {
@@ -131,17 +154,11 @@ export const useWorkflowLayout = () => {
         }
     };
 
-    const handleWorkflowCodeEditorClick = () => {
-        setShowWorkflowCodeEditorSheet(true);
-    };
+    const handleWorkflowCodeEditorClick = () => setShowWorkflowCodeEditorSheet(true);
 
-    const handleWorkflowInputsClick = () => {
-        setShowWorkflowInputsSheet(true);
-    };
+    const handleWorkflowInputsClick = () => setShowWorkflowInputsSheet(true);
 
-    const handleWorkflowOutputsClick = () => {
-        setShowWorkflowOutputsSheet(true);
-    };
+    const handleWorkflowOutputsClick = () => setShowWorkflowOutputsSheet(true);
 
     useEffect(() => {
         if (componentDefinitions) {

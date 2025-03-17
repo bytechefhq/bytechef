@@ -3,27 +3,37 @@ import {
     ActionDefinition,
     ComponentDefinitionBasic,
     type Property,
+    TaskDispatcherDefinitionBasic,
     TriggerDefinition,
 } from '@/shared/middleware/platform/configuration';
 import {Accordion, AccordionItem} from '@radix-ui/react-accordion';
 
 import DataPillPanelBodyPropertiesItem from './DataPillPanelBodyPropertiesItem';
 
-export interface ComponentActionI extends ActionDefinition {
-    componentDefinition: ComponentDefinitionBasic;
+interface BaseComponentOperationI {
+    workflowNodeName: string;
     outputSchema: Property;
     sampleOutput: object;
-    workflowNodeName: string;
 }
 
-export interface ComponentTriggerI extends TriggerDefinition {
+interface ComponentActionOperationI extends BaseComponentOperationI {
     componentDefinition: ComponentDefinitionBasic;
-    outputSchema: Property;
-    sampleOutput: object;
-    workflowNodeName: string;
+    actionDefinition: ActionDefinition;
+    taskDispatcherDefinition: never;
 }
 
-export type ComponentOperationType = ComponentActionI & ComponentTriggerI;
+interface ComponentTriggerOperationI extends BaseComponentOperationI {
+    componentDefinition: ComponentDefinitionBasic;
+    taskDispatcherDefinition: never;
+    triggerDefinition: TriggerDefinition;
+}
+
+interface TaskDispatcherOperationI extends BaseComponentOperationI {
+    componentDefinition: never;
+    taskDispatcherDefinition: TaskDispatcherDefinitionBasic;
+}
+
+export type ComponentOperationType = ComponentActionOperationI | ComponentTriggerOperationI | TaskDispatcherOperationI;
 
 interface DataPillPanelBodyProps {
     componentOperations: Array<ComponentOperationType>;
@@ -38,25 +48,19 @@ const DataPillPanelBody = ({componentOperations, dataPillFilterQuery}: DataPillP
                     <DataPillPanelBodyInputsItem />
                 </AccordionItem>
 
-                {componentOperations.map((componentOperation: ComponentOperationType, index: number) => {
-                    if (!componentOperation.componentDefinition) {
-                        return <></>;
-                    }
-
-                    return (
-                        <AccordionItem
-                            className="group"
-                            key={`accordion-item-${componentOperation.workflowNodeName}`}
-                            value={componentOperation.workflowNodeName}
-                        >
-                            <DataPillPanelBodyPropertiesItem
-                                componentOperation={componentOperation}
-                                dataPillFilterQuery={dataPillFilterQuery}
-                                sampleOutput={componentOperations[index].sampleOutput}
-                            />
-                        </AccordionItem>
-                    );
-                })}
+                {componentOperations.map((operation) => (
+                    <AccordionItem
+                        className="group"
+                        key={`accordion-item-${operation.workflowNodeName}`}
+                        value={operation.workflowNodeName}
+                    >
+                        <DataPillPanelBodyPropertiesItem
+                            componentOperation={operation}
+                            dataPillFilterQuery={dataPillFilterQuery}
+                            sampleOutput={operation.sampleOutput}
+                        />
+                    </AccordionItem>
+                ))}
             </Accordion>
         </div>
     </div>

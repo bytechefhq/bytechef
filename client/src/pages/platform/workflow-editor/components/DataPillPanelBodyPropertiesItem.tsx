@@ -30,7 +30,7 @@ const DataPillPanelBodyPropertiesItem = ({
         }))
     );
 
-    const {componentDefinition, workflowNodeName} = componentOperation;
+    const {workflowNodeName} = componentOperation;
 
     const outputSchema: PropertyAllType | undefined = componentOperation?.outputSchema;
 
@@ -43,7 +43,17 @@ const DataPillPanelBodyPropertiesItem = ({
           })
         : [];
 
-    const {icon, title} = componentDefinition;
+    let icon: string | undefined, title: string | undefined;
+
+    if (componentOperation.componentDefinition) {
+        icon = componentOperation.componentDefinition.icon;
+        title = componentOperation.componentDefinition.title;
+    }
+
+    if (componentOperation.taskDispatcherDefinition) {
+        icon = componentOperation.taskDispatcherDefinition.icon;
+        title = componentOperation.taskDispatcherDefinition.title;
+    }
 
     const currentComponentAction = componentActions.find((action) => action.workflowNodeName === workflowNodeName);
 
@@ -68,16 +78,18 @@ const DataPillPanelBodyPropertiesItem = ({
                         </div>
                     )}
 
-                    <div className="flex items-center text-sm">
+                    <h3 className="flex items-center text-sm">
                         {title}
 
-                        <div className="truncate pl-1 text-xs text-gray-400">({workflowNodeName})</div>
-                    </div>
+                        <span className="truncate pl-1 text-xs text-gray-400">({workflowNodeName})</span>
+                    </h3>
                 </div>
 
-                <span className="ml-auto mr-4 max-w-36 truncate rounded bg-muted px-2 py-1 text-xs">
-                    {currentComponentAction?.operationName}
-                </span>
+                {currentComponentAction?.operationName && (
+                    <span className="ml-auto mr-4 max-w-36 truncate rounded bg-muted px-2 py-1 text-xs">
+                        {currentComponentAction?.operationName}
+                    </span>
+                )}
 
                 <ChevronDownIcon className="size-5 text-gray-400 transition-transform duration-300 group-data-[state=open]:rotate-180" />
             </AccordionTrigger>
@@ -89,7 +101,7 @@ const DataPillPanelBodyPropertiesItem = ({
                 {outputSchema ? (
                     <>
                         <DataPill
-                            componentIcon={componentDefinition.icon}
+                            componentIcon={icon}
                             property={outputSchema}
                             root={true}
                             sampleOutput={sampleOutput}
@@ -109,7 +121,7 @@ const DataPillPanelBodyPropertiesItem = ({
                                 return (
                                     <div className="flex items-center space-x-3" key={property.name}>
                                         <DataPill
-                                            componentIcon={componentDefinition.icon}
+                                            componentIcon={icon}
                                             property={property}
                                             sampleOutput={sampleOutput}
                                             workflowNodeName={workflowNodeName}
@@ -138,9 +150,13 @@ const DataPillPanelBodyPropertiesItem = ({
                             action.
                         </p>
 
-                        <Button onClick={handleOutputTabRedirectClick} variant="secondary">
+                        <Button
+                            className="hover:bg-surface-brand-secondary-hover"
+                            onClick={handleOutputTabRedirectClick}
+                            variant="secondary"
+                        >
                             Go to
-                            <span className="pl-1 font-semibold">{currentComponentAction?.workflowNodeName}</span>
+                            <span className="-ml-1 font-semibold">{currentComponentAction?.workflowNodeName}</span>
                         </Button>
                     </div>
                 )}
