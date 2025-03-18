@@ -67,6 +67,7 @@
                     "animate-slide-right-fade",
                     "bg-accent",
                     "bg-background",
+                    "bg-destructive-foreground",
                     "bg-input",
                     "bg-muted",
                     "bg-popover",
