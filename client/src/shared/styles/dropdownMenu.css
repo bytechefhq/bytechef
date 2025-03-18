@@ -1,0 +1,22 @@
+.dropdown-menu-item {
+    @apply !cursor-pointer;
+    @apply !rounded-none;
+    @apply !px-4;
+    @apply !py-2;
+    @apply !justify-start;
+}
+
+.dropdown-menu-item-default {
+    @apply dropdown-menu-item;
+    @apply hover:!bg-surface-neutral-primary-hover;
+    @apply focus:!bg-surface-neutral-primary-hover;
+}
+
+.dropdown-menu-item-destructive {
+    @apply dropdown-menu-item;
+    @apply !text-destructive;
+    @apply hover:!bg-surface-error-secondary;
+    @apply hover:!text-destructive;
+    @apply focus:!bg-surface-error-secondary;
+    @apply focus:!text-destructive;
+}
