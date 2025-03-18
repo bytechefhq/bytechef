@@ -1,3 +1,4 @@
+import '@/shared/styles/dropdownMenu.css';
 import {Button} from '@/components/ui/button';
 import {Separator} from '@/components/ui/separator';
 import {CopyIcon, EditIcon, Trash2Icon, UploadIcon} from 'lucide-react';
@@ -23,24 +24,16 @@ const WorkflowTabButtons = ({
 
     return (
         <div className="flex flex-col" onClick={handleButtonClick}>
-            <Button
-                className="justify-start rounded-none hover:bg-surface-neutral-primary-hover"
-                onClick={onShowEditWorkflowDialog}
-                variant="ghost"
-            >
+            <Button className="dropdown-menu-item-default" onClick={onShowEditWorkflowDialog} variant="ghost">
                 <EditIcon /> Edit
             </Button>
 
-            <Button
-                className="justify-start rounded-none hover:bg-surface-neutral-primary-hover"
-                onClick={onDuplicateWorkflow}
-                variant="ghost"
-            >
+            <Button className="dropdown-menu-item-default" onClick={onDuplicateWorkflow} variant="ghost">
                 <CopyIcon /> Duplicate
             </Button>
 
             <Button
-                className="justify-start rounded-none hover:bg-surface-neutral-primary-hover"
+                className="dropdown-menu-item-default"
                 onClick={() => (window.location.href = `/api/automation/internal/workflows/${workflowId}/export`)}
                 variant="ghost"
             >
@@ -50,7 +43,7 @@ const WorkflowTabButtons = ({
             <Separator />
 
             <Button
-                className="justify-start rounded-none text-destructive hover:bg-surface-error-secondary hover:text-destructive"
+                className="dropdown-menu-item-destructive"
                 onClick={() => onShowDeleteWorkflowAlertDialog()}
                 variant="ghost"
             >

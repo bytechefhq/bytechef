@@ -1,3 +1,4 @@
+import '@/shared/styles/dropdownMenu.css';
 import {
     AlertDialog,
     AlertDialogAction,
@@ -42,7 +43,18 @@ import {useGetWorkflowQuery} from '@/shared/queries/automation/workflows.queries
 import {useFeatureFlagsStore} from '@/shared/stores/useFeatureFlagsStore';
 import {ChevronDownIcon} from '@radix-ui/react-icons';
 import {useQueryClient} from '@tanstack/react-query';
-import {EllipsisVerticalIcon} from 'lucide-react';
+import {
+    CopyIcon,
+    DownloadIcon,
+    EditIcon,
+    EllipsisVerticalIcon,
+    GitBranchIcon,
+    GitPullRequestArrowIcon,
+    PlusIcon,
+    SendIcon,
+    Trash2Icon,
+    WorkflowIcon,
+} from 'lucide-react';
 import {ChangeEvent, useRef, useState} from 'react';
 import {Link, useNavigate, useSearchParams} from 'react-router-dom';
 
@@ -179,7 +191,7 @@ const ProjectListItem = ({project, projectGitConfiguration, remainingTags}: Proj
 
     return (
         <>
-            <div className="flex w-full items-center justify-between rounded-md px-2 hover:bg-muted/50">
+            <div className="flex w-full items-center justify-between rounded-md px-2 hover:bg-destructive-foreground">
                 <div className="flex flex-1 items-center py-5 group-data-[state='open']:border-none">
                     <div className="flex-1">
                         <div className="flex items-center gap-2">
@@ -264,7 +276,7 @@ const ProjectListItem = ({project, projectGitConfiguration, remainingTags}: Proj
 
                             <Tooltip>
                                 <TooltipTrigger>
-                                    <div className="flex items-center text-sm text-gray-500 sm:mt-0">
+                                    <div className="flex items-center text-sm text-muted-foreground sm:mt-0">
                                         {project.lastPublishedDate ? (
                                             <span className="text-xs">
                                                 {`Published at ${project.lastPublishedDate?.toLocaleDateString()} ${project.lastPublishedDate?.toLocaleTimeString()}`}
@@ -282,75 +294,95 @@ const ProjectListItem = ({project, projectGitConfiguration, remainingTags}: Proj
                         <DropdownMenu>
                             <DropdownMenuTrigger asChild>
                                 <Button size="icon" variant="ghost">
-                                    <EllipsisVerticalIcon className="size-4 hover:cursor-pointer" />
+                                    <EllipsisVerticalIcon className="size-4 cursor-pointer" />
                                 </Button>
                             </DropdownMenuTrigger>
 
-                            <DropdownMenuContent align="end">
-                                <DropdownMenuItem onClick={() => setShowEditDialog(true)}>Edit</DropdownMenuItem>
-
-                                {project.projectWorkflowIds && project.projectWorkflowIds?.length > 0 && (
-                                    <DropdownMenuItem
-                                        onClick={() =>
-                                            navigate(
-                                                `/automation/projects/${project?.id}/project-workflows/${project?.projectWorkflowIds![0]}`
-                                            )
-                                        }
-                                    >
-                                        View Workflows
-                                    </DropdownMenuItem>
-                                )}
-
-                                <DropdownMenuItem onClick={() => duplicateProjectMutation.mutate(project.id!)}>
-                                    Duplicate
+                            <DropdownMenuContent align="end" className="p-0">
+                                <DropdownMenuItem
+                                    className="dropdown-menu-item-default"
+                                    onClick={() => setShowPublishProjectDialog(true)}
+                                >
+                                    <SendIcon /> Publish
                                 </DropdownMenuItem>
 
-                                <DropdownMenuItem onClick={() => setShowWorkflowDialog(true)}>
-                                    New Workflow
-                                </DropdownMenuItem>
+                                <DropdownMenuSeparator className="m-0" />
 
-                                <DropdownMenuItem onClick={() => setShowPublishProjectDialog(true)}>
-                                    Publish
+                                <DropdownMenuItem
+                                    className="dropdown-menu-item-default"
+                                    onClick={() => setShowEditDialog(true)}
+                                >
+                                    <EditIcon /> Edit
                                 </DropdownMenuItem>
 
                                 <DropdownMenuItem
+                                    className="dropdown-menu-item-default"
+                                    onClick={() => duplicateProjectMutation.mutate(project.id!)}
+                                >
+                                    <CopyIcon /> Duplicate
+                                </DropdownMenuItem>
+
+                                <DropdownMenuSeparator className="m-0" />
+
+                                <DropdownMenuItem
+                                    className="dropdown-menu-item-default"
                                     onClick={() => {
                                         if (hiddenFileInputRef.current) {
                                             hiddenFileInputRef.current.click();
                                         }
                                     }}
                                 >
-                                    Import Workflow
+                                    <DownloadIcon /> Import Workflow
                                 </DropdownMenuItem>
 
-                                <DropdownMenuSeparator />
+                                {project.projectWorkflowIds && project.projectWorkflowIds?.length > 0 && (
+                                    <DropdownMenuItem
+                                        className="dropdown-menu-item-default"
+                                        onClick={() =>
+                                            navigate(
+                                                `/automation/projects/${project?.id}/project-workflows/${project?.projectWorkflowIds![0]}`
+                                            )
+                                        }
+                                    >
+                                        <WorkflowIcon /> View Workflows
+                                    </DropdownMenuItem>
+                                )}
+
+                                <DropdownMenuItem
+                                    className="dropdown-menu-item-default"
+                                    onClick={() => setShowWorkflowDialog(true)}
+                                >
+                                    <PlusIcon /> New Workflow
+                                </DropdownMenuItem>
+
+                                <DropdownMenuSeparator className="m-0" />
 
                                 {ff_1039 && (
                                     <EEVersion hidden={true}>
                                         <DropdownMenuItem
-                                            className="justify-start rounded-none hover:bg-surface-neutral-primary-hover"
+                                            className="dropdown-menu-item-default"
                                             disabled={!projectGitConfiguration?.enabled}
                                             onClick={handlePullProjectFromGitClick}
                                         >
-                                            Pull Project from Git
+                                            <GitPullRequestArrowIcon /> Pull Project from Git
                                         </DropdownMenuItem>
 
                                         <DropdownMenuItem
-                                            className="justify-start hover:bg-surface-neutral-primary-hover"
+                                            className="dropdown-menu-item-default"
                                             onClick={() => setShowProjectGitConfigurationDialog(true)}
                                         >
-                                            Git Configuration
+                                            <GitBranchIcon /> Git Configuration
                                         </DropdownMenuItem>
 
-                                        <DropdownMenuSeparator />
+                                        <DropdownMenuSeparator className="m-0" />
                                     </EEVersion>
                                 )}
 
                                 <DropdownMenuItem
-                                    className="text-destructive"
+                                    className="dropdown-menu-item-destructive"
                                     onClick={() => setShowDeleteDialog(true)}
                                 >
-                                    Delete
+                                    <Trash2Icon /> Delete
                                 </DropdownMenuItem>
                             </DropdownMenuContent>
                         </DropdownMenu>
@@ -370,10 +402,12 @@ const ProjectListItem = ({project, projectGitConfiguration, remainingTags}: Proj
                     </AlertDialogHeader>
 
                     <AlertDialogFooter>
-                        <AlertDialogCancel onClick={() => setShowDeleteDialog(false)}>Cancel</AlertDialogCancel>
+                        <AlertDialogCancel className="shadow-none" onClick={() => setShowDeleteDialog(false)}>
+                            Cancel
+                        </AlertDialogCancel>
 
                         <AlertDialogAction
-                            className="bg-destructive"
+                            className="bg-surface-destructive-primary shadow-none hover:bg-surface-destructive-primary-hover active:bg-surface-destructive-primary-active"
                             onClick={() => {
                                 if (project.id) {
                                     deleteProjectMutation.mutate(project.id);
