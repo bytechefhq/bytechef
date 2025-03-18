@@ -1,3 +1,4 @@
+import '@/shared/styles/dropdownMenu.css';
 import {
     AlertDialog,
     AlertDialogAction,
@@ -30,7 +31,7 @@ import {ProjectKeys} from '@/shared/queries/automation/projects.queries';
 import {WorkflowKeys, useGetWorkflowQuery} from '@/shared/queries/automation/workflows.queries';
 import {WorkflowTestConfigurationKeys} from '@/shared/queries/platform/workflowTestConfigurations.queries';
 import {useQueryClient} from '@tanstack/react-query';
-import {EllipsisVerticalIcon} from 'lucide-react';
+import {CopyIcon, EditIcon, EllipsisVerticalIcon, Trash2Icon, UploadIcon} from 'lucide-react';
 import {useState} from 'react';
 import InlineSVG from 'react-inlinesvg';
 import {Link, useSearchParams} from 'react-router-dom';
@@ -95,7 +96,10 @@ const ProjectWorkflowListItem = ({
     });
 
     return (
-        <li className="flex items-center justify-between rounded-md px-2 py-1 hover:bg-gray-50" key={workflow.id}>
+        <li
+            className="flex items-center justify-between rounded-md px-2 py-1 hover:bg-destructive-foreground"
+            key={workflow.id}
+        >
             <Link
                 className="flex flex-1 items-center"
                 to={`/automation/projects/${project.id}/project-workflows/${workflow.projectWorkflowId}?${searchParams}`}
@@ -134,7 +138,7 @@ const ProjectWorkflowListItem = ({
 
             <div className="flex justify-end gap-x-6">
                 <Tooltip>
-                    <TooltipTrigger className="flex items-center text-sm text-gray-500">
+                    <TooltipTrigger className="flex items-center text-sm text-muted-foreground">
                         <span className="text-xs">
                             {`Updated at ${workflow.lastModifiedDate?.toLocaleDateString()} ${workflow.lastModifiedDate?.toLocaleTimeString()}`}
                         </span>
@@ -146,21 +150,23 @@ const ProjectWorkflowListItem = ({
                 <DropdownMenu>
                     <DropdownMenuTrigger asChild>
                         <Button size="icon" variant="ghost">
-                            <EllipsisVerticalIcon className="size-4 hover:cursor-pointer" />
+                            <EllipsisVerticalIcon className="size-4 cursor-pointer" />
                         </Button>
                     </DropdownMenuTrigger>
 
-                    <DropdownMenuContent align="end">
+                    <DropdownMenuContent align="end" className="p-0">
                         <DropdownMenuItem
+                            className="dropdown-menu-item-default"
                             onClick={() => {
                                 setShowEditDialog(true);
                             }}
                         >
-                            Edit
+                            <EditIcon /> Edit
                         </DropdownMenuItem>
 
                         {project && workflow && (
                             <DropdownMenuItem
+                                className="dropdown-menu-item-default"
                                 onClick={() =>
                                     duplicateWorkflowMutation.mutate({
                                         id: project.id!,
@@ -168,27 +174,28 @@ const ProjectWorkflowListItem = ({
                                     })
                                 }
                             >
-                                Duplicate
+                                <CopyIcon /> Duplicate
                             </DropdownMenuItem>
                         )}
 
                         <DropdownMenuItem
+                            className="dropdown-menu-item-default"
                             onClick={() =>
                                 (window.location.href = `/api/automation/internal/workflows/${workflow.id}/export`)
                             }
                         >
-                            Export
+                            <UploadIcon /> Export
                         </DropdownMenuItem>
 
-                        <DropdownMenuSeparator />
+                        <DropdownMenuSeparator className="m-0" />
 
                         <DropdownMenuItem
-                            className="text-destructive"
+                            className="dropdown-menu-item-destructive"
                             onClick={() => {
                                 setShowDeleteDialog(true);
                             }}
                         >
-                            Delete
+                            <Trash2Icon /> Delete
                         </DropdownMenuItem>
                     </DropdownMenuContent>
                 </DropdownMenu>
@@ -205,10 +212,12 @@ const ProjectWorkflowListItem = ({
                     </AlertDialogHeader>
 
                     <AlertDialogFooter>
-                        <AlertDialogCancel onClick={() => setShowDeleteDialog(false)}>Cancel</AlertDialogCancel>
+                        <AlertDialogCancel className="shadow-none" onClick={() => setShowDeleteDialog(false)}>
+                            Cancel
+                        </AlertDialogCancel>
 
                         <AlertDialogAction
-                            className="bg-destructive"
+                            className="bg-surface-destructive-primary shadow-none hover:bg-surface-destructive-primary-hover active:bg-surface-destructive-primary-active"
                             onClick={() => {
                                 if (workflow?.id) {
                                     deleteWorkflowMutation.mutate({

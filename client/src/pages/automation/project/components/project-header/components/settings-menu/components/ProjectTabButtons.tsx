@@ -1,3 +1,4 @@
+import '@/shared/styles/dropdownMenu.css';
 import {Button} from '@/components/ui/button';
 import {Separator} from '@/components/ui/separator';
 import EEVersion from '@/shared/edition/EEVersion';
@@ -45,23 +46,19 @@ const ProjectTabButtons = ({
     return (
         <div className="flex flex-col" onClick={handleButtonClick}>
             <Button
-                className="justify-start rounded-none hover:bg-surface-neutral-primary-hover"
+                className="dropdown-menu-item-default"
                 onClick={() => onShowEditProjectDialogClick()}
                 variant="ghost"
             >
                 <EditIcon /> Edit
             </Button>
 
-            <Button
-                className="justify-start rounded-none hover:bg-surface-neutral-primary-hover"
-                onClick={onDuplicateProjectClick}
-                variant="ghost"
-            >
+            <Button className="dropdown-menu-item-default" onClick={onDuplicateProjectClick} variant="ghost">
                 <CopyIcon /> Duplicate
             </Button>
 
             <Button
-                className="justify-start rounded-none hover:bg-surface-neutral-primary-hover"
+                className="dropdown-menu-item-default"
                 onClick={() => {
                     if (hiddenFileInputRef.current) {
                         hiddenFileInputRef.current.click();
@@ -77,7 +74,7 @@ const ProjectTabButtons = ({
             {ff_1039 && (
                 <EEVersion hidden={true}>
                     <Button
-                        className="justify-start rounded-none hover:bg-surface-neutral-primary-hover"
+                        className="dropdown-menu-item-default"
                         disabled={!projectGitConfigurationEnabled}
                         onClick={onPullProjectFromGitClick}
                         variant="ghost"
@@ -86,7 +83,7 @@ const ProjectTabButtons = ({
                     </Button>
 
                     <Button
-                        className="justify-start hover:bg-surface-neutral-primary-hover"
+                        className="dropdown-menu-item-default"
                         onClick={onShowProjectGitConfigurationDialog}
                         variant="ghost"
                     >
@@ -97,21 +94,13 @@ const ProjectTabButtons = ({
                 </EEVersion>
             )}
 
-            <Button
-                className="justify-start rounded-none hover:bg-surface-neutral-primary-hover"
-                onClick={onShowProjectVersionHistorySheet}
-                variant="ghost"
-            >
+            <Button className="dropdown-menu-item-default" onClick={onShowProjectVersionHistorySheet} variant="ghost">
                 <HistoryIcon /> Project History
             </Button>
 
             <Separator />
 
-            <Button
-                className="justify-start rounded-none text-destructive hover:bg-surface-error-secondary hover:text-destructive"
-                onClick={onDeleteProjectClick}
-                variant="ghost"
-            >
+            <Button className="dropdown-menu-item-destructive" onClick={onDeleteProjectClick} variant="ghost">
                 <Trash2Icon /> Delete
             </Button>
         </div>
