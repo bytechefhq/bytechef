@@ -1,4 +1,4 @@
-.dropdown-menu-item {
+.dropdown-menu-item-base {
     @apply !cursor-pointer;
     @apply !rounded-none;
     @apply !px-4;
@@ -6,14 +6,14 @@
     @apply !justify-start;
 }
 
-.dropdown-menu-item-default {
-    @apply dropdown-menu-item;
+.dropdown-menu-item {
+    @apply dropdown-menu-item-base;
     @apply hover:!bg-surface-neutral-primary-hover;
     @apply focus:!bg-surface-neutral-primary-hover;
 }
 
 .dropdown-menu-item-destructive {
-    @apply dropdown-menu-item;
+    @apply dropdown-menu-item-base;
     @apply !text-destructive;
     @apply hover:!bg-surface-error-secondary;
     @apply hover:!text-destructive;

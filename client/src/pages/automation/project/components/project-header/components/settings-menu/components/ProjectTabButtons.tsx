@@ -45,20 +45,16 @@ const ProjectTabButtons = ({
 
     return (
         <div className="flex flex-col" onClick={handleButtonClick}>
-            <Button
-                className="dropdown-menu-item-default"
-                onClick={() => onShowEditProjectDialogClick()}
-                variant="ghost"
-            >
+            <Button className="dropdown-menu-item" onClick={() => onShowEditProjectDialogClick()} variant="ghost">
                 <EditIcon /> Edit
             </Button>
 
-            <Button className="dropdown-menu-item-default" onClick={onDuplicateProjectClick} variant="ghost">
+            <Button className="dropdown-menu-item" onClick={onDuplicateProjectClick} variant="ghost">
                 <CopyIcon /> Duplicate
             </Button>
 
             <Button
-                className="dropdown-menu-item-default"
+                className="dropdown-menu-item"
                 onClick={() => {
                     if (hiddenFileInputRef.current) {
                         hiddenFileInputRef.current.click();
@@ -74,7 +70,7 @@ const ProjectTabButtons = ({
             {ff_1039 && (
                 <EEVersion hidden={true}>
                     <Button
-                        className="dropdown-menu-item-default"
+                        className="dropdown-menu-item"
                         disabled={!projectGitConfigurationEnabled}
                         onClick={onPullProjectFromGitClick}
                         variant="ghost"
@@ -83,7 +79,7 @@ const ProjectTabButtons = ({
                     </Button>
 
                     <Button
-                        className="dropdown-menu-item-default"
+                        className="dropdown-menu-item"
                         onClick={onShowProjectGitConfigurationDialog}
                         variant="ghost"
                     >
@@ -94,7 +90,7 @@ const ProjectTabButtons = ({
                 </EEVersion>
             )}
 
-            <Button className="dropdown-menu-item-default" onClick={onShowProjectVersionHistorySheet} variant="ghost">
+            <Button className="dropdown-menu-item" onClick={onShowProjectVersionHistorySheet} variant="ghost">
                 <HistoryIcon /> Project History
             </Button>
 

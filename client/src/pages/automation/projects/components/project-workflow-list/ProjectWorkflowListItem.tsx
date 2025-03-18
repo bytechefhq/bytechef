@@ -156,7 +156,7 @@ const ProjectWorkflowListItem = ({
 
                     <DropdownMenuContent align="end" className="p-0">
                         <DropdownMenuItem
-                            className="dropdown-menu-item-default"
+                            className="dropdown-menu-item"
                             onClick={() => {
                                 setShowEditDialog(true);
                             }}
@@ -166,7 +166,7 @@ const ProjectWorkflowListItem = ({
 
                         {project && workflow && (
                             <DropdownMenuItem
-                                className="dropdown-menu-item-default"
+                                className="dropdown-menu-item"
                                 onClick={() =>
                                     duplicateWorkflowMutation.mutate({
                                         id: project.id!,
@@ -179,7 +179,7 @@ const ProjectWorkflowListItem = ({
                         )}
 
                         <DropdownMenuItem
-                            className="dropdown-menu-item-default"
+                            className="dropdown-menu-item"
                             onClick={() =>
                                 (window.location.href = `/api/automation/internal/workflows/${workflow.id}/export`)
                             }
