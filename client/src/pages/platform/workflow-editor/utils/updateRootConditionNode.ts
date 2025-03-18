@@ -24,7 +24,7 @@ export default function updateRootConditionNode({
     updatedParentConditionTask,
     workflow,
 }: UpdateRootConditionNodeProps): NodeDataType {
-    let currentTaskNode = updatedParentConditionNodeData;
+    let currentTaskNodeData = updatedParentConditionNodeData;
 
     let currentTaskNodeConditionData = updatedParentConditionNodeData.conditionData;
 
@@ -48,7 +48,7 @@ export default function updateRootConditionNode({
 
         const workflowTasks = workflow.tasks;
 
-        let currentTask = workflowTasks?.find((task) => task.name === currentTaskNode.componentName);
+        let currentTask = workflowTasks?.find((task) => task.name === currentTaskNodeData.componentName);
 
         if (!currentTask) {
             currentTask = updatedParentConditionTask;
@@ -67,17 +67,10 @@ export default function updateRootConditionNode({
             [currentConditionCase]: parentConditionCaseTasks,
         };
 
-        currentTaskNode = {
-            ...parentConditionTaskNode,
-            componentName: (parentConditionTaskNode.data as NodeDataType).componentName,
-            name: parentConditionTaskNode.id,
-            type: parentConditionTaskNode.type || 'workflow',
-            version: Number((parentConditionTaskNode.data as NodeDataType)?.type?.split('/v')[1]),
-            workflowNodeName: parentConditionTaskNode.id,
-        };
+        currentTaskNodeData = parentConditionTaskNode.data as NodeDataType;
 
         currentTaskNodeConditionData = (parentConditionTaskNode.data as NodeDataType).conditionData;
     }
 
-    return currentTaskNode;
+    return currentTaskNodeData;
 }
