@@ -24,16 +24,16 @@ const WorkflowTabButtons = ({
 
     return (
         <div className="flex flex-col" onClick={handleButtonClick}>
-            <Button className="dropdown-menu-item-default" onClick={onShowEditWorkflowDialog} variant="ghost">
+            <Button className="dropdown-menu-item" onClick={onShowEditWorkflowDialog} variant="ghost">
                 <EditIcon /> Edit
             </Button>
 
-            <Button className="dropdown-menu-item-default" onClick={onDuplicateWorkflow} variant="ghost">
+            <Button className="dropdown-menu-item" onClick={onDuplicateWorkflow} variant="ghost">
                 <CopyIcon /> Duplicate
             </Button>
 
             <Button
-                className="dropdown-menu-item-default"
+                className="dropdown-menu-item"
                 onClick={() => (window.location.href = `/api/automation/internal/workflows/${workflowId}/export`)}
                 variant="ghost"
             >

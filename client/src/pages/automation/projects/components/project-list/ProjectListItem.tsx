@@ -300,7 +300,7 @@ const ProjectListItem = ({project, projectGitConfiguration, remainingTags}: Proj
 
                             <DropdownMenuContent align="end" className="p-0">
                                 <DropdownMenuItem
-                                    className="dropdown-menu-item-default"
+                                    className="dropdown-menu-item"
                                     onClick={() => setShowPublishProjectDialog(true)}
                                 >
                                     <SendIcon /> Publish
@@ -309,14 +309,14 @@ const ProjectListItem = ({project, projectGitConfiguration, remainingTags}: Proj
                                 <DropdownMenuSeparator className="m-0" />
 
                                 <DropdownMenuItem
-                                    className="dropdown-menu-item-default"
+                                    className="dropdown-menu-item"
                                     onClick={() => setShowEditDialog(true)}
                                 >
                                     <EditIcon /> Edit
                                 </DropdownMenuItem>
 
                                 <DropdownMenuItem
-                                    className="dropdown-menu-item-default"
+                                    className="dropdown-menu-item"
                                     onClick={() => duplicateProjectMutation.mutate(project.id!)}
                                 >
                                     <CopyIcon /> Duplicate
@@ -325,7 +325,7 @@ const ProjectListItem = ({project, projectGitConfiguration, remainingTags}: Proj
                                 <DropdownMenuSeparator className="m-0" />
 
                                 <DropdownMenuItem
-                                    className="dropdown-menu-item-default"
+                                    className="dropdown-menu-item"
                                     onClick={() => {
                                         if (hiddenFileInputRef.current) {
                                             hiddenFileInputRef.current.click();
@@ -337,7 +337,7 @@ const ProjectListItem = ({project, projectGitConfiguration, remainingTags}: Proj
 
                                 {project.projectWorkflowIds && project.projectWorkflowIds?.length > 0 && (
                                     <DropdownMenuItem
-                                        className="dropdown-menu-item-default"
+                                        className="dropdown-menu-item"
                                         onClick={() =>
                                             navigate(
                                                 `/automation/projects/${project?.id}/project-workflows/${project?.projectWorkflowIds![0]}`
@@ -349,7 +349,7 @@ const ProjectListItem = ({project, projectGitConfiguration, remainingTags}: Proj
                                 )}
 
                                 <DropdownMenuItem
-                                    className="dropdown-menu-item-default"
+                                    className="dropdown-menu-item"
                                     onClick={() => setShowWorkflowDialog(true)}
                                 >
                                     <PlusIcon /> New Workflow
@@ -360,7 +360,7 @@ const ProjectListItem = ({project, projectGitConfiguration, remainingTags}: Proj
                                 {ff_1039 && (
                                     <EEVersion hidden={true}>
                                         <DropdownMenuItem
-                                            className="dropdown-menu-item-default"
+                                            className="dropdown-menu-item"
                                             disabled={!projectGitConfiguration?.enabled}
                                             onClick={handlePullProjectFromGitClick}
                                         >
@@ -368,7 +368,7 @@ const ProjectListItem = ({project, projectGitConfiguration, remainingTags}: Proj
                                         </DropdownMenuItem>
 
                                         <DropdownMenuItem
-                                            className="dropdown-menu-item-default"
+                                            className="dropdown-menu-item"
                                             onClick={() => setShowProjectGitConfigurationDialog(true)}
                                         >
                                             <GitBranchIcon /> Git Configuration
