@@ -41,7 +41,7 @@ public abstract class AbstractDispatcherPreSendProcessor {
                 projectDeploymentId, workflowId, workflowNodeName);
 
         return MapUtils.toMap(
-            projectDeploymentWorkflowConnections, ProjectDeploymentWorkflowConnection::getKey,
+            projectDeploymentWorkflowConnections, ProjectDeploymentWorkflowConnection::getWorkflowConnectionKey,
             ProjectDeploymentWorkflowConnection::getConnectionId);
     }
 }

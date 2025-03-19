@@ -31,8 +31,8 @@ public class ProjectDeploymentWorkflowConnection {
     @Column("connection_id")
     private AggregateReference<Connection, Long> connectionId;
 
-    @Column
-    private String key;
+    @Column("workflow_connection_key")
+    private String workflowConnectionKey;
 
     @Column("workflow_node_name")
     private String workflowNodeName;
@@ -41,9 +41,11 @@ public class ProjectDeploymentWorkflowConnection {
     }
 
     @Default
-    public ProjectDeploymentWorkflowConnection(long connectionId, String key, String workflowNodeName) {
+    public ProjectDeploymentWorkflowConnection(
+        long connectionId, String workflowConnectionKey, String workflowNodeName) {
+
         this.connectionId = AggregateReference.to(connectionId);
-        this.key = key;
+        this.workflowConnectionKey = workflowConnectionKey;
         this.workflowNodeName = workflowNodeName;
     }
 
@@ -57,21 +59,22 @@ public class ProjectDeploymentWorkflowConnection {
             return false;
         }
 
-        return Objects.equals(connectionId, that.connectionId) && Objects.equals(key, that.key)
-            && Objects.equals(workflowNodeName, that.workflowNodeName);
+        return Objects.equals(connectionId, that.connectionId) &&
+            Objects.equals(workflowConnectionKey, that.workflowConnectionKey) &&
+            Objects.equals(workflowNodeName, that.workflowNodeName);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(connectionId, key, workflowNodeName);
+        return Objects.hash(connectionId, workflowConnectionKey, workflowNodeName);
     }
 
     public Long getConnectionId() {
         return connectionId.getId();
     }
 
-    public String getKey() {
-        return key;
+    public String getWorkflowConnectionKey() {
+        return workflowConnectionKey;
     }
 
     public String getWorkflowNodeName() {
@@ -82,7 +85,7 @@ public class ProjectDeploymentWorkflowConnection {
     public String toString() {
         return "ProjectDeploymentWorkflowConnection{" +
             "connectionId=" + connectionId +
-            ", key='" + key + '\'' +
+            ", workflowConnectionKey='" + workflowConnectionKey + '\'' +
             ", workflowNodeName='" + workflowNodeName + '\'' +
             '}';
     }

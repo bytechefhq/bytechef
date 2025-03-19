@@ -82,7 +82,7 @@ public class ProjectDeploymentWorkflowServiceImpl implements ProjectDeploymentWo
             .stream()
             .filter(projectDeploymentWorkflowConnection -> Objects
                 .equals(projectDeploymentWorkflowConnection.getWorkflowNodeName(), workflowNodeName) &&
-                Objects.equals(projectDeploymentWorkflowConnection.getKey(), workflowConnectionKey))
+                Objects.equals(projectDeploymentWorkflowConnection.getWorkflowConnectionKey(), workflowConnectionKey))
             .findFirst();
     }
 

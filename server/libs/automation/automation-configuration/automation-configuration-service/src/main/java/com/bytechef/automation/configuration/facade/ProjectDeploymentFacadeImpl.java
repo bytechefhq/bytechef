@@ -696,7 +696,7 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
 
             ComponentConnection componentConnection = componentConnectionFacade.getComponentConnection(
                 workflow.getId(), projectDeploymentWorkflowConnection.getWorkflowNodeName(),
-                projectDeploymentWorkflowConnection.getKey());
+                projectDeploymentWorkflowConnection.getWorkflowConnectionKey());
 
             if (!Objects.equals(connection.getComponentName(), componentConnection.componentName())) {
                 throw new IllegalArgumentException(

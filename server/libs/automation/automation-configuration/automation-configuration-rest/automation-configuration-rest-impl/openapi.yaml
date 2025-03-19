@@ -1047,14 +1047,14 @@ components:
       type: "object"
       required:
         - "connectionId"
-        - "key"
+        - "workflowConnectionKey"
         - "workflowNodeName"
       properties:
         connectionId:
           description: "The connection id"
           type: "integer"
           format: "int64"
-        key:
+        workflowConnectionKey:
           description: "The connection key under which a connection is defined in\
             \ a workflow definition."
           type: "string"
