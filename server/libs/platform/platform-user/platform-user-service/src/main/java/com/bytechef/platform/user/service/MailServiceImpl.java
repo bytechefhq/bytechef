@@ -166,7 +166,7 @@ public class MailServiceImpl implements MailService {
 
             log.debug("Sent email to User '{}'", to);
         } catch (MailException | MessagingException e) {
-            log.warn("Email could not be sent to user '{}'", to, e);
+            log.error("Email could not be sent to user '{}'", to, e);
         }
     }
 }
