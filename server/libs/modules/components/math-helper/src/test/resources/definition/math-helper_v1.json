@@ -121,9 +121,9 @@
       "controlType" : "NUMBER"
     } ],
     "title" : "Addition",
-    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "perform" : { }
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -231,9 +231,9 @@
       "controlType" : "NUMBER"
     } ],
     "title" : "Division",
-    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "perform" : { }
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -341,9 +341,9 @@
       "controlType" : "NUMBER"
     } ],
     "title" : "Modulo",
-    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "perform" : { }
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -451,9 +451,9 @@
       "controlType" : "NUMBER"
     } ],
     "title" : "Multiplication",
-    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "perform" : { }
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -561,11 +561,11 @@
       "controlType" : "NUMBER"
     } ],
     "title" : "Subtraction",
-    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "perform" : { }
   } ],
   "clusterElements" : null,
-  "triggers" : null,
-  "unifiedApi" : null
+  "unifiedApi" : null,
+  "triggers" : null
 }

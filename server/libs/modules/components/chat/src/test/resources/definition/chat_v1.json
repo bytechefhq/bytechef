@@ -162,15 +162,15 @@
       "minItems" : null,
       "multipleValues" : null,
       "options" : null,
-      "optionsDataSource" : null,
-      "controlType" : "ARRAY_BUILDER"
+      "controlType" : "ARRAY_BUILDER",
+      "optionsDataSource" : null
     } ],
     "title" : "Response to Chat Request",
+    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
-    "perform" : { }
+    "workflowNodeDescription" : null
   } ],
-  "clusterElements" : null,
+  "unifiedApi" : null,
   "triggers" : [ {
     "batch" : null,
     "deprecated" : null,
@@ -352,11 +352,11 @@
             "minItems" : null,
             "multipleValues" : null,
             "options" : null,
-            "optionsDataSource" : null,
-            "controlType" : "ARRAY_BUILDER"
+            "controlType" : "ARRAY_BUILDER",
+            "optionsDataSource" : null
           } ],
-          "optionsDataSource" : null,
-          "controlType" : "OBJECT_BUILDER"
+          "controlType" : "OBJECT_BUILDER",
+          "optionsDataSource" : null
         },
         "sampleOutput" : null,
         "placeholder" : null
@@ -533,11 +533,11 @@
           "minItems" : null,
           "multipleValues" : null,
           "options" : null,
-          "optionsDataSource" : null,
-          "controlType" : "ARRAY_BUILDER"
+          "controlType" : "ARRAY_BUILDER",
+          "optionsDataSource" : null
         } ],
-        "optionsDataSource" : null,
-        "controlType" : "OBJECT_BUILDER"
+        "controlType" : "OBJECT_BUILDER",
+        "optionsDataSource" : null
       },
       "sampleOutput" : null
     },
@@ -566,25 +566,25 @@
         "label" : "Embedded Chat",
         "value" : 2
       } ],
-      "optionsDataSource" : null,
-      "controlType" : "SELECT"
+      "controlType" : "SELECT",
+      "optionsDataSource" : null
     } ],
     "title" : "New Chat Request",
     "type" : "STATIC_WEBHOOK",
     "webhookRawBody" : null,
     "workflowSyncExecution" : true,
-    "dynamicWebhookRefresh" : null,
-    "processErrorResponse" : null,
-    "webhookValidateOnEnable" : null,
-    "workflowNodeDescription" : null,
+    "deduplicate" : null,
+    "poll" : null,
     "webhookDisable" : null,
     "webhookEnable" : null,
     "webhookRequest" : { },
     "listenerDisable" : null,
     "listenerEnable" : null,
     "webhookValidate" : null,
-    "deduplicate" : null,
-    "poll" : null
+    "dynamicWebhookRefresh" : null,
+    "processErrorResponse" : null,
+    "webhookValidateOnEnable" : null,
+    "workflowNodeDescription" : null
   } ],
-  "unifiedApi" : null
+  "clusterElements" : null
 }

@@ -63,8 +63,6 @@
       "title" : "API Key",
       "type" : "API_KEY",
       "acquire" : null,
-      "oauth2AuthorizationExtraQueryParameters" : null,
-      "authorizationCallback" : null,
       "apply" : null,
       "clientId" : null,
       "pkce" : null,
@@ -74,7 +72,9 @@
       "tokenUrl" : null,
       "authorizationUrl" : null,
       "clientSecret" : null,
-      "refreshToken" : null
+      "refreshToken" : null,
+      "authorizationCallback" : null,
+      "oauth2AuthorizationExtraQueryParameters" : null
     }, {
       "detectOn" : null,
       "description" : null,
@@ -124,8 +124,6 @@
       "title" : "OAuth2 Authorization Code",
       "type" : "OAUTH2_AUTHORIZATION_CODE",
       "acquire" : null,
-      "oauth2AuthorizationExtraQueryParameters" : null,
-      "authorizationCallback" : null,
       "apply" : null,
       "clientId" : null,
       "pkce" : null,
@@ -135,7 +133,9 @@
       "tokenUrl" : { },
       "authorizationUrl" : { },
       "clientSecret" : null,
-      "refreshToken" : null
+      "refreshToken" : null,
+      "authorizationCallback" : null,
+      "oauth2AuthorizationExtraQueryParameters" : null
     } ],
     "properties" : null,
     "version" : 1,
@@ -840,9 +840,9 @@
       "optionsDataSource" : null
     } ],
     "title" : "Update Deal",
+    "perform" : null,
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
-    "perform" : null
+    "workflowNodeDescription" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -1540,9 +1540,9 @@
       "optionsDataSource" : null
     } ],
     "title" : "Create Deal",
+    "perform" : null,
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
-    "perform" : null
+    "workflowNodeDescription" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -2363,9 +2363,9 @@
       "optionsDataSource" : null
     } ],
     "title" : "Enrich Person",
+    "perform" : null,
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
-    "perform" : null
+    "workflowNodeDescription" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -3016,9 +3016,9 @@
       "optionsDataSource" : null
     } ],
     "title" : "Enrich Company",
+    "perform" : null,
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
-    "perform" : null
+    "workflowNodeDescription" : null
   } ],
   "triggers" : [ ],
   "unifiedApi" : null,

@@ -63,6 +63,8 @@
       "title" : "OAuth2 Authorization Code",
       "type" : "OAUTH2_AUTHORIZATION_CODE",
       "acquire" : null,
+      "oauth2AuthorizationExtraQueryParameters" : { },
+      "authorizationCallback" : null,
       "apply" : null,
       "clientId" : null,
       "pkce" : null,
@@ -72,9 +74,7 @@
       "tokenUrl" : { },
       "authorizationUrl" : { },
       "clientSecret" : null,
-      "refreshToken" : null,
-      "oauth2AuthorizationExtraQueryParameters" : { },
-      "authorizationCallback" : null
+      "refreshToken" : null
     } ],
     "properties" : null,
     "version" : 1,
@@ -889,9 +889,9 @@
       "optionsDataSource" : null
     } ],
     "title" : "Create Contact",
-    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "perform" : { }
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -1011,9 +1011,9 @@
       "optionsDataSource" : null
     } ],
     "title" : "Create Group",
-    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "perform" : { }
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -1841,9 +1841,9 @@
       "optionsDataSource" : null
     } ],
     "title" : "Update Contact",
-    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "perform" : { }
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -2749,11 +2749,11 @@
       "optionsDataSource" : null
     } ],
     "title" : "Search Contacts",
-    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "perform" : { }
   } ],
-  "triggers" : null,
   "unifiedApi" : null,
+  "triggers" : null,
   "clusterElements" : null
 }

@@ -49,8 +49,8 @@
       "maxValue" : null,
       "minValue" : null,
       "options" : null,
-      "optionsDataSource" : null,
-      "controlType" : "INTEGER"
+      "controlType" : "INTEGER",
+      "optionsDataSource" : null
     }, {
       "advancedOption" : null,
       "description" : null,
@@ -143,15 +143,15 @@
       "multipleValues" : null,
       "options" : null,
       "properties" : null,
-      "optionsDataSource" : null,
-      "controlType" : "OBJECT_BUILDER"
+      "controlType" : "OBJECT_BUILDER",
+      "optionsDataSource" : null
     } ],
     "title" : "Send Message",
     "processErrorResponse" : null,
     "workflowNodeDescription" : null,
     "perform" : { }
   } ],
-  "clusterElements" : null,
+  "unifiedApi" : null,
   "triggers" : [ {
     "batch" : null,
     "deprecated" : null,
@@ -193,14 +193,14 @@
     "workflowNodeDescription" : null,
     "dynamicWebhookRefresh" : null,
     "webhookValidateOnEnable" : null,
+    "deduplicate" : null,
+    "poll" : null,
     "webhookDisable" : null,
     "webhookEnable" : null,
     "webhookRequest" : null,
     "listenerDisable" : { },
     "listenerEnable" : { },
-    "webhookValidate" : null,
-    "deduplicate" : null,
-    "poll" : null
+    "webhookValidate" : null
   } ],
-  "unifiedApi" : null
+  "clusterElements" : null
 }

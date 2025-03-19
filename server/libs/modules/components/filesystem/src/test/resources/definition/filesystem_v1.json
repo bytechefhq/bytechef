@@ -1052,6 +1052,6 @@
     "perform" : { }
   } ],
   "clusterElements" : null,
-  "triggers" : null,
-  "unifiedApi" : null
+  "unifiedApi" : null,
+  "triggers" : null
 }

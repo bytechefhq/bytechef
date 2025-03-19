@@ -173,7 +173,7 @@
     "processErrorResponse" : null,
     "workflowNodeDescription" : null
   } ],
-  "triggers" : null,
   "unifiedApi" : null,
+  "triggers" : null,
   "clusterElements" : null
 }

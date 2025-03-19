@@ -1649,8 +1649,8 @@
     "processErrorResponse" : null,
     "workflowNodeDescription" : null
   } ],
-  "triggers" : null,
   "unifiedApi" : null,
+  "triggers" : null,
   "clusterElements" : [ {
     "description" : null,
     "name" : "writer",
@@ -1661,8 +1661,7 @@
       "name" : "destination",
       "label" : "Destination",
       "multipleElements" : false,
-      "required" : false,
-      "local" : true
+      "required" : false
     },
     "object" : { }
   } ]

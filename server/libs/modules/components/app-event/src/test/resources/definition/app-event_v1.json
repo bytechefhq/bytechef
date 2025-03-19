@@ -24,8 +24,8 @@
     "outputDefinition" : {
       "output" : { },
       "outputResponse" : null,
-      "sampleOutput" : null,
-      "outputSchema" : null
+      "outputSchema" : null,
+      "sampleOutput" : null
     },
     "properties" : [ {
       "advancedOption" : null,
@@ -54,8 +54,8 @@
     "type" : "STATIC_WEBHOOK",
     "webhookRawBody" : null,
     "workflowSyncExecution" : null,
-    "webhookDisable" : null,
     "webhookEnable" : null,
+    "webhookDisable" : null,
     "webhookRequest" : { },
     "listenerDisable" : null,
     "listenerEnable" : null,

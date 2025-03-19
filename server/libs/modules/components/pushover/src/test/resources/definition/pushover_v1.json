@@ -63,18 +63,18 @@
       "title" : null,
       "type" : "CUSTOM",
       "acquire" : null,
-      "oauth2AuthorizationExtraQueryParameters" : null,
-      "authorizationCallback" : null,
-      "authorizationUrl" : null,
-      "clientSecret" : null,
-      "refreshToken" : null,
       "apply" : null,
       "clientId" : null,
       "pkce" : null,
       "refresh" : null,
       "refreshUrl" : null,
       "scopes" : null,
-      "tokenUrl" : null
+      "tokenUrl" : null,
+      "authorizationUrl" : null,
+      "clientSecret" : null,
+      "refreshToken" : null,
+      "oauth2AuthorizationExtraQueryParameters" : null,
+      "authorizationCallback" : null
     } ],
     "properties" : null,
     "version" : 1,
@@ -126,8 +126,8 @@
             "maxValue" : null,
             "minValue" : null,
             "options" : null,
-            "optionsDataSource" : null,
-            "controlType" : "INTEGER"
+            "controlType" : "INTEGER",
+            "optionsDataSource" : null
           }, {
             "advancedOption" : null,
             "description" : null,
@@ -149,8 +149,8 @@
             "options" : null,
             "optionsDataSource" : null
           } ],
-          "optionsDataSource" : null,
-          "controlType" : "OBJECT_BUILDER"
+          "controlType" : "OBJECT_BUILDER",
+          "optionsDataSource" : null
         },
         "sampleOutput" : null,
         "placeholder" : null
@@ -189,8 +189,8 @@
           "maxValue" : null,
           "minValue" : null,
           "options" : null,
-          "optionsDataSource" : null,
-          "controlType" : "INTEGER"
+          "controlType" : "INTEGER",
+          "optionsDataSource" : null
         }, {
           "advancedOption" : null,
           "description" : null,
@@ -212,8 +212,8 @@
           "options" : null,
           "optionsDataSource" : null
         } ],
-        "optionsDataSource" : null,
-        "controlType" : "OBJECT_BUILDER"
+        "controlType" : "OBJECT_BUILDER",
+        "optionsDataSource" : null
       },
       "sampleOutput" : null
     },
@@ -314,8 +314,8 @@
       "maxValue" : null,
       "minValue" : null,
       "options" : null,
-      "optionsDataSource" : null,
-      "controlType" : "INTEGER"
+      "controlType" : "INTEGER",
+      "optionsDataSource" : null
     }, {
       "advancedOption" : null,
       "description" : "If the notification has not be acknowledged in expire seconds, it will be marked as expired and will stop being sent to the user.",
@@ -333,8 +333,8 @@
       "maxValue" : null,
       "minValue" : null,
       "options" : null,
-      "optionsDataSource" : null,
-      "controlType" : "INTEGER"
+      "controlType" : "INTEGER",
+      "optionsDataSource" : null
     }, {
       "advancedOption" : null,
       "description" : "Clickable URL link in the message to send.",
@@ -473,11 +473,11 @@
       "controlType" : "FILE_ENTRY"
     } ],
     "title" : "Send Notification",
+    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
-    "perform" : { }
+    "workflowNodeDescription" : null
   } ],
-  "clusterElements" : null,
+  "unifiedApi" : null,
   "triggers" : null,
-  "unifiedApi" : null
+  "clusterElements" : null
 }

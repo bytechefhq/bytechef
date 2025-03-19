@@ -63,8 +63,6 @@
       "title" : "OAuth2 Authorization Code",
       "type" : "OAUTH2_AUTHORIZATION_CODE",
       "acquire" : null,
-      "oauth2AuthorizationExtraQueryParameters" : null,
-      "authorizationCallback" : null,
       "authorizationUrl" : { },
       "clientSecret" : null,
       "refreshToken" : null,
@@ -74,7 +72,9 @@
       "refresh" : null,
       "refreshUrl" : { },
       "scopes" : null,
-      "tokenUrl" : { }
+      "tokenUrl" : { },
+      "authorizationCallback" : null,
+      "oauth2AuthorizationExtraQueryParameters" : null
     } ],
     "properties" : null,
     "version" : 1,
@@ -166,11 +166,12 @@
       "optionsDataSource" : null
     } ],
     "title" : "Update Project",
+    "perform" : null,
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
-    "perform" : null
+    "workflowNodeDescription" : null
   } ],
   "clusterElements" : null,
+  "unifiedApi" : null,
   "triggers" : [ {
     "batch" : null,
     "deprecated" : null,
@@ -897,10 +898,6 @@
     "type" : "DYNAMIC_WEBHOOK",
     "webhookRawBody" : null,
     "workflowSyncExecution" : null,
-    "dynamicWebhookRefresh" : null,
-    "webhookValidateOnEnable" : { },
-    "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
     "webhookDisable" : { },
     "webhookEnable" : { },
     "listenerDisable" : null,
@@ -908,7 +905,10 @@
     "webhookRequest" : { },
     "webhookValidate" : null,
     "deduplicate" : null,
-    "poll" : null
-  } ],
-  "unifiedApi" : null
+    "poll" : null,
+    "dynamicWebhookRefresh" : null,
+    "webhookValidateOnEnable" : { },
+    "processErrorResponse" : null,
+    "workflowNodeDescription" : null
+  } ]
 }

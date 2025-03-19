@@ -86,8 +86,6 @@
       "title" : "OAuth2 Authorization Code",
       "type" : "OAUTH2_AUTHORIZATION_CODE",
       "acquire" : null,
-      "oauth2AuthorizationExtraQueryParameters" : null,
-      "authorizationCallback" : null,
       "authorizationUrl" : { },
       "clientSecret" : null,
       "refreshToken" : null,
@@ -97,7 +95,9 @@
       "refresh" : null,
       "refreshUrl" : null,
       "scopes" : { },
-      "tokenUrl" : { }
+      "tokenUrl" : { },
+      "oauth2AuthorizationExtraQueryParameters" : null,
+      "authorizationCallback" : null
     } ],
     "properties" : null,
     "version" : 1,
@@ -541,9 +541,9 @@
       "optionsDataSource" : null
     } ],
     "title" : "Create Company",
+    "perform" : null,
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
-    "perform" : null
+    "workflowNodeDescription" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -1085,9 +1085,9 @@
       "optionsDataSource" : null
     } ],
     "title" : "Create Contact",
+    "perform" : null,
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
-    "perform" : null
+    "workflowNodeDescription" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -1515,9 +1515,9 @@
       "controlType" : "DATE"
     } ],
     "title" : "Create Task",
+    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
-    "perform" : { }
+    "workflowNodeDescription" : null
   } ],
   "clusterElements" : null,
   "triggers" : [ ],

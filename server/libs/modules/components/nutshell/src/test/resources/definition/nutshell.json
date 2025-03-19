@@ -63,6 +63,8 @@
       "title" : "Basic Auth",
       "type" : "BASIC_AUTH",
       "acquire" : null,
+      "authorizationCallback" : null,
+      "oauth2AuthorizationExtraQueryParameters" : null,
       "apply" : null,
       "clientId" : null,
       "pkce" : null,
@@ -72,9 +74,7 @@
       "tokenUrl" : null,
       "authorizationUrl" : null,
       "clientSecret" : null,
-      "refreshToken" : null,
-      "oauth2AuthorizationExtraQueryParameters" : null,
-      "authorizationCallback" : null
+      "refreshToken" : null
     } ],
     "properties" : null,
     "version" : 1,
@@ -883,9 +883,9 @@
       "optionsDataSource" : null
     } ],
     "title" : "Create Contact",
-    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "perform" : { }
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -1687,9 +1687,9 @@
       "optionsDataSource" : null
     } ],
     "title" : "Create Company",
-    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "perform" : { }
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -2114,11 +2114,11 @@
       }
     } ],
     "title" : "Create Lead",
-    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "perform" : { }
   } ],
-  "triggers" : null,
   "unifiedApi" : null,
+  "triggers" : null,
   "clusterElements" : null
 }

@@ -13,6 +13,55 @@
   "resources" : null,
   "version" : 1,
   "title" : "Stripe",
+  "connection" : {
+    "authorizations" : [ {
+      "detectOn" : null,
+      "description" : null,
+      "name" : "bearer_token",
+      "properties" : [ {
+        "advancedOption" : null,
+        "description" : null,
+        "displayCondition" : null,
+        "expressionEnabled" : null,
+        "hidden" : null,
+        "metadata" : { },
+        "required" : true,
+        "name" : "token",
+        "type" : "STRING",
+        "defaultValue" : null,
+        "exampleValue" : null,
+        "label" : "Token",
+        "placeholder" : null,
+        "controlType" : "TEXT",
+        "languageId" : null,
+        "maxLength" : null,
+        "minLength" : null,
+        "options" : null,
+        "optionsDataSource" : null
+      } ],
+      "refreshOn" : null,
+      "title" : "Bearer Token",
+      "type" : "BEARER_TOKEN",
+      "acquire" : null,
+      "apply" : { },
+      "clientId" : null,
+      "pkce" : null,
+      "refresh" : null,
+      "refreshUrl" : null,
+      "scopes" : null,
+      "tokenUrl" : null,
+      "authorizationUrl" : null,
+      "clientSecret" : null,
+      "refreshToken" : null,
+      "oauth2AuthorizationExtraQueryParameters" : null,
+      "authorizationCallback" : null
+    } ],
+    "properties" : null,
+    "version" : 1,
+    "authorizationRequired" : null,
+    "baseUri" : { },
+    "test" : null
+  },
   "actions" : [ {
     "batch" : null,
     "deprecated" : null,
@@ -294,6 +343,7 @@
         "sampleOutput" : null,
         "placeholder" : null
       },
+      "sampleOutput" : null,
       "outputSchema" : {
         "advancedOption" : null,
         "description" : null,
@@ -556,8 +606,7 @@
         } ],
         "controlType" : "OBJECT_BUILDER",
         "optionsDataSource" : null
-      },
-      "sampleOutput" : null
+      }
     },
     "properties" : [ {
       "advancedOption" : null,
@@ -792,8 +841,8 @@
     } ],
     "title" : "Create Customer",
     "perform" : null,
-    "workflowNodeDescription" : null,
-    "processErrorResponse" : null
+    "processErrorResponse" : null,
+    "workflowNodeDescription" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -915,6 +964,7 @@
         "sampleOutput" : null,
         "placeholder" : null
       },
+      "sampleOutput" : null,
       "outputSchema" : {
         "advancedOption" : null,
         "description" : null,
@@ -1017,8 +1067,7 @@
         } ],
         "controlType" : "OBJECT_BUILDER",
         "optionsDataSource" : null
-      },
-      "sampleOutput" : null
+      }
     },
     "properties" : [ {
       "advancedOption" : null,
@@ -1092,10 +1141,9 @@
     } ],
     "title" : "Create Invoice",
     "perform" : null,
-    "workflowNodeDescription" : null,
-    "processErrorResponse" : null
+    "processErrorResponse" : null,
+    "workflowNodeDescription" : null
   } ],
-  "clusterElements" : null,
   "unifiedApi" : null,
   "triggers" : [ {
     "batch" : null,
@@ -1390,6 +1438,7 @@
         "sampleOutput" : null,
         "placeholder" : null
       },
+      "sampleOutput" : null,
       "outputSchema" : {
         "advancedOption" : null,
         "description" : null,
@@ -1670,26 +1719,25 @@
         } ],
         "controlType" : "OBJECT_BUILDER",
         "optionsDataSource" : null
-      },
-      "sampleOutput" : null
+      }
     },
     "properties" : null,
     "title" : "New Customer",
     "type" : "DYNAMIC_WEBHOOK",
     "webhookRawBody" : null,
     "workflowSyncExecution" : null,
-    "workflowNodeDescription" : null,
-    "processErrorResponse" : null,
-    "poll" : null,
     "deduplicate" : null,
+    "poll" : null,
     "webhookDisable" : { },
     "webhookEnable" : { },
-    "dynamicWebhookRefresh" : null,
     "listenerDisable" : null,
     "listenerEnable" : null,
     "webhookRequest" : { },
     "webhookValidate" : null,
-    "webhookValidateOnEnable" : null
+    "dynamicWebhookRefresh" : null,
+    "webhookValidateOnEnable" : null,
+    "processErrorResponse" : null,
+    "workflowNodeDescription" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -1843,6 +1891,7 @@
         "sampleOutput" : null,
         "placeholder" : null
       },
+      "sampleOutput" : null,
       "outputSchema" : {
         "advancedOption" : null,
         "description" : null,
@@ -1983,74 +2032,25 @@
         } ],
         "controlType" : "OBJECT_BUILDER",
         "optionsDataSource" : null
-      },
-      "sampleOutput" : null
+      }
     },
     "properties" : null,
     "title" : "New Invoice",
     "type" : "DYNAMIC_WEBHOOK",
     "webhookRawBody" : null,
     "workflowSyncExecution" : null,
-    "workflowNodeDescription" : null,
-    "processErrorResponse" : null,
-    "poll" : null,
     "deduplicate" : null,
+    "poll" : null,
     "webhookDisable" : { },
     "webhookEnable" : { },
-    "dynamicWebhookRefresh" : null,
     "listenerDisable" : null,
     "listenerEnable" : null,
     "webhookRequest" : { },
     "webhookValidate" : null,
-    "webhookValidateOnEnable" : null
+    "dynamicWebhookRefresh" : null,
+    "webhookValidateOnEnable" : null,
+    "processErrorResponse" : null,
+    "workflowNodeDescription" : null
   } ],
-  "connection" : {
-    "authorizations" : [ {
-      "detectOn" : null,
-      "description" : null,
-      "name" : "bearer_token",
-      "properties" : [ {
-        "advancedOption" : null,
-        "description" : null,
-        "displayCondition" : null,
-        "expressionEnabled" : null,
-        "hidden" : null,
-        "metadata" : { },
-        "required" : true,
-        "name" : "token",
-        "type" : "STRING",
-        "defaultValue" : null,
-        "exampleValue" : null,
-        "label" : "Token",
-        "placeholder" : null,
-        "controlType" : "TEXT",
-        "languageId" : null,
-        "maxLength" : null,
-        "minLength" : null,
-        "options" : null,
-        "optionsDataSource" : null
-      } ],
-      "refreshOn" : null,
-      "title" : "Bearer Token",
-      "type" : "BEARER_TOKEN",
-      "acquire" : null,
-      "apply" : { },
-      "authorizationCallback" : null,
-      "authorizationUrl" : null,
-      "clientId" : null,
-      "clientSecret" : null,
-      "oauth2AuthorizationExtraQueryParameters" : null,
-      "pkce" : null,
-      "refresh" : null,
-      "refreshUrl" : null,
-      "scopes" : null,
-      "refreshToken" : null,
-      "tokenUrl" : null
-    } ],
-    "properties" : null,
-    "version" : 1,
-    "authorizationRequired" : null,
-    "baseUri" : { },
-    "test" : null
-  }
+  "clusterElements" : null
 }

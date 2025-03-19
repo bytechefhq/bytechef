@@ -83,6 +83,9 @@
       "title" : "OAuth2 Authorization Code",
       "type" : "OAUTH2_AUTHORIZATION_CODE",
       "acquire" : null,
+      "authorizationUrl" : { },
+      "clientSecret" : null,
+      "refreshToken" : null,
       "apply" : null,
       "clientId" : null,
       "pkce" : null,
@@ -90,11 +93,8 @@
       "refreshUrl" : { },
       "scopes" : { },
       "tokenUrl" : { },
-      "authorizationUrl" : { },
-      "clientSecret" : null,
-      "refreshToken" : null,
-      "oauth2AuthorizationExtraQueryParameters" : null,
-      "authorizationCallback" : null
+      "authorizationCallback" : null,
+      "oauth2AuthorizationExtraQueryParameters" : null
     } ],
     "properties" : null,
     "version" : 1,
@@ -150,8 +150,8 @@
             "options" : null,
             "optionsDataSource" : null
           } ],
-          "controlType" : "OBJECT_BUILDER",
-          "optionsDataSource" : null
+          "optionsDataSource" : null,
+          "controlType" : "OBJECT_BUILDER"
         },
         "sampleOutput" : null,
         "placeholder" : null
@@ -194,8 +194,8 @@
           "options" : null,
           "optionsDataSource" : null
         } ],
-        "controlType" : "OBJECT_BUILDER",
-        "optionsDataSource" : null
+        "optionsDataSource" : null,
+        "controlType" : "OBJECT_BUILDER"
       },
       "sampleOutput" : null
     },
@@ -292,8 +292,8 @@
         "maxValue" : null,
         "minValue" : null,
         "options" : null,
-        "controlType" : "INTEGER",
-        "optionsDataSource" : null
+        "optionsDataSource" : null,
+        "controlType" : "INTEGER"
       }, {
         "advancedOption" : null,
         "description" : null,
@@ -334,14 +334,14 @@
         "minValue" : null,
         "numberPrecision" : null,
         "options" : null,
-        "controlType" : "NUMBER",
-        "optionsDataSource" : null
+        "optionsDataSource" : null,
+        "controlType" : "NUMBER"
       } ],
       "multipleValues" : null,
       "options" : null,
       "properties" : null,
-      "controlType" : "OBJECT_BUILDER",
-      "optionsDataSource" : null
+      "optionsDataSource" : null,
+      "controlType" : "OBJECT_BUILDER"
     } ],
     "title" : "Create Record",
     "perform" : { },
@@ -568,8 +568,8 @@
         "maxValue" : null,
         "minValue" : null,
         "options" : null,
-        "controlType" : "INTEGER",
-        "optionsDataSource" : null
+        "optionsDataSource" : null,
+        "controlType" : "INTEGER"
       }, {
         "advancedOption" : null,
         "description" : null,
@@ -610,20 +610,22 @@
         "minValue" : null,
         "numberPrecision" : null,
         "options" : null,
-        "controlType" : "NUMBER",
-        "optionsDataSource" : null
+        "optionsDataSource" : null,
+        "controlType" : "NUMBER"
       } ],
       "multipleValues" : null,
       "options" : null,
       "properties" : null,
-      "controlType" : "OBJECT_BUILDER",
-      "optionsDataSource" : null
+      "optionsDataSource" : null,
+      "controlType" : "OBJECT_BUILDER"
     } ],
     "title" : "Update Record",
     "perform" : { },
     "processErrorResponse" : null,
     "workflowNodeDescription" : null
   } ],
+  "clusterElements" : null,
+  "unifiedApi" : null,
   "triggers" : [ {
     "batch" : null,
     "deprecated" : null,
@@ -664,18 +666,18 @@
     "type" : "POLLING",
     "webhookRawBody" : null,
     "workflowSyncExecution" : null,
-    "deduplicate" : null,
-    "poll" : { },
     "webhookDisable" : null,
     "webhookEnable" : null,
     "webhookRequest" : null,
     "listenerDisable" : null,
     "listenerEnable" : null,
     "webhookValidate" : null,
-    "dynamicWebhookRefresh" : null,
-    "webhookValidateOnEnable" : null,
+    "deduplicate" : null,
+    "poll" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "dynamicWebhookRefresh" : null,
+    "webhookValidateOnEnable" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -716,19 +718,17 @@
     "type" : "POLLING",
     "webhookRawBody" : null,
     "workflowSyncExecution" : null,
-    "deduplicate" : null,
-    "poll" : { },
     "webhookDisable" : null,
     "webhookEnable" : null,
     "webhookRequest" : null,
     "listenerDisable" : null,
     "listenerEnable" : null,
     "webhookValidate" : null,
-    "dynamicWebhookRefresh" : null,
-    "webhookValidateOnEnable" : null,
+    "deduplicate" : null,
+    "poll" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null
-  } ],
-  "unifiedApi" : null,
-  "clusterElements" : null
+    "workflowNodeDescription" : null,
+    "dynamicWebhookRefresh" : null,
+    "webhookValidateOnEnable" : null
+  } ]
 }

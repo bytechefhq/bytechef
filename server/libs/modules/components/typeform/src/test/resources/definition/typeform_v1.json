@@ -232,6 +232,7 @@
     "workflowNodeDescription" : null,
     "perform" : { }
   } ],
+  "unifiedApi" : null,
   "triggers" : [ {
     "batch" : null,
     "deprecated" : null,
@@ -322,13 +323,12 @@
     "webhookValidateOnEnable" : null,
     "deduplicate" : null,
     "poll" : null,
+    "listenerEnable" : null,
+    "webhookValidate" : null,
     "webhookDisable" : { },
     "webhookEnable" : { },
     "webhookRequest" : { },
-    "listenerDisable" : null,
-    "listenerEnable" : null,
-    "webhookValidate" : null
+    "listenerDisable" : null
   } ],
-  "unifiedApi" : null,
   "clusterElements" : null
 }

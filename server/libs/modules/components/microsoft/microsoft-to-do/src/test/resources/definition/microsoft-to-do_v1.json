@@ -83,6 +83,8 @@
       "title" : "OAuth2 Authorization Code",
       "type" : "OAUTH2_AUTHORIZATION_CODE",
       "acquire" : null,
+      "oauth2AuthorizationExtraQueryParameters" : null,
+      "authorizationCallback" : null,
       "apply" : null,
       "clientId" : null,
       "pkce" : null,
@@ -92,9 +94,7 @@
       "tokenUrl" : { },
       "authorizationUrl" : { },
       "clientSecret" : null,
-      "refreshToken" : null,
-      "oauth2AuthorizationExtraQueryParameters" : null,
-      "authorizationCallback" : null
+      "refreshToken" : null
     } ],
     "properties" : null,
     "version" : 1,
@@ -868,9 +868,9 @@
       "controlType" : "SELECT"
     } ],
     "title" : "Create Task",
-    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "perform" : { }
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -1246,9 +1246,9 @@
       "optionsDataSource" : null
     } ],
     "title" : "Create Task List",
-    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "perform" : { }
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -1962,11 +1962,11 @@
       }
     } ],
     "title" : "Get Task",
-    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "perform" : { }
   } ],
-  "triggers" : null,
   "unifiedApi" : null,
+  "triggers" : null,
   "clusterElements" : null
 }

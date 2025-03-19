@@ -63,8 +63,6 @@
       "title" : "OAuth2 Authorization Code",
       "type" : "OAUTH2_AUTHORIZATION_CODE",
       "acquire" : null,
-      "authorizationCallback" : null,
-      "oauth2AuthorizationExtraQueryParameters" : { },
       "authorizationUrl" : { },
       "clientSecret" : null,
       "refreshToken" : null,
@@ -74,7 +72,9 @@
       "refresh" : null,
       "refreshUrl" : { },
       "scopes" : { },
-      "tokenUrl" : { }
+      "tokenUrl" : { },
+      "authorizationCallback" : null,
+      "oauth2AuthorizationExtraQueryParameters" : { }
     } ],
     "properties" : null,
     "version" : 1,
@@ -120,9 +120,9 @@
       }
     } ],
     "title" : "Get All Responses",
+    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
-    "perform" : { }
+    "workflowNodeDescription" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -161,9 +161,9 @@
       }
     } ],
     "title" : "Get Form",
+    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
-    "perform" : { }
+    "workflowNodeDescription" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -225,11 +225,12 @@
       }
     } ],
     "title" : "Get Response",
+    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
-    "perform" : { }
+    "workflowNodeDescription" : null
   } ],
   "clusterElements" : null,
+  "unifiedApi" : null,
   "triggers" : [ {
     "batch" : null,
     "deprecated" : null,
@@ -270,10 +271,6 @@
     "type" : "POLLING",
     "webhookRawBody" : null,
     "workflowSyncExecution" : null,
-    "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
-    "dynamicWebhookRefresh" : null,
-    "webhookValidateOnEnable" : null,
     "webhookDisable" : null,
     "webhookEnable" : null,
     "webhookRequest" : null,
@@ -281,7 +278,10 @@
     "listenerEnable" : null,
     "webhookValidate" : null,
     "deduplicate" : null,
-    "poll" : { }
-  } ],
-  "unifiedApi" : null
+    "poll" : { },
+    "processErrorResponse" : null,
+    "workflowNodeDescription" : null,
+    "dynamicWebhookRefresh" : null,
+    "webhookValidateOnEnable" : null
+  } ]
 }

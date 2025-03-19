@@ -63,18 +63,18 @@
       "title" : "OAuth2 Authorization Code",
       "type" : "OAUTH2_AUTHORIZATION_CODE",
       "acquire" : null,
+      "oauth2AuthorizationExtraQueryParameters" : { },
+      "authorizationCallback" : null,
+      "authorizationUrl" : { },
+      "clientSecret" : null,
+      "refreshToken" : null,
       "apply" : null,
       "clientId" : null,
       "pkce" : null,
       "refresh" : null,
       "refreshUrl" : { },
       "scopes" : { },
-      "tokenUrl" : { },
-      "authorizationUrl" : { },
-      "clientSecret" : null,
-      "refreshToken" : null,
-      "authorizationCallback" : null,
-      "oauth2AuthorizationExtraQueryParameters" : { }
+      "tokenUrl" : { }
     } ],
     "properties" : null,
     "version" : 1,
@@ -188,11 +188,11 @@
             "minItems" : null,
             "multipleValues" : null,
             "options" : null,
-            "controlType" : "ARRAY_BUILDER",
-            "optionsDataSource" : null
+            "optionsDataSource" : null,
+            "controlType" : "ARRAY_BUILDER"
           } ],
-          "controlType" : "OBJECT_BUILDER",
-          "optionsDataSource" : null
+          "optionsDataSource" : null,
+          "controlType" : "OBJECT_BUILDER"
         },
         "sampleOutput" : null,
         "placeholder" : null
@@ -293,11 +293,11 @@
           "minItems" : null,
           "multipleValues" : null,
           "options" : null,
-          "controlType" : "ARRAY_BUILDER",
-          "optionsDataSource" : null
+          "optionsDataSource" : null,
+          "controlType" : "ARRAY_BUILDER"
         } ],
-        "controlType" : "OBJECT_BUILDER",
-        "optionsDataSource" : null
+        "optionsDataSource" : null,
+        "controlType" : "OBJECT_BUILDER"
       },
       "sampleOutput" : null
     },
@@ -363,16 +363,16 @@
       "minItems" : null,
       "multipleValues" : null,
       "options" : null,
-      "controlType" : "MULTI_SELECT",
       "optionsDataSource" : {
         "optionsLookupDependsOn" : null,
         "options" : { }
-      }
+      },
+      "controlType" : "MULTI_SELECT"
     } ],
     "title" : "Add Labels",
-    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "perform" : { }
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -406,9 +406,9 @@
       }
     } ],
     "title" : "Delete Mail",
-    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "perform" : { }
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -524,13 +524,13 @@
       "minItems" : null,
       "multipleValues" : null,
       "options" : null,
-      "controlType" : "ARRAY_BUILDER",
-      "optionsDataSource" : null
+      "optionsDataSource" : null,
+      "controlType" : "ARRAY_BUILDER"
     } ],
     "title" : "Get Mail",
-    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "perform" : { }
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -646,13 +646,13 @@
       "minItems" : null,
       "multipleValues" : null,
       "options" : null,
-      "controlType" : "ARRAY_BUILDER",
-      "optionsDataSource" : null
+      "optionsDataSource" : null,
+      "controlType" : "ARRAY_BUILDER"
     } ],
     "title" : "Get Thread",
-    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "perform" : { }
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -759,11 +759,11 @@
             "minItems" : null,
             "multipleValues" : null,
             "options" : null,
-            "controlType" : "ARRAY_BUILDER",
-            "optionsDataSource" : null
+            "optionsDataSource" : null,
+            "controlType" : "ARRAY_BUILDER"
           } ],
-          "controlType" : "OBJECT_BUILDER",
-          "optionsDataSource" : null
+          "optionsDataSource" : null,
+          "controlType" : "OBJECT_BUILDER"
         },
         "sampleOutput" : null,
         "placeholder" : null
@@ -864,11 +864,11 @@
           "minItems" : null,
           "multipleValues" : null,
           "options" : null,
-          "controlType" : "ARRAY_BUILDER",
-          "optionsDataSource" : null
+          "optionsDataSource" : null,
+          "controlType" : "ARRAY_BUILDER"
         } ],
-        "controlType" : "OBJECT_BUILDER",
-        "optionsDataSource" : null
+        "optionsDataSource" : null,
+        "controlType" : "OBJECT_BUILDER"
       },
       "sampleOutput" : null
     },
@@ -934,8 +934,8 @@
       "minItems" : null,
       "multipleValues" : null,
       "options" : null,
-      "controlType" : "ARRAY_BUILDER",
-      "optionsDataSource" : null
+      "optionsDataSource" : null,
+      "controlType" : "ARRAY_BUILDER"
     }, {
       "advancedOption" : null,
       "description" : "Bcc recipients email addresses.",
@@ -975,8 +975,8 @@
       "minItems" : null,
       "multipleValues" : null,
       "options" : null,
-      "controlType" : "ARRAY_BUILDER",
-      "optionsDataSource" : null
+      "optionsDataSource" : null,
+      "controlType" : "ARRAY_BUILDER"
     }, {
       "advancedOption" : null,
       "description" : "Cc recipients email addresses.",
@@ -1016,8 +1016,8 @@
       "minItems" : null,
       "multipleValues" : null,
       "options" : null,
-      "controlType" : "ARRAY_BUILDER",
-      "optionsDataSource" : null
+      "optionsDataSource" : null,
+      "controlType" : "ARRAY_BUILDER"
     }, {
       "advancedOption" : null,
       "description" : "Body text of the email",
@@ -1153,13 +1153,13 @@
       "minItems" : null,
       "multipleValues" : null,
       "options" : null,
-      "controlType" : "ARRAY_BUILDER",
-      "optionsDataSource" : null
+      "optionsDataSource" : null,
+      "controlType" : "ARRAY_BUILDER"
     } ],
     "title" : "Reply to Email",
-    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "perform" : { }
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -1259,15 +1259,15 @@
                 "options" : null,
                 "optionsDataSource" : null
               } ],
-              "controlType" : "OBJECT_BUILDER",
-              "optionsDataSource" : null
+              "optionsDataSource" : null,
+              "controlType" : "OBJECT_BUILDER"
             } ],
             "maxItems" : null,
             "minItems" : null,
             "multipleValues" : null,
             "options" : null,
-            "controlType" : "ARRAY_BUILDER",
-            "optionsDataSource" : null
+            "optionsDataSource" : null,
+            "controlType" : "ARRAY_BUILDER"
           }, {
             "advancedOption" : null,
             "description" : null,
@@ -1308,11 +1308,11 @@
             "minValue" : null,
             "numberPrecision" : null,
             "options" : null,
-            "controlType" : "NUMBER",
-            "optionsDataSource" : null
+            "optionsDataSource" : null,
+            "controlType" : "NUMBER"
           } ],
-          "controlType" : "OBJECT_BUILDER",
-          "optionsDataSource" : null
+          "optionsDataSource" : null,
+          "controlType" : "OBJECT_BUILDER"
         },
         "sampleOutput" : null,
         "placeholder" : null
@@ -1406,15 +1406,15 @@
               "options" : null,
               "optionsDataSource" : null
             } ],
-            "controlType" : "OBJECT_BUILDER",
-            "optionsDataSource" : null
+            "optionsDataSource" : null,
+            "controlType" : "OBJECT_BUILDER"
           } ],
           "maxItems" : null,
           "minItems" : null,
           "multipleValues" : null,
           "options" : null,
-          "controlType" : "ARRAY_BUILDER",
-          "optionsDataSource" : null
+          "optionsDataSource" : null,
+          "controlType" : "ARRAY_BUILDER"
         }, {
           "advancedOption" : null,
           "description" : null,
@@ -1455,11 +1455,11 @@
           "minValue" : null,
           "numberPrecision" : null,
           "options" : null,
-          "controlType" : "NUMBER",
-          "optionsDataSource" : null
+          "optionsDataSource" : null,
+          "controlType" : "NUMBER"
         } ],
-        "controlType" : "OBJECT_BUILDER",
-        "optionsDataSource" : null
+        "optionsDataSource" : null,
+        "controlType" : "OBJECT_BUILDER"
       },
       "sampleOutput" : null
     },
@@ -1483,8 +1483,8 @@
       "minValue" : null,
       "numberPrecision" : null,
       "options" : null,
-      "controlType" : "NUMBER",
-      "optionsDataSource" : null
+      "optionsDataSource" : null,
+      "controlType" : "NUMBER"
     }, {
       "advancedOption" : null,
       "description" : "Page token to retrieve a specific page of results in the list.",
@@ -1655,8 +1655,8 @@
       "minItems" : null,
       "multipleValues" : null,
       "options" : null,
-      "controlType" : "ARRAY_BUILDER",
-      "optionsDataSource" : null
+      "optionsDataSource" : null,
+      "controlType" : "ARRAY_BUILDER"
     }, {
       "advancedOption" : null,
       "description" : "Include messages from SPAM and TRASH in the results.",
@@ -1683,9 +1683,9 @@
       "controlType" : "SELECT"
     } ],
     "title" : "Search Email",
-    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "perform" : { }
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -1792,11 +1792,11 @@
             "minItems" : null,
             "multipleValues" : null,
             "options" : null,
-            "controlType" : "ARRAY_BUILDER",
-            "optionsDataSource" : null
+            "optionsDataSource" : null,
+            "controlType" : "ARRAY_BUILDER"
           } ],
-          "controlType" : "OBJECT_BUILDER",
-          "optionsDataSource" : null
+          "optionsDataSource" : null,
+          "controlType" : "OBJECT_BUILDER"
         },
         "sampleOutput" : null,
         "placeholder" : null
@@ -1897,11 +1897,11 @@
           "minItems" : null,
           "multipleValues" : null,
           "options" : null,
-          "controlType" : "ARRAY_BUILDER",
-          "optionsDataSource" : null
+          "optionsDataSource" : null,
+          "controlType" : "ARRAY_BUILDER"
         } ],
-        "controlType" : "OBJECT_BUILDER",
-        "optionsDataSource" : null
+        "optionsDataSource" : null,
+        "controlType" : "OBJECT_BUILDER"
       },
       "sampleOutput" : null
     },
@@ -1944,8 +1944,8 @@
       "minItems" : null,
       "multipleValues" : null,
       "options" : null,
-      "controlType" : "ARRAY_BUILDER",
-      "optionsDataSource" : null
+      "optionsDataSource" : null,
+      "controlType" : "ARRAY_BUILDER"
     }, {
       "advancedOption" : null,
       "description" : "Subject of the email.",
@@ -2005,8 +2005,8 @@
       "minItems" : null,
       "multipleValues" : null,
       "options" : null,
-      "controlType" : "ARRAY_BUILDER",
-      "optionsDataSource" : null
+      "optionsDataSource" : null,
+      "controlType" : "ARRAY_BUILDER"
     }, {
       "advancedOption" : null,
       "description" : "Cc recipients email addresses.",
@@ -2046,8 +2046,8 @@
       "minItems" : null,
       "multipleValues" : null,
       "options" : null,
-      "controlType" : "ARRAY_BUILDER",
-      "optionsDataSource" : null
+      "optionsDataSource" : null,
+      "controlType" : "ARRAY_BUILDER"
     }, {
       "advancedOption" : null,
       "description" : "Reply-to email addresses.",
@@ -2087,8 +2087,8 @@
       "minItems" : null,
       "multipleValues" : null,
       "options" : null,
-      "controlType" : "ARRAY_BUILDER",
-      "optionsDataSource" : null
+      "optionsDataSource" : null,
+      "controlType" : "ARRAY_BUILDER"
     }, {
       "advancedOption" : null,
       "description" : "Body text of the email",
@@ -2224,300 +2224,14 @@
       "minItems" : null,
       "multipleValues" : null,
       "options" : null,
-      "controlType" : "ARRAY_BUILDER",
-      "optionsDataSource" : null
+      "optionsDataSource" : null,
+      "controlType" : "ARRAY_BUILDER"
     } ],
     "title" : "Send Email",
-    "perform" : { },
-    "processErrorResponse" : null,
-    "workflowNodeDescription" : null
-  } ],
-  "triggers" : [ {
-    "batch" : null,
-    "deprecated" : null,
-    "description" : "Triggers when new mail is found in your Gmail inbox.",
-    "help" : null,
-    "name" : "newEmail",
-    "outputDefinition" : {
-      "output" : { },
-      "outputResponse" : null,
-      "outputSchema" : null,
-      "sampleOutput" : null
-    },
-    "properties" : [ {
-      "advancedOption" : null,
-      "description" : "Must be 3-255 characters, start with a letter, and contain only the following characters: letters, numbers, dashes (-), periods (.), underscores (_), tildes (~), percents (%) or plus signs (+). Cannot start with goog.",
-      "displayCondition" : null,
-      "expressionEnabled" : null,
-      "hidden" : null,
-      "metadata" : { },
-      "required" : true,
-      "name" : "topicName",
-      "type" : "STRING",
-      "defaultValue" : null,
-      "exampleValue" : null,
-      "label" : "Topic Name",
-      "placeholder" : null,
-      "controlType" : "TEXT",
-      "languageId" : null,
-      "maxLength" : 255,
-      "minLength" : 3,
-      "options" : null,
-      "optionsDataSource" : null
-    }, {
-      "advancedOption" : null,
-      "description" : "The format to return the message in.",
-      "displayCondition" : null,
-      "expressionEnabled" : null,
-      "hidden" : null,
-      "metadata" : { },
-      "required" : false,
-      "name" : "format",
-      "type" : "STRING",
-      "defaultValue" : "SIMPLE",
-      "exampleValue" : null,
-      "label" : "Format",
-      "placeholder" : null,
-      "controlType" : "SELECT",
-      "languageId" : null,
-      "maxLength" : null,
-      "minLength" : null,
-      "options" : [ {
-        "description" : "Returns email message's from, to, subject, body and attachments.",
-        "label" : "Simple",
-        "value" : "SIMPLE"
-      }, {
-        "description" : "Returns only email message ID and labels; does not return the email headers, body, or payload.",
-        "label" : "Minimal",
-        "value" : "MINIMAL"
-      }, {
-        "description" : "Returns the full email message data with body content parsed in the payload field; the raw field is not used. Format cannot be used when accessing the api using the gmail.metadata scope.",
-        "label" : "Full",
-        "value" : "FULL"
-      }, {
-        "description" : "Returns the full email message data with body content in the raw field as a base64url encoded string; the payload field is not used. Format cannot be used when accessing the api using the gmail.metadata scope.",
-        "label" : "Raw",
-        "value" : "RAW"
-      }, {
-        "description" : "Returns only email message ID, labels, and email headers.",
-        "label" : "Metadata",
-        "value" : "metadata"
-      } ],
-      "optionsDataSource" : null
-    } ],
-    "title" : "New Email",
-    "type" : "STATIC_WEBHOOK",
-    "webhookRawBody" : null,
-    "workflowSyncExecution" : null,
-    "deduplicate" : null,
-    "poll" : null,
-    "webhookDisable" : { },
-    "webhookEnable" : { },
-    "webhookRequest" : { },
-    "listenerDisable" : null,
-    "listenerEnable" : null,
-    "webhookValidate" : null,
     "processErrorResponse" : null,
     "workflowNodeDescription" : null,
-    "dynamicWebhookRefresh" : null,
-    "webhookValidateOnEnable" : null
-  }, {
-    "batch" : null,
-    "deprecated" : null,
-    "description" : "Periodically checks your Gmail inbox for any new incoming emails.",
-    "help" : null,
-    "name" : "newEmailPolling",
-    "outputDefinition" : {
-      "output" : null,
-      "outputResponse" : {
-        "outputSchema" : {
-          "advancedOption" : null,
-          "description" : null,
-          "displayCondition" : null,
-          "expressionEnabled" : null,
-          "hidden" : null,
-          "metadata" : { },
-          "required" : null,
-          "name" : null,
-          "type" : "ARRAY",
-          "defaultValue" : null,
-          "exampleValue" : null,
-          "label" : null,
-          "placeholder" : null,
-          "items" : [ {
-            "advancedOption" : null,
-            "description" : null,
-            "displayCondition" : null,
-            "expressionEnabled" : null,
-            "hidden" : null,
-            "metadata" : { },
-            "required" : null,
-            "name" : null,
-            "type" : "OBJECT",
-            "defaultValue" : null,
-            "exampleValue" : null,
-            "label" : null,
-            "placeholder" : null,
-            "additionalProperties" : null,
-            "multipleValues" : null,
-            "options" : null,
-            "properties" : [ {
-              "advancedOption" : null,
-              "description" : "ID of the message.",
-              "displayCondition" : null,
-              "expressionEnabled" : null,
-              "hidden" : null,
-              "metadata" : { },
-              "required" : null,
-              "name" : "id",
-              "type" : "STRING",
-              "defaultValue" : null,
-              "exampleValue" : null,
-              "label" : null,
-              "placeholder" : null,
-              "controlType" : "TEXT",
-              "languageId" : null,
-              "maxLength" : null,
-              "minLength" : null,
-              "options" : null,
-              "optionsDataSource" : null
-            }, {
-              "advancedOption" : null,
-              "description" : "The ID of the thread the message belongs to.",
-              "displayCondition" : null,
-              "expressionEnabled" : null,
-              "hidden" : null,
-              "metadata" : { },
-              "required" : null,
-              "name" : "threadId",
-              "type" : "STRING",
-              "defaultValue" : null,
-              "exampleValue" : null,
-              "label" : null,
-              "placeholder" : null,
-              "controlType" : "TEXT",
-              "languageId" : null,
-              "maxLength" : null,
-              "minLength" : null,
-              "options" : null,
-              "optionsDataSource" : null
-            } ],
-            "controlType" : "OBJECT_BUILDER",
-            "optionsDataSource" : null
-          } ],
-          "maxItems" : null,
-          "minItems" : null,
-          "multipleValues" : null,
-          "options" : null,
-          "controlType" : "ARRAY_BUILDER",
-          "optionsDataSource" : null
-        },
-        "sampleOutput" : null,
-        "placeholder" : null
-      },
-      "outputSchema" : {
-        "advancedOption" : null,
-        "description" : null,
-        "displayCondition" : null,
-        "expressionEnabled" : null,
-        "hidden" : null,
-        "metadata" : { },
-        "required" : null,
-        "name" : null,
-        "type" : "ARRAY",
-        "defaultValue" : null,
-        "exampleValue" : null,
-        "label" : null,
-        "placeholder" : null,
-        "items" : [ {
-          "advancedOption" : null,
-          "description" : null,
-          "displayCondition" : null,
-          "expressionEnabled" : null,
-          "hidden" : null,
-          "metadata" : { },
-          "required" : null,
-          "name" : null,
-          "type" : "OBJECT",
-          "defaultValue" : null,
-          "exampleValue" : null,
-          "label" : null,
-          "placeholder" : null,
-          "additionalProperties" : null,
-          "multipleValues" : null,
-          "options" : null,
-          "properties" : [ {
-            "advancedOption" : null,
-            "description" : "ID of the message.",
-            "displayCondition" : null,
-            "expressionEnabled" : null,
-            "hidden" : null,
-            "metadata" : { },
-            "required" : null,
-            "name" : "id",
-            "type" : "STRING",
-            "defaultValue" : null,
-            "exampleValue" : null,
-            "label" : null,
-            "placeholder" : null,
-            "controlType" : "TEXT",
-            "languageId" : null,
-            "maxLength" : null,
-            "minLength" : null,
-            "options" : null,
-            "optionsDataSource" : null
-          }, {
-            "advancedOption" : null,
-            "description" : "The ID of the thread the message belongs to.",
-            "displayCondition" : null,
-            "expressionEnabled" : null,
-            "hidden" : null,
-            "metadata" : { },
-            "required" : null,
-            "name" : "threadId",
-            "type" : "STRING",
-            "defaultValue" : null,
-            "exampleValue" : null,
-            "label" : null,
-            "placeholder" : null,
-            "controlType" : "TEXT",
-            "languageId" : null,
-            "maxLength" : null,
-            "minLength" : null,
-            "options" : null,
-            "optionsDataSource" : null
-          } ],
-          "controlType" : "OBJECT_BUILDER",
-          "optionsDataSource" : null
-        } ],
-        "maxItems" : null,
-        "minItems" : null,
-        "multipleValues" : null,
-        "options" : null,
-        "controlType" : "ARRAY_BUILDER",
-        "optionsDataSource" : null
-      },
-      "sampleOutput" : null
-    },
-    "properties" : null,
-    "title" : "New Email Polling",
-    "type" : "POLLING",
-    "webhookRawBody" : null,
-    "workflowSyncExecution" : null,
-    "deduplicate" : null,
-    "poll" : { },
-    "webhookDisable" : null,
-    "webhookEnable" : null,
-    "webhookRequest" : null,
-    "listenerDisable" : null,
-    "listenerEnable" : null,
-    "webhookValidate" : null,
-    "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
-    "dynamicWebhookRefresh" : null,
-    "webhookValidateOnEnable" : null
+    "perform" : { }
   } ],
-  "unifiedApi" : null,
   "clusterElements" : [ {
     "description" : "Get an email from your Gmail account via Id.",
     "name" : "getEmail",
@@ -2629,16 +2343,15 @@
       "minItems" : null,
       "multipleValues" : null,
       "options" : null,
-      "controlType" : "ARRAY_BUILDER",
-      "optionsDataSource" : null
+      "optionsDataSource" : null,
+      "controlType" : "ARRAY_BUILDER"
     } ],
     "title" : "Get Email",
     "type" : {
-      "name" : "tool",
-      "label" : "Tool",
+      "name" : "tools",
+      "label" : "Tools",
       "multipleElements" : true,
-      "required" : false,
-      "local" : true
+      "required" : false
     },
     "object" : { }
   }, {
@@ -2736,15 +2449,15 @@
                 "options" : null,
                 "optionsDataSource" : null
               } ],
-              "controlType" : "OBJECT_BUILDER",
-              "optionsDataSource" : null
+              "optionsDataSource" : null,
+              "controlType" : "OBJECT_BUILDER"
             } ],
             "maxItems" : null,
             "minItems" : null,
             "multipleValues" : null,
             "options" : null,
-            "controlType" : "ARRAY_BUILDER",
-            "optionsDataSource" : null
+            "optionsDataSource" : null,
+            "controlType" : "ARRAY_BUILDER"
           }, {
             "advancedOption" : null,
             "description" : null,
@@ -2785,11 +2498,11 @@
             "minValue" : null,
             "numberPrecision" : null,
             "options" : null,
-            "controlType" : "NUMBER",
-            "optionsDataSource" : null
+            "optionsDataSource" : null,
+            "controlType" : "NUMBER"
           } ],
-          "controlType" : "OBJECT_BUILDER",
-          "optionsDataSource" : null
+          "optionsDataSource" : null,
+          "controlType" : "OBJECT_BUILDER"
         },
         "sampleOutput" : null,
         "placeholder" : null
@@ -2883,15 +2596,15 @@
               "options" : null,
               "optionsDataSource" : null
             } ],
-            "controlType" : "OBJECT_BUILDER",
-            "optionsDataSource" : null
+            "optionsDataSource" : null,
+            "controlType" : "OBJECT_BUILDER"
           } ],
           "maxItems" : null,
           "minItems" : null,
           "multipleValues" : null,
           "options" : null,
-          "controlType" : "ARRAY_BUILDER",
-          "optionsDataSource" : null
+          "optionsDataSource" : null,
+          "controlType" : "ARRAY_BUILDER"
         }, {
           "advancedOption" : null,
           "description" : null,
@@ -2932,11 +2645,11 @@
           "minValue" : null,
           "numberPrecision" : null,
           "options" : null,
-          "controlType" : "NUMBER",
-          "optionsDataSource" : null
+          "optionsDataSource" : null,
+          "controlType" : "NUMBER"
         } ],
-        "controlType" : "OBJECT_BUILDER",
-        "optionsDataSource" : null
+        "optionsDataSource" : null,
+        "controlType" : "OBJECT_BUILDER"
       },
       "sampleOutput" : null
     },
@@ -2960,8 +2673,8 @@
       "minValue" : null,
       "numberPrecision" : null,
       "options" : null,
-      "controlType" : "NUMBER",
-      "optionsDataSource" : null
+      "optionsDataSource" : null,
+      "controlType" : "NUMBER"
     }, {
       "advancedOption" : null,
       "description" : "Page token to retrieve a specific page of results in the list.",
@@ -3132,8 +2845,8 @@
       "minItems" : null,
       "multipleValues" : null,
       "options" : null,
-      "controlType" : "ARRAY_BUILDER",
-      "optionsDataSource" : null
+      "optionsDataSource" : null,
+      "controlType" : "ARRAY_BUILDER"
     }, {
       "advancedOption" : null,
       "description" : "Include messages from SPAM and TRASH in the results.",
@@ -3161,11 +2874,10 @@
     } ],
     "title" : "Search Email",
     "type" : {
-      "name" : "tool",
-      "label" : "Tool",
+      "name" : "tools",
+      "label" : "Tools",
       "multipleElements" : true,
-      "required" : false,
-      "local" : true
+      "required" : false
     },
     "object" : { }
   }, {
@@ -3270,11 +2982,11 @@
             "minItems" : null,
             "multipleValues" : null,
             "options" : null,
-            "controlType" : "ARRAY_BUILDER",
-            "optionsDataSource" : null
+            "optionsDataSource" : null,
+            "controlType" : "ARRAY_BUILDER"
           } ],
-          "controlType" : "OBJECT_BUILDER",
-          "optionsDataSource" : null
+          "optionsDataSource" : null,
+          "controlType" : "OBJECT_BUILDER"
         },
         "sampleOutput" : null,
         "placeholder" : null
@@ -3375,11 +3087,11 @@
           "minItems" : null,
           "multipleValues" : null,
           "options" : null,
-          "controlType" : "ARRAY_BUILDER",
-          "optionsDataSource" : null
+          "optionsDataSource" : null,
+          "controlType" : "ARRAY_BUILDER"
         } ],
-        "controlType" : "OBJECT_BUILDER",
-        "optionsDataSource" : null
+        "optionsDataSource" : null,
+        "controlType" : "OBJECT_BUILDER"
       },
       "sampleOutput" : null
     },
@@ -3422,8 +3134,8 @@
       "minItems" : null,
       "multipleValues" : null,
       "options" : null,
-      "controlType" : "ARRAY_BUILDER",
-      "optionsDataSource" : null
+      "optionsDataSource" : null,
+      "controlType" : "ARRAY_BUILDER"
     }, {
       "advancedOption" : null,
       "description" : "Subject of the email.",
@@ -3483,8 +3195,8 @@
       "minItems" : null,
       "multipleValues" : null,
       "options" : null,
-      "controlType" : "ARRAY_BUILDER",
-      "optionsDataSource" : null
+      "optionsDataSource" : null,
+      "controlType" : "ARRAY_BUILDER"
     }, {
       "advancedOption" : null,
       "description" : "Cc recipients email addresses.",
@@ -3524,8 +3236,8 @@
       "minItems" : null,
       "multipleValues" : null,
       "options" : null,
-      "controlType" : "ARRAY_BUILDER",
-      "optionsDataSource" : null
+      "optionsDataSource" : null,
+      "controlType" : "ARRAY_BUILDER"
     }, {
       "advancedOption" : null,
       "description" : "Reply-to email addresses.",
@@ -3565,8 +3277,8 @@
       "minItems" : null,
       "multipleValues" : null,
       "options" : null,
-      "controlType" : "ARRAY_BUILDER",
-      "optionsDataSource" : null
+      "optionsDataSource" : null,
+      "controlType" : "ARRAY_BUILDER"
     }, {
       "advancedOption" : null,
       "description" : "Body text of the email",
@@ -3702,17 +3414,302 @@
       "minItems" : null,
       "multipleValues" : null,
       "options" : null,
-      "controlType" : "ARRAY_BUILDER",
-      "optionsDataSource" : null
+      "optionsDataSource" : null,
+      "controlType" : "ARRAY_BUILDER"
     } ],
     "title" : "Send Email",
     "type" : {
-      "name" : "tool",
-      "label" : "Tool",
+      "name" : "tools",
+      "label" : "Tools",
       "multipleElements" : true,
-      "required" : false,
-      "local" : true
+      "required" : false
     },
     "object" : { }
+  } ],
+  "unifiedApi" : null,
+  "triggers" : [ {
+    "batch" : null,
+    "deprecated" : null,
+    "description" : "Triggers when new mail is found in your Gmail inbox.",
+    "help" : null,
+    "name" : "newEmail",
+    "outputDefinition" : {
+      "output" : { },
+      "outputResponse" : null,
+      "outputSchema" : null,
+      "sampleOutput" : null
+    },
+    "properties" : [ {
+      "advancedOption" : null,
+      "description" : "Must be 3-255 characters, start with a letter, and contain only the following characters: letters, numbers, dashes (-), periods (.), underscores (_), tildes (~), percents (%) or plus signs (+). Cannot start with goog.",
+      "displayCondition" : null,
+      "expressionEnabled" : null,
+      "hidden" : null,
+      "metadata" : { },
+      "required" : true,
+      "name" : "topicName",
+      "type" : "STRING",
+      "defaultValue" : null,
+      "exampleValue" : null,
+      "label" : "Topic Name",
+      "placeholder" : null,
+      "controlType" : "TEXT",
+      "languageId" : null,
+      "maxLength" : 255,
+      "minLength" : 3,
+      "options" : null,
+      "optionsDataSource" : null
+    }, {
+      "advancedOption" : null,
+      "description" : "The format to return the message in.",
+      "displayCondition" : null,
+      "expressionEnabled" : null,
+      "hidden" : null,
+      "metadata" : { },
+      "required" : false,
+      "name" : "format",
+      "type" : "STRING",
+      "defaultValue" : "SIMPLE",
+      "exampleValue" : null,
+      "label" : "Format",
+      "placeholder" : null,
+      "controlType" : "SELECT",
+      "languageId" : null,
+      "maxLength" : null,
+      "minLength" : null,
+      "options" : [ {
+        "description" : "Returns email message's from, to, subject, body and attachments.",
+        "label" : "Simple",
+        "value" : "SIMPLE"
+      }, {
+        "description" : "Returns only email message ID and labels; does not return the email headers, body, or payload.",
+        "label" : "Minimal",
+        "value" : "MINIMAL"
+      }, {
+        "description" : "Returns the full email message data with body content parsed in the payload field; the raw field is not used. Format cannot be used when accessing the api using the gmail.metadata scope.",
+        "label" : "Full",
+        "value" : "FULL"
+      }, {
+        "description" : "Returns the full email message data with body content in the raw field as a base64url encoded string; the payload field is not used. Format cannot be used when accessing the api using the gmail.metadata scope.",
+        "label" : "Raw",
+        "value" : "RAW"
+      }, {
+        "description" : "Returns only email message ID, labels, and email headers.",
+        "label" : "Metadata",
+        "value" : "metadata"
+      } ],
+      "optionsDataSource" : null
+    } ],
+    "title" : "New Email",
+    "type" : "STATIC_WEBHOOK",
+    "webhookRawBody" : null,
+    "workflowSyncExecution" : null,
+    "processErrorResponse" : null,
+    "workflowNodeDescription" : null,
+    "dynamicWebhookRefresh" : null,
+    "webhookValidateOnEnable" : null,
+    "webhookDisable" : { },
+    "webhookEnable" : { },
+    "webhookRequest" : { },
+    "listenerDisable" : null,
+    "listenerEnable" : null,
+    "webhookValidate" : null,
+    "deduplicate" : null,
+    "poll" : null
+  }, {
+    "batch" : null,
+    "deprecated" : null,
+    "description" : "Periodically checks your Gmail inbox for any new incoming emails.",
+    "help" : null,
+    "name" : "newEmailPolling",
+    "outputDefinition" : {
+      "output" : null,
+      "outputResponse" : {
+        "outputSchema" : {
+          "advancedOption" : null,
+          "description" : null,
+          "displayCondition" : null,
+          "expressionEnabled" : null,
+          "hidden" : null,
+          "metadata" : { },
+          "required" : null,
+          "name" : null,
+          "type" : "ARRAY",
+          "defaultValue" : null,
+          "exampleValue" : null,
+          "label" : null,
+          "placeholder" : null,
+          "items" : [ {
+            "advancedOption" : null,
+            "description" : null,
+            "displayCondition" : null,
+            "expressionEnabled" : null,
+            "hidden" : null,
+            "metadata" : { },
+            "required" : null,
+            "name" : null,
+            "type" : "OBJECT",
+            "defaultValue" : null,
+            "exampleValue" : null,
+            "label" : null,
+            "placeholder" : null,
+            "additionalProperties" : null,
+            "multipleValues" : null,
+            "options" : null,
+            "properties" : [ {
+              "advancedOption" : null,
+              "description" : "ID of the message.",
+              "displayCondition" : null,
+              "expressionEnabled" : null,
+              "hidden" : null,
+              "metadata" : { },
+              "required" : null,
+              "name" : "id",
+              "type" : "STRING",
+              "defaultValue" : null,
+              "exampleValue" : null,
+              "label" : null,
+              "placeholder" : null,
+              "controlType" : "TEXT",
+              "languageId" : null,
+              "maxLength" : null,
+              "minLength" : null,
+              "options" : null,
+              "optionsDataSource" : null
+            }, {
+              "advancedOption" : null,
+              "description" : "The ID of the thread the message belongs to.",
+              "displayCondition" : null,
+              "expressionEnabled" : null,
+              "hidden" : null,
+              "metadata" : { },
+              "required" : null,
+              "name" : "threadId",
+              "type" : "STRING",
+              "defaultValue" : null,
+              "exampleValue" : null,
+              "label" : null,
+              "placeholder" : null,
+              "controlType" : "TEXT",
+              "languageId" : null,
+              "maxLength" : null,
+              "minLength" : null,
+              "options" : null,
+              "optionsDataSource" : null
+            } ],
+            "optionsDataSource" : null,
+            "controlType" : "OBJECT_BUILDER"
+          } ],
+          "maxItems" : null,
+          "minItems" : null,
+          "multipleValues" : null,
+          "options" : null,
+          "optionsDataSource" : null,
+          "controlType" : "ARRAY_BUILDER"
+        },
+        "sampleOutput" : null,
+        "placeholder" : null
+      },
+      "outputSchema" : {
+        "advancedOption" : null,
+        "description" : null,
+        "displayCondition" : null,
+        "expressionEnabled" : null,
+        "hidden" : null,
+        "metadata" : { },
+        "required" : null,
+        "name" : null,
+        "type" : "ARRAY",
+        "defaultValue" : null,
+        "exampleValue" : null,
+        "label" : null,
+        "placeholder" : null,
+        "items" : [ {
+          "advancedOption" : null,
+          "description" : null,
+          "displayCondition" : null,
+          "expressionEnabled" : null,
+          "hidden" : null,
+          "metadata" : { },
+          "required" : null,
+          "name" : null,
+          "type" : "OBJECT",
+          "defaultValue" : null,
+          "exampleValue" : null,
+          "label" : null,
+          "placeholder" : null,
+          "additionalProperties" : null,
+          "multipleValues" : null,
+          "options" : null,
+          "properties" : [ {
+            "advancedOption" : null,
+            "description" : "ID of the message.",
+            "displayCondition" : null,
+            "expressionEnabled" : null,
+            "hidden" : null,
+            "metadata" : { },
+            "required" : null,
+            "name" : "id",
+            "type" : "STRING",
+            "defaultValue" : null,
+            "exampleValue" : null,
+            "label" : null,
+            "placeholder" : null,
+            "controlType" : "TEXT",
+            "languageId" : null,
+            "maxLength" : null,
+            "minLength" : null,
+            "options" : null,
+            "optionsDataSource" : null
+          }, {
+            "advancedOption" : null,
+            "description" : "The ID of the thread the message belongs to.",
+            "displayCondition" : null,
+            "expressionEnabled" : null,
+            "hidden" : null,
+            "metadata" : { },
+            "required" : null,
+            "name" : "threadId",
+            "type" : "STRING",
+            "defaultValue" : null,
+            "exampleValue" : null,
+            "label" : null,
+            "placeholder" : null,
+            "controlType" : "TEXT",
+            "languageId" : null,
+            "maxLength" : null,
+            "minLength" : null,
+            "options" : null,
+            "optionsDataSource" : null
+          } ],
+          "optionsDataSource" : null,
+          "controlType" : "OBJECT_BUILDER"
+        } ],
+        "maxItems" : null,
+        "minItems" : null,
+        "multipleValues" : null,
+        "options" : null,
+        "optionsDataSource" : null,
+        "controlType" : "ARRAY_BUILDER"
+      },
+      "sampleOutput" : null
+    },
+    "properties" : null,
+    "title" : "New Email Polling",
+    "type" : "POLLING",
+    "webhookRawBody" : null,
+    "workflowSyncExecution" : null,
+    "processErrorResponse" : null,
+    "workflowNodeDescription" : null,
+    "dynamicWebhookRefresh" : null,
+    "webhookValidateOnEnable" : null,
+    "webhookDisable" : null,
+    "webhookEnable" : null,
+    "webhookRequest" : null,
+    "listenerDisable" : null,
+    "listenerEnable" : null,
+    "webhookValidate" : null,
+    "deduplicate" : null,
+    "poll" : { }
   } ]
 }

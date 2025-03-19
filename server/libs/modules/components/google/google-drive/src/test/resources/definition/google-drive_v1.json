@@ -63,8 +63,6 @@
       "title" : "OAuth2 Authorization Code",
       "type" : "OAUTH2_AUTHORIZATION_CODE",
       "acquire" : null,
-      "oauth2AuthorizationExtraQueryParameters" : { },
-      "authorizationCallback" : null,
       "authorizationUrl" : { },
       "clientSecret" : null,
       "refreshToken" : null,
@@ -74,7 +72,9 @@
       "refresh" : null,
       "refreshUrl" : { },
       "scopes" : { },
-      "tokenUrl" : { }
+      "tokenUrl" : { },
+      "authorizationCallback" : null,
+      "oauth2AuthorizationExtraQueryParameters" : { }
     } ],
     "properties" : null,
     "version" : 1,
@@ -367,9 +367,9 @@
       }
     } ],
     "title" : "Copy File",
+    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
-    "perform" : { }
+    "workflowNodeDescription" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -482,9 +482,9 @@
           "controlType" : "OBJECT_BUILDER"
         },
         "sampleOutput" : {
+          "mimeType" : "plain/text",
           "name" : "new-file.txt",
-          "id" : "1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr",
-          "mimeType" : "plain/text"
+          "id" : "1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr"
         },
         "placeholder" : null
       },
@@ -590,9 +590,9 @@
         "controlType" : "OBJECT_BUILDER"
       },
       "sampleOutput" : {
+        "mimeType" : "plain/text",
         "name" : "new-file.txt",
-        "id" : "1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr",
-        "mimeType" : "plain/text"
+        "id" : "1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr"
       }
     },
     "properties" : [ {
@@ -640,9 +640,9 @@
       }
     } ],
     "title" : "Create New Folder",
+    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
-    "perform" : { }
+    "workflowNodeDescription" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -755,9 +755,9 @@
           "controlType" : "OBJECT_BUILDER"
         },
         "sampleOutput" : {
+          "mimeType" : "plain/text",
           "name" : "new-file.txt",
-          "id" : "1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr",
-          "mimeType" : "plain/text"
+          "id" : "1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr"
         },
         "placeholder" : null
       },
@@ -863,9 +863,9 @@
         "controlType" : "OBJECT_BUILDER"
       },
       "sampleOutput" : {
+        "mimeType" : "plain/text",
         "name" : "new-file.txt",
-        "id" : "1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr",
-        "mimeType" : "plain/text"
+        "id" : "1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr"
       }
     },
     "properties" : [ {
@@ -965,9 +965,9 @@
       }
     } ],
     "title" : "Create New Text File",
+    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
-    "perform" : { }
+    "workflowNodeDescription" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -1001,9 +1001,9 @@
       }
     } ],
     "title" : "Delete File",
+    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
-    "perform" : { }
+    "workflowNodeDescription" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -1238,9 +1238,9 @@
       }
     } ],
     "title" : "Download File",
+    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
-    "perform" : { }
+    "workflowNodeDescription" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -1483,9 +1483,9 @@
       }
     } ],
     "title" : "Get File",
+    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
-    "perform" : { }
+    "workflowNodeDescription" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -1598,9 +1598,9 @@
           "controlType" : "OBJECT_BUILDER"
         },
         "sampleOutput" : {
+          "mimeType" : "plain/text",
           "name" : "new-file.txt",
-          "id" : "1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr",
-          "mimeType" : "plain/text"
+          "id" : "1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr"
         },
         "placeholder" : null
       },
@@ -1706,9 +1706,9 @@
         "controlType" : "OBJECT_BUILDER"
       },
       "sampleOutput" : {
+        "mimeType" : "plain/text",
         "name" : "new-file.txt",
-        "id" : "1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr",
-        "mimeType" : "plain/text"
+        "id" : "1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr"
       }
     },
     "properties" : [ {
@@ -1832,11 +1832,12 @@
       }
     } ],
     "title" : "Upload File",
+    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
-    "perform" : { }
+    "workflowNodeDescription" : null
   } ],
   "clusterElements" : null,
+  "unifiedApi" : null,
   "triggers" : [ {
     "batch" : null,
     "deprecated" : null,
@@ -2123,10 +2124,6 @@
     "type" : "POLLING",
     "webhookRawBody" : null,
     "workflowSyncExecution" : null,
-    "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
-    "dynamicWebhookRefresh" : null,
-    "webhookValidateOnEnable" : null,
     "webhookDisable" : null,
     "webhookEnable" : null,
     "webhookRequest" : null,
@@ -2134,7 +2131,11 @@
     "listenerEnable" : null,
     "webhookValidate" : null,
     "deduplicate" : null,
-    "poll" : { }
+    "poll" : { },
+    "processErrorResponse" : null,
+    "workflowNodeDescription" : null,
+    "dynamicWebhookRefresh" : null,
+    "webhookValidateOnEnable" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -2421,10 +2422,6 @@
     "type" : "POLLING",
     "webhookRawBody" : null,
     "workflowSyncExecution" : null,
-    "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
-    "dynamicWebhookRefresh" : null,
-    "webhookValidateOnEnable" : null,
     "webhookDisable" : null,
     "webhookEnable" : null,
     "webhookRequest" : null,
@@ -2432,7 +2429,10 @@
     "listenerEnable" : null,
     "webhookValidate" : null,
     "deduplicate" : null,
-    "poll" : { }
-  } ],
-  "unifiedApi" : null
+    "poll" : { },
+    "processErrorResponse" : null,
+    "workflowNodeDescription" : null,
+    "dynamicWebhookRefresh" : null,
+    "webhookValidateOnEnable" : null
+  } ]
 }

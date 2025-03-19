@@ -63,8 +63,8 @@
       "title" : "OAuth2 Authorization Code",
       "type" : "OAUTH2_AUTHORIZATION_CODE",
       "acquire" : null,
-      "oauth2AuthorizationExtraQueryParameters" : { },
       "authorizationCallback" : null,
+      "oauth2AuthorizationExtraQueryParameters" : { },
       "apply" : null,
       "clientId" : null,
       "pkce" : null,
@@ -79,8 +79,8 @@
     "properties" : null,
     "version" : 1,
     "authorizationRequired" : null,
-    "test" : null,
-    "baseUri" : null
+    "baseUri" : null,
+    "test" : null
   },
   "actions" : [ {
     "batch" : null,
@@ -1043,7 +1043,7 @@
     "workflowNodeDescription" : null,
     "perform" : { }
   } ],
-  "triggers" : null,
   "unifiedApi" : null,
+  "triggers" : null,
   "clusterElements" : null
 }

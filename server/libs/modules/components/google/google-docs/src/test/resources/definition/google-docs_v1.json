@@ -63,8 +63,6 @@
       "title" : "OAuth2 Authorization Code",
       "type" : "OAUTH2_AUTHORIZATION_CODE",
       "acquire" : null,
-      "oauth2AuthorizationExtraQueryParameters" : { },
-      "authorizationCallback" : null,
       "apply" : null,
       "clientId" : null,
       "pkce" : null,
@@ -74,7 +72,9 @@
       "tokenUrl" : { },
       "authorizationUrl" : { },
       "clientSecret" : null,
-      "refreshToken" : null
+      "refreshToken" : null,
+      "authorizationCallback" : null,
+      "oauth2AuthorizationExtraQueryParameters" : { }
     } ],
     "properties" : null,
     "version" : 1,
@@ -137,9 +137,9 @@
       "optionsDataSource" : null
     } ],
     "title" : "Create Document",
+    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
-    "perform" : { }
+    "workflowNodeDescription" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -301,9 +301,9 @@
       "optionsDataSource" : null
     } ],
     "title" : "Create Document From Template",
+    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
-    "perform" : { }
+    "workflowNodeDescription" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -342,11 +342,11 @@
       }
     } ],
     "title" : "Get Document",
+    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
-    "perform" : { }
+    "workflowNodeDescription" : null
   } ],
-  "triggers" : null,
   "unifiedApi" : null,
+  "triggers" : null,
   "clusterElements" : null
 }

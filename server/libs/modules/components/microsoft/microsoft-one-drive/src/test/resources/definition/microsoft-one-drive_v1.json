@@ -83,8 +83,6 @@
       "title" : "OAuth2 Authorization Code",
       "type" : "OAUTH2_AUTHORIZATION_CODE",
       "acquire" : null,
-      "authorizationCallback" : null,
-      "oauth2AuthorizationExtraQueryParameters" : null,
       "apply" : null,
       "clientId" : null,
       "pkce" : null,
@@ -94,7 +92,9 @@
       "tokenUrl" : { },
       "authorizationUrl" : { },
       "clientSecret" : null,
-      "refreshToken" : null
+      "refreshToken" : null,
+      "authorizationCallback" : null,
+      "oauth2AuthorizationExtraQueryParameters" : null
     } ],
     "properties" : null,
     "version" : 1,
@@ -359,9 +359,9 @@
       }
     } ],
     "title" : "Download File",
+    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
-    "perform" : { }
+    "workflowNodeDescription" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -566,9 +566,9 @@
       }
     } ],
     "title" : "List Files",
+    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
-    "perform" : { }
+    "workflowNodeDescription" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -773,9 +773,9 @@
       }
     } ],
     "title" : "List Folders",
+    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
-    "perform" : { }
+    "workflowNodeDescription" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -1034,10 +1034,11 @@
       "controlType" : "FILE_ENTRY"
     } ],
     "title" : "Upload File",
+    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
-    "perform" : { }
+    "workflowNodeDescription" : null
   } ],
+  "unifiedApi" : null,
   "triggers" : [ {
     "batch" : null,
     "deprecated" : null,
@@ -1244,10 +1245,6 @@
     "type" : "POLLING",
     "webhookRawBody" : null,
     "workflowSyncExecution" : null,
-    "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
-    "dynamicWebhookRefresh" : null,
-    "webhookValidateOnEnable" : null,
     "deduplicate" : null,
     "poll" : { },
     "webhookDisable" : null,
@@ -1255,8 +1252,11 @@
     "webhookRequest" : null,
     "listenerDisable" : null,
     "listenerEnable" : null,
-    "webhookValidate" : null
+    "webhookValidate" : null,
+    "processErrorResponse" : null,
+    "workflowNodeDescription" : null,
+    "dynamicWebhookRefresh" : null,
+    "webhookValidateOnEnable" : null
   } ],
-  "unifiedApi" : null,
   "clusterElements" : null
 }

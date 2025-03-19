@@ -172,9 +172,9 @@
       "controlType" : "FILE_ENTRY"
     } ],
     "title" : "Read from File as String",
-    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "perform" : { }
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -426,9 +426,9 @@
       "optionsDataSource" : null
     } ],
     "title" : "Write to File",
-    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "perform" : { }
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -680,11 +680,11 @@
       "optionsDataSource" : null
     } ],
     "title" : "Download File",
-    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "perform" : { }
   } ],
-  "triggers" : null,
+  "clusterElements" : null,
   "unifiedApi" : null,
-  "clusterElements" : null
+  "triggers" : null
 }

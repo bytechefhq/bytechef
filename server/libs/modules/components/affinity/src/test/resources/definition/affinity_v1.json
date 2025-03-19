@@ -43,8 +43,6 @@
       "title" : "Bearer Token",
       "type" : "BEARER_TOKEN",
       "acquire" : null,
-      "oauth2AuthorizationExtraQueryParameters" : null,
-      "authorizationCallback" : null,
       "apply" : null,
       "clientId" : null,
       "pkce" : null,
@@ -54,7 +52,9 @@
       "tokenUrl" : null,
       "authorizationUrl" : null,
       "clientSecret" : null,
-      "refreshToken" : null
+      "refreshToken" : null,
+      "oauth2AuthorizationExtraQueryParameters" : null,
+      "authorizationCallback" : null
     } ],
     "properties" : null,
     "version" : 1,
@@ -232,9 +232,9 @@
       "optionsDataSource" : null
     } ],
     "title" : "Create Opportunity",
+    "perform" : null,
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
-    "perform" : null
+    "workflowNodeDescription" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -467,9 +467,9 @@
       "optionsDataSource" : null
     } ],
     "title" : "Create Organization",
+    "perform" : null,
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
-    "perform" : null
+    "workflowNodeDescription" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -829,9 +829,9 @@
       "optionsDataSource" : null
     } ],
     "title" : "Create Person",
+    "perform" : null,
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
-    "perform" : null
+    "workflowNodeDescription" : null
   } ],
   "triggers" : [ ],
   "unifiedApi" : null,

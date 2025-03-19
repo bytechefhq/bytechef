@@ -16,6 +16,7 @@
   "connection" : null,
   "actions" : null,
   "clusterElements" : null,
+  "unifiedApi" : null,
   "triggers" : [ {
     "batch" : null,
     "deprecated" : null,
@@ -93,6 +94,5 @@
     "processErrorResponse" : null,
     "webhookValidateOnEnable" : null,
     "workflowNodeDescription" : null
-  } ],
-  "unifiedApi" : null
+  } ]
 }

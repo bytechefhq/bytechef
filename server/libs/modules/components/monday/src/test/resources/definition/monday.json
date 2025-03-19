@@ -60,9 +60,6 @@
       "title" : "OAuth2 Authorization Code",
       "type" : "OAUTH2_AUTHORIZATION_CODE",
       "acquire" : null,
-      "authorizationUrl" : { },
-      "clientSecret" : null,
-      "refreshToken" : null,
       "apply" : null,
       "clientId" : null,
       "pkce" : null,
@@ -70,6 +67,9 @@
       "refreshUrl" : { },
       "scopes" : { },
       "tokenUrl" : { },
+      "authorizationUrl" : { },
+      "clientSecret" : null,
+      "refreshToken" : null,
       "authorizationCallback" : null,
       "oauth2AuthorizationExtraQueryParameters" : null
     } ],
@@ -164,16 +164,15 @@
               "options" : null,
               "optionsDataSource" : null
             } ],
-            "optionsDataSource" : null,
-            "controlType" : "OBJECT_BUILDER"
+            "controlType" : "OBJECT_BUILDER",
+            "optionsDataSource" : null
           } ],
-          "optionsDataSource" : null,
-          "controlType" : "OBJECT_BUILDER"
+          "controlType" : "OBJECT_BUILDER",
+          "optionsDataSource" : null
         },
         "sampleOutput" : null,
         "placeholder" : null
       },
-      "sampleOutput" : null,
       "outputSchema" : {
         "advancedOption" : null,
         "description" : null,
@@ -249,12 +248,13 @@
             "options" : null,
             "optionsDataSource" : null
           } ],
-          "optionsDataSource" : null,
-          "controlType" : "OBJECT_BUILDER"
+          "controlType" : "OBJECT_BUILDER",
+          "optionsDataSource" : null
         } ],
-        "optionsDataSource" : null,
-        "controlType" : "OBJECT_BUILDER"
-      }
+        "controlType" : "OBJECT_BUILDER",
+        "optionsDataSource" : null
+      },
+      "sampleOutput" : null
     },
     "properties" : [ {
       "advancedOption" : null,
@@ -588,16 +588,15 @@
               "options" : null,
               "optionsDataSource" : null
             } ],
-            "optionsDataSource" : null,
-            "controlType" : "OBJECT_BUILDER"
+            "controlType" : "OBJECT_BUILDER",
+            "optionsDataSource" : null
           } ],
-          "optionsDataSource" : null,
-          "controlType" : "OBJECT_BUILDER"
+          "controlType" : "OBJECT_BUILDER",
+          "optionsDataSource" : null
         },
         "sampleOutput" : null,
         "placeholder" : null
       },
-      "sampleOutput" : null,
       "outputSchema" : {
         "advancedOption" : null,
         "description" : null,
@@ -673,12 +672,13 @@
             "options" : null,
             "optionsDataSource" : null
           } ],
-          "optionsDataSource" : null,
-          "controlType" : "OBJECT_BUILDER"
+          "controlType" : "OBJECT_BUILDER",
+          "optionsDataSource" : null
         } ],
-        "optionsDataSource" : null,
-        "controlType" : "OBJECT_BUILDER"
-      }
+        "controlType" : "OBJECT_BUILDER",
+        "optionsDataSource" : null
+      },
+      "sampleOutput" : null
     },
     "properties" : [ {
       "advancedOption" : null,
@@ -836,16 +836,15 @@
               "options" : null,
               "optionsDataSource" : null
             } ],
-            "optionsDataSource" : null,
-            "controlType" : "OBJECT_BUILDER"
+            "controlType" : "OBJECT_BUILDER",
+            "optionsDataSource" : null
           } ],
-          "optionsDataSource" : null,
-          "controlType" : "OBJECT_BUILDER"
+          "controlType" : "OBJECT_BUILDER",
+          "optionsDataSource" : null
         },
         "sampleOutput" : null,
         "placeholder" : null
       },
-      "sampleOutput" : null,
       "outputSchema" : {
         "advancedOption" : null,
         "description" : null,
@@ -921,12 +920,13 @@
             "options" : null,
             "optionsDataSource" : null
           } ],
-          "optionsDataSource" : null,
-          "controlType" : "OBJECT_BUILDER"
+          "controlType" : "OBJECT_BUILDER",
+          "optionsDataSource" : null
         } ],
-        "optionsDataSource" : null,
-        "controlType" : "OBJECT_BUILDER"
-      }
+        "controlType" : "OBJECT_BUILDER",
+        "optionsDataSource" : null
+      },
+      "sampleOutput" : null
     },
     "properties" : [ {
       "advancedOption" : null,
@@ -1122,16 +1122,15 @@
               "options" : null,
               "optionsDataSource" : null
             } ],
-            "optionsDataSource" : null,
-            "controlType" : "OBJECT_BUILDER"
+            "controlType" : "OBJECT_BUILDER",
+            "optionsDataSource" : null
           } ],
-          "optionsDataSource" : null,
-          "controlType" : "OBJECT_BUILDER"
+          "controlType" : "OBJECT_BUILDER",
+          "optionsDataSource" : null
         },
         "sampleOutput" : null,
         "placeholder" : null
       },
-      "sampleOutput" : null,
       "outputSchema" : {
         "advancedOption" : null,
         "description" : null,
@@ -1207,12 +1206,13 @@
             "options" : null,
             "optionsDataSource" : null
           } ],
-          "optionsDataSource" : null,
-          "controlType" : "OBJECT_BUILDER"
+          "controlType" : "OBJECT_BUILDER",
+          "optionsDataSource" : null
         } ],
-        "optionsDataSource" : null,
-        "controlType" : "OBJECT_BUILDER"
-      }
+        "controlType" : "OBJECT_BUILDER",
+        "optionsDataSource" : null
+      },
+      "sampleOutput" : null
     },
     "properties" : [ {
       "advancedOption" : null,
@@ -1374,7 +1374,7 @@
     "processErrorResponse" : null,
     "workflowNodeDescription" : null
   } ],
-  "clusterElements" : null,
+  "unifiedApi" : null,
   "triggers" : [ {
     "batch" : null,
     "deprecated" : null,
@@ -1384,8 +1384,8 @@
     "outputDefinition" : {
       "output" : null,
       "outputResponse" : null,
-      "sampleOutput" : null,
-      "outputSchema" : null
+      "outputSchema" : null,
+      "sampleOutput" : null
     },
     "properties" : [ {
       "advancedOption" : null,
@@ -1438,18 +1438,18 @@
     "type" : "DYNAMIC_WEBHOOK",
     "webhookRawBody" : null,
     "workflowSyncExecution" : null,
+    "deduplicate" : null,
+    "poll" : null,
     "webhookDisable" : { },
     "webhookEnable" : { },
     "webhookRequest" : { },
     "listenerDisable" : null,
     "listenerEnable" : null,
     "webhookValidate" : null,
-    "deduplicate" : null,
-    "poll" : null,
     "processErrorResponse" : null,
     "workflowNodeDescription" : null,
     "dynamicWebhookRefresh" : null,
     "webhookValidateOnEnable" : { }
   } ],
-  "unifiedApi" : null
+  "clusterElements" : null
 }
