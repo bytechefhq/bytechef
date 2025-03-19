@@ -21,7 +21,7 @@ import jakarta.annotation.Generated;
  */
 
 @JsonTypeName("publishIntegration_request")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-03-10T21:49:30.205405+01:00[Europe/Zagreb]", comments = "Generator version: 7.12.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-03-14T15:53:16.172318+01:00[Europe/Zagreb]", comments = "Generator version: 7.12.0")
 public class PublishIntegrationRequestModel {
 
   private @Nullable String description;

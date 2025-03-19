@@ -22,12 +22,12 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "ProjectDeploymentWorkflowConnection", description = "The connection used in a particular action task or trigger.")
 @JsonTypeName("ProjectDeploymentWorkflowConnection")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-03-10T21:49:29.448259+01:00[Europe/Zagreb]", comments = "Generator version: 7.12.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-03-14T15:53:15.316280+01:00[Europe/Zagreb]", comments = "Generator version: 7.12.0")
 public class ProjectDeploymentWorkflowConnectionModel {
 
   private Long connectionId;
 
-  private String key;
+  private @Nullable String workflowConnectionKey;
 
   private String workflowNodeName;
 
@@ -38,9 +38,8 @@ public class ProjectDeploymentWorkflowConnectionModel {
   /**
    * Constructor with only required parameters
    */
-  public ProjectDeploymentWorkflowConnectionModel(Long connectionId, String key, String workflowNodeName) {
+  public ProjectDeploymentWorkflowConnectionModel(Long connectionId, String workflowNodeName) {
     this.connectionId = connectionId;
-    this.key = key;
     this.workflowNodeName = workflowNodeName;
   }
 
@@ -64,24 +63,24 @@ public class ProjectDeploymentWorkflowConnectionModel {
     this.connectionId = connectionId;
   }
 
-  public ProjectDeploymentWorkflowConnectionModel key(String key) {
-    this.key = key;
+  public ProjectDeploymentWorkflowConnectionModel workflowConnectionKey(String workflowConnectionKey) {
+    this.workflowConnectionKey = workflowConnectionKey;
     return this;
   }
 
   /**
    * The connection key under which a connection is defined in a workflow definition.
-   * @return key
+   * @return workflowConnectionKey
    */
-  @NotNull 
-  @Schema(name = "key", description = "The connection key under which a connection is defined in a workflow definition.", requiredMode = Schema.RequiredMode.REQUIRED)
-  @JsonProperty("key")
-  public String getKey() {
-    return key;
+  
+  @Schema(name = "workflowConnectionKey", description = "The connection key under which a connection is defined in a workflow definition.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("workflowConnectionKey")
+  public String getWorkflowConnectionKey() {
+    return workflowConnectionKey;
   }
 
-  public void setKey(String key) {
-    this.key = key;
+  public void setWorkflowConnectionKey(String workflowConnectionKey) {
+    this.workflowConnectionKey = workflowConnectionKey;
   }
 
   public ProjectDeploymentWorkflowConnectionModel workflowNodeName(String workflowNodeName) {
@@ -114,13 +113,13 @@ public class ProjectDeploymentWorkflowConnectionModel {
     }
     ProjectDeploymentWorkflowConnectionModel projectDeploymentWorkflowConnection = (ProjectDeploymentWorkflowConnectionModel) o;
     return Objects.equals(this.connectionId, projectDeploymentWorkflowConnection.connectionId) &&
-        Objects.equals(this.key, projectDeploymentWorkflowConnection.key) &&
+        Objects.equals(this.workflowConnectionKey, projectDeploymentWorkflowConnection.workflowConnectionKey) &&
         Objects.equals(this.workflowNodeName, projectDeploymentWorkflowConnection.workflowNodeName);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(connectionId, key, workflowNodeName);
+    return Objects.hash(connectionId, workflowConnectionKey, workflowNodeName);
   }
 
   @Override
@@ -128,7 +127,7 @@ public class ProjectDeploymentWorkflowConnectionModel {
     StringBuilder sb = new StringBuilder();
     sb.append("class ProjectDeploymentWorkflowConnectionModel {\n");
     sb.append("    connectionId: ").append(toIndentedString(connectionId)).append("\n");
-    sb.append("    key: ").append(toIndentedString(key)).append("\n");
+    sb.append("    workflowConnectionKey: ").append(toIndentedString(workflowConnectionKey)).append("\n");
     sb.append("    workflowNodeName: ").append(toIndentedString(workflowNodeName)).append("\n");
     sb.append("}");
     return sb.toString();

@@ -24,7 +24,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "Workspace", description = "A workspace.")
 @JsonTypeName("Workspace")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-03-10T21:49:29.448259+01:00[Europe/Zagreb]", comments = "Generator version: 7.12.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-03-14T15:53:15.316280+01:00[Europe/Zagreb]", comments = "Generator version: 7.12.0")
 public class WorkspaceModel {
 
   private @Nullable String createdBy;
