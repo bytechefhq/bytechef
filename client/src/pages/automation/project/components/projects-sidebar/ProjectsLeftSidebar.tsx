@@ -116,7 +116,7 @@ const ProjectsLeftSidebar = ({
                 )}
             </div>
 
-            <ScrollArea className="h-screen w-full overflow-y-auto px-4">
+            <ScrollArea className="mb-3 h-screen w-full overflow-y-auto px-4">
                 {isLoading && <WorkflowsListSkeleton />}
 
                 {!isLoading && (
