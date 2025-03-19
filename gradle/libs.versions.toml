@@ -13,7 +13,7 @@ spotbugs = "4.8.6"
 spring-ai = "1.0.0-M6"
 spring-boot = "3.4.3"
 spring-cloud-aws = "3.3.0"
-spring-cloud-dependencies = "2024.0.0"
+spring-cloud-dependencies = "2024.0.1"
 spring-shell = "3.3.4"
 
 [libraries]
