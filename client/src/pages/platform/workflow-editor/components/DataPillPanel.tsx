@@ -91,7 +91,7 @@ const DataPillPanel = ({
                     </button>
                 </header>
 
-                <main className="flex w-full grow flex-col">
+                <main className="flex w-full grow flex-col overflow-hidden">
                     <div className="mb-0 border-b border-b-border/50 p-4">
                         <Input
                             name="dataPillFilter"
