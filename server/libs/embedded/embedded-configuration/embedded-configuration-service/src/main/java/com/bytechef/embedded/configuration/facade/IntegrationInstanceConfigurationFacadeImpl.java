@@ -852,7 +852,7 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
 
             ComponentConnection componentConnection = componentConnectionFacade.getComponentConnection(
                 workflow.getId(), integrationInstanceConfigurationWorkflowConnection.getWorkflowNodeName(),
-                integrationInstanceConfigurationWorkflowConnection.getKey());
+                integrationInstanceConfigurationWorkflowConnection.getWorkflowConnectionKey());
 
             if (!Objects.equals(connection.getComponentName(), componentConnection.componentName())) {
                 throw new IllegalArgumentException(
