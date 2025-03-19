@@ -22,12 +22,8 @@ import com.bytechef.message.broker.redis.RedisMessageBroker;
 import com.bytechef.message.broker.redis.serializer.RedisMessageDeserializer;
 import com.bytechef.message.broker.redis.serializer.RedisMessageSerializer;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.oblac.jrsmq.RedisSMQ;
-import com.oblac.jrsmq.RedisSMQConfig;
-import java.time.Duration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.boot.autoconfigure.data.redis.RedisProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
@@ -50,9 +46,9 @@ public class RedisMessageBrokerConfiguration {
 
     @Bean
     MessageBroker redisMessageBroker(
-        RedisMessageSerializer redisMessageSerializer, RedisSMQ redisSMQ, StringRedisTemplate stringRedisTemplate) {
+        RedisMessageSerializer redisMessageSerializer, StringRedisTemplate stringRedisTemplate) {
 
-        return new RedisMessageBroker(redisMessageSerializer, redisSMQ, stringRedisTemplate);
+        return new RedisMessageBroker(redisMessageSerializer, stringRedisTemplate);
     }
 
     @Bean
@@ -68,21 +64,5 @@ public class RedisMessageBrokerConfiguration {
     @Bean
     StringRedisTemplate stringRedisTemplate(RedisConnectionFactory redisConnectionFactory) {
         return new StringRedisTemplate(redisConnectionFactory);
-    }
-
-    @Bean
-    RedisSMQ redisSMQ(RedisProperties redisProperties) {
-        return new RedisSMQ(
-            RedisSMQConfig.createDefaultConfig()
-                .database(redisProperties.getDatabase())
-                .host(redisProperties.getHost())
-                .password(redisProperties.getPassword())
-                .port(redisProperties.getPort())
-//                .ssl(redisProperties.isSsl())
-                .timeout(getTimeout(redisProperties.getTimeout())));
-    }
-
-    private static int getTimeout(Duration timeout) {
-        return timeout == null ? 5000 : (int) timeout.toMillis();
     }
 }

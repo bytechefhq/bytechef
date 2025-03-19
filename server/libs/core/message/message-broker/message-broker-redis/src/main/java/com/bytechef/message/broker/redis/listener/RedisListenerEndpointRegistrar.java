@@ -18,13 +18,11 @@ package com.bytechef.message.broker.redis.listener;
 
 import com.bytechef.message.broker.redis.serializer.RedisMessageDeserializer;
 import com.bytechef.message.route.MessageRoute;
-import com.oblac.jrsmq.QueueMessage;
-import com.oblac.jrsmq.RedisSMQ;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 import org.slf4j.Logger;
@@ -32,6 +30,12 @@ import org.slf4j.LoggerFactory;
 import org.springframework.core.task.TaskExecutor;
 import org.springframework.data.redis.connection.Message;
 import org.springframework.data.redis.connection.MessageListener;
+import org.springframework.data.redis.connection.stream.MapRecord;
+import org.springframework.data.redis.connection.stream.ReadOffset;
+import org.springframework.data.redis.connection.stream.StreamOffset;
+import org.springframework.data.redis.connection.stream.StreamReadOptions;
+import org.springframework.data.redis.core.StreamOperations;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.util.MethodInvoker;
 
 /**
@@ -41,19 +45,22 @@ public class RedisListenerEndpointRegistrar implements MessageListener {
 
     private static final Logger logger = LoggerFactory.getLogger(RedisListenerEndpointRegistrar.class);
 
-    private final TaskExecutor taskExecutor;
+    private static final String CONSUMER_GROUP = "message_event_group";
+
     private final Map<String, Consumer<String>> invokerMap = new HashMap<>();
     private final RedisMessageDeserializer redisMessageDeserializer;
-    private final RedisSMQ redisSMQ;
     private boolean stopped;
+    private final StringRedisTemplate stringRedisTemplate;
+    private final TaskExecutor taskExecutor;
 
     @SuppressFBWarnings("EI2")
     public RedisListenerEndpointRegistrar(
-        RedisMessageDeserializer redisMessageDeserializer, RedisSMQ redisSMQ, TaskExecutor taskExecutor) {
+        RedisMessageDeserializer redisMessageDeserializer, StringRedisTemplate stringRedisTemplate,
+        TaskExecutor taskExecutor) {
 
         this.taskExecutor = taskExecutor;
         this.redisMessageDeserializer = redisMessageDeserializer;
-        this.redisSMQ = redisSMQ;
+        this.stringRedisTemplate = stringRedisTemplate;
     }
 
     @Override
@@ -76,45 +83,65 @@ public class RedisListenerEndpointRegistrar implements MessageListener {
 
         invokerMap.put(queueName, (String message) -> invoke(delegate, methodName, message));
 
-        checkQueueExists(queueName);
-
-        if (messageRoute.isMessageExchange()) {
-            taskExecutor.execute(() -> periodicallyCheckQueueForMessage(queueName));
+        try {
+            stringRedisTemplate.opsForStream()
+                .createGroup(messageRoute.getName(), CONSUMER_GROUP);
+        } catch (Exception e) {
+            if (logger.isDebugEnabled()) {
+                logger.debug("Consumer group already exists or error occurred: {}", e.getMessage());
+            }
         }
+
+//        if (messageRoute.isMessageExchange()) {
+//            StreamMessageListenerContainer.create(redisConnectionFactory)
+//                .receive(
+//                    org.springframework.data.redis.connection.stream.Consumer.from(queueName, this.toString()),
+//                    StreamOffset.create(queueName, ReadOffset.lastConsumed()),
+//                    message -> {
+//                        Consumer<String> invokerConsumer = invokerMap.get(queueName);
+//
+//                        taskExecutor.execute(() -> invokerConsumer.accept(message.getValue().get("message")));
+//                    });
+//        }
+    }
+
+    public void start() {
+        taskExecutor.execute(this::periodicallyCheckQueueForMessage);
     }
 
     public void stop() {
         this.stopped = true;
     }
 
-    private void periodicallyCheckQueueForMessage(String queueName) {
+    private void periodicallyCheckQueueForMessage() {
         while (!stopped) {
             try {
-                QueueMessage queueMessage = redisSMQ.popMessage()
-                    .qname(queueName)
-                    .exec();
+                for (Map.Entry<String, Consumer<String>> entry : invokerMap.entrySet()) {
+                    StreamOperations<String, Object, Object> stringObjectObjectStreamOperations =
+                        stringRedisTemplate.opsForStream();
 
-                if (queueMessage == null) {
-                    sleep();
-                } else {
-                    Consumer<String> invokerConsumer = invokerMap.get(queueName);
+                    List<MapRecord<String, Object, Object>> messages = stringObjectObjectStreamOperations.read(
+                        org.springframework.data.redis.connection.stream.Consumer.from(CONSUMER_GROUP, this.toString()),
+                        StreamReadOptions.empty(), StreamOffset.create(entry.getKey(), ReadOffset.lastConsumed()));
 
-                    taskExecutor.execute(() -> invokerConsumer.accept(queueMessage.message()));
+                    if (messages != null && !messages.isEmpty()) {
+                        Consumer<String> invokerConsumer = invokerMap.get(entry.getKey());
+
+                        for (MapRecord<String, Object, Object> message : messages) {
+                            Map<Object, Object> value = message.getValue();
+
+                            invokerConsumer.accept((String) value.get("message"));
+
+                            stringObjectObjectStreamOperations.acknowledge(
+                                entry.getKey(), CONSUMER_GROUP, message.getId());
+                        }
+                    }
                 }
+
+                sleep();
             } catch (Exception e) {
                 logger.error(e.getMessage(), e);
             }
-        }
-    }
-
-    private void checkQueueExists(String queueName) {
-        Set<String> queueNames = redisSMQ.listQueues()
-            .exec();
-
-        if (!queueNames.contains(queueName)) {
-            redisSMQ.createQueue()
-                .qname(queueName)
-                .exec();
         }
     }
 

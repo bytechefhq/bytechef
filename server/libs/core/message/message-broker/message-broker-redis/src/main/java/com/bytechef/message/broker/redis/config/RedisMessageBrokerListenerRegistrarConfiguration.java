@@ -22,7 +22,6 @@ import com.bytechef.message.broker.config.MessageBrokerListenerRegistrar;
 import com.bytechef.message.broker.redis.listener.RedisListenerEndpointRegistrar;
 import com.bytechef.message.broker.redis.serializer.RedisMessageDeserializer;
 import com.bytechef.message.route.MessageRoute;
-import com.oblac.jrsmq.RedisSMQ;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Collections;
 import java.util.List;
@@ -34,6 +33,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.task.TaskExecutor;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.listener.ChannelTopic;
 import org.springframework.data.redis.listener.RedisMessageListenerContainer;
 import org.springframework.data.redis.listener.adapter.MessageListenerAdapter;
@@ -46,8 +46,8 @@ import org.springframework.data.redis.listener.adapter.MessageListenerAdapter;
 public class RedisMessageBrokerListenerRegistrarConfiguration implements SmartInitializingSingleton, DisposableBean,
     MessageBrokerListenerRegistrar<RedisListenerEndpointRegistrar> {
 
-    private static final Logger logger =
-        LoggerFactory.getLogger(RedisMessageBrokerListenerRegistrarConfiguration.class);
+    private static final Logger logger = LoggerFactory.getLogger(
+        RedisMessageBrokerListenerRegistrarConfiguration.class);
 
     private final List<MessageBrokerConfigurer<RedisListenerEndpointRegistrar>> messageBrokerConfigurers;
     private MessageListenerAdapter messageListenerAdapter;
@@ -55,7 +55,7 @@ public class RedisMessageBrokerListenerRegistrarConfiguration implements SmartIn
     private RedisListenerEndpointRegistrar redisListenerEndpointRegistrar;
     private RedisMessageListenerContainer redisMessageListenerContainer;
     private final RedisMessageDeserializer redisMessageDeserializer;
-    private final RedisSMQ redisSMQ;
+    private final StringRedisTemplate stringRedisTemplate;
     private final TaskExecutor taskExecutor;
 
     @SuppressFBWarnings("EI2")
@@ -63,20 +63,20 @@ public class RedisMessageBrokerListenerRegistrarConfiguration implements SmartIn
         @Autowired(
             required = false) List<MessageBrokerConfigurer<RedisListenerEndpointRegistrar>> messageBrokerConfigurers,
         RedisConnectionFactory redisConnectionFactory, RedisMessageDeserializer redisMessageDeserializer,
-        RedisSMQ redisSMQ, TaskExecutor taskExecutor) {
+        StringRedisTemplate stringRedisTemplate, TaskExecutor taskExecutor) {
 
         this.messageBrokerConfigurers = messageBrokerConfigurers == null
             ? Collections.emptyList() : messageBrokerConfigurers;
         this.redisConnectionFactory = redisConnectionFactory;
         this.redisMessageDeserializer = redisMessageDeserializer;
-        this.redisSMQ = redisSMQ;
+        this.stringRedisTemplate = stringRedisTemplate;
         this.taskExecutor = taskExecutor;
     }
 
     @Override
     public void afterSingletonsInstantiated() {
         redisListenerEndpointRegistrar = new RedisListenerEndpointRegistrar(
-            redisMessageDeserializer, redisSMQ, taskExecutor);
+            redisMessageDeserializer, stringRedisTemplate, taskExecutor);
 
         redisMessageListenerContainer = new RedisMessageListenerContainer();
         messageListenerAdapter = new MessageListenerAdapter(redisListenerEndpointRegistrar);
@@ -90,6 +90,7 @@ public class RedisMessageBrokerListenerRegistrarConfiguration implements SmartIn
 
         redisMessageListenerContainer.setConnectionFactory(redisConnectionFactory);
 
+        redisListenerEndpointRegistrar.start();
         redisMessageListenerContainer.afterPropertiesSet();
         redisMessageListenerContainer.start();
     }
@@ -109,9 +110,11 @@ public class RedisMessageBrokerListenerRegistrarConfiguration implements SmartIn
 
         logger.info("Registering Redis Listener: {} -> {}:{}", messageRoute, delegateClass, methodName);
 
-        listenerEndpointRegistrar.registerListenerEndpoint(messageRoute, delegate, methodName);
-
-        redisMessageListenerContainer.addMessageListener(
-            messageListenerAdapter, new ChannelTopic(messageRoute.getName()));
+        if (messageRoute.isControlExchange()) {
+            redisMessageListenerContainer.addMessageListener(
+                messageListenerAdapter, new ChannelTopic(messageRoute.getName()));
+        } else {
+            listenerEndpointRegistrar.registerListenerEndpoint(messageRoute, delegate, methodName);
+        }
     }
 }

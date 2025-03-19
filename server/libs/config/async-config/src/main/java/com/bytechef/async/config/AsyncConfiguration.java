@@ -25,8 +25,10 @@ import org.springframework.aop.interceptor.AsyncUncaughtExceptionHandler;
 import org.springframework.aop.interceptor.SimpleAsyncUncaughtExceptionHandler;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.task.TaskExecutionProperties;
+import org.springframework.boot.autoconfigure.thread.Threading;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.env.Environment;
 import org.springframework.core.task.AsyncTaskExecutor;
 import org.springframework.scheduling.annotation.AsyncConfigurer;
 import org.springframework.scheduling.annotation.EnableAsync;
@@ -45,10 +47,12 @@ public class AsyncConfiguration implements AsyncConfigurer {
 
     private static final Logger log = LoggerFactory.getLogger(AsyncConfiguration.class);
 
+    private final Environment environment;
     private final TaskExecutionProperties taskExecutionProperties;
 
     @SuppressFBWarnings("EI")
-    public AsyncConfiguration(TaskExecutionProperties taskExecutionProperties) {
+    public AsyncConfiguration(Environment environment, TaskExecutionProperties taskExecutionProperties) {
+        this.environment = environment;
         this.taskExecutionProperties = taskExecutionProperties;
     }
 
@@ -65,6 +69,7 @@ public class AsyncConfiguration implements AsyncConfigurer {
         executor.setMaxPoolSize(pool.getMaxSize());
         executor.setQueueCapacity(pool.getQueueCapacity());
         executor.setThreadNamePrefix(taskExecutionProperties.getThreadNamePrefix());
+        executor.setVirtualThreads(Threading.VIRTUAL.isActive(environment));
 
         return executor;
     }

@@ -20,11 +20,13 @@ import com.bytechef.message.Retryable;
 import com.bytechef.message.broker.MessageBroker;
 import com.bytechef.message.broker.redis.serializer.RedisMessageSerializer;
 import com.bytechef.message.route.MessageRoute;
-import com.oblac.jrsmq.RedisSMQ;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.redis.connection.stream.MapRecord;
+import org.springframework.data.redis.connection.stream.StreamRecords;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.util.Assert;
 
@@ -36,15 +38,13 @@ public class RedisMessageBroker implements MessageBroker {
     private static final Logger logger = LoggerFactory.getLogger(RedisMessageBroker.class);
 
     private final RedisMessageSerializer redisMessageSerializer;
-    private final RedisSMQ redisSMQ;
     private final StringRedisTemplate stringRedisTemplate;
 
     @SuppressFBWarnings("EI2")
     public RedisMessageBroker(
-        RedisMessageSerializer redisMessageSerializer, RedisSMQ redisSMQ, StringRedisTemplate stringRedisTemplate) {
+        RedisMessageSerializer redisMessageSerializer, StringRedisTemplate stringRedisTemplate) {
 
         this.redisMessageSerializer = redisMessageSerializer;
-        this.redisSMQ = redisSMQ;
         this.stringRedisTemplate = stringRedisTemplate;
     }
 
@@ -64,10 +64,17 @@ public class RedisMessageBroker implements MessageBroker {
     }
 
     private void sendMessageToQueue(String queueName, Object message) {
-        redisSMQ.sendMessage()
-            .qname(queueName)
-            .message(redisMessageSerializer.serialize(message))
-            .exec();
+        MapRecord<String, String, String> messageObjectRecord = StreamRecords.newRecord()
+            .ofMap(Map.of("message", redisMessageSerializer.serialize(message)))
+            .withStreamKey(queueName);
+
+        stringRedisTemplate.opsForStream()
+            .add(messageObjectRecord);
+
+//        redisSMQ.sendMessage()
+//            .qname(queueName)
+//            .message(redisMessageSerializer.serialize(message))
+//            .exec();
     }
 
     private void sendMessageToTopic(String queueName, Object message) {

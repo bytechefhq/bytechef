@@ -46,21 +46,21 @@ public class TriggerWorkerMessageBrokerConfigurerConfiguration {
 
     @Bean
     MessageBrokerConfigurer<?> triggerWorkerMessageBrokerConfigurer(TriggerWorker triggerWorker) {
-        TaskWorkerDelegate taskWorkerDelegate =
-            new TaskWorkerDelegate(messageEventPostReceiveProcessors, triggerWorker);
+        TriggerWorkerDelegate triggerWorkerDelegate =
+            new TriggerWorkerDelegate(messageEventPostReceiveProcessors, triggerWorker);
 
         return (listenerEndpointRegistrar, messageBrokerListenerRegistrar) -> {
             messageBrokerListenerRegistrar.registerListenerEndpoint(
-                listenerEndpointRegistrar, TriggerWorkerMessageRoute.CONTROL_EVENTS, 1, taskWorkerDelegate,
+                listenerEndpointRegistrar, TriggerWorkerMessageRoute.CONTROL_EVENTS, 1, triggerWorkerDelegate,
                 "onCancelControlTriggerEvent");
 
             messageBrokerListenerRegistrar.registerListenerEndpoint(
-                listenerEndpointRegistrar, TriggerWorkerMessageRoute.TRIGGER_EXECUTION_EVENTS, 1, taskWorkerDelegate,
+                listenerEndpointRegistrar, TriggerWorkerMessageRoute.TRIGGER_EXECUTION_EVENTS, 1, triggerWorkerDelegate,
                 "onTriggerExecutionEvent");
         };
     }
 
-    private record TaskWorkerDelegate(
+    private record TriggerWorkerDelegate(
         List<MessageEventPostReceiveProcessor> messageEventPostReceiveProcessors, TriggerWorker triggerWorker) {
 
         public void onCancelControlTriggerEvent(MessageEvent<?> messageEvent) {
