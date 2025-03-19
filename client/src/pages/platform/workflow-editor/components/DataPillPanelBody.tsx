@@ -1,3 +1,4 @@
+import {ScrollArea} from '@/components/ui/scroll-area';
 import DataPillPanelBodyInputsItem from '@/pages/platform/workflow-editor/components/DataPillPanelBodyInputsItem';
 import {
     ActionDefinition,
@@ -41,29 +42,27 @@ interface DataPillPanelBodyProps {
 }
 
 const DataPillPanelBody = ({componentOperations, dataPillFilterQuery}: DataPillPanelBodyProps) => (
-    <div className="relative h-full overflow-y-auto">
-        <div className="absolute left-0 top-0 w-full">
-            <Accordion className="h-full" collapsible type="single">
-                <AccordionItem className="group" value="inputs">
-                    <DataPillPanelBodyInputsItem />
-                </AccordionItem>
+    <ScrollArea>
+        <Accordion className="h-full" collapsible type="single">
+            <AccordionItem className="group" value="inputs">
+                <DataPillPanelBodyInputsItem />
+            </AccordionItem>
 
-                {componentOperations.map((operation) => (
-                    <AccordionItem
-                        className="group"
-                        key={`accordion-item-${operation.workflowNodeName}`}
-                        value={operation.workflowNodeName}
-                    >
-                        <DataPillPanelBodyPropertiesItem
-                            componentOperation={operation}
-                            dataPillFilterQuery={dataPillFilterQuery}
-                            sampleOutput={operation.sampleOutput}
-                        />
-                    </AccordionItem>
-                ))}
-            </Accordion>
-        </div>
-    </div>
+            {componentOperations.map((operation) => (
+                <AccordionItem
+                    className="group"
+                    key={`accordion-item-${operation.workflowNodeName}`}
+                    value={operation.workflowNodeName}
+                >
+                    <DataPillPanelBodyPropertiesItem
+                        componentOperation={operation}
+                        dataPillFilterQuery={dataPillFilterQuery}
+                        sampleOutput={operation.sampleOutput}
+                    />
+                </AccordionItem>
+            ))}
+        </Accordion>
+    </ScrollArea>
 );
 
 export default DataPillPanelBody;

@@ -1,5 +1,6 @@
 import LoadingIcon from '@/components/LoadingIcon';
 import {Button} from '@/components/ui/button';
+import {ScrollArea} from '@/components/ui/scroll-area';
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/ui/select';
 import {Skeleton} from '@/components/ui/skeleton';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
@@ -657,7 +658,7 @@ const WorkflowNodeDetailsPanel = ({
             key={currentNode?.workflowNodeName}
         >
             {currentNode?.workflowNodeName && currentWorkflowNode && (
-                <div className="flex h-full flex-col divide-y divide-gray-100 bg-white">
+                <div className="flex h-full flex-col divide-y divide-muted bg-background">
                     <header className="flex items-center p-4 text-lg font-medium">
                         {currentWorkflowNode.icon && (
                             <InlineSVG
@@ -669,7 +670,7 @@ const WorkflowNodeDetailsPanel = ({
 
                         {currentNode?.label}
 
-                        <span className="mx-2 text-sm text-gray-500">({currentNode?.workflowNodeName})</span>
+                        <span className="mx-2 text-sm text-muted-foreground">({currentNode?.workflowNodeName})</span>
 
                         {currentWorkflowNode.description && (
                             <Tooltip delayDuration={500}>
@@ -696,7 +697,7 @@ const WorkflowNodeDetailsPanel = ({
                         </button>
                     </header>
 
-                    <main className="flex h-full flex-col">
+                    <main className="flex h-full flex-col overflow-hidden">
                         {!!currentTaskDataOperations?.length && operationDataMissing && (
                             <div className="flex flex-col border-b border-muted p-4">
                                 <span className="text-sm leading-6">Actions</span>
@@ -728,7 +729,7 @@ const WorkflowNodeDetailsPanel = ({
                                 {nodeTabs.map((tab) => (
                                     <Button
                                         className={twMerge(
-                                            'grow justify-center whitespace-nowrap rounded-none border-0 border-b border-gray-200 bg-white py-5 text-sm font-medium text-gray-500 hover:border-blue-500 hover:text-blue-500 focus:border-blue-500 focus:text-blue-500 focus:outline-none',
+                                            'grow justify-center whitespace-nowrap rounded-none border-0 border-b border-border bg-background py-5 text-sm font-medium text-muted-foreground hover:border-blue-500 hover:text-blue-500 focus:border-blue-500 focus:text-blue-500 focus:outline-none',
                                             activeTab === tab?.name &&
                                                 'border-blue-500 text-blue-500 hover:text-blue-500'
                                         )}
@@ -744,7 +745,7 @@ const WorkflowNodeDetailsPanel = ({
                         )}
 
                         {currentNode.componentName !== 'manual' && !tabDataExists && (
-                            <div className="flex justify-center space-x-2 border-b border-gray-200 p-2">
+                            <div className="flex justify-center space-x-2 border-b border-border p-2">
                                 <Skeleton className="h-6 w-1/4" />
 
                                 <Skeleton className="h-6 w-1/4" />
@@ -755,9 +756,9 @@ const WorkflowNodeDetailsPanel = ({
                             </div>
                         )}
 
-                        <div className="relative h-full overflow-y-scroll">
+                        <ScrollArea>
                             {currentWorkflowNode && (
-                                <div className="absolute left-0 top-0 size-full">
+                                <div className="size-full">
                                     {activeTab === 'description' &&
                                         (nodeDefinition ? (
                                             <DescriptionTab
@@ -845,10 +846,10 @@ const WorkflowNodeDetailsPanel = ({
                                     )}
                                 </div>
                             )}
-                        </div>
+                        </ScrollArea>
                     </main>
 
-                    <footer className="z-50 mt-auto flex bg-white px-4 py-2">
+                    <footer className="z-50 mt-auto flex bg-background px-4 py-2">
                         <Select defaultValue={currentWorkflowNode?.version.toString()}>
                             <SelectTrigger className="w-auto border-none shadow-none">
                                 <SelectValue placeholder="Choose version..." />
