@@ -40,6 +40,7 @@ public class DataStorageConstants {
     public static final List<Option<String>> SCOPE_OPTIONS = List.of(
         option("Current Execution", "CURRENT_EXECUTION"),
         option("Workflow", "WORKFLOW"),
+        option("Deployment", "PRINCIPAL"),
         option("Account", "ACCOUNT"));
 
     public static final List<Option<String>> TYPE_OPTIONS = List.of(
