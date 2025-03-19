@@ -287,7 +287,7 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ActionDefinition"
-  /component-definitions/{componentName}/versions/{componentVersion}/cluster-element-definition/{clusterElementType}:
+  /component-definitions/{componentName}/versions/{componentVersion}/cluster-element-definition/{clusterElementName}:
     get:
       description: "Get a cluster element definition of a component."
       summary: "Get a cluster element definition of a component"
@@ -307,8 +307,8 @@ paths:
           in: "path"
           schema:
             type: "integer"
-        - name: "clusterElementType"
-          description: "The name of a cluster elements to get."
+        - name: "clusterElementName"
+          description: "The name of a cluster element to get."
           required: true
           in: "path"
           schema:
@@ -322,20 +322,20 @@ paths:
                 $ref: "#/components/schemas/ClusterElementDefinition"
   /component-definitions/{rootComponentName}/versions/{rootComponentVersion}/cluster-element-definitions/{clusterElementType}:
     get:
-      description: "Get an cluster element definitions of a root component."
-      summary: "Get an cluster element definitions of a root component."
+      description: "Get a cluster element definitions of a root component."
+      summary: "Get a cluster element definitions of a root component."
       tags:
         - "cluster-element-definition"
       operationId: "getRootComponentClusterElementDefinitions"
       parameters:
         - name: "rootComponentName"
-          description: "The name of a component."
+          description: "The name of a root component."
           required: true
           in: "path"
           schema:
             type: "string"
         - name: "rootComponentVersion"
-          description: "The version of a component."
+          description: "The version of a root component."
           required: true
           in: "path"
           schema:
@@ -1415,7 +1415,8 @@ components:
           required:
             - "componentName"
             - "componentVersion"
-            - "elementType"
+            - "name"
+            - "type"
             - "outputDefined"
           properties:
             properties:
@@ -1429,7 +1430,8 @@ components:
       required:
         - "componentName"
         - "componentVersion"
-        - "elementType"
+        - "name"
+        - "type"
         - "outputDefined"
       properties:
         componentName:
@@ -1438,7 +1440,10 @@ components:
         componentVersion:
           description: "The component version."
           type: "integer"
-        elementType:
+        name:
+          description: "The cluster element name."
+          type: "string"
+        type:
           description: "The cluster element type."
           type: "string"
         outputDefined:
@@ -1472,6 +1477,13 @@ components:
       - "version"
       - "connectionRequired"
       properties:
+        actionClusterElementTypes:
+          description: "The list of cluster element types per action."
+          type: "object"
+          additionalProperties:
+            type: "array"
+            items:
+              type: "string"
         actions:
           description: "The list of all available actions the component can perform."
           type: "array"
