@@ -57,8 +57,7 @@ public class CsvFileWriteAction {
     protected static FileEntry perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext context) throws IOException {
 
-        List<Map<String, ?>> rows = inputParameters.getList(
-            ROWS, new TypeReference<>() {}, List.of());
+        List<Map<String, ?>> rows = inputParameters.getList(ROWS, new TypeReference<>() {}, List.of());
 
         try (InputStream inputStream = new ByteArrayInputStream(write(rows))) {
             return context.file(
