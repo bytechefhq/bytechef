@@ -30,7 +30,7 @@ export interface IntegrationInstanceConfigurationWorkflowConnection {
      * @type {string}
      * @memberof IntegrationInstanceConfigurationWorkflowConnection
      */
-    key?: string;
+    workflowConnectionKey?: string;
     /**
      * The action/trigger name to which a connection belongs.
      * @type {string}
@@ -57,7 +57,7 @@ export function IntegrationInstanceConfigurationWorkflowConnectionFromJSONTyped(
     return {
         
         'connectionId': json['connectionId'] == null ? undefined : json['connectionId'],
-        'key': json['key'] == null ? undefined : json['key'],
+        'workflowConnectionKey': json['workflowConnectionKey'] == null ? undefined : json['workflowConnectionKey'],
         'workflowNodeName': json['workflowNodeName'] == null ? undefined : json['workflowNodeName'],
     };
 }
@@ -74,7 +74,7 @@ export function IntegrationInstanceConfigurationWorkflowConnectionToJSONTyped(va
     return {
         
         'connectionId': value['connectionId'],
-        'key': value['key'],
+        'workflowConnectionKey': value['workflowConnectionKey'],
         'workflowNodeName': value['workflowNodeName'],
     };
 }
