@@ -15,7 +15,9 @@ import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.annotation.JsonValue;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import org.springframework.lang.Nullable;
 import org.openapitools.jackson.nullable.JsonNullable;
 import java.time.OffsetDateTime;
@@ -33,8 +35,11 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "ComponentDefinition", description = "A component contains a set of reusable code(actions) that accomplish specific tasks, triggers and connections if there is a need for a connection to an outside service.")
 @JsonTypeName("ComponentDefinition")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-03-14T15:53:17.053861+01:00[Europe/Zagreb]", comments = "Generator version: 7.12.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-03-20T07:39:40.498527+01:00[Europe/Zagreb]", comments = "Generator version: 7.12.0")
 public class ComponentDefinitionModel {
+
+  @Valid
+  private Map<String, List<String>> actionClusterElementTypes = new HashMap<>();
 
   @Valid
   private List<@Valid ActionDefinitionBasicModel> actions = new ArrayList<>();
@@ -86,6 +91,34 @@ public class ComponentDefinitionModel {
     this.connectionRequired = connectionRequired;
     this.name = name;
     this.version = version;
+  }
+
+  public ComponentDefinitionModel actionClusterElementTypes(Map<String, List<String>> actionClusterElementTypes) {
+    this.actionClusterElementTypes = actionClusterElementTypes;
+    return this;
+  }
+
+  public ComponentDefinitionModel putActionClusterElementTypesItem(String key, List<String> actionClusterElementTypesItem) {
+    if (this.actionClusterElementTypes == null) {
+      this.actionClusterElementTypes = new HashMap<>();
+    }
+    this.actionClusterElementTypes.put(key, actionClusterElementTypesItem);
+    return this;
+  }
+
+  /**
+   * The list of cluster element types per action.
+   * @return actionClusterElementTypes
+   */
+  @Valid 
+  @Schema(name = "actionClusterElementTypes", description = "The list of cluster element types per action.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("actionClusterElementTypes")
+  public Map<String, List<String>> getActionClusterElementTypes() {
+    return actionClusterElementTypes;
+  }
+
+  public void setActionClusterElementTypes(Map<String, List<String>> actionClusterElementTypes) {
+    this.actionClusterElementTypes = actionClusterElementTypes;
   }
 
   public ComponentDefinitionModel actions(List<@Valid ActionDefinitionBasicModel> actions) {
@@ -457,7 +490,8 @@ public class ComponentDefinitionModel {
       return false;
     }
     ComponentDefinitionModel componentDefinition = (ComponentDefinitionModel) o;
-    return Objects.equals(this.actions, componentDefinition.actions) &&
+    return Objects.equals(this.actionClusterElementTypes, componentDefinition.actionClusterElementTypes) &&
+        Objects.equals(this.actions, componentDefinition.actions) &&
         Objects.equals(this.clusterElement, componentDefinition.clusterElement) &&
         Objects.equals(this.clusterElementTypes, componentDefinition.clusterElementTypes) &&
         Objects.equals(this.clusterRoot, componentDefinition.clusterRoot) &&
@@ -477,13 +511,14 @@ public class ComponentDefinitionModel {
 
   @Override
   public int hashCode() {
-    return Objects.hash(actions, clusterElement, clusterElementTypes, clusterRoot, componentCategories, connection, connectionRequired, description, icon, name, resources, tags, title, triggers, unifiedApiCategory, version);
+    return Objects.hash(actionClusterElementTypes, actions, clusterElement, clusterElementTypes, clusterRoot, componentCategories, connection, connectionRequired, description, icon, name, resources, tags, title, triggers, unifiedApiCategory, version);
   }
 
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
     sb.append("class ComponentDefinitionModel {\n");
+    sb.append("    actionClusterElementTypes: ").append(toIndentedString(actionClusterElementTypes)).append("\n");
     sb.append("    actions: ").append(toIndentedString(actions)).append("\n");
     sb.append("    clusterElement: ").append(toIndentedString(clusterElement)).append("\n");
     sb.append("    clusterElementTypes: ").append(toIndentedString(clusterElementTypes)).append("\n");
