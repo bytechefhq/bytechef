@@ -94,14 +94,15 @@ const IntegrationInstanceConfigurationEditWorkflowDialog = ({
                     (integrationInstanceConfigurationWorkflowConnection) =>
                         integrationInstanceConfigurationWorkflowConnection.workflowNodeName ===
                             componentConnection.workflowNodeName &&
-                        integrationInstanceConfigurationWorkflowConnection.key === componentConnection.key
+                        integrationInstanceConfigurationWorkflowConnection.workflowConnectionKey ===
+                            componentConnection.key
                 );
 
             if (!integrationInstanceConfigurationWorkflowConnection) {
                 integrationInstanceConfigurationWorkflowConnection = {
                     /* eslint-disable @typescript-eslint/no-explicit-any */
                     connectionId: undefined as any,
-                    key: componentConnection.key,
+                    workflowConnectionKey: componentConnection.key,
                     workflowNodeName: componentConnection.workflowNodeName,
                 };
             }

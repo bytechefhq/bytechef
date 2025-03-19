@@ -231,14 +231,14 @@ const ProjectDeploymentDialog = ({
                         (projectDeploymentWorkflowConnection) =>
                             projectDeploymentWorkflowConnection.workflowNodeName ===
                                 componentConnection.workflowNodeName &&
-                            projectDeploymentWorkflowConnection.key === componentConnection.key
+                            projectDeploymentWorkflowConnection.workflowConnectionKey === componentConnection.key
                     );
 
                     newProjectDeploymentWorkflowConnections = [
                         ...newProjectDeploymentWorkflowConnections,
                         projectDeploymentWorkflowConnection ??
                             ({
-                                key: componentConnection.key,
+                                workflowConnectionKey: componentConnection.key,
                                 workflowNodeName: componentConnection.workflowNodeName,
                             } as ProjectDeploymentWorkflowConnection),
                     ];

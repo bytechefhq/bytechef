@@ -85,14 +85,14 @@ const ProjectDeploymentEditWorkflowDialog = ({
             let projectDeploymentWorkflowConnection = projectDeploymentWorkflow?.connections?.find(
                 (projectDeploymentWorkflowConnection) =>
                     projectDeploymentWorkflowConnection.workflowNodeName === workflowConnection.workflowNodeName &&
-                    projectDeploymentWorkflowConnection.key === workflowConnection.key
+                    projectDeploymentWorkflowConnection.workflowConnectionKey === workflowConnection.key
             );
 
             if (!projectDeploymentWorkflowConnection) {
                 projectDeploymentWorkflowConnection = {
                     /* eslint-disable @typescript-eslint/no-explicit-any */
                     connectionId: undefined as any,
-                    key: workflowConnection.key,
+                    workflowConnectionKey: workflowConnection.key,
                     workflowNodeName: workflowConnection.workflowNodeName,
                 };
             }

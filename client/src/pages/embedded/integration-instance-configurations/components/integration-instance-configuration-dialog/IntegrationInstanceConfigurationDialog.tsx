@@ -293,7 +293,8 @@ const IntegrationInstanceConfigurationDialog = ({
                             (integrationInstanceConfigurationWorkflowConnection) =>
                                 integrationInstanceConfigurationWorkflowConnection.workflowNodeName ===
                                     componentConnection.workflowNodeName &&
-                                integrationInstanceConfigurationWorkflowConnection.key === componentConnection.key
+                                integrationInstanceConfigurationWorkflowConnection.workflowConnectionKey ===
+                                    componentConnection.key
                         );
 
                     newIntegrationInstanceConfigurationWorkflowConnections = [

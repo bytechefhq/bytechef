@@ -122,7 +122,7 @@ const IntegrationInstanceConfigurationDialogWorkflowsStepItemConnection = ({
             <FormField
                 control={control}
                 defaultValue={componentConnection.key}
-                name={`integrationInstanceConfigurationWorkflows.${workflowIndex!}.connections.${componentConnectionIndex}.key`}
+                name={`integrationInstanceConfigurationWorkflows.${workflowIndex!}.connections.${componentConnectionIndex}.workflowConnectionKey`}
                 render={({field}) => <input type="hidden" {...field} />}
             />
 
