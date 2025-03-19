@@ -76,7 +76,7 @@ const WorkflowTestConfigurationFormField = ({
                                 <span className="ml-1">{componentDefinition?.title} Connection</span>
 
                                 <span className="ml-0.5 text-xs text-gray-500">
-                                    {`(${componentConnection.workflowNodeName})`}
+                                    {`(${componentConnection.workflowNodeName}-${componentConnection.key})`}
                                 </span>
                             </FormLabel>
 
