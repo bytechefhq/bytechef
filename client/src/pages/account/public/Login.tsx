@@ -151,6 +151,7 @@ const Login = () => {
                                                     <Input
                                                         aria-label="Password"
                                                         className="py-5"
+                                                        id="password"
                                                         type={showPassword ? 'text' : 'password'}
                                                         {...field}
                                                     />
