@@ -19,6 +19,7 @@ import {useWorkflowMutation} from '@/pages/platform/workflow-editor/providers/wo
 import useRightSidebarStore from '@/pages/platform/workflow-editor/stores/useRightSidebarStore';
 import useWorkflowEditorStore from '@/pages/platform/workflow-editor/stores/useWorkflowEditorStore';
 import {useCopilotStore} from '@/shared/components/copilot/stores/useCopilotStore';
+import {twMerge} from 'tailwind-merge';
 
 import DataPillPanel from './components/DataPillPanel';
 import WorkflowEditor from './components/WorkflowEditor';
@@ -67,7 +68,7 @@ const WorkflowEditorLayout = () => {
                 errors={[componentsError, taskDispatcherDefinitionsError]}
                 loading={componentsIsLoading || taskDispatcherDefinitionsLoading}
             >
-                <div className="relative mx-3 mb-3 flex w-full">
+                <div className={twMerge('relative mx-3 mb-3 flex w-full', projectLeftSidebarOpen && 'ml-0')}>
                     {componentDefinitions && taskDispatcherDefinitions && (
                         <WorkflowEditor
                             componentDefinitions={componentDefinitions}
