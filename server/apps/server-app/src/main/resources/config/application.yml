@@ -173,7 +173,7 @@ spring:
     execution:
       thread-name-prefix: server-app-task-
       pool:
-        core-size: 2
+#        core-size: 2
         max-size: 50
         queue-capacity: 10000
     scheduling:
