@@ -24,6 +24,7 @@ import com.bytechef.platform.component.facade.ActionDefinitionFacade;
 import com.bytechef.platform.constant.Environment;
 import com.bytechef.platform.constant.ModeType;
 import com.bytechef.platform.security.util.SecurityUtils;
+import edu.umd.cs.findbugs.annotations.Nullable;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Map;
 import org.springframework.stereotype.Service;
@@ -48,7 +49,7 @@ public class ActionFacadeImpl implements ActionFacade {
     @Override
     public Object executeAction(
         String componentName, Integer componentVersion, String actionName, Map<String, Object> input,
-        Environment environment, Long instanceId) {
+        Environment environment, @Nullable Long instanceId) {
 
         Long connectionId;
 
