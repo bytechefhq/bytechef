@@ -25,19 +25,8 @@ import java.util.Optional;
  *
  * @author Ivica Cardic
  */
-public interface ComponentDefinition {
-
-    /**
-     *
-     * @return
-     */
-    Optional<List<? extends ActionDefinition>> getActions();
-
-    /**
-     *
-     * @return
-     */
-    Optional<List<? extends ClusterElementDefinition<?>>> getClusterElements();
+public interface ComponentDefinition
+    extends ClusterElementComponentDefinition, UnifiedApiComponentDefinition, WorkflowComponentDefinition {
 
     /**
      * @return
@@ -49,18 +38,6 @@ public interface ComponentDefinition {
      * @return
      */
     Optional<ConnectionDefinition> getConnection();
-
-    /**
-     *
-     * @return
-     */
-    Optional<Boolean> getCustomAction();
-
-    /**
-     *
-     * @return
-     */
-    Optional<Help> getCustomActionHelp();
 
     /**
      *
@@ -105,18 +82,6 @@ public interface ComponentDefinition {
      * @return
      */
     Optional<String> getTitle();
-
-    /**
-     *
-     * @return
-     */
-    Optional<List<? extends TriggerDefinition>> getTriggers();
-
-    /**
-     *
-     * @return
-     */
-    Optional<UnifiedApiDefinition> getUnifiedApi();
 
     /**
      *
