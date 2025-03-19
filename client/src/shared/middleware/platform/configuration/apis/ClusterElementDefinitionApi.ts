@@ -28,7 +28,7 @@ import {
 export interface GetComponentClusterElementDefinitionRequest {
     componentName: string;
     componentVersion: number;
-    clusterElementType: string;
+    clusterElementName: string;
 }
 
 export interface GetRootComponentClusterElementDefinitionsRequest {
@@ -61,10 +61,10 @@ export class ClusterElementDefinitionApi extends runtime.BaseAPI {
             );
         }
 
-        if (requestParameters['clusterElementType'] == null) {
+        if (requestParameters['clusterElementName'] == null) {
             throw new runtime.RequiredError(
-                'clusterElementType',
-                'Required parameter "clusterElementType" was null or undefined when calling getComponentClusterElementDefinition().'
+                'clusterElementName',
+                'Required parameter "clusterElementName" was null or undefined when calling getComponentClusterElementDefinition().'
             );
         }
 
@@ -73,7 +73,7 @@ export class ClusterElementDefinitionApi extends runtime.BaseAPI {
         const headerParameters: runtime.HTTPHeaders = {};
 
         const response = await this.request({
-            path: `/component-definitions/{componentName}/versions/{componentVersion}/cluster-element-definition/{clusterElementType}`.replace(`{${"componentName"}}`, encodeURIComponent(String(requestParameters['componentName']))).replace(`{${"componentVersion"}}`, encodeURIComponent(String(requestParameters['componentVersion']))).replace(`{${"clusterElementType"}}`, encodeURIComponent(String(requestParameters['clusterElementType']))),
+            path: `/component-definitions/{componentName}/versions/{componentVersion}/cluster-element-definition/{clusterElementName}`.replace(`{${"componentName"}}`, encodeURIComponent(String(requestParameters['componentName']))).replace(`{${"componentVersion"}}`, encodeURIComponent(String(requestParameters['componentVersion']))).replace(`{${"clusterElementName"}}`, encodeURIComponent(String(requestParameters['clusterElementName']))),
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
@@ -92,8 +92,8 @@ export class ClusterElementDefinitionApi extends runtime.BaseAPI {
     }
 
     /**
-     * Get an cluster element definitions of a root component.
-     * Get an cluster element definitions of a root component.
+     * Get a cluster element definitions of a root component.
+     * Get a cluster element definitions of a root component.
      */
     async getRootComponentClusterElementDefinitionsRaw(requestParameters: GetRootComponentClusterElementDefinitionsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<ClusterElementDefinitionBasic>>> {
         if (requestParameters['rootComponentName'] == null) {
@@ -132,8 +132,8 @@ export class ClusterElementDefinitionApi extends runtime.BaseAPI {
     }
 
     /**
-     * Get an cluster element definitions of a root component.
-     * Get an cluster element definitions of a root component.
+     * Get a cluster element definitions of a root component.
+     * Get a cluster element definitions of a root component.
      */
     async getRootComponentClusterElementDefinitions(requestParameters: GetRootComponentClusterElementDefinitionsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<ClusterElementDefinitionBasic>> {
         const response = await this.getRootComponentClusterElementDefinitionsRaw(requestParameters, initOverrides);

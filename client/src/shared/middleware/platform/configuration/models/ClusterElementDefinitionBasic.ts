@@ -32,11 +32,17 @@ export interface ClusterElementDefinitionBasic {
      */
     componentVersion: number;
     /**
+     * The cluster element name.
+     * @type {string}
+     * @memberof ClusterElementDefinitionBasic
+     */
+    name: string;
+    /**
      * The cluster element type.
      * @type {string}
      * @memberof ClusterElementDefinitionBasic
      */
-    elementType: string;
+    type: string;
     /**
      * Does action define output schema.
      * @type {boolean}
@@ -51,7 +57,8 @@ export interface ClusterElementDefinitionBasic {
 export function instanceOfClusterElementDefinitionBasic(value: object): value is ClusterElementDefinitionBasic {
     if (!('componentName' in value) || value['componentName'] === undefined) return false;
     if (!('componentVersion' in value) || value['componentVersion'] === undefined) return false;
-    if (!('elementType' in value) || value['elementType'] === undefined) return false;
+    if (!('name' in value) || value['name'] === undefined) return false;
+    if (!('type' in value) || value['type'] === undefined) return false;
     if (!('outputDefined' in value) || value['outputDefined'] === undefined) return false;
     return true;
 }
@@ -68,7 +75,8 @@ export function ClusterElementDefinitionBasicFromJSONTyped(json: any, ignoreDisc
         
         'componentName': json['componentName'],
         'componentVersion': json['componentVersion'],
-        'elementType': json['elementType'],
+        'name': json['name'],
+        'type': json['type'],
         'outputDefined': json['outputDefined'],
     };
 }
@@ -86,7 +94,8 @@ export function ClusterElementDefinitionBasicToJSONTyped(value?: ClusterElementD
         
         'componentName': value['componentName'],
         'componentVersion': value['componentVersion'],
-        'elementType': value['elementType'],
+        'name': value['name'],
+        'type': value['type'],
         'outputDefined': value['outputDefined'],
     };
 }

@@ -70,6 +70,12 @@ import {
  */
 export interface ComponentDefinition {
     /**
+     * The list of cluster element types per action.
+     * @type {{ [key: string]: Array<string>; }}
+     * @memberof ComponentDefinition
+     */
+    actionClusterElementTypes?: { [key: string]: Array<string>; };
+    /**
      * The list of all available actions the component can perform.
      * @type {Array<ActionDefinitionBasic>}
      * @memberof ComponentDefinition
@@ -191,6 +197,7 @@ export function ComponentDefinitionFromJSONTyped(json: any, ignoreDiscriminator:
     }
     return {
         
+        'actionClusterElementTypes': json['actionClusterElementTypes'] == null ? undefined : json['actionClusterElementTypes'],
         'actions': json['actions'] == null ? undefined : ((json['actions'] as Array<any>).map(ActionDefinitionBasicFromJSON)),
         'clusterElement': json['clusterElement'],
         'clusterElementTypes': json['clusterElementTypes'] == null ? undefined : ((json['clusterElementTypes'] as Array<any>).map(ClusterElementTypeFromJSON)),
@@ -221,6 +228,7 @@ export function ComponentDefinitionToJSONTyped(value?: ComponentDefinition | nul
 
     return {
         
+        'actionClusterElementTypes': value['actionClusterElementTypes'],
         'actions': value['actions'] == null ? undefined : ((value['actions'] as Array<any>).map(ActionDefinitionBasicToJSON)),
         'clusterElement': value['clusterElement'],
         'clusterElementTypes': value['clusterElementTypes'] == null ? undefined : ((value['clusterElementTypes'] as Array<any>).map(ClusterElementTypeToJSON)),

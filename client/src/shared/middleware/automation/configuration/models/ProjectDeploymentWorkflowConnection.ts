@@ -30,7 +30,7 @@ export interface ProjectDeploymentWorkflowConnection {
      * @type {string}
      * @memberof ProjectDeploymentWorkflowConnection
      */
-    workflowConnectionKey?: string;
+    workflowConnectionKey: string;
     /**
      * The action/trigger name to which a connection belongs.
      * @type {string}
@@ -44,6 +44,7 @@ export interface ProjectDeploymentWorkflowConnection {
  */
 export function instanceOfProjectDeploymentWorkflowConnection(value: object): value is ProjectDeploymentWorkflowConnection {
     if (!('connectionId' in value) || value['connectionId'] === undefined) return false;
+    if (!('workflowConnectionKey' in value) || value['workflowConnectionKey'] === undefined) return false;
     if (!('workflowNodeName' in value) || value['workflowNodeName'] === undefined) return false;
     return true;
 }
@@ -59,7 +60,7 @@ export function ProjectDeploymentWorkflowConnectionFromJSONTyped(json: any, igno
     return {
         
         'connectionId': json['connectionId'],
-        'workflowConnectionKey': json['workflowConnectionKey'] == null ? undefined : json['workflowConnectionKey'],
+        'workflowConnectionKey': json['workflowConnectionKey'],
         'workflowNodeName': json['workflowNodeName'],
     };
 }

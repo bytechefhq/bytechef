@@ -40,11 +40,17 @@ export interface ClusterElementDefinition {
      */
     componentVersion: number;
     /**
+     * The cluster element name.
+     * @type {string}
+     * @memberof ClusterElementDefinition
+     */
+    name: string;
+    /**
      * The cluster element type.
      * @type {string}
      * @memberof ClusterElementDefinition
      */
-    elementType: string;
+    type: string;
     /**
      * Does action define output schema.
      * @type {boolean}
@@ -65,7 +71,8 @@ export interface ClusterElementDefinition {
 export function instanceOfClusterElementDefinition(value: object): value is ClusterElementDefinition {
     if (!('componentName' in value) || value['componentName'] === undefined) return false;
     if (!('componentVersion' in value) || value['componentVersion'] === undefined) return false;
-    if (!('elementType' in value) || value['elementType'] === undefined) return false;
+    if (!('name' in value) || value['name'] === undefined) return false;
+    if (!('type' in value) || value['type'] === undefined) return false;
     if (!('outputDefined' in value) || value['outputDefined'] === undefined) return false;
     return true;
 }
@@ -82,7 +89,8 @@ export function ClusterElementDefinitionFromJSONTyped(json: any, ignoreDiscrimin
         
         'componentName': json['componentName'],
         'componentVersion': json['componentVersion'],
-        'elementType': json['elementType'],
+        'name': json['name'],
+        'type': json['type'],
         'outputDefined': json['outputDefined'],
         'properties': json['properties'] == null ? undefined : ((json['properties'] as Array<any>).map(PropertyFromJSON)),
     };
@@ -101,7 +109,8 @@ export function ClusterElementDefinitionToJSONTyped(value?: ClusterElementDefini
         
         'componentName': value['componentName'],
         'componentVersion': value['componentVersion'],
-        'elementType': value['elementType'],
+        'name': value['name'],
+        'type': value['type'],
         'outputDefined': value['outputDefined'],
         'properties': value['properties'] == null ? undefined : ((value['properties'] as Array<any>).map(PropertyToJSON)),
     };
