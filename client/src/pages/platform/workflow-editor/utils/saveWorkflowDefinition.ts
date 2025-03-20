@@ -10,8 +10,7 @@ import {NodeDataType, TaskDispatcherContextType, WorkflowDefinitionType} from '@
 import {QueryClient, UseMutationResult} from '@tanstack/react-query';
 
 import useWorkflowDataStore from '../stores/useWorkflowDataStore';
-import insertNewConditionSubtask from './insertNewConditionSubtask';
-import insertNewLoopSubtask from './insertNewLoopSubtask';
+import insertTaskDispatcherSubtask from './insertTaskDispatcherSubtask';
 
 const SPACE = 4;
 
@@ -173,21 +172,25 @@ export default async function saveWorkflowDefinition({
         tasks = [...(workflowDefinition.tasks || [])];
 
         if (taskDispatcherContext?.conditionId) {
-            tasks = insertNewConditionSubtask({
-                conditionId: taskDispatcherContext?.conditionId,
+            tasks = insertTaskDispatcherSubtask({
+                dispatcherId: taskDispatcherContext.conditionId,
                 newTask,
                 placeholderId,
                 taskDispatcherContext,
                 tasks,
             });
+
+            console.log('tasks', tasks);
         } else if (taskDispatcherContext?.loopId) {
-            tasks = insertNewLoopSubtask({
-                loopId: taskDispatcherContext?.loopId,
+            tasks = insertTaskDispatcherSubtask({
+                dispatcherId: taskDispatcherContext.loopId,
                 newTask,
                 placeholderId,
                 taskDispatcherContext,
                 tasks,
             });
+
+            console.log('tasks', tasks);
         } else if (nodeIndex !== undefined && nodeIndex > -1) {
             const tasksAfterCurrent = tasks.slice(nodeIndex);
 
