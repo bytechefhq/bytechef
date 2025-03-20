@@ -31,11 +31,11 @@ import com.bytechef.component.ai.llm.ChatModel;
 import com.bytechef.component.ai.llm.Provider;
 import com.bytechef.component.ai.llm.anthropic.action.AnthropicChatAction;
 import com.bytechef.component.ai.llm.azure.openai.action.AzureOpenAiChatAction;
-import com.bytechef.component.ai.llm.groq.action.GroqChatAction;
 import com.bytechef.component.ai.llm.hugging.face.action.HuggingFaceChatAction;
 import com.bytechef.component.ai.llm.mistral.action.MistralChatAction;
 import com.bytechef.component.ai.llm.nvidia.action.NvidiaChatAction;
 import com.bytechef.component.ai.llm.openai.action.OpenAiChatAction;
+import com.bytechef.component.ai.llm.perplexity.action.PerplexityChatAction;
 import com.bytechef.component.ai.llm.vertex.gemini.action.VertexGeminiChatAction;
 import com.bytechef.component.ai.universal.text.action.AiTextAction;
 import com.bytechef.component.definition.ActionContext;
@@ -273,7 +273,7 @@ public class AiTextActionDefinition extends AbstractActionDefinitionWrapper {
             token = groq.getApiKey();
         }
 
-        return new ChatModelResult(GroqChatAction.CHAT_MODEL, token);
+        return new ChatModelResult(PerplexityChatAction.CHAT_MODEL, token);
     }
 
     private ChatModelResult getHuggingFaceChatModel(List<String> activeProviderKeys) {
