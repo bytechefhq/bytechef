@@ -17,15 +17,25 @@
 package com.bytechef.component.calendly;
 
 import com.bytechef.component.OpenApiComponentHandler;
+import com.bytechef.component.calendly.trigger.CalendlyInviteeCanceledTrigger;
+import com.bytechef.component.calendly.trigger.CalendlyInviteeCreatedTrigger;
 import com.bytechef.component.definition.ComponentCategory;
+import com.bytechef.component.definition.ComponentDsl;
 import com.bytechef.component.definition.ComponentDsl.ModifiableComponentDefinition;
 import com.google.auto.service.AutoService;
+import java.util.List;
 
 /**
  * @author Monika Kušter
  */
 @AutoService(OpenApiComponentHandler.class)
 public class CalendlyComponentHandler extends AbstractCalendlyComponentHandler {
+
+    @Override
+    public List<ComponentDsl.ModifiableTriggerDefinition> getTriggers() {
+        return List.of(
+            CalendlyInviteeCanceledTrigger.TRIGGER_DEFINITION, CalendlyInviteeCreatedTrigger.TRIGGER_DEFINITION);
+    }
 
     @Override
     public ModifiableComponentDefinition modifyComponent(ModifiableComponentDefinition modifiableComponentDefinition) {
