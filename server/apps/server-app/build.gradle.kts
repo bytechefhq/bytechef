@@ -130,6 +130,7 @@ dependencies {
     //implementation(project(":server:libs:modules:components:ai:llm:amazon-bedrock"))
     implementation(project(":server:libs:modules:components:ai:llm:anthropic"))
     implementation(project(":server:libs:modules:components:ai:llm:azure-open-ai"))
+    implementation(project(":server:libs:modules:components:ai:llm:deepseek"))
     implementation(project(":server:libs:modules:components:ai:llm:groq"))
     implementation(project(":server:libs:modules:components:ai:llm:hugging-face"))
     implementation(project(":server:libs:modules:components:ai:llm:mistral"))
