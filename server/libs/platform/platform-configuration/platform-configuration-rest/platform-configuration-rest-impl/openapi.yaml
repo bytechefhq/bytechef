@@ -1551,6 +1551,11 @@ components:
         actionsCount:
           default: "The number of actions a component has"
           type: "integer"
+        componentCategories:
+          description: "The list of categories the component belongs to."
+          type: "array"
+          items:
+            $ref: "#/components/schemas/ComponentCategory"
         description:
           description: "The description."
           type: "string"
