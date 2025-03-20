@@ -264,13 +264,7 @@ Store an object to AWS S3.
 
 #### Output
 
-
-
-Type: STRING
-
-
-
-
+This action does not produce any output.
 
 
 

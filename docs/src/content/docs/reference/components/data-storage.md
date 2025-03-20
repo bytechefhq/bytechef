@@ -28,7 +28,7 @@ Append value to the end of a list. If the list does not exist, it will be create
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| scope | Scope | STRING <details> <summary> Options </summary> CURRENT_EXECUTION, WORKFLOW, ACCOUNT </details> | The namespace for appending a value. | true |
+| scope | Scope | STRING <details> <summary> Options </summary> CURRENT_EXECUTION, WORKFLOW, PRINCIPAL, ACCOUNT </details> | The namespace for appending a value. | true |
 | key | Key | STRING | The identifier of a list must be unique within the chosen scope, or a new value will overwrite the existing one. | true |
 | type | Type | STRING <details> <summary> Options </summary> ARRAY, BOOLEAN, DATE, DATE_TIME, INTEGER, NULL, NUMBER, OBJECT, STRING, TIME </details> | The value type. | null |
 | value | Value | ARRAY <details> <summary> Items </summary> [] </details> | The value to set under given key. | true |
@@ -76,7 +76,7 @@ The numeric value can be incremented atomically, and the action can be used conc
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | key | Key | STRING | The identifier of a value to increment. | true |
-| scope | Scope | STRING <details> <summary> Options </summary> CURRENT_EXECUTION, WORKFLOW, ACCOUNT </details> | The namespace to obtain a value from. | true |
+| scope | Scope | STRING <details> <summary> Options </summary> CURRENT_EXECUTION, WORKFLOW, PRINCIPAL, ACCOUNT </details> | The namespace to obtain a value from. | true |
 | valueToAdd | Value to Add | INTEGER | The value that can be added to the existing numeric value, which may have a negative value. | null |
 
 #### Example JSON Structure
@@ -116,18 +116,18 @@ Wait for a value under a specified key, until it's available.
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | key | Key | STRING | The identifier of a value to wait for. | true |
-| scope | Scope | STRING <details> <summary> Options </summary> CURRENT_EXECUTION, WORKFLOW, ACCOUNT </details> | The namespace to obtain a value from. | true |
+| scope | Scope | STRING <details> <summary> Options </summary> CURRENT_EXECUTION, WORKFLOW, PRINCIPAL, ACCOUNT </details> | The namespace to obtain a value from. | true |
 | type | Type | STRING <details> <summary> Options </summary> ARRAY, BOOLEAN, DATE, DATE_TIME, INTEGER, NULL, NUMBER, OBJECT, STRING, TIME </details> | The value type. | null |
-| defaultValue | Default Value | ARRAY <details> <summary> Items </summary> [] </details> | The default value to return if no value exists under the given key. | true |
-| defaultValue | Default Value | BOOLEAN <details> <summary> Options </summary> true, false </details> | The default value to return if no value exists under the given key. | true |
-| defaultValue | Default Value | DATE | The default value to return if no value exists under the given key. | true |
-| defaultValue | Default Value | DATE_TIME | The default value to return if no value exists under the given key. | true |
-| defaultValue | Default Value | INTEGER | The default value to return if no value exists under the given key. | true |
-| defaultValue | Default Value | NULL | The default value to return if no value exists under the given key. | true |
-| defaultValue | Default Value | NUMBER | The default value to return if no value exists under the given key. | true |
-| defaultValue | Default Value | OBJECT <details> <summary> Properties </summary> {} </details> | The default value to return if no value exists under the given key. | true |
-| defaultValue | Default Value | STRING | The default value to return if no value exists under the given key. | true |
-| defaultValue | Default Value | TIME | The default value to return if no value exists under the given key. | true |
+| defaultValue | Default Value | ARRAY <details> <summary> Items </summary> [] </details> | The default value to return if no value exists under the given key. | null |
+| defaultValue | Default Value | BOOLEAN <details> <summary> Options </summary> true, false </details> | The default value to return if no value exists under the given key. | null |
+| defaultValue | Default Value | DATE | The default value to return if no value exists under the given key. | null |
+| defaultValue | Default Value | DATE_TIME | The default value to return if no value exists under the given key. | null |
+| defaultValue | Default Value | INTEGER | The default value to return if no value exists under the given key. | null |
+| defaultValue | Default Value | NULL | The default value to return if no value exists under the given key. | null |
+| defaultValue | Default Value | NUMBER | The default value to return if no value exists under the given key. | null |
+| defaultValue | Default Value | OBJECT <details> <summary> Properties </summary> {} </details> | The default value to return if no value exists under the given key. | null |
+| defaultValue | Default Value | STRING | The default value to return if no value exists under the given key. | null |
+| defaultValue | Default Value | TIME | The default value to return if no value exists under the given key. | null |
 | timeout | Timeout | INTEGER | If a value is not found within the specified time, the action returns a null value. Therefore, the maximum wait time should be set accordingly. | true |
 
 #### Example JSON Structure
@@ -163,7 +163,7 @@ Remove a value associated with a key in the specified scope.
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | key | Key | STRING | The identifier of a value to delete, stored earlier in the selected scope. | true |
-| scope | Scope | STRING <details> <summary> Options </summary> CURRENT_EXECUTION, WORKFLOW, ACCOUNT </details> | The namespace to delete a value from. The value should have been previously accessible, either in the present workflow execution, or the workflow itself for all the executions, or the user account for all the workflows the user has. | true |
+| scope | Scope | STRING <details> <summary> Options </summary> CURRENT_EXECUTION, WORKFLOW, PRINCIPAL, ACCOUNT </details> | The namespace to delete a value from. The value should have been previously accessible, either in the present workflow execution, or the workflow itself for all the executions, or the user account for all the workflows the user has. | true |
 
 #### Example JSON Structure
 ```json
@@ -195,7 +195,7 @@ Delete a value from the given index in a list.
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | key | Key | STRING | The identifier of a list to delete value from, stored earlier in the selected scope. | true |
-| scope | Scope | STRING <details> <summary> Options </summary> CURRENT_EXECUTION, WORKFLOW, ACCOUNT </details> | The namespace to delete a value from. The value should have been previously accessible, either in the present workflow execution, or the workflow itself for all the executions, or the user account for all the workflows the user has. | true |
+| scope | Scope | STRING <details> <summary> Options </summary> CURRENT_EXECUTION, WORKFLOW, PRINCIPAL, ACCOUNT </details> | The namespace to delete a value from. The value should have been previously accessible, either in the present workflow execution, or the workflow itself for all the executions, or the user account for all the workflows the user has. | true |
 | index | Index | INTEGER | The specified index in the list will be removed, and if it doesn't exist, the list will remain unaltered. | true |
 
 #### Example JSON Structure
@@ -228,7 +228,7 @@ Retrieve all the currently existing keys from storage, along with their values w
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| scope | Scope | STRING <details> <summary> Options </summary> CURRENT_EXECUTION, WORKFLOW, ACCOUNT </details> | The namespace to get keys from. | true |
+| scope | Scope | STRING <details> <summary> Options </summary> CURRENT_EXECUTION, WORKFLOW, PRINCIPAL, ACCOUNT </details> | The namespace to get keys from. | true |
 
 #### Example JSON Structure
 ```json
@@ -259,18 +259,18 @@ Retrieve a previously assigned value within the specified scope using its corres
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | key | Key | STRING | The identifier of a value to get, stored earlier in the selected scope. | true |
-| scope | Scope | STRING <details> <summary> Options </summary> CURRENT_EXECUTION, WORKFLOW, ACCOUNT </details> | The namespace to get a value from. The value should have been previously accessible, either in the present workflow execution, or the workflow itself for all the executions, or the user account for all the workflows the user has. | true |
+| scope | Scope | STRING <details> <summary> Options </summary> CURRENT_EXECUTION, WORKFLOW, PRINCIPAL, ACCOUNT </details> | The namespace to get a value from. The value should have been previously accessible, either in the present workflow execution, or the workflow itself for all the executions, or the user account for all the workflows the user has. | true |
 | type | Type | STRING <details> <summary> Options </summary> ARRAY, BOOLEAN, DATE, DATE_TIME, INTEGER, NULL, NUMBER, OBJECT, STRING, TIME </details> | The value type. | null |
-| defaultValue | Default Value | ARRAY <details> <summary> Items </summary> [] </details> | The default value to return if no value exists under the given key. | true |
-| defaultValue | Default Value | BOOLEAN <details> <summary> Options </summary> true, false </details> | The default value to return if no value exists under the given key. | true |
-| defaultValue | Default Value | DATE | The default value to return if no value exists under the given key. | true |
-| defaultValue | Default Value | DATE_TIME | The default value to return if no value exists under the given key. | true |
-| defaultValue | Default Value | INTEGER | The default value to return if no value exists under the given key. | true |
-| defaultValue | Default Value | NULL | The default value to return if no value exists under the given key. | true |
-| defaultValue | Default Value | NUMBER | The default value to return if no value exists under the given key. | true |
-| defaultValue | Default Value | OBJECT <details> <summary> Properties </summary> {} </details> | The default value to return if no value exists under the given key. | true |
-| defaultValue | Default Value | STRING | The default value to return if no value exists under the given key. | true |
-| defaultValue | Default Value | TIME | The default value to return if no value exists under the given key. | true |
+| defaultValue | Default Value | ARRAY <details> <summary> Items </summary> [] </details> | The default value to return if no value exists under the given key. | null |
+| defaultValue | Default Value | BOOLEAN <details> <summary> Options </summary> true, false </details> | The default value to return if no value exists under the given key. | null |
+| defaultValue | Default Value | DATE | The default value to return if no value exists under the given key. | null |
+| defaultValue | Default Value | DATE_TIME | The default value to return if no value exists under the given key. | null |
+| defaultValue | Default Value | INTEGER | The default value to return if no value exists under the given key. | null |
+| defaultValue | Default Value | NULL | The default value to return if no value exists under the given key. | null |
+| defaultValue | Default Value | NUMBER | The default value to return if no value exists under the given key. | null |
+| defaultValue | Default Value | OBJECT <details> <summary> Properties </summary> {} </details> | The default value to return if no value exists under the given key. | null |
+| defaultValue | Default Value | STRING | The default value to return if no value exists under the given key. | null |
+| defaultValue | Default Value | TIME | The default value to return if no value exists under the given key. | null |
 
 #### Example JSON Structure
 ```json
@@ -304,7 +304,7 @@ Set a value under a key, in the specified scope.
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | key | Key | STRING | The identifier of a value. Must be unique across all keys within the chosen scope to prevent overwriting the existing value with a new one. Also, it must be less than 1024 bytes in length. | true |
-| scope | Scope | STRING <details> <summary> Options </summary> CURRENT_EXECUTION, WORKFLOW, ACCOUNT </details> | The namespace to set a value in. The value should have been previously accessible, either in the present workflow execution, or the workflow itself for all the executions, or the user account for all the workflows the user has. | true |
+| scope | Scope | STRING <details> <summary> Options </summary> CURRENT_EXECUTION, WORKFLOW, PRINCIPAL, ACCOUNT </details> | The namespace to set a value in. The value should have been previously accessible, either in the present workflow execution, or the workflow itself for all the executions, or the user account for all the workflows the user has. | true |
 | type | Type | STRING <details> <summary> Options </summary> ARRAY, BOOLEAN, DATE, DATE_TIME, INTEGER, NULL, NUMBER, OBJECT, STRING, TIME </details> | The value type. | null |
 | value | Value | ARRAY <details> <summary> Items </summary> [] </details> | The value to set under the specified key. | true |
 | value | Value | BOOLEAN <details> <summary> Options </summary> true, false </details> | The value to set under the specified key. | true |
@@ -349,7 +349,7 @@ Set value under a specified index in a list.
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | key | Key | STRING | The identifier of a list. Must be unique across all keys within the chosen scope to prevent overwriting the existing value with a new one. Also, it must be less than 1024 bytes in length. | true |
-| scope | Scope | STRING <details> <summary> Options </summary> CURRENT_EXECUTION, WORKFLOW, ACCOUNT </details> | The namespace to set a value in. The value should have been previously accessible, either in the present workflow execution, or the workflow itself for all the executions, or the user account for all the workflows the user has. | true |
+| scope | Scope | STRING <details> <summary> Options </summary> CURRENT_EXECUTION, WORKFLOW, PRINCIPAL, ACCOUNT </details> | The namespace to set a value in. The value should have been previously accessible, either in the present workflow execution, or the workflow itself for all the executions, or the user account for all the workflows the user has. | true |
 | index | Index | INTEGER | The index in a list to set a value under. The previous value will be overridden. | true |
 | type | Type | STRING <details> <summary> Options </summary> ARRAY, BOOLEAN, DATE, DATE_TIME, INTEGER, NULL, NUMBER, OBJECT, STRING, TIME </details> | The value type. | null |
 | value | Value | ARRAY <details> <summary> Items </summary> [] </details> | The value to set under the specified list's key. | true |
