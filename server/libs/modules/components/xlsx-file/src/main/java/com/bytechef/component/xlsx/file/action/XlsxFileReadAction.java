@@ -41,6 +41,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import org.apache.commons.lang3.BooleanUtils;
@@ -193,7 +194,7 @@ public class XlsxFileReadAction {
 
                     rows.add(map);
                 } else {
-                    Map<String, Object> map = new HashMap<>();
+                    Map<String, Object> map = new LinkedHashMap<>();
 
                     for (int i = 0; i < lastColumn; i++) {
                         Cell cell = row.getCell(i, Row.MissingCellPolicy.RETURN_BLANK_AS_NULL);
