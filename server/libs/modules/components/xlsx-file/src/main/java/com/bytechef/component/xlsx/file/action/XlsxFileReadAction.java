@@ -200,7 +200,7 @@ public class XlsxFileReadAction {
                         Cell cell = row.getCell(i, Row.MissingCellPolicy.RETURN_BLANK_AS_NULL);
 
                         map.put(
-                            "column_" + (i + 1),
+                            "column_" + columnToLabel(i + 1),
                             processValue(
                                 cell, configuration.includeEmptyCells(), configuration.readAsString(), context));
                     }
@@ -310,6 +310,18 @@ public class XlsxFileReadAction {
         }
 
         return value;
+    }
+
+    private static String columnToLabel(int columnNumber) {
+        StringBuilder columnName = new StringBuilder();
+
+        while (columnNumber > 0) {
+            int modulo = (columnNumber - 1) % 26;
+            columnName.insert(0, (char) (65 + modulo));
+            columnNumber = (columnNumber - modulo) / 26;
+        }
+
+        return columnName.toString();
     }
 
     protected record ReadConfiguration(
