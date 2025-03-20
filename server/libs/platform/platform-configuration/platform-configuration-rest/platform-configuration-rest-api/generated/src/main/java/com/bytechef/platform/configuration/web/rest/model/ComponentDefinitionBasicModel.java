@@ -2,9 +2,13 @@ package com.bytechef.platform.configuration.web.rest.model;
 
 import java.net.URI;
 import java.util.Objects;
+import com.bytechef.platform.configuration.web.rest.model.ComponentCategoryModel;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonTypeName;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import org.springframework.lang.Nullable;
 import org.openapitools.jackson.nullable.JsonNullable;
 import java.time.OffsetDateTime;
@@ -22,10 +26,13 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "ComponentDefinitionBasic", description = "A component contains a set of reusable code(actions) that accomplish specific tasks, triggers and connections if there is a need for a connection to an outside service.")
 @JsonTypeName("ComponentDefinitionBasic")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-03-20T07:39:40.498527+01:00[Europe/Zagreb]", comments = "Generator version: 7.12.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-03-20T08:02:10.095443+01:00[Europe/Zagreb]", comments = "Generator version: 7.12.0")
 public class ComponentDefinitionBasicModel {
 
   private @Nullable Integer actionsCount;
+
+  @Valid
+  private List<@Valid ComponentCategoryModel> componentCategories = new ArrayList<>();
 
   private @Nullable String description;
 
@@ -69,6 +76,34 @@ public class ComponentDefinitionBasicModel {
 
   public void setActionsCount(Integer actionsCount) {
     this.actionsCount = actionsCount;
+  }
+
+  public ComponentDefinitionBasicModel componentCategories(List<@Valid ComponentCategoryModel> componentCategories) {
+    this.componentCategories = componentCategories;
+    return this;
+  }
+
+  public ComponentDefinitionBasicModel addComponentCategoriesItem(ComponentCategoryModel componentCategoriesItem) {
+    if (this.componentCategories == null) {
+      this.componentCategories = new ArrayList<>();
+    }
+    this.componentCategories.add(componentCategoriesItem);
+    return this;
+  }
+
+  /**
+   * The list of categories the component belongs to.
+   * @return componentCategories
+   */
+  @Valid 
+  @Schema(name = "componentCategories", description = "The list of categories the component belongs to.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("componentCategories")
+  public List<@Valid ComponentCategoryModel> getComponentCategories() {
+    return componentCategories;
+  }
+
+  public void setComponentCategories(List<@Valid ComponentCategoryModel> componentCategories) {
+    this.componentCategories = componentCategories;
   }
 
   public ComponentDefinitionBasicModel description(String description) {
@@ -201,6 +236,7 @@ public class ComponentDefinitionBasicModel {
     }
     ComponentDefinitionBasicModel componentDefinitionBasic = (ComponentDefinitionBasicModel) o;
     return Objects.equals(this.actionsCount, componentDefinitionBasic.actionsCount) &&
+        Objects.equals(this.componentCategories, componentDefinitionBasic.componentCategories) &&
         Objects.equals(this.description, componentDefinitionBasic.description) &&
         Objects.equals(this.icon, componentDefinitionBasic.icon) &&
         Objects.equals(this.name, componentDefinitionBasic.name) &&
@@ -211,7 +247,7 @@ public class ComponentDefinitionBasicModel {
 
   @Override
   public int hashCode() {
-    return Objects.hash(actionsCount, description, icon, name, title, triggersCount, version);
+    return Objects.hash(actionsCount, componentCategories, description, icon, name, title, triggersCount, version);
   }
 
   @Override
@@ -219,6 +255,7 @@ public class ComponentDefinitionBasicModel {
     StringBuilder sb = new StringBuilder();
     sb.append("class ComponentDefinitionBasicModel {\n");
     sb.append("    actionsCount: ").append(toIndentedString(actionsCount)).append("\n");
+    sb.append("    componentCategories: ").append(toIndentedString(componentCategories)).append("\n");
     sb.append("    description: ").append(toIndentedString(description)).append("\n");
     sb.append("    icon: ").append(toIndentedString(icon)).append("\n");
     sb.append("    name: ").append(toIndentedString(name)).append("\n");

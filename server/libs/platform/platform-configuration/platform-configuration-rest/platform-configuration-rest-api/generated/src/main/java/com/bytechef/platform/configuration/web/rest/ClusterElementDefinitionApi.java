@@ -33,7 +33,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-03-20T07:39:40.498527+01:00[Europe/Zagreb]", comments = "Generator version: 7.12.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-03-20T08:02:10.095443+01:00[Europe/Zagreb]", comments = "Generator version: 7.12.0")
 @Validated
 @Tag(name = "cluster-element-definition", description = "The Platform Cluster Element Definition Internal API")
 public interface ClusterElementDefinitionApi {
@@ -67,7 +67,7 @@ public interface ClusterElementDefinitionApi {
         value = "/component-definitions/{componentName}/versions/{componentVersion}/cluster-element-definition/{clusterElementName}",
         produces = { "application/json" }
     )
-
+    
     default ResponseEntity<ClusterElementDefinitionModel> getComponentClusterElementDefinition(
         @Parameter(name = "componentName", description = "The name of a component.", required = true, in = ParameterIn.PATH) @PathVariable("componentName") String componentName,
         @Parameter(name = "componentVersion", description = "The version of a component.", required = true, in = ParameterIn.PATH) @PathVariable("componentVersion") Integer componentVersion,

@@ -34,7 +34,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-03-20T07:39:40.498527+01:00[Europe/Zagreb]", comments = "Generator version: 7.12.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-03-20T08:02:10.095443+01:00[Europe/Zagreb]", comments = "Generator version: 7.12.0")
 @Validated
 @Tag(name = "component-definition", description = "The Platform Component Definition Internal API")
 public interface ComponentDefinitionApi {
@@ -116,7 +116,7 @@ public interface ComponentDefinitionApi {
         getRequest().ifPresent(request -> {
             for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
                 if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
-                    String exampleString = "[ { \"icon\" : \"icon\", \"name\" : \"name\", \"actionsCount\" : 0, \"description\" : \"description\", \"title\" : \"title\", \"version\" : 1, \"triggersCount\" : 6 }, { \"icon\" : \"icon\", \"name\" : \"name\", \"actionsCount\" : 0, \"description\" : \"description\", \"title\" : \"title\", \"version\" : 1, \"triggersCount\" : 6 } ]";
+                    String exampleString = "[ { \"componentCategories\" : [ { \"name\" : \"name\", \"label\" : \"label\" }, { \"name\" : \"name\", \"label\" : \"label\" } ], \"icon\" : \"icon\", \"name\" : \"name\", \"actionsCount\" : 0, \"description\" : \"description\", \"title\" : \"title\", \"version\" : 1, \"triggersCount\" : 6 }, { \"componentCategories\" : [ { \"name\" : \"name\", \"label\" : \"label\" }, { \"name\" : \"name\", \"label\" : \"label\" } ], \"icon\" : \"icon\", \"name\" : \"name\", \"actionsCount\" : 0, \"description\" : \"description\", \"title\" : \"title\", \"version\" : 1, \"triggersCount\" : 6 } ]";
                     ApiUtil.setExampleResponse(request, "application/json", exampleString);
                     break;
                 }
@@ -165,7 +165,7 @@ public interface ComponentDefinitionApi {
         getRequest().ifPresent(request -> {
             for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
                 if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
-                    String exampleString = "[ { \"icon\" : \"icon\", \"name\" : \"name\", \"actionsCount\" : 0, \"description\" : \"description\", \"title\" : \"title\", \"version\" : 1, \"triggersCount\" : 6 }, { \"icon\" : \"icon\", \"name\" : \"name\", \"actionsCount\" : 0, \"description\" : \"description\", \"title\" : \"title\", \"version\" : 1, \"triggersCount\" : 6 } ]";
+                    String exampleString = "[ { \"componentCategories\" : [ { \"name\" : \"name\", \"label\" : \"label\" }, { \"name\" : \"name\", \"label\" : \"label\" } ], \"icon\" : \"icon\", \"name\" : \"name\", \"actionsCount\" : 0, \"description\" : \"description\", \"title\" : \"title\", \"version\" : 1, \"triggersCount\" : 6 }, { \"componentCategories\" : [ { \"name\" : \"name\", \"label\" : \"label\" }, { \"name\" : \"name\", \"label\" : \"label\" } ], \"icon\" : \"icon\", \"name\" : \"name\", \"actionsCount\" : 0, \"description\" : \"description\", \"title\" : \"title\", \"version\" : 1, \"triggersCount\" : 6 } ]";
                     ApiUtil.setExampleResponse(request, "application/json", exampleString);
                     break;
                 }
@@ -249,7 +249,7 @@ public interface ComponentDefinitionApi {
         getRequest().ifPresent(request -> {
             for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
                 if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
-                    String exampleString = "[ { \"icon\" : \"icon\", \"name\" : \"name\", \"actionsCount\" : 0, \"description\" : \"description\", \"title\" : \"title\", \"version\" : 1, \"triggersCount\" : 6 }, { \"icon\" : \"icon\", \"name\" : \"name\", \"actionsCount\" : 0, \"description\" : \"description\", \"title\" : \"title\", \"version\" : 1, \"triggersCount\" : 6 } ]";
+                    String exampleString = "[ { \"componentCategories\" : [ { \"name\" : \"name\", \"label\" : \"label\" }, { \"name\" : \"name\", \"label\" : \"label\" } ], \"icon\" : \"icon\", \"name\" : \"name\", \"actionsCount\" : 0, \"description\" : \"description\", \"title\" : \"title\", \"version\" : 1, \"triggersCount\" : 6 }, { \"componentCategories\" : [ { \"name\" : \"name\", \"label\" : \"label\" }, { \"name\" : \"name\", \"label\" : \"label\" } ], \"icon\" : \"icon\", \"name\" : \"name\", \"actionsCount\" : 0, \"description\" : \"description\", \"title\" : \"title\", \"version\" : 1, \"triggersCount\" : 6 } ]";
                     ApiUtil.setExampleResponse(request, "application/json", exampleString);
                     break;
                 }
