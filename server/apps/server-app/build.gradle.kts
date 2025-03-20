@@ -136,6 +136,7 @@ dependencies {
     implementation(project(":server:libs:modules:components:ai:llm:nvidia"))
     implementation(project(":server:libs:modules:components:ai:llm:ollama"))
     implementation(project(":server:libs:modules:components:ai:llm:open-ai"))
+    implementation(project(":server:libs:modules:components:ai:llm:perplexity"))
     implementation(project(":server:libs:modules:components:ai:llm:stability"))
     implementation(project(":server:libs:modules:components:ai:llm:vertex:gemini"))
     implementation(project(":server:libs:modules:components:ai:llm:watsonx"))
