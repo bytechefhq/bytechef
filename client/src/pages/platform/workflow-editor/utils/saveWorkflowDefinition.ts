@@ -21,9 +21,7 @@ type UpdateWorkflowRequestType = {
 };
 
 interface SaveWorkflowDefinitionProps {
-    conditionId?: string;
     decorative?: boolean;
-    loopId?: string;
     nodeData: NodeDataType;
     nodeIndex?: number;
     onSuccess?: () => void;
@@ -36,9 +34,7 @@ interface SaveWorkflowDefinitionProps {
 }
 
 export default async function saveWorkflowDefinition({
-    conditionId,
     decorative,
-    loopId,
     nodeData,
     nodeIndex,
     onSuccess,
@@ -176,10 +172,22 @@ export default async function saveWorkflowDefinition({
     } else {
         tasks = [...(workflowDefinition.tasks || [])];
 
-        if (conditionId) {
-            tasks = insertNewConditionSubtask({conditionId, newTask, placeholderId, taskDispatcherContext, tasks});
-        } else if (loopId && placeholderId) {
-            tasks = insertNewLoopSubtask({loopId, newTask, placeholderId, tasks});
+        if (taskDispatcherContext?.conditionId) {
+            tasks = insertNewConditionSubtask({
+                conditionId: taskDispatcherContext?.conditionId,
+                newTask,
+                placeholderId,
+                taskDispatcherContext,
+                tasks,
+            });
+        } else if (taskDispatcherContext?.loopId) {
+            tasks = insertNewLoopSubtask({
+                loopId: taskDispatcherContext?.loopId,
+                newTask,
+                placeholderId,
+                taskDispatcherContext,
+                tasks,
+            });
         } else if (nodeIndex !== undefined && nodeIndex > -1) {
             const tasksAfterCurrent = tasks.slice(nodeIndex);
 

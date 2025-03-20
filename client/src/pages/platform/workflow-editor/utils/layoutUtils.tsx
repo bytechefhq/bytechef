@@ -20,11 +20,9 @@ import InlineSVG from 'react-inlinesvg';
 
 import {findParentConditionId, isConditionNested} from './conditionHelpers';
 import {getConditionBranchSide} from './createConditionEdges';
+import {findParentLoopId, isLoopNested} from './loopHelpers';
 
 export const calculateNodeHeight = (node: Node, nodes: Node[], index: number) => {
-    const loopPlaceholderNode =
-        (node.data.taskDispatcherId as string)?.includes('loop') && node.id.includes('placeholder');
-
     const loopGhostNode = (node.data.taskDispatcherId as string)?.includes('loop') && node.type?.includes('GhostNode');
 
     const conditionPlaceholderNode = node.id.includes('condition') && node.id.includes('placeholder');
@@ -47,16 +45,8 @@ export const calculateNodeHeight = (node: Node, nodes: Node[], index: number) =>
         if (node.id.includes('bottom')) {
             height = PLACEHOLDER_NODE_HEIGHT;
         }
-    } else if (loopPlaceholderNode) {
-        const otherLoopPlaceholderNodes = getOtherLoopPlaceholderNodes(nodes, node);
-
-        height = PLACEHOLDER_NODE_HEIGHT * 2;
-
-        if (otherLoopPlaceholderNodes.length) {
-            height = 0;
-        }
     } else if (loopGhostNode) {
-        height = 0;
+        height = NODE_HEIGHT;
     } else if (!node.data.conditionData && !node.data.loopData) {
         height = NODE_HEIGHT * 1.2;
     }
@@ -115,19 +105,6 @@ export const filterConditionCaseNodes = (nodes: Node[], node: Node) =>
             nodeItem.data.conditionCase === node.data.conditionCase &&
             nodeItem.id !== node.id
         );
-    });
-
-export const getOtherLoopPlaceholderNodes = (nodes: Node[], node: Node) =>
-    nodes.filter((nodeItem) => {
-        if (nodeItem.id === node.id) {
-            return false;
-        }
-
-        if (!nodeItem.data.loopId) {
-            return false;
-        }
-
-        return nodeItem.data.loopId === node.data.loopId && nodeItem.id !== node.id;
     });
 
 export const getLayoutedElements = (nodes: Node[], edges: Edge[], canvasWidth: number) => {
@@ -200,7 +177,19 @@ export const getLayoutedElements = (nodes: Node[], edges: Edge[], canvasWidth: n
 
         const isLoopPlaceholderNode = source.includes('loop') && source.includes('placeholder');
 
-        if (isSourceConditionTaskNode || isSourceLoopTaskNode || isLoopPlaceholderNode) {
+        const isLoopGhostNode = source.includes('loop') && source.includes('ghost');
+
+        const sourceNode = allNodes.find((node) => node.id === source);
+
+        const isLoopChildTask = sourceNode?.data?.loopData !== undefined;
+
+        if (
+            isSourceConditionTaskNode ||
+            isSourceLoopTaskNode ||
+            isLoopPlaceholderNode ||
+            isLoopGhostNode ||
+            isLoopChildTask
+        ) {
             filteredEdges.push(...sourceEdges);
         } else {
             filteredEdges.push(sourceEdges[0]);
@@ -231,60 +220,96 @@ export const createEdgeFromTaskDispatcherBottomGhostNode = (
     index: number = 0
 ): Edge | null => {
     const nodeData = node.data as NodeDataType;
-    const {conditionId} = nodeData;
+    const {taskDispatcherId} = nodeData;
 
-    if (!conditionId) {
+    if (!taskDispatcherId) {
         return null;
     }
 
-    const isNestedCondition = tasks?.length > 0 && isConditionNested(conditionId, tasks);
+    if (taskDispatcherId.includes('condition')) {
+        const isNestedCondition = tasks?.length > 0 && isConditionNested(taskDispatcherId, tasks);
 
-    // Special handling for nested conditions - connect to parent's bottom ghost
-    if (isNestedCondition) {
-        const parentConditionId = findParentConditionId(conditionId, tasks);
+        // Special handling for nested conditions - connect to parent's bottom ghost
+        if (isNestedCondition) {
+            const parentConditionId = findParentConditionId(taskDispatcherId, tasks);
 
-        if (!parentConditionId) {
-            return null;
+            if (!parentConditionId) {
+                return null;
+            }
+
+            const parentConditionBottomGhostId = `${parentConditionId}-condition-bottom-ghost`;
+            const parentConditionBottomGhost = allNodes.find((node) => node.id === parentConditionBottomGhostId);
+
+            if (!parentConditionBottomGhost) {
+                return null;
+            }
+
+            const branchSide = getConditionBranchSide(taskDispatcherId, tasks, parentConditionId);
+
+            // Create edge to parent's bottom ghost
+            return {
+                id: `${node.id}=>${parentConditionBottomGhostId}`,
+                source: node.id,
+                style: EDGE_STYLES,
+                target: parentConditionBottomGhostId,
+                targetHandle: `${parentConditionBottomGhostId}-${branchSide}`,
+                type: 'workflow',
+            };
         }
+    } else if (taskDispatcherId.includes('loop')) {
+        const isNestedLoop = tasks?.length > 0 && isLoopNested(taskDispatcherId, tasks);
 
-        const parentBottomGhostId = `${parentConditionId}-condition-bottom-ghost`;
-        const parentBottomGhost = allNodes.find((n) => n.id === parentBottomGhostId);
+        if (isNestedLoop) {
+            const parentLoopId = findParentLoopId(taskDispatcherId, tasks);
 
-        if (!parentBottomGhost) {
-            return null;
+            if (!parentLoopId) {
+                return null;
+            }
+
+            const parentLoopBottomGhostId = `${parentLoopId}-loop-bottom-ghost`;
+            const parentLoopBottomGhost = allNodes.find((node) => node.id === parentLoopBottomGhostId);
+
+            if (!parentLoopBottomGhost) {
+                return null;
+            }
+
+            return {
+                id: `${node.id}=>${parentLoopBottomGhostId}`,
+                source: node.id,
+                style: EDGE_STYLES,
+                target: parentLoopBottomGhostId,
+                targetHandle: `${parentLoopBottomGhostId}-right`,
+                type: 'workflow',
+            };
         }
-
-        const branchSide = getConditionBranchSide(conditionId, tasks, parentConditionId);
-
-        // Create edge to parent's bottom ghost
-        return {
-            id: `${node.id}=>${parentBottomGhostId}`,
-            source: node.id,
-            style: EDGE_STYLES,
-            target: parentBottomGhostId,
-            targetHandle: `${parentBottomGhostId}-bottom-ghost-${branchSide}`,
-            type: 'workflow',
-        };
     }
 
     const subsequentNodes = allNodes.slice(index + 1);
 
     const nextTaskNodeOutsideTaskDispatcher = subsequentNodes.find((subsequentNode) => {
-        if (subsequentNode.type === 'placeholder' || subsequentNode.type === 'taskDispatcherBottomGhostNode') {
+        if (subsequentNode.type !== 'workflow') {
             return false;
         }
 
         const subsequentNodeData = subsequentNode.data as NodeDataType;
 
-        if (subsequentNodeData.conditionData?.conditionId === conditionId) {
+        if (subsequentNodeData.conditionData && subsequentNodeData.conditionData.conditionId === taskDispatcherId) {
+            return false;
+        } else if (subsequentNodeData.loopData && subsequentNodeData.loopData.loopId === taskDispatcherId) {
             return false;
         }
 
         for (const task of tasks || []) {
-            if (task.type?.includes('condition') && task.parameters) {
-                const allBranchTasks = [...(task.parameters.caseTrue || []), ...(task.parameters.caseFalse || [])];
+            if (task.type?.startsWith('condition') && task.parameters) {
+                const conditionSubtasks = [...(task.parameters.caseTrue || []), ...(task.parameters.caseFalse || [])];
 
-                if (allBranchTasks.some((branchTask) => branchTask.name === subsequentNode.id)) {
+                if (conditionSubtasks.some((subtask) => subtask.name === subsequentNode.id)) {
+                    return false;
+                }
+            } else if (task.type?.startsWith('loop') && task.parameters?.iteratee) {
+                const loopSubtasks: WorkflowTask[] = task.parameters.iteratee;
+
+                if (loopSubtasks.some((subtask) => subtask.name === subsequentNode.id)) {
                     return false;
                 }
             }

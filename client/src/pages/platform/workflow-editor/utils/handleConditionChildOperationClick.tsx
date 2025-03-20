@@ -65,7 +65,6 @@ export default function handleConditionChildOperationClick({
     const taskAfterCurrentIndex = workflow.tasks?.length;
 
     saveWorkflowDefinition({
-        conditionId,
         nodeData: {
             ...newWorkflowNodeData,
             parameters: getParametersWithDefaultValues({

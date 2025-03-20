@@ -254,4 +254,5 @@ export type TaskDispatcherContextType = {
     conditionCase?: string;
     conditionId?: string;
     index?: number;
+    loopId?: string;
 };

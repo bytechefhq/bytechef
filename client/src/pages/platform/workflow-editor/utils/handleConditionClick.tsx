@@ -1,6 +1,12 @@
-import {TaskDispatcherDefinitionApi, Workflow, WorkflowTask} from '@/shared/middleware/platform/configuration';
+import {TaskDispatcherDefinitionApi, Workflow} from '@/shared/middleware/platform/configuration';
 import {TaskDispatcherKeys} from '@/shared/queries/platform/taskDispatcherDefinitions.queries';
-import {ClickedDefinitionType, NodeDataType, PropertyAllType, UpdateWorkflowMutationType} from '@/shared/types';
+import {
+    ClickedDefinitionType,
+    NodeDataType,
+    PropertyAllType,
+    TaskDispatcherContextType,
+    UpdateWorkflowMutationType,
+} from '@/shared/types';
 import {Component1Icon} from '@radix-ui/react-icons';
 import {QueryClient} from '@tanstack/react-query';
 import InlineSVG from 'react-inlinesvg';
@@ -13,18 +19,18 @@ import saveWorkflowDefinition from './saveWorkflowDefinition';
 
 interface HandleConditionClickProps {
     clickedItem: ClickedDefinitionType;
-    edgeId?: string;
+    edge?: boolean;
     projectId: number;
     queryClient: QueryClient;
     sourceNodeId?: string;
-    taskDispatcherContext?: Record<string, unknown>;
+    taskDispatcherContext?: TaskDispatcherContextType;
     updateWorkflowMutation: UpdateWorkflowMutationType;
     workflow: Workflow & WorkflowTaskDataType;
 }
 
 export default async function handleConditionClick({
     clickedItem,
-    edgeId,
+    edge,
     projectId,
     queryClient,
     sourceNodeId,
@@ -43,10 +49,6 @@ export default async function handleConditionClick({
             taskDispatcherVersion: clickedItem.version,
         }),
     });
-
-    if (!conditionDefinition || !workflow.definition) {
-        return;
-    }
 
     const workflowNodeName = getFormattedName(clickedItem.name!);
 
@@ -69,65 +71,37 @@ export default async function handleConditionClick({
         workflowNodeName,
     };
 
-    const tasks: Array<WorkflowTask> = JSON.parse(workflow.definition).tasks;
-
-    let taskIndex = tasks?.length;
-
-    const isSourceConditionPlaceholderNode =
-        sourceNodeId?.includes('condition') && sourceNodeId?.includes('placeholder');
-
-    let conditionId: string | undefined;
-
-    const hasTaskDispatcherContextValues =
-        taskDispatcherContext && Object.values(taskDispatcherContext).filter(Boolean).length;
-
-    if (hasTaskDispatcherContextValues && !sourceNodeId?.includes('condition-bottom-ghost')) {
-        conditionId = taskDispatcherContext.conditionId as string;
-
-        if (!conditionId || !tasks) {
-            return;
-        }
-
-        taskIndex = tasks.findIndex((task) => task.name === conditionId) + 1;
-    } else if (sourceNodeId && isSourceConditionPlaceholderNode) {
-        if (edgeId && tasks) {
-            taskIndex = tasks.findIndex((task) => task.name === sourceNodeId) + 1;
-        }
-
-        conditionId = sourceNodeId.split('-')[0];
-
-        if (!conditionId || !tasks) {
-            return;
-        }
-
-        taskIndex = tasks.findIndex((task) => task.name === conditionId) + 1;
-
-        if (sourceNodeId.includes('left') || sourceNodeId.includes('right')) {
-            taskIndex = parseInt(sourceNodeId.split('-')[3]);
-        } else {
-            conditionId = undefined;
-        }
-    } else if (sourceNodeId && !isSourceConditionPlaceholderNode) {
-        if (edgeId && tasks) {
-            const targetTaskId = edgeId.split('=>')[1];
-
-            taskIndex = tasks.findIndex((task) => task.name === targetTaskId);
+    // Handle adding a taskDispatcher to a condition node
+    if (taskDispatcherContext) {
+        if (taskDispatcherContext.conditionId) {
+            newConditionNodeData.conditionData = {
+                conditionCase: taskDispatcherContext.conditionCase as 'caseTrue' | 'caseFalse',
+                conditionId: taskDispatcherContext.conditionId as string,
+                index: (taskDispatcherContext.index ?? 0) as number,
+            };
+        } else if (taskDispatcherContext.loopId) {
+            newConditionNodeData.loopData = {
+                index: (taskDispatcherContext.index ?? 0) as number,
+                loopId: taskDispatcherContext.loopId as string,
+            };
         }
     }
 
-    // Handle adding condition inside another condition
-    if (taskDispatcherContext && taskDispatcherContext.conditionId) {
-        conditionId = taskDispatcherContext.conditionId as string;
+    const hasTaskDispatcherId = Object.entries(taskDispatcherContext ?? {}).some(
+        ([key, value]) => key.endsWith('Id') && !!value
+    );
 
-        newConditionNodeData.conditionData = {
-            conditionCase: taskDispatcherContext.conditionCase as 'caseTrue' | 'caseFalse',
-            conditionId: taskDispatcherContext.conditionId as string,
-            index: (taskDispatcherContext.index ?? 0) as number,
-        };
+    let nodeIndex = workflow.tasks?.length;
+
+    if (hasTaskDispatcherId) {
+        nodeIndex = taskDispatcherContext?.index;
+    }
+
+    if (edge) {
+        nodeIndex = (workflow.tasks?.findIndex((task) => task.name === sourceNodeId) ?? 0) + 1;
     }
 
     saveWorkflowDefinition({
-        conditionId,
         nodeData: {
             ...newConditionNodeData,
             parameters: {
@@ -139,14 +113,14 @@ export default async function handleConditionClick({
             },
             workflowNodeName,
         },
-        nodeIndex: taskIndex,
+        nodeIndex,
         onSuccess: () =>
             handleComponentAddedSuccess({
                 nodeData: newConditionNodeData,
                 queryClient,
                 workflow,
             }),
-        placeholderId: taskDispatcherContext ? undefined : sourceNodeId,
+        placeholderId: hasTaskDispatcherId ? undefined : sourceNodeId,
         projectId,
         queryClient,
         taskDispatcherContext,

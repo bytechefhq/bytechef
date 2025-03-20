@@ -213,6 +213,19 @@ const WorkflowNodesPopoverMenuOperationList = ({
                     });
 
                     return;
+                } else if (taskDispatcherContext?.loopId) {
+                    handleLoopChildOperationClick({
+                        loopId: taskDispatcherContext.loopId as string,
+                        operation: clickedOperation,
+                        operationDefinition: clickedComponentActionDefinition,
+                        projectId: +projectId!,
+                        queryClient,
+                        taskDispatcherContext,
+                        updateWorkflowMutation,
+                        workflow,
+                    });
+
+                    return;
                 }
 
                 captureComponentUsed(componentName, operationName, undefined);
@@ -227,14 +240,15 @@ const WorkflowNodesPopoverMenuOperationList = ({
 
                 const taskDispatcherContext = getTaskDispatcherContext({node: sourceNode});
 
-                if (loopId) {
+                if (taskDispatcherContext?.loopId || loopId) {
                     handleLoopChildOperationClick({
-                        loopId,
+                        loopId: (taskDispatcherContext?.loopId as string) ?? loopId,
                         operation: clickedOperation,
                         operationDefinition: clickedComponentActionDefinition,
                         placeholderId: sourceNodeId,
                         projectId: +projectId!,
                         queryClient,
+                        taskDispatcherContext,
                         updateWorkflowMutation,
                         workflow,
                     });

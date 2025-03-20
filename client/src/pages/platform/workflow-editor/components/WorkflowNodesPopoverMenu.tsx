@@ -18,7 +18,6 @@ import WorkflowNodesPopoverMenuOperationList from './WorkflowNodesPopoverMenuOpe
 
 interface WorkflowNodesPopoverMenuProps extends PropsWithChildren {
     conditionId?: string;
-    edge?: boolean;
     edgeId?: string;
     hideActionComponents?: boolean;
     hideTriggerComponents?: boolean;
@@ -31,7 +30,6 @@ interface WorkflowNodesPopoverMenuProps extends PropsWithChildren {
 const WorkflowNodesPopoverMenu = ({
     children,
     conditionId,
-    edge = false,
     edgeId,
     hideActionComponents = false,
     hideTaskDispatchers = false,
@@ -75,18 +73,18 @@ const WorkflowNodesPopoverMenu = ({
             const {componentVersion, name, taskDispatcher, trigger, version} = clickedItem;
 
             if (taskDispatcher) {
+                const edge = edges.find((edge) => edge.id === edgeId);
+
+                const taskDispatcherContext = getTaskDispatcherContext({
+                    edge: edge,
+                    node: edge?.type === 'workflow' ? undefined : sourceNode,
+                    nodes: nodes,
+                });
+
                 if (name.includes('condition')) {
-                    const edge = edges.find((edge) => edge.id === edgeId);
-
-                    const taskDispatcherContext = getTaskDispatcherContext({
-                        edge: edge,
-                        node: edge?.type === 'workflow' ? undefined : sourceNode,
-                        nodes: nodes,
-                    });
-
                     await handleConditionClick({
                         clickedItem,
-                        edgeId,
+                        edge: !!edge,
                         projectId: +projectId!,
                         queryClient,
                         sourceNodeId,
@@ -97,10 +95,11 @@ const WorkflowNodesPopoverMenu = ({
                 } else if (name.includes('loop')) {
                     await handleLoopClick({
                         clickedItem,
-                        edge,
+                        edge: !!edge,
                         projectId: +projectId!,
                         queryClient,
                         sourceNodeId,
+                        taskDispatcherContext,
                         updateWorkflowMutation,
                         workflow,
                     });
