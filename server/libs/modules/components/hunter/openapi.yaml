@@ -1,0 +1,347 @@
+---
+openapi: "3.0.2"
+info:
+  title: "Hunter"
+  description: "Hunter is a tool that helps users find and verify professional email addresses, enabling effective outreach and communication."
+  version: "v1"
+servers:
+  - url: "https://api.hunter.io/v2"
+paths:
+  /people/find:
+    get:
+      summary: "Email Enrichment"
+      description: "Returns all the information associated with an email address, such as a person's name, location and social handles."
+      operationId: "emailEnrichment"
+      parameters:
+        - name: "email"
+          description: "The email address name for which you to find associated information."
+          in: "query"
+          required: true
+          schema:
+            type: "string"
+            title: "Email Address"
+      responses:
+        200:
+          description: "Successful operation"
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  data:
+                    type: "object"
+                    properties:
+                      id:
+                        type: "string"
+                        description: "ID of the person."
+                      name:
+                        type: "object"
+                        properties:
+                          fullName:
+                            type: "string"
+                            description: "Full name of the person."
+                          givenName:
+                            type: "string"
+                            description: "First name of the person."
+                          familyName:
+                            type: "string"
+                            description: "Last name of the person."
+                      email:
+                        type: "string"
+                        description: "Email address of the person."
+                      location:
+                        type: "string"
+                        description: "Location of the person."
+                      geo:
+                        type: "object"
+                        description: "Geographical information."
+                        properties:
+                          city:
+                            type: "string"
+                            description: "City"
+                          state:
+                            type: "string"
+                            description: "State"
+                          stateCode:
+                            type: "integer"
+                            description: "State code."
+                          country:
+                            type: "string"
+                            description: "Country"
+                          countryCode:
+                            type: "string"
+                            description: "Country code"
+                          lat:
+                            type: "number"
+                            description: "Latitude"
+                          lng:
+                            type: "number"
+                            description: "Longitude"
+                      meta:
+                        type: "object"
+                        properties:
+                          email:
+                            type: "string"
+                            description: "Email address of the person."
+  /companies/find:
+    get:
+      summary: "Company Enrichment"
+      description: "Returns all the information associated with a domain name, such as the industry, the description, or headquarters' location."
+      operationId: "companyEnrichment"
+      parameters:
+        - name: "domain"
+          description: "The domain name for which you to find associated information."
+          in: "query"
+          required: true
+          schema:
+            type: "string"
+            title: "Domain"
+      responses:
+        200:
+          description: "Successful operation"
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  data:
+                    type: "object"
+                    properties:
+                      id:
+                        type: "string"
+                        description: "ID of the company."
+                      name:
+                        type: "string"
+                        description: "Name of the company."
+                      legalName:
+                        type: "string"
+                        description: "Legal name of the company."
+                      domain:
+                        type: "string"
+                        description: "Domain name of the company."
+                      description:
+                        type: "string"
+                        description: "Description of the company."
+                      foundedYear:
+                        type: "integer"
+                        description: "Year the company was founded."
+                      location:
+                        type: "string"
+                        description: "Location of the company."
+                      timeZone:
+                        type: "string"
+                        description: "Time zone the company is located in."
+                      logo:
+                        type: "string"
+                        description: "URL of the company's logo."
+                      emailProvider:
+                        type: "string"
+                        description: "Email provider the company is using."
+                      phone:
+                        type: "string"
+                        description: "Phone number of the company."
+                      meta:
+                        type: "object"
+                        properties:
+                          domain:
+                            type: "string"
+  /combined/find:
+    get:
+      summary: "Combined Enrichment"
+      description: "Returns all the information associated with an email address and its domain name."
+      operationId: "combinedEnrichment"
+      parameters:
+        - name: "email"
+          description: "The email address name for which you to find associated information."
+          in: "query"
+          required: true
+          schema:
+            type: "string"
+            title: "Email Address"
+      responses:
+        200:
+          description: "Successful operation"
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  data:
+                    type: "object"
+                    properties:
+                      person:
+                        type: "object"
+                        properties:
+                          id:
+                            type: "string"
+                            description: "ID of the person."
+                          name:
+                            type: "object"
+                            properties:
+                              fullName:
+                                type: "string"
+                                description: "Full name of the person."
+                              givenName:
+                                type: "string"
+                                description: "First name of the person."
+                              familyName:
+                                type: "string"
+                                description: "Last name of the person."
+                          email:
+                            type: "string"
+                            description: "Email address of the person."
+                          location:
+                            type: "string"
+                            description: "Location of the person."
+                          geo:
+                            type: "object"
+                            description: "Geographical information."
+                            properties:
+                              city:
+                                type: "string"
+                                description: "City"
+                              state:
+                                type: "string"
+                                description: "State"
+                              stateCode:
+                                type: "integer"
+                                description: "State code."
+                              country:
+                                type: "string"
+                                description: "Country"
+                              countryCode:
+                                type: "string"
+                                description: "Country code"
+                              lat:
+                                type: "number"
+                                description: "Latitude"
+                              lng:
+                                type: "number"
+                                description: "Longitude"
+                      company:
+                        type: "object"
+                        properties:
+                          id:
+                            type: "string"
+                            description: "ID of the company."
+                          name:
+                            type: "string"
+                            description: "Name of the company."
+                          legalName:
+                            type: "string"
+                            description: "Legal name of the company."
+                          domain:
+                            type: "string"
+                            description: "Domain name of the company."
+                          description:
+                            type: "string"
+                            description: "Description of the company."
+                          foundedYear:
+                            type: "integer"
+                            description: "Year the company was founded."
+                          location:
+                            type: "string"
+                            description: "Location of the company."
+                          timeZone:
+                            type: "string"
+                            description: "Time zone the company is located in."
+                          logo:
+                            type: "string"
+                            description: "URL of the company's logo."
+                          emailProvider:
+                            type: "string"
+                            description: "Email provider the company is using."
+                          phone:
+                            type: "string"
+                            description: "Phone number of the company."
+  /leads:
+    post:
+      summary: "Create Lead"
+      description: "Creates a new lead."
+      operationId: "createLead"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: "object"
+              properties:
+                email:
+                  type: "string"
+                  description: "The email address of the lead."
+                  title: "Email Address"
+                  required: true
+                first_name:
+                  type: "string"
+                  title: "First Name"
+                  description: "The first name of the lead."
+                  required: false
+                last_name:
+                  type: "string"
+                  title: "Last Name"
+                  description: "The last name of the lead."
+                  required: false
+                position:
+                  type: "string"
+                  title: "Position"
+                  description: "The job title of the lead."
+                  required: false
+                company:
+                  type: "string"
+                  title: "Company"
+                  description: "The name of the company the lead is working in."
+                  required: false
+                phone_number:
+                  type: "string"
+                  description: "The phone number of the lead."
+                  title: "Phone Number"
+                  required: false
+                lead_list_id:
+                  type: "integer"
+                  description: "The identifier of the list the lead belongs to. If it's not specified, the lead is saved in the last list created."
+                  title: "Lead List ID"
+                  required: false
+                  x-dynamic-options: true
+      responses:
+        200:
+          description: "Successful operation"
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  data:
+                    type: "object"
+                    properties:
+                      id:
+                        type: "string"
+                        description: "ID of the lead."
+                      email:
+                        type: "string"
+                        description: "Email address of the lead."
+                      first_name:
+                        type: "string"
+                        description: "First name of the lead."
+                      last_name:
+                        type: "string"
+                        description: "Last name of the lead."
+                      position:
+                        type: "string"
+                        description: "Job title of the lead."
+                      company:
+                        type: "string"
+                        description: "Name of the company the lead is working in."
+                      leads_list:
+                        type: "object"
+                        properties:
+                          id:
+                            type: "integer"
+                            description: "ID of the list the lead belongs to."
+                          name:
+                            type: "string"
+                            description: "Name of the list the lead belongs to."
+components:
+  securitySchemes:
+    ApiKeyAuth:
+      type: "apiKey"
+      in: "header"
+      name: "X-API-KEY"

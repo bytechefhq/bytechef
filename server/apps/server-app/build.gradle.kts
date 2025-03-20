@@ -191,6 +191,7 @@ dependencies {
     implementation(project(":server:libs:modules:components:google:google-tasks"))
     implementation(project(":server:libs:modules:components:http-client"))
     implementation(project(":server:libs:modules:components:hubspot"))
+    implementation(project(":server:libs:modules:components:hunter"))
     implementation(project(":server:libs:modules:components:image-helper"))
     implementation(project(":server:libs:modules:components:infobip"))
     implementation(project(":server:libs:modules:components:insightly"))
