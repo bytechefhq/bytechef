@@ -13,6 +13,14 @@
  */
 
 import { mapValues } from '../runtime';
+import type { ComponentCategory } from './ComponentCategory';
+import {
+    ComponentCategoryFromJSON,
+    ComponentCategoryFromJSONTyped,
+    ComponentCategoryToJSON,
+    ComponentCategoryToJSONTyped,
+} from './ComponentCategory';
+
 /**
  * A component contains a set of reusable code(actions) that accomplish specific tasks, triggers and connections if there is a need for a connection to an outside service.
  * @export
@@ -25,6 +33,12 @@ export interface ComponentDefinitionBasic {
      * @memberof ComponentDefinitionBasic
      */
     actionsCount?: number;
+    /**
+     * The list of categories the component belongs to.
+     * @type {Array<ComponentCategory>}
+     * @memberof ComponentDefinitionBasic
+     */
+    componentCategories?: Array<ComponentCategory>;
     /**
      * The description.
      * @type {string}
@@ -83,6 +97,7 @@ export function ComponentDefinitionBasicFromJSONTyped(json: any, ignoreDiscrimin
     return {
         
         'actionsCount': json['actionsCount'] == null ? undefined : json['actionsCount'],
+        'componentCategories': json['componentCategories'] == null ? undefined : ((json['componentCategories'] as Array<any>).map(ComponentCategoryFromJSON)),
         'description': json['description'] == null ? undefined : json['description'],
         'icon': json['icon'] == null ? undefined : json['icon'],
         'name': json['name'],
@@ -104,6 +119,7 @@ export function ComponentDefinitionBasicToJSONTyped(value?: ComponentDefinitionB
     return {
         
         'actionsCount': value['actionsCount'],
+        'componentCategories': value['componentCategories'] == null ? undefined : ((value['componentCategories'] as Array<any>).map(ComponentCategoryToJSON)),
         'description': value['description'],
         'icon': value['icon'],
         'name': value['name'],
