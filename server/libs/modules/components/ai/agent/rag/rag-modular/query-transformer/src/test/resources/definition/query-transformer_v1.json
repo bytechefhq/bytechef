@@ -1,0 +1,86 @@
+{
+  "actions" : [ ],
+  "componentCategories" : [ {
+    "name" : "artificial-intelligence",
+    "label" : "artificial-intelligence"
+  } ],
+  "connection" : null,
+  "customAction" : null,
+  "customActionHelp" : null,
+  "clusterElements" : [ {
+    "description" : "Uses a large language model to compress a conversation history and a follow-up query\ninto a standalone query that captures the essence of the conversation.\nThis transformer is useful when the conversation history is long and the follow-up\nquery is related to the conversation context.\n",
+    "name" : "compressionQueryTransformer",
+    "outputDefinition" : null,
+    "properties" : null,
+    "title" : "Compression Query Transformer",
+    "type" : {
+      "name" : "queryTransformer",
+      "label" : "Query Transformer",
+      "multipleElements" : true,
+      "required" : false
+    },
+    "object" : { }
+  }, {
+    "description" : "Uses a large language model to rewrite a user query to provide better results when\nquerying a target system, such as a vector store or a web search engine.\nThis transformer is useful when the user query is verbose, ambiguous, or contains\nirrelevant information that may affect the quality of the search results.\n",
+    "name" : "rewriteQueryTransformer",
+    "outputDefinition" : null,
+    "properties" : null,
+    "title" : "Rewrite Query Transformer",
+    "type" : {
+      "name" : "queryTransformer",
+      "label" : "Query Transformer",
+      "multipleElements" : true,
+      "required" : false
+    },
+    "object" : { }
+  }, {
+    "description" : "Uses a large language model to translate a query to a target language that is supported\nby the embedding model used to generate the document embeddings. If the query is\nalready in the target language, it is returned unchanged. If the language of the query\nis unknown, it is also returned unchanged.\nThis transformer is useful when the embedding model is trained on a specific language\nand the user query is in a different language.\n",
+    "name" : "translationQueryTransformer",
+    "outputDefinition" : null,
+    "properties" : [ {
+      "advancedOption" : null,
+      "description" : "The target language to which the query should be translated. The language\nshould be specified in ISO 639-1 format (e.g., \"en\" for English, \"fr\" for\nFrench, etc.).\n",
+      "displayCondition" : null,
+      "expressionEnabled" : null,
+      "hidden" : null,
+      "metadata" : { },
+      "required" : false,
+      "name" : "targetLanguage",
+      "type" : "STRING",
+      "defaultValue" : null,
+      "exampleValue" : null,
+      "label" : "Target Language",
+      "placeholder" : null,
+      "controlType" : "TEXT",
+      "languageId" : null,
+      "maxLength" : null,
+      "minLength" : null,
+      "options" : null,
+      "optionsDataSource" : null
+    } ],
+    "title" : "Translation Query Transformer",
+    "type" : {
+      "name" : "queryTransformer",
+      "label" : "Query Transformer",
+      "multipleElements" : true,
+      "required" : false
+    },
+    "object" : { }
+  } ],
+  "description" : "Query Transformer.",
+  "icon" : "path:assets/query-transformer.svg",
+  "tags" : null,
+  "metadata" : null,
+  "name" : "queryTransformer",
+  "resources" : null,
+  "title" : "Query Transformer",
+  "triggers" : null,
+  "unifiedApi" : null,
+  "version" : 1,
+  "elementTypes" : [ {
+    "name" : "model",
+    "label" : "Model",
+    "multipleElements" : false,
+    "required" : true
+  } ]
+}

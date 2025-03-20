@@ -27,13 +27,8 @@ import java.util.List;
  */
 public interface DataStreamComponentDefinition extends ClusterRootComponentDefinition {
 
-    /**
-     *
-     */
-    String DATA_STREAM = "dataStream";
-
     @Override
-    default List<ClusterElementDefinition.ClusterElementType> getElementTypes() {
+    default List<ClusterElementDefinition.ClusterElementType> getClusterElementType() {
         return List.of(SOURCE, DESTINATION);
     }
 }

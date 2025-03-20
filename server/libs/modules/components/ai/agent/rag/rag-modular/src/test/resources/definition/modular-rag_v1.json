@@ -1,0 +1,60 @@
+{
+  "actions" : [ ],
+  "componentCategories" : [ {
+    "name" : "artificial-intelligence",
+    "label" : "artificial-intelligence"
+  } ],
+  "connection" : null,
+  "customAction" : null,
+  "customActionHelp" : null,
+  "clusterElements" : [ {
+    "description" : "Moduler RAG.",
+    "name" : "rag",
+    "outputDefinition" : null,
+    "properties" : null,
+    "title" : "Moduler RAG",
+    "type" : {
+      "name" : "rag",
+      "label" : "RAG",
+      "multipleElements" : false,
+      "required" : false
+    },
+    "object" : { }
+  } ],
+  "description" : "Retrieval Augmentation is a powerful tool that allows you to retrieve relevant information from a vector database, such as Pinecone, and use it to enhance your AI agent's responses.",
+  "icon" : "path:assets/rag.svg",
+  "tags" : null,
+  "metadata" : null,
+  "name" : "modularRag",
+  "resources" : null,
+  "title" : "Modular RAG",
+  "triggers" : null,
+  "unifiedApi" : null,
+  "version" : 1,
+  "elementTypes" : [ {
+    "name" : "documentJoiner",
+    "label" : "Document Joiner",
+    "multipleElements" : false,
+    "required" : false
+  }, {
+    "name" : "documentRetriever",
+    "label" : "Document Retriever",
+    "multipleElements" : false,
+    "required" : true
+  }, {
+    "name" : "queryAugmenter",
+    "label" : "Query Augmenter",
+    "multipleElements" : false,
+    "required" : false
+  }, {
+    "name" : "queryExpander",
+    "label" : "Query Expander",
+    "multipleElements" : false,
+    "required" : false
+  }, {
+    "name" : "queryTransformer",
+    "label" : "Query Transformer",
+    "multipleElements" : true,
+    "required" : false
+  } ]
+}

@@ -16,9 +16,12 @@
 
 package com.bytechef.component.datastream.item;
 
+import static com.bytechef.component.datastream.constant.DataStreamConstants.COMPONENT_OPERATION;
 import static com.bytechef.component.datastream.constant.DataStreamConstants.CONNECTION_PARAMETERS;
 import static com.bytechef.component.datastream.constant.DataStreamConstants.INPUT_PARAMETERS;
 import static com.bytechef.component.datastream.constant.DataStreamConstants.TENANT_ID;
+import static com.bytechef.platform.configuration.constant.WorkflowExtConstants.COMPONENT_NAME;
+import static com.bytechef.platform.configuration.constant.WorkflowExtConstants.COMPONENT_VERSION;
 
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.component.definition.ClusterElementDefinition.ClusterElementType;
@@ -26,7 +29,6 @@ import com.bytechef.component.definition.Parameters;
 import com.bytechef.platform.component.constant.MetadataConstants;
 import com.bytechef.platform.component.definition.ContextFactory;
 import com.bytechef.platform.component.definition.ParametersFactory;
-import com.bytechef.platform.configuration.constant.WorkflowExtConstants;
 import java.util.Map;
 import java.util.Objects;
 import org.apache.commons.lang3.Validate;
@@ -42,6 +44,7 @@ public abstract class AbstractItemDelegate {
 
     protected boolean editorEnvironment;
     protected String componentName;
+    protected String componentOperation;
     protected int componentVersion;
     protected Parameters connectionParameters;
     protected ContextFactory contextFactory;
@@ -66,8 +69,9 @@ public abstract class AbstractItemDelegate {
 
         Map<String, ?> clusterElementTypeMap = (Map<String, ?>) jobParameter.getValue();
 
-        componentName = MapUtils.getRequiredString(clusterElementTypeMap, WorkflowExtConstants.COMPONENT_NAME);
-        componentVersion = MapUtils.getRequiredInteger(clusterElementTypeMap, WorkflowExtConstants.COMPONENT_VERSION);
+        componentName = MapUtils.getRequiredString(clusterElementTypeMap, COMPONENT_NAME);
+        componentVersion = MapUtils.getRequiredInteger(clusterElementTypeMap, COMPONENT_VERSION);
+        componentOperation = MapUtils.getRequiredString(clusterElementTypeMap, COMPONENT_OPERATION);
 
         Map<String, ?> connectionParameterMap = MapUtils.getMap(clusterElementTypeMap, CONNECTION_PARAMETERS);
 

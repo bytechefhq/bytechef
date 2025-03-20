@@ -60,9 +60,9 @@ class ContextFactoryImpl implements ContextFactory {
 
     @Override
     public ActionContext createActionContext(
-        String componentName, int componentVersion, String actionName, ModeType type,
-        Long jobPrincipalId, Long jobPrincipalWorkflowId, String workflowId, Long jobId, ComponentConnection connection,
-        boolean editorEnvironment) {
+        String componentName, int componentVersion, String actionName, @Nullable ModeType type,
+        @Nullable Long jobPrincipalId, @Nullable Long jobPrincipalWorkflowId, @Nullable String workflowId,
+        @Nullable Long jobId, @Nullable ComponentConnection connection, boolean editorEnvironment) {
 
         return new ActionContextImpl(
             componentName, componentVersion, actionName, type, jobPrincipalId, jobPrincipalWorkflowId, workflowId,
@@ -76,15 +76,18 @@ class ContextFactoryImpl implements ContextFactory {
     }
 
     @Override
-    public Context createContext(String componentName, ComponentConnection connection, boolean editorEnvironment) {
+    public Context createContext(
+        String componentName, @Nullable ComponentConnection connection, boolean editorEnvironment) {
+
         return new ContextImpl(
-            componentName, -1, null, filesFileStorage, connection, getHttpClientExecutor(editorEnvironment));
+            componentName, -1, null, connection, filesFileStorage, getHttpClientExecutor(editorEnvironment));
     }
 
     @Override
     public TriggerContext createTriggerContext(
-        String componentName, int componentVersion, String triggerName, ModeType type,
-        Long jobPrincipalId, String workflowReferenceCode, ComponentConnection connection, boolean editorEnvironment) {
+        String componentName, int componentVersion, String triggerName, @Nullable ModeType type,
+        @Nullable Long jobPrincipalId, @Nullable String workflowReferenceCode, @Nullable ComponentConnection connection,
+        boolean editorEnvironment) {
 
         return new TriggerContextImpl(
             componentName, componentVersion, triggerName, type, jobPrincipalId, workflowReferenceCode, connection,

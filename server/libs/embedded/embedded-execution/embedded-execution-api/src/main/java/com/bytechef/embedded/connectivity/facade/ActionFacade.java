@@ -17,9 +17,8 @@
 package com.bytechef.embedded.connectivity.facade;
 
 import com.bytechef.platform.constant.Environment;
-import org.springframework.lang.Nullable;
-
 import java.util.Map;
+import org.springframework.lang.Nullable;
 
 /**
  * @author Ivica Cardic

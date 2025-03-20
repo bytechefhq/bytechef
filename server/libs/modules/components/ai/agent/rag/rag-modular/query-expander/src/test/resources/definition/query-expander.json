@@ -1,0 +1,83 @@
+{
+  "actions" : [ ],
+  "componentCategories" : [ {
+    "name" : "artificial-intelligence",
+    "label" : "artificial-intelligence"
+  } ],
+  "connection" : null,
+  "customAction" : null,
+  "customActionHelp" : null,
+  "clusterElements" : [ {
+    "description" : "Uses a large language model to expand a query into multiple semantically diverse\nvariations to capture different perspectives, useful for retrieving additional\ncontextual information and increasing the chances of finding relevant results.\n",
+    "name" : "multiQueryExpander",
+    "outputDefinition" : null,
+    "properties" : [ {
+      "advancedOption" : null,
+      "description" : "If true, the original query is included in the list of expanded queries.\nIf false, only the expanded queries are returned.\n",
+      "displayCondition" : null,
+      "expressionEnabled" : null,
+      "hidden" : null,
+      "metadata" : { },
+      "required" : null,
+      "name" : "includeOriginal",
+      "type" : "BOOLEAN",
+      "defaultValue" : true,
+      "exampleValue" : null,
+      "label" : "Include Original",
+      "placeholder" : null,
+      "options" : [ {
+        "description" : null,
+        "label" : "True",
+        "value" : true
+      }, {
+        "description" : null,
+        "label" : "False",
+        "value" : false
+      } ],
+      "controlType" : "SELECT"
+    }, {
+      "advancedOption" : null,
+      "description" : "The number of queries to generate. The default value is 3.",
+      "displayCondition" : null,
+      "expressionEnabled" : null,
+      "hidden" : null,
+      "metadata" : { },
+      "required" : null,
+      "name" : "numberOfQueries",
+      "type" : "INTEGER",
+      "defaultValue" : 3,
+      "exampleValue" : null,
+      "label" : "Number of Queries",
+      "placeholder" : null,
+      "maxValue" : null,
+      "minValue" : null,
+      "options" : null,
+      "optionsDataSource" : null,
+      "controlType" : "INTEGER"
+    } ],
+    "title" : "Multi Query Expander",
+    "type" : {
+      "name" : "queryExpander",
+      "label" : "Query Expander",
+      "multipleElements" : false,
+      "required" : false
+    },
+    "object" : { }
+  } ],
+  "description" : "Query Expander.",
+  "icon" : "path:assets/query-expander.svg",
+  "tags" : null,
+  "metadata" : null,
+  "name" : "queryExpander",
+  "resources" : null,
+  "title" : "Query Expander",
+  "triggers" : null,
+  "unifiedApi" : null,
+  "version" : 1,
+  "elementTypes" : [ {
+    "name" : "model",
+    "label" : "Model",
+    "multipleElements" : false,
+    "required" : true
+  } ]
+}

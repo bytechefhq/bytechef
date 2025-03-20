@@ -73,6 +73,7 @@ public class ItemReaderDelegate extends AbstractItemDelegate
     }
 
     protected void doBeforeStep(final StepExecution stepExecution) {
-        itemReader = clusterElementDefinitionService.getClusterElementObject(componentName, componentVersion, SOURCE);
+        itemReader = clusterElementDefinitionService.getClusterElementObject(
+            componentName, componentVersion, componentOperation);
     }
 }

@@ -26,7 +26,6 @@ import com.bytechef.platform.component.domain.ClusterElementDefinition;
 import java.util.List;
 import java.util.Objects;
 import org.springframework.stereotype.Service;
-import org.springframework.util.Assert;
 
 /**
  * @author Ivica Cardic
@@ -42,83 +41,34 @@ public class ClusterElementDefinitionServiceImpl implements ClusterElementDefini
 
     @Override
     public ClusterElementDefinition getClusterElementDefinition(
-        String componentName, int componentVersion, String clusterElementTypeName) {
-
-        ClusterElementType clusterElementType = getClusterElementType(
-            componentName, componentVersion, clusterElementTypeName);
-
-        return getClusterElementDefinition(componentName, componentVersion, clusterElementType);
-    }
-
-    @Override
-    public ClusterElementDefinition getClusterElementDefinition(
-        String componentName, int componentVersion, ClusterElementType clusterElementType) {
-
-        Assert.isTrue(
-            !clusterElementType.multipleElements(),
-            "Cluster element type " + clusterElementType.name() + " contains multiple elements");
+        String componentName, int componentVersion, String clusterElementName) {
 
         List<? extends com.bytechef.component.definition.ClusterElementDefinition<?>> clusterElementDefinitions =
-            getClusterElementDefinitions(componentName, componentVersion, clusterElementType);
-
-        return new ClusterElementDefinition(clusterElementDefinitions.getFirst(), componentName, componentVersion);
-    }
-
-    @Override
-    public ClusterElementDefinition getClusterElementDefinition(
-        String componentName, int componentVersion, ClusterElementType clusterElementType, String name) {
-
-        List<? extends com.bytechef.component.definition.ClusterElementDefinition<?>> clusterElementDefinitions =
-            getClusterElementDefinitions(componentName, componentVersion, clusterElementType);
+            getClusterElementDefinitions(componentName, componentVersion, clusterElementName);
 
         return clusterElementDefinitions.stream()
-            .filter(clusterElementDefinition -> name.equals(clusterElementDefinition.getName()))
+            .filter(clusterElementDefinition -> clusterElementName.equals(clusterElementDefinition.getName()))
             .findFirst()
             .map(clusterElementDefinition -> new ClusterElementDefinition(
                 clusterElementDefinition, componentName, componentVersion))
             .orElseThrow(() -> new IllegalArgumentException(
-                "Cluster element definition " + name + " not found in component " + componentName));
+                "Cluster element definition " + clusterElementName + " not found in component " + componentName));
     }
 
     @Override
     @SuppressWarnings("unchecked")
     public <T> T getClusterElementObject(
-        String componentName, int componentVersion, ClusterElementType clusterElementType) {
-
-        Assert.isTrue(
-            !clusterElementType.multipleElements(),
-            "Cluster element type " + clusterElementType.name() + " contains multiple elements");
-        Assert.isTrue(
-            clusterElementType.local(),
-            "Cluster element type " + clusterElementType.name() + " is not local");
+        String componentName, int componentVersion, String clusterElementName) {
 
         List<? extends com.bytechef.component.definition.ClusterElementDefinition<?>> clusterElementDefinitions =
-            getClusterElementDefinitions(componentName, componentVersion, clusterElementType);
-
-        com.bytechef.component.definition.ClusterElementDefinition<?> clusterElementDefinition =
-            clusterElementDefinitions.getFirst();
-
-        return (T) clusterElementDefinition.getObject();
-    }
-
-    @Override
-    @SuppressWarnings("unchecked")
-    public <T> T getClusterElementObject(
-        String componentName, int componentVersion, ClusterElementType clusterElementType, String name) {
-
-        Assert.isTrue(
-            clusterElementType.local(),
-            "Cluster element type " + clusterElementType.name() + " is not local");
-
-        List<? extends com.bytechef.component.definition.ClusterElementDefinition<?>> clusterElementDefinitions =
-            getClusterElementDefinitions(componentName, componentVersion, clusterElementType);
+            getClusterElementDefinitions(componentName, componentVersion, clusterElementName);
 
         return (T) clusterElementDefinitions.stream()
-            .filter(clusterElementDefinition -> name.equals(clusterElementDefinition.getName()))
+            .filter(clusterElementDefinition -> clusterElementName.equals(clusterElementDefinition.getName()))
             .findFirst()
             .map(com.bytechef.component.definition.ClusterElementDefinition::getObject)
             .orElseThrow(() -> new IllegalArgumentException(
-                "Cluster element definition " + name + " not found in component " + componentName));
+                "Cluster element definition " + clusterElementName + " not found in component " + componentName));
     }
 
     @Override
@@ -128,13 +78,11 @@ public class ClusterElementDefinitionServiceImpl implements ClusterElementDefini
         ClusterElementType clusterElementType = getClusterElementType(
             rootComponentName, rootComponentVersion, clusterElementTypeName);
 
-        return getRootClusterElementDefinitions(rootComponentName, rootComponentVersion, clusterElementType);
+        return getRootClusterElementDefinitions(clusterElementType);
     }
 
     @Override
-    public List<ClusterElementDefinition> getRootClusterElementDefinitions(
-        String rootComponentName, int rootComponentVersion, ClusterElementType clusterElementType) {
-
+    public List<ClusterElementDefinition> getRootClusterElementDefinitions(ClusterElementType clusterElementType) {
         return componentDefinitionRegistry.getComponentDefinitions()
             .stream()
             .filter(componentDefinition -> OptionalUtils.isPresent(componentDefinition.getClusterElements()))
@@ -151,7 +99,7 @@ public class ClusterElementDefinitionServiceImpl implements ClusterElementDefini
     }
 
     private List<? extends com.bytechef.component.definition.ClusterElementDefinition<?>> getClusterElementDefinitions(
-        String componentName, int componentVersion, ClusterElementType clusterElementType) {
+        String componentName, int componentVersion, String clusterElementName) {
 
         ComponentDefinition componentDefinition = componentDefinitionRegistry.getComponentDefinition(
             componentName, componentVersion);
@@ -160,7 +108,7 @@ public class ClusterElementDefinitionServiceImpl implements ClusterElementDefini
             .stream()
             .map(
                 clusterElementDefinition -> (com.bytechef.component.definition.ClusterElementDefinition<?>) clusterElementDefinition)
-            .filter(clusterElementDefinition -> clusterElementType.equals(clusterElementDefinition.getType()))
+            .filter(clusterElementDefinition -> clusterElementName.equals(clusterElementDefinition.getName()))
             .toList();
     }
 
@@ -171,7 +119,7 @@ public class ClusterElementDefinitionServiceImpl implements ClusterElementDefini
             (ClusterRootComponentDefinition) componentDefinitionRegistry.getComponentDefinition(
                 rootComponentName, rootComponentVersion);
 
-        return rootComponentDefinition.getElementTypes()
+        return rootComponentDefinition.getClusterElementType()
             .stream()
             .filter(curClusterElementType -> Objects.equals(curClusterElementType.name(), clusterElementTypeName))
             .findFirst()

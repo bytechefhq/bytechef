@@ -24,6 +24,7 @@ import com.bytechef.platform.data.storage.domain.DataStorageScope;
 import com.bytechef.platform.file.storage.FilesFileStorage;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Optional;
+import javax.annotation.Nullable;
 import org.apache.commons.lang3.Validate;
 
 /**
@@ -40,11 +41,12 @@ class TriggerContextImpl extends ContextImpl implements TriggerContext, TriggerC
 
     @SuppressFBWarnings("EI")
     public TriggerContextImpl(
-        String componentName, int componentVersion, String triggerName, ModeType type, Long jobPrincipalId,
-        String workflowReferenceCode, ComponentConnection connection, DataStorage dataStorage,
-        FilesFileStorage filesFileStorage, HttpClientExecutor httpClientExecutor, boolean editorEnvironment) {
+        String componentName, int componentVersion, String triggerName, @Nullable ModeType type,
+        @Nullable Long jobPrincipalId, @Nullable String workflowReferenceCode,
+        @Nullable ComponentConnection connection, DataStorage dataStorage, FilesFileStorage filesFileStorage,
+        HttpClientExecutor httpClientExecutor, boolean editorEnvironment) {
 
-        super(componentName, componentVersion, triggerName, filesFileStorage, connection, httpClientExecutor);
+        super(componentName, componentVersion, triggerName, connection, filesFileStorage, httpClientExecutor);
 
         this.data = new DataImpl(
             componentName, componentVersion, triggerName, type, workflowReferenceCode, dataStorage);

@@ -16,6 +16,7 @@
 
 package com.bytechef.component.datastream.action.definition;
 
+import static com.bytechef.component.datastream.constant.DataStreamConstants.COMPONENT_OPERATION;
 import static com.bytechef.component.datastream.constant.DataStreamConstants.CONNECTION_PARAMETERS;
 import static com.bytechef.component.datastream.constant.DataStreamConstants.INPUT_PARAMETERS;
 import static com.bytechef.component.datastream.constant.DataStreamConstants.JOB_ID;
@@ -25,6 +26,8 @@ import static com.bytechef.component.datastream.constant.DataStreamConstants.PRI
 import static com.bytechef.component.datastream.constant.DataStreamConstants.TENANT_ID;
 import static com.bytechef.component.definition.datastream.ItemReader.SOURCE;
 import static com.bytechef.component.definition.datastream.ItemWriter.DESTINATION;
+import static com.bytechef.platform.configuration.constant.WorkflowExtConstants.COMPONENT_NAME;
+import static com.bytechef.platform.configuration.constant.WorkflowExtConstants.COMPONENT_VERSION;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ActionDefinition;
@@ -34,8 +37,8 @@ import com.bytechef.platform.component.constant.MetadataConstants;
 import com.bytechef.platform.component.definition.AbstractActionDefinitionWrapper;
 import com.bytechef.platform.component.definition.ActionContextAware;
 import com.bytechef.platform.component.definition.MultipleConnectionsPerformFunction;
-import com.bytechef.platform.configuration.domain.ClusterElements;
-import com.bytechef.platform.configuration.domain.ClusterElements.ClusterElement;
+import com.bytechef.platform.configuration.domain.ClusterElement;
+import com.bytechef.platform.configuration.domain.ClusterElementMap;
 import com.bytechef.tenant.TenantContext;
 import java.util.HashMap;
 import java.util.List;
@@ -71,18 +74,22 @@ public class DataStreamStreamActionDefinition extends AbstractActionDefinitionWr
 
         ActionContextAware actionContextAware = (ActionContextAware) actionContext;
 
-        ClusterElements clusterElements = ClusterElements.of(extensions);
+        ClusterElementMap clusterElementMap = ClusterElementMap.of(extensions);
 
         JobParameters jobParameters = new JobParameters(
             new HashMap<>() {
                 {
-                    ClusterElement clusterElement = clusterElements.getFirst(DESTINATION.name());
+                    ClusterElement clusterElement = clusterElementMap.getFirst(DESTINATION);
 
                     put(
                         DESTINATION.name(),
                         new JobParameter<>(
                             Map.of(
-                                CONNECTION_PARAMETERS, connectionParameters.get(clusterElement.getName()),
+                                COMPONENT_NAME, clusterElement.getComponentName(),
+                                COMPONENT_VERSION, clusterElement.getComponentVersion(),
+                                COMPONENT_OPERATION, clusterElement.getClusterElementName(),
+                                CONNECTION_PARAMETERS, connectionParameters.get(
+                                    DESTINATION.key() + "_" + clusterElement.getClusterElementName()),
                                 INPUT_PARAMETERS, clusterElement.getParameters()),
                             Map.class));
 
@@ -98,13 +105,17 @@ public class DataStreamStreamActionDefinition extends AbstractActionDefinitionWr
 
                     put(JOB_ID, new JobParameter<>(actionContextAware.getJobId(), Long.class));
 
-                    clusterElement = clusterElements.getFirst(SOURCE.name());
+                    clusterElement = clusterElementMap.getFirst(SOURCE);
 
                     put(
                         SOURCE.name(),
                         new JobParameter<>(
                             Map.of(
-                                CONNECTION_PARAMETERS, connectionParameters.get(clusterElement.getName()),
+                                COMPONENT_NAME, clusterElement.getComponentName(),
+                                COMPONENT_VERSION, clusterElement.getComponentVersion(),
+                                COMPONENT_OPERATION, clusterElement.getClusterElementName(),
+                                CONNECTION_PARAMETERS, connectionParameters.get(
+                                    SOURCE.key() + "_" + clusterElement.getClusterElementName()),
                                 INPUT_PARAMETERS, clusterElement.getParameters()),
                             Map.class));
 

@@ -16,10 +16,13 @@
 
 package com.bytechef.platform.component.definition;
 
-import static com.bytechef.platform.component.definition.vectorstore.EmbeddingFunction.EMBEDDING;
+import static com.bytechef.platform.component.definition.ai.vectorstore.DocumentReaderFunction.DOCUMENT_READER;
+import static com.bytechef.platform.component.definition.ai.vectorstore.DocumentTransformerFunction.DOCUMENT_TRANSFORMER;
+import static com.bytechef.platform.component.definition.ai.vectorstore.EmbeddingFunction.EMBEDDING;
 
-import com.bytechef.component.definition.ClusterElementDefinition;
+import com.bytechef.component.definition.ClusterElementDefinition.ClusterElementType;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author Ivica Cardic
@@ -29,10 +32,22 @@ public interface VectorStoreComponentDefinition extends ClusterRootComponentDefi
     /**
      *
      */
-    String VECTOR_STORE = "vectorStore";
+    String LOAD = "load";
+
+    /**
+     *
+     */
+    String SEARCH = "search";
 
     @Override
-    default List<ClusterElementDefinition.ClusterElementType> getElementTypes() {
-        return List.of(EMBEDDING);
+    default List<ClusterElementType> getClusterElementType() {
+        return List.of(DOCUMENT_READER, DOCUMENT_TRANSFORMER, EMBEDDING);
+    }
+
+    @Override
+    default Map<String, List<String>> getActionClusterElementTypes() {
+        return Map.of(
+            LOAD, List.of(EMBEDDING.name()),
+            SEARCH, List.of(DOCUMENT_READER.name(), EMBEDDING.name(), DOCUMENT_TRANSFORMER.name()));
     }
 }

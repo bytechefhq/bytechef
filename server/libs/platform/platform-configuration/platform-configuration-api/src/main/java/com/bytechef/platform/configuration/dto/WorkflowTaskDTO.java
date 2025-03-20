@@ -17,7 +17,7 @@
 package com.bytechef.platform.configuration.dto;
 
 import com.bytechef.atlas.configuration.domain.WorkflowTask;
-import com.bytechef.platform.configuration.domain.ClusterElements;
+import com.bytechef.platform.configuration.domain.ClusterElementMap;
 import com.bytechef.platform.configuration.domain.ComponentConnection;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Collections;
@@ -31,7 +31,7 @@ import java.util.Objects;
 public final class WorkflowTaskDTO {
 
     private final List<ComponentConnection> connections;
-    private final ClusterElements clusterElements;
+    private final ClusterElementMap clusterElementMap;
     private final String description;
     private final List<WorkflowTask> finalize;
     private final String label;
@@ -48,12 +48,12 @@ public final class WorkflowTaskDTO {
 
     @SuppressFBWarnings("EI")
     public WorkflowTaskDTO(
-        ClusterElements clusterElements, List<ComponentConnection> connections, String description,
+        ClusterElementMap clusterElementMap, List<ComponentConnection> connections, String description,
         List<WorkflowTask> finalize, String label, int maxRetries, Map<String, ?> metadata, String name, String node,
         Map<String, ?> parameters, List<WorkflowTask> post, List<WorkflowTask> pre, int taskNumber, String timeout,
         String type) {
 
-        this.clusterElements = clusterElements;
+        this.clusterElementMap = clusterElementMap;
         this.connections = Collections.unmodifiableList(connections);
         this.description = description;
         this.finalize = Collections.unmodifiableList(finalize);
@@ -72,18 +72,18 @@ public final class WorkflowTaskDTO {
 
     @SuppressFBWarnings("EI")
     public WorkflowTaskDTO(
-        WorkflowTask workflowTask, ClusterElements clusterElements, List<ComponentConnection> connections) {
+        WorkflowTask workflowTask, ClusterElementMap clusterElementMap, List<ComponentConnection> connections) {
 
         this(
-            clusterElements, connections, workflowTask.getDescription(), workflowTask.getFinalize(),
+            clusterElementMap, connections, workflowTask.getDescription(), workflowTask.getFinalize(),
             workflowTask.getLabel(), workflowTask.getMaxRetries(), workflowTask.getMetadata(), workflowTask.getName(),
             workflowTask.getNode(), workflowTask.getParameters(), workflowTask.getPost(), workflowTask.getPre(),
             workflowTask.getTaskNumber(), workflowTask.getTimeout(), workflowTask.getType());
     }
 
     @SuppressFBWarnings("EI")
-    public ClusterElements getClusterElements() {
-        return clusterElements;
+    public ClusterElementMap getClusterElements() {
+        return clusterElementMap;
     }
 
     public List<ComponentConnection> getConnections() {
@@ -154,7 +154,7 @@ public final class WorkflowTaskDTO {
 
         WorkflowTaskDTO that = (WorkflowTaskDTO) obj;
 
-        return Objects.equals(this.clusterElements, that.clusterElements) &&
+        return Objects.equals(this.clusterElementMap, that.clusterElementMap) &&
             Objects.equals(this.connections, that.connections) && Objects.equals(this.description, that.description) &&
             Objects.equals(this.finalize, that.finalize) && Objects.equals(this.label, that.label) &&
             this.maxRetries == that.maxRetries && Objects.equals(this.name, that.name) &&

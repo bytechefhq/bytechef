@@ -67,7 +67,7 @@ public interface ClusterElementDefinitionApi {
         value = "/component-definitions/{componentName}/versions/{componentVersion}/cluster-element-definition/{clusterElementName}",
         produces = { "application/json" }
     )
-    
+
     default ResponseEntity<ClusterElementDefinitionModel> getComponentClusterElementDefinition(
         @Parameter(name = "componentName", description = "The name of a component.", required = true, in = ParameterIn.PATH) @PathVariable("componentName") String componentName,
         @Parameter(name = "componentVersion", description = "The version of a component.", required = true, in = ParameterIn.PATH) @PathVariable("componentVersion") Integer componentVersion,

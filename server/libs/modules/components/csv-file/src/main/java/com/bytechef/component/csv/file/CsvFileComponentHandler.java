@@ -22,7 +22,7 @@ import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.csv.file.action.CsvFileReadAction;
 import com.bytechef.component.csv.file.action.CsvFileWriteAction;
 import com.bytechef.component.csv.file.datastream.CsvFileItemReader;
-import com.bytechef.component.csv.file.datastream.CsvFileItemStreamWriter;
+import com.bytechef.component.csv.file.datastream.CsvFileItemWriter;
 import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDefinition;
 import com.google.auto.service.AutoService;
@@ -43,7 +43,7 @@ public class CsvFileComponentHandler implements ComponentHandler {
             CsvFileWriteAction.ACTION_DEFINITION)
         .clusterElements(
             CsvFileItemReader.CLUSTER_ELEMENT_DEFINITION,
-            CsvFileItemStreamWriter.CLUSTER_ELEMENT_DEFINITION);
+            CsvFileItemWriter.CLUSTER_ELEMENT_DEFINITION);
 
     @Override
     public ComponentDefinition getDefinition() {

@@ -16,8 +16,8 @@
 
 package com.bytechef.component.datastream.task.handler;
 
+import static com.bytechef.component.datastream.constant.DataStreamConstants.DATA_STREAM;
 import static com.bytechef.component.datastream.constant.DataStreamConstants.STREAM;
-import static com.bytechef.platform.component.definition.DataStreamComponentDefinition.DATA_STREAM;
 
 import com.bytechef.platform.component.facade.ActionDefinitionFacade;
 import com.bytechef.platform.workflow.worker.task.handler.AbstractTaskHandler;

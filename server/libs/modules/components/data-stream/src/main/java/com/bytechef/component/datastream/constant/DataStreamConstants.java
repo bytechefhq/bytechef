@@ -21,15 +21,17 @@ package com.bytechef.component.datastream.constant;
  */
 public class DataStreamConstants {
 
-    private DataStreamConstants() {
-    }
-
     public static final String CONNECTION_PARAMETERS = "connectionParameters";
+    public static final String DATA_STREAM = "dataStream";
     public static final String INPUT_PARAMETERS = "inputParameters";
     public static final String JOB_ID = "jobId";
     public static final String MODE_TYPE = "modeType";
+    public static final String COMPONENT_OPERATION = "componentOperation";
     public static final String PRINCIPAL_ID = "principalId";
     public static final String PRINCIPAL_WORKFLOW_ID = "principalWorkflowId";
     public static final String STREAM = "stream";
     public static final String TENANT_ID = "tenantId";
+
+    private DataStreamConstants() {
+    }
 }

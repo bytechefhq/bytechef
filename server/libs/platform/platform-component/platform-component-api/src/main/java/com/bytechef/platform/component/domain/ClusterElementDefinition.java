@@ -35,7 +35,7 @@ public class ClusterElementDefinition {
     private String componentName;
     private int componentVersion;
     private String description;
-    private ClusterElementType elementType;
+    private ClusterElementType type;
     private String name;
     private boolean outputDefined;
     private boolean outputFunctionDefined;
@@ -53,7 +53,7 @@ public class ClusterElementDefinition {
         this.componentName = componentName;
         this.componentVersion = componentVersion;
         this.description = OptionalUtils.orElse(clusterElementDefinition.getDescription(), null);
-        this.elementType = clusterElementDefinition.getType();
+        this.type = clusterElementDefinition.getType();
         this.name = clusterElementDefinition.getName();
         this.outputDefined = OptionalUtils.mapOrElse(
             clusterElementDefinition.getOutputDefinition(), outputDefinition -> true, false);
@@ -74,7 +74,7 @@ public class ClusterElementDefinition {
         }
 
         return componentVersion == that.componentVersion && Objects.equals(description, that.description) &&
-            Objects.equals(elementType, that.elementType) && Objects.equals(name, that.name) &&
+            Objects.equals(type, that.type) && Objects.equals(name, that.name) &&
             outputDefined == that.outputDefined && outputFunctionDefined == that.outputFunctionDefined &&
             Objects.equals(componentName, that.componentName) && Objects.equals(outputResponse, that.outputResponse) &&
             Objects.equals(properties, that.properties) && Objects.equals(title, that.title);
@@ -83,7 +83,7 @@ public class ClusterElementDefinition {
     @Override
     public int hashCode() {
         return Objects.hash(
-            componentName, componentVersion, description, elementType, name, outputDefined, outputFunctionDefined,
+            componentName, componentVersion, description, type, name, outputDefined, outputFunctionDefined,
             outputResponse, properties, title);
     }
 
@@ -100,10 +100,6 @@ public class ClusterElementDefinition {
         return description;
     }
 
-    public ClusterElementType getElementType() {
-        return elementType;
-    }
-
     public String getName() {
         return name;
     }
@@ -115,6 +111,10 @@ public class ClusterElementDefinition {
 
     public List<? extends Property> getProperties() {
         return Collections.unmodifiableList(properties);
+    }
+
+    public ClusterElementType getType() {
+        return type;
     }
 
     public boolean isOutputDefined() {
@@ -129,7 +129,7 @@ public class ClusterElementDefinition {
             ", description='" + description + '\'' +
             ", componentName='" + componentName + '\'' +
             ", componentVersion=" + componentVersion +
-            ", elementType=" + elementType +
+            ", type=" + type +
             ", properties=" + properties +
             ", outputDefined=" + outputDefined +
             ", outputFunctionDefined=" + outputFunctionDefined +

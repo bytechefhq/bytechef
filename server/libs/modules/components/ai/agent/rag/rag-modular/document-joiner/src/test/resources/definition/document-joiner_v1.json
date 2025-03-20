@@ -1,0 +1,34 @@
+{
+  "componentCategories" : [ {
+    "name" : "artificial-intelligence",
+    "label" : "artificial-intelligence"
+  } ],
+  "customAction" : null,
+  "customActionHelp" : null,
+  "description" : "Document Joiner.",
+  "icon" : "path:assets/document-joiner.svg",
+  "tags" : null,
+  "metadata" : null,
+  "name" : "documentJoiner",
+  "resources" : null,
+  "version" : 1,
+  "title" : "Document Joiner",
+  "connection" : null,
+  "actions" : null,
+  "unifiedApi" : null,
+  "triggers" : null,
+  "clusterElements" : [ {
+    "description" : "Combines documents retrieved based on multiple queries and from multiple data sources\nby concatenating them into a single collection of documents. In case of duplicate\ndocuments, the first occurrence is kept. The score of each document is kept as is.\n",
+    "name" : "concatenationDocumentJoiner",
+    "outputDefinition" : null,
+    "properties" : null,
+    "title" : "Concatenation Document Joiner",
+    "type" : {
+      "name" : "documentJoiner",
+      "label" : "Document Joiner",
+      "multipleElements" : false,
+      "required" : false
+    },
+    "object" : { }
+  } ]
+}

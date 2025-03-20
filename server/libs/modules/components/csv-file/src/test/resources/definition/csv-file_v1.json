@@ -275,9 +275,9 @@
       "controlType" : "SELECT"
     } ],
     "title" : "Read from File",
+    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
-    "perform" : { }
+    "workflowNodeDescription" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -633,9 +633,9 @@
       "optionsDataSource" : null
     } ],
     "title" : "Write to CSV File",
+    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
-    "perform" : { }
+    "workflowNodeDescription" : null
   } ],
   "clusterElements" : [ {
     "description" : null,
@@ -893,8 +893,7 @@
       "name" : "source",
       "label" : "Source",
       "multipleElements" : false,
-      "required" : false,
-      "local" : true
+      "required" : false
     },
     "object" : { }
   }, {
@@ -1051,11 +1050,10 @@
       "name" : "destination",
       "label" : "Destination",
       "multipleElements" : false,
-      "required" : false,
-      "local" : true
+      "required" : false
     },
     "object" : { }
   } ],
-  "triggers" : null,
-  "unifiedApi" : null
+  "unifiedApi" : null,
+  "triggers" : null
 }

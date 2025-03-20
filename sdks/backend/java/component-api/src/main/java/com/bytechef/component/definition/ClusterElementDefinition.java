@@ -71,14 +71,15 @@ public interface ClusterElementDefinition<T> {
     /**
      *
      */
-    record ClusterElementType(String name, String label, boolean multipleElements, boolean required, boolean local) {
+    record ClusterElementType(
+        String name, String key, String label, boolean multipleElements, boolean required) {
 
-        public ClusterElementType(String name, String label, boolean required, boolean local) {
-            this(name, label, false, required, local);
+        public ClusterElementType(String name, String key, String label, boolean required) {
+            this(name, key, label, false, required);
         }
 
-        public ClusterElementType(String name, String label, boolean local) {
-            this(name, label, false, false, local);
+        public ClusterElementType(String name, String key, String label) {
+            this(name, key, label, false, false);
         }
     }
 

@@ -1,0 +1,59 @@
+{
+  "actions" : [ ],
+  "componentCategories" : [ {
+    "name" : "artificial-intelligence",
+    "label" : "artificial-intelligence"
+  } ],
+  "connection" : null,
+  "customAction" : null,
+  "customActionHelp" : null,
+  "clusterElements" : [ {
+    "description" : "Memory is retrieved from a VectorStore added into the prompt's system text. This only works for text based exchanges with the models, not multi-modal exchanges.",
+    "name" : "chatMemory",
+    "outputDefinition" : null,
+    "properties" : [ {
+      "advancedOption" : null,
+      "description" : "The number of messages to retrieve from the vector store.",
+      "displayCondition" : null,
+      "expressionEnabled" : null,
+      "hidden" : null,
+      "metadata" : { },
+      "required" : null,
+      "name" : "chatMemoryRetrieveSize",
+      "type" : "INTEGER",
+      "defaultValue" : 100,
+      "exampleValue" : null,
+      "label" : "Chat Memory Retrieve Size",
+      "placeholder" : null,
+      "maxValue" : null,
+      "minValue" : null,
+      "options" : null,
+      "controlType" : "INTEGER",
+      "optionsDataSource" : null
+    } ],
+    "title" : "Vector Store Chat Memory",
+    "type" : {
+      "name" : "chatMemory",
+      "label" : "Chat Memory",
+      "multipleElements" : false,
+      "required" : false
+    },
+    "object" : { }
+  } ],
+  "description" : "Vector Store Chat Memory.",
+  "icon" : "path:assets/vector-store-chat-memory.svg",
+  "tags" : null,
+  "metadata" : null,
+  "name" : "vectorStoreChatMemory",
+  "resources" : null,
+  "title" : "Vector Store Chat Memory",
+  "triggers" : null,
+  "unifiedApi" : null,
+  "version" : 1,
+  "elementTypes" : [ {
+    "name" : "vectorStore",
+    "label" : "Vector Store",
+    "multipleElements" : false,
+    "required" : true
+  } ]
+}

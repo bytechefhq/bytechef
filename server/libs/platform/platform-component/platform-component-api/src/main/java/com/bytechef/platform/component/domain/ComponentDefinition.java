@@ -27,6 +27,7 @@ import com.bytechef.platform.component.definition.ClusterRootComponentDefinition
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import org.springframework.lang.Nullable;
@@ -37,6 +38,7 @@ import org.springframework.lang.Nullable;
 @SuppressFBWarnings("EI")
 public class ComponentDefinition {
 
+    private Map<String, List<String>> actionClusterElementTypes;
     private List<ActionDefinition> actions;
     private List<ComponentCategory> componentCategories;
     private boolean clusterElement;
@@ -70,7 +72,8 @@ public class ComponentDefinition {
         this.clusterElement = OptionalUtils.orElse(componentDefinition.getClusterElements(), List.of())
             .isEmpty();
         if (componentDefinition instanceof ClusterRootComponentDefinition clusterRootComponentDefinition) {
-            this.clusterElementTypes = clusterRootComponentDefinition.getElementTypes();
+            this.actionClusterElementTypes = clusterRootComponentDefinition.getActionClusterElementTypes();
+            this.clusterElementTypes = clusterRootComponentDefinition.getClusterElementType();
         } else {
             this.clusterElementTypes = List.of();
         }
@@ -107,6 +110,10 @@ public class ComponentDefinition {
 
     public boolean isConnectionRequired() {
         return connectionRequired;
+    }
+
+    public Map<String, List<String>> getActionClusterElementTypes() {
+        return actionClusterElementTypes;
     }
 
     public List<ActionDefinition> getActions() {

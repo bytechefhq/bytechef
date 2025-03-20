@@ -23,35 +23,14 @@ public class RemoteClusterElementDefinitionServiceClient implements ClusterEleme
 
     @Override
     public ClusterElementDefinition getClusterElementDefinition(
-        String componentName, int componentVersion, String clusterElementTypeName) {
-
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public ClusterElementDefinition getClusterElementDefinition(
-        String componentName, int componentVersion, ClusterElementType clusterElementType) {
-
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public ClusterElementDefinition getClusterElementDefinition(
-        String componentName, int componentVersion, ClusterElementType clusterElementType, String name) {
+        String componentName, int componentVersion, String clusterElementName) {
 
         throw new UnsupportedOperationException();
     }
 
     @Override
     public <T> T getClusterElementObject(
-        String componentName, int componentVersion, ClusterElementType clusterElementType) {
-
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public <T> T getClusterElementObject(
-        String componentName, int componentVersion, ClusterElementType clusterElementType, String name) {
+        String componentName, int componentVersion, String clusterElementName) {
 
         throw new UnsupportedOperationException();
     }
@@ -65,7 +44,7 @@ public class RemoteClusterElementDefinitionServiceClient implements ClusterEleme
 
     @Override
     public List<ClusterElementDefinition> getRootClusterElementDefinitions(
-        String rootComponentName, int rootComponentVersion, ClusterElementType clusterElementType) {
+        ClusterElementType clusterElementType) {
 
         throw new UnsupportedOperationException();
     }

@@ -42,7 +42,7 @@ import com.bytechef.component.definition.Property;
 import com.bytechef.platform.component.definition.JdbcComponentDefinition;
 import com.bytechef.platform.component.jdbc.DataSourceFactory;
 import com.bytechef.platform.component.jdbc.constant.JdbcConstants;
-import com.bytechef.platform.component.jdbc.datastream.JdbcItemStreamWriter;
+import com.bytechef.platform.component.jdbc.datastream.JdbcItemWriter;
 import com.bytechef.platform.component.jdbc.operation.DeleteJdbcOperation;
 import com.bytechef.platform.component.jdbc.operation.ExecuteJdbcOperation;
 import com.bytechef.platform.component.jdbc.operation.InsertJdbcOperation;
@@ -284,7 +284,7 @@ public class JdbcComponentHandlerImpl implements ComponentHandler {
             .title(title)
             .connection(CONNECTION_DEFINITION)
             .actions(actionDefinitions)
-            .clusterElements(JdbcItemStreamWriter.clusterElementDefinition(databaseJdbcName, jdbcDriverClassName));
+            .clusterElements(JdbcItemWriter.clusterElementDefinition(databaseJdbcName, jdbcDriverClassName));
     }
 
     private SingleConnectionDataSource getDataSource(Map<String, ?> connectionParameters) {

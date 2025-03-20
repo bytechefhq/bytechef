@@ -16,8 +16,12 @@
 
 package com.bytechef.component.ai.llm.mistral.constant;
 
+import static com.bytechef.component.ai.llm.constant.LLMConstants.MODEL;
+import static com.bytechef.component.definition.ComponentDsl.string;
+
 import com.bytechef.component.ai.llm.util.LLMUtils;
 import com.bytechef.component.definition.Option;
+import com.bytechef.component.definition.Property;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -30,9 +34,19 @@ public final class MistralConstants {
 
     public static final String SAFE_PROMPT = "safePrompt";
 
-    public static final List<Option<String>> MODELS = LLMUtils.getEnumOptions(
+    public static final List<Option<String>> CHAT_MODELS = LLMUtils.getEnumOptions(
         Arrays.stream(MistralAiApi.ChatModel.values())
             .collect(Collectors.toMap(MistralAiApi.ChatModel::getValue, MistralAiApi.ChatModel::getValue)));
+
+    public static final List<Option<String>> EMBEDDING_MODELS = LLMUtils.getEnumOptions(
+        Arrays.stream(MistralAiApi.EmbeddingModel.values())
+            .collect(Collectors.toMap(MistralAiApi.EmbeddingModel::getValue, MistralAiApi.EmbeddingModel::getValue)));
+
+    public static final Property CHAT_MODEL_PROPERTY = string(MODEL)
+        .label("Model")
+        .description("ID of the model to use.")
+        .required(true)
+        .options(CHAT_MODELS);
 
     private MistralConstants() {
     }

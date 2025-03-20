@@ -200,6 +200,10 @@ public class WorkflowNodeOutputFacadeImpl implements WorkflowNodeOutputFacade {
                 WorkflowTestConfigurationConnection::getConnectionId);
 
             if (workflowNodeType.operation() == null) {
+                // TODO
+                // Remove hardcodes values, use the ones defined in variable properties,
+                // check LoopTaskDispatcherDefinitionFactory
+
                 if (Objects.equals(workflowNodeType.name(), "loop")) {
                     List<Map<String, ?>> childWorkflowTasks = MapUtils.getList(
                         workflowTask.getParameters(), "iteratee", new TypeReference<>() {}, List.of());

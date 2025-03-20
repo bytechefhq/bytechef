@@ -9,8 +9,6 @@ dependencies {
 
 subprojects {
     dependencies {
-        implementation(project(":server:libs:platform:platform-component:platform-component-api"))
-
         implementation(project(":server:libs:modules:components:ai:llm"))
     }
 }

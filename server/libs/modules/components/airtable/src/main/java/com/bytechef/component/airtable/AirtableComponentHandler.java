@@ -18,7 +18,7 @@ package com.bytechef.component.airtable;
 
 import com.bytechef.component.OpenApiComponentHandler;
 import com.bytechef.component.airtable.datastream.AirtableItemReader;
-import com.bytechef.component.airtable.datastream.AirtableItemStreamWriter;
+import com.bytechef.component.airtable.datastream.AirtableItemWriter;
 import com.bytechef.component.airtable.trigger.AirtableNewRecordTrigger;
 import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
@@ -66,6 +66,6 @@ public class AirtableComponentHandler extends AbstractAirtableComponentHandler {
             .categories(ComponentCategory.PRODUCTIVITY_AND_COLLABORATION)
             .clusterElements(
                 AirtableItemReader.CLUSTER_ELEMENT_DEFINITION,
-                AirtableItemStreamWriter.CLUSTER_ELEMENT_DEFINITION);
+                AirtableItemWriter.CLUSTER_ELEMENT_DEFINITION);
     }
 }

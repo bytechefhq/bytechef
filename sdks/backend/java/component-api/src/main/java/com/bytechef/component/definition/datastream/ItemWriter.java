@@ -25,7 +25,7 @@ import java.util.Map;
  */
 public interface ItemWriter extends ItemStream {
 
-    ClusterElementType DESTINATION = new ClusterElementType("destination", "Destination", true);
+    ClusterElementType DESTINATION = new ClusterElementType("DESTINATION", "destination", "Destination");
 
     void write(List<? extends Map<String, ?>> items) throws Exception;
 }

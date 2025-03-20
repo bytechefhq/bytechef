@@ -29,6 +29,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Consumer;
+import javax.annotation.Nullable;
 import org.apache.commons.lang3.Validate;
 import org.springframework.context.ApplicationEventPublisher;
 
@@ -50,12 +51,13 @@ class ActionContextImpl extends ContextImpl implements ActionContext, ActionCont
 
     @SuppressFBWarnings("EI")
     public ActionContextImpl(
-        String componentName, int componentVersion, String actionName, ModeType modeType, Long jobPrincipalId,
-        Long jobPrincipalWorkflowId, String workflowId, Long jobId, ComponentConnection connection,
+        String componentName, int componentVersion, String actionName, @Nullable ModeType modeType,
+        @Nullable Long jobPrincipalId, @Nullable Long jobPrincipalWorkflowId, @Nullable String workflowId,
+        @Nullable Long jobId, @Nullable ComponentConnection connection,
         String publicUrl, DataStorage dataStorage, ApplicationEventPublisher eventPublisher,
         FilesFileStorage filesFileStorage, HttpClientExecutor httpClientExecutor, boolean editorEnvironment) {
 
-        super(componentName, componentVersion, actionName, filesFileStorage, connection, httpClientExecutor);
+        super(componentName, componentVersion, actionName, connection, filesFileStorage, httpClientExecutor);
 
         this.actionName = actionName;
 

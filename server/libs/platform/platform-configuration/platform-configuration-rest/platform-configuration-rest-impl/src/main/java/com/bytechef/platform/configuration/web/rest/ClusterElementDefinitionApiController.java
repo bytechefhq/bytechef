@@ -46,12 +46,12 @@ public class ClusterElementDefinitionApiController implements ClusterElementDefi
 
     @Override
     public ResponseEntity<ClusterElementDefinitionModel> getComponentClusterElementDefinition(
-        String componentName, Integer componentVersion, String clusterElementType) {
+        String componentName, Integer componentVersion, String clusterElementName) {
 
         return ResponseEntity.ok(
             conversionService.convert(
                 clusterElementDefinitionService.getClusterElementDefinition(
-                    componentName, componentVersion, clusterElementType),
+                    componentName, componentVersion, clusterElementName),
                 ClusterElementDefinitionModel.class));
     }
 

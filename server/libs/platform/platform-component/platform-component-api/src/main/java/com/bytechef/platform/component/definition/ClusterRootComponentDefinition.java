@@ -18,6 +18,7 @@ package com.bytechef.platform.component.definition;
 
 import com.bytechef.component.definition.ClusterElementDefinition.ClusterElementType;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author Ivica Cardic
@@ -28,5 +29,13 @@ public interface ClusterRootComponentDefinition extends PlatformComponentDefinit
      *
      * @return
      */
-    List<ClusterElementType> getElementTypes();
+    List<ClusterElementType> getClusterElementType();
+
+    /**
+     *
+     * @return
+     */
+    default Map<String, List<String>> getActionClusterElementTypes() {
+        return Map.of();
+    }
 }

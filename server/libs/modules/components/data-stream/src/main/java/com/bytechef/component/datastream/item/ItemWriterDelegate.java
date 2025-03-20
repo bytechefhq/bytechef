@@ -75,6 +75,6 @@ public class ItemWriterDelegate extends AbstractItemDelegate implements ItemStre
 
     protected void doBeforeStep(final StepExecution stepExecution) {
         itemWriter = clusterElementDefinitionService.getClusterElementObject(
-            componentName, componentVersion, DESTINATION);
+            componentName, componentVersion, componentOperation);
     }
 }

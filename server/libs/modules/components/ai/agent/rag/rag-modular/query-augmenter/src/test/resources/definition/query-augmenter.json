@@ -1,0 +1,34 @@
+{
+  "componentCategories" : [ {
+    "name" : "artificial-intelligence",
+    "label" : "artificial-intelligence"
+  } ],
+  "customAction" : null,
+  "customActionHelp" : null,
+  "description" : "Query Augmenter.",
+  "icon" : "path:assets/query-augmenter.svg",
+  "tags" : null,
+  "metadata" : null,
+  "name" : "queryAugmenter",
+  "resources" : null,
+  "version" : 1,
+  "title" : "Query Augmenter",
+  "connection" : null,
+  "actions" : null,
+  "unifiedApi" : null,
+  "triggers" : null,
+  "clusterElements" : [ {
+    "description" : "Augments the user query with contextual data from the content of the provided\ndocuments.\n",
+    "name" : "contextualQueryAugmenter",
+    "outputDefinition" : null,
+    "properties" : null,
+    "title" : "Contextual Query Augmenter",
+    "type" : {
+      "name" : "queryAugmenter",
+      "label" : "Query Augmenter",
+      "multipleElements" : false,
+      "required" : false
+    },
+    "object" : { }
+  } ]
+}

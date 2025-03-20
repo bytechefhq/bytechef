@@ -38,6 +38,6 @@ public interface MultipleConnectionsOutputFunction extends BaseOutputFunction {
      * @throws Exception
      */
     OutputResponse apply(
-        Parameters inputParameters, Map<String, ? extends ComponentConnection> componentConnections,
-        Parameters extensions, ActionContext context) throws Exception;
+        Parameters inputParameters, Map<String, ComponentConnection> componentConnections, Parameters extensions,
+        ActionContext context) throws Exception;
 }

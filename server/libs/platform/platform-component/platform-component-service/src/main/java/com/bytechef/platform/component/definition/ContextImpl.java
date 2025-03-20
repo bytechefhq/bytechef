@@ -43,6 +43,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
+import javax.annotation.Nullable;
 import org.apache.commons.lang3.Validate;
 import org.slf4j.LoggerFactory;
 
@@ -62,8 +63,9 @@ class ContextImpl implements Context {
 
     @SuppressFBWarnings("EI")
     public ContextImpl(
-        String componentName, int componentVersion, String componentOperationName, FilesFileStorage filesFileStorage,
-        ComponentConnection connection, HttpClientExecutor httpClientExecutor) {
+        String componentName, int componentVersion, String componentOperationName,
+        @Nullable ComponentConnection connection, FilesFileStorage filesFileStorage,
+        HttpClientExecutor httpClientExecutor) {
 
         this.convert = new ConvertImpl();
         this.file = new FileImpl(filesFileStorage);

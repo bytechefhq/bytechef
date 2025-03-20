@@ -24,7 +24,7 @@ import java.util.Map;
  */
 public interface ItemReader extends ItemStream {
 
-    ClusterElementType SOURCE = new ClusterElementType("source", "Source", true);
+    ClusterElementType SOURCE = new ClusterElementType("SOURCE", "source", "Source");
 
     Map<String, ?> read() throws Exception;
 }
