@@ -151,7 +151,7 @@ const WorkflowNode = ({data, id}: {data: NodeDataType; id: string}) => {
                 type="target"
             />
 
-            {data.taskDispatcher ? (
+            {data.componentName === 'condition' ? (
                 <>
                     <Handle
                         className={twMerge('absolute top-3/4', styles.handle)}

@@ -22,6 +22,7 @@ import LoopLeftGhostNode from '../nodes/LoopLeftGhostNode';
 import PlaceholderNode from '../nodes/PlaceholderNode';
 import TaskDispatcherBottomGhostNode from '../nodes/TaskDispatcherBottomGhostNode';
 import WorkflowNode from '../nodes/WorkflowNode';
+import TaskDispatcherTopGhostNode from '../nodes/TaskDispatcherTopGhostNode';
 
 export interface WorkflowEditorProps {
     componentDefinitions: ComponentDefinitionBasic[];
@@ -59,6 +60,7 @@ const WorkflowEditor = ({
             loopLeftGhostNode: LoopLeftGhostNode,
             placeholder: PlaceholderNode,
             taskDispatcherBottomGhostNode: TaskDispatcherBottomGhostNode,
+            taskDispatcherTopGhostNode: TaskDispatcherTopGhostNode,
             workflow: WorkflowNode,
         }),
         []
@@ -240,6 +242,12 @@ const WorkflowEditor = ({
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [workflow.id]);
 
+    console.log(
+        'edges: ',
+        edges.map((edge) => edge.id)
+    );
+    console.log('nodes: ', nodes);
+    // console.log('edges: ', edges);
     return (
         <div className="flex h-full flex-1 flex-col rounded-lg bg-background">
             <ReactFlow

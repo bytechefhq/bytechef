@@ -1,33 +1,105 @@
+import {DEFAULT_NODE_POSITION} from '@/shared/constants';
 import {Node} from '@xyflow/react';
 
-export default function createLoopNode({allNodes, taskNode}: {allNodes: Array<Node>; taskNode: Node}) {
-    const baseNode = {
-        data: {taskDispatcherId: taskNode.id},
-        position: {x: 0, y: 0},
+type LoopNodeOptionsType = {
+    createPlaceholder?: boolean;
+    createTopGhost?: boolean;
+    createLeftGhost?: boolean;
+    createBottomGhost?: boolean;
+};
+
+type CreateLoopNodePropsType = {
+    allNodes: Array<Node>;
+    loopId: string;
+    isNestedLoop?: boolean;
+    options?: LoopNodeOptionsType;
+};
+
+/**
+ * Creates a placeholder node for a loop
+ */
+function createPlaceholderNode(loopId: string): Node {
+    return {
+        data: {
+            label: '+',
+            loopId,
+            taskDispatcherId: loopId,
+        },
+        id: `${loopId}-loop-placeholder-0`,
+        position: DEFAULT_NODE_POSITION,
         type: 'placeholder',
     };
+}
 
-    const placeholderNode: Node = {
-        ...baseNode,
-        data: {...baseNode.data, label: '+', loopId: taskNode.id},
-        id: `${taskNode.id}-loop-placeholder-0`,
+/**
+ * Creates a top ghost node for a loop
+ */
+function createTopGhostNode(loopId: string): Node {
+    return {
+        data: {
+            taskDispatcherId: loopId,
+        },
+        id: `${loopId}-loop-top-ghost`,
+        position: DEFAULT_NODE_POSITION,
+        type: 'taskDispatcherTopGhostNode',
     };
+}
 
-    const leftGhostNode: Node = {
-        ...baseNode,
-        id: `${taskNode.id}-loop-left-ghost`,
+/**
+ * Creates a left ghost node for a loop
+ */
+function createLeftGhostNode(loopId: string): Node {
+    return {
+        data: {
+            taskDispatcherId: loopId,
+        },
+        id: `${loopId}-loop-left-ghost`,
+        position: DEFAULT_NODE_POSITION,
         type: 'loopLeftGhostNode',
     };
+}
 
-    const bottomGhostNode: Node = {
-        ...baseNode,
-        id: `${taskNode.id}-loop-bottom-ghost`,
+/**
+ * Creates a bottom ghost node for a loop
+ */
+function createBottomGhostNode(loopId: string, isNested: boolean = false): Node {
+    return {
+        data: {
+            isNestedLoopBottomGhost: isNested,
+            taskDispatcherId: loopId,
+        },
+        id: `${loopId}-loop-bottom-ghost`,
+        position: DEFAULT_NODE_POSITION,
         type: 'taskDispatcherBottomGhostNode',
     };
+}
 
-    const insertIndex = allNodes.findIndex((node) => node.id === taskNode.id) + 1;
+/**
+ * Creates all necessary auxiliary nodes for a loop task node
+ */
+export default function createLoopNode({
+    allNodes,
+    isNestedLoop = false,
+    loopId,
+    options = {
+        createPlaceholder: true,
+    },
+}: CreateLoopNodePropsType): Node[] {
+    const nodesWithLoop = [...allNodes];
+    const insertIndex = nodesWithLoop.findIndex((node) => node.id === loopId) + 1;
+    const nodesToAdd = [];
 
-    allNodes.splice(insertIndex, 0, leftGhostNode, placeholderNode, bottomGhostNode);
+    nodesToAdd.push(createTopGhostNode(loopId));
+    nodesToAdd.push(createLeftGhostNode(loopId));
 
-    return allNodes;
+    if (options.createPlaceholder) {
+        nodesToAdd.push(createPlaceholderNode(loopId));
+    }
+
+    nodesToAdd.push(createBottomGhostNode(loopId, isNestedLoop));
+
+    // Insert all nodes at the correct position
+    nodesWithLoop.splice(insertIndex, 0, ...nodesToAdd);
+
+    return nodesWithLoop;
 }

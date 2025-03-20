@@ -2,6 +2,58 @@ import {TASK_DISPATCHER_NAMES} from '@/shared/constants';
 import {NodeDataType, TaskDispatcherContextType} from '@/shared/types';
 import {Edge, Node} from '@xyflow/react';
 
+/**
+ * Creates context from a task node's dispatcher data
+ */
+function getContextFromTaskNodeData(nodeData: NodeDataType, indexIncrement: number = 0): TaskDispatcherContextType {
+    const context: TaskDispatcherContextType = {};
+
+    if (!nodeData) {
+        return context;
+    }
+
+    if (nodeData.conditionData) {
+        context.conditionCase = nodeData.conditionData.conditionCase as string;
+        context.conditionId = nodeData.conditionData.conditionId as string;
+        context.index = (nodeData.conditionData.index as number) + indexIncrement;
+    } else if (nodeData.loopData) {
+        context.loopId = nodeData.loopData.loopId as string;
+        context.index = (nodeData.loopData.index as number) + indexIncrement;
+    }
+
+    return context;
+}
+
+/**
+ * Creates context from a placeholder node
+ */
+function getContextFromPlaceholderNode(node: Node): TaskDispatcherContextType {
+    const context: TaskDispatcherContextType = {};
+
+    if (!node) {
+        return context;
+    }
+
+    if (node.id.includes('loop-placeholder')) {
+        const loopId = node.id.split('-loop-placeholder')[0];
+        const placeholderIndex = parseInt(node.id.split('-').pop() || '0');
+
+        context.loopId = loopId;
+        context.index = placeholderIndex;
+    } else if (node.id.includes('condition-placeholder')) {
+        context.conditionId = node.data?.conditionId as string;
+        context.conditionCase = node.data?.conditionCase as string;
+        context.index = 0;
+    } else {
+        context.conditionCase = node.data?.conditionCase as string;
+        context.conditionId = node.data?.conditionId as string;
+        context.loopId = node.data?.loopId as string;
+        context.index = 0;
+    }
+
+    return context;
+}
+
 export default function getTaskDispatcherContext({
     edge,
     node,
@@ -11,9 +63,11 @@ export default function getTaskDispatcherContext({
     node?: Node;
     nodes?: Array<Node>;
 }): TaskDispatcherContextType {
-    const taskDispatcherContext: TaskDispatcherContextType = {};
+    if (node) {
+        return getContextFromPlaceholderNode(node);
+    }
 
-    if (edge) {
+    if (edge && nodes) {
         const {source, target} = edge;
 
         const sourceNodeComponentName = source.split('_')[0];
@@ -22,73 +76,70 @@ export default function getTaskDispatcherContext({
         const isSourceTaskDispatcher = TASK_DISPATCHER_NAMES.includes(sourceNodeComponentName);
         const isTargetTaskDispatcher = TASK_DISPATCHER_NAMES.includes(targetNodeComponentName);
 
-        const isSourceTaskDispatcherBottomGhostNode = source.includes('bottom-ghost');
-        const isTargetTaskDispatcherBottomGhostNode = target.includes('bottom-ghost');
+        const isSourceGhost = source.includes('ghost');
+        const isTargetGhost = target.includes('ghost');
 
-        if (isSourceTaskDispatcherBottomGhostNode && isTargetTaskDispatcherBottomGhostNode && nodes) {
+        // Case 1: Ghost node to ghost node
+        if (isSourceGhost && isTargetGhost) {
             const sourceNode = nodes.find((node) => node.id === source);
 
             if (!sourceNode) {
-                return taskDispatcherContext;
+                return {};
             }
 
-            const sourceTaskDispatcherNode = nodes.find((node) => node.id === sourceNode?.data.taskDispatcherId);
+            const sourceTaskDispatcherNode = nodes.find((node) => node.id === sourceNode.data.taskDispatcherId);
 
             if (!sourceTaskDispatcherNode) {
-                return taskDispatcherContext;
+                return {};
             }
 
-            const taskDispatcherData = sourceTaskDispatcherNode.data as NodeDataType;
-
-            taskDispatcherContext.conditionId = taskDispatcherData.conditionData?.conditionId as string;
-            taskDispatcherContext.conditionCase = taskDispatcherData.conditionData?.conditionCase as string;
-            taskDispatcherContext.index = (taskDispatcherData.conditionData?.index as number) + 1;
-
-            return taskDispatcherContext;
+            return getContextFromTaskNodeData(sourceTaskDispatcherNode.data as NodeDataType, 1);
         }
 
+        // Case 2: Task dispatcher to task node
         if (isSourceTaskDispatcher) {
-            if (!nodes) {
-                return taskDispatcherContext;
+            const targetNode = nodes.find((node) => node.id === target);
+
+            if (!targetNode) {
+                return {};
             }
 
-            const targetNodeData = nodes.find((node) => node.id === target)?.data as NodeDataType;
-
-            if (targetNodeData.conditionData) {
-                taskDispatcherContext.conditionCase = targetNodeData.conditionData!.conditionCase as string;
-                taskDispatcherContext.conditionId = targetNodeData.conditionData!.conditionId as string;
-                taskDispatcherContext.index = targetNodeData.conditionData!.index as number;
-            }
-
-            return taskDispatcherContext;
+            return getContextFromTaskNodeData(targetNode.data as NodeDataType, 0);
         }
 
-        if (isTargetTaskDispatcherBottomGhostNode) {
-            const sourceNodeData = nodes?.find((node) => node.id === source)?.data as NodeDataType;
+        // Case 3: Task node to ghost node
+        if (isTargetGhost) {
+            const sourceNode = nodes.find((node) => node.id === source);
 
-            if (sourceNodeData.conditionData) {
-                taskDispatcherContext.conditionCase = sourceNodeData.conditionData.conditionCase as string;
-                taskDispatcherContext.conditionId = sourceNodeData.conditionData.conditionId as string;
-                taskDispatcherContext.index = (sourceNodeData.conditionData.index as number) + 1;
+            if (!sourceNode) {
+                return {};
             }
 
-            return taskDispatcherContext;
+            return getContextFromTaskNodeData(sourceNode.data as NodeDataType, 1);
         }
 
+        // Case 4: Task node to task node
         if (!isSourceTaskDispatcher && !isTargetTaskDispatcher) {
-            const sourceNodeData = nodes?.find((node) => node.id === source)?.data as NodeDataType;
+            const sourceNode = nodes.find((node) => node.id === source);
 
-            if (sourceNodeData.conditionData) {
-                taskDispatcherContext.conditionCase = sourceNodeData.conditionData.conditionCase as string;
-                taskDispatcherContext.conditionId = sourceNodeData.conditionData.conditionId as string;
-                taskDispatcherContext.index = (sourceNodeData.conditionData.index as number) + 1;
+            if (!sourceNode) {
+                return {};
             }
+
+            return getContextFromTaskNodeData(sourceNode.data as NodeDataType, 1);
         }
-    } else if (node) {
-        taskDispatcherContext.conditionCase = node.data?.conditionCase as string;
-        taskDispatcherContext.conditionId = node.data?.conditionId as string;
-        taskDispatcherContext.index = 0;
+
+        // Case 5: Task node to task dispatcher
+        if (!isSourceTaskDispatcher && isTargetTaskDispatcher) {
+            const sourceNode = nodes.find((node) => node.id === source);
+
+            if (!sourceNode) {
+                return {};
+            }
+
+            return getContextFromTaskNodeData(sourceNode.data as NodeDataType, 1);
+        }
     }
 
-    return taskDispatcherContext;
+    return {};
 }

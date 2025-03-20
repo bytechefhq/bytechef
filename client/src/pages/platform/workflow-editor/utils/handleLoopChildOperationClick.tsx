@@ -1,6 +1,12 @@
 import {Workflow} from '@/shared/middleware/automation/configuration';
 import {ActionDefinition} from '@/shared/middleware/platform/configuration';
-import {ClickedOperationType, NodeDataType, PropertyAllType, UpdateWorkflowMutationType} from '@/shared/types';
+import {
+    ClickedOperationType,
+    NodeDataType,
+    PropertyAllType,
+    TaskDispatcherContextType,
+    UpdateWorkflowMutationType,
+} from '@/shared/types';
 import {QueryClient} from '@tanstack/react-query';
 import {ComponentIcon} from 'lucide-react';
 import InlineSVG from 'react-inlinesvg';
@@ -16,9 +22,10 @@ interface HandleLoopChildOperationClickProps {
     loopId: string;
     operation: ClickedOperationType;
     operationDefinition: ActionDefinition;
-    placeholderId: string;
+    placeholderId?: string;
     projectId: number;
     queryClient: QueryClient;
+    taskDispatcherContext?: TaskDispatcherContextType;
     updateWorkflowMutation: UpdateWorkflowMutationType;
     workflow: Workflow & WorkflowTaskDataType;
 }
@@ -30,6 +37,7 @@ export default function handleLoopChildOperationClick({
     placeholderId,
     projectId,
     queryClient,
+    taskDispatcherContext,
     updateWorkflowMutation,
     workflow,
 }: HandleLoopChildOperationClickProps) {
@@ -37,7 +45,7 @@ export default function handleLoopChildOperationClick({
 
     const workflowNodeName = getFormattedName(componentName!);
 
-    const newWorkflowNodeData = {
+    const newWorkflowNodeData: NodeDataType = {
         componentName: componentName,
         icon: icon && <InlineSVG className="size-9" loader={<ComponentIcon className="size-9" />} src={icon} />,
         label: componentLabel,
@@ -48,10 +56,16 @@ export default function handleLoopChildOperationClick({
         workflowNodeName,
     };
 
+    if (taskDispatcherContext?.loopId) {
+        newWorkflowNodeData.loopData = {
+            index: taskDispatcherContext.index as number,
+            loopId: taskDispatcherContext.loopId as string,
+        };
+    }
+
     const taskAfterCurrentIndex = workflow.tasks?.length;
 
     saveWorkflowDefinition({
-        loopId,
         nodeData: {
             ...newWorkflowNodeData,
             parameters: getParametersWithDefaultValues({
@@ -68,6 +82,7 @@ export default function handleLoopChildOperationClick({
         placeholderId,
         projectId,
         queryClient,
+        taskDispatcherContext,
         updateWorkflowMutation,
     });
 }

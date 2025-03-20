@@ -1,7 +1,13 @@
 import {Workflow} from '@/shared/middleware/automation/configuration';
 import {TaskDispatcherDefinitionApi} from '@/shared/middleware/platform/configuration';
 import {TaskDispatcherKeys} from '@/shared/queries/platform/taskDispatcherDefinitions.queries';
-import {ClickedDefinitionType, NodeDataType, PropertyAllType, UpdateWorkflowMutationType} from '@/shared/types';
+import {
+    ClickedDefinitionType,
+    NodeDataType,
+    PropertyAllType,
+    TaskDispatcherContextType,
+    UpdateWorkflowMutationType,
+} from '@/shared/types';
 import {QueryClient} from '@tanstack/react-query';
 import {ComponentIcon} from 'lucide-react';
 import InlineSVG from 'react-inlinesvg';
@@ -18,6 +24,7 @@ interface HandleLoopClickProps {
     projectId: number;
     queryClient: QueryClient;
     sourceNodeId?: string;
+    taskDispatcherContext?: TaskDispatcherContextType;
     updateWorkflowMutation: UpdateWorkflowMutationType;
     workflow: Workflow & WorkflowTaskDataType;
 }
@@ -28,6 +35,7 @@ export default async function handleLoopClick({
     projectId,
     queryClient,
     sourceNodeId,
+    taskDispatcherContext,
     updateWorkflowMutation,
     workflow,
 }: HandleLoopClickProps) {
@@ -42,10 +50,6 @@ export default async function handleLoopClick({
             taskDispatcherVersion: clickedItem.version,
         }),
     });
-
-    if (!loopDefinition) {
-        return;
-    }
 
     const workflowNodeName = getFormattedName(clickedItem.name!);
 
@@ -68,30 +72,37 @@ export default async function handleLoopClick({
         workflowNodeName,
     };
 
-    const {tasks} = workflow;
-
-    let taskIndex = tasks?.length;
-
-    if (edge && tasks) {
-        sourceNodeId = sourceNodeId?.split('=>')[0];
-
-        taskIndex = tasks.findIndex((task) => task.name === sourceNodeId) + 1;
+    // Handle adding a taskDispatcher to a loop node
+    if (taskDispatcherContext) {
+        if (taskDispatcherContext.conditionId) {
+            newLoopNodeData.conditionData = {
+                conditionCase: taskDispatcherContext.conditionCase as 'caseTrue' | 'caseFalse',
+                conditionId: taskDispatcherContext.conditionId as string,
+                index: (taskDispatcherContext.index ?? 0) as number,
+            };
+        } else if (taskDispatcherContext.loopId) {
+            newLoopNodeData.loopData = {
+                index: (taskDispatcherContext.index ?? 0) as number,
+                loopId: taskDispatcherContext.loopId as string,
+            };
+        }
     }
 
-    let loopId: string | undefined;
+    const hasTaskDispatcherId = Object.entries(taskDispatcherContext ?? {}).some(
+        ([key, value]) => key.endsWith('Id') && !!value
+    );
 
-    if (sourceNodeId && sourceNodeId.includes('loop') && sourceNodeId.includes('placeholder')) {
-        loopId = sourceNodeId.split('-')[0];
+    let nodeIndex = workflow.tasks?.length;
 
-        if (!loopId || !tasks) {
-            return;
-        }
+    if (hasTaskDispatcherId) {
+        nodeIndex = taskDispatcherContext?.index;
+    }
 
-        taskIndex = tasks.findIndex((task) => task.name === loopId) + 1;
+    if (edge) {
+        nodeIndex = (workflow.tasks?.findIndex((task) => task.name === sourceNodeId) ?? 0) + 1;
     }
 
     saveWorkflowDefinition({
-        loopId,
         nodeData: {
             ...newLoopNodeData,
             parameters: {
@@ -100,16 +111,17 @@ export default async function handleLoopClick({
                 }),
             },
         },
-        nodeIndex: taskIndex,
+        nodeIndex,
         onSuccess: () =>
             handleComponentAddedSuccess({
                 nodeData: newLoopNodeData,
                 queryClient,
                 workflow,
             }),
-        placeholderId: sourceNodeId,
+        placeholderId: hasTaskDispatcherId ? undefined : sourceNodeId,
         projectId,
         queryClient,
+        taskDispatcherContext,
         updateWorkflowMutation,
     });
 }

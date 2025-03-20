@@ -90,7 +90,7 @@ function createBranchStartEdge(
             source: placeholderId,
             style: EDGE_STYLES,
             target: bottomGhostId,
-            targetHandle: `${bottomGhostId}-bottom-ghost-${branchSide}`,
+            targetHandle: `${bottomGhostId}-${branchSide}`,
             type: 'smoothstep',
         };
 
@@ -117,7 +117,7 @@ function connectSequentialTasks(branchTasks: WorkflowTask[]): Edge[] {
                 const edgeFromNestedConditionBottomGhostToNextSubtask = {
                     id: `${sourceTaskName}-condition-bottom-ghost=>${targetTaskName}`,
                     source: `${sourceTaskName}-condition-bottom-ghost`,
-                    sourceHandle: `${sourceTaskName}-condition-bottom-ghost-bottom-ghost-bottom`,
+                    sourceHandle: `${sourceTaskName}-condition-bottom-ghost-bottom`,
                     style: EDGE_STYLES,
                     target: targetTaskName,
                     type: 'workflow',
@@ -167,7 +167,7 @@ function createBranchExitEdge(
                 source: nestedConditionBottomGhostId,
                 style: EDGE_STYLES,
                 target: bottomGhostId,
-                targetHandle: `${bottomGhostId}-bottom-ghost-${branchSide}`,
+                targetHandle: `${bottomGhostId}-${branchSide}`,
                 type: 'workflow',
             };
 
@@ -181,7 +181,7 @@ function createBranchExitEdge(
             source: lastTaskName,
             style: EDGE_STYLES,
             target: bottomGhostId,
-            targetHandle: `${bottomGhostId}-bottom-ghost-${branchSide}`,
+            targetHandle: `${bottomGhostId}-${branchSide}`,
             type: 'workflow',
         };
 
