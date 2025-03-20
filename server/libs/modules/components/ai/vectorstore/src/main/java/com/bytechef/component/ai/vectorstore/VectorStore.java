@@ -32,14 +32,14 @@ import org.springframework.ai.embedding.EmbeddingModel;
 public interface VectorStore {
 
     org.springframework.ai.vectorstore.VectorStore createVectorStore(
-        Parameters connectionParameters, EmbeddingModel embeddingModel);
+        Parameters inputParameters, Parameters connectionParameters, EmbeddingModel embeddingModel);
 
     default void load(
         Parameters inputParameters, Parameters connectionParameters, EmbeddingModel embeddingModel,
         DocumentReader documentReader, List<DocumentTransformer> documentTransformers) {
 
         org.springframework.ai.vectorstore.VectorStore vectorStore = createVectorStore(
-            connectionParameters, embeddingModel);
+            inputParameters, connectionParameters, embeddingModel);
 
         List<Document> documents = documentReader.read();
 
@@ -54,7 +54,7 @@ public interface VectorStore {
         Parameters inputParameters, Parameters connectionParameters, EmbeddingModel embeddingModel) {
 
         org.springframework.ai.vectorstore.VectorStore vectorStore = createVectorStore(
-            connectionParameters, embeddingModel);
+            inputParameters, connectionParameters, embeddingModel);
 
         return vectorStore.similaritySearch(inputParameters.getRequiredString(QUERY));
     }

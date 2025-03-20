@@ -60,6 +60,9 @@ public abstract class AbstractVectorStore {
         EmbeddingModel embeddingModel = VectorStoreUtils.getEmbeddingModel(
             extensions, componentConnections, clusterElementDefinitionService);
 
-        return vectorStore.createVectorStore(ParametersFactory.createParameters(connectionParameters), embeddingModel);
+        return vectorStore.createVectorStore(
+            ParametersFactory.createParameters(inputParameters),
+            ParametersFactory.createParameters(connectionParameters),
+            embeddingModel);
     }
 }
