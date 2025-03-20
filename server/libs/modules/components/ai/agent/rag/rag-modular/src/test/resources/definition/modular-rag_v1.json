@@ -14,7 +14,8 @@
     "properties" : null,
     "title" : "Moduler RAG",
     "type" : {
-      "name" : "rag",
+      "name" : "RAG",
+      "key" : "rag",
       "label" : "RAG",
       "multipleElements" : false,
       "required" : false
@@ -31,30 +32,36 @@
   "triggers" : null,
   "unifiedApi" : null,
   "version" : 1,
-  "elementTypes" : [ {
-    "name" : "documentJoiner",
+  "clusterElementType" : [ {
+    "name" : "DOCUMENT_JOINER",
+    "key" : "documentJoiner",
     "label" : "Document Joiner",
     "multipleElements" : false,
     "required" : false
   }, {
-    "name" : "documentRetriever",
+    "name" : "DOCUMENT_RETRIEVER",
+    "key" : "documentRetriever",
     "label" : "Document Retriever",
     "multipleElements" : false,
     "required" : true
   }, {
-    "name" : "queryAugmenter",
+    "name" : "QUERY_AUGMENTER",
+    "key" : "queryAugmenter",
     "label" : "Query Augmenter",
     "multipleElements" : false,
     "required" : false
   }, {
-    "name" : "queryExpander",
+    "name" : "QUERY_EXPANDER",
+    "key" : "queryExpander",
     "label" : "Query Expander",
     "multipleElements" : false,
     "required" : false
   }, {
-    "name" : "queryTransformer",
+    "name" : "QUERY_TRANSFORMER",
+    "key" : "queryTransformer",
     "label" : "Query Transformer",
     "multipleElements" : true,
     "required" : false
-  } ]
+  } ],
+  "actionClusterElementTypes" : { }
 }

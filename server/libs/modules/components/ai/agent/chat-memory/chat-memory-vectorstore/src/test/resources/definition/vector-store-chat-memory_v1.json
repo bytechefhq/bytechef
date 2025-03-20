@@ -28,12 +28,13 @@
       "maxValue" : null,
       "minValue" : null,
       "options" : null,
-      "controlType" : "INTEGER",
-      "optionsDataSource" : null
+      "optionsDataSource" : null,
+      "controlType" : "INTEGER"
     } ],
     "title" : "Vector Store Chat Memory",
     "type" : {
-      "name" : "chatMemory",
+      "name" : "CHAT_MEMORY",
+      "key" : "chatMemory",
       "label" : "Chat Memory",
       "multipleElements" : false,
       "required" : false
@@ -50,10 +51,12 @@
   "triggers" : null,
   "unifiedApi" : null,
   "version" : 1,
-  "elementTypes" : [ {
-    "name" : "vectorStore",
+  "clusterElementType" : [ {
+    "name" : "VECTOR_STORE",
+    "key" : "vectorStore",
     "label" : "Vector Store",
     "multipleElements" : false,
     "required" : true
-  } ]
+  } ],
+  "actionClusterElementTypes" : { }
 }

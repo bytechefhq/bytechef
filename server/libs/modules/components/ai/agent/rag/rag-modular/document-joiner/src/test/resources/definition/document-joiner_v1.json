@@ -24,7 +24,8 @@
     "properties" : null,
     "title" : "Concatenation Document Joiner",
     "type" : {
-      "name" : "documentJoiner",
+      "name" : "DOCUMENT_JOINER",
+      "key" : "documentJoiner",
       "label" : "Document Joiner",
       "multipleElements" : false,
       "required" : false

@@ -9,7 +9,7 @@
   "customActionHelp" : null,
   "clusterElements" : [ {
     "description" : "Memory is retrieved added into the prompt's system text.",
-    "name" : "vectorStoreDocumentRetriever",
+    "name" : "documentRetriever",
     "outputDefinition" : null,
     "properties" : [ {
       "advancedOption" : null,
@@ -51,8 +51,8 @@
       "minValue" : 0.0,
       "numberPrecision" : null,
       "options" : null,
-      "optionsDataSource" : null,
-      "controlType" : "NUMBER"
+      "controlType" : "NUMBER",
+      "optionsDataSource" : null
     }, {
       "advancedOption" : null,
       "description" : "The top 'k' similar results to return.",
@@ -70,12 +70,13 @@
       "maxValue" : null,
       "minValue" : 0,
       "options" : null,
-      "optionsDataSource" : null,
-      "controlType" : "INTEGER"
+      "controlType" : "INTEGER",
+      "optionsDataSource" : null
     } ],
     "title" : "Document Retriever",
     "type" : {
-      "name" : "documentRetriever",
+      "name" : "DOCUMENT_RETRIEVER",
+      "key" : "documentRetriever",
       "label" : "Document Retriever",
       "multipleElements" : false,
       "required" : true
@@ -86,16 +87,18 @@
   "icon" : "path:assets/document-retriever.svg",
   "tags" : null,
   "metadata" : null,
-  "name" : "documentRetriever",
+  "name" : "vectorStoreDocumentRetriever",
   "resources" : null,
   "title" : "Vector Store Document Retriever",
   "triggers" : null,
   "unifiedApi" : null,
   "version" : 1,
-  "elementTypes" : [ {
-    "name" : "vectorStore",
+  "clusterElementType" : [ {
+    "name" : "VECTOR_STORE",
+    "key" : "vectorStore",
     "label" : "Vector Store",
     "multipleElements" : false,
     "required" : true
-  } ]
+  } ],
+  "actionClusterElementTypes" : { }
 }

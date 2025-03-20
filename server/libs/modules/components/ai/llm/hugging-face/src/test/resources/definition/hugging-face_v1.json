@@ -43,18 +43,18 @@
       "title" : "Bearer Token",
       "type" : "BEARER_TOKEN",
       "acquire" : null,
+      "oauth2AuthorizationExtraQueryParameters" : null,
+      "authorizationCallback" : null,
+      "apply" : null,
+      "clientId" : null,
       "pkce" : null,
       "refresh" : null,
       "refreshUrl" : null,
       "scopes" : null,
       "tokenUrl" : null,
-      "apply" : null,
-      "clientId" : null,
       "authorizationUrl" : null,
       "clientSecret" : null,
-      "refreshToken" : null,
-      "oauth2AuthorizationExtraQueryParameters" : null,
-      "authorizationCallback" : null
+      "refreshToken" : null
     } ],
     "properties" : null,
     "version" : 1,
@@ -375,9 +375,9 @@
       "optionsDataSource" : null
     } ],
     "title" : "Ask",
-    "perform" : { },
+    "workflowNodeDescription" : null,
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "perform" : { }
   } ],
   "unifiedApi" : null,
   "triggers" : null,

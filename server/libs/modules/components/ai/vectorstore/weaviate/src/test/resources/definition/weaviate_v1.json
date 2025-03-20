@@ -34,9 +34,9 @@
       "optionsDataSource" : null
     } ],
     "title" : "Search Data",
+    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
-    "perform" : { }
+    "workflowNodeDescription" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -47,9 +47,9 @@
     "outputDefinition" : null,
     "properties" : [ ],
     "title" : "Load Data",
+    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
-    "perform" : { }
+    "workflowNodeDescription" : null
   } ],
   "componentCategories" : [ {
     "name" : "artificial-intelligence",
@@ -105,8 +105,9 @@
       "title" : null,
       "type" : "CUSTOM",
       "acquire" : null,
-      "oauth2AuthorizationExtraQueryParameters" : null,
-      "authorizationCallback" : null,
+      "authorizationUrl" : null,
+      "clientSecret" : null,
+      "refreshToken" : null,
       "apply" : null,
       "clientId" : null,
       "pkce" : null,
@@ -114,9 +115,8 @@
       "refreshUrl" : null,
       "scopes" : null,
       "tokenUrl" : null,
-      "authorizationUrl" : null,
-      "clientSecret" : null,
-      "refreshToken" : null
+      "oauth2AuthorizationExtraQueryParameters" : null,
+      "authorizationCallback" : null
     } ],
     "properties" : null,
     "version" : 1,
@@ -133,7 +133,8 @@
     "properties" : null,
     "title" : "Weaviate VectorStore",
     "type" : {
-      "name" : "vectorStore",
+      "name" : "VECTOR_STORE",
+      "key" : "vectorStore",
       "label" : "Vector Store",
       "multipleElements" : false,
       "required" : true
@@ -150,10 +151,27 @@
   "triggers" : null,
   "unifiedApi" : null,
   "version" : 1,
-  "elementTypes" : [ {
-    "name" : "embedding",
+  "clusterElementType" : [ {
+    "name" : "DOCUMENT_READER",
+    "key" : "documentReader",
+    "label" : "Document Reader",
+    "multipleElements" : false,
+    "required" : true
+  }, {
+    "name" : "DOCUMENT_TRANSFORMER",
+    "key" : "documentTransformer",
+    "label" : "Document Transformer",
+    "multipleElements" : true,
+    "required" : false
+  }, {
+    "name" : "EMBEDDING",
+    "key" : "embedding",
     "label" : "Embedding",
     "multipleElements" : false,
     "required" : true
-  } ]
+  } ],
+  "actionClusterElementTypes" : {
+    "search" : [ "DOCUMENT_READER", "EMBEDDING", "DOCUMENT_TRANSFORMER" ],
+    "load" : [ "EMBEDDING" ]
+  }
 }

@@ -45,15 +45,16 @@
         "maxValue" : null,
         "minValue" : null,
         "options" : null,
-        "controlType" : "INTEGER",
-        "optionsDataSource" : null
+        "optionsDataSource" : null,
+        "controlType" : "INTEGER"
       } ],
-      "controlType" : "OBJECT_BUILDER",
-      "optionsDataSource" : null
+      "optionsDataSource" : null,
+      "controlType" : "OBJECT_BUILDER"
     } ],
     "title" : "Keyword Metadata Enricher",
     "type" : {
-      "name" : "documentTransformer",
+      "name" : "DOCUMENT_TRANSFORMER",
+      "key" : "documentTransformer",
       "label" : "Document Transformer",
       "multipleElements" : true,
       "required" : false
@@ -131,15 +132,16 @@
           "label" : "Next",
           "value" : "NEXT"
         } ],
-        "controlType" : "MULTI_SELECT",
-        "optionsDataSource" : null
+        "optionsDataSource" : null,
+        "controlType" : "MULTI_SELECT"
       } ],
-      "controlType" : "OBJECT_BUILDER",
-      "optionsDataSource" : null
+      "optionsDataSource" : null,
+      "controlType" : "OBJECT_BUILDER"
     } ],
     "title" : "Summary Metadata Enricher",
     "type" : {
-      "name" : "documentTransformer",
+      "name" : "DOCUMENT_TRANSFORMER",
+      "key" : "documentTransformer",
       "label" : "Document Transformer",
       "multipleElements" : true,
       "required" : false
@@ -156,10 +158,12 @@
   "triggers" : null,
   "unifiedApi" : null,
   "version" : 1,
-  "elementTypes" : [ {
-    "name" : "model",
+  "clusterElementType" : [ {
+    "name" : "MODEL",
+    "key" : "model",
     "label" : "Model",
     "multipleElements" : false,
     "required" : true
-  } ]
+  } ],
+  "actionClusterElementTypes" : { }
 }

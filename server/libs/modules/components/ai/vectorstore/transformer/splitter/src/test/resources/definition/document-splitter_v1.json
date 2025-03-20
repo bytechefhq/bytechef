@@ -142,7 +142,8 @@
     } ],
     "title" : "Token Text Splitter",
     "type" : {
-      "name" : "documentTransformer",
+      "name" : "DOCUMENT_TRANSFORMER",
+      "key" : "documentTransformer",
       "label" : "Document Transformer",
       "multipleElements" : true,
       "required" : false

@@ -63,8 +63,8 @@
       "title" : "OAuth2 Authorization Code",
       "type" : "OAUTH2_AUTHORIZATION_CODE",
       "acquire" : null,
-      "oauth2AuthorizationExtraQueryParameters" : { },
       "authorizationCallback" : null,
+      "oauth2AuthorizationExtraQueryParameters" : { },
       "authorizationUrl" : { },
       "clientSecret" : null,
       "refreshToken" : null,
@@ -2348,7 +2348,8 @@
     } ],
     "title" : "Get Email",
     "type" : {
-      "name" : "tools",
+      "name" : "TOOLS",
+      "key" : "tools",
       "label" : "Tools",
       "multipleElements" : true,
       "required" : false
@@ -2874,7 +2875,8 @@
     } ],
     "title" : "Search Email",
     "type" : {
-      "name" : "tools",
+      "name" : "TOOLS",
+      "key" : "tools",
       "label" : "Tools",
       "multipleElements" : true,
       "required" : false
@@ -3419,7 +3421,8 @@
     } ],
     "title" : "Send Email",
     "type" : {
-      "name" : "tools",
+      "name" : "TOOLS",
+      "key" : "tools",
       "label" : "Tools",
       "multipleElements" : true,
       "required" : false

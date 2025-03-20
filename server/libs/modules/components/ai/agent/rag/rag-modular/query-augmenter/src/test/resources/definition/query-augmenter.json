@@ -24,7 +24,8 @@
     "properties" : null,
     "title" : "Contextual Query Augmenter",
     "type" : {
-      "name" : "queryAugmenter",
+      "name" : "QUERY_AUGMENTER",
+      "key" : "queryAugmenter",
       "label" : "Query Augmenter",
       "multipleElements" : false,
       "required" : false

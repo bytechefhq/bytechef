@@ -43,6 +43,9 @@
       "title" : "Bearer Token",
       "type" : "BEARER_TOKEN",
       "acquire" : null,
+      "authorizationUrl" : null,
+      "clientSecret" : null,
+      "refreshToken" : null,
       "apply" : null,
       "clientId" : null,
       "pkce" : null,
@@ -50,9 +53,6 @@
       "refreshUrl" : null,
       "scopes" : null,
       "tokenUrl" : null,
-      "authorizationUrl" : null,
-      "clientSecret" : null,
-      "refreshToken" : null,
       "authorizationCallback" : null,
       "oauth2AuthorizationExtraQueryParameters" : null
     } ],
@@ -229,8 +229,8 @@
             } ],
             "controlType" : "SELECT"
           } ],
-          "controlType" : "OBJECT_BUILDER",
-          "optionsDataSource" : null
+          "optionsDataSource" : null,
+          "controlType" : "OBJECT_BUILDER"
         },
         "sampleOutput" : null,
         "placeholder" : null
@@ -299,8 +299,8 @@
           } ],
           "controlType" : "SELECT"
         } ],
-        "controlType" : "OBJECT_BUILDER",
-        "optionsDataSource" : null
+        "optionsDataSource" : null,
+        "controlType" : "OBJECT_BUILDER"
       },
       "sampleOutput" : null
     },
@@ -481,6 +481,143 @@
     "processErrorResponse" : { },
     "workflowNodeDescription" : null
   } ],
+  "clusterElements" : [ {
+    "description" : null,
+    "name" : "read",
+    "outputDefinition" : null,
+    "properties" : [ {
+      "advancedOption" : null,
+      "description" : "ID of the base where table is located.",
+      "displayCondition" : null,
+      "expressionEnabled" : null,
+      "hidden" : null,
+      "metadata" : { },
+      "required" : true,
+      "name" : "baseId",
+      "type" : "STRING",
+      "defaultValue" : null,
+      "exampleValue" : null,
+      "label" : "Base ID",
+      "placeholder" : null,
+      "controlType" : "SELECT",
+      "languageId" : null,
+      "maxLength" : null,
+      "minLength" : null,
+      "options" : null,
+      "optionsDataSource" : {
+        "optionsLookupDependsOn" : null,
+        "options" : { }
+      }
+    }, {
+      "advancedOption" : null,
+      "description" : "ID of the table where the record is located.",
+      "displayCondition" : null,
+      "expressionEnabled" : null,
+      "hidden" : null,
+      "metadata" : { },
+      "required" : true,
+      "name" : "tableId",
+      "type" : "STRING",
+      "defaultValue" : null,
+      "exampleValue" : null,
+      "label" : "Table ID",
+      "placeholder" : null,
+      "controlType" : "SELECT",
+      "languageId" : null,
+      "maxLength" : null,
+      "minLength" : null,
+      "options" : null,
+      "optionsDataSource" : {
+        "optionsLookupDependsOn" : [ "baseId" ],
+        "options" : { }
+      }
+    } ],
+    "title" : "Read table row",
+    "type" : {
+      "name" : "SOURCE",
+      "key" : "source",
+      "label" : "Source",
+      "multipleElements" : false,
+      "required" : false
+    },
+    "object" : { }
+  }, {
+    "description" : null,
+    "name" : "write",
+    "outputDefinition" : null,
+    "properties" : [ {
+      "advancedOption" : null,
+      "description" : "ID of the base where table is located.",
+      "displayCondition" : null,
+      "expressionEnabled" : null,
+      "hidden" : null,
+      "metadata" : { },
+      "required" : true,
+      "name" : "baseId",
+      "type" : "STRING",
+      "defaultValue" : null,
+      "exampleValue" : null,
+      "label" : "Base ID",
+      "placeholder" : null,
+      "controlType" : "SELECT",
+      "languageId" : null,
+      "maxLength" : null,
+      "minLength" : null,
+      "options" : null,
+      "optionsDataSource" : {
+        "optionsLookupDependsOn" : null,
+        "options" : { }
+      }
+    }, {
+      "advancedOption" : null,
+      "description" : "The table where the record will be created.",
+      "displayCondition" : null,
+      "expressionEnabled" : null,
+      "hidden" : null,
+      "metadata" : { },
+      "required" : true,
+      "name" : "tableId",
+      "type" : "STRING",
+      "defaultValue" : null,
+      "exampleValue" : null,
+      "label" : "Table ID",
+      "placeholder" : null,
+      "controlType" : "SELECT",
+      "languageId" : null,
+      "maxLength" : null,
+      "minLength" : null,
+      "options" : null,
+      "optionsDataSource" : {
+        "optionsLookupDependsOn" : [ "baseId" ],
+        "options" : { }
+      }
+    }, {
+      "advancedOption" : null,
+      "description" : null,
+      "displayCondition" : null,
+      "expressionEnabled" : null,
+      "hidden" : null,
+      "metadata" : { },
+      "required" : false,
+      "name" : "fields",
+      "type" : "DYNAMIC_PROPERTIES",
+      "header" : null,
+      "dynamicPropertiesDataSource" : {
+        "propertiesLookupDependsOn" : [ "baseId", "tableId" ],
+        "properties" : { }
+      }
+    } ],
+    "title" : "Write tabel rows",
+    "type" : {
+      "name" : "DESTINATION",
+      "key" : "destination",
+      "label" : "Destination",
+      "multipleElements" : false,
+      "required" : false
+    },
+    "object" : { }
+  } ],
+  "unifiedApi" : null,
   "triggers" : [ {
     "batch" : null,
     "deprecated" : null,
@@ -564,152 +701,17 @@
     "type" : "POLLING",
     "webhookRawBody" : null,
     "workflowSyncExecution" : null,
-    "deduplicate" : null,
-    "poll" : { },
     "webhookDisable" : null,
     "webhookEnable" : null,
     "listenerDisable" : null,
     "listenerEnable" : null,
     "webhookRequest" : null,
     "webhookValidate" : null,
-    "dynamicWebhookRefresh" : null,
-    "webhookValidateOnEnable" : null,
+    "deduplicate" : null,
+    "poll" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null
-  } ],
-  "unifiedApi" : null,
-  "clusterElements" : [ {
-    "description" : null,
-    "name" : "read",
-    "outputDefinition" : null,
-    "properties" : [ {
-      "advancedOption" : null,
-      "description" : "ID of the base where table is located.",
-      "displayCondition" : null,
-      "expressionEnabled" : null,
-      "hidden" : null,
-      "metadata" : { },
-      "required" : true,
-      "name" : "baseId",
-      "type" : "STRING",
-      "defaultValue" : null,
-      "exampleValue" : null,
-      "label" : "Base ID",
-      "placeholder" : null,
-      "controlType" : "SELECT",
-      "languageId" : null,
-      "maxLength" : null,
-      "minLength" : null,
-      "options" : null,
-      "optionsDataSource" : {
-        "optionsLookupDependsOn" : null,
-        "options" : { }
-      }
-    }, {
-      "advancedOption" : null,
-      "description" : "ID of the table where the record is located.",
-      "displayCondition" : null,
-      "expressionEnabled" : null,
-      "hidden" : null,
-      "metadata" : { },
-      "required" : true,
-      "name" : "tableId",
-      "type" : "STRING",
-      "defaultValue" : null,
-      "exampleValue" : null,
-      "label" : "Table ID",
-      "placeholder" : null,
-      "controlType" : "SELECT",
-      "languageId" : null,
-      "maxLength" : null,
-      "minLength" : null,
-      "options" : null,
-      "optionsDataSource" : {
-        "optionsLookupDependsOn" : [ "baseId" ],
-        "options" : { }
-      }
-    } ],
-    "title" : "Read table row",
-    "type" : {
-      "name" : "source",
-      "label" : "Source",
-      "multipleElements" : false,
-      "required" : false
-    },
-    "object" : { }
-  }, {
-    "description" : null,
-    "name" : "write",
-    "outputDefinition" : null,
-    "properties" : [ {
-      "advancedOption" : null,
-      "description" : "ID of the base where table is located.",
-      "displayCondition" : null,
-      "expressionEnabled" : null,
-      "hidden" : null,
-      "metadata" : { },
-      "required" : true,
-      "name" : "baseId",
-      "type" : "STRING",
-      "defaultValue" : null,
-      "exampleValue" : null,
-      "label" : "Base ID",
-      "placeholder" : null,
-      "controlType" : "SELECT",
-      "languageId" : null,
-      "maxLength" : null,
-      "minLength" : null,
-      "options" : null,
-      "optionsDataSource" : {
-        "optionsLookupDependsOn" : null,
-        "options" : { }
-      }
-    }, {
-      "advancedOption" : null,
-      "description" : "The table where the record will be created.",
-      "displayCondition" : null,
-      "expressionEnabled" : null,
-      "hidden" : null,
-      "metadata" : { },
-      "required" : true,
-      "name" : "tableId",
-      "type" : "STRING",
-      "defaultValue" : null,
-      "exampleValue" : null,
-      "label" : "Table ID",
-      "placeholder" : null,
-      "controlType" : "SELECT",
-      "languageId" : null,
-      "maxLength" : null,
-      "minLength" : null,
-      "options" : null,
-      "optionsDataSource" : {
-        "optionsLookupDependsOn" : [ "baseId" ],
-        "options" : { }
-      }
-    }, {
-      "advancedOption" : null,
-      "description" : null,
-      "displayCondition" : null,
-      "expressionEnabled" : null,
-      "hidden" : null,
-      "metadata" : { },
-      "required" : false,
-      "name" : "fields",
-      "type" : "DYNAMIC_PROPERTIES",
-      "header" : null,
-      "dynamicPropertiesDataSource" : {
-        "propertiesLookupDependsOn" : [ "baseId", "tableId" ],
-        "properties" : { }
-      }
-    } ],
-    "title" : "Write tabel rows",
-    "type" : {
-      "name" : "destination",
-      "label" : "Destination",
-      "multipleElements" : false,
-      "required" : false
-    },
-    "object" : { }
+    "workflowNodeDescription" : null,
+    "dynamicWebhookRefresh" : null,
+    "webhookValidateOnEnable" : null
   } ]
 }

@@ -890,7 +890,8 @@
     } ],
     "title" : "Read CSV file row",
     "type" : {
-      "name" : "source",
+      "name" : "SOURCE",
+      "key" : "source",
       "label" : "Source",
       "multipleElements" : false,
       "required" : false
@@ -1047,7 +1048,8 @@
     } ],
     "title" : "Write CSV file rows",
     "type" : {
-      "name" : "destination",
+      "name" : "DESTINATION",
+      "key" : "destination",
       "label" : "Destination",
       "multipleElements" : false,
       "required" : false

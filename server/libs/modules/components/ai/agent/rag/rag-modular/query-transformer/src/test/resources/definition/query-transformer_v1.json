@@ -14,7 +14,8 @@
     "properties" : null,
     "title" : "Compression Query Transformer",
     "type" : {
-      "name" : "queryTransformer",
+      "name" : "QUERY_TRANSFORMER",
+      "key" : "queryTransformer",
       "label" : "Query Transformer",
       "multipleElements" : true,
       "required" : false
@@ -27,7 +28,8 @@
     "properties" : null,
     "title" : "Rewrite Query Transformer",
     "type" : {
-      "name" : "queryTransformer",
+      "name" : "QUERY_TRANSFORMER",
+      "key" : "queryTransformer",
       "label" : "Query Transformer",
       "multipleElements" : true,
       "required" : false
@@ -60,7 +62,8 @@
     } ],
     "title" : "Translation Query Transformer",
     "type" : {
-      "name" : "queryTransformer",
+      "name" : "QUERY_TRANSFORMER",
+      "key" : "queryTransformer",
       "label" : "Query Transformer",
       "multipleElements" : true,
       "required" : false
@@ -77,10 +80,12 @@
   "triggers" : null,
   "unifiedApi" : null,
   "version" : 1,
-  "elementTypes" : [ {
-    "name" : "model",
+  "clusterElementType" : [ {
+    "name" : "MODEL",
+    "key" : "model",
     "label" : "Model",
     "multipleElements" : false,
     "required" : true
-  } ]
+  } ],
+  "actionClusterElementTypes" : { }
 }

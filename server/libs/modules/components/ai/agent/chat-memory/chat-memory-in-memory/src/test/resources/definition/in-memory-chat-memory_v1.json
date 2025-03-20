@@ -24,7 +24,8 @@
     "properties" : null,
     "title" : "In Memory Chat Memory",
     "type" : {
-      "name" : "chatMemory",
+      "name" : "CHAT_MEMORY",
+      "key" : "chatMemory",
       "label" : "Chat Memory",
       "multipleElements" : false,
       "required" : false

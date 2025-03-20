@@ -46,13 +46,13 @@
       "authorizationUrl" : null,
       "clientSecret" : null,
       "refreshToken" : null,
-      "scopes" : null,
-      "tokenUrl" : null,
       "apply" : null,
       "clientId" : null,
       "pkce" : null,
       "refresh" : null,
       "refreshUrl" : null,
+      "scopes" : null,
+      "tokenUrl" : null,
       "authorizationCallback" : null,
       "oauth2AuthorizationExtraQueryParameters" : null
     } ],
@@ -585,6 +585,6 @@
     "workflowNodeDescription" : null
   } ],
   "clusterElements" : null,
-  "triggers" : null,
-  "unifiedApi" : null
+  "unifiedApi" : null,
+  "triggers" : null
 }

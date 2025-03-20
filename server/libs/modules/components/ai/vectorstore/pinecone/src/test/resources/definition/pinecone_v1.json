@@ -105,8 +105,8 @@
       "title" : null,
       "type" : "CUSTOM",
       "acquire" : null,
-      "oauth2AuthorizationExtraQueryParameters" : null,
       "authorizationCallback" : null,
+      "oauth2AuthorizationExtraQueryParameters" : null,
       "apply" : null,
       "clientId" : null,
       "pkce" : null,
@@ -133,7 +133,8 @@
     "properties" : null,
     "title" : "Pinecone VectorStore",
     "type" : {
-      "name" : "vectorStore",
+      "name" : "VECTOR_STORE",
+      "key" : "vectorStore",
       "label" : "Vector Store",
       "multipleElements" : false,
       "required" : true
@@ -150,8 +151,25 @@
   "triggers" : null,
   "unifiedApi" : null,
   "version" : 1,
-  "elementTypes" : [ {
-    "name" : "embedding",
+  "actionClusterElementTypes" : {
+    "load" : [ "EMBEDDING" ],
+    "search" : [ "DOCUMENT_READER", "EMBEDDING", "DOCUMENT_TRANSFORMER" ]
+  },
+  "clusterElementType" : [ {
+    "name" : "DOCUMENT_READER",
+    "key" : "documentReader",
+    "label" : "Document Reader",
+    "multipleElements" : false,
+    "required" : true
+  }, {
+    "name" : "DOCUMENT_TRANSFORMER",
+    "key" : "documentTransformer",
+    "label" : "Document Transformer",
+    "multipleElements" : true,
+    "required" : false
+  }, {
+    "name" : "EMBEDDING",
+    "key" : "embedding",
     "label" : "Embedding",
     "multipleElements" : false,
     "required" : true
