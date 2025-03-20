@@ -126,10 +126,18 @@ const Login = () => {
                                     name="email"
                                     render={({field}) => (
                                         <FormItem>
-                                            <FormLabel className="text-content-neutral-primary" htmlFor="email">Email</FormLabel>
+                                            <FormLabel className="text-content-neutral-primary" htmlFor="email">
+                                                Email
+                                            </FormLabel>
 
                                             <FormControl>
-                                                <Input autocomplete="email" className="py-5" id="email" type="email" {...field} />
+                                                <Input
+                                                    autoComplete="email"
+                                                    className="py-5"
+                                                    id="email"
+                                                    type="email"
+                                                    {...field}
+                                                />
                                             </FormControl>
 
                                             <FormMessage />
@@ -197,7 +205,10 @@ const Login = () => {
                                             <Checkbox checked={field.value} onCheckedChange={field.onChange} />
                                         </FormControl>
 
-                                        <FormLabel className="font-normal text-content-neutral-primary" htmlFor="stayLoggedIn">
+                                        <FormLabel
+                                            className="font-normal text-content-neutral-primary"
+                                            htmlFor="stayLoggedIn"
+                                        >
                                             Stay logged in
                                         </FormLabel>
                                     </FormItem>
