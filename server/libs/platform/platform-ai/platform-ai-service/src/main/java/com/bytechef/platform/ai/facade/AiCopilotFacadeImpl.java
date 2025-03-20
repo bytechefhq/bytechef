@@ -19,6 +19,7 @@ package com.bytechef.platform.ai.facade;
 import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.platform.ai.facade.dto.ContextDTO;
+import com.bytechef.platform.ai.service.VectorStoreService;
 import com.knuddels.jtokkit.api.EncodingType;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
@@ -32,8 +33,10 @@ import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.client.advisor.AbstractChatMemoryAdvisor;
@@ -62,6 +65,8 @@ public class AiCopilotFacadeImpl implements ChatFacade {
     private final ChatClient chatClientScript;
     private final WorkflowService workflowService;
 
+    private final TokenCountBatchingStrategy strategy;
+
     private static VectorStore vectorStore;
 
     private static final String CATEGORY = "category";
@@ -69,11 +74,20 @@ public class AiCopilotFacadeImpl implements ChatFacade {
 
     @SuppressFBWarnings("EI")
     @Autowired
-    public AiCopilotFacadeImpl(ChatClient.Builder chatClientBuilder, WorkflowService workflowService, VectorStore vectorStore) {
+    public AiCopilotFacadeImpl(ChatClient.Builder chatClientBuilder, WorkflowService workflowService, VectorStore vectorStore, VectorStoreService vectorStoreService) {
         this.vectorStore = vectorStore;
-        // moja mala skriptica za punjenje baze, teba pokrenuti na startupu jednom
-//        addDocumentsToVectorDatabase();
+        strategy = new TokenCountBatchingStrategy(EncodingType.CL100K_BASE, 8191, 0.1, Document.DEFAULT_CONTENT_FORMATTER, MetadataMode.ALL);
 
+        if(vectorStoreService.count() == 0) {
+            System.out.println("vector store is empty!!!!!!!!!!!!!!!!");
+            addAllDocumentsToVectorDatabase();
+        }
+        else {
+            System.out.println("vector store is NOT empty!!!!!!!!!!!!!!!!");
+            List<com.bytechef.platform.ai.domain.VectorStore> vectorsList = vectorStoreService.findAll();
+            Map<UUID, Map<String, Object>> vectorsMap = vectorsList.stream().collect(Collectors.toMap(com.bytechef.platform.ai.domain.VectorStore::getId, com.bytechef.platform.ai.domain.VectorStore::getMetadata));
+            versionDocumentsToVectorDatabase(vectorsMap);
+        }
 
         MessageChatMemoryAdvisor messageChatMemoryAdvisor = new MessageChatMemoryAdvisor(new InMemoryChatMemory());
 
@@ -114,83 +128,6 @@ public class AiCopilotFacadeImpl implements ChatFacade {
 
         this.workflowService = workflowService;
     }
-
-    @Override
-    public Flux<Map<String, ?>> chat(String message, ContextDTO contextDTO, String conversationId) {
-        Workflow workflow = workflowService.getWorkflow(contextDTO.workflowId());
-
-        final String userPrompt = """
-              Current workflow:
-              {workflow}
-              Instructions:
-              {message}
-            """;
-        final String workflowString = "workflow";
-        final String messageString = "message";
-
-        return switch (contextDTO.source()){
-            case WORKFLOW_EDITOR -> {
-                ChatClient.ChatClientRequestSpec advisors = chatClientDocs.prompt()
-                    .system("You are a Bytechef assistant. You answer questions about Bytechef and help users with problems. If a user asks you about generating a workflow: answer only with a json in a format similar to the json objects in the vector database. Only use the actions, triggers and parameters which you know exist.")
-                    .user(message)
-                    .advisors(advisor -> advisor
-                        .param(AbstractChatMemoryAdvisor.CHAT_MEMORY_CONVERSATION_ID_KEY, conversationId)
-                        )
-                    ; //.param("clear_memory", true).param("chat_memory_response_size", 200)
-                yield advisors
-                    .stream()
-                    .content()
-                    .map(content -> Map.of("text", content));
-            }
-            case WORKFLOW_EDITOR_COMPONENTS_POPOVER_MENU ->
-                chatClientWorkflow.prompt()
-                    .system("Answer only with a json in a format similar to the json objects in the vector database. Only use the actions, triggers and parameters which you know exist; look for JSON Example for the action or trigger. If a parameter is required, you must use it.") //ARRAY_BUILDER is an indicator that the parameter must be in [] brackets. OBJECT_BUILDER is an indicator that the parameter must be in {} brackets.
-                    .user(u -> u.text(userPrompt)
-                        .param(workflowString, workflow.getDefinition())
-                        .param(messageString, message))
-                    .advisors(advisor -> advisor
-                        .param(AbstractChatMemoryAdvisor.CHAT_MEMORY_CONVERSATION_ID_KEY, conversationId))
-                    .stream()
-                    .content()
-                    .map(content -> Map.of("text", content));
-            case CODE_EDITOR ->
-                switch (contextDTO.parameters().get("language").toString()){
-                    case "javascript" -> chatClientScript.prompt()
-                        .system("You are a javascript code generator, answer only with code.")
-                        .user(u -> u.text(userPrompt)
-                            .param(workflowString, workflow.getDefinition())
-                            .param(messageString, message))
-                        .advisors(advisor -> advisor
-                            .param(AbstractChatMemoryAdvisor.CHAT_MEMORY_CONVERSATION_ID_KEY, conversationId))
-                        .stream()
-                        .content()
-                        .map(content -> Map.of("text", content));
-                    case "python" -> chatClientScript.prompt()
-                        .system("You are a python code generator, answer only with code.")
-                        .user(u -> u.text(userPrompt)
-                            .param(workflowString, workflow.getDefinition())
-                            .param(messageString, message))
-                        .advisors(advisor -> advisor
-                            .param(AbstractChatMemoryAdvisor.CHAT_MEMORY_CONVERSATION_ID_KEY, conversationId))
-                        .stream()
-                        .content()
-                        .map(content -> Map.of("text", content));
-                    case "ruby" -> chatClientScript.prompt()
-                        .system("You are a ruby code generator, answer only with code.")
-                        .user(u -> u.text(userPrompt)
-                            .param(workflowString, workflow.getDefinition())
-                            .param(messageString, message))
-                        .advisors(advisor -> advisor
-                            .param(AbstractChatMemoryAdvisor.CHAT_MEMORY_CONVERSATION_ID_KEY, conversationId))
-                        .stream()
-                        .content()
-                        .map(content -> Map.of("text", content));
-                    default -> throw new IllegalStateException("Unexpected value: " + contextDTO.parameters().get("language").toString());
-                };
-            case null, default -> throw new IllegalStateException("Unexpected value: " + contextDTO.source());
-        };
-    }
-
 
     public static String preprocessDocument(String document) {
         Pattern htmlTagsPattern = Pattern.compile("<[^>]*>");
@@ -284,9 +221,7 @@ public class AiCopilotFacadeImpl implements ChatFacade {
         }
     }
 
-    private void addDocumentsToVectorDatabase() {
-        TokenCountBatchingStrategy strategy = new TokenCountBatchingStrategy(EncodingType.CL100K_BASE, 8191, 0.1, Document.DEFAULT_CONTENT_FORMATTER, MetadataMode.ALL);
-
+    private void addAllDocumentsToVectorDatabase() {
         String docsName = "documentation";
         String workflowsName = "workflows";
         String componentsName = "components";
@@ -306,11 +241,91 @@ public class AiCopilotFacadeImpl implements ChatFacade {
         try {
             Path welomePath = Paths.get( "/home/user/IdeaProjects/bytechef/docs/src/content/docs/welcome.md");
             String welcome = Files.readString(welomePath);
-            vectorStore.add(List.of(new Document(welcome, Map.of(CATEGORY, docsName, NAME, "welcome"))));
+            String cleanedDocument = preprocessDocument(welcome);
+            vectorStore.add(List.of(new Document(cleanedDocument, Map.of(CATEGORY, docsName, NAME, "welcome"))));
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
 
+    private void versionDocumentsToVectorDatabase(Map<UUID, Map<String, Object>> vectorsMap) {
 
+    }
+
+
+    @Override
+    public Flux<Map<String, ?>> chat(String message, ContextDTO contextDTO, String conversationId) {
+        Workflow workflow = workflowService.getWorkflow(contextDTO.workflowId());
+
+        final String userPrompt = """
+              Current workflow:
+              {workflow}
+              Instructions:
+              {message}
+            """;
+        final String workflowString = "workflow";
+        final String messageString = "message";
+
+        return switch (contextDTO.source()){
+            case WORKFLOW_EDITOR -> {
+                ChatClient.ChatClientRequestSpec advisors = chatClientDocs.prompt()
+                    .system("You are a Bytechef assistant. You answer questions about Bytechef and help users with problems. If a user asks you about generating a workflow: answer only with a json in a format similar to the json objects in the vector database. Only use the actions, triggers and parameters which you know exist.")
+                    .user(message)
+                    .advisors(advisor -> advisor
+                        .param(AbstractChatMemoryAdvisor.CHAT_MEMORY_CONVERSATION_ID_KEY, conversationId)
+                        )
+                    ; //.param("clear_memory", true).param("chat_memory_response_size", 200)
+                yield advisors
+                    .stream()
+                    .content()
+                    .map(content -> Map.of("text", content));
+            }
+            case WORKFLOW_EDITOR_COMPONENTS_POPOVER_MENU ->
+                chatClientWorkflow.prompt()
+                    .system("Answer only with a json in a format similar to the json objects in the vector database. Only use the actions, triggers and parameters which you know exist; look for JSON Example for the action or trigger. If a parameter is required, you must use it.") //ARRAY_BUILDER is an indicator that the parameter must be in [] brackets. OBJECT_BUILDER is an indicator that the parameter must be in {} brackets.
+                    .user(u -> u.text(userPrompt)
+                        .param(workflowString, workflow.getDefinition())
+                        .param(messageString, message))
+                    .advisors(advisor -> advisor
+                        .param(AbstractChatMemoryAdvisor.CHAT_MEMORY_CONVERSATION_ID_KEY, conversationId))
+                    .stream()
+                    .content()
+                    .map(content -> Map.of("text", content));
+            case CODE_EDITOR ->
+                switch (contextDTO.parameters().get("language").toString()){
+                    case "javascript" -> chatClientScript.prompt()
+                        .system("You are a javascript code generator, answer only with code.")
+                        .user(u -> u.text(userPrompt)
+                            .param(workflowString, workflow.getDefinition())
+                            .param(messageString, message))
+                        .advisors(advisor -> advisor
+                            .param(AbstractChatMemoryAdvisor.CHAT_MEMORY_CONVERSATION_ID_KEY, conversationId))
+                        .stream()
+                        .content()
+                        .map(content -> Map.of("text", content));
+                    case "python" -> chatClientScript.prompt()
+                        .system("You are a python code generator, answer only with code.")
+                        .user(u -> u.text(userPrompt)
+                            .param(workflowString, workflow.getDefinition())
+                            .param(messageString, message))
+                        .advisors(advisor -> advisor
+                            .param(AbstractChatMemoryAdvisor.CHAT_MEMORY_CONVERSATION_ID_KEY, conversationId))
+                        .stream()
+                        .content()
+                        .map(content -> Map.of("text", content));
+                    case "ruby" -> chatClientScript.prompt()
+                        .system("You are a ruby code generator, answer only with code.")
+                        .user(u -> u.text(userPrompt)
+                            .param(workflowString, workflow.getDefinition())
+                            .param(messageString, message))
+                        .advisors(advisor -> advisor
+                            .param(AbstractChatMemoryAdvisor.CHAT_MEMORY_CONVERSATION_ID_KEY, conversationId))
+                        .stream()
+                        .content()
+                        .map(content -> Map.of("text", content));
+                    default -> throw new IllegalStateException("Unexpected value: " + contextDTO.parameters().get("language").toString());
+                };
+            case null, default -> throw new IllegalStateException("Unexpected value: " + contextDTO.source());
+        };
+    }
 }
