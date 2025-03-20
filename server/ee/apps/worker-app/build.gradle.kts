@@ -76,6 +76,7 @@ dependencies {
     implementation(project(":server:libs:modules:components:ai:universal:universal-image"))
     implementation(project(":server:libs:modules:components:ai:universal:universal-text"))
     implementation(project(":server:libs:modules:components:ai:vectorstore:pinecone"))
+    implementation(project(":server:libs:modules:components:ai:vectorstore:qdrant"))
     implementation(project(":server:libs:modules:components:ai:vectorstore:reader"))
     implementation(project(":server:libs:modules:components:ai:vectorstore:transformer:enricher"))
     implementation(project(":server:libs:modules:components:ai:vectorstore:transformer:splitter"))
