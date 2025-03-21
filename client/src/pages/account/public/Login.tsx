@@ -202,12 +202,16 @@ const Login = () => {
                                 render={({field}) => (
                                     <FormItem className="flex items-center space-x-2 space-y-0 py-4">
                                         <FormControl>
-                                            <Checkbox checked={field.value} onCheckedChange={field.onChange} />
+                                            <Checkbox
+                                                checked={field.value}
+                                                id="stayLoggedInButton"
+                                                onCheckedChange={field.onChange}
+                                            />
                                         </FormControl>
 
                                         <FormLabel
                                             className="font-normal text-content-neutral-primary"
-                                            htmlFor="stayLoggedIn"
+                                            htmlFor="stayLoggedInButton"
                                         >
                                             Stay logged in
                                         </FormLabel>
