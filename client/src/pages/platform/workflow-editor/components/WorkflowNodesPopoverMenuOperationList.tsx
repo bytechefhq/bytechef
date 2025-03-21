@@ -23,8 +23,7 @@ import getFormattedName from '../utils/getFormattedName';
 import getParametersWithDefaultValues from '../utils/getParametersWithDefaultValues';
 import getTaskDispatcherContext from '../utils/getTaskDispatcherContext';
 import handleComponentAddedSuccess from '../utils/handleComponentAddedSuccess';
-import handleConditionChildOperationClick from '../utils/handleConditionChildOperationClick';
-import handleLoopChildOperationClick from '../utils/handleLoopChildOperationClick';
+import handleTaskDispatcherSubtaskOperationClick from '../utils/handleTaskDispatcherSubtaskOperationClick';
 import saveWorkflowDefinition from '../utils/saveWorkflowDefinition';
 
 interface WorkflowNodesPopoverMenuOperationListProps {
@@ -200,22 +199,8 @@ const WorkflowNodesPopoverMenuOperationList = ({
 
                 const taskDispatcherContext = getTaskDispatcherContext({edge: clickedEdge, nodes});
 
-                if (taskDispatcherContext?.conditionId) {
-                    handleConditionChildOperationClick({
-                        conditionId: taskDispatcherContext.conditionId as string,
-                        operation: clickedOperation,
-                        operationDefinition: clickedComponentActionDefinition,
-                        projectId: +projectId!,
-                        queryClient,
-                        taskDispatcherContext,
-                        updateWorkflowMutation,
-                        workflow,
-                    });
-
-                    return;
-                } else if (taskDispatcherContext?.loopId) {
-                    handleLoopChildOperationClick({
-                        loopId: taskDispatcherContext.loopId as string,
+                if (taskDispatcherContext?.conditionId || taskDispatcherContext.loopId) {
+                    handleTaskDispatcherSubtaskOperationClick({
                         operation: clickedOperation,
                         operationDefinition: clickedComponentActionDefinition,
                         projectId: +projectId!,
@@ -241,8 +226,7 @@ const WorkflowNodesPopoverMenuOperationList = ({
                 const taskDispatcherContext = getTaskDispatcherContext({node: sourceNode});
 
                 if (taskDispatcherContext?.loopId || loopId) {
-                    handleLoopChildOperationClick({
-                        loopId: (taskDispatcherContext?.loopId as string) ?? loopId,
+                    handleTaskDispatcherSubtaskOperationClick({
                         operation: clickedOperation,
                         operationDefinition: clickedComponentActionDefinition,
                         placeholderId: sourceNodeId,
@@ -253,8 +237,7 @@ const WorkflowNodesPopoverMenuOperationList = ({
                         workflow,
                     });
                 } else if (taskDispatcherContext?.conditionId || conditionId) {
-                    handleConditionChildOperationClick({
-                        conditionId: (taskDispatcherContext?.conditionId as string) ?? conditionId,
+                    handleTaskDispatcherSubtaskOperationClick({
                         operation: clickedOperation,
                         operationDefinition: clickedComponentActionDefinition,
                         placeholderId: sourceNodeId,
