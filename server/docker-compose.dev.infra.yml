@@ -8,7 +8,7 @@ services:
       - "1025:1025"
       - "8025:8025"
   postgres:
-    image: postgres:14-alpine
+    image: pgvector/pgvector:pg17
     platform: linux/amd64
     ports:
     - "5432:5432"
@@ -29,17 +29,6 @@ services:
     command: "redis-server --save 20 1 --loglevel warning"
     volumes:
     - "cache:/data"
-  pgvector:
-    image: pgvector/pgvector:pg14
-    platform: linux/amd64
-    ports:
-      - "5555:5432"
-    volumes:
-      - "db:/var/lib/pg-vector/data"
-    environment:
-      - "POSTGRES_PASSWORD=postgres"
-      - "POSTGRES_USER=postgres"
-      - "POSTGRES_DB=bytechef-vector"
 volumes:
   cache:
     driver: "local"
