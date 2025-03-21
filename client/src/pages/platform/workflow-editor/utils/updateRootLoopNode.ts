@@ -3,7 +3,7 @@ import {NodeDataType} from '@/shared/types';
 import {Node} from '@xyflow/react';
 
 import {WorkflowTaskDataType} from '../stores/useWorkflowDataStore';
-import getParentConditionTask from './getParentConditionTask';
+import getParentTaskDispatcherTask from './getParentTaskDispatcherTask';
 
 interface UpdateRootLoopNodeProps {
     loopId: string;
@@ -28,7 +28,7 @@ export default function updateRootLoopNode({
     let currentTaskNodeLoopData = updatedParentLoopNodeData.loopData;
 
     while (currentTaskNodeLoopData) {
-        const parentLoopTask = getParentConditionTask(tasks, currentTaskNodeLoopData.loopId);
+        const parentLoopTask = getParentTaskDispatcherTask({taskDispatcherId: currentTaskNodeLoopData.loopId, tasks});
 
         if (!parentLoopTask) {
             break;

@@ -3,7 +3,7 @@ import {NodeDataType} from '@/shared/types';
 import {Node} from '@xyflow/react';
 
 import {WorkflowTaskDataType} from '../stores/useWorkflowDataStore';
-import getParentConditionTask from './getParentConditionTask';
+import getParentTaskDispatcherTask from './getParentTaskDispatcherTask';
 
 interface UpdateRootConditionNodeProps {
     conditionCase: string;
@@ -29,7 +29,10 @@ export default function updateRootConditionNode({
     let currentTaskNodeConditionData = updatedParentConditionNodeData.conditionData;
 
     while (currentTaskNodeConditionData) {
-        const parentConditionTask = getParentConditionTask(tasks, currentTaskNodeConditionData.conditionId);
+        const parentConditionTask = getParentTaskDispatcherTask({
+            taskDispatcherId: currentTaskNodeConditionData.conditionId,
+            tasks,
+        });
 
         if (!parentConditionTask) {
             break;
