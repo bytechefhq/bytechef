@@ -10,7 +10,7 @@
         <preConditions onFail="MARK_RAN">
             <not>
                 <sqlCheck expectedResult="0">
-                    SELECT COUNT(*) FROM pg_extension WHERE extname = 'vector';
+                    SELECT COUNT(*) FROM pg_extension;
                 </sqlCheck>
             </not>
         </preConditions>
@@ -23,11 +23,11 @@
 
     <!-- ChangeSet to create the workflow table -->
     <changeSet id="00000000000001-1" author="Marko Kriskovic">
-        <createTable tableName="workflow_vector">
+        <createTable tableName="vector_store">
             <column name="id" type="UUID" defaultValue="uuid_generate_v4()">
                 <constraints primaryKey="true" nullable="false"/>
             </column>
-            <column name="content" type="JSONB"/>
+            <column name="content" type="text"/>
             <column name="metadata" type="JSONB"/>
             <column name="embedding" type="VECTOR(1536)">
                 <constraints nullable="true"/>
@@ -35,7 +35,7 @@
         </createTable>
         <!-- Create an index for vector similarity search -->
         <sql>
-            CREATE INDEX idx_documentation_embedding ON workflow_vector USING hnsw (embedding vector_cosine_ops);
+            CREATE INDEX idx_documentation_embedding ON vector_store USING hnsw (embedding vector_cosine_ops);
         </sql>
     </changeSet>
 </databaseChangeLog>
