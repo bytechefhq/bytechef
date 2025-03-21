@@ -2,8 +2,7 @@ import {CONDITION_CASE_FALSE, CONDITION_CASE_TRUE} from '@/shared/constants';
 import {WorkflowTask} from '@/shared/middleware/platform/configuration';
 import {TaskDispatcherContextType} from '@/shared/types';
 
-import getParentConditionTask from './getParentConditionTask';
-import getParentLoopTask from './getParentLoopTask';
+import getParentTaskDispatcherTask from './getParentTaskDispatcherTask';
 
 type UpdateTaskParametersType = {
     context?: TaskDispatcherContextType;
@@ -23,7 +22,7 @@ const TASK_DISPATCHER_CONFIG = {
                 index,
             };
         },
-        getParentTask: getParentConditionTask,
+        getParentTask: getParentTaskDispatcherTask,
         getSubtasks: (task: WorkflowTask, context: TaskDispatcherContextType): Array<WorkflowTask> => {
             const conditionCase = context.conditionCase || CONDITION_CASE_TRUE;
 
@@ -54,7 +53,7 @@ const TASK_DISPATCHER_CONFIG = {
 
             return {index};
         },
-        getParentTask: getParentLoopTask,
+        getParentTask: getParentTaskDispatcherTask,
         getSubtasks: (task: WorkflowTask): Array<WorkflowTask> => task.parameters?.iteratee || [],
         initializeParameters: () => ({
             iteratee: [],
@@ -140,7 +139,7 @@ export default function insertTaskDispatcherSubtask({
     let task = tasks.find((task) => task.name === dispatcherId);
 
     if (!task) {
-        task = getParentTask(tasks, dispatcherId);
+        task = getParentTask({taskDispatcherId: dispatcherId, tasks});
     }
 
     if (!task) {

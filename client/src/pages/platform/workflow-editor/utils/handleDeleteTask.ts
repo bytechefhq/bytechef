@@ -8,8 +8,7 @@ import {QueryClient, UseMutationResult} from '@tanstack/react-query';
 
 import {WorkflowTaskDataType} from '../stores/useWorkflowDataStore';
 import useWorkflowNodeDetailsPanelStore from '../stores/useWorkflowNodeDetailsPanelStore';
-import getParentConditionTask from './getParentConditionTask';
-import getParentLoopTask from './getParentLoopTask';
+import getParentTaskDispatcherTask from './getParentTaskDispatcherTask';
 
 interface HandleDeleteTaskProps {
     currentNode?: NodeDataType;
@@ -43,7 +42,11 @@ export default function handleDeleteTask({
     let updatedTasks: Array<WorkflowTaskType>;
 
     if (data.conditionData) {
-        const parentConditionTask = getParentConditionTask(workflowTasks, data.conditionData.conditionId);
+        const parentConditionTask = getParentTaskDispatcherTask({
+            taskDispatcherId: data.conditionData.conditionId,
+            tasks: workflowTasks,
+        });
+
         const taskConditionCase = data.conditionData.conditionCase;
 
         if (parentConditionTask?.parameters) {
@@ -85,7 +88,10 @@ export default function handleDeleteTask({
             });
         }
     } else if (data.loopData) {
-        const parentLoopTask = getParentLoopTask(workflowTasks, data.loopData.loopId);
+        const parentLoopTask = getParentTaskDispatcherTask({
+            taskDispatcherId: data.loopData.loopId,
+            tasks: workflowTasks,
+        });
 
         if (parentLoopTask?.parameters) {
             parentLoopTask.parameters.iteratee = (parentLoopTask.parameters.iteratee as Array<WorkflowTask>).filter(
