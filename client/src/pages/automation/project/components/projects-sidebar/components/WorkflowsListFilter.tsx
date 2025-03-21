@@ -14,12 +14,12 @@ interface WorkflowsListFilterProps {
 
 const WorkflowsListFilter = ({searchValue, setSearchValue, setSortBy, sortBy}: WorkflowsListFilterProps) => {
     return (
-        <div className="flex w-80 items-center gap-2">
-            <div className="relative w-full rounded-md bg-background">
+        <div className="flex items-center gap-2">
+            <div className="relative flex w-full rounded-md bg-background align-middle">
                 <SearchIcon className="absolute left-3 top-2.5 size-4 text-muted-foreground" />
 
                 <Input
-                    className="border-stroke-neutral-secondary pl-8 shadow-none"
+                    className="h-auto border-stroke-neutral-secondary py-1.5 pl-8 shadow-none"
                     onChange={(event) => setSearchValue(event.target.value)}
                     placeholder="Search workflows"
                     value={searchValue}
@@ -32,8 +32,7 @@ const WorkflowsListFilter = ({searchValue, setSearchValue, setSortBy, sortBy}: W
                         <TooltipTrigger asChild>
                             <Button
                                 aria-label="Sort by"
-                                className="border-stroke-neutral-secondary p-2 shadow-none hover:bg-surface-neutral-primary-hover data-[state=open]:border-stroke-brand-secondary data-[state=open]:bg-surface-brand-secondary data-[state=open]:text-content-brand-primary"
-                                size="icon"
+                                className="h-auto border-stroke-neutral-secondary p-2 shadow-none hover:bg-surface-neutral-primary-hover data-[state=open]:border-stroke-brand-secondary data-[state=open]:bg-surface-brand-secondary data-[state=open]:text-content-brand-primary"
                                 variant="outline"
                             >
                                 <ListFilterIcon />
