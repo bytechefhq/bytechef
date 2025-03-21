@@ -29,9 +29,9 @@
       "optionsDataSource" : null
     } ],
     "title" : "Load Data",
+    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
-    "perform" : { }
+    "workflowNodeDescription" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -67,9 +67,9 @@
       "optionsDataSource" : null
     } ],
     "title" : "Search Data",
+    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
-    "perform" : { }
+    "workflowNodeDescription" : null
   } ],
   "componentCategories" : [ {
     "name" : "artificial-intelligence",
@@ -144,18 +144,18 @@
       "title" : null,
       "type" : "CUSTOM",
       "acquire" : null,
-      "apply" : null,
-      "authorizationCallback" : null,
       "authorizationUrl" : null,
-      "clientId" : null,
       "clientSecret" : null,
-      "oauth2AuthorizationExtraQueryParameters" : null,
+      "refreshToken" : null,
+      "apply" : null,
+      "clientId" : null,
       "pkce" : null,
       "refresh" : null,
       "refreshUrl" : null,
       "scopes" : null,
-      "refreshToken" : null,
-      "tokenUrl" : null
+      "tokenUrl" : null,
+      "authorizationCallback" : null,
+      "oauth2AuthorizationExtraQueryParameters" : null
     } ],
     "properties" : null,
     "version" : 1,
@@ -190,10 +190,6 @@
   "triggers" : null,
   "unifiedApi" : null,
   "version" : 1,
-  "actionClusterElementTypes" : {
-    "load" : [ "EMBEDDING" ],
-    "search" : [ "DOCUMENT_READER", "EMBEDDING", "DOCUMENT_TRANSFORMER" ]
-  },
   "clusterElementType" : [ {
     "name" : "DOCUMENT_READER",
     "key" : "documentReader",
@@ -212,5 +208,9 @@
     "label" : "Embedding",
     "multipleElements" : false,
     "required" : true
-  } ]
+  } ],
+  "actionClusterElementTypes" : {
+    "search" : [ "DOCUMENT_READER", "DOCUMENT_TRANSFORMER", "EMBEDDING" ],
+    "load" : [ "EMBEDDING" ]
+  }
 }
