@@ -22,7 +22,7 @@
     </changeSet>
 
     <!-- ChangeSet to create the workflow table -->
-    <changeSet id="create-workflow-table" author="Marko Kriskovic">
+    <changeSet id="00000000000001-1" author="Marko Kriskovic">
         <createTable tableName="workflow_vector">
             <column name="id" type="UUID" defaultValue="uuid_generate_v4()">
                 <constraints primaryKey="true" nullable="false"/>
@@ -38,23 +38,4 @@
             CREATE INDEX idx_documentation_embedding ON workflow_vector USING hnsw (embedding vector_cosine_ops);
         </sql>
     </changeSet>
-
-    <!-- ChangeSet to create the documentation table -->
-<!--    <changeSet id="create-documentation-table" author="Marko Kriskovic">-->
-<!--        <createTable tableName="documentation">-->
-<!--            <column name="id" type="UUID">-->
-<!--                <constraints primaryKey="true" nullable="false"/>-->
-<!--            </column>-->
-<!--            <column name="content" type="TEXT"/>-->
-<!--            <column name="metadata" type="JSONB"/>-->
-<!--            <column name="embedding" type="VECTOR(1536)">-->
-<!--                <constraints nullable="true"/>-->
-<!--            </column>-->
-<!--        </createTable>-->
-<!--        &lt;!&ndash; Create an index for vector similarity search &ndash;&gt;-->
-<!--        <sql>-->
-<!--            CREATE INDEX idx_documentation_embedding ON documentation USING hnsw (embedding vector_cosine_ops);-->
-<!--        </sql>-->
-<!--    </changeSet>-->
-
 </databaseChangeLog>
