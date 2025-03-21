@@ -1,4 +1,5 @@
-import {TaskDispatcherDefinitionApi, Workflow} from '@/shared/middleware/platform/configuration';
+import {Workflow} from '@/shared/middleware/automation/configuration';
+import {TaskDispatcherDefinitionApi} from '@/shared/middleware/platform/configuration';
 import {TaskDispatcherKeys} from '@/shared/queries/platform/taskDispatcherDefinitions.queries';
 import {
     ClickedDefinitionType,
@@ -7,8 +8,8 @@ import {
     TaskDispatcherContextType,
     UpdateWorkflowMutationType,
 } from '@/shared/types';
-import {Component1Icon} from '@radix-ui/react-icons';
 import {QueryClient} from '@tanstack/react-query';
+import {ComponentIcon} from 'lucide-react';
 import InlineSVG from 'react-inlinesvg';
 
 import {WorkflowTaskDataType} from '../stores/useWorkflowDataStore';
@@ -17,28 +18,55 @@ import getParametersWithDefaultValues from './getParametersWithDefaultValues';
 import handleComponentAddedSuccess from './handleComponentAddedSuccess';
 import saveWorkflowDefinition from './saveWorkflowDefinition';
 
-interface HandleConditionClickProps {
+const fallbackIcon = <ComponentIcon className="size-9 text-gray-700" />;
+
+const TASK_DISPATCHER_CONFIG = {
+    condition: {
+        getInitialParameters: (properties: Array<PropertyAllType>) => ({
+            ...getParametersWithDefaultValues({properties}),
+            caseFalse: [],
+            caseTrue: [],
+        }),
+    },
+    loop: {
+        getInitialParameters: (properties: Array<PropertyAllType>) => ({
+            ...getParametersWithDefaultValues({properties}),
+        }),
+    },
+};
+
+interface HandleTaskDispatcherClickProps {
     clickedItem: ClickedDefinitionType;
     edge?: boolean;
     projectId: number;
     queryClient: QueryClient;
     sourceNodeId?: string;
     taskDispatcherContext?: TaskDispatcherContextType;
+    taskDispatcherName: keyof typeof TASK_DISPATCHER_CONFIG;
     updateWorkflowMutation: UpdateWorkflowMutationType;
     workflow: Workflow & WorkflowTaskDataType;
 }
 
-export default async function handleConditionClick({
+export default async function handleTaskDispatcherClick({
     clickedItem,
     edge,
     projectId,
     queryClient,
     sourceNodeId,
     taskDispatcherContext,
+    taskDispatcherName,
     updateWorkflowMutation,
     workflow,
-}: HandleConditionClickProps) {
-    const conditionDefinition = await queryClient.fetchQuery({
+}: HandleTaskDispatcherClickProps) {
+    const config = TASK_DISPATCHER_CONFIG[taskDispatcherName];
+
+    if (!config) {
+        console.error(`Unknown task dispatcher type: ${taskDispatcherName}`);
+
+        return;
+    }
+
+    const taskDispatcherDefinition = await queryClient.fetchQuery({
         queryFn: () =>
             new TaskDispatcherDefinitionApi().getTaskDispatcherDefinition({
                 taskDispatcherName: clickedItem.name,
@@ -52,35 +80,26 @@ export default async function handleConditionClick({
 
     const workflowNodeName = getFormattedName(clickedItem.name!);
 
-    const newConditionNodeData: NodeDataType = {
-        ...conditionDefinition,
+    const newNodeData: NodeDataType = {
+        ...taskDispatcherDefinition,
         componentName: clickedItem.name,
-        icon: (
-            <>
-                {clickedItem.icon ? (
-                    <InlineSVG className="size-9 text-gray-700" src={clickedItem.icon} />
-                ) : (
-                    <Component1Icon className="size-9 text-gray-700" />
-                )}
-            </>
-        ),
+        icon: clickedItem.icon ? <InlineSVG className="size-9 text-gray-700" src={clickedItem.icon} /> : fallbackIcon,
         label: clickedItem?.title,
         name: workflowNodeName,
         taskDispatcher: true,
-        type: `${conditionDefinition.name}/v${conditionDefinition.version}`,
+        type: `${taskDispatcherDefinition.name}/v${taskDispatcherDefinition.version}`,
         workflowNodeName,
     };
 
-    // Handle adding a taskDispatcher to a condition node
     if (taskDispatcherContext) {
         if (taskDispatcherContext.conditionId) {
-            newConditionNodeData.conditionData = {
+            newNodeData.conditionData = {
                 conditionCase: taskDispatcherContext.conditionCase as 'caseTrue' | 'caseFalse',
                 conditionId: taskDispatcherContext.conditionId as string,
                 index: (taskDispatcherContext.index ?? 0) as number,
             };
         } else if (taskDispatcherContext.loopId) {
-            newConditionNodeData.loopData = {
+            newNodeData.loopData = {
                 index: (taskDispatcherContext.index ?? 0) as number,
                 loopId: taskDispatcherContext.loopId as string,
             };
@@ -103,20 +122,14 @@ export default async function handleConditionClick({
 
     saveWorkflowDefinition({
         nodeData: {
-            ...newConditionNodeData,
-            parameters: {
-                ...getParametersWithDefaultValues({
-                    properties: conditionDefinition?.properties as Array<PropertyAllType>,
-                }),
-                caseFalse: [],
-                caseTrue: [],
-            },
+            ...newNodeData,
+            parameters: config.getInitialParameters(taskDispatcherDefinition?.properties as Array<PropertyAllType>),
             workflowNodeName,
         },
         nodeIndex,
         onSuccess: () =>
             handleComponentAddedSuccess({
-                nodeData: newConditionNodeData,
+                nodeData: newNodeData,
                 queryClient,
                 workflow,
             }),

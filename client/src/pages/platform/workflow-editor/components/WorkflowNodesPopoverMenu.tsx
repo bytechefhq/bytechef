@@ -11,8 +11,7 @@ import {useShallow} from 'zustand/react/shallow';
 import {useWorkflowMutation} from '../providers/workflowMutationProvider';
 import useWorkflowDataStore from '../stores/useWorkflowDataStore';
 import getTaskDispatcherContext from '../utils/getTaskDispatcherContext';
-import handleConditionClick from '../utils/handleConditionClick';
-import handleLoopClick from '../utils/handleLoopClick';
+import handleTaskDispatcherClick from '../utils/handleTaskDispatcherClick';
 import WorkflowNodesPopoverMenuComponentList from './WorkflowNodesPopoverMenuComponentList';
 import WorkflowNodesPopoverMenuOperationList from './WorkflowNodesPopoverMenuOperationList';
 
@@ -81,29 +80,17 @@ const WorkflowNodesPopoverMenu = ({
                     nodes: nodes,
                 });
 
-                if (name.includes('condition')) {
-                    await handleConditionClick({
-                        clickedItem,
-                        edge: !!edge,
-                        projectId: +projectId!,
-                        queryClient,
-                        sourceNodeId,
-                        taskDispatcherContext,
-                        updateWorkflowMutation,
-                        workflow,
-                    });
-                } else if (name.includes('loop')) {
-                    await handleLoopClick({
-                        clickedItem,
-                        edge: !!edge,
-                        projectId: +projectId!,
-                        queryClient,
-                        sourceNodeId,
-                        taskDispatcherContext,
-                        updateWorkflowMutation,
-                        workflow,
-                    });
-                }
+                await handleTaskDispatcherClick({
+                    clickedItem,
+                    edge: !!edge,
+                    projectId: +projectId!,
+                    queryClient,
+                    sourceNodeId,
+                    taskDispatcherContext,
+                    taskDispatcherName: name as 'condition' | 'loop',
+                    updateWorkflowMutation,
+                    workflow,
+                });
 
                 setPopoverOpen(false);
 
