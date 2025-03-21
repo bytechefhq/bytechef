@@ -7,13 +7,6 @@
 
     <!-- ChangeSet to create the vector extension -->
     <changeSet id="00000000000001" author="Marko Kriskovic">
-        <preConditions onFail="MARK_RAN">
-            <not>
-                <sqlCheck expectedResult="0">
-                    SELECT COUNT(*) FROM pg_extension;
-                </sqlCheck>
-            </not>
-        </preConditions>
         <sql>
             CREATE EXTENSION IF NOT EXISTS vector;
             CREATE EXTENSION IF NOT EXISTS hstore;
