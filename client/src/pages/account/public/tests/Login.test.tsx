@@ -171,14 +171,20 @@ it('should show validation errors after clicking "Log in" button, if input field
 it('should toggle "Stay logged in" checkbox on click', async () => {
     renderLoginPage();
 
-    const checkbox = screen.getByLabelText('Stay logged in');
+    const button = screen.getByLabelText('Stay logged in');
+
+    expect(button);
+
+    const inputElements = button.parentElement.getElementsByTagName('input');
+
+    const checkbox = inputElements.item(0);
 
     expect(checkbox).not.toBeChecked();
 
-    await userEvent.click(checkbox);
+    await userEvent.click(button);
     expect(checkbox).toBeChecked();
 
-    await userEvent.click(checkbox);
+    await userEvent.click(button);
     expect(checkbox).not.toBeChecked();
 });
 
