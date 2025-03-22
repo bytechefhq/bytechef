@@ -15,7 +15,7 @@ const TASK_DISPATCHER_CONFIG = {
         extractContextFromPlaceholder: (placeholderId: string): TaskDispatcherContextType => {
             const parts = placeholderId.split('-');
             const index = parseInt(parts[parts.length - 1] || '-1');
-            const conditionCase = parts[1] === 'left' ? CONDITION_CASE_TRUE : CONDITION_CASE_FALSE;
+            const conditionCase = parts[2] === 'left' ? CONDITION_CASE_TRUE : CONDITION_CASE_FALSE;
 
             return {
                 conditionCase,
@@ -109,7 +109,6 @@ function updateTasksRecursively(tasks: Array<WorkflowTask>, taskToReplace: Workf
 }
 
 interface InsertTaskDispatcherSubtaskProps {
-    dispatcherId: string;
     newTask: WorkflowTask;
     placeholderId?: string;
     taskDispatcherContext?: TaskDispatcherContextType;
@@ -117,13 +116,14 @@ interface InsertTaskDispatcherSubtaskProps {
 }
 
 export default function insertTaskDispatcherSubtask({
-    dispatcherId,
     newTask,
     placeholderId,
     taskDispatcherContext = {},
     tasks,
 }: InsertTaskDispatcherSubtaskProps): Array<WorkflowTask> {
-    const componentName = dispatcherId.split('_')[0] as keyof typeof TASK_DISPATCHER_CONFIG;
+    const taskDispatcherId = taskDispatcherContext.taskDispatcherId;
+
+    const componentName = taskDispatcherId?.split('_')[0] as keyof typeof TASK_DISPATCHER_CONFIG;
 
     const config = TASK_DISPATCHER_CONFIG[componentName];
 
@@ -136,10 +136,10 @@ export default function insertTaskDispatcherSubtask({
     const {extractContextFromPlaceholder, getParentTask, getSubtasks, initializeParameters, updateTaskParameters} =
         config;
 
-    let task = tasks.find((task) => task.name === dispatcherId);
+    let task = tasks.find((task) => task.name === taskDispatcherId);
 
     if (!task) {
-        task = getParentTask({taskDispatcherId: dispatcherId, tasks});
+        task = getParentTask({taskDispatcherId, tasks});
     }
 
     if (!task) {
@@ -152,7 +152,7 @@ export default function insertTaskDispatcherSubtask({
 
     let context = {...taskDispatcherContext};
 
-    if (placeholderId && !context.index) {
+    if (placeholderId && context.index === 0) {
         const placeholderContext = extractContextFromPlaceholder(placeholderId);
 
         context = {...context, ...placeholderContext};

@@ -173,7 +173,6 @@ export default async function saveWorkflowDefinition({
 
         if (taskDispatcherContext?.conditionId) {
             tasks = insertTaskDispatcherSubtask({
-                dispatcherId: taskDispatcherContext.conditionId,
                 newTask,
                 placeholderId,
                 taskDispatcherContext,
@@ -183,7 +182,6 @@ export default async function saveWorkflowDefinition({
             console.log('tasks', tasks);
         } else if (taskDispatcherContext?.loopId) {
             tasks = insertTaskDispatcherSubtask({
-                dispatcherId: taskDispatcherContext.loopId,
                 newTask,
                 placeholderId,
                 taskDispatcherContext,
