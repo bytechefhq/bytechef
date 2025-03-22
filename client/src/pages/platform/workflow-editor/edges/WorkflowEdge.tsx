@@ -37,9 +37,11 @@ export default function WorkflowEdge({
         targetY,
     });
 
-    const sourceNodeId = useMemo(() => id.split('=>')[0], [id]);
+    const sourceNodeId = id.split('=>')[0];
+    const targetNodeId = id.split('=>')[1];
 
-    const sourceNode = useMemo(() => nodes.find((node) => node.id === sourceNodeId), [nodes, sourceNodeId]);
+    const sourceNode = nodes.find((node) => node.id === sourceNodeId);
+    const targetNode = nodes.find((node) => node.id === targetNodeId);
 
     const sourceNodeComponentName = useMemo(() => (sourceNode?.data as NodeDataType)?.componentName, [sourceNode]);
 
@@ -62,15 +64,28 @@ export default function WorkflowEdge({
             posY = Math.min(sourceY, targetY) + Math.abs(targetY - sourceY) * 0.5;
         }
 
-        if (id.includes('bottom-ghost')) {
+        if (sourceNode?.type === 'taskDispatcherTopGhostNode') {
+            posX = targetX;
+        } else if (sourceNode?.type === 'taskDispatcherBottomGhostNode') {
+            posX = sourceX;
+        } else if (targetNode?.type === 'taskDispatcherBottomGhostNode') {
             posX = sourceX;
         } else if (sourceNodeComponentName && TASK_DISPATCHER_NAMES.includes(sourceNodeComponentName as string)) {
             posX = targetX;
         }
 
         return {x: posX, y: posY};
-    }, [sourceY, targetY, sourceX, targetX, id, sourceNodeComponentName, edgeCenterX, edgeCenterY]);
-
+    }, [
+        sourceY,
+        targetY,
+        sourceX,
+        targetX,
+        sourceNode?.type,
+        targetNode?.type,
+        sourceNodeComponentName,
+        edgeCenterX,
+        edgeCenterY,
+    ]);
     return (
         <>
             <BaseEdge

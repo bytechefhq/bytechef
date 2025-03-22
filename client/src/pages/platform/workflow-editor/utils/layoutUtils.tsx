@@ -6,6 +6,7 @@ import {
     NODE_WIDTH,
     PLACEHOLDER_NODE_HEIGHT,
     TASK_DISPATCHER_NAMES,
+    TASK_DISPATCHER_NODE_HEIGHT,
 } from '@/shared/constants';
 import {
     ComponentDefinitionBasic,
@@ -22,37 +23,21 @@ import {findParentConditionId, isConditionNested} from './conditionHelpers';
 import {getConditionBranchSide} from './createConditionEdges';
 import {findParentLoopId, isLoopNested} from './loopHelpers';
 
-export const calculateNodeHeight = (node: Node, nodes: Node[], index: number) => {
-    const loopGhostNode = (node.data.taskDispatcherId as string)?.includes('loop') && node.type?.includes('GhostNode');
-
-    const conditionPlaceholderNode = node.id.includes('condition') && node.id.includes('placeholder');
+export const calculateNodeHeight = (node: Node) => {
+    const isTopGhostNode = node.type === 'taskDispatcherTopGhostNode';
+    const isBottomGhostNode = node.type === 'taskDispatcherBottomGhostNode';
+    const isLeftGhostNode = node.type === 'loopLeftGhostNode';
+    const isPlaceholderNode = node.type === 'placeholder';
+    const isGhostNode = isTopGhostNode || isBottomGhostNode || isLeftGhostNode;
 
     let height = NODE_HEIGHT;
 
-    if (conditionPlaceholderNode) {
-        height = PLACEHOLDER_NODE_HEIGHT * 2;
+    if (isPlaceholderNode || isGhostNode) {
+        height = PLACEHOLDER_NODE_HEIGHT;
 
-        if (node.id.includes('placeholder-0')) {
-            const otherConditionCaseNodes = filterConditionCaseNodes(nodes, node);
-
-            if (otherConditionCaseNodes.length) {
-                height = 0;
-            }
-        } else {
-            height = PLACEHOLDER_NODE_HEIGHT;
+        if (isBottomGhostNode) {
+            height = NODE_HEIGHT;
         }
-
-        if (node.id.includes('bottom')) {
-            height = PLACEHOLDER_NODE_HEIGHT;
-        }
-    } else if (loopGhostNode) {
-        height = NODE_HEIGHT;
-    } else if (!node.data.conditionData && !node.data.loopData) {
-        height = NODE_HEIGHT * 1.2;
-    }
-
-    if (index === nodes.length - 1) {
-        height = 20;
     }
 
     return height;
@@ -112,8 +97,8 @@ export const getLayoutedElements = (nodes: Node[], edges: Edge[], canvasWidth: n
 
     dagreGraph.setGraph({rankdir: DIRECTION});
 
-    nodes.forEach((node, index) => {
-        const height = calculateNodeHeight(node, nodes, index);
+    nodes.forEach((node) => {
+        const height = calculateNodeHeight(node);
 
         dagreGraph.setNode(node.id, {height, width: NODE_WIDTH});
     });
