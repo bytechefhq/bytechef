@@ -6,7 +6,9 @@ import {Edge, Node} from '@xyflow/react';
  * Creates context from a task node's dispatcher data
  */
 function getContextFromTaskNodeData(nodeData: NodeDataType, indexIncrement: number = 0): TaskDispatcherContextType {
-    const context: TaskDispatcherContextType = {};
+    const context: TaskDispatcherContextType = {
+        taskDispatcherId: nodeData.taskDispatcherId as string,
+    };
 
     if (!nodeData) {
         return context;
@@ -74,79 +76,55 @@ export default function getTaskDispatcherContext({
         return getContextFromPlaceholderNode(node);
     }
 
-    if (edge && nodes) {
-        const {source, target} = edge;
+    const {source, target} = edge!;
 
-        const sourceNodeComponentName = source.split('_')[0];
-        const targetNodeComponentName = target.split('_')[0];
+    const sourceNode = nodes!.find((node) => node.id === source);
+    const targetNode = nodes!.find((node) => node.id === target);
 
-        const isSourceTaskDispatcher = TASK_DISPATCHER_NAMES.includes(sourceNodeComponentName);
-        const isTargetTaskDispatcher = TASK_DISPATCHER_NAMES.includes(targetNodeComponentName);
+    const isSourceTaskDispatcher = TASK_DISPATCHER_NAMES.includes((sourceNode?.data as NodeDataType).componentName);
+    const isTargetTaskDispatcher = TASK_DISPATCHER_NAMES.includes((targetNode?.data as NodeDataType).componentName);
 
-        const isSourceGhost = source.includes('ghost');
-        const isTargetGhost = target.includes('ghost');
+    const isSourceTask = sourceNode?.type === 'workflow';
+    const isTargetTask = targetNode?.type === 'workflow';
 
-        // Case 1: Ghost node to ghost node
-        if (isSourceGhost && isTargetGhost) {
-            const sourceNode = nodes.find((node) => node.id === source);
+    const isSourceGhost = source.includes('ghost');
+    const isTargetGhost = target.includes('ghost');
 
-            if (!sourceNode) {
-                return {};
-            }
+    const taskDispatcherId = (sourceNode?.data?.taskDispatcherId || targetNode?.data.taskDispatcherId) as string;
 
-            const sourceTaskDispatcherNode = nodes.find((node) => node.id === sourceNode.data.taskDispatcherId);
+    const context: TaskDispatcherContextType = {
+        taskDispatcherId,
+    };
 
-            if (!sourceTaskDispatcherNode) {
-                return {};
-            }
-
-            return getContextFromTaskNodeData(sourceTaskDispatcherNode.data as NodeDataType, 1);
-        }
-
-        // Case 2: Task dispatcher to task node
-        if (isSourceTaskDispatcher) {
-            const targetNode = nodes.find((node) => node.id === target);
-
-            if (!targetNode) {
-                return {};
-            }
-
-            return getContextFromTaskNodeData(targetNode.data as NodeDataType, 0);
-        }
-
-        // Case 3: Task node to ghost node
-        if (isTargetGhost) {
-            const sourceNode = nodes.find((node) => node.id === source);
-
-            if (!sourceNode) {
-                return {};
-            }
-
-            return getContextFromTaskNodeData(sourceNode.data as NodeDataType, 1);
-        }
-
-        // Case 4: Task node to task node
-        if (!isSourceTaskDispatcher && !isTargetTaskDispatcher) {
-            const sourceNode = nodes.find((node) => node.id === source);
-
-            if (!sourceNode) {
-                return {};
-            }
-
-            return getContextFromTaskNodeData(sourceNode.data as NodeDataType, 1);
-        }
-
-        // Case 5: Task node to task dispatcher
-        if (!isSourceTaskDispatcher && isTargetTaskDispatcher) {
-            const sourceNode = nodes.find((node) => node.id === source);
-
-            if (!sourceNode) {
-                return {};
-            }
-
-            return getContextFromTaskNodeData(sourceNode.data as NodeDataType, 1);
-        }
+    if (!sourceNode || !targetNode) {
+        return context;
     }
 
-    return {};
+    if (isSourceGhost && isTargetGhost) {
+        const sourceTaskDispatcherNode = nodes!.find((node) => node.id === sourceNode.data.taskDispatcherId);
+
+        return getContextFromTaskNodeData(sourceTaskDispatcherNode?.data as NodeDataType, 1);
+    }
+
+    if (isSourceTaskDispatcher && isTargetTask) {
+        return getContextFromTaskNodeData(targetNode.data as NodeDataType, 0);
+    }
+
+    if (isSourceTask && isTargetGhost) {
+        return getContextFromTaskNodeData(sourceNode.data as NodeDataType, 1);
+    }
+
+    if (isSourceTask && isTargetTask) {
+        return getContextFromTaskNodeData(sourceNode.data as NodeDataType, 1);
+    }
+
+    if (isSourceTask && isTargetTaskDispatcher) {
+        return getContextFromTaskNodeData(targetNode.data as NodeDataType, 1);
+    }
+
+    if (isSourceGhost && isTargetTask) {
+        return getContextFromTaskNodeData(targetNode.data as NodeDataType);
+    }
+
+    return context;
 }

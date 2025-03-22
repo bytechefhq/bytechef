@@ -20,6 +20,7 @@ const TASK_DISPATCHER_CONFIG = {
             return {
                 conditionCase,
                 index,
+                taskDispatcherId: parts[0],
             };
         },
         getParentTask: getParentTaskDispatcherTask,
@@ -51,7 +52,7 @@ const TASK_DISPATCHER_CONFIG = {
             const parts = placeholderId.split('-');
             const index = parseInt(parts[parts.length - 1] || '-1');
 
-            return {index};
+            return {index, taskDispatcherId: parts[0]};
         },
         getParentTask: getParentTaskDispatcherTask,
         getSubtasks: (task: WorkflowTask): Array<WorkflowTask> => task.parameters?.iteratee || [],
@@ -111,17 +112,17 @@ function updateTasksRecursively(tasks: Array<WorkflowTask>, taskToReplace: Workf
 interface InsertTaskDispatcherSubtaskProps {
     newTask: WorkflowTask;
     placeholderId?: string;
-    taskDispatcherContext?: TaskDispatcherContextType;
+    taskDispatcherContext: TaskDispatcherContextType;
     tasks: Array<WorkflowTask>;
 }
 
 export default function insertTaskDispatcherSubtask({
     newTask,
     placeholderId,
-    taskDispatcherContext = {},
+    taskDispatcherContext,
     tasks,
 }: InsertTaskDispatcherSubtaskProps): Array<WorkflowTask> {
-    const taskDispatcherId = taskDispatcherContext.taskDispatcherId;
+    const taskDispatcherId = taskDispatcherContext!.taskDispatcherId;
 
     const componentName = taskDispatcherId?.split('_')[0] as keyof typeof TASK_DISPATCHER_CONFIG;
 
@@ -150,7 +151,7 @@ export default function insertTaskDispatcherSubtask({
         task.parameters = initializeParameters();
     }
 
-    let context = {...taskDispatcherContext};
+    let context: TaskDispatcherContextType = {...taskDispatcherContext};
 
     if (placeholderId && context.index === 0) {
         const placeholderContext = extractContextFromPlaceholder(placeholderId);

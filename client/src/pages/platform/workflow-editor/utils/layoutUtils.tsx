@@ -6,7 +6,6 @@ import {
     NODE_WIDTH,
     PLACEHOLDER_NODE_HEIGHT,
     TASK_DISPATCHER_NAMES,
-    TASK_DISPATCHER_NODE_HEIGHT,
 } from '@/shared/constants';
 import {
     ComponentDefinitionBasic,
