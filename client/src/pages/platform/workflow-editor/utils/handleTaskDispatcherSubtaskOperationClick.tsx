@@ -81,11 +81,21 @@ export default function handleTaskDispatcherSubtaskOperationClick({
     placeholderId,
     projectId,
     queryClient,
-    taskDispatcherContext = {},
+    taskDispatcherContext,
     updateWorkflowMutation,
     workflow,
 }: HandleTaskDispatcherSubtaskOperationClickProps) {
-    const taskDispatcherId = taskDispatcherContext.loopId || taskDispatcherContext.conditionId || '';
+    if (!taskDispatcherContext) {
+        console.error('Task dispatcher context is required to add a subtask');
+
+        return;
+    }
+
+    const taskDispatcherId =
+        taskDispatcherContext!.loopId ||
+        taskDispatcherContext!.conditionId ||
+        taskDispatcherContext!.taskDispatcherId ||
+        '';
 
     const componentName = taskDispatcherId.split('_')[0] as keyof typeof TASK_DISPATCHER_CONFIG;
 
