@@ -151,35 +151,12 @@ const WorkflowNode = ({data, id}: {data: NodeDataType; id: string}) => {
                 type="target"
             />
 
-            {data.componentName === 'condition' ? (
-                <>
-                    <Handle
-                        className={twMerge('absolute top-3/4', styles.handle)}
-                        id={`${id}-left-source-handle`}
-                        isConnectable={false}
-                        position={Position.Left}
-                        type="source"
-                    />
-
-                    <Handle
-                        className={twMerge(
-                            'absolute left-task-dispatcher-node-handle-placement top-3/4 size-1',
-                            styles.handle
-                        )}
-                        id={`${id}-right-source-handle`}
-                        isConnectable={false}
-                        position={Position.Right}
-                        type="source"
-                    />
-                </>
-            ) : (
-                <Handle
-                    className={twMerge('left-node-handle-placement', styles.handle)}
-                    isConnectable={false}
-                    position={Position.Bottom}
-                    type="source"
-                />
-            )}
+            <Handle
+                className={twMerge('left-node-handle-placement', styles.handle)}
+                isConnectable={false}
+                position={Position.Bottom}
+                type="source"
+            />
 
             {data.name.includes('condition') && (
                 <div className="absolute bottom-0 left-0 font-bold text-muted-foreground">
