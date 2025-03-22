@@ -43,9 +43,9 @@ const PlaceholderNode = ({data, id}: {data: NodeDataType; id: string}) => {
             >
                 {data.label}
 
-                <Handle className={styles.handle} isConnectable={false} position={Position.Top} type="target" />
+                <Handle className={styles.handle} position={Position.Top} type="target" />
 
-                <Handle className={styles.handle} isConnectable={false} position={Position.Bottom} type="source" />
+                <Handle className={styles.handle} position={Position.Bottom} type="source" />
             </div>
         </WorkflowNodesPopoverMenu>
     );
