@@ -34,4 +34,7 @@
 
     <!-- audit -->
     <includeAll path="classpath:config/liquibase/changelog/audit/" relativeToChangelogFile="false" errorIfMissingOrEmpty="false" contextFilter="mono or configuration or connection or multitenant" />
+
+    <!-- vector -->
+    <includeAll path="classpath:config/liquibase/changelog/platform/ai/" relativeToChangelogFile="false" errorIfMissingOrEmpty="false" contextFilter="mono or configuration or connection or multitenant" />
 </databaseChangeLog>
