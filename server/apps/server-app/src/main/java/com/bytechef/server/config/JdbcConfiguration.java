@@ -37,6 +37,10 @@ import com.bytechef.platform.workflow.execution.repository.converter.StringToWor
 import com.bytechef.platform.workflow.execution.repository.converter.TriggerStateValueToStringConverter;
 import com.bytechef.platform.workflow.execution.repository.converter.WorkflowExecutionIdToStringConverter;
 import com.bytechef.platform.workflow.execution.repository.converter.WorkflowTriggerToStringConverter;
+import com.bytechef.platform.ai.repository.converter.MapToPGObjectConverter;
+import com.bytechef.platform.ai.repository.converter.PGobjectToMapConverter;
+import com.bytechef.platform.ai.repository.converter.ListDoubleToPGObjectConverter;
+import com.bytechef.platform.ai.repository.converter.PGObjectToListDoubleConverter;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Arrays;
@@ -67,6 +71,10 @@ public class JdbcConfiguration extends AbstractJdbcConfiguration {
             new EncryptedMapWrapperToStringConverter(encryption, objectMapper),
             new EncryptedStringToMapWrapperConverter(encryption, objectMapper),
             new ExecutionErrorToStringConverter(objectMapper),
+            new MapToPGObjectConverter(objectMapper),
+            new PGobjectToMapConverter(objectMapper),
+            new ListDoubleToPGObjectConverter(),
+            new PGObjectToListDoubleConverter(),
             new FileEntryToStringConverter(objectMapper),
             new MapWrapperToStringConverter(objectMapper),
             new StringToDataEntryValueWrapperConverter(),

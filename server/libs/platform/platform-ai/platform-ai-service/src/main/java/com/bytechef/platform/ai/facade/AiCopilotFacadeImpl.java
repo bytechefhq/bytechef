@@ -33,10 +33,8 @@ import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.client.advisor.AbstractChatMemoryAdvisor;
@@ -78,15 +76,13 @@ public class AiCopilotFacadeImpl implements ChatFacade {
         this.vectorStore = vectorStore;
         strategy = new TokenCountBatchingStrategy(EncodingType.CL100K_BASE, 8191, 0.1, Document.DEFAULT_CONTENT_FORMATTER, MetadataMode.ALL);
 
-        if(vectorStoreService.count() == 0) {
-            System.out.println("vector store is empty!!!!!!!!!!!!!!!!");
-            addAllDocumentsToVectorDatabase();
+        if(vectorStoreService.count() != 0) {
+            List<com.bytechef.platform.ai.domain.VectorStore> vectorsList = vectorStoreService.findAll();
+            List<Map<String, Object>> vectorsMetadataList = vectorsList.stream().map(com.bytechef.platform.ai.domain.VectorStore::getMetadata).toList();
+            addDocumentsToVectorDatabase(vectorsMetadataList);
         }
         else {
-            System.out.println("vector store is NOT empty!!!!!!!!!!!!!!!!");
-            List<com.bytechef.platform.ai.domain.VectorStore> vectorsList = vectorStoreService.findAll();
-            Map<UUID, Map<String, Object>> vectorsMap = vectorsList.stream().collect(Collectors.toMap(com.bytechef.platform.ai.domain.VectorStore::getId, com.bytechef.platform.ai.domain.VectorStore::getMetadata));
-            versionDocumentsToVectorDatabase(vectorsMap);
+            addDocumentsToVectorDatabase(List.of());
         }
 
         MessageChatMemoryAdvisor messageChatMemoryAdvisor = new MessageChatMemoryAdvisor(new InMemoryChatMemory());
@@ -188,7 +184,7 @@ public class AiCopilotFacadeImpl implements ChatFacade {
         return chunks;
     }
 
-    private static void storeDocumentsFromPath(String name, Path path, String suffix, BatchingStrategy batchingStrategy) throws IOException {
+    private static void storeDocumentsFromPath(String name, Path path, String suffix, BatchingStrategy batchingStrategy, List<Map<String, Object>> vectorStoreList) throws IOException {
         List<Document> documentList = new ArrayList<>();
 
         Files.walkFileTree(path, new SimpleFileVisitor<Path>() {
@@ -198,6 +194,11 @@ public class AiCopilotFacadeImpl implements ChatFacade {
                     String document = Files.readString(file);
                     String fileName = file.getFileName().toString().replace(suffix, "");
 
+                    // check if already exists
+                    if(listContainsFileName(vectorStoreList, fileName)) {
+                        return FileVisitResult.CONTINUE;
+                    }
+
                     // Preprocess the document
                     String cleanedDocument = preprocessDocument(document);
 
@@ -206,7 +207,7 @@ public class AiCopilotFacadeImpl implements ChatFacade {
                         List<String> chunks = splitDocument(cleanedDocument.split("\\s+"), 1536);
 
                         for (String chunk : chunks) {
-                            //System.out.println("Chunk " + (i + 1) + ": " + chunks.get(i));
+                            // TODO: add versioning to files
                             documentList.add(new Document(chunk, Map.of(CATEGORY, name, NAME, fileName)));
                         }
                     }
@@ -221,7 +222,11 @@ public class AiCopilotFacadeImpl implements ChatFacade {
         }
     }
 
-    private void addAllDocumentsToVectorDatabase() {
+    public static boolean listContainsFileName(List<Map<String, Object>> vectorStoreList, String name) {
+        return !vectorStoreList.isEmpty() && vectorStoreList.stream().anyMatch(map -> name.equals(map.get("name")));
+    }
+
+    private void addDocumentsToVectorDatabase(List<Map<String, Object>> vectorStoreList) {
         String docsName = "documentation";
         String workflowsName = "workflows";
         String componentsName = "components";
@@ -231,9 +236,9 @@ public class AiCopilotFacadeImpl implements ChatFacade {
         Path workflowsDir = Paths.get("/home/user/IdeaProjects/bytechef-workflows/projects/samples/basic_workflows");
 
         try {
-            storeDocumentsFromPath(docsName, docsDir, ".md", strategy);
-            storeDocumentsFromPath(workflowsName, workflowsDir, ".json", strategy);
-            storeDocumentsFromPath(componentsName, componentsDir, ".md", strategy);
+            storeDocumentsFromPath(docsName, docsDir, ".md", strategy, vectorStoreList);
+            storeDocumentsFromPath(workflowsName, workflowsDir, ".json", strategy, vectorStoreList);
+            storeDocumentsFromPath(componentsName, componentsDir, ".md", strategy, vectorStoreList);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -246,10 +251,6 @@ public class AiCopilotFacadeImpl implements ChatFacade {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-    }
-
-    private void versionDocumentsToVectorDatabase(Map<UUID, Map<String, Object>> vectorsMap) {
-
     }
 
 
