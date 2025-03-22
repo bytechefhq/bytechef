@@ -164,32 +164,16 @@ export const getLayoutedElements = (nodes: Node[], edges: Edge[], canvasWidth: n
 
     const filteredEdges: Edge[] = [];
 
+    // Filter edges so that only one edge is kept for each source node
     sourceEdgeMap.forEach((sourceEdges, source) => {
-        if (sourceEdges.length === 0) {
+        const sourceNode = allNodes.find((node) => node.id === source);
+        if (sourceEdges.length === 0 || !sourceNode) {
             return;
         }
 
-        const isSourceTaskNode = !source.includes('ghost') && !source.includes('placeholder');
+        const isSourceTaskDispatcherTopGhostNode = sourceNode.type === 'taskDispatcherTopGhostNode';
 
-        const isSourceConditionTaskNode = source.includes('condition') && isSourceTaskNode;
-
-        const isSourceLoopTaskNode = source.includes('loop') && isSourceTaskNode;
-
-        const isLoopPlaceholderNode = source.includes('loop') && source.includes('placeholder');
-
-        const isLoopGhostNode = source.includes('loop') && source.includes('ghost');
-
-        const sourceNode = allNodes.find((node) => node.id === source);
-
-        const isLoopChildTask = sourceNode?.data?.loopData !== undefined;
-
-        if (
-            isSourceConditionTaskNode ||
-            isSourceLoopTaskNode ||
-            isLoopPlaceholderNode ||
-            isLoopGhostNode ||
-            isLoopChildTask
-        ) {
+        if (isSourceTaskDispatcherTopGhostNode) {
             filteredEdges.push(...sourceEdges);
         } else {
             filteredEdges.push(sourceEdges[0]);

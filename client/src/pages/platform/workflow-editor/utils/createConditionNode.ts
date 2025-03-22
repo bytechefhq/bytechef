@@ -4,43 +4,56 @@ import {Node} from '@xyflow/react';
 type ConditionNodeOptionsType = {
     createLeftPlaceholder?: boolean;
     createRightPlaceholder?: boolean;
-    createBottomGhost?: boolean;
 };
 
 type CreateConditionNodePropsType = {
     allNodes: Array<Node>;
+    conditionId: string;
     isNestedCondition?: boolean;
     options?: ConditionNodeOptionsType;
-    taskNode: Node;
 };
 
 /**
  * Creates a placeholder node for a condition branch
  */
-function createPlaceholderNode(taskNodeId: string, conditionCase: string, suffix: string): Node {
+function createPlaceholderNode(conditionId: string, conditionCase: string, suffix: string): Node {
     return {
         data: {
             conditionCase,
-            conditionId: taskNodeId,
+            conditionId: conditionId,
             label: '+',
         },
-        id: `${taskNodeId}-${suffix}-placeholder-0`,
+        id: `${conditionId}-condition-${suffix}-placeholder-0`,
         position: DEFAULT_NODE_POSITION,
         type: 'placeholder',
     };
 }
 
 /**
- * Creates a bottom ghost node for a condition
+ * Creates a top ghost node for a loop
  */
-function createBottomGhostNode(taskNodeId: string, isNested: boolean = false): Node {
+function createTopGhostNode(conditionId: string): Node {
     return {
         data: {
-            conditionId: taskNodeId,
-            isNestedConditionBottomGhost: isNested,
-            taskDispatcherId: taskNodeId,
+            taskDispatcherId: conditionId,
         },
-        id: `${taskNodeId}-condition-bottom-ghost`,
+        id: `${conditionId}-condition-top-ghost`,
+        position: DEFAULT_NODE_POSITION,
+        type: 'taskDispatcherTopGhostNode',
+    };
+}
+
+/**
+ * Creates a bottom ghost node for a condition
+ */
+function createBottomGhostNode(conditionId: string, isNested: boolean = false): Node {
+    return {
+        data: {
+            conditionId: conditionId,
+            isNestedConditionBottomGhost: isNested,
+            taskDispatcherId: conditionId,
+        },
+        id: `${conditionId}-condition-bottom-ghost`,
         position: DEFAULT_NODE_POSITION,
         type: 'taskDispatcherBottomGhostNode',
     };
@@ -51,27 +64,30 @@ function createBottomGhostNode(taskNodeId: string, isNested: boolean = false): N
  */
 export default function createConditionNode({
     allNodes,
+    conditionId,
     isNestedCondition = false,
     options = {
-        createBottomGhost: true,
         createLeftPlaceholder: true,
         createRightPlaceholder: true,
     },
-    taskNode,
 }: CreateConditionNodePropsType): Node[] {
     const nodesWithCondition = [...allNodes];
+    const insertIndex = nodesWithCondition.findIndex((node) => node.id === conditionId) + 1;
+    const nodesToAdd = [];
+
+    nodesToAdd.push(createTopGhostNode(conditionId));
 
     if (options.createLeftPlaceholder) {
-        nodesWithCondition.push(createPlaceholderNode(taskNode.id, CONDITION_CASE_TRUE, 'left'));
+        nodesToAdd.push(createPlaceholderNode(conditionId, CONDITION_CASE_TRUE, 'left'));
     }
 
     if (options.createRightPlaceholder) {
-        nodesWithCondition.push(createPlaceholderNode(taskNode.id, CONDITION_CASE_FALSE, 'right'));
+        nodesToAdd.push(createPlaceholderNode(conditionId, CONDITION_CASE_FALSE, 'right'));
     }
 
-    if (options.createBottomGhost) {
-        nodesWithCondition.push(createBottomGhostNode(taskNode.id, isNestedCondition));
-    }
+    nodesToAdd.push(createBottomGhostNode(conditionId, isNestedCondition));
+
+    nodesWithCondition.splice(insertIndex, 0, ...nodesToAdd);
 
     return nodesWithCondition;
 }

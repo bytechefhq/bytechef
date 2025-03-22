@@ -175,13 +175,12 @@ export default function useLayout({
 
                 allNodes = createConditionNode({
                     allNodes: [...allNodes, taskNode],
+                    conditionId: taskNode.id,
                     isNestedCondition: isConditionChild,
                     options: {
-                        createBottomGhost: true,
                         createLeftPlaceholder: !hasTrueBranchTasks,
                         createRightPlaceholder: !hasFalseBranchTasks,
                     },
-                    taskNode,
                 });
             } else if (isLoopTask) {
                 const hasSubtasks = parameters?.iteratee?.length > 0;

@@ -4,6 +4,68 @@ import {NodeDataType} from '@/shared/types';
 import {Edge, Node} from '@xyflow/react';
 
 /**
+ * Creates the base Condition structure edges (Condition -> top ghost -> left placeholder -> right placeholder)
+ */
+function createBaseStructureEdges(conditionId: string): Edge[] {
+    const topGhostNodeId = `${conditionId}-condition-top-ghost`;
+    const bottomGhostNodeId = `${conditionId}-condition-bottom-ghost`;
+    const caseTruePlaceholderNodeId = `${conditionId}-condition-left-placeholder-0`;
+    const caseFalsePlaceholderNodeId = `${conditionId}-condition-right-placeholder-0`;
+
+    const baseEdge = {
+        style: EDGE_STYLES,
+        type: 'smoothstep',
+    };
+
+    const edgeFromConditionToTopGhost = {
+        id: `${conditionId}=>${topGhostNodeId}`,
+        source: conditionId,
+        target: topGhostNodeId,
+        ...baseEdge,
+    };
+
+    const edgeFromTopGhostToCaseTruePlaceholder = {
+        id: `${topGhostNodeId}=>${caseTruePlaceholderNodeId}`,
+        source: topGhostNodeId,
+        sourceHandle: `${topGhostNodeId}-left`,
+        target: caseTruePlaceholderNodeId,
+        ...baseEdge,
+    };
+
+    const edgeFromTopGhostToCaseFalsePlaceholder = {
+        id: `${topGhostNodeId}=>${caseFalsePlaceholderNodeId}`,
+        source: topGhostNodeId,
+        sourceHandle: `${topGhostNodeId}-right`,
+        target: caseFalsePlaceholderNodeId,
+        ...baseEdge,
+    };
+
+    const edgeFromCaseTruePlaceholderToBottomGhost = {
+        id: `${caseTruePlaceholderNodeId}=>${bottomGhostNodeId}`,
+        source: caseTruePlaceholderNodeId,
+        target: bottomGhostNodeId,
+        targetHandle: `${bottomGhostNodeId}-left`,
+        ...baseEdge,
+    };
+
+    const edgeFromCaseFalsePlaceholderToBottomGhost = {
+        id: `${caseFalsePlaceholderNodeId}=>${bottomGhostNodeId}`,
+        source: caseFalsePlaceholderNodeId,
+        target: bottomGhostNodeId,
+        targetHandle: `${bottomGhostNodeId}-right`,
+        ...baseEdge,
+    };
+
+    return [
+        edgeFromConditionToTopGhost,
+        edgeFromTopGhostToCaseTruePlaceholder,
+        edgeFromTopGhostToCaseFalsePlaceholder,
+        edgeFromCaseTruePlaceholderToBottomGhost,
+        edgeFromCaseFalsePlaceholderToBottomGhost,
+    ];
+}
+
+/**
  * Creates all edges for a specific branch
  */
 function createBranchEdges(
@@ -51,6 +113,7 @@ function createBranchStartEdge(
 ): Edge[] {
     const edges: Edge[] = [];
     const conditionId = conditionNode.id;
+    const topGhostId = `${conditionId}-condition-top-ghost`;
 
     if (branchTasks.length > 0) {
         const firstTaskName = branchTasks[0].name;
@@ -58,30 +121,30 @@ function createBranchStartEdge(
         const firstTaskNode = allNodes.find((node) => node.id === firstTaskName);
 
         if (firstTaskNode) {
-            const edgeToFirstTask = {
-                id: `${conditionId}=>${firstTaskName}`,
-                source: conditionId,
-                sourceHandle: `${conditionId}-${branchSide}-source-handle`,
+            const edgeFromTopGhostToTask = {
+                id: `${topGhostId}=>${firstTaskName}`,
+                source: topGhostId,
+                sourceHandle: `${topGhostId}-${branchSide}`,
                 style: EDGE_STYLES,
                 target: firstTaskName,
                 type: 'workflow',
             };
 
-            edges.push(edgeToFirstTask);
+            edges.push(edgeFromTopGhostToTask);
         }
     } else {
-        const placeholderId = `${conditionId}-${branchSide}-placeholder-0`;
+        const placeholderId = `${conditionId}-condition-${branchSide}-placeholder-0`;
 
-        const edgeToPlaceholder = {
-            id: `${conditionId}=>${placeholderId}`,
-            source: conditionId,
-            sourceHandle: `${conditionId}-${branchSide}-source-handle`,
+        const edgeFromTopGhostToPlaceholder = {
+            id: `${topGhostId}=>${placeholderId}`,
+            source: topGhostId,
+            sourceHandle: `${topGhostId}-${branchSide}`,
             style: EDGE_STYLES,
             target: placeholderId,
             type: 'smoothstep',
         };
 
-        edges.push(edgeToPlaceholder);
+        edges.push(edgeFromTopGhostToPlaceholder);
 
         const bottomGhostId = `${conditionId}-condition-bottom-ghost`;
 
@@ -236,7 +299,11 @@ export default function createAllConditionEdges(conditionNode: Node, allNodes: N
 
     const {conditionData, parameters} = conditionNodeData;
 
-    const isNestedCondition = conditionData !== undefined;
+    const baseStructureEdges = createBaseStructureEdges(conditionNode.id);
+
+    edges.push(...baseStructureEdges);
+
+    // const isNestedCondition = conditionData !== undefined;
     const parentConditionId = isNestedCondition ? conditionData?.conditionId : undefined;
 
     const bottomGhostId = `${conditionNode.id}-condition-bottom-ghost`;

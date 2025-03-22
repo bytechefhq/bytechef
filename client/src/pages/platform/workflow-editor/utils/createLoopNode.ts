@@ -3,9 +3,7 @@ import {Node} from '@xyflow/react';
 
 type LoopNodeOptionsType = {
     createPlaceholder?: boolean;
-    createTopGhost?: boolean;
     createLeftGhost?: boolean;
-    createBottomGhost?: boolean;
 };
 
 type CreateLoopNodePropsType = {
@@ -98,7 +96,6 @@ export default function createLoopNode({
 
     nodesToAdd.push(createBottomGhostNode(loopId, isNestedLoop));
 
-    // Insert all nodes at the correct position
     nodesWithLoop.splice(insertIndex, 0, ...nodesToAdd);
 
     return nodesWithLoop;
