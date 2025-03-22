@@ -6,11 +6,16 @@ import {Edge, Node} from '@xyflow/react';
 /**
  * Creates the base Condition structure edges (Condition -> top ghost -> left placeholder -> right placeholder)
  */
-function createBaseStructureEdges(conditionId: string): Edge[] {
+function createBaseStructureEdges(conditionNode: Node): Edge[] {
+    const conditionId = conditionNode.id;
+
     const topGhostNodeId = `${conditionId}-condition-top-ghost`;
     const bottomGhostNodeId = `${conditionId}-condition-bottom-ghost`;
     const caseTruePlaceholderNodeId = `${conditionId}-condition-left-placeholder-0`;
     const caseFalsePlaceholderNodeId = `${conditionId}-condition-right-placeholder-0`;
+
+    const caseTrueSubtasks = (conditionNode.data as NodeDataType).parameters?.caseTrue;
+    const caseFalseSubtasks = (conditionNode.data as NodeDataType).parameters?.caseFalse;
 
     const baseEdge = {
         style: EDGE_STYLES,
@@ -24,59 +29,63 @@ function createBaseStructureEdges(conditionId: string): Edge[] {
         ...baseEdge,
     };
 
-    const edgeFromTopGhostToCaseTruePlaceholder = {
-        id: `${topGhostNodeId}=>${caseTruePlaceholderNodeId}`,
-        source: topGhostNodeId,
-        sourceHandle: `${topGhostNodeId}-left`,
-        target: caseTruePlaceholderNodeId,
-        ...baseEdge,
-    };
+    const edges = [edgeFromConditionToTopGhost];
 
-    const edgeFromTopGhostToCaseFalsePlaceholder = {
-        id: `${topGhostNodeId}=>${caseFalsePlaceholderNodeId}`,
-        source: topGhostNodeId,
-        sourceHandle: `${topGhostNodeId}-right`,
-        target: caseFalsePlaceholderNodeId,
-        ...baseEdge,
-    };
+    if (!caseTrueSubtasks) {
+        const edgeFromTopGhostToCaseTruePlaceholder = {
+            id: `${topGhostNodeId}=>${caseTruePlaceholderNodeId}`,
+            source: topGhostNodeId,
+            sourceHandle: `${topGhostNodeId}-left`,
+            target: caseTruePlaceholderNodeId,
+            ...baseEdge,
+        };
 
-    const edgeFromCaseTruePlaceholderToBottomGhost = {
-        id: `${caseTruePlaceholderNodeId}=>${bottomGhostNodeId}`,
-        source: caseTruePlaceholderNodeId,
-        target: bottomGhostNodeId,
-        targetHandle: `${bottomGhostNodeId}-left`,
-        ...baseEdge,
-    };
+        const edgeFromCaseTruePlaceholderToBottomGhost = {
+            id: `${caseTruePlaceholderNodeId}=>${bottomGhostNodeId}`,
+            source: caseTruePlaceholderNodeId,
+            target: bottomGhostNodeId,
+            targetHandle: `${bottomGhostNodeId}-left`,
+            ...baseEdge,
+        };
 
-    const edgeFromCaseFalsePlaceholderToBottomGhost = {
-        id: `${caseFalsePlaceholderNodeId}=>${bottomGhostNodeId}`,
-        source: caseFalsePlaceholderNodeId,
-        target: bottomGhostNodeId,
-        targetHandle: `${bottomGhostNodeId}-right`,
-        ...baseEdge,
-    };
+        edges.push(edgeFromTopGhostToCaseTruePlaceholder, edgeFromCaseTruePlaceholderToBottomGhost);
+    }
 
-    return [
-        edgeFromConditionToTopGhost,
-        edgeFromTopGhostToCaseTruePlaceholder,
-        edgeFromTopGhostToCaseFalsePlaceholder,
-        edgeFromCaseTruePlaceholderToBottomGhost,
-        edgeFromCaseFalsePlaceholderToBottomGhost,
-    ];
+    if (!caseFalseSubtasks) {
+        const edgeFromTopGhostToCaseFalsePlaceholder = {
+            id: `${topGhostNodeId}=>${caseFalsePlaceholderNodeId}`,
+            source: topGhostNodeId,
+            sourceHandle: `${topGhostNodeId}-right`,
+            target: caseFalsePlaceholderNodeId,
+            ...baseEdge,
+        };
+
+        const edgeFromCaseFalsePlaceholderToBottomGhost = {
+            id: `${caseFalsePlaceholderNodeId}=>${bottomGhostNodeId}`,
+            source: caseFalsePlaceholderNodeId,
+            target: bottomGhostNodeId,
+            targetHandle: `${bottomGhostNodeId}-right`,
+            ...baseEdge,
+        };
+
+        edges.push(edgeFromTopGhostToCaseFalsePlaceholder, edgeFromCaseFalsePlaceholderToBottomGhost);
+    }
+
+    return edges;
 }
 
 /**
  * Creates all edges for a specific branch
  */
 function createBranchEdges(
-    conditionNode: Node,
+    conditionId: string,
     branchTasks: WorkflowTask[],
     branchSide: 'left' | 'right',
     allNodes: Node[]
 ): Edge[] {
     const edges: Edge[] = [];
 
-    const edgesFromConditionToFirstTask = createBranchStartEdge(conditionNode, branchTasks, branchSide, allNodes);
+    const edgesFromConditionToFirstTask = createBranchStartEdge(conditionId, branchTasks, branchSide, allNodes);
 
     edges.push(...edgesFromConditionToFirstTask);
 
@@ -86,15 +95,15 @@ function createBranchEdges(
         edges.push(...edgeBetweenTaskNodes);
     }
 
-    const edgeFromLastTaskNodeToBottomGhost = createBranchExitEdge(conditionNode, branchTasks, branchSide, allNodes)[0];
+    const edgeFromLastTaskNodeToBottomGhost = createBranchExitEdge(conditionId, branchTasks, branchSide, allNodes)[0];
 
     if (!edgeFromLastTaskNodeToBottomGhost) {
         return edges;
     }
 
     if (
-        edgeFromLastTaskNodeToBottomGhost.source === conditionNode.id ||
-        edgeFromLastTaskNodeToBottomGhost.target.includes(conditionNode.id)
+        edgeFromLastTaskNodeToBottomGhost.source === conditionId ||
+        edgeFromLastTaskNodeToBottomGhost.target.includes(conditionId)
     ) {
         edges.push(edgeFromLastTaskNodeToBottomGhost);
     }
@@ -106,39 +115,39 @@ function createBranchEdges(
  * Create edge from condition to first node in a branch
  */
 function createBranchStartEdge(
-    conditionNode: Node,
-    branchTasks: WorkflowTask[],
-    branchSide: 'left' | 'right',
+    conditionId: string,
+    branchSubtasks: WorkflowTask[],
+    conditionCase: 'left' | 'right',
     allNodes: Node[]
 ): Edge[] {
     const edges: Edge[] = [];
-    const conditionId = conditionNode.id;
-    const topGhostId = `${conditionId}-condition-top-ghost`;
+    const topGhostNodeId = `${conditionId}-condition-top-ghost`;
+    const bottomGhostNodeId = `${conditionId}-condition-bottom-ghost`;
 
-    if (branchTasks.length > 0) {
-        const firstTaskName = branchTasks[0].name;
+    if (branchSubtasks.length > 0) {
+        const firstSubtaskId = branchSubtasks[0].name;
 
-        const firstTaskNode = allNodes.find((node) => node.id === firstTaskName);
+        const firstTaskNode = allNodes.find((node) => node.id === firstSubtaskId);
 
         if (firstTaskNode) {
             const edgeFromTopGhostToTask = {
-                id: `${topGhostId}=>${firstTaskName}`,
-                source: topGhostId,
-                sourceHandle: `${topGhostId}-${branchSide}`,
+                id: `${topGhostNodeId}=>${firstSubtaskId}`,
+                source: topGhostNodeId,
+                sourceHandle: `${topGhostNodeId}-${conditionCase}`,
                 style: EDGE_STYLES,
-                target: firstTaskName,
+                target: firstSubtaskId,
                 type: 'workflow',
             };
 
             edges.push(edgeFromTopGhostToTask);
         }
     } else {
-        const placeholderId = `${conditionId}-condition-${branchSide}-placeholder-0`;
+        const placeholderId = `${conditionId}-condition-${conditionCase}-placeholder-0`;
 
         const edgeFromTopGhostToPlaceholder = {
-            id: `${topGhostId}=>${placeholderId}`,
-            source: topGhostId,
-            sourceHandle: `${topGhostId}-${branchSide}`,
+            id: `${topGhostNodeId}=>${placeholderId}`,
+            source: topGhostNodeId,
+            sourceHandle: `${topGhostNodeId}-${conditionCase}`,
             style: EDGE_STYLES,
             target: placeholderId,
             type: 'smoothstep',
@@ -146,14 +155,12 @@ function createBranchStartEdge(
 
         edges.push(edgeFromTopGhostToPlaceholder);
 
-        const bottomGhostId = `${conditionId}-condition-bottom-ghost`;
-
         const edgeFromPlaceholderToBottomGhost = {
-            id: `${placeholderId}=>${bottomGhostId}`,
+            id: `${placeholderId}=>${bottomGhostNodeId}`,
             source: placeholderId,
             style: EDGE_STYLES,
-            target: bottomGhostId,
-            targetHandle: `${bottomGhostId}-${branchSide}`,
+            target: bottomGhostNodeId,
+            targetHandle: `${bottomGhostNodeId}-${conditionCase}`,
             type: 'smoothstep',
         };
 
@@ -166,23 +173,23 @@ function createBranchStartEdge(
 /**
  * Create edges between tasks in a branch
  */
-function connectSequentialTasks(branchTasks: WorkflowTask[]): Edge[] {
+function connectSequentialTasks(branchSubtasks: WorkflowTask[]): Edge[] {
     const edges: Edge[] = [];
 
-    branchTasks.forEach((task, index) => {
-        if (index < branchTasks.length - 1) {
-            const sourceTaskName = task.name;
-            const targetTaskName = branchTasks[index + 1].name;
+    branchSubtasks.forEach((task, index) => {
+        if (index < branchSubtasks.length - 1) {
+            const sourceTaskNodeId = task.name;
+            const targetTaskNodeId = branchSubtasks[index + 1].name;
 
             const sourceTaskComponentName = task.name.split('_')[0];
 
             if (TASK_DISPATCHER_NAMES.includes(sourceTaskComponentName)) {
                 const edgeFromNestedConditionBottomGhostToNextSubtask = {
-                    id: `${sourceTaskName}-condition-bottom-ghost=>${targetTaskName}`,
-                    source: `${sourceTaskName}-condition-bottom-ghost`,
-                    sourceHandle: `${sourceTaskName}-condition-bottom-ghost-bottom`,
+                    id: `${sourceTaskNodeId}-condition-bottom-ghost=>${targetTaskNodeId}`,
+                    source: `${sourceTaskNodeId}-condition-bottom-ghost`,
+                    sourceHandle: `${sourceTaskNodeId}-condition-bottom-ghost-bottom`,
                     style: EDGE_STYLES,
-                    target: targetTaskName,
+                    target: targetTaskNodeId,
                     type: 'workflow',
                 };
 
@@ -192,10 +199,10 @@ function connectSequentialTasks(branchTasks: WorkflowTask[]): Edge[] {
             }
 
             const edgeBetweenTasks = {
-                id: `${sourceTaskName}=>${targetTaskName}`,
-                source: sourceTaskName,
+                id: `${sourceTaskNodeId}=>${targetTaskNodeId}`,
+                source: sourceTaskNodeId,
                 style: EDGE_STYLES,
-                target: targetTaskName,
+                target: targetTaskNodeId,
                 type: 'workflow',
             };
 
@@ -210,7 +217,7 @@ function connectSequentialTasks(branchTasks: WorkflowTask[]): Edge[] {
  * Create edge from last node in a branch to bottom ghost
  */
 function createBranchExitEdge(
-    conditionNode: Node,
+    conditionId: string,
     branchTasks: WorkflowTask[],
     branchSide: 'left' | 'right',
     allNodes: Node[]
@@ -218,37 +225,39 @@ function createBranchExitEdge(
     const edges: Edge[] = [];
 
     if (branchTasks.length > 0) {
-        const lastTaskName = branchTasks[branchTasks.length - 1].name;
-        const bottomGhostId = `${conditionNode.id}-condition-bottom-ghost`;
-        const lastTaskNode = allNodes.find((node) => node.id === lastTaskName);
+        const lastTaskNodeId = branchTasks[branchTasks.length - 1].name;
+        const bottomGhostNodeId = `${conditionId}-condition-bottom-ghost`;
+        const lastTaskNode = allNodes.find((node) => node.id === lastTaskNodeId);
 
-        if (lastTaskNode?.data.componentName === 'condition') {
-            const nestedConditionBottomGhostId = `${lastTaskName}-condition-bottom-ghost`;
+        const lastTaskComponentName = lastTaskNodeId.split('_')[0];
 
-            const nestedGhostToParentGhostEdge = {
-                id: `${nestedConditionBottomGhostId}=>${bottomGhostId}`,
-                source: nestedConditionBottomGhostId,
+        if (lastTaskNode?.data.taskDispatcher) {
+            const nestedBottomGhostId = `${lastTaskNodeId}-${lastTaskComponentName}-bottom-ghost`;
+
+            if (nestedBottomGhostId) {
+                const nestedGhostToParentGhostEdge = {
+                    id: `${nestedBottomGhostId}=>${bottomGhostNodeId}`,
+                    source: nestedBottomGhostId,
+                    style: EDGE_STYLES,
+                    target: bottomGhostNodeId,
+                    targetHandle: `${bottomGhostNodeId}-${branchSide}`,
+                    type: 'workflow',
+                };
+
+                edges.push(nestedGhostToParentGhostEdge);
+            }
+        } else {
+            const edgeFromLastTaskToBottomGhost = {
+                id: `${lastTaskNodeId}=>${bottomGhostNodeId}`,
+                source: lastTaskNodeId,
                 style: EDGE_STYLES,
-                target: bottomGhostId,
-                targetHandle: `${bottomGhostId}-${branchSide}`,
+                target: bottomGhostNodeId,
+                targetHandle: `${bottomGhostNodeId}-${branchSide}`,
                 type: 'workflow',
             };
 
-            edges.push(nestedGhostToParentGhostEdge);
-
-            return edges;
+            edges.push(edgeFromLastTaskToBottomGhost);
         }
-
-        const edgeFromLastTaskToBottomGhost = {
-            id: `${lastTaskName}=>${bottomGhostId}`,
-            source: lastTaskName,
-            style: EDGE_STYLES,
-            target: bottomGhostId,
-            targetHandle: `${bottomGhostId}-${branchSide}`,
-            type: 'workflow',
-        };
-
-        edges.push(edgeFromLastTaskToBottomGhost);
     }
 
     return edges;
@@ -296,33 +305,19 @@ export function hasTaskInConditionBranches(conditionId: string, taskId: string, 
 export default function createAllConditionEdges(conditionNode: Node, allNodes: Node[]): Edge[] {
     const edges: Edge[] = [];
     const conditionNodeData: NodeDataType = conditionNode.data as NodeDataType;
+    const conditionId = conditionNode.id;
 
-    const {conditionData, parameters} = conditionNodeData;
+    const {parameters} = conditionNodeData;
 
-    const baseStructureEdges = createBaseStructureEdges(conditionNode.id);
+    const baseStructureEdges = createBaseStructureEdges(conditionNode);
 
     edges.push(...baseStructureEdges);
 
-    // const isNestedCondition = conditionData !== undefined;
-    const parentConditionId = isNestedCondition ? conditionData?.conditionId : undefined;
+    const caseTrueSubtasks: WorkflowTask[] = parameters?.caseTrue || [];
+    const caseFalseSubtasks: WorkflowTask[] = parameters?.caseFalse || [];
 
-    const bottomGhostId = `${conditionNode.id}-condition-bottom-ghost`;
-    const bottomGhostNode = allNodes.find((node) => node.id === bottomGhostId);
-
-    if (bottomGhostNode) {
-        bottomGhostNode.data = {
-            ...bottomGhostNode.data,
-            conditionId: conditionNode.id,
-            isNestedConditionBottomGhost: isNestedCondition,
-            parentConditionId,
-        };
-    }
-
-    const trueTasks: WorkflowTask[] = parameters?.caseTrue || [];
-    const falseTasks: WorkflowTask[] = parameters?.caseFalse || [];
-
-    const trueEdges = createBranchEdges(conditionNode, trueTasks, 'left', allNodes);
-    const falseEdges = createBranchEdges(conditionNode, falseTasks, 'right', allNodes);
+    const trueEdges = createBranchEdges(conditionId, caseTrueSubtasks, 'left', allNodes);
+    const falseEdges = createBranchEdges(conditionId, caseFalseSubtasks, 'right', allNodes);
 
     edges.push(...trueEdges);
     edges.push(...falseEdges);
