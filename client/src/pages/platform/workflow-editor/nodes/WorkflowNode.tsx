@@ -160,9 +160,9 @@ const WorkflowNode = ({data, id}: {data: NodeDataType; id: string}) => {
 
             {data.name.includes('condition') && (
                 <div className="absolute bottom-0 left-0 font-bold text-muted-foreground">
-                    <span className="absolute -bottom-6 -left-16">TRUE</span>
+                    <span className="absolute -bottom-10 -left-16">TRUE</span>
 
-                    <span className="absolute -bottom-6 left-24">FALSE</span>
+                    <span className="absolute -bottom-10 left-24">FALSE</span>
                 </div>
             )}
         </div>
