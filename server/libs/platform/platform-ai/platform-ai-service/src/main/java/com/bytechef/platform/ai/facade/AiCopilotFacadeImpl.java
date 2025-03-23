@@ -184,7 +184,7 @@ public class AiCopilotFacadeImpl implements ChatFacade {
         return chunks;
     }
 
-    private static void storeDocumentsFromPath(String name, Path path, String suffix, BatchingStrategy batchingStrategy, List<Map<String, Object>> vectorStoreList) throws IOException {
+    private static void storeDocumentsFromPath(String categoryName, Path path, String suffix, BatchingStrategy batchingStrategy, List<Map<String, Object>> vectorStoreList) throws IOException {
         List<Document> documentList = new ArrayList<>();
 
         Files.walkFileTree(path, new SimpleFileVisitor<Path>() {
@@ -195,7 +195,7 @@ public class AiCopilotFacadeImpl implements ChatFacade {
                     String fileName = file.getFileName().toString().replace(suffix, "");
 
                     // check if already exists
-                    if(listContainsFileName(vectorStoreList, fileName)) {
+                    if(vectorStoreListContainsFile(vectorStoreList, fileName, categoryName)) {
                         return FileVisitResult.CONTINUE;
                     }
 
@@ -208,7 +208,7 @@ public class AiCopilotFacadeImpl implements ChatFacade {
 
                         for (String chunk : chunks) {
                             // TODO: add versioning to files
-                            documentList.add(new Document(chunk, Map.of(CATEGORY, name, NAME, fileName)));
+                            documentList.add(new Document(chunk, Map.of(CATEGORY, categoryName, NAME, fileName)));
                         }
                     }
 
@@ -222,8 +222,8 @@ public class AiCopilotFacadeImpl implements ChatFacade {
         }
     }
 
-    public static boolean listContainsFileName(List<Map<String, Object>> vectorStoreList, String name) {
-        return !vectorStoreList.isEmpty() && vectorStoreList.stream().anyMatch(map -> name.equals(map.get("name")));
+    public static boolean vectorStoreListContainsFile(List<Map<String, Object>> vectorStoreList, String fileName, String categoryName) {
+        return !vectorStoreList.isEmpty() && vectorStoreList.stream().anyMatch(map -> fileName.equals(map.get(NAME)) && categoryName.equals(map.get(CATEGORY)));
     }
 
     private void addDocumentsToVectorDatabase(List<Map<String, Object>> vectorStoreList) {
