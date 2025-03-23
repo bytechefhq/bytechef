@@ -175,6 +175,12 @@ it('should toggle "Stay logged in" checkbox on click', async () => {
 
     expect(button);
 
+    expect(button.parentElement).toBeDefined();
+
+    if (button.parentElement == null) {
+        return;
+    }
+
     const inputElements = button.parentElement.getElementsByTagName('input');
 
     const checkbox = inputElements.item(0);
