@@ -1,13 +1,7 @@
+import {TASK_DISPATCHER_SUBTASK_COLLECTIONS} from '@/shared/constants';
 import {WorkflowTask} from '@/shared/middleware/platform/configuration';
 
-const TASK_DISPATCHER_CONFIG = {
-    condition: {
-        collections: ['caseTrue', 'caseFalse'],
-    },
-    loop: {
-        collections: ['iteratee'],
-    },
-};
+const ALL_COLLECTION_NAMES = Object.values(TASK_DISPATCHER_SUBTASK_COLLECTIONS).flat();
 
 type GetParentTaskDispatcherTaskType = {
     taskDispatcherId: string;
@@ -22,31 +16,17 @@ export default function getParentTaskDispatcherTask({
         if (task.name === taskDispatcherId) {
             return task;
         }
-    }
 
-    const componentName = taskDispatcherId.split('_')[0] as keyof typeof TASK_DISPATCHER_CONFIG;
+        if (task.parameters) {
+            for (const collectionName of ALL_COLLECTION_NAMES) {
+                const subtasks = task.parameters[collectionName];
 
-    const config = TASK_DISPATCHER_CONFIG[componentName];
+                if (Array.isArray(subtasks) && subtasks.length > 0) {
+                    const foundTask = getParentTaskDispatcherTask({taskDispatcherId, tasks: subtasks});
 
-    if (!config) {
-        console.error(`Unknown task dispatcher type: ${componentName}`);
-
-        return undefined;
-    }
-
-    for (const task of tasks) {
-        if (!task.parameters) {
-            continue;
-        }
-
-        for (const collectionName of config.collections) {
-            const subtasks = task.parameters[collectionName];
-
-            if (Array.isArray(subtasks) && subtasks.length > 0) {
-                const foundTask = getParentTaskDispatcherTask({taskDispatcherId, tasks: subtasks});
-
-                if (foundTask) {
-                    return foundTask;
+                    if (foundTask) {
+                        return foundTask;
+                    }
                 }
             }
         }

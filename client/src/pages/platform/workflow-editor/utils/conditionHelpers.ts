@@ -1,12 +1,15 @@
 import {WorkflowTask} from '@/shared/middleware/platform/configuration';
 
 export function isConditionNested(conditionId: string, tasks: WorkflowTask[]): boolean {
-    // Check if this condition appears in any branch of any other condition
     return tasks.some((task) => {
-        if (task.type?.includes('condition') && task.parameters && task.name !== conditionId) {
-            const allBranchTasks = [...(task.parameters.caseTrue || []), ...(task.parameters.caseFalse || [])];
+        if (task.type?.startsWith('condition/') && task.parameters && task.name !== conditionId) {
+            const subtasks = [...task.parameters.caseTrue, ...task.parameters.caseFalse];
 
-            return allBranchTasks.some((branchTask) => branchTask.name === conditionId);
+            return subtasks.some((subtask) => subtask.name === conditionId);
+        } else if (task.type?.startsWith('loop/') && task.parameters && task.name !== conditionId) {
+            const subtasks: WorkflowTask[] = task.parameters.iteratee;
+
+            return subtasks?.some((childTask) => childTask.name === conditionId);
         }
 
         return false;
@@ -21,9 +24,9 @@ export function findParentConditionId(conditionId: string, tasks: WorkflowTask[]
         const {parameters, type} = task;
 
         if (type?.includes('condition/') && parameters) {
-            const allBranchTasks = [...(parameters.caseTrue || []), ...(parameters.caseFalse || [])];
+            const subtasks = [...parameters.caseTrue, ...parameters.caseFalse];
 
-            return allBranchTasks.some((branchTask) => branchTask.name === conditionId);
+            return subtasks?.some((subtask) => subtask.name === conditionId);
         }
 
         return false;

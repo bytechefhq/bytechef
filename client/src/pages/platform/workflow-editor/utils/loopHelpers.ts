@@ -5,10 +5,14 @@ import {WorkflowTask} from '@/shared/middleware/platform/configuration';
  */
 export function isLoopNested(loopId: string, tasks: WorkflowTask[]): boolean {
     return tasks.some((task) => {
-        if (task.type?.startsWith('loop') && task.parameters && task.name !== loopId) {
-            const loopChildTasks: WorkflowTask[] = task.parameters.iteratee || [];
+        if (task.type?.startsWith('loop/') && task.parameters && task.name !== loopId) {
+            const subtasks: WorkflowTask[] = task.parameters.iteratee || [];
 
-            return loopChildTasks.some((childTask) => childTask.name === loopId);
+            return subtasks.some((childTask) => childTask.name === loopId);
+        } else if (task.type?.startsWith('condition/') && task.parameters) {
+            const subtasks: WorkflowTask[] = [...task.parameters.caseTrue, ...task.parameters.caseFalse];
+
+            return subtasks.some((childTask) => childTask.name === loopId);
         }
 
         return false;
@@ -23,9 +27,9 @@ export function findParentLoopId(loopId: string, tasks: WorkflowTask[]): string 
         const {parameters, type} = task;
 
         if (type?.startsWith('loop') && parameters) {
-            const loopChildTasks: WorkflowTask[] = parameters.iteration || [];
+            const subtasks: WorkflowTask[] = parameters.iteration || [];
 
-            return loopChildTasks.some((childTask) => childTask.name === loopId);
+            return subtasks.some((childTask) => childTask.name === loopId);
         }
 
         return false;
