@@ -122,7 +122,7 @@ export default function insertTaskDispatcherSubtask({
     taskDispatcherContext,
     tasks,
 }: InsertTaskDispatcherSubtaskProps): Array<WorkflowTask> {
-    const taskDispatcherId = taskDispatcherContext!.taskDispatcherId;
+    const taskDispatcherId = taskDispatcherContext.taskDispatcherId;
 
     const componentName = taskDispatcherId?.split('_')[0] as keyof typeof TASK_DISPATCHER_CONFIG;
 

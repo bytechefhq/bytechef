@@ -30,13 +30,21 @@ const TASK_DISPATCHER_CONFIG = {
                 conditionId: taskDispatcherId,
             };
 
-            // Add condition-specific data if context exists
             if (taskDispatcherContext?.conditionId) {
                 newNodeData.conditionData = {
                     conditionCase: taskDispatcherContext.conditionCase as string,
                     conditionId: taskDispatcherContext.conditionId as string,
                     index: taskDispatcherContext.index as number,
                 };
+
+                newNodeData.taskDispatcherId = taskDispatcherContext.conditionId;
+            } else if (taskDispatcherContext.loopId) {
+                newNodeData.loopData = {
+                    index: taskDispatcherContext.index as number,
+                    loopId: taskDispatcherContext.loopId as string,
+                };
+
+                newNodeData.taskDispatcherId = taskDispatcherContext.loopId;
             }
 
             return newNodeData;
@@ -50,12 +58,21 @@ const TASK_DISPATCHER_CONFIG = {
                 loopId: taskDispatcherId,
             };
 
-            // Add loop-specific data if context exists
-            if (taskDispatcherContext?.loopId) {
+            if (taskDispatcherContext?.conditionId) {
+                newNodeData.conditionData = {
+                    conditionCase: taskDispatcherContext.conditionCase as string,
+                    conditionId: taskDispatcherContext.conditionId as string,
+                    index: taskDispatcherContext.index as number,
+                };
+
+                newNodeData.taskDispatcherId = taskDispatcherContext.conditionId;
+            } else if (taskDispatcherContext?.loopId) {
                 newNodeData.loopData = {
                     index: taskDispatcherContext.index as number,
                     loopId: taskDispatcherContext.loopId as string,
                 };
+
+                newNodeData.taskDispatcherId = taskDispatcherContext.loopId;
             }
 
             return newNodeData;
@@ -99,9 +116,9 @@ export default function handleTaskDispatcherSubtaskOperationClick({
 
     const componentName = taskDispatcherId.split('_')[0] as keyof typeof TASK_DISPATCHER_CONFIG;
 
-    const dispatcherConfig = TASK_DISPATCHER_CONFIG[componentName];
+    const taskDispatcherConfig = TASK_DISPATCHER_CONFIG[componentName];
 
-    if (!dispatcherConfig) {
+    if (!taskDispatcherConfig) {
         console.error(`Unknown task dispatcher type: ${componentName}`);
 
         return;
@@ -121,7 +138,11 @@ export default function handleTaskDispatcherSubtaskOperationClick({
         workflowNodeName,
     };
 
-    const newWorkflowNodeData = dispatcherConfig.buildNodeData({baseNodeData, taskDispatcherContext, taskDispatcherId});
+    const newWorkflowNodeData = taskDispatcherConfig.buildNodeData({
+        baseNodeData,
+        taskDispatcherContext,
+        taskDispatcherId,
+    });
 
     const taskAfterCurrentIndex = workflow.tasks?.length;
 

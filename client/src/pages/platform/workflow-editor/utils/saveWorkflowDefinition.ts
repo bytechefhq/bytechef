@@ -171,24 +171,13 @@ export default async function saveWorkflowDefinition({
     } else {
         tasks = [...(workflowDefinition.tasks || [])];
 
-        if (taskDispatcherContext?.conditionId) {
+        if (taskDispatcherContext?.taskDispatcherId) {
             tasks = insertTaskDispatcherSubtask({
                 newTask,
                 placeholderId,
                 taskDispatcherContext,
                 tasks,
             });
-
-            console.log('tasks', tasks);
-        } else if (taskDispatcherContext?.loopId) {
-            tasks = insertTaskDispatcherSubtask({
-                newTask,
-                placeholderId,
-                taskDispatcherContext,
-                tasks,
-            });
-
-            console.log('tasks', tasks);
         } else if (nodeIndex !== undefined && nodeIndex > -1) {
             const tasksAfterCurrent = tasks.slice(nodeIndex);
 
