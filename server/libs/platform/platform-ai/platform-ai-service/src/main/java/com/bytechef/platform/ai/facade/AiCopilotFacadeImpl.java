@@ -57,7 +57,7 @@ import reactor.core.publisher.Flux;
  */
 @Service
 @ConditionalOnProperty(prefix = "bytechef.ai.copilot", name = "enabled", havingValue = "true")
-public class AiCopilotFacadeImpl implements ChatFacade {
+public class AiCopilotFacadeImpl implements AiCopilotFacade {
     private final ChatClient chatClientWorkflow;
     private final ChatClient chatClientDocs;
     private final ChatClient chatClientScript;
