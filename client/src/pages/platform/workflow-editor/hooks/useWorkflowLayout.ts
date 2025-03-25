@@ -88,7 +88,7 @@ export const useWorkflowLayout = () => {
         isLoading: taskDispatcherDefinitionsLoading,
     } = useGetTaskDispatcherDefinitionsQuery();
 
-    const {data: workflowNodeOutputs} = useGetPreviousWorkflowNodeOutputsQuery(
+    const {data: workflowNodeOutputs, isPending: isWorkflowNodeOutputsPending} = useGetPreviousWorkflowNodeOutputsQuery(
         {
             id: workflow.id!,
             lastWorkflowNodeName: currentNode?.name,
@@ -184,6 +184,7 @@ export const useWorkflowLayout = () => {
         handleWorkflowCodeEditorClick,
         handleWorkflowInputsClick,
         handleWorkflowOutputsClick,
+        isWorkflowNodeOutputsPending,
         previousComponentDefinitions,
         runDisabled,
         taskDispatcherDefinitions,

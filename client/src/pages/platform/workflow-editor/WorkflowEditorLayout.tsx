@@ -39,7 +39,7 @@ const WorkflowEditorLayout = () => {
         showWorkflowInputsSheet,
         showWorkflowOutputsSheet,
     } = useWorkflowEditorStore();
-    const {currentComponent, currentNode} = useWorkflowNodeDetailsPanelStore();
+    const {currentComponent} = useWorkflowNodeDetailsPanelStore();
 
     const {
         componentDefinitions,
@@ -51,6 +51,7 @@ const WorkflowEditorLayout = () => {
         handleWorkflowCodeEditorClick,
         handleWorkflowInputsClick,
         handleWorkflowOutputsClick,
+        isWorkflowNodeOutputsPending,
         previousComponentDefinitions,
         runDisabled,
         taskDispatcherDefinitions,
@@ -108,13 +109,11 @@ const WorkflowEditorLayout = () => {
 
             {workflow.id && <WorkflowTestChatPanel />}
 
-            {(filteredWorkflowNodeOutputs || (!filteredWorkflowNodeOutputs && currentNode?.trigger)) &&
-                previousComponentDefinitions && (
-                    <DataPillPanel
-                        previousComponentDefinitions={previousComponentDefinitions}
-                        workflowNodeOutputs={filteredWorkflowNodeOutputs ?? []}
-                    />
-                )}
+            <DataPillPanel
+                isLoading={isWorkflowNodeOutputsPending}
+                previousComponentDefinitions={previousComponentDefinitions}
+                workflowNodeOutputs={filteredWorkflowNodeOutputs ?? []}
+            />
 
             <WorkflowInputsSheet
                 onSheetOpenChange={setShowWorkflowInputsSheet}
