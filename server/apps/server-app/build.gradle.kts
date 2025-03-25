@@ -175,6 +175,7 @@ dependencies {
     implementation(project(":server:libs:modules:components:chat"))
     implementation(project(":server:libs:modules:components:clickup"))
     implementation(project(":server:libs:modules:components:copper"))
+    implementation(project(":server:libs:modules:components:crypto-helper"))
     implementation(project(":server:libs:modules:components:csv-file"))
     implementation(project(":server:libs:modules:components:data-mapper"))
     implementation(project(":server:libs:modules:components:data-storage"))
