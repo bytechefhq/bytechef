@@ -73,8 +73,8 @@ const DataPillPanelBodyPropertiesItem = ({
             >
                 <div className="flex items-center space-x-4">
                     {icon && (
-                        <div className="flex size-5 items-center">
-                            <InlineSVG src={icon} />
+                        <div className="flex items-center">
+                            <InlineSVG className="size-5" src={icon} />
                         </div>
                     )}
 
