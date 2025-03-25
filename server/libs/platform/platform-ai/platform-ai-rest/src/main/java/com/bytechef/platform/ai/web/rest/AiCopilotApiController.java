@@ -17,7 +17,7 @@
 package com.bytechef.platform.ai.web.rest;
 
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
-import com.bytechef.platform.ai.facade.ChatFacade;
+import com.bytechef.platform.ai.facade.AiCopilotFacade;
 import com.bytechef.platform.ai.facade.dto.ContextDTO;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Map;
@@ -38,17 +38,17 @@ import reactor.core.publisher.Flux;
 @ConditionalOnProperty(prefix = "bytechef.ai.copilot", name = "enabled", havingValue = "true")
 public class AiCopilotApiController {
 
-    private final ChatFacade chatFacade;
+    private final AiCopilotFacade aiCopilotFacade;
 
-    public AiCopilotApiController(ChatFacade chatFacade) {
-        this.chatFacade = chatFacade;
+    public AiCopilotApiController(AiCopilotFacade aiCopilotFacade) {
+        this.aiCopilotFacade = aiCopilotFacade;
     }
 
     @PostMapping("/ai/chat")
     public Flux<Map<String, ?>> chat(
         @RequestBody Request request, @RequestHeader("X-Copilot-Conversation-Id") String conversationId) {
 
-        return chatFacade.chat(request.message, request.context, conversationId);
+        return aiCopilotFacade.chat(request.message, request.context, conversationId);
     }
 
     @SuppressFBWarnings("EI")

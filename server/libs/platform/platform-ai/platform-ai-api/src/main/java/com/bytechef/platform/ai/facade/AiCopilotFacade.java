@@ -23,7 +23,7 @@ import reactor.core.publisher.Flux;
 /**
  * @author Ivica Cardic
  */
-public interface ChatFacade {
+public interface AiCopilotFacade {
 
     Flux<Map<String, ?>> chat(String message, ContextDTO contextDTO, String conversationId);
 }
