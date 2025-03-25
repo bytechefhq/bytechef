@@ -45,7 +45,7 @@ export default function updateRootLoopNode({
 
         const workflowTasks = workflow.tasks;
 
-        let currentTask = workflowTasks?.find((task) => task.name === currentTaskNode.componentName);
+        let currentTask = workflowTasks?.find((task) => task.name === currentTaskNode.workflowNodeName);
 
         if (!currentTask) {
             currentTask = updatedParentLoopTask;
