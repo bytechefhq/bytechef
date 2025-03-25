@@ -154,6 +154,7 @@ dependencies {
     implementation(project(":server:libs:modules:components:keap"))
     implementation(project(":server:libs:modules:components:logger"))
     implementation(project(":server:libs:modules:components:mailchimp"))
+    implementation(project(":server:libs:modules:components:mailerlite"))
     implementation(project(":server:libs:modules:components:map"))
     implementation(project(":server:libs:modules:components:math-helper"))
     implementation(project(":server:libs:modules:components:mautic"))
