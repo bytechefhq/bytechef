@@ -51,7 +51,7 @@ export default function updateRootConditionNode({
 
         const workflowTasks = workflow.tasks;
 
-        let currentTask = workflowTasks?.find((task) => task.name === currentTaskNodeData.componentName);
+        let currentTask = workflowTasks?.find((task) => task.name === currentTaskNodeData.workflowNodeName);
 
         if (!currentTask) {
             currentTask = updatedParentConditionTask;
