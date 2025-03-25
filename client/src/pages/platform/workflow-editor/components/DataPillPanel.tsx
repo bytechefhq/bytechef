@@ -1,4 +1,5 @@
 import {Input} from '@/components/ui/input';
+import {Skeleton} from '@/components/ui/skeleton';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import DataPillPanelBody, {ComponentOperationType} from '@/pages/platform/workflow-editor/components/DataPillPanelBody';
 import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWorkflowDataStore';
@@ -10,9 +11,11 @@ import useDataPillPanelStore from '../stores/useDataPillPanelStore';
 import useWorkflowNodeDetailsPanelStore from '../stores/useWorkflowNodeDetailsPanelStore';
 
 const DataPillPanel = ({
+    isLoading,
     previousComponentDefinitions,
     workflowNodeOutputs,
 }: {
+    isLoading: boolean;
     previousComponentDefinitions: Array<ComponentDefinitionBasic>;
     workflowNodeOutputs: Array<WorkflowNodeOutput>;
 }) => {
@@ -101,8 +104,44 @@ const DataPillPanel = ({
                         />
                     </div>
 
-                    {!hasAvailableDataPills && (
+                    {(!isLoading || currentNode?.trigger) && !hasAvailableDataPills && (
                         <span className="p-4 text-sm text-muted-foreground">No available data pills.</span>
+                    )}
+
+                    {!currentNode?.trigger && isLoading && (
+                        <ul className="flex flex-col">
+                            <li className="flex items-center space-x-4 border-b border-border/50 p-4">
+                                <Skeleton className="size-6" />
+
+                                <Skeleton className="h-6 w-2/3" />
+
+                                <Skeleton className="h-6 w-1/5" />
+                            </li>
+
+                            <li className="flex items-center space-x-4 border-b border-border/50 p-4">
+                                <Skeleton className="size-6" />
+
+                                <Skeleton className="h-6 w-2/3" />
+
+                                <Skeleton className="h-6 w-1/5" />
+                            </li>
+
+                            <li className="flex items-center space-x-4 border-b border-border/50 p-4">
+                                <Skeleton className="size-6" />
+
+                                <Skeleton className="h-6 w-2/3" />
+
+                                <Skeleton className="h-6 w-1/5" />
+                            </li>
+
+                            <li className="flex items-center space-x-4 border-b border-border/50 p-4">
+                                <Skeleton className="size-6" />
+
+                                <Skeleton className="h-6 w-2/3" />
+
+                                <Skeleton className="h-6 w-1/5" />
+                            </li>
+                        </ul>
                     )}
 
                     <DataPillPanelBody
