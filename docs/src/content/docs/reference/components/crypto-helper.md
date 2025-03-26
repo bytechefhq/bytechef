@@ -20,7 +20,7 @@ Type: cryptoHelper/v1
 
 
 ### Generate Password
-Name: generatePasswordAction
+Name: generatePassword
 
 Generate a random password of the specified length.
 
@@ -35,12 +35,12 @@ Generate a random password of the specified length.
 ```json
 {
   "label" : "Generate Password",
-  "name" : "generatePasswordAction",
+  "name" : "generatePassword",
   "parameters" : {
     "length" : 1,
     "characterSet" : ""
   },
-  "type" : "cryptoHelper/v1/generatePasswordAction"
+  "type" : "cryptoHelper/v1/generatePassword"
 }
 ```
 
@@ -58,7 +58,7 @@ Type: STRING
 
 
 ### Hash
-Name: hashAction
+Name: hash
 
 Computes and returns the hash of the input.
 
@@ -73,12 +73,12 @@ Computes and returns the hash of the input.
 ```json
 {
   "label" : "Hash",
-  "name" : "hashAction",
+  "name" : "hash",
   "parameters" : {
     "algorithm" : "",
     "input" : ""
   },
-  "type" : "cryptoHelper/v1/hashAction"
+  "type" : "cryptoHelper/v1/hash"
 }
 ```
 
@@ -96,7 +96,7 @@ Type: STRING
 
 
 ### Hmac
-Name: hmacAction
+Name: hmac
 
 Computes and returns the HMAC of the input.
 
@@ -112,13 +112,13 @@ Computes and returns the HMAC of the input.
 ```json
 {
   "label" : "Hmac",
-  "name" : "hmacAction",
+  "name" : "hmac",
   "parameters" : {
     "algorithm" : "",
     "input" : "",
     "key" : ""
   },
-  "type" : "cryptoHelper/v1/hmacAction"
+  "type" : "cryptoHelper/v1/hmac"
 }
 ```
 
@@ -141,3 +141,4 @@ Type: STRING
 
 # Additional instructions
 <hr />
+
