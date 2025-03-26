@@ -9,18 +9,14 @@ import {
 import {EllipsisVerticalIcon} from 'lucide-react';
 
 interface IntegrationInstanceConfigurationListItemDropdownMenuProps {
-    integrationInstanceConfigurationEnabled: boolean;
     onDeleteClick: () => void;
     onEditClick: () => void;
-    onEnableClick: () => void;
     onUpdateIntegrationVersionClick: () => void;
 }
 
 const IntegrationInstanceConfigurationListItemDropdownMenu = ({
-    integrationInstanceConfigurationEnabled,
     onDeleteClick,
     onEditClick,
-    onEnableClick,
     onUpdateIntegrationVersionClick,
 }: IntegrationInstanceConfigurationListItemDropdownMenuProps) => {
     return (
@@ -36,10 +32,6 @@ const IntegrationInstanceConfigurationListItemDropdownMenu = ({
 
                 <DropdownMenuItem onClick={onUpdateIntegrationVersionClick}>
                     Update Integration Version
-                </DropdownMenuItem>
-
-                <DropdownMenuItem onClick={onEnableClick}>
-                    {integrationInstanceConfigurationEnabled ? 'Disable' : 'Enable'}
                 </DropdownMenuItem>
 
                 <DropdownMenuSeparator />
