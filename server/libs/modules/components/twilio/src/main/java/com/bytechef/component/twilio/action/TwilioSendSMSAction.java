@@ -18,23 +18,19 @@ package com.bytechef.component.twilio.action;
 
 import static com.bytechef.component.definition.Authorization.USERNAME;
 import static com.bytechef.component.definition.ComponentDsl.action;
-import static com.bytechef.component.definition.ComponentDsl.dateTime;
-import static com.bytechef.component.definition.ComponentDsl.integer;
-import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.Context.Http.BodyContentType.FORM_URL_ENCODED;
-import static com.bytechef.component.definition.Context.Http.ResponseType;
 import static com.bytechef.component.definition.Context.Http.responseType;
 import static com.bytechef.component.twilio.constant.TwilioConstants.BODY;
-import static com.bytechef.component.twilio.constant.TwilioConstants.DATE_TIME;
 import static com.bytechef.component.twilio.constant.TwilioConstants.FROM;
+import static com.bytechef.component.twilio.constant.TwilioConstants.MESSAGE_OUTPUT_PROPERTY;
 import static com.bytechef.component.twilio.constant.TwilioConstants.TO;
-import static com.bytechef.component.twilio.constant.TwilioConstants.ZONE_ID;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context.Http.Body;
+import com.bytechef.component.definition.Context.Http.ResponseType;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.Property.ControlType;
 import com.bytechef.component.definition.TypeReference;
@@ -52,10 +48,9 @@ public class TwilioSendSMSAction {
         .properties(
             string(TO)
                 .label("To")
-                .description(
-                    "The recipient's phone number in E.164 format (for SMS/MMS) or channel address, e.g. " +
-                        "whatsapp:+15552229999.")
+                .description("The recipient's phone number in E.164 format.")
                 .controlType(ControlType.PHONE)
+                .exampleValue("+15554449999")
                 .required(true),
             string(FROM)
                 .label("From")
@@ -67,6 +62,7 @@ public class TwilioSendSMSAction {
                         "assigns a from value from the Messaging Service's Sender Pool) or you can provide a " +
                         "specific sender from your Sender Pool.")
                 .controlType(ControlType.PHONE)
+                .exampleValue("+15554449999")
                 .required(true),
             string(BODY)
                 .label("Body")
@@ -76,51 +72,13 @@ public class TwilioSendSMSAction {
                         "For long body text, consider using the send_as_mms parameter.")
                 .maxLength(1600)
                 .required(true))
-        .output(
-            outputSchema(
-                object()
-                    .properties(
-                        string("body"),
-                        string("numSegments"),
-                        string("direction"),
-                        object("from")
-                            .properties(
-                                string("rawNumber")),
-                        string("to"),
-                        object("dateUpdated")
-                            .properties(
-                                dateTime(DATE_TIME),
-                                string(ZONE_ID)),
-                        string("price"),
-                        string("errorMessage"),
-                        string("uri"),
-                        string("accountSid"),
-                        string("numMedia"),
-                        string("status"),
-                        string("messagingServiceSid"),
-                        string("sid"),
-                        object("dateSent")
-                            .properties(
-                                dateTime(DATE_TIME),
-                                string(ZONE_ID)),
-                        object("dateCreated")
-                            .properties(
-                                dateTime(DATE_TIME),
-                                string(ZONE_ID)),
-                        integer("errorCode"),
-                        object("currency")
-                            .properties(
-                                string("currencyCode"),
-                                integer("defaultFractionDigits"),
-                                integer("numericCode")),
-                        string("apiVersion"),
-                        object("subresourceUris")
-                            .additionalProperties(string()))))
+        .output(outputSchema(MESSAGE_OUTPUT_PROPERTY))
         .perform(TwilioSendSMSAction::perform);
 
-    public static Object perform(Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
+    protected static Object perform(
+        Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) {
 
-        return context
+        return actionContext
             .http(http -> http.post("/Accounts/" + connectionParameters.getRequiredString(USERNAME) + "/Messages.json"))
             .body(
                 Body.of(
