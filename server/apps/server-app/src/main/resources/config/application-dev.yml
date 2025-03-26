@@ -10,6 +10,9 @@ spring:
   devtools:
     restart:
       enabled: true
+  graphql:
+    graphiql:
+      enabled: true
   messages:
     cache-duration: PT1S # 1 second, see the ISO 8601 standard
   thymeleaf:

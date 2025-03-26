@@ -1,0 +1,8 @@
+extend type Query {
+    integration(id: ID): Integration
+}
+
+type Integration {
+    id: ID!
+    name: String!
+}

@@ -1,0 +1,6 @@
+query projectById($id: ID!) {
+    project(id: $id) {
+        id
+        name
+    }
+}

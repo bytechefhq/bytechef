@@ -22,12 +22,18 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 /**
  * @author Ivica Cardic
  */
 public class SpaWebFilter extends OncePerRequestFilter {
+
+    private static final List<String> NON_SPA_PATH_PREFIXES = Arrays.asList(
+        "/api", "/approvals", "/actuator", "/auditevents", "/file-entries", "/graphql", "/graphiql", "/v3/api-docs",
+        "/webhooks");
 
     /**
      * Forwards any unmapped paths (except those containing a period) to the client {@code index.html}.
@@ -41,16 +47,7 @@ public class SpaWebFilter extends OncePerRequestFilter {
 
         String path = requestURI.substring(contextPath.length());
 
-        if (!path.startsWith("/api") &&
-            !path.startsWith("/approvals") &&
-            !path.startsWith("/actuator") &&
-            !path.startsWith("/auditevents") &&
-            !path.startsWith("/v3/api-docs") &&
-            !path.startsWith("/file-entries") &&
-            !path.startsWith("/webhooks") &&
-            !path.contains(".") &&
-            path.matches("/(.*)")) {
-
+        if (isNonSpaPath(path) && !path.contains(".") && path.matches("/(.*)")) {
             RequestDispatcher requestDispatcher = request.getRequestDispatcher("/index.html");
 
             requestDispatcher.forward(request, response);
@@ -59,5 +56,10 @@ public class SpaWebFilter extends OncePerRequestFilter {
         }
 
         filterChain.doFilter(request, response);
+    }
+
+    private static boolean isNonSpaPath(String path) {
+        return NON_SPA_PATH_PREFIXES.stream()
+            .noneMatch(path::startsWith);
     }
 }
