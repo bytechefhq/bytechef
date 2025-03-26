@@ -233,7 +233,7 @@ public class AiCopilotFacadeImpl implements AiCopilotFacade {
 
         Path docsDir = Paths.get("/home/user/IdeaProjects/bytechef/docs/src/content/docs/automation");
         Path componentsDir = Paths.get("/home/user/IdeaProjects/bytechef/docs/src/content/docs/reference/components");  //include task-dispatchers when documentation is written
-        Path workflowsDir = Paths.get("/home/user/IdeaProjects/bytechef-workflows/projects/samples/basic_workflows");
+        Path workflowsDir = Paths.get("/home/user/IdeaProjects/bytechef/server/libs/platform/platform-ai/platform-ai-service/src/main/resources/workflows");
 
         try {
             storeDocumentsFromPath(docsName, docsDir, ".md", strategy, vectorStoreList);
