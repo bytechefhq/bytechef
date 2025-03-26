@@ -22,6 +22,7 @@
   },
   "scripts": {
     "dev": "vite",
+    "codegen": "graphql-codegen --config codegen.ts",
     "build": "tsc && vite build",
     "serve": "vite preview",
     "test": "vitest run",

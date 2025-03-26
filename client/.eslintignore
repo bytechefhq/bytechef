@@ -2,3 +2,4 @@ node_modules
 dist
 src/components/ui
 src/hooks/use-toast.ts
+src/**/graphql.ts
