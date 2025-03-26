@@ -22,7 +22,7 @@ import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.example.constant.CryptoHelperConstants.ALGORITHM;
 import static com.bytechef.component.example.constant.CryptoHelperConstants.INPUT;
 import static com.bytechef.component.example.constant.CryptoHelperConstants.KEY;
-import static com.bytechef.component.example.util.CryptoHelperUtil.bytesToHex;
+import static com.bytechef.component.example.util.CryptoHelperUtil.convertBytesToHexString;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
@@ -37,7 +37,7 @@ import javax.crypto.spec.SecretKeySpec;
  */
 public class CryptoHelperHmacAction {
 
-    public static final ModifiableActionDefinition ACTION_DEFINITION = action("hmacAction")
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action("hmac")
         .title("Hmac")
         .description("Computes and returns the HMAC of the input.")
         .properties(
@@ -65,23 +65,23 @@ public class CryptoHelperHmacAction {
 
     protected static String perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) {
-        String algorithm = inputParameters.getRequiredString(ALGORITHM);
 
         try {
+            String algorithm = inputParameters.getRequiredString(ALGORITHM);
+            String key = inputParameters.getRequiredString(KEY);
+            SecretKeySpec secretKey = new SecretKeySpec(key.getBytes(StandardCharsets.UTF_8), algorithm);
+
             Mac mac = Mac.getInstance(algorithm);
-            SecretKeySpec secretKey = new SecretKeySpec(inputParameters.getRequiredString(KEY)
-                .getBytes(StandardCharsets.UTF_8), algorithm);
 
             mac.init(secretKey);
 
-            byte[] hmac = mac.doFinal(inputParameters.getRequiredString(INPUT)
-                .getBytes(StandardCharsets.UTF_8));
+            String input = inputParameters.getRequiredString(INPUT);
+            byte[] hmac = mac.doFinal(input.getBytes(StandardCharsets.UTF_8));
 
-            return bytesToHex(hmac);
+            return convertBytesToHexString(hmac);
 
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }
-
 }

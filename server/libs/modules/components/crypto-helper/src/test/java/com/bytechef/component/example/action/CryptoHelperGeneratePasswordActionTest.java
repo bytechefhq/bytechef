@@ -19,12 +19,13 @@ package com.bytechef.component.example.action;
 import static com.bytechef.component.example.constant.CryptoHelperConstants.ALPHANUMERIC_CHARACTERS;
 import static com.bytechef.component.example.constant.CryptoHelperConstants.CHARACTER_SET;
 import static com.bytechef.component.example.constant.CryptoHelperConstants.LENGTH;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.Parameters;
-import org.junit.jupiter.api.Assertions;
+import com.bytechef.component.test.definition.MockParametersFactory;
+import java.util.Map;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -33,20 +34,14 @@ import org.junit.jupiter.api.Test;
 class CryptoHelperGeneratePasswordActionTest {
 
     private final ActionContext mockedActionContext = mock(ActionContext.class);
-    private final Parameters mockedParameters = mock(Parameters.class);
+    private final Parameters mockedParameters =
+        MockParametersFactory.create(Map.of(LENGTH, 8, CHARACTER_SET, ALPHANUMERIC_CHARACTERS));
 
     @Test
     void testPerform() {
-        int expectedPasswordLength = 8;
+        String password = CryptoHelperGeneratePasswordAction.perform(
+            mockedParameters, mockedParameters, mockedActionContext);
 
-        when(mockedParameters.getInteger(LENGTH))
-            .thenReturn(expectedPasswordLength);
-        when(mockedParameters.getRequiredString(CHARACTER_SET))
-            .thenReturn(ALPHANUMERIC_CHARACTERS);
-
-        String password =
-            CryptoHelperGeneratePasswordAction.perform(mockedParameters, mockedParameters, mockedActionContext);
-
-        Assertions.assertEquals(expectedPasswordLength, password.length());
+        assertEquals(8, password.length());
     }
 }

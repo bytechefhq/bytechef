@@ -18,22 +18,24 @@ package com.bytechef.component.example.action;
 
 import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.integer;
+import static com.bytechef.component.definition.ComponentDsl.option;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
+import static com.bytechef.component.example.constant.CryptoHelperConstants.ALPHANUMERIC_CHARACTERS;
 import static com.bytechef.component.example.constant.CryptoHelperConstants.CHARACTER_SET;
 import static com.bytechef.component.example.constant.CryptoHelperConstants.LENGTH;
+import static com.bytechef.component.example.constant.CryptoHelperConstants.SYMBOL_CHARACTERS;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.example.util.CryptoHelperUtil;
 
 /**
  * @author Nikolina Spehar
  */
 public class CryptoHelperGeneratePasswordAction {
 
-    public static final ModifiableActionDefinition ACTION_DEFINITION = action("generatePasswordAction")
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action("generatePassword")
         .title("Generate Password")
         .description("Generate a random password of the specified length.")
         .properties(
@@ -46,7 +48,9 @@ public class CryptoHelperGeneratePasswordAction {
                 .label("Character Set")
                 .description("The character set to be used for generating the password.")
                 .required(true)
-                .options(CryptoHelperUtil.getCharacterSetOptions()))
+                .options(
+                    option("Alphanumeric", ALPHANUMERIC_CHARACTERS),
+                    option("Alphanumeric + Symbols", ALPHANUMERIC_CHARACTERS + SYMBOL_CHARACTERS)))
         .output(
             outputSchema(
                 string()
@@ -61,12 +65,12 @@ public class CryptoHelperGeneratePasswordAction {
 
         StringBuilder password = new StringBuilder();
 
-        for (int i = 0; i < inputParameters.getInteger(LENGTH); i++) {
-            int randomIndex = (int) Math.floor(
-                Math.random() * inputParameters.getRequiredString(CHARACTER_SET)
-                    .length());
-            password.append(inputParameters.getRequiredString(CHARACTER_SET)
-                .charAt(randomIndex));
+        for (int i = 0; i < inputParameters.getRequiredInteger(LENGTH); i++) {
+            String characterSet = inputParameters.getRequiredString(CHARACTER_SET);
+
+            int randomIndex = (int) Math.floor(Math.random() * characterSet.length());
+
+            password.append(characterSet.charAt(randomIndex));
         }
 
         return password.toString();

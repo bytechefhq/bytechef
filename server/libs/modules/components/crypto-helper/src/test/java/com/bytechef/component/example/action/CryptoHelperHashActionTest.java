@@ -20,11 +20,13 @@ import static com.bytechef.component.example.constant.CryptoHelperConstants.ALGO
 import static com.bytechef.component.example.constant.CryptoHelperConstants.INPUT;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.Parameters;
-import org.junit.jupiter.api.Test;
+import com.bytechef.component.test.definition.MockParametersFactory;
+import java.util.Map;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 
 /**
  * @author Nikolina Spehar
@@ -32,38 +34,18 @@ import org.junit.jupiter.api.Test;
 class CryptoHelperHashActionTest {
 
     private final ActionContext mockedActionContext = mock(ActionContext.class);
-    private final Parameters mockedParameters = mock(Parameters.class);
 
-    @Test
-    void testPerformMD5() {
-        String result = mockPerform("MD5");
-        String expected = "5eed650258ee02f6a77c87b748b764ec";
+    @ParameterizedTest
+    @CsvSource({
+        "MD5, 5eed650258ee02f6a77c87b748b764ec",
+        "SHA1, 49883b34e5a0f48224dd6230f471e9dc1bdbeaf5",
+        "SHA256, 9dfe6f15d1ab73af898739394fd22fd72a03db01834582f24bb2e1c66c7aaeae"
+    })
+    void testPerform(String algorithm, String expected) {
+        Parameters mockedParameters = MockParametersFactory.create(Map.of(ALGORITHM, algorithm, INPUT, "test input"));
 
-        assertEquals(expected, result);
-    }
-
-    @Test
-    void testPerformSHA1() {
-        String result = mockPerform("SHA1");
-        String expected = "49883b34e5a0f48224dd6230f471e9dc1bdbeaf5";
+        String result = CryptoHelperHashAction.perform(mockedParameters, mockedParameters, mockedActionContext);
 
         assertEquals(expected, result);
-    }
-
-    @Test
-    void testPerformSHA256() {
-        String result = mockPerform("SHA256");
-        String expected = "9dfe6f15d1ab73af898739394fd22fd72a03db01834582f24bb2e1c66c7aaeae";
-
-        assertEquals(expected, result);
-    }
-
-    private String mockPerform(String algorithm) {
-        when(mockedParameters.getRequiredString(ALGORITHM))
-            .thenReturn(algorithm);
-        when(mockedParameters.getRequiredString(INPUT))
-            .thenReturn("test input");
-
-        return CryptoHelperHashAction.perform(mockedParameters, mockedParameters, mockedActionContext);
     }
 }
