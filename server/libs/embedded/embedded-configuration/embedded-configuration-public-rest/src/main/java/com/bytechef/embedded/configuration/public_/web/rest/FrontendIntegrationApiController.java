@@ -14,11 +14,10 @@
  * limitations under the License.
  */
 
-package com.bytechef.embedded.configuration.public_.web.rest.frontend;
+package com.bytechef.embedded.configuration.public_.web.rest;
 
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
 import com.bytechef.embedded.configuration.facade.IntegrationInstanceConfigurationFacade;
-import com.bytechef.embedded.configuration.public_.web.rest.FrontendIntegrationApi;
 import com.bytechef.embedded.configuration.public_.web.rest.converter.CaseInsensitiveEnumPropertyEditorSupport;
 import com.bytechef.embedded.configuration.public_.web.rest.model.EnvironmentModel;
 import com.bytechef.embedded.configuration.public_.web.rest.model.IntegrationModel;
@@ -62,8 +61,8 @@ public class FrontendIntegrationApiController implements FrontendIntegrationApi 
 
         return ResponseEntity.ok(
             conversionService.convert(
-                integrationInstanceConfigurationFacade.getEnabledIntegrationInstanceConfigurationIntegration(
-                    id, environment),
+                integrationInstanceConfigurationFacade.getIntegrationInstanceConfigurationIntegration(
+                    id, environment, true),
                 IntegrationModel.class));
     }
 
@@ -74,7 +73,7 @@ public class FrontendIntegrationApiController implements FrontendIntegrationApi 
 
         return ResponseEntity.ok(
             integrationInstanceConfigurationFacade
-                .getEnabledIntegrationInstanceConfigurationIntegrations(environment)
+                .getIntegrationInstanceConfigurationIntegrations(environment, true)
                 .stream()
                 .map(integrationDTO -> conversionService.convert(integrationDTO, IntegrationModel.class))
                 .toList());

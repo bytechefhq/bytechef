@@ -104,8 +104,8 @@ public class ActionDefinitionFacadeImpl implements ActionDefinitionFacade {
 
     @Override
     public OutputResponse executeOutput(
-        String componentName, int componentVersion, String actionName,
-        Map<String, ?> inputParameters, Map<String, Long> connectionIds) {
+        String componentName, int componentVersion, String actionName, Map<String, ?> inputParameters,
+        Map<String, Long> connectionIds) {
 
         ExecuteFunctionData executeFunctionData = getExecuteFunctionData(
             componentName, componentVersion, actionName, connectionIds);

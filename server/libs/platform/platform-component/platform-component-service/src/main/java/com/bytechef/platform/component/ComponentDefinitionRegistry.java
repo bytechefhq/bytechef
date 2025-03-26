@@ -163,7 +163,7 @@ public class ComponentDefinitionRegistry {
             .orElseThrow(IllegalArgumentException::new);
     }
 
-    public ComponentDefinition getComponentDefinition(String name, Integer version) {
+    public ComponentDefinition getComponentDefinition(String name, @Nullable Integer version) {
         return fetchComponentDefinition(name, version)
             .orElseThrow(() -> new IllegalArgumentException("The component '%s' does not exist.".formatted(name)));
     }

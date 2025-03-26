@@ -34,6 +34,15 @@ public interface IntegrationInstanceRepository
 
     List<IntegrationInstance> findAllByConnectedUserId(long connectedUserId);
 
+    @Query("""
+        SELECT DISTINCT integration_instance.* FROM integration_instance
+        JOIN integration_instance_configuration on integration_instance.integration_instance_configuration_id = integration_instance_configuration.id
+        WHERE integration_instance_configuration.environment = :environment
+        AND integration_instance.connected_user_id = :connectedUserId
+        """)
+    List<IntegrationInstance> findAllByConnectedUserIdAndEnvironment(
+        @Param("connectedUserId") long connectedUserId, @Param("environment") int environment);
+
     List<IntegrationInstance> findAllByConnectedUserIdIn(List<Long> connectedUserIds);
 
     List<IntegrationInstance> findAllByConnectedUserIdAndEnabled(long connectedUserId, boolean enabled);
@@ -42,7 +51,7 @@ public interface IntegrationInstanceRepository
 
     @Query("""
         SELECT DISTINCT integration_instance.* FROM integration_instance
-        JOIN integration_instance_configuration on integration_instance_configuration_id = integration_instance_configuration.id
+        JOIN integration_instance_configuration on integration_instance.integration_instance_configuration_id = integration_instance_configuration.id
         JOIN integration_instance_configuration_workflow on integration_instance_configuration.id = integration_instance_configuration_workflow.integration_instance_configuration_id
         WHERE integration_instance_configuration_workflow.workflow_id = :workflowId
         AND integration_instance_configuration.environment = :environment
@@ -54,7 +63,7 @@ public interface IntegrationInstanceRepository
 
     @Query("""
         SELECT DISTINCT integration_instance.* FROM integration_instance
-        JOIN integration_instance_configuration on integration_instance_configuration_id = integration_instance_configuration.id
+        JOIN integration_instance_configuration on integration_instance.integration_instance_configuration_id = integration_instance_configuration.id
         JOIN integration on integration_instance_configuration.integration_id = integration.id
         WHERE integration.component_name = :componentName
         AND integration_instance_configuration.environment = :environment

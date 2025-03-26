@@ -80,18 +80,16 @@ public class ActionDefinition {
 
     @Override
     public boolean equals(Object o) {
-
         if (!(o instanceof ActionDefinition that)) {
             return false;
         }
 
         return batch == that.batch && componentVersion == that.componentVersion &&
             outputDefined == that.outputDefined && outputFunctionDefined == that.outputFunctionDefined &&
-            workflowNodeDescriptionDefined == that.workflowNodeDescriptionDefined &&
             Objects.equals(componentName, that.componentName) && Objects.equals(description, that.description) &&
             Objects.equals(help, that.help) && Objects.equals(name, that.name) &&
             Objects.equals(outputResponse, that.outputResponse) && Objects.equals(properties, that.properties) &&
-            Objects.equals(title, that.title);
+            Objects.equals(title, that.title) && workflowNodeDescriptionDefined == that.workflowNodeDescriptionDefined;
     }
 
     @Override

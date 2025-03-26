@@ -34,9 +34,11 @@ public interface IntegrationInstanceService {
 
     List<IntegrationInstance> getConnectedUserIntegrationInstances(long connectedUserId);
 
-    List<IntegrationInstance> getConnectedUserIntegrationInstances(List<Long> connectedUserIds);
+    List<IntegrationInstance> getConnectedUserIntegrationInstances(long connectedUserId, boolean enabled);
 
-    List<IntegrationInstance> getConnectedUserEnabledIntegrationInstances(long connectedUserId);
+    List<IntegrationInstance> getConnectedUserIntegrationInstances(long connectedUserId, Environment environment);
+
+    List<IntegrationInstance> getConnectedUserIntegrationInstances(List<Long> connectedUserIds);
 
     IntegrationInstance getIntegrationInstance(long id);
 
