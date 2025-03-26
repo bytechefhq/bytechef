@@ -22,11 +22,13 @@ import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.component.twilio.action.TwilioSendSMSAction;
+import com.bytechef.component.twilio.action.TwilioSendWhatsAppMessageAction;
 import com.bytechef.component.twilio.connection.TwilioConnection;
+import com.bytechef.component.twilio.trigger.TwilioNewWhatsappMessageTrigger;
 import com.google.auto.service.AutoService;
 
 /**
- * @author Monika Domiter
+ * @author Monika Kušter
  */
 @AutoService(ComponentHandler.class)
 public class TwilioComponentHandler implements ComponentHandler {
@@ -34,13 +36,15 @@ public class TwilioComponentHandler implements ComponentHandler {
     private static final ComponentDefinition COMPONENT_DEFINITION = component("twilio")
         .title("Twilio")
         .description(
-            "Twilio is a cloud communications platform that enables developers to integrate messaging, voice, and" +
-                " video capabilities into their applications.")
+            "Twilio is a cloud communications platform that enables developers to integrate messaging, voice, and " +
+                "video capabilities into their applications.")
         .customAction(true)
         .icon("path:assets/twilio.svg")
         .categories(ComponentCategory.COMMUNICATION)
         .connection(TwilioConnection.CONNECTION_DEFINITION)
-        .actions(TwilioSendSMSAction.ACTION_DEFINITION);
+        .actions(
+            TwilioSendSMSAction.ACTION_DEFINITION,
+            TwilioSendWhatsAppMessageAction.ACTION_DEFINITION);
 
     @Override
     public ComponentDefinition getDefinition() {
