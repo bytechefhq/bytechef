@@ -183,6 +183,7 @@ dependencies {
     implementation(project(":server:libs:modules:components:delay"))
     implementation(project(":server:libs:modules:components:discord"))
     implementation(project(":server:libs:modules:components:dropbox"))
+    implementation(project(":server:libs:modules:components:elevenlabs"))
     implementation(project(":server:libs:modules:components:email"))
     implementation(project(":server:libs:modules:components:encharge"))
     implementation(project(":server:libs:modules:components:figma"))
