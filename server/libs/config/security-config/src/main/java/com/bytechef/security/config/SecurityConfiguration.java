@@ -35,6 +35,7 @@ import java.util.List;
 import java.util.function.Supplier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
@@ -99,6 +100,21 @@ public class SecurityConfiguration {
     }
 
     @Bean
+    @Profile("dev")
+    public SecurityFilterChain graphqlDevFilterChain(HttpSecurity http) throws Exception {
+        http
+            .securityMatcher("/graphql")
+            .authorizeHttpRequests(
+                auth -> auth
+                    .anyRequest()
+                    .authenticated())
+            .httpBasic(withDefaults())
+            .csrf(AbstractHttpConfigurer::disable);
+
+        return http.build();
+    }
+
+    @Bean
     public SecurityFilterChain filterChain(
         HttpSecurity http, MvcRequestMatcher.Builder mvc,
         List<AuthenticationProviderContributor> authenticationProviderContributors,
@@ -106,17 +122,20 @@ public class SecurityConfiguration {
         throws Exception {
 
         http
+            .securityMatcher("/**")
             .cors(withDefaults())
-            .csrf(csrf -> csrf
-                .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
-                // See https://stackoverflow.com/q/74447118/65681
-                .csrfTokenRequestHandler(new SpaCsrfTokenRequestHandler())
-                .ignoringRequestMatchers(
-                    RegexRequestMatcher.regexMatcher("^/api/(automation|embedded|platform)/v[0-9]+/.+"))
-                .ignoringRequestMatchers("/api/o/**")
-                .ignoringRequestMatchers("/approvals/**")
-                .ignoringRequestMatchers("/file-entries/**")
-                .ignoringRequestMatchers("/webhooks/**"));
+            .csrf(
+                csrf -> csrf
+                    .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
+                    // See https://stackoverflow.com/q/74447118/65681
+                    .csrfTokenRequestHandler(new SpaCsrfTokenRequestHandler())
+                    .ignoringRequestMatchers(
+                        RegexRequestMatcher.regexMatcher("^/api/(automation|embedded|platform)/v[0-9]+/.+"))
+                    .ignoringRequestMatchers("/api/o/**")
+                    .ignoringRequestMatchers("/approvals/**")
+                    .ignoringRequestMatchers("/file-entries/**")
+                    .ignoringRequestMatchers("/graphql")
+                    .ignoringRequestMatchers("/webhooks/**"));
 
         for (AuthenticationProviderContributor authenticationProviderContributor : authenticationProviderContributors) {
             http.authenticationProvider(authenticationProviderContributor.getAuthenticationProvider());
@@ -175,6 +194,10 @@ public class SecurityConfiguration {
                     .permitAll()
                     .requestMatchers(mvc.pattern("/file-entries/**"))
                     .permitAll()
+                    .requestMatchers(mvc.pattern("/graphiql"))
+                    .permitAll()
+                    .requestMatchers(mvc.pattern("/graphql"))
+                    .authenticated()
                     .requestMatchers(mvc.pattern("/i18n/**"))
                     .permitAll()
                     .requestMatchers(mvc.pattern("/index.html"))
@@ -195,7 +218,7 @@ public class SecurityConfiguration {
             .exceptionHandling(
                 exceptionHanding -> exceptionHanding.defaultAuthenticationEntryPointFor(
                     new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED),
-                    new OrRequestMatcher(antMatcher("/api/**"))))
+                    new OrRequestMatcher(antMatcher("/api/**"), antMatcher("/graphql"))))
             .formLogin(
                 formLogin -> formLogin
                     .loginPage("/")

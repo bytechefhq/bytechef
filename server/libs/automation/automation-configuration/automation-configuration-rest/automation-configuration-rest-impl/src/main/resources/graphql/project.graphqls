@@ -1,0 +1,21 @@
+extend type Query {
+    project(id: ID): Project
+    projects: [Project]
+}
+
+type Category {
+    id: ID
+    name: String
+}
+
+type Project {
+    id: ID!
+    name: String!
+    category: Category
+    tags: [Tag]
+}
+
+type Tag {
+    id: ID!
+    name: String!
+}
