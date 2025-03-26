@@ -44,7 +44,8 @@ public class TwilioComponentHandler implements ComponentHandler {
         .connection(TwilioConnection.CONNECTION_DEFINITION)
         .actions(
             TwilioSendSMSAction.ACTION_DEFINITION,
-            TwilioSendWhatsAppMessageAction.ACTION_DEFINITION);
+            TwilioSendWhatsAppMessageAction.ACTION_DEFINITION)
+        .triggers(TwilioNewWhatsappMessageTrigger.TRIGGER_DEFINITION);
 
     @Override
     public ComponentDefinition getDefinition() {
