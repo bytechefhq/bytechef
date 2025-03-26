@@ -42,19 +42,18 @@ class ProjectHandlerPolyglotEngine {
         try (Context polyglotContext = getContext()) {
             Value value = polyglotContext.eval(languageId, script);
 
-            String name = Objects.requireNonNull(getMember(value, "name", String.class));
-            String description = getMember(value, "description", String.class);
-            String version = getMember(value, "version", String.class);
+            String name = Objects.requireNonNull(getMember(value, "name"));
+            String description = getMember(value, "description");
+            String version = getMember(value, "version");
 
-            List<WorkflowDefinition> workflows = getMember(
-                value, "workflows", new TypeLiteral<List<Map<String, Object>>>() {})
+            List<WorkflowDefinition> workflows = getWorkflows(
+                value, new TypeLiteral<List<Map<String, Object>>>() {})
                     .stream()
                     .map(workflow -> (WorkflowDefinition) new PolyglotWorkflowDefinition(
                         (String) workflow.get("name"), (String) workflow.get("label"),
                         (String) workflow.get("description"),
                         toTaskDefinitions(
-                            (String) workflow.get("name"), (List<Map<String, Object>>) workflow.get("tasks"),
-                            languageId, script)))
+                            (String) workflow.get("name"), (List<?>) workflow.get("tasks"), languageId, script)))
                     .toList();
 
             return () -> new PolyglotProjectDefinition(name, description, version, workflows);
@@ -66,7 +65,7 @@ class ProjectHandlerPolyglotEngine {
         try (Context polyglotContext = getContext()) {
             Value value = polyglotContext.eval(languageId, script);
 
-            List<Map<String, Object>> workflows = getMember(value, "workflows", new TypeLiteral<>() {});
+            List<Map<String, Object>> workflows = getWorkflows(value, new TypeLiteral<>() {});
 
             List<Map<String, Object>> tasks = (List<Map<String, Object>>) workflows.stream()
                 .filter(workflow -> workflowName.equals(workflow.get("name")))
@@ -92,25 +91,26 @@ class ProjectHandlerPolyglotEngine {
             .build();
     }
 
-    private static <T> T getMember(Value value, String name, Class<T> valueClass) {
+    private static String getMember(Value value, String name) {
         value = value.getMember(name);
 
-        return value == null ? null : value.as(valueClass);
+        return value == null ? null : value.as(String.class);
     }
 
-    private static <T> T getMember(Value value, String name, TypeLiteral<T> typeLiteral) {
-        return value.getMember(name)
+    private static <T> T getWorkflows(Value value, TypeLiteral<T> typeLiteral) {
+        return value.getMember("workflows")
             .as(typeLiteral);
     }
 
     private static List<TaskDefinition> toTaskDefinitions(
-        String workflowName, List<Map<String, Object>> tasks, String languageId, String script) {
+        String workflowName, List<?> tasks, String languageId, String script) {
 
         if (tasks == null) {
             return List.of();
         }
 
         return tasks.stream()
+            .map(task -> (Map<?, ?>) task)
             .map(task -> (TaskDefinition) new PolyglotTaskDefinition(
                 workflowName, (String) task.get("name"), (String) task.get("label"), (String) task.get("description"),
                 languageId, script))
