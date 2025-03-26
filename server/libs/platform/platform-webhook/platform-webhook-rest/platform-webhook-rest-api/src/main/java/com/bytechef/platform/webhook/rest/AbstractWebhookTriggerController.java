@@ -473,10 +473,19 @@ public abstract class AbstractWebhookTriggerController {
         }
     }
 
+    @SuppressWarnings("unchecked")
     private void walkThroughList(List<?> list) {
-        for (Object item : list) {
-            if (item instanceof Map) {
-                walkThroughMap((Map<?, ?>) item);
+        for (int i = 0; i < list.size(); i++) {
+            Object item = list.get(i);
+
+            if (item instanceof Map<?, ?> map) {
+                if (FileEntry.isFileEntryMap(map)) {
+                    String fileEntryUrl = convertToFileEntryUrl(map);
+
+                    ((List<Object>) list).set(i, fileEntryUrl);
+                }
+
+                walkThroughMap(map);
             } else if (item instanceof List) {
                 walkThroughList((List<?>) item);
             }
