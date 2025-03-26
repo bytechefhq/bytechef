@@ -22,7 +22,6 @@ import com.bytechef.platform.ai.facade.dto.ContextDTO;
 import com.bytechef.platform.ai.service.VectorStoreService;
 import com.knuddels.jtokkit.api.EncodingType;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-
 import java.io.IOException;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
@@ -35,7 +34,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.client.advisor.AbstractChatMemoryAdvisor;
 import org.springframework.ai.chat.client.advisor.MessageChatMemoryAdvisor;
@@ -72,25 +70,34 @@ public class AiCopilotFacadeImpl implements AiCopilotFacade {
 
     @SuppressFBWarnings("EI")
     @Autowired
-    public AiCopilotFacadeImpl(ChatClient.Builder chatClientBuilder, WorkflowService workflowService, VectorStore vectorStore, VectorStoreService vectorStoreService) {
+    public AiCopilotFacadeImpl(ChatClient.Builder chatClientBuilder, WorkflowService workflowService,
+        VectorStore vectorStore, VectorStoreService vectorStoreService) {
         this.vectorStore = vectorStore;
-        strategy = new TokenCountBatchingStrategy(EncodingType.CL100K_BASE, 8191, 0.1, Document.DEFAULT_CONTENT_FORMATTER, MetadataMode.ALL);
+        strategy = new TokenCountBatchingStrategy(EncodingType.CL100K_BASE, 8191, 0.1,
+            Document.DEFAULT_CONTENT_FORMATTER, MetadataMode.ALL);
 
-        if(vectorStoreService.count() != 0) {
+        if (vectorStoreService.count() != 0) {
             List<com.bytechef.platform.ai.domain.VectorStore> vectorsList = vectorStoreService.findAll();
-            List<Map<String, Object>> vectorsMetadataList = vectorsList.stream().map(com.bytechef.platform.ai.domain.VectorStore::getMetadata).toList();
+            List<Map<String, Object>> vectorsMetadataList = vectorsList.stream()
+                .map(com.bytechef.platform.ai.domain.VectorStore::getMetadata)
+                .toList();
             addDocumentsToVectorDatabase(vectorsMetadataList);
-        }
-        else {
+        } else {
             addDocumentsToVectorDatabase(List.of());
         }
 
         MessageChatMemoryAdvisor messageChatMemoryAdvisor = new MessageChatMemoryAdvisor(new InMemoryChatMemory());
 
         SearchRequest.Builder searchRequestBuilder = SearchRequest.builder();
-        QuestionAnswerAdvisor questionAnswerAdvisorDocs = new QuestionAnswerAdvisor(vectorStore, searchRequestBuilder.filterExpression("category == 'documentation'").build());
-        QuestionAnswerAdvisor questionAnswerAdvisorComponents = new QuestionAnswerAdvisor(vectorStore, searchRequestBuilder.filterExpression("category == 'components'").build());
-        QuestionAnswerAdvisor questionAnswerAdvisorWorkflow = new QuestionAnswerAdvisor(vectorStore, searchRequestBuilder.filterExpression("category == 'workflows'").build());
+        QuestionAnswerAdvisor questionAnswerAdvisorDocs =
+            new QuestionAnswerAdvisor(vectorStore, searchRequestBuilder.filterExpression("category == 'documentation'")
+                .build());
+        QuestionAnswerAdvisor questionAnswerAdvisorComponents =
+            new QuestionAnswerAdvisor(vectorStore, searchRequestBuilder.filterExpression("category == 'components'")
+                .build());
+        QuestionAnswerAdvisor questionAnswerAdvisorWorkflow =
+            new QuestionAnswerAdvisor(vectorStore, searchRequestBuilder.filterExpression("category == 'workflows'")
+                .build());
 
         this.chatClientDocs = chatClientBuilder
             .clone()
@@ -98,8 +105,7 @@ public class AiCopilotFacadeImpl implements AiCopilotFacade {
             .defaultAdvisors(
                 messageChatMemoryAdvisor,
                 questionAnswerAdvisorDocs,
-                questionAnswerAdvisorComponents
-            )
+                questionAnswerAdvisorComponents)
             .build();
 
         this.chatClientWorkflow = chatClientBuilder
@@ -108,8 +114,7 @@ public class AiCopilotFacadeImpl implements AiCopilotFacade {
             .defaultAdvisors(
                 messageChatMemoryAdvisor,
                 questionAnswerAdvisorWorkflow,
-                questionAnswerAdvisorComponents
-            )
+                questionAnswerAdvisorComponents)
             .build();
 
         this.chatClientScript = chatClientBuilder
@@ -118,7 +123,7 @@ public class AiCopilotFacadeImpl implements AiCopilotFacade {
             .defaultAdvisors(
                 messageChatMemoryAdvisor,
                 questionAnswerAdvisorComponents
-                //add script advisor
+            // add script advisor
             )
             .build();
 
@@ -127,7 +132,8 @@ public class AiCopilotFacadeImpl implements AiCopilotFacade {
 
     public static String preprocessDocument(String document) {
         Pattern htmlTagsPattern = Pattern.compile("<[^>]*>");
-        document = htmlTagsPattern.matcher(document).replaceAll("");
+        document = htmlTagsPattern.matcher(document)
+            .replaceAll("");
 
         Pattern pixelLinkPattern = Pattern.compile("^!.+$", Pattern.MULTILINE);
         Matcher pixelLinkMatcher = pixelLinkPattern.matcher(document);
@@ -145,7 +151,7 @@ public class AiCopilotFacadeImpl implements AiCopilotFacade {
         Matcher headerMatcher = headerPattern.matcher(document);
         document = headerMatcher.replaceAll("");
 
-        //properties and tables
+        // properties and tables
         Pattern propertiesPattern = Pattern.compile("^#### Properties.*$", Pattern.MULTILINE);
         Matcher propertiesMatcher = propertiesPattern.matcher(document);
         document = propertiesMatcher.replaceAll("");
@@ -156,7 +162,8 @@ public class AiCopilotFacadeImpl implements AiCopilotFacade {
         //
 
         Pattern spacePattern = Pattern.compile("\\s+");
-        document = spacePattern.matcher(document).replaceAll(" ");
+        document = spacePattern.matcher(document)
+            .replaceAll(" ");
 
         return document.trim();
     }
@@ -169,40 +176,48 @@ public class AiCopilotFacadeImpl implements AiCopilotFacade {
 
         for (String token : tokens) {
             if (tokenCount + 1 > maxTokens) {
-                chunks.add(currentChunk.toString().trim());
+                chunks.add(currentChunk.toString()
+                    .trim());
                 currentChunk.setLength(0); // Reset the current chunk
                 tokenCount = 0;
             }
-            currentChunk.append(token).append(" ");
+            currentChunk.append(token)
+                .append(" ");
             tokenCount++;
         }
 
         if (!currentChunk.isEmpty()) {
-            chunks.add(currentChunk.toString().trim());
+            chunks.add(currentChunk.toString()
+                .trim());
         }
 
         return chunks;
     }
 
-    private static void storeDocumentsFromPath(String categoryName, Path path, String suffix, BatchingStrategy batchingStrategy, List<Map<String, Object>> vectorStoreList) throws IOException {
+    private static void storeDocumentsFromPath(
+        String categoryName, Path path, String suffix, BatchingStrategy batchingStrategy,
+        List<Map<String, Object>> vectorStoreList) throws IOException {
         List<Document> documentList = new ArrayList<>();
 
         Files.walkFileTree(path, new SimpleFileVisitor<Path>() {
             @Override
             public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
-                if (file.toString().endsWith(suffix)) {
+                if (file.toString()
+                    .endsWith(suffix)) {
                     String document = Files.readString(file);
-                    String fileName = file.getFileName().toString().replace(suffix, "");
+                    String fileName = file.getFileName()
+                        .toString()
+                        .replace(suffix, "");
 
                     // check if already exists
-                    if(vectorStoreListContainsFile(vectorStoreList, fileName, categoryName)) {
+                    if (vectorStoreListContainsFile(vectorStoreList, fileName, categoryName)) {
                         return FileVisitResult.CONTINUE;
                     }
 
                     // Preprocess the document
                     String cleanedDocument = preprocessDocument(document);
 
-                    if(!cleanedDocument.isEmpty()) {
+                    if (!cleanedDocument.isEmpty()) {
                         // Split the document into chunks
                         List<String> chunks = splitDocument(cleanedDocument.split("\\s+"), 1536);
 
@@ -217,13 +232,15 @@ public class AiCopilotFacadeImpl implements AiCopilotFacade {
             }
         });
 
-        for(List<Document> batch : batchingStrategy.batch(documentList)) {
+        for (List<Document> batch : batchingStrategy.batch(documentList)) {
             vectorStore.add(batch);
         }
     }
 
-    public static boolean vectorStoreListContainsFile(List<Map<String, Object>> vectorStoreList, String fileName, String categoryName) {
-        return !vectorStoreList.isEmpty() && vectorStoreList.stream().anyMatch(map -> fileName.equals(map.get(NAME)) && categoryName.equals(map.get(CATEGORY)));
+    public static boolean
+        vectorStoreListContainsFile(List<Map<String, Object>> vectorStoreList, String fileName, String categoryName) {
+        return !vectorStoreList.isEmpty() && vectorStoreList.stream()
+            .anyMatch(map -> fileName.equals(map.get(NAME)) && categoryName.equals(map.get(CATEGORY)));
     }
 
     private void addDocumentsToVectorDatabase(List<Map<String, Object>> vectorStoreList) {
@@ -232,8 +249,14 @@ public class AiCopilotFacadeImpl implements AiCopilotFacade {
         String componentsName = "components";
 
         Path docsDir = Paths.get("/home/user/IdeaProjects/bytechef/docs/src/content/docs/automation");
-        Path componentsDir = Paths.get("/home/user/IdeaProjects/bytechef/docs/src/content/docs/reference/components");  //include task-dispatchers when documentation is written
-        Path workflowsDir = Paths.get("/home/user/IdeaProjects/bytechef/server/libs/platform/platform-ai/platform-ai-service/src/main/resources/workflows");
+        Path componentsDir = Paths.get("/home/user/IdeaProjects/bytechef/docs/src/content/docs/reference/components"); // include
+                                                                                                                       // task-dispatchers
+                                                                                                                       // when
+                                                                                                                       // documentation
+                                                                                                                       // is
+                                                                                                                       // written
+        Path workflowsDir = Paths.get(
+            "/home/user/IdeaProjects/bytechef/server/libs/platform/platform-ai/platform-ai-service/src/main/resources/workflows");
 
         try {
             storeDocumentsFromPath(docsName, docsDir, ".md", strategy, vectorStoreList);
@@ -244,7 +267,7 @@ public class AiCopilotFacadeImpl implements AiCopilotFacade {
         }
 
         try {
-            Path welomePath = Paths.get( "/home/user/IdeaProjects/bytechef/docs/src/content/docs/welcome.md");
+            Path welomePath = Paths.get("/home/user/IdeaProjects/bytechef/docs/src/content/docs/welcome.md");
             String welcome = Files.readString(welomePath);
             String cleanedDocument = preprocessDocument(welcome);
             vectorStore.add(List.of(new Document(cleanedDocument, Map.of(CATEGORY, docsName, NAME, "welcome"))));
@@ -252,7 +275,6 @@ public class AiCopilotFacadeImpl implements AiCopilotFacade {
             throw new RuntimeException(e);
         }
     }
-
 
     @Override
     public Flux<Map<String, ?>> chat(String message, ContextDTO contextDTO, String conversationId) {
@@ -267,15 +289,16 @@ public class AiCopilotFacadeImpl implements AiCopilotFacade {
         final String workflowString = "workflow";
         final String messageString = "message";
 
-        return switch (contextDTO.source()){
+        return switch (contextDTO.source()) {
             case WORKFLOW_EDITOR -> {
                 ChatClient.ChatClientRequestSpec advisors = chatClientDocs.prompt()
-                    .system("You are a Bytechef assistant. You answer questions about Bytechef and help users with problems. If a user asks you about generating a workflow: answer only with a json in a format similar to the json objects in the vector database. Only use the actions, triggers and parameters which you know exist.")
+                    .system(
+                        "You are a Bytechef assistant. You answer questions about Bytechef and help users with problems. If a user asks you about generating a workflow: answer only with a json in a format similar to the json objects in the vector database. Only use the actions, triggers and parameters which you know exist.")
                     .user(message)
                     .advisors(advisor -> advisor
-                        .param(AbstractChatMemoryAdvisor.CHAT_MEMORY_CONVERSATION_ID_KEY, conversationId)
-                        )
-                    ; //.param("clear_memory", true).param("chat_memory_response_size", 200)
+                        .param(AbstractChatMemoryAdvisor.CHAT_MEMORY_CONVERSATION_ID_KEY, conversationId)); // .param("clear_memory",
+                                                                                                            // true).param("chat_memory_response_size",
+                                                                                                            // 200)
                 yield advisors
                     .stream()
                     .content()
@@ -283,7 +306,31 @@ public class AiCopilotFacadeImpl implements AiCopilotFacade {
             }
             case WORKFLOW_EDITOR_COMPONENTS_POPOVER_MENU ->
                 chatClientWorkflow.prompt()
-                    .system("Answer only with a json in a format similar to the json objects in the vector database. Only use the actions, triggers and parameters which you know exist; look for JSON Example for the action or trigger. If a parameter is required, you must use it.") //ARRAY_BUILDER is an indicator that the parameter must be in [] brackets. OBJECT_BUILDER is an indicator that the parameter must be in {} brackets.
+                    .system(
+                        "Answer only with a json in a format similar to the json objects in the vector database. Only use the actions, triggers and parameters which you know exist; look for JSON Example for the action or trigger. If a parameter is required, you must use it.") // ARRAY_BUILDER
+                                                                                                                                                                                                                                                                                     // is
+                                                                                                                                                                                                                                                                                     // an
+                                                                                                                                                                                                                                                                                     // indicator
+                                                                                                                                                                                                                                                                                     // that
+                                                                                                                                                                                                                                                                                     // the
+                                                                                                                                                                                                                                                                                     // parameter
+                                                                                                                                                                                                                                                                                     // must
+                                                                                                                                                                                                                                                                                     // be
+                                                                                                                                                                                                                                                                                     // in
+                                                                                                                                                                                                                                                                                     // []
+                                                                                                                                                                                                                                                                                     // brackets.
+                                                                                                                                                                                                                                                                                     // OBJECT_BUILDER
+                                                                                                                                                                                                                                                                                     // is
+                                                                                                                                                                                                                                                                                     // an
+                                                                                                                                                                                                                                                                                     // indicator
+                                                                                                                                                                                                                                                                                     // that
+                                                                                                                                                                                                                                                                                     // the
+                                                                                                                                                                                                                                                                                     // parameter
+                                                                                                                                                                                                                                                                                     // must
+                                                                                                                                                                                                                                                                                     // be
+                                                                                                                                                                                                                                                                                     // in
+                                                                                                                                                                                                                                                                                     // {}
+                                                                                                                                                                                                                                                                                     // brackets.
                     .user(u -> u.text(userPrompt)
                         .param(workflowString, workflow.getDefinition())
                         .param(messageString, message))
@@ -293,7 +340,9 @@ public class AiCopilotFacadeImpl implements AiCopilotFacade {
                     .content()
                     .map(content -> Map.of("text", content));
             case CODE_EDITOR ->
-                switch (contextDTO.parameters().get("language").toString()){
+                switch (contextDTO.parameters()
+                    .get("language")
+                    .toString()) {
                     case "javascript" -> chatClientScript.prompt()
                         .system("You are a javascript code generator, answer only with code.")
                         .user(u -> u.text(userPrompt)
@@ -324,7 +373,9 @@ public class AiCopilotFacadeImpl implements AiCopilotFacade {
                         .stream()
                         .content()
                         .map(content -> Map.of("text", content));
-                    default -> throw new IllegalStateException("Unexpected value: " + contextDTO.parameters().get("language").toString());
+                    default -> throw new IllegalStateException("Unexpected value: " + contextDTO.parameters()
+                        .get("language")
+                        .toString());
                 };
             case null, default -> throw new IllegalStateException("Unexpected value: " + contextDTO.source());
         };
