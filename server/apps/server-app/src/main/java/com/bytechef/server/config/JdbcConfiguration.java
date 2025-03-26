@@ -29,6 +29,10 @@ import com.bytechef.commons.data.jdbc.converter.EncryptedStringToMapWrapperConve
 import com.bytechef.commons.data.jdbc.converter.MapWrapperToStringConverter;
 import com.bytechef.commons.data.jdbc.converter.StringToMapWrapperConverter;
 import com.bytechef.encryption.Encryption;
+import com.bytechef.platform.ai.repository.converter.ListDoubleToPGObjectConverter;
+import com.bytechef.platform.ai.repository.converter.MapToPGObjectConverter;
+import com.bytechef.platform.ai.repository.converter.PGObjectToListDoubleConverter;
+import com.bytechef.platform.ai.repository.converter.PGobjectToMapConverter;
 import com.bytechef.platform.data.storage.jdbc.repository.converter.DataEntryValueWrapperToStringConverter;
 import com.bytechef.platform.data.storage.jdbc.repository.converter.StringToDataEntryValueWrapperConverter;
 import com.bytechef.platform.workflow.execution.repository.converter.StringToTriggerStateValueConverter;
@@ -37,10 +41,6 @@ import com.bytechef.platform.workflow.execution.repository.converter.StringToWor
 import com.bytechef.platform.workflow.execution.repository.converter.TriggerStateValueToStringConverter;
 import com.bytechef.platform.workflow.execution.repository.converter.WorkflowExecutionIdToStringConverter;
 import com.bytechef.platform.workflow.execution.repository.converter.WorkflowTriggerToStringConverter;
-import com.bytechef.platform.ai.repository.converter.MapToPGObjectConverter;
-import com.bytechef.platform.ai.repository.converter.PGobjectToMapConverter;
-import com.bytechef.platform.ai.repository.converter.ListDoubleToPGObjectConverter;
-import com.bytechef.platform.ai.repository.converter.PGObjectToListDoubleConverter;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Arrays;
