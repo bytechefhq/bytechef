@@ -133,7 +133,6 @@ public class SecurityConfiguration {
                         RegexRequestMatcher.regexMatcher("^/api/(automation|embedded|platform)/v[0-9]+/.+"))
                     .ignoringRequestMatchers("/api/o/**")
                     .ignoringRequestMatchers("/approvals/**")
-                    .ignoringRequestMatchers("/file-entries/**")
                     .ignoringRequestMatchers("/graphql")
                     .ignoringRequestMatchers("/webhooks/**"));
 
