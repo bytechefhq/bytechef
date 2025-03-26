@@ -6,7 +6,7 @@
   "customAction" : null,
   "customActionHelp" : null,
   "description" : "The Crypto Helper allows you to use cryptographic functions.",
-  "icon" : "path:assets/cryptoHelper.svg",
+  "icon" : "path:assets/crypto-helper.svg",
   "tags" : null,
   "metadata" : null,
   "name" : "cryptoHelper",
@@ -19,7 +19,7 @@
     "description" : "Generate a random password of the specified length.",
     "help" : null,
     "metadata" : null,
-    "name" : "generatePasswordAction",
+    "name" : "generatePassword",
     "outputDefinition" : {
       "output" : null,
       "outputResponse" : {
@@ -128,7 +128,7 @@
     "description" : "Computes and returns the hash of the input.",
     "help" : null,
     "metadata" : null,
-    "name" : "hashAction",
+    "name" : "hash",
     "outputDefinition" : {
       "output" : null,
       "outputResponse" : {
@@ -242,7 +242,7 @@
     "description" : "Computes and returns the HMAC of the input.",
     "help" : null,
     "metadata" : null,
-    "name" : "hmacAction",
+    "name" : "hmac",
     "outputDefinition" : {
       "output" : null,
       "outputResponse" : {
