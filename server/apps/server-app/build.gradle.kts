@@ -6,10 +6,18 @@ springBoot {
 }
 
 dependencies {
-    implementation("io.awspring.cloud:spring-cloud-aws-starter-s3")
     implementation("io.awspring.cloud:spring-cloud-aws-starter-secrets-manager")
     implementation("io.awspring.cloud:spring-cloud-aws-starter-sqs")
     implementation(libs.org.springdoc.springdoc.openapi.starter.common)
+    implementation(libs.org.springdoc.springdoc.openapi.starter.webmvc.ui)
+    implementation("org.apache.activemq:artemis-jakarta-server")
+    implementation("org.springframework.boot:spring-boot-starter-actuator")
+    implementation("org.springframework.boot:spring-boot-starter-amqp")
+    implementation("org.springframework.boot:spring-boot-starter-artemis")
+    implementation("org.springframework.boot:spring-boot-starter-cache")
+    implementation("org.springframework.boot:spring-boot-starter-quartz")
+    implementation("org.springframework.boot:spring-boot-starter-mail")
+    implementation("io.awspring.cloud:spring-cloud-aws-starter-s3")
     implementation("org.springframework.ai:spring-ai-openai-spring-boot-starter:${rootProject.libs.versions.spring.ai.get()}")
     implementation("org.springframework.ai:spring-ai-pgvector-store-spring-boot-starter:${rootProject.libs.versions.spring.ai.get()}")
     implementation("org.springframework.boot:spring-boot-starter-batch")
@@ -20,6 +28,7 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-thymeleaf")
     implementation("org.springframework.boot:spring-boot-starter-validation")
     implementation("org.springframework.boot:spring-boot-starter-web")
+    implementation("org.springframework.kafka:spring-kafka")
     implementation(project(":server:libs:atlas:atlas-configuration:atlas-configuration-config"))
     implementation(project(":server:libs:atlas:atlas-configuration:atlas-configuration-converter"))
     implementation(project(":server:libs:atlas:atlas-configuration:atlas-configuration-repository:atlas-configuration-repository-git"))
@@ -308,16 +317,7 @@ dependencies {
 
     runtimeOnly("com.h2database:h2")
     runtimeOnly("com.zaxxer:HikariCP")
-    runtimeOnly("org.apache.activemq:artemis-jakarta-server")
     runtimeOnly("org.postgresql:postgresql")
-    runtimeOnly(libs.org.springdoc.springdoc.openapi.starter.webmvc.ui)
-    runtimeOnly("org.springframework.boot:spring-boot-starter-actuator")
-    runtimeOnly("org.springframework.boot:spring-boot-starter-amqp")
-    runtimeOnly("org.springframework.boot:spring-boot-starter-artemis")
-    runtimeOnly("org.springframework.boot:spring-boot-starter-cache")
-    runtimeOnly("org.springframework.boot:spring-boot-starter-quartz")
-    runtimeOnly("org.springframework.boot:spring-boot-starter-mail")
-    runtimeOnly("org.springframework.kafka:spring-kafka")
 
     testImplementation(project(":server:libs:test:test-int-support"))
 }

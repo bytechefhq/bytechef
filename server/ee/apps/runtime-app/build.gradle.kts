@@ -7,6 +7,8 @@ springBoot {
 
 dependencies {
     implementation("org.springframework.boot:spring-boot-starter")
+    implementation("org.springframework.boot:spring-boot-starter-actuator")
+    implementation("org.springframework.boot:spring-boot-starter-cache")
     implementation(project(":server:libs:atlas:atlas-configuration:atlas-configuration-config"))
     implementation(project(":server:libs:atlas:atlas-configuration:atlas-configuration-converter"))
     implementation(project(":server:libs:atlas:atlas-configuration:atlas-configuration-repository:atlas-configuration-repository-git"))
@@ -159,9 +161,6 @@ dependencies {
     implementation(project(":server:libs:modules:task-dispatchers:subflow"))
 
     implementation(project(":server:ee:libs:config:observability-config"))
-
-    runtimeOnly("org.springframework.boot:spring-boot-starter-actuator")
-    runtimeOnly("org.springframework.boot:spring-boot-starter-cache")
 
     testImplementation(project(":server:libs:test:test-int-support"))
 }

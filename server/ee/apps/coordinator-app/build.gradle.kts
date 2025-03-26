@@ -7,9 +7,14 @@ springBoot {
 
 dependencies {
     implementation("org.apache.commons:commons-lang3")
+    implementation("org.springframework.boot:spring-boot-starter-amqp")
+    implementation("org.springframework.boot:spring-boot-starter-actuator")
+    implementation("org.springframework.boot:spring-boot-starter-aop")
+    implementation("org.springframework.boot:spring-boot-starter-data-redis")
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("org.springframework.cloud:spring-cloud-starter-config")
     implementation("org.springframework.cloud:spring-cloud-starter-loadbalancer")
+    implementation("org.springframework.kafka:spring-kafka")
     implementation("org.springframework.retry:spring-retry")
     implementation(project(":server:libs:atlas:atlas-coordinator:atlas-coordinator-config"))
     implementation(project(":server:libs:atlas:atlas-file-storage:atlas-file-storage-impl"))
@@ -56,12 +61,6 @@ dependencies {
     implementation(project(":server:libs:modules:task-dispatchers:map"))
     implementation(project(":server:libs:modules:task-dispatchers:parallel"))
     implementation(project(":server:libs:modules:task-dispatchers:subflow"))
-
-    runtimeOnly("org.springframework.boot:spring-boot-starter-amqp")
-    runtimeOnly("org.springframework.boot:spring-boot-starter-actuator")
-    runtimeOnly("org.springframework.boot:spring-boot-starter-aop")
-    runtimeOnly("org.springframework.boot:spring-boot-starter-data-redis")
-    runtimeOnly("org.springframework.kafka:spring-kafka")
 
     testImplementation(project(":server:libs:test:test-int-support"))
 }

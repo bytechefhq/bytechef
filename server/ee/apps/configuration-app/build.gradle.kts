@@ -8,6 +8,10 @@ springBoot {
 dependencies {
     implementation("org.apache.commons:commons-lang3")
     implementation(libs.org.springdoc.springdoc.openapi.starter.common)
+    implementation(libs.org.springdoc.springdoc.openapi.starter.webmvc.ui)
+    implementation("org.springframework.boot:spring-boot-starter-actuator")
+    implementation("org.springframework.boot:spring-boot-starter-aop")
+    implementation("org.springframework.boot:spring-boot-starter-cache")
     implementation("org.springframework.boot:spring-boot-starter-data-jdbc")
     implementation("org.springframework.boot:spring-boot-starter-data-redis")
     implementation("org.springframework.boot:spring-boot-starter-validation")
@@ -75,10 +79,6 @@ dependencies {
 
     runtimeOnly("org.postgresql:postgresql")
     runtimeOnly("com.zaxxer:HikariCP")
-    runtimeOnly(libs.org.springdoc.springdoc.openapi.starter.webmvc.ui)
-    runtimeOnly("org.springframework.boot:spring-boot-starter-actuator")
-    runtimeOnly("org.springframework.boot:spring-boot-starter-aop")
-    runtimeOnly("org.springframework.boot:spring-boot-starter-cache")
 
     testImplementation(project(":server:libs:test:test-int-support"))
 }
