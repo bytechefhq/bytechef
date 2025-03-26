@@ -209,15 +209,8 @@ const IntegrationInstanceConfigurationListItem = ({
                         </div>
 
                         <IntegrationInstanceConfigurationListItemDropdownMenu
-                            integrationInstanceConfigurationEnabled={integrationInstanceConfiguration.enabled!}
                             onDeleteClick={() => setShowDeleteDialog(true)}
                             onEditClick={() => setShowEditDialog(true)}
-                            onEnableClick={() =>
-                                enableIntegrationInstanceConfigurationMutation.mutate({
-                                    enable: !integrationInstanceConfiguration.enabled,
-                                    id: integrationInstanceConfiguration.id!,
-                                })
-                            }
                             onUpdateIntegrationVersionClick={() => setShowUpdateIntegrationVersionDialog(true)}
                         />
                     </div>
