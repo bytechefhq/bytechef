@@ -56,8 +56,7 @@ public interface IntegrationFacade {
 
     List<IntegrationDTO> getIntegrations(
         @Nullable Long categoryId, boolean integrationInstanceConfigurations, @Nullable Long tagId,
-        @Nullable Status status,
-        boolean includeAllFields);
+        @Nullable Status status, boolean includeAllFields);
 
     void publishIntegration(long id, @Nullable String description);
 

@@ -111,8 +111,7 @@ public class AppEventTriggerApiController extends AbstractWebhookTriggerControll
             environment, OptionalUtils.get(SecurityUtils.getCurrentUserLogin(), "User not found"));
 
         List<IntegrationInstance> integrationInstances =
-            integrationInstanceService.getConnectedUserEnabledIntegrationInstances(
-                connectedUser.getId());
+            integrationInstanceService.getConnectedUserIntegrationInstances(connectedUser.getId(), true);
 
         for (IntegrationInstance integrationInstance : integrationInstances) {
             List<IntegrationInstanceWorkflow> integrationInstanceWorkflows =

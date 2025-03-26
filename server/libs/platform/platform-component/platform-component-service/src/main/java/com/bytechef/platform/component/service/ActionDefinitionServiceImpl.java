@@ -256,8 +256,8 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
 
     @Override
     public String executeWorkflowNodeDescription(
-        String componentName, int componentVersion, String actionName,
-        Map<String, ?> inputParameters, ActionContext context) {
+        String componentName, int componentVersion, String actionName, Map<String, ?> inputParameters,
+        ActionContext context) {
 
         com.bytechef.component.definition.ActionDefinition.ActionWorkflowNodeDescriptionFunction workflowNodeDescriptionFunction =
             getWorkflowNodeDescriptionFunction(
@@ -272,8 +272,7 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
     }
 
     @Override
-    public ActionDefinition getActionDefinition(
-        String componentName, int componentVersion, String actionName) {
+    public ActionDefinition getActionDefinition(String componentName, int componentVersion, String actionName) {
         if (componentDefinitionRegistry.hasComponentDefinition(componentName, componentVersion)) {
             return new ActionDefinition(
                 componentDefinitionRegistry.getActionDefinition(componentName, componentVersion, actionName),

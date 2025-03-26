@@ -47,13 +47,22 @@ public class IntegrationInstanceServiceImpl implements IntegrationInstanceServic
 
     @Override
     @Transactional(readOnly = true)
-    public List<IntegrationInstance> getConnectedUserIntegrationInstances(List<Long> connectedUserIds) {
-        return integrationInstanceRepository.findAllByConnectedUserIdIn(connectedUserIds);
+    public List<IntegrationInstance> getConnectedUserIntegrationInstances(long connectedUserId, boolean enabled) {
+        return integrationInstanceRepository.findAllByConnectedUserIdAndEnabled(connectedUserId, enabled);
     }
 
     @Override
-    public List<IntegrationInstance> getConnectedUserEnabledIntegrationInstances(long connectedUserId) {
-        return integrationInstanceRepository.findAllByConnectedUserIdAndEnabled(connectedUserId, true);
+    public List<IntegrationInstance> getConnectedUserIntegrationInstances(
+        long connectedUserId, Environment environment) {
+
+        return integrationInstanceRepository.findAllByConnectedUserIdAndEnvironment(
+            connectedUserId, environment.ordinal());
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<IntegrationInstance> getConnectedUserIntegrationInstances(List<Long> connectedUserIds) {
+        return integrationInstanceRepository.findAllByConnectedUserIdIn(connectedUserIds);
     }
 
     @Override

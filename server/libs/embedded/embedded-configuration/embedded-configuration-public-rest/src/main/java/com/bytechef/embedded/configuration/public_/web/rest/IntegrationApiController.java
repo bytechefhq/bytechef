@@ -58,7 +58,7 @@ public class IntegrationApiController implements IntegrationApi {
 
         return ResponseEntity.ok(
             integrationInstanceConfigurationFacade
-                .getEnabledIntegrationInstanceConfigurationIntegrations(environment)
+                .getIntegrationInstanceConfigurationIntegrations(environment, true)
                 .stream()
                 .map(integrationDTO -> conversionService.convert(integrationDTO, IntegrationModel.class))
                 .toList());

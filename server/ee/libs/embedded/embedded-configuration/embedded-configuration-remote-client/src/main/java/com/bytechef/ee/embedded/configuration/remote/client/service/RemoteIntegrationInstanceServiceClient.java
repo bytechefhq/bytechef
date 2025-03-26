@@ -42,12 +42,19 @@ public class RemoteIntegrationInstanceServiceClient implements IntegrationInstan
     }
 
     @Override
-    public List<IntegrationInstance> getConnectedUserIntegrationInstances(List<Long> connectedUserIds) {
-        return null;
+    public List<IntegrationInstance> getConnectedUserIntegrationInstances(long connectedUserId, boolean enabled) {
+        throw new UnsupportedOperationException();
     }
 
     @Override
-    public List<IntegrationInstance> getConnectedUserEnabledIntegrationInstances(long connectedUserId) {
+    public List<IntegrationInstance> getConnectedUserIntegrationInstances(
+        long connectedUserId, Environment environment) {
+
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public List<IntegrationInstance> getConnectedUserIntegrationInstances(List<Long> connectedUserIds) {
         throw new UnsupportedOperationException();
     }
 

@@ -288,10 +288,10 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
     }
 
     @Override
-    public IntegrationInstanceConfigurationDTO getEnabledIntegrationInstanceConfigurationIntegration(
-        long integrationId, Environment environment) {
+    public IntegrationInstanceConfigurationDTO getIntegrationInstanceConfigurationIntegration(
+        long integrationId, Environment environment, boolean enabled) {
 
-        return getEnabledIntegrationInstanceConfigurationIntegrations(environment)
+        return getIntegrationInstanceConfigurationIntegrations(environment, true)
             .stream()
             .filter(integrationDTO -> Objects.equals(integrationDTO.id(), integrationId))
             .findFirst()
@@ -299,13 +299,13 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
     }
 
     @Override
-    public List<IntegrationInstanceConfigurationDTO> getEnabledIntegrationInstanceConfigurationIntegrations(
-        Environment environment) {
+    public List<IntegrationInstanceConfigurationDTO> getIntegrationInstanceConfigurationIntegrations(
+        Environment environment, boolean enabled) {
 
         List<IntegrationInstanceConfigurationDTO> integrationInstanceConfigurationDTOs = List.of();
 
         List<IntegrationInstanceConfiguration> integrationInstanceConfigurations =
-            integrationInstanceConfigurationService.getEnabledIntegrationInstanceConfigurations(environment);
+            integrationInstanceConfigurationService.getIntegrationInstanceConfigurations(environment, true);
 
         if (!integrationInstanceConfigurations.isEmpty()) {
             List<IntegrationDTO> integrationDTOs = getIntegrations(integrationInstanceConfigurations);
