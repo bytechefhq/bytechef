@@ -21,7 +21,7 @@ import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.example.constant.CryptoHelperConstants.ALGORITHM;
 import static com.bytechef.component.example.constant.CryptoHelperConstants.INPUT;
-import static com.bytechef.component.example.util.CryptoHelperUtil.bytesToHex;
+import static com.bytechef.component.example.util.CryptoHelperUtil.convertBytesToHexString;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
@@ -36,7 +36,7 @@ import java.security.NoSuchAlgorithmException;
  */
 public class CryptoHelperHashAction {
 
-    public static final ModifiableActionDefinition ACTION_DEFINITION = action("hashAction")
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action("hash")
         .title("Hash")
         .description("Computes and returns the hash of the input.")
         .properties(
@@ -60,12 +60,15 @@ public class CryptoHelperHashAction {
 
     protected static String perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) {
+
         try {
             MessageDigest digest = MessageDigest.getInstance(inputParameters.getRequiredString(ALGORITHM));
-            byte[] hashBytes = digest.digest(inputParameters.getRequiredString(INPUT)
-                .getBytes(StandardCharsets.UTF_8));
 
-            return bytesToHex(hashBytes);
+            byte[] hashBytes = digest
+                .digest(inputParameters.getRequiredString(INPUT)
+                    .getBytes(StandardCharsets.UTF_8));
+
+            return convertBytesToHexString(hashBytes);
 
         } catch (NoSuchAlgorithmException e) {
             throw new RuntimeException("Invalid Hash Algorithm", e);

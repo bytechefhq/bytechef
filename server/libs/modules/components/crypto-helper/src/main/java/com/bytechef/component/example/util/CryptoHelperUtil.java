@@ -17,8 +17,6 @@
 package com.bytechef.component.example.util;
 
 import static com.bytechef.component.definition.ComponentDsl.option;
-import static com.bytechef.component.example.constant.CryptoHelperConstants.ALPHANUMERIC_CHARACTERS;
-import static com.bytechef.component.example.constant.CryptoHelperConstants.SYMBOL_CHARACTERS;
 
 import com.bytechef.component.definition.Option;
 import java.util.Arrays;
@@ -30,28 +28,10 @@ import java.util.stream.Collectors;
  */
 public class CryptoHelperUtil {
 
-    public static List<Option<String>> getHashAlgorithmOptions() {
-
-        return Arrays.stream(CryptographicAlgorithmsEnum.values())
-            .map(algorithm -> option(algorithm.getLabel(), algorithm.getLabel()))
-            .collect(Collectors.toList());
+    private CryptoHelperUtil() {
     }
 
-    public static List<Option<String>> getHmacAlgorithmOptions() {
-
-        return Arrays.stream(CryptographicAlgorithmsEnum.values())
-            .map(algorithm -> option(algorithm.getLabel(), algorithm.getHmacLabel()))
-            .collect(Collectors.toList());
-    }
-
-    public static List<Option<String>> getCharacterSetOptions() {
-
-        return List.of(
-            option("Alphanumeric", ALPHANUMERIC_CHARACTERS),
-            option("Alphanumeric + Symbols", ALPHANUMERIC_CHARACTERS + SYMBOL_CHARACTERS));
-    }
-
-    public static String bytesToHex(byte[] bytes) {
+    public static String convertBytesToHexString(byte[] bytes) {
         StringBuilder hexString = new StringBuilder();
 
         for (byte b : bytes) {
@@ -59,5 +39,17 @@ public class CryptoHelperUtil {
         }
 
         return hexString.toString();
+    }
+
+    public static List<Option<String>> getHashAlgorithmOptions() {
+        return Arrays.stream(CryptographicAlgorithmsEnum.values())
+            .map(algorithm -> option(algorithm.getLabel(), algorithm.getLabel()))
+            .collect(Collectors.toList());
+    }
+
+    public static List<Option<String>> getHmacAlgorithmOptions() {
+        return Arrays.stream(CryptographicAlgorithmsEnum.values())
+            .map(algorithm -> option(algorithm.getLabel(), algorithm.getHmacLabel()))
+            .collect(Collectors.toList());
     }
 }

@@ -21,9 +21,9 @@ package com.bytechef.component.example.constant;
  */
 public class CryptoHelperConstants {
 
+    public static final String ALGORITHM = "algorithm";
     public static final String ALPHANUMERIC_CHARACTERS =
         "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-    public static final String ALGORITHM = "algorithm";
     public static final String CHARACTER_SET = "characterSet";
     public static final String INPUT = "input";
     public static final String KEY = "key";

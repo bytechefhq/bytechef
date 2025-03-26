@@ -26,7 +26,7 @@ class CryptoHelperComponentHandlerTest {
 
     @Test
     void testGetComponentDefinition() {
-        JsonFileAssert.assertEquals("definition/cryptoHelper_v1.json",
+        JsonFileAssert.assertEquals("definition/crypto-helper_v1.json",
             new CryptoHelperComponentHandler().getDefinition());
     }
 }

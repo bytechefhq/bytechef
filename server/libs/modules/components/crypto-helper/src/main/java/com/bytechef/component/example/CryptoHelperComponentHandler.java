@@ -35,7 +35,7 @@ public class CryptoHelperComponentHandler implements ComponentHandler {
     private static final ComponentDefinition COMPONENT_DEFINITION = component("cryptoHelper")
         .title("Crypto Helper")
         .description("The Crypto Helper allows you to use cryptographic functions.")
-        .icon("path:assets/cryptoHelper.svg")
+        .icon("path:assets/crypto-helper.svg")
         .categories(ComponentCategory.HELPERS)
         .actions(
             CryptoHelperGeneratePasswordAction.ACTION_DEFINITION,
