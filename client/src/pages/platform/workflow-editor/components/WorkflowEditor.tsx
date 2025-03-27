@@ -7,7 +7,7 @@ import {useCopilotStore} from '@/shared/components/copilot/stores/useCopilotStor
 import {MINIMAP_MASK_COLOR, MINIMAP_NODE_COLOR} from '@/shared/constants';
 import {ComponentDefinitionBasic, TaskDispatcherDefinitionBasic} from '@/shared/middleware/platform/configuration';
 import {ClickedDefinitionType} from '@/shared/types';
-import {Controls, MiniMap, ReactFlow, useReactFlow} from '@xyflow/react';
+import {Background, BackgroundVariant, Controls, MiniMap, ReactFlow, useReactFlow} from '@xyflow/react';
 import {DragEventHandler, useCallback, useEffect, useMemo} from 'react';
 import {twMerge} from 'tailwind-merge';
 import {useShallow} from 'zustand/react/shallow';
@@ -269,6 +269,8 @@ const WorkflowEditor = ({
                     nodeBorderRadius={24}
                     nodeColor={MINIMAP_NODE_COLOR}
                 />
+
+                <Background color="#ccc" variant={BackgroundVariant.Dots} />
 
                 <Controls
                     className="m-2 rounded-md border border-stroke-neutral-secondary bg-background"
