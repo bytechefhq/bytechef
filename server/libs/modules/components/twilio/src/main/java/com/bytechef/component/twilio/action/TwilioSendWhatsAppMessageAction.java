@@ -127,9 +127,7 @@ public class TwilioSendWhatsAppMessageAction {
             Map<String, String> map = inputParameters.getMap(CONTENT_VARIABLES, String.class);
 
             if (map != null) {
-                String contentVariables = actionContext.json(json -> json.write(map));
-
-                bodyMap.put(CONTENT_VARIABLES, contentVariables);
+                bodyMap.put(CONTENT_VARIABLES, actionContext.json(json -> json.write(map)));
             }
         } else {
             bodyMap.put(BODY, inputParameters.getRequiredString(BODY));
@@ -140,6 +138,7 @@ public class TwilioSendWhatsAppMessageAction {
 
     private static void validatePhoneNumber(String phoneNumber) {
         Pattern pattern = Pattern.compile("whatsapp:\\+\\d{11,15}");
+
         Matcher matcher = pattern.matcher(phoneNumber);
 
         if (!matcher.find()) {
