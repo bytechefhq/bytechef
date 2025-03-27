@@ -2,9 +2,13 @@ package com.bytechef.embedded.execution.public_.web.rest.model;
 
 import java.net.URI;
 import java.util.Objects;
+import com.bytechef.embedded.execution.public_.web.rest.model.ErrorsInnerModel;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonTypeName;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import org.springframework.lang.Nullable;
 import org.openapitools.jackson.nullable.JsonNullable;
 import java.time.OffsetDateTime;
@@ -17,33 +21,42 @@ import java.util.*;
 import jakarta.annotation.Generated;
 
 /**
- * ExecuteAction200ResponseModel
+ * ExecuteWorkflows400ResponseModel
  */
 
-@JsonTypeName("executeAction_200_response")
+@JsonTypeName("executeWorkflows_400_response")
 @Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-03-27T18:31:41.013287+01:00[Europe/Zagreb]", comments = "Generator version: 7.12.0")
-public class ExecuteAction200ResponseModel {
+public class ExecuteWorkflows400ResponseModel {
 
-  private @Nullable Object output;
+  @Valid
+  private List<@Valid ErrorsInnerModel> errors = new ArrayList<>();
 
-  public ExecuteAction200ResponseModel output(Object output) {
-    this.output = output;
+  public ExecuteWorkflows400ResponseModel errors(List<@Valid ErrorsInnerModel> errors) {
+    this.errors = errors;
+    return this;
+  }
+
+  public ExecuteWorkflows400ResponseModel addErrorsItem(ErrorsInnerModel errorsItem) {
+    if (this.errors == null) {
+      this.errors = new ArrayList<>();
+    }
+    this.errors.add(errorsItem);
     return this;
   }
 
   /**
-   * The result of the action call.
-   * @return output
+   * Get errors
+   * @return errors
    */
-  
-  @Schema(name = "output", description = "The result of the action call.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  @JsonProperty("output")
-  public Object getOutput() {
-    return output;
+  @Valid 
+  @Schema(name = "errors", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("errors")
+  public List<@Valid ErrorsInnerModel> getErrors() {
+    return errors;
   }
 
-  public void setOutput(Object output) {
-    this.output = output;
+  public void setErrors(List<@Valid ErrorsInnerModel> errors) {
+    this.errors = errors;
   }
 
   @Override
@@ -54,20 +67,20 @@ public class ExecuteAction200ResponseModel {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    ExecuteAction200ResponseModel executeAction200Response = (ExecuteAction200ResponseModel) o;
-    return Objects.equals(this.output, executeAction200Response.output);
+    ExecuteWorkflows400ResponseModel executeWorkflows400Response = (ExecuteWorkflows400ResponseModel) o;
+    return Objects.equals(this.errors, executeWorkflows400Response.errors);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(output);
+    return Objects.hash(errors);
   }
 
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    sb.append("class ExecuteAction200ResponseModel {\n");
-    sb.append("    output: ").append(toIndentedString(output)).append("\n");
+    sb.append("class ExecuteWorkflows400ResponseModel {\n");
+    sb.append("    errors: ").append(toIndentedString(errors)).append("\n");
     sb.append("}");
     return sb.toString();
   }
