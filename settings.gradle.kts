@@ -125,6 +125,7 @@ include("server:libs:embedded:embedded-configuration:embedded-configuration-rest
 include("server:libs:embedded:embedded-configuration:embedded-configuration-service")
 include("server:libs:embedded:embedded-connection:embedded-connection-rest")
 include("server:libs:embedded:embedded-execution:embedded-execution-api")
+include("server:libs:embedded:embedded-execution:embedded-execution-mcp-server")
 include("server:libs:embedded:embedded-execution:embedded-execution-public-rest")
 include("server:libs:embedded:embedded-execution:embedded-execution-service")
 include("server:libs:embedded:embedded-security-web:embedded-security-web-impl")
