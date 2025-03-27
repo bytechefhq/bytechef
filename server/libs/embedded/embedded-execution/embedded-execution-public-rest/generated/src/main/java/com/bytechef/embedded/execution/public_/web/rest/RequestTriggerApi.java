@@ -6,6 +6,7 @@
 package com.bytechef.embedded.execution.public_.web.rest;
 
 import com.bytechef.embedded.execution.public_.web.rest.model.EnvironmentModel;
+import com.bytechef.embedded.execution.public_.web.rest.model.ExecuteWorkflows400ResponseModel;
 import io.swagger.v3.oas.annotations.ExternalDocumentation;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -32,7 +33,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-03-20T07:58:31.863654+01:00[Europe/Zagreb]", comments = "Generator version: 7.12.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-03-27T18:31:41.013287+01:00[Europe/Zagreb]", comments = "Generator version: 7.12.0")
 @Validated
 @Tag(name = "request-trigger", description = "The Embedded Request Trigger Public API")
 public interface RequestTriggerApi {
@@ -48,6 +49,15 @@ public interface RequestTriggerApi {
      * @param workflowReferenceCode The workflow reference code. (required)
      * @param xEnvironment The environment. (optional)
      * @return The list of active integrations. (status code 200)
+     *         or Bad request (status code 400)
+     *         or Unauthorized (status code 401)
+     *         or Forbidden (status code 403)
+     *         or Not found (status code 404)
+     *         or Conflict (status code 409)
+     *         or Unprocessable entity (status code 422)
+     *         or Remote provider error (status code 499)
+     *         or Internal server error (status code 500)
+     *         or Not implemented (status code 501)
      */
     @Operation(
         operationId = "executeWorkflow",
@@ -57,6 +67,33 @@ public interface RequestTriggerApi {
         responses = {
             @ApiResponse(responseCode = "200", description = "The list of active integrations.", content = {
                 @Content(mediaType = "application/json", schema = @Schema(implementation = Object.class))
+            }),
+            @ApiResponse(responseCode = "400", description = "Bad request", content = {
+                @Content(mediaType = "application/json", schema = @Schema(implementation = ExecuteWorkflows400ResponseModel.class))
+            }),
+            @ApiResponse(responseCode = "401", description = "Unauthorized", content = {
+                @Content(mediaType = "application/json", schema = @Schema(implementation = ExecuteWorkflows400ResponseModel.class))
+            }),
+            @ApiResponse(responseCode = "403", description = "Forbidden", content = {
+                @Content(mediaType = "application/json", schema = @Schema(implementation = ExecuteWorkflows400ResponseModel.class))
+            }),
+            @ApiResponse(responseCode = "404", description = "Not found", content = {
+                @Content(mediaType = "application/json", schema = @Schema(implementation = ExecuteWorkflows400ResponseModel.class))
+            }),
+            @ApiResponse(responseCode = "409", description = "Conflict", content = {
+                @Content(mediaType = "application/json", schema = @Schema(implementation = ExecuteWorkflows400ResponseModel.class))
+            }),
+            @ApiResponse(responseCode = "422", description = "Unprocessable entity", content = {
+                @Content(mediaType = "application/json", schema = @Schema(implementation = ExecuteWorkflows400ResponseModel.class))
+            }),
+            @ApiResponse(responseCode = "499", description = "Remote provider error", content = {
+                @Content(mediaType = "application/json", schema = @Schema(implementation = ExecuteWorkflows400ResponseModel.class))
+            }),
+            @ApiResponse(responseCode = "500", description = "Internal server error", content = {
+                @Content(mediaType = "application/json", schema = @Schema(implementation = ExecuteWorkflows400ResponseModel.class))
+            }),
+            @ApiResponse(responseCode = "501", description = "Not implemented", content = {
+                @Content(mediaType = "application/json", schema = @Schema(implementation = ExecuteWorkflows400ResponseModel.class))
             })
         }
     )
@@ -70,6 +107,55 @@ public interface RequestTriggerApi {
         @Parameter(name = "workflowReferenceCode", description = "The workflow reference code.", required = true, in = ParameterIn.PATH) @PathVariable("workflowReferenceCode") String workflowReferenceCode,
         @Parameter(name = "X-Environment", description = "The environment.", in = ParameterIn.HEADER) @RequestHeader(value = "X-Environment", required = false) EnvironmentModel xEnvironment
     ) {
+        getRequest().ifPresent(request -> {
+            for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
+                if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
+                    String exampleString = "{ \"errors\" : [ { \"code\" : \"MISSING_REQUIRED_FIELD\", \"meta\" : { \"application_name\" : \"MyCompany Production\", \"origin\" : \"remote-provider\", \"cause\" : \"{}\" }, \"problem_type\" : \"MISSING_REQUIRED_FIELD\", \"id\" : \"9366efb4-8fb1-4a28-bfb0-8d6f9cc6b5c5\", \"detail\" : \"detail\", \"title\" : \"Property values were not valid\n\", \"status\" : \"400\" }, { \"code\" : \"MISSING_REQUIRED_FIELD\", \"meta\" : { \"application_name\" : \"MyCompany Production\", \"origin\" : \"remote-provider\", \"cause\" : \"{}\" }, \"problem_type\" : \"MISSING_REQUIRED_FIELD\", \"id\" : \"9366efb4-8fb1-4a28-bfb0-8d6f9cc6b5c5\", \"detail\" : \"detail\", \"title\" : \"Property values were not valid\n\", \"status\" : \"400\" } ] }";
+                    ApiUtil.setExampleResponse(request, "application/json", exampleString);
+                    break;
+                }
+                if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
+                    String exampleString = "{ \"errors\" : [ { \"code\" : \"MISSING_REQUIRED_FIELD\", \"meta\" : { \"application_name\" : \"MyCompany Production\", \"origin\" : \"remote-provider\", \"cause\" : \"{}\" }, \"problem_type\" : \"MISSING_REQUIRED_FIELD\", \"id\" : \"9366efb4-8fb1-4a28-bfb0-8d6f9cc6b5c5\", \"detail\" : \"detail\", \"title\" : \"Property values were not valid\n\", \"status\" : \"400\" }, { \"code\" : \"MISSING_REQUIRED_FIELD\", \"meta\" : { \"application_name\" : \"MyCompany Production\", \"origin\" : \"remote-provider\", \"cause\" : \"{}\" }, \"problem_type\" : \"MISSING_REQUIRED_FIELD\", \"id\" : \"9366efb4-8fb1-4a28-bfb0-8d6f9cc6b5c5\", \"detail\" : \"detail\", \"title\" : \"Property values were not valid\n\", \"status\" : \"400\" } ] }";
+                    ApiUtil.setExampleResponse(request, "application/json", exampleString);
+                    break;
+                }
+                if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
+                    String exampleString = "{ \"errors\" : [ { \"code\" : \"MISSING_REQUIRED_FIELD\", \"meta\" : { \"application_name\" : \"MyCompany Production\", \"origin\" : \"remote-provider\", \"cause\" : \"{}\" }, \"problem_type\" : \"MISSING_REQUIRED_FIELD\", \"id\" : \"9366efb4-8fb1-4a28-bfb0-8d6f9cc6b5c5\", \"detail\" : \"detail\", \"title\" : \"Property values were not valid\n\", \"status\" : \"400\" }, { \"code\" : \"MISSING_REQUIRED_FIELD\", \"meta\" : { \"application_name\" : \"MyCompany Production\", \"origin\" : \"remote-provider\", \"cause\" : \"{}\" }, \"problem_type\" : \"MISSING_REQUIRED_FIELD\", \"id\" : \"9366efb4-8fb1-4a28-bfb0-8d6f9cc6b5c5\", \"detail\" : \"detail\", \"title\" : \"Property values were not valid\n\", \"status\" : \"400\" } ] }";
+                    ApiUtil.setExampleResponse(request, "application/json", exampleString);
+                    break;
+                }
+                if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
+                    String exampleString = "{ \"errors\" : [ { \"code\" : \"MISSING_REQUIRED_FIELD\", \"meta\" : { \"application_name\" : \"MyCompany Production\", \"origin\" : \"remote-provider\", \"cause\" : \"{}\" }, \"problem_type\" : \"MISSING_REQUIRED_FIELD\", \"id\" : \"9366efb4-8fb1-4a28-bfb0-8d6f9cc6b5c5\", \"detail\" : \"detail\", \"title\" : \"Property values were not valid\n\", \"status\" : \"400\" }, { \"code\" : \"MISSING_REQUIRED_FIELD\", \"meta\" : { \"application_name\" : \"MyCompany Production\", \"origin\" : \"remote-provider\", \"cause\" : \"{}\" }, \"problem_type\" : \"MISSING_REQUIRED_FIELD\", \"id\" : \"9366efb4-8fb1-4a28-bfb0-8d6f9cc6b5c5\", \"detail\" : \"detail\", \"title\" : \"Property values were not valid\n\", \"status\" : \"400\" } ] }";
+                    ApiUtil.setExampleResponse(request, "application/json", exampleString);
+                    break;
+                }
+                if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
+                    String exampleString = "{ \"errors\" : [ { \"code\" : \"MISSING_REQUIRED_FIELD\", \"meta\" : { \"application_name\" : \"MyCompany Production\", \"origin\" : \"remote-provider\", \"cause\" : \"{}\" }, \"problem_type\" : \"MISSING_REQUIRED_FIELD\", \"id\" : \"9366efb4-8fb1-4a28-bfb0-8d6f9cc6b5c5\", \"detail\" : \"detail\", \"title\" : \"Property values were not valid\n\", \"status\" : \"400\" }, { \"code\" : \"MISSING_REQUIRED_FIELD\", \"meta\" : { \"application_name\" : \"MyCompany Production\", \"origin\" : \"remote-provider\", \"cause\" : \"{}\" }, \"problem_type\" : \"MISSING_REQUIRED_FIELD\", \"id\" : \"9366efb4-8fb1-4a28-bfb0-8d6f9cc6b5c5\", \"detail\" : \"detail\", \"title\" : \"Property values were not valid\n\", \"status\" : \"400\" } ] }";
+                    ApiUtil.setExampleResponse(request, "application/json", exampleString);
+                    break;
+                }
+                if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
+                    String exampleString = "{ \"errors\" : [ { \"code\" : \"MISSING_REQUIRED_FIELD\", \"meta\" : { \"application_name\" : \"MyCompany Production\", \"origin\" : \"remote-provider\", \"cause\" : \"{}\" }, \"problem_type\" : \"MISSING_REQUIRED_FIELD\", \"id\" : \"9366efb4-8fb1-4a28-bfb0-8d6f9cc6b5c5\", \"detail\" : \"detail\", \"title\" : \"Property values were not valid\n\", \"status\" : \"400\" }, { \"code\" : \"MISSING_REQUIRED_FIELD\", \"meta\" : { \"application_name\" : \"MyCompany Production\", \"origin\" : \"remote-provider\", \"cause\" : \"{}\" }, \"problem_type\" : \"MISSING_REQUIRED_FIELD\", \"id\" : \"9366efb4-8fb1-4a28-bfb0-8d6f9cc6b5c5\", \"detail\" : \"detail\", \"title\" : \"Property values were not valid\n\", \"status\" : \"400\" } ] }";
+                    ApiUtil.setExampleResponse(request, "application/json", exampleString);
+                    break;
+                }
+                if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
+                    String exampleString = "{ \"errors\" : [ { \"code\" : \"MISSING_REQUIRED_FIELD\", \"meta\" : { \"application_name\" : \"MyCompany Production\", \"origin\" : \"remote-provider\", \"cause\" : \"{}\" }, \"problem_type\" : \"MISSING_REQUIRED_FIELD\", \"id\" : \"9366efb4-8fb1-4a28-bfb0-8d6f9cc6b5c5\", \"detail\" : \"detail\", \"title\" : \"Property values were not valid\n\", \"status\" : \"400\" }, { \"code\" : \"MISSING_REQUIRED_FIELD\", \"meta\" : { \"application_name\" : \"MyCompany Production\", \"origin\" : \"remote-provider\", \"cause\" : \"{}\" }, \"problem_type\" : \"MISSING_REQUIRED_FIELD\", \"id\" : \"9366efb4-8fb1-4a28-bfb0-8d6f9cc6b5c5\", \"detail\" : \"detail\", \"title\" : \"Property values were not valid\n\", \"status\" : \"400\" } ] }";
+                    ApiUtil.setExampleResponse(request, "application/json", exampleString);
+                    break;
+                }
+                if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
+                    String exampleString = "{ \"errors\" : [ { \"code\" : \"MISSING_REQUIRED_FIELD\", \"meta\" : { \"application_name\" : \"MyCompany Production\", \"origin\" : \"remote-provider\", \"cause\" : \"{}\" }, \"problem_type\" : \"MISSING_REQUIRED_FIELD\", \"id\" : \"9366efb4-8fb1-4a28-bfb0-8d6f9cc6b5c5\", \"detail\" : \"detail\", \"title\" : \"Property values were not valid\n\", \"status\" : \"400\" }, { \"code\" : \"MISSING_REQUIRED_FIELD\", \"meta\" : { \"application_name\" : \"MyCompany Production\", \"origin\" : \"remote-provider\", \"cause\" : \"{}\" }, \"problem_type\" : \"MISSING_REQUIRED_FIELD\", \"id\" : \"9366efb4-8fb1-4a28-bfb0-8d6f9cc6b5c5\", \"detail\" : \"detail\", \"title\" : \"Property values were not valid\n\", \"status\" : \"400\" } ] }";
+                    ApiUtil.setExampleResponse(request, "application/json", exampleString);
+                    break;
+                }
+                if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
+                    String exampleString = "{ \"errors\" : [ { \"code\" : \"MISSING_REQUIRED_FIELD\", \"meta\" : { \"application_name\" : \"MyCompany Production\", \"origin\" : \"remote-provider\", \"cause\" : \"{}\" }, \"problem_type\" : \"MISSING_REQUIRED_FIELD\", \"id\" : \"9366efb4-8fb1-4a28-bfb0-8d6f9cc6b5c5\", \"detail\" : \"detail\", \"title\" : \"Property values were not valid\n\", \"status\" : \"400\" }, { \"code\" : \"MISSING_REQUIRED_FIELD\", \"meta\" : { \"application_name\" : \"MyCompany Production\", \"origin\" : \"remote-provider\", \"cause\" : \"{}\" }, \"problem_type\" : \"MISSING_REQUIRED_FIELD\", \"id\" : \"9366efb4-8fb1-4a28-bfb0-8d6f9cc6b5c5\", \"detail\" : \"detail\", \"title\" : \"Property values were not valid\n\", \"status\" : \"400\" } ] }";
+                    ApiUtil.setExampleResponse(request, "application/json", exampleString);
+                    break;
+                }
+            }
+        });
         return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
 
     }

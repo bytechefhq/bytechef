@@ -2,11 +2,10 @@ package com.bytechef.embedded.execution.public_.web.rest.model;
 
 import java.net.URI;
 import java.util.Objects;
+import com.bytechef.embedded.execution.public_.web.rest.model.FunctionModel;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonTypeName;
-import java.util.HashMap;
-import java.util.Map;
 import org.springframework.lang.Nullable;
 import org.openapitools.jackson.nullable.JsonNullable;
 import java.time.OffsetDateTime;
@@ -19,53 +18,67 @@ import java.util.*;
 import jakarta.annotation.Generated;
 
 /**
- * ExecuteActionRequestModel
+ * ToolModel
  */
 
-@JsonTypeName("executeAction_request")
+@JsonTypeName("Tool")
 @Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-03-27T18:31:41.013287+01:00[Europe/Zagreb]", comments = "Generator version: 7.12.0")
-public class ExecuteActionRequestModel {
+public class ToolModel {
 
-  @Valid
-  private Map<String, Object> input = new HashMap<>();
+  private FunctionModel function;
 
-  public ExecuteActionRequestModel() {
+  private String type = "function";
+
+  public ToolModel() {
     super();
   }
 
   /**
    * Constructor with only required parameters
    */
-  public ExecuteActionRequestModel(Map<String, Object> input) {
-    this.input = input;
+  public ToolModel(FunctionModel function, String type) {
+    this.function = function;
+    this.type = type;
   }
 
-  public ExecuteActionRequestModel input(Map<String, Object> input) {
-    this.input = input;
-    return this;
-  }
-
-  public ExecuteActionRequestModel putInputItem(String key, Object inputItem) {
-    if (this.input == null) {
-      this.input = new HashMap<>();
-    }
-    this.input.put(key, inputItem);
+  public ToolModel function(FunctionModel function) {
+    this.function = function;
     return this;
   }
 
   /**
-   * The input parameters for the action.
-   * @return input
+   * Get function
+   * @return function
    */
-  @NotNull 
-  @Schema(name = "input", description = "The input parameters for the action.", requiredMode = Schema.RequiredMode.REQUIRED)
-  @JsonProperty("input")
-  public Map<String, Object> getInput() {
-    return input;
+  @NotNull @Valid 
+  @Schema(name = "function", requiredMode = Schema.RequiredMode.REQUIRED)
+  @JsonProperty("function")
+  public FunctionModel getFunction() {
+    return function;
   }
 
-  public void setInput(Map<String, Object> input) {
-    this.input = input;
+  public void setFunction(FunctionModel function) {
+    this.function = function;
+  }
+
+  public ToolModel type(String type) {
+    this.type = type;
+    return this;
+  }
+
+  /**
+   * The type of the tool
+   * @return type
+   */
+  @NotNull 
+  @Schema(name = "type", description = "The type of the tool", requiredMode = Schema.RequiredMode.REQUIRED)
+  @JsonProperty("type")
+  public String getType() {
+    return type;
+  }
+
+  public void setType(String type) {
+    this.type = type;
   }
 
   @Override
@@ -76,20 +89,22 @@ public class ExecuteActionRequestModel {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    ExecuteActionRequestModel executeActionRequest = (ExecuteActionRequestModel) o;
-    return Objects.equals(this.input, executeActionRequest.input);
+    ToolModel tool = (ToolModel) o;
+    return Objects.equals(this.function, tool.function) &&
+        Objects.equals(this.type, tool.type);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(input);
+    return Objects.hash(function, type);
   }
 
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    sb.append("class ExecuteActionRequestModel {\n");
-    sb.append("    input: ").append(toIndentedString(input)).append("\n");
+    sb.append("class ToolModel {\n");
+    sb.append("    function: ").append(toIndentedString(function)).append("\n");
+    sb.append("    type: ").append(toIndentedString(type)).append("\n");
     sb.append("}");
     return sb.toString();
   }
