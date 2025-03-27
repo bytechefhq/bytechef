@@ -28,8 +28,6 @@ import com.bytechef.atlas.coordinator.event.listener.LogTaskApplicationEventList
 import com.bytechef.atlas.coordinator.event.listener.TaskExecutionErrorEventListener;
 import com.bytechef.atlas.coordinator.event.listener.TaskProgressedApplicationEventListener;
 import com.bytechef.atlas.coordinator.event.listener.TaskStartedApplicationEventListener;
-import com.bytechef.atlas.coordinator.event.listener.WebhookJobStatusApplicationEventListener;
-import com.bytechef.atlas.coordinator.event.listener.WebhookTaskStartedApplicationEventListener;
 import com.bytechef.atlas.coordinator.job.JobExecutor;
 import com.bytechef.atlas.coordinator.task.completion.DefaultTaskCompletionHandler;
 import com.bytechef.atlas.coordinator.task.completion.TaskCompletionHandler;
@@ -119,11 +117,6 @@ public class TaskCoordinatorConfiguration {
     }
 
     @Bean
-    WebhookJobStatusApplicationEventListener jobStatusWebhookEventHandler() {
-        return new WebhookJobStatusApplicationEventListener(jobService);
-    }
-
-    @Bean
     TaskExecutionErrorEventListener taskExecutionErrorHandler() {
         return new TaskExecutionErrorEventListener(eventPublisher, jobService, taskDispatcher(), taskExecutionService);
     }
@@ -177,8 +170,4 @@ public class TaskCoordinatorConfiguration {
         return new TaskStartedApplicationEventListener(taskExecutionService, taskDispatcher(), jobService);
     }
 
-    @Bean
-    WebhookTaskStartedApplicationEventListener taskStartedWebhookEventListener() {
-        return new WebhookTaskStartedApplicationEventListener(jobService);
-    }
 }
