@@ -134,9 +134,7 @@ public class RemoteActionDefinitionServiceClient extends AbstractWorkerClient im
     }
 
     @Override
-    public boolean isSingleConnectionPerform(
-        String componentName, int componentVersion, String actionName) {
-
+    public boolean isSingleConnectionPerform(String componentName, int componentVersion, String actionName) {
         throw new UnsupportedOperationException();
     }
 }

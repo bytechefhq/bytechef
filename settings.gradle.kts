@@ -363,6 +363,7 @@ include("server:libs:modules:task-dispatchers:subflow")
 include("server:libs:test:test-support")
 include("server:libs:test:test-int-support")
 
+include("sdks:backend:java:ai-toolkit-api")
 include("sdks:backend:java:component-api")
 include("sdks:backend:java:component-test")
 include("sdks:backend:java:definition-api")

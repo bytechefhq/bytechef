@@ -237,18 +237,10 @@ public class ActionDefinitionFacadeImpl implements ActionDefinitionFacade {
         return componentConnection;
     }
 
-    private ComponentConnection getComponentConnection(Map.Entry<String, Long> entry) {
-        Connection connection = connectionService.getConnection(entry.getValue());
-
-        return new ComponentConnection(
-            connection.getComponentName(), connection.getConnectionVersion(), entry.getValue(),
-            connection.getParameters(), connection.getAuthorizationName());
-    }
-
     private Map<String, ComponentConnection> getComponentConnections(Map<String, Long> connectionIds) {
         return connectionIds.entrySet()
             .stream()
-            .collect(Collectors.toMap(Map.Entry::getKey, this::getComponentConnection));
+            .collect(Collectors.toMap(Map.Entry::getKey, entry -> getComponentConnection(entry.getValue())));
     }
 
     private record ExecuteFunctionData(

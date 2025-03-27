@@ -280,9 +280,7 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
         }
 
         return new ActionDefinition(
-            componentDefinitionRegistry.getActionDefinition("missing", 1, "missing"),
-            componentName, componentVersion);
-
+            componentDefinitionRegistry.getActionDefinition("missing", 1, "missing"), componentName, componentVersion);
     }
 
     @Override

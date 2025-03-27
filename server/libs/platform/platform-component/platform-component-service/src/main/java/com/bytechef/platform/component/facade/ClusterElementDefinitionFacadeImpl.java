@@ -22,6 +22,9 @@ import com.bytechef.platform.component.definition.ContextFactory;
 import com.bytechef.platform.component.exception.ActionDefinitionErrorType;
 import com.bytechef.platform.component.service.ClusterElementDefinitionService;
 import com.bytechef.platform.component.util.TokenRefreshHelper;
+import com.bytechef.platform.connection.domain.Connection;
+import com.bytechef.platform.connection.service.ConnectionService;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Map;
 import javax.annotation.Nullable;
 import org.springframework.stereotype.Service;
@@ -33,16 +36,37 @@ import org.springframework.stereotype.Service;
 public class ClusterElementDefinitionFacadeImpl implements ClusterElementDefinitionFacade {
 
     private final ClusterElementDefinitionService clusterElementDefinitionService;
+    private final ConnectionService connectionService;
     private final ContextFactory contextFactory;
     private final TokenRefreshHelper tokenRefreshHelper;
 
+    @SuppressFBWarnings("EI")
     public ClusterElementDefinitionFacadeImpl(
-        ClusterElementDefinitionService clusterElementDefinitionService, ContextFactory contextFactory,
-        TokenRefreshHelper tokenRefreshHelper) {
+        ClusterElementDefinitionService clusterElementDefinitionService, ConnectionService connectionService,
+        ContextFactory contextFactory, TokenRefreshHelper tokenRefreshHelper) {
 
         this.clusterElementDefinitionService = clusterElementDefinitionService;
+        this.connectionService = connectionService;
         this.contextFactory = contextFactory;
         this.tokenRefreshHelper = tokenRefreshHelper;
+    }
+
+    @Override
+    public Object executeTool(
+        String componentName, int componentVersion, String clusterElementName, Map<String, ?> inputParameters,
+        @Nullable Long connectionId) {
+
+        return executeTool(
+            componentName, componentVersion, clusterElementName, inputParameters, getComponentConnection(connectionId));
+    }
+
+    @Override
+    public Object executeTool(
+        String componentName, int componentVersion, String clusterElementName, Map<String, ?> inputParameters,
+        @Nullable ComponentConnection componentConnection) {
+
+        return executeTool(
+            componentName, componentVersion, clusterElementName, inputParameters, componentConnection, false);
     }
 
     @Override
@@ -59,6 +83,19 @@ public class ClusterElementDefinitionFacadeImpl implements ClusterElementDefinit
                 actionContext1),
             componentConnection1 -> contextFactory.createContext(
                 componentName, componentConnection, editorEnvironment));
+    }
 
+    private ComponentConnection getComponentConnection(Long connectionId) {
+        ComponentConnection componentConnection = null;
+
+        if (connectionId != null) {
+            Connection connection = connectionService.getConnection(connectionId);
+
+            componentConnection = new ComponentConnection(
+                connection.getComponentName(), connection.getConnectionVersion(), connectionId,
+                connection.getParameters(), connection.getAuthorizationName());
+        }
+
+        return componentConnection;
     }
 }

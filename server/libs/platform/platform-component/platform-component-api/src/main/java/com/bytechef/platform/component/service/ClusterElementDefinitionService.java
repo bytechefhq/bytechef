@@ -33,13 +33,18 @@ public interface ClusterElementDefinitionService {
         String componentName, int componentVersion, String clusterElementName, Map<String, ?> inputParameters,
         @Nullable ComponentConnection componentConnection, Context context);
 
+    ClusterElementDefinition getClusterElementDefinition(String componentName, String clusterElementName);
+
     ClusterElementDefinition getClusterElementDefinition(
         String componentName, int componentVersion, String clusterElementName);
+
+    List<ClusterElementDefinition> getClusterElementDefinitions(ClusterElementType clusterElementType);
+
+    List<ClusterElementDefinition> getClusterElementDefinitions(
+        String componentName, int componentVersion, ClusterElementType clusterElementType);
 
     <T> T getClusterElementObject(String componentName, int componentVersion, String clusterElementName);
 
     List<ClusterElementDefinition> getRootClusterElementDefinitions(
         String rootComponentName, int rootComponentVersion, String clusterElementTypeName);
-
-    List<ClusterElementDefinition> getRootClusterElementDefinitions(ClusterElementType clusterElementType);
 }
