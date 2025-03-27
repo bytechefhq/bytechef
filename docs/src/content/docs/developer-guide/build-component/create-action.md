@@ -27,8 +27,7 @@ public static final ModifiableActionDefinition ACTION_DEFINITION = action("dummy
 The `perform` method contains the logic for the action. Here is the simplest example of the `perform` method that returns the value of the `name` property.
 
 ``` java
-protected static String perform(
-        Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) {
+public static String perform(Parameters inputParameters, Parameters connectionParameters, Context cntext) {
 
         return inputParemeters.getRequiredString("name");
     }

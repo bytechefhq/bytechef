@@ -20,8 +20,8 @@ import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
 
-import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
+import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
 
 public class ExampleDummyAction {
@@ -36,8 +36,7 @@ public class ExampleDummyAction {
     private ExampleDummyAction() {
     }
 
-    protected static String perform(
-        Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) {
+    public static String perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
         // TODO
 
         return null;
