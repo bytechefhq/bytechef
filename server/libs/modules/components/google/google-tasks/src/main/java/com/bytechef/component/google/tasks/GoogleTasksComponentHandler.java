@@ -25,6 +25,9 @@ import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.component.google.tasks.action.GoogleTasksCreateTaskAction;
 import com.bytechef.component.google.tasks.action.GoogleTasksListTasksAction;
 import com.bytechef.component.google.tasks.action.GoogleTasksUpdateTaskAction;
+import com.bytechef.component.google.tasks.cluster.GoogleTasksCreateTaskTool;
+import com.bytechef.component.google.tasks.cluster.GoogleTasksListTasksTool;
+import com.bytechef.component.google.tasks.cluster.GoogleTasksUpdateTaskTool;
 import com.google.auto.service.AutoService;
 
 /**
@@ -45,7 +48,11 @@ public class GoogleTasksComponentHandler implements ComponentHandler {
         .actions(
             GoogleTasksCreateTaskAction.ACTION_DEFINITION,
             GoogleTasksListTasksAction.ACTION_DEFINITION,
-            GoogleTasksUpdateTaskAction.ACTION_DEFINITION);
+            GoogleTasksUpdateTaskAction.ACTION_DEFINITION)
+        .clusterElements(
+            GoogleTasksCreateTaskTool.CLUSTER_ELEMENT_DEFINITION,
+            GoogleTasksListTasksTool.CLUSTER_ELEMENT_DEFINITION,
+            GoogleTasksUpdateTaskTool.CLUSTER_ELEMENT_DEFINITION);
 
     @Override
     public ComponentDefinition getDefinition() {

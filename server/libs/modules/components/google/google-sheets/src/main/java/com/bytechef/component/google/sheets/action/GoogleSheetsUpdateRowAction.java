@@ -28,18 +28,23 @@ import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstant
 import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.SHEET_NAME_PROPERTY;
 import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.SPREADSHEET_ID;
 import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.SPREADSHEET_ID_PROPERTY;
+import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.UPDATE_ROW;
+import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.UPDATE_ROW_DESCRIPTION;
+import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.UPDATE_ROW_TITLE;
 import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.UPDATE_WHOLE_ROW;
 import static com.bytechef.component.google.sheets.util.GoogleSheetsUtils.createRange;
 import static com.bytechef.component.google.sheets.util.GoogleSheetsUtils.getMapOfValuesForRow;
 import static com.bytechef.component.google.sheets.util.GoogleSheetsUtils.getUpdatedRowValues;
 
-import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
+import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
+import com.bytechef.component.definition.Property;
 import com.bytechef.component.google.sheets.util.GoogleSheetsUtils;
 import com.bytechef.google.commons.GoogleServices;
 import com.google.api.services.sheets.v4.Sheets;
 import com.google.api.services.sheets.v4.model.ValueRange;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Map;
 
@@ -48,26 +53,30 @@ import java.util.Map;
  */
 public class GoogleSheetsUpdateRowAction {
 
-    public static final ModifiableActionDefinition ACTION_DEFINITION = action("updateRow")
-        .title("Update Row")
-        .description("Overwrite values in an existing row.")
-        .properties(
-            SPREADSHEET_ID_PROPERTY,
-            SHEET_NAME_PROPERTY,
-            integer(ROW_NUMBER)
-                .label("Row Number")
-                .description("The row number to update.")
-                .required(true),
-            IS_THE_FIRST_ROW_HEADER_PROPERTY,
-            bool(UPDATE_WHOLE_ROW)
-                .label("Update Whole Row")
-                .description("Whether to update the whole row or just specific columns.")
-                .defaultValue(true)
-                .required(true),
-            dynamicProperties(ROW)
-                .propertiesLookupDependsOn(SPREADSHEET_ID, SHEET_NAME, IS_THE_FIRST_ROW_HEADER, UPDATE_WHOLE_ROW)
-                .properties(GoogleSheetsUtils::createPropertiesToUpdateRow)
-                .required(true))
+    @SuppressFBWarnings("MS")
+    public static final Property[] PROPERTIES = {
+        SPREADSHEET_ID_PROPERTY,
+        SHEET_NAME_PROPERTY,
+        integer(ROW_NUMBER)
+            .label("Row Number")
+            .description("The row number to update.")
+            .required(true),
+        IS_THE_FIRST_ROW_HEADER_PROPERTY,
+        bool(UPDATE_WHOLE_ROW)
+            .label("Update Whole Row")
+            .description("Whether to update the whole row or just specific columns.")
+            .defaultValue(true)
+            .required(true),
+        dynamicProperties(ROW)
+            .propertiesLookupDependsOn(SPREADSHEET_ID, SHEET_NAME, IS_THE_FIRST_ROW_HEADER, UPDATE_WHOLE_ROW)
+            .properties(GoogleSheetsUtils::createPropertiesToUpdateRow)
+            .required(true)
+    };
+
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action(UPDATE_ROW)
+        .title(UPDATE_ROW_TITLE)
+        .description(UPDATE_ROW_DESCRIPTION)
+        .properties(PROPERTIES)
         .output()
         .perform(GoogleSheetsUpdateRowAction::perform);
 
@@ -75,7 +84,8 @@ public class GoogleSheetsUpdateRowAction {
     }
 
     public static Map<String, Object> perform(
-        Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) throws Exception {
+        Parameters inputParameters, Parameters connectionParameters, Context context) throws Exception {
+
         Sheets sheets = GoogleServices.getSheets(connectionParameters);
         String range = createRange(
             inputParameters.getRequiredString(SHEET_NAME), inputParameters.getRequiredInteger(ROW_NUMBER));

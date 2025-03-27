@@ -19,6 +19,9 @@ package com.bytechef.component.google.mail.cluster;
 import static com.bytechef.component.definition.ai.agent.ToolFunction.TOOLS;
 import static com.bytechef.component.google.mail.action.GoogleMailGetMailAction.OUTPUT_FUNCTION;
 import static com.bytechef.component.google.mail.action.GoogleMailGetMailAction.PROPERTIES;
+import static com.bytechef.component.google.mail.constant.GoogleMailConstants.GET_MAIL;
+import static com.bytechef.component.google.mail.constant.GoogleMailConstants.GET_MAIL_DESCRIPTION;
+import static com.bytechef.component.google.mail.constant.GoogleMailConstants.GET_MAIL_TITLE;
 
 import com.bytechef.component.definition.ClusterElementDefinition;
 import com.bytechef.component.definition.ComponentDsl;
@@ -31,9 +34,9 @@ import com.bytechef.component.google.mail.action.GoogleMailGetMailAction;
 public class GoogleMailGetMailTool {
 
     public static final ClusterElementDefinition<SingleConnectionToolFunction> CLUSTER_ELEMENT_DEFINITION =
-        ComponentDsl.<SingleConnectionToolFunction>clusterElement("getEmail")
-            .title("Get Email")
-            .description("Get an email from your Gmail account via Id.")
+        ComponentDsl.<SingleConnectionToolFunction>clusterElement(GET_MAIL)
+            .title(GET_MAIL_TITLE)
+            .description(GET_MAIL_DESCRIPTION)
             .type(TOOLS)
             .properties(PROPERTIES)
             .output(OUTPUT_FUNCTION)

@@ -29,7 +29,11 @@ import com.bytechef.component.google.mail.action.GoogleMailGetThreadAction;
 import com.bytechef.component.google.mail.action.GoogleMailReplyToEmailAction;
 import com.bytechef.component.google.mail.action.GoogleMailSearchEmailAction;
 import com.bytechef.component.google.mail.action.GoogleMailSendEmailAction;
+import com.bytechef.component.google.mail.cluster.GoogleMailAddLabelslTool;
+import com.bytechef.component.google.mail.cluster.GoogleMailDeleteMailTool;
 import com.bytechef.component.google.mail.cluster.GoogleMailGetMailTool;
+import com.bytechef.component.google.mail.cluster.GoogleMailGetThreadTool;
+import com.bytechef.component.google.mail.cluster.GoogleMailReplyToEmailTool;
 import com.bytechef.component.google.mail.cluster.GoogleMailSearchEmailTool;
 import com.bytechef.component.google.mail.cluster.GoogleMailSendEmailTool;
 import com.bytechef.component.google.mail.trigger.GoogleMailNewEmailPollingTrigger;
@@ -63,7 +67,11 @@ public class GoogleMailComponentHandler implements ComponentHandler {
             GoogleMailNewEmailTrigger.TRIGGER_DEFINITION,
             GoogleMailNewEmailPollingTrigger.TRIGGER_DEFINITION)
         .clusterElements(
+            GoogleMailAddLabelslTool.CLUSTER_ELEMENT_DEFINITION,
+            GoogleMailDeleteMailTool.CLUSTER_ELEMENT_DEFINITION,
             GoogleMailGetMailTool.CLUSTER_ELEMENT_DEFINITION,
+            GoogleMailGetThreadTool.CLUSTER_ELEMENT_DEFINITION,
+            GoogleMailReplyToEmailTool.CLUSTER_ELEMENT_DEFINITION,
             GoogleMailSearchEmailTool.CLUSTER_ELEMENT_DEFINITION,
             GoogleMailSendEmailTool.CLUSTER_ELEMENT_DEFINITION);
 

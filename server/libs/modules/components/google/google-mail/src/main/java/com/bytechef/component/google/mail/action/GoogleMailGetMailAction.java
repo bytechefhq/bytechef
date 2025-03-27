@@ -20,6 +20,9 @@ import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.FORMAT;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.FORMAT_PROPERTY;
+import static com.bytechef.component.google.mail.constant.GoogleMailConstants.GET_MAIL;
+import static com.bytechef.component.google.mail.constant.GoogleMailConstants.GET_MAIL_DESCRIPTION;
+import static com.bytechef.component.google.mail.constant.GoogleMailConstants.GET_MAIL_TITLE;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.ID;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.METADATA_HEADERS_PROPERTY;
 import static com.bytechef.component.google.mail.definition.Format.SIMPLE;
@@ -57,9 +60,9 @@ public class GoogleMailGetMailAction {
 
     public static final OutputFunction OUTPUT_FUNCTION = GoogleMailUtils::getMessageOutput;
 
-    public static final ModifiableActionDefinition ACTION_DEFINITION = action("getMail")
-        .title("Get Mail")
-        .description("Get an email from your Gmail account via Id")
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action(GET_MAIL)
+        .title(GET_MAIL_TITLE)
+        .description(GET_MAIL_DESCRIPTION)
         .properties(PROPERTIES)
         .output(OUTPUT_FUNCTION)
         .perform(GoogleMailGetMailAction::perform);
@@ -67,8 +70,8 @@ public class GoogleMailGetMailAction {
     private GoogleMailGetMailAction() {
     }
 
-    public static Object perform(
-        Parameters inputParameters, Parameters connectionParameters, Context context) throws IOException {
+    public static Object perform(Parameters inputParameters, Parameters connectionParameters, Context context)
+        throws IOException {
 
         Format format = inputParameters.get(FORMAT, Format.class, SIMPLE);
         Gmail gmail = GoogleServices.getMail(connectionParameters);

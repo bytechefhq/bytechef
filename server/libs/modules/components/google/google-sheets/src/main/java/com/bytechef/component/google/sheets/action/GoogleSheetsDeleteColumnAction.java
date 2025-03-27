@@ -18,39 +18,48 @@ package com.bytechef.component.google.sheets.action;
 
 import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.string;
+import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.DELETE_COLUMN;
+import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.DELETE_COLUMN_DESCRIPTION;
+import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.DELETE_COLUMN_TITLE;
 import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.LABEL;
 import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.SHEET_ID_PROPERTY;
 import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.SPREADSHEET_ID_PROPERTY;
 import static com.bytechef.component.google.sheets.util.GoogleSheetsColumnConverterUtils.labelToColumn;
 import static com.bytechef.component.google.sheets.util.GoogleSheetsUtils.deleteDimension;
 
-import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
+import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
+import com.bytechef.component.definition.Property;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 /**
  * @author Marija Horvat
  */
 public class GoogleSheetsDeleteColumnAction {
 
-    public static final ModifiableActionDefinition ACTION_DEFINITION = action("deleteColumn")
-        .title("Delete Column")
-        .description("Delete column on an existing sheet.")
-        .properties(
-            SPREADSHEET_ID_PROPERTY,
-            SHEET_ID_PROPERTY,
-            string(LABEL)
-                .label("Column Label")
-                .description("The label of the column to be deleted.")
-                .exampleValue("A")
-                .required(true))
+    @SuppressFBWarnings("MS")
+    public static final Property[] PROPERTIES = {
+        SPREADSHEET_ID_PROPERTY,
+        SHEET_ID_PROPERTY,
+        string(LABEL)
+            .label("Column Label")
+            .description("The label of the column to be deleted.")
+            .exampleValue("A")
+            .required(true)
+    };
+
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action(DELETE_COLUMN)
+        .title(DELETE_COLUMN_TITLE)
+        .description(DELETE_COLUMN_DESCRIPTION)
+        .properties(PROPERTIES)
         .perform(GoogleSheetsDeleteColumnAction::perform);
 
     private GoogleSheetsDeleteColumnAction() {
     }
 
-    public static Object perform(
-        Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) throws Exception {
+    public static Object perform(Parameters inputParameters, Parameters connectionParameters, Context context)
+        throws Exception {
 
         Integer columnNumber = labelToColumn(inputParameters.getRequiredString(LABEL));
 

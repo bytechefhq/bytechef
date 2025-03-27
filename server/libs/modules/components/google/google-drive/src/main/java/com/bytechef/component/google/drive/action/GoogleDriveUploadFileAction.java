@@ -25,17 +25,24 @@ import static com.bytechef.component.google.drive.constant.GoogleDriveConstants.
 import static com.bytechef.component.google.drive.constant.GoogleDriveConstants.FILE_ENTRY;
 import static com.bytechef.component.google.drive.constant.GoogleDriveConstants.GOOGLE_FILE_OUTPUT_PROPERTY;
 import static com.bytechef.component.google.drive.constant.GoogleDriveConstants.GOOGLE_FILE_SAMPLE_OUTPUT;
+import static com.bytechef.component.google.drive.constant.GoogleDriveConstants.UPLOAD_FILE;
+import static com.bytechef.component.google.drive.constant.GoogleDriveConstants.UPLOAD_FILE_DESCRIPTION;
+import static com.bytechef.component.google.drive.constant.GoogleDriveConstants.UPLOAD_FILE_TITLE;
 import static com.bytechef.google.commons.constant.GoogleCommonsContants.FOLDER_ID;
 
-import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
+import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.FileEntry;
 import com.bytechef.component.definition.Parameters;
+import com.bytechef.component.definition.Property;
+import com.bytechef.component.definition.Property.ObjectProperty;
+import com.bytechef.definition.BaseOutputDefinition.OutputSchema;
 import com.bytechef.google.commons.GoogleServices;
 import com.bytechef.google.commons.GoogleUtils;
 import com.google.api.client.http.FileContent;
 import com.google.api.services.drive.Drive;
 import com.google.api.services.drive.model.File;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.IOException;
 import java.util.List;
 
@@ -46,29 +53,35 @@ import java.util.List;
  */
 public class GoogleDriveUploadFileAction {
 
-    public static final ModifiableActionDefinition ACTION_DEFINITION = action("uploadFile")
-        .title("Upload File")
-        .description("Uploads a file in your Google Drive.")
-        .properties(
-            fileEntry(FILE_ENTRY)
-                .label("File")
-                .description("The object property which contains a reference to the file to upload.")
-                .required(true),
-            string(FOLDER_ID)
-                .label("Parent Folder ID")
-                .description(
-                    "ID of the folder where the file will be uploaded; if no folder is selected, the file will be " +
-                        "uploaded to the root folder.")
-                .options(GoogleUtils.getFileOptionsByMimeType(APPLICATION_VND_GOOGLE_APPS_FOLDER, true))
-                .required(false))
-        .output(outputSchema(GOOGLE_FILE_OUTPUT_PROPERTY), sampleOutput(GOOGLE_FILE_SAMPLE_OUTPUT))
+    @SuppressFBWarnings("MS")
+    public static final Property[] PROPERTIES = {
+        fileEntry(FILE_ENTRY)
+            .label("File")
+            .description("The object property which contains a reference to the file to upload.")
+            .required(true),
+        string(FOLDER_ID)
+            .label("Parent Folder ID")
+            .description(
+                "ID of the folder where the file will be uploaded; if no folder is selected, the file will be " +
+                    "uploaded to the root folder.")
+            .options(GoogleUtils.getFileOptionsByMimeType(APPLICATION_VND_GOOGLE_APPS_FOLDER, true))
+            .required(false)
+    };
+
+    public static final OutputSchema<ObjectProperty> OUTPUT_SCHEMA = outputSchema(GOOGLE_FILE_OUTPUT_PROPERTY);
+
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action(UPLOAD_FILE)
+        .title(UPLOAD_FILE_TITLE)
+        .description(UPLOAD_FILE_DESCRIPTION)
+        .properties(PROPERTIES)
+        .output(OUTPUT_SCHEMA, sampleOutput(GOOGLE_FILE_SAMPLE_OUTPUT))
         .perform(GoogleDriveUploadFileAction::perform);
 
     private GoogleDriveUploadFileAction() {
     }
 
-    public static File perform(
-        Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) throws IOException {
+    public static File perform(Parameters inputParameters, Parameters connectionParameters, Context context)
+        throws IOException {
 
         Drive drive = GoogleServices.getDrive(connectionParameters);
         FileEntry fileEntry = inputParameters.getRequiredFileEntry(FILE_ENTRY);
@@ -82,7 +95,7 @@ public class GoogleDriveUploadFileAction {
                     .setParents(parentFolder == null ? null : List.of(parentFolder)),
                 new FileContent(
                     fileEntry.getMimeType(),
-                    actionContext.file(actionContextFile -> actionContextFile.toTempFile(fileEntry))))
+                    context.file(file -> file.toTempFile(fileEntry))))
             .execute();
     }
 }

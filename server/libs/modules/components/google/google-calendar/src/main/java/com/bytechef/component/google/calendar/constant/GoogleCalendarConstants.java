@@ -38,21 +38,36 @@ public class GoogleCalendarConstants {
     private GoogleCalendarConstants() {
     }
 
+    public static final String ADD_ATTENDEES_TO_EVENT = "addAttendeesToEvent";
+    public static final String ADD_ATTENDEES_TO_EVENT_DESCRIPTION = "Invites one or more person to an existing event.";
+    public static final String ADD_ATTENDEES_TO_EVENT_TITLE = "Add Attendees to Event";
     public static final String ALL_DAY = "allDay";
     public static final String ATTACHMENTS = "attachments";
     public static final String ATTENDEES = "attendees";
     public static final String CALENDAR_ID = "calendarId";
+    public static final String CREATE_EVENT = "createEvent";
+    public static final String CREATE_EVENT_DESCRIPTION = "Creates a new event in Google Calendar.";
+    public static final String CREATE_EVENT_TITLE = "Create Event";
+    public static final String CREATE_QUICK_EVENT = "createQuickEvent";
+    public static final String CREATE_QUICK_EVENT_DESCRIPTION = "Creates a quick event in Google Calendar.";
+    public static final String CREATE_QUICK_EVENT_TITLE = "Create Quick Event";
     public static final String DATE_RANGE = "dateRange";
+    public static final String DELETE_EVENT = "deleteEvent";
+    public static final String DELETE_EVENT_DESCRIPTION = "Deletes an event from Google Calendar.";
+    public static final String DELETE_EVENT_TITLE = "Delete Event";
     public static final String DESCRIPTION = "description";
-    public static final String DISPLAY_NAME = "displayName";
-    public static final String EMAIL = "email";
     public static final String END = "end";
     public static final String EVENT_ID = "eventId";
     public static final String EVENT_TYPE = "eventType";
+    public static final String GET_EVENTS = "getEvents";
+    public static final String GET_EVENTS_DESCRIPTION = "List events from the specified Google Calendar.";
+    public static final String GET_EVENTS_TITLE = "Get Events";
+    public static final String GET_FREE_TIME_SLOTS = "getFreeTimeSlots";
+    public static final String GET_FREE_TIME_SLOTS_DESCRIPTION = "Get free time slots from Google Calendar.";
+    public static final String GET_FREE_TIME_SLOTS_TITLE = "Get Free Time Slots";
     public static final String GUEST_CAN_INVITE_OTHERS = "guestsCanInviteOthers";
     public static final String GUEST_CAN_MODIFY = "guestsCanModify";
     public static final String GUEST_CAN_SEE_OTHER_GUESTS = "guestsCanSeeOtherGuests";
-    public static final String ICON_LINK = "iconLink";
     public static final String ID = "id";
     public static final String LOCATION = "location";
     public static final String MAX_RESULTS = "maxResults";
@@ -60,19 +75,18 @@ public class GoogleCalendarConstants {
     public static final LocalTime LOCAL_TIME_MAX = LocalTime.MAX;
     public static final LocalTime LOCAL_TIME_MIN = LocalTime.MIN;
     public static final String MINUTES = "minutes";
-    public static final String ORGANIZER = "organizer";
     public static final String Q = "q";
     public static final String REMINDERS = "reminders";
     public static final String RESOURCE_ID = "resourceId";
     public static final String SEND_UPDATES = "sendUpdates";
-    public static final String SELF = "self";
-    public static final String STATUS = "status";
     public static final String SUMMARY = "summary";
     public static final String TEXT = "text";
     public static final String FROM = "from";
     public static final String TO = "to";
-    public static final String TITLE = "title";
     public static final String START = "start";
+    public static final String UPDATE_EVENT = "updateEvent";
+    public static final String UPDATES_EVENT_DESCRIPTION = "Updates event in Google Calendar.";
+    public static final String UPDATE_EVENT_TITLE = "Update Event";
     public static final String USE_DEFAULT = "useDefault";
 
     public static final ModifiableStringProperty CALENDAR_ID_PROPERTY = string(CALENDAR_ID)
@@ -84,7 +98,7 @@ public class GoogleCalendarConstants {
         .properties(
             string("iCalUID")
                 .description(
-                    "Event unique identifier as defined in RFC5545. It is used to uniquely identify events accross " +
+                    "Event unique identifier as defined in RFC5545. It is used to uniquely identify events across " +
                         "calendaring systems."),
             string(ID)
                 .description("Identifier of the event."),
@@ -100,7 +114,7 @@ public class GoogleCalendarConstants {
                 .description("Specific type of the event."),
             string("htmlLink")
                 .description("An absolute link to this event in the Google Calendar Web UI."),
-            string(STATUS)
+            string("status")
                 .description("Status of the event."),
             string(LOCATION)
                 .description("Geographic location of the event as free-form text."),
@@ -115,21 +129,21 @@ public class GoogleCalendarConstants {
                                 .description("Number of additional guests."),
                             string("comment")
                                 .description("The attendee's response comment."),
-                            string(DISPLAY_NAME)
+                            string("displayName")
                                 .description("The attendee's name."),
-                            string(EMAIL)
+                            string("email")
                                 .description("The attendee's email address."),
                             string(ID)
                                 .description("The attendee's Profile ID."),
                             bool("optional")
                                 .description("Whether this is an optional attendee."),
-                            bool(ORGANIZER)
+                            bool("organizer")
                                 .description("Whether the attendee is the organizer of the event."),
                             bool("resource")
                                 .description("Whether the attendee is a resource. "),
                             string("responseStatus")
                                 .description("The attendee's response status."),
-                            bool(SELF)
+                            bool("self")
                                 .description(
                                     "Whether this entry represents the calendar on which this copy of the event appears."))),
             array(ATTACHMENTS)
@@ -141,11 +155,11 @@ public class GoogleCalendarConstants {
                                 .description("ID of the attached file. "),
                             string("fileUrl")
                                 .description("URL link to the attachment."),
-                            string(ICON_LINK)
+                            string("iconLink")
                                 .description("URL link to the attachment's icon."),
                             string("mimeType")
                                 .description("Internet media type (MIME type) of the attachment."),
-                            string(TITLE)
+                            string("title")
                                 .description("Attachment title."))),
             object(REMINDERS)
                 .description("Information about the event's reminders for the authenticated user.")
@@ -176,5 +190,4 @@ public class GoogleCalendarConstants {
                 option("None", "none", "No notifications are sent."))
             .defaultValue("none")
             .required(false);
-
 }

@@ -20,15 +20,20 @@ import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.CALENDAR_ID;
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.CALENDAR_ID_PROPERTY;
+import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.DELETE_EVENT;
+import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.DELETE_EVENT_DESCRIPTION;
+import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.DELETE_EVENT_TITLE;
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.EVENT_ID;
 
-import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
+import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.Parameters;
+import com.bytechef.component.definition.Property;
 import com.bytechef.component.google.calendar.util.GoogleCalendarUtils;
 import com.bytechef.google.commons.GoogleServices;
 import com.google.api.services.calendar.Calendar;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.IOException;
 
 /**
@@ -36,24 +41,28 @@ import java.io.IOException;
  */
 public class GoogleCalendarDeleteEventAction {
 
-    public static final ModifiableActionDefinition ACTION_DEFINITION = action("deleteEvent")
-        .title("Delete Event")
-        .description("Deletes an event from Google Calendar.")
-        .properties(
-            CALENDAR_ID_PROPERTY,
-            string(EVENT_ID)
-                .label("Event ID")
-                .description("ID of the event to delete.")
-                .options((ActionOptionsFunction<String>) GoogleCalendarUtils::getEventIdOptions)
-                .optionsLookupDependsOn(CALENDAR_ID)
-                .required(true))
+    @SuppressFBWarnings("MS")
+    public static final Property[] PROPERTIES = {
+        CALENDAR_ID_PROPERTY,
+        string(EVENT_ID)
+            .label("Event ID")
+            .description("ID of the event to delete.")
+            .options((ActionOptionsFunction<String>) GoogleCalendarUtils::getEventIdOptions)
+            .optionsLookupDependsOn(CALENDAR_ID)
+            .required(true)
+    };
+
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action(DELETE_EVENT)
+        .title(DELETE_EVENT_TITLE)
+        .description(DELETE_EVENT_DESCRIPTION)
+        .properties(PROPERTIES)
         .perform(GoogleCalendarDeleteEventAction::perform);
 
     private GoogleCalendarDeleteEventAction() {
     }
 
-    public static Object perform(
-        Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) throws IOException {
+    public static Object perform(Parameters inputParameters, Parameters connectionParameters, Context context)
+        throws IOException {
 
         Calendar calendar = GoogleServices.getCalendar(connectionParameters);
 

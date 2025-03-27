@@ -18,16 +18,21 @@ package com.bytechef.component.google.mail.action;
 
 import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.string;
+import static com.bytechef.component.google.mail.constant.GoogleMailConstants.DELETE_MAIL;
+import static com.bytechef.component.google.mail.constant.GoogleMailConstants.DELETE_MAIL_DESCRIPTION;
+import static com.bytechef.component.google.mail.constant.GoogleMailConstants.DELETE_MAIL_TITLE;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.ID;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.ME;
 
-import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
+import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.Parameters;
+import com.bytechef.component.definition.Property;
 import com.bytechef.component.google.mail.util.GoogleMailUtils;
 import com.bytechef.google.commons.GoogleServices;
 import com.google.api.services.gmail.Gmail;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.IOException;
 
 /**
@@ -35,22 +40,26 @@ import java.io.IOException;
  */
 public class GoogleMailDeleteMailAction {
 
-    public static final ModifiableActionDefinition ACTION_DEFINITION = action("deleteMail")
-        .title("Delete Mail")
-        .description("Delete an email from your Gmail account permanently via Id")
-        .properties(
-            string(ID)
-                .label("Message ID")
-                .description("The ID of the message to delete.")
-                .options((ActionOptionsFunction<String>) GoogleMailUtils::getMessageIdOptions)
-                .required(true))
+    @SuppressFBWarnings("MS")
+    public static final Property[] PROPERTIES = {
+        string(ID)
+            .label("Message ID")
+            .description("The ID of the message to delete.")
+            .options((ActionOptionsFunction<String>) GoogleMailUtils::getMessageIdOptions)
+            .required(true)
+    };
+
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action(DELETE_MAIL)
+        .title(DELETE_MAIL_TITLE)
+        .description(DELETE_MAIL_DESCRIPTION)
+        .properties(PROPERTIES)
         .perform(GoogleMailDeleteMailAction::perform);
 
     private GoogleMailDeleteMailAction() {
     }
 
-    public static Object perform(
-        Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) throws IOException {
+    public static Object perform(Parameters inputParameters, Parameters connectionParameters, Context context)
+        throws IOException {
 
         Gmail gmail = GoogleServices.getMail(connectionParameters);
 

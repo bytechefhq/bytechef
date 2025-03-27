@@ -32,6 +32,9 @@ import static com.bytechef.component.google.calendar.constant.GoogleCalendarCons
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.ATTENDEES;
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.CALENDAR_ID;
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.CALENDAR_ID_PROPERTY;
+import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.CREATE_EVENT;
+import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.CREATE_EVENT_DESCRIPTION;
+import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.CREATE_EVENT_TITLE;
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.DESCRIPTION;
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.END;
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.EVENT_OUTPUT_PROPERTY;
@@ -50,17 +53,21 @@ import static com.bytechef.component.google.calendar.constant.GoogleCalendarCons
 import static com.bytechef.component.google.calendar.util.GoogleCalendarUtils.createCustomEvent;
 import static com.bytechef.component.google.calendar.util.GoogleCalendarUtils.createEventDateTime;
 
-import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
+import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.FileEntry;
 import com.bytechef.component.definition.Parameters;
+import com.bytechef.component.definition.Property;
+import com.bytechef.component.definition.Property.ObjectProperty;
 import com.bytechef.component.google.calendar.util.GoogleCalendarUtils.CustomEvent;
+import com.bytechef.definition.BaseOutputDefinition.OutputSchema;
 import com.bytechef.google.commons.GoogleServices;
 import com.google.api.services.calendar.Calendar;
 import com.google.api.services.calendar.model.Event;
 import com.google.api.services.calendar.model.EventAttachment;
 import com.google.api.services.calendar.model.EventAttendee;
 import com.google.api.services.calendar.model.EventReminder;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -70,113 +77,118 @@ import java.util.List;
  */
 public class GoogleCalendarCreateEventAction {
 
-    public static final ModifiableActionDefinition ACTION_DEFINITION = action("createEvent")
-        .title("Create Event")
-        .description("Creates an event")
-        .properties(
-            CALENDAR_ID_PROPERTY,
-            string(SUMMARY)
-                .label("Title")
-                .description("Title of the event.")
-                .required(false),
-            bool(ALL_DAY)
-                .label("All Day Event?")
-                .defaultValue(false)
-                .required(true),
-            date(START)
-                .label("Start Date")
-                .description("The start date of the event.")
-                .displayCondition("%s == true".formatted(ALL_DAY))
-                .required(true),
-            date(END)
-                .label("End Date")
-                .description("The end date of the event.")
-                .displayCondition("%s == true".formatted(ALL_DAY))
-                .required(true),
-            dateTime(START)
-                .label("Start Date Time")
-                .description(
-                    "The (inclusive) start time of the event. For a recurring event, this is the start time of the " +
-                        "first instance.")
-                .displayCondition("%s == false".formatted(ALL_DAY))
-                .required(true),
-            dateTime(END)
-                .label("End Date Time")
-                .description(
-                    "The (exclusive) end time of the event. For a recurring event, this is the end time of the " +
-                        "first instance.")
-                .displayCondition("%s == false".formatted(ALL_DAY))
-                .required(true),
-            string(DESCRIPTION)
-                .label("Description")
-                .description("Description of the event. Can contain HTML.")
-                .required(false),
-            string(LOCATION)
-                .label("Location")
-                .description("Geographic location of the event as free-form text.")
-                .required(false),
-            array(ATTACHMENTS)
-                .label("Attachments")
-                .items(fileEntry())
-                .required(false),
-            array(ATTENDEES)
-                .label("Attendees")
-                .description("The attendees of the event.")
-                .items(
-                    string()
-                        .label("Email")
-                        .description("The attendee's email address."))
-                .required(false),
-            bool(GUEST_CAN_INVITE_OTHERS)
-                .label("Guest Can Invite Others")
-                .description("Whether attendees other than the organizer can invite others to the event.")
-                .defaultValue(true)
-                .required(false),
-            bool(GUEST_CAN_MODIFY)
-                .label("Guest Can Modify")
-                .description("Whether attendees other than the organizer can modify the event.")
-                .defaultValue(false)
-                .required(false),
-            bool(GUEST_CAN_SEE_OTHER_GUESTS)
-                .label("Guest Can See Other Guests")
-                .description("Whether attendees other than the organizer can see who the event's attendees are.")
-                .defaultValue(true)
-                .required(false),
-            SEND_UPDATES_PROPERTY,
-            bool(USE_DEFAULT)
-                .label("Use Default Reminders")
-                .description("Whether the default reminders of the calendar apply to the event.")
-                .defaultValue(true)
-                .required(true),
-            array(REMINDERS)
-                .label("Reminders")
-                .displayCondition("%s == false".formatted(USE_DEFAULT))
-                .items(
-                    object()
-                        .properties(
-                            string(METHOD)
-                                .label("How Is Reminder Sent?")
-                                .options(
-                                    option("Email", "email", "Reminders are sent via email."),
-                                    option("Popup", "popup", "Reminders are sent via a UI popup."))
-                                .required(true),
-                            integer(MINUTES)
-                                .label("Minutes before reminder")
-                                .description(
-                                    "Number of minutes before the start of the event when the reminder " +
-                                        "should trigger.")
-                                .minValue(0)
-                                .maxValue(40320)
-                                .required(true)))
-                .required(false))
-        .output(outputSchema(EVENT_OUTPUT_PROPERTY))
+    @SuppressFBWarnings("MS")
+    public static final Property[] PROPERTIES = {
+        CALENDAR_ID_PROPERTY,
+        string(SUMMARY)
+            .label("Title")
+            .description("Title of the event.")
+            .required(false),
+        bool(ALL_DAY)
+            .label("All Day Event?")
+            .defaultValue(false)
+            .required(true),
+        date(START)
+            .label("Start Date")
+            .description("The start date of the event.")
+            .displayCondition("%s == true".formatted(ALL_DAY))
+            .required(true),
+        date(END)
+            .label("End Date")
+            .description("The end date of the event.")
+            .displayCondition("%s == true".formatted(ALL_DAY))
+            .required(true),
+        dateTime(START)
+            .label("Start Date Time")
+            .description(
+                "The (inclusive) start time of the event. For a recurring event, this is the start time of the first " +
+                    "instance.")
+            .displayCondition("%s == false".formatted(ALL_DAY))
+            .required(true),
+        dateTime(END)
+            .label("End Date Time")
+            .description(
+                "The (exclusive) end time of the event. For a recurring event, this is the end time of the first " +
+                    "instance.")
+            .displayCondition("%s == false".formatted(ALL_DAY))
+            .required(true),
+        string(DESCRIPTION)
+            .label("Description")
+            .description("Description of the event. Can contain HTML.")
+            .required(false),
+        string(LOCATION)
+            .label("Location")
+            .description("Geographic location of the event as free-form text.")
+            .required(false),
+        array(ATTACHMENTS)
+            .label("Attachments")
+            .items(fileEntry())
+            .required(false),
+        array(ATTENDEES)
+            .label("Attendees")
+            .description("The attendees of the event.")
+            .items(
+                string()
+                    .label("Email")
+                    .description("The attendee's email address."))
+            .required(false),
+        bool(GUEST_CAN_INVITE_OTHERS)
+            .label("Guest Can Invite Others")
+            .description("Whether attendees other than the organizer can invite others to the event.")
+            .defaultValue(true)
+            .required(false),
+        bool(GUEST_CAN_MODIFY)
+            .label("Guest Can Modify")
+            .description("Whether attendees other than the organizer can modify the event.")
+            .defaultValue(false)
+            .required(false),
+        bool(GUEST_CAN_SEE_OTHER_GUESTS)
+            .label("Guest Can See Other Guests")
+            .description("Whether attendees other than the organizer can see who the event's attendees are.")
+            .defaultValue(true)
+            .required(false),
+        SEND_UPDATES_PROPERTY,
+        bool(USE_DEFAULT)
+            .label("Use Default Reminders")
+            .description("Whether the default reminders of the calendar apply to the event.")
+            .defaultValue(true)
+            .required(true),
+        array(REMINDERS)
+            .label("Reminders")
+            .displayCondition("%s == false".formatted(USE_DEFAULT))
+            .items(
+                object()
+                    .properties(
+                        string(METHOD)
+                            .label("How Is Reminder Sent?")
+                            .options(
+                                option("Email", "email", "Reminders are sent via email."),
+                                option("Popup", "popup", "Reminders are sent via a UI popup."))
+                            .required(true),
+                        integer(MINUTES)
+                            .label("Minutes before reminder")
+                            .description(
+                                "Number of minutes before the start of the event when the reminder should trigger.")
+                            .minValue(0)
+                            .maxValue(40320)
+                            .required(true)))
+            .required(false)
+    };
+
+    public static final OutputSchema<ObjectProperty> OUTPUT_SCHEMA = outputSchema(EVENT_OUTPUT_PROPERTY);
+
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action(CREATE_EVENT)
+        .title(CREATE_EVENT_TITLE)
+        .description(CREATE_EVENT_DESCRIPTION)
+        .properties(PROPERTIES)
+        .output(OUTPUT_SCHEMA)
         .perform(GoogleCalendarCreateEventAction::perform);
 
     private GoogleCalendarCreateEventAction() {
     }
 
-    public static CustomEvent perform(
-        Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) throws IOException {
+    public static CustomEvent perform(Parameters inputParameters, Parameters connectionParameters, Context context)
+        throws IOException {
 
         List<EventAttachment> eventAttachments = new ArrayList<>();
 

@@ -35,6 +35,9 @@ import static com.bytechef.component.google.mail.constant.GoogleMailConstants.ME
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.NEXT_PAGE_TOKEN;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.PAGE_TOKEN;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.RESULT_SIZE_ESTIMATE;
+import static com.bytechef.component.google.mail.constant.GoogleMailConstants.SEARCH_EMAIL;
+import static com.bytechef.component.google.mail.constant.GoogleMailConstants.SEARCH_EMAIL_DESCRIPTION;
+import static com.bytechef.component.google.mail.constant.GoogleMailConstants.SEARCH_EMAIL_TITLE;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.SUBJECT;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.THREAD_ID;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.TO;
@@ -125,9 +128,9 @@ public class GoogleMailSearchEmailAction {
                 number(RESULT_SIZE_ESTIMATE)
                     .description("Estimated number of messages.")));
 
-    public static final ModifiableActionDefinition ACTION_DEFINITION = action("searchEmail")
-        .title("Search Email")
-        .description("Lists the messages in the user's mailbox.")
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action(SEARCH_EMAIL)
+        .title(SEARCH_EMAIL_TITLE)
+        .description(SEARCH_EMAIL_DESCRIPTION)
         .properties(PROPERTIES)
         .output(OUTPUT_SCHEMA)
         .perform(GoogleMailSearchEmailAction::perform);

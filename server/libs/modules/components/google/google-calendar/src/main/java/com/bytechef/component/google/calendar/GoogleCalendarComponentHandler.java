@@ -29,6 +29,13 @@ import com.bytechef.component.google.calendar.action.GoogleCalendarDeleteEventAc
 import com.bytechef.component.google.calendar.action.GoogleCalendarGetEventsAction;
 import com.bytechef.component.google.calendar.action.GoogleCalendarGetFreeTimeSlotsAction;
 import com.bytechef.component.google.calendar.action.GoogleCalendarUpdateEventAction;
+import com.bytechef.component.google.calendar.cluster.GoogleCalendarAddAttendeesToEventTool;
+import com.bytechef.component.google.calendar.cluster.GoogleCalendarCreateEventTool;
+import com.bytechef.component.google.calendar.cluster.GoogleCalendarCreateQuickEventTool;
+import com.bytechef.component.google.calendar.cluster.GoogleCalendarDeleteEventTool;
+import com.bytechef.component.google.calendar.cluster.GoogleCalendarGetEventsTool;
+import com.bytechef.component.google.calendar.cluster.GoogleCalendarGetFreeTimeSlotsTool;
+import com.bytechef.component.google.calendar.cluster.GoogleCalendarUpdateEventTool;
 import com.bytechef.component.google.calendar.trigger.GoogleCalendarEventTrigger;
 import com.google.auto.service.AutoService;
 
@@ -55,6 +62,14 @@ public class GoogleCalendarComponentHandler implements ComponentHandler {
             GoogleCalendarGetEventsAction.ACTION_DEFINITION,
             GoogleCalendarGetFreeTimeSlotsAction.ACTION_DEFINITION,
             GoogleCalendarUpdateEventAction.ACTION_DEFINITION)
+        .clusterElements(
+            GoogleCalendarAddAttendeesToEventTool.CLUSTER_ELEMENT_DEFINITION,
+            GoogleCalendarCreateEventTool.CLUSTER_ELEMENT_DEFINITION,
+            GoogleCalendarCreateQuickEventTool.CLUSTER_ELEMENT_DEFINITION,
+            GoogleCalendarDeleteEventTool.CLUSTER_ELEMENT_DEFINITION,
+            GoogleCalendarGetEventsTool.CLUSTER_ELEMENT_DEFINITION,
+            GoogleCalendarGetFreeTimeSlotsTool.CLUSTER_ELEMENT_DEFINITION,
+            GoogleCalendarUpdateEventTool.CLUSTER_ELEMENT_DEFINITION)
         .triggers(GoogleCalendarEventTrigger.TRIGGER_DEFINITION);
 
     @Override

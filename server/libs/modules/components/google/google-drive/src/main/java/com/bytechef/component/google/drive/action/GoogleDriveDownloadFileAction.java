@@ -21,16 +21,23 @@ import static com.bytechef.component.definition.ComponentDsl.fileEntry;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.google.drive.constant.GoogleDriveConstants.APPLICATION_VND_GOOGLE_APPS_FOLDER;
+import static com.bytechef.component.google.drive.constant.GoogleDriveConstants.DOWNLOAD_FILE;
+import static com.bytechef.component.google.drive.constant.GoogleDriveConstants.DOWNLOAD_FILE_DESCRIPTION;
+import static com.bytechef.component.google.drive.constant.GoogleDriveConstants.DOWNLOAD_FILE_TITLE;
 import static com.bytechef.google.commons.constant.GoogleCommonsContants.FILE_ID;
 
-import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
+import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.FileEntry;
 import com.bytechef.component.definition.Parameters;
+import com.bytechef.component.definition.Property;
+import com.bytechef.component.definition.Property.FileEntryProperty;
+import com.bytechef.definition.BaseOutputDefinition.OutputSchema;
 import com.bytechef.google.commons.GoogleServices;
 import com.bytechef.google.commons.GoogleUtils;
 import com.google.api.services.drive.Drive;
 import com.google.api.services.drive.model.File;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -40,23 +47,29 @@ import java.io.InputStream;
  */
 public class GoogleDriveDownloadFileAction {
 
-    public static final ModifiableActionDefinition ACTION_DEFINITION = action("downloadFile")
-        .title("Download File")
-        .description("Download selected file from Google Drive.")
-        .properties(
-            string(FILE_ID)
-                .label("File ID")
-                .description("ID of the file to download.")
-                .options(GoogleUtils.getFileOptionsByMimeType(APPLICATION_VND_GOOGLE_APPS_FOLDER, false))
-                .required(true))
-        .output(outputSchema(fileEntry()))
+    @SuppressFBWarnings("MS")
+    public static final Property[] PROPERTIES = {
+        string(FILE_ID)
+            .label("File ID")
+            .description("ID of the file to download.")
+            .options(GoogleUtils.getFileOptionsByMimeType(APPLICATION_VND_GOOGLE_APPS_FOLDER, false))
+            .required(true)
+    };
+
+    public static final OutputSchema<FileEntryProperty> OUTPUT_SCHEMA = outputSchema(fileEntry());
+
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action(DOWNLOAD_FILE)
+        .title(DOWNLOAD_FILE_TITLE)
+        .description(DOWNLOAD_FILE_DESCRIPTION)
+        .properties(PROPERTIES)
+        .output(OUTPUT_SCHEMA)
         .perform(GoogleDriveDownloadFileAction::perform);
 
     private GoogleDriveDownloadFileAction() {
     }
 
-    public static FileEntry perform(
-        Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) throws IOException {
+    public static FileEntry perform(Parameters inputParameters, Parameters connectionParameters, Context context)
+        throws IOException {
 
         Drive drive = GoogleServices.getDrive(connectionParameters);
 
@@ -76,18 +89,18 @@ public class GoogleDriveDownloadFileAction {
                 .export(fileId, exportMimeType)
                 .executeMediaAsInputStream()) {
 
-                String extension = actionContext.mimeType(mimeType1 -> mimeType1.lookupExt(exportMimeType));
+                String extension = context.mimeType(mimeType1 -> mimeType1.lookupExt(exportMimeType));
 
                 String finalFileName = fileName + "." + extension;
 
-                return actionContext.file(file -> file.storeContent(finalFileName, inputStream));
+                return context.file(file -> file.storeContent(finalFileName, inputStream));
             }
         } else {
             String fileExtension = googleFile.getFileExtension();
 
             if (fileExtension == null || fileExtension.isEmpty()) {
                 fileExtension =
-                    actionContext.mimeType(
+                    context.mimeType(
                         mimeType1 -> mimeType1.lookupExt(mimeType.equals("plain/text") ? "text/plain" : mimeType));
                 if (fileExtension != null && !fileName.contains(fileExtension)) {
                     fileName += "." + fileExtension;
@@ -97,7 +110,7 @@ public class GoogleDriveDownloadFileAction {
             try (InputStream inputStream = get.executeMediaAsInputStream()) {
                 String finalFilename = fileName;
 
-                return actionContext.file(file -> file.storeContent(finalFilename, inputStream));
+                return context.file(file -> file.storeContent(finalFilename, inputStream));
             }
         }
     }

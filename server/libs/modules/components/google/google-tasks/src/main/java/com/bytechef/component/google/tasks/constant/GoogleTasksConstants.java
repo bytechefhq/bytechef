@@ -26,12 +26,21 @@ import com.bytechef.component.definition.ComponentDsl.ModifiableObjectProperty;
  */
 public class GoogleTasksConstants {
 
+    public static final String CREATE_TASK = "createTask";
+    public static final String CREATE_TASK_DESCRIPTION = "Creates a new task on the specified task list.";
+    public static final String CREATE_TASK_TITLE = "Create Task";
     public static final String LIST_ID = "listId";
+    public static final String LIST_TASKS = "listTasks";
+    public static final String LIST_TASKS_DESCRIPTION = "Returns all tasks in the specified task list.";
+    public static final String LIST_TASKS_TITLE = "List Tasks";
     public static final String NOTES = "notes";
     public static final String SHOW_COMPLETED = "showCompleted";
     public static final String STATUS = "status";
     public static final String TASK_ID = "taskId";
     public static final String TITLE = "title";
+    public static final String UPDATE_TASK = "updateTask";
+    public static final String UPDATE_TASK_DESCRIPTION = "Updates a specific task on the specified task list.";
+    public static final String UPDATE_TASK_TITLE = "Update Task";
 
     public static final ModifiableObjectProperty TASK_OUTPUT_PROPERTY =
         object()

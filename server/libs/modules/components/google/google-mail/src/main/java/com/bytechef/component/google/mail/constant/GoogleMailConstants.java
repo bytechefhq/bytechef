@@ -40,13 +40,25 @@ public class GoogleMailConstants {
     private GoogleMailConstants() {
     }
 
+    public static final String ADD_LABELS = "addLabels";
+    public static final String ADD_LABELS_DESCRIPTION = "Add labels to an email in your Gmail account.";
+    public static final String ADD_LABELS_TITLE = "Add Labels";
     public static final String ATTACHMENTS = "attachments";
     public static final String BCC = "bcc";
     public static final String BODY = "body";
     public static final String CATEGORY = "category";
     public static final String CC = "cc";
+    public static final String DELETE_MAIL = "deleteMail";
+    public static final String DELETE_MAIL_DESCRIPTION = "Delete an email from your Gmail account permanently via Id";
+    public static final String DELETE_MAIL_TITLE = "Delete Mail";
     public static final String FORMAT = "format";
     public static final String FROM = "from";
+    public static final String GET_MAIL = "getMail";
+    public static final String GET_MAIL_DESCRIPTION = "Get an email from your Gmail account via Id";
+    public static final String GET_MAIL_TITLE = "Get Mail";
+    public static final String GET_THREAD = "getThread";
+    public static final String GET_THREAD_DESCRIPTION = "Gets the specified thread.";
+    public static final String GET_THREAD_TITLE = "Get Thread";
     public static final String HEADERS = "headers";
     public static final String HISTORY_ID = "historyId";
     public static final String ID = "id";
@@ -56,16 +68,24 @@ public class GoogleMailConstants {
     public static final String MAX_RESULTS = "maxResults";
     public static final String ME = "me";
     public static final String MESSAGES = "messages";
-    public static final String METADATA = "metadata";
     public static final String METADATA_HEADERS = "metadataHeaders";
-
     public static final String NAME = "name";
     public static final String NEXT_PAGE_TOKEN = "nextPageToken";
     public static final String PAGE_TOKEN = "pageToken";
     public static final String PAYLOAD = "payload";
     public static final String RAW = "raw";
     public static final String REPLY_TO = "replyTo";
+    public static final String REPLY_TO_EMAIL = "replyToEmail";
+    public static final String REPLY_TO_EMAIL_DESCRIPTION = "Send a reply to an email message.";
+    public static final String REPLY_TO_EMAIL_TITLE = "Reply to Email";
     public static final String RESULT_SIZE_ESTIMATE = "resultSizeEstimate";
+    public static final String SEARCH_EMAIL = "searchEmail";
+    public static final String SEARCH_EMAIL_DESCRIPTION = "Lists the messages in the user's mailbox.";
+    public static final String SEARCH_EMAIL_TITLE = "Search Email";
+    public static final String SEND_EMAIL = "sendEmail";
+    public static final String SEND_EMAIL_TITLE = "Send Email";
+    public static final String SEND_EMAIL_DESCRIPTION =
+        "Sends the specified message to the recipients in the To, Cc, and Bcc headers.";
     public static final String SIZE_ESTIMATE = "sizeEstimate";
     public static final String SNIPPET = "snippet";
     public static final String SUBJECT = "subject";
