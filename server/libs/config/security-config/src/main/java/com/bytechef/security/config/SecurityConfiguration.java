@@ -134,6 +134,7 @@ public class SecurityConfiguration {
                     .ignoringRequestMatchers("/api/o/**")
                     .ignoringRequestMatchers("/approvals/**")
                     .ignoringRequestMatchers("/graphql")
+                    .ignoringRequestMatchers("/mcp/**")
                     .ignoringRequestMatchers("/webhooks/**"));
 
         for (AuthenticationProviderContributor authenticationProviderContributor : authenticationProviderContributors) {
@@ -201,6 +202,8 @@ public class SecurityConfiguration {
                     .permitAll()
                     .requestMatchers(mvc.pattern("/index.html"))
                     .permitAll()
+                    .requestMatchers(mvc.pattern("/sse"))
+                    .authenticated()
                     .requestMatchers(mvc.pattern("/swagger-ui/**"))
                     .permitAll()
                     .requestMatchers(mvc.pattern("/swagger-ui.html"))
