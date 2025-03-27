@@ -8,9 +8,13 @@
 package com.bytechef.ee.platform.component.remote.client.service;
 
 import com.bytechef.component.definition.ClusterElementDefinition.ClusterElementType;
+import com.bytechef.component.definition.Context;
+import com.bytechef.platform.component.ComponentConnection;
 import com.bytechef.platform.component.domain.ClusterElementDefinition;
 import com.bytechef.platform.component.service.ClusterElementDefinitionService;
 import java.util.List;
+import java.util.Map;
+import javax.annotation.Nullable;
 import org.springframework.stereotype.Component;
 
 /**
@@ -20,6 +24,14 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public class RemoteClusterElementDefinitionServiceClient implements ClusterElementDefinitionService {
+
+    @Override
+    public Object executeTool(
+        String componentName, int componentVersion, String clusterElementName, Map<String, ?> inputParameters,
+        @Nullable ComponentConnection componentConnection, Context context) {
+
+        throw new UnsupportedOperationException();
+    }
 
     @Override
     public ClusterElementDefinition getClusterElementDefinition(
