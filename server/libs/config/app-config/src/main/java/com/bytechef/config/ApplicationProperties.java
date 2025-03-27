@@ -17,6 +17,7 @@
 package com.bytechef.config;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -357,6 +358,7 @@ public class ApplicationProperties {
 
         private Provider provider = new Provider();
         private Copilot copilot = new Copilot();
+        private Paths paths = new Paths();
 
         public Copilot getCopilot() {
             return copilot;
@@ -366,12 +368,62 @@ public class ApplicationProperties {
             return provider;
         }
 
+        public Paths getPaths() {
+            return paths;
+        }
+
         public void setCopilot(Copilot copilot) {
             this.copilot = copilot;
         }
 
         public void setProvider(Provider provider) {
             this.provider = provider;
+        }
+
+        public void setPaths(Paths paths) {
+            this.paths = paths;
+        }
+
+        public static class Paths {
+            private String documentationPath;
+
+            public String getDocumentationPath() {
+                return documentationPath;
+            }
+
+            public void setDocumentationPath(String documentationPath) {
+                this.documentationPath = documentationPath;
+            }
+
+            private String componentsPath;
+
+            public String getComponentsPath() {
+                return componentsPath;
+            }
+
+            public void setComponentsPath(String componentsPath) {
+                this.componentsPath = componentsPath;
+            }
+
+            private String workflowsPath;
+
+            public String getWorkflowsPath() {
+                return workflowsPath;
+            }
+
+            public void setWorkflowsPath(String workflowsPath) {
+                this.workflowsPath = workflowsPath;
+            }
+
+            private String welcomePath;
+
+            public String getWelcomePath() {
+                return welcomePath;
+            }
+
+            public void setWelcomePath(String welcomePath) {
+                this.welcomePath = welcomePath;
+            }
         }
 
         public static class Copilot {

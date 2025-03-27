@@ -44,13 +44,10 @@ public class AiCopilotFacadeImpl implements AiCopilotFacade {
     private final ChatClient chatClientScript;
     private final WorkflowService workflowService;
 
-    private final VectorStore vectorStore;
-
     @SuppressFBWarnings("EI")
     @Autowired
     public AiCopilotFacadeImpl(ChatClient.Builder chatClientBuilder, WorkflowService workflowService,
         VectorStore vectorStore) {
-        this.vectorStore = vectorStore;
         this.workflowService = workflowService;
 
         MessageChatMemoryAdvisor messageChatMemoryAdvisor = new MessageChatMemoryAdvisor(new InMemoryChatMemory());
