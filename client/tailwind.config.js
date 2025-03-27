@@ -103,6 +103,7 @@ module.exports = {
                         primary: 'hsl(var(--stroke-neutral-primary))',
                         'primary-hover': 'hsl(var(--stroke-neutral-primary-hover))',
                         secondary: 'hsl(var(--stroke-neutral-secondary))',
+                        tertiary: 'hsl(var(--stroke-neutral-tertiary))',
                     },
                 },
                 success: {
