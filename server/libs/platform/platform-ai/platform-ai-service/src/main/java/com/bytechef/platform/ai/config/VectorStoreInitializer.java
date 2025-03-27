@@ -16,8 +16,10 @@
 
 package com.bytechef.platform.ai.config;
 
+import com.bytechef.config.ApplicationProperties;
 import com.bytechef.platform.ai.service.VectorStoreService;
 import com.knuddels.jtokkit.api.EncodingType;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.IOException;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
@@ -46,28 +48,33 @@ public class VectorStoreInitializer {
     private final VectorStoreService vectorStoreService;
     private final TokenCountBatchingStrategy strategy;
 
+    private final Path welcomePath;
+    private final Path documentationPath;
+    private final Path componentsPath;
+    private final Path workflowsPath;
+
     private static final String CATEGORY = "category";
     private static final String NAME = "name";
-
     private static final String DOCUMENTATION = "documentation";
     private static final String WORKFLOWS = "workflows";
     private static final String COMPONENTS = "components";
-    private static final Path WELCOME_PATH =
-        Paths.get("/home/user/IdeaProjects/bytechef/docs/src/content/docs/welcome.md");
-    private static final Path DOCUMENTATION_PATH =
-        Paths.get("/home/user/IdeaProjects/bytechef/docs/src/content/docs/automation");
-    private static final Path COMPONENTS_PATH =
-        Paths.get("/home/user/IdeaProjects/bytechef/docs/src/content/docs/reference/components");
-    private static final Path WORKFLOWS_PATH = Paths.get(
-        "/home/user/IdeaProjects/bytechef/server/libs/platform/platform-ai/platform-ai-service/src/main/resources/workflows");
 
+    @SuppressFBWarnings("EI")
     @Autowired
     public VectorStoreInitializer(org.springframework.ai.vectorstore.VectorStore vectorStore,
-        VectorStoreService vectorStoreService) {
+        VectorStoreService vectorStoreService, ApplicationProperties applicationProperties) {
         this.vectorStore = vectorStore;
         this.vectorStoreService = vectorStoreService;
         this.strategy = new TokenCountBatchingStrategy(EncodingType.CL100K_BASE, 8191, 0.1,
             Document.DEFAULT_CONTENT_FORMATTER, MetadataMode.ALL);
+
+        ApplicationProperties.Ai.Paths paths = applicationProperties.getAi()
+            .getPaths();
+
+        this.welcomePath = Paths.get(paths.getWelcomePath());
+        this.documentationPath = Paths.get(paths.getDocumentationPath());
+        this.componentsPath = Paths.get(paths.getComponentsPath());
+        this.workflowsPath = Paths.get(paths.getWorkflowsPath());
     }
 
     @EventListener(ContextRefreshedEvent.class)
@@ -87,7 +94,7 @@ public class VectorStoreInitializer {
         }
     }
 
-    public static String preprocessDocument(String document) {
+    private static String preprocessDocument(String document) {
         Pattern htmlTagsPattern = Pattern.compile("<[^>]*>");
         document = htmlTagsPattern.matcher(document)
             .replaceAll("");
@@ -116,7 +123,6 @@ public class VectorStoreInitializer {
         Pattern tablePattern = Pattern.compile("^\\|.*\\|$", Pattern.MULTILINE);
         Matcher tableMatcher = tablePattern.matcher(document);
         document = tableMatcher.replaceAll("");
-        //
 
         Pattern spacePattern = Pattern.compile("\\s+");
         document = spacePattern.matcher(document)
@@ -126,7 +132,7 @@ public class VectorStoreInitializer {
     }
 
     // Function to split a document into chunks based on a maximum token limit
-    public static List<String> splitDocument(String[] tokens, int maxTokens) {
+    private static List<String> splitDocument(String[] tokens, int maxTokens) {
         List<String> chunks = new ArrayList<>();
         StringBuilder currentChunk = new StringBuilder();
         int tokenCount = 0;
@@ -159,6 +165,7 @@ public class VectorStoreInitializer {
 
         Files.walkFileTree(path, new SimpleFileVisitor<>() {
             @Override
+            @SuppressFBWarnings("NP")
             public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
                 if (file.toString()
                     .endsWith(suffix)) {
@@ -180,7 +187,7 @@ public class VectorStoreInitializer {
                         List<String> chunks = splitDocument(cleanedDocument.split("\\s+"), 1536);
 
                         for (String chunk : chunks) {
-                            // TODO: add versioning to files
+                            // TODO add versioning to files
                             documentList.add(new Document(chunk, Map.of(CATEGORY, categoryName, NAME, fileName)));
                         }
                     }
@@ -195,7 +202,7 @@ public class VectorStoreInitializer {
         }
     }
 
-    public static boolean
+    private static boolean
         vectorStoreListContainsFile(List<Map<String, Object>> vectorStoreList, String fileName, String categoryName) {
         return !vectorStoreList.isEmpty() && vectorStoreList.stream()
             .anyMatch(map -> fileName.equals(map.get(NAME)) && categoryName.equals(map.get(CATEGORY)));
@@ -203,15 +210,15 @@ public class VectorStoreInitializer {
 
     private void addDocumentsToVectorDatabase(List<Map<String, Object>> vectorStoreList) {
         try {
-            storeDocumentsFromPath(DOCUMENTATION, DOCUMENTATION_PATH, ".md", strategy, vectorStoreList, vectorStore);
-            storeDocumentsFromPath(WORKFLOWS, WORKFLOWS_PATH, ".json", strategy, vectorStoreList, vectorStore);
-            storeDocumentsFromPath(COMPONENTS, COMPONENTS_PATH, ".md", strategy, vectorStoreList, vectorStore);
+            storeDocumentsFromPath(DOCUMENTATION, documentationPath, ".md", strategy, vectorStoreList, vectorStore);
+            storeDocumentsFromPath(WORKFLOWS, workflowsPath, ".json", strategy, vectorStoreList, vectorStore);
+            storeDocumentsFromPath(COMPONENTS, componentsPath, ".md", strategy, vectorStoreList, vectorStore);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
 
         try {
-            String welcome = Files.readString(WELCOME_PATH);
+            String welcome = Files.readString(welcomePath);
             String cleanedDocument = preprocessDocument(welcome);
             vectorStore.add(List.of(new Document(cleanedDocument, Map.of(CATEGORY, DOCUMENTATION, NAME, "welcome"))));
         } catch (IOException e) {
