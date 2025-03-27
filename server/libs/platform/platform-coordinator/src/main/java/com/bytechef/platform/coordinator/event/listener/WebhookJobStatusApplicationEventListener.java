@@ -16,11 +16,12 @@
  * Modifications copyright (C) 2023 ByteChef Inc.
  */
 
-package com.bytechef.atlas.coordinator.event.listener;
+package com.bytechef.platform.coordinator.event.listener;
 
 import com.bytechef.atlas.configuration.constant.WorkflowConstants;
 import com.bytechef.atlas.coordinator.event.ApplicationEvent;
 import com.bytechef.atlas.coordinator.event.JobStatusApplicationEvent;
+import com.bytechef.atlas.coordinator.event.listener.ApplicationEventListener;
 import com.bytechef.atlas.execution.domain.Job;
 import com.bytechef.atlas.execution.service.JobService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
