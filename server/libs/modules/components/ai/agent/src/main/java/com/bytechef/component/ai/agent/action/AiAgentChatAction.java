@@ -230,10 +230,10 @@ public class AiAgentChatAction {
 
             FunctionToolCallback.Builder<Map<String, Object>, Object> builder = FunctionToolCallback.builder(
                 clusterElementDefinition.getName(),
-                new ToolCallbackFunction(
+                getToolCallbackFunction(
                     clusterElement.getComponentName(), clusterElement.getComponentVersion(),
                     clusterElementDefinition.getName(), clusterElement.getParameters(), componentConnection,
-                    editorEnvironment, clusterElementDefinitionFacade))
+                    editorEnvironment))
                 .inputType(Map.class)
                 .inputSchema(JsonSchemaGeneratorUtils.generateInputSchema(clusterElementDefinition.getProperties()));
 
@@ -247,16 +247,12 @@ public class AiAgentChatAction {
         return toolCallbacks;
     }
 
-    private record ToolCallbackFunction(
+    private Function<Map<String, Object>, Object> getToolCallbackFunction(
         String componentName, int componentVersion, String clusterElementName, Map<String, ?> parameters,
-        ComponentConnection componentConnection, boolean editorEnvironment,
-        ClusterElementDefinitionFacade clusterElementDefinitionFacade)
-        implements Function<Map<String, Object>, Object> {
+        ComponentConnection componentConnection, boolean editorEnvironment) {
 
-        public Object apply(Map<String, Object> request) {
-            return clusterElementDefinitionFacade.executeTool(
-                componentName, componentVersion, clusterElementName,
-                MapUtils.concat(request, new HashMap<>(parameters)), componentConnection, editorEnvironment);
-        }
+        return request -> clusterElementDefinitionFacade.executeTool(
+            componentName, componentVersion, clusterElementName,
+            MapUtils.concat(request, new HashMap<>(parameters)), componentConnection, editorEnvironment);
     }
 }

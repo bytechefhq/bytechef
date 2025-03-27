@@ -14,43 +14,35 @@
  * limitations under the License.
  */
 
-package com.bytechef.embedded.connectivity.facade;
+package com.bytechef.embedded.execution.util;
 
 import com.bytechef.embedded.configuration.domain.IntegrationInstance;
 import com.bytechef.embedded.configuration.service.IntegrationInstanceService;
 import com.bytechef.embedded.connected.user.domain.ConnectedUser;
 import com.bytechef.embedded.connected.user.service.ConnectedUserService;
-import com.bytechef.platform.component.facade.ActionDefinitionFacade;
 import com.bytechef.platform.constant.Environment;
-import com.bytechef.platform.constant.ModeType;
 import com.bytechef.platform.security.util.SecurityUtils;
-import edu.umd.cs.findbugs.annotations.Nullable;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import java.util.Map;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 
-@Service
-public class ActionFacadeImpl implements ActionFacade {
+/**
+ * @author Ivica Cardic
+ */
+@Component
+public class ConnectionIdHelper {
 
-    private final ActionDefinitionFacade actionDefinitionFacade;
     private final ConnectedUserService connectedUserService;
     private final IntegrationInstanceService integrationInstanceService;
 
     @SuppressFBWarnings("EI")
-    public ActionFacadeImpl(
-        ActionDefinitionFacade actionDefinitionFacade, ConnectedUserService connectedUserService,
-        IntegrationInstanceService integrationInstanceService) {
+    public ConnectionIdHelper(
+        ConnectedUserService connectedUserService, IntegrationInstanceService integrationInstanceService) {
 
-        this.actionDefinitionFacade = actionDefinitionFacade;
         this.connectedUserService = connectedUserService;
         this.integrationInstanceService = integrationInstanceService;
     }
 
-    @Override
-    public Object executeAction(
-        String componentName, Integer componentVersion, String actionName, Map<String, Object> input,
-        Environment environment, @Nullable Long instanceId) {
-
+    public Long getConnectionId(String componentName, Environment environment, Long instanceId) {
         Long connectionId;
 
         if (instanceId == null) {
@@ -69,8 +61,6 @@ public class ActionFacadeImpl implements ActionFacade {
             connectionId = integrationInstance.getConnectionId();
         }
 
-        return actionDefinitionFacade.executePerform(
-            componentName, componentVersion, actionName, ModeType.EMBEDDED, null, null, null, null, input,
-            connectionId == null ? Map.of() : Map.of(componentName, connectionId), Map.of(), false);
+        return connectionId;
     }
 }

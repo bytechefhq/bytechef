@@ -221,11 +221,6 @@ public class RemoteTriggerDefinitionFacadeClient extends AbstractWorkerClient im
         Map<String, ?> inputParameters, Long connectionId, List<String> loadDependsOnPath) {
     }
 
-    private record SampleOutputRequest(
-        String componentName, int componentVersion, String triggerName, Map<String, ?> inputParameters,
-        Long connectionId) {
-    }
-
     private record DynamicWebhookDisableRequest(
         String componentName, int componentVersion, String triggerName, Map<String, ?> inputParameters,
         String workflowExecutionId, Map<String, ?> outputParameters, Long connectionIdd) {

@@ -34,6 +34,11 @@ public class RemoteClusterElementDefinitionServiceClient implements ClusterEleme
     }
 
     @Override
+    public ClusterElementDefinition getClusterElementDefinition(String componentName, String clusterElementName) {
+        return null;
+    }
+
+    @Override
     public ClusterElementDefinition getClusterElementDefinition(
         String componentName, int componentVersion, String clusterElementName) {
 
@@ -48,15 +53,22 @@ public class RemoteClusterElementDefinitionServiceClient implements ClusterEleme
     }
 
     @Override
-    public List<ClusterElementDefinition> getRootClusterElementDefinitions(
-        String rootComponentName, int rootComponentVersion, String clusterElementTypeName) {
+    public List<ClusterElementDefinition> getClusterElementDefinitions(
+        ClusterElementType clusterElementType) {
+
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public List<ClusterElementDefinition> getClusterElementDefinitions(
+        String componentName, int componentVersion, ClusterElementType clusterElementType) {
 
         throw new UnsupportedOperationException();
     }
 
     @Override
     public List<ClusterElementDefinition> getRootClusterElementDefinitions(
-        ClusterElementType clusterElementType) {
+        String rootComponentName, int rootComponentVersion, String clusterElementTypeName) {
 
         throw new UnsupportedOperationException();
     }

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.component.ai.agent.util;
+package com.bytechef.platform.component.util;
 
 import com.bytechef.platform.component.domain.Property;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -42,9 +42,9 @@ import org.springframework.ai.util.json.JsonParser;
  *
  * @author Ivica Cardic
  */
-public class JsonSchemaGenerator {
+public class JsonSchemaGeneratorUtils {
 
-    private static final SchemaGenerator SUBTYPE_SCHEMA_GENERATOR;
+    private static final SchemaGenerator TYPE_SCHEMA_GENERATOR;
 
     static {
         Module jacksonModule = new JacksonModule(JacksonOption.RESPECT_JSONPROPERTY_REQUIRED);
@@ -55,11 +55,9 @@ public class JsonSchemaGenerator {
                 .with(Option.EXTRA_OPEN_API_FORMAT_VALUES)
                 .with(Option.PLAIN_DEFINITION_KEYS);
 
-        SchemaGeneratorConfig subtypeSchemaGeneratorConfig = schemaGeneratorConfigBuilder
-            .without(Option.SCHEMA_VERSION_INDICATOR)
-            .build();
+        SchemaGeneratorConfig typeSchemaGeneratorConfig = schemaGeneratorConfigBuilder.build();
 
-        SUBTYPE_SCHEMA_GENERATOR = new SchemaGenerator(subtypeSchemaGeneratorConfig);
+        TYPE_SCHEMA_GENERATOR = new SchemaGenerator(typeSchemaGeneratorConfig);
     }
 
     public static String generateInputSchema(List<? extends Property> properties) {
@@ -80,7 +78,8 @@ public class JsonSchemaGenerator {
                 required.add(parameterName);
             }
 
-            ObjectNode parameterObjectNode = SUBTYPE_SCHEMA_GENERATOR.generateSchema(getType(property.getType()));
+            // TODO check array and object, it seems schema is not generated correctly
+            ObjectNode parameterObjectNode = TYPE_SCHEMA_GENERATOR.generateSchema(getType(property.getType()));
             String parameterDescription = property.getDescription();
 
             if (StringUtils.isNotEmpty(parameterDescription)) {
@@ -99,15 +98,15 @@ public class JsonSchemaGenerator {
 
     private static Type getType(com.bytechef.component.definition.Property.Type type) {
         return switch (type) {
-            case ARRAY -> List.class;
-            case BOOLEAN -> Boolean.class;
-            case DATE -> LocalDate.class;
-            case DATE_TIME -> LocalDateTime.class;
-            case INTEGER -> Integer.class;
-            case NUMBER -> Double.class;
-            case STRING -> String.class;
-            case OBJECT -> Object.class;
-            case TIME -> LocalTime.class;
+            case com.bytechef.component.definition.Property.Type.ARRAY -> List.class;
+            case com.bytechef.component.definition.Property.Type.BOOLEAN -> Boolean.class;
+            case com.bytechef.component.definition.Property.Type.DATE -> LocalDate.class;
+            case com.bytechef.component.definition.Property.Type.DATE_TIME -> LocalDateTime.class;
+            case com.bytechef.component.definition.Property.Type.INTEGER -> Integer.class;
+            case com.bytechef.component.definition.Property.Type.NUMBER -> Double.class;
+            case com.bytechef.component.definition.Property.Type.STRING -> String.class;
+            case com.bytechef.component.definition.Property.Type.OBJECT -> Object.class;
+            case com.bytechef.component.definition.Property.Type.TIME -> LocalTime.class;
             default -> throw new IllegalStateException("Unexpected value: " + type);
         };
     }

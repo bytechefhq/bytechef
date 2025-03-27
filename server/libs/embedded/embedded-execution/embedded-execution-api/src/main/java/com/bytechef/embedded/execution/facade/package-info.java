@@ -16,7 +16,7 @@
 
 @NonNullApi
 @NonNullFields
-package com.bytechef.embedded.connectivity.facade;
+package com.bytechef.embedded.execution.facade;
 
 import org.springframework.lang.NonNullApi;
 import org.springframework.lang.NonNullFields;

@@ -21,7 +21,7 @@ import static com.bytechef.file.storage.base64.service.Base64FileStorageService.
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.component.definition.Context.Http;
-import com.bytechef.embedded.connectivity.facade.ActionFacade;
+import com.bytechef.embedded.execution.facade.ActionFacade;
 import com.bytechef.embedded.execution.public_.web.rest.converter.CaseInsensitiveEnumPropertyEditorSupport;
 import com.bytechef.embedded.execution.public_.web.rest.model.EnvironmentModel;
 import com.bytechef.embedded.execution.public_.web.rest.model.ExecuteAction200ResponseModel;

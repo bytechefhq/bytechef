@@ -42,6 +42,7 @@ public class ComponentDefinition {
     private List<ActionDefinition> actions;
     private List<ComponentCategory> componentCategories;
     private boolean clusterElement;
+    private List<ClusterElementDefinition> clusterElements;
     private List<ClusterElementType> clusterElementTypes;
     private boolean clusterRoot;
     private ConnectionDefinition connection;
@@ -71,6 +72,8 @@ public class ComponentDefinition {
 
         this.clusterElement = OptionalUtils.orElse(componentDefinition.getClusterElements(), List.of())
             .isEmpty();
+        this.clusterElements = getClusterElements(componentDefinition);
+
         if (componentDefinition instanceof ClusterRootComponentDefinition clusterRootComponentDefinition) {
             this.actionClusterElementTypes = clusterRootComponentDefinition.getActionClusterElementTypes();
             this.clusterElementTypes = clusterRootComponentDefinition.getClusterElementType();
@@ -122,6 +125,10 @@ public class ComponentDefinition {
 
     public int getActionsCount() {
         return actions.size();
+    }
+
+    public List<ClusterElementDefinition> getClusterElements() {
+        return clusterElements;
     }
 
     public List<ComponentCategory> getComponentCategories() {
@@ -193,7 +200,8 @@ public class ComponentDefinition {
         }
 
         return Objects.equals(actions, that.actions) && clusterElement == that.clusterElement &&
-            clusterRoot == that.clusterRoot && Objects.equals(componentCategories, that.componentCategories) &&
+            Objects.equals(clusterElements, that.clusterElements) && clusterRoot == that.clusterRoot &&
+            Objects.equals(componentCategories, that.componentCategories) &&
             Objects.equals(connection, that.connection) && connectionRequired == that.connectionRequired &&
             Objects.equals(description, that.description) && Objects.equals(icon, that.icon) &&
             Objects.equals(name, that.name) && Objects.equals(resources, that.resources) &&
@@ -205,8 +213,8 @@ public class ComponentDefinition {
     @Override
     public int hashCode() {
         return Objects.hash(
-            actions, clusterElement, clusterRoot, componentCategories, connection, connectionRequired, description,
-            icon, name, resources, tags, triggers, title, unifiedApiCategory, version);
+            actions, clusterElement, clusterElements, clusterRoot, componentCategories, connection, connectionRequired,
+            description, icon, name, resources, tags, triggers, title, unifiedApiCategory, version);
     }
 
     @Override
@@ -223,6 +231,7 @@ public class ComponentDefinition {
             ", icon='" + icon + '\'' +
             ", actions=" + actions +
             ", triggers=" + triggers +
+            ", clusterElements=" + clusterElements +
             ", categories='" + componentCategories + '\'' +
             ", resources=" + resources +
             ", tags=" + tags +
@@ -236,6 +245,17 @@ public class ComponentDefinition {
             componentDefinition.getActions(),
             actionDefinitions -> CollectionUtils.map(actionDefinitions, actionDefinition -> new ActionDefinition(
                 actionDefinition, componentDefinition.getName(), componentDefinition.getVersion())),
+            Collections.emptyList());
+    }
+
+    private static List<ClusterElementDefinition> getClusterElements(
+        com.bytechef.component.definition.ComponentDefinition componentDefinition) {
+
+        return OptionalUtils.mapOrElse(
+            componentDefinition.getClusterElements(),
+            actionDefinitions -> CollectionUtils.map(actionDefinitions,
+                clusterElementDefinition -> new ClusterElementDefinition(
+                    clusterElementDefinition, componentDefinition.getName(), componentDefinition.getVersion())),
             Collections.emptyList());
     }
 

@@ -14,18 +14,14 @@
  * limitations under the License.
  */
 
-package com.bytechef.embedded.connectivity.facade;
-
-import com.bytechef.platform.constant.Environment;
-import java.util.Map;
-import org.springframework.lang.Nullable;
+package com.bytechef.ai.toolkit;
 
 /**
+ * Enum representing the environment in which the application is running. It can be either PRODUCTION or TEST.
+ *
  * @author Ivica Cardic
  */
-public interface ActionFacade {
+public enum Environment {
 
-    Object executeAction(
-        String componentName, Integer componentVersion, String actionName, Map<String, Object> input,
-        Environment environment, @Nullable Long instanceId);
+    PRODUCTION, TEST
 }
