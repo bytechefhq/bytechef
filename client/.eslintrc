@@ -97,6 +97,7 @@
                     "border-stroke-neutral-primary",
                     "border-stroke-neutral-primary-hover",
                     "border-stroke-neutral-secondary",
+                    "border-stroke-neutral-tertiary",
                     "divide-muted",
                     "h-connection-list-item-taglist-height",
                     "h-footer-height",
