@@ -19,6 +19,9 @@ package com.bytechef.component.google.mail.cluster;
 import static com.bytechef.component.definition.ai.agent.ToolFunction.TOOLS;
 import static com.bytechef.component.google.mail.action.GoogleMailSendEmailAction.OUTPUT_SCHEMA;
 import static com.bytechef.component.google.mail.action.GoogleMailSendEmailAction.PROPERTIES;
+import static com.bytechef.component.google.mail.constant.GoogleMailConstants.SEND_EMAIL;
+import static com.bytechef.component.google.mail.constant.GoogleMailConstants.SEND_EMAIL_DESCRIPTION;
+import static com.bytechef.component.google.mail.constant.GoogleMailConstants.SEND_EMAIL_TITLE;
 
 import com.bytechef.component.definition.ClusterElementDefinition;
 import com.bytechef.component.definition.ComponentDsl;
@@ -31,9 +34,9 @@ import com.bytechef.component.google.mail.action.GoogleMailSendEmailAction;
 public class GoogleMailSendEmailTool {
 
     public static final ClusterElementDefinition<SingleConnectionToolFunction> CLUSTER_ELEMENT_DEFINITION =
-        ComponentDsl.<SingleConnectionToolFunction>clusterElement("sendEmail")
-            .title("Send Email")
-            .description("Send email to the specified email address.")
+        ComponentDsl.<SingleConnectionToolFunction>clusterElement(SEND_EMAIL)
+            .title(SEND_EMAIL_TITLE)
+            .description(SEND_EMAIL_DESCRIPTION)
             .type(TOOLS)
             .properties(PROPERTIES)
             .output(OUTPUT_SCHEMA)

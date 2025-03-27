@@ -29,21 +29,28 @@ import static com.bytechef.component.google.mail.constant.GoogleMailConstants.CC
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.EMAIL_PROPERTY;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.ID;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.LABEL_IDS;
+import static com.bytechef.component.google.mail.constant.GoogleMailConstants.REPLY_TO_EMAIL;
+import static com.bytechef.component.google.mail.constant.GoogleMailConstants.REPLY_TO_EMAIL_DESCRIPTION;
+import static com.bytechef.component.google.mail.constant.GoogleMailConstants.REPLY_TO_EMAIL_TITLE;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.THREAD_ID;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.TO;
 import static com.bytechef.component.google.mail.util.GoogleMailUtils.getEncodedEmail;
 import static com.bytechef.component.google.mail.util.GoogleMailUtils.getMessage;
 import static com.bytechef.component.google.mail.util.GoogleMailUtils.sendMail;
 
-import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
+import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.Parameters;
+import com.bytechef.component.definition.Property;
 import com.bytechef.component.definition.Property.ControlType;
+import com.bytechef.component.definition.Property.ObjectProperty;
 import com.bytechef.component.google.mail.util.GoogleMailUtils;
+import com.bytechef.definition.BaseOutputDefinition.OutputSchema;
 import com.bytechef.google.commons.GoogleServices;
 import com.google.api.services.gmail.Gmail;
 import com.google.api.services.gmail.model.Message;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import jakarta.mail.MessagingException;
 import java.io.IOException;
 
@@ -52,57 +59,61 @@ import java.io.IOException;
  */
 public class GoogleMailReplyToEmailAction {
 
-    public static final ModifiableActionDefinition ACTION_DEFINITION = action("replyToEmail")
-        .title("Reply to Email")
-        .description("Send a reply to an email message.")
-        .properties(
-            string(ID)
-                .label("Message ID")
-                .description("The ID of the message to reply to.")
-                .options((ActionOptionsFunction<String>) GoogleMailUtils::getMessageIdOptions)
-                .required(true),
-            array(TO)
-                .label("To")
-                .description("Recipients email addresses.")
-                .items(EMAIL_PROPERTY)
-                .required(true),
-            array(BCC)
-                .label("Bcc")
-                .description("Bcc recipients email addresses.")
-                .items(EMAIL_PROPERTY)
-                .required(false),
-            array(CC)
-                .label("Cc")
-                .description("Cc recipients email addresses.")
-                .items(EMAIL_PROPERTY)
-                .required(false),
-            string(BODY)
-                .label("Body")
-                .description("Body text of the email")
-                .controlType(ControlType.TEXT_AREA)
-                .required(true),
-            array(ATTACHMENTS)
-                .label("Attachments")
-                .description("A list of attachments to send with the email.")
-                .items(fileEntry()))
-        .output(
-            outputSchema(
-                object()
-                    .properties(
-                        string(ID)
-                            .description("The ID of the message."),
-                        string(THREAD_ID)
-                            .description("The ID of the thread the message belongs to."),
-                        array(LABEL_IDS)
-                            .description("List of IDs of labels applied to this message.")
-                            .items(string()))))
+    @SuppressFBWarnings("MS")
+    public static final Property[] PROPERTIES = {
+        string(ID)
+            .label("Message ID")
+            .description("The ID of the message to reply to.")
+            .options((ActionOptionsFunction<String>) GoogleMailUtils::getMessageIdOptions)
+            .required(true),
+        array(TO)
+            .label("To")
+            .description("Recipients email addresses.")
+            .items(EMAIL_PROPERTY)
+            .required(true),
+        array(BCC)
+            .label("Bcc")
+            .description("Bcc recipients email addresses.")
+            .items(EMAIL_PROPERTY)
+            .required(false),
+        array(CC)
+            .label("Cc")
+            .description("Cc recipients email addresses.")
+            .items(EMAIL_PROPERTY)
+            .required(false),
+        string(BODY)
+            .label("Body")
+            .description("Body text of the email")
+            .controlType(ControlType.TEXT_AREA)
+            .required(true),
+        array(ATTACHMENTS)
+            .label("Attachments")
+            .description("A list of attachments to send with the email.")
+            .items(fileEntry())
+    };
+
+    public static final OutputSchema<ObjectProperty> OUTPUT_SCHEMA = outputSchema(
+        object()
+            .properties(
+                string(ID)
+                    .description("The ID of the message."),
+                string(THREAD_ID)
+                    .description("The ID of the thread the message belongs to."),
+                array(LABEL_IDS)
+                    .description("List of IDs of labels applied to this message.")
+                    .items(string())));
+
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action(REPLY_TO_EMAIL)
+        .title(REPLY_TO_EMAIL_TITLE)
+        .description(REPLY_TO_EMAIL_DESCRIPTION)
+        .properties(PROPERTIES)
+        .output(OUTPUT_SCHEMA)
         .perform(GoogleMailReplyToEmailAction::perform);
 
     private GoogleMailReplyToEmailAction() {
     }
 
-    public static Message perform(
-        Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext)
+    public static Message perform(Parameters inputParameters, Parameters connectionParameters, Context context)
         throws IOException, MessagingException {
 
         Gmail gmail = GoogleServices.getMail(connectionParameters);
@@ -111,7 +122,7 @@ public class GoogleMailReplyToEmailAction {
 
         Message newMessage = new Message();
 
-        newMessage.setRaw(getEncodedEmail(inputParameters, actionContext, message));
+        newMessage.setRaw(getEncodedEmail(inputParameters, context, message));
         newMessage.setThreadId(message.getThreadId());
         newMessage.setHistoryId(message.getHistoryId());
 

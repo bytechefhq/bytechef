@@ -30,6 +30,9 @@ import static com.bytechef.component.google.mail.constant.GoogleMailConstants.EM
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.ID;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.LABEL_IDS;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.REPLY_TO;
+import static com.bytechef.component.google.mail.constant.GoogleMailConstants.SEND_EMAIL;
+import static com.bytechef.component.google.mail.constant.GoogleMailConstants.SEND_EMAIL_DESCRIPTION;
+import static com.bytechef.component.google.mail.constant.GoogleMailConstants.SEND_EMAIL_TITLE;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.SUBJECT;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.THREAD_ID;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.TO;
@@ -101,9 +104,9 @@ public class GoogleMailSendEmailAction {
                     .description("List of IDs of labels applied to this message.")
                     .items(string())));
 
-    public static final ModifiableActionDefinition ACTION_DEFINITION = action("sendEmail")
-        .title("Send Email")
-        .description("Sends the specified message to the recipients in the To, Cc, and Bcc headers.")
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action(SEND_EMAIL)
+        .title(SEND_EMAIL_TITLE)
+        .description(SEND_EMAIL_DESCRIPTION)
         .properties(PROPERTIES)
         .output(OUTPUT_SCHEMA)
         .perform(GoogleMailSendEmailAction::perform);

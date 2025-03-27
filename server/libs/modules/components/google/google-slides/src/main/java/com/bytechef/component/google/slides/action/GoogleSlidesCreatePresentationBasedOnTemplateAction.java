@@ -19,18 +19,23 @@ package com.bytechef.component.google.slides.action;
 import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.string;
+import static com.bytechef.component.google.slides.constant.GoogleSlidesConstants.CREATE_PRESENTATION_BASED_ON_TEMPLATE;
+import static com.bytechef.component.google.slides.constant.GoogleSlidesConstants.CREATE_PRESENTATION_BASED_ON_TEMPLATE_DESCRIPTION;
+import static com.bytechef.component.google.slides.constant.GoogleSlidesConstants.CREATE_PRESENTATION_BASED_ON_TEMPLATE_TITLE;
 import static com.bytechef.component.google.slides.constant.GoogleSlidesConstants.VALUES;
 import static com.bytechef.google.commons.constant.GoogleCommonsContants.FILE_ID;
 import static com.bytechef.google.commons.constant.GoogleCommonsContants.FILE_NAME;
 import static com.bytechef.google.commons.constant.GoogleCommonsContants.FOLDER_ID;
 
-import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
+import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Parameters;
+import com.bytechef.component.definition.Property;
 import com.bytechef.component.definition.TypeReference;
 import com.bytechef.google.commons.GoogleUtils;
 import com.google.api.services.drive.model.File;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -40,47 +45,49 @@ import java.util.Map;
  */
 public class GoogleSlidesCreatePresentationBasedOnTemplateAction {
 
-    public static final ModifiableActionDefinition ACTION_DEFINITION = action("createPresentationBasedOnTemplate")
-        .title("Create Presentation Based on Template")
-        .description(
-            "Creates a new presentation based on an existing one and can replace any placeholder variables found in " +
-                "your template presentation, like [[name]], [[email]], etc.")
-        .properties(
-            string(FILE_ID)
-                .label("Template Presentation ID")
-                .description("The ID of the template presentation from which the new presentation will be created.")
-                .options(GoogleUtils.getFileOptionsByMimeType("application/vnd.google-apps.presentation", true))
-                .required(true),
-            string(FILE_NAME)
-                .label("New Presentation Name")
-                .description("Name of the new presentation.")
-                .required(true),
-            string(FOLDER_ID)
-                .label("Folder ID")
-                .description(
-                    "ID of the folder where the new presentation will be saved. If not provided, the new " +
-                        "presentation will be saved in the same folder as the template presentation.")
-                .options(GoogleUtils.getFileOptionsByMimeType("application/vnd.google-apps.folder", true))
-                .required(false),
-            object(VALUES)
-                .label("Values")
-                .description("Don't include the \"[[]]\", only the key name and its value.")
-                .additionalProperties(string())
-                .required(true))
+    @SuppressFBWarnings("MS")
+    public static final Property[] PROPERTIES = {
+        string(FILE_ID)
+            .label("Template Presentation ID")
+            .description("The ID of the template presentation from which the new presentation will be created.")
+            .options(GoogleUtils.getFileOptionsByMimeType("application/vnd.google-apps.presentation", true))
+            .required(true),
+        string(FILE_NAME)
+            .label("New Presentation Name")
+            .description("Name of the new presentation.")
+            .required(true),
+        string(FOLDER_ID)
+            .label("Folder ID")
+            .description(
+                "ID of the folder where the new presentation will be saved. If not provided, the new presentation " +
+                    "will be saved in the same folder as the template presentation.")
+            .options(GoogleUtils.getFileOptionsByMimeType("application/vnd.google-apps.folder", true))
+            .required(false),
+        object(VALUES)
+            .label("Values")
+            .description("Don't include the \"[[]]\", only the key name and its value.")
+            .additionalProperties(string())
+            .required(true)
+    };
+
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action(CREATE_PRESENTATION_BASED_ON_TEMPLATE)
+        .title(CREATE_PRESENTATION_BASED_ON_TEMPLATE_TITLE)
+        .description(CREATE_PRESENTATION_BASED_ON_TEMPLATE_DESCRIPTION)
+        .properties(PROPERTIES)
         .output()
         .perform(GoogleSlidesCreatePresentationBasedOnTemplateAction::perform);
 
     private GoogleSlidesCreatePresentationBasedOnTemplateAction() {
     }
 
-    public static Object perform(
-        Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) throws Exception {
+    public static Object perform(Parameters inputParameters, Parameters connectionParameters, Context context)
+        throws Exception {
 
         File copiedPresentation = GoogleUtils.copyFileOnGoogleDrive(connectionParameters, inputParameters);
         List<Map<String, Map<String, Object>>> requests = createReplaceTextRequests(
             inputParameters.getMap(VALUES, String.class, Map.of()));
 
-        return executeBatchUpdate(actionContext, copiedPresentation.getId(), requests);
+        return executeBatchUpdate(context, copiedPresentation.getId(), requests);
     }
 
     private static List<Map<String, Map<String, Object>>> createReplaceTextRequests(Map<String, String> values) {
@@ -97,9 +104,9 @@ public class GoogleSlidesCreatePresentationBasedOnTemplateAction {
     }
 
     private static Object executeBatchUpdate(
-        ActionContext actionContext, String presentationId, List<Map<String, Map<String, Object>>> requests) {
+        Context context, String presentationId, List<Map<String, Map<String, Object>>> requests) {
 
-        return actionContext
+        return context
             .http(http -> http
                 .post("https://slides.googleapis.com/v1/presentations/%s:batchUpdate".formatted(presentationId)))
             .body(Http.Body.of("requests", requests))

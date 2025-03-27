@@ -19,13 +19,17 @@ package com.bytechef.component.google.docs.action;
 import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.google.docs.constant.GoogleDocsConstants.BODY;
+import static com.bytechef.component.google.docs.constant.GoogleDocsConstants.CREATE_DOCUMENT;
+import static com.bytechef.component.google.docs.constant.GoogleDocsConstants.CREATE_DOCUMENT_DESCRIPTION;
+import static com.bytechef.component.google.docs.constant.GoogleDocsConstants.CREATE_DOCUMENT_TITLE;
 import static com.bytechef.component.google.docs.constant.GoogleDocsConstants.TITLE;
 import static com.bytechef.component.google.docs.util.GoogleDocsUtils.createDocument;
 import static com.bytechef.component.google.docs.util.GoogleDocsUtils.writeToDocument;
 
-import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
+import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
+import com.bytechef.component.definition.Property;
 import com.bytechef.component.definition.Property.ControlType;
 import com.bytechef.google.commons.GoogleServices;
 import com.google.api.services.docs.v1.Docs;
@@ -33,6 +37,7 @@ import com.google.api.services.docs.v1.model.Document;
 import com.google.api.services.docs.v1.model.EndOfSegmentLocation;
 import com.google.api.services.docs.v1.model.InsertTextRequest;
 import com.google.api.services.docs.v1.model.Request;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.IOException;
 import java.util.List;
 
@@ -41,27 +46,31 @@ import java.util.List;
  */
 public class GoogleDocsCreateDocumentAction {
 
-    public static final ModifiableActionDefinition ACTION_DEFINITION = action("createDocument")
-        .title("Create Document")
-        .description("Create a document on Google Docs.")
-        .properties(
-            string(TITLE)
-                .label("Title")
-                .description("Document title.")
-                .required(true),
-            string(BODY)
-                .label("Content")
-                .description("Document content.")
-                .controlType(ControlType.TEXT_AREA)
-                .required(true))
+    @SuppressFBWarnings("MS")
+    public static final Property[] PROPERTIES = {
+        string(TITLE)
+            .label("Title")
+            .description("Document title.")
+            .required(true),
+        string(BODY)
+            .label("Content")
+            .description("Document content.")
+            .controlType(ControlType.TEXT_AREA)
+            .required(true)
+    };
+
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action(CREATE_DOCUMENT)
+        .title(CREATE_DOCUMENT_TITLE)
+        .description(CREATE_DOCUMENT_DESCRIPTION)
+        .properties(PROPERTIES)
         .output()
         .perform(GoogleDocsCreateDocumentAction::perform);
 
     private GoogleDocsCreateDocumentAction() {
     }
 
-    public static Object perform(
-        Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) throws IOException {
+    public static Object perform(Parameters inputParameters, Parameters connectionParameters, Context context)
+        throws IOException {
 
         Docs docs = GoogleServices.getDocs(connectionParameters);
 

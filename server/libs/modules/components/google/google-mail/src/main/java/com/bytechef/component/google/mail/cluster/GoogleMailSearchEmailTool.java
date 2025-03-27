@@ -19,6 +19,9 @@ package com.bytechef.component.google.mail.cluster;
 import static com.bytechef.component.definition.ai.agent.ToolFunction.TOOLS;
 import static com.bytechef.component.google.mail.action.GoogleMailSearchEmailAction.OUTPUT_SCHEMA;
 import static com.bytechef.component.google.mail.action.GoogleMailSearchEmailAction.PROPERTIES;
+import static com.bytechef.component.google.mail.constant.GoogleMailConstants.SEARCH_EMAIL;
+import static com.bytechef.component.google.mail.constant.GoogleMailConstants.SEARCH_EMAIL_DESCRIPTION;
+import static com.bytechef.component.google.mail.constant.GoogleMailConstants.SEARCH_EMAIL_TITLE;
 
 import com.bytechef.component.definition.ClusterElementDefinition;
 import com.bytechef.component.definition.ComponentDsl;
@@ -31,9 +34,9 @@ import com.bytechef.component.google.mail.action.GoogleMailSearchEmailAction;
 public class GoogleMailSearchEmailTool {
 
     public static final ClusterElementDefinition<SingleConnectionToolFunction> CLUSTER_ELEMENT_DEFINITION =
-        ComponentDsl.<SingleConnectionToolFunction>clusterElement("searchEmail")
-            .title("Search Email")
-            .description("Search email to the specified email address.")
+        ComponentDsl.<SingleConnectionToolFunction>clusterElement(SEARCH_EMAIL)
+            .title(SEARCH_EMAIL_TITLE)
+            .description(SEARCH_EMAIL_DESCRIPTION)
             .type(TOOLS)
             .properties(PROPERTIES)
             .output(OUTPUT_SCHEMA)

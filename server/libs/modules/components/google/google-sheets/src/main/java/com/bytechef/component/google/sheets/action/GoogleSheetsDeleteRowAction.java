@@ -18,37 +18,46 @@ package com.bytechef.component.google.sheets.action;
 
 import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.integer;
+import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.DELETE_ROW;
+import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.DELETE_ROW_DESCRIPTION;
+import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.DELETE_ROW_TITLE;
 import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.ROW_NUMBER;
 import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.SHEET_ID_PROPERTY;
 import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.SPREADSHEET_ID_PROPERTY;
 import static com.bytechef.component.google.sheets.util.GoogleSheetsUtils.deleteDimension;
 
-import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
+import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
+import com.bytechef.component.definition.Property;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 /**
  * @author Monika Kušter
  */
 public class GoogleSheetsDeleteRowAction {
 
-    public static final ModifiableActionDefinition ACTION_DEFINITION = action("deleteRow")
-        .title("Delete Row")
-        .description("Delete row on an existing sheet.")
-        .properties(
-            SPREADSHEET_ID_PROPERTY,
-            SHEET_ID_PROPERTY,
-            integer(ROW_NUMBER)
-                .label("Row Number")
-                .description("The row number to delete.")
-                .required(true))
+    @SuppressFBWarnings("MS")
+    public static final Property[] PROPERTIES = {
+        SPREADSHEET_ID_PROPERTY,
+        SHEET_ID_PROPERTY,
+        integer(ROW_NUMBER)
+            .label("Row Number")
+            .description("The row number to delete.")
+            .required(true)
+    };
+
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action(DELETE_ROW)
+        .title(DELETE_ROW_TITLE)
+        .description(DELETE_ROW_DESCRIPTION)
+        .properties(PROPERTIES)
         .perform(GoogleSheetsDeleteRowAction::perform);
 
     private GoogleSheetsDeleteRowAction() {
     }
 
-    public static Object perform(
-        Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) throws Exception {
+    public static Object perform(Parameters inputParameters, Parameters connectionParameters, Context context)
+        throws Exception {
 
         deleteDimension(inputParameters, connectionParameters, inputParameters.getRequiredInteger(ROW_NUMBER), "ROWS");
 

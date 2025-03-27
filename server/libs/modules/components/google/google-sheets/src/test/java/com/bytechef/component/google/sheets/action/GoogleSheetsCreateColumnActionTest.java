@@ -16,7 +16,7 @@
 
 package com.bytechef.component.google.sheets.action;
 
-import static com.bytechef.component.google.sheets.action.GoogleSheetsCreateColumnAction.COLUMN_NAME;
+import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.COLUMN_NAME;
 import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.SHEET_NAME;
 import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.SPREADSHEET_ID;
 import static com.bytechef.component.google.sheets.util.GoogleSheetsUtils.SheetRecord;

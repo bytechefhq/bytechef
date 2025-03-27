@@ -20,6 +20,9 @@ import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.array;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
+import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.CREATE_SHEET;
+import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.CREATE_SHEET_DESCRIPTION;
+import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.CREATE_SHEET_TITLE;
 import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.HEADERS;
 import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.SHEET_NAME;
 import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.SHEET_RECORD_OUTPUT_PROPERTY;
@@ -29,9 +32,12 @@ import static com.bytechef.component.google.sheets.util.GoogleSheetsUtils.SheetR
 import static com.bytechef.component.google.sheets.util.GoogleSheetsUtils.appendValues;
 import static com.bytechef.component.google.sheets.util.GoogleSheetsUtils.createRange;
 
-import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
+import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
+import com.bytechef.component.definition.Property;
+import com.bytechef.component.definition.Property.ObjectProperty;
+import com.bytechef.definition.BaseOutputDefinition.OutputSchema;
 import com.bytechef.google.commons.GoogleServices;
 import com.google.api.services.sheets.v4.Sheets;
 import com.google.api.services.sheets.v4.model.AddSheetRequest;
@@ -40,6 +46,7 @@ import com.google.api.services.sheets.v4.model.BatchUpdateSpreadsheetResponse;
 import com.google.api.services.sheets.v4.model.Request;
 import com.google.api.services.sheets.v4.model.SheetProperties;
 import com.google.api.services.sheets.v4.model.ValueRange;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 
 /**
@@ -47,28 +54,34 @@ import java.util.List;
  */
 public class GoogleSheetsCreateSheetAction {
 
-    public static final ModifiableActionDefinition ACTION_DEFINITION = action("createSheet")
-        .title("Create Sheet")
-        .description("Create a blank sheet with title. Optionally, provide headers.")
-        .properties(
-            SPREADSHEET_ID_PROPERTY,
-            string(SHEET_NAME)
-                .label("Sheet Name")
-                .description("The name of the new sheet.")
-                .required(true),
-            array(HEADERS)
-                .label("Headers")
-                .description("The headers of the new sheet.")
-                .items(string())
-                .required(false))
-        .output(outputSchema(SHEET_RECORD_OUTPUT_PROPERTY))
+    @SuppressFBWarnings("MS")
+    public static final Property[] PROPERTIES = {
+        SPREADSHEET_ID_PROPERTY,
+        string(SHEET_NAME)
+            .label("Sheet Name")
+            .description("The name of the new sheet.")
+            .required(true),
+        array(HEADERS)
+            .label("Headers")
+            .description("The headers of the new sheet.")
+            .items(string())
+            .required(false)
+    };
+
+    public static final OutputSchema<ObjectProperty> OUTPUT_SCHEMA = outputSchema(SHEET_RECORD_OUTPUT_PROPERTY);
+
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action(CREATE_SHEET)
+        .title(CREATE_SHEET_TITLE)
+        .description(CREATE_SHEET_DESCRIPTION)
+        .properties(PROPERTIES)
+        .output(OUTPUT_SCHEMA)
         .perform(GoogleSheetsCreateSheetAction::perform);
 
     private GoogleSheetsCreateSheetAction() {
     }
 
-    public static SheetRecord perform(
-        Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) throws Exception {
+    public static SheetRecord perform(Parameters inputParameters, Parameters connectionParameters, Context context)
+        throws Exception {
 
         Sheets sheets = GoogleServices.getSheets(connectionParameters);
 

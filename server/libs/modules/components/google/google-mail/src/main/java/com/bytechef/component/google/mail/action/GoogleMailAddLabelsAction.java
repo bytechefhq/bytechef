@@ -22,19 +22,26 @@ import static com.bytechef.component.definition.ComponentDsl.array;
 import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
+import static com.bytechef.component.google.mail.constant.GoogleMailConstants.ADD_LABELS;
+import static com.bytechef.component.google.mail.constant.GoogleMailConstants.ADD_LABELS_DESCRIPTION;
+import static com.bytechef.component.google.mail.constant.GoogleMailConstants.ADD_LABELS_TITLE;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.ID;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.LABEL_IDS;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.ME;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.THREAD_ID;
 
-import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.Parameters;
+import com.bytechef.component.definition.Property;
+import com.bytechef.component.definition.Property.ObjectProperty;
 import com.bytechef.component.google.mail.util.GoogleMailUtils;
+import com.bytechef.definition.BaseOutputDefinition.OutputSchema;
 import com.bytechef.google.commons.GoogleServices;
 import com.google.api.services.gmail.Gmail;
 import com.google.api.services.gmail.model.Message;
 import com.google.api.services.gmail.model.ModifyMessageRequest;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.IOException;
 
 /**
@@ -42,40 +49,45 @@ import java.io.IOException;
  */
 public class GoogleMailAddLabelsAction {
 
-    public static final ModifiableActionDefinition ACTION_DEFINITION = action("addLabels")
-        .title("Add Labels")
-        .description("Add labels to an email in your Gmail account.")
-        .properties(
-            string(ID)
-                .label("Message ID")
-                .description("ID of the message to add labels")
-                .options((ActionOptionsFunction<String>) GoogleMailUtils::getMessageIdOptions)
-                .required(true),
-            array(LABEL_IDS)
-                .label("Labels")
-                .description("Labels to add to this message. You can add up to 100 labels with each update.")
-                .items(string())
-                .options((ActionOptionsFunction<String>) GoogleMailUtils::getLabelOptions)
-                .maxItems(100)
-                .required(true))
-        .output(
-            outputSchema(
-                object()
-                    .properties(
-                        string(ID)
-                            .description("The ID of the message."),
-                        string(THREAD_ID)
-                            .description("The ID of the thread the message belongs to."),
-                        array(LABEL_IDS)
-                            .description("List of IDs of labels applied to this message.")
-                            .items(string()))))
+    @SuppressFBWarnings("MS")
+    public static final Property[] PROPERTIES = {
+        string(ID)
+            .label("Message ID")
+            .description("ID of the message to add labels")
+            .options((ActionOptionsFunction<String>) GoogleMailUtils::getMessageIdOptions)
+            .required(true),
+        array(LABEL_IDS)
+            .label("Labels")
+            .description("Labels to add to this message. You can add up to 100 labels with each update.")
+            .items(string())
+            .options((ActionOptionsFunction<String>) GoogleMailUtils::getLabelOptions)
+            .maxItems(100)
+            .required(true)
+    };
+
+    public static final OutputSchema<ObjectProperty> OUTPUT_SCHEMA = outputSchema(
+        object()
+            .properties(
+                string(ID)
+                    .description("The ID of the message."),
+                string(THREAD_ID)
+                    .description("The ID of the thread the message belongs to."),
+                array(LABEL_IDS)
+                    .description("List of IDs of labels applied to this message.")
+                    .items(string())));
+
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action(ADD_LABELS)
+        .title(ADD_LABELS_TITLE)
+        .description(ADD_LABELS_DESCRIPTION)
+        .properties(PROPERTIES)
+        .output(OUTPUT_SCHEMA)
         .perform(GoogleMailAddLabelsAction::perform);
 
     private GoogleMailAddLabelsAction() {
     }
 
-    public static Message perform(
-        Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) throws IOException {
+    public static Message perform(Parameters inputParameters, Parameters connectionParameters, Context context)
+        throws IOException {
 
         Gmail gmail = GoogleServices.getMail(connectionParameters);
 

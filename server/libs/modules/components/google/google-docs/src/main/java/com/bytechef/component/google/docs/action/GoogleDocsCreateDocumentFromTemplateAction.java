@@ -20,6 +20,9 @@ import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.google.docs.constant.GoogleDocsConstants.APPLICATION_VND_GOOGLE_APPS_DOCUMENT;
+import static com.bytechef.component.google.docs.constant.GoogleDocsConstants.CREATE_DOCUMENT_FROM_TEMPLATE;
+import static com.bytechef.component.google.docs.constant.GoogleDocsConstants.CREATE_DOCUMENT_FROM_TEMPLATE_DESCRIPTION;
+import static com.bytechef.component.google.docs.constant.GoogleDocsConstants.CREATE_DOCUMENT_FROM_TEMPLATE_TITLE;
 import static com.bytechef.component.google.docs.constant.GoogleDocsConstants.IMAGES;
 import static com.bytechef.component.google.docs.constant.GoogleDocsConstants.VALUES;
 import static com.bytechef.component.google.docs.util.GoogleDocsUtils.writeToDocument;
@@ -27,9 +30,10 @@ import static com.bytechef.google.commons.constant.GoogleCommonsContants.FILE_ID
 import static com.bytechef.google.commons.constant.GoogleCommonsContants.FILE_NAME;
 import static com.bytechef.google.commons.constant.GoogleCommonsContants.FOLDER_ID;
 
-import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
+import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
+import com.bytechef.component.definition.Property;
 import com.bytechef.google.commons.GoogleServices;
 import com.bytechef.google.commons.GoogleUtils;
 import com.google.api.services.docs.v1.Docs;
@@ -38,6 +42,7 @@ import com.google.api.services.docs.v1.model.ReplaceImageRequest;
 import com.google.api.services.docs.v1.model.Request;
 import com.google.api.services.docs.v1.model.SubstringMatchCriteria;
 import com.google.api.services.drive.model.File;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -47,46 +52,48 @@ import java.util.Map;
  */
 public class GoogleDocsCreateDocumentFromTemplateAction {
 
-    public static final ModifiableActionDefinition ACTION_DEFINITION = action("createDocumentFromTemplate")
-        .title("Create Document From Template")
-        .description(
-            "Creates a new document based on an existing one and can replace any placeholder variables found in your " +
-                "template document, like [[name]], [[email]], etc.")
-        .properties(
-            string(FILE_ID)
-                .label("Template Document ID")
-                .description("The ID of the template document from which the new document will be created.")
-                .options(GoogleUtils.getFileOptionsByMimeType(APPLICATION_VND_GOOGLE_APPS_DOCUMENT, true))
-                .required(true),
-            string(FILE_NAME)
-                .label("New Document Name")
-                .description("Name of the new document.")
-                .required(true),
-            string(FOLDER_ID)
-                .label("Folder for New Document")
-                .description(
-                    "Folder ID where the new document will be saved. If not provided, the new document " +
-                        "will be saved in the same folder as the template document.")
-                .options(GoogleUtils.getFileOptionsByMimeType("application/vnd.google-apps.folder", true))
-                .required(false),
-            object(VALUES)
-                .label("Variables")
-                .description("Don't include the \"[[]]\", only the key name and its value.")
-                .additionalProperties(string())
-                .required(false),
-            object(IMAGES)
-                .label("Images")
-                .description("Key: Image ID (get it manually from the Read File Action), Value: Image URL.")
-                .additionalProperties(string())
-                .required(false))
+    @SuppressFBWarnings("MS")
+    public static final Property[] PROPERTIES = {
+        string(FILE_ID)
+            .label("Template Document ID")
+            .description("The ID of the template document from which the new document will be created.")
+            .options(GoogleUtils.getFileOptionsByMimeType(APPLICATION_VND_GOOGLE_APPS_DOCUMENT, true))
+            .required(true),
+        string(FILE_NAME)
+            .label("New Document Name")
+            .description("Name of the new document.")
+            .required(true),
+        string(FOLDER_ID)
+            .label("Folder for New Document")
+            .description(
+                "Folder ID where the new document will be saved. If not provided, the new document will be saved in " +
+                    "the same folder as the template document.")
+            .options(GoogleUtils.getFileOptionsByMimeType("application/vnd.google-apps.folder", true))
+            .required(false),
+        object(VALUES)
+            .label("Variables")
+            .description("Don't include the \"[[]]\", only the key name and its value.")
+            .additionalProperties(string())
+            .required(false),
+        object(IMAGES)
+            .label("Images")
+            .description("Key: Image ID (get it manually from the Read File Action), Value: Image URL.")
+            .additionalProperties(string())
+            .required(false)
+    };
+
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action(CREATE_DOCUMENT_FROM_TEMPLATE)
+        .title(CREATE_DOCUMENT_FROM_TEMPLATE_TITLE)
+        .description(CREATE_DOCUMENT_FROM_TEMPLATE_DESCRIPTION)
+        .properties(PROPERTIES)
         .output()
         .perform(GoogleDocsCreateDocumentFromTemplateAction::perform);
 
     private GoogleDocsCreateDocumentFromTemplateAction() {
     }
 
-    public static Object perform(
-        Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) throws Exception {
+    public static Object perform(Parameters inputParameters, Parameters connectionParameters, Context context)
+        throws Exception {
 
         Docs docs = GoogleServices.getDocs(connectionParameters);
         File copiedPresentation = GoogleUtils.copyFileOnGoogleDrive(connectionParameters, inputParameters);

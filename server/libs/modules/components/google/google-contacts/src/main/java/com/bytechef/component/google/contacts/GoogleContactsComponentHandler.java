@@ -26,6 +26,10 @@ import com.bytechef.component.google.contacts.action.GoogleContactsCreateContact
 import com.bytechef.component.google.contacts.action.GoogleContactsCreateGroupAction;
 import com.bytechef.component.google.contacts.action.GoogleContactsSearchContactsAction;
 import com.bytechef.component.google.contacts.action.GoogleContactsUpdateContactAction;
+import com.bytechef.component.google.contacts.cluster.GoogleContactsCreateContactTool;
+import com.bytechef.component.google.contacts.cluster.GoogleContactsCreateGroupTool;
+import com.bytechef.component.google.contacts.cluster.GoogleContactsSearchContactsTool;
+import com.bytechef.component.google.contacts.cluster.GoogleContactsUpdateContactTool;
 import com.google.auto.service.AutoService;
 
 /**
@@ -47,7 +51,12 @@ public class GoogleContactsComponentHandler implements ComponentHandler {
             GoogleContactsCreateContactAction.ACTION_DEFINITION,
             GoogleContactsCreateGroupAction.ACTION_DEFINITION,
             GoogleContactsUpdateContactAction.ACTION_DEFINITION,
-            GoogleContactsSearchContactsAction.ACTION_DEFINITION);
+            GoogleContactsSearchContactsAction.ACTION_DEFINITION)
+        .clusterElements(
+            GoogleContactsCreateContactTool.CLUSTER_ELEMENT_DEFINITION,
+            GoogleContactsCreateGroupTool.CLUSTER_ELEMENT_DEFINITION,
+            GoogleContactsUpdateContactTool.CLUSTER_ELEMENT_DEFINITION,
+            GoogleContactsSearchContactsTool.CLUSTER_ELEMENT_DEFINITION);
 
     @Override
     public ComponentDefinition getDefinition() {
