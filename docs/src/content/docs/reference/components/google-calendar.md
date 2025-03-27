@@ -78,7 +78,7 @@ Type: OBJECT
 
 |     Name     |     Type     |     Description     |
 |:------------:|:------------:|:-------------------:|
-| iCalUID | STRING | Event unique identifier as defined in RFC5545. It is used to uniquely identify events accross calendaring systems. |
+| iCalUID | STRING | Event unique identifier as defined in RFC5545. It is used to uniquely identify events across calendaring systems. |
 | id | STRING | Identifier of the event. |
 | summary | STRING | Title of the event. |
 | startTime | DATE_TIME | Start time of the event. |
@@ -143,7 +143,7 @@ Type: OBJECT
 ### Create Event
 Name: createEvent
 
-Creates an event
+Creates a new event in Google Calendar.
 
 #### Properties
 
@@ -212,7 +212,7 @@ Type: OBJECT
 
 |     Name     |     Type     |     Description     |
 |:------------:|:------------:|:-------------------:|
-| iCalUID | STRING | Event unique identifier as defined in RFC5545. It is used to uniquely identify events accross calendaring systems. |
+| iCalUID | STRING | Event unique identifier as defined in RFC5545. It is used to uniquely identify events across calendaring systems. |
 | id | STRING | Identifier of the event. |
 | summary | STRING | Title of the event. |
 | startTime | DATE_TIME | Start time of the event. |
@@ -277,7 +277,7 @@ Type: OBJECT
 ### Create Quick Event
 Name: createQuickEvent
 
-Add Quick Calendar Event
+Creates a quick event in Google Calendar.
 
 #### Properties
 
@@ -312,7 +312,7 @@ Type: OBJECT
 
 |     Name     |     Type     |     Description     |
 |:------------:|:------------:|:-------------------:|
-| iCalUID | STRING | Event unique identifier as defined in RFC5545. It is used to uniquely identify events accross calendaring systems. |
+| iCalUID | STRING | Event unique identifier as defined in RFC5545. It is used to uniquely identify events across calendaring systems. |
 | id | STRING | Identifier of the event. |
 | summary | STRING | Title of the event. |
 | startTime | DATE_TIME | Start time of the event. |
@@ -453,7 +453,7 @@ Items Type: OBJECT
 #### Properties
 |     Name     |     Type     |     Description     |
 |:------------:|:------------:|:-------------------:|
-| iCalUID | STRING | Event unique identifier as defined in RFC5545. It is used to uniquely identify events accross calendaring systems. |
+| iCalUID | STRING | Event unique identifier as defined in RFC5545. It is used to uniquely identify events across calendaring systems. |
 | id | STRING | Identifier of the event. |
 | summary | STRING | Title of the event. |
 | startTime | DATE_TIME | Start time of the event. |
@@ -623,7 +623,7 @@ Type: OBJECT
 
 |     Name     |     Type     |     Description     |
 |:------------:|:------------:|:-------------------:|
-| iCalUID | STRING | Event unique identifier as defined in RFC5545. It is used to uniquely identify events accross calendaring systems. |
+| iCalUID | STRING | Event unique identifier as defined in RFC5545. It is used to uniquely identify events across calendaring systems. |
 | id | STRING | Identifier of the event. |
 | summary | STRING | Title of the event. |
 | startTime | DATE_TIME | Start time of the event. |
@@ -715,7 +715,7 @@ Type: OBJECT
 
 |     Name     |     Type     |     Description     |
 |:------------:|:------------:|:-------------------:|
-| iCalUID | STRING | Event unique identifier as defined in RFC5545. It is used to uniquely identify events accross calendaring systems. |
+| iCalUID | STRING | Event unique identifier as defined in RFC5545. It is used to uniquely identify events across calendaring systems. |
 | id | STRING | Identifier of the event. |
 | summary | STRING | Title of the event. |
 | startTime | DATE_TIME | Start time of the event. |

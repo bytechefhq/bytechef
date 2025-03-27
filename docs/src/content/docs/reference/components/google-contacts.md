@@ -251,7 +251,7 @@ Searches the contacts in Google Contacts account.
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | query | Query | STRING | The plain-text query for the request.The query is used to match prefix phrases of the fields on a person. For example, a person with name "foo name" matches queries such as "f", "fo", "foo", "foo n", "nam", etc., but not "oo n". | true |
-| readMask | Read Mask | ARRAY <details> <summary> Items </summary> [STRING] </details> | A field mask to restrict which fields on each person are returned.. | true |
+| readMask | Read Mask | ARRAY <details> <summary> Items </summary> [STRING] </details> | A field mask to restrict which fields on each person are returned. | true |
 | pageSize | Page Size | INTEGER | The number of results to return per page. | true |
 
 #### Example JSON Structure
