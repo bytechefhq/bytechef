@@ -67,8 +67,9 @@ public class CryptoHelperHmacAction {
         Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) {
 
         try {
-            String algorithm = inputParameters.getRequiredString(ALGORITHM);
             String key = inputParameters.getRequiredString(KEY);
+            String algorithm = inputParameters.getRequiredString(ALGORITHM);
+
             SecretKeySpec secretKey = new SecretKeySpec(key.getBytes(StandardCharsets.UTF_8), algorithm);
 
             Mac mac = Mac.getInstance(algorithm);
@@ -76,10 +77,10 @@ public class CryptoHelperHmacAction {
             mac.init(secretKey);
 
             String input = inputParameters.getRequiredString(INPUT);
+
             byte[] hmac = mac.doFinal(input.getBytes(StandardCharsets.UTF_8));
 
             return convertBytesToHexString(hmac);
-
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

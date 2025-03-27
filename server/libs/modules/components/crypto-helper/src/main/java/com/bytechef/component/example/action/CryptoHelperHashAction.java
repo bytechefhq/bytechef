@@ -63,12 +63,9 @@ public class CryptoHelperHashAction {
 
         try {
             MessageDigest digest = MessageDigest.getInstance(inputParameters.getRequiredString(ALGORITHM));
+            String input = inputParameters.getRequiredString(INPUT);
 
-            byte[] hashBytes = digest
-                .digest(inputParameters.getRequiredString(INPUT)
-                    .getBytes(StandardCharsets.UTF_8));
-
-            return convertBytesToHexString(hashBytes);
+            return convertBytesToHexString(digest.digest(input.getBytes(StandardCharsets.UTF_8)));
 
         } catch (NoSuchAlgorithmException e) {
             throw new RuntimeException("Invalid Hash Algorithm", e);
