@@ -17,12 +17,14 @@
 package com.bytechef.platform.ai.repository.converter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Map;
 import org.postgresql.util.PGobject;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.data.convert.ReadingConverter;
 
 @ReadingConverter
+@SuppressFBWarnings("EI_EXPOSE_REP2")
 public class PGobjectToMapConverter implements Converter<PGobject, Map<String, Object>> {
 
     private final ObjectMapper objectMapper;
@@ -34,7 +36,7 @@ public class PGobjectToMapConverter implements Converter<PGobject, Map<String, O
     @Override
     public Map<String, Object> convert(PGobject source) {
         try {
-            return objectMapper.readValue(source.getValue(), Map.class);
+            return Map.copyOf(objectMapper.readValue(source.getValue(), Map.class));
         } catch (Exception e) {
             throw new RuntimeException("Failed to convert PGobject to Map", e);
         }
