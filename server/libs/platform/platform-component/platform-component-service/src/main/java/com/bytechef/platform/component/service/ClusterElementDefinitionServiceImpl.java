@@ -20,11 +20,20 @@ import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.component.definition.ClusterElementDefinition.ClusterElementType;
 import com.bytechef.component.definition.ComponentDefinition;
+import com.bytechef.component.definition.Context;
+import com.bytechef.component.definition.ai.agent.SingleConnectionToolFunction;
+import com.bytechef.component.exception.ProviderException;
+import com.bytechef.platform.component.ComponentConnection;
 import com.bytechef.platform.component.ComponentDefinitionRegistry;
 import com.bytechef.platform.component.definition.ClusterRootComponentDefinition;
+import com.bytechef.platform.component.definition.ParametersFactory;
 import com.bytechef.platform.component.domain.ClusterElementDefinition;
+import com.bytechef.platform.component.exception.ActionDefinitionErrorType;
+import com.bytechef.platform.exception.ExecutionException;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
+import javax.annotation.Nullable;
 import org.springframework.stereotype.Service;
 
 /**
@@ -37,6 +46,29 @@ public class ClusterElementDefinitionServiceImpl implements ClusterElementDefini
 
     public ClusterElementDefinitionServiceImpl(ComponentDefinitionRegistry componentDefinitionRegistry) {
         this.componentDefinitionRegistry = componentDefinitionRegistry;
+    }
+
+    @Override
+    public Object executeTool(
+        String componentName, int componentVersion, String clusterElementName, Map<String, ?> inputParameters,
+        @Nullable ComponentConnection componentConnection, Context context) {
+
+        SingleConnectionToolFunction toolFunction = getClusterElementObject(
+            componentName, componentVersion, clusterElementName);
+
+        try {
+            return toolFunction.apply(
+                ParametersFactory.createParameters(inputParameters),
+                ParametersFactory.createParameters(
+                    componentConnection == null ? Map.of() : componentConnection.getParameters()),
+                context);
+        } catch (Exception e) {
+            if (e instanceof ProviderException) {
+                throw (ProviderException) e;
+            }
+
+            throw new ExecutionException(e, inputParameters, ActionDefinitionErrorType.EXECUTE_PERFORM);
+        }
     }
 
     @Override

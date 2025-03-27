@@ -160,9 +160,7 @@ public class ActionDefinitionFacadeImpl implements ActionDefinitionFacade {
                     actionContext1),
                 componentConnection1 -> contextFactory.createActionContext(
                     componentName, componentVersion, actionName, type, jobPrincipalId, jobPrincipalWorkflowId,
-                    workflowId,
-                    jobId,
-                    componentConnection1, editorEnvironment));
+                    workflowId, jobId, componentConnection1, editorEnvironment));
         } else {
             ActionContext actionContext = contextFactory.createActionContext(
                 componentName, componentVersion, actionName, type, jobPrincipalId, jobPrincipalWorkflowId, workflowId,

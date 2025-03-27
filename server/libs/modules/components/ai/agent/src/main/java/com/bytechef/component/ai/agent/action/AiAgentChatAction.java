@@ -28,17 +28,14 @@ import static com.bytechef.platform.component.definition.ai.agent.RagFunction.RA
 import static org.springframework.ai.chat.client.advisor.AbstractChatMemoryAdvisor.CHAT_MEMORY_CONVERSATION_ID_KEY;
 
 import com.bytechef.commons.util.MapUtils;
-import com.bytechef.component.ai.agent.util.JsonSchemaGenerator;
 import com.bytechef.component.ai.llm.util.LLMUtils;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ActionDefinition;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.definition.ai.agent.SingleConnectionToolFunction;
 import com.bytechef.component.definition.ai.agent.ToolFunction;
 import com.bytechef.platform.component.ComponentConnection;
 import com.bytechef.platform.component.definition.AbstractActionDefinitionWrapper;
 import com.bytechef.platform.component.definition.ActionContextAware;
-import com.bytechef.platform.component.definition.ContextFactory;
 import com.bytechef.platform.component.definition.MultipleConnectionsOutputFunction;
 import com.bytechef.platform.component.definition.MultipleConnectionsPerformFunction;
 import com.bytechef.platform.component.definition.ParametersFactory;
@@ -46,7 +43,9 @@ import com.bytechef.platform.component.definition.ai.agent.ChatMemoryFunction;
 import com.bytechef.platform.component.definition.ai.agent.ModelFunction;
 import com.bytechef.platform.component.definition.ai.agent.RagFunction;
 import com.bytechef.platform.component.domain.ClusterElementDefinition;
+import com.bytechef.platform.component.facade.ClusterElementDefinitionFacade;
 import com.bytechef.platform.component.service.ClusterElementDefinitionService;
+import com.bytechef.platform.component.util.JsonSchemaGeneratorUtils;
 import com.bytechef.platform.configuration.domain.ClusterElement;
 import com.bytechef.platform.configuration.domain.ClusterElementMap;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -70,11 +69,12 @@ public class AiAgentChatAction {
 
     public final ChatActionDefinition actionDefinition;
 
+    private final ClusterElementDefinitionFacade clusterElementDefinitionFacade;
     private final ClusterElementDefinitionService clusterElementDefinitionService;
-    private final ContextFactory contextFactory;
 
     public AiAgentChatAction(
-        ClusterElementDefinitionService clusterElementDefinitionService, ContextFactory contextFactory) {
+        ClusterElementDefinitionFacade clusterElementDefinitionFacade,
+        ClusterElementDefinitionService clusterElementDefinitionService) {
 
         actionDefinition = new ChatActionDefinition(
             action(CHAT)
@@ -90,8 +90,8 @@ public class AiAgentChatAction {
                         inputParameters, componentConnections, extensions, context) -> LLMUtils.output(
                             inputParameters, null, context)));
 
+        this.clusterElementDefinitionFacade = clusterElementDefinitionFacade;
         this.clusterElementDefinitionService = clusterElementDefinitionService;
-        this.contextFactory = contextFactory;
     }
 
     public class ChatActionDefinition extends AbstractActionDefinitionWrapper {
@@ -226,19 +226,16 @@ public class AiAgentChatAction {
                     clusterElement.getComponentName(), clusterElement.getComponentVersion(),
                     clusterElement.getClusterElementName());
 
-            SingleConnectionToolFunction toolFunction = clusterElementDefinitionService.getClusterElementObject(
-                clusterElementDefinition.getComponentName(), clusterElementDefinition.getComponentVersion(),
-                clusterElementDefinition.getName());
-
             ComponentConnection componentConnection = connectionParameters.get(clusterElement.getComponentName());
 
             FunctionToolCallback.Builder<Map<String, Object>, Object> builder = FunctionToolCallback.builder(
                 clusterElementDefinition.getName(),
                 new ToolCallbackFunction(
-                    toolFunction, clusterElement.getComponentName(), clusterElement.getParameters(),
-                    componentConnection, editorEnvironment, contextFactory))
+                    clusterElement.getComponentName(), clusterElement.getComponentVersion(),
+                    clusterElementDefinition.getName(), clusterElement.getParameters(), componentConnection,
+                    editorEnvironment, clusterElementDefinitionFacade))
                 .inputType(Map.class)
-                .inputSchema(JsonSchemaGenerator.generateInputSchema(clusterElementDefinition.getProperties()));
+                .inputSchema(JsonSchemaGeneratorUtils.generateInputSchema(clusterElementDefinition.getProperties()));
 
             if (clusterElementDefinition.getDescription() != null) {
                 builder.description(clusterElementDefinition.getDescription());
@@ -251,22 +248,15 @@ public class AiAgentChatAction {
     }
 
     private record ToolCallbackFunction(
-        SingleConnectionToolFunction toolFunction, String componentName, Map<String, ?> parameters,
-        ComponentConnection componentConnection, boolean editorEnvironment, ContextFactory contextFactory)
+        String componentName, int componentVersion, String clusterElementName, Map<String, ?> parameters,
+        ComponentConnection componentConnection, boolean editorEnvironment,
+        ClusterElementDefinitionFacade clusterElementDefinitionFacade)
         implements Function<Map<String, Object>, Object> {
 
         public Object apply(Map<String, Object> request) {
-            try {
-                // TODO Move to ClusterElementDefinitionService to allow remote calls
-
-                return toolFunction.apply(
-                    ParametersFactory.createParameters(MapUtils.concat(request, new HashMap<>(parameters))),
-                    ParametersFactory.createParameters(
-                        componentConnection == null ? Map.of() : componentConnection.getParameters()),
-                    contextFactory.createContext(componentName, componentConnection, editorEnvironment));
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
+            return clusterElementDefinitionFacade.executeTool(
+                componentName, componentVersion, clusterElementName,
+                MapUtils.concat(request, new HashMap<>(parameters)), componentConnection, editorEnvironment);
         }
     }
 }
