@@ -14,6 +14,8 @@ tags:
     description: "The Embedded Component Public API"
   - name: "request-trigger"
     description: "The Embedded Request Trigger Public API"
+  - name: "tool"
+    description: "The Embedded AI Tool Public API"
   - name: "trigger"
     description: "The Embedded Component Trigger Public API"
   - name: "trigger-subscription"
@@ -105,6 +107,24 @@ paths:
       responses:
         "204":
           description: "Successful operation."
+        "400":
+          $ref: "#/components/responses/badRequest"
+        "401":
+          $ref: "#/components/responses/unauthorized"
+        "403":
+          $ref: "#/components/responses/forbidden"
+        "404":
+          $ref: "#/components/responses/notFound"
+        "409":
+          $ref: "#/components/responses/conflict"
+        "422":
+          $ref: "#/components/responses/unprocessableEntity"
+        "499":
+          $ref: "#/components/responses/remoteProviderError"
+        "500":
+          $ref: "#/components/responses/internalServerError"
+        "501":
+          $ref: "#/components/responses/notImplemented"
   /components/{componentName}/versions/{componentVersion}/actions/{actionName}:
     post:
       description: "Executes an action of a component and returns the result as the response."
@@ -119,7 +139,7 @@ paths:
           required: false
           schema:
             $ref: '#/components/schemas/Environment'
-        - name: x-instance-id
+        - name: "X-Instance-Id"
           in: header
           schema:
             type: integer
@@ -169,17 +189,23 @@ paths:
                     description: The result of the action call.
                     type: object
         "400":
-          description: "Invalid Input"
+          $ref: "#/components/responses/badRequest"
         "401":
-          description: "Unauthorized"
+          $ref: "#/components/responses/unauthorized"
         "403":
-          description: "Forbidden"
+          $ref: "#/components/responses/forbidden"
         "404":
-          description: "Not Found"
-        "429":
-          description: "Limit Exceeded"
+          $ref: "#/components/responses/notFound"
+        "409":
+          $ref: "#/components/responses/conflict"
+        "422":
+          $ref: "#/components/responses/unprocessableEntity"
+        "499":
+          $ref: "#/components/responses/remoteProviderError"
         "500":
-          description: "Internal Error"
+          $ref: "#/components/responses/internalServerError"
+        "501":
+          $ref: "#/components/responses/notImplemented"
 #  /components/{componentName}/versions/{componentVersion}/triggers:
 #    get:
 #      description: "Returns a list with all the available triggers for a given component."
@@ -221,6 +247,135 @@ paths:
 #          description: "Limit Exceeded"
 #        "500":
 #          description: "Internal Error"
+  /tools:
+    get:
+      description: "Returns a list with all the available tools."
+      summary: "Returns a list with all the available tools"
+      tags:
+        - "tool"
+      operationId: "getTools"
+      parameters:
+        - name: "X-Environment"
+          description: "The environment."
+          in: "header"
+          required: false
+          schema:
+            $ref: '#/components/schemas/Environment'
+        - name: "categories"
+          description: "Filter by specific integration categories, depending on the integrations the user has connected."
+          in: "query"
+          required: false
+          schema:
+            type: "array"
+            items:
+              type: "string"
+        - name: "components"
+          description: "Filter by specific components, depending on the integrations the user has connected."
+          in: "query"
+          required: false
+          schema:
+            type: "array"
+            items:
+              type: "string"
+        - name: "actions"
+          description: "Filter by specific actions, depending on the integrations the user has connected."
+          in: "query"
+          required: false
+          schema:
+            type: "array"
+            items:
+              type: "string"
+      responses:
+        "200":
+          description: "The list of tool objects."
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties:
+                  type: array
+                  items:
+                    $ref: "#/components/schemas/Tool"
+        "400":
+          $ref: "#/components/responses/badRequest"
+        "401":
+          $ref: "#/components/responses/unauthorized"
+        "403":
+          $ref: "#/components/responses/forbidden"
+        "404":
+          $ref: "#/components/responses/notFound"
+        "409":
+          $ref: "#/components/responses/conflict"
+        "422":
+          $ref: "#/components/responses/unprocessableEntity"
+        "499":
+          $ref: "#/components/responses/remoteProviderError"
+        "500":
+          $ref: "#/components/responses/internalServerError"
+        "501":
+          $ref: "#/components/responses/notImplemented"
+    post:
+      description: "Executes a tool and returns the result as the response."
+      summary: "Executes a tool and returns the result as the response"
+      tags:
+        - "tool"
+      operationId: "executeTool"
+      parameters:
+        - name: "X-Environment"
+          description: "The environment."
+          in: "header"
+          required: false
+          schema:
+            $ref: '#/components/schemas/Environment'
+        - name: "X-Instance-Id"
+          in: header
+          schema:
+            type: integer
+            format: int64
+          example: 1234
+          description: The integration instance Id that uniquely identifies the connected user's specific integration instance
+          required: false
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: "object"
+              required:
+                - name
+                - parameters
+              properties:
+                name:
+                  description: The name of the tool to call.
+                  type: "string"
+                parameters:
+                  description: The input parameters for the tool.
+                  type: object
+                  additionalProperties: true
+      responses:
+        "200":
+          description: "The provider's response'."
+          content:
+            application/json:
+              schema:
+                type: object
+        "400":
+          $ref: "#/components/responses/badRequest"
+        "401":
+          $ref: "#/components/responses/unauthorized"
+        "403":
+          $ref: "#/components/responses/forbidden"
+        "404":
+          $ref: "#/components/responses/notFound"
+        "409":
+          $ref: "#/components/responses/conflict"
+        "422":
+          $ref: "#/components/responses/unprocessableEntity"
+        "499":
+          $ref: "#/components/responses/remoteProviderError"
+        "500":
+          $ref: "#/components/responses/internalServerError"
+        "501":
+          $ref: "#/components/responses/notImplemented"
   /workflows/{workflowReferenceCode}:
     post:
       description: "Execute workflows."
@@ -248,6 +403,24 @@ paths:
             application/json:
               schema:
                 type: "object"
+        "400":
+          $ref: "#/components/responses/badRequest"
+        "401":
+          $ref: "#/components/responses/unauthorized"
+        "403":
+          $ref: "#/components/responses/forbidden"
+        "404":
+          $ref: "#/components/responses/notFound"
+        "409":
+          $ref: "#/components/responses/conflict"
+        "422":
+          $ref: "#/components/responses/unprocessableEntity"
+        "499":
+          $ref: "#/components/responses/remoteProviderError"
+        "500":
+          $ref: "#/components/responses/internalServerError"
+        "501":
+          $ref: "#/components/responses/notImplemented"
 #  /subscriptions:
 #    get:
 #      description: "Returns a list with all the available triggers for a given component."
@@ -404,6 +577,88 @@ paths:
 #        "500":
 #          description: "Internal Error"
 components:
+  responses:
+    badRequest:
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              errors:
+                $ref: "#/components/schemas/Errors"
+    conflict:
+      description: Conflict
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              errors:
+                $ref: "#/components/schemas/Errors"
+    forbidden:
+      description: Forbidden
+      content:
+       application/json:
+         schema:
+           type: object
+           properties:
+             errors:
+               $ref: "#/components/schemas/Errors"
+    internalServerError:
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              errors:
+                $ref: "#/components/schemas/Errors"
+    notFound:
+      description: Not found
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              errors:
+                $ref: "#/components/schemas/Errors"
+    notImplemented:
+      description: Not implemented
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              errors:
+                $ref: "#/components/schemas/Errors"
+    remoteProviderError:
+      description: Remote provider error
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              errors:
+                $ref: "#/components/schemas/Errors"
+    unauthorized:
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              errors:
+                $ref: "#/components/schemas/Errors"
+    unprocessableEntity:
+      description: Unprocessable entity
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              errors:
+                $ref: "#/components/schemas/Errors"
   schemas:
 #    Action:
 #      type: "object"
@@ -557,7 +812,66 @@ components:
 #                $ref: "#/components/schemas/Option"
     Environment:
       $ref: "../../../platform/platform-rest/openapi/components/schemas/objects/environment.yaml"
-#    FileEntryProperty:
+    Errors:
+      type: array
+      items:
+        type: object
+        properties:
+          id:
+            type: string
+            description: A unique identifier for the instance of the error. Provide this to support when contacting ByteChef.
+            example: 9366efb4-8fb1-4a28-bfb0-8d6f9cc6b5c5
+          detail:
+            type: string
+            description: A detailed description of the error.
+          #      example: 'Property values were not valid: [{"isValid":false,"message":"Property "__about_us" does not exist","error":"PROPERTY_DOESNT_EXIST","name":"__about_us","localizedErrorMessage":"Property "__about_us" does not exist"}]'
+          problem_type:
+            type: string
+            description: The ByteChef error code associated with the error.
+            example: MISSING_REQUIRED_FIELD
+            deprecated: true
+          title:
+            type: string
+            description: A brief description of the error. The schema and type of message will vary by Provider.
+            example: |
+              Property values were not valid
+          code:
+            type: string
+            description: The ByteChef error code associated with the error.
+            example: MISSING_REQUIRED_FIELD
+          status:
+            type: string
+            description: The HTTP status code associated with the error.
+            example: '400'
+          meta:
+            type: object
+            description: Additional metadata about the error.
+            properties:
+              cause:
+                type: object
+                description: The cause of the error. Usually the underlying error from the remote Provider.
+              origin:
+                type: string
+                enum: [ remote-provider, bytechef ]
+                description: The origin of the error.
+                example: remote-provider
+              application_name:
+                type: string
+                description: The name of the application that generated the error.
+                example: MyCompany Production
+            required:
+              - origin
+            additionalProperties: true
+        required:
+          - id
+          - detail
+          - problem_type
+          - title
+          - code
+          - status
+          - meta
+
+    #    FileEntryProperty:
 #      description: "An file entry property type."
 #      type: "object"
 #      allOf:
@@ -579,7 +893,26 @@ components:
 #            header:
 #              description: "The dynamic property header."
 #              type: "string"
-#    IntegerProperty:
+    Function:
+      description: "A function property type."
+      type: "object"
+      required:
+        - name
+        - description
+        - parameters
+      properties:
+        name:
+          description: "The function name."
+          type: "string"
+        description:
+          description: "The function description."
+          type: "string"
+#        parameters:
+#          $ref: "#/components/schemas/Parameters"
+        parameters:
+          description: "JSON Schema for the function parameters."
+          type: string
+    #    IntegerProperty:
 #      description: "An integer property type."
 #      type: "object"
 #      allOf:
@@ -760,6 +1093,57 @@ components:
 #              type: "array"
 #              items:
 #                $ref: "#/components/schemas/Option"
+#    Parameters:
+#      type: object
+#      required:
+#        - $schema
+#        - additionalProperties
+#        - required
+#        - properties
+#        - type
+#      properties:
+#        $schema:
+#          type: string
+#          default: "<http://json-schema.org/draft-07/schema#>"
+#        additionalProperties:
+#          type: boolean
+#          default: false
+#        properties:
+#          description: The parameter properties.
+#          type: object
+#          additionalProperties:
+#            $ref: "#/components/schemas/Property"
+#        required:
+#          type: array
+#          items:
+#            type: string
+#        type:
+#          description: The type of the parameters
+#          type: "string"
+#          default: "object"
+#    Property:
+#      type: object
+#      description: A property type.
+#      properties:
+#        description:
+#          description: The property description
+#          type: "string"
+#        type:
+#          description: The type of the property
+#          type: "string"
+#          default: "object"
+    Tool:
+      type: "object"
+      required:
+        - function
+        - type
+      properties:
+        function:
+          $ref: "#/components/schemas/Function"
+        type:
+          description: The type of the tool
+          type: "string"
+          default: "function"
 #    Trigger:
 #      type: "object"
 #      required:
