@@ -29,6 +29,9 @@ public class PGObjectToListDoubleConverter implements Converter<PGobject, List<D
     public List<Double> convert(PGobject source) {
         try {
             String vectorString = source.getValue();
+            if (vectorString == null) {
+                throw new IllegalArgumentException("PGobject value cannot be null");
+            }
 
             if (vectorString.startsWith("[") && vectorString.endsWith("]")) {
                 vectorString = vectorString.substring(1, vectorString.length() - 1);

@@ -19,30 +19,13 @@ package com.bytechef.platform.ai.facade;
 import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.platform.ai.facade.dto.ContextDTO;
-import com.bytechef.platform.ai.service.VectorStoreService;
-import com.knuddels.jtokkit.api.EncodingType;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import java.io.IOException;
-import java.nio.file.FileVisitResult;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.SimpleFileVisitor;
-import java.nio.file.attribute.BasicFileAttributes;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.client.advisor.AbstractChatMemoryAdvisor;
 import org.springframework.ai.chat.client.advisor.MessageChatMemoryAdvisor;
 import org.springframework.ai.chat.client.advisor.QuestionAnswerAdvisor;
 import org.springframework.ai.chat.memory.InMemoryChatMemory;
-import org.springframework.ai.document.Document;
-import org.springframework.ai.document.MetadataMode;
-import org.springframework.ai.embedding.BatchingStrategy;
-import org.springframework.ai.embedding.TokenCountBatchingStrategy;
 import org.springframework.ai.vectorstore.SearchRequest;
 import org.springframework.ai.vectorstore.VectorStore;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -61,30 +44,14 @@ public class AiCopilotFacadeImpl implements AiCopilotFacade {
     private final ChatClient chatClientScript;
     private final WorkflowService workflowService;
 
-    private final TokenCountBatchingStrategy strategy;
-
-    private static VectorStore vectorStore;
-
-    private static final String CATEGORY = "category";
-    private static final String NAME = "name";
+    private final VectorStore vectorStore;
 
     @SuppressFBWarnings("EI")
     @Autowired
     public AiCopilotFacadeImpl(ChatClient.Builder chatClientBuilder, WorkflowService workflowService,
-        VectorStore vectorStore, VectorStoreService vectorStoreService) {
+        VectorStore vectorStore) {
         this.vectorStore = vectorStore;
-        strategy = new TokenCountBatchingStrategy(EncodingType.CL100K_BASE, 8191, 0.1,
-            Document.DEFAULT_CONTENT_FORMATTER, MetadataMode.ALL);
-
-        if (vectorStoreService.count() != 0) {
-            List<com.bytechef.platform.ai.domain.VectorStore> vectorsList = vectorStoreService.findAll();
-            List<Map<String, Object>> vectorsMetadataList = vectorsList.stream()
-                .map(com.bytechef.platform.ai.domain.VectorStore::getMetadata)
-                .toList();
-            addDocumentsToVectorDatabase(vectorsMetadataList);
-        } else {
-            addDocumentsToVectorDatabase(List.of());
-        }
+        this.workflowService = workflowService;
 
         MessageChatMemoryAdvisor messageChatMemoryAdvisor = new MessageChatMemoryAdvisor(new InMemoryChatMemory());
 
@@ -126,154 +93,6 @@ public class AiCopilotFacadeImpl implements AiCopilotFacade {
             // add script advisor
             )
             .build();
-
-        this.workflowService = workflowService;
-    }
-
-    public static String preprocessDocument(String document) {
-        Pattern htmlTagsPattern = Pattern.compile("<[^>]*>");
-        document = htmlTagsPattern.matcher(document)
-            .replaceAll("");
-
-        Pattern pixelLinkPattern = Pattern.compile("^!.+$", Pattern.MULTILINE);
-        Matcher pixelLinkMatcher = pixelLinkPattern.matcher(document);
-        document = pixelLinkMatcher.replaceAll("");
-
-        Pattern colonPattern = Pattern.compile("^\\|:.+$", Pattern.MULTILINE);
-        Matcher colonMatcher = colonPattern.matcher(document);
-        document = colonMatcher.replaceAll("");
-
-        Pattern linkPattern = Pattern.compile("^\\[.*\\)$", Pattern.MULTILINE);
-        Matcher linkMatcher = linkPattern.matcher(document);
-        document = linkMatcher.replaceAll("");
-
-        Pattern headerPattern = Pattern.compile("^---.*\\n([\\s\\S]*?)^---\n", Pattern.MULTILINE);
-        Matcher headerMatcher = headerPattern.matcher(document);
-        document = headerMatcher.replaceAll("");
-
-        // properties and tables
-        Pattern propertiesPattern = Pattern.compile("^#### Properties.*$", Pattern.MULTILINE);
-        Matcher propertiesMatcher = propertiesPattern.matcher(document);
-        document = propertiesMatcher.replaceAll("");
-
-        Pattern tablePattern = Pattern.compile("^\\|.*\\|$", Pattern.MULTILINE);
-        Matcher tableMatcher = tablePattern.matcher(document);
-        document = tableMatcher.replaceAll("");
-        //
-
-        Pattern spacePattern = Pattern.compile("\\s+");
-        document = spacePattern.matcher(document)
-            .replaceAll(" ");
-
-        return document.trim();
-    }
-
-    // Function to split a document into chunks based on a maximum token limit
-    public static List<String> splitDocument(String[] tokens, int maxTokens) {
-        List<String> chunks = new ArrayList<>();
-        StringBuilder currentChunk = new StringBuilder();
-        int tokenCount = 0;
-
-        for (String token : tokens) {
-            if (tokenCount + 1 > maxTokens) {
-                chunks.add(currentChunk.toString()
-                    .trim());
-                currentChunk.setLength(0); // Reset the current chunk
-                tokenCount = 0;
-            }
-            currentChunk.append(token)
-                .append(" ");
-            tokenCount++;
-        }
-
-        if (!currentChunk.isEmpty()) {
-            chunks.add(currentChunk.toString()
-                .trim());
-        }
-
-        return chunks;
-    }
-
-    private static void storeDocumentsFromPath(
-        String categoryName, Path path, String suffix, BatchingStrategy batchingStrategy,
-        List<Map<String, Object>> vectorStoreList) throws IOException {
-        List<Document> documentList = new ArrayList<>();
-
-        Files.walkFileTree(path, new SimpleFileVisitor<Path>() {
-            @Override
-            public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
-                if (file.toString()
-                    .endsWith(suffix)) {
-                    String document = Files.readString(file);
-                    String fileName = file.getFileName()
-                        .toString()
-                        .replace(suffix, "");
-
-                    // check if already exists
-                    if (vectorStoreListContainsFile(vectorStoreList, fileName, categoryName)) {
-                        return FileVisitResult.CONTINUE;
-                    }
-
-                    // Preprocess the document
-                    String cleanedDocument = preprocessDocument(document);
-
-                    if (!cleanedDocument.isEmpty()) {
-                        // Split the document into chunks
-                        List<String> chunks = splitDocument(cleanedDocument.split("\\s+"), 1536);
-
-                        for (String chunk : chunks) {
-                            // TODO: add versioning to files
-                            documentList.add(new Document(chunk, Map.of(CATEGORY, categoryName, NAME, fileName)));
-                        }
-                    }
-
-                }
-                return FileVisitResult.CONTINUE;
-            }
-        });
-
-        for (List<Document> batch : batchingStrategy.batch(documentList)) {
-            vectorStore.add(batch);
-        }
-    }
-
-    public static boolean
-        vectorStoreListContainsFile(List<Map<String, Object>> vectorStoreList, String fileName, String categoryName) {
-        return !vectorStoreList.isEmpty() && vectorStoreList.stream()
-            .anyMatch(map -> fileName.equals(map.get(NAME)) && categoryName.equals(map.get(CATEGORY)));
-    }
-
-    private void addDocumentsToVectorDatabase(List<Map<String, Object>> vectorStoreList) {
-        String docsName = "documentation";
-        String workflowsName = "workflows";
-        String componentsName = "components";
-
-        Path docsDir = Paths.get("/home/user/IdeaProjects/bytechef/docs/src/content/docs/automation");
-        Path componentsDir = Paths.get("/home/user/IdeaProjects/bytechef/docs/src/content/docs/reference/components"); // include
-                                                                                                                       // task-dispatchers
-                                                                                                                       // when
-                                                                                                                       // documentation
-                                                                                                                       // is
-                                                                                                                       // written
-        Path workflowsDir = Paths.get(
-            "/home/user/IdeaProjects/bytechef/server/libs/platform/platform-ai/platform-ai-service/src/main/resources/workflows");
-
-        try {
-            storeDocumentsFromPath(docsName, docsDir, ".md", strategy, vectorStoreList);
-            storeDocumentsFromPath(workflowsName, workflowsDir, ".json", strategy, vectorStoreList);
-            storeDocumentsFromPath(componentsName, componentsDir, ".md", strategy, vectorStoreList);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-
-        try {
-            Path welomePath = Paths.get("/home/user/IdeaProjects/bytechef/docs/src/content/docs/welcome.md");
-            String welcome = Files.readString(welomePath);
-            String cleanedDocument = preprocessDocument(welcome);
-            vectorStore.add(List.of(new Document(cleanedDocument, Map.of(CATEGORY, docsName, NAME, "welcome"))));
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
     }
 
     @Override
@@ -296,9 +115,7 @@ public class AiCopilotFacadeImpl implements AiCopilotFacade {
                         "You are a Bytechef assistant. You answer questions about Bytechef and help users with problems. If a user asks you about generating a workflow: answer only with a json in a format similar to the json objects in the vector database. Only use the actions, triggers and parameters which you know exist.")
                     .user(message)
                     .advisors(advisor -> advisor
-                        .param(AbstractChatMemoryAdvisor.CHAT_MEMORY_CONVERSATION_ID_KEY, conversationId)); // .param("clear_memory",
-                                                                                                            // true).param("chat_memory_response_size",
-                                                                                                            // 200)
+                        .param(AbstractChatMemoryAdvisor.CHAT_MEMORY_CONVERSATION_ID_KEY, conversationId));
                 yield advisors
                     .stream()
                     .content()
@@ -307,30 +124,7 @@ public class AiCopilotFacadeImpl implements AiCopilotFacade {
             case WORKFLOW_EDITOR_COMPONENTS_POPOVER_MENU ->
                 chatClientWorkflow.prompt()
                     .system(
-                        "Answer only with a json in a format similar to the json objects in the vector database. Only use the actions, triggers and parameters which you know exist; look for JSON Example for the action or trigger. If a parameter is required, you must use it.") // ARRAY_BUILDER
-                                                                                                                                                                                                                                                                                     // is
-                                                                                                                                                                                                                                                                                     // an
-                                                                                                                                                                                                                                                                                     // indicator
-                                                                                                                                                                                                                                                                                     // that
-                                                                                                                                                                                                                                                                                     // the
-                                                                                                                                                                                                                                                                                     // parameter
-                                                                                                                                                                                                                                                                                     // must
-                                                                                                                                                                                                                                                                                     // be
-                                                                                                                                                                                                                                                                                     // in
-                                                                                                                                                                                                                                                                                     // []
-                                                                                                                                                                                                                                                                                     // brackets.
-                                                                                                                                                                                                                                                                                     // OBJECT_BUILDER
-                                                                                                                                                                                                                                                                                     // is
-                                                                                                                                                                                                                                                                                     // an
-                                                                                                                                                                                                                                                                                     // indicator
-                                                                                                                                                                                                                                                                                     // that
-                                                                                                                                                                                                                                                                                     // the
-                                                                                                                                                                                                                                                                                     // parameter
-                                                                                                                                                                                                                                                                                     // must
-                                                                                                                                                                                                                                                                                     // be
-                                                                                                                                                                                                                                                                                     // in
-                                                                                                                                                                                                                                                                                     // {}
-                                                                                                                                                                                                                                                                                     // brackets.
+                        "Answer only with a json in a format similar to the json objects in the vector database. Only use the actions, triggers and parameters which you know exist; look for JSON Example for the action or trigger. If a parameter is required, you must use it.")
                     .user(u -> u.text(userPrompt)
                         .param(workflowString, workflow.getDefinition())
                         .param(messageString, message))
