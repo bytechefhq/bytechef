@@ -1,13 +1,21 @@
+import {Input} from '@/components/ui/input';
 import {Popover, PopoverContent, PopoverTrigger} from '@/components/ui/popover';
-import {ComponentDefinition, ComponentDefinitionApi} from '@/shared/middleware/platform/configuration';
+import {ScrollArea} from '@/components/ui/scroll-area';
+import {
+    ClusterElementDefinitionBasic,
+    ComponentDefinition,
+    ComponentDefinitionApi,
+} from '@/shared/middleware/platform/configuration';
 import {ComponentDefinitionKeys} from '@/shared/queries/platform/componentDefinitions.queries';
 import {ClickedDefinitionType} from '@/shared/types';
 import {useQueryClient} from '@tanstack/react-query';
+import {ComponentIcon} from 'lucide-react';
 import {PropsWithChildren, useCallback, useEffect, useMemo, useState} from 'react';
 import {useParams} from 'react-router-dom';
 import {twMerge} from 'tailwind-merge';
 import {useShallow} from 'zustand/react/shallow';
 
+import {AgentDataType} from '../nodes/AIAgentNode';
 import {useWorkflowMutation} from '../providers/workflowMutationProvider';
 import useWorkflowDataStore from '../stores/useWorkflowDataStore';
 import getTaskDispatcherContext from '../utils/getTaskDispatcherContext';
@@ -16,6 +24,7 @@ import WorkflowNodesPopoverMenuComponentList from './WorkflowNodesPopoverMenuCom
 import WorkflowNodesPopoverMenuOperationList from './WorkflowNodesPopoverMenuOperationList';
 
 interface WorkflowNodesPopoverMenuProps extends PropsWithChildren {
+    agentData?: AgentDataType;
     conditionId?: string;
     edgeId?: string;
     hideActionComponents?: boolean;
@@ -23,10 +32,13 @@ interface WorkflowNodesPopoverMenuProps extends PropsWithChildren {
     hideTaskDispatchers?: boolean;
     loopId?: string;
     nodeIndex?: number;
+    setAgentData?: (data: AgentDataType) => void;
+    sourceData?: ClusterElementDefinitionBasic[];
     sourceNodeId: string;
 }
 
 const WorkflowNodesPopoverMenu = ({
+    agentData,
     children,
     conditionId,
     edgeId,
@@ -35,6 +47,8 @@ const WorkflowNodesPopoverMenu = ({
     hideTriggerComponents = false,
     loopId,
     nodeIndex,
+    setAgentData,
+    sourceData,
     sourceNodeId,
 }: WorkflowNodesPopoverMenuProps) => {
     const [actionPanelOpen, setActionPanelOpen] = useState(false);
@@ -121,6 +135,18 @@ const WorkflowNodesPopoverMenu = ({
         [sourceNodeId, nodeIndex]
     );
 
+    const handleClusterElementClick = (data: ClusterElementDefinitionBasic) => {
+        if (agentData && setAgentData) {
+            let value = data.componentName;
+
+            if (data.type === 'TOOLS') {
+                value = `${data.componentName}#${data.name}`;
+            }
+
+            setAgentData({...agentData, [data.type]: value});
+        }
+    };
+
     useEffect(() => {
         if (componentDefinitionToBeAdded?.name) {
             setActionPanelOpen(true);
@@ -148,7 +174,9 @@ const WorkflowNodesPopoverMenu = ({
             }}
             open={popoverOpen}
         >
-            <PopoverTrigger asChild>{children}</PopoverTrigger>
+            <PopoverTrigger asChild onClick={(event) => event.stopPropagation()}>
+                {children}
+            </PopoverTrigger>
 
             <PopoverContent
                 align="start"
@@ -158,24 +186,65 @@ const WorkflowNodesPopoverMenu = ({
                         ? 'w-workflow-nodes-popover-menu-width'
                         : 'w-workflow-nodes-popover-component-menu-width'
                 )}
+                onClick={(event) => event.stopPropagation()}
                 side="right"
                 sideOffset={-34}
             >
                 <div className="nowheel flex w-full rounded-lg bg-gray-100">
-                    {(!memoizedComponentDefinitions || !memoizedTaskDispatcherDefinitions) && (
-                        <div className="px-3 py-2 text-xs">Something went wrong.</div>
+                    {sourceData && sourceData.length > 0 && (
+                        <div className="flex w-full flex-col">
+                            <header className="flex items-center gap-1 rounded-t-lg bg-white p-3 text-center">
+                                <Input
+                                    disabled
+                                    // value={filter}
+                                    name="workflowNodeFilter"
+                                    // onChange={(event) => setFilter(event.target.value)}
+                                    placeholder="Search AI models"
+                                />
+                            </header>
+
+                            <ScrollArea className="w-full overflow-y-auto">
+                                <ul className="h-96 space-y-2 rounded-br-lg bg-muted p-3">
+                                    {sourceData?.map((data, index) => (
+                                        <li
+                                            className="flex cursor-pointer items-center gap-2 space-y-1 rounded border-2 border-transparent bg-white px-2 py-1 hover:border-blue-200"
+                                            key={index}
+                                            onClick={() => handleClusterElementClick(data)}
+                                        >
+                                            {data.icon ? data.icon : <ComponentIcon />}
+
+                                            <div className="flex flex-col gap-2 text-start">
+                                                <div>
+                                                    <span className="text-sm font-bold">{data.componentName}</span>
+
+                                                    {data.type === 'TOOLS' && (
+                                                        <span className="text-xs"> #{data.name}</span>
+                                                    )}
+                                                </div>
+
+                                                <p className="break-words text-xs text-muted-foreground">
+                                                    {data.description ? data.description : 'Description'}
+                                                </p>
+                                            </div>
+                                        </li>
+                                    ))}
+                                </ul>
+                            </ScrollArea>
+                        </div>
                     )}
 
-                    <WorkflowNodesPopoverMenuComponentList
-                        actionPanelOpen={actionPanelOpen}
-                        handleComponentClick={handleComponentClick}
-                        hideActionComponents={hideActionComponents}
-                        hideTaskDispatchers={hideTaskDispatchers}
-                        hideTriggerComponents={hideTriggerComponents}
-                        selectedComponentName={componentDefinitionToBeAdded?.name}
-                    />
+                    {!sourceData && (
+                        <WorkflowNodesPopoverMenuComponentList
+                            actionPanelOpen={actionPanelOpen}
+                            handleComponentClick={handleComponentClick}
+                            hideActionComponents={hideActionComponents}
+                            hideTaskDispatchers={hideTaskDispatchers}
+                            hideTriggerComponents={hideTriggerComponents}
+                            selectedComponentName={componentDefinitionToBeAdded?.name}
+                        />
+                    )}
 
-                    {actionPanelOpen && componentDefinitionToBeAdded && (
+                    {!sourceData && actionPanelOpen && componentDefinitionToBeAdded && (
                         <WorkflowNodesPopoverMenuOperationList
                             componentDefinition={componentDefinitionToBeAdded}
                             conditionId={conditionId}
@@ -186,6 +255,10 @@ const WorkflowNodesPopoverMenu = ({
                             // taskDispatcherContext={taskDispatcherContext}
                             trigger={trigger}
                         />
+                    )}
+
+                    {!sourceData && (!memoizedComponentDefinitions || !memoizedTaskDispatcherDefinitions) && (
+                        <div className="px-3 py-2 text-xs">Something went wrong.</div>
                     )}
                 </div>
             </PopoverContent>

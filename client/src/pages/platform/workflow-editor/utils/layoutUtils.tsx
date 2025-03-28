@@ -27,9 +27,11 @@ export const calculateNodeHeight = (node: Node) => {
     const isBottomGhostNode = node.type === 'taskDispatcherBottomGhostNode';
     const isLeftGhostNode = node.type === 'loopLeftGhostNode';
     const isPlaceholderNode = node.type === 'placeholder';
+    const isAIAgentNode = node.type === 'aiAgentNode';
     const isGhostNode = isTopGhostNode || isBottomGhostNode || isLeftGhostNode;
 
     let height = NODE_HEIGHT;
+    const aiAgentNodeHeight = 250;
 
     if (isPlaceholderNode || isGhostNode) {
         height = PLACEHOLDER_NODE_HEIGHT;
@@ -37,6 +39,10 @@ export const calculateNodeHeight = (node: Node) => {
         if (isBottomGhostNode) {
             height = NODE_HEIGHT;
         }
+    }
+
+    if (isAIAgentNode) {
+        height = aiAgentNodeHeight;
     }
 
     return height;
@@ -70,7 +76,7 @@ export const convertTaskToNode = (
         },
         id: task.name,
         position: {x: 0, y: 0},
-        type: 'workflow',
+        type: componentName === 'aiAgent' ? 'aiAgentNode' : 'workflow',
     };
 };
 
@@ -99,7 +105,7 @@ export const getLayoutedElements = (nodes: Node[], edges: Edge[], canvasWidth: n
     nodes.forEach((node) => {
         const height = calculateNodeHeight(node);
 
-        dagreGraph.setNode(node.id, {height, width: NODE_WIDTH});
+        dagreGraph.setNode(node.id, {height, width: node.type === 'aiAgentNode' ? 350 : NODE_WIDTH});
     });
 
     edges.forEach((edge) => {
@@ -108,13 +114,21 @@ export const getLayoutedElements = (nodes: Node[], edges: Edge[], canvasWidth: n
 
     dagre.layout(dagreGraph);
 
-    const allNodes = nodes.map((node) => ({
-        ...node,
-        position: {
-            x: dagreGraph.node(node.id).x + (canvasWidth / 2 - dagreGraph.node(nodes[0].id).x - 72 / 2),
-            y: dagreGraph.node(node.id).y,
-        },
-    }));
+    const allNodes = nodes.map((node) => {
+        let positionX = dagreGraph.node(node.id).x + (canvasWidth / 2 - dagreGraph.node(nodes[0].id).x - 72 / 2);
+
+        if (node.type === 'aiAgentNode') {
+            positionX -= 100;
+        }
+
+        return {
+            ...node,
+            position: {
+                x: positionX,
+                y: dagreGraph.node(node.id).y,
+            },
+        };
+    });
 
     const sourceEdgeMap = new Map<string, Edge[]>();
 
