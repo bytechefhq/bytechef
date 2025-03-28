@@ -119,7 +119,8 @@ class MondayPropertiesUtilsTest {
                 .required(false),
             array(NAME)
                 .label(LABEL)
-                .items(string().options(option("item1", "item1")))
+                .items(string())
+                .options(List.of(option("item1", "item1")))
                 .required(false),
             string(NAME)
                 .label(LABEL)
