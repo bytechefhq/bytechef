@@ -1,0 +1,101 @@
+---
+title: "Milvus"
+description: "Milvus is an open-source vector database that has garnered significant attention in the fields of data science and machine learning."
+---
+
+Milvus is an open-source vector database that has garnered significant attention in the fields of data science and machine learning.
+
+
+Categories: artificial-intelligence
+
+
+Type: milvus/v1
+
+<hr />
+
+
+
+## Connections
+
+Version: 1
+
+
+### custom
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| host | Host | STRING | The name or address of the host. | true |
+| port | Port | STRING | The connection port. | true |
+| uri | Uri | STRING | The uri of Milvus instance. | true |
+| username | Username | STRING | The username for this connection. | true |
+| password | Password | STRING | The password for this connection. | true |
+| collection | Collection Name | STRING | Milvus collection name to use. | true |
+| database | Database Name | STRING | The name of the Milvus database to use. | true |
+| initializeSchema | Initialize Schema | BOOLEAN <details> <summary> Options </summary> true, false </details> | Whether to initialize the schema. | true |
+
+
+
+
+
+<hr />
+
+
+
+## Actions
+
+
+### Search Data
+Name: search
+
+Query data from the vector store using LLM embeddings.
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| query | Query | STRING | The query to be executed. | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Search Data",
+  "name" : "search",
+  "parameters" : {
+    "query" : ""
+  },
+  "type" : "milvus/v1/search"
+}
+```
+
+#### Output
+
+The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
+
+
+
+
+### Load Data
+Name: load
+
+Loads data into the vector store using LLM embeddings.
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Load Data",
+  "name" : "load",
+  "type" : "milvus/v1/load"
+}
+```
+
+#### Output
+
+This action does not produce any output.
+
+
+
+
+
+
