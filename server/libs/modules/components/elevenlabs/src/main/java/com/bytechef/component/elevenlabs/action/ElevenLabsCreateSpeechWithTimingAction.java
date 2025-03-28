@@ -17,13 +17,14 @@
 package com.bytechef.component.elevenlabs.action;
 
 import static com.bytechef.component.definition.ComponentDsl.action;
+import static com.bytechef.component.definition.ComponentDsl.array;
+import static com.bytechef.component.definition.ComponentDsl.number;
 import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.Context.Http.responseType;
 import static com.bytechef.component.elevenlabs.constant.ElevenLabsConstants.TEXT;
 import static com.bytechef.component.elevenlabs.constant.ElevenLabsConstants.VOICE_ID;
-import static com.bytechef.component.elevenlabs.util.ElevenLabsUtil.alignmentObject;
 
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context;
@@ -60,8 +61,22 @@ public class ElevenLabsCreateSpeechWithTimingAction {
                     .properties(
                         string("audio_base64")
                             .description("Base64 encoded audio data"),
-                        alignmentObject("alignment"),
-                        alignmentObject("normalized_alignment"))))
+                        object("alignment")
+                            .properties(
+                                array("characters")
+                                    .items(string()),
+                                array("character_start_times_seconds")
+                                    .items(number()),
+                                array("character_end_times_seconds")
+                                    .items(number())),
+                        object("normalized_alignment")
+                            .properties(
+                                array("characters")
+                                    .items(string()),
+                                array("character_start_times_seconds")
+                                    .items(number()),
+                                array("character_end_times_seconds")
+                                    .items(number())))))
         .perform(ElevenLabsCreateSpeechWithTimingAction::perform);
 
     private ElevenLabsCreateSpeechWithTimingAction() {
@@ -71,10 +86,9 @@ public class ElevenLabsCreateSpeechWithTimingAction {
         Parameters inputParameters, Parameters connectionParameters, Context context) {
 
         return context
-            .http(http -> http
-                .post("/text-to-speech/" + inputParameters.getRequiredString(VOICE_ID) + "/with-timestamps"))
-            .body(Body.of(
-                Map.of(TEXT, inputParameters.getRequiredString(TEXT))))
+            .http(http -> http.post(
+                "/text-to-speech/%s/with-timestamps".formatted(inputParameters.getRequiredString(VOICE_ID))))
+            .body(Body.of(Map.of(TEXT, inputParameters.getRequiredString(TEXT))))
             .configuration(responseType(ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});

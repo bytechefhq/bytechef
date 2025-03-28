@@ -22,12 +22,12 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Context.Http.Body;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.test.definition.MockParametersFactory;
+import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -38,35 +38,31 @@ import org.mockito.ArgumentCaptor;
 class ElevenLabsCreateSoundEffectTest {
 
     private final ArgumentCaptor<Body> bodyArgumentCaptor = ArgumentCaptor.forClass(Body.class);
-    private final ActionContext mockedActionContext = mock(ActionContext.class);
+    private final Context mockedContext = mock(Context.class);
     private final Http.Executor mockedExecutor = mock(Http.Executor.class);
     private final Parameters mockedParameters = MockParametersFactory.create(
         Map.of(TEXT, "This is text that will be converted to speech."));
     private final Http.Response mockedResponse = mock(Http.Response.class);
-    private final Map<String, Object> response = Map.of();
+    private final ArgumentCaptor<String> stringArgumentCaptor = ArgumentCaptor.forClass(String.class);
 
     @Test
     void testPerform() {
-        when(mockedActionContext.http(any()))
+        when(mockedContext.http(any()))
             .thenReturn(mockedExecutor);
-        when(mockedExecutor.header("Content-Type", "audio/mpeg"))
-            .thenReturn(mockedExecutor);
-        when(mockedExecutor.configuration(any()))
+        when(mockedExecutor.header(stringArgumentCaptor.capture(), stringArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
         when(mockedExecutor.body(bodyArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
+        when(mockedExecutor.configuration(any()))
+            .thenReturn(mockedExecutor);
         when(mockedExecutor.execute())
             .thenReturn(mockedResponse);
-        when(mockedResponse.getBody(any(TypeReference.class)))
-            .thenReturn(response);
 
-        ElevenLabsCreateSoundEffectAction.perform(
-            mockedParameters, mockedParameters, mockedActionContext);
+        ElevenLabsCreateSoundEffectAction.perform(mockedParameters, mockedParameters, mockedContext);
 
         Body body = bodyArgumentCaptor.getValue();
 
-        assertEquals(
-            Map.of(TEXT, mockedParameters.getRequiredString(TEXT)),
-            body.getContent());
+        assertEquals(Map.of(TEXT, mockedParameters.getString(TEXT)), body.getContent());
+        assertEquals(List.of("Content-Type", "audio/mpeg"), stringArgumentCaptor.getAllValues());
     }
 }

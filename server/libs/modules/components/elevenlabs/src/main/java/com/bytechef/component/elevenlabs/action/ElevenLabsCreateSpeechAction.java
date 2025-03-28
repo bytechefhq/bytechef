@@ -17,7 +17,6 @@
 package com.bytechef.component.elevenlabs.action;
 
 import static com.bytechef.component.definition.ComponentDsl.action;
-import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.Context.Http.responseType;
 import static com.bytechef.component.elevenlabs.constant.ElevenLabsConstants.TEXT;
@@ -39,8 +38,7 @@ public class ElevenLabsCreateSpeechAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("createSpeech")
         .title("Create Speech")
-        .description(
-            "Converts text into speech using a voice of your choice and returns audio.")
+        .description("Converts text into speech using a voice of your choice and returns audio.")
         .properties(
             string(VOICE_ID)
                 .label("Voice")
@@ -51,20 +49,17 @@ public class ElevenLabsCreateSpeechAction {
                 .label("Text")
                 .description("Text you want to convert into speech.")
                 .required(true))
-        .output(outputSchema(string()))
+        .output()
         .perform(ElevenLabsCreateSpeechAction::perform);
 
     private ElevenLabsCreateSpeechAction() {
     }
 
-    public static Object perform(
-        Parameters inputParameters, Parameters connectionParameters, Context context) {
-
+    public static Object perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
         return context
             .http(http -> http.post("/text-to-speech/" + inputParameters.getRequiredString(VOICE_ID)))
             .header("Content-Type", "audio/mpeg")
-            .body(Body.of(
-                Map.of(TEXT, inputParameters.getRequiredString(TEXT))))
+            .body(Body.of(Map.of(TEXT, inputParameters.getRequiredString(TEXT))))
             .configuration(responseType(ResponseType.BINARY))
             .execute();
     }
