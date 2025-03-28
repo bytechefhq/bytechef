@@ -20,7 +20,9 @@ import com.bytechef.platform.ai.domain.VectorStore;
 import org.springframework.data.repository.ListCrudRepository;
 import org.springframework.stereotype.Repository;
 
+/**
+ * @author Marko Kriskovic
+ */
 @Repository
 public interface VectorStoreRepository extends ListCrudRepository<VectorStore, Long> {
-
 }

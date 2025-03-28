@@ -23,6 +23,9 @@ import org.postgresql.util.PGobject;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.data.convert.ReadingConverter;
 
+/**
+ * @author Marko Kriskovic
+ */
 @ReadingConverter
 @SuppressFBWarnings("EI_EXPOSE_REP2")
 public class PGobjectToMapConverter implements Converter<PGobject, Map<String, Object>> {

@@ -29,6 +29,7 @@ import org.springframework.data.relational.core.mapping.Table;
  */
 @Table("vector_store")
 public class VectorStore {
+
     @Id
     private UUID id;
 
@@ -82,9 +83,12 @@ public class VectorStore {
 
     @Override
     public boolean equals(Object o) {
-        if (o == null || getClass() != o.getClass())
+        if (o == null || getClass() != o.getClass()) {
             return false;
+        }
+
         VectorStore that = (VectorStore) o;
+
         return Objects.equals(id, that.id) && Objects.equals(content, that.content)
             && Objects.equals(metadata, that.metadata) && Objects.equals(embedding, that.embedding);
     }

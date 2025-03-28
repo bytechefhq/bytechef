@@ -22,6 +22,9 @@ import org.postgresql.util.PGobject;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.data.convert.ReadingConverter;
 
+/**
+ * @author Marko Kriskovic
+ */
 @ReadingConverter
 public class PGObjectToListDoubleConverter implements Converter<PGobject, List<Double>> {
 
@@ -29,6 +32,7 @@ public class PGObjectToListDoubleConverter implements Converter<PGobject, List<D
     public List<Double> convert(PGobject source) {
         try {
             String vectorString = source.getValue();
+
             if (vectorString == null) {
                 throw new IllegalArgumentException("PGobject value cannot be null");
             }
