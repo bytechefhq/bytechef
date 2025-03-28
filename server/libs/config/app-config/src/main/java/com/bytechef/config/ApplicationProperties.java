@@ -17,7 +17,6 @@
 package com.bytechef.config;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;

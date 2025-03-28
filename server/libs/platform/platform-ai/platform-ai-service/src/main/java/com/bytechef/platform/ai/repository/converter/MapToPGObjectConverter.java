@@ -26,6 +26,9 @@ import org.postgresql.util.PGobject;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.data.convert.WritingConverter;
 
+/**
+ * @author Marko Kriskovic
+ */
 @WritingConverter
 @SuppressFBWarnings("EI_EXPOSE_REP2")
 public class MapToPGObjectConverter implements Converter<Map<String, Object>, PGobject> {
@@ -40,8 +43,10 @@ public class MapToPGObjectConverter implements Converter<Map<String, Object>, PG
         Map<String, Object> defensiveCopy = new HashMap<>(source);
         try {
             PGobject jsonObject = new PGobject();
+
             jsonObject.setType("jsonb");
             jsonObject.setValue(objectMapper.writeValueAsString(defensiveCopy));
+
             return (PGobject) jsonObject.clone();
         } catch (SQLException | JsonProcessingException e) {
             throw new RuntimeException("Failed to convert Map to PGobject", e);

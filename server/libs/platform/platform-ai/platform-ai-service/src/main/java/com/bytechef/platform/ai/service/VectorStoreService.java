@@ -21,8 +21,12 @@ import com.bytechef.platform.ai.repository.VectorStoreRepository;
 import java.util.List;
 import org.springframework.stereotype.Service;
 
+/**
+ * @author Marko Kriskovic
+ */
 @Service
 public class VectorStoreService {
+
     private final VectorStoreRepository repository;
 
     public VectorStoreService(VectorStoreRepository repository) {
