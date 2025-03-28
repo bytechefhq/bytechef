@@ -170,9 +170,8 @@ public class CopperCreateCompanyAction {
             array(TAGS)
                 .description("Tags associated with the company")
                 .label("Tags")
-                .items(
-                    string()
-                        .options((ActionOptionsFunction<String>) CopperOptionUtils::getTagsOptions))
+                .items(string())
+                .options((ActionOptionsFunction<String>) CopperOptionUtils::getTagsOptions)
                 .required(false))
         .output(outputSchema(
             object()

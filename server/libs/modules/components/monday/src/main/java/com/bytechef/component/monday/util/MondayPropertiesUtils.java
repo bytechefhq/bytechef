@@ -161,7 +161,8 @@ public class MondayPropertiesUtils {
 
         return array(id)
             .label(title)
-            .items(string().options(options))
+            .items(string())
+            .options(options)
             .required(false);
     }
 
