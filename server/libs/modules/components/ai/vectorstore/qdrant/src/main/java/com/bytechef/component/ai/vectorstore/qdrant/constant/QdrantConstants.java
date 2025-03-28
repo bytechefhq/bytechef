@@ -29,10 +29,11 @@ public class QdrantConstants {
     public static final String API_KEY = "apiKey";
     public static final String COLLECTION = "collection";
     public static final String HOST = "host";
+    public static final String INITIALIZE_SCHEMA = "initializeSchema";
     public static final String PORT = "port";
     public static final String QDRANT = "qdrant";
 
-    public static final VectorStore VECTOR_STORE = (inputParameters, connectionParameters, embeddingModel) -> {
+    public static final VectorStore VECTOR_STORE = (connectionParameters, embeddingModel) -> {
         QdrantClient qdrantClient = new QdrantClient(
             QdrantGrpcClient.newBuilder(
                 connectionParameters.getRequiredString(HOST),
@@ -41,7 +42,8 @@ public class QdrantConstants {
                 .build());
 
         return QdrantVectorStore.builder(qdrantClient, embeddingModel)
-            .collectionName(inputParameters.getRequiredString(COLLECTION))
+            .collectionName(connectionParameters.getRequiredString(COLLECTION))
+            .initializeSchema(connectionParameters.getRequiredBoolean(INITIALIZE_SCHEMA))
             .build();
     };
 

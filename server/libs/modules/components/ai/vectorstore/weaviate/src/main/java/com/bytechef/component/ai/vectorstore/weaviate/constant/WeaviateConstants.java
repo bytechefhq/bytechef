@@ -38,7 +38,7 @@ public class WeaviateConstants {
     private WeaviateConstants() {
     }
 
-    public static final VectorStore VECTOR_STORE = (inputParameters, connectionParameters, embeddingModel) -> {
+    public static final VectorStore VECTOR_STORE = (connectionParameters, embeddingModel) -> {
         Pattern pattern = Pattern.compile("^(http|https)://([^/]+)");
         Matcher matcher = pattern.matcher(connectionParameters.getRequiredString(URL));
 

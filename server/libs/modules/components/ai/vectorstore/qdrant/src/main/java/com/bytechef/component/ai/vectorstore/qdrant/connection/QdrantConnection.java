@@ -17,10 +17,13 @@
 package com.bytechef.component.ai.vectorstore.qdrant.connection;
 
 import static com.bytechef.component.ai.vectorstore.qdrant.constant.QdrantConstants.API_KEY;
+import static com.bytechef.component.ai.vectorstore.qdrant.constant.QdrantConstants.COLLECTION;
 import static com.bytechef.component.ai.vectorstore.qdrant.constant.QdrantConstants.HOST;
+import static com.bytechef.component.ai.vectorstore.qdrant.constant.QdrantConstants.INITIALIZE_SCHEMA;
 import static com.bytechef.component.ai.vectorstore.qdrant.constant.QdrantConstants.PORT;
 import static com.bytechef.component.definition.Authorization.AuthorizationType.CUSTOM;
 import static com.bytechef.component.definition.ComponentDsl.authorization;
+import static com.bytechef.component.definition.ComponentDsl.bool;
 import static com.bytechef.component.definition.ComponentDsl.connection;
 import static com.bytechef.component.definition.ComponentDsl.integer;
 import static com.bytechef.component.definition.ComponentDsl.string;
@@ -49,6 +52,16 @@ public class QdrantConnection {
                     string(API_KEY)
                         .label("API Key")
                         .description("The API key to use for authentication withe the server.")
+                        .required(true),
+                    string(COLLECTION)
+                        .label("Collection Name")
+                        .description("The name of the collection to use.")
+                        .defaultValue("vector_store")
+                        .required(true),
+                    bool(INITIALIZE_SCHEMA)
+                        .label("Initialize Schema")
+                        .description("Whether to initialize the schema.")
+                        .defaultValue(false)
                         .required(true)));
 
     private QdrantConnection() {

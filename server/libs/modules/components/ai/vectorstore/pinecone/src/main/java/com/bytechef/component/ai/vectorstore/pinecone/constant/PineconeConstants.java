@@ -39,23 +39,22 @@ public class PineconeConstants {
             .maximumSize(1000)
             .build();
 
-    public static final VectorStore VECTOR_STORE =
-        (inputParameters, connectionParameters, embeddingModel) -> VECTOR_STORES.get(
-            connectionParameters.toString(), key -> {
-                Pattern pattern = Pattern.compile("https:\\/\\/(.*)-(.*)\\.svc\\.(.*)\\.pinecone\\.io");
-                Matcher matcher = pattern.matcher(connectionParameters.getRequiredString(HOST));
+    public static final VectorStore VECTOR_STORE = (connectionParameters, embeddingModel) -> VECTOR_STORES.get(
+        connectionParameters.toString(), key -> {
+            Pattern pattern = Pattern.compile("https:\\/\\/(.*)-(.*)\\.svc\\.(.*)\\.pinecone\\.io");
+            Matcher matcher = pattern.matcher(connectionParameters.getRequiredString(HOST));
 
-                if (matcher.find()) {
-                    return PineconeVectorStore.builder(embeddingModel)
-                        .apiKey(connectionParameters.getRequiredString(API_KEY))
-                        .projectId(matcher.group(2))
-                        .environment(matcher.group(3))
-                        .indexName(matcher.group(1))
-                        .build();
-                } else {
-                    throw new IllegalArgumentException("Invalid Host url");
-                }
-            });
+            if (matcher.find()) {
+                return PineconeVectorStore.builder(embeddingModel)
+                    .apiKey(connectionParameters.getRequiredString(API_KEY))
+                    .projectId(matcher.group(2))
+                    .environment(matcher.group(3))
+                    .indexName(matcher.group(1))
+                    .build();
+            } else {
+                throw new IllegalArgumentException("Invalid Host url");
+            }
+        });
 
     private PineconeConstants() {
     }

@@ -16,9 +16,7 @@
 
 package com.bytechef.component.ai.vectorstore.qdrant.action;
 
-import static com.bytechef.component.ai.vectorstore.qdrant.constant.QdrantConstants.COLLECTION;
 import static com.bytechef.component.ai.vectorstore.qdrant.constant.QdrantConstants.QDRANT;
-import static com.bytechef.component.definition.ComponentDsl.string;
 
 import com.bytechef.component.ai.vectorstore.action.AbstractLoadAction;
 import com.bytechef.component.ai.vectorstore.qdrant.constant.QdrantConstants;
@@ -34,16 +32,6 @@ public class QdrantLoadAction extends AbstractLoadAction {
     public QdrantLoadAction(
         ClusterElementDefinitionService clusterElementDefinitionService, ContextFactory contextFactory) {
 
-        super(
-            QDRANT,
-            QdrantConstants.VECTOR_STORE,
-            List.of(
-                string(COLLECTION)
-                    .label("Collection Name")
-                    .description("The name of the collection where the data will be stored.")
-                    .defaultValue("vector_store")
-                    .required(true)),
-            clusterElementDefinitionService,
-            contextFactory);
+        super(QDRANT, QdrantConstants.VECTOR_STORE, List.of(), clusterElementDefinitionService, contextFactory);
     }
 }
