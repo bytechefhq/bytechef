@@ -16,10 +16,12 @@
 
 package com.bytechef.component.brevo.util;
 
+import static com.bytechef.component.brevo.constant.BrevoConstants.EMAIL;
 import static com.bytechef.component.definition.ComponentDsl.option;
 import static com.bytechef.component.definition.Context.Http.responseType;
 
 import com.bytechef.component.definition.Context;
+import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
@@ -39,36 +41,46 @@ public class BrevoUtils {
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
         String searchText, Context context) {
 
-        Map<String, Object> response = context
+        Map<String, Object> body = context
             .http(http -> http.get("/contacts"))
-            .configuration(responseType(Context.Http.ResponseType.JSON))
+            .configuration(responseType(Http.ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});
 
-        return getOptions(response.get("contacts"));
+        List<Option<String>> options = new ArrayList<>();
+
+        if (body.get("contacts") instanceof List<?> contacts) {
+            for (Object contact : contacts) {
+                if (contact instanceof Map<?, ?> map) {
+                    String email = (String) map.get(EMAIL);
+
+                    options.add(option(email, email));
+                }
+            }
+        }
+
+        return options;
     }
 
     public static List<Option<String>> getSendersOptions(
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
         String searchText, Context context) {
 
-        Map<String, Object> response = context
+        Map<String, List<Map<String, Object>>> body = context
             .http(http -> http.get("/senders"))
-            .configuration(responseType(Context.Http.ResponseType.JSON))
+            .configuration(responseType(Http.ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});
 
-        return getOptions(response.get("senders"));
-    }
-
-    private static List<Option<String>> getOptions(Object response) {
         List<Option<String>> options = new ArrayList<>();
-        List<Map<String, String>> contacts = (List<Map<String, String>>) response;
 
-        for (Map<String, String> contact : contacts) {
-            options.add(option(contact.get("email"), contact.get("email")));
+        for (Map<String, Object> contact : body.get("senders")) {
+            String email = (String) contact.get(EMAIL);
+
+            options.add(option(email, email));
         }
 
         return options;
     }
+
 }

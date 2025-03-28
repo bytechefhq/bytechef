@@ -57,7 +57,6 @@ class BrevoUtilsTest {
 
     @Test
     void testGetContactsOptions() {
-
         when(mockedResponse.getBody(any(TypeReference.class)))
             .thenReturn(Map.of(
                 "contacts", List.of(
@@ -72,7 +71,6 @@ class BrevoUtilsTest {
 
     @Test
     void testGetSendersOptions() {
-
         when(mockedResponse.getBody(any(TypeReference.class)))
             .thenReturn(Map.of(
                 "senders", List.of(

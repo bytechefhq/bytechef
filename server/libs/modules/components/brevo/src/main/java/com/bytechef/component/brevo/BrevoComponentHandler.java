@@ -35,9 +35,9 @@ public class BrevoComponentHandler implements ComponentHandler {
 
     private static final ComponentDefinition COMPONENT_DEFINITION = component("brevo")
         .title("Brevo")
-        .description("Brevo is an email marketing platform that offers a cloud-based marketing " +
-            "communication software suite with transactional email, marketing automation, customer-relationship " +
-            "management  and more.")
+        .description(
+            "Brevo is an email marketing platform that offers a cloud-based marketing communication software suite " +
+                "with transactional email, marketing automation, customer-relationship management and more.")
         .icon("path:assets/brevo.svg")
         .categories(ComponentCategory.MARKETING_AUTOMATION)
         .connection(BrevoConnection.CONNECTION_DEFINITION)
