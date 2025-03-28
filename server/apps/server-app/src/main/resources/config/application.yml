@@ -109,6 +109,7 @@ spring:
       org.springframework.ai.autoconfigure.watsonxai.WatsonxAiAutoConfiguration,
       org.springframework.ai.autoconfigure.vectorstore.pinecone.PineconeVectorStoreAutoConfiguration,
       org.springframework.ai.autoconfigure.vectorstore.qdrant.QdrantVectorStoreAutoConfiguration,
+      org.springframework.ai.autoconfigure.vectorstore.typesense.TypesenseVectorStoreAutoConfiguration,
       org.springframework.ai.autoconfigure.vectorstore.weaviate.WeaviateVectorStoreAutoConfiguration
   application:
     name: server-app
