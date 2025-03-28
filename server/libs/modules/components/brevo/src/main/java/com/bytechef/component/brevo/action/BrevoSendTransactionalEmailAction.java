@@ -16,21 +16,30 @@
 
 package com.bytechef.component.brevo.action;
 
+import static com.bytechef.component.brevo.constant.BrevoConstants.BCC;
+import static com.bytechef.component.brevo.constant.BrevoConstants.CC;
+import static com.bytechef.component.brevo.constant.BrevoConstants.CONTENT;
+import static com.bytechef.component.brevo.constant.BrevoConstants.CONTENT_TYPE;
 import static com.bytechef.component.brevo.constant.BrevoConstants.EMAIL;
-import static com.bytechef.component.brevo.constant.BrevoConstants.NAME;
+import static com.bytechef.component.brevo.constant.BrevoConstants.SENDER_EMAIL;
 import static com.bytechef.component.brevo.constant.BrevoConstants.SUBJECT;
-import static com.bytechef.component.brevo.constant.BrevoConstants.TEXT_CONTENT;
+import static com.bytechef.component.brevo.constant.BrevoConstants.TO;
 import static com.bytechef.component.definition.ComponentDsl.action;
+import static com.bytechef.component.definition.ComponentDsl.array;
+import static com.bytechef.component.definition.ComponentDsl.object;
+import static com.bytechef.component.definition.ComponentDsl.option;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.Context.Http.responseType;
 
 import com.bytechef.component.brevo.util.BrevoUtils;
-import com.bytechef.component.definition.ComponentDsl;
+import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context;
+import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Context.Http.Body;
-import com.bytechef.component.definition.OptionsDataSource;
+import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.Parameters;
+import com.bytechef.component.definition.Property.ControlType;
 import com.bytechef.component.definition.TypeReference;
 import java.util.List;
 import java.util.Map;
@@ -40,61 +49,103 @@ import java.util.Map;
  */
 public class BrevoSendTransactionalEmailAction {
 
-    public static final ComponentDsl.ModifiableActionDefinition ACTION_DEFINITION = action("sendTransactionalEmail")
-        .title("Send transactional email")
-        .description("Send a transactional email.")
+    enum ContentType {
+        HTML, TEXT
+    }
+
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action("sendTransactionalEmail")
+        .title("Send Transactional Email")
+        .description("Sends and email from your Brevo account.")
         .properties(
-            string("senderEmail")
-                .label("Sender email")
+            string(SENDER_EMAIL)
+                .label("Sender Email")
                 .description("Email of the sender from which the emails will be sent.")
-                .options((OptionsDataSource.ActionOptionsFunction<String>) BrevoUtils::getSendersOptions)
+                .options((ActionOptionsFunction<String>) BrevoUtils::getSendersOptions)
                 .required(true),
-            string("senderName")
-                .label("Sender name")
-                .description("Name of the sender from which the emails will be sent.")
+            array(TO)
+                .label("To Recipients")
+                .description("The To: recipients for the message.")
+                .items(string().controlType(ControlType.EMAIL))
+                .options((ActionOptionsFunction<String>) BrevoUtils::getContactsOptions)
+                .minItems(1)
                 .required(true),
-            string("recipientEmail")
-                .label("Recipient email")
-                .description("Email address of the recipient.")
-                .options((OptionsDataSource.ActionOptionsFunction<String>) BrevoUtils::getContactsOptions)
-                .required(true),
-            string("recipientName")
-                .label("Recipient name")
-                .description("Name of the recipient.")
-                .required(true),
+            array(BCC)
+                .label("Bcc Recipients")
+                .description("The Bcc recipients for the message.")
+                .items(string().controlType(ControlType.EMAIL))
+                .options((ActionOptionsFunction<String>) BrevoUtils::getContactsOptions)
+                .required(false),
+            array(CC)
+                .label("Cc Recipients")
+                .description("The Cc recipients for the message.")
+                .items(string().controlType(ControlType.EMAIL))
+                .options((ActionOptionsFunction<String>) BrevoUtils::getContactsOptions)
+                .required(false),
             string(SUBJECT)
                 .label("Subject")
-                .description("Subject of the message.")
-                .required(false),
-            string(TEXT_CONTENT)
-                .label("Text body")
+                .description("Subject of the email.")
+                .required(true),
+            string(CONTENT_TYPE)
+                .label("Content Type")
+                .description("Content type of the email.")
+                .options(
+                    option("Text", ContentType.TEXT.name()),
+                    option("HTML", ContentType.HTML.name()))
+                .defaultValue(ContentType.TEXT.name())
+                .required(true),
+            string(CONTENT)
+                .label("Text Content")
                 .description("Plain text body of the message.")
-                .required(false))
+                .controlType(ControlType.TEXT_AREA)
+                .displayCondition("contentType == '%s'".formatted(ContentType.TEXT))
+                .required(true),
+            string(CONTENT)
+                .label("HTML Content")
+                .description("HTML body of the message.")
+                .controlType(ControlType.RICH_TEXT)
+                .displayCondition("contentType == '%s'".formatted(ContentType.HTML))
+                .required(true))
         .output(
             outputSchema(
-                string()
-                    .description("Message ID of the transactional email sent.")))
+                object()
+                    .properties(
+                        string("messageId")
+                            .description("Message ID of the transactional email sent."))))
         .perform(BrevoSendTransactionalEmailAction::perform);
 
     private BrevoSendTransactionalEmailAction() {
     }
 
-    public static Object perform(
-        Parameters inputParameters, Parameters connectionParameters, Context context) {
+    public static Object perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
+        String type = "textContent";
+        String contentType = inputParameters.getRequiredString(CONTENT_TYPE);
+
+        if (contentType.equals(ContentType.HTML.name())) {
+            type = "htmlContent";
+        }
 
         return context
             .http(http -> http.post("/smtp/email/"))
-            .configuration(responseType(Context.Http.ResponseType.JSON))
             .body(Body.of(
-                "sender", Map.of(
-                    EMAIL, inputParameters.getRequiredString("senderEmail"),
-                    NAME, inputParameters.getRequiredString("senderName")),
-                "to", List.of(Map.of(
-                    EMAIL, inputParameters.getRequiredString("recipientEmail"),
-                    NAME, inputParameters.getRequiredString("recipientName"))),
+                "sender", Map.of(EMAIL, inputParameters.getRequiredString(SENDER_EMAIL)),
+                TO, getRecipients(inputParameters.getRequiredList(TO, String.class)),
+                BCC, getRecipients(inputParameters.getList(BCC, String.class)),
+                CC, getRecipients(inputParameters.getList(CC, String.class)),
                 SUBJECT, inputParameters.getRequiredString(SUBJECT),
-                TEXT_CONTENT, inputParameters.getString(TEXT_CONTENT)))
+                type, inputParameters.getRequiredString(CONTENT)))
+            .configuration(responseType(Http.ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});
+    }
+
+    private static List<Map<String, String>> getRecipients(List<String> recipients) {
+        if (recipients == null) {
+            return null;
+        }
+
+        return recipients
+            .stream()
+            .map(recipient -> Map.of(EMAIL, recipient))
+            .toList();
     }
 }

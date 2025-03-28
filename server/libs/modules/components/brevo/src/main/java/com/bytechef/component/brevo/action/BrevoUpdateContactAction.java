@@ -26,9 +26,8 @@ import static com.bytechef.component.definition.Context.Http.Body;
 import com.bytechef.component.brevo.util.BrevoUtils;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context;
-import com.bytechef.component.definition.OptionsDataSource;
+import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.Parameters;
-import java.util.Map;
 
 /**
  * @author Marija Horvat
@@ -36,36 +35,38 @@ import java.util.Map;
 public class BrevoUpdateContactAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("updateContact")
-        .title("Update contact")
-        .description("Update contact.")
+        .title("Update Contact")
+        .description("Updates existing contact.")
         .properties(
             string(EMAIL)
                 .label("Email")
-                .description("Email address of the user.")
-                .options((OptionsDataSource.ActionOptionsFunction<String>) BrevoUtils::getContactsOptions)
+                .description("Email address of the contact to update.")
+                .options((ActionOptionsFunction<String>) BrevoUtils::getContactsOptions)
                 .required(true),
             string(FIRST_NAME)
-                .label("First name")
-                .description("First name of the user.")
-                .required(true),
+                .label("First Name")
+                .description("New first name of the contact.")
+                .required(false),
             string(LAST_NAME)
-                .label("Last name")
-                .description("Last name of the user.")
-                .required(true))
+                .label("Last Name")
+                .description("New last name of the contact.")
+                .required(false))
         .perform(BrevoUpdateContactAction::perform);
 
     private BrevoUpdateContactAction() {
     }
 
-    public static Object perform(
-        Parameters inputParameters, Parameters connectionParameters, Context context) {
-
-        return context
+    public static Object perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
+        context
             .http(http -> http.put("/contacts/" + inputParameters.getRequiredString(EMAIL)))
             .body(Body.of(
-                "attributes", Map.of(
-                    FIRST_NAME, inputParameters.getRequiredString(FIRST_NAME),
-                    LAST_NAME, inputParameters.getRequiredString(LAST_NAME))))
+                "attributes",
+                new Object[] {
+                    FIRST_NAME, inputParameters.getString(FIRST_NAME),
+                    LAST_NAME, inputParameters.getString(LAST_NAME)
+                }))
             .execute();
+
+        return null;
     }
 }

@@ -21,12 +21,18 @@ package com.bytechef.component.brevo.constant;
  */
 public class BrevoConstants {
 
+    public static final String BCC = "bcc";
+    public static final String CC = "cc";
+    public static final String CONTENT = "content";
+    public static final String CONTENT_TYPE = "contentType";
     public static final String EMAIL = "email";
     public static final String FIRST_NAME = "FIRSTNAME";
     public static final String LAST_NAME = "LASTNAME";
     public static final String NAME = "name";
+    public static final String RECIPIENT_EMAIL = "recipientEmail";
+    public static final String SENDER_EMAIL = "senderEmail";
     public static final String SUBJECT = "subject";
-    public static final String TEXT_CONTENT = "textContent";
+    public static final String TO = "to";
 
     private BrevoConstants() {
     }

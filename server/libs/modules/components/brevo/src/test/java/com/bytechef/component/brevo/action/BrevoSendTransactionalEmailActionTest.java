@@ -16,13 +16,17 @@
 
 package com.bytechef.component.brevo.action;
 
+import static com.bytechef.component.brevo.constant.BrevoConstants.BCC;
+import static com.bytechef.component.brevo.constant.BrevoConstants.CC;
+import static com.bytechef.component.brevo.constant.BrevoConstants.CONTENT;
+import static com.bytechef.component.brevo.constant.BrevoConstants.CONTENT_TYPE;
 import static com.bytechef.component.brevo.constant.BrevoConstants.EMAIL;
-import static com.bytechef.component.brevo.constant.BrevoConstants.NAME;
+import static com.bytechef.component.brevo.constant.BrevoConstants.SENDER_EMAIL;
 import static com.bytechef.component.brevo.constant.BrevoConstants.SUBJECT;
-import static com.bytechef.component.brevo.constant.BrevoConstants.TEXT_CONTENT;
+import static com.bytechef.component.brevo.constant.BrevoConstants.TO;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import com.bytechef.component.definition.Context;
+import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.test.definition.MockParametersFactory;
 import java.util.List;
@@ -36,23 +40,29 @@ class BrevoSendTransactionalEmailActionTest extends AbstractBrevoActionTest {
 
     private final Parameters mockedParameters = MockParametersFactory.create(
         Map.of(
-            "senderEmail", "sender@test.com",
-            "senderName", "sender",
-            "recipientEmail", "recepient@test.com",
-            "recipientName", "recipient",
+            SENDER_EMAIL, "sender@test.com",
+            TO, List.of("recepient1@test.com", "recepient2@test.com"),
+            CC, List.of("recepient1@test.com", "recepient2@test.com"),
+            BCC, List.of("recepient1@test.com", "recepient2@test.com"),
             SUBJECT, "test",
-            TEXT_CONTENT, "this is a test."));
+            CONTENT_TYPE, BrevoSendTransactionalEmailAction.ContentType.TEXT.name(),
+            CONTENT, "this is a test."));
 
     @Test
     void testPerform() {
-        BrevoSendTransactionalEmailAction.perform(mockedParameters, mockedParameters, mockedContext);
-        Context.Http.Body body = bodyArgumentCaptor.getValue();
+        Object result = BrevoSendTransactionalEmailAction.perform(mockedParameters, mockedParameters, mockedContext);
 
-        Map<String, Object> expected = Map.of(
-            "sender", Map.of(EMAIL, "sender@test.com", NAME, "sender"),
-            "to", List.of(Map.of(EMAIL, "recepient@test.com", NAME, "recipient")),
+        assertEquals(responseMap, result);
+        Http.Body body = bodyArgumentCaptor.getValue();
+
+        Map<String, Object> expectedBody = Map.of(
+            "sender", Map.of(EMAIL, "sender@test.com"),
+            TO, List.of(Map.of(EMAIL, "recepient1@test.com"), Map.of(EMAIL, "recepient2@test.com")),
+            CC, List.of(Map.of(EMAIL, "recepient1@test.com"), Map.of(EMAIL, "recepient2@test.com")),
+            BCC, List.of(Map.of(EMAIL, "recepient1@test.com"), Map.of(EMAIL, "recepient2@test.com")),
             SUBJECT, "test",
-            TEXT_CONTENT, "this is a test.");
-        assertEquals(expected, body.getContent());
+            "textContent", "this is a test.");
+
+        assertEquals(expectedBody, body.getContent());
     }
 }

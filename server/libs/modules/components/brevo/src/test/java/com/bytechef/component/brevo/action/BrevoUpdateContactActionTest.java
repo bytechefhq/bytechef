@@ -20,6 +20,7 @@ import static com.bytechef.component.brevo.constant.BrevoConstants.EMAIL;
 import static com.bytechef.component.brevo.constant.BrevoConstants.FIRST_NAME;
 import static com.bytechef.component.brevo.constant.BrevoConstants.LAST_NAME;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Parameters;
@@ -31,16 +32,20 @@ import org.junit.jupiter.api.Test;
  * @author Marija Horvat
  */
 class BrevoUpdateContactActionTest extends AbstractBrevoActionTest {
+
     private final Parameters mockedParameters = MockParametersFactory.create(
         Map.of(EMAIL, "test@test.com", FIRST_NAME, "test", LAST_NAME, "test"));
 
     @Test
     void testPerform() {
-        BrevoUpdateContactAction.perform(mockedParameters, mockedParameters, mockedContext);
+        Object result = BrevoUpdateContactAction.perform(mockedParameters, mockedParameters, mockedContext);
+
+        assertNull(result);
+
         Http.Body body = bodyArgumentCaptor.getValue();
 
-        Map<String, Object> expected = Map.of(
-            "attributes", Map.of(FIRST_NAME, "test", LAST_NAME, "test"));
-        assertEquals(expected, body.getContent());
+        Map<String, Object> expectedMap = Map.of("attributes", Map.of(FIRST_NAME, "test", LAST_NAME, "test"));
+
+        assertEquals(expectedMap, body.getContent());
     }
 }
