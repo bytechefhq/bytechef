@@ -61,7 +61,6 @@ public abstract class AbstractVectorStore {
             extensions, componentConnections, clusterElementDefinitionService);
 
         return vectorStore.createVectorStore(
-            ParametersFactory.createParameters(inputParameters),
             ParametersFactory.createParameters(connectionParameters),
             embeddingModel);
     }

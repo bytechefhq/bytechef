@@ -7,27 +7,7 @@
     "metadata" : null,
     "name" : "load",
     "outputDefinition" : null,
-    "properties" : [ {
-      "advancedOption" : null,
-      "description" : "The name of the collection where the data will be stored.",
-      "displayCondition" : null,
-      "expressionEnabled" : null,
-      "hidden" : null,
-      "metadata" : { },
-      "required" : true,
-      "name" : "collection",
-      "type" : "STRING",
-      "defaultValue" : "vector_store",
-      "exampleValue" : null,
-      "label" : "Collection Name",
-      "placeholder" : null,
-      "controlType" : "TEXT",
-      "languageId" : null,
-      "maxLength" : null,
-      "minLength" : null,
-      "options" : null,
-      "optionsDataSource" : null
-    } ],
+    "properties" : [ ],
     "title" : "Load Data",
     "perform" : { },
     "processErrorResponse" : null,
@@ -117,8 +97,8 @@
         "maxValue" : null,
         "minValue" : null,
         "options" : null,
-        "optionsDataSource" : null,
-        "controlType" : "INTEGER"
+        "controlType" : "INTEGER",
+        "optionsDataSource" : null
       }, {
         "advancedOption" : null,
         "description" : "The API key to use for authentication withe the server.",
@@ -139,23 +119,67 @@
         "minLength" : null,
         "options" : null,
         "optionsDataSource" : null
+      }, {
+        "advancedOption" : null,
+        "description" : "The name of the collection to use.",
+        "displayCondition" : null,
+        "expressionEnabled" : null,
+        "hidden" : null,
+        "metadata" : { },
+        "required" : true,
+        "name" : "collection",
+        "type" : "STRING",
+        "defaultValue" : "vector_store",
+        "exampleValue" : null,
+        "label" : "Collection Name",
+        "placeholder" : null,
+        "controlType" : "TEXT",
+        "languageId" : null,
+        "maxLength" : null,
+        "minLength" : null,
+        "options" : null,
+        "optionsDataSource" : null
+      }, {
+        "advancedOption" : null,
+        "description" : "Whether to initialize the schema.",
+        "displayCondition" : null,
+        "expressionEnabled" : null,
+        "hidden" : null,
+        "metadata" : { },
+        "required" : true,
+        "name" : "initializeSchema",
+        "type" : "BOOLEAN",
+        "defaultValue" : false,
+        "exampleValue" : null,
+        "label" : "Initialize Schema",
+        "placeholder" : null,
+        "options" : [ {
+          "description" : null,
+          "label" : "True",
+          "value" : true
+        }, {
+          "description" : null,
+          "label" : "False",
+          "value" : false
+        } ],
+        "controlType" : "SELECT"
       } ],
       "refreshOn" : null,
       "title" : null,
       "type" : "CUSTOM",
       "acquire" : null,
-      "authorizationUrl" : null,
-      "clientSecret" : null,
-      "refreshToken" : null,
       "apply" : null,
+      "authorizationCallback" : null,
+      "authorizationUrl" : null,
       "clientId" : null,
+      "clientSecret" : null,
+      "oauth2AuthorizationExtraQueryParameters" : null,
       "pkce" : null,
       "refresh" : null,
       "refreshUrl" : null,
       "scopes" : null,
-      "tokenUrl" : null,
-      "authorizationCallback" : null,
-      "oauth2AuthorizationExtraQueryParameters" : null
+      "refreshToken" : null,
+      "tokenUrl" : null
     } ],
     "properties" : null,
     "version" : 1,
@@ -190,6 +214,10 @@
   "triggers" : null,
   "unifiedApi" : null,
   "version" : 1,
+  "actionClusterElementTypes" : {
+    "load" : [ "EMBEDDING" ],
+    "search" : [ "DOCUMENT_READER", "DOCUMENT_TRANSFORMER", "EMBEDDING" ]
+  },
   "clusterElementType" : [ {
     "name" : "DOCUMENT_READER",
     "key" : "documentReader",
@@ -208,9 +236,5 @@
     "label" : "Embedding",
     "multipleElements" : false,
     "required" : true
-  } ],
-  "actionClusterElementTypes" : {
-    "search" : [ "DOCUMENT_READER", "DOCUMENT_TRANSFORMER", "EMBEDDING" ],
-    "load" : [ "EMBEDDING" ]
-  }
+  } ]
 }
