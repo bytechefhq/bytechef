@@ -13,7 +13,6 @@
   "resources" : null,
   "version" : 1,
   "title" : "Math Helper",
-  "connection" : null,
   "actions" : [ {
     "batch" : null,
     "deprecated" : null,
@@ -44,8 +43,8 @@
           "minValue" : null,
           "numberPrecision" : null,
           "options" : null,
-          "optionsDataSource" : null,
-          "controlType" : "NUMBER"
+          "controlType" : "NUMBER",
+          "optionsDataSource" : null
         },
         "sampleOutput" : null,
         "placeholder" : null
@@ -70,8 +69,8 @@
         "minValue" : null,
         "numberPrecision" : null,
         "options" : null,
-        "optionsDataSource" : null,
-        "controlType" : "NUMBER"
+        "controlType" : "NUMBER",
+        "optionsDataSource" : null
       },
       "sampleOutput" : null
     },
@@ -95,8 +94,8 @@
       "minValue" : null,
       "numberPrecision" : null,
       "options" : null,
-      "optionsDataSource" : null,
-      "controlType" : "NUMBER"
+      "controlType" : "NUMBER",
+      "optionsDataSource" : null
     }, {
       "advancedOption" : null,
       "description" : null,
@@ -117,13 +116,13 @@
       "minValue" : null,
       "numberPrecision" : null,
       "options" : null,
-      "optionsDataSource" : null,
-      "controlType" : "NUMBER"
+      "controlType" : "NUMBER",
+      "optionsDataSource" : null
     } ],
     "title" : "Addition",
+    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
-    "perform" : { }
+    "workflowNodeDescription" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -154,8 +153,8 @@
           "minValue" : null,
           "numberPrecision" : null,
           "options" : null,
-          "optionsDataSource" : null,
-          "controlType" : "NUMBER"
+          "controlType" : "NUMBER",
+          "optionsDataSource" : null
         },
         "sampleOutput" : null,
         "placeholder" : null
@@ -180,8 +179,8 @@
         "minValue" : null,
         "numberPrecision" : null,
         "options" : null,
-        "optionsDataSource" : null,
-        "controlType" : "NUMBER"
+        "controlType" : "NUMBER",
+        "optionsDataSource" : null
       },
       "sampleOutput" : null
     },
@@ -205,8 +204,8 @@
       "minValue" : null,
       "numberPrecision" : null,
       "options" : null,
-      "optionsDataSource" : null,
-      "controlType" : "NUMBER"
+      "controlType" : "NUMBER",
+      "optionsDataSource" : null
     }, {
       "advancedOption" : null,
       "description" : "Number to divide by.",
@@ -227,13 +226,13 @@
       "minValue" : null,
       "numberPrecision" : null,
       "options" : null,
-      "optionsDataSource" : null,
-      "controlType" : "NUMBER"
+      "controlType" : "NUMBER",
+      "optionsDataSource" : null
     } ],
     "title" : "Division",
+    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
-    "perform" : { }
+    "workflowNodeDescription" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -264,8 +263,8 @@
           "minValue" : null,
           "numberPrecision" : null,
           "options" : null,
-          "optionsDataSource" : null,
-          "controlType" : "NUMBER"
+          "controlType" : "NUMBER",
+          "optionsDataSource" : null
         },
         "sampleOutput" : null,
         "placeholder" : null
@@ -290,8 +289,8 @@
         "minValue" : null,
         "numberPrecision" : null,
         "options" : null,
-        "optionsDataSource" : null,
-        "controlType" : "NUMBER"
+        "controlType" : "NUMBER",
+        "optionsDataSource" : null
       },
       "sampleOutput" : null
     },
@@ -315,8 +314,8 @@
       "minValue" : null,
       "numberPrecision" : null,
       "options" : null,
-      "optionsDataSource" : null,
-      "controlType" : "NUMBER"
+      "controlType" : "NUMBER",
+      "optionsDataSource" : null
     }, {
       "advancedOption" : null,
       "description" : "Number to divide by.",
@@ -337,13 +336,13 @@
       "minValue" : null,
       "numberPrecision" : null,
       "options" : null,
-      "optionsDataSource" : null,
-      "controlType" : "NUMBER"
+      "controlType" : "NUMBER",
+      "optionsDataSource" : null
     } ],
     "title" : "Modulo",
+    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
-    "perform" : { }
+    "workflowNodeDescription" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -374,8 +373,8 @@
           "minValue" : null,
           "numberPrecision" : null,
           "options" : null,
-          "optionsDataSource" : null,
-          "controlType" : "NUMBER"
+          "controlType" : "NUMBER",
+          "optionsDataSource" : null
         },
         "sampleOutput" : null,
         "placeholder" : null
@@ -400,8 +399,8 @@
         "minValue" : null,
         "numberPrecision" : null,
         "options" : null,
-        "optionsDataSource" : null,
-        "controlType" : "NUMBER"
+        "controlType" : "NUMBER",
+        "optionsDataSource" : null
       },
       "sampleOutput" : null
     },
@@ -425,8 +424,8 @@
       "minValue" : null,
       "numberPrecision" : null,
       "options" : null,
-      "optionsDataSource" : null,
-      "controlType" : "NUMBER"
+      "controlType" : "NUMBER",
+      "optionsDataSource" : null
     }, {
       "advancedOption" : null,
       "description" : null,
@@ -447,13 +446,13 @@
       "minValue" : null,
       "numberPrecision" : null,
       "options" : null,
-      "optionsDataSource" : null,
-      "controlType" : "NUMBER"
+      "controlType" : "NUMBER",
+      "optionsDataSource" : null
     } ],
     "title" : "Multiplication",
+    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
-    "perform" : { }
+    "workflowNodeDescription" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -484,8 +483,8 @@
           "minValue" : null,
           "numberPrecision" : null,
           "options" : null,
-          "optionsDataSource" : null,
-          "controlType" : "NUMBER"
+          "controlType" : "NUMBER",
+          "optionsDataSource" : null
         },
         "sampleOutput" : null,
         "placeholder" : null
@@ -510,8 +509,8 @@
         "minValue" : null,
         "numberPrecision" : null,
         "options" : null,
-        "optionsDataSource" : null,
-        "controlType" : "NUMBER"
+        "controlType" : "NUMBER",
+        "optionsDataSource" : null
       },
       "sampleOutput" : null
     },
@@ -535,8 +534,8 @@
       "minValue" : null,
       "numberPrecision" : null,
       "options" : null,
-      "optionsDataSource" : null,
-      "controlType" : "NUMBER"
+      "controlType" : "NUMBER",
+      "optionsDataSource" : null
     }, {
       "advancedOption" : null,
       "description" : "Number to subtract.",
@@ -557,15 +556,571 @@
       "minValue" : null,
       "numberPrecision" : null,
       "options" : null,
-      "optionsDataSource" : null,
-      "controlType" : "NUMBER"
+      "controlType" : "NUMBER",
+      "optionsDataSource" : null
     } ],
     "title" : "Subtraction",
+    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
-    "perform" : { }
+    "workflowNodeDescription" : null
   } ],
-  "clusterElements" : null,
+  "clusterElements" : [ {
+    "description" : "Add two numbers.",
+    "name" : "addition",
+    "outputDefinition" : {
+      "output" : null,
+      "outputResponse" : {
+        "outputSchema" : {
+          "advancedOption" : null,
+          "description" : "Result of addition.",
+          "displayCondition" : null,
+          "expressionEnabled" : null,
+          "hidden" : null,
+          "metadata" : { },
+          "required" : null,
+          "name" : null,
+          "type" : "NUMBER",
+          "defaultValue" : null,
+          "exampleValue" : null,
+          "label" : null,
+          "placeholder" : null,
+          "maxNumberPrecision" : null,
+          "maxValue" : null,
+          "minNumberPrecision" : null,
+          "minValue" : null,
+          "numberPrecision" : null,
+          "options" : null,
+          "controlType" : "NUMBER",
+          "optionsDataSource" : null
+        },
+        "sampleOutput" : null,
+        "placeholder" : null
+      },
+      "outputSchema" : {
+        "advancedOption" : null,
+        "description" : "Result of addition.",
+        "displayCondition" : null,
+        "expressionEnabled" : null,
+        "hidden" : null,
+        "metadata" : { },
+        "required" : null,
+        "name" : null,
+        "type" : "NUMBER",
+        "defaultValue" : null,
+        "exampleValue" : null,
+        "label" : null,
+        "placeholder" : null,
+        "maxNumberPrecision" : null,
+        "maxValue" : null,
+        "minNumberPrecision" : null,
+        "minValue" : null,
+        "numberPrecision" : null,
+        "options" : null,
+        "controlType" : "NUMBER",
+        "optionsDataSource" : null
+      },
+      "sampleOutput" : null
+    },
+    "properties" : [ {
+      "advancedOption" : null,
+      "description" : null,
+      "displayCondition" : null,
+      "expressionEnabled" : null,
+      "hidden" : null,
+      "metadata" : { },
+      "required" : true,
+      "name" : "firstNumber",
+      "type" : "NUMBER",
+      "defaultValue" : null,
+      "exampleValue" : null,
+      "label" : "First Number",
+      "placeholder" : null,
+      "maxNumberPrecision" : null,
+      "maxValue" : null,
+      "minNumberPrecision" : null,
+      "minValue" : null,
+      "numberPrecision" : null,
+      "options" : null,
+      "controlType" : "NUMBER",
+      "optionsDataSource" : null
+    }, {
+      "advancedOption" : null,
+      "description" : null,
+      "displayCondition" : null,
+      "expressionEnabled" : null,
+      "hidden" : null,
+      "metadata" : { },
+      "required" : true,
+      "name" : "secondNumber",
+      "type" : "NUMBER",
+      "defaultValue" : null,
+      "exampleValue" : null,
+      "label" : "Second Number",
+      "placeholder" : null,
+      "maxNumberPrecision" : null,
+      "maxValue" : null,
+      "minNumberPrecision" : null,
+      "minValue" : null,
+      "numberPrecision" : null,
+      "options" : null,
+      "controlType" : "NUMBER",
+      "optionsDataSource" : null
+    } ],
+    "title" : "Addition",
+    "type" : {
+      "name" : "TOOLS",
+      "key" : "tools",
+      "label" : "Tools",
+      "multipleElements" : true,
+      "required" : false
+    },
+    "object" : { }
+  }, {
+    "description" : "Divide two numbers.",
+    "name" : "division",
+    "outputDefinition" : {
+      "output" : null,
+      "outputResponse" : {
+        "outputSchema" : {
+          "advancedOption" : null,
+          "description" : "Result of division.",
+          "displayCondition" : null,
+          "expressionEnabled" : null,
+          "hidden" : null,
+          "metadata" : { },
+          "required" : null,
+          "name" : null,
+          "type" : "NUMBER",
+          "defaultValue" : null,
+          "exampleValue" : null,
+          "label" : null,
+          "placeholder" : null,
+          "maxNumberPrecision" : null,
+          "maxValue" : null,
+          "minNumberPrecision" : null,
+          "minValue" : null,
+          "numberPrecision" : null,
+          "options" : null,
+          "controlType" : "NUMBER",
+          "optionsDataSource" : null
+        },
+        "sampleOutput" : null,
+        "placeholder" : null
+      },
+      "outputSchema" : {
+        "advancedOption" : null,
+        "description" : "Result of division.",
+        "displayCondition" : null,
+        "expressionEnabled" : null,
+        "hidden" : null,
+        "metadata" : { },
+        "required" : null,
+        "name" : null,
+        "type" : "NUMBER",
+        "defaultValue" : null,
+        "exampleValue" : null,
+        "label" : null,
+        "placeholder" : null,
+        "maxNumberPrecision" : null,
+        "maxValue" : null,
+        "minNumberPrecision" : null,
+        "minValue" : null,
+        "numberPrecision" : null,
+        "options" : null,
+        "controlType" : "NUMBER",
+        "optionsDataSource" : null
+      },
+      "sampleOutput" : null
+    },
+    "properties" : [ {
+      "advancedOption" : null,
+      "description" : "Number to be divided.",
+      "displayCondition" : null,
+      "expressionEnabled" : null,
+      "hidden" : null,
+      "metadata" : { },
+      "required" : true,
+      "name" : "firstNumber",
+      "type" : "NUMBER",
+      "defaultValue" : null,
+      "exampleValue" : null,
+      "label" : "First Number",
+      "placeholder" : null,
+      "maxNumberPrecision" : null,
+      "maxValue" : null,
+      "minNumberPrecision" : null,
+      "minValue" : null,
+      "numberPrecision" : null,
+      "options" : null,
+      "controlType" : "NUMBER",
+      "optionsDataSource" : null
+    }, {
+      "advancedOption" : null,
+      "description" : "Number to divide by.",
+      "displayCondition" : null,
+      "expressionEnabled" : null,
+      "hidden" : null,
+      "metadata" : { },
+      "required" : true,
+      "name" : "secondNumber",
+      "type" : "NUMBER",
+      "defaultValue" : null,
+      "exampleValue" : null,
+      "label" : "Second Number",
+      "placeholder" : null,
+      "maxNumberPrecision" : null,
+      "maxValue" : null,
+      "minNumberPrecision" : null,
+      "minValue" : null,
+      "numberPrecision" : null,
+      "options" : null,
+      "controlType" : "NUMBER",
+      "optionsDataSource" : null
+    } ],
+    "title" : "Division",
+    "type" : {
+      "name" : "TOOLS",
+      "key" : "tools",
+      "label" : "Tools",
+      "multipleElements" : true,
+      "required" : false
+    },
+    "object" : { }
+  }, {
+    "description" : "Divide two numbers.",
+    "name" : "division",
+    "outputDefinition" : {
+      "output" : null,
+      "outputResponse" : {
+        "outputSchema" : {
+          "advancedOption" : null,
+          "description" : "Result of division.",
+          "displayCondition" : null,
+          "expressionEnabled" : null,
+          "hidden" : null,
+          "metadata" : { },
+          "required" : null,
+          "name" : null,
+          "type" : "NUMBER",
+          "defaultValue" : null,
+          "exampleValue" : null,
+          "label" : null,
+          "placeholder" : null,
+          "maxNumberPrecision" : null,
+          "maxValue" : null,
+          "minNumberPrecision" : null,
+          "minValue" : null,
+          "numberPrecision" : null,
+          "options" : null,
+          "controlType" : "NUMBER",
+          "optionsDataSource" : null
+        },
+        "sampleOutput" : null,
+        "placeholder" : null
+      },
+      "outputSchema" : {
+        "advancedOption" : null,
+        "description" : "Result of division.",
+        "displayCondition" : null,
+        "expressionEnabled" : null,
+        "hidden" : null,
+        "metadata" : { },
+        "required" : null,
+        "name" : null,
+        "type" : "NUMBER",
+        "defaultValue" : null,
+        "exampleValue" : null,
+        "label" : null,
+        "placeholder" : null,
+        "maxNumberPrecision" : null,
+        "maxValue" : null,
+        "minNumberPrecision" : null,
+        "minValue" : null,
+        "numberPrecision" : null,
+        "options" : null,
+        "controlType" : "NUMBER",
+        "optionsDataSource" : null
+      },
+      "sampleOutput" : null
+    },
+    "properties" : [ {
+      "advancedOption" : null,
+      "description" : "Number to be divided.",
+      "displayCondition" : null,
+      "expressionEnabled" : null,
+      "hidden" : null,
+      "metadata" : { },
+      "required" : true,
+      "name" : "firstNumber",
+      "type" : "NUMBER",
+      "defaultValue" : null,
+      "exampleValue" : null,
+      "label" : "First Number",
+      "placeholder" : null,
+      "maxNumberPrecision" : null,
+      "maxValue" : null,
+      "minNumberPrecision" : null,
+      "minValue" : null,
+      "numberPrecision" : null,
+      "options" : null,
+      "controlType" : "NUMBER",
+      "optionsDataSource" : null
+    }, {
+      "advancedOption" : null,
+      "description" : "Number to divide by.",
+      "displayCondition" : null,
+      "expressionEnabled" : null,
+      "hidden" : null,
+      "metadata" : { },
+      "required" : true,
+      "name" : "secondNumber",
+      "type" : "NUMBER",
+      "defaultValue" : null,
+      "exampleValue" : null,
+      "label" : "Second Number",
+      "placeholder" : null,
+      "maxNumberPrecision" : null,
+      "maxValue" : null,
+      "minNumberPrecision" : null,
+      "minValue" : null,
+      "numberPrecision" : null,
+      "options" : null,
+      "controlType" : "NUMBER",
+      "optionsDataSource" : null
+    } ],
+    "title" : "Division",
+    "type" : {
+      "name" : "TOOLS",
+      "key" : "tools",
+      "label" : "Tools",
+      "multipleElements" : true,
+      "required" : false
+    },
+    "object" : { }
+  }, {
+    "description" : "Multiply two numbers.",
+    "name" : "multiplication",
+    "outputDefinition" : {
+      "output" : null,
+      "outputResponse" : {
+        "outputSchema" : {
+          "advancedOption" : null,
+          "description" : "Result of multiplication.",
+          "displayCondition" : null,
+          "expressionEnabled" : null,
+          "hidden" : null,
+          "metadata" : { },
+          "required" : null,
+          "name" : null,
+          "type" : "NUMBER",
+          "defaultValue" : null,
+          "exampleValue" : null,
+          "label" : null,
+          "placeholder" : null,
+          "maxNumberPrecision" : null,
+          "maxValue" : null,
+          "minNumberPrecision" : null,
+          "minValue" : null,
+          "numberPrecision" : null,
+          "options" : null,
+          "controlType" : "NUMBER",
+          "optionsDataSource" : null
+        },
+        "sampleOutput" : null,
+        "placeholder" : null
+      },
+      "outputSchema" : {
+        "advancedOption" : null,
+        "description" : "Result of multiplication.",
+        "displayCondition" : null,
+        "expressionEnabled" : null,
+        "hidden" : null,
+        "metadata" : { },
+        "required" : null,
+        "name" : null,
+        "type" : "NUMBER",
+        "defaultValue" : null,
+        "exampleValue" : null,
+        "label" : null,
+        "placeholder" : null,
+        "maxNumberPrecision" : null,
+        "maxValue" : null,
+        "minNumberPrecision" : null,
+        "minValue" : null,
+        "numberPrecision" : null,
+        "options" : null,
+        "controlType" : "NUMBER",
+        "optionsDataSource" : null
+      },
+      "sampleOutput" : null
+    },
+    "properties" : [ {
+      "advancedOption" : null,
+      "description" : null,
+      "displayCondition" : null,
+      "expressionEnabled" : null,
+      "hidden" : null,
+      "metadata" : { },
+      "required" : true,
+      "name" : "firstNumber",
+      "type" : "NUMBER",
+      "defaultValue" : null,
+      "exampleValue" : null,
+      "label" : "First Number",
+      "placeholder" : null,
+      "maxNumberPrecision" : null,
+      "maxValue" : null,
+      "minNumberPrecision" : null,
+      "minValue" : null,
+      "numberPrecision" : null,
+      "options" : null,
+      "controlType" : "NUMBER",
+      "optionsDataSource" : null
+    }, {
+      "advancedOption" : null,
+      "description" : null,
+      "displayCondition" : null,
+      "expressionEnabled" : null,
+      "hidden" : null,
+      "metadata" : { },
+      "required" : true,
+      "name" : "secondNumber",
+      "type" : "NUMBER",
+      "defaultValue" : null,
+      "exampleValue" : null,
+      "label" : "Second Number",
+      "placeholder" : null,
+      "maxNumberPrecision" : null,
+      "maxValue" : null,
+      "minNumberPrecision" : null,
+      "minValue" : null,
+      "numberPrecision" : null,
+      "options" : null,
+      "controlType" : "NUMBER",
+      "optionsDataSource" : null
+    } ],
+    "title" : "Multiplication",
+    "type" : {
+      "name" : "TOOLS",
+      "key" : "tools",
+      "label" : "Tools",
+      "multipleElements" : true,
+      "required" : false
+    },
+    "object" : { }
+  }, {
+    "description" : "Subtract two numbers.",
+    "name" : "subtraction",
+    "outputDefinition" : {
+      "output" : null,
+      "outputResponse" : {
+        "outputSchema" : {
+          "advancedOption" : null,
+          "description" : "Result of subtraction.",
+          "displayCondition" : null,
+          "expressionEnabled" : null,
+          "hidden" : null,
+          "metadata" : { },
+          "required" : null,
+          "name" : null,
+          "type" : "NUMBER",
+          "defaultValue" : null,
+          "exampleValue" : null,
+          "label" : null,
+          "placeholder" : null,
+          "maxNumberPrecision" : null,
+          "maxValue" : null,
+          "minNumberPrecision" : null,
+          "minValue" : null,
+          "numberPrecision" : null,
+          "options" : null,
+          "controlType" : "NUMBER",
+          "optionsDataSource" : null
+        },
+        "sampleOutput" : null,
+        "placeholder" : null
+      },
+      "outputSchema" : {
+        "advancedOption" : null,
+        "description" : "Result of subtraction.",
+        "displayCondition" : null,
+        "expressionEnabled" : null,
+        "hidden" : null,
+        "metadata" : { },
+        "required" : null,
+        "name" : null,
+        "type" : "NUMBER",
+        "defaultValue" : null,
+        "exampleValue" : null,
+        "label" : null,
+        "placeholder" : null,
+        "maxNumberPrecision" : null,
+        "maxValue" : null,
+        "minNumberPrecision" : null,
+        "minValue" : null,
+        "numberPrecision" : null,
+        "options" : null,
+        "controlType" : "NUMBER",
+        "optionsDataSource" : null
+      },
+      "sampleOutput" : null
+    },
+    "properties" : [ {
+      "advancedOption" : null,
+      "description" : "Number to subtract from.",
+      "displayCondition" : null,
+      "expressionEnabled" : null,
+      "hidden" : null,
+      "metadata" : { },
+      "required" : true,
+      "name" : "firstNumber",
+      "type" : "NUMBER",
+      "defaultValue" : null,
+      "exampleValue" : null,
+      "label" : "First Number",
+      "placeholder" : null,
+      "maxNumberPrecision" : null,
+      "maxValue" : null,
+      "minNumberPrecision" : null,
+      "minValue" : null,
+      "numberPrecision" : null,
+      "options" : null,
+      "controlType" : "NUMBER",
+      "optionsDataSource" : null
+    }, {
+      "advancedOption" : null,
+      "description" : "Number to subtract.",
+      "displayCondition" : null,
+      "expressionEnabled" : null,
+      "hidden" : null,
+      "metadata" : { },
+      "required" : true,
+      "name" : "secondNumber",
+      "type" : "NUMBER",
+      "defaultValue" : null,
+      "exampleValue" : null,
+      "label" : "Second Number",
+      "placeholder" : null,
+      "maxNumberPrecision" : null,
+      "maxValue" : null,
+      "minNumberPrecision" : null,
+      "minValue" : null,
+      "numberPrecision" : null,
+      "options" : null,
+      "controlType" : "NUMBER",
+      "optionsDataSource" : null
+    } ],
+    "title" : "Subtraction",
+    "type" : {
+      "name" : "TOOLS",
+      "key" : "tools",
+      "label" : "Tools",
+      "multipleElements" : true,
+      "required" : false
+    },
+    "object" : { }
+  } ],
   "unifiedApi" : null,
-  "triggers" : null
+  "triggers" : null,
+  "connection" : null
 }

@@ -13,75 +13,6 @@
   "resources" : null,
   "version" : 1,
   "title" : "GitHub",
-  "connection" : {
-    "authorizations" : [ {
-      "detectOn" : null,
-      "description" : null,
-      "name" : "oauth2_authorization_code",
-      "properties" : [ {
-        "advancedOption" : null,
-        "description" : null,
-        "displayCondition" : null,
-        "expressionEnabled" : null,
-        "hidden" : null,
-        "metadata" : { },
-        "required" : true,
-        "name" : "clientId",
-        "type" : "STRING",
-        "defaultValue" : null,
-        "exampleValue" : null,
-        "label" : "Client id",
-        "placeholder" : null,
-        "controlType" : "TEXT",
-        "languageId" : null,
-        "maxLength" : null,
-        "minLength" : null,
-        "options" : null,
-        "optionsDataSource" : null
-      }, {
-        "advancedOption" : null,
-        "description" : null,
-        "displayCondition" : null,
-        "expressionEnabled" : null,
-        "hidden" : null,
-        "metadata" : { },
-        "required" : true,
-        "name" : "clientSecret",
-        "type" : "STRING",
-        "defaultValue" : null,
-        "exampleValue" : null,
-        "label" : "Client secret",
-        "placeholder" : null,
-        "controlType" : "TEXT",
-        "languageId" : null,
-        "maxLength" : null,
-        "minLength" : null,
-        "options" : null,
-        "optionsDataSource" : null
-      } ],
-      "refreshOn" : null,
-      "title" : "OAuth2 Authorization Code",
-      "type" : "OAUTH2_AUTHORIZATION_CODE",
-      "acquire" : null,
-      "authorizationCallback" : null,
-      "oauth2AuthorizationExtraQueryParameters" : null,
-      "apply" : null,
-      "clientId" : null,
-      "pkce" : null,
-      "refresh" : null,
-      "refreshUrl" : null,
-      "scopes" : { },
-      "tokenUrl" : { },
-      "authorizationUrl" : { },
-      "clientSecret" : null,
-      "refreshToken" : null
-    } ],
-    "properties" : null,
-    "version" : 1,
-    "authorizationRequired" : null,
-    "baseUri" : { },
-    "test" : null
-  },
   "actions" : [ {
     "batch" : null,
     "deprecated" : null,
@@ -957,9 +888,9 @@
       }
     } ],
     "title" : "Add Assignee to Issue",
-    "processErrorResponse" : null,
+    "perform" : { },
     "workflowNodeDescription" : null,
-    "perform" : { }
+    "processErrorResponse" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -1311,9 +1242,9 @@
       }
     } ],
     "title" : "Add Labels to Issue",
-    "processErrorResponse" : null,
+    "perform" : { },
     "workflowNodeDescription" : null,
-    "perform" : { }
+    "processErrorResponse" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -2165,9 +2096,9 @@
       "optionsDataSource" : null
     } ],
     "title" : "Create Comment on Issue",
-    "processErrorResponse" : null,
+    "perform" : { },
     "workflowNodeDescription" : null,
-    "perform" : { }
+    "processErrorResponse" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -3016,9 +2947,9 @@
       "optionsDataSource" : null
     } ],
     "title" : "Create Issue",
-    "processErrorResponse" : null,
+    "perform" : { },
     "workflowNodeDescription" : null,
-    "perform" : { }
+    "processErrorResponse" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -3850,9 +3781,9 @@
       }
     } ],
     "title" : "Get Issue",
-    "processErrorResponse" : null,
+    "perform" : { },
     "workflowNodeDescription" : null,
-    "perform" : { }
+    "processErrorResponse" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -4756,9 +4687,9 @@
       "optionsDataSource" : null
     } ],
     "title" : "List Issues",
-    "processErrorResponse" : null,
+    "perform" : { },
     "workflowNodeDescription" : null,
-    "perform" : { }
+    "processErrorResponse" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -5609,9 +5540,9 @@
       }
     } ],
     "title" : "List Repository Issues",
-    "processErrorResponse" : null,
+    "perform" : { },
     "workflowNodeDescription" : null,
-    "perform" : { }
+    "processErrorResponse" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -5662,10 +5593,80 @@
       "optionsDataSource" : null
     } ],
     "title" : "Star Repository",
-    "processErrorResponse" : null,
+    "perform" : { },
     "workflowNodeDescription" : null,
-    "perform" : { }
+    "processErrorResponse" : null
   } ],
+  "connection" : {
+    "authorizations" : [ {
+      "detectOn" : null,
+      "description" : null,
+      "name" : "oauth2_authorization_code",
+      "properties" : [ {
+        "advancedOption" : null,
+        "description" : null,
+        "displayCondition" : null,
+        "expressionEnabled" : null,
+        "hidden" : null,
+        "metadata" : { },
+        "required" : true,
+        "name" : "clientId",
+        "type" : "STRING",
+        "defaultValue" : null,
+        "exampleValue" : null,
+        "label" : "Client id",
+        "placeholder" : null,
+        "controlType" : "TEXT",
+        "languageId" : null,
+        "maxLength" : null,
+        "minLength" : null,
+        "options" : null,
+        "optionsDataSource" : null
+      }, {
+        "advancedOption" : null,
+        "description" : null,
+        "displayCondition" : null,
+        "expressionEnabled" : null,
+        "hidden" : null,
+        "metadata" : { },
+        "required" : true,
+        "name" : "clientSecret",
+        "type" : "STRING",
+        "defaultValue" : null,
+        "exampleValue" : null,
+        "label" : "Client secret",
+        "placeholder" : null,
+        "controlType" : "TEXT",
+        "languageId" : null,
+        "maxLength" : null,
+        "minLength" : null,
+        "options" : null,
+        "optionsDataSource" : null
+      } ],
+      "refreshOn" : null,
+      "title" : "OAuth2 Authorization Code",
+      "type" : "OAUTH2_AUTHORIZATION_CODE",
+      "acquire" : null,
+      "apply" : null,
+      "authorizationCallback" : null,
+      "authorizationUrl" : { },
+      "clientId" : null,
+      "clientSecret" : null,
+      "oauth2AuthorizationExtraQueryParameters" : null,
+      "pkce" : null,
+      "refresh" : null,
+      "refreshUrl" : null,
+      "scopes" : { },
+      "refreshToken" : null,
+      "tokenUrl" : { }
+    } ],
+    "properties" : null,
+    "version" : 1,
+    "authorizationRequired" : null,
+    "baseUri" : { },
+    "test" : null
+  },
+  "clusterElements" : null,
   "unifiedApi" : null,
   "triggers" : [ {
     "batch" : null,
@@ -7107,18 +7108,18 @@
     "type" : "DYNAMIC_WEBHOOK",
     "webhookRawBody" : null,
     "workflowSyncExecution" : null,
-    "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
-    "dynamicWebhookRefresh" : null,
-    "webhookValidateOnEnable" : null,
-    "deduplicate" : null,
     "poll" : null,
+    "deduplicate" : null,
     "webhookDisable" : { },
     "webhookEnable" : { },
+    "dynamicWebhookRefresh" : null,
+    "workflowNodeDescription" : null,
+    "processErrorResponse" : null,
     "webhookRequest" : { },
     "listenerDisable" : null,
     "listenerEnable" : null,
-    "webhookValidate" : null
+    "webhookValidate" : null,
+    "webhookValidateOnEnable" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -8067,18 +8068,17 @@
     "type" : "DYNAMIC_WEBHOOK",
     "webhookRawBody" : null,
     "workflowSyncExecution" : null,
-    "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
-    "dynamicWebhookRefresh" : null,
-    "webhookValidateOnEnable" : null,
-    "deduplicate" : null,
     "poll" : null,
+    "deduplicate" : null,
     "webhookDisable" : { },
     "webhookEnable" : { },
+    "dynamicWebhookRefresh" : null,
+    "workflowNodeDescription" : null,
+    "processErrorResponse" : null,
     "webhookRequest" : { },
     "listenerDisable" : null,
     "listenerEnable" : null,
-    "webhookValidate" : null
-  } ],
-  "clusterElements" : null
+    "webhookValidate" : null,
+    "webhookValidateOnEnable" : null
+  } ]
 }
