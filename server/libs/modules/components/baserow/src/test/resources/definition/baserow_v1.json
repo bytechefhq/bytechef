@@ -13,55 +13,6 @@
   "resources" : null,
   "version" : 1,
   "title" : "Baserow",
-  "connection" : {
-    "authorizations" : [ {
-      "detectOn" : null,
-      "description" : null,
-      "name" : "custom",
-      "properties" : [ {
-        "advancedOption" : null,
-        "description" : null,
-        "displayCondition" : null,
-        "expressionEnabled" : null,
-        "hidden" : null,
-        "metadata" : { },
-        "required" : true,
-        "name" : "token",
-        "type" : "STRING",
-        "defaultValue" : null,
-        "exampleValue" : null,
-        "label" : "Database Token",
-        "placeholder" : null,
-        "controlType" : "TEXT",
-        "languageId" : null,
-        "maxLength" : null,
-        "minLength" : null,
-        "options" : null,
-        "optionsDataSource" : null
-      } ],
-      "refreshOn" : null,
-      "title" : null,
-      "type" : "CUSTOM",
-      "acquire" : null,
-      "authorizationUrl" : null,
-      "clientSecret" : null,
-      "refreshToken" : null,
-      "apply" : { },
-      "clientId" : null,
-      "pkce" : null,
-      "refresh" : null,
-      "refreshUrl" : null,
-      "scopes" : null,
-      "tokenUrl" : null,
-      "oauth2AuthorizationExtraQueryParameters" : null,
-      "authorizationCallback" : null
-    } ],
-    "properties" : null,
-    "version" : 1,
-    "authorizationRequired" : null,
-    "baseUri" : { },
-    "test" : null
-  },
   "actions" : [ {
     "batch" : null,
     "deprecated" : null,
@@ -92,8 +43,8 @@
       "maxValue" : null,
       "minValue" : null,
       "options" : null,
-      "optionsDataSource" : null,
-      "controlType" : "INTEGER"
+      "controlType" : "INTEGER",
+      "optionsDataSource" : null
     }, {
       "advancedOption" : null,
       "description" : "The field names returned by this endpoint will be the actual names of the fields.",
@@ -136,8 +87,8 @@
     } ],
     "title" : "Create Row",
     "perform" : { },
-    "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "processErrorResponse" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -163,8 +114,8 @@
       "maxValue" : null,
       "minValue" : null,
       "options" : null,
-      "optionsDataSource" : null,
-      "controlType" : "INTEGER"
+      "controlType" : "INTEGER",
+      "optionsDataSource" : null
     }, {
       "advancedOption" : null,
       "description" : "ID of the row to be deleted.",
@@ -182,13 +133,13 @@
       "maxValue" : null,
       "minValue" : null,
       "options" : null,
-      "optionsDataSource" : null,
-      "controlType" : "INTEGER"
+      "controlType" : "INTEGER",
+      "optionsDataSource" : null
     } ],
     "title" : "Delete Row",
     "perform" : { },
-    "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "processErrorResponse" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -219,8 +170,8 @@
       "maxValue" : null,
       "minValue" : null,
       "options" : null,
-      "optionsDataSource" : null,
-      "controlType" : "INTEGER"
+      "controlType" : "INTEGER",
+      "optionsDataSource" : null
     }, {
       "advancedOption" : null,
       "description" : "ID of the row to get.",
@@ -238,8 +189,8 @@
       "maxValue" : null,
       "minValue" : null,
       "options" : null,
-      "optionsDataSource" : null,
-      "controlType" : "INTEGER"
+      "controlType" : "INTEGER",
+      "optionsDataSource" : null
     }, {
       "advancedOption" : null,
       "description" : "The field names returned by this endpoint will be the actual names of the fields.",
@@ -267,8 +218,8 @@
     } ],
     "title" : "Get Row",
     "perform" : { },
-    "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "processErrorResponse" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -299,8 +250,8 @@
       "maxValue" : null,
       "minValue" : null,
       "options" : null,
-      "optionsDataSource" : null,
-      "controlType" : "INTEGER"
+      "controlType" : "INTEGER",
+      "optionsDataSource" : null
     }, {
       "advancedOption" : null,
       "description" : "The maximum number of rows to retrieve.",
@@ -318,8 +269,8 @@
       "maxValue" : null,
       "minValue" : null,
       "options" : null,
-      "optionsDataSource" : null,
-      "controlType" : "INTEGER"
+      "controlType" : "INTEGER",
+      "optionsDataSource" : null
     }, {
       "advancedOption" : null,
       "description" : "If provided rows will be order by specific field. Use - sign for descending ordering.",
@@ -367,8 +318,8 @@
     } ],
     "title" : "List Rows",
     "perform" : { },
-    "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "processErrorResponse" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -399,8 +350,8 @@
       "maxValue" : null,
       "minValue" : null,
       "options" : null,
-      "optionsDataSource" : null,
-      "controlType" : "INTEGER"
+      "controlType" : "INTEGER",
+      "optionsDataSource" : null
     }, {
       "advancedOption" : null,
       "description" : "ID of the row to be updated.",
@@ -418,8 +369,8 @@
       "maxValue" : null,
       "minValue" : null,
       "options" : null,
-      "optionsDataSource" : null,
-      "controlType" : "INTEGER"
+      "controlType" : "INTEGER",
+      "optionsDataSource" : null
     }, {
       "advancedOption" : null,
       "description" : "The field names returned by this endpoint will be the actual names of the fields.",
@@ -462,10 +413,466 @@
     } ],
     "title" : "Update Row",
     "perform" : { },
-    "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "processErrorResponse" : null
   } ],
-  "clusterElements" : null,
+  "clusterElements" : [ {
+    "description" : "Creates a new row.",
+    "name" : "createRow",
+    "outputDefinition" : {
+      "output" : null,
+      "outputResponse" : null,
+      "outputSchema" : null,
+      "sampleOutput" : null
+    },
+    "properties" : [ {
+      "advancedOption" : null,
+      "description" : "ID of the table where the row must be created in.",
+      "displayCondition" : null,
+      "expressionEnabled" : null,
+      "hidden" : null,
+      "metadata" : { },
+      "required" : true,
+      "name" : "tableId",
+      "type" : "INTEGER",
+      "defaultValue" : null,
+      "exampleValue" : null,
+      "label" : "Table ID",
+      "placeholder" : null,
+      "maxValue" : null,
+      "minValue" : null,
+      "options" : null,
+      "controlType" : "INTEGER",
+      "optionsDataSource" : null
+    }, {
+      "advancedOption" : null,
+      "description" : "The field names returned by this endpoint will be the actual names of the fields.",
+      "displayCondition" : null,
+      "expressionEnabled" : null,
+      "hidden" : null,
+      "metadata" : { },
+      "required" : false,
+      "name" : "user_field_names",
+      "type" : "BOOLEAN",
+      "defaultValue" : true,
+      "exampleValue" : null,
+      "label" : "User Field Names",
+      "placeholder" : null,
+      "options" : [ {
+        "description" : null,
+        "label" : "True",
+        "value" : true
+      }, {
+        "description" : null,
+        "label" : "False",
+        "value" : false
+      } ],
+      "controlType" : "SELECT"
+    }, {
+      "advancedOption" : null,
+      "description" : null,
+      "displayCondition" : null,
+      "expressionEnabled" : null,
+      "hidden" : null,
+      "metadata" : { },
+      "required" : true,
+      "name" : "fields",
+      "type" : "DYNAMIC_PROPERTIES",
+      "header" : null,
+      "dynamicPropertiesDataSource" : {
+        "propertiesLookupDependsOn" : [ "tableId" ],
+        "properties" : { }
+      }
+    } ],
+    "title" : "Create Row",
+    "type" : {
+      "name" : "TOOLS",
+      "key" : "tools",
+      "label" : "Tools",
+      "multipleElements" : true,
+      "required" : false
+    },
+    "object" : { }
+  }, {
+    "description" : "Deletes the specified row.",
+    "name" : "deleteRow",
+    "outputDefinition" : null,
+    "properties" : [ {
+      "advancedOption" : null,
+      "description" : "ID of the table containing the row to be deleted.",
+      "displayCondition" : null,
+      "expressionEnabled" : null,
+      "hidden" : null,
+      "metadata" : { },
+      "required" : true,
+      "name" : "tableId",
+      "type" : "INTEGER",
+      "defaultValue" : null,
+      "exampleValue" : null,
+      "label" : "Table ID",
+      "placeholder" : null,
+      "maxValue" : null,
+      "minValue" : null,
+      "options" : null,
+      "controlType" : "INTEGER",
+      "optionsDataSource" : null
+    }, {
+      "advancedOption" : null,
+      "description" : "ID of the row to be deleted.",
+      "displayCondition" : null,
+      "expressionEnabled" : null,
+      "hidden" : null,
+      "metadata" : { },
+      "required" : true,
+      "name" : "rowId",
+      "type" : "INTEGER",
+      "defaultValue" : null,
+      "exampleValue" : null,
+      "label" : "Row ID",
+      "placeholder" : null,
+      "maxValue" : null,
+      "minValue" : null,
+      "options" : null,
+      "controlType" : "INTEGER",
+      "optionsDataSource" : null
+    } ],
+    "title" : "Delete Row",
+    "type" : {
+      "name" : "TOOLS",
+      "key" : "tools",
+      "label" : "Tools",
+      "multipleElements" : true,
+      "required" : false
+    },
+    "object" : { }
+  }, {
+    "description" : "Fetches a single table row.",
+    "name" : "getRow",
+    "outputDefinition" : {
+      "output" : null,
+      "outputResponse" : null,
+      "outputSchema" : null,
+      "sampleOutput" : null
+    },
+    "properties" : [ {
+      "advancedOption" : null,
+      "description" : "ID of the table where you want to get the row from.",
+      "displayCondition" : null,
+      "expressionEnabled" : null,
+      "hidden" : null,
+      "metadata" : { },
+      "required" : true,
+      "name" : "tableId",
+      "type" : "INTEGER",
+      "defaultValue" : null,
+      "exampleValue" : null,
+      "label" : "Table ID",
+      "placeholder" : null,
+      "maxValue" : null,
+      "minValue" : null,
+      "options" : null,
+      "controlType" : "INTEGER",
+      "optionsDataSource" : null
+    }, {
+      "advancedOption" : null,
+      "description" : "ID of the row to get.",
+      "displayCondition" : null,
+      "expressionEnabled" : null,
+      "hidden" : null,
+      "metadata" : { },
+      "required" : true,
+      "name" : "rowId",
+      "type" : "INTEGER",
+      "defaultValue" : null,
+      "exampleValue" : null,
+      "label" : "Row ID",
+      "placeholder" : null,
+      "maxValue" : null,
+      "minValue" : null,
+      "options" : null,
+      "controlType" : "INTEGER",
+      "optionsDataSource" : null
+    }, {
+      "advancedOption" : null,
+      "description" : "The field names returned by this endpoint will be the actual names of the fields.",
+      "displayCondition" : null,
+      "expressionEnabled" : null,
+      "hidden" : null,
+      "metadata" : { },
+      "required" : false,
+      "name" : "user_field_names",
+      "type" : "BOOLEAN",
+      "defaultValue" : true,
+      "exampleValue" : null,
+      "label" : "User Field Names",
+      "placeholder" : null,
+      "options" : [ {
+        "description" : null,
+        "label" : "True",
+        "value" : true
+      }, {
+        "description" : null,
+        "label" : "False",
+        "value" : false
+      } ],
+      "controlType" : "SELECT"
+    } ],
+    "title" : "Get Row",
+    "type" : {
+      "name" : "TOOLS",
+      "key" : "tools",
+      "label" : "Tools",
+      "multipleElements" : true,
+      "required" : false
+    },
+    "object" : { }
+  }, {
+    "description" : "Lists table rows.",
+    "name" : "listRows",
+    "outputDefinition" : {
+      "output" : null,
+      "outputResponse" : null,
+      "outputSchema" : null,
+      "sampleOutput" : null
+    },
+    "properties" : [ {
+      "advancedOption" : null,
+      "description" : "ID of the table where you want to get the rows from.",
+      "displayCondition" : null,
+      "expressionEnabled" : null,
+      "hidden" : null,
+      "metadata" : { },
+      "required" : true,
+      "name" : "tableId",
+      "type" : "INTEGER",
+      "defaultValue" : null,
+      "exampleValue" : null,
+      "label" : "Table ID",
+      "placeholder" : null,
+      "maxValue" : null,
+      "minValue" : null,
+      "options" : null,
+      "controlType" : "INTEGER",
+      "optionsDataSource" : null
+    }, {
+      "advancedOption" : null,
+      "description" : "The maximum number of rows to retrieve.",
+      "displayCondition" : null,
+      "expressionEnabled" : null,
+      "hidden" : null,
+      "metadata" : { },
+      "required" : false,
+      "name" : "size",
+      "type" : "INTEGER",
+      "defaultValue" : 100,
+      "exampleValue" : null,
+      "label" : "Size",
+      "placeholder" : null,
+      "maxValue" : null,
+      "minValue" : null,
+      "options" : null,
+      "controlType" : "INTEGER",
+      "optionsDataSource" : null
+    }, {
+      "advancedOption" : null,
+      "description" : "If provided rows will be order by specific field. Use - sign for descending ordering.",
+      "displayCondition" : null,
+      "expressionEnabled" : null,
+      "hidden" : null,
+      "metadata" : { },
+      "required" : false,
+      "name" : "order_by",
+      "type" : "STRING",
+      "defaultValue" : "id",
+      "exampleValue" : "My Field, -My Field 2",
+      "label" : "Order By",
+      "placeholder" : null,
+      "controlType" : "TEXT",
+      "languageId" : null,
+      "maxLength" : null,
+      "minLength" : null,
+      "options" : null,
+      "optionsDataSource" : null
+    }, {
+      "advancedOption" : null,
+      "description" : "The field names returned by this endpoint will be the actual names of the fields.",
+      "displayCondition" : null,
+      "expressionEnabled" : null,
+      "hidden" : null,
+      "metadata" : { },
+      "required" : false,
+      "name" : "user_field_names",
+      "type" : "BOOLEAN",
+      "defaultValue" : true,
+      "exampleValue" : null,
+      "label" : "User Field Names",
+      "placeholder" : null,
+      "options" : [ {
+        "description" : null,
+        "label" : "True",
+        "value" : true
+      }, {
+        "description" : null,
+        "label" : "False",
+        "value" : false
+      } ],
+      "controlType" : "SELECT"
+    } ],
+    "title" : "List Rows",
+    "type" : {
+      "name" : "TOOLS",
+      "key" : "tools",
+      "label" : "Tools",
+      "multipleElements" : true,
+      "required" : false
+    },
+    "object" : { }
+  }, {
+    "description" : "Updates the specified row.",
+    "name" : "updateRow",
+    "outputDefinition" : {
+      "output" : null,
+      "outputResponse" : null,
+      "outputSchema" : null,
+      "sampleOutput" : null
+    },
+    "properties" : [ {
+      "advancedOption" : null,
+      "description" : "ID of the table containing the row to be updated.",
+      "displayCondition" : null,
+      "expressionEnabled" : null,
+      "hidden" : null,
+      "metadata" : { },
+      "required" : true,
+      "name" : "tableId",
+      "type" : "INTEGER",
+      "defaultValue" : null,
+      "exampleValue" : null,
+      "label" : "Table ID",
+      "placeholder" : null,
+      "maxValue" : null,
+      "minValue" : null,
+      "options" : null,
+      "controlType" : "INTEGER",
+      "optionsDataSource" : null
+    }, {
+      "advancedOption" : null,
+      "description" : "ID of the row to be updated.",
+      "displayCondition" : null,
+      "expressionEnabled" : null,
+      "hidden" : null,
+      "metadata" : { },
+      "required" : true,
+      "name" : "rowId",
+      "type" : "INTEGER",
+      "defaultValue" : null,
+      "exampleValue" : null,
+      "label" : "Row ID",
+      "placeholder" : null,
+      "maxValue" : null,
+      "minValue" : null,
+      "options" : null,
+      "controlType" : "INTEGER",
+      "optionsDataSource" : null
+    }, {
+      "advancedOption" : null,
+      "description" : "The field names returned by this endpoint will be the actual names of the fields.",
+      "displayCondition" : null,
+      "expressionEnabled" : null,
+      "hidden" : null,
+      "metadata" : { },
+      "required" : false,
+      "name" : "user_field_names",
+      "type" : "BOOLEAN",
+      "defaultValue" : true,
+      "exampleValue" : null,
+      "label" : "User Field Names",
+      "placeholder" : null,
+      "options" : [ {
+        "description" : null,
+        "label" : "True",
+        "value" : true
+      }, {
+        "description" : null,
+        "label" : "False",
+        "value" : false
+      } ],
+      "controlType" : "SELECT"
+    }, {
+      "advancedOption" : null,
+      "description" : null,
+      "displayCondition" : null,
+      "expressionEnabled" : null,
+      "hidden" : null,
+      "metadata" : { },
+      "required" : true,
+      "name" : "fields",
+      "type" : "DYNAMIC_PROPERTIES",
+      "header" : null,
+      "dynamicPropertiesDataSource" : {
+        "propertiesLookupDependsOn" : [ "tableId" ],
+        "properties" : { }
+      }
+    } ],
+    "title" : "Update Row",
+    "type" : {
+      "name" : "TOOLS",
+      "key" : "tools",
+      "label" : "Tools",
+      "multipleElements" : true,
+      "required" : false
+    },
+    "object" : { }
+  } ],
   "unifiedApi" : null,
-  "triggers" : null
+  "triggers" : null,
+  "connection" : {
+    "authorizations" : [ {
+      "detectOn" : null,
+      "description" : null,
+      "name" : "custom",
+      "properties" : [ {
+        "advancedOption" : null,
+        "description" : null,
+        "displayCondition" : null,
+        "expressionEnabled" : null,
+        "hidden" : null,
+        "metadata" : { },
+        "required" : true,
+        "name" : "token",
+        "type" : "STRING",
+        "defaultValue" : null,
+        "exampleValue" : null,
+        "label" : "Database Token",
+        "placeholder" : null,
+        "controlType" : "TEXT",
+        "languageId" : null,
+        "maxLength" : null,
+        "minLength" : null,
+        "options" : null,
+        "optionsDataSource" : null
+      } ],
+      "refreshOn" : null,
+      "title" : null,
+      "type" : "CUSTOM",
+      "acquire" : null,
+      "apply" : { },
+      "authorizationCallback" : null,
+      "authorizationUrl" : null,
+      "clientId" : null,
+      "clientSecret" : null,
+      "oauth2AuthorizationExtraQueryParameters" : null,
+      "pkce" : null,
+      "refresh" : null,
+      "refreshUrl" : null,
+      "scopes" : null,
+      "refreshToken" : null,
+      "tokenUrl" : null
+    } ],
+    "properties" : null,
+    "version" : 1,
+    "authorizationRequired" : null,
+    "baseUri" : { },
+    "test" : null
+  }
 }
