@@ -20,36 +20,48 @@ import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.number;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.math.helper.constants.MathHelperConstants.FIRST_NUMBER;
+import static com.bytechef.component.math.helper.constants.MathHelperConstants.MULTIPLICATION;
+import static com.bytechef.component.math.helper.constants.MathHelperConstants.MULTIPLICATION_DESCRIPTION;
+import static com.bytechef.component.math.helper.constants.MathHelperConstants.MULTIPLICATION_TITLE;
 import static com.bytechef.component.math.helper.constants.MathHelperConstants.SECOND_NUMBER;
 
-import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
+import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
+import com.bytechef.component.definition.Property;
+import com.bytechef.component.definition.Property.NumberProperty;
+import com.bytechef.definition.BaseOutputDefinition.OutputSchema;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 /**
  * @author Monika Kušter
  */
 public class MathHelperMultiplicationAction {
 
-    public static final ModifiableActionDefinition ACTION_DEFINITION = action("multiplication")
-        .title("Multiplication")
-        .description("Multiply two numbers.")
-        .properties(
-            number(FIRST_NUMBER)
-                .label("First Number")
-                .required(true),
-            number(SECOND_NUMBER)
-                .label("Second Number")
-                .required(true))
-        .output(outputSchema(number().description("Result of multiplication.")))
+    @SuppressFBWarnings("MS")
+    public static final Property[] PROPERTIES = {
+        number(FIRST_NUMBER)
+            .label("First Number")
+            .required(true),
+        number(SECOND_NUMBER)
+            .label("Second Number")
+            .required(true)
+    };
+
+    public static final OutputSchema<NumberProperty> OUTPUT_SCHEMA = outputSchema(
+        number().description("Result of multiplication."));
+
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action(MULTIPLICATION)
+        .title(MULTIPLICATION_TITLE)
+        .description(MULTIPLICATION_DESCRIPTION)
+        .properties(PROPERTIES)
+        .output(OUTPUT_SCHEMA)
         .perform(MathHelperMultiplicationAction::perform);
 
     private MathHelperMultiplicationAction() {
     }
 
-    protected static Double perform(
-        Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) {
-
+    public static Double perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
         double firstNumber = inputParameters.getRequiredDouble(FIRST_NUMBER);
         double secondNumber = inputParameters.getRequiredDouble(SECOND_NUMBER);
 

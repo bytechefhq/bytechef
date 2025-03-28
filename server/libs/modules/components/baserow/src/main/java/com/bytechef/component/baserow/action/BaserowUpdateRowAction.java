@@ -20,45 +20,53 @@ import static com.bytechef.component.baserow.constant.BaserowConstants.FIELDS;
 import static com.bytechef.component.baserow.constant.BaserowConstants.FIELDS_DYNAMIC_PROPERTY;
 import static com.bytechef.component.baserow.constant.BaserowConstants.ROW_ID;
 import static com.bytechef.component.baserow.constant.BaserowConstants.TABLE_ID;
+import static com.bytechef.component.baserow.constant.BaserowConstants.UPDATE_ROW;
+import static com.bytechef.component.baserow.constant.BaserowConstants.UPDATE_ROW_DESCRIPTION;
+import static com.bytechef.component.baserow.constant.BaserowConstants.UPDATE_ROW_TITLE;
 import static com.bytechef.component.baserow.constant.BaserowConstants.USER_FIELD_NAMES;
 import static com.bytechef.component.baserow.constant.BaserowConstants.USER_FIELD_NAMES_PROPERTY;
 import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.integer;
 
-import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
+import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Parameters;
+import com.bytechef.component.definition.Property;
 import com.bytechef.component.definition.TypeReference;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 public class BaserowUpdateRowAction {
 
-    public static final ModifiableActionDefinition ACTION_DEFINITION = action("updateRow")
-        .title("Update Row")
-        .description("Updates the specified row.")
-        .properties(
-            integer(TABLE_ID)
-                .label("Table ID")
-                .description("ID of the table containing the row to be updated.")
-                .required(true),
-            integer(ROW_ID)
-                .label("Row ID")
-                .description("ID of the row to be updated.")
-                .required(true),
-            USER_FIELD_NAMES_PROPERTY,
-            FIELDS_DYNAMIC_PROPERTY)
+    @SuppressFBWarnings("MS")
+    public static final Property[] PROPERTIES = {
+        integer(TABLE_ID)
+            .label("Table ID")
+            .description("ID of the table containing the row to be updated.")
+            .required(true),
+        integer(ROW_ID)
+            .label("Row ID")
+            .description("ID of the row to be updated.")
+            .required(true),
+        USER_FIELD_NAMES_PROPERTY,
+        FIELDS_DYNAMIC_PROPERTY
+    };
+
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action(UPDATE_ROW)
+        .title(UPDATE_ROW_TITLE)
+        .description(UPDATE_ROW_DESCRIPTION)
+        .properties(PROPERTIES)
         .output()
         .perform(BaserowUpdateRowAction::perform);
 
     private BaserowUpdateRowAction() {
     }
 
-    protected static Object perform(
-        Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) {
-
-        return actionContext
-            .http(http -> http.patch("/database/rows/table/" + inputParameters.getRequiredString(TABLE_ID) + "/"
-                + inputParameters.getRequiredString(ROW_ID) + "/"))
+    public static Object perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
+        return context
+            .http(http -> http.patch(
+                "/database/rows/table/%s/%s/"
+                    .formatted(inputParameters.getRequiredString(TABLE_ID), inputParameters.getRequiredString(ROW_ID))))
             .queryParameter(USER_FIELD_NAMES, inputParameters.getString(USER_FIELD_NAMES))
             .body(Http.Body.of(inputParameters.getRequiredMap(FIELDS)))
             .configuration(Http.responseType(Http.ResponseType.JSON))

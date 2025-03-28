@@ -50,6 +50,7 @@ import com.bytechef.component.definition.ComponentDsl.ModifiableObjectProperty;
 import com.bytechef.component.definition.ComponentDsl.ModifiableStringProperty;
 import com.bytechef.component.definition.ComponentDsl.ModifiableTimeProperty;
 import com.bytechef.component.definition.ComponentDsl.ModifiableValueProperty;
+import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.Property.ControlType;
@@ -277,7 +278,7 @@ public class MondayPropertiesUtils {
     }
 
     public static Map<String, Object> convertPropertyToMondayColumnValue(
-        Map<String, ?> columnValuesInput, String boardId, ActionContext actionContext) {
+        Map<String, ?> columnValuesInput, String boardId, Context context) {
 
         Map<String, Object> mondayColumnValues = new HashMap<>();
 
@@ -285,7 +286,7 @@ public class MondayPropertiesUtils {
             String key = entry.getKey();
 
             if (!Objects.equals(key, "")) {
-                Map<String, String> columnIdTypeMap = generateColumnIdTypeMap(boardId, actionContext);
+                Map<String, String> columnIdTypeMap = generateColumnIdTypeMap(boardId, context);
 
                 MondayColumnType enumType = getColumnTypeByName(columnIdTypeMap.get(key));
 
@@ -323,8 +324,8 @@ public class MondayPropertiesUtils {
         return mondayColumnValues;
     }
 
-    private static Map<String, String> generateColumnIdTypeMap(String boardId, ActionContext actionContext) {
-        List<?> boardColumns = getBoardColumns(boardId, actionContext);
+    private static Map<String, String> generateColumnIdTypeMap(String boardId, Context context) {
+        List<?> boardColumns = getBoardColumns(boardId, context);
 
         Map<String, String> columnIdTypeMap = new HashMap<>();
 
