@@ -53,7 +53,8 @@ public class ElevenLabsCreateTranscriptAction {
             fileEntry(FILE)
                 .label("File")
                 .description(
-                    "The file to transcribe. All major audio and video formats are supported. The file size must be less than 1GB.")
+                    "The file to transcribe. All major audio and video formats are supported. The file size must be " +
+                        "less than 1GB.")
                 .required(true))
         .output(
             outputSchema(
@@ -78,11 +79,9 @@ public class ElevenLabsCreateTranscriptAction {
                                             .description("The end time of the word or sound in seconds"),
                                         string("type")
                                             .description(
-                                                "The type of the word or sound. ‘audio_event’ is used for non-word sounds like laughter or footsteps."
-                                                    +
-                                                    "Allowed values: word, spacing and audio_event.")))
-
-                    )))
+                                                "The type of the word or sound. ‘audio_event’ is used for non-word " +
+                                                    "sounds like laughter or footsteps. Allowed values: word, " +
+                                                    "spacing and audio_event."))))))
         .perform(ElevenLabsCreateTranscriptAction::perform);
 
     private ElevenLabsCreateTranscriptAction() {

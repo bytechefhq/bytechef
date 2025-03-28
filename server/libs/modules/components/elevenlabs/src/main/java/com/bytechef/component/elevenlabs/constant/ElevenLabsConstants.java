@@ -15,7 +15,9 @@
  */
 
 package com.bytechef.component.elevenlabs.constant;
-
+/**
+ * @author Nikolina Spehar
+ */
 public class ElevenLabsConstants {
 
     public static final String FILE = "file";
@@ -23,9 +25,6 @@ public class ElevenLabsConstants {
     public static final String TEXT = "text";
     public static final String VOICE_ID = "voiceId";
 
-    /**
-     * @author Nikolina Spehar
-     */
     private ElevenLabsConstants() {
     }
 }

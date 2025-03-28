@@ -36,7 +36,8 @@ public class ElevenLabsCreateSoundEffectAction {
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("createSoundEffect")
         .title("Create Sound Effect")
         .description(
-            "Turn text into sound effects for your videos, voice-overs or video games using the most advanced sound effects model in the world.")
+            "Turn text into sound effects for your videos, voice-overs or video games using the most advanced sound " +
+                "effects model in the world.")
         .properties(
             string(TEXT)
                 .label("Text")
@@ -48,14 +49,11 @@ public class ElevenLabsCreateSoundEffectAction {
     private ElevenLabsCreateSoundEffectAction() {
     }
 
-    public static Object perform(
-        Parameters inputParameters, Parameters connectionParameters, Context context) {
-
+    public static Object perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
         return context
             .http(http -> http.post("/sound-generation"))
             .header("Content-Type", "audio/mpeg")
-            .body(Body.of(
-                Map.of(TEXT, inputParameters.getRequiredString(TEXT))))
+            .body(Body.of(Map.of(TEXT, inputParameters.getRequiredString(TEXT))))
             .configuration(responseType(ResponseType.BINARY))
             .execute();
     }

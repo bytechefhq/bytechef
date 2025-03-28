@@ -23,7 +23,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Context.Http.Body;
 import com.bytechef.component.definition.Parameters;
@@ -39,7 +39,7 @@ import org.mockito.ArgumentCaptor;
 class ElevenLabsCreateSpeechWithTimingActionTest {
 
     private final ArgumentCaptor<Body> bodyArgumentCaptor = ArgumentCaptor.forClass(Body.class);
-    private final ActionContext mockedActionContext = mock(ActionContext.class);
+    private final Context mockedContext = mock(Context.class);
     private final Http.Executor mockedExecutor = mock(Http.Executor.class);
     private final Parameters mockedParameters = MockParametersFactory.create(
         Map.of(VOICE_ID, "21m00Tcm4TlvDq8ikWAM", TEXT, "This is text that will be converted to speech."));
@@ -48,7 +48,7 @@ class ElevenLabsCreateSpeechWithTimingActionTest {
 
     @Test
     void testPerform() {
-        when(mockedActionContext.http(any()))
+        when(mockedContext.http(any()))
             .thenReturn(mockedExecutor);
         when(mockedExecutor.configuration(any()))
             .thenReturn(mockedExecutor);
@@ -60,14 +60,12 @@ class ElevenLabsCreateSpeechWithTimingActionTest {
             .thenReturn(mockedResult);
 
         Map<String, Object> result = ElevenLabsCreateSpeechWithTimingAction.perform(
-            mockedParameters, mockedParameters, mockedActionContext);
+            mockedParameters, mockedParameters, mockedContext);
 
         assertEquals(mockedResult, result);
 
         Body body = bodyArgumentCaptor.getValue();
 
-        assertEquals(
-            Map.of(TEXT, mockedParameters.getRequiredString(TEXT)),
-            body.getContent());
+        assertEquals(Map.of(TEXT, mockedParameters.getRequiredString(TEXT)), body.getContent());
     }
 }
