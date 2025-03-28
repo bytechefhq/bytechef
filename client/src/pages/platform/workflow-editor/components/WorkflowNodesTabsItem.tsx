@@ -38,7 +38,13 @@ const WorkflowNodesTabsItem = ({draggable, handleClick, node, selected}: Workflo
             )}
             draggable={draggable}
             id={node?.title}
-            onClick={handleClick}
+            onClick={(event) => {
+                if (handleClick) {
+                    handleClick();
+                }
+
+                event.stopPropagation();
+            }}
             onDragStart={(event) => onDragStart(event)}
         >
             {node.icon ? (

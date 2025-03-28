@@ -130,6 +130,7 @@ module.exports = {
                     neutral: {
                         'primary-hover': 'hsl(var(--surface-neutral-primary-hover))',
                         secondary: 'hsl(var(--surface-neutral-secondary))',
+                        'secondary-hover': 'hsl(var(--surface-neutral-secondary-hover))',
                         tertiary: 'hsl(var(--surface-neutral-tertiary))',
                     },
                 },

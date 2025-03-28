@@ -18,6 +18,7 @@ import PlaceholderEdge from '../edges/PlaceholderEdge';
 import WorkflowEdge from '../edges/WorkflowEdge';
 import useHandleDrop from '../hooks/useHandleDrop';
 import useLayout from '../hooks/useLayout';
+import AIAgentNode from '../nodes/AIAgentNode';
 import LoopLeftGhostNode from '../nodes/LoopLeftGhostNode';
 import PlaceholderNode from '../nodes/PlaceholderNode';
 import TaskDispatcherBottomGhostNode from '../nodes/TaskDispatcherBottomGhostNode';
@@ -57,6 +58,7 @@ const WorkflowEditor = ({
 
     const nodeTypes = useMemo(
         () => ({
+            aiAgentNode: AIAgentNode,
             loopLeftGhostNode: LoopLeftGhostNode,
             placeholder: PlaceholderNode,
             taskDispatcherBottomGhostNode: TaskDispatcherBottomGhostNode,
