@@ -4,6 +4,7 @@ export * from './ActionDefinitionApi';
 export * from './ClusterElementDefinitionApi';
 export * from './ComponentDefinitionApi';
 export * from './ConnectionDefinitionApi';
+export * from './NotificationApi';
 export * from './Oauth2Api';
 export * from './TaskDispatcherDefinitionApi';
 export * from './TriggerDefinitionApi';
