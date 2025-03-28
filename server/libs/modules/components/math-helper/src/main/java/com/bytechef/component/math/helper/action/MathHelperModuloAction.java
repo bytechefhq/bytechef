@@ -20,11 +20,18 @@ import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.number;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.math.helper.constants.MathHelperConstants.FIRST_NUMBER;
+import static com.bytechef.component.math.helper.constants.MathHelperConstants.MODULO;
+import static com.bytechef.component.math.helper.constants.MathHelperConstants.MODULO_DESCRIPTION;
+import static com.bytechef.component.math.helper.constants.MathHelperConstants.MODULO_TITLE;
 import static com.bytechef.component.math.helper.constants.MathHelperConstants.SECOND_NUMBER;
 
-import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
+import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
+import com.bytechef.component.definition.Property;
+import com.bytechef.component.definition.Property.NumberProperty;
+import com.bytechef.definition.BaseOutputDefinition.OutputSchema;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.math.BigDecimal;
 
 /**
@@ -32,27 +39,32 @@ import java.math.BigDecimal;
  */
 public class MathHelperModuloAction {
 
-    public static final ModifiableActionDefinition ACTION_DEFINITION = action("modulo")
-        .title("Modulo")
-        .description("Get the remainder of the division of two numbers.")
-        .properties(
-            number(FIRST_NUMBER)
-                .label("First Number")
-                .description("Number to be divided.")
-                .required(true),
-            number(SECOND_NUMBER)
-                .label("Second Number")
-                .description("Number to divide by.")
-                .required(true))
-        .output(outputSchema(number().description("Result of modulo.")))
+    @SuppressFBWarnings("MS")
+    public static final Property[] PROPERTIES = {
+        number(FIRST_NUMBER)
+            .label("First Number")
+            .description("Number to be divided.")
+            .required(true),
+        number(SECOND_NUMBER)
+            .label("Second Number")
+            .description("Number to divide by.")
+            .required(true)
+    };
+
+    public static final OutputSchema<NumberProperty> OUTPUT_SCHEMA = outputSchema(
+        number().description("Result of modulo."));
+
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action(MODULO)
+        .title(MODULO_TITLE)
+        .description(MODULO_DESCRIPTION)
+        .properties(PROPERTIES)
+        .output(OUTPUT_SCHEMA)
         .perform(MathHelperModuloAction::perform);
 
     private MathHelperModuloAction() {
     }
 
-    protected static Double perform(
-        Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) {
-
+    public static Double perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
         BigDecimal firstNumber = BigDecimal.valueOf(inputParameters.getRequiredDouble(FIRST_NUMBER));
         BigDecimal secondNumber = BigDecimal.valueOf(inputParameters.getRequiredDouble(SECOND_NUMBER));
 

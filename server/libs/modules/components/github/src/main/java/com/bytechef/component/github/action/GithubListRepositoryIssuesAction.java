@@ -22,16 +22,23 @@ import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.Context.Http.responseType;
 import static com.bytechef.component.github.constant.GithubConstants.ISSUE_OUTPUT_PROPERTY;
+import static com.bytechef.component.github.constant.GithubConstants.LIST_REPOSITORY_ISSUES;
+import static com.bytechef.component.github.constant.GithubConstants.LIST_REPOSITORY_ISSUES_DESCRIPTION;
+import static com.bytechef.component.github.constant.GithubConstants.LIST_REPOSITORY_ISSUES_TITLE;
 import static com.bytechef.component.github.constant.GithubConstants.REPOSITORY;
 import static com.bytechef.component.github.util.GithubUtils.getOwnerName;
 
-import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
+import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http.ResponseType;
 import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.Parameters;
+import com.bytechef.component.definition.Property;
+import com.bytechef.component.definition.Property.ArrayProperty;
 import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.github.util.GithubUtils;
+import com.bytechef.definition.BaseOutputDefinition.OutputSchema;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Map;
 
@@ -40,31 +47,36 @@ import java.util.Map;
  */
 public class GithubListRepositoryIssuesAction {
 
-    public static final ModifiableActionDefinition ACTION_DEFINITION = action("listRepositoryIssues")
-        .title("List Repository Issues")
-        .description("Lists issues in a repository. Only open issues will be listed.")
-        .properties(
-            string(REPOSITORY)
-                .label("Repository")
-                .options((ActionOptionsFunction<String>) GithubUtils::getRepositoryOptions)
-                .description("The name of the repository")
-                .required(true))
-        .output(
-            outputSchema(
-                array()
-                    .description("List of issues in the repository.")
-                    .items(ISSUE_OUTPUT_PROPERTY)))
+    @SuppressFBWarnings("MS")
+    public static final Property[] PROPERTIES = {
+        string(REPOSITORY)
+            .label("Repository")
+            .options((ActionOptionsFunction<String>) GithubUtils::getRepositoryOptions)
+            .description("The name of the repository")
+            .required(true)
+    };
+
+    public static final OutputSchema<ArrayProperty> OUTPUT_SCHEMA = outputSchema(
+        array()
+            .description("List of issues in the repository.")
+            .items(ISSUE_OUTPUT_PROPERTY));
+
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action(LIST_REPOSITORY_ISSUES)
+        .title(LIST_REPOSITORY_ISSUES_TITLE)
+        .description(LIST_REPOSITORY_ISSUES_DESCRIPTION)
+        .properties(PROPERTIES)
+        .output(OUTPUT_SCHEMA)
         .perform(GithubListRepositoryIssuesAction::perform);
 
     private GithubListRepositoryIssuesAction() {
     }
 
-    protected static List<Map<String, Object>> perform(
-        Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) {
+    public static List<Map<String, Object>> perform(
+        Parameters inputParameters, Parameters connectionParameters, Context context) {
 
-        return actionContext
+        return context
             .http(http -> http.get(
-                "/repos/" + getOwnerName(actionContext) + "/" + inputParameters.getRequiredString(REPOSITORY) +
+                "/repos/" + getOwnerName(context) + "/" + inputParameters.getRequiredString(REPOSITORY) +
                     "/issues"))
             .configuration(responseType(ResponseType.JSON))
             .execute()

@@ -22,6 +22,9 @@ import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.monday.constant.MondayConstants.BOARD_ID;
+import static com.bytechef.component.monday.constant.MondayConstants.CREATE_ITEM;
+import static com.bytechef.component.monday.constant.MondayConstants.CREATE_ITEM_DESCRIPTION;
+import static com.bytechef.component.monday.constant.MondayConstants.CREATE_ITEM_TITLE;
 import static com.bytechef.component.monday.constant.MondayConstants.DATA;
 import static com.bytechef.component.monday.constant.MondayConstants.GROUP_ID;
 import static com.bytechef.component.monday.constant.MondayConstants.ID;
@@ -31,12 +34,16 @@ import static com.bytechef.component.monday.constant.MondayConstants.WORKSPACE_I
 import static com.bytechef.component.monday.util.MondayPropertiesUtils.convertPropertyToMondayColumnValue;
 import static com.bytechef.component.monday.util.MondayUtils.executeGraphQLQuery;
 
-import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
+import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.Parameters;
+import com.bytechef.component.definition.Property;
+import com.bytechef.component.definition.Property.ObjectProperty;
 import com.bytechef.component.monday.util.MondayOptionUtils;
 import com.bytechef.component.monday.util.MondayPropertiesUtils;
+import com.bytechef.definition.BaseOutputDefinition.OutputSchema;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Map;
 
 /**
@@ -44,56 +51,59 @@ import java.util.Map;
  */
 public class MondayCreateItemAction {
 
-    public static final ModifiableActionDefinition ACTION_DEFINITION = action("createItem")
-        .title("Create Item")
-        .description("Create a new item in a board.")
-        .properties(
-            string(WORKSPACE_ID)
-                .label("Workspace ID")
-                .options((ActionOptionsFunction<String>) MondayOptionUtils::getWorkspaceIdOptions)
-                .required(true),
-            string(BOARD_ID)
-                .label("Board ID")
-                .description("ID of the board where new item will be created.")
-                .options((ActionOptionsFunction<String>) MondayOptionUtils::getBoardIdOptions)
-                .optionsLookupDependsOn(WORKSPACE_ID)
-                .required(true),
-            string(GROUP_ID)
-                .label("Group ID")
-                .description("The item's group.")
-                .options((ActionOptionsFunction<String>) MondayOptionUtils::getGroupIdOptions)
-                .optionsLookupDependsOn(WORKSPACE_ID, BOARD_ID)
-                .required(false),
-            string(ITEM_NAME)
-                .label("Item Name")
-                .description("The item's name.")
-                .required(true),
-            dynamicProperties("columnValues")
-                .properties(MondayPropertiesUtils::createPropertiesForItem)
-                .propertiesLookupDependsOn(WORKSPACE_ID, BOARD_ID, GROUP_ID)
-                .required(false))
-        .output(
-            outputSchema(
-                object()
+    @SuppressFBWarnings("MS")
+    public static final Property[] PROPERTIES = {
+        string(WORKSPACE_ID)
+            .label("Workspace ID")
+            .options((ActionOptionsFunction<String>) MondayOptionUtils::getWorkspaceIdOptions)
+            .required(true),
+        string(BOARD_ID)
+            .label("Board ID")
+            .description("ID of the board where new item will be created.")
+            .options((ActionOptionsFunction<String>) MondayOptionUtils::getBoardIdOptions)
+            .optionsLookupDependsOn(WORKSPACE_ID)
+            .required(true),
+        string(GROUP_ID)
+            .label("Group ID")
+            .description("The item's group.")
+            .options((ActionOptionsFunction<String>) MondayOptionUtils::getGroupIdOptions)
+            .optionsLookupDependsOn(WORKSPACE_ID, BOARD_ID)
+            .required(false),
+        string(ITEM_NAME)
+            .label("Item Name")
+            .description("The item's name.")
+            .required(true),
+        dynamicProperties("columnValues")
+            .properties(MondayPropertiesUtils::createPropertiesForItem)
+            .propertiesLookupDependsOn(WORKSPACE_ID, BOARD_ID, GROUP_ID)
+            .required(false)
+    };
+
+    public static final OutputSchema<ObjectProperty> OUTPUT_SCHEMA = outputSchema(
+        object()
+            .properties(
+                object("create_item")
                     .properties(
-                        object("create_item")
-                            .properties(
-                                string(ID)
-                                    .description("ID of the item."),
-                                string(NAME)
-                                    .description("Name of the item.")))))
+                        string(ID)
+                            .description("ID of the item."),
+                        string(NAME)
+                            .description("Name of the item."))));
+
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action(CREATE_ITEM)
+        .title(CREATE_ITEM_TITLE)
+        .description(CREATE_ITEM_DESCRIPTION)
+        .properties(PROPERTIES)
+        .output(OUTPUT_SCHEMA)
         .perform(MondayCreateItemAction::perform);
 
     private MondayCreateItemAction() {
     }
 
-    public static Object perform(
-        Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) {
-
+    public static Object perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
         Map<String, Object> mondayColumnValues = convertPropertyToMondayColumnValue(
-            inputParameters.getMap("columnValues"), inputParameters.getRequiredString(BOARD_ID), actionContext);
+            inputParameters.getMap("columnValues"), inputParameters.getRequiredString(BOARD_ID), context);
 
-        String jsonMondayColumnValues = actionContext.json(json -> json.write(mondayColumnValues));
+        String jsonMondayColumnValues = context.json(json -> json.write(mondayColumnValues));
         String query =
             "mutation{create_item(board_id: %s, group_id: \"%s\", item_name: \"%s\", column_values:\"%s\"){id name}}"
                 .formatted(
@@ -101,7 +111,7 @@ public class MondayCreateItemAction {
                     inputParameters.getRequiredString(ITEM_NAME),
                     jsonMondayColumnValues.replace("\"", "\\\""));
 
-        Map<String, Object> body = executeGraphQLQuery(query, actionContext);
+        Map<String, Object> body = executeGraphQLQuery(query, context);
 
         return body.get(DATA);
     }

@@ -23,39 +23,46 @@ import static com.bytechef.component.definition.Context.Http.ResponseType;
 import static com.bytechef.component.definition.Context.Http.responseType;
 import static com.bytechef.component.github.constant.GithubConstants.OWNER;
 import static com.bytechef.component.github.constant.GithubConstants.REPOSITORY;
+import static com.bytechef.component.github.constant.GithubConstants.STAR_REPOSITORY;
+import static com.bytechef.component.github.constant.GithubConstants.STAR_REPOSITORY_DESCRIPTION;
+import static com.bytechef.component.github.constant.GithubConstants.STAR_REPOSITORY_TITLE;
 
-import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
+import com.bytechef.component.definition.Property;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 /**
  * @author Monika Kušter
  */
 public class GithubStarRepositoryAction {
 
-    public static final ModifiableActionDefinition ACTION_DEFINITION = action("starRepository")
-        .title("Star Repository")
-        .description("Stars a repository for the authenticated user.")
-        .properties(
-            string(OWNER)
-                .label("Owner")
-                .description("The account owner of the repository. The name is not case sensitive.")
-                .exampleValue("bytechefhq")
-                .required(true),
-            string(REPOSITORY)
-                .label("Repository")
-                .description(
-                    "The name of the repository including owner without the .git extension. The name is not case " +
-                        "sensitive.")
-                .exampleValue("bytechef")
-                .required(true))
+    @SuppressFBWarnings("MS")
+    public static final Property[] PROPERTIES = {
+        string(OWNER)
+            .label("Owner")
+            .description("The account owner of the repository. The name is not case sensitive.")
+            .exampleValue("bytechefhq")
+            .required(true),
+        string(REPOSITORY)
+            .label("Repository")
+            .description(
+                "The name of the repository including owner without the .git extension. The name is not case " +
+                    "sensitive.")
+            .exampleValue("bytechef")
+            .required(true)
+    };
+
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action(STAR_REPOSITORY)
+        .title(STAR_REPOSITORY_TITLE)
+        .description(STAR_REPOSITORY_DESCRIPTION)
+        .properties(PROPERTIES)
         .perform(GithubStarRepositoryAction::perform);
 
     private GithubStarRepositoryAction() {
     }
 
-    public static Object perform(
-        Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
-
+    public static Object perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
         context.http(http -> http.put(
             "/user/starred/" + inputParameters.getRequiredString(OWNER) + "/"
                 + inputParameters.getRequiredString(REPOSITORY)))

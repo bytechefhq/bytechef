@@ -21,19 +21,26 @@ import static com.bytechef.component.definition.ComponentDsl.array;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.Context.Http.responseType;
+import static com.bytechef.component.github.constant.GithubConstants.ADD_ASSIGNEES_TO_ISSUE;
+import static com.bytechef.component.github.constant.GithubConstants.ADD_ASSIGNEES_TO_ISSUE_DESCRIPTION;
+import static com.bytechef.component.github.constant.GithubConstants.ADD_ASSIGNEES_TO_ISSUE_TITLE;
 import static com.bytechef.component.github.constant.GithubConstants.ASSIGNEES;
 import static com.bytechef.component.github.constant.GithubConstants.ISSUE;
 import static com.bytechef.component.github.constant.GithubConstants.ISSUE_OUTPUT_PROPERTY;
 import static com.bytechef.component.github.constant.GithubConstants.REPOSITORY;
 import static com.bytechef.component.github.util.GithubUtils.getOwnerName;
 
-import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
+import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.Parameters;
+import com.bytechef.component.definition.Property;
+import com.bytechef.component.definition.Property.ObjectProperty;
 import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.github.util.GithubUtils;
+import com.bytechef.definition.BaseOutputDefinition.OutputSchema;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Map;
 
 /**
@@ -41,36 +48,42 @@ import java.util.Map;
  */
 public class GithubAddAssigneesToIssueAction {
 
-    public static final ModifiableActionDefinition ACTION_DEFINITION = action("addAssigneesToIssue")
-        .title("Add Assignee to Issue")
-        .description("Adds an assignees to the specified issue.")
-        .properties(
-            string(REPOSITORY)
-                .options((ActionOptionsFunction<String>) GithubUtils::getRepositoryOptions)
-                .label("Repository")
-                .required(true),
-            string(ISSUE)
-                .options((ActionOptionsFunction<String>) GithubUtils::getIssueOptions)
-                .optionsLookupDependsOn(REPOSITORY)
-                .label("Issue Number")
-                .description("The number of the issue to add assignee to.")
-                .required(true),
-            array(ASSIGNEES)
-                .label("Assignees")
-                .description("The list of assignees to add to the issue.")
-                .items(string())
-                .maxItems(10)
-                .options((ActionOptionsFunction<String>) GithubUtils::getCollaborators)
-                .optionsLookupDependsOn(REPOSITORY)
-                .required(true))
-        .output(outputSchema(ISSUE_OUTPUT_PROPERTY))
+    @SuppressFBWarnings("MS")
+    public static final Property[] PROPERTIES = {
+        string(REPOSITORY)
+            .options((ActionOptionsFunction<String>) GithubUtils::getRepositoryOptions)
+            .label("Repository")
+            .required(true),
+        string(ISSUE)
+            .options((ActionOptionsFunction<String>) GithubUtils::getIssueOptions)
+            .optionsLookupDependsOn(REPOSITORY)
+            .label("Issue Number")
+            .description("The number of the issue to add assignee to.")
+            .required(true),
+        array(ASSIGNEES)
+            .label("Assignees")
+            .description("The list of assignees to add to the issue.")
+            .items(string())
+            .maxItems(10)
+            .options((ActionOptionsFunction<String>) GithubUtils::getCollaborators)
+            .optionsLookupDependsOn(REPOSITORY)
+            .required(true)
+    };
+
+    public static final OutputSchema<ObjectProperty> OUTPUT_SCHEMA = outputSchema(ISSUE_OUTPUT_PROPERTY);
+
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action(ADD_ASSIGNEES_TO_ISSUE)
+        .title(ADD_ASSIGNEES_TO_ISSUE_TITLE)
+        .description(ADD_ASSIGNEES_TO_ISSUE_DESCRIPTION)
+        .properties(PROPERTIES)
+        .output(OUTPUT_SCHEMA)
         .perform(GithubAddAssigneesToIssueAction::perform);
 
     private GithubAddAssigneesToIssueAction() {
     }
 
     public static Map<String, Object> perform(
-        Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
+        Parameters inputParameters, Parameters connectionParameters, Context context) {
 
         return context
             .http(http -> http.post(

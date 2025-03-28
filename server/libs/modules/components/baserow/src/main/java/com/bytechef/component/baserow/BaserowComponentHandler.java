@@ -24,6 +24,11 @@ import com.bytechef.component.baserow.action.BaserowDeleteRowAction;
 import com.bytechef.component.baserow.action.BaserowGetRowAction;
 import com.bytechef.component.baserow.action.BaserowListRowsAction;
 import com.bytechef.component.baserow.action.BaserowUpdateRowAction;
+import com.bytechef.component.baserow.cluster.BaserowCreateRowTool;
+import com.bytechef.component.baserow.cluster.BaserowDeleteRowTool;
+import com.bytechef.component.baserow.cluster.BaserowGetRowTool;
+import com.bytechef.component.baserow.cluster.BaserowListRowsTool;
+import com.bytechef.component.baserow.cluster.BaserowUpdateRowTool;
 import com.bytechef.component.baserow.connection.BaserowConnection;
 import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDefinition;
@@ -49,7 +54,13 @@ public class BaserowComponentHandler implements ComponentHandler {
             BaserowDeleteRowAction.ACTION_DEFINITION,
             BaserowGetRowAction.ACTION_DEFINITION,
             BaserowListRowsAction.ACTION_DEFINITION,
-            BaserowUpdateRowAction.ACTION_DEFINITION);
+            BaserowUpdateRowAction.ACTION_DEFINITION)
+        .clusterElements(
+            BaserowCreateRowTool.CLUSTER_ELEMENT_DEFINITION,
+            BaserowDeleteRowTool.CLUSTER_ELEMENT_DEFINITION,
+            BaserowGetRowTool.CLUSTER_ELEMENT_DEFINITION,
+            BaserowListRowsTool.CLUSTER_ELEMENT_DEFINITION,
+            BaserowUpdateRowTool.CLUSTER_ELEMENT_DEFINITION);
 
     @Override
     public ComponentDefinition getDefinition() {

@@ -19,7 +19,6 @@ package com.bytechef.component.monday.util;
 import static com.bytechef.component.monday.constant.MondayConstants.BOARDS;
 import static com.bytechef.component.monday.constant.MondayConstants.DATA;
 
-import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Context.Http.Body;
@@ -36,7 +35,7 @@ public class MondayUtils {
     private MondayUtils() {
     }
 
-    public static List<?> getBoardColumns(String boardId, ActionContext context) {
+    public static List<?> getBoardColumns(String boardId, Context context) {
         String query = "query{boards(ids: %s){columns{id title type settings_str description}}}".formatted(boardId);
 
         Map<String, Object> result = executeGraphQLQuery(query, context);
