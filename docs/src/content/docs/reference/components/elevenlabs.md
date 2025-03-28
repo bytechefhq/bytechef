@@ -97,13 +97,7 @@ Converts text into speech using a voice of your choice and returns audio.
 
 #### Output
 
-
-
-Type: STRING
-
-
-
-
+The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
 
 
 
@@ -145,8 +139,8 @@ Type: OBJECT
 |     Name     |     Type     |     Description     |
 |:------------:|:------------:|:-------------------:|
 | audio_base64 | STRING | Base64 encoded audio data |
-| alignment | OBJECT <details> <summary> Properties </summary> {[]\(characters), []\(character_start_times_seconds), []\(character_end_times_seconds)} </details> |  |
-| normalized_alignment | OBJECT <details> <summary> Properties </summary> {[]\(characters), []\(character_start_times_seconds), []\(character_end_times_seconds)} </details> |  |
+| alignment | OBJECT <details> <summary> Properties </summary> {[STRING]\(characters), [NUMBER]\(character_start_times_seconds), [NUMBER]\(character_end_times_seconds)} </details> |  |
+| normalized_alignment | OBJECT <details> <summary> Properties </summary> {[STRING]\(characters), [NUMBER]\(character_start_times_seconds), [NUMBER]\(character_end_times_seconds)} </details> |  |
 
 
 
@@ -156,14 +150,14 @@ Type: OBJECT
 {
   "audio_base64" : "",
   "alignment" : {
-    "characters" : [ ],
-    "character_start_times_seconds" : [ ],
-    "character_end_times_seconds" : [ ]
+    "characters" : [ "" ],
+    "character_start_times_seconds" : [ 0.0 ],
+    "character_end_times_seconds" : [ 0.0 ]
   },
   "normalized_alignment" : {
-    "characters" : [ ],
-    "character_start_times_seconds" : [ ],
-    "character_end_times_seconds" : [ ]
+    "characters" : [ "" ],
+    "character_start_times_seconds" : [ 0.0 ],
+    "character_end_times_seconds" : [ 0.0 ]
   }
 }
 ```
