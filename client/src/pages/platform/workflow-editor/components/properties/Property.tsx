@@ -1,4 +1,5 @@
 import {SchemaRecordType} from '@/components/JsonSchemaBuilder/utils/types';
+import {MultiSelectOptionType} from '@/components/MultiSelect';
 import RequiredMark from '@/components/RequiredMark';
 import {Label} from '@/components/ui/label';
 import {Skeleton} from '@/components/ui/skeleton';
@@ -38,6 +39,7 @@ import {twMerge} from 'tailwind-merge';
 import {useDebouncedCallback} from 'use-debounce';
 
 import {decodePath, encodeParameters, encodePath} from '../../utils/encodingUtils';
+import PropertyMultiSelect from './components/PropertyMultiSelect';
 
 const INPUT_PROPERTY_CONTROL_TYPES = [
     'DATE',
@@ -107,6 +109,7 @@ const Property = ({
     const [mentionInput, setMentionInput] = useState(
         !control && MENTION_INPUT_PROPERTY_CONTROL_TYPES.includes(property.controlType!)
     );
+    const [multiSelectValue, setMultiSelectValue] = useState<string[]>(property.defaultValue || []);
     const [propertyParameterValue, setPropertyParameterValue] = useState(parameterValue || property.defaultValue || '');
     const [selectValue, setSelectValue] = useState(
         property.defaultValue !== undefined ? property.defaultValue : 'null'
@@ -183,8 +186,12 @@ const Property = ({
     }, [mentionInput, controlType]);
 
     const typeIcon = useMemo(() => {
+        if (controlType === 'MULTI_SELECT') {
+            return TYPE_ICONS[property.items?.[0].type as keyof typeof TYPE_ICONS];
+        }
+
         return TYPE_ICONS[type as keyof typeof TYPE_ICONS];
-    }, [type]);
+    }, [controlType, property.items, type]);
 
     const {deleteWorkflowNodeParameterMutation, updateWorkflowNodeParameterMutation} =
         useWorkflowNodeParameterMutation();
@@ -332,6 +339,8 @@ const Property = ({
         setMentionInput(!mentionInput);
 
         setMentionInputValue('');
+        setPropertyParameterValue('');
+        setMultiSelectValue([]);
 
         if (mentionInput) {
             setTimeout(() => {
@@ -375,6 +384,8 @@ const Property = ({
                 setInputValue('');
                 setMentionInputValue('');
                 setSelectValue('');
+                setMultiSelectValue([]);
+
                 setPropertyParameterValue('');
             },
             type,
@@ -430,6 +441,34 @@ const Property = ({
         ]
     );
 
+    const handleMultiSelectChange = useCallback(
+        (value: string[]) => {
+            if (!currentComponent || !workflow.id || !path || !updateWorkflowNodeParameterMutation) {
+                return;
+            }
+
+            const currentValue = JSON.stringify(propertyParameterValue || []);
+            const newValue = JSON.stringify(value);
+
+            if (currentValue === newValue) {
+                return;
+            }
+
+            setPropertyParameterValue(value);
+            setMultiSelectValue(value);
+
+            saveProperty({
+                includeInMetadata: custom,
+                path,
+                type,
+                updateWorkflowNodeParameterMutation,
+                value,
+                workflowId: workflow.id,
+            });
+        },
+        [currentComponent, custom, path, propertyParameterValue, type, updateWorkflowNodeParameterMutation, workflow.id]
+    );
+
     const memoizedWorkflowTask = useMemo(() => {
         return [...(workflow.triggers ?? []), ...(workflow.tasks ?? [])].find(
             (node) => node.name === currentNode?.name
@@ -449,7 +488,7 @@ const Property = ({
                 typeof propertyParameterValue === 'string' &&
                 controlType !== 'SELECT' &&
                 controlType !== 'JSON_SCHEMA_BUILDER' &&
-                (propertyParameterValue.includes('${') || type === 'STRING')
+                (propertyParameterValue.includes('${') || type === 'STRING' || controlType === 'MULTI_SELECT')
             ) {
                 setMentionInput(true);
             }
@@ -459,7 +498,12 @@ const Property = ({
             setMentionInput(true);
         }
 
-        if (controlType === 'SELECT' || controlType === 'JSON_SCHEMA_BUILDER' || controlType === 'OBJECT_BUILDER') {
+        if (
+            controlType === 'SELECT' ||
+            controlType === 'MULTI_SELECT' ||
+            controlType === 'JSON_SCHEMA_BUILDER' ||
+            controlType === 'OBJECT_BUILDER'
+        ) {
             if (
                 propertyParameterValue &&
                 typeof propertyParameterValue === 'string' &&
@@ -544,8 +588,8 @@ const Property = ({
                 setMentionInputValue('');
             } else {
                 setInputValue('');
-
                 setSelectValue('');
+                setMultiSelectValue([]);
 
                 setPropertyParameterValue('');
             }
@@ -574,6 +618,14 @@ const Property = ({
                 } else {
                     setSelectValue(propertyParameterValue);
                 }
+            }
+        }
+
+        if (controlType === 'MULTI_SELECT' && propertyParameterValue !== undefined) {
+            if (propertyParameterValue === null) {
+                setMultiSelectValue([]);
+            } else if (propertyParameterValue !== undefined) {
+                setMultiSelectValue(propertyParameterValue);
             }
         }
 
@@ -669,13 +721,18 @@ const Property = ({
 
     // reset all values when currentNode.operationName changes
     useEffect(() => {
-        const parameterDefaultValue = property.defaultValue !== undefined ? property.defaultValue : '';
+        const parameterDefaultValue: string | string[] =
+            property.defaultValue !== undefined ? property.defaultValue : '';
 
         if (previousOperationName) {
             setPropertyParameterValue(parameterDefaultValue);
             setInputValue(parameterDefaultValue);
             setMentionInputValue(parameterDefaultValue);
             setSelectValue(parameterDefaultValue.toString());
+
+            if (Array.isArray(parameterDefaultValue)) {
+                setMultiSelectValue(parameterDefaultValue);
+            }
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [currentNode?.operationName, previousOperationName, property.defaultValue]);
@@ -1066,6 +1123,27 @@ const Property = ({
                             onChange={handleInputChange}
                             required={required}
                             value={inputValue}
+                        />
+                    )}
+
+                    {!control && controlType === 'MULTI_SELECT' && (
+                        <PropertyMultiSelect
+                            defaultValue={propertyParameterValue as string[]}
+                            deletePropertyButton={deletePropertyButton}
+                            handleInputTypeSwitchButtonClick={() => handleInputTypeSwitchButtonClick()}
+                            leadingIcon={typeIcon}
+                            lookupDependsOnPaths={optionsDataSource?.optionsLookupDependsOn?.map(
+                                (optionLookupDependency) => optionLookupDependency.replace('[index]', `[${arrayIndex}]`)
+                            )}
+                            lookupDependsOnValues={lookupDependsOnValues}
+                            onChange={(value) => handleMultiSelectChange(value)}
+                            options={formattedOptions as MultiSelectOptionType[]}
+                            optionsDataSource={optionsDataSource}
+                            path={path}
+                            property={property}
+                            showInputTypeSwitchButton={showInputTypeSwitchButton}
+                            value={multiSelectValue}
+                            workflowId={workflow.id!}
                         />
                     )}
 
