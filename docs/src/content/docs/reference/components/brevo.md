@@ -1,9 +1,9 @@
 ---
 title: "Brevo"
-description: "Brevo is an email marketing platform that offers a cloud-based marketing communication software suite with transactional email, marketing automation, customer-relationship management  and more."
+description: "Brevo is an email marketing platform that offers a cloud-based marketing communication software suite with transactional email, marketing automation, customer-relationship management and more."
 ---
 
-Brevo is an email marketing platform that offers a cloud-based marketing communication software suite with transactional email, marketing automation, customer-relationship management  and more.
+Brevo is an email marketing platform that offers a cloud-based marketing communication software suite with transactional email, marketing automation, customer-relationship management and more.
 
 
 Categories: marketing-automation
@@ -40,23 +40,23 @@ Version: 1
 ## Actions
 
 
-### Create contact
+### Create Contact
 Name: createContact
 
-Create new contact.
+Creates new contact.
 
 #### Properties
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| email | Email | STRING | Email address of the user. | true |
-| FIRSTNAME | First name | STRING | First name of the user. | true |
-| LASTNAME | Last name | STRING | Last name of the user. | true |
+| email | Email | STRING | Email address of the contact. | true |
+| FIRSTNAME | First Name | STRING | First name of the contact. | false |
+| LASTNAME | Last Name | STRING | Last name of the contact. | false |
 
 #### Example JSON Structure
 ```json
 {
-  "label" : "Create contact",
+  "label" : "Create Contact",
   "name" : "createContact",
   "parameters" : {
     "email" : "",
@@ -71,32 +71,43 @@ Create new contact.
 
 
 
-Type: INTEGER
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| id | INTEGER | ID of the created contact. |
 
 
 
 
+#### Output Example
+```json
+{
+  "id" : 1
+}
+```
 
 
-
-
-### Update contact
+### Update Contact
 Name: updateContact
 
-Update contact.
+Updates existing contact.
 
 #### Properties
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| email | Email | STRING | Email address of the user. | true |
-| FIRSTNAME | First name | STRING | First name of the user. | true |
-| LASTNAME | Last name | STRING | Last name of the user. | true |
+| email | Email | STRING | Email address of the contact to update. | true |
+| FIRSTNAME | First Name | STRING | New first name of the contact. | false |
+| LASTNAME | Last Name | STRING | New last name of the contact. | false |
 
 #### Example JSON Structure
 ```json
 {
-  "label" : "Update contact",
+  "label" : "Update Contact",
   "name" : "updateContact",
   "parameters" : {
     "email" : "",
@@ -114,34 +125,37 @@ This action does not produce any output.
 
 
 
-### Send transactional email
+### Send Transactional Email
 Name: sendTransactionalEmail
 
-Send a transactional email.
+Sends and email from your Brevo account.
 
 #### Properties
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| senderEmail | Sender email | STRING | Email of the sender from which the emails will be sent. | true |
-| senderName | Sender name | STRING | Name of the sender from which the emails will be sent. | true |
-| recipientEmail | Recipient email | STRING | Email address of the recipient. | true |
-| recipientName | Recipient name | STRING | Name of the recipient. | true |
-| subject | Subject | STRING | Subject of the message. | false |
-| textContent | Text body | STRING | Plain text body of the message. | false |
+| senderEmail | Sender Email | STRING | Email of the sender from which the emails will be sent. | true |
+| to | To Recipients | ARRAY <details> <summary> Items </summary> [STRING] </details> | The To: recipients for the message. | true |
+| bcc | Bcc Recipients | ARRAY <details> <summary> Items </summary> [STRING] </details> | The Bcc recipients for the message. | false |
+| cc | Cc Recipients | ARRAY <details> <summary> Items </summary> [STRING] </details> | The Cc recipients for the message. | false |
+| subject | Subject | STRING | Subject of the email. | true |
+| contentType | Content Type | STRING <details> <summary> Options </summary> TEXT, HTML </details> | Content type of the email. | true |
+| content | Text Content | STRING | Plain text body of the message. | true |
+| content | HTML Content | STRING | HTML body of the message. | true |
 
 #### Example JSON Structure
 ```json
 {
-  "label" : "Send transactional email",
+  "label" : "Send Transactional Email",
   "name" : "sendTransactionalEmail",
   "parameters" : {
     "senderEmail" : "",
-    "senderName" : "",
-    "recipientEmail" : "",
-    "recipientName" : "",
+    "to" : [ "" ],
+    "bcc" : [ "" ],
+    "cc" : [ "" ],
     "subject" : "",
-    "textContent" : ""
+    "contentType" : "",
+    "content" : ""
   },
   "type" : "brevo/v1/sendTransactionalEmail"
 }
@@ -151,13 +165,24 @@ Send a transactional email.
 
 
 
-Type: STRING
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| messageId | STRING | Message ID of the transactional email sent. |
 
 
 
 
-
-
+#### Output Example
+```json
+{
+  "messageId" : ""
+}
+```
 
 
 
