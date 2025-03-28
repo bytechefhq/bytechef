@@ -168,6 +168,7 @@ const Property = ({
                 if (option.value === '') {
                     return null;
                 }
+
                 return option;
             })
             .filter((option) => option !== null);
@@ -342,6 +343,7 @@ const Property = ({
         } else {
             setTimeout(() => {
                 setFocusedInput(editorRef.current);
+
                 editorRef.current?.commands.setContent('');
                 editorRef.current?.commands.focus();
 
@@ -760,6 +762,7 @@ const Property = ({
                 controlType === 'ARRAY_BUILDER' && 'flex-col',
                 customClassName
             )}
+            key={`${currentNode?.name}_${currentComponent?.operationName}_${name}`}
         >
             {mentionInput && currentComponent && type !== 'DYNAMIC_PROPERTIES' && controlType !== 'CODE_EDITOR' && (
                 <PropertyMentionsInput
@@ -768,7 +771,6 @@ const Property = ({
                     deletePropertyButton={deletePropertyButton}
                     description={description}
                     handleInputTypeSwitchButtonClick={handleInputTypeSwitchButtonClick}
-                    key={`${currentNode?.name}_${currentComponent?.operationName}_${name}`}
                     label={label || name}
                     leadingIcon={typeIcon}
                     path={path}
@@ -860,7 +862,6 @@ const Property = ({
                         <Controller
                             control={control}
                             defaultValue={defaultValue}
-                            key={`${currentNode?.name}_${currentComponent?.operationName}_${name}`}
                             name={path}
                             render={({field}) => (
                                 <PropertyInput
@@ -883,7 +884,6 @@ const Property = ({
                         <Controller
                             control={control}
                             defaultValue={defaultValue}
-                            key={`${currentNode?.name}_${currentComponent?.operationName}_${name}`}
                             name={path}
                             render={({field: {name, onChange}}) => (
                                 <PropertySelect
@@ -909,7 +909,6 @@ const Property = ({
                         <Controller
                             control={control}
                             defaultValue={defaultValue}
-                            key={`${currentNode?.name}_${currentComponent?.operationName}_${name}`}
                             name={path}
                             render={({field: {name, onChange}}) => (
                                 <PropertySelect
@@ -919,6 +918,7 @@ const Property = ({
                                     name={name}
                                     onValueChange={(value) => {
                                         onChange(value);
+
                                         setSelectValue(value);
                                     }}
                                     options={[
@@ -935,7 +935,6 @@ const Property = ({
                         <Controller
                             control={control}
                             defaultValue={defaultValue}
-                            key={`${currentNode?.name}_${currentComponent?.operationName}_${name}`}
                             name={path}
                             render={({field}) => (
                                 <PropertyTextArea
@@ -960,7 +959,6 @@ const Property = ({
                             errorMessage={errorMessage}
                             fieldsetClassName={objectName && arrayName && 'ml-2'}
                             handleInputTypeSwitchButtonClick={handleInputTypeSwitchButtonClick}
-                            key={`${currentNode?.name}_${currentComponent?.operationName}_${name}`}
                             label={label || name}
                             leadingIcon={typeIcon}
                             max={maxValue}
@@ -987,7 +985,6 @@ const Property = ({
                         <PropertySelect
                             deletePropertyButton={deletePropertyButton}
                             description={description}
-                            key={`${currentNode?.name}_${currentComponent?.operationName}_${name}`}
                             label={label || name}
                             leadingIcon={typeIcon}
                             name={name}
@@ -1019,7 +1016,6 @@ const Property = ({
                             deletePropertyButton={deletePropertyButton}
                             description={description}
                             handleInputTypeSwitchButtonClick={handleInputTypeSwitchButtonClick}
-                            key={`${currentNode?.name}_${currentComponent?.operationName}_${name}`}
                             label={label || name}
                             leadingIcon={typeIcon}
                             lookupDependsOnPaths={optionsDataSource?.optionsLookupDependsOn?.map(
@@ -1045,7 +1041,6 @@ const Property = ({
                             deletePropertyButton={deletePropertyButton}
                             description={description}
                             handleInputTypeSwitchButtonClick={handleInputTypeSwitchButtonClick}
-                            key={`${currentNode?.name}_${currentComponent?.operationName}_${name}`}
                             label={label || name}
                             leadingIcon={typeIcon}
                             name={name}
@@ -1065,7 +1060,6 @@ const Property = ({
                             description={description}
                             error={hasError}
                             errorMessage={errorMessage}
-                            key={`${currentNode?.name}_${currentComponent?.operationName}_${name}`}
                             label={label || name}
                             leadingIcon={typeIcon}
                             name={name!}
@@ -1100,7 +1094,6 @@ const Property = ({
                     description={description}
                     error={hasError}
                     errorMessage={errorMessage}
-                    key={`${currentNode?.name}_${currentComponent?.operationName}_${name}`}
                     label={label || name}
                     language={languageId!}
                     leadingIcon={typeIcon}
