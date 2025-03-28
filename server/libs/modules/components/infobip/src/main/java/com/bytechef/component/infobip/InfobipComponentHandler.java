@@ -25,7 +25,7 @@ import com.bytechef.component.infobip.action.InfobipSendSMSAction;
 import com.bytechef.component.infobip.action.InfobipSendWhatsappTextMessageAction;
 import com.bytechef.component.infobip.connection.InfobipConnection;
 import com.bytechef.component.infobip.trigger.InfobipNewSMSTrigger;
-import com.bytechef.component.infobip.trigger.InfobipNewWhatsappMessageTrigger;
+import com.bytechef.component.infobip.trigger.InfobipNewWhatsAppMessageTrigger;
 import com.google.auto.service.AutoService;
 
 /**
@@ -46,7 +46,9 @@ public class InfobipComponentHandler implements ComponentHandler {
         .actions(
             InfobipSendSMSAction.ACTION_DEFINITION,
             InfobipSendWhatsappTextMessageAction.ACTION_DEFINITION)
-        .triggers(InfobipNewSMSTrigger.TRIGGER_DEFINITION);
+        .triggers(
+            InfobipNewSMSTrigger.TRIGGER_DEFINITION,
+            InfobipNewWhatsAppMessageTrigger.TRIGGER_DEFINITION);
 
     @Override
     public ComponentDefinition getDefinition() {
