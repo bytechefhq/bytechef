@@ -164,6 +164,7 @@ dependencies {
     implementation(project(":server:libs:modules:components:ai:vectorstore:pinecone"))
     implementation(project(":server:libs:modules:components:ai:vectorstore:qdrant"))
     implementation(project(":server:libs:modules:components:ai:vectorstore:reader"))
+    implementation(project(":server:libs:modules:components:ai:vectorstore:redis"))
     implementation(project(":server:libs:modules:components:ai:vectorstore:transformer:enricher"))
     implementation(project(":server:libs:modules:components:ai:vectorstore:transformer:splitter"))
     implementation(project(":server:libs:modules:components:ai:vectorstore:typesense"))
