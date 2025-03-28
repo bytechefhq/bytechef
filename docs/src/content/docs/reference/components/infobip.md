@@ -173,6 +173,73 @@ Type: OBJECT
 
 
 
+## Triggers
+
+
+### New SMS Message
+Name: newSMS
+
+Triggers when a new SMS message is received.
+
+Type: DYNAMIC_WEBHOOK
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| numberKey | Number | STRING |  | true |
+
+
+#### Output
+
+The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
+
+#### JSON Example
+```json
+{
+  "label" : "New SMS Message",
+  "name" : "newSMS",
+  "parameters" : {
+    "numberKey" : ""
+  },
+  "type" : "infobip/v1/newSMS"
+}
+```
+
+
+### New WhatsApp Message
+Name: newWhatsappMessage
+
+Triggers when a new WhatsApp message is received.
+
+Type: DYNAMIC_WEBHOOK
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| numberKey | Number | STRING |  | true |
+
+
+#### Output
+
+The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
+
+#### JSON Example
+```json
+{
+  "label" : "New WhatsApp Message",
+  "name" : "newWhatsappMessage",
+  "parameters" : {
+    "numberKey" : ""
+  },
+  "type" : "infobip/v1/newWhatsappMessage"
+}
+```
+
+
+<hr />
+
 <hr />
 
 # Additional instructions
