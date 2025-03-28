@@ -26,6 +26,7 @@ public class InfobipConstants {
 
     public static final String BASE_URL = "baseUrl";
     public static final String BULK_ID = "bulkId";
+    public static final String CONFIGURATION_KEY = "configurationKey";
     public static final String CONTENT = "content";
     public static final String DESCRIPTION = "description";
     public static final String DESTINATIONS = "destinations";
@@ -37,8 +38,8 @@ public class InfobipConstants {
     public static final String MESSAGE_COUNT = "messageCount";
     public static final String MESSAGE_ID = "messageId";
     public static final String NAME = "name";
+    public static final String NUMBER_KEY = "numberKey";
     public static final String SENDER = "sender";
-    public static final String SMS_COUNT = "smsCount";
     public static final String STATUS = "status";
     public static final String TEXT = "text";
     public static final String TO = "to";
