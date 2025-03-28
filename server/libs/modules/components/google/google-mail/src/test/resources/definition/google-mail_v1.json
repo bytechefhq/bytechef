@@ -128,7 +128,6 @@
         "sampleOutput" : null,
         "placeholder" : null
       },
-      "sampleOutput" : null,
       "outputSchema" : {
         "advancedOption" : null,
         "description" : null,
@@ -230,7 +229,8 @@
         } ],
         "controlType" : "OBJECT_BUILDER",
         "optionsDataSource" : null
-      }
+      },
+      "sampleOutput" : null
     },
     "properties" : [ {
       "advancedOption" : null,
@@ -302,8 +302,8 @@
     } ],
     "title" : "Add Labels",
     "perform" : { },
-    "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "processErrorResponse" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -338,8 +338,8 @@
     } ],
     "title" : "Delete Mail",
     "perform" : { },
-    "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "processErrorResponse" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -350,8 +350,8 @@
     "outputDefinition" : {
       "output" : { },
       "outputResponse" : null,
-      "sampleOutput" : null,
-      "outputSchema" : null
+      "outputSchema" : null,
+      "sampleOutput" : null
     },
     "properties" : [ {
       "advancedOption" : null,
@@ -460,8 +460,8 @@
     } ],
     "title" : "Get Mail",
     "perform" : { },
-    "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "processErrorResponse" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -472,8 +472,8 @@
     "outputDefinition" : {
       "output" : { },
       "outputResponse" : null,
-      "sampleOutput" : null,
-      "outputSchema" : null
+      "outputSchema" : null,
+      "sampleOutput" : null
     },
     "properties" : [ {
       "advancedOption" : null,
@@ -582,8 +582,8 @@
     } ],
     "title" : "Get Thread",
     "perform" : { },
-    "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "processErrorResponse" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -699,7 +699,6 @@
         "sampleOutput" : null,
         "placeholder" : null
       },
-      "sampleOutput" : null,
       "outputSchema" : {
         "advancedOption" : null,
         "description" : null,
@@ -801,7 +800,8 @@
         } ],
         "controlType" : "OBJECT_BUILDER",
         "optionsDataSource" : null
-      }
+      },
+      "sampleOutput" : null
     },
     "properties" : [ {
       "advancedOption" : null,
@@ -1089,8 +1089,8 @@
     } ],
     "title" : "Reply to Email",
     "perform" : { },
-    "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "processErrorResponse" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -1248,7 +1248,6 @@
         "sampleOutput" : null,
         "placeholder" : null
       },
-      "sampleOutput" : null,
       "outputSchema" : {
         "advancedOption" : null,
         "description" : null,
@@ -1392,7 +1391,8 @@
         } ],
         "controlType" : "OBJECT_BUILDER",
         "optionsDataSource" : null
-      }
+      },
+      "sampleOutput" : null
     },
     "properties" : [ {
       "advancedOption" : null,
@@ -1572,22 +1572,22 @@
         "exampleValue" : null,
         "label" : null,
         "placeholder" : null,
-        "controlType" : "SELECT",
+        "controlType" : "TEXT",
         "languageId" : null,
         "maxLength" : null,
         "minLength" : null,
         "options" : null,
-        "optionsDataSource" : {
-          "optionsLookupDependsOn" : null,
-          "options" : { }
-        }
+        "optionsDataSource" : null
       } ],
       "maxItems" : null,
       "minItems" : null,
       "multipleValues" : null,
       "options" : null,
-      "controlType" : "ARRAY_BUILDER",
-      "optionsDataSource" : null
+      "controlType" : "MULTI_SELECT",
+      "optionsDataSource" : {
+        "optionsLookupDependsOn" : null,
+        "options" : { }
+      }
     }, {
       "advancedOption" : null,
       "description" : "Include messages from SPAM and TRASH in the results.",
@@ -1615,8 +1615,8 @@
     } ],
     "title" : "Search Email",
     "perform" : { },
-    "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "processErrorResponse" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -1732,7 +1732,6 @@
         "sampleOutput" : null,
         "placeholder" : null
       },
-      "sampleOutput" : null,
       "outputSchema" : {
         "advancedOption" : null,
         "description" : null,
@@ -1834,7 +1833,8 @@
         } ],
         "controlType" : "OBJECT_BUILDER",
         "optionsDataSource" : null
-      }
+      },
+      "sampleOutput" : null
     },
     "properties" : [ {
       "advancedOption" : null,
@@ -2160,8 +2160,8 @@
     } ],
     "title" : "Send Email",
     "perform" : { },
-    "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "processErrorResponse" : null
   } ],
   "clusterElements" : [ {
     "description" : "Add labels to an email in your Gmail account.",
@@ -2274,7 +2274,6 @@
         "sampleOutput" : null,
         "placeholder" : null
       },
-      "sampleOutput" : null,
       "outputSchema" : {
         "advancedOption" : null,
         "description" : null,
@@ -2376,7 +2375,8 @@
         } ],
         "controlType" : "OBJECT_BUILDER",
         "optionsDataSource" : null
-      }
+      },
+      "sampleOutput" : null
     },
     "properties" : [ {
       "advancedOption" : null,
@@ -2498,8 +2498,8 @@
     "outputDefinition" : {
       "output" : { },
       "outputResponse" : null,
-      "sampleOutput" : null,
-      "outputSchema" : null
+      "outputSchema" : null,
+      "sampleOutput" : null
     },
     "properties" : [ {
       "advancedOption" : null,
@@ -2621,8 +2621,8 @@
     "outputDefinition" : {
       "output" : { },
       "outputResponse" : null,
-      "sampleOutput" : null,
-      "outputSchema" : null
+      "outputSchema" : null,
+      "sampleOutput" : null
     },
     "properties" : [ {
       "advancedOption" : null,
@@ -2849,7 +2849,6 @@
         "sampleOutput" : null,
         "placeholder" : null
       },
-      "sampleOutput" : null,
       "outputSchema" : {
         "advancedOption" : null,
         "description" : null,
@@ -2951,7 +2950,8 @@
         } ],
         "controlType" : "OBJECT_BUILDER",
         "optionsDataSource" : null
-      }
+      },
+      "sampleOutput" : null
     },
     "properties" : [ {
       "advancedOption" : null,
@@ -3399,7 +3399,6 @@
         "sampleOutput" : null,
         "placeholder" : null
       },
-      "sampleOutput" : null,
       "outputSchema" : {
         "advancedOption" : null,
         "description" : null,
@@ -3543,7 +3542,8 @@
         } ],
         "controlType" : "OBJECT_BUILDER",
         "optionsDataSource" : null
-      }
+      },
+      "sampleOutput" : null
     },
     "properties" : [ {
       "advancedOption" : null,
@@ -3723,22 +3723,22 @@
         "exampleValue" : null,
         "label" : null,
         "placeholder" : null,
-        "controlType" : "SELECT",
+        "controlType" : "TEXT",
         "languageId" : null,
         "maxLength" : null,
         "minLength" : null,
         "options" : null,
-        "optionsDataSource" : {
-          "optionsLookupDependsOn" : null,
-          "options" : { }
-        }
+        "optionsDataSource" : null
       } ],
       "maxItems" : null,
       "minItems" : null,
       "multipleValues" : null,
       "options" : null,
-      "controlType" : "ARRAY_BUILDER",
-      "optionsDataSource" : null
+      "controlType" : "MULTI_SELECT",
+      "optionsDataSource" : {
+        "optionsLookupDependsOn" : null,
+        "options" : { }
+      }
     }, {
       "advancedOption" : null,
       "description" : "Include messages from SPAM and TRASH in the results.",
@@ -3884,7 +3884,6 @@
         "sampleOutput" : null,
         "placeholder" : null
       },
-      "sampleOutput" : null,
       "outputSchema" : {
         "advancedOption" : null,
         "description" : null,
@@ -3986,7 +3985,8 @@
         } ],
         "controlType" : "OBJECT_BUILDER",
         "optionsDataSource" : null
-      }
+      },
+      "sampleOutput" : null
     },
     "properties" : [ {
       "advancedOption" : null,
@@ -4330,8 +4330,8 @@
     "outputDefinition" : {
       "output" : { },
       "outputResponse" : null,
-      "sampleOutput" : null,
-      "outputSchema" : null
+      "outputSchema" : null,
+      "sampleOutput" : null
     },
     "properties" : [ {
       "advancedOption" : null,
@@ -4398,18 +4398,18 @@
     "type" : "STATIC_WEBHOOK",
     "webhookRawBody" : null,
     "workflowSyncExecution" : null,
-    "listenerDisable" : null,
-    "listenerEnable" : null,
-    "webhookValidate" : null,
-    "webhookValidateOnEnable" : null,
     "poll" : null,
     "deduplicate" : null,
     "webhookDisable" : { },
     "webhookEnable" : { },
     "dynamicWebhookRefresh" : null,
     "webhookRequest" : { },
+    "listenerDisable" : null,
+    "workflowNodeDescription" : null,
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "listenerEnable" : null,
+    "webhookValidate" : null,
+    "webhookValidateOnEnable" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -4504,7 +4504,6 @@
         "sampleOutput" : null,
         "placeholder" : null
       },
-      "sampleOutput" : null,
       "outputSchema" : {
         "advancedOption" : null,
         "description" : null,
@@ -4586,25 +4585,26 @@
         "options" : null,
         "controlType" : "ARRAY_BUILDER",
         "optionsDataSource" : null
-      }
+      },
+      "sampleOutput" : null
     },
     "properties" : null,
     "title" : "New Email Polling",
     "type" : "POLLING",
     "webhookRawBody" : null,
     "workflowSyncExecution" : null,
-    "listenerDisable" : null,
-    "listenerEnable" : null,
-    "webhookValidate" : null,
-    "webhookValidateOnEnable" : null,
     "poll" : { },
     "deduplicate" : null,
     "webhookDisable" : null,
     "webhookEnable" : null,
     "dynamicWebhookRefresh" : null,
     "webhookRequest" : null,
+    "listenerDisable" : null,
+    "workflowNodeDescription" : null,
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "listenerEnable" : null,
+    "webhookValidate" : null,
+    "webhookValidateOnEnable" : null
   } ],
   "connection" : {
     "authorizations" : [ {
@@ -4656,16 +4656,16 @@
       "title" : "OAuth2 Authorization Code",
       "type" : "OAUTH2_AUTHORIZATION_CODE",
       "acquire" : null,
-      "apply" : null,
+      "refresh" : null,
       "pkce" : null,
       "authorizationCallback" : null,
-      "authorizationUrl" : { },
       "clientId" : null,
+      "scopes" : { },
+      "apply" : null,
+      "authorizationUrl" : { },
       "clientSecret" : null,
       "oauth2AuthorizationExtraQueryParameters" : { },
-      "refresh" : null,
       "refreshUrl" : { },
-      "scopes" : { },
       "refreshToken" : null,
       "tokenUrl" : { }
     } ],
