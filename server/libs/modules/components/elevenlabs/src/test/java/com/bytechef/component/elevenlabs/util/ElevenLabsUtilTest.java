@@ -60,7 +60,7 @@ class ElevenLabsUtilTest {
         when(mockedResponse.getBody(any(TypeReference.class)))
             .thenReturn(response);
 
-        List<Option<String>> result = ElevenLabsUtil.getVoiceOptions(
+        List<Option<String>> result = ElevenLabsUtils.getVoiceOptions(
             mockedParameters, mockedParameters, Map.of(), "", mockedActionContext);
 
         List<Option<String>> expected = List.of(

@@ -31,17 +31,16 @@ import java.util.Map;
 /**
  * @author Nikolina Spehar
  */
-public class ElevenLabsUtil {
+public class ElevenLabsUtils {
 
-    private ElevenLabsUtil() {
+    private ElevenLabsUtils() {
     }
 
     public static List<Option<String>> getVoiceOptions(
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> stringStringMap, String s,
         ActionContext context) {
 
-        Map<String, List<Map<String, Object>>> body = context
-            .http(http -> http.get("/voices"))
+        Map<String, List<Map<String, Object>>> body = context.http(http -> http.get("/voices"))
             .configuration(responseType(Http.ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});
