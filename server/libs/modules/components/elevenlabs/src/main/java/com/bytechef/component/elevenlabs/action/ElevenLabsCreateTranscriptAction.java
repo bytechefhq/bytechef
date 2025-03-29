@@ -90,14 +90,14 @@ public class ElevenLabsCreateTranscriptAction {
     public static Map<String, Object> perform(
         Parameters inputParameters, Parameters connectionParameters, Context context) {
 
-        return context
-            .http(http -> http.post("/speech-to-text"))
+        return context.http(http -> http.post("/speech-to-text"))
             .header("Content-Type", "multipart/form-data")
-            .body(Body.of(
-                Map.of(
-                    MODEL_ID, inputParameters.getRequiredString(MODEL_ID),
-                    FILE, inputParameters.getRequiredFileEntry(FILE)),
-                BodyContentType.FORM_DATA))
+            .body(
+                Body.of(
+                    Map.of(
+                        MODEL_ID, inputParameters.getRequiredString(MODEL_ID),
+                        FILE, inputParameters.getRequiredFileEntry(FILE)),
+                    BodyContentType.FORM_DATA))
             .configuration(responseType(ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});

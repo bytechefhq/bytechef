@@ -28,7 +28,7 @@ import com.bytechef.component.definition.Context.Http.Body;
 import com.bytechef.component.definition.Context.Http.ResponseType;
 import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.elevenlabs.util.ElevenLabsUtil;
+import com.bytechef.component.elevenlabs.util.ElevenLabsUtils;
 import java.util.Map;
 
 /**
@@ -43,7 +43,7 @@ public class ElevenLabsCreateSpeechAction {
             string(VOICE_ID)
                 .label("Voice")
                 .description("Voice you want to use for converting the text into speech.")
-                .options((ActionOptionsFunction<String>) ElevenLabsUtil::getVoiceOptions)
+                .options((ActionOptionsFunction<String>) ElevenLabsUtils::getVoiceOptions)
                 .required(true),
             string(TEXT)
                 .label("Text")
@@ -56,8 +56,7 @@ public class ElevenLabsCreateSpeechAction {
     }
 
     public static Object perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
-        return context
-            .http(http -> http.post("/text-to-speech/" + inputParameters.getRequiredString(VOICE_ID)))
+        return context.http(http -> http.post("/text-to-speech/" + inputParameters.getRequiredString(VOICE_ID)))
             .header("Content-Type", "audio/mpeg")
             .body(Body.of(Map.of(TEXT, inputParameters.getRequiredString(TEXT))))
             .configuration(responseType(ResponseType.BINARY))
