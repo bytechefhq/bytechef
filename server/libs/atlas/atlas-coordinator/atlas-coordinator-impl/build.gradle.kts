@@ -7,8 +7,6 @@ dependencies {
     implementation("org.springframework:spring-context")
     implementation("org.springframework:spring-core")
     implementation("org.springframework:spring-expression")
-    implementation("org.springframework:spring-web")
-    implementation("org.springframework.retry:spring-retry")
     implementation(project(":server:libs:atlas:atlas-file-storage:atlas-file-storage-api"))
     implementation(project(":server:libs:atlas:atlas-worker:atlas-worker-api"))
     implementation(project(":server:libs:core:commons:commons-util"))
