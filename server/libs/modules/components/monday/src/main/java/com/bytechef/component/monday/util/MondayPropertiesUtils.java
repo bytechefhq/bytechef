@@ -56,6 +56,7 @@ import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.Property.ControlType;
 import com.bytechef.component.definition.Property.ValueProperty;
 import com.bytechef.component.monday.constant.MondayColumnType;
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -122,18 +123,22 @@ public class MondayPropertiesUtils {
     private static ModifiableStringProperty createPropertyForCountryColumnType(
         String id, String title, ActionContext actionContext) {
 
-        InputStream inputStream = MondayPropertiesUtils.class.getClassLoader()
-            .getResourceAsStream("assets/country.json");
-        Map<String, String> countryMap = actionContext.json(json -> json.readMap(inputStream, String.class));
+        ClassLoader classLoader = MondayPropertiesUtils.class.getClassLoader();
 
-        List<Option<String>> options = new ArrayList<>();
+        try (InputStream inputStream = classLoader.getResourceAsStream("assets/country.json")) {
+            Map<String, String> countryMap = actionContext.json(json -> json.readMap(inputStream, String.class));
 
-        countryMap.forEach((key, value) -> options.add(option(value, key + "-" + value)));
+            List<Option<String>> options = new ArrayList<>();
 
-        return string(id)
-            .label(title)
-            .options(options)
-            .required(false);
+            countryMap.forEach((key, value) -> options.add(option(value, key + "-" + value)));
+
+            return string(id)
+                .label(title)
+                .options(options)
+                .required(false);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     private static ModifiableDateProperty createPropertyForDateColumType(String id, String title) {
@@ -150,8 +155,8 @@ public class MondayPropertiesUtils {
         List<Option<String>> options = new ArrayList<>();
 
         if (settingStrMap.get(LABELS) instanceof List<?> list) {
-            for (Object o : list) {
-                if (o instanceof Map<?, ?> map) {
+            for (Object item : list) {
+                if (item instanceof Map<?, ?> map) {
                     String name = (String) map.get(NAME);
 
                     options.add(option(name, name));
