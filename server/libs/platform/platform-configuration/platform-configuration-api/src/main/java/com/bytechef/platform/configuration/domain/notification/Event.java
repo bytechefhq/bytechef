@@ -45,7 +45,7 @@ public class Event {
         return type;
     }
 
-    public void setName(Type type) {
+    public void setType(Type type) {
         this.type = type;
     }
 

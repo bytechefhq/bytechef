@@ -17,14 +17,15 @@
 package com.bytechef.platform.configuration.repository;
 
 import com.bytechef.platform.configuration.domain.notification.Event;
-import org.springframework.data.repository.CrudRepository;
+import java.util.List;
+import org.springframework.data.repository.ListCrudRepository;
 import org.springframework.stereotype.Repository;
 
 /**
  * @author Matija Petanjek
  */
 @Repository
-public interface EventRepository extends CrudRepository<Event, Long> {
+public interface EventRepository extends ListCrudRepository<Event, Long> {
 
-    Event findByType(String type);
+    List<Event> findByIdIn(List<Long> eventIds);
 }
