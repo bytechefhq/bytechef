@@ -1,73 +1,7 @@
-import {CONDITION_CASE_FALSE, CONDITION_CASE_TRUE} from '@/shared/constants';
 import {WorkflowTask} from '@/shared/middleware/platform/configuration';
 import {TaskDispatcherContextType} from '@/shared/types';
 
-import getParentTaskDispatcherTask from './getParentTaskDispatcherTask';
-
-type UpdateTaskParametersType = {
-    context?: TaskDispatcherContextType;
-    task: WorkflowTask;
-    updatedSubtasks: Array<WorkflowTask>;
-};
-
-const TASK_DISPATCHER_CONFIG = {
-    condition: {
-        extractContextFromPlaceholder: (placeholderId: string): TaskDispatcherContextType => {
-            const parts = placeholderId.split('-');
-            const index = parseInt(parts[parts.length - 1] || '-1');
-            const conditionCase = parts[2] === 'left' ? CONDITION_CASE_TRUE : CONDITION_CASE_FALSE;
-
-            return {
-                conditionCase,
-                index,
-                taskDispatcherId: parts[0],
-            };
-        },
-        getParentTask: getParentTaskDispatcherTask,
-        getSubtasks: (task: WorkflowTask, context: TaskDispatcherContextType): Array<WorkflowTask> => {
-            const conditionCase = context.conditionCase || CONDITION_CASE_TRUE;
-
-            return conditionCase === CONDITION_CASE_TRUE
-                ? task.parameters?.caseTrue || []
-                : task.parameters?.caseFalse || [];
-        },
-        initializeParameters: () => ({
-            caseFalse: [],
-            caseTrue: [],
-        }),
-        updateTaskParameters: ({context, task, updatedSubtasks}: UpdateTaskParametersType): WorkflowTask => {
-            const conditionCase = context?.conditionCase || CONDITION_CASE_TRUE;
-
-            return {
-                ...task,
-                parameters: {
-                    ...task.parameters,
-                    [conditionCase]: updatedSubtasks,
-                },
-            };
-        },
-    },
-    loop: {
-        extractContextFromPlaceholder: (placeholderId: string): TaskDispatcherContextType => {
-            const parts = placeholderId.split('-');
-            const index = parseInt(parts[parts.length - 1] || '-1');
-
-            return {index, taskDispatcherId: parts[0]};
-        },
-        getParentTask: getParentTaskDispatcherTask,
-        getSubtasks: (task: WorkflowTask): Array<WorkflowTask> => task.parameters?.iteratee || [],
-        initializeParameters: () => ({
-            iteratee: [],
-        }),
-        updateTaskParameters: ({task, updatedSubtasks}: UpdateTaskParametersType): WorkflowTask => ({
-            ...task,
-            parameters: {
-                ...task.parameters,
-                iteratee: updatedSubtasks,
-            },
-        }),
-    },
-};
+import {TASK_DISPATCHER_CONFIG} from './taskDispatcherConfig';
 
 function updateTasksRecursively(tasks: Array<WorkflowTask>, taskToReplace: WorkflowTask): Array<WorkflowTask> {
     return tasks.map((task) => {

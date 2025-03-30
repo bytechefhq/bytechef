@@ -95,12 +95,12 @@ const WorkflowNodesPopoverMenu = ({
                 });
 
                 await handleTaskDispatcherClick({
-                    clickedItem,
                     edge: !!edge,
                     projectId: +projectId!,
                     queryClient,
                     sourceNodeId,
                     taskDispatcherContext,
+                    taskDispatcherDefinition: clickedItem,
                     taskDispatcherName: name as 'condition' | 'loop',
                     updateWorkflowMutation,
                     workflow,

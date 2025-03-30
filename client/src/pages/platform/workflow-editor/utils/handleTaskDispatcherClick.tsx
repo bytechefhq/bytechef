@@ -1,6 +1,4 @@
 import {Workflow} from '@/shared/middleware/automation/configuration';
-import {TaskDispatcherDefinitionApi} from '@/shared/middleware/platform/configuration';
-import {TaskDispatcherKeys} from '@/shared/queries/platform/taskDispatcherDefinitions.queries';
 import {
     ClickedDefinitionType,
     NodeDataType,
@@ -14,46 +12,31 @@ import InlineSVG from 'react-inlinesvg';
 
 import {WorkflowTaskDataType} from '../stores/useWorkflowDataStore';
 import getFormattedName from './getFormattedName';
-import getParametersWithDefaultValues from './getParametersWithDefaultValues';
 import handleComponentAddedSuccess from './handleComponentAddedSuccess';
 import saveWorkflowDefinition from './saveWorkflowDefinition';
+import {TASK_DISPATCHER_CONFIG} from './taskDispatcherConfig';
 
 const fallbackIcon = <ComponentIcon className="size-9 text-gray-700" />;
 
-const TASK_DISPATCHER_CONFIG = {
-    condition: {
-        getInitialParameters: (properties: Array<PropertyAllType>) => ({
-            ...getParametersWithDefaultValues({properties}),
-            caseFalse: [],
-            caseTrue: [],
-        }),
-    },
-    loop: {
-        getInitialParameters: (properties: Array<PropertyAllType>) => ({
-            ...getParametersWithDefaultValues({properties}),
-        }),
-    },
-};
-
 interface HandleTaskDispatcherClickProps {
-    clickedItem: ClickedDefinitionType;
     edge?: boolean;
     projectId: number;
     queryClient: QueryClient;
     sourceNodeId?: string;
     taskDispatcherContext?: TaskDispatcherContextType;
+    taskDispatcherDefinition: ClickedDefinitionType;
     taskDispatcherName: keyof typeof TASK_DISPATCHER_CONFIG;
     updateWorkflowMutation: UpdateWorkflowMutationType;
     workflow: Workflow & WorkflowTaskDataType;
 }
 
 export default async function handleTaskDispatcherClick({
-    clickedItem,
     edge,
     projectId,
     queryClient,
     sourceNodeId,
     taskDispatcherContext,
+    taskDispatcherDefinition,
     taskDispatcherName,
     updateWorkflowMutation,
     workflow,
@@ -66,28 +49,18 @@ export default async function handleTaskDispatcherClick({
         return;
     }
 
-    const taskDispatcherDefinition = await queryClient.fetchQuery({
-        queryFn: () =>
-            new TaskDispatcherDefinitionApi().getTaskDispatcherDefinition({
-                taskDispatcherName: clickedItem.name,
-                taskDispatcherVersion: clickedItem.version,
-            }),
-        queryKey: TaskDispatcherKeys.taskDispatcherDefinition({
-            taskDispatcherName: clickedItem.name,
-            taskDispatcherVersion: clickedItem.version,
-        }),
-    });
+    const {icon, name, title, version} = taskDispatcherDefinition;
 
-    const workflowNodeName = getFormattedName(clickedItem.name!);
+    const workflowNodeName = getFormattedName(taskDispatcherDefinition.name!);
 
     const newNodeData: NodeDataType = {
         ...taskDispatcherDefinition,
-        componentName: clickedItem.name,
-        icon: clickedItem.icon ? <InlineSVG className="size-9 text-gray-700" src={clickedItem.icon} /> : fallbackIcon,
-        label: clickedItem?.title,
+        componentName: name,
+        icon: icon ? <InlineSVG className="size-9 text-gray-700" src={icon} /> : fallbackIcon,
+        label: title,
         name: workflowNodeName,
         taskDispatcher: true,
-        type: `${taskDispatcherDefinition.name}/v${taskDispatcherDefinition.version}`,
+        type: `${name}/v${version}`,
         workflowNodeName,
     };
 
