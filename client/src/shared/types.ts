@@ -23,6 +23,7 @@ import {
     TriggerDefinition,
     TriggerType,
     ValueProperty,
+    WorkflowTask,
 } from '@/shared/middleware/platform/configuration';
 import {UseMutationResult} from '@tanstack/react-query';
 import {ReactNode} from 'react';
@@ -256,4 +257,16 @@ export type TaskDispatcherContextType = {
     index?: number;
     loopId?: string;
     taskDispatcherId: string;
+};
+
+export type BuildNodeDataType = {
+    taskDispatcherContext: TaskDispatcherContextType;
+    taskDispatcherId: string;
+    baseNodeData: NodeDataType;
+};
+
+export type UpdateTaskParametersType = {
+    context?: TaskDispatcherContextType;
+    task: WorkflowTask;
+    updatedSubtasks: Array<WorkflowTask>;
 };

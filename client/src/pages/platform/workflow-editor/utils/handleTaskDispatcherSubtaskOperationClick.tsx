@@ -15,71 +15,7 @@ import getFormattedName from './getFormattedName';
 import getParametersWithDefaultValues from './getParametersWithDefaultValues';
 import handleComponentAddedSuccess from './handleComponentAddedSuccess';
 import saveWorkflowDefinition from './saveWorkflowDefinition';
-
-type BuildNodeDataType = {
-    taskDispatcherContext: TaskDispatcherContextType;
-    taskDispatcherId: string;
-    baseNodeData: NodeDataType;
-};
-
-const TASK_DISPATCHER_CONFIG = {
-    condition: {
-        buildNodeData: ({baseNodeData, taskDispatcherContext, taskDispatcherId}: BuildNodeDataType): NodeDataType => {
-            const newNodeData = {
-                ...baseNodeData,
-                conditionId: taskDispatcherId,
-            };
-
-            if (taskDispatcherContext?.conditionId) {
-                newNodeData.conditionData = {
-                    conditionCase: taskDispatcherContext.conditionCase as string,
-                    conditionId: taskDispatcherContext.conditionId as string,
-                    index: taskDispatcherContext.index as number,
-                };
-
-                newNodeData.taskDispatcherId = taskDispatcherContext.conditionId;
-            } else if (taskDispatcherContext.loopId) {
-                newNodeData.loopData = {
-                    index: taskDispatcherContext.index as number,
-                    loopId: taskDispatcherContext.loopId as string,
-                };
-
-                newNodeData.taskDispatcherId = taskDispatcherContext.loopId;
-            }
-
-            return newNodeData;
-        },
-        getDispatcherId: (context: TaskDispatcherContextType) => context.conditionId,
-    },
-    loop: {
-        buildNodeData: ({baseNodeData, taskDispatcherContext, taskDispatcherId}: BuildNodeDataType): NodeDataType => {
-            const newNodeData = {
-                ...baseNodeData,
-                loopId: taskDispatcherId,
-            };
-
-            if (taskDispatcherContext?.conditionId) {
-                newNodeData.conditionData = {
-                    conditionCase: taskDispatcherContext.conditionCase as string,
-                    conditionId: taskDispatcherContext.conditionId as string,
-                    index: taskDispatcherContext.index as number,
-                };
-
-                newNodeData.taskDispatcherId = taskDispatcherContext.conditionId;
-            } else if (taskDispatcherContext?.loopId) {
-                newNodeData.loopData = {
-                    index: taskDispatcherContext.index as number,
-                    loopId: taskDispatcherContext.loopId as string,
-                };
-
-                newNodeData.taskDispatcherId = taskDispatcherContext.loopId;
-            }
-
-            return newNodeData;
-        },
-        getDispatcherId: (context: TaskDispatcherContextType) => context.loopId,
-    },
-};
+import {TASK_DISPATCHER_CONFIG} from './taskDispatcherConfig';
 
 interface HandleTaskDispatcherSubtaskOperationClickProps {
     operation: ClickedOperationType;
