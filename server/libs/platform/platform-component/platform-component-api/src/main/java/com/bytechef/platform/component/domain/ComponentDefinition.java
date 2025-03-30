@@ -255,7 +255,8 @@ public class ComponentDefinition {
             componentDefinition.getClusterElements(),
             actionDefinitions -> CollectionUtils.map(actionDefinitions,
                 clusterElementDefinition -> new ClusterElementDefinition(
-                    clusterElementDefinition, componentDefinition.getName(), componentDefinition.getVersion())),
+                    clusterElementDefinition, componentDefinition.getName(), componentDefinition.getVersion(),
+                    OptionalUtils.orElse(componentDefinition.getIcon(), null))),
             Collections.emptyList());
     }
 

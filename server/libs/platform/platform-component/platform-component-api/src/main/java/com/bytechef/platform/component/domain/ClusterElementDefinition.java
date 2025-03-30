@@ -35,26 +35,27 @@ public class ClusterElementDefinition {
     private String componentName;
     private int componentVersion;
     private String description;
-    private ClusterElementType type;
+    private String icon;
     private String name;
     private boolean outputDefined;
     private boolean outputFunctionDefined;
     private OutputResponse outputResponse;
     private List<? extends Property> properties;
     private String title;
+    private ClusterElementType type;
 
     private ClusterElementDefinition() {
     }
 
     public ClusterElementDefinition(
         com.bytechef.component.definition.ClusterElementDefinition<?> clusterElementDefinition,
-        String componentName, int componentVersion) {
+        String componentName, int componentVersion, String icon) {
 
         this.componentName = componentName;
         this.componentVersion = componentVersion;
         this.description = OptionalUtils.orElse(clusterElementDefinition.getDescription(), null);
-        this.type = clusterElementDefinition.getType();
         this.name = clusterElementDefinition.getName();
+        this.icon = icon;
         this.outputDefined = OptionalUtils.mapOrElse(
             clusterElementDefinition.getOutputDefinition(), outputDefinition -> true, false);
         this.outputFunctionDefined = OptionalUtils.mapOrElse(
@@ -65,6 +66,7 @@ public class ClusterElementDefinition {
         this.properties = CollectionUtils.map(
             OptionalUtils.orElse(clusterElementDefinition.getProperties(), List.of()), Property::toProperty);
         this.title = OptionalUtils.orElse(clusterElementDefinition.getTitle(), null);
+        this.type = clusterElementDefinition.getType();
     }
 
     @Override
@@ -74,17 +76,17 @@ public class ClusterElementDefinition {
         }
 
         return componentVersion == that.componentVersion && Objects.equals(description, that.description) &&
-            Objects.equals(type, that.type) && Objects.equals(name, that.name) &&
-            outputDefined == that.outputDefined && outputFunctionDefined == that.outputFunctionDefined &&
-            Objects.equals(componentName, that.componentName) && Objects.equals(outputResponse, that.outputResponse) &&
-            Objects.equals(properties, that.properties) && Objects.equals(title, that.title);
+            Objects.equals(icon, that.icon) && Objects.equals(name, that.name) && outputDefined == that.outputDefined &&
+            outputFunctionDefined == that.outputFunctionDefined && Objects.equals(componentName, that.componentName) &&
+            Objects.equals(outputResponse, that.outputResponse) && Objects.equals(properties, that.properties) &&
+            Objects.equals(title, that.title) && Objects.equals(type, that.type);
     }
 
     @Override
     public int hashCode() {
         return Objects.hash(
-            componentName, componentVersion, description, type, name, outputDefined, outputFunctionDefined,
-            outputResponse, properties, title);
+            componentName, componentVersion, description, icon, name, outputDefined, outputFunctionDefined,
+            outputResponse, properties, title, type);
     }
 
     public String getComponentName() {
@@ -100,6 +102,10 @@ public class ClusterElementDefinition {
         return description;
     }
 
+    public String getIcon() {
+        return icon;
+    }
+
     public String getName() {
         return name;
     }
@@ -111,6 +117,10 @@ public class ClusterElementDefinition {
 
     public List<? extends Property> getProperties() {
         return Collections.unmodifiableList(properties);
+    }
+
+    public String getTitle() {
+        return title;
     }
 
     public ClusterElementType getType() {
