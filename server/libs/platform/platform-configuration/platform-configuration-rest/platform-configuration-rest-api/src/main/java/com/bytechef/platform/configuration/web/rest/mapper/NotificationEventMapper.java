@@ -14,21 +14,20 @@
  * limitations under the License.
  */
 
-package com.bytechef.platform.configuration.service;
+package com.bytechef.platform.configuration.web.rest.mapper;
 
 import com.bytechef.platform.configuration.domain.notification.Event;
-import com.bytechef.platform.configuration.domain.notification.Notification;
-import java.util.List;
-import java.util.Map;
+import com.bytechef.platform.configuration.web.rest.mapper.config.PlatformConfigurationMapperSpringConfig;
+import com.bytechef.platform.configuration.web.rest.model.NotificationEventModel;
+import org.mapstruct.Mapper;
+import org.springframework.core.convert.converter.Converter;
 
 /**
  * @author Matija Petanjek
  */
-public interface NotificationService {
+@Mapper(config = PlatformConfigurationMapperSpringConfig.class)
+public interface NotificationEventMapper extends Converter<Event, NotificationEventModel> {
 
-    List<Notification> findAll();
-
-    List<Notification> fetchNotifications(Event.Type eventType);
-
-    Notification create(String name, Notification.Type type, Map<String, String> settings, List<Long> eventIds);
+    @Override
+    NotificationEventModel convert(Event event);
 }

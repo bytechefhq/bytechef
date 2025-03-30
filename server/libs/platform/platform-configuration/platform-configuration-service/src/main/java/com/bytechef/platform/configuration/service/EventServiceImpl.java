@@ -17,18 +17,29 @@
 package com.bytechef.platform.configuration.service;
 
 import com.bytechef.platform.configuration.domain.notification.Event;
-import com.bytechef.platform.configuration.domain.notification.Notification;
+import com.bytechef.platform.configuration.repository.EventRepository;
 import java.util.List;
-import java.util.Map;
+import org.springframework.stereotype.Service;
 
 /**
  * @author Matija Petanjek
  */
-public interface NotificationService {
+@Service
+public class EventServiceImpl implements EventService {
 
-    List<Notification> findAll();
+    private final EventRepository eventRepository;
 
-    List<Notification> fetchNotifications(Event.Type eventType);
+    public EventServiceImpl(EventRepository eventRepository) {
+        this.eventRepository = eventRepository;
+    }
 
-    Notification create(String name, Notification.Type type, Map<String, String> settings, List<Long> eventIds);
+    @Override
+    public List<Event> findAll() {
+        return eventRepository.findAll();
+    }
+
+    @Override
+    public List<Event> findAllIn(List<Long> eventIds) {
+        return eventRepository.findByIdIn(eventIds);
+    }
 }

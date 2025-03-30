@@ -18,7 +18,6 @@ package com.bytechef.platform.configuration.service;
 
 import com.bytechef.platform.configuration.domain.notification.Event;
 import com.bytechef.platform.configuration.domain.notification.Notification;
-import com.bytechef.platform.configuration.repository.EventRepository;
 import com.bytechef.platform.configuration.repository.NotificationRepository;
 import java.util.List;
 import java.util.Map;
@@ -32,14 +31,17 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class NotificationServiceImpl implements NotificationService {
 
-    private EventRepository eventRepository;
     private NotificationRepository notificationRepository;
 
     public NotificationServiceImpl(
-        EventRepository eventRepository, NotificationRepository notificationRepository) {
+        NotificationRepository notificationRepository) {
 
-        this.eventRepository = eventRepository;
         this.notificationRepository = notificationRepository;
+    }
+
+    @Override
+    public List<Notification> findAll() {
+        return notificationRepository.findAll();
     }
 
     @Override
@@ -49,7 +51,7 @@ public class NotificationServiceImpl implements NotificationService {
 
     @Override
     public Notification create(
-        String name, Notification.Type notificationType, Map<String, Object> settings, List<Long> eventIds) {
+        String name, Notification.Type notificationType, Map<String, String> settings, List<Long> eventIds) {
         Notification notification = new Notification();
 
         notification.setName(name);
