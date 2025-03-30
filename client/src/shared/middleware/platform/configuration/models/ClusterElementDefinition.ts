@@ -46,11 +46,29 @@ export interface ClusterElementDefinition {
      */
     name: string;
     /**
+     * The cluster element title.
+     * @type {string}
+     * @memberof ClusterElementDefinition
+     */
+    title?: string;
+    /**
+     * The cluster element description.
+     * @type {string}
+     * @memberof ClusterElementDefinition
+     */
+    description?: string;
+    /**
      * The cluster element type.
      * @type {string}
      * @memberof ClusterElementDefinition
      */
     type: string;
+    /**
+     * The component icon.
+     * @type {string}
+     * @memberof ClusterElementDefinition
+     */
+    icon?: string;
     /**
      * Does action define output schema.
      * @type {boolean}
@@ -90,7 +108,10 @@ export function ClusterElementDefinitionFromJSONTyped(json: any, ignoreDiscrimin
         'componentName': json['componentName'],
         'componentVersion': json['componentVersion'],
         'name': json['name'],
+        'title': json['title'] == null ? undefined : json['title'],
+        'description': json['description'] == null ? undefined : json['description'],
         'type': json['type'],
+        'icon': json['icon'] == null ? undefined : json['icon'],
         'outputDefined': json['outputDefined'],
         'properties': json['properties'] == null ? undefined : ((json['properties'] as Array<any>).map(PropertyFromJSON)),
     };
@@ -110,7 +131,10 @@ export function ClusterElementDefinitionToJSONTyped(value?: ClusterElementDefini
         'componentName': value['componentName'],
         'componentVersion': value['componentVersion'],
         'name': value['name'],
+        'title': value['title'],
+        'description': value['description'],
         'type': value['type'],
+        'icon': value['icon'],
         'outputDefined': value['outputDefined'],
         'properties': value['properties'] == null ? undefined : ((value['properties'] as Array<any>).map(PropertyToJSON)),
     };
