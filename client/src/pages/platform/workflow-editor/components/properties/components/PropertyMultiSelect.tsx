@@ -47,8 +47,6 @@ const PropertyMultiSelect = ({
 }: PropertyMultiSelectProps) => {
     const [value, setValue] = useState<string[]>(initialValue ?? defaultValue ?? []);
 
-    console.log('value', value);
-
     const {currentNode} = useWorkflowNodeDetailsPanelStore();
     const {description, label, name, placeholder, required} = property;
 
