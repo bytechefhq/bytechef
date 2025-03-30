@@ -22,7 +22,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "ClusterElementDefinitionBasic", description = "A cluster element basic definition.")
 @JsonTypeName("ClusterElementDefinitionBasic")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-03-20T08:02:10.095443+01:00[Europe/Zagreb]", comments = "Generator version: 7.12.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-03-30T21:05:08.054229+02:00[Europe/Zagreb]", comments = "Generator version: 7.12.0")
 public class ClusterElementDefinitionBasicModel {
 
   private String componentName;
@@ -31,7 +31,13 @@ public class ClusterElementDefinitionBasicModel {
 
   private String name;
 
+  private @Nullable String title;
+
+  private @Nullable String description;
+
   private String type;
+
+  private @Nullable String icon;
 
   private Boolean outputDefined;
 
@@ -110,6 +116,46 @@ public class ClusterElementDefinitionBasicModel {
     this.name = name;
   }
 
+  public ClusterElementDefinitionBasicModel title(String title) {
+    this.title = title;
+    return this;
+  }
+
+  /**
+   * The cluster element title.
+   * @return title
+   */
+  
+  @Schema(name = "title", description = "The cluster element title.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("title")
+  public String getTitle() {
+    return title;
+  }
+
+  public void setTitle(String title) {
+    this.title = title;
+  }
+
+  public ClusterElementDefinitionBasicModel description(String description) {
+    this.description = description;
+    return this;
+  }
+
+  /**
+   * The cluster element description.
+   * @return description
+   */
+  
+  @Schema(name = "description", description = "The cluster element description.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("description")
+  public String getDescription() {
+    return description;
+  }
+
+  public void setDescription(String description) {
+    this.description = description;
+  }
+
   public ClusterElementDefinitionBasicModel type(String type) {
     this.type = type;
     return this;
@@ -128,6 +174,26 @@ public class ClusterElementDefinitionBasicModel {
 
   public void setType(String type) {
     this.type = type;
+  }
+
+  public ClusterElementDefinitionBasicModel icon(String icon) {
+    this.icon = icon;
+    return this;
+  }
+
+  /**
+   * The component icon.
+   * @return icon
+   */
+  
+  @Schema(name = "icon", description = "The component icon.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("icon")
+  public String getIcon() {
+    return icon;
+  }
+
+  public void setIcon(String icon) {
+    this.icon = icon;
   }
 
   public ClusterElementDefinitionBasicModel outputDefined(Boolean outputDefined) {
@@ -162,13 +228,16 @@ public class ClusterElementDefinitionBasicModel {
     return Objects.equals(this.componentName, clusterElementDefinitionBasic.componentName) &&
         Objects.equals(this.componentVersion, clusterElementDefinitionBasic.componentVersion) &&
         Objects.equals(this.name, clusterElementDefinitionBasic.name) &&
+        Objects.equals(this.title, clusterElementDefinitionBasic.title) &&
+        Objects.equals(this.description, clusterElementDefinitionBasic.description) &&
         Objects.equals(this.type, clusterElementDefinitionBasic.type) &&
+        Objects.equals(this.icon, clusterElementDefinitionBasic.icon) &&
         Objects.equals(this.outputDefined, clusterElementDefinitionBasic.outputDefined);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(componentName, componentVersion, name, type, outputDefined);
+    return Objects.hash(componentName, componentVersion, name, title, description, type, icon, outputDefined);
   }
 
   @Override
@@ -178,7 +247,10 @@ public class ClusterElementDefinitionBasicModel {
     sb.append("    componentName: ").append(toIndentedString(componentName)).append("\n");
     sb.append("    componentVersion: ").append(toIndentedString(componentVersion)).append("\n");
     sb.append("    name: ").append(toIndentedString(name)).append("\n");
+    sb.append("    title: ").append(toIndentedString(title)).append("\n");
+    sb.append("    description: ").append(toIndentedString(description)).append("\n");
     sb.append("    type: ").append(toIndentedString(type)).append("\n");
+    sb.append("    icon: ").append(toIndentedString(icon)).append("\n");
     sb.append("    outputDefined: ").append(toIndentedString(outputDefined)).append("\n");
     sb.append("}");
     return sb.toString();

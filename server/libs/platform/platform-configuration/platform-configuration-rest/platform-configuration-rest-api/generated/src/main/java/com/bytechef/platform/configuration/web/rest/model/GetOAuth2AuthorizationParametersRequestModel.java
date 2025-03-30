@@ -24,7 +24,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "getOAuth2AuthorizationParameters_request", description = "Contains all required information to open a connection to a service defined by componentName parameter.")
 @JsonTypeName("getOAuth2AuthorizationParameters_request")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-03-20T08:02:10.095443+01:00[Europe/Zagreb]", comments = "Generator version: 7.12.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-03-30T21:05:08.054229+02:00[Europe/Zagreb]", comments = "Generator version: 7.12.0")
 public class GetOAuth2AuthorizationParametersRequestModel {
 
   private @Nullable String authorizationName;
