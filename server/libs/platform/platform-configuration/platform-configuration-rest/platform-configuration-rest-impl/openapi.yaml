@@ -1443,8 +1443,17 @@ components:
         name:
           description: "The cluster element name."
           type: "string"
+        title:
+          description: "The cluster element title."
+          type: "string"
+        description:
+          description: "The cluster element description."
+          type: "string"
         type:
           description: "The cluster element type."
+          type: "string"
+        icon:
+          description: "The component icon."
           type: "string"
         outputDefined:
           description: "Does action define output schema."
