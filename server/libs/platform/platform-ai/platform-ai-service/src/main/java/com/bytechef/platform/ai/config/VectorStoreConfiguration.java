@@ -194,8 +194,7 @@ public class VectorStoreConfiguration {
 
     private static void storeDocumentsFromPath(
         String categoryName, Path path, String suffix, BatchingStrategy batchingStrategy,
-        List<Map<String, Object>> vectorStoreList, org.springframework.ai.vectorstore.VectorStore vectorStore)
-        throws IOException {
+        List<Map<String, Object>> vectorStoreList, VectorStore vectorStore) throws IOException {
 
         List<Document> documentList = new ArrayList<>();
 

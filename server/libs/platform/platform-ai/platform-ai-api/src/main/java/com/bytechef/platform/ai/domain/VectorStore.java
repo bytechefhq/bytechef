@@ -20,6 +20,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
+
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
@@ -28,6 +30,7 @@ import org.springframework.data.relational.core.mapping.Table;
  * @author Marko Kriskovic
  */
 @Table("vector_store")
+@SuppressFBWarnings("EI")
 public class VectorStore {
 
     @Id
