@@ -1,4 +1,5 @@
 import {
+    CONDITION_CASE_TRUE,
     DIRECTION,
     EDGE_STYLES,
     FINAL_PLACEHOLDER_NODE_ID,
@@ -18,9 +19,8 @@ import {Edge, Node} from '@xyflow/react';
 import {ComponentIcon} from 'lucide-react';
 import InlineSVG from 'react-inlinesvg';
 
-import {findParentConditionId, isConditionNested} from './conditionHelpers';
 import {getConditionBranchSide} from './createConditionEdges';
-import {findParentLoopId, isLoopNested} from './loopHelpers';
+import {TASK_DISPATCHER_CONFIG, findParentTaskDispatcher} from './taskDispatcherConfig';
 
 export const calculateNodeHeight = (node: Node) => {
     const isTopGhostNode = node.type === 'taskDispatcherTopGhostNode';
@@ -195,75 +195,97 @@ export const getLayoutedElements = (nodes: Node[], edges: Edge[], canvasWidth: n
     return {edges, nodes: allNodes};
 };
 
-export const createEdgeFromTaskDispatcherBottomGhostNode = (
-    node: Node,
-    allNodes: Node[] = [],
-    tasks: WorkflowTask[] = [],
-    index: number = 0
-): Edge | null => {
+export const createEdgeFromTaskDispatcherBottomGhostNode = ({
+    allNodes = [],
+    index = 0,
+    node,
+    tasks = [],
+}: {
+    allNodes?: Node[];
+    node: Node;
+    index?: number;
+    tasks?: WorkflowTask[];
+}): Edge | null => {
     const nodeData = node.data as NodeDataType;
+
     const {taskDispatcherId} = nodeData;
 
     if (!taskDispatcherId) {
         return null;
     }
 
-    if (taskDispatcherId.includes('condition')) {
-        const isNestedCondition = tasks?.length > 0 && isConditionNested(taskDispatcherId, tasks);
+    let componentName;
 
-        // Special handling for nested conditions - connect to parent's bottom ghost
-        if (isNestedCondition) {
-            const parentConditionId = findParentConditionId(taskDispatcherId, tasks);
+    // Connect to the parent task dispatcher if this is a nested task dispatcher
+    if (node.data.isNestedBottomGhost) {
+        const parentTaskDispatcher = findParentTaskDispatcher(taskDispatcherId, tasks);
 
-            if (!parentConditionId) {
-                return null;
-            }
+        if (!parentTaskDispatcher) {
+            return null;
+        }
 
-            const parentConditionBottomGhostId = `${parentConditionId}-condition-bottom-ghost`;
-            const parentConditionBottomGhost = allNodes.find((node) => node.id === parentConditionBottomGhostId);
+        const taskDispatcherNode = allNodes.find((node) => node.id === taskDispatcherId);
 
-            if (!parentConditionBottomGhost) {
-                return null;
-            }
+        componentName = parentTaskDispatcher.type.split('/')[0];
 
-            const branchSide = getConditionBranchSide(taskDispatcherId, tasks, parentConditionId);
+        let parentSubtasks: WorkflowTask[] = [];
 
-            // Create edge to parent's bottom ghost
-            return {
-                id: `${node.id}=>${parentConditionBottomGhostId}`,
+        if (componentName === 'condition') {
+            parentSubtasks = TASK_DISPATCHER_CONFIG[componentName as keyof typeof TASK_DISPATCHER_CONFIG].getSubtasks({
+                context: {
+                    conditionCase:
+                        ((taskDispatcherNode?.data as NodeDataType).conditionData?.conditionCase as
+                            | 'caseTrue'
+                            | 'caseFalse') || CONDITION_CASE_TRUE,
+                    taskDispatcherId: parentTaskDispatcher.name,
+                },
+                task: parentTaskDispatcher,
+            });
+        } else {
+            parentSubtasks = TASK_DISPATCHER_CONFIG[componentName as keyof typeof TASK_DISPATCHER_CONFIG].getSubtasks({
+                task: parentTaskDispatcher,
+            });
+        }
+
+        const currentSubtaskIndex = parentSubtasks.findIndex((subtask) => subtask.name === taskDispatcherId);
+
+        const nextSubtask = parentSubtasks[currentSubtaskIndex + 1];
+
+        if (nextSubtask) {
+            const edgeFromNestedBottomGhostToNextSubtask = {
+                id: `${node.id}=>${nextSubtask.name}`,
                 source: node.id,
                 style: EDGE_STYLES,
-                target: parentConditionBottomGhostId,
-                targetHandle: `${parentConditionBottomGhostId}-${branchSide}`,
+                target: nextSubtask.name,
                 type: 'workflow',
             };
+
+            return edgeFromNestedBottomGhostToNextSubtask;
         }
-    } else if (taskDispatcherId.includes('loop')) {
-        const isNestedLoop = tasks?.length > 0 && isLoopNested(taskDispatcherId, tasks);
 
-        if (isNestedLoop) {
-            const parentLoopId = findParentLoopId(taskDispatcherId, tasks);
+        const parentTaskDispatcherBottomGhostId = `${parentTaskDispatcher.name}-${componentName}-bottom-ghost`;
+        const parentTaskDispatcherBottomGhost = allNodes.find((node) => node.id === parentTaskDispatcherBottomGhostId);
 
-            if (!parentLoopId) {
-                return null;
-            }
-
-            const parentLoopBottomGhostId = `${parentLoopId}-loop-bottom-ghost`;
-            const parentLoopBottomGhost = allNodes.find((node) => node.id === parentLoopBottomGhostId);
-
-            if (!parentLoopBottomGhost) {
-                return null;
-            }
-
-            return {
-                id: `${node.id}=>${parentLoopBottomGhostId}`,
-                source: node.id,
-                style: EDGE_STYLES,
-                target: parentLoopBottomGhostId,
-                targetHandle: `${parentLoopBottomGhostId}-right`,
-                type: 'workflow',
-            };
+        if (!parentTaskDispatcherBottomGhost) {
+            return null;
         }
+
+        let targetHandle = `${parentTaskDispatcherBottomGhostId}-right`;
+
+        if (componentName === 'condition') {
+            const branchSide = getConditionBranchSide(taskDispatcherId, tasks, parentTaskDispatcher.name);
+
+            targetHandle = `${parentTaskDispatcherBottomGhostId}-${branchSide}`;
+        }
+
+        return {
+            id: `${node.id}=>${parentTaskDispatcherBottomGhostId}`,
+            source: node.id,
+            style: EDGE_STYLES,
+            target: parentTaskDispatcherBottomGhostId,
+            targetHandle,
+            type: 'workflow',
+        };
     }
 
     const subsequentNodes = allNodes.slice(index + 1);

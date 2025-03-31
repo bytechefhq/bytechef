@@ -94,16 +94,12 @@ export default function useLayout({
 
         tasks.forEach((task) => {
             const {name, parameters, type} = task;
-
             const componentName = type.split('/')[0];
-
             const isTaskDispatcher = TASK_DISPATCHER_NAMES.includes(componentName);
-            const isConditionTask = componentName === 'condition';
-            const isLoopTask = componentName === 'loop';
 
             let taskNode: Node;
-            let isConditionChild = false;
-            let isLoopChild = false;
+            let isNested = false;
+            let nestingData = {};
 
             const taskDefinition = [...componentDefinitions, ...taskDispatcherDefinitions].find(
                 (definition) => definition.name === componentName
@@ -128,6 +124,7 @@ export default function useLayout({
                 };
             }
 
+            // Check for nesting in conditions
             for (const [conditionId, conditionCases] of Object.entries(conditionChildTasks)) {
                 const conditionCasesList = [
                     {taskNames: conditionCases.caseTrue, value: CONDITION_CASE_TRUE},
@@ -137,8 +134,7 @@ export default function useLayout({
                 const matchingCase = conditionCasesList.find((conditionCase) => conditionCase.taskNames.includes(name));
 
                 if (matchingCase) {
-                    taskNode.data = {
-                        ...taskNode.data,
+                    nestingData = {
                         conditionData: {
                             conditionCase: matchingCase.value,
                             conditionId,
@@ -146,48 +142,58 @@ export default function useLayout({
                         },
                     };
 
-                    isConditionChild = true;
+                    isNested = true;
 
                     break;
                 }
             }
 
-            for (const [loopId, loopData] of Object.entries(loopChildTasks)) {
-                if (loopData.iteratee.includes(name)) {
-                    taskNode.data = {
-                        ...taskNode.data,
-                        loopData: {
-                            index: loopData.iteratee.indexOf(name),
-                            loopId,
-                        },
-                    };
+            // Only check for loop nesting if not already nested in a condition
+            if (!isNested) {
+                for (const [loopId, loopData] of Object.entries(loopChildTasks)) {
+                    if (loopData.iteratee.includes(name)) {
+                        nestingData = {
+                            loopData: {
+                                index: loopData.iteratee.indexOf(name),
+                                loopId,
+                            },
+                        };
 
-                    isLoopChild = true;
+                        isNested = true;
 
-                    break;
+                        break;
+                    }
                 }
+            }
+
+            // Apply nesting data if found
+            if (isNested) {
+                taskNode.data = {
+                    ...taskNode.data,
+                    ...nestingData,
+                };
             }
 
             // Create auxiliary nodes for task dispatchers
-            if (isConditionTask) {
+            if (componentName === 'condition') {
                 const hasTrueBranchTasks = parameters?.caseTrue?.length > 0;
                 const hasFalseBranchTasks = parameters?.caseFalse?.length > 0;
 
                 allNodes = createConditionNode({
                     allNodes: [...allNodes, taskNode],
                     conditionId: taskNode.id,
-                    isNestedCondition: isConditionChild,
+                    isNested,
                     options: {
                         createLeftPlaceholder: !hasTrueBranchTasks,
                         createRightPlaceholder: !hasFalseBranchTasks,
                     },
                 });
-            } else if (isLoopTask) {
+            } else if (componentName === 'loop') {
                 const hasSubtasks = parameters?.iteratee?.length > 0;
 
                 allNodes = createLoopNode({
                     allNodes: [...allNodes, taskNode],
-                    isNestedLoop: isLoopChild,
+                    isNested,
                     loopId: taskNode.id,
                     options: {
                         createPlaceholder: !hasSubtasks,
@@ -248,7 +254,7 @@ export default function useLayout({
             const isTaskDispatcherBottomGhostNode = node.type === 'taskDispatcherBottomGhostNode';
 
             if (isTaskDispatcherBottomGhostNode) {
-                const edge = createEdgeFromTaskDispatcherBottomGhostNode(node, allNodes, tasks, index);
+                const edge = createEdgeFromTaskDispatcherBottomGhostNode({allNodes, index, node, tasks});
 
                 if (edge) {
                     taskEdges.push(edge);

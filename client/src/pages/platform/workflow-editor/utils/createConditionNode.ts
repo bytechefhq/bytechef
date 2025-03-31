@@ -9,7 +9,7 @@ type ConditionNodeOptionsType = {
 type CreateConditionNodePropsType = {
     allNodes: Array<Node>;
     conditionId: string;
-    isNestedCondition?: boolean;
+    isNested?: boolean;
     options?: ConditionNodeOptionsType;
 };
 
@@ -50,7 +50,7 @@ function createBottomGhostNode(conditionId: string, isNested: boolean = false): 
     return {
         data: {
             conditionId: conditionId,
-            isNestedConditionBottomGhost: isNested,
+            isNestedBottomGhost: isNested,
             taskDispatcherId: conditionId,
         },
         id: `${conditionId}-condition-bottom-ghost`,
@@ -65,7 +65,7 @@ function createBottomGhostNode(conditionId: string, isNested: boolean = false): 
 export default function createConditionNode({
     allNodes,
     conditionId,
-    isNestedCondition = false,
+    isNested = false,
     options = {
         createLeftPlaceholder: true,
         createRightPlaceholder: true,
@@ -85,7 +85,7 @@ export default function createConditionNode({
         nodesToAdd.push(createPlaceholderNode(conditionId, CONDITION_CASE_FALSE, 'right'));
     }
 
-    nodesToAdd.push(createBottomGhostNode(conditionId, isNestedCondition));
+    nodesToAdd.push(createBottomGhostNode(conditionId, isNested));
 
     nodesWithCondition.splice(insertIndex, 0, ...nodesToAdd);
 
