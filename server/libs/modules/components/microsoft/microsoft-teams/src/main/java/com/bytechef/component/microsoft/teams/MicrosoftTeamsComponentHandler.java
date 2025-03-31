@@ -17,6 +17,7 @@
 package com.bytechef.component.microsoft.teams;
 
 import static com.bytechef.component.definition.ComponentDsl.component;
+import static com.bytechef.component.definition.ComponentDsl.tool;
 
 import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.definition.ComponentCategory;
@@ -45,7 +46,11 @@ public class MicrosoftTeamsComponentHandler implements ComponentHandler {
         .actions(
             MicrosoftTeamsCreateChannelAction.ACTION_DEFINITION,
             MicrosoftTeamsSendChannelMessageAction.ACTION_DEFINITION,
-            MicrosoftTeamsSendChatMessageAction.ACTION_DEFINITION);
+            MicrosoftTeamsSendChatMessageAction.ACTION_DEFINITION)
+        .clusterElements(
+            tool(MicrosoftTeamsCreateChannelAction.ACTION_DEFINITION),
+            tool(MicrosoftTeamsSendChannelMessageAction.ACTION_DEFINITION),
+            tool(MicrosoftTeamsSendChatMessageAction.ACTION_DEFINITION));
 
     @Override
     public ComponentDefinition getDefinition() {

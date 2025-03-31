@@ -17,6 +17,7 @@
 package com.bytechef.component.rabbitmq;
 
 import static com.bytechef.component.definition.ComponentDsl.component;
+import static com.bytechef.component.definition.ComponentDsl.tool;
 
 import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.definition.ComponentDefinition;
@@ -40,6 +41,7 @@ public class RabbitMqComponentHandler implements ComponentHandler {
         .icon("path:assets/rabbitmq.svg")
         .connection(RabbitMqConnection.CONNECTION_DEFINITION)
         .actions(RabbitMqSendMessageAction.ACTION_DEFINITION)
+        .clusterElements(tool(RabbitMqSendMessageAction.ACTION_DEFINITION))
         .triggers(RabbitMqNewMessageTrigger.TRIGGER_DEFINITION);
 
     @Override

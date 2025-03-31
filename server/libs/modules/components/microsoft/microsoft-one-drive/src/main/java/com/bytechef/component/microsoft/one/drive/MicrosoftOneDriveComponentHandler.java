@@ -17,6 +17,7 @@
 package com.bytechef.component.microsoft.one.drive;
 
 import static com.bytechef.component.definition.ComponentDsl.component;
+import static com.bytechef.component.definition.ComponentDsl.tool;
 
 import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.definition.ComponentCategory;
@@ -49,6 +50,11 @@ public class MicrosoftOneDriveComponentHandler implements ComponentHandler {
             MicrosoftOneDriveListFilesAction.ACTION_DEFINITION,
             MicrosoftOneDriveListFoldersAction.ACTION_DEFINITION,
             MicrosoftOneDriveUploadFileAction.ACTION_DEFINITION)
+        .clusterElements(
+            tool(MicrosoftOneDriveDownloadFileAction.ACTION_DEFINITION),
+            tool(MicrosoftOneDriveListFilesAction.ACTION_DEFINITION),
+            tool(MicrosoftOneDriveListFoldersAction.ACTION_DEFINITION),
+            tool(MicrosoftOneDriveUploadFileAction.ACTION_DEFINITION))
         .triggers(MicrosoftOneDriveNewFileTrigger.TRIGGER_DEFINITION);
 
     @Override

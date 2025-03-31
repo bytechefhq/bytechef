@@ -23,8 +23,8 @@ import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.dropbox.constant.DropboxConstants.QUERY;
 
-import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
+import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.ContextFunction;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Parameters;
@@ -84,10 +84,8 @@ public class DropboxSearchAction {
     private DropboxSearchAction() {
     }
 
-    public static Object perform(
-        Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) {
-
-        return actionContext.http(POST_SEARCH_CONTEXT_FUNCTION)
+    public static Object perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
+        return context.http(POST_SEARCH_CONTEXT_FUNCTION)
             .body(Http.Body.of(QUERY, inputParameters.getRequired(QUERY)))
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute()

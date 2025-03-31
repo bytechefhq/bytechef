@@ -25,8 +25,8 @@ import static com.bytechef.component.microsoft.excel.constant.MicrosoftExcelCons
 import static com.bytechef.component.microsoft.excel.constant.MicrosoftExcelConstants.WORKSHEET_NAME_PROPERTY;
 import static com.bytechef.component.microsoft.excel.util.MicrosoftExcelUtils.getLastUsedColumnLabel;
 
-import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
+import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Parameters;
 import java.util.List;
@@ -51,14 +51,12 @@ public class MicrosoftExcelDeleteRowAction {
     private MicrosoftExcelDeleteRowAction() {
     }
 
-    protected static Object perform(
-        Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) {
-
+    public static Object perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
         int rowNumber = inputParameters.getRequiredInteger(ROW_NUMBER);
 
-        String range = "A" + rowNumber + ":" + getLastUsedColumnLabel(inputParameters, actionContext) + rowNumber;
+        String range = "A" + rowNumber + ":" + getLastUsedColumnLabel(inputParameters, context) + rowNumber;
 
-        actionContext.http(http -> http
+        context.http(http -> http
             .post(
                 "/me/drive/items/%s/workbook/worksheets/%s/range(address='%s')/delete"
                     .formatted(inputParameters.getRequiredString(WORKBOOK_ID),

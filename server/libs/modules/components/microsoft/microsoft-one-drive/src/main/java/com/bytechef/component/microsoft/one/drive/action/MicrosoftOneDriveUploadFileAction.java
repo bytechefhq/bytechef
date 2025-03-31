@@ -27,8 +27,8 @@ import static com.bytechef.component.microsoft.one.drive.constant.MicrosoftOneDr
 import static com.bytechef.component.microsoft.one.drive.constant.MicrosoftOneDriveConstants.PARENT_ID;
 import static com.bytechef.component.microsoft.one.drive.util.MicrosoftOneDriveUtils.getFolderId;
 
-import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
+import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.FileEntry;
 import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
@@ -67,9 +67,7 @@ public class MicrosoftOneDriveUploadFileAction {
     private MicrosoftOneDriveUploadFileAction() {
     }
 
-    public static Object perform(
-        Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
-
+    public static Object perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
         FileEntry fileEntry = inputParameters.getRequiredFileEntry(FILE);
 
         return context

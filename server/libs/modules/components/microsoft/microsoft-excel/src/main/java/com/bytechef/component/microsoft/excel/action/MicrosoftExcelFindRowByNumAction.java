@@ -25,8 +25,8 @@ import static com.bytechef.component.microsoft.excel.constant.MicrosoftExcelCons
 import static com.bytechef.component.microsoft.excel.util.MicrosoftExcelRowUtils.getRowFromWorksheet;
 import static com.bytechef.component.microsoft.excel.util.MicrosoftExcelUtils.getMapOfValuesForRow;
 
-import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
+import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
 import java.util.List;
 
@@ -52,12 +52,10 @@ public class MicrosoftExcelFindRowByNumAction {
     private MicrosoftExcelFindRowByNumAction() {
     }
 
-    protected static Object perform(
-        Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) {
-
+    public static Object perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
         List<Object> row = getRowFromWorksheet(
-            inputParameters, actionContext, inputParameters.getRequiredInteger(ROW_NUMBER));
+            inputParameters, context, inputParameters.getRequiredInteger(ROW_NUMBER));
 
-        return getMapOfValuesForRow(inputParameters, actionContext, row);
+        return getMapOfValuesForRow(inputParameters, context, row);
     }
 }

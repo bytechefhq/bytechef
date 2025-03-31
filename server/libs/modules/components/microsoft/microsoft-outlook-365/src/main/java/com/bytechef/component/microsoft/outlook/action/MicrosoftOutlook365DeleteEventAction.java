@@ -22,8 +22,8 @@ import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook
 import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.CALENDAR_ID_PROPERTY;
 import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.EVENT;
 
-import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
+import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.Parameters;
@@ -50,10 +50,8 @@ public class MicrosoftOutlook365DeleteEventAction {
     private MicrosoftOutlook365DeleteEventAction() {
     }
 
-    protected static Object perform(
-        Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) {
-
-        actionContext
+    public static Object perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
+        context
             .http(http -> http.delete(
                 "/me/calendars/%s/events/%s"
                     .formatted(inputParameters.getRequiredString(CALENDAR), inputParameters.getRequiredString(EVENT))))

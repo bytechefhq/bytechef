@@ -32,8 +32,8 @@ import static com.bytechef.component.intercom.constant.IntercomConstants.TEMPLAT
 import static com.bytechef.component.intercom.constant.IntercomConstants.TO;
 import static com.bytechef.component.intercom.constant.IntercomConstants.TYPE;
 
-import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
+import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.ContextFunction;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Context.Http.Body;
@@ -101,13 +101,11 @@ public class IntercomSendMessageAction {
     protected static final ContextFunction<Http, Http.Executor> POST_MESSAGES_CONTEXT_FUNCTION =
         http -> http.post("/messages");
 
-    public static Object perform(
-        Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) {
+    public static Object perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
+        Map<String, String> fromData = IntercomUtils.getContactRole(inputParameters.getString(TO), context);
+        Map<String, String> toData = IntercomUtils.getAdminId(context);
 
-        Map<String, String> fromData = IntercomUtils.getContactRole(inputParameters.getString(TO), actionContext);
-        Map<String, String> toData = IntercomUtils.getAdminId(actionContext);
-
-        return actionContext.http(POST_MESSAGES_CONTEXT_FUNCTION)
+        return context.http(POST_MESSAGES_CONTEXT_FUNCTION)
             .body(
                 Body.of(
                     MESSAGE_TYPE, inputParameters.getRequiredString(MESSAGE_TYPE),

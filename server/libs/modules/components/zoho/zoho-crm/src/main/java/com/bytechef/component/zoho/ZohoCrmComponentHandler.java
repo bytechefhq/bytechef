@@ -17,6 +17,7 @@
 package com.bytechef.component.zoho;
 
 import static com.bytechef.component.definition.ComponentDsl.component;
+import static com.bytechef.component.definition.ComponentDsl.tool;
 import static com.bytechef.component.zoho.connection.ZohoCrmConnection.CONNECTION_DEFINITION;
 
 import com.bytechef.component.ComponentHandler;
@@ -45,6 +46,10 @@ public class ZohoCrmComponentHandler implements ComponentHandler {
             ZohoCrmAddUserAction.ACTION_DEFINITION,
             ZohoCrmGetOrganizationAction.ACTION_DEFINITION,
             ZohoCrmListUsersAction.ACTION_DEFINITION)
+        .clusterElements(
+            tool(ZohoCrmAddUserAction.ACTION_DEFINITION),
+            tool(ZohoCrmGetOrganizationAction.ACTION_DEFINITION),
+            tool(ZohoCrmListUsersAction.ACTION_DEFINITION))
         .icon("path:assets/zoho-crm.svg");
 
     @Override

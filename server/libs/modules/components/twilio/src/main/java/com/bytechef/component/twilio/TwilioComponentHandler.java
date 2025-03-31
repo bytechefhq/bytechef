@@ -17,6 +17,7 @@
 package com.bytechef.component.twilio;
 
 import static com.bytechef.component.definition.ComponentDsl.component;
+import static com.bytechef.component.definition.ComponentDsl.tool;
 
 import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.definition.ComponentCategory;
@@ -45,6 +46,9 @@ public class TwilioComponentHandler implements ComponentHandler {
         .actions(
             TwilioSendSMSAction.ACTION_DEFINITION,
             TwilioSendWhatsAppMessageAction.ACTION_DEFINITION)
+        .clusterElements(
+            tool(TwilioSendSMSAction.ACTION_DEFINITION),
+            tool(TwilioSendWhatsAppMessageAction.ACTION_DEFINITION))
         .triggers(TwilioNewWhatsappMessageTrigger.TRIGGER_DEFINITION);
 
     @Override

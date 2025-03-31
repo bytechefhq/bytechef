@@ -20,7 +20,7 @@ import static com.bytechef.component.microsoft.excel.constant.MicrosoftExcelCons
 import static com.bytechef.component.microsoft.excel.constant.MicrosoftExcelConstants.WORKBOOK_ID;
 import static com.bytechef.component.microsoft.excel.constant.MicrosoftExcelConstants.WORKSHEET_NAME;
 
-import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
@@ -36,8 +36,7 @@ public class MicrosoftExcelRowUtils {
     private MicrosoftExcelRowUtils() {
     }
 
-    public static List<Object> getRowFromWorksheet(
-        Parameters inputParameters, ActionContext context, Integer rowNumber) {
+    public static List<Object> getRowFromWorksheet(Parameters inputParameters, Context context, Integer rowNumber) {
 
         String range =
             "A" + rowNumber + ":" + MicrosoftExcelUtils.getLastUsedColumnLabel(inputParameters, context) + rowNumber;

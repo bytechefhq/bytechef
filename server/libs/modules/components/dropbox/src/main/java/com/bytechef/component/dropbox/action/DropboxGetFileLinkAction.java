@@ -24,8 +24,8 @@ import static com.bytechef.component.dropbox.constant.DropboxConstants.FILENAME;
 import static com.bytechef.component.dropbox.constant.DropboxConstants.PATH;
 import static com.bytechef.component.dropbox.util.DropboxUtils.getFullPath;
 
-import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
+import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.ContextFunction;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Parameters;
@@ -86,10 +86,8 @@ public class DropboxGetFileLinkAction {
     private DropboxGetFileLinkAction() {
     }
 
-    public static Object perform(
-        Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) {
-
-        return actionContext.http(POST_TEMPORARY_LINK_CONTEXT_FUNCTION)
+    public static Object perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
+        return context.http(POST_TEMPORARY_LINK_CONTEXT_FUNCTION)
             .body(
                 Http.Body.of(
                     Map.of(

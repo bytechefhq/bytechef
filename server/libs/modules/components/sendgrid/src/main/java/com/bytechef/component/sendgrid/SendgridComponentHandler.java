@@ -17,6 +17,7 @@
 package com.bytechef.component.sendgrid;
 
 import static com.bytechef.component.definition.ComponentDsl.component;
+import static com.bytechef.component.definition.ComponentDsl.tool;
 
 import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.definition.ComponentCategory;
@@ -38,7 +39,8 @@ public class SendgridComponentHandler implements ComponentHandler {
         .connection(SendgridConnection.CONNECTION_DEFINITION)
         .icon("path:assets/sendgrid.svg")
         .categories(ComponentCategory.COMMUNICATION, ComponentCategory.MARKETING_AUTOMATION)
-        .actions(SendgridSendEmailAction.ACTION_DEFINITION);
+        .actions(SendgridSendEmailAction.ACTION_DEFINITION)
+        .clusterElements(tool(SendgridSendEmailAction.ACTION_DEFINITION));
 
     @Override
     public ComponentDefinition getDefinition() {

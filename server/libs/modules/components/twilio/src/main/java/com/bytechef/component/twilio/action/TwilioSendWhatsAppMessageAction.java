@@ -32,8 +32,8 @@ import static com.bytechef.component.twilio.constant.TwilioConstants.MESSAGE_OUT
 import static com.bytechef.component.twilio.constant.TwilioConstants.TO;
 import static com.bytechef.component.twilio.constant.TwilioConstants.USE_TEMPLATE;
 
-import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
+import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.Parameters;
@@ -96,12 +96,10 @@ public class TwilioSendWhatsAppMessageAction {
     private TwilioSendWhatsAppMessageAction() {
     }
 
-    protected static Object perform(
-        Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) {
+    protected static Object perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
+        Map<String, String> bodyMap = createBodyMap(inputParameters, context);
 
-        Map<String, String> bodyMap = createBodyMap(inputParameters, actionContext);
-
-        return actionContext
+        return context
             .http(http -> http.post("/Accounts/" + connectionParameters.getRequiredString(USERNAME) + "/Messages.json"))
             .body(Http.Body.of(bodyMap, FORM_URL_ENCODED))
             .configuration(responseType(Http.ResponseType.JSON))
@@ -109,7 +107,7 @@ public class TwilioSendWhatsAppMessageAction {
             .getBody(new TypeReference<>() {});
     }
 
-    private static Map<String, String> createBodyMap(Parameters inputParameters, ActionContext actionContext) {
+    private static Map<String, String> createBodyMap(Parameters inputParameters, Context context) {
         String from = inputParameters.getRequiredString(FROM);
         String to = inputParameters.getRequiredString(TO);
 
@@ -127,7 +125,7 @@ public class TwilioSendWhatsAppMessageAction {
             Map<String, String> map = inputParameters.getMap(CONTENT_VARIABLES, String.class);
 
             if (map != null) {
-                bodyMap.put(CONTENT_VARIABLES, actionContext.json(json -> json.write(map)));
+                bodyMap.put(CONTENT_VARIABLES, context.json(json -> json.write(map)));
             }
         } else {
             bodyMap.put(BODY, inputParameters.getRequiredString(BODY));

@@ -29,8 +29,8 @@ import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook
 import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.VALUE;
 import static com.bytechef.component.microsoft.outlook.util.MicrosoftOutlook365Utils.getItemsFromNextPage;
 
-import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
+import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.Parameters;
@@ -73,7 +73,7 @@ public class MicrosoftOutlook365SearchEmailAction {
     }
 
     public static List<Map<?, ?>> perform(
-        Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
+        Parameters inputParameters, Parameters connectionParameters, Context context) {
 
         StringBuilder stringBuilder = new StringBuilder();
 

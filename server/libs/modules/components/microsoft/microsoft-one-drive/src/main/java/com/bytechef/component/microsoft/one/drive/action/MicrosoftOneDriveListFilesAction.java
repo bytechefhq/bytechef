@@ -28,8 +28,8 @@ import static com.bytechef.component.microsoft.one.drive.constant.MicrosoftOneDr
 import static com.bytechef.component.microsoft.one.drive.constant.MicrosoftOneDriveConstants.VALUE;
 import static com.bytechef.component.microsoft.one.drive.util.MicrosoftOneDriveUtils.getFolderId;
 
-import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
+import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.Parameters;
@@ -69,7 +69,7 @@ public class MicrosoftOneDriveListFilesAction {
     }
 
     public static List<Map<?, ?>> perform(
-        Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
+        Parameters inputParameters, Parameters connectionParameters, Context context) {
 
         Map<String, ?> body = context
             .http(http -> http.get(

@@ -22,7 +22,7 @@ import static com.bytechef.component.microsoft.excel.constant.MicrosoftExcelCons
 import static com.bytechef.component.microsoft.excel.util.MicrosoftExcelUtils.columnToLabel;
 import static com.bytechef.component.microsoft.excel.util.MicrosoftExcelUtils.getMapOfValuesForRow;
 
-import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Parameters;
 import java.util.List;
@@ -37,11 +37,11 @@ public class MicrosoftExcelUpdateWorksheetUtils {
     }
 
     public static Map<String, Object> updateRange(
-        Parameters inputParameters, ActionContext actionContext, int rowNumber, List<Object> rowValues) {
+        Parameters inputParameters, Context context, int rowNumber, List<Object> rowValues) {
 
         String range = "A" + rowNumber + ":" + columnToLabel(rowValues.size(), false) + rowNumber;
 
-        actionContext
+        context
             .http(http -> http.patch(
                 "/me/drive/items/%s/workbook/worksheets/%s/range(address='%s')"
                     .formatted(inputParameters.getRequiredString(WORKBOOK_ID),
@@ -50,6 +50,6 @@ public class MicrosoftExcelUpdateWorksheetUtils {
             .body(Http.Body.of(VALUES, List.of(rowValues)))
             .execute();
 
-        return getMapOfValuesForRow(inputParameters, actionContext, rowValues);
+        return getMapOfValuesForRow(inputParameters, context, rowValues);
     }
 }

@@ -33,7 +33,7 @@ import static com.bytechef.component.sendgrid.constant.SendgridConstants.TEXT;
 import static com.bytechef.component.sendgrid.constant.SendgridConstants.TO;
 import static com.bytechef.component.sendgrid.constant.SendgridConstants.TYPE;
 
-import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http.Body;
 import com.bytechef.component.definition.Context.Http.ResponseType;
 import com.bytechef.component.definition.FileEntry;
@@ -115,7 +115,7 @@ public final class SendgridSendEmailAction {
 
     private static final Base64.Encoder ENCODER = Base64.getEncoder();
 
-    public static Object perform(Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
+    public static Object perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
         List<FileEntry> attachmentFiles = inputParameters.getList(ATTACHMENTS, FileEntry.class);
 
         List<Map<String, Object>> allAttachments = getAllAttachments(attachmentFiles, context);
@@ -150,7 +150,7 @@ public final class SendgridSendEmailAction {
         return null;
     }
 
-    private static List<Map<String, Object>> getAllAttachments(List<FileEntry> attachmentFiles, ActionContext context) {
+    private static List<Map<String, Object>> getAllAttachments(List<FileEntry> attachmentFiles, Context context) {
         List<Map<String, Object>> allAttachments = new ArrayList<>();
 
         for (FileEntry attachment : attachmentFiles) {

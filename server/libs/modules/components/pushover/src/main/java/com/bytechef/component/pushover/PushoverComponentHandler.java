@@ -17,6 +17,7 @@
 package com.bytechef.component.pushover;
 
 import static com.bytechef.component.definition.ComponentDsl.component;
+import static com.bytechef.component.definition.ComponentDsl.tool;
 
 import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.definition.ComponentCategory;
@@ -39,7 +40,8 @@ public class PushoverComponentHandler implements ComponentHandler {
         .icon("path:assets/pushover.svg")
         .categories(ComponentCategory.COMMUNICATION)
         .connection(PushoverConnection.CONNECTION_DEFINITION)
-        .actions(PushoverSendNotificationAction.ACTION_DEFINITION);
+        .actions(PushoverSendNotificationAction.ACTION_DEFINITION)
+        .clusterElements(tool(PushoverSendNotificationAction.ACTION_DEFINITION));
 
     @Override
     public ComponentDefinition getDefinition() {

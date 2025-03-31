@@ -17,6 +17,7 @@
 package com.bytechef.component.jira;
 
 import static com.bytechef.component.definition.ComponentDsl.component;
+import static com.bytechef.component.definition.ComponentDsl.tool;
 
 import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.definition.ComponentCategory;
@@ -52,6 +53,11 @@ public class JiraComponentHandler implements ComponentHandler {
             JiraCreateIssueCommentAction.ACTION_DEFINITION,
             JiraGetIssueAction.ACTION_DEFINITION,
             JiraSearchForIssuesUsingJqlAction.ACTION_DEFINITION)
+        .clusterElements(
+            tool(JiraCreateIssueAction.ACTION_DEFINITION),
+            tool(JiraCreateIssueCommentAction.ACTION_DEFINITION),
+            tool(JiraGetIssueAction.ACTION_DEFINITION),
+            tool(JiraSearchForIssuesUsingJqlAction.ACTION_DEFINITION))
         .triggers(
             JiraNewIssueTrigger.TRIGGER_DEFINITION,
             JiraUpdatedIssueTrigger.TRIGGER_DEFINITION)

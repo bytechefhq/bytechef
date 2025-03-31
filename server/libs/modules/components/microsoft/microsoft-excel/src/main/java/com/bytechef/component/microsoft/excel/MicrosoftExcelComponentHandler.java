@@ -17,6 +17,7 @@
 package com.bytechef.component.microsoft.excel;
 
 import static com.bytechef.component.definition.ComponentDsl.component;
+import static com.bytechef.component.definition.ComponentDsl.tool;
 
 import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.definition.ComponentCategory;
@@ -49,7 +50,13 @@ public class MicrosoftExcelComponentHandler implements ComponentHandler {
             MicrosoftExcelClearWorksheetAction.ACTION_DEFINITION,
             MicrosoftExcelDeleteRowAction.ACTION_DEFINITION,
             MicrosoftExcelFindRowByNumAction.ACTION_DEFINITION,
-            MicrosoftExcelUpdateRowAction.ACTION_DEFINITION);
+            MicrosoftExcelUpdateRowAction.ACTION_DEFINITION)
+        .clusterElements(
+            tool(MicrosoftExcelAppendRowAction.ACTION_DEFINITION),
+            tool(MicrosoftExcelClearWorksheetAction.ACTION_DEFINITION),
+            tool(MicrosoftExcelDeleteRowAction.ACTION_DEFINITION),
+            tool(MicrosoftExcelFindRowByNumAction.ACTION_DEFINITION),
+            tool(MicrosoftExcelUpdateRowAction.ACTION_DEFINITION));
 
     @Override
     public ComponentDefinition getDefinition() {

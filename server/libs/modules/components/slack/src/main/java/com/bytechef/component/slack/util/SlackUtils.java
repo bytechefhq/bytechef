@@ -40,8 +40,9 @@ public class SlackUtils {
     private SlackUtils() {
     }
 
-    public static Object
-        sendMessage(String channel, String text, List<Map<String, Object>> blocks, ActionContext actionContext) {
+    public static Object sendMessage(
+        String channel, String text, List<Map<String, Object>> blocks, ActionContext actionContext) {
+
         return actionContext
             .http(http -> http.post("/chat.postMessage"))
             .body(

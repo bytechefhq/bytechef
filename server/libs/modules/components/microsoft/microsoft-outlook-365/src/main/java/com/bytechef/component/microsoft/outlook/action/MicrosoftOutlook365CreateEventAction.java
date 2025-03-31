@@ -41,8 +41,8 @@ import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook
 import static com.bytechef.component.microsoft.outlook.util.MicrosoftOutlook365CustomEventUtils.createCustomEvent;
 import static com.bytechef.component.microsoft.outlook.util.MicrosoftOutlook365Utils.getMailboxTimeZone;
 
-import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
+import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
@@ -114,9 +114,7 @@ public class MicrosoftOutlook365CreateEventAction {
     private MicrosoftOutlook365CreateEventAction() {
     }
 
-    protected static CustomEvent perform(
-        Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) {
-
+    public static CustomEvent perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
         boolean allDay = inputParameters.getRequiredBoolean(ALL_DAY);
 
         LocalDateTime startTime = allDay
@@ -133,10 +131,10 @@ public class MicrosoftOutlook365CreateEventAction {
             .map(attendee -> Map.of(EMAIL_ADDRESS, Map.of(ADDRESS, attendee)))
             .toList();
 
-        String zone = getMailboxTimeZone(actionContext);
+        String zone = getMailboxTimeZone(context);
 
         Map<String, Object> body =
-            actionContext
+            context
                 .http(
                     http -> http.post("/me/calendars/%s/events".formatted(inputParameters.getRequiredString(CALENDAR))))
                 .configuration(Http.responseType(Http.ResponseType.JSON))

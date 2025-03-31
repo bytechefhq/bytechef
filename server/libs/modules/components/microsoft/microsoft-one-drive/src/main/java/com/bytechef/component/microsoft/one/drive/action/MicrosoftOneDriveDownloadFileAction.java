@@ -23,8 +23,8 @@ import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.microsoft.one.drive.constant.MicrosoftOneDriveConstants.ID;
 import static com.bytechef.component.microsoft.one.drive.constant.MicrosoftOneDriveConstants.PARENT_ID;
 
-import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
+import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.Parameters;
@@ -56,9 +56,7 @@ public class MicrosoftOneDriveDownloadFileAction {
     private MicrosoftOneDriveDownloadFileAction() {
     }
 
-    public static Object perform(
-        Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
-
+    public static Object perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
         Http.Response response = context
             .http(http -> http.get("/me/drive/items/%s/content".formatted(inputParameters.getRequiredString(ID))))
             .configuration(Http.responseType(Http.ResponseType.JSON))

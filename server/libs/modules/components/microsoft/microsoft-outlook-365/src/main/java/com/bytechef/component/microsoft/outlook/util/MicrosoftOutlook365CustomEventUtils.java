@@ -34,7 +34,6 @@ import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook
 import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.TO;
 import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.VALUE;
 
-import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
@@ -83,10 +82,10 @@ public class MicrosoftOutlook365CustomEventUtils {
         return LocalDateTime.parse(inputFormatter.format(LocalDateTime.parse((String) timeMap.get(DATE_TIME))));
     }
 
-    public static List<CustomEvent> retrieveCustomEvents(Parameters inputParameters, ActionContext actionContext) {
-        Map<String, Object> body = actionContext
+    public static List<CustomEvent> retrieveCustomEvents(Parameters inputParameters, Context context) {
+        Map<String, Object> body = context
             .http(http -> http.get("/me/calendars/%s/events".formatted(inputParameters.getRequiredString(CALENDAR))))
-            .header("Prefer", "outlook.timezone=\"" + MicrosoftOutlook365Utils.getMailboxTimeZone(actionContext) + "\"")
+            .header("Prefer", "outlook.timezone=\"" + MicrosoftOutlook365Utils.getMailboxTimeZone(context) + "\"")
             .configuration(Context.Http.responseType(Context.Http.ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});
@@ -102,7 +101,7 @@ public class MicrosoftOutlook365CustomEventUtils {
         }
 
         List<Map<?, ?>> eventsFromNextPage =
-            MicrosoftOutlook365Utils.getItemsFromNextPage((String) body.get(ODATA_NEXT_LINK), actionContext);
+            MicrosoftOutlook365Utils.getItemsFromNextPage((String) body.get(ODATA_NEXT_LINK), context);
 
         events.addAll(eventsFromNextPage);
 
