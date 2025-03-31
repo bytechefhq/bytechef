@@ -16,8 +16,8 @@ info:
   analytics:
     enabled: ${bytechef.analytics.enabled:false}
     postHog:
-      apiKey: ${bytechef.analytics.post-hog.api-key:}
-      host: ${bytechef.analytics.post-hog.host:}
+      apiKey: ${post-hog.api-key:}
+      host: ${post-hog.host:}
   application:
     edition: ${bytechef.edition:}
   featureFlags: ${bytechef.feature-flags}

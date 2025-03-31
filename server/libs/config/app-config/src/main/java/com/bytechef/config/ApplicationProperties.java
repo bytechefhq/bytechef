@@ -852,47 +852,12 @@ public class ApplicationProperties {
 
         private boolean enabled;
 
-        private PostHog postHog = new PostHog();
-
         public boolean isEnabled() {
             return enabled;
         }
 
-        public PostHog getPostHog() {
-            return postHog;
-        }
-
         public void setEnabled(boolean enabled) {
             this.enabled = enabled;
-        }
-
-        public void setPostHog(PostHog postHog) {
-            this.postHog = postHog;
-        }
-
-        /**
-         * PostHog properties.
-         */
-        public static class PostHog {
-
-            private String apiKey;
-            private String host;
-
-            public String getApiKey() {
-                return apiKey;
-            }
-
-            public String getHost() {
-                return host;
-            }
-
-            public void setApiKey(String apiKey) {
-                this.apiKey = apiKey;
-            }
-
-            public void setHost(String host) {
-                this.host = host;
-            }
         }
     }
 

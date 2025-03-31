@@ -31,12 +31,15 @@ spring:
 command-bar:
   org-id: 3816ef6c
 
+post-hog:
+  api-key: phc_oZ9XWAVf8xf6sI7IYBAbGldSbiud07ioZItD1XvhJ7S
+  host: https://eu.i.posthog.com
+
+#####
+
 bytechef:
   analytics:
     enabled: true
-    post-hog:
-      api-key: phc_oZ9XWAVf8xf6sI7IYBAbGldSbiud07ioZItD1XvhJ7S
-      host: https://eu.i.posthog.com
   help-hub:
     enabled: true
   public-url: http://127.0.0.1:8080
