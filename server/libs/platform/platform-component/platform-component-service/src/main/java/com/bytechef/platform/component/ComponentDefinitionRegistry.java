@@ -50,6 +50,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -79,7 +80,7 @@ public class ComponentDefinitionRegistry {
         .actions(ComponentDsl.action("missing")
             .title("Missing Action"));
 
-    private final Map<String, Map<Integer, ComponentDefinition>> componentDefinitions = new HashMap<>();
+    private final Map<String, Map<Integer, ComponentDefinition>> componentDefinitionsMap = new HashMap<>();
     private final List<DynamicComponentHandlerRegistry> dynamicComponentHandlerListFactories;
 
     public ComponentDefinitionRegistry(
@@ -111,7 +112,8 @@ public class ComponentDefinitionRegistry {
         validate(componentDefinitions);
 
         for (ComponentDefinition componentDefinition : componentDefinitions) {
-            this.componentDefinitions.computeIfAbsent(componentDefinition.getName(), key -> new HashMap<>())
+            this.componentDefinitionsMap
+                .computeIfAbsent(StringUtils.upperCase(componentDefinition.getName()), key -> new HashMap<>())
                 .put(componentDefinition.getVersion(), componentDefinition);
         }
 
@@ -183,7 +185,8 @@ public class ComponentDefinitionRegistry {
 
             componentDefinition = filteredComponentDefinitions.getLast();
         } else {
-            Map<Integer, ComponentDefinition> componentDefinitionMap = componentDefinitions.get(name);
+            Map<Integer, ComponentDefinition> componentDefinitionMap = componentDefinitionsMap.get(
+                StringUtils.upperCase(name));
 
             if (componentDefinitionMap != null) {
                 componentDefinition = componentDefinitionMap.get(version);
@@ -208,7 +211,7 @@ public class ComponentDefinitionRegistry {
     public List<ComponentDefinition> getComponentDefinitions() {
         return CollectionUtils.sort(
             CollectionUtils.concat(
-                componentDefinitions.values()
+                componentDefinitionsMap.values()
                     .stream()
                     .flatMap(map -> CollectionUtils.stream(map.values()))
                     .toList(),
@@ -221,7 +224,8 @@ public class ComponentDefinitionRegistry {
     }
 
     public List<ComponentDefinition> getComponentDefinitions(String name) {
-        Map<Integer, ComponentDefinition> integerComponentDefinitionMap = componentDefinitions.get(name);
+        Map<Integer, ComponentDefinition> integerComponentDefinitionMap = componentDefinitionsMap.get(
+            StringUtils.upperCase(name));
 
         if (integerComponentDefinitionMap == null) {
             return List.of();

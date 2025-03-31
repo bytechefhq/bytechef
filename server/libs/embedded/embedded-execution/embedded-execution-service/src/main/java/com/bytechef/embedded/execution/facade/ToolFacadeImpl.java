@@ -41,7 +41,6 @@ import edu.umd.cs.findbugs.annotations.Nullable;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 
@@ -50,8 +49,6 @@ import org.springframework.stereotype.Service;
  */
 @Service
 public class ToolFacadeImpl implements ToolFacade {
-
-    private static final Map<String, String> COMPONENT_NAME_MAP = new ConcurrentHashMap<>();
 
     private final ClusterElementDefinitionFacade clusterElementDefinitionFacade;
     private final ClusterElementDefinitionService clusterElementDefinitionService;
@@ -142,10 +139,10 @@ public class ToolFacadeImpl implements ToolFacade {
     public Object executeTool(
         String toolName, Map<String, Object> inputParameters, Environment environment, @Nullable Long instanceId) {
 
-        Map.Entry<String, String> componentClusterElementNames = getComponentClusterElementNames(toolName);
+        ComponentClusterElementNameResult result = getComponentClusterElementNames(toolName);
 
         ClusterElementDefinition clusterElementDefinition = clusterElementDefinitionService.getClusterElementDefinition(
-            componentClusterElementNames.getKey(), componentClusterElementNames.getValue());
+            result.componentName(), result.clusterElementName());
 
         String componentName = clusterElementDefinition.getComponentName();
 
@@ -207,18 +204,15 @@ public class ToolFacadeImpl implements ToolFacade {
             }
         }
 
-        String toolName = sb.toString();
-
-        COMPONENT_NAME_MAP.putIfAbsent(toolName, componentName);
-
-        return toolName;
+        return sb.toString();
     }
 
-    private static Map.Entry<String, String> getComponentClusterElementNames(String toolName) {
+    private static ComponentClusterElementNameResult getComponentClusterElementNames(String toolName) {
         String lowerCase = toolName.toLowerCase();
 
         String[] parts = lowerCase.split("_");
 
+        String componentName = parts[0];
         StringBuilder clusterElementName = new StringBuilder();
 
         for (int i = 1; i < parts.length; i++) {
@@ -234,6 +228,9 @@ public class ToolFacadeImpl implements ToolFacade {
             }
         }
 
-        return Map.entry(COMPONENT_NAME_MAP.get(toolName), clusterElementName.toString());
+        return new ComponentClusterElementNameResult(componentName, clusterElementName.toString());
+    }
+
+    private record ComponentClusterElementNameResult(String componentName, String clusterElementName) {
     }
 }

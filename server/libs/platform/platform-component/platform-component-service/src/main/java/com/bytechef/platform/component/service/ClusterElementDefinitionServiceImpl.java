@@ -76,7 +76,8 @@ public class ClusterElementDefinitionServiceImpl implements ClusterElementDefini
         ComponentDefinition componentDefinition = componentDefinitionRegistry.getComponentDefinition(
             componentName, null);
 
-        return getClusterElementDefinition(componentName, componentDefinition.getVersion(), clusterElementName);
+        return getClusterElementDefinition(
+            componentDefinition.getName(), componentDefinition.getVersion(), clusterElementName);
     }
 
     @Override
@@ -87,7 +88,7 @@ public class ClusterElementDefinitionServiceImpl implements ClusterElementDefini
             getComponentClusterElementDefinition(componentName, componentVersion, clusterElementName);
 
         return new ClusterElementDefinition(
-            result.clusterElementDefinition, componentName, componentVersion,
+            result.clusterElementDefinition, result.componentDefinition.getName(), componentVersion,
             OptionalUtils.orElse(result.componentDefinition.getIcon(), null));
     }
 
@@ -122,7 +123,7 @@ public class ClusterElementDefinitionServiceImpl implements ClusterElementDefini
                 clusterElementDefinition -> (com.bytechef.component.definition.ClusterElementDefinition<?>) clusterElementDefinition)
             .filter(clusterElementDefinition -> clusterElementType == clusterElementDefinition.getType())
             .map(clusterElementDefinition -> new ClusterElementDefinition(
-                clusterElementDefinition, componentName, componentVersion,
+                clusterElementDefinition, componentDefinition.getName(), componentVersion,
                 OptionalUtils.orElse(componentDefinition.getIcon(), null)))
             .toList();
     }
@@ -132,8 +133,8 @@ public class ClusterElementDefinitionServiceImpl implements ClusterElementDefini
     public <T> T getClusterElementObject(
         String componentName, int componentVersion, String clusterElementName) {
 
-        ComponentClusterElementDefinitionResult result =
-            getComponentClusterElementDefinition(componentName, componentVersion, clusterElementName);
+        ComponentClusterElementDefinitionResult result = getComponentClusterElementDefinition(
+            componentName, componentVersion, clusterElementName);
 
         return (T) result.clusterElementDefinition.getObject();
     }
