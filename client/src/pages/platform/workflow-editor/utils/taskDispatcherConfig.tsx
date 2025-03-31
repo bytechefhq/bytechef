@@ -1,4 +1,4 @@
-import {CONDITION_CASE_FALSE, CONDITION_CASE_TRUE} from '@/shared/constants';
+import {CONDITION_CASE_FALSE, CONDITION_CASE_TRUE, TASK_DISPATCHER_NAMES} from '@/shared/constants';
 import {WorkflowTask} from '@/shared/middleware/platform/configuration';
 import {
     BuildNodeDataType,
@@ -12,12 +12,6 @@ import getParametersWithDefaultValues from './getParametersWithDefaultValues';
 import getParentTaskDispatcherTask from './getParentTaskDispatcherTask';
 
 export const TASK_DISPATCHER_CONFIG = {
-    branch: {
-        getInitialParameters: (properties: Array<PropertyAllType>) => ({
-            ...getParametersWithDefaultValues({properties}),
-            cases: [],
-        }),
-    },
     condition: {
         buildNodeData: ({baseNodeData, taskDispatcherContext, taskDispatcherId}: BuildNodeDataType): NodeDataType => {
             const newNodeData = {
@@ -62,9 +56,14 @@ export const TASK_DISPATCHER_CONFIG = {
             caseTrue: [],
         }),
         getParentTask: getParentTaskDispatcherTask,
-        getSubtasks: (task: WorkflowTask, context: TaskDispatcherContextType): Array<WorkflowTask> => {
-            const conditionCase = context.conditionCase || CONDITION_CASE_TRUE;
-
+        getSubtasks: ({
+            context,
+            task,
+        }: {
+            context?: TaskDispatcherContextType;
+            task: WorkflowTask;
+        }): Array<WorkflowTask> => {
+            const conditionCase = (context?.conditionCase as 'caseTrue' | 'caseFalse') || CONDITION_CASE_TRUE;
             return conditionCase === CONDITION_CASE_TRUE
                 ? task.parameters?.caseTrue || []
                 : task.parameters?.caseFalse || [];
@@ -122,7 +121,7 @@ export const TASK_DISPATCHER_CONFIG = {
             ...getParametersWithDefaultValues({properties}),
         }),
         getParentTask: getParentTaskDispatcherTask,
-        getSubtasks: (task: WorkflowTask): Array<WorkflowTask> => task.parameters?.iteratee || [],
+        getSubtasks: ({task}: {task: WorkflowTask}): Array<WorkflowTask> => task.parameters?.iteratee || [],
         initializeParameters: () => ({
             iteratee: [],
         }),
@@ -135,3 +134,44 @@ export const TASK_DISPATCHER_CONFIG = {
         }),
     },
 };
+
+/**
+ * Find the parent task dispatcher ID for a nested task
+ */
+export function findParentTaskDispatcher(taskId: string, tasks: WorkflowTask[]): WorkflowTask | undefined {
+    return tasks.find((task) => {
+        if (task.name === taskId) {
+            return false;
+        }
+
+        const componentName = task.type?.split('/')[0];
+
+        if (!componentName || !TASK_DISPATCHER_NAMES.includes(componentName)) {
+            return false;
+        }
+
+        const config = TASK_DISPATCHER_CONFIG[componentName as keyof typeof TASK_DISPATCHER_CONFIG];
+
+        if (!config) {
+            return false;
+        }
+
+        if (componentName === 'condition') {
+            const trueBranchTasks = config.getSubtasks({
+                context: {conditionCase: CONDITION_CASE_TRUE, taskDispatcherId: taskId},
+                task,
+            });
+
+            const falseBranchTasks = config.getSubtasks({
+                context: {conditionCase: CONDITION_CASE_FALSE, taskDispatcherId: taskId},
+                task,
+            });
+
+            return [...trueBranchTasks, ...falseBranchTasks].some((subtask) => subtask.name === taskId);
+        }
+
+        const allSubtasks = config.getSubtasks({task});
+
+        return allSubtasks.some((subtask) => subtask.name === taskId);
+    });
+}

@@ -93,7 +93,7 @@ export default function insertTaskDispatcherSubtask({
         context = {...context, ...placeholderContext};
     }
 
-    const subtasks = getSubtasks(task, context);
+    const subtasks = getSubtasks({context, task});
 
     let updatedSubtasks: Array<WorkflowTask>;
 

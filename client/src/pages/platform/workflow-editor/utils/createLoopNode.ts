@@ -9,7 +9,7 @@ type LoopNodeOptionsType = {
 type CreateLoopNodePropsType = {
     allNodes: Array<Node>;
     loopId: string;
-    isNestedLoop?: boolean;
+    isNested?: boolean;
     options?: LoopNodeOptionsType;
 };
 
@@ -63,7 +63,7 @@ function createLeftGhostNode(loopId: string): Node {
 function createBottomGhostNode(loopId: string, isNested: boolean = false): Node {
     return {
         data: {
-            isNestedLoopBottomGhost: isNested,
+            isNestedBottomGhost: isNested,
             taskDispatcherId: loopId,
         },
         id: `${loopId}-loop-bottom-ghost`,
@@ -77,7 +77,7 @@ function createBottomGhostNode(loopId: string, isNested: boolean = false): Node 
  */
 export default function createLoopNode({
     allNodes,
-    isNestedLoop = false,
+    isNested = false,
     loopId,
     options = {
         createPlaceholder: true,
@@ -94,7 +94,7 @@ export default function createLoopNode({
         nodesToAdd.push(createPlaceholderNode(loopId));
     }
 
-    nodesToAdd.push(createBottomGhostNode(loopId, isNestedLoop));
+    nodesToAdd.push(createBottomGhostNode(loopId, isNested));
 
     nodesWithLoop.splice(insertIndex, 0, ...nodesToAdd);
 

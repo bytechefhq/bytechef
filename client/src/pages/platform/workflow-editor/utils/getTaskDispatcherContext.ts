@@ -15,7 +15,7 @@ function getContextFromTaskNodeData(nodeData: NodeDataType, indexIncrement: numb
     }
 
     if (nodeData.conditionData) {
-        context.conditionCase = nodeData.conditionData.conditionCase as string;
+        context.conditionCase = nodeData.conditionData.conditionCase as 'caseTrue' | 'caseFalse';
         context.conditionId = nodeData.conditionData.conditionId as string;
         context.index = (nodeData.conditionData.index as number) + indexIncrement;
         context.taskDispatcherId = nodeData.conditionData.conditionId as string;
@@ -49,11 +49,11 @@ function getContextFromPlaceholderNode(node: Node): TaskDispatcherContextType {
         context.taskDispatcherId = loopId;
     } else if (node.id.includes('condition-placeholder')) {
         context.conditionId = node.data?.conditionId as string;
-        context.conditionCase = node.data?.conditionCase as string;
+        context.conditionCase = node.data?.conditionCase as 'caseTrue' | 'caseFalse';
         context.index = 0;
         context.taskDispatcherId = node.data?.conditionId as string;
     } else {
-        context.conditionCase = node.data?.conditionCase as string;
+        context.conditionCase = node.data?.conditionCase as 'caseTrue' | 'caseFalse';
         context.conditionId = node.data?.conditionId as string;
         context.loopId = node.data?.loopId as string;
         context.index = 0;

@@ -252,7 +252,7 @@ export type PropertyAllType = Omit<PropertyTypeAllType, 'controlType'> & {
 export type UpdateWorkflowMutationType = UseMutationResult<void, Error, UpdateWorkflowRequestI, unknown>;
 
 export type TaskDispatcherContextType = {
-    conditionCase?: string;
+    conditionCase?: 'caseTrue' | 'caseFalse';
     conditionId?: string;
     index?: number;
     loopId?: string;
