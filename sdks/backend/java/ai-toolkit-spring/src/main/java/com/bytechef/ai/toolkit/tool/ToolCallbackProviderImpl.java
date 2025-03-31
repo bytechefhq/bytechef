@@ -17,6 +17,9 @@
 package com.bytechef.ai.toolkit.tool;
 
 import com.bytechef.ai.toolkit.Environment;
+import com.bytechef.ai.toolkit.ToolClient;
+import com.bytechef.ai.toolkit.model.FunctionModel;
+import com.bytechef.ai.toolkit.model.ToolModel;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.ArrayList;
 import java.util.List;
@@ -25,27 +28,24 @@ import java.util.function.Function;
 import org.springframework.ai.tool.ToolCallback;
 import org.springframework.ai.tool.ToolCallbackProvider;
 import org.springframework.ai.tool.function.FunctionToolCallback;
-import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.web.client.RestClient;
 
 /**
  * @author Ivica Cardic
  */
 class ToolCallbackProviderImpl implements ToolCallbackProvider {
 
-    private final String externalUserId;
     private final String apiKey;
+    private final String baseUrl;
     private final Environment environment;
-    // TODO Convert to HttpClient
-    private final RestClient restClient;
+    private final String externalUserId;
 
     public ToolCallbackProviderImpl(
-        String externalUserId, String apiKey, Environment environment, RestClient restClient) {
+        String apiKey, String baseUrl, Environment environment, String externalUserId) {
 
-        this.externalUserId = externalUserId;
         this.apiKey = apiKey;
+        this.baseUrl = baseUrl;
         this.environment = environment;
-        this.restClient = restClient;
+        this.externalUserId = externalUserId;
     }
 
     @Override
@@ -53,13 +53,7 @@ class ToolCallbackProviderImpl implements ToolCallbackProvider {
     public ToolCallback[] getToolCallbacks() {
         List<ToolCallback> toolCallbacks = new ArrayList<>();
 
-        List<ToolModel> toolModels = restClient.get()
-            // TODO
-            .uri("http://localhost:9555/api/embedded/v1/tools?externalUserId=%s".formatted(externalUserId))
-            .header("Authorization", "Bearer %s".formatted(apiKey))
-            .header("X-Environment", environment.name())
-            .retrieve()
-            .body(new ParameterizedTypeReference<Map<String, List<ToolModel>>>() {})
+        List<ToolModel> toolModels = new ToolClient(apiKey, baseUrl, environment).getTools(externalUserId)
             .entrySet()
             .stream()
             .flatMap(entry -> entry.getValue()
@@ -89,22 +83,7 @@ class ToolCallbackProviderImpl implements ToolCallbackProvider {
     private Function<Map<String, Object>, Object> getToolCallbackFunction(
         String toolName, String externalUserId, String apiKey, Environment environment) {
 
-        return parameters -> restClient.post()
-            // TODO
-            .uri("http://localhost:9555/api/embedded/v1/tools?externalUserId=%s".formatted(externalUserId))
-            .header("Authorization", "Bearer %s".formatted(apiKey))
-            .header("X-Environment", environment.name())
-            .body(
-                Map.of(
-                    "name", toolName,
-                    "parameters", parameters))
-            .retrieve()
-            .body(Object.class);
-    }
-
-    record ToolModel(FunctionModel function, String type) {
-    }
-
-    record FunctionModel(String name, String description, String parameters) {
+        return parameters -> new ToolClient(
+            apiKey, baseUrl, environment).executeTool(externalUserId, toolName, parameters);
     }
 }
