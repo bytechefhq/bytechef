@@ -28,6 +28,9 @@ spring:
 
 #####
 
+command-bar:
+  org-id: 3816ef6c
+
 bytechef:
   analytics:
     enabled: true
@@ -36,7 +39,5 @@ bytechef:
       host: https://eu.i.posthog.com
   help-hub:
     enabled: true
-    command-bar:
-      org-id: 3816ef6c
   public-url: http://127.0.0.1:8080
   webhook-url: ${bytechef.public-url}/webhooks/{id}

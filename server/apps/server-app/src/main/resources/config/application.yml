@@ -24,7 +24,7 @@ info:
   helpHub:
     enabled: ${bytechef.help-hub.enabled:false}
     commandBar:
-      orgId: ${bytechef.help-hub.command-bar.org-id:}
+      orgId: ${command-bar.org-id:}
   signUp:
     activationRequired: ${bytechef.sign-up.activation-required:false}
     enabled: ${bytechef.sign-up.enabled}

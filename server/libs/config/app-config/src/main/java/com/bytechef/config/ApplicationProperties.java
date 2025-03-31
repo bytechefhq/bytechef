@@ -1447,36 +1447,14 @@ public class ApplicationProperties {
      */
     public static class HelpHub {
 
-        private CommandBar commandBar = new CommandBar();
         private boolean enabled;
-
-        public CommandBar getCommandBar() {
-            return commandBar;
-        }
 
         public boolean isEnabled() {
             return enabled;
         }
 
-        public void setCommandBar(CommandBar commandBar) {
-            this.commandBar = commandBar;
-        }
-
         public void setEnabled(boolean enabled) {
             this.enabled = enabled;
-        }
-
-        public static class CommandBar {
-
-            private String orgId;
-
-            public String getOrgId() {
-                return orgId;
-            }
-
-            public void setOrgId(String orgId) {
-                this.orgId = orgId;
-            }
         }
     }
 
