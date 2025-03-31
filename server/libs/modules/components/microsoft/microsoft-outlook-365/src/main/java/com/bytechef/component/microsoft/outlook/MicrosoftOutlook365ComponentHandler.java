@@ -17,6 +17,7 @@
 package com.bytechef.component.microsoft.outlook;
 
 import static com.bytechef.component.definition.ComponentDsl.component;
+import static com.bytechef.component.definition.ComponentDsl.tool;
 
 import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.definition.ComponentCategory;
@@ -57,6 +58,15 @@ public class MicrosoftOutlook365ComponentHandler implements ComponentHandler {
             MicrosoftOutlook365ReplyToEmailAction.ACTION_DEFINITION,
             MicrosoftOutlook365SearchEmailAction.ACTION_DEFINITION,
             MicrosoftOutlook365SendEmailAction.ACTION_DEFINITION)
+        .clusterElements(
+            tool(MicrosoftOutlook365CreateEventAction.ACTION_DEFINITION),
+            tool(MicrosoftOutlook365DeleteEventAction.ACTION_DEFINITION),
+            tool(MicrosoftOutlook365GetEventsAction.ACTION_DEFINITION),
+            tool(MicrosoftOutlook365GetFreeTimeSlotsAction.ACTION_DEFINITION),
+            tool(MicrosoftOutlook365GetMailAction.ACTION_DEFINITION),
+            tool(MicrosoftOutlook365ReplyToEmailAction.ACTION_DEFINITION),
+            tool(MicrosoftOutlook365SearchEmailAction.ACTION_DEFINITION),
+            tool(MicrosoftOutlook365SendEmailAction.ACTION_DEFINITION))
         .triggers(MicrosoftOutlook365NewEmailTrigger.TRIGGER_DEFINITION);
 
     @Override

@@ -17,6 +17,7 @@
 package com.bytechef.component.dropbox;
 
 import static com.bytechef.component.definition.ComponentDsl.component;
+import static com.bytechef.component.definition.ComponentDsl.tool;
 
 import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.definition.ComponentCategory;
@@ -57,7 +58,17 @@ public class DropboxComponentHandler implements ComponentHandler {
             DropboxListFolderAction.ACTION_DEFINITION,
             DropboxMoveAction.ACTION_DEFINITION,
             DropboxSearchAction.ACTION_DEFINITION,
-            DropboxUploadFileAction.ACTION_DEFINITION);
+            DropboxUploadFileAction.ACTION_DEFINITION)
+        .clusterElements(
+            tool(DropboxCopyAction.ACTION_DEFINITION),
+            tool(DropboxCreateNewFolderAction.ACTION_DEFINITION),
+            tool(DropboxCreateNewTextFileAction.ACTION_DEFINITION),
+            tool(DropboxDeleteAction.ACTION_DEFINITION),
+            tool(DropboxGetFileLinkAction.ACTION_DEFINITION),
+            tool(DropboxListFolderAction.ACTION_DEFINITION),
+            tool(DropboxMoveAction.ACTION_DEFINITION),
+            tool(DropboxSearchAction.ACTION_DEFINITION),
+            tool(DropboxUploadFileAction.ACTION_DEFINITION));
 
     @Override
     public ComponentDefinition getDefinition() {

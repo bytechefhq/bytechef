@@ -26,7 +26,7 @@ import static com.bytechef.component.jira.constant.JiraConstants.COMMENT;
 import static com.bytechef.component.jira.constant.JiraConstants.ISSUE_ID;
 import static com.bytechef.component.jira.constant.JiraConstants.PROJECT;
 
-import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.Parameters;
@@ -87,10 +87,8 @@ public class JiraCreateIssueCommentAction {
                                 string("value")))))
         .perform(JiraCreateIssueCommentAction::perform);
 
-    protected static Object perform(
-        Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) {
-
-        return actionContext
+    public static Object perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
+        return context
             .http(http -> http.post("/issue/" + inputParameters.getRequiredString(ISSUE_ID) + "/comment"))
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .body(Http.Body.of(

@@ -17,6 +17,7 @@
 package com.bytechef.component.trello;
 
 import static com.bytechef.component.definition.ComponentDsl.component;
+import static com.bytechef.component.definition.ComponentDsl.tool;
 
 import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.definition.ComponentCategory;
@@ -47,6 +48,10 @@ public class TrelloComponentHandler implements ComponentHandler {
             TrelloCreateBoardAction.ACTION_DEFINITION,
             TrelloCreateCardAction.ACTION_DEFINITION,
             TrelloGetCardAction.ACTION_DEFINITION)
+        .clusterElements(
+            tool(TrelloCreateBoardAction.ACTION_DEFINITION),
+            tool(TrelloCreateCardAction.ACTION_DEFINITION),
+            tool(TrelloGetCardAction.ACTION_DEFINITION))
         .triggers(TrelloNewCardTrigger.TRIGGER_DEFINITION);
 
     @Override

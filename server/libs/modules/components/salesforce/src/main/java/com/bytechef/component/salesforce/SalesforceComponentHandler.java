@@ -17,6 +17,7 @@
 package com.bytechef.component.salesforce;
 
 import static com.bytechef.component.definition.ComponentDsl.component;
+import static com.bytechef.component.definition.ComponentDsl.tool;
 
 import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.definition.ComponentCategory;
@@ -50,6 +51,11 @@ public class SalesforceComponentHandler implements ComponentHandler {
             SalesforceDeleteRecordAction.ACTION_DEFINITION,
             SalesforceSOQLQueryAction.ACTION_DEFINITION,
             SalesforceUpdateRecordAction.ACTION_DEFINITION)
+        .clusterElements(
+            tool(SalesforceCreateRecordAction.ACTION_DEFINITION),
+            tool(SalesforceDeleteRecordAction.ACTION_DEFINITION),
+            tool(SalesforceSOQLQueryAction.ACTION_DEFINITION),
+            tool(SalesforceUpdateRecordAction.ACTION_DEFINITION))
         .triggers(
             SalesforceNewRecordTrigger.TRIGGER_DEFINITION,
             SalesforceUpdatedRecordTrigger.TRIGGER_DEFINITION);

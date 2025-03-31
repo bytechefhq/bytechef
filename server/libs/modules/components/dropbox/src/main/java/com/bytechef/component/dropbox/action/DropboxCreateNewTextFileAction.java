@@ -30,8 +30,8 @@ import static com.bytechef.component.dropbox.constant.DropboxConstants.STRICT_CO
 import static com.bytechef.component.dropbox.constant.DropboxConstants.TEXT;
 import static com.bytechef.component.dropbox.util.DropboxUtils.uploadFile;
 
-import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
+import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.FileEntry;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.Property.ControlType;
@@ -111,14 +111,12 @@ public class DropboxCreateNewTextFileAction {
     private DropboxCreateNewTextFileAction() {
     }
 
-    public static Object perform(
-        Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) {
-
-        FileEntry fileEntry = actionContext.file(
+    public static Object perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
+        FileEntry fileEntry = context.file(
             file -> file.storeContent(
                 inputParameters.getRequiredString(FILENAME) + ".paper",
                 inputParameters.getRequiredString(TEXT)));
 
-        return uploadFile(inputParameters, actionContext, fileEntry);
+        return uploadFile(inputParameters, context, fileEntry);
     }
 }

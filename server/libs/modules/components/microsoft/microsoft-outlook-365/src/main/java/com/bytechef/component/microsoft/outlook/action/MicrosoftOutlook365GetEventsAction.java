@@ -28,8 +28,8 @@ import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook
 import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.TO;
 import static com.bytechef.component.microsoft.outlook.util.MicrosoftOutlook365CustomEventUtils.retrieveCustomEvents;
 
-import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
+import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.microsoft.outlook.util.MicrosoftOutlook365CustomEventUtils.CustomEvent;
 import java.util.List;
@@ -63,9 +63,9 @@ public class MicrosoftOutlook365GetEventsAction {
     private MicrosoftOutlook365GetEventsAction() {
     }
 
-    protected static List<CustomEvent> perform(
-        Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) {
+    public static List<CustomEvent> perform(
+        Parameters inputParameters, Parameters connectionParameters, Context context) {
 
-        return retrieveCustomEvents(inputParameters, actionContext);
+        return retrieveCustomEvents(inputParameters, context);
     }
 }

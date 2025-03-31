@@ -32,7 +32,7 @@ import static com.bytechef.component.intercom.constant.IntercomConstants.PHONE;
 import static com.bytechef.component.intercom.constant.IntercomConstants.ROLE;
 import static com.bytechef.component.intercom.constant.IntercomConstants.USER;
 
-import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.ContextFunction;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Context.Http.Body;
@@ -81,10 +81,8 @@ public class IntercomCreateContactAction {
     protected static final ContextFunction<Http, Http.Executor> POST_CONTACTS_CONTEXT_FUNCTION =
         http -> http.post("/contacts");
 
-    public static Object perform(
-        Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) {
-
-        return actionContext.http(POST_CONTACTS_CONTEXT_FUNCTION)
+    public static Object perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
+        return context.http(POST_CONTACTS_CONTEXT_FUNCTION)
             .body(
                 Body.of(
                     ROLE, inputParameters.getRequiredString(ROLE),

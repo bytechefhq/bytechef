@@ -26,8 +26,8 @@ import static com.bytechef.component.microsoft.excel.constant.MicrosoftExcelCons
 import static com.bytechef.component.microsoft.excel.util.MicrosoftExcelUtils.getLastUsedColumnLabel;
 import static com.bytechef.component.microsoft.excel.util.MicrosoftExcelUtils.getLastUsedRowIndex;
 
-import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
+import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Parameters;
 import java.util.List;
@@ -49,15 +49,13 @@ public class MicrosoftExcelClearWorksheetAction {
     private MicrosoftExcelClearWorksheetAction() {
     }
 
-    protected static Object perform(
-        Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) {
-
+    public static Object perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
         String range = inputParameters.getRequiredBoolean(IS_THE_FIRST_ROW_HEADER)
-            ? "range(address='A2:" + getLastUsedColumnLabel(inputParameters, actionContext)
-                + getLastUsedRowIndex(inputParameters, actionContext) + "')"
+            ? "range(address='A2:" + getLastUsedColumnLabel(inputParameters, context)
+                + getLastUsedRowIndex(inputParameters, context) + "')"
             : "usedRange(valuesOnly=true)";
 
-        actionContext.http(http -> http
+        context.http(http -> http
             .post(
                 "/me/drive/items/%s/workbook/worksheets/%s/%s/clear"
                     .formatted(

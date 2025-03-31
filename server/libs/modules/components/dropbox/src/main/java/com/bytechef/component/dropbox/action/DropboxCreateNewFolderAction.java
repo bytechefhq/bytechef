@@ -22,8 +22,8 @@ import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.dropbox.constant.DropboxConstants.PATH;
 
-import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
+import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.ContextFunction;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Parameters;
@@ -71,10 +71,8 @@ public class DropboxCreateNewFolderAction {
     private DropboxCreateNewFolderAction() {
     }
 
-    public static Object perform(
-        Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) {
-
-        return actionContext.http(POST_CREATE_FOLDER_CONTEXT_FUNCTION)
+    public static Object perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
+        return context.http(POST_CREATE_FOLDER_CONTEXT_FUNCTION)
             .body(Http.Body.of(PATH, inputParameters.getRequired(PATH)))
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute()

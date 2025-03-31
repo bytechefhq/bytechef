@@ -24,8 +24,8 @@ import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.microsoft.todo.constant.MicrosoftToDoConstants.DISPLAY_NAME;
 import static com.bytechef.component.microsoft.todo.constant.MicrosoftToDoConstants.ID;
 
-import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
+import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
@@ -60,10 +60,8 @@ public class MicrosoftToDoCreateTaskListAction {
     private MicrosoftToDoCreateTaskListAction() {
     }
 
-    protected static Object perform(
-        Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) {
-
-        return actionContext
+    public static Object perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
+        return context
             .http(http -> http.post("/me/todo/lists"))
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .body(Http.Body.of(Map.of(DISPLAY_NAME, inputParameters.getRequiredString(DISPLAY_NAME))))

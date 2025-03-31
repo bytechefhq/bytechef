@@ -17,6 +17,7 @@
 package com.bytechef.component.intercom;
 
 import static com.bytechef.component.definition.ComponentDsl.component;
+import static com.bytechef.component.definition.ComponentDsl.tool;
 
 import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.definition.ComponentCategory;
@@ -44,7 +45,11 @@ public class IntercomComponentHandler implements ComponentHandler {
         .actions(
             IntercomCreateContactAction.ACTION_DEFINITION,
             IntercomGetContactAction.ACTION_DEFINITION,
-            IntercomSendMessageAction.ACTION_DEFINITION);
+            IntercomSendMessageAction.ACTION_DEFINITION)
+        .clusterElements(
+            tool(IntercomCreateContactAction.ACTION_DEFINITION),
+            tool(IntercomGetContactAction.ACTION_DEFINITION),
+            tool(IntercomSendMessageAction.ACTION_DEFINITION));
 
     @Override
     public ComponentDefinition getDefinition() {

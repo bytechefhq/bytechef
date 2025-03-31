@@ -23,6 +23,7 @@ import static com.bytechef.component.intercom.constant.IntercomConstants.ID;
 import static com.bytechef.component.intercom.constant.IntercomConstants.TYPE;
 
 import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.ContextFunction;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Option;
@@ -48,8 +49,7 @@ public class IntercomUtils {
     private IntercomUtils() {
     }
 
-    public static Map<String, String> getAdminId(ActionContext context) {
-
+    public static Map<String, String> getAdminId(Context context) {
         Map<String, Object> body = context.http(GET_ADMINS_CONTEXT_FUNCTION)
             .configuration(responseType(ResponseType.JSON))
             .execute()
@@ -90,7 +90,7 @@ public class IntercomUtils {
         return options;
     }
 
-    public static Map<String, String> getContactRole(String id, ActionContext context) {
+    public static Map<String, String> getContactRole(String id, Context context) {
         Map<String, Object> body = context.http(http -> http.get("/contacts/" + id))
             .configuration(responseType(ResponseType.JSON))
             .execute()

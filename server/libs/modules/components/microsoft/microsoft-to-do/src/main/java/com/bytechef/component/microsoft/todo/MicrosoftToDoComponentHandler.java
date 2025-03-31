@@ -17,6 +17,7 @@
 package com.bytechef.component.microsoft.todo;
 
 import static com.bytechef.component.definition.ComponentDsl.component;
+import static com.bytechef.component.definition.ComponentDsl.tool;
 
 import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.definition.ComponentCategory;
@@ -44,7 +45,11 @@ public class MicrosoftToDoComponentHandler implements ComponentHandler {
         .actions(
             MicrosoftToDoCreateTaskAction.ACTION_DEFINITION,
             MicrosoftToDoCreateTaskListAction.ACTION_DEFINITION,
-            MicrosoftToDoGetTaskAction.ACTION_DEFINITION);
+            MicrosoftToDoGetTaskAction.ACTION_DEFINITION)
+        .clusterElements(
+            tool(MicrosoftToDoCreateTaskAction.ACTION_DEFINITION),
+            tool(MicrosoftToDoCreateTaskListAction.ACTION_DEFINITION),
+            tool(MicrosoftToDoGetTaskAction.ACTION_DEFINITION));
 
     @Override
     public ComponentDefinition getDefinition() {

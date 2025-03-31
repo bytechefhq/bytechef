@@ -22,7 +22,7 @@ import static com.bytechef.component.dropbox.constant.DropboxConstants.MUTE;
 import static com.bytechef.component.dropbox.constant.DropboxConstants.PATH;
 import static com.bytechef.component.dropbox.constant.DropboxConstants.STRICT_CONFLICT;
 
-import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.ContextFunction;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.FileEntry;
@@ -47,8 +47,8 @@ public class DropboxUtils {
     private DropboxUtils() {
     }
 
-    public static Object uploadFile(Parameters inputParameters, ActionContext actionContext, FileEntry fileEntry) {
-        String headerJson = actionContext.json(json -> {
+    public static Object uploadFile(Parameters inputParameters, Context context, FileEntry fileEntry) {
+        String headerJson = context.json(json -> {
             Map<String, Object> ime = Map.of(
                 AUTORENAME, inputParameters.getBoolean(AUTORENAME),
                 "mode", "add",
@@ -59,7 +59,7 @@ public class DropboxUtils {
             return json.write(ime);
         });
 
-        return actionContext.http(POST_FILES_UPLOAD_CONTEXT_FUNCTION)
+        return context.http(POST_FILES_UPLOAD_CONTEXT_FUNCTION)
             .headers(Map.of("Dropbox-API-Arg", List.of(headerJson)))
             .body(Http.Body.of(fileEntry, "application/octet-stream"))
             .configuration(Http.responseType(Http.ResponseType.JSON))

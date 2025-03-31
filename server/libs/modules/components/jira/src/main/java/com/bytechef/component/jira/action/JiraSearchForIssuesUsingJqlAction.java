@@ -26,8 +26,8 @@ import static com.bytechef.component.jira.constant.JiraConstants.ISSUE_OUTPUT_PR
 import static com.bytechef.component.jira.constant.JiraConstants.JQL;
 import static com.bytechef.component.jira.constant.JiraConstants.MAX_RESULTS;
 
-import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
+import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
@@ -65,7 +65,7 @@ public class JiraSearchForIssuesUsingJqlAction {
     private JiraSearchForIssuesUsingJqlAction() {
     }
 
-    public static Object perform(Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
+    public static Object perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
         StringBuilder url = new StringBuilder("?maxResults=" + inputParameters.getRequiredInteger(MAX_RESULTS));
         String jql = inputParameters.getString(JQL);
 

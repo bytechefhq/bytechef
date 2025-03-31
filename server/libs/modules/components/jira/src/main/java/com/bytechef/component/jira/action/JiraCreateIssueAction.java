@@ -35,8 +35,8 @@ import static com.bytechef.component.jira.constant.JiraConstants.SUMMARY;
 import static com.bytechef.component.jira.constant.JiraConstants.TEXT;
 import static com.bytechef.component.jira.constant.JiraConstants.TYPE;
 
-import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
+import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.Parameters;
@@ -109,17 +109,13 @@ public class JiraCreateIssueAction {
     private JiraCreateIssueAction() {
     }
 
-    public static Object perform(
-        Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
-
-        Http.Response execute = context
+    public static Object perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
+        return context
             .http(http -> http.post("/issue"))
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .body(Http.Body.of(FIELDS, getIssueFieldsMap(inputParameters)))
-            .execute();
-
-        return execute.getBody(new TypeReference<>() {});
-
+            .execute()
+            .getBody(new TypeReference<>() {});
     }
 
     private static Map<String, Object> getIssueFieldsMap(Parameters inputParameters) {

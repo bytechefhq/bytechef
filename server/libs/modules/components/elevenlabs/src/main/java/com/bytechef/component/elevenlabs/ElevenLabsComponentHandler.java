@@ -17,6 +17,7 @@
 package com.bytechef.component.elevenlabs;
 
 import static com.bytechef.component.definition.ComponentDsl.component;
+import static com.bytechef.component.definition.ComponentDsl.tool;
 
 import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.definition.ComponentCategory;
@@ -46,7 +47,12 @@ public class ElevenLabsComponentHandler implements ComponentHandler {
             ElevenLabsCreateSoundEffectAction.ACTION_DEFINITION,
             ElevenLabsCreateSpeechAction.ACTION_DEFINITION,
             ElevenLabsCreateSpeechWithTimingAction.ACTION_DEFINITION,
-            ElevenLabsCreateTranscriptAction.ACTION_DEFINITION);
+            ElevenLabsCreateTranscriptAction.ACTION_DEFINITION)
+        .clusterElements(
+            tool(ElevenLabsCreateSoundEffectAction.ACTION_DEFINITION),
+            tool(ElevenLabsCreateSpeechAction.ACTION_DEFINITION),
+            tool(ElevenLabsCreateSpeechWithTimingAction.ACTION_DEFINITION),
+            tool(ElevenLabsCreateTranscriptAction.ACTION_DEFINITION));
 
     @Override
     public ComponentDefinition getDefinition() {

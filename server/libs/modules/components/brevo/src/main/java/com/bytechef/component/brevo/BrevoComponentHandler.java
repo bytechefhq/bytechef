@@ -17,6 +17,7 @@
 package com.bytechef.component.brevo;
 
 import static com.bytechef.component.definition.ComponentDsl.component;
+import static com.bytechef.component.definition.ComponentDsl.tool;
 
 import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.brevo.action.BrevoCreateContactAction;
@@ -44,7 +45,11 @@ public class BrevoComponentHandler implements ComponentHandler {
         .actions(
             BrevoCreateContactAction.ACTION_DEFINITION,
             BrevoUpdateContactAction.ACTION_DEFINITION,
-            BrevoSendTransactionalEmailAction.ACTION_DEFINITION);
+            BrevoSendTransactionalEmailAction.ACTION_DEFINITION)
+        .clusterElements(
+            tool(BrevoCreateContactAction.ACTION_DEFINITION),
+            tool(BrevoUpdateContactAction.ACTION_DEFINITION),
+            tool(BrevoSendTransactionalEmailAction.ACTION_DEFINITION));
 
     @Override
     public ComponentDefinition getDefinition() {

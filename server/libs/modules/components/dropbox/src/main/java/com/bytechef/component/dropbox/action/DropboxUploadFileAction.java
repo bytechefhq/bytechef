@@ -31,8 +31,8 @@ import static com.bytechef.component.dropbox.constant.DropboxConstants.PATH;
 import static com.bytechef.component.dropbox.constant.DropboxConstants.STRICT_CONFLICT;
 import static com.bytechef.component.dropbox.util.DropboxUtils.uploadFile;
 
-import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
+import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
 
 /**
@@ -105,9 +105,7 @@ public class DropboxUploadFileAction {
     private DropboxUploadFileAction() {
     }
 
-    public static Object perform(
-        Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) {
-
-        return uploadFile(inputParameters, actionContext, inputParameters.getRequiredFileEntry(FILE_ENTRY));
+    public static Object perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
+        return uploadFile(inputParameters, context, inputParameters.getRequiredFileEntry(FILE_ENTRY));
     }
 }

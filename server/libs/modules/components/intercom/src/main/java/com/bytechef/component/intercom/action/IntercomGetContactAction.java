@@ -23,8 +23,8 @@ import static com.bytechef.component.definition.Context.Http;
 import static com.bytechef.component.intercom.constant.IntercomConstants.CONTACT_OUTPUT_PROPERTY;
 import static com.bytechef.component.intercom.constant.IntercomConstants.ID;
 
-import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
+import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
@@ -47,10 +47,8 @@ public class IntercomGetContactAction {
         .output(outputSchema(CONTACT_OUTPUT_PROPERTY))
         .perform(IntercomGetContactAction::perform);
 
-    public static Object
-        perform(Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) {
-
-        return actionContext
+    public static Object perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
+        return context
             .http(http -> http.get("/contacts/" + inputParameters.getRequiredString(ID)))
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute()

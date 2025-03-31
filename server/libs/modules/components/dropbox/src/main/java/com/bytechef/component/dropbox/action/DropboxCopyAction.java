@@ -25,8 +25,8 @@ import static com.bytechef.component.dropbox.constant.DropboxConstants.FROM_PATH
 import static com.bytechef.component.dropbox.constant.DropboxConstants.TO_PATH;
 import static com.bytechef.component.dropbox.util.DropboxUtils.getFullPath;
 
-import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
+import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.ContextFunction;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Parameters;
@@ -85,12 +85,10 @@ public class DropboxCopyAction {
     private DropboxCopyAction() {
     }
 
-    public static Object perform(
-        Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) {
-
+    public static Object perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
         String filename = inputParameters.getRequiredString(FILENAME);
 
-        return actionContext.http(POST_COPY_CONTEXT_FUNCTION)
+        return context.http(POST_COPY_CONTEXT_FUNCTION)
             .body(
                 Http.Body.of(
                     FROM_PATH, getFullPath(inputParameters.getRequiredString(FROM_PATH), filename),

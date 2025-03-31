@@ -27,8 +27,8 @@ import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook
 import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.TO;
 import static com.bytechef.component.microsoft.outlook.util.MicrosoftOutlook365CustomEventUtils.retrieveCustomEvents;
 
-import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
+import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.microsoft.outlook.util.MicrosoftOutlook365CustomEventUtils.CustomEvent;
 import java.time.LocalDateTime;
@@ -75,10 +75,8 @@ public class MicrosoftOutlook365GetFreeTimeSlotsAction {
     private MicrosoftOutlook365GetFreeTimeSlotsAction() {
     }
 
-    protected static List<Interval> perform(
-        Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) {
-
-        List<CustomEvent> customEvents = new ArrayList<>(retrieveCustomEvents(inputParameters, actionContext));
+    public static List<Interval> perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
+        List<CustomEvent> customEvents = new ArrayList<>(retrieveCustomEvents(inputParameters, context));
 
         customEvents.sort(Comparator.comparing(CustomEvent::startTime));
 

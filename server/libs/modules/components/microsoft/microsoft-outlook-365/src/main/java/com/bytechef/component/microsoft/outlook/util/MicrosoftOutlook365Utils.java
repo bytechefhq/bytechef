@@ -19,7 +19,6 @@ package com.bytechef.component.microsoft.outlook.util;
 import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.ODATA_NEXT_LINK;
 import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.VALUE;
 
-import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.TypeReference;
@@ -60,8 +59,8 @@ public class MicrosoftOutlook365Utils {
         return otherItems;
     }
 
-    public static String getMailboxTimeZone(ActionContext actionContext) {
-        Map<String, String> body = actionContext.http(http -> http.get("/me/mailboxSettings/timeZone"))
+    public static String getMailboxTimeZone(Context context) {
+        Map<String, String> body = context.http(http -> http.get("/me/mailboxSettings/timeZone"))
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});

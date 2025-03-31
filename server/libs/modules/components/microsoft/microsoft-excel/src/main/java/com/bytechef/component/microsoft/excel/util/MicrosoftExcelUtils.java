@@ -38,6 +38,7 @@ import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableArrayProperty;
 import com.bytechef.component.definition.ComponentDsl.ModifiableObjectProperty;
 import com.bytechef.component.definition.ComponentDsl.ModifiableValueProperty;
+import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Parameters;
@@ -141,7 +142,7 @@ public class MicrosoftExcelUtils {
         }
     }
 
-    public static String getLastUsedColumnLabel(Parameters inputParameters, ActionContext context) {
+    public static String getLastUsedColumnLabel(Parameters inputParameters, Context context) {
         Map<String, Object> body = context
             .http(http -> http.get(
                 "/me/drive/items/%s/workbook/worksheets/%s/usedRange"
@@ -159,7 +160,7 @@ public class MicrosoftExcelUtils {
         throw new IllegalStateException("Failed to get last used column");
     }
 
-    public static Integer getLastUsedRowIndex(Parameters inputParameters, ActionContext context) {
+    public static Integer getLastUsedRowIndex(Parameters inputParameters, Context context) {
         Map<String, Object> body = context
             .http(http -> http.get("/me/drive/items/%s/workbook/worksheets/%s/usedRange"
                 .formatted(inputParameters.getRequiredString(WORKBOOK_ID),
@@ -185,7 +186,7 @@ public class MicrosoftExcelUtils {
     }
 
     public static Map<String, Object> getMapOfValuesForRow(
-        Parameters inputParameters, ActionContext context, List<Object> row) {
+        Parameters inputParameters, Context context, List<Object> row) {
 
         Map<String, Object> valuesMap;
 
@@ -228,8 +229,7 @@ public class MicrosoftExcelUtils {
         return row;
     }
 
-    public static List<Object> getUpdatedRowValues(Parameters inputParameters, ActionContext actionContext) {
-
+    public static List<Object> getUpdatedRowValues(Parameters inputParameters, Context context) {
         List<Object> row = new ArrayList<>();
 
         if (inputParameters.get(ROW) instanceof Map<?, ?> rowMap) {
@@ -244,9 +244,9 @@ public class MicrosoftExcelUtils {
                 if (inputParameters.getRequiredBoolean(IS_THE_FIRST_ROW_HEADER)) {
 
                     List<Object> firstRow =
-                        MicrosoftExcelRowUtils.getRowFromWorksheet(inputParameters, actionContext, 1);
+                        MicrosoftExcelRowUtils.getRowFromWorksheet(inputParameters, context, 1);
                     List<Object> rowToUpdate = MicrosoftExcelRowUtils.getRowFromWorksheet(inputParameters,
-                        actionContext, inputParameters.getRequiredInteger(ROW_NUMBER));
+                        context, inputParameters.getRequiredInteger(ROW_NUMBER));
 
                     for (Object o : list) {
                         if (o instanceof Map<?, ?> map) {
@@ -265,7 +265,7 @@ public class MicrosoftExcelUtils {
 
                     } else {
                         List<Object> rowToUpdate = MicrosoftExcelRowUtils.getRowFromWorksheet(inputParameters,
-                            actionContext, inputParameters.getRequiredInteger(ROW_NUMBER));
+                            context, inputParameters.getRequiredInteger(ROW_NUMBER));
 
                         for (Object o : list) {
                             if (o instanceof Map<?, ?> map) {

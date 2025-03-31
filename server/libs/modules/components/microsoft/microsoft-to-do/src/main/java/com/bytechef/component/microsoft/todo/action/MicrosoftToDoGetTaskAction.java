@@ -23,8 +23,8 @@ import static com.bytechef.component.microsoft.todo.constant.MicrosoftToDoConsta
 import static com.bytechef.component.microsoft.todo.constant.MicrosoftToDoConstants.TASK_ID;
 import static com.bytechef.component.microsoft.todo.constant.MicrosoftToDoConstants.TASK_LIST_ID;
 
-import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
+import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.Parameters;
@@ -57,10 +57,8 @@ public class MicrosoftToDoGetTaskAction {
     private MicrosoftToDoGetTaskAction() {
     }
 
-    protected static Object perform(
-        Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) {
-
-        return actionContext
+    public static Object perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
+        return context
             .http(http -> http.get(
                 "/me/todo/lists/%s/tasks/%s".formatted(
                     inputParameters.getRequiredString(TASK_LIST_ID), inputParameters.getRequiredString(TASK_ID))))

@@ -17,6 +17,7 @@
 package com.bytechef.component.quickbooks;
 
 import static com.bytechef.component.definition.ComponentDsl.component;
+import static com.bytechef.component.definition.ComponentDsl.tool;
 
 import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.definition.ComponentCategory;
@@ -57,7 +58,16 @@ public class QuickbooksComponentHandler implements ComponentHandler {
             QuickbooksGetCustomerAction.ACTION_DEFINITION,
             QuickbooksGetInvoiceAction.ACTION_DEFINITION,
             QuickbooksGetItemAction.ACTION_DEFINITION,
-            QuickbooksGetPaymentAction.ACTION_DEFINITION);
+            QuickbooksGetPaymentAction.ACTION_DEFINITION)
+        .clusterElements(
+            tool(QuickbooksCreateCategoryAction.ACTION_DEFINITION),
+            tool(QuickbooksCreateCustomerAction.ACTION_DEFINITION),
+            tool(QuickbooksCreateItemAction.ACTION_DEFINITION),
+            tool(QuickbooksCreatePaymentAction.ACTION_DEFINITION),
+            tool(QuickbooksGetCustomerAction.ACTION_DEFINITION),
+            tool(QuickbooksGetInvoiceAction.ACTION_DEFINITION),
+            tool(QuickbooksGetItemAction.ACTION_DEFINITION),
+            tool(QuickbooksGetPaymentAction.ACTION_DEFINITION));
 
     @Override
     public ComponentDefinition getDefinition() {

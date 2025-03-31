@@ -29,8 +29,8 @@ import static com.bytechef.component.microsoft.excel.util.MicrosoftExcelUpdateWo
 import static com.bytechef.component.microsoft.excel.util.MicrosoftExcelUtils.getLastUsedRowIndex;
 import static com.bytechef.component.microsoft.excel.util.MicrosoftExcelUtils.getRowValues;
 
-import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
+import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.microsoft.excel.util.MicrosoftExcelUtils;
 
@@ -56,11 +56,9 @@ public class MicrosoftExcelAppendRowAction {
     private MicrosoftExcelAppendRowAction() {
     }
 
-    protected static Object perform(
-        Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) {
-
+    public static Object perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
         return updateRange(
-            inputParameters, actionContext, getLastUsedRowIndex(inputParameters, actionContext) + 1,
+            inputParameters, context, getLastUsedRowIndex(inputParameters, context) + 1,
             getRowValues(inputParameters));
     }
 }

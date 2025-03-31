@@ -26,8 +26,8 @@ import static com.bytechef.component.definition.Context.Http.ResponseType;
 import static com.bytechef.component.definition.Context.Http.responseType;
 import static com.bytechef.component.zoho.constant.ZohoCrmConstants.TYPE;
 
-import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
+import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
 
@@ -89,10 +89,8 @@ public class ZohoCrmListUsersAction {
     private ZohoCrmListUsersAction() {
     }
 
-    protected static Object perform(
-        Parameters inputParameters, Parameters conectionParameters, ActionContext actionContext) {
-
-        return actionContext.http(http -> http.get("/users"))
+    public static Object perform(Parameters inputParameters, Parameters conectionParameters, Context context) {
+        return context.http(http -> http.get("/users"))
             .queryParameters(TYPE, inputParameters.getString(TYPE))
             .configuration(responseType(ResponseType.JSON))
             .execute()

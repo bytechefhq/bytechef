@@ -32,8 +32,8 @@ import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook
 import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.SUBJECT;
 import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.TO_RECIPIENTS;
 
-import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
+import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.Property.ControlType;
@@ -104,10 +104,8 @@ public class MicrosoftOutlook365SendEmailAction {
     private MicrosoftOutlook365SendEmailAction() {
     }
 
-    protected static Object perform(
-        Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) {
-
-        actionContext.http(http -> http.post("/me/sendMail"))
+    public static Object perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
+        context.http(http -> http.post("/me/sendMail"))
             .body(
                 Http.Body.of(
                     "message",

@@ -27,8 +27,8 @@ import static com.bytechef.component.twilio.constant.TwilioConstants.FROM;
 import static com.bytechef.component.twilio.constant.TwilioConstants.MESSAGE_OUTPUT_PROPERTY;
 import static com.bytechef.component.twilio.constant.TwilioConstants.TO;
 
-import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
+import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http.Body;
 import com.bytechef.component.definition.Context.Http.ResponseType;
 import com.bytechef.component.definition.Parameters;
@@ -75,10 +75,8 @@ public class TwilioSendSMSAction {
         .output(outputSchema(MESSAGE_OUTPUT_PROPERTY))
         .perform(TwilioSendSMSAction::perform);
 
-    protected static Object perform(
-        Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) {
-
-        return actionContext
+    public static Object perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
+        return context
             .http(http -> http.post("/Accounts/" + connectionParameters.getRequiredString(USERNAME) + "/Messages.json"))
             .body(
                 Body.of(

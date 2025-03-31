@@ -29,8 +29,8 @@ import static com.bytechef.component.zoho.constant.ZohoCrmConstants.LAST_NAME;
 import static com.bytechef.component.zoho.constant.ZohoCrmConstants.PROFILE;
 import static com.bytechef.component.zoho.constant.ZohoCrmConstants.ROLE;
 
-import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
+import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http.Body;
 import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.Parameters;
@@ -92,10 +92,8 @@ public class ZohoCrmAddUserAction {
     private ZohoCrmAddUserAction() {
     }
 
-    protected static Object perform(
-        Parameters inputParameters, Parameters conectionParameters, ActionContext actionContext) {
-
-        return actionContext.http(http -> http.post("/users"))
+    public static Object perform(Parameters inputParameters, Parameters conectionParameters, Context context) {
+        return context.http(http -> http.post("/users"))
             .body(
                 Body.of(
                     "users", List.of(
