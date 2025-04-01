@@ -17,6 +17,7 @@
 package com.bytechef.component.active.campaign;
 
 import static com.bytechef.component.definition.ComponentDsl.component;
+import static com.bytechef.component.definition.ComponentDsl.tool;
 
 import com.bytechef.component.OpenApiComponentHandler;
 import com.bytechef.component.active.campaign.action.ActiveCampaignCreateAccountAction;
@@ -40,6 +41,9 @@ public abstract class AbstractActiveCampaignComponentHandler implements OpenApiC
                         ActiveCampaignCreateContactAction.ACTION_DEFINITION,
                         ActiveCampaignCreateTaskAction.ACTION_DEFINITION))
                     .connection(modifyConnection(ActiveCampaignConnection.CONNECTION_DEFINITION))
+                    .clusterElements(modifyClusterElements(tool(ActiveCampaignCreateAccountAction.ACTION_DEFINITION),
+                        tool(ActiveCampaignCreateContactAction.ACTION_DEFINITION),
+                        tool(ActiveCampaignCreateTaskAction.ACTION_DEFINITION)))
                     .triggers(getTriggers());
 
     @Override

@@ -12,6 +12,7 @@ paths:
       summary: "Create Customer"
       description: "Creates a new customer."
       operationId: "createCustomer"
+      x-ai-agent-tool: true
       requestBody:
         content:
           application/x-www-form-urlencoded:
@@ -99,6 +100,7 @@ paths:
       summary: "Create Invoice"
       description: "Creates a new invoice."
       operationId: "createInvoice"
+      x-ai-agent-tool: true
       requestBody:
         content:
           application/x-www-form-urlencoded:

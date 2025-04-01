@@ -11,6 +11,7 @@ paths:
       summary: "Get Deals"
       description: "Returns all deals."
       operationId: "getDeals"
+      x-ai-agent-tool: true
       tags:
         - "Deals"
       parameters:
@@ -100,6 +101,7 @@ paths:
       summary: "Add Deal"
       description: "Adds a new deal."
       operationId: "addDeal"
+      x-ai-agent-tool: true
       tags:
         - "Deals"
       requestBody:
@@ -214,6 +216,7 @@ paths:
       summary: "Search Deals"
       description: "Searches all deals by title, notes and/or custom fields."
       operationId: "searchDeals"
+      x-ai-agent-tool: true
       tags:
         - "Deals"
       parameters:
@@ -321,6 +324,7 @@ paths:
       summary: "Delete Deal"
       description: "Marks a deal as deleted. After 30 days, the deal will be permanently deleted."
       operationId: "deleteDeal"
+      x-ai-agent-tool: true
       tags:
         - "Deals"
       parameters:
@@ -348,6 +352,7 @@ paths:
       summary: "Get Details of Deal"
       description: "Returns the details of a specific deal."
       operationId: "getDealDetails"
+      x-ai-agent-tool: true
       tags:
         - "Deals"
       parameters:
@@ -408,6 +413,7 @@ paths:
       summary: "Get Leads"
       description: "Returns multiple leads. Leads are sorted by the time they were created, from oldest to newest."
       operationId: "getLeads"
+      x-ai-agent-tool: true
       parameters:
         - in: "query"
           name: "archived_status"
@@ -499,6 +505,7 @@ paths:
       summary: "Add Lead"
       description: "Creates a lead. A lead always has to be linked to a person or an organization or both."
       operationId: "addLead"
+      x-ai-agent-tool: true
       requestBody:
         content:
           application/json:
@@ -581,6 +588,7 @@ paths:
       summary: "Get Lead Details"
       description: "Returns details of a specific lead. "
       operationId: "getLeadDetails"
+      x-ai-agent-tool: true
       parameters:
         - in: "path"
           name: "id"
@@ -624,6 +632,7 @@ paths:
       summary: "Delete Lead"
       description: "Deletes a specific lead."
       operationId: "deleteLead"
+      x-ai-agent-tool: true
       parameters:
         - in: "path"
           name: "id"
@@ -651,6 +660,7 @@ paths:
       summary: "Search Leads"
       description: "Searches all leads by title, notes and/or custom fields."
       operationId: "searchLeads"
+      x-ai-agent-tool: true
       tags:
         - "Leads"
       parameters:
@@ -734,6 +744,7 @@ paths:
       summary: "Get All Organizations"
       description: "Returns all organizations."
       operationId: "getOrganizations"
+      x-ai-agent-tool: true
       tags:
         - "Organizations"
       parameters:
@@ -792,6 +803,7 @@ paths:
       summary: "Add Organization"
       description: "Adds a new organization."
       operationId: "addOrganization"
+      x-ai-agent-tool: true
       tags:
         - "Organizations"
       requestBody:
@@ -843,6 +855,7 @@ paths:
         \ fields. This endpoint is a wrapper of <a href=\"https://developers.pipedrive.com/docs/api/v1/ItemSearch#searchItem\"\
         >/v1/itemSearch</a> with a narrower OAuth scope."
       operationId: "searchOrganization"
+      x-ai-agent-tool: true
       tags:
         - "Organizations"
       parameters:
@@ -905,6 +918,7 @@ paths:
       summary: "Delete Organization"
       description: "Marks an organization as deleted. After 30 days, the organization will be permanently deleted."
       operationId: "deleteOrganization"
+      x-ai-agent-tool: true
       tags:
         - "Organizations"
       parameters:
@@ -932,6 +946,7 @@ paths:
       summary: "Get Details of Organization"
       description: "Returns the details of an organization."
       operationId: "getOrganizationDetails"
+      x-ai-agent-tool: true
       tags:
         - "Organizations"
       parameters:
@@ -973,6 +988,7 @@ paths:
       summary: "Get Persons"
       description: "Returns all persons."
       operationId: "getPersons"
+      x-ai-agent-tool: true
       tags:
         - "Persons"
       parameters:
@@ -1063,6 +1079,7 @@ paths:
       summary: "Add Person"
       description: "Adds a new person."
       operationId: "addPerson"
+      x-ai-agent-tool: true
       tags:
         - "Persons"
       requestBody:
@@ -1193,6 +1210,7 @@ paths:
       summary: "Search Persons"
       description: "Searches all persons by name, email, phone, notes and/or custom fields."
       operationId: "searchPersons"
+      x-ai-agent-tool: true
       tags:
         - "Persons"
       parameters:
@@ -1292,6 +1310,7 @@ paths:
       summary: "Delete Person"
       description: "Marks a person as deleted. After 30 days, the person will be permanently deleted."
       operationId: "deletePerson"
+      x-ai-agent-tool: true
       tags:
         - "Persons"
       parameters:
@@ -1319,6 +1338,7 @@ paths:
       summary: "Get Details of Person"
       description: "Returns the details of a person. This also returns some additional fields which are not present when asking for all persons."
       operationId: "getPersonDetails"
+      x-ai-agent-tool: true
       tags:
         - "Persons"
       parameters:

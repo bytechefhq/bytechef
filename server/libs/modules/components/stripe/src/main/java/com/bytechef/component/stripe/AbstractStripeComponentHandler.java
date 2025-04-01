@@ -17,6 +17,7 @@
 package com.bytechef.component.stripe;
 
 import static com.bytechef.component.definition.ComponentDsl.component;
+import static com.bytechef.component.definition.ComponentDsl.tool;
 
 import com.bytechef.component.OpenApiComponentHandler;
 import com.bytechef.component.definition.ComponentDefinition;
@@ -38,6 +39,8 @@ public abstract class AbstractStripeComponentHandler implements OpenApiComponent
                     .actions(modifyActions(StripeCreateCustomerAction.ACTION_DEFINITION,
                         StripeCreateInvoiceAction.ACTION_DEFINITION))
                     .connection(modifyConnection(StripeConnection.CONNECTION_DEFINITION))
+                    .clusterElements(modifyClusterElements(tool(StripeCreateCustomerAction.ACTION_DEFINITION),
+                        tool(StripeCreateInvoiceAction.ACTION_DEFINITION)))
                     .triggers(getTriggers());
 
     @Override

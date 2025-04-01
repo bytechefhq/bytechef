@@ -17,6 +17,7 @@
 package com.bytechef.component.discord;
 
 import static com.bytechef.component.definition.ComponentDsl.component;
+import static com.bytechef.component.definition.ComponentDsl.tool;
 
 import com.bytechef.component.OpenApiComponentHandler;
 import com.bytechef.component.definition.ComponentDefinition;
@@ -38,6 +39,8 @@ public abstract class AbstractDiscordComponentHandler implements OpenApiComponen
                     .actions(modifyActions(DiscordSendChannelMessageAction.ACTION_DEFINITION,
                         DiscordCreateChannelAction.ACTION_DEFINITION))
                     .connection(modifyConnection(DiscordConnection.CONNECTION_DEFINITION))
+                    .clusterElements(modifyClusterElements(tool(DiscordSendChannelMessageAction.ACTION_DEFINITION),
+                        tool(DiscordCreateChannelAction.ACTION_DEFINITION)))
                     .triggers(getTriggers());
 
     @Override

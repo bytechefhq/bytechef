@@ -14,6 +14,7 @@ paths:
       summary: "Create Contact"
       description: "Create a contact with the given properties."
       operationId: "createContact"
+      x-ai-agent-tool: true
       requestBody:
         content:
           application/json:
@@ -53,6 +54,7 @@ paths:
       summary: "Delete Contact"
       description: "Move Contact to the recycling bin."
       operationId: "deleteContact"
+      x-ai-agent-tool: true
       parameters:
         - name: "contactId"
           in: "path"
@@ -68,6 +70,7 @@ paths:
       summary: "Get Contact"
       description: "Get contact details."
       operationId: "getContact"
+      x-ai-agent-tool: true
       parameters:
         - name: "contactId"
           in: "path"
@@ -87,6 +90,7 @@ paths:
       summary: "Update Contact"
       description: "Update Contact properties."
       operationId: "updateContact"
+      x-ai-agent-tool: true
       parameters:
         - name: "contactId"
           in: "path"
@@ -138,6 +142,7 @@ paths:
       summary: "Create Deal"
       description: "Creates a new deal."
       operationId: "createDeal"
+      x-ai-agent-tool: true
       requestBody:
         content:
           application/json:
@@ -210,6 +215,7 @@ paths:
       summary: "Get Ticket"
       description: "Gets ticket details."
       operationId: "getTicket"
+      x-ai-agent-tool: true
       parameters:
         - name: "ticketId"
           in: "path"

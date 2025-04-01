@@ -17,6 +17,7 @@
 package com.bytechef.component.asana;
 
 import static com.bytechef.component.definition.ComponentDsl.component;
+import static com.bytechef.component.definition.ComponentDsl.tool;
 
 import com.bytechef.component.OpenApiComponentHandler;
 import com.bytechef.component.asana.action.AsanaCreateProjectAction;
@@ -38,6 +39,8 @@ public abstract class AbstractAsanaComponentHandler implements OpenApiComponentH
                     .actions(modifyActions(AsanaCreateProjectAction.ACTION_DEFINITION,
                         AsanaCreateTaskAction.ACTION_DEFINITION))
                     .connection(modifyConnection(AsanaConnection.CONNECTION_DEFINITION))
+                    .clusterElements(modifyClusterElements(tool(AsanaCreateProjectAction.ACTION_DEFINITION),
+                        tool(AsanaCreateTaskAction.ACTION_DEFINITION)))
                     .triggers(getTriggers());
 
     @Override

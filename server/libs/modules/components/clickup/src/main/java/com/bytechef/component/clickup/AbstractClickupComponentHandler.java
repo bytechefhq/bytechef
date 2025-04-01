@@ -17,6 +17,7 @@
 package com.bytechef.component.clickup;
 
 import static com.bytechef.component.definition.ComponentDsl.component;
+import static com.bytechef.component.definition.ComponentDsl.tool;
 
 import com.bytechef.component.OpenApiComponentHandler;
 import com.bytechef.component.clickup.action.ClickupCreateFolderAction;
@@ -39,6 +40,9 @@ public abstract class AbstractClickupComponentHandler implements OpenApiComponen
                     .actions(modifyActions(ClickupCreateListAction.ACTION_DEFINITION,
                         ClickupCreateTaskAction.ACTION_DEFINITION, ClickupCreateFolderAction.ACTION_DEFINITION))
                     .connection(modifyConnection(ClickupConnection.CONNECTION_DEFINITION))
+                    .clusterElements(modifyClusterElements(tool(ClickupCreateListAction.ACTION_DEFINITION),
+                        tool(ClickupCreateTaskAction.ACTION_DEFINITION),
+                        tool(ClickupCreateFolderAction.ACTION_DEFINITION)))
                     .triggers(getTriggers());
 
     @Override

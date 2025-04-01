@@ -12,6 +12,7 @@ paths:
       summary: "Create Order"
       description: "Adds an order into a Shopify store."
       operationId: "createOrder"
+      x-ai-agent-tool: true
       requestBody:
         content:
           application/json:
@@ -82,6 +83,7 @@ paths:
       summary: "Delete Order"
       description: "Deletes an order. Orders that interact with an online gateway can't be deleted."
       operationId: "deleteOrder"
+      x-ai-agent-tool: true
       parameters:
         - name: "orderId"
           description: "ID of the order to delete."
@@ -98,6 +100,7 @@ paths:
       summary: "Cancel an order"
       description: "Cancels an order. Orders that are paid and have fulfillments can't be canceled."
       operationId: "cancelOrder"
+      x-ai-agent-tool: true
       parameters:
         - name: "orderId"
           description: "ID of the order to cancel."
@@ -118,6 +121,7 @@ paths:
       summary: "Update Order"
       description: "Update an existing order."
       operationId: "updateOrder"
+      x-ai-agent-tool: true
       parameters:
         - name: "orderId"
           description: "ID of the order to update."
@@ -162,6 +166,7 @@ paths:
       summary: "Close Order"
       description: "Closes an order. A closed order is one that has no more work to be done. All items have been fulfilled or refunded."
       operationId: "closeOrder"
+      x-ai-agent-tool: true
       parameters:
         - name: "orderId"
           description: "ID of the order to close."

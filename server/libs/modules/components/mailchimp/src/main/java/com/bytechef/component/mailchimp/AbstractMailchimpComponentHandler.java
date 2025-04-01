@@ -17,6 +17,7 @@
 package com.bytechef.component.mailchimp;
 
 import static com.bytechef.component.definition.ComponentDsl.component;
+import static com.bytechef.component.definition.ComponentDsl.tool;
 
 import com.bytechef.component.OpenApiComponentHandler;
 import com.bytechef.component.definition.ComponentDefinition;
@@ -35,6 +36,7 @@ public abstract class AbstractMailchimpComponentHandler implements OpenApiCompon
             .description("Mailchimp is a marketing automation and email marketing platform."))
                 .actions(modifyActions(MailchimpAddMemberToListAction.ACTION_DEFINITION))
                 .connection(modifyConnection(MailchimpConnection.CONNECTION_DEFINITION))
+                .clusterElements(modifyClusterElements(tool(MailchimpAddMemberToListAction.ACTION_DEFINITION)))
                 .triggers(getTriggers());
 
     @Override

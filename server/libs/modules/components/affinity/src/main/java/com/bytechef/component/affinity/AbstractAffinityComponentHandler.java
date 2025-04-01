@@ -17,6 +17,7 @@
 package com.bytechef.component.affinity;
 
 import static com.bytechef.component.definition.ComponentDsl.component;
+import static com.bytechef.component.definition.ComponentDsl.tool;
 
 import com.bytechef.component.OpenApiComponentHandler;
 import com.bytechef.component.affinity.action.AffinityCreateOpportunityAction;
@@ -40,6 +41,9 @@ public abstract class AbstractAffinityComponentHandler implements OpenApiCompone
                         AffinityCreateOrganizationAction.ACTION_DEFINITION,
                         AffinityCreatePersonAction.ACTION_DEFINITION))
                     .connection(modifyConnection(AffinityConnection.CONNECTION_DEFINITION))
+                    .clusterElements(modifyClusterElements(tool(AffinityCreateOpportunityAction.ACTION_DEFINITION),
+                        tool(AffinityCreateOrganizationAction.ACTION_DEFINITION),
+                        tool(AffinityCreatePersonAction.ACTION_DEFINITION)))
                     .triggers(getTriggers());
 
     @Override

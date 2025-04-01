@@ -12,6 +12,7 @@ paths:
       summary: "Create Deal"
       description: "Creates new deal for an Apollo account."
       operationId: "createDeal"
+      x-ai-agent-tool: true
       parameters:
         - name: "name"
           description: "Name the deal you are creating."
@@ -104,6 +105,7 @@ paths:
       summary: "Update Deal"
       description: "Updates the details of existing deals within your team's Apollo account."
       operationId: "updateDeal"
+      x-ai-agent-tool: true
       parameters:
         - name: "opportunity_id"
           description: "The ID for the deal you want to update."
@@ -196,6 +198,7 @@ paths:
       summary: "Enrich Person"
       description: "Enriches data for a person."
       operationId: "enrichPerson"
+      x-ai-agent-tool: true
       parameters:
         - name: "first_name"
           description: "The first name of the person."
@@ -306,6 +309,7 @@ paths:
       summary: "Enrich Company"
       description: "Enriches data for company."
       operationId: "enrichCompany"
+      x-ai-agent-tool: true
       parameters:
         - name: "domain"
           description: "The domain of the company that you want to enrich. Do not include www., the @ symbol, or similar."

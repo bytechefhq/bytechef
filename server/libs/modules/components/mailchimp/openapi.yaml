@@ -12,6 +12,7 @@ paths:
       tags:
       - "Members"
       operationId: "addMemberToList"
+      x-ai-agent-tool: true
       parameters:
       - name: "listId"
         description: "The unique ID for the list."

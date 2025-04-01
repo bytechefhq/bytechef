@@ -12,6 +12,7 @@ paths:
       summary: "Cancel Event"
       description: "Cancels specified event."
       operationId: "cancelEvent"
+      x-ai-agent-tool: true
       parameters:
         - name: "eventId"
           description: "Event to be canceled."

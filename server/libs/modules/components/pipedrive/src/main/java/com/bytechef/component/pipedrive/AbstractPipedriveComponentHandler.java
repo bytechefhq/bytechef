@@ -17,6 +17,7 @@
 package com.bytechef.component.pipedrive;
 
 import static com.bytechef.component.definition.ComponentDsl.component;
+import static com.bytechef.component.definition.ComponentDsl.tool;
 
 import com.bytechef.component.OpenApiComponentHandler;
 import com.bytechef.component.definition.ComponentDefinition;
@@ -66,6 +67,23 @@ public abstract class AbstractPipedriveComponentHandler implements OpenApiCompon
                     PipedriveSearchPersonsAction.ACTION_DEFINITION, PipedriveDeletePersonAction.ACTION_DEFINITION,
                     PipedriveGetPersonDetailsAction.ACTION_DEFINITION))
                 .connection(modifyConnection(PipedriveConnection.CONNECTION_DEFINITION))
+                .clusterElements(modifyClusterElements(tool(PipedriveGetDealsAction.ACTION_DEFINITION),
+                    tool(PipedriveAddDealAction.ACTION_DEFINITION), tool(PipedriveSearchDealsAction.ACTION_DEFINITION),
+                    tool(PipedriveDeleteDealAction.ACTION_DEFINITION),
+                    tool(PipedriveGetDealDetailsAction.ACTION_DEFINITION),
+                    tool(PipedriveGetLeadsAction.ACTION_DEFINITION), tool(PipedriveAddLeadAction.ACTION_DEFINITION),
+                    tool(PipedriveDeleteLeadAction.ACTION_DEFINITION),
+                    tool(PipedriveGetLeadDetailsAction.ACTION_DEFINITION),
+                    tool(PipedriveSearchLeadsAction.ACTION_DEFINITION),
+                    tool(PipedriveGetOrganizationsAction.ACTION_DEFINITION),
+                    tool(PipedriveAddOrganizationAction.ACTION_DEFINITION),
+                    tool(PipedriveSearchOrganizationAction.ACTION_DEFINITION),
+                    tool(PipedriveDeleteOrganizationAction.ACTION_DEFINITION),
+                    tool(PipedriveGetOrganizationDetailsAction.ACTION_DEFINITION),
+                    tool(PipedriveGetPersonsAction.ACTION_DEFINITION), tool(PipedriveAddPersonAction.ACTION_DEFINITION),
+                    tool(PipedriveSearchPersonsAction.ACTION_DEFINITION),
+                    tool(PipedriveDeletePersonAction.ACTION_DEFINITION),
+                    tool(PipedriveGetPersonDetailsAction.ACTION_DEFINITION)))
                 .triggers(getTriggers());
 
     @Override

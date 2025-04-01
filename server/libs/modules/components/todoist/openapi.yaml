@@ -12,6 +12,7 @@ paths:
       summary: "Create Task"
       description: "Creates a new task."
       operationId: "createTask"
+      x-ai-agent-tool: true
       requestBody:
         content:
           application/json:
@@ -68,6 +69,7 @@ paths:
       summary: "Mark Task as Completed"
       description: "Mark a tas as being completed."
       operationId: "markTaskCompleted"
+      x-ai-agent-tool: true
       parameters:
         - name: "taskId"
           description: "ID of the task to be closed."
@@ -85,6 +87,7 @@ paths:
       summary: "Create Project"
       description: "Creates a new project."
       operationId: "createProject"
+      x-ai-agent-tool: true
       requestBody:
         content:
           application/json:

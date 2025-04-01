@@ -12,6 +12,7 @@ paths:
       summary: "Create Issue"
       description: "Creates a new project issue."
       operationId: "createIssue"
+      x-ai-agent-tool: true
       parameters:
         - name: "projectId"
           description: "ID of the project where new issue will be created."
@@ -65,6 +66,7 @@ paths:
       summary: "Create Comment on Issue"
       description: "Adds a comment to the specified issue."
       operationId: "createCommentOnIssue"
+      x-ai-agent-tool: true
       parameters:
         - name: "projectId"
           in: "path"

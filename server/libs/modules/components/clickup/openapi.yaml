@@ -12,6 +12,7 @@ paths:
       summary: "Create List"
       description: "Creates a new List in specified Folder."
       operationId: "createList"
+      x-ai-agent-tool: true
       parameters:
         - name: "folderId"
           description: "ID of the folder where new list will be created."
@@ -72,6 +73,7 @@ paths:
       summary: "Create Task"
       description: "Create a new task in a ClickUp workspace and list."
       operationId: "createTask"
+      x-ai-agent-tool: true
       parameters:
         - name: "listId"
           description: "ID of the list where new task will be created."
@@ -148,6 +150,7 @@ paths:
       summary: "Create Folder"
       description: "Creates a new folder in a ClickUp workspace."
       operationId: "createFolder"
+      x-ai-agent-tool: true
       parameters:
         - name: "spaceId"
           description: "ID of the space where new folder will be created."

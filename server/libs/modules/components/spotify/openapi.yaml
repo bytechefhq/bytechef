@@ -12,6 +12,7 @@ paths:
       summary: "Play/Resume Playback"
       description: "Start or resume current playback on an active device."
       operationId: "startResumePlayback"
+      x-ai-agent-tool: true
       parameters:
         - name: "deviceId"
           in: "query"
@@ -47,6 +48,7 @@ paths:
       summary: "Add Items to a Playlist"
       description: "Adds one or more items to your playlist."
       operationId: "addItemsToPlaylist"
+      x-ai-agent-tool: true
       parameters:
         - name: "playlist_id"
           in: "path"

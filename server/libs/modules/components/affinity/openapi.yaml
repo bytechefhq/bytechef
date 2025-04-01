@@ -12,6 +12,7 @@ paths:
       summary: "Create Opportunity"
       description: "Creates a new opportunity."
       operationId: "createOpportunity"
+      x-ai-agent-tool: true
       requestBody:
         content:
           application/json:
@@ -44,6 +45,7 @@ paths:
       summary: "Create Organization"
       description: "Creates a new organization."
       operationId: "createOrganization"
+      x-ai-agent-tool: true
       requestBody:
         content:
           application/json:
@@ -83,6 +85,7 @@ paths:
       summary: "Create Person"
       description: "Creates a new person."
       operationId: "createPerson"
+      x-ai-agent-tool: true
       requestBody:
         content:
           application/json:
