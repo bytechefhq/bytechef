@@ -57,8 +57,8 @@ const WorkflowNodesSidebar = ({
     }, [componentDefinitions, filter, taskDispatcherDefinitions]);
 
     return (
-        <aside className="absolute inset-y-2 right-14 flex w-96 flex-col overflow-hidden rounded-md border border-stroke-neutral-secondary bg-background pb-4">
-            <div className="p-3 text-center text-content-neutral-secondary">
+        <aside className="absolute inset-y-2 right-14 flex w-96 flex-col overflow-hidden rounded-md border border-stroke-neutral-secondary bg-surface-neutral-secondary pb-4">
+            <div className="bg-background p-3 text-center text-content-neutral-secondary">
                 <Input
                     name="workflowNodeFilter"
                     onChange={(event) => setFilter(event.target.value)}
