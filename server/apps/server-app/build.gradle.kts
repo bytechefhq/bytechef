@@ -176,6 +176,7 @@ dependencies {
     implementation(project(":server:libs:modules:components:approval-link"))
     implementation(project(":server:libs:modules:components:asana"))
     implementation(project(":server:libs:modules:components:aws:aws-s3"))
+    implementation(project(":server:libs:modules:components:bambooHR"))
     implementation(project(":server:libs:modules:components:baserow"))
     implementation(project(":server:libs:modules:components:bash"))
     implementation(project(":server:libs:modules:components:beamer"))
