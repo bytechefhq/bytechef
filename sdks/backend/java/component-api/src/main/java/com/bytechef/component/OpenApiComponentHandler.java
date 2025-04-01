@@ -17,6 +17,7 @@
 package com.bytechef.component;
 
 import com.bytechef.component.definition.ActionDefinition;
+import com.bytechef.component.definition.ClusterElementDefinition;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.ComponentDsl.ModifiableComponentDefinition;
 import com.bytechef.component.definition.ComponentDsl.ModifiableConnectionDefinition;
@@ -47,6 +48,14 @@ public interface OpenApiComponentHandler extends ComponentHandler {
      * @return
      */
     default List<? extends ModifiableActionDefinition> getCustomActions() {
+        return List.of();
+    }
+
+    /**
+     *
+     * @return
+     */
+    default List<ClusterElementDefinition<?>> getCustomClusterElements() {
         return List.of();
     }
 
@@ -86,6 +95,18 @@ public interface OpenApiComponentHandler extends ComponentHandler {
      */
     default ModifiableActionDefinition modifyAction(ModifiableActionDefinition modifiableActionDefinition) {
         return modifiableActionDefinition;
+    }
+
+    /**
+     *
+     * @param clusterElementDefinitions
+     * @return
+     */
+    default List<ClusterElementDefinition<?>> modifyClusterElements(
+        ClusterElementDefinition<?>... clusterElementDefinitions) {
+
+        return Stream.concat(Stream.of(clusterElementDefinitions), getCustomClusterElements().stream())
+            .toList();
     }
 
     /**
