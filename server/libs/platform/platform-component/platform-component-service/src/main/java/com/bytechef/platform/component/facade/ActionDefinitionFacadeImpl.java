@@ -70,7 +70,7 @@ public class ActionDefinitionFacadeImpl implements ActionDefinitionFacade {
         ComponentConnection componentConnection = getComponentConnection(connectionId);
 
         ActionContext actionContext = contextFactory.createActionContext(
-            componentName, componentVersion, actionName, null, null, null, workflowId, null, componentConnection, true);
+            componentName, componentVersion, actionName, null, null, null, null, workflowId, componentConnection, true);
 
         return tokenRefreshHelper.executeSingleConnectionFunction(
             componentName, componentVersion, componentConnection, actionContext,
@@ -149,8 +149,8 @@ public class ActionDefinitionFacadeImpl implements ActionDefinitionFacade {
             ComponentConnection singleComponentConnection = executeFunctionData.getSingleComponentConnection();
 
             ActionContext actionContext = contextFactory.createActionContext(
-                componentName, componentVersion, actionName, type, jobPrincipalId, jobPrincipalWorkflowId, workflowId,
-                jobId, singleComponentConnection, editorEnvironment);
+                componentName, componentVersion, actionName, type, jobPrincipalId, jobPrincipalWorkflowId, jobId,
+                workflowId, singleComponentConnection, editorEnvironment);
 
             return tokenRefreshHelper.executeSingleConnectionFunction(
                 componentName, componentVersion, singleComponentConnection, actionContext,
@@ -160,11 +160,11 @@ public class ActionDefinitionFacadeImpl implements ActionDefinitionFacade {
                     actionContext1),
                 componentConnection1 -> contextFactory.createActionContext(
                     componentName, componentVersion, actionName, type, jobPrincipalId, jobPrincipalWorkflowId,
-                    workflowId, jobId, componentConnection1, editorEnvironment));
+                    jobId, workflowId, componentConnection1, editorEnvironment));
         } else {
             ActionContext actionContext = contextFactory.createActionContext(
-                componentName, componentVersion, actionName, type, jobPrincipalId, jobPrincipalWorkflowId, workflowId,
-                jobId, null, editorEnvironment);
+                componentName, componentVersion, actionName, type, jobPrincipalId, jobPrincipalWorkflowId, jobId,
+                workflowId, null, editorEnvironment);
 
             return actionDefinitionService.executeMultipleConnectionsPerform(
                 componentName, componentVersion, actionName, inputParameters, executeFunctionData.componentConnections,
@@ -187,7 +187,7 @@ public class ActionDefinitionFacadeImpl implements ActionDefinitionFacade {
             componentConnection1 -> contextFactory.createActionContext(
                 componentName, componentVersion, actionName, actionContextAware.getModeType(),
                 actionContextAware.getJobPrincipalId(), actionContextAware.getJobPrincipalWorkflowId(),
-                actionContextAware.getWorkflowId(), actionContextAware.getJobId(), componentConnection1,
+                actionContextAware.getJobId(), actionContextAware.getWorkflowId(), componentConnection1,
                 actionContextAware.isEditorEnvironment()));
     }
 

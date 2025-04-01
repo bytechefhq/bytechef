@@ -61,8 +61,8 @@ class ContextFactoryImpl implements ContextFactory {
     @Override
     public ActionContext createActionContext(
         String componentName, int componentVersion, String actionName, @Nullable ModeType type,
-        @Nullable Long jobPrincipalId, @Nullable Long jobPrincipalWorkflowId, @Nullable String workflowId,
-        @Nullable Long jobId, @Nullable ComponentConnection connection, boolean editorEnvironment) {
+        @Nullable Long jobPrincipalId, @Nullable Long jobPrincipalWorkflowId, @Nullable Long jobId,
+        @Nullable String workflowId, @Nullable ComponentConnection connection, boolean editorEnvironment) {
 
         return new ActionContextImpl(
             componentName, componentVersion, actionName, type, jobPrincipalId, jobPrincipalWorkflowId, workflowId,

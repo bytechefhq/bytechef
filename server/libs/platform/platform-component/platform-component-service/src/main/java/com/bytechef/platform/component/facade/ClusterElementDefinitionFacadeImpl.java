@@ -71,8 +71,7 @@ public class ClusterElementDefinitionFacadeImpl implements ClusterElementDefinit
 
         ActionContext context = contextFactory.createActionContext(
             componentName, componentVersion, clusterElementName, type, jobPrincipalId, jobPrincipalWorkflowId,
-            workflowId, jobId,
-            componentConnection, editorEnvironment);
+            jobId, workflowId, componentConnection, editorEnvironment);
 
         return tokenRefreshHelper.executeSingleConnectionFunction(
             componentName, componentVersion, componentConnection, context, ActionDefinitionErrorType.EXECUTE_PERFORM,
@@ -81,7 +80,7 @@ public class ClusterElementDefinitionFacadeImpl implements ClusterElementDefinit
                 actionContext1),
             componentConnection1 -> contextFactory.createActionContext(
                 componentName, componentVersion, clusterElementName, type, jobPrincipalId, jobPrincipalWorkflowId,
-                workflowId, jobId, componentConnection1, editorEnvironment));
+                jobId, workflowId, componentConnection1, editorEnvironment));
     }
 
     private ComponentConnection getComponentConnection(Long connectionId) {
