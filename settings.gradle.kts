@@ -480,3 +480,4 @@ include("server:ee:libs:platform:platform-workflow:platform-workflow-worker:plat
 
 include("server:ee:libs:modules:components:api-platform")
 include("server:ee:libs:modules:components:code-workflow")
+include("server:libs:platform:platform-mail")
