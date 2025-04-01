@@ -53,7 +53,7 @@ public class ClusterElementDefinitionServiceImpl implements ClusterElementDefini
         String componentName, int componentVersion, String clusterElementName, Map<String, ?> inputParameters,
         @Nullable ComponentConnection componentConnection, ActionContext context) {
 
-        SingleConnectionToolFunction toolFunction = getClusterElementObject(
+        SingleConnectionToolFunction toolFunction = getClusterElement(
             componentName, componentVersion, clusterElementName);
 
         try {
@@ -69,6 +69,15 @@ public class ClusterElementDefinitionServiceImpl implements ClusterElementDefini
 
             throw new ExecutionException(e, inputParameters, ActionDefinitionErrorType.EXECUTE_PERFORM);
         }
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public <T> T getClusterElement(String componentName, int componentVersion, String clusterElementName) {
+        ComponentClusterElementDefinitionResult result = getComponentClusterElementDefinition(
+            componentName, componentVersion, clusterElementName);
+
+        return (T) result.clusterElementDefinition.getElement();
     }
 
     @Override
@@ -126,17 +135,6 @@ public class ClusterElementDefinitionServiceImpl implements ClusterElementDefini
                 clusterElementDefinition, componentDefinition.getName(), componentVersion,
                 OptionalUtils.orElse(componentDefinition.getIcon(), null)))
             .toList();
-    }
-
-    @Override
-    @SuppressWarnings("unchecked")
-    public <T> T getClusterElementObject(
-        String componentName, int componentVersion, String clusterElementName) {
-
-        ComponentClusterElementDefinitionResult result = getComponentClusterElementDefinition(
-            componentName, componentVersion, clusterElementName);
-
-        return (T) result.clusterElementDefinition.getObject();
     }
 
     @Override

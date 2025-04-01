@@ -113,7 +113,7 @@ public class AiAgentChatAction {
 
             ClusterElement clusterElement = clusterElementMap.getFirst(MODEL);
 
-            ModelFunction modelFunction = clusterElementDefinitionService.getClusterElementObject(
+            ModelFunction modelFunction = clusterElementDefinitionService.getClusterElement(
                 clusterElement.getComponentName(), clusterElement.getComponentVersion(),
                 clusterElement.getClusterElementName());
 
@@ -174,7 +174,7 @@ public class AiAgentChatAction {
     private Advisor getChatMemoryAdvisor(
         Map<String, ComponentConnection> componentConnections, ClusterElement clusterElement) {
 
-        ChatMemoryFunction chatMemoryFunction = clusterElementDefinitionService.getClusterElementObject(
+        ChatMemoryFunction chatMemoryFunction = clusterElementDefinitionService.getClusterElement(
             clusterElement.getComponentName(), clusterElement.getComponentVersion(),
             clusterElement.getClusterElementName());
 
@@ -195,7 +195,7 @@ public class AiAgentChatAction {
     private Advisor getRagAdvisor(
         Map<String, ComponentConnection> componentConnections, ClusterElement clusterElement) {
 
-        RagFunction ragFunction = clusterElementDefinitionService.getClusterElementObject(
+        RagFunction ragFunction = clusterElementDefinitionService.getClusterElement(
             clusterElement.getComponentName(), clusterElement.getComponentVersion(),
             clusterElement.getClusterElementName());
 

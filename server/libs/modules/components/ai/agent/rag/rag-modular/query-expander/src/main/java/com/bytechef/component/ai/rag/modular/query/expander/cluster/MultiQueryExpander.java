@@ -81,7 +81,7 @@ public class MultiQueryExpander {
         ClusterElement clusterElement = ClusterElementMap.of(extensions)
             .getFirst(MODEL);
 
-        ModelFunction modelFunction = clusterElementDefinitionService.getClusterElementObject(
+        ModelFunction modelFunction = clusterElementDefinitionService.getClusterElement(
             clusterElement.getComponentName(), clusterElement.getComponentVersion(),
             clusterElement.getClusterElementName());
 

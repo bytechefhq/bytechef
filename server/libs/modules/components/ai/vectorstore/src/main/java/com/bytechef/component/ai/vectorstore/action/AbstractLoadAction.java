@@ -95,7 +95,7 @@ public abstract class AbstractLoadAction {
 
         ComponentConnection componentConnection = componentConnections.get(componentName);
 
-        DocumentReaderFunction documentReaderFunction = clusterElementDefinitionService.getClusterElementObject(
+        DocumentReaderFunction documentReaderFunction = clusterElementDefinitionService.getClusterElement(
             clusterElement.getComponentName(), clusterElement.getComponentVersion(),
             clusterElement.getClusterElementName());
 
@@ -116,7 +116,7 @@ public abstract class AbstractLoadAction {
                 ComponentConnection componentConnection = componentConnections.get(componentName);
 
                 DocumentTransformerFunction documentTransformerFunction =
-                    clusterElementDefinitionService.getClusterElementObject(
+                    clusterElementDefinitionService.getClusterElement(
                         clusterElement.getComponentName(), clusterElement.getComponentVersion(),
                         clusterElement.getClusterElementName());
 

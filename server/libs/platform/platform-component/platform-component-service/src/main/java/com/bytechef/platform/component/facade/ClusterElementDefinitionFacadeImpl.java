@@ -70,7 +70,8 @@ public class ClusterElementDefinitionFacadeImpl implements ClusterElementDefinit
         @Nullable ComponentConnection componentConnection, boolean editorEnvironment) {
 
         ActionContext context = contextFactory.createActionContext(
-            componentName, componentVersion, clusterElementName, type, jobPrincipalId, jobPrincipalWorkflowId, workflowId, jobId,
+            componentName, componentVersion, clusterElementName, type, jobPrincipalId, jobPrincipalWorkflowId,
+            workflowId, jobId,
             componentConnection, editorEnvironment);
 
         return tokenRefreshHelper.executeSingleConnectionFunction(

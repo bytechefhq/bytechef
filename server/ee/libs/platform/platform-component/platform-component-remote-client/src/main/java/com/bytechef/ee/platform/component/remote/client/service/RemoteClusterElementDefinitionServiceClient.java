@@ -34,7 +34,7 @@ public class RemoteClusterElementDefinitionServiceClient implements ClusterEleme
     }
 
     @Override
-    public <T> T getClusterElementObject(String componentName, int componentVersion, String clusterElementName) {
+    public <T> T getClusterElement(String componentName, int componentVersion, String clusterElementName) {
         throw new UnsupportedOperationException();
     }
 

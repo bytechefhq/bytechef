@@ -68,7 +68,7 @@ public class VectorStoreChatMemory {
         ClusterElement clusterElement = ClusterElementMap.of(extensions)
             .getFirst(VECTOR_STORE);
 
-        VectorStoreFunction vectorStoreFunction = clusterElementDefinitionService.getClusterElementObject(
+        VectorStoreFunction vectorStoreFunction = clusterElementDefinitionService.getClusterElement(
             clusterElement.getComponentName(), clusterElement.getComponentVersion(),
             clusterElement.getClusterElementName());
 

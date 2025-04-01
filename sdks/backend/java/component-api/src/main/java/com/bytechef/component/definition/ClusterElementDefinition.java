@@ -36,7 +36,7 @@ public interface ClusterElementDefinition<T> {
      *
      * @return
      */
-    T getObject();
+    T getElement();
 
     /**
      *

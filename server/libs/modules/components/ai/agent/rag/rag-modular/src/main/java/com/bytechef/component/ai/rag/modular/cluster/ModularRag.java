@@ -84,7 +84,7 @@ public class ModularRag {
         return ClusterElementMap.of(extensions)
             .fetchFirst(DOCUMENT_JOINER)
             .map(clusterElement -> {
-                DocumentJoinerFunction documentJoinerFunction = clusterElementDefinitionService.getClusterElementObject(
+                DocumentJoinerFunction documentJoinerFunction = clusterElementDefinitionService.getClusterElement(
                     clusterElement.getComponentName(), clusterElement.getComponentVersion(),
                     clusterElement.getClusterElementName());
 
@@ -108,7 +108,7 @@ public class ModularRag {
             .fetchFirst(DOCUMENT_RETRIEVER)
             .map(clusterElement -> {
                 DocumentRetrieverFunction documentRetrieverFunction =
-                    clusterElementDefinitionService.getClusterElementObject(
+                    clusterElementDefinitionService.getClusterElement(
                         clusterElement.getComponentName(), clusterElement.getComponentVersion(),
                         clusterElement.getClusterElementName());
 
@@ -133,7 +133,7 @@ public class ModularRag {
         return ClusterElementMap.of(extensions)
             .fetchFirst(QUERY_AUGMENTER)
             .map(clusterElement -> {
-                QueryAugmenterFunction queryAugmenterFunction = clusterElementDefinitionService.getClusterElementObject(
+                QueryAugmenterFunction queryAugmenterFunction = clusterElementDefinitionService.getClusterElement(
                     clusterElement.getComponentName(), clusterElement.getComponentVersion(),
                     clusterElement.getClusterElementName());
 
@@ -156,7 +156,7 @@ public class ModularRag {
         return ClusterElementMap.of(extensions)
             .fetchFirst(QUERY_EXPANDER)
             .map(clusterElement -> {
-                QueryExpanderFunction queryExpanderFunction = clusterElementDefinitionService.getClusterElementObject(
+                QueryExpanderFunction queryExpanderFunction = clusterElementDefinitionService.getClusterElement(
                     clusterElement.getComponentName(), clusterElement.getComponentVersion(),
                     clusterElement.getClusterElementName());
 
@@ -184,7 +184,7 @@ public class ModularRag {
 
         for (ClusterElement clusterElement : clusterElements) {
             QueryTransformerFunction queryTransformerFunction =
-                clusterElementDefinitionService.getClusterElementObject(
+                clusterElementDefinitionService.getClusterElement(
                     clusterElement.getComponentName(), clusterElement.getComponentVersion(),
                     clusterElement.getClusterElementName());
 

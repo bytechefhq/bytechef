@@ -1728,7 +1728,7 @@ public final class ComponentDsl {
         }
 
         @Override
-        public T getObject() {
+        public T getElement() {
             return objectSupplier.get();
         }
 
