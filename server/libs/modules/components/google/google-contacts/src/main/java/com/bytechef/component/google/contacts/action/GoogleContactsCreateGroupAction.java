@@ -20,22 +20,15 @@ import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
-import static com.bytechef.component.google.contacts.constant.GoogleContactsConstants.CREATE_GROUP;
-import static com.bytechef.component.google.contacts.constant.GoogleContactsConstants.CREATE_GROUP_DESCRIPTION;
-import static com.bytechef.component.google.contacts.constant.GoogleContactsConstants.CREATE_GROUP_TITLE;
 import static com.bytechef.component.google.contacts.constant.GoogleContactsConstants.NAME;
 
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.definition.Property;
-import com.bytechef.component.definition.Property.ObjectProperty;
-import com.bytechef.definition.BaseOutputDefinition.OutputSchema;
 import com.bytechef.google.commons.GoogleServices;
 import com.google.api.services.people.v1.PeopleService;
 import com.google.api.services.people.v1.model.ContactGroup;
 import com.google.api.services.people.v1.model.CreateContactGroupRequest;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.IOException;
 
 /**
@@ -43,26 +36,22 @@ import java.io.IOException;
  */
 public class GoogleContactsCreateGroupAction {
 
-    @SuppressFBWarnings("MS")
-    public static final Property[] PROPERTIES = {
-        string(NAME)
-            .label("Group Name")
-            .description("The name of the group.")
-            .required(true)
-    };
-
-    public static final OutputSchema<ObjectProperty> OUTPUT_SCHEMA = outputSchema(
-        object()
-            .properties(
-                string(NAME)
-                    .description(
-                        "The contact group name set by the group owner or a system provided name for system groups.")));
-
-    public static final ModifiableActionDefinition ACTION_DEFINITION = action(CREATE_GROUP)
-        .title(CREATE_GROUP_TITLE)
-        .description(CREATE_GROUP_DESCRIPTION)
-        .properties(PROPERTIES)
-        .output(OUTPUT_SCHEMA)
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action("createGroup")
+        .title("Create Group")
+        .description("Creates a new group.")
+        .properties(
+            string(NAME)
+                .label("Group Name")
+                .description("The name of the group.")
+                .required(true))
+        .output(
+            outputSchema(
+                object()
+                    .properties(
+                        string(NAME)
+                            .description(
+                                "The contact group name set by the group owner or a system provided name for " +
+                                    "system groups."))))
         .perform(GoogleContactsCreateGroupAction::perform);
 
     private GoogleContactsCreateGroupAction() {

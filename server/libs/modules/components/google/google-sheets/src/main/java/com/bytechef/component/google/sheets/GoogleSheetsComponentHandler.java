@@ -17,6 +17,7 @@
 package com.bytechef.component.google.sheets;
 
 import static com.bytechef.component.definition.ComponentDsl.component;
+import static com.bytechef.component.definition.ComponentDsl.tool;
 import static com.bytechef.component.google.sheets.connection.GoogleSheetsConnection.CONNECTION_DEFINITION;
 
 import com.bytechef.component.ComponentHandler;
@@ -34,18 +35,6 @@ import com.bytechef.component.google.sheets.action.GoogleSheetsInsertMultipleRow
 import com.bytechef.component.google.sheets.action.GoogleSheetsInsertRowAction;
 import com.bytechef.component.google.sheets.action.GoogleSheetsListSheetsAction;
 import com.bytechef.component.google.sheets.action.GoogleSheetsUpdateRowAction;
-import com.bytechef.component.google.sheets.cluster.GoogleSheetsClearSheetTool;
-import com.bytechef.component.google.sheets.cluster.GoogleSheetsCreateColumnTool;
-import com.bytechef.component.google.sheets.cluster.GoogleSheetsCreateSheetTool;
-import com.bytechef.component.google.sheets.cluster.GoogleSheetsCreateSpreadsheetTool;
-import com.bytechef.component.google.sheets.cluster.GoogleSheetsDeleteColumnTool;
-import com.bytechef.component.google.sheets.cluster.GoogleSheetsDeleteRowTool;
-import com.bytechef.component.google.sheets.cluster.GoogleSheetsDeleteSheetTool;
-import com.bytechef.component.google.sheets.cluster.GoogleSheetsFindRowByNumTool;
-import com.bytechef.component.google.sheets.cluster.GoogleSheetsInsertMultipleRowsTool;
-import com.bytechef.component.google.sheets.cluster.GoogleSheetsInsertRowTool;
-import com.bytechef.component.google.sheets.cluster.GoogleSheetsListSheetsTool;
-import com.bytechef.component.google.sheets.cluster.GoogleSheetsUpdateRowTool;
 import com.bytechef.component.google.sheets.trigger.GoogleSheetsNewRowTrigger;
 import com.google.auto.service.AutoService;
 
@@ -78,18 +67,18 @@ public class GoogleSheetsComponentHandler implements ComponentHandler {
             GoogleSheetsListSheetsAction.ACTION_DEFINITION,
             GoogleSheetsUpdateRowAction.ACTION_DEFINITION)
         .clusterElements(
-            GoogleSheetsClearSheetTool.CLUSTER_ELEMENT_DEFINITION,
-            GoogleSheetsCreateColumnTool.CLUSTER_ELEMENT_DEFINITION,
-            GoogleSheetsCreateSheetTool.CLUSTER_ELEMENT_DEFINITION,
-            GoogleSheetsCreateSpreadsheetTool.CLUSTER_ELEMENT_DEFINITION,
-            GoogleSheetsDeleteColumnTool.CLUSTER_ELEMENT_DEFINITION,
-            GoogleSheetsDeleteRowTool.CLUSTER_ELEMENT_DEFINITION,
-            GoogleSheetsDeleteSheetTool.CLUSTER_ELEMENT_DEFINITION,
-            GoogleSheetsFindRowByNumTool.CLUSTER_ELEMENT_DEFINITION,
-            GoogleSheetsInsertMultipleRowsTool.CLUSTER_ELEMENT_DEFINITION,
-            GoogleSheetsInsertRowTool.CLUSTER_ELEMENT_DEFINITION,
-            GoogleSheetsListSheetsTool.CLUSTER_ELEMENT_DEFINITION,
-            GoogleSheetsUpdateRowTool.CLUSTER_ELEMENT_DEFINITION)
+            tool(GoogleSheetsClearSheetAction.ACTION_DEFINITION),
+            tool(GoogleSheetsCreateColumnAction.ACTION_DEFINITION),
+            tool(GoogleSheetsCreateSheetAction.ACTION_DEFINITION),
+            tool(GoogleSheetsCreateSpreadsheetAction.ACTION_DEFINITION),
+            tool(GoogleSheetsDeleteColumnAction.ACTION_DEFINITION),
+            tool(GoogleSheetsDeleteRowAction.ACTION_DEFINITION),
+            tool(GoogleSheetsDeleteSheetAction.ACTION_DEFINITION),
+            tool(GoogleSheetsFindRowByNumAction.ACTION_DEFINITION),
+            tool(GoogleSheetsInsertMultipleRowsAction.ACTION_DEFINITION),
+            tool(GoogleSheetsInsertRowAction.ACTION_DEFINITION),
+            tool(GoogleSheetsListSheetsAction.ACTION_DEFINITION),
+            tool(GoogleSheetsUpdateRowAction.ACTION_DEFINITION))
         .triggers(GoogleSheetsNewRowTrigger.TRIGGER_DEFINITION);
 
     @Override

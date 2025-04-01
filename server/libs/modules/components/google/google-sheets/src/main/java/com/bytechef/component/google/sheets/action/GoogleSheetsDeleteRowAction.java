@@ -18,9 +18,6 @@ package com.bytechef.component.google.sheets.action;
 
 import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.integer;
-import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.DELETE_ROW;
-import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.DELETE_ROW_DESCRIPTION;
-import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.DELETE_ROW_TITLE;
 import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.ROW_NUMBER;
 import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.SHEET_ID_PROPERTY;
 import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.SPREADSHEET_ID_PROPERTY;
@@ -29,28 +26,22 @@ import static com.bytechef.component.google.sheets.util.GoogleSheetsUtils.delete
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.definition.Property;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 /**
  * @author Monika Kušter
  */
 public class GoogleSheetsDeleteRowAction {
 
-    @SuppressFBWarnings("MS")
-    public static final Property[] PROPERTIES = {
-        SPREADSHEET_ID_PROPERTY,
-        SHEET_ID_PROPERTY,
-        integer(ROW_NUMBER)
-            .label("Row Number")
-            .description("The row number to delete.")
-            .required(true)
-    };
-
-    public static final ModifiableActionDefinition ACTION_DEFINITION = action(DELETE_ROW)
-        .title(DELETE_ROW_TITLE)
-        .description(DELETE_ROW_DESCRIPTION)
-        .properties(PROPERTIES)
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action("deleteRow")
+        .title("Delete Row")
+        .description("Delete row on an existing sheet.")
+        .properties(
+            SPREADSHEET_ID_PROPERTY,
+            SHEET_ID_PROPERTY,
+            integer(ROW_NUMBER)
+                .label("Row Number")
+                .description("The row number to delete.")
+                .required(true))
         .perform(GoogleSheetsDeleteRowAction::perform);
 
     private GoogleSheetsDeleteRowAction() {

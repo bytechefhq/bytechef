@@ -17,6 +17,7 @@
 package com.bytechef.component.google.mail;
 
 import static com.bytechef.component.definition.ComponentDsl.component;
+import static com.bytechef.component.definition.ComponentDsl.tool;
 import static com.bytechef.component.google.mail.connection.GoogleMailConnection.CONNECTION_DEFINITION;
 
 import com.bytechef.component.ComponentHandler;
@@ -29,13 +30,6 @@ import com.bytechef.component.google.mail.action.GoogleMailGetThreadAction;
 import com.bytechef.component.google.mail.action.GoogleMailReplyToEmailAction;
 import com.bytechef.component.google.mail.action.GoogleMailSearchEmailAction;
 import com.bytechef.component.google.mail.action.GoogleMailSendEmailAction;
-import com.bytechef.component.google.mail.cluster.GoogleMailAddLabelslTool;
-import com.bytechef.component.google.mail.cluster.GoogleMailDeleteMailTool;
-import com.bytechef.component.google.mail.cluster.GoogleMailGetMailTool;
-import com.bytechef.component.google.mail.cluster.GoogleMailGetThreadTool;
-import com.bytechef.component.google.mail.cluster.GoogleMailReplyToEmailTool;
-import com.bytechef.component.google.mail.cluster.GoogleMailSearchEmailTool;
-import com.bytechef.component.google.mail.cluster.GoogleMailSendEmailTool;
 import com.bytechef.component.google.mail.trigger.GoogleMailNewEmailPollingTrigger;
 import com.bytechef.component.google.mail.trigger.GoogleMailNewEmailTrigger;
 import com.google.auto.service.AutoService;
@@ -67,13 +61,13 @@ public class GoogleMailComponentHandler implements ComponentHandler {
             GoogleMailNewEmailTrigger.TRIGGER_DEFINITION,
             GoogleMailNewEmailPollingTrigger.TRIGGER_DEFINITION)
         .clusterElements(
-            GoogleMailAddLabelslTool.CLUSTER_ELEMENT_DEFINITION,
-            GoogleMailDeleteMailTool.CLUSTER_ELEMENT_DEFINITION,
-            GoogleMailGetMailTool.CLUSTER_ELEMENT_DEFINITION,
-            GoogleMailGetThreadTool.CLUSTER_ELEMENT_DEFINITION,
-            GoogleMailReplyToEmailTool.CLUSTER_ELEMENT_DEFINITION,
-            GoogleMailSearchEmailTool.CLUSTER_ELEMENT_DEFINITION,
-            GoogleMailSendEmailTool.CLUSTER_ELEMENT_DEFINITION);
+            tool(GoogleMailAddLabelsAction.ACTION_DEFINITION),
+            tool(GoogleMailDeleteMailAction.ACTION_DEFINITION),
+            tool(GoogleMailGetMailAction.ACTION_DEFINITION),
+            tool(GoogleMailGetThreadAction.ACTION_DEFINITION),
+            tool(GoogleMailReplyToEmailAction.ACTION_DEFINITION),
+            tool(GoogleMailSearchEmailAction.ACTION_DEFINITION),
+            tool(GoogleMailSendEmailAction.ACTION_DEFINITION));
 
     @Override
     public ComponentDefinition getDefinition() {

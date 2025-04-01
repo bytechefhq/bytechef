@@ -27,21 +27,14 @@ import static com.bytechef.component.google.tasks.constant.GoogleTasksConstants.
 import static com.bytechef.component.google.tasks.constant.GoogleTasksConstants.TASK_ID;
 import static com.bytechef.component.google.tasks.constant.GoogleTasksConstants.TASK_OUTPUT_PROPERTY;
 import static com.bytechef.component.google.tasks.constant.GoogleTasksConstants.TITLE;
-import static com.bytechef.component.google.tasks.constant.GoogleTasksConstants.UPDATE_TASK;
-import static com.bytechef.component.google.tasks.constant.GoogleTasksConstants.UPDATE_TASK_DESCRIPTION;
-import static com.bytechef.component.google.tasks.constant.GoogleTasksConstants.UPDATE_TASK_TITLE;
 
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.definition.Property;
-import com.bytechef.component.definition.Property.ObjectProperty;
 import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.google.tasks.util.GoogleTasksUtils;
-import com.bytechef.definition.BaseOutputDefinition.OutputSchema;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Map;
 
 /**
@@ -49,43 +42,37 @@ import java.util.Map;
  */
 public class GoogleTasksUpdateTaskAction {
 
-    @SuppressFBWarnings("MS")
-    public static final Property[] PROPERTIES = {
-        string(LIST_ID)
-            .label("List ID")
-            .description("ID of the list where specific task is stored.")
-            .options((ActionOptionsFunction<String>) GoogleTasksUtils::getListsIdOptions)
-            .required(true),
-        string(TASK_ID)
-            .label("Task ID")
-            .description("ID of the task to update.")
-            .options((ActionOptionsFunction<String>) GoogleTasksUtils::getTasksIdOptions)
-            .optionsLookupDependsOn(LIST_ID)
-            .required(true),
-        string(TITLE)
-            .label("Title")
-            .description("Title of the task to be updated. If empty, title will not be changed.")
-            .required(false),
-        string(STATUS)
-            .label("Status")
-            .description("Status of the task. If empty, status will not be changed.")
-            .options(
-                option("Needs Action", "needsAction", "Issues needs action."),
-                option("Completed", "completed", "Issues is completed."))
-            .required(false),
-        string(NOTES)
-            .label("Notes")
-            .description("Notes describing the task. If empty, notes will not be changed.")
-            .required(false)
-    };
-
-    public static final OutputSchema<ObjectProperty> OUTPUT_SCHEMA = outputSchema(TASK_OUTPUT_PROPERTY);
-
-    public static final ModifiableActionDefinition ACTION_DEFINITION = action(UPDATE_TASK)
-        .title(UPDATE_TASK_TITLE)
-        .description(UPDATE_TASK_DESCRIPTION)
-        .properties(PROPERTIES)
-        .output(OUTPUT_SCHEMA)
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action("updateTask")
+        .title("Update Task")
+        .description("Updates a specific task on the specified task list.")
+        .properties(
+            string(LIST_ID)
+                .label("List ID")
+                .description("ID of the list where specific task is stored.")
+                .options((ActionOptionsFunction<String>) GoogleTasksUtils::getListsIdOptions)
+                .required(true),
+            string(TASK_ID)
+                .label("Task ID")
+                .description("ID of the task to update.")
+                .options((ActionOptionsFunction<String>) GoogleTasksUtils::getTasksIdOptions)
+                .optionsLookupDependsOn(LIST_ID)
+                .required(true),
+            string(TITLE)
+                .label("Title")
+                .description("Title of the task to be updated. If empty, title will not be changed.")
+                .required(false),
+            string(STATUS)
+                .label("Status")
+                .description("Status of the task. If empty, status will not be changed.")
+                .options(
+                    option("Needs Action", "needsAction", "Issues needs action."),
+                    option("Completed", "completed", "Issues is completed."))
+                .required(false),
+            string(NOTES)
+                .label("Notes")
+                .description("Notes describing the task. If empty, notes will not be changed.")
+                .required(false))
+        .output(outputSchema(TASK_OUTPUT_PROPERTY))
         .perform(GoogleTasksUpdateTaskAction::perform);
 
     private GoogleTasksUpdateTaskAction() {

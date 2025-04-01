@@ -17,13 +17,13 @@
 package com.bytechef.component.google.slides;
 
 import static com.bytechef.component.definition.ComponentDsl.component;
+import static com.bytechef.component.definition.ComponentDsl.tool;
 import static com.bytechef.component.google.slides.connection.GoogleSlidesConnection.CONNECTION_DEFINITION;
 
 import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.component.google.slides.action.GoogleSlidesCreatePresentationBasedOnTemplateAction;
-import com.bytechef.component.google.slides.cluster.GoogleSlidesCreatePresentationBasedOnTemplateTool;
 import com.google.auto.service.AutoService;
 
 /**
@@ -42,7 +42,7 @@ public class GoogleSlidesComponentHandler implements ComponentHandler {
         .categories(ComponentCategory.FILE_STORAGE)
         .connection(CONNECTION_DEFINITION)
         .actions(GoogleSlidesCreatePresentationBasedOnTemplateAction.ACTION_DEFINITION)
-        .clusterElements(GoogleSlidesCreatePresentationBasedOnTemplateTool.CLUSTER_ELEMENT_DEFINITION);
+        .clusterElements(tool(GoogleSlidesCreatePresentationBasedOnTemplateAction.ACTION_DEFINITION));
 
     @Override
     public ComponentDefinition getDefinition() {

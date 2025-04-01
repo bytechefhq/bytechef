@@ -35,9 +35,6 @@ import static com.bytechef.component.google.mail.constant.GoogleMailConstants.ME
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.NEXT_PAGE_TOKEN;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.PAGE_TOKEN;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.RESULT_SIZE_ESTIMATE;
-import static com.bytechef.component.google.mail.constant.GoogleMailConstants.SEARCH_EMAIL;
-import static com.bytechef.component.google.mail.constant.GoogleMailConstants.SEARCH_EMAIL_DESCRIPTION;
-import static com.bytechef.component.google.mail.constant.GoogleMailConstants.SEARCH_EMAIL_TITLE;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.SUBJECT;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.THREAD_ID;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.TO;
@@ -46,14 +43,10 @@ import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.definition.Property;
-import com.bytechef.component.definition.Property.ObjectProperty;
 import com.bytechef.component.google.mail.util.GoogleMailUtils;
-import com.bytechef.definition.BaseOutputDefinition.OutputSchema;
 import com.bytechef.google.commons.GoogleServices;
 import com.google.api.services.gmail.Gmail;
 import com.google.api.services.gmail.model.ListMessagesResponse;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.IOException;
 import java.util.List;
 
@@ -62,76 +55,71 @@ import java.util.List;
  */
 public class GoogleMailSearchEmailAction {
 
-    @SuppressFBWarnings("MS")
-    public static final Property[] PROPERTIES = {
-        number(MAX_RESULTS)
-            .label("Max Results")
-            .description("Maximum number of messages to return.")
-            .defaultValue(100)
-            .maxValue(500)
-            .required(false),
-        string(PAGE_TOKEN)
-            .label("Page Token")
-            .description("Page token to retrieve a specific page of results in the list.")
-            .required(false),
-        string(FROM)
-            .label("From")
-            .description("The address sending the mail")
-            .required(false),
-        string(TO)
-            .label("To")
-            .description("The address receiving the new mail")
-            .required(false),
-        string(SUBJECT)
-            .label("Subject")
-            .description("Words in the subject line")
-            .required(false),
-        string(CATEGORY)
-            .label("Category")
-            .description("Messages in a certain category")
-            .options(
-                option("Primary", "primary"),
-                option("Social", "social"),
-                option("Promotions", "promotions"),
-                option("Updates", "updates"),
-                option("Forums", "forums"),
-                option("Reservations", "reservations"),
-                option("Purchases", "purchases"))
-            .required(false),
-        array(LABEL_IDS)
-            .label("Labels")
-            .description(
-                "Only return messages with labels that match all of the specified label IDs. Messages in a " +
-                    "thread might have labels that other messages in the same thread don't have.")
-            .items(string())
-            .options((ActionOptionsFunction<String>) GoogleMailUtils::getLabelOptions)
-            .required(false),
-        bool(INCLUDE_SPAM_TRASH)
-            .label("Include Spam Trash")
-            .description("Include messages from SPAM and TRASH in the results.")
-            .required(false)
-    };
-
-    public static final OutputSchema<ObjectProperty> OUTPUT_SCHEMA = outputSchema(
-        object()
-            .properties(
-                array(MESSAGES)
-                    .items(
-                        object()
-                            .properties(
-                                string(ID)
-                                    .description("ID of the message."),
-                                string(THREAD_ID)
-                                    .description("The ID of the thread the message belongs to."))),
-                string(NEXT_PAGE_TOKEN),
-                number(RESULT_SIZE_ESTIMATE)
-                    .description("Estimated number of messages.")));
-
-    public static final ModifiableActionDefinition ACTION_DEFINITION = action(SEARCH_EMAIL)
-        .title(SEARCH_EMAIL_TITLE)
-        .description(SEARCH_EMAIL_DESCRIPTION)
-        .properties(PROPERTIES)
-        .output(OUTPUT_SCHEMA)
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action("searchEmail")
+        .title("Search Email")
+        .description("Lists the messages in the user's mailbox.")
+        .properties(
+            number(MAX_RESULTS)
+                .label("Max Results")
+                .description("Maximum number of messages to return.")
+                .defaultValue(100)
+                .maxValue(500)
+                .required(false),
+            string(PAGE_TOKEN)
+                .label("Page Token")
+                .description("Page token to retrieve a specific page of results in the list.")
+                .required(false),
+            string(FROM)
+                .label("From")
+                .description("The address sending the mail")
+                .required(false),
+            string(TO)
+                .label("To")
+                .description("The address receiving the new mail")
+                .required(false),
+            string(SUBJECT)
+                .label("Subject")
+                .description("Words in the subject line")
+                .required(false),
+            string(CATEGORY)
+                .label("Category")
+                .description("Messages in a certain category")
+                .options(
+                    option("Primary", "primary"),
+                    option("Social", "social"),
+                    option("Promotions", "promotions"),
+                    option("Updates", "updates"),
+                    option("Forums", "forums"),
+                    option("Reservations", "reservations"),
+                    option("Purchases", "purchases"))
+                .required(false),
+            array(LABEL_IDS)
+                .label("Labels")
+                .description(
+                    "Only return messages with labels that match all of the specified label IDs. Messages in a " +
+                        "thread might have labels that other messages in the same thread don't have.")
+                .items(string())
+                .options((ActionOptionsFunction<String>) GoogleMailUtils::getLabelOptions)
+                .required(false),
+            bool(INCLUDE_SPAM_TRASH)
+                .label("Include Spam Trash")
+                .description("Include messages from SPAM and TRASH in the results.")
+                .required(false))
+        .output(
+            outputSchema(
+                object()
+                    .properties(
+                        array(MESSAGES)
+                            .items(
+                                object()
+                                    .properties(
+                                        string(ID)
+                                            .description("ID of the message."),
+                                        string(THREAD_ID)
+                                            .description("The ID of the thread the message belongs to."))),
+                        string(NEXT_PAGE_TOKEN),
+                        number(RESULT_SIZE_ESTIMATE)
+                            .description("Estimated number of messages."))))
         .perform(GoogleMailSearchEmailAction::perform);
 
     private GoogleMailSearchEmailAction() {

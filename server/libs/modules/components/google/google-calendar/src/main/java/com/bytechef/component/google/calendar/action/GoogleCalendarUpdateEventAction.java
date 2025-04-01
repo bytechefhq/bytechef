@@ -33,9 +33,6 @@ import static com.bytechef.component.google.calendar.constant.GoogleCalendarCons
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.EVENT_OUTPUT_PROPERTY;
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.START;
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.SUMMARY;
-import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.UPDATES_EVENT_DESCRIPTION;
-import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.UPDATE_EVENT;
-import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.UPDATE_EVENT_TITLE;
 import static com.bytechef.component.google.calendar.util.GoogleCalendarUtils.createCustomEvent;
 import static com.bytechef.component.google.calendar.util.GoogleCalendarUtils.createEventDateTime;
 import static com.bytechef.component.google.calendar.util.GoogleCalendarUtils.getEvent;
@@ -45,14 +42,10 @@ import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.definition.Property;
-import com.bytechef.component.definition.Property.ObjectProperty;
 import com.bytechef.component.google.calendar.util.GoogleCalendarUtils;
 import com.bytechef.component.google.calendar.util.GoogleCalendarUtils.CustomEvent;
-import com.bytechef.definition.BaseOutputDefinition.OutputSchema;
 import com.google.api.services.calendar.model.Event;
 import com.google.api.services.calendar.model.EventAttendee;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.IOException;
 import java.util.List;
 
@@ -61,67 +54,61 @@ import java.util.List;
  */
 public class GoogleCalendarUpdateEventAction {
 
-    @SuppressFBWarnings("MS")
-    public static final Property[] PROPERTIES = {
-        CALENDAR_ID_PROPERTY,
-        string(EVENT_ID)
-            .label("Event ID")
-            .description("ID of the event to update.")
-            .options((ActionOptionsFunction<String>) GoogleCalendarUtils::getEventIdOptions)
-            .optionsLookupDependsOn(CALENDAR_ID)
-            .required(true),
-        string(SUMMARY)
-            .label("Title")
-            .description("New title of the event.")
-            .required(false),
-        bool(ALL_DAY)
-            .label("All Day Event?")
-            .required(false),
-        date(START)
-            .label("Start Date")
-            .description("New start date of the event.")
-            .displayCondition("%s == true".formatted(ALL_DAY))
-            .required(true),
-        date(END)
-            .label("End Date")
-            .description("New end date of the event.")
-            .displayCondition("%s == true".formatted(ALL_DAY))
-            .required(true),
-        dateTime(START)
-            .label("Start Date Time")
-            .description(
-                "New (inclusive) start time of the event. For a recurring event, this is the start time of the first " +
-                    "instance.")
-            .displayCondition("%s == false".formatted(ALL_DAY))
-            .required(true),
-        dateTime(END)
-            .label("End Date Time")
-            .description(
-                "New (exclusive) end time of the event. For a recurring event, this is the end time of the first " +
-                    "instance.")
-            .displayCondition("%s == false".formatted(ALL_DAY))
-            .required(true),
-        string(DESCRIPTION)
-            .label("Description")
-            .description("New description of the event. Can contain HTML.")
-            .required(false),
-        array(ATTENDEES)
-            .label("Attendees")
-            .description("New attendees of the event.")
-            .items(
-                string()
-                    .label("Email")
-                    .description("The attendee's email address."))
-            .required(false)
-    };
-
-    public static final OutputSchema<ObjectProperty> OUTPUT_SCHEMA = outputSchema(EVENT_OUTPUT_PROPERTY);
-
-    public static final ModifiableActionDefinition ACTION_DEFINITION = action(UPDATE_EVENT)
-        .title(UPDATE_EVENT_TITLE)
-        .description(UPDATES_EVENT_DESCRIPTION)
-        .properties(PROPERTIES)
-        .output(OUTPUT_SCHEMA)
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action("updateEvent")
+        .title("Update Event")
+        .description("Updates event in Google Calendar.")
+        .properties(
+            CALENDAR_ID_PROPERTY,
+            string(EVENT_ID)
+                .label("Event ID")
+                .description("ID of the event to update.")
+                .options((ActionOptionsFunction<String>) GoogleCalendarUtils::getEventIdOptions)
+                .optionsLookupDependsOn(CALENDAR_ID)
+                .required(true),
+            string(SUMMARY)
+                .label("Title")
+                .description("New title of the event.")
+                .required(false),
+            bool(ALL_DAY)
+                .label("All Day Event?")
+                .required(false),
+            date(START)
+                .label("Start Date")
+                .description("New start date of the event.")
+                .displayCondition("%s == true".formatted(ALL_DAY))
+                .required(true),
+            date(END)
+                .label("End Date")
+                .description("New end date of the event.")
+                .displayCondition("%s == true".formatted(ALL_DAY))
+                .required(true),
+            dateTime(START)
+                .label("Start Date Time")
+                .description(
+                    "New (inclusive) start time of the event. For a recurring event, this is the start time of the " +
+                        "first instance.")
+                .displayCondition("%s == false".formatted(ALL_DAY))
+                .required(true),
+            dateTime(END)
+                .label("End Date Time")
+                .description(
+                    "New (exclusive) end time of the event. For a recurring event, this is the end time of the " +
+                        "first instance.")
+                .displayCondition("%s == false".formatted(ALL_DAY))
+                .required(true),
+            string(DESCRIPTION)
+                .label("Description")
+                .description("New description of the event. Can contain HTML.")
+                .required(false),
+            array(ATTENDEES)
+                .label("Attendees")
+                .description("New attendees of the event.")
+                .items(
+                    string()
+                        .label("Email")
+                        .description("The attendee's email address."))
+                .required(false))
+        .output(outputSchema(EVENT_OUTPUT_PROPERTY))
         .perform(GoogleCalendarUpdateEventAction::perform);
 
     private GoogleCalendarUpdateEventAction() {

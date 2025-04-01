@@ -31,41 +31,15 @@ import java.util.List;
  */
 public class GithubConstants {
 
-    public static final String ADD_ASSIGNEES_TO_ISSUE = "addAssigneesToIssue";
-    public static final String ADD_ASSIGNEES_TO_ISSUE_DESCRIPTION = "Adds an assignees to the specified issue.";
-    public static final String ADD_ASSIGNEES_TO_ISSUE_TITLE = "Add Assignee to Issue";
-    public static final String ADD_LABELS_TO_ISSUE = "addLabelsToIssue";
-    public static final String ADD_LABELS_TO_ISSUE_DESCRIPTION = "Adds labels to the specified issue.";
-    public static final String ADD_LABELS_TO_ISSUE_TITLE = "Add Labels to Issue";
     public static final String ASSIGNEES = "assignees";
     public static final String BODY = "body";
-    public static final String CREATE_COMMENT_ON_ISSUE = "createCommentOnIssue";
-    public static final String CREATE_COMMENT_ON_ISSUE_DESCRIPTION = "Adds a comment to the specified issue.";
-    public static final String CREATE_COMMENT_ON_ISSUE_TITLE = "Create Comment on Issue";
-    public static final String CREATE_ISSUE = "createIssue";
-    public static final String CREATE_ISSUE_DESCRIPTION = "Create Issue in GitHub Repository";
-    public static final String CREATE_ISSUE_TITLE = "Create Issue";
     public static final String FILTER = "filter";
-    public static final String GET_ISSUE = "getIssue";
-    public static final String GET_ISSUE_DESCRIPTION = "Get information from a specific issue";
-    public static final String GET_ISSUE_TITLE = "Get Issue";
     public static final String ID = "id";
     public static final String ISSUE = "issue";
     public static final String LABELS = "labels";
-    public static final String LIST_ISSUES = "listIssues";
-    public static final String LIST_ISSUES_DESCRIPTION =
-        "Retrieve issues assigned to the authenticated user across all accessible repositories.";
-    public static final String LIST_ISSUES_TITLE = "List Issues";
-    public static final String LIST_REPOSITORY_ISSUES = "listRepositoryIssues";
-    public static final String LIST_REPOSITORY_ISSUES_DESCRIPTION =
-        "Lists issues in a repository. Only open issues will be listed.";
-    public static final String LIST_REPOSITORY_ISSUES_TITLE = "List Repository Issues";
     public static final String NAME = "name";
     public static final String OWNER = "owner";
     public static final String REPOSITORY = "repository";
-    public static final String STAR_REPOSITORY = "starRepository";
-    public static final String STAR_REPOSITORY_DESCRIPTION = "Stars a repository for the authenticated user.";
-    public static final String STAR_REPOSITORY_TITLE = "Star Repository";
     public static final String STATE = "state";
     public static final String TITLE = "title";
 

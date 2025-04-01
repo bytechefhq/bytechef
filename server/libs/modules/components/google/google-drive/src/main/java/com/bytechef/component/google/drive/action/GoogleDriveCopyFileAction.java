@@ -20,9 +20,6 @@ import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.google.drive.constant.GoogleDriveConstants.APPLICATION_VND_GOOGLE_APPS_FOLDER;
-import static com.bytechef.component.google.drive.constant.GoogleDriveConstants.COPY_FILE;
-import static com.bytechef.component.google.drive.constant.GoogleDriveConstants.COPY_FILE_DESCRIPTION;
-import static com.bytechef.component.google.drive.constant.GoogleDriveConstants.COPY_FILE_TITLE;
 import static com.bytechef.component.google.drive.constant.GoogleDriveConstants.GOOGLE_FILE_OUTPUT_PROPERTY;
 import static com.bytechef.google.commons.constant.GoogleCommonsContants.FILE_ID;
 import static com.bytechef.google.commons.constant.GoogleCommonsContants.FILE_NAME;
@@ -31,12 +28,8 @@ import static com.bytechef.google.commons.constant.GoogleCommonsContants.FOLDER_
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.definition.Property;
-import com.bytechef.component.definition.Property.ObjectProperty;
-import com.bytechef.definition.BaseOutputDefinition.OutputSchema;
 import com.bytechef.google.commons.GoogleUtils;
 import com.google.api.services.drive.model.File;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.IOException;
 
 /**
@@ -44,31 +37,25 @@ import java.io.IOException;
  */
 public class GoogleDriveCopyFileAction {
 
-    @SuppressFBWarnings("MS")
-    public static final Property[] PROPERTIES = {
-        string(FILE_ID)
-            .label("File ID")
-            .description("The id of the file to be copied.")
-            .options(GoogleUtils.getFileOptionsByMimeType(APPLICATION_VND_GOOGLE_APPS_FOLDER, false))
-            .required(true),
-        string(FILE_NAME)
-            .label("New File Name")
-            .description("The name of the new file created as a result of the copy operation.")
-            .required(true),
-        string(FOLDER_ID)
-            .label("Destination Folder ID")
-            .description("The ID of the folder where the copied file will be stored.")
-            .options(GoogleUtils.getFileOptionsByMimeType(APPLICATION_VND_GOOGLE_APPS_FOLDER, true))
-            .required(true)
-    };
-
-    public static final OutputSchema<ObjectProperty> OUTPUT_SCHEMA = outputSchema(GOOGLE_FILE_OUTPUT_PROPERTY);
-
-    public static final ModifiableActionDefinition ACTION_DEFINITION = action(COPY_FILE)
-        .title(COPY_FILE_TITLE)
-        .description(COPY_FILE_DESCRIPTION)
-        .properties(PROPERTIES)
-        .output(OUTPUT_SCHEMA)
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action("copyFile")
+        .title("Copy File")
+        .description("Copy a selected file to a different location within Google Drive.")
+        .properties(
+            string(FILE_ID)
+                .label("File ID")
+                .description("The id of the file to be copied.")
+                .options(GoogleUtils.getFileOptionsByMimeType(APPLICATION_VND_GOOGLE_APPS_FOLDER, false))
+                .required(true),
+            string(FILE_NAME)
+                .label("New File Name")
+                .description("The name of the new file created as a result of the copy operation.")
+                .required(true),
+            string(FOLDER_ID)
+                .label("Destination Folder ID")
+                .description("The ID of the folder where the copied file will be stored.")
+                .options(GoogleUtils.getFileOptionsByMimeType(APPLICATION_VND_GOOGLE_APPS_FOLDER, true))
+                .required(true))
+        .output(outputSchema(GOOGLE_FILE_OUTPUT_PROPERTY))
         .perform(GoogleDriveCopyFileAction::perform);
 
     private GoogleDriveCopyFileAction() {

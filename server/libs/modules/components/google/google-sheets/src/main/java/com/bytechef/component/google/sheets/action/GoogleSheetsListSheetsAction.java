@@ -20,9 +20,6 @@ import static com.bytechef.component.definition.ComponentDsl.ModifiableActionDef
 import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.array;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
-import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.LIST_SHEETS;
-import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.LIST_SHEETS_DESCRIPTION;
-import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.LIST_SHEETS_TITLE;
 import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.SHEET_RECORD_OUTPUT_PROPERTY;
 import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.SPREADSHEET_ID;
 import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.SPREADSHEET_ID_PROPERTY;
@@ -30,14 +27,10 @@ import static com.bytechef.component.google.sheets.util.GoogleSheetsUtils.SheetR
 
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.definition.Property;
-import com.bytechef.component.definition.Property.ArrayProperty;
-import com.bytechef.definition.BaseOutputDefinition.OutputSchema;
 import com.bytechef.google.commons.GoogleServices;
 import com.google.api.services.sheets.v4.Sheets;
 import com.google.api.services.sheets.v4.model.Sheet;
 import com.google.api.services.sheets.v4.model.SheetProperties;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
@@ -47,21 +40,15 @@ import java.util.List;
  */
 public class GoogleSheetsListSheetsAction {
 
-    @SuppressFBWarnings("MS")
-    public static final Property[] PROPERTIES = {
-        SPREADSHEET_ID_PROPERTY
-    };
-
-    public static final OutputSchema<ArrayProperty> OUTPUT_SCHEMA = outputSchema(
-        array()
-            .description("List of sheets in the spreadsheet.")
-            .items(SHEET_RECORD_OUTPUT_PROPERTY));
-
-    public static final ModifiableActionDefinition ACTION_DEFINITION = action(LIST_SHEETS)
-        .title(LIST_SHEETS_TITLE)
-        .description(LIST_SHEETS_DESCRIPTION)
-        .properties(PROPERTIES)
-        .output(OUTPUT_SCHEMA)
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action("listSheets")
+        .title("List Sheets")
+        .description("Get all sheets from the spreadsheet.")
+        .properties(SPREADSHEET_ID_PROPERTY)
+        .output(
+            outputSchema(
+                array()
+                    .description("List of sheets in the spreadsheet.")
+                    .items(SHEET_RECORD_OUTPUT_PROPERTY)))
         .perform(GoogleSheetsListSheetsAction::perform);
 
     private GoogleSheetsListSheetsAction() {

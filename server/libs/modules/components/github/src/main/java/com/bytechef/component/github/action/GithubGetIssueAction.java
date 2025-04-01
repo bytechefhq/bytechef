@@ -22,9 +22,6 @@ import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.Context.Http.ResponseType;
 import static com.bytechef.component.definition.Context.Http.responseType;
-import static com.bytechef.component.github.constant.GithubConstants.GET_ISSUE;
-import static com.bytechef.component.github.constant.GithubConstants.GET_ISSUE_DESCRIPTION;
-import static com.bytechef.component.github.constant.GithubConstants.GET_ISSUE_TITLE;
 import static com.bytechef.component.github.constant.GithubConstants.ISSUE;
 import static com.bytechef.component.github.constant.GithubConstants.ISSUE_OUTPUT_PROPERTY;
 import static com.bytechef.component.github.constant.GithubConstants.REPOSITORY;
@@ -33,12 +30,8 @@ import static com.bytechef.component.github.util.GithubUtils.getOwnerName;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.definition.Property;
-import com.bytechef.component.definition.Property.ObjectProperty;
 import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.github.util.GithubUtils;
-import com.bytechef.definition.BaseOutputDefinition.OutputSchema;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Map;
 
 /**
@@ -46,27 +39,21 @@ import java.util.Map;
  */
 public class GithubGetIssueAction {
 
-    @SuppressFBWarnings("MS")
-    public static final Property[] PROPERTIES = {
-        string(REPOSITORY)
-            .label("Repository")
-            .options((ActionOptionsFunction<String>) GithubUtils::getRepositoryOptions)
-            .required(true),
-        string(ISSUE)
-            .label("Issue Number")
-            .description("The number of the issue you want to get details from.")
-            .options((ActionOptionsFunction<String>) GithubUtils::getIssueOptions)
-            .optionsLookupDependsOn(REPOSITORY)
-            .required(true)
-    };
-
-    public static final OutputSchema<ObjectProperty> OUTPUT_SCHEMA = outputSchema(ISSUE_OUTPUT_PROPERTY);
-
-    public static final ModifiableActionDefinition ACTION_DEFINITION = action(GET_ISSUE)
-        .title(GET_ISSUE_TITLE)
-        .description(GET_ISSUE_DESCRIPTION)
-        .properties(PROPERTIES)
-        .output(OUTPUT_SCHEMA)
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action("getIssue")
+        .title("Get Issue")
+        .description("Get information from a specific issue")
+        .properties(
+            string(REPOSITORY)
+                .label("Repository")
+                .options((ActionOptionsFunction<String>) GithubUtils::getRepositoryOptions)
+                .required(true),
+            string(ISSUE)
+                .label("Issue Number")
+                .description("The number of the issue you want to get details from.")
+                .options((ActionOptionsFunction<String>) GithubUtils::getIssueOptions)
+                .optionsLookupDependsOn(REPOSITORY)
+                .required(true))
+        .output(outputSchema(ISSUE_OUTPUT_PROPERTY))
         .perform(GithubGetIssueAction::perform);
 
     private GithubGetIssueAction() {

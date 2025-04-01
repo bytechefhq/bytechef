@@ -16,9 +16,6 @@
 
 package com.bytechef.component.baserow.action;
 
-import static com.bytechef.component.baserow.constant.BaserowConstants.GET_ROW;
-import static com.bytechef.component.baserow.constant.BaserowConstants.GET_ROW_DESCRIPTION;
-import static com.bytechef.component.baserow.constant.BaserowConstants.GET_ROW_TITLE;
 import static com.bytechef.component.baserow.constant.BaserowConstants.ROW_ID;
 import static com.bytechef.component.baserow.constant.BaserowConstants.TABLE_ID;
 import static com.bytechef.component.baserow.constant.BaserowConstants.USER_FIELD_NAMES;
@@ -30,32 +27,26 @@ import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.definition.Property;
 import com.bytechef.component.definition.TypeReference;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 /**
  * @author Monika Kušter
  */
 public class BaserowGetRowAction {
 
-    @SuppressFBWarnings("MS")
-    public static final Property[] PROPERTIES = {
-        integer(TABLE_ID)
-            .label("Table ID")
-            .description("ID of the table where you want to get the row from.")
-            .required(true),
-        integer(ROW_ID)
-            .label("Row ID")
-            .description("ID of the row to get.")
-            .required(true),
-        USER_FIELD_NAMES_PROPERTY
-    };
-
-    public static final ModifiableActionDefinition ACTION_DEFINITION = action(GET_ROW)
-        .title(GET_ROW_TITLE)
-        .description(GET_ROW_DESCRIPTION)
-        .properties(PROPERTIES)
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action("getRow")
+        .title("Get Row")
+        .description("Fetches a single table row.")
+        .properties(
+            integer(TABLE_ID)
+                .label("Table ID")
+                .description("ID of the table where you want to get the row from.")
+                .required(true),
+            integer(ROW_ID)
+                .label("Row ID")
+                .description("ID of the row to get.")
+                .required(true),
+            USER_FIELD_NAMES_PROPERTY)
         .output()
         .perform(BaserowGetRowAction::perform);
 

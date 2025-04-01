@@ -38,33 +38,15 @@ public class GoogleCalendarConstants {
     private GoogleCalendarConstants() {
     }
 
-    public static final String ADD_ATTENDEES_TO_EVENT = "addAttendeesToEvent";
-    public static final String ADD_ATTENDEES_TO_EVENT_DESCRIPTION = "Invites one or more person to an existing event.";
-    public static final String ADD_ATTENDEES_TO_EVENT_TITLE = "Add Attendees to Event";
     public static final String ALL_DAY = "allDay";
     public static final String ATTACHMENTS = "attachments";
     public static final String ATTENDEES = "attendees";
     public static final String CALENDAR_ID = "calendarId";
-    public static final String CREATE_EVENT = "createEvent";
-    public static final String CREATE_EVENT_DESCRIPTION = "Creates a new event in Google Calendar.";
-    public static final String CREATE_EVENT_TITLE = "Create Event";
-    public static final String CREATE_QUICK_EVENT = "createQuickEvent";
-    public static final String CREATE_QUICK_EVENT_DESCRIPTION = "Creates a quick event in Google Calendar.";
-    public static final String CREATE_QUICK_EVENT_TITLE = "Create Quick Event";
     public static final String DATE_RANGE = "dateRange";
-    public static final String DELETE_EVENT = "deleteEvent";
-    public static final String DELETE_EVENT_DESCRIPTION = "Deletes an event from Google Calendar.";
-    public static final String DELETE_EVENT_TITLE = "Delete Event";
     public static final String DESCRIPTION = "description";
     public static final String END = "end";
     public static final String EVENT_ID = "eventId";
     public static final String EVENT_TYPE = "eventType";
-    public static final String GET_EVENTS = "getEvents";
-    public static final String GET_EVENTS_DESCRIPTION = "List events from the specified Google Calendar.";
-    public static final String GET_EVENTS_TITLE = "Get Events";
-    public static final String GET_FREE_TIME_SLOTS = "getFreeTimeSlots";
-    public static final String GET_FREE_TIME_SLOTS_DESCRIPTION = "Get free time slots from Google Calendar.";
-    public static final String GET_FREE_TIME_SLOTS_TITLE = "Get Free Time Slots";
     public static final String GUEST_CAN_INVITE_OTHERS = "guestsCanInviteOthers";
     public static final String GUEST_CAN_MODIFY = "guestsCanModify";
     public static final String GUEST_CAN_SEE_OTHER_GUESTS = "guestsCanSeeOtherGuests";
@@ -84,9 +66,6 @@ public class GoogleCalendarConstants {
     public static final String FROM = "from";
     public static final String TO = "to";
     public static final String START = "start";
-    public static final String UPDATE_EVENT = "updateEvent";
-    public static final String UPDATES_EVENT_DESCRIPTION = "Updates event in Google Calendar.";
-    public static final String UPDATE_EVENT_TITLE = "Update Event";
     public static final String USE_DEFAULT = "useDefault";
 
     public static final ModifiableStringProperty CALENDAR_ID_PROPERTY = string(CALENDAR_ID)

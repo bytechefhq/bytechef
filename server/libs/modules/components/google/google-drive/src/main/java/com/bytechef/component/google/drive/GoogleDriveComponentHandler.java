@@ -17,6 +17,7 @@
 package com.bytechef.component.google.drive;
 
 import static com.bytechef.component.definition.ComponentDsl.component;
+import static com.bytechef.component.definition.ComponentDsl.tool;
 import static com.bytechef.component.google.drive.connection.GoogleDriveConnection.CONNECTION_DEFINITION;
 
 import com.bytechef.component.ComponentHandler;
@@ -29,13 +30,6 @@ import com.bytechef.component.google.drive.action.GoogleDriveDeleteFileAction;
 import com.bytechef.component.google.drive.action.GoogleDriveDownloadFileAction;
 import com.bytechef.component.google.drive.action.GoogleDriveGetFileAction;
 import com.bytechef.component.google.drive.action.GoogleDriveUploadFileAction;
-import com.bytechef.component.google.drive.cluster.GoogleDriveCopyFileTool;
-import com.bytechef.component.google.drive.cluster.GoogleDriveCreateNewFolderTool;
-import com.bytechef.component.google.drive.cluster.GoogleDriveCreateNewTextFileTool;
-import com.bytechef.component.google.drive.cluster.GoogleDriveDeleteFileTool;
-import com.bytechef.component.google.drive.cluster.GoogleDriveDownloadFileTool;
-import com.bytechef.component.google.drive.cluster.GoogleDriveGetFileTool;
-import com.bytechef.component.google.drive.cluster.GoogleDriveUploadFileTool;
 import com.bytechef.component.google.drive.trigger.GoogleDriveNewFileTrigger;
 import com.bytechef.component.google.drive.trigger.GoogleDriveNewFolderTrigger;
 import com.google.auto.service.AutoService;
@@ -65,13 +59,13 @@ public class GoogleDriveComponentHandler implements ComponentHandler {
             GoogleDriveGetFileAction.ACTION_DEFINITION,
             GoogleDriveUploadFileAction.ACTION_DEFINITION)
         .clusterElements(
-            GoogleDriveCopyFileTool.CLUSTER_ELEMENT_DEFINITION,
-            GoogleDriveCreateNewFolderTool.CLUSTER_ELEMENT_DEFINITION,
-            GoogleDriveCreateNewTextFileTool.CLUSTER_ELEMENT_DEFINITION,
-            GoogleDriveDeleteFileTool.CLUSTER_ELEMENT_DEFINITION,
-            GoogleDriveDownloadFileTool.CLUSTER_ELEMENT_DEFINITION,
-            GoogleDriveGetFileTool.CLUSTER_ELEMENT_DEFINITION,
-            GoogleDriveUploadFileTool.CLUSTER_ELEMENT_DEFINITION)
+            tool(GoogleDriveCopyFileAction.ACTION_DEFINITION),
+            tool(GoogleDriveCreateNewFolderAction.ACTION_DEFINITION),
+            tool(GoogleDriveCreateNewTextFileAction.ACTION_DEFINITION),
+            tool(GoogleDriveDeleteFileAction.ACTION_DEFINITION),
+            tool(GoogleDriveDownloadFileAction.ACTION_DEFINITION),
+            tool(GoogleDriveGetFileAction.ACTION_DEFINITION),
+            tool(GoogleDriveUploadFileAction.ACTION_DEFINITION))
         .triggers(
             GoogleDriveNewFileTrigger.TRIGGER_DEFINITION,
             GoogleDriveNewFolderTrigger.TRIGGER_DEFINITION);

@@ -23,9 +23,6 @@ import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.Context.Http.responseType;
 import static com.bytechef.component.google.tasks.constant.GoogleTasksConstants.LIST_ID;
-import static com.bytechef.component.google.tasks.constant.GoogleTasksConstants.LIST_TASKS;
-import static com.bytechef.component.google.tasks.constant.GoogleTasksConstants.LIST_TASKS_DESCRIPTION;
-import static com.bytechef.component.google.tasks.constant.GoogleTasksConstants.LIST_TASKS_TITLE;
 import static com.bytechef.component.google.tasks.constant.GoogleTasksConstants.SHOW_COMPLETED;
 import static com.bytechef.component.google.tasks.constant.GoogleTasksConstants.TASK_OUTPUT_PROPERTY;
 
@@ -34,12 +31,8 @@ import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.definition.Property;
-import com.bytechef.component.definition.Property.ArrayProperty;
 import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.google.tasks.util.GoogleTasksUtils;
-import com.bytechef.definition.BaseOutputDefinition.OutputSchema;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Map;
 
 /**
@@ -47,29 +40,23 @@ import java.util.Map;
  */
 public class GoogleTasksListTasksAction {
 
-    @SuppressFBWarnings("MS")
-    public static final Property[] PROPERTIES = {
-        string(LIST_ID)
-            .label("List ID")
-            .description("ID of the list where tasks are stored.")
-            .options((ActionOptionsFunction<String>) GoogleTasksUtils::getListsIdOptions)
-            .required(true),
-        bool(SHOW_COMPLETED)
-            .label("Show completed")
-            .description(
-                "Show also completed tasks. By default both completed task and task that needs action will be " +
-                    "shown.")
-            .defaultValue(true)
-            .required(true)
-    };
-
-    public static final OutputSchema<ArrayProperty> OUTPUT_SCHEMA = outputSchema(array().items(TASK_OUTPUT_PROPERTY));
-
-    public static final ModifiableActionDefinition ACTION_DEFINITION = action(LIST_TASKS)
-        .title(LIST_TASKS_TITLE)
-        .description(LIST_TASKS_DESCRIPTION)
-        .properties(PROPERTIES)
-        .output(OUTPUT_SCHEMA)
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action("listTasks")
+        .title("List Tasks")
+        .description("Returns all tasks in the specified task list.")
+        .properties(
+            string(LIST_ID)
+                .label("List ID")
+                .description("ID of the list where tasks are stored.")
+                .options((ActionOptionsFunction<String>) GoogleTasksUtils::getListsIdOptions)
+                .required(true),
+            bool(SHOW_COMPLETED)
+                .label("Show completed")
+                .description(
+                    "Show also completed tasks. By default both completed task and task that needs action will be " +
+                        "shown.")
+                .defaultValue(true)
+                .required(true))
+        .output(outputSchema(array().items(TASK_OUTPUT_PROPERTY)))
         .perform(GoogleTasksListTasksAction::perform);
 
     private GoogleTasksListTasksAction() {

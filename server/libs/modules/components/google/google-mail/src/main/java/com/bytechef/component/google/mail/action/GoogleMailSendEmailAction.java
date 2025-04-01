@@ -30,9 +30,6 @@ import static com.bytechef.component.google.mail.constant.GoogleMailConstants.EM
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.ID;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.LABEL_IDS;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.REPLY_TO;
-import static com.bytechef.component.google.mail.constant.GoogleMailConstants.SEND_EMAIL;
-import static com.bytechef.component.google.mail.constant.GoogleMailConstants.SEND_EMAIL_DESCRIPTION;
-import static com.bytechef.component.google.mail.constant.GoogleMailConstants.SEND_EMAIL_TITLE;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.SUBJECT;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.THREAD_ID;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.TO;
@@ -43,12 +40,9 @@ import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.Property;
-import com.bytechef.component.definition.Property.ObjectProperty;
-import com.bytechef.definition.BaseOutputDefinition.OutputSchema;
 import com.bytechef.google.commons.GoogleServices;
 import com.google.api.services.gmail.Gmail;
 import com.google.api.services.gmail.model.Message;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import jakarta.mail.MessagingException;
 import java.io.IOException;
 
@@ -57,65 +51,60 @@ import java.io.IOException;
  */
 public class GoogleMailSendEmailAction {
 
-    @SuppressFBWarnings("MS")
-    public static final Property[] PROPERTIES = {
-        array(TO)
-            .label("To")
-            .description("Recipients email addresses.")
-            .items(EMAIL_PROPERTY)
-            .required(true),
-        string(SUBJECT)
-            .label("Subject")
-            .description("Subject of the email.")
-            .required(true),
-        array(BCC)
-            .label("Bcc")
-            .description("Bcc recipients email addresses.")
-            .items(EMAIL_PROPERTY)
-            .required(false),
-        array(CC)
-            .label("Cc")
-            .description("Cc recipients email addresses.")
-            .items(EMAIL_PROPERTY)
-            .required(false),
-        array(REPLY_TO)
-            .label("Reply To")
-            .description("Reply-to email addresses.")
-            .items(EMAIL_PROPERTY)
-            .required(false),
-        string(BODY)
-            .label("Body")
-            .description("Body text of the email")
-            .controlType(Property.ControlType.RICH_TEXT)
-            .required(true),
-        array(ATTACHMENTS)
-            .label("Attachments")
-            .description("A list of attachments to send with the email.")
-            .items(fileEntry())
-    };
-    public static final OutputSchema<ObjectProperty> OUTPUT_SCHEMA = outputSchema(
-        object()
-            .properties(
-                string(ID)
-                    .description("The ID of the message."),
-                string(THREAD_ID)
-                    .description("The ID of the thread the message belongs to."),
-                array(LABEL_IDS)
-                    .description("List of IDs of labels applied to this message.")
-                    .items(string())));
-
-    public static final ModifiableActionDefinition ACTION_DEFINITION = action(SEND_EMAIL)
-        .title(SEND_EMAIL_TITLE)
-        .description(SEND_EMAIL_DESCRIPTION)
-        .properties(PROPERTIES)
-        .output(OUTPUT_SCHEMA)
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action("sendEmail")
+        .title("Send Email")
+        .description("Sends the specified message to the recipients in the To, Cc, and Bcc headers.")
+        .properties(
+            array(TO)
+                .label("To")
+                .description("Recipients email addresses.")
+                .items(EMAIL_PROPERTY)
+                .required(true),
+            string(SUBJECT)
+                .label("Subject")
+                .description("Subject of the email.")
+                .required(true),
+            array(BCC)
+                .label("Bcc")
+                .description("Bcc recipients email addresses.")
+                .items(EMAIL_PROPERTY)
+                .required(false),
+            array(CC)
+                .label("Cc")
+                .description("Cc recipients email addresses.")
+                .items(EMAIL_PROPERTY)
+                .required(false),
+            array(REPLY_TO)
+                .label("Reply To")
+                .description("Reply-to email addresses.")
+                .items(EMAIL_PROPERTY)
+                .required(false),
+            string(BODY)
+                .label("Body")
+                .description("Body text of the email")
+                .controlType(Property.ControlType.RICH_TEXT)
+                .required(true),
+            array(ATTACHMENTS)
+                .label("Attachments")
+                .description("A list of attachments to send with the email.")
+                .items(fileEntry()))
+        .output(
+            outputSchema(
+                object()
+                    .properties(
+                        string(ID)
+                            .description("The ID of the message."),
+                        string(THREAD_ID)
+                            .description("The ID of the thread the message belongs to."),
+                        array(LABEL_IDS)
+                            .description("List of IDs of labels applied to this message.")
+                            .items(string()))))
         .perform(GoogleMailSendEmailAction::perform);
 
     private GoogleMailSendEmailAction() {
     }
 
-    public static Message perform(
-        Parameters inputParameters, Parameters connectionParameters, Context context)
+    public static Message perform(Parameters inputParameters, Parameters connectionParameters, Context context)
         throws IOException, MessagingException {
 
         Gmail gmail = GoogleServices.getMail(connectionParameters);

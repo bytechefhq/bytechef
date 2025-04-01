@@ -18,9 +18,6 @@ package com.bytechef.component.google.sheets.action;
 
 import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.integer;
-import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.FIND_ROW_BY_NUM;
-import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.FIND_ROW_BY_NUM_DESCRIPTION;
-import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.FIND_ROW_BY_NUM_TITLE;
 import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.IS_THE_FIRST_ROW_HEADER_PROPERTY;
 import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.ROW_NUMBER;
 import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.SHEET_NAME;
@@ -33,10 +30,8 @@ import static com.bytechef.component.google.sheets.util.GoogleSheetsUtils.getMap
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.definition.Property;
 import com.bytechef.google.commons.GoogleServices;
 import com.google.api.services.sheets.v4.Sheets;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Map;
 
@@ -45,21 +40,17 @@ import java.util.Map;
  */
 public class GoogleSheetsFindRowByNumAction {
 
-    @SuppressFBWarnings("MS")
-    public static final Property[] PROPERTIES = {
-        SPREADSHEET_ID_PROPERTY,
-        SHEET_NAME_PROPERTY,
-        IS_THE_FIRST_ROW_HEADER_PROPERTY,
-        integer(ROW_NUMBER)
-            .label("Row Number")
-            .required(true)
-            .description("The row number to get from the sheet.")
-    };
-
-    public static final ModifiableActionDefinition ACTION_DEFINITION = action(FIND_ROW_BY_NUM)
-        .title(FIND_ROW_BY_NUM_TITLE)
-        .description(FIND_ROW_BY_NUM_DESCRIPTION)
-        .properties(PROPERTIES)
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action("findRowByNum")
+        .title("Find Row by Number")
+        .description("Get a row in a Google Sheet by row number.")
+        .properties(
+            SPREADSHEET_ID_PROPERTY,
+            SHEET_NAME_PROPERTY,
+            IS_THE_FIRST_ROW_HEADER_PROPERTY,
+            integer(ROW_NUMBER)
+                .label("Row Number")
+                .required(true)
+                .description("The row number to get from the sheet."))
         .output()
         .perform(GoogleSheetsFindRowByNumAction::perform);
 

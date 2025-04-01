@@ -18,16 +18,12 @@ package com.bytechef.component.google.sheets.action;
 
 import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.string;
-import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.CREATE_SPREADSHEET;
-import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.CREATE_SPREADSHEET_DESCRIPTION;
-import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.CREATE_SPREADSHEET_TITLE;
 import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.FOLDER_ID;
 import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.TITLE;
 
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.definition.Property;
 import com.bytechef.google.commons.GoogleServices;
 import com.bytechef.google.commons.GoogleUtils;
 import com.google.api.services.drive.Drive;
@@ -35,32 +31,27 @@ import com.google.api.services.drive.model.File;
 import com.google.api.services.sheets.v4.Sheets;
 import com.google.api.services.sheets.v4.model.Spreadsheet;
 import com.google.api.services.sheets.v4.model.SpreadsheetProperties;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 /**
  * @author Marija Horvat
  */
 public class GoogleSheetsCreateSpreadsheetAction {
 
-    @SuppressFBWarnings("MS")
-    public static final Property[] PROPERTIES = {
-        string(TITLE)
-            .label("Title")
-            .description("Title of the new spreadsheet to be created.")
-            .required(true),
-        string(FOLDER_ID)
-            .label("Folder ID")
-            .description(
-                "ID of the folder where the new spreadsheet will be stored. If no folder is selected, the folder " +
-                    "will be created in the root folder.")
-            .options(GoogleUtils.getFileOptionsByMimeType("application/vnd.google-apps.folder", true))
-            .required(false)
-    };
-
-    public static final ModifiableActionDefinition ACTION_DEFINITION = action(CREATE_SPREADSHEET)
-        .title(CREATE_SPREADSHEET_TITLE)
-        .description(CREATE_SPREADSHEET_DESCRIPTION)
-        .properties(PROPERTIES)
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action("createSpreadsheet")
+        .title("Create Spreadsheet")
+        .description("Create a new spreadsheet in a specified folder.")
+        .properties(
+            string(TITLE)
+                .label("Title")
+                .description("Title of the new spreadsheet to be created.")
+                .required(true),
+            string(FOLDER_ID)
+                .label("Folder ID")
+                .description(
+                    "ID of the folder where the new spreadsheet will be stored. If no folder is selected, the folder " +
+                        "will be created in the root folder.")
+                .options(GoogleUtils.getFileOptionsByMimeType("application/vnd.google-apps.folder", true))
+                .required(false))
         .output()
         .perform(GoogleSheetsCreateSpreadsheetAction::perform);
 

@@ -17,6 +17,7 @@
 package com.bytechef.component.monday;
 
 import static com.bytechef.component.definition.ComponentDsl.component;
+import static com.bytechef.component.definition.ComponentDsl.tool;
 
 import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.definition.ComponentDefinition;
@@ -25,11 +26,6 @@ import com.bytechef.component.monday.action.MondayCreateColumnAction;
 import com.bytechef.component.monday.action.MondayCreateGroupAction;
 import com.bytechef.component.monday.action.MondayCreateItemAction;
 import com.bytechef.component.monday.action.MondayDeleteItemAction;
-import com.bytechef.component.monday.cluster.MondayCreateBoardTool;
-import com.bytechef.component.monday.cluster.MondayCreateColumnTool;
-import com.bytechef.component.monday.cluster.MondayCreateGroupTool;
-import com.bytechef.component.monday.cluster.MondayCreateItemTool;
-import com.bytechef.component.monday.cluster.MondayDeleteItemTool;
 import com.bytechef.component.monday.connection.MondayConnection;
 import com.bytechef.component.monday.trigger.MondayNewItemInBoardTrigger;
 import com.google.auto.service.AutoService;
@@ -53,11 +49,11 @@ public class MondayComponentHandler implements ComponentHandler {
             MondayCreateItemAction.ACTION_DEFINITION,
             MondayDeleteItemAction.ACTION_DEFINITION)
         .clusterElements(
-            MondayCreateBoardTool.CLUSTER_ELEMENT_DEFINITION,
-            MondayCreateColumnTool.CLUSTER_ELEMENT_DEFINITION,
-            MondayCreateGroupTool.CLUSTER_ELEMENT_DEFINITION,
-            MondayCreateItemTool.CLUSTER_ELEMENT_DEFINITION,
-            MondayDeleteItemTool.CLUSTER_ELEMENT_DEFINITION)
+            tool(MondayCreateBoardAction.ACTION_DEFINITION),
+            tool(MondayCreateColumnAction.ACTION_DEFINITION),
+            tool(MondayCreateGroupAction.ACTION_DEFINITION),
+            tool(MondayCreateItemAction.ACTION_DEFINITION),
+            tool(MondayDeleteItemAction.ACTION_DEFINITION))
         .triggers(MondayNewItemInBoardTrigger.TRIGGER_DEFINITION);
 
     @Override

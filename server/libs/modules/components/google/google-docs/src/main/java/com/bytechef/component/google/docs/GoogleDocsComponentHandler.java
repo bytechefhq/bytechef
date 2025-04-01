@@ -17,6 +17,7 @@
 package com.bytechef.component.google.docs;
 
 import static com.bytechef.component.definition.ComponentDsl.component;
+import static com.bytechef.component.definition.ComponentDsl.tool;
 import static com.bytechef.component.google.docs.connection.GoogleDocsConnection.CONNECTION_DEFINITION;
 
 import com.bytechef.component.ComponentHandler;
@@ -25,9 +26,6 @@ import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.component.google.docs.action.GoogleDocsCreateDocumentAction;
 import com.bytechef.component.google.docs.action.GoogleDocsCreateDocumentFromTemplateAction;
 import com.bytechef.component.google.docs.action.GoogleDocsGetDocumentAction;
-import com.bytechef.component.google.docs.cluster.GoogleDocsCreateDocumentFromTemplateTool;
-import com.bytechef.component.google.docs.cluster.GoogleDocsCreateDocumentTool;
-import com.bytechef.component.google.docs.cluster.GoogleDocsGetDocumentTool;
 import com.google.auto.service.AutoService;
 
 /**
@@ -50,9 +48,9 @@ public class GoogleDocsComponentHandler implements ComponentHandler {
             GoogleDocsCreateDocumentFromTemplateAction.ACTION_DEFINITION,
             GoogleDocsGetDocumentAction.ACTION_DEFINITION)
         .clusterElements(
-            GoogleDocsCreateDocumentFromTemplateTool.CLUSTER_ELEMENT_DEFINITION,
-            GoogleDocsCreateDocumentTool.CLUSTER_ELEMENT_DEFINITION,
-            GoogleDocsGetDocumentTool.CLUSTER_ELEMENT_DEFINITION);
+            tool(GoogleDocsCreateDocumentAction.ACTION_DEFINITION),
+            tool(GoogleDocsCreateDocumentFromTemplateAction.ACTION_DEFINITION),
+            tool(GoogleDocsGetDocumentAction.ACTION_DEFINITION));
 
     @Override
     public ComponentDefinition getDefinition() {

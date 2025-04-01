@@ -20,9 +20,6 @@ import static com.bytechef.component.baserow.constant.BaserowConstants.FIELDS;
 import static com.bytechef.component.baserow.constant.BaserowConstants.FIELDS_DYNAMIC_PROPERTY;
 import static com.bytechef.component.baserow.constant.BaserowConstants.ROW_ID;
 import static com.bytechef.component.baserow.constant.BaserowConstants.TABLE_ID;
-import static com.bytechef.component.baserow.constant.BaserowConstants.UPDATE_ROW;
-import static com.bytechef.component.baserow.constant.BaserowConstants.UPDATE_ROW_DESCRIPTION;
-import static com.bytechef.component.baserow.constant.BaserowConstants.UPDATE_ROW_TITLE;
 import static com.bytechef.component.baserow.constant.BaserowConstants.USER_FIELD_NAMES;
 import static com.bytechef.component.baserow.constant.BaserowConstants.USER_FIELD_NAMES_PROPERTY;
 import static com.bytechef.component.definition.ComponentDsl.action;
@@ -32,30 +29,24 @@ import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.definition.Property;
 import com.bytechef.component.definition.TypeReference;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 public class BaserowUpdateRowAction {
 
-    @SuppressFBWarnings("MS")
-    public static final Property[] PROPERTIES = {
-        integer(TABLE_ID)
-            .label("Table ID")
-            .description("ID of the table containing the row to be updated.")
-            .required(true),
-        integer(ROW_ID)
-            .label("Row ID")
-            .description("ID of the row to be updated.")
-            .required(true),
-        USER_FIELD_NAMES_PROPERTY,
-        FIELDS_DYNAMIC_PROPERTY
-    };
-
-    public static final ModifiableActionDefinition ACTION_DEFINITION = action(UPDATE_ROW)
-        .title(UPDATE_ROW_TITLE)
-        .description(UPDATE_ROW_DESCRIPTION)
-        .properties(PROPERTIES)
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action("updateRow")
+        .title("Update Row")
+        .description("Updates the specified row.")
+        .properties(
+            integer(TABLE_ID)
+                .label("Table ID")
+                .description("ID of the table containing the row to be updated.")
+                .required(true),
+            integer(ROW_ID)
+                .label("Row ID")
+                .description("ID of the row to be updated.")
+                .required(true),
+            USER_FIELD_NAMES_PROPERTY,
+            FIELDS_DYNAMIC_PROPERTY)
         .output()
         .perform(BaserowUpdateRowAction::perform);
 

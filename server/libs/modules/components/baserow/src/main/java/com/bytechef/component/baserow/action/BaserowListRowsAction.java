@@ -16,9 +16,6 @@
 
 package com.bytechef.component.baserow.action;
 
-import static com.bytechef.component.baserow.constant.BaserowConstants.LIST_ROWS;
-import static com.bytechef.component.baserow.constant.BaserowConstants.LIST_ROWS_DESCRIPTION;
-import static com.bytechef.component.baserow.constant.BaserowConstants.LIST_ROWS_TITLE;
 import static com.bytechef.component.baserow.constant.BaserowConstants.ORDER_BY;
 import static com.bytechef.component.baserow.constant.BaserowConstants.SIZE;
 import static com.bytechef.component.baserow.constant.BaserowConstants.TABLE_ID;
@@ -32,39 +29,33 @@ import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.definition.Property;
 import com.bytechef.component.definition.TypeReference;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 /**
  * @author Monika Kušter
  */
 public class BaserowListRowsAction {
 
-    @SuppressFBWarnings("MS")
-    public static final Property[] PROPERTIES = {
-        integer(TABLE_ID)
-            .label("Table ID")
-            .description("ID of the table where you want to get the rows from.")
-            .required(true),
-        integer(SIZE)
-            .label("Size")
-            .description("The maximum number of rows to retrieve.")
-            .defaultValue(100)
-            .required(false),
-        string(ORDER_BY)
-            .label("Order By")
-            .description("If provided rows will be order by specific field. Use - sign for descending ordering.")
-            .exampleValue("My Field, -My Field 2")
-            .defaultValue("id")
-            .required(false),
-        USER_FIELD_NAMES_PROPERTY
-    };
-
-    public static final ModifiableActionDefinition ACTION_DEFINITION = action(LIST_ROWS)
-        .title(LIST_ROWS_TITLE)
-        .description(LIST_ROWS_DESCRIPTION)
-        .properties(PROPERTIES)
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action("listRows")
+        .title("List Rows")
+        .description("Lists table rows.")
+        .properties(
+            integer(TABLE_ID)
+                .label("Table ID")
+                .description("ID of the table where you want to get the rows from.")
+                .required(true),
+            integer(SIZE)
+                .label("Size")
+                .description("The maximum number of rows to retrieve.")
+                .defaultValue(100)
+                .required(false),
+            string(ORDER_BY)
+                .label("Order By")
+                .description("If provided rows will be order by specific field. Use - sign for descending ordering.")
+                .exampleValue("My Field, -My Field 2")
+                .defaultValue("id")
+                .required(false),
+            USER_FIELD_NAMES_PROPERTY)
         .output()
         .perform(BaserowListRowsAction::perform);
 

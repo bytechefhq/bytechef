@@ -20,9 +20,6 @@ import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.COLUMN_NAME;
-import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.CREATE_COLUMN;
-import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.CREATE_COLUMN_DESCRIPTION;
-import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.CREATE_COLUMN_TITLE;
 import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.SHEET_NAME;
 import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.SHEET_NAME_PROPERTY;
 import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.SHEET_RECORD_OUTPUT_PROPERTY;
@@ -36,13 +33,9 @@ import static com.bytechef.component.google.sheets.util.GoogleSheetsUtils.append
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.definition.Property;
-import com.bytechef.component.definition.Property.ObjectProperty;
-import com.bytechef.definition.BaseOutputDefinition.OutputSchema;
 import com.bytechef.google.commons.GoogleServices;
 import com.google.api.services.sheets.v4.Sheets;
 import com.google.api.services.sheets.v4.model.ValueRange;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 
 /**
@@ -50,23 +43,17 @@ import java.util.List;
  */
 public class GoogleSheetsCreateColumnAction {
 
-    @SuppressFBWarnings("MS")
-    public static final Property[] PROPERTIES = {
-        SPREADSHEET_ID_PROPERTY,
-        SHEET_NAME_PROPERTY,
-        string(COLUMN_NAME)
-            .label("Column Name")
-            .description("Name of the new column.")
-            .required(true)
-    };
-
-    public static final OutputSchema<ObjectProperty> OUTPUT_SCHEMA = outputSchema(SHEET_RECORD_OUTPUT_PROPERTY);
-
-    public static final ModifiableActionDefinition ACTION_DEFINITION = action(CREATE_COLUMN)
-        .title(CREATE_COLUMN_TITLE)
-        .description(CREATE_COLUMN_DESCRIPTION)
-        .properties(PROPERTIES)
-        .output(OUTPUT_SCHEMA)
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action("createColumn")
+        .title("Create Column")
+        .description("Append a new column to the end of the sheet.")
+        .properties(
+            SPREADSHEET_ID_PROPERTY,
+            SHEET_NAME_PROPERTY,
+            string(COLUMN_NAME)
+                .label("Column Name")
+                .description("Name of the new column.")
+                .required(true))
+        .output(outputSchema(SHEET_RECORD_OUTPUT_PROPERTY))
         .perform(GoogleSheetsCreateColumnAction::perform);
 
     private GoogleSheetsCreateColumnAction() {

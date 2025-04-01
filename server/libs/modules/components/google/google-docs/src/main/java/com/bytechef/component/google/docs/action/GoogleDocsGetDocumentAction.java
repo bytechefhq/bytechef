@@ -20,18 +20,13 @@ import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.google.docs.constant.GoogleDocsConstants.APPLICATION_VND_GOOGLE_APPS_DOCUMENT;
 import static com.bytechef.component.google.docs.constant.GoogleDocsConstants.DOCUMENT_ID;
-import static com.bytechef.component.google.docs.constant.GoogleDocsConstants.GET_DOCUMENT;
-import static com.bytechef.component.google.docs.constant.GoogleDocsConstants.GET_DOCUMENT_DESCRIPTION;
-import static com.bytechef.component.google.docs.constant.GoogleDocsConstants.GET_DOCUMENT_TITLE;
 
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.definition.Property;
 import com.bytechef.google.commons.GoogleServices;
 import com.bytechef.google.commons.GoogleUtils;
 import com.google.api.services.docs.v1.Docs;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.IOException;
 
 /**
@@ -39,19 +34,15 @@ import java.io.IOException;
  */
 public class GoogleDocsGetDocumentAction {
 
-    @SuppressFBWarnings("MS")
-    public static final Property[] PROPERTIES = {
-        string(DOCUMENT_ID)
-            .label("Document Id")
-            .description("The ID of the document to read.")
-            .options(GoogleUtils.getFileOptionsByMimeType(APPLICATION_VND_GOOGLE_APPS_DOCUMENT, true))
-            .required(true)
-    };
-
-    public static final ModifiableActionDefinition ACTION_DEFINITION = action(GET_DOCUMENT)
-        .title(GET_DOCUMENT_TITLE)
-        .description(GET_DOCUMENT_DESCRIPTION)
-        .properties(PROPERTIES)
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action("getDocument")
+        .title("Get Document")
+        .description("Retrieve a specified document from your Google Drive.")
+        .properties(
+            string(DOCUMENT_ID)
+                .label("Document Id")
+                .description("The ID of the document to read.")
+                .options(GoogleUtils.getFileOptionsByMimeType(APPLICATION_VND_GOOGLE_APPS_DOCUMENT, true))
+                .required(true))
         .output()
         .perform(GoogleDocsGetDocumentAction::perform);
 

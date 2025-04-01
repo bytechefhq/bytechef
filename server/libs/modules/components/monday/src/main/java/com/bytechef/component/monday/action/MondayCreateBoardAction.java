@@ -23,9 +23,6 @@ import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.monday.constant.MondayConstants.BOARD_KIND;
 import static com.bytechef.component.monday.constant.MondayConstants.BOARD_NAME;
-import static com.bytechef.component.monday.constant.MondayConstants.CREATE_BOARD;
-import static com.bytechef.component.monday.constant.MondayConstants.CREATE_BOARD_DESCRIPTION;
-import static com.bytechef.component.monday.constant.MondayConstants.CREATE_BOARD_TITLE;
 import static com.bytechef.component.monday.constant.MondayConstants.DATA;
 import static com.bytechef.component.monday.constant.MondayConstants.DESCRIPTION;
 import static com.bytechef.component.monday.constant.MondayConstants.ID;
@@ -34,10 +31,6 @@ import static com.bytechef.component.monday.util.MondayUtils.executeGraphQLQuery
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.definition.Property;
-import com.bytechef.component.definition.Property.ObjectProperty;
-import com.bytechef.definition.BaseOutputDefinition.OutputSchema;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Map;
 
 /**
@@ -45,41 +38,36 @@ import java.util.Map;
  */
 public class MondayCreateBoardAction {
 
-    @SuppressFBWarnings("MS")
-    public static final Property[] PROPERTIES = {
-        string(BOARD_NAME)
-            .label("Board Name")
-            .description("Name of the new board.")
-            .required(true),
-        string(BOARD_KIND)
-            .label("Board Kind")
-            .description("The type of board to create.")
-            .options(
-                option("Private", "private"),
-                option("Public", "public"),
-                option("Share", "share"))
-            .required(true),
-        string(DESCRIPTION)
-            .label("Description")
-            .description("Detailed description of the new board.")
-            .required(false)
-    };
-
-    public static final OutputSchema<ObjectProperty> OUTPUT_SCHEMA = outputSchema(
-        object()
-            .properties(
-                object("create_board")
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action("createBoard")
+        .title("Create Board")
+        .description("Create a new board.")
+        .properties(
+            string(BOARD_NAME)
+                .label("Board Name")
+                .description("Name of the new board.")
+                .required(true),
+            string(BOARD_KIND)
+                .label("Board Kind")
+                .description("The type of board to create.")
+                .options(
+                    option("Private", "private"),
+                    option("Public", "public"),
+                    option("Share", "share"))
+                .required(true),
+            string(DESCRIPTION)
+                .label("Description")
+                .description("Detailed description of the new board.")
+                .required(false))
+        .output(
+            outputSchema(
+                object()
                     .properties(
-                        string(ID)
-                            .description("ID of the board"),
-                        string(BOARD_NAME)
-                            .description("Name of the board."))));
-
-    public static final ModifiableActionDefinition ACTION_DEFINITION = action(CREATE_BOARD)
-        .title(CREATE_BOARD_TITLE)
-        .description(CREATE_BOARD_DESCRIPTION)
-        .properties(PROPERTIES)
-        .output(OUTPUT_SCHEMA)
+                        object("create_board")
+                            .properties(
+                                string(ID)
+                                    .description("ID of the board"),
+                                string(BOARD_NAME)
+                                    .description("Name of the board.")))))
         .perform(MondayCreateBoardAction::perform);
 
     private MondayCreateBoardAction() {

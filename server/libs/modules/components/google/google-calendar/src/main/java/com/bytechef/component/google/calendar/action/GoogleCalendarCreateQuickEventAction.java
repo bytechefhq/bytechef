@@ -21,9 +21,6 @@ import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.CALENDAR_ID;
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.CALENDAR_ID_PROPERTY;
-import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.CREATE_QUICK_EVENT;
-import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.CREATE_QUICK_EVENT_DESCRIPTION;
-import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.CREATE_QUICK_EVENT_TITLE;
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.EVENT_OUTPUT_PROPERTY;
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.SEND_UPDATES;
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.SEND_UPDATES_PROPERTY;
@@ -33,14 +30,10 @@ import static com.bytechef.component.google.calendar.util.GoogleCalendarUtils.cr
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.definition.Property;
-import com.bytechef.component.definition.Property.ObjectProperty;
 import com.bytechef.component.google.calendar.util.GoogleCalendarUtils.CustomEvent;
-import com.bytechef.definition.BaseOutputDefinition.OutputSchema;
 import com.bytechef.google.commons.GoogleServices;
 import com.google.api.services.calendar.Calendar;
 import com.google.api.services.calendar.model.Event;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.IOException;
 
 /**
@@ -48,23 +41,17 @@ import java.io.IOException;
  */
 public class GoogleCalendarCreateQuickEventAction {
 
-    @SuppressFBWarnings("MS")
-    public static final Property[] PROPERTIES = {
-        CALENDAR_ID_PROPERTY,
-        string(TEXT)
-            .label("Text")
-            .description("The text describing the event to be created.")
-            .required(true),
-        SEND_UPDATES_PROPERTY
-    };
-
-    public static final OutputSchema<ObjectProperty> OUTPUT_SCHEMA = outputSchema(EVENT_OUTPUT_PROPERTY);
-
-    public static final ModifiableActionDefinition ACTION_DEFINITION = action(CREATE_QUICK_EVENT)
-        .title(CREATE_QUICK_EVENT_TITLE)
-        .description(CREATE_QUICK_EVENT_DESCRIPTION)
-        .properties(PROPERTIES)
-        .output(OUTPUT_SCHEMA)
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action("createQuickEvent")
+        .title("Create Quick Event")
+        .description("Creates a quick event in Google Calendar.")
+        .properties(
+            CALENDAR_ID_PROPERTY,
+            string(TEXT)
+                .label("Text")
+                .description("The text describing the event to be created.")
+                .required(true),
+            SEND_UPDATES_PROPERTY)
+        .output(outputSchema(EVENT_OUTPUT_PROPERTY))
         .perform(GoogleCalendarCreateQuickEventAction::perform);
 
     private GoogleCalendarCreateQuickEventAction() {

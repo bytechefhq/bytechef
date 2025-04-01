@@ -21,23 +21,8 @@ package com.bytechef.component.math.helper.constants;
  */
 public class MathHelperConstants {
 
-    public static final String ADDITION = "addition";
-    public static final String ADDITION_DESCRIPTION = "Add two numbers.";
-    public static final String ADDITION_TITLE = "Addition";
-    public static final String DIVISION = "division";
-    public static final String DIVISION_DESCRIPTION = "Divide two numbers.";
-    public static final String DIVISION_TITLE = "Division";
     public static final String FIRST_NUMBER = "firstNumber";
-    public static final String MODULO = "modulo";
-    public static final String MODULO_DESCRIPTION = "Get the remainder of the division of two numbers.";
-    public static final String MODULO_TITLE = "Modulo";
-    public static final String MULTIPLICATION = "multiplication";
-    public static final String MULTIPLICATION_DESCRIPTION = "Multiply two numbers.";
-    public static final String MULTIPLICATION_TITLE = "Multiplication";
     public static final String SECOND_NUMBER = "secondNumber";
-    public static final String SUBTRACTION = "subtraction";
-    public static final String SUBTRACTION_DESCRIPTION = "Subtract two numbers.";
-    public static final String SUBTRACTION_TITLE = "Subtraction";
 
     private MathHelperConstants() {
     }

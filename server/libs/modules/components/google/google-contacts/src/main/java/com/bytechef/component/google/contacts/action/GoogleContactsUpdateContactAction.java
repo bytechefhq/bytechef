@@ -28,25 +28,18 @@ import static com.bytechef.component.google.contacts.constant.GoogleContactsCons
 import static com.bytechef.component.google.contacts.constant.GoogleContactsConstants.PHONE_NUMBER;
 import static com.bytechef.component.google.contacts.constant.GoogleContactsConstants.RESOURCE_NAME;
 import static com.bytechef.component.google.contacts.constant.GoogleContactsConstants.TITLE;
-import static com.bytechef.component.google.contacts.constant.GoogleContactsConstants.UPDATE_CONTACT;
-import static com.bytechef.component.google.contacts.constant.GoogleContactsConstants.UPDATE_CONTACT_DESCRIPTION;
-import static com.bytechef.component.google.contacts.constant.GoogleContactsConstants.UPDATE_CONTACT_TITLE;
 import static com.bytechef.component.google.contacts.util.GoogleContactsUtils.createName;
 import static com.bytechef.component.google.contacts.util.GoogleContactsUtils.createOrganization;
 
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.definition.Property;
 import com.bytechef.component.definition.Property.ControlType;
-import com.bytechef.component.definition.Property.ObjectProperty;
-import com.bytechef.definition.BaseOutputDefinition.OutputSchema;
 import com.bytechef.google.commons.GoogleServices;
 import com.google.api.services.people.v1.PeopleService;
 import com.google.api.services.people.v1.model.EmailAddress;
 import com.google.api.services.people.v1.model.Person;
 import com.google.api.services.people.v1.model.PhoneNumber;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.IOException;
 import java.util.List;
 
@@ -55,51 +48,45 @@ import java.util.List;
  */
 public class GoogleContactsUpdateContactAction {
 
-    @SuppressFBWarnings("MS")
-    public static final Property[] PROPERTIES = {
-        string(RESOURCE_NAME)
-            .label("Resource Name")
-            .description("Resource name of the contact to be updated.")
-            .required(true),
-        string(GIVEN_NAME)
-            .label("First Name")
-            .description("New first name of the contact.")
-            .required(true),
-        string(MIDDLE_NAME)
-            .label("Middle Name")
-            .description("New middle name of the contact.")
-            .required(false),
-        string(FAMILY_NAME)
-            .label("Last Name")
-            .description("Updated last name of the contact.")
-            .required(true),
-        string(TITLE)
-            .label("Job Title")
-            .description("Updated job title of the contact.")
-            .required(false),
-        string(NAME)
-            .label("Company")
-            .description("Updated name of the company where the contact is employed.")
-            .required(false),
-        string(EMAIL)
-            .label("Email Address")
-            .description("Updated email address of the contact.")
-            .controlType(ControlType.EMAIL)
-            .required(false),
-        string(PHONE_NUMBER)
-            .label("Phone Number")
-            .description("Updated phone number of the contact.")
-            .controlType(ControlType.PHONE)
-            .required(false)
-    };
-
-    public static final OutputSchema<ObjectProperty> OUTPUT_SCHEMA = outputSchema(CONTACT_OUTPUT_PROPERTY);
-
-    public static final ModifiableActionDefinition ACTION_DEFINITION = action(UPDATE_CONTACT)
-        .title(UPDATE_CONTACT_TITLE)
-        .description(UPDATE_CONTACT_DESCRIPTION)
-        .properties(PROPERTIES)
-        .output(OUTPUT_SCHEMA)
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action("updateContact")
+        .title("Update Contact")
+        .description("Modifies an existing contact.")
+        .properties(
+            string(RESOURCE_NAME)
+                .label("Resource Name")
+                .description("Resource name of the contact to be updated.")
+                .required(true),
+            string(GIVEN_NAME)
+                .label("First Name")
+                .description("New first name of the contact.")
+                .required(true),
+            string(MIDDLE_NAME)
+                .label("Middle Name")
+                .description("New middle name of the contact.")
+                .required(false),
+            string(FAMILY_NAME)
+                .label("Last Name")
+                .description("Updated last name of the contact.")
+                .required(true),
+            string(TITLE)
+                .label("Job Title")
+                .description("Updated job title of the contact.")
+                .required(false),
+            string(NAME)
+                .label("Company")
+                .description("Updated name of the company where the contact is employed.")
+                .required(false),
+            string(EMAIL)
+                .label("Email Address")
+                .description("Updated email address of the contact.")
+                .controlType(ControlType.EMAIL)
+                .required(false),
+            string(PHONE_NUMBER)
+                .label("Phone Number")
+                .description("Updated phone number of the contact.")
+                .controlType(ControlType.PHONE)
+                .required(false))
+        .output(outputSchema(CONTACT_OUTPUT_PROPERTY))
         .perform(GoogleContactsUpdateContactAction::perform);
 
     public static Person perform(Parameters inputParameters, Parameters connectionParameters, Context context)

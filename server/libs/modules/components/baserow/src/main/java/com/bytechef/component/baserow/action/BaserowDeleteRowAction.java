@@ -16,9 +16,6 @@
 
 package com.bytechef.component.baserow.action;
 
-import static com.bytechef.component.baserow.constant.BaserowConstants.DELETE_ROW;
-import static com.bytechef.component.baserow.constant.BaserowConstants.DELETE_ROW_DESCRIPTION;
-import static com.bytechef.component.baserow.constant.BaserowConstants.DELETE_ROW_TITLE;
 import static com.bytechef.component.baserow.constant.BaserowConstants.ROW_ID;
 import static com.bytechef.component.baserow.constant.BaserowConstants.TABLE_ID;
 import static com.bytechef.component.definition.ComponentDsl.action;
@@ -27,30 +24,24 @@ import static com.bytechef.component.definition.ComponentDsl.integer;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.definition.Property;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 /**
  * @author Arina Kolodeznikova
  */
 public class BaserowDeleteRowAction {
 
-    @SuppressFBWarnings("MS")
-    public static final Property[] PROPERTIES = {
-        integer(TABLE_ID)
-            .label("Table ID")
-            .description("ID of the table containing the row to be deleted.")
-            .required(true),
-        integer(ROW_ID)
-            .label("Row ID")
-            .description("ID of the row to be deleted.")
-            .required(true)
-    };
-
-    public static final ModifiableActionDefinition ACTION_DEFINITION = action(DELETE_ROW)
-        .title(DELETE_ROW_TITLE)
-        .description(DELETE_ROW_DESCRIPTION)
-        .properties(PROPERTIES)
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action("deleteRow")
+        .title("Delete Row")
+        .description("Deletes the specified row.")
+        .properties(
+            integer(TABLE_ID)
+                .label("Table ID")
+                .description("ID of the table containing the row to be deleted.")
+                .required(true),
+            integer(ROW_ID)
+                .label("Row ID")
+                .description("ID of the row to be deleted.")
+                .required(true))
         .perform(BaserowDeleteRowAction::perform);
 
     private BaserowDeleteRowAction() {

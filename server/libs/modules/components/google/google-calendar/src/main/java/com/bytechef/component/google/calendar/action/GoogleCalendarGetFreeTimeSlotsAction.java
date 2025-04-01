@@ -24,9 +24,6 @@ import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.CALENDAR_ID_PROPERTY;
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.DATE_RANGE;
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.FROM;
-import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.GET_FREE_TIME_SLOTS;
-import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.GET_FREE_TIME_SLOTS_DESCRIPTION;
-import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.GET_FREE_TIME_SLOTS_TITLE;
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.LOCAL_TIME_MIN;
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.TO;
 import static com.bytechef.component.google.calendar.util.GoogleCalendarUtils.getCustomEvents;
@@ -34,11 +31,7 @@ import static com.bytechef.component.google.calendar.util.GoogleCalendarUtils.ge
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.definition.Property;
-import com.bytechef.component.definition.Property.ArrayProperty;
 import com.bytechef.component.google.calendar.util.GoogleCalendarUtils.CustomEvent;
-import com.bytechef.definition.BaseOutputDefinition.OutputSchema;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -53,40 +46,35 @@ import java.util.Map;
  */
 public class GoogleCalendarGetFreeTimeSlotsAction {
 
-    @SuppressFBWarnings("MS")
-    public static final Property[] PROPERTIES = {
-        CALENDAR_ID_PROPERTY,
-        object(DATE_RANGE)
-            .label("Date Range")
-            .description("Date range to find free time.")
-            .properties(
-                dateTime(FROM)
-                    .label("From")
-                    .description("Start of the time range.")
-                    .required(true),
-                dateTime(TO)
-                    .label("To")
-                    .description("End of the time range.")
-                    .required(true))
-            .required(true)
-    };
-
-    public static final OutputSchema<ArrayProperty> OUTPUT_SCHEMA = outputSchema(
-        array()
-            .description("Free time slots.")
-            .items(
-                object()
-                    .properties(
-                        dateTime("startTime")
-                            .description("Start time of the free time slot."),
-                        dateTime("endTime")
-                            .description("End time of the free time slot."))));
-
-    public static final ModifiableActionDefinition ACTION_DEFINITION = action(GET_FREE_TIME_SLOTS)
-        .title(GET_FREE_TIME_SLOTS_TITLE)
-        .description(GET_FREE_TIME_SLOTS_DESCRIPTION)
-        .properties(PROPERTIES)
-        .output(OUTPUT_SCHEMA)
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action("getFreeTimeSlots")
+        .title("Get Free Time Slots")
+        .description("Get free time slots from Google Calendar.")
+        .properties(
+            CALENDAR_ID_PROPERTY,
+            object(DATE_RANGE)
+                .label("Date Range")
+                .description("Date range to find free time.")
+                .properties(
+                    dateTime(FROM)
+                        .label("From")
+                        .description("Start of the time range.")
+                        .required(true),
+                    dateTime(TO)
+                        .label("To")
+                        .description("End of the time range.")
+                        .required(true))
+                .required(true))
+        .output(
+            outputSchema(
+                array()
+                    .description("Free time slots.")
+                    .items(
+                        object()
+                            .properties(
+                                dateTime("startTime")
+                                    .description("Start time of the free time slot."),
+                                dateTime("endTime")
+                                    .description("End time of the free time slot.")))))
         .perform(GoogleCalendarGetFreeTimeSlotsAction::perform);
 
     private GoogleCalendarGetFreeTimeSlotsAction() {
