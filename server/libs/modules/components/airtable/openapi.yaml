@@ -14,6 +14,7 @@ paths:
       summary: "Create Record"
       description: "Adds a record into an Airtable table."
       operationId: "createRecord"
+      x-ai-agent-tool: true
       parameters:
         - name: "baseId"
           description: "ID of the base where table is located."
@@ -53,6 +54,7 @@ paths:
       summary: "Delete Record"
       description: "Deletes a single record from a table."
       operationId: "deleteRecord"
+      x-ai-agent-tool: true
       parameters:
         - name: "baseId"
           description: "ID of the base where table is located."
@@ -101,6 +103,7 @@ paths:
       summary: "Get Record"
       description: "Retrieves a single record."
       operationId: "getRecord"
+      x-ai-agent-tool: true
       parameters:
         - name: "baseId"
           description: "ID of the base where table is located."

@@ -17,6 +17,7 @@
 package com.bytechef.component.airtable;
 
 import static com.bytechef.component.definition.ComponentDsl.component;
+import static com.bytechef.component.definition.ComponentDsl.tool;
 
 import com.bytechef.component.OpenApiComponentHandler;
 import com.bytechef.component.airtable.action.AirtableCreateRecordAction;
@@ -38,6 +39,9 @@ public abstract class AbstractAirtableComponentHandler implements OpenApiCompone
                 .actions(modifyActions(AirtableCreateRecordAction.ACTION_DEFINITION,
                     AirtableDeleteRecordAction.ACTION_DEFINITION, AirtableGetRecordAction.ACTION_DEFINITION))
                 .connection(modifyConnection(AirtableConnection.CONNECTION_DEFINITION))
+                .clusterElements(modifyClusterElements(tool(AirtableCreateRecordAction.ACTION_DEFINITION),
+                    tool(AirtableDeleteRecordAction.ACTION_DEFINITION),
+                    tool(AirtableGetRecordAction.ACTION_DEFINITION)))
                 .triggers(getTriggers());
 
     @Override

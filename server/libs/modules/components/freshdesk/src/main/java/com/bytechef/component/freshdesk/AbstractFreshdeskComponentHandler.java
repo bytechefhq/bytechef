@@ -17,6 +17,7 @@
 package com.bytechef.component.freshdesk;
 
 import static com.bytechef.component.definition.ComponentDsl.component;
+import static com.bytechef.component.definition.ComponentDsl.tool;
 
 import com.bytechef.component.OpenApiComponentHandler;
 import com.bytechef.component.definition.ComponentDefinition;
@@ -39,6 +40,9 @@ public abstract class AbstractFreshdeskComponentHandler implements OpenApiCompon
                     .actions(modifyActions(FreshdeskCreateCompanyAction.ACTION_DEFINITION,
                         FreshdeskCreateContactAction.ACTION_DEFINITION, FreshdeskCreateTicketAction.ACTION_DEFINITION))
                     .connection(modifyConnection(FreshdeskConnection.CONNECTION_DEFINITION))
+                    .clusterElements(modifyClusterElements(tool(FreshdeskCreateCompanyAction.ACTION_DEFINITION),
+                        tool(FreshdeskCreateContactAction.ACTION_DEFINITION),
+                        tool(FreshdeskCreateTicketAction.ACTION_DEFINITION)))
                     .triggers(getTriggers());
 
     @Override

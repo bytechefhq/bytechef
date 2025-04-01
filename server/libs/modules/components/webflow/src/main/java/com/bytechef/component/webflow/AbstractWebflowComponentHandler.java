@@ -17,6 +17,7 @@
 package com.bytechef.component.webflow;
 
 import static com.bytechef.component.definition.ComponentDsl.component;
+import static com.bytechef.component.definition.ComponentDsl.tool;
 
 import com.bytechef.component.OpenApiComponentHandler;
 import com.bytechef.component.definition.ComponentDefinition;
@@ -38,6 +39,8 @@ public abstract class AbstractWebflowComponentHandler implements OpenApiComponen
                     .actions(modifyActions(WebflowFulfillOrderAction.ACTION_DEFINITION,
                         WebflowGetCollectionItemAction.ACTION_DEFINITION))
                     .connection(modifyConnection(WebflowConnection.CONNECTION_DEFINITION))
+                    .clusterElements(modifyClusterElements(tool(WebflowFulfillOrderAction.ACTION_DEFINITION),
+                        tool(WebflowGetCollectionItemAction.ACTION_DEFINITION)))
                     .triggers(getTriggers());
 
     @Override

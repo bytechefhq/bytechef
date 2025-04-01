@@ -12,6 +12,7 @@ paths:
       summary: "Fulfill Order"
       description: "Updates an order's status to fulfilled."
       operationId: "fulfillOrder"
+      x-ai-agent-tool: true
       parameters:
         - name: "siteId"
           in: "path"
@@ -48,6 +49,7 @@ paths:
       summary: "Get Collection Item"
       description: "Get collection item in a collection."
       operationId: "getCollectionItem"
+      x-ai-agent-tool: true
       parameters:
         - name: "collectionId"
           in: "path"

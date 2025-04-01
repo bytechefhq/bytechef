@@ -17,6 +17,7 @@
 package com.bytechef.component.calendly;
 
 import static com.bytechef.component.definition.ComponentDsl.component;
+import static com.bytechef.component.definition.ComponentDsl.tool;
 
 import com.bytechef.component.OpenApiComponentHandler;
 import com.bytechef.component.calendly.action.CalendlyCancelEventAction;
@@ -36,6 +37,7 @@ public abstract class AbstractCalendlyComponentHandler implements OpenApiCompone
                 "Calendly is a scheduling tool that allows users to easily set up and manage appointments and meetings."))
                     .actions(modifyActions(CalendlyCancelEventAction.ACTION_DEFINITION))
                     .connection(modifyConnection(CalendlyConnection.CONNECTION_DEFINITION))
+                    .clusterElements(modifyClusterElements(tool(CalendlyCancelEventAction.ACTION_DEFINITION)))
                     .triggers(getTriggers());
 
     @Override

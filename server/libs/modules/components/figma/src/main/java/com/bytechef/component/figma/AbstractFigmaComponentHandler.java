@@ -17,6 +17,7 @@
 package com.bytechef.component.figma;
 
 import static com.bytechef.component.definition.ComponentDsl.component;
+import static com.bytechef.component.definition.ComponentDsl.tool;
 
 import com.bytechef.component.OpenApiComponentHandler;
 import com.bytechef.component.definition.ComponentDefinition;
@@ -38,6 +39,8 @@ public abstract class AbstractFigmaComponentHandler implements OpenApiComponentH
                     .actions(modifyActions(FigmaGetCommentsAction.ACTION_DEFINITION,
                         FigmaPostCommentAction.ACTION_DEFINITION))
                     .connection(modifyConnection(FigmaConnection.CONNECTION_DEFINITION))
+                    .clusterElements(modifyClusterElements(tool(FigmaGetCommentsAction.ACTION_DEFINITION),
+                        tool(FigmaPostCommentAction.ACTION_DEFINITION)))
                     .triggers(getTriggers());
 
     @Override

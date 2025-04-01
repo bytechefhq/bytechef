@@ -12,6 +12,7 @@ paths:
       summary: "Get Comments"
       description: "Gets a list of comments left on the file."
       operationId: "getComments"
+      x-ai-agent-tool: true
       parameters:
         - name: "fileKey"
           in: "path"
@@ -60,6 +61,7 @@ paths:
       summary: "Post Comment"
       description: "Posts a new comment on the file."
       operationId: "postComment"
+      x-ai-agent-tool: true
       parameters:
         - name: "fileKey"
           in: "path"

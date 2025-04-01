@@ -17,6 +17,7 @@
 package com.bytechef.component.spotify;
 
 import static com.bytechef.component.definition.ComponentDsl.component;
+import static com.bytechef.component.definition.ComponentDsl.tool;
 
 import com.bytechef.component.OpenApiComponentHandler;
 import com.bytechef.component.definition.ComponentDefinition;
@@ -38,6 +39,8 @@ public abstract class AbstractSpotifyComponentHandler implements OpenApiComponen
                     .actions(modifyActions(SpotifyStartResumePlaybackAction.ACTION_DEFINITION,
                         SpotifyAddItemsToPlaylistAction.ACTION_DEFINITION))
                     .connection(modifyConnection(SpotifyConnection.CONNECTION_DEFINITION))
+                    .clusterElements(modifyClusterElements(tool(SpotifyStartResumePlaybackAction.ACTION_DEFINITION),
+                        tool(SpotifyAddItemsToPlaylistAction.ACTION_DEFINITION)))
                     .triggers(getTriggers());
 
     @Override

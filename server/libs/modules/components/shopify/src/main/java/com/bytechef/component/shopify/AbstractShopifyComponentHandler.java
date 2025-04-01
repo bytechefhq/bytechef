@@ -17,6 +17,7 @@
 package com.bytechef.component.shopify;
 
 import static com.bytechef.component.definition.ComponentDsl.component;
+import static com.bytechef.component.definition.ComponentDsl.tool;
 
 import com.bytechef.component.OpenApiComponentHandler;
 import com.bytechef.component.definition.ComponentDefinition;
@@ -42,6 +43,11 @@ public abstract class AbstractShopifyComponentHandler implements OpenApiComponen
                         ShopifyDeleteOrderAction.ACTION_DEFINITION, ShopifyCancelOrderAction.ACTION_DEFINITION,
                         ShopifyUpdateOrderAction.ACTION_DEFINITION, ShopifyCloseOrderAction.ACTION_DEFINITION))
                     .connection(modifyConnection(ShopifyConnection.CONNECTION_DEFINITION))
+                    .clusterElements(modifyClusterElements(tool(ShopifyCreateOrderAction.ACTION_DEFINITION),
+                        tool(ShopifyDeleteOrderAction.ACTION_DEFINITION),
+                        tool(ShopifyCancelOrderAction.ACTION_DEFINITION),
+                        tool(ShopifyUpdateOrderAction.ACTION_DEFINITION),
+                        tool(ShopifyCloseOrderAction.ACTION_DEFINITION)))
                     .triggers(getTriggers());
 
     @Override

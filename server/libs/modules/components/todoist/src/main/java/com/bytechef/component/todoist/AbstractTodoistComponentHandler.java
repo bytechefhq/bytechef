@@ -17,6 +17,7 @@
 package com.bytechef.component.todoist;
 
 import static com.bytechef.component.definition.ComponentDsl.component;
+import static com.bytechef.component.definition.ComponentDsl.tool;
 
 import com.bytechef.component.OpenApiComponentHandler;
 import com.bytechef.component.definition.ComponentDefinition;
@@ -39,6 +40,9 @@ public abstract class AbstractTodoistComponentHandler implements OpenApiComponen
                     .actions(modifyActions(TodoistCreateTaskAction.ACTION_DEFINITION,
                         TodoistMarkTaskCompletedAction.ACTION_DEFINITION, TodoistCreateProjectAction.ACTION_DEFINITION))
                     .connection(modifyConnection(TodoistConnection.CONNECTION_DEFINITION))
+                    .clusterElements(modifyClusterElements(tool(TodoistCreateTaskAction.ACTION_DEFINITION),
+                        tool(TodoistMarkTaskCompletedAction.ACTION_DEFINITION),
+                        tool(TodoistCreateProjectAction.ACTION_DEFINITION)))
                     .triggers(getTriggers());
 
     @Override

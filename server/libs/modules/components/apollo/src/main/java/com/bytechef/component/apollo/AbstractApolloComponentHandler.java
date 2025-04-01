@@ -17,6 +17,7 @@
 package com.bytechef.component.apollo;
 
 import static com.bytechef.component.definition.ComponentDsl.component;
+import static com.bytechef.component.definition.ComponentDsl.tool;
 
 import com.bytechef.component.OpenApiComponentHandler;
 import com.bytechef.component.apollo.action.ApolloCreateDealAction;
@@ -41,6 +42,10 @@ public abstract class AbstractApolloComponentHandler implements OpenApiComponent
                         ApolloCreateDealAction.ACTION_DEFINITION, ApolloEnrichPersonAction.ACTION_DEFINITION,
                         ApolloEnrichCompanyAction.ACTION_DEFINITION))
                     .connection(modifyConnection(ApolloConnection.CONNECTION_DEFINITION))
+                    .clusterElements(modifyClusterElements(tool(ApolloUpdateDealAction.ACTION_DEFINITION),
+                        tool(ApolloCreateDealAction.ACTION_DEFINITION),
+                        tool(ApolloEnrichPersonAction.ACTION_DEFINITION),
+                        tool(ApolloEnrichCompanyAction.ACTION_DEFINITION)))
                     .triggers(getTriggers());
 
     @Override

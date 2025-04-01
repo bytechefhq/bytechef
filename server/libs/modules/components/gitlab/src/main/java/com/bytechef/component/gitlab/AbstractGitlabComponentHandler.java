@@ -17,6 +17,7 @@
 package com.bytechef.component.gitlab;
 
 import static com.bytechef.component.definition.ComponentDsl.component;
+import static com.bytechef.component.definition.ComponentDsl.tool;
 
 import com.bytechef.component.OpenApiComponentHandler;
 import com.bytechef.component.definition.ComponentDefinition;
@@ -38,6 +39,8 @@ public abstract class AbstractGitlabComponentHandler implements OpenApiComponent
                     .actions(modifyActions(GitlabCreateIssueAction.ACTION_DEFINITION,
                         GitlabCreateCommentOnIssueAction.ACTION_DEFINITION))
                     .connection(modifyConnection(GitlabConnection.CONNECTION_DEFINITION))
+                    .clusterElements(modifyClusterElements(tool(GitlabCreateIssueAction.ACTION_DEFINITION),
+                        tool(GitlabCreateCommentOnIssueAction.ACTION_DEFINITION)))
                     .triggers(getTriggers());
 
     @Override

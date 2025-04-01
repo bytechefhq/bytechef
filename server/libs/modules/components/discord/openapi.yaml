@@ -14,6 +14,7 @@ paths:
       summary: "Send Channel Message"
       description: "Post a new message to a specific #channel you choose."
       operationId: "sendChannelMessage"
+      x-ai-agent-tool: true
       parameters:
         - name: "channelId"
           description: "ID of the channel where to send the message."
@@ -64,6 +65,7 @@ paths:
       summary: "Create Channel"
       description: "Create a new channel"
       operationId: "createChannel"
+      x-ai-agent-tool: true
       parameters:
         - name: "guildId"
           in: "path"
