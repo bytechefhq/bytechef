@@ -136,6 +136,7 @@ public class ComponentInitOpenApiGenerator {
     private final Set<String> oAuth2Scopes = new HashSet<>();
     private final Map<String, String> dynamicOptionsMap = new HashMap<>();
     private final List<String> dynamicProperties = new ArrayList<>();
+    private final List<ClassName> aiAgentTools = new ArrayList<>();
 
     @SuppressFBWarnings("CT_CONSTRUCTOR_THROW")
     public ComponentInitOpenApiGenerator(
@@ -319,6 +320,7 @@ public class ComponentInitOpenApiGenerator {
             .addStaticImport(COMPONENT_DSL_CLASS_NAME, "sampleOutput")
             .addStaticImport(COMPONENT_DSL_CLASS_NAME, "string")
             .addStaticImport(COMPONENT_DSL_CLASS_NAME, "time")
+            .addStaticImport(COMPONENT_DSL_CLASS_NAME, "tool")
             .addStaticImport(CONNECTION_DEFINITION_CLASS_NAME, "BASE_URI")
             .addStaticImport(AUTHORIZATION_CLASS_NAME, "ApiTokenLocation", "AuthorizationType")
             .addStaticImport(CONTEXT_HTTP_CLASS, "BodyContentType", "ResponseType")
@@ -731,6 +733,13 @@ public class ComponentInitOpenApiGenerator {
 
                 if (generatorConfig.openApi.oAuth2Scopes.isEmpty() && operationItem.operation.getSecurity() != null) {
                     collectOAuthScopes(operationItem.operation.getSecurity());
+                }
+
+                Operation operation = operationItem.operation();
+                Map<String, Object> extensions = operation.getExtensions();
+
+                if (extensions != null && Boolean.TRUE.equals(extensions.get("x-ai-agent-tool"))) {
+                    aiAgentTools.add(className);
                 }
             }
         }
@@ -1238,6 +1247,17 @@ public class ComponentInitOpenApiGenerator {
 
         if (!codeBlock.isEmpty()) {
             builder.add(".connection(modifyConnection($L))", codeBlock);
+        }
+
+        if (!aiAgentTools.isEmpty()) {
+            List<CodeBlock> codeBlocks = new ArrayList<>();
+
+            for (ClassName className : aiAgentTools) {
+                codeBlocks.add(CodeBlock.of("tool($T.ACTION_DEFINITION)", className));
+            }
+
+            builder.add(".clusterElements(modifyClusterElements($L))", codeBlocks.stream()
+                .collect(CodeBlock.joining(",")));
         }
 
         builder.add(".triggers(getTriggers())");
