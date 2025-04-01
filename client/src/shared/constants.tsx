@@ -1,3 +1,21 @@
+import {
+    CalculatorIcon,
+    CalendarCheckIcon,
+    CircleDollarSign,
+    CodeIcon,
+    DiamondPercentIcon,
+    GaugeIcon,
+    HandshakeIcon,
+    HeadsetIcon,
+    MessageCircleQuestionIcon,
+    MessagesSquareIcon,
+    Package2,
+    SmileIcon,
+    SparklesIcon,
+    SquareKanbanIcon,
+} from 'lucide-react';
+
+import IconECommerce from '../assets/IconECommerce.svg';
 import {getRandomId} from './util/random-utils';
 
 export const AUTHORITIES = {
@@ -100,4 +118,22 @@ export const MINIMAP_NODE_COLOR = '#e2e8f0';
 export const TASK_DISPATCHER_SUBTASK_COLLECTIONS = {
     condition: ['caseTrue', 'caseFalse'],
     loop: ['iteratee'],
+};
+
+export const COMPONENT_CATEGORY_ICON: Record<string, JSX.Element> = {
+    accounting: <CalculatorIcon />,
+    'artificial-intelligence': <SparklesIcon />,
+    'calendars-and-scheduling': <CalendarCheckIcon />,
+    communication: <MessagesSquareIcon />,
+    crm: <HandshakeIcon />,
+    'customer-support': <HeadsetIcon />,
+    'developer-tools': <CodeIcon />,
+    'e-commerce': <img alt="E-Commerce" src={IconECommerce} />,
+    'file-storage': <Package2 />,
+    helpers: <MessageCircleQuestionIcon />,
+    'marketing-automation': <DiamondPercentIcon />,
+    'payment-processing': <CircleDollarSign />,
+    'productivity-and-collaboration': <GaugeIcon />,
+    'project-management': <SquareKanbanIcon />,
+    'surveys-and-feedback': <SmileIcon />,
 };
