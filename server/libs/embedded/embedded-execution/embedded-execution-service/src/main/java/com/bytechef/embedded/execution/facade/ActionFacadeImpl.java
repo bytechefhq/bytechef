@@ -19,7 +19,6 @@ package com.bytechef.embedded.execution.facade;
 import com.bytechef.embedded.execution.util.ConnectionIdHelper;
 import com.bytechef.platform.component.facade.ActionDefinitionFacade;
 import com.bytechef.platform.constant.Environment;
-import com.bytechef.platform.constant.ModeType;
 import edu.umd.cs.findbugs.annotations.Nullable;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Map;
@@ -48,7 +47,7 @@ public class ActionFacadeImpl implements ActionFacade {
         Long connectionId = connectionIdHelper.getConnectionId(componentName, environment, instanceId);
 
         return actionDefinitionFacade.executePerform(
-            componentName, componentVersion, actionName, ModeType.EMBEDDED, null, null, null, null, inputParameters,
+            componentName, componentVersion, actionName, null, null, null, null, null, inputParameters,
             connectionId == null ? Map.of() : Map.of(componentName, connectionId), Map.of(), false);
     }
 }
