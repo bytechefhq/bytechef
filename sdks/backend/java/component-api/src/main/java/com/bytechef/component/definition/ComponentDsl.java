@@ -1213,6 +1213,12 @@ public final class ComponentDsl {
             return this;
         }
 
+        public ModifiableComponentDefinition clusterElements(List<ClusterElementDefinition<?>> clusterElements) {
+            this.clusterElementDefinitions = new ArrayList<>(clusterElements);
+
+            return this;
+        }
+
         public ModifiableComponentDefinition connection(ModifiableConnectionDefinition connectionDefinition) {
             this.connectionDefinition = connectionDefinition;
 
