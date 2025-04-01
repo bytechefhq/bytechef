@@ -68,6 +68,7 @@
         --stroke-brand-secondary: 217 62% 82%;
         --stroke-brand-secondary-hover: 213 81% 65%;
         --radius: 0.5rem;
+        --workflow-nodes-popover-component-menu-width: 330px;
     }
 
     .dark {

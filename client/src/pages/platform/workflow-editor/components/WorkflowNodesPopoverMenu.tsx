@@ -182,15 +182,13 @@ const WorkflowNodesPopoverMenu = ({
                 align="start"
                 className={twMerge(
                     'flex rounded-lg p-0 will-change-auto',
-                    actionPanelOpen
-                        ? 'w-workflow-nodes-popover-menu-width'
-                        : 'w-workflow-nodes-popover-component-menu-width'
+                    actionPanelOpen ? 'w-workflow-nodes-popover-menu-width' : 'w-node-popover-width'
                 )}
                 onClick={(event) => event.stopPropagation()}
                 side="right"
                 sideOffset={-34}
             >
-                <div className="nowheel flex w-full rounded-lg bg-gray-100">
+                <div className="nowheel flex w-full rounded-lg bg-surface-neutral-secondary">
                     {sourceData && sourceData.length > 0 && (
                         <div className="flex w-full flex-col">
                             <header className="flex items-center gap-1 rounded-t-lg bg-white p-3 text-center">

@@ -213,9 +213,10 @@ module.exports = {
             width: {
                 'appearance-theme-choice-skeleton-large-width': '100px',
                 'appearance-theme-choice-skeleton-small-width': '80px',
+                'node-popover-width': 'var(--workflow-nodes-popover-component-menu-width)',
                 'sidebar-width': '56px',
+                'task-filter-dropdown-menu-width': 'calc(var(--workflow-nodes-popover-component-menu-width) - 50px)',
                 'workflow-nodes-popover-actions-menu-width': '400px',
-                'workflow-nodes-popover-component-menu-width': '330px',
                 'workflow-nodes-popover-menu-width': '730px',
                 'workflow-outputs-sheet-dialog-width': '440px',
             },
