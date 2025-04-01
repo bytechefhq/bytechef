@@ -45,6 +45,18 @@ tasks.withType(org.springframework.boot.gradle.tasks.run.BootRun::class) {
     args = listOf("--spring.profiles.active=$profiles")
 }
 
+tasks.withType(org.springframework.boot.gradle.tasks.bundling.BootJar::class) {
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+}
+
+tasks.withType(Tar::class) {
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+}
+
+tasks.withType(Zip::class) {
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+}
+
 val processResources by tasks.existing(ProcessResources::class) {
     inputs.property("version", version)
     inputs.property("springProfiles", profiles)
