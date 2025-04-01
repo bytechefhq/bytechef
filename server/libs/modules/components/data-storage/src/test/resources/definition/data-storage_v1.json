@@ -13,7 +13,6 @@
   "resources" : null,
   "version" : 1,
   "title" : "Data Storage",
-  "connection" : null,
   "actions" : [ {
     "batch" : null,
     "deprecated" : null,
@@ -356,9 +355,9 @@
       "controlType" : "SELECT"
     } ],
     "title" : "Append Value to List",
+    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
-    "perform" : { }
+    "workflowNodeDescription" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -491,9 +490,9 @@
       "optionsDataSource" : null
     } ],
     "title" : "Atomic Increment",
+    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
-    "perform" : { }
+    "workflowNodeDescription" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -836,9 +835,9 @@
       "optionsDataSource" : null
     } ],
     "title" : "Await Get Value",
+    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
-    "perform" : { }
+    "workflowNodeDescription" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -905,9 +904,9 @@
       "optionsDataSource" : null
     } ],
     "title" : "Delete Value",
+    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
-    "perform" : { }
+    "workflowNodeDescription" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -993,9 +992,9 @@
       "optionsDataSource" : null
     } ],
     "title" : "Delete Value from List",
+    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
-    "perform" : { }
+    "workflowNodeDescription" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -1047,9 +1046,9 @@
       "optionsDataSource" : null
     } ],
     "title" : "Get All Entries(Keys and Values)",
+    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
-    "perform" : { }
+    "workflowNodeDescription" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -1373,9 +1372,9 @@
       "optionsDataSource" : null
     } ],
     "title" : "Get Value",
+    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
-    "perform" : { }
+    "workflowNodeDescription" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -1694,9 +1693,9 @@
       "optionsDataSource" : null
     } ],
     "title" : "Set Value",
+    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
-    "perform" : { }
+    "workflowNodeDescription" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -2034,11 +2033,12 @@
       "optionsDataSource" : null
     } ],
     "title" : "Set Value in List",
+    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
-    "perform" : { }
+    "workflowNodeDescription" : null
   } ],
+  "connection" : null,
+  "clusterElements" : null,
   "unifiedApi" : null,
-  "triggers" : null,
-  "clusterElements" : null
+  "triggers" : null
 }

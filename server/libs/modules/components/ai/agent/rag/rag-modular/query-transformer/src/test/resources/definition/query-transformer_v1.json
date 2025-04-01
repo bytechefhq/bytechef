@@ -20,7 +20,7 @@
       "multipleElements" : true,
       "required" : false
     },
-    "object" : { }
+    "element" : { }
   }, {
     "description" : "Uses a large language model to rewrite a user query to provide better results when\nquerying a target system, such as a vector store or a web search engine.\nThis transformer is useful when the user query is verbose, ambiguous, or contains\nirrelevant information that may affect the quality of the search results.\n",
     "name" : "rewriteQueryTransformer",
@@ -34,7 +34,7 @@
       "multipleElements" : true,
       "required" : false
     },
-    "object" : { }
+    "element" : { }
   }, {
     "description" : "Uses a large language model to translate a query to a target language that is supported\nby the embedding model used to generate the document embeddings. If the query is\nalready in the target language, it is returned unchanged. If the language of the query\nis unknown, it is also returned unchanged.\nThis transformer is useful when the embedding model is trained on a specific language\nand the user query is in a different language.\n",
     "name" : "translationQueryTransformer",
@@ -68,7 +68,7 @@
       "multipleElements" : true,
       "required" : false
     },
-    "object" : { }
+    "element" : { }
   } ],
   "description" : "Query Transformer.",
   "icon" : "path:assets/query-transformer.svg",

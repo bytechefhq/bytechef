@@ -674,7 +674,7 @@
       "multipleElements" : true,
       "required" : false
     },
-    "object" : { }
+    "element" : { }
   }, {
     "description" : "Divide two numbers.",
     "name" : "division",
@@ -785,16 +785,16 @@
       "multipleElements" : true,
       "required" : false
     },
-    "object" : { }
+    "element" : { }
   }, {
-    "description" : "Divide two numbers.",
-    "name" : "division",
+    "description" : "Get the remainder of the division of two numbers.",
+    "name" : "modulo",
     "outputDefinition" : {
       "output" : null,
       "outputResponse" : {
         "outputSchema" : {
           "advancedOption" : null,
-          "description" : "Result of division.",
+          "description" : "Result of modulo.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -820,7 +820,7 @@
       },
       "outputSchema" : {
         "advancedOption" : null,
-        "description" : "Result of division.",
+        "description" : "Result of modulo.",
         "displayCondition" : null,
         "expressionEnabled" : null,
         "hidden" : null,
@@ -888,7 +888,7 @@
       "controlType" : "NUMBER",
       "optionsDataSource" : null
     } ],
-    "title" : "Division",
+    "title" : "Modulo",
     "type" : {
       "name" : "TOOLS",
       "key" : "tools",
@@ -896,7 +896,7 @@
       "multipleElements" : true,
       "required" : false
     },
-    "object" : { }
+    "element" : { }
   }, {
     "description" : "Multiply two numbers.",
     "name" : "multiplication",
@@ -1007,7 +1007,7 @@
       "multipleElements" : true,
       "required" : false
     },
-    "object" : { }
+    "element" : { }
   }, {
     "description" : "Subtract two numbers.",
     "name" : "subtraction",
@@ -1118,7 +1118,7 @@
       "multipleElements" : true,
       "required" : false
     },
-    "object" : { }
+    "element" : { }
   } ],
   "unifiedApi" : null,
   "triggers" : null,

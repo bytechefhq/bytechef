@@ -9,9 +9,9 @@
     "outputDefinition" : null,
     "properties" : [ ],
     "title" : "Load Data",
-    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "perform" : { }
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -47,9 +47,9 @@
       "optionsDataSource" : null
     } ],
     "title" : "Search Data",
-    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "perform" : { }
   } ],
   "componentCategories" : [ {
     "name" : "artificial-intelligence",
@@ -105,18 +105,18 @@
       "title" : null,
       "type" : "CUSTOM",
       "acquire" : null,
-      "authorizationUrl" : null,
-      "clientSecret" : null,
-      "refreshToken" : null,
       "apply" : null,
+      "authorizationCallback" : null,
+      "authorizationUrl" : null,
       "clientId" : null,
+      "clientSecret" : null,
+      "oauth2AuthorizationExtraQueryParameters" : null,
       "pkce" : null,
       "refresh" : null,
       "refreshUrl" : null,
       "scopes" : null,
-      "tokenUrl" : null,
-      "oauth2AuthorizationExtraQueryParameters" : null,
-      "authorizationCallback" : null
+      "refreshToken" : null,
+      "tokenUrl" : null
     } ],
     "properties" : null,
     "version" : 1,
@@ -139,7 +139,7 @@
       "multipleElements" : false,
       "required" : true
     },
-    "object" : { }
+    "element" : { }
   } ],
   "description" : "Pinecone is a vector database designed for efficient similarity search and storage of high-dimensional data, commonly used in machine learning and AI applications.",
   "icon" : "path:assets/pinecone.svg",
@@ -151,6 +151,10 @@
   "triggers" : null,
   "unifiedApi" : null,
   "version" : 1,
+  "actionClusterElementTypes" : {
+    "search" : [ "DOCUMENT_READER", "DOCUMENT_TRANSFORMER", "EMBEDDING" ],
+    "load" : [ "EMBEDDING" ]
+  },
   "clusterElementType" : [ {
     "name" : "DOCUMENT_READER",
     "key" : "documentReader",
@@ -169,9 +173,5 @@
     "label" : "Embedding",
     "multipleElements" : false,
     "required" : true
-  } ],
-  "actionClusterElementTypes" : {
-    "load" : [ "EMBEDDING" ],
-    "search" : [ "DOCUMENT_READER", "DOCUMENT_TRANSFORMER", "EMBEDDING" ]
-  }
+  } ]
 }

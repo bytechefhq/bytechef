@@ -51,8 +51,8 @@
       "minValue" : 0.0,
       "numberPrecision" : null,
       "options" : null,
-      "optionsDataSource" : null,
-      "controlType" : "NUMBER"
+      "controlType" : "NUMBER",
+      "optionsDataSource" : null
     }, {
       "advancedOption" : null,
       "description" : "The top 'k' similar results to return.",
@@ -70,8 +70,8 @@
       "maxValue" : null,
       "minValue" : 0,
       "options" : null,
-      "optionsDataSource" : null,
-      "controlType" : "INTEGER"
+      "controlType" : "INTEGER",
+      "optionsDataSource" : null
     } ],
     "title" : "Question Answer RAG",
     "type" : {
@@ -81,7 +81,7 @@
       "multipleElements" : false,
       "required" : false
     },
-    "object" : { }
+    "element" : { }
   } ],
   "description" : "Retrieval Augmentation is a powerful tool that allows you to retrieve relevant information from a vector database, such as Pinecone, and use it to enhance your AI agent's responses.",
   "icon" : "path:assets/rag.svg",

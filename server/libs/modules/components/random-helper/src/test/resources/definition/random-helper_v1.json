@@ -13,7 +13,6 @@
   "resources" : null,
   "version" : 1,
   "title" : "Random Helper",
-  "connection" : null,
   "actions" : [ {
     "batch" : null,
     "deprecated" : null,
@@ -217,7 +216,8 @@
     "processErrorResponse" : null,
     "workflowNodeDescription" : null
   } ],
+  "connection" : null,
+  "clusterElements" : null,
   "unifiedApi" : null,
-  "triggers" : null,
-  "clusterElements" : null
+  "triggers" : null
 }

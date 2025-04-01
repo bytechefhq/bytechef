@@ -10742,7 +10742,7 @@
       "multipleElements" : true,
       "required" : false
     },
-    "object" : { }
+    "element" : { }
   }, {
     "description" : "Creates a new event in Google Calendar.",
     "name" : "createEvent",
@@ -12824,7 +12824,7 @@
       "multipleElements" : true,
       "required" : false
     },
-    "object" : { }
+    "element" : { }
   }, {
     "description" : "Creates a quick event in Google Calendar.",
     "name" : "createQuickEvent",
@@ -14432,7 +14432,7 @@
       "multipleElements" : true,
       "required" : false
     },
-    "object" : { }
+    "element" : { }
   }, {
     "description" : "Deletes an event from Google Calendar.",
     "name" : "deleteEvent",
@@ -14492,7 +14492,7 @@
       "multipleElements" : true,
       "required" : false
     },
-    "object" : { }
+    "element" : { }
   }, {
     "description" : "List events from the specified Google Calendar.",
     "name" : "getEvents",
@@ -16236,7 +16236,7 @@
       "multipleElements" : true,
       "required" : false
     },
-    "object" : { }
+    "element" : { }
   }, {
     "description" : "Get free time slots from Google Calendar.",
     "name" : "getFreeTimeSlots",
@@ -16486,7 +16486,7 @@
       "multipleElements" : true,
       "required" : false
     },
-    "object" : { }
+    "element" : { }
   }, {
     "description" : "Updates event in Google Calendar.",
     "name" : "updateEvent",
@@ -18238,7 +18238,7 @@
       "multipleElements" : true,
       "required" : false
     },
-    "object" : { }
+    "element" : { }
   } ],
   "unifiedApi" : null,
   "triggers" : [ {

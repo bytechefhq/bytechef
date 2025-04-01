@@ -28,8 +28,8 @@
       "maxValue" : null,
       "minValue" : null,
       "options" : null,
-      "optionsDataSource" : null,
-      "controlType" : "INTEGER"
+      "controlType" : "INTEGER",
+      "optionsDataSource" : null
     } ],
     "title" : "Vector Store Chat Memory",
     "type" : {
@@ -39,7 +39,7 @@
       "multipleElements" : false,
       "required" : false
     },
-    "object" : { }
+    "element" : { }
   } ],
   "description" : "Vector Store Chat Memory.",
   "icon" : "path:assets/vector-store-chat-memory.svg",

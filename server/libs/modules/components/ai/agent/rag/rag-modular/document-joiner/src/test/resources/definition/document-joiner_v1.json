@@ -13,10 +13,8 @@
   "resources" : null,
   "version" : 1,
   "title" : "Document Joiner",
-  "connection" : null,
   "actions" : null,
-  "unifiedApi" : null,
-  "triggers" : null,
+  "connection" : null,
   "clusterElements" : [ {
     "description" : "Combines documents retrieved based on multiple queries and from multiple data sources\nby concatenating them into a single collection of documents. In case of duplicate\ndocuments, the first occurrence is kept. The score of each document is kept as is.\n",
     "name" : "concatenationDocumentJoiner",
@@ -30,6 +28,8 @@
       "multipleElements" : false,
       "required" : false
     },
-    "object" : { }
-  } ]
+    "element" : { }
+  } ],
+  "unifiedApi" : null,
+  "triggers" : null
 }

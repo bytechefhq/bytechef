@@ -81,7 +81,7 @@
       "multipleElements" : false,
       "required" : true
     },
-    "object" : { }
+    "element" : { }
   } ],
   "description" : "Vector Store Document Retriever.",
   "icon" : "path:assets/document-retriever.svg",

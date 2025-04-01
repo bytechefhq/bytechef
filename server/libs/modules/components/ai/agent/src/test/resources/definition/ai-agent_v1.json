@@ -204,18 +204,18 @@
           "minItems" : null,
           "multipleValues" : null,
           "options" : null,
-          "optionsDataSource" : null,
-          "controlType" : "ARRAY_BUILDER"
+          "controlType" : "ARRAY_BUILDER",
+          "optionsDataSource" : null
         } ],
-        "optionsDataSource" : null,
-        "controlType" : "OBJECT_BUILDER"
+        "controlType" : "OBJECT_BUILDER",
+        "optionsDataSource" : null
       } ],
       "maxItems" : null,
       "minItems" : null,
       "multipleValues" : null,
       "options" : null,
-      "optionsDataSource" : null,
-      "controlType" : "ARRAY_BUILDER"
+      "controlType" : "ARRAY_BUILDER",
+      "optionsDataSource" : null
     }, {
       "advancedOption" : null,
       "description" : "The response from the API.",
@@ -282,8 +282,8 @@
         "options" : null,
         "optionsDataSource" : null
       } ],
-      "optionsDataSource" : null,
-      "controlType" : "OBJECT_BUILDER"
+      "controlType" : "OBJECT_BUILDER",
+      "optionsDataSource" : null
     }, {
       "advancedOption" : null,
       "description" : "The conversation id used in conjunction with memory.",
@@ -308,13 +308,13 @@
     "title" : "Chat",
     "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
     "outputDefinition" : {
       "output" : { },
       "outputResponse" : null,
       "outputSchema" : null,
       "sampleOutput" : null
-    }
+    },
+    "workflowNodeDescription" : null
   } ],
   "componentCategories" : [ {
     "name" : "artificial-intelligence",

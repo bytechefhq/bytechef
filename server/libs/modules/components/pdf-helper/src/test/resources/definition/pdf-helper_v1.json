@@ -13,7 +13,6 @@
   "resources" : null,
   "version" : 1,
   "title" : "PDF Helper",
-  "connection" : null,
   "actions" : [ {
     "batch" : null,
     "deprecated" : null,
@@ -48,6 +47,7 @@
         "sampleOutput" : null,
         "placeholder" : null
       },
+      "sampleOutput" : null,
       "outputSchema" : {
         "advancedOption" : null,
         "description" : "Extracted text from the PDF file.",
@@ -68,8 +68,7 @@
         "minLength" : null,
         "options" : null,
         "optionsDataSource" : null
-      },
-      "sampleOutput" : null
+      }
     },
     "properties" : [ {
       "advancedOption" : null,
@@ -173,7 +172,8 @@
     "processErrorResponse" : null,
     "workflowNodeDescription" : null
   } ],
+  "clusterElements" : null,
   "unifiedApi" : null,
   "triggers" : null,
-  "clusterElements" : null
+  "connection" : null
 }

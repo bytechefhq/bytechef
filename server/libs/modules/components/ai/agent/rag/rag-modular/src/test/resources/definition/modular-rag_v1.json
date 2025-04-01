@@ -20,7 +20,7 @@
       "multipleElements" : false,
       "required" : false
     },
-    "object" : { }
+    "element" : { }
   } ],
   "description" : "Retrieval Augmentation is a powerful tool that allows you to retrieve relevant information from a vector database, such as Pinecone, and use it to enhance your AI agent's responses.",
   "icon" : "path:assets/rag.svg",

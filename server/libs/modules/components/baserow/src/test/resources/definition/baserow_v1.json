@@ -86,8 +86,8 @@
       }
     } ],
     "title" : "Create Row",
-    "perform" : { },
     "workflowNodeDescription" : null,
+    "perform" : { },
     "processErrorResponse" : null
   }, {
     "batch" : null,
@@ -137,8 +137,8 @@
       "optionsDataSource" : null
     } ],
     "title" : "Delete Row",
-    "perform" : { },
     "workflowNodeDescription" : null,
+    "perform" : { },
     "processErrorResponse" : null
   }, {
     "batch" : null,
@@ -217,8 +217,8 @@
       "controlType" : "SELECT"
     } ],
     "title" : "Get Row",
-    "perform" : { },
     "workflowNodeDescription" : null,
+    "perform" : { },
     "processErrorResponse" : null
   }, {
     "batch" : null,
@@ -317,8 +317,8 @@
       "controlType" : "SELECT"
     } ],
     "title" : "List Rows",
-    "perform" : { },
     "workflowNodeDescription" : null,
+    "perform" : { },
     "processErrorResponse" : null
   }, {
     "batch" : null,
@@ -412,10 +412,59 @@
       }
     } ],
     "title" : "Update Row",
-    "perform" : { },
     "workflowNodeDescription" : null,
+    "perform" : { },
     "processErrorResponse" : null
   } ],
+  "connection" : {
+    "authorizations" : [ {
+      "detectOn" : null,
+      "description" : null,
+      "name" : "custom",
+      "properties" : [ {
+        "advancedOption" : null,
+        "description" : null,
+        "displayCondition" : null,
+        "expressionEnabled" : null,
+        "hidden" : null,
+        "metadata" : { },
+        "required" : true,
+        "name" : "token",
+        "type" : "STRING",
+        "defaultValue" : null,
+        "exampleValue" : null,
+        "label" : "Database Token",
+        "placeholder" : null,
+        "controlType" : "TEXT",
+        "languageId" : null,
+        "maxLength" : null,
+        "minLength" : null,
+        "options" : null,
+        "optionsDataSource" : null
+      } ],
+      "refreshOn" : null,
+      "title" : null,
+      "type" : "CUSTOM",
+      "acquire" : null,
+      "apply" : { },
+      "authorizationCallback" : null,
+      "authorizationUrl" : null,
+      "clientId" : null,
+      "clientSecret" : null,
+      "oauth2AuthorizationExtraQueryParameters" : null,
+      "pkce" : null,
+      "refresh" : null,
+      "refreshUrl" : null,
+      "scopes" : null,
+      "refreshToken" : null,
+      "tokenUrl" : null
+    } ],
+    "properties" : null,
+    "version" : 1,
+    "authorizationRequired" : null,
+    "baseUri" : { },
+    "test" : null
+  },
   "clusterElements" : [ {
     "description" : "Creates a new row.",
     "name" : "createRow",
@@ -492,7 +541,7 @@
       "multipleElements" : true,
       "required" : false
     },
-    "object" : { }
+    "element" : { }
   }, {
     "description" : "Deletes the specified row.",
     "name" : "deleteRow",
@@ -544,7 +593,7 @@
       "multipleElements" : true,
       "required" : false
     },
-    "object" : { }
+    "element" : { }
   }, {
     "description" : "Fetches a single table row.",
     "name" : "getRow",
@@ -625,7 +674,7 @@
       "multipleElements" : true,
       "required" : false
     },
-    "object" : { }
+    "element" : { }
   }, {
     "description" : "Lists table rows.",
     "name" : "listRows",
@@ -726,7 +775,7 @@
       "multipleElements" : true,
       "required" : false
     },
-    "object" : { }
+    "element" : { }
   }, {
     "description" : "Updates the specified row.",
     "name" : "updateRow",
@@ -822,57 +871,8 @@
       "multipleElements" : true,
       "required" : false
     },
-    "object" : { }
+    "element" : { }
   } ],
   "unifiedApi" : null,
-  "triggers" : null,
-  "connection" : {
-    "authorizations" : [ {
-      "detectOn" : null,
-      "description" : null,
-      "name" : "custom",
-      "properties" : [ {
-        "advancedOption" : null,
-        "description" : null,
-        "displayCondition" : null,
-        "expressionEnabled" : null,
-        "hidden" : null,
-        "metadata" : { },
-        "required" : true,
-        "name" : "token",
-        "type" : "STRING",
-        "defaultValue" : null,
-        "exampleValue" : null,
-        "label" : "Database Token",
-        "placeholder" : null,
-        "controlType" : "TEXT",
-        "languageId" : null,
-        "maxLength" : null,
-        "minLength" : null,
-        "options" : null,
-        "optionsDataSource" : null
-      } ],
-      "refreshOn" : null,
-      "title" : null,
-      "type" : "CUSTOM",
-      "acquire" : null,
-      "apply" : { },
-      "authorizationCallback" : null,
-      "authorizationUrl" : null,
-      "clientId" : null,
-      "clientSecret" : null,
-      "oauth2AuthorizationExtraQueryParameters" : null,
-      "pkce" : null,
-      "refresh" : null,
-      "refreshUrl" : null,
-      "scopes" : null,
-      "refreshToken" : null,
-      "tokenUrl" : null
-    } ],
-    "properties" : null,
-    "version" : 1,
-    "authorizationRequired" : null,
-    "baseUri" : { },
-    "test" : null
-  }
+  "triggers" : null
 }

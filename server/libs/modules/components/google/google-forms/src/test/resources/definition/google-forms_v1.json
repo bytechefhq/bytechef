@@ -270,13 +270,13 @@
       "authorizationUrl" : { },
       "clientId" : null,
       "clientSecret" : null,
+      "oauth2AuthorizationExtraQueryParameters" : { },
       "pkce" : null,
       "refresh" : null,
       "refreshUrl" : { },
       "scopes" : { },
       "refreshToken" : null,
-      "tokenUrl" : { },
-      "oauth2AuthorizationExtraQueryParameters" : { }
+      "tokenUrl" : { }
     } ],
     "properties" : null,
     "version" : 1,

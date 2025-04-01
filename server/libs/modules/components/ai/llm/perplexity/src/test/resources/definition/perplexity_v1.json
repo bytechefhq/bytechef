@@ -555,10 +555,13 @@
       "optionsDataSource" : null
     } ],
     "title" : "Ask",
-    "perform" : { },
     "processErrorResponse" : null,
+    "perform" : { },
     "workflowNodeDescription" : null
   } ],
+  "clusterElements" : null,
+  "unifiedApi" : null,
+  "triggers" : null,
   "connection" : {
     "authorizations" : [ {
       "detectOn" : null,
@@ -605,10 +608,7 @@
     "properties" : null,
     "version" : 1,
     "authorizationRequired" : null,
-    "test" : null,
-    "baseUri" : { }
-  },
-  "clusterElements" : null,
-  "unifiedApi" : null,
-  "triggers" : null
+    "baseUri" : { },
+    "test" : null
+  }
 }

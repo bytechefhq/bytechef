@@ -181,10 +181,6 @@
   "triggers" : null,
   "unifiedApi" : null,
   "version" : 1,
-  "actionClusterElementTypes" : {
-    "search" : [ "DOCUMENT_READER", "DOCUMENT_TRANSFORMER", "EMBEDDING" ],
-    "load" : [ "EMBEDDING" ]
-  },
   "clusterElementType" : [ {
     "name" : "DOCUMENT_READER",
     "key" : "documentReader",
@@ -203,5 +199,9 @@
     "label" : "Embedding",
     "multipleElements" : false,
     "required" : true
-  } ]
+  } ],
+  "actionClusterElementTypes" : {
+    "search" : [ "DOCUMENT_READER", "DOCUMENT_TRANSFORMER", "EMBEDDING" ],
+    "load" : [ "EMBEDDING" ]
+  }
 }

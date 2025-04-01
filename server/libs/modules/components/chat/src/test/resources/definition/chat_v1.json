@@ -13,7 +13,6 @@
   "resources" : null,
   "version" : 1,
   "title" : "Chat",
-  "connection" : null,
   "actions" : [ {
     "batch" : null,
     "deprecated" : null,
@@ -166,10 +165,11 @@
       "optionsDataSource" : null
     } ],
     "title" : "Response to Chat Request",
-    "perform" : { },
     "processErrorResponse" : null,
+    "perform" : { },
     "workflowNodeDescription" : null
   } ],
+  "clusterElements" : null,
   "unifiedApi" : null,
   "triggers" : [ {
     "batch" : null,
@@ -574,17 +574,17 @@
     "webhookRawBody" : null,
     "workflowSyncExecution" : true,
     "deduplicate" : null,
-    "poll" : null,
     "webhookDisable" : null,
     "webhookEnable" : null,
     "webhookRequest" : { },
     "listenerDisable" : null,
     "listenerEnable" : null,
-    "webhookValidate" : null,
-    "dynamicWebhookRefresh" : null,
+    "poll" : null,
     "processErrorResponse" : null,
+    "dynamicWebhookRefresh" : null,
+    "webhookValidate" : null,
     "webhookValidateOnEnable" : null,
     "workflowNodeDescription" : null
   } ],
-  "clusterElements" : null
+  "connection" : null
 }

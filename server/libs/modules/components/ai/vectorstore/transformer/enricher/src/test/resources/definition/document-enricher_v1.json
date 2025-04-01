@@ -45,11 +45,11 @@
         "maxValue" : null,
         "minValue" : null,
         "options" : null,
-        "optionsDataSource" : null,
-        "controlType" : "INTEGER"
+        "controlType" : "INTEGER",
+        "optionsDataSource" : null
       } ],
-      "optionsDataSource" : null,
-      "controlType" : "OBJECT_BUILDER"
+      "controlType" : "OBJECT_BUILDER",
+      "optionsDataSource" : null
     } ],
     "title" : "Keyword Metadata Enricher",
     "type" : {
@@ -59,7 +59,7 @@
       "multipleElements" : true,
       "required" : false
     },
-    "object" : { }
+    "element" : { }
   }, {
     "description" : "Title extractor with adjacent sharing that uses generative to extract 'section_summary', 'prev_section_summary', 'next_section_summary' metadata fields.",
     "name" : "summaryMetadataEnricher",
@@ -132,11 +132,11 @@
           "label" : "Next",
           "value" : "NEXT"
         } ],
-        "optionsDataSource" : null,
-        "controlType" : "MULTI_SELECT"
+        "controlType" : "MULTI_SELECT",
+        "optionsDataSource" : null
       } ],
-      "optionsDataSource" : null,
-      "controlType" : "OBJECT_BUILDER"
+      "controlType" : "OBJECT_BUILDER",
+      "optionsDataSource" : null
     } ],
     "title" : "Summary Metadata Enricher",
     "type" : {
@@ -146,7 +146,7 @@
       "multipleElements" : true,
       "required" : false
     },
-    "object" : { }
+    "element" : { }
   } ],
   "description" : "Document Enricher.",
   "icon" : "path:assets/document-enricher.svg",
