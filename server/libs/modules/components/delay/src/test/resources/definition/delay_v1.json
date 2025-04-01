@@ -13,7 +13,6 @@
   "resources" : null,
   "version" : 1,
   "title" : "Delay",
-  "connection" : null,
   "actions" : [ {
     "batch" : null,
     "deprecated" : null,
@@ -39,8 +38,8 @@
       "maxValue" : null,
       "minValue" : null,
       "options" : null,
-      "optionsDataSource" : null,
-      "controlType" : "INTEGER"
+      "controlType" : "INTEGER",
+      "optionsDataSource" : null
     } ],
     "title" : "Sleep",
     "perform" : { },
@@ -49,5 +48,6 @@
   } ],
   "clusterElements" : null,
   "unifiedApi" : null,
-  "triggers" : null
+  "triggers" : null,
+  "connection" : null
 }

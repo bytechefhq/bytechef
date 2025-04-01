@@ -44,28 +44,28 @@
       "maxValue" : null,
       "minValue" : null,
       "options" : null,
+      "controlType" : "SELECT",
       "optionsDataSource" : {
         "optionsLookupDependsOn" : null,
         "options" : { }
-      },
-      "controlType" : "SELECT"
+      }
     } ],
     "title" : "New Event",
     "type" : "STATIC_WEBHOOK",
     "webhookRawBody" : null,
     "workflowSyncExecution" : null,
-    "webhookEnable" : null,
-    "webhookDisable" : null,
+    "dynamicWebhookRefresh" : null,
     "webhookRequest" : { },
     "listenerDisable" : null,
     "listenerEnable" : null,
-    "webhookValidate" : null,
-    "deduplicate" : null,
     "poll" : null,
-    "dynamicWebhookRefresh" : null,
     "processErrorResponse" : null,
+    "webhookValidate" : null,
     "webhookValidateOnEnable" : null,
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "deduplicate" : null,
+    "webhookDisable" : null,
+    "webhookEnable" : null
   } ],
   "unifiedApi" : null,
   "version" : 1

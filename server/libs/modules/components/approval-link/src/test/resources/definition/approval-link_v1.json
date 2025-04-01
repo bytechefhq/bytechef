@@ -16,7 +16,6 @@
   "resources" : null,
   "version" : 1,
   "title" : "Approval Link",
-  "connection" : null,
   "actions" : [ {
     "batch" : null,
     "deprecated" : null,
@@ -38,5 +37,6 @@
   } ],
   "clusterElements" : null,
   "unifiedApi" : null,
-  "triggers" : null
+  "triggers" : null,
+  "connection" : null
 }

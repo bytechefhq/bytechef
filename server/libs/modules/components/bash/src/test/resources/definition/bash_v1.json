@@ -10,7 +10,6 @@
   "resources" : null,
   "version" : 1,
   "title" : "Bash",
-  "connection" : null,
   "actions" : [ {
     "batch" : null,
     "deprecated" : null,
@@ -91,10 +90,11 @@
     } ],
     "title" : "Execute",
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
-    "perform" : { }
+    "perform" : { },
+    "workflowNodeDescription" : null
   } ],
+  "clusterElements" : null,
   "unifiedApi" : null,
   "triggers" : null,
-  "clusterElements" : null
+  "connection" : null
 }

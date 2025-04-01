@@ -278,6 +278,65 @@
     "perform" : { }
   } ],
   "clusterElements" : [ {
+    "description" : "Create a document on Google Docs.",
+    "name" : "createDocument",
+    "outputDefinition" : {
+      "output" : null,
+      "outputResponse" : null,
+      "outputSchema" : null,
+      "sampleOutput" : null
+    },
+    "properties" : [ {
+      "advancedOption" : null,
+      "description" : "Document title.",
+      "displayCondition" : null,
+      "expressionEnabled" : null,
+      "hidden" : null,
+      "metadata" : { },
+      "required" : true,
+      "name" : "title",
+      "type" : "STRING",
+      "defaultValue" : null,
+      "exampleValue" : null,
+      "label" : "Title",
+      "placeholder" : null,
+      "controlType" : "TEXT",
+      "languageId" : null,
+      "maxLength" : null,
+      "minLength" : null,
+      "options" : null,
+      "optionsDataSource" : null
+    }, {
+      "advancedOption" : null,
+      "description" : "Document content.",
+      "displayCondition" : null,
+      "expressionEnabled" : null,
+      "hidden" : null,
+      "metadata" : { },
+      "required" : true,
+      "name" : "body",
+      "type" : "STRING",
+      "defaultValue" : null,
+      "exampleValue" : null,
+      "label" : "Content",
+      "placeholder" : null,
+      "controlType" : "TEXT_AREA",
+      "languageId" : null,
+      "maxLength" : null,
+      "minLength" : null,
+      "options" : null,
+      "optionsDataSource" : null
+    } ],
+    "title" : "Create Document",
+    "type" : {
+      "name" : "TOOLS",
+      "key" : "tools",
+      "label" : "Tools",
+      "multipleElements" : true,
+      "required" : false
+    },
+    "element" : { }
+  }, {
     "description" : "Creates a new document based on an existing one and can replace any placeholder variables found in your template document, like [[name]], [[email]], etc.",
     "name" : "createDocumentFromTemplate",
     "outputDefinition" : {
@@ -441,66 +500,7 @@
       "multipleElements" : true,
       "required" : false
     },
-    "object" : { }
-  }, {
-    "description" : "Create a document on Google Docs.",
-    "name" : "createDocument",
-    "outputDefinition" : {
-      "output" : null,
-      "outputResponse" : null,
-      "outputSchema" : null,
-      "sampleOutput" : null
-    },
-    "properties" : [ {
-      "advancedOption" : null,
-      "description" : "Document title.",
-      "displayCondition" : null,
-      "expressionEnabled" : null,
-      "hidden" : null,
-      "metadata" : { },
-      "required" : true,
-      "name" : "title",
-      "type" : "STRING",
-      "defaultValue" : null,
-      "exampleValue" : null,
-      "label" : "Title",
-      "placeholder" : null,
-      "controlType" : "TEXT",
-      "languageId" : null,
-      "maxLength" : null,
-      "minLength" : null,
-      "options" : null,
-      "optionsDataSource" : null
-    }, {
-      "advancedOption" : null,
-      "description" : "Document content.",
-      "displayCondition" : null,
-      "expressionEnabled" : null,
-      "hidden" : null,
-      "metadata" : { },
-      "required" : true,
-      "name" : "body",
-      "type" : "STRING",
-      "defaultValue" : null,
-      "exampleValue" : null,
-      "label" : "Content",
-      "placeholder" : null,
-      "controlType" : "TEXT_AREA",
-      "languageId" : null,
-      "maxLength" : null,
-      "minLength" : null,
-      "options" : null,
-      "optionsDataSource" : null
-    } ],
-    "title" : "Create Document",
-    "type" : {
-      "name" : "TOOLS",
-      "key" : "tools",
-      "label" : "Tools",
-      "multipleElements" : true,
-      "required" : false
-    },
-    "object" : { }
+    "element" : { }
   }, {
     "description" : "Retrieve a specified document from your Google Drive.",
     "name" : "getDocument",
@@ -542,7 +542,7 @@
       "multipleElements" : true,
       "required" : false
     },
-    "object" : { }
+    "element" : { }
   } ],
   "unifiedApi" : null,
   "triggers" : null,

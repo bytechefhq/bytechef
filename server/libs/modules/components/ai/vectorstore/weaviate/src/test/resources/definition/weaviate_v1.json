@@ -34,9 +34,9 @@
       "optionsDataSource" : null
     } ],
     "title" : "Search Data",
-    "processErrorResponse" : null,
+    "perform" : { },
     "workflowNodeDescription" : null,
-    "perform" : { }
+    "processErrorResponse" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -47,9 +47,9 @@
     "outputDefinition" : null,
     "properties" : [ ],
     "title" : "Load Data",
-    "processErrorResponse" : null,
+    "perform" : { },
     "workflowNodeDescription" : null,
-    "perform" : { }
+    "processErrorResponse" : null
   } ],
   "componentCategories" : [ {
     "name" : "artificial-intelligence",
@@ -105,18 +105,18 @@
       "title" : null,
       "type" : "CUSTOM",
       "acquire" : null,
-      "oauth2AuthorizationExtraQueryParameters" : null,
-      "authorizationCallback" : null,
       "apply" : null,
+      "authorizationCallback" : null,
+      "authorizationUrl" : null,
       "clientId" : null,
+      "clientSecret" : null,
+      "oauth2AuthorizationExtraQueryParameters" : null,
       "pkce" : null,
       "refresh" : null,
       "refreshUrl" : null,
       "scopes" : null,
-      "tokenUrl" : null,
-      "authorizationUrl" : null,
-      "clientSecret" : null,
-      "refreshToken" : null
+      "refreshToken" : null,
+      "tokenUrl" : null
     } ],
     "properties" : null,
     "version" : 1,
@@ -139,7 +139,7 @@
       "multipleElements" : false,
       "required" : true
     },
-    "object" : { }
+    "element" : { }
   } ],
   "description" : "Weaviate is an open-source vector search engine and database that enables efficient storage, retrieval, and management of high-dimensional data, often used in machine learning and AI applications.",
   "icon" : "path:assets/weaviate.svg",
@@ -152,8 +152,8 @@
   "unifiedApi" : null,
   "version" : 1,
   "actionClusterElementTypes" : {
-    "load" : [ "EMBEDDING" ],
-    "search" : [ "DOCUMENT_READER", "DOCUMENT_TRANSFORMER", "EMBEDDING" ]
+    "search" : [ "DOCUMENT_READER", "DOCUMENT_TRANSFORMER", "EMBEDDING" ],
+    "load" : [ "EMBEDDING" ]
   },
   "clusterElementType" : [ {
     "name" : "DOCUMENT_READER",

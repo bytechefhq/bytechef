@@ -10,6 +10,60 @@
   "resources" : null,
   "version" : 1,
   "title" : "RabbitMQ",
+  "actions" : [ {
+    "batch" : null,
+    "deprecated" : null,
+    "description" : "Send a new RabbitMQ message.",
+    "help" : null,
+    "metadata" : null,
+    "name" : "sendMessage",
+    "outputDefinition" : null,
+    "properties" : [ {
+      "advancedOption" : null,
+      "description" : "The name of the queue to read from",
+      "displayCondition" : null,
+      "expressionEnabled" : null,
+      "hidden" : null,
+      "metadata" : { },
+      "required" : true,
+      "name" : "queue",
+      "type" : "STRING",
+      "defaultValue" : null,
+      "exampleValue" : null,
+      "label" : null,
+      "placeholder" : null,
+      "controlType" : "TEXT",
+      "languageId" : null,
+      "maxLength" : null,
+      "minLength" : null,
+      "options" : null,
+      "optionsDataSource" : null
+    }, {
+      "advancedOption" : null,
+      "description" : "The name of the queue to read from",
+      "displayCondition" : null,
+      "expressionEnabled" : null,
+      "hidden" : null,
+      "metadata" : { },
+      "required" : true,
+      "name" : "message",
+      "type" : "OBJECT",
+      "defaultValue" : null,
+      "exampleValue" : null,
+      "label" : null,
+      "placeholder" : null,
+      "additionalProperties" : null,
+      "multipleValues" : null,
+      "options" : null,
+      "properties" : null,
+      "controlType" : "OBJECT_BUILDER",
+      "optionsDataSource" : null
+    } ],
+    "title" : "Send Message",
+    "perform" : { },
+    "processErrorResponse" : null,
+    "workflowNodeDescription" : null
+  } ],
   "connection" : {
     "authorizations" : null,
     "properties" : [ {
@@ -97,12 +151,8 @@
     "baseUri" : null,
     "test" : null
   },
-  "actions" : [ {
-    "batch" : null,
-    "deprecated" : null,
+  "clusterElements" : [ {
     "description" : "Send a new RabbitMQ message.",
-    "help" : null,
-    "metadata" : null,
     "name" : "sendMessage",
     "outputDefinition" : null,
     "properties" : [ {
@@ -147,9 +197,14 @@
       "optionsDataSource" : null
     } ],
     "title" : "Send Message",
-    "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
-    "perform" : { }
+    "type" : {
+      "name" : "TOOLS",
+      "key" : "tools",
+      "label" : "Tools",
+      "multipleElements" : true,
+      "required" : false
+    },
+    "element" : { }
   } ],
   "unifiedApi" : null,
   "triggers" : [ {
@@ -189,18 +244,17 @@
     "type" : "LISTENER",
     "webhookRawBody" : null,
     "workflowSyncExecution" : null,
-    "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
-    "dynamicWebhookRefresh" : null,
-    "webhookValidateOnEnable" : null,
-    "deduplicate" : null,
     "poll" : null,
+    "deduplicate" : null,
     "webhookDisable" : null,
     "webhookEnable" : null,
     "webhookRequest" : null,
+    "processErrorResponse" : null,
+    "workflowNodeDescription" : null,
+    "dynamicWebhookRefresh" : null,
     "listenerDisable" : { },
     "listenerEnable" : { },
-    "webhookValidate" : null
-  } ],
-  "clusterElements" : null
+    "webhookValidate" : null,
+    "webhookValidateOnEnable" : null
+  } ]
 }

@@ -63,7 +63,7 @@
       "multipleElements" : false,
       "required" : false
     },
-    "object" : { }
+    "element" : { }
   } ],
   "description" : "Query Expander.",
   "icon" : "path:assets/query-expander.svg",

@@ -13,7 +13,6 @@
   "resources" : null,
   "version" : 1,
   "title" : "Webhook",
-  "connection" : null,
   "actions" : [ {
     "batch" : null,
     "deprecated" : null,
@@ -105,8 +104,8 @@
       "multipleValues" : null,
       "options" : null,
       "properties" : null,
-      "optionsDataSource" : null,
-      "controlType" : "OBJECT_BUILDER"
+      "controlType" : "OBJECT_BUILDER",
+      "optionsDataSource" : null
     }, {
       "advancedOption" : null,
       "description" : "The body of the response.",
@@ -125,8 +124,8 @@
       "multipleValues" : null,
       "options" : null,
       "properties" : null,
-      "optionsDataSource" : null,
-      "controlType" : "OBJECT_BUILDER"
+      "controlType" : "OBJECT_BUILDER",
+      "optionsDataSource" : null
     }, {
       "advancedOption" : null,
       "description" : "The body of the response.",
@@ -280,8 +279,8 @@
       "maxValue" : null,
       "minValue" : null,
       "options" : null,
-      "optionsDataSource" : null,
-      "controlType" : "INTEGER"
+      "controlType" : "INTEGER",
+      "optionsDataSource" : null
     } ],
     "title" : "Response to Webhook Request",
     "perform" : { },
@@ -302,10 +301,10 @@
         "outputSchema" : null,
         "sampleOutput" : null,
         "placeholder" : {
-          "method" : "POST",
-          "parameters" : { },
+          "headers" : { },
           "body" : { },
-          "headers" : { }
+          "parameters" : { },
+          "method" : "POST"
         }
       },
       "outputSchema" : null,
@@ -316,17 +315,17 @@
     "type" : "STATIC_WEBHOOK",
     "webhookRawBody" : null,
     "workflowSyncExecution" : null,
+    "poll" : null,
+    "deduplicate" : null,
     "webhookDisable" : null,
     "webhookEnable" : null,
+    "dynamicWebhookRefresh" : null,
+    "processErrorResponse" : null,
+    "workflowNodeDescription" : null,
     "webhookRequest" : { },
     "listenerDisable" : null,
     "listenerEnable" : null,
     "webhookValidate" : null,
-    "deduplicate" : null,
-    "poll" : null,
-    "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
-    "dynamicWebhookRefresh" : null,
     "webhookValidateOnEnable" : null
   }, {
     "batch" : null,
@@ -340,10 +339,10 @@
         "outputSchema" : null,
         "sampleOutput" : null,
         "placeholder" : {
-          "method" : "POST",
-          "parameters" : { },
+          "headers" : { },
           "body" : { },
-          "headers" : { }
+          "parameters" : { },
+          "method" : "POST"
         }
       },
       "outputSchema" : null,
@@ -374,17 +373,17 @@
     "type" : "STATIC_WEBHOOK",
     "webhookRawBody" : null,
     "workflowSyncExecution" : null,
+    "poll" : null,
+    "deduplicate" : null,
     "webhookDisable" : null,
     "webhookEnable" : null,
+    "dynamicWebhookRefresh" : null,
+    "processErrorResponse" : null,
+    "workflowNodeDescription" : null,
     "webhookRequest" : { },
     "listenerDisable" : null,
     "listenerEnable" : null,
     "webhookValidate" : { },
-    "deduplicate" : null,
-    "poll" : null,
-    "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
-    "dynamicWebhookRefresh" : null,
     "webhookValidateOnEnable" : null
   }, {
     "batch" : null,
@@ -398,10 +397,10 @@
         "outputSchema" : null,
         "sampleOutput" : null,
         "placeholder" : {
-          "method" : "POST",
-          "parameters" : { },
+          "headers" : { },
           "body" : { },
-          "headers" : { }
+          "parameters" : { },
+          "method" : "POST"
         }
       },
       "outputSchema" : null,
@@ -444,24 +443,25 @@
       "maxValue" : null,
       "minValue" : null,
       "options" : null,
-      "optionsDataSource" : null,
-      "controlType" : "INTEGER"
+      "controlType" : "INTEGER",
+      "optionsDataSource" : null
     } ],
     "title" : "Await Workflow and Respond",
     "type" : "STATIC_WEBHOOK",
     "webhookRawBody" : null,
     "workflowSyncExecution" : true,
+    "poll" : null,
+    "deduplicate" : null,
     "webhookDisable" : null,
     "webhookEnable" : null,
+    "dynamicWebhookRefresh" : null,
+    "processErrorResponse" : null,
+    "workflowNodeDescription" : null,
     "webhookRequest" : { },
     "listenerDisable" : null,
     "listenerEnable" : null,
     "webhookValidate" : { },
-    "deduplicate" : null,
-    "poll" : null,
-    "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
-    "dynamicWebhookRefresh" : null,
     "webhookValidateOnEnable" : null
-  } ]
+  } ],
+  "connection" : null
 }

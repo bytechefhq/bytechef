@@ -202,7 +202,7 @@
       "multipleElements" : false,
       "required" : true
     },
-    "object" : { }
+    "element" : { }
   } ],
   "description" : "Qdrant is an open-source vector similarity search engine designed to handle high-dimensional data, enabling efficient and scalable nearest neighbor search for applications like recommendation systems and machine learning.",
   "icon" : "path:assets/qdrant.svg",
