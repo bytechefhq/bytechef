@@ -22,11 +22,13 @@ import static com.bytechef.component.definition.Authorization.TOKEN;
 import static com.bytechef.component.definition.ComponentDsl.authorization;
 import static com.bytechef.component.definition.ComponentDsl.option;
 import static com.bytechef.component.definition.ComponentDsl.string;
+import static com.bytechef.component.definition.ComponentDsl.tool;
 import static com.bytechef.component.discord.constant.DiscordConstants.GUILD_ID_PROPERTY;
 
 import com.bytechef.component.OpenApiComponentHandler;
 import com.bytechef.component.definition.ActionDefinition;
 import com.bytechef.component.definition.Authorization.AuthorizationType;
+import com.bytechef.component.definition.ClusterElementDefinition;
 import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.ComponentDsl.ModifiableComponentDefinition;
@@ -52,6 +54,11 @@ public class DiscordComponentHandler extends AbstractDiscordComponentHandler {
     @Override
     public List<? extends ModifiableActionDefinition> getCustomActions() {
         return List.of(DiscordSendDirectMessageAction.ACTION_DEFINITION);
+    }
+
+    @Override
+    public List<ClusterElementDefinition<?>> getCustomClusterElements() {
+        return List.of(tool(DiscordSendDirectMessageAction.ACTION_DEFINITION));
     }
 
     @Override
