@@ -249,7 +249,7 @@ public final class ComponentDsl {
         Optional<List<? extends Property>> properties = actionDefinition.getProperties();
         Optional<OutputDefinition> outputDefinition = actionDefinition.getOutputDefinition();
         SingleConnectionPerformFunction perform = (SingleConnectionPerformFunction) actionDefinition.getPerform()
-            .orElseThrow(() -> new IllegalStateException("No perform found"));
+            .orElse((SingleConnectionPerformFunction) (inputParameters, connectionParameters, context) -> null);
 
         return ComponentDsl.<SingleConnectionToolFunction>clusterElement(actionDefinition.getName())
             .title(title.orElse(null))
