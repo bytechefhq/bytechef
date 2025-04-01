@@ -53,11 +53,12 @@ class ToolCallbackProviderImpl implements ToolCallbackProvider {
     public ToolCallback[] getToolCallbacks() {
         List<ToolCallback> toolCallbacks = new ArrayList<>();
 
-        List<ToolModel> toolModels = new ToolClient(apiKey, baseUrl, environment).getTools(externalUserId)
-            .entrySet()
+        ToolClient toolClient = new ToolClient(apiKey, baseUrl, environment);
+
+        List<ToolModel> toolModels = toolClient.getTools(externalUserId)
+            .values()
             .stream()
-            .flatMap(entry -> entry.getValue()
-                .stream())
+            .flatMap(List::stream)
             .toList();
 
         for (ToolModel toolModel : toolModels) {
@@ -83,7 +84,10 @@ class ToolCallbackProviderImpl implements ToolCallbackProvider {
     private Function<Map<String, Object>, Object> getToolCallbackFunction(
         String toolName, String externalUserId, String apiKey, Environment environment) {
 
-        return parameters -> new ToolClient(
-            apiKey, baseUrl, environment).executeTool(externalUserId, toolName, parameters);
+        return parameters -> {
+            ToolClient toolClient = new ToolClient(apiKey, baseUrl, environment);
+
+            return toolClient.executeTool(externalUserId, toolName, parameters);
+        };
     }
 }
