@@ -11,33 +11,73 @@ import {
 import getParametersWithDefaultValues from './getParametersWithDefaultValues';
 import getParentTaskDispatcherTask from './getParentTaskDispatcherTask';
 
-export const TASK_DISPATCHER_CONFIG = {
+export const DISPATCHER_TYPE_MAP = {
     condition: {
-        buildNodeData: ({baseNodeData, taskDispatcherContext, taskDispatcherId}: BuildNodeDataType): NodeDataType => {
-            const newNodeData = {
-                ...baseNodeData,
-                conditionId: taskDispatcherId,
-            };
+        contextIdentifier: 'conditionId',
+        dataKey: 'conditionData',
+    },
+    loop: {
+        contextIdentifier: 'loopId',
+        dataKey: 'loopData',
+    },
+} as const;
 
-            if (taskDispatcherContext?.conditionId) {
-                newNodeData.conditionData = {
-                    conditionCase: taskDispatcherContext.conditionCase as string,
-                    conditionId: taskDispatcherContext.conditionId as string,
-                    index: taskDispatcherContext.index as number,
+export function buildGenericNodeData(
+    baseNodeData: NodeDataType,
+    taskDispatcherContext: TaskDispatcherContextType,
+    taskDispatcherId: string,
+    dispatcherType: keyof typeof DISPATCHER_TYPE_MAP
+): NodeDataType {
+    const {contextIdentifier} = DISPATCHER_TYPE_MAP[dispatcherType];
+
+    const newNodeData = {
+        ...baseNodeData,
+        [contextIdentifier]: taskDispatcherId,
+    };
+
+    for (const [type, config] of Object.entries(DISPATCHER_TYPE_MAP)) {
+        const contextId = taskDispatcherContext[config.contextIdentifier as 'conditionId' | 'loopId'];
+
+        if (contextId) {
+            if (type === 'condition') {
+                newNodeData[config.dataKey] = {
+                    [config.contextIdentifier]: contextId,
+                    conditionCase: taskDispatcherContext.conditionCase || CONDITION_CASE_TRUE,
+                    conditionId: contextId,
+                    index: taskDispatcherContext.index ?? 0,
                 };
-
-                newNodeData.taskDispatcherId = taskDispatcherContext.conditionId;
-            } else if (taskDispatcherContext.loopId) {
-                newNodeData.loopData = {
-                    index: taskDispatcherContext.index as number,
-                    loopId: taskDispatcherContext.loopId as string,
+            } else if (type === 'loop') {
+                newNodeData[config.dataKey] = {
+                    index: taskDispatcherContext.index ?? 0,
+                    loopId: contextId,
                 };
-
-                newNodeData.taskDispatcherId = taskDispatcherContext.loopId;
             }
 
-            return newNodeData;
-        },
+            newNodeData.taskDispatcherId = contextId;
+
+            break;
+        }
+    }
+
+    return newNodeData;
+}
+
+export const TASK_DISPATCHER_CONFIG = {
+    branch: {
+        buildNodeData: ({baseNodeData, taskDispatcherContext, taskDispatcherId}: BuildNodeDataType): NodeDataType =>
+            buildGenericNodeData(baseNodeData, taskDispatcherContext, taskDispatcherId, 'branch'),
+        getDispatcherId: (context: TaskDispatcherContextType) => context.branchId,
+        getInitialParameters: (properties: Array<PropertyAllType>) => ({
+            ...getParametersWithDefaultValues({properties}),
+        }),
+        initializeParameters: () => ({
+            cases: [],
+            default: [],
+        }),
+    },
+    condition: {
+        buildNodeData: ({baseNodeData, taskDispatcherContext, taskDispatcherId}: BuildNodeDataType): NodeDataType =>
+            buildGenericNodeData(baseNodeData, taskDispatcherContext, taskDispatcherId, 'condition'),
         extractContextFromPlaceholder: (placeholderId: string): TaskDispatcherContextType => {
             const parts = placeholderId.split('-');
             const index = parseInt(parts[parts.length - 1] || '-1');
@@ -85,31 +125,8 @@ export const TASK_DISPATCHER_CONFIG = {
         },
     },
     loop: {
-        buildNodeData: ({baseNodeData, taskDispatcherContext, taskDispatcherId}: BuildNodeDataType): NodeDataType => {
-            const newNodeData = {
-                ...baseNodeData,
-                loopId: taskDispatcherId,
-            };
-
-            if (taskDispatcherContext?.conditionId) {
-                newNodeData.conditionData = {
-                    conditionCase: taskDispatcherContext.conditionCase as string,
-                    conditionId: taskDispatcherContext.conditionId as string,
-                    index: taskDispatcherContext.index as number,
-                };
-
-                newNodeData.taskDispatcherId = taskDispatcherContext.conditionId;
-            } else if (taskDispatcherContext?.loopId) {
-                newNodeData.loopData = {
-                    index: taskDispatcherContext.index as number,
-                    loopId: taskDispatcherContext.loopId as string,
-                };
-
-                newNodeData.taskDispatcherId = taskDispatcherContext.loopId;
-            }
-
-            return newNodeData;
-        },
+        buildNodeData: ({baseNodeData, taskDispatcherContext, taskDispatcherId}: BuildNodeDataType): NodeDataType =>
+            buildGenericNodeData(baseNodeData, taskDispatcherContext, taskDispatcherId, 'loop'),
         extractContextFromPlaceholder: (placeholderId: string): TaskDispatcherContextType => {
             const parts = placeholderId.split('-');
             const index = parseInt(parts[parts.length - 1] || '-1');
