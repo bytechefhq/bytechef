@@ -17,6 +17,7 @@
 package com.bytechef.platform.component.facade;
 
 import com.bytechef.platform.component.ComponentConnection;
+import com.bytechef.platform.constant.ModeType;
 import java.util.Map;
 import javax.annotation.Nullable;
 
@@ -30,10 +31,8 @@ public interface ClusterElementDefinitionFacade {
         @Nullable Long connectionId);
 
     Object executeTool(
-        String componentName, int componentVersion, String clusterElementName, Map<String, ?> inputParameters,
-        @Nullable ComponentConnection componentConnection);
-
-    Object executeTool(
-        String componentName, int componentVersion, String clusterElementName, Map<String, ?> inputParameters,
+        String componentName, int componentVersion, String clusterElementName,
+        @Nullable ModeType type, @Nullable Long jobPrincipalId, @Nullable Long jobPrincipalWorkflowId,
+        @Nullable Long jobId, @Nullable String workflowId, Map<String, ?> inputParameters,
         @Nullable ComponentConnection componentConnection, boolean editorEnvironment);
 }

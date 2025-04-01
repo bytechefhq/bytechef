@@ -16,12 +16,16 @@
 
 package com.bytechef.component.definition;
 
+import static com.bytechef.component.definition.ai.agent.ToolFunction.TOOLS;
+
+import com.bytechef.component.definition.ActionDefinition.SingleConnectionPerformFunction;
 import com.bytechef.component.definition.Authorization.AuthorizationType;
 import com.bytechef.component.definition.OptionsDataSource.OptionsFunction;
 import com.bytechef.component.definition.PropertiesDataSource.ActionPropertiesFunction;
 import com.bytechef.component.definition.PropertiesDataSource.TriggerPropertiesFunction;
 import com.bytechef.component.definition.Property.ObjectProperty;
 import com.bytechef.component.definition.Property.ValueProperty;
+import com.bytechef.component.definition.ai.agent.SingleConnectionToolFunction;
 import com.bytechef.component.definition.unified.base.adapter.ProviderModelAdapter;
 import com.bytechef.component.definition.unified.base.mapper.ProviderModelMapper;
 import com.bytechef.definition.BaseOutputDefinition.OutputSchema;
@@ -235,6 +239,25 @@ public final class ComponentDsl {
 
     public static ModifiableTimeProperty time(String name) {
         return new ModifiableTimeProperty(name);
+    }
+
+    public static ModifiableClusterElementDefinition<SingleConnectionToolFunction> tool(
+        ActionDefinition actionDefinition) {
+
+        Optional<String> title = actionDefinition.getTitle();
+        Optional<String> description = actionDefinition.getDescription();
+        Optional<List<? extends Property>> properties = actionDefinition.getProperties();
+        Optional<OutputDefinition> outputDefinition = actionDefinition.getOutputDefinition();
+        SingleConnectionPerformFunction perform = (SingleConnectionPerformFunction) actionDefinition.getPerform()
+            .orElseThrow(() -> new IllegalStateException("No perform found"));
+
+        return ComponentDsl.<SingleConnectionToolFunction>clusterElement(actionDefinition.getName())
+            .title(title.orElse(null))
+            .description(description.orElse(null))
+            .type(TOOLS)
+            .properties(properties.orElse(List.of()))
+            .output(outputDefinition.orElse(null))
+            .object(() -> perform::apply);
     }
 
     public static ModifiableTriggerDefinition trigger(String name) {
@@ -1651,9 +1674,18 @@ public final class ComponentDsl {
             return this;
         }
 
-        public ModifiableClusterElementDefinition<T> properties(Property... properties) {
+        @SafeVarargs
+        public final <P extends Property> ModifiableClusterElementDefinition<T> properties(P... properties) {
             if (properties != null) {
                 this.properties = List.of(properties);
+            }
+
+            return this;
+        }
+
+        public <P extends Property> ModifiableClusterElementDefinition<T> properties(List<P> properties) {
+            if (properties != null) {
+                this.properties = Collections.unmodifiableList(properties);
             }
 
             return this;
@@ -1736,6 +1768,14 @@ public final class ComponentDsl {
                 ", outputDefinition=" + outputDefinition +
                 ", properties=" + properties +
                 '}';
+        }
+
+        private ModifiableClusterElementDefinition<T> output(
+            OutputDefinition outputDefinition) {
+
+            this.outputDefinition = outputDefinition;
+
+            return this;
         }
     }
 

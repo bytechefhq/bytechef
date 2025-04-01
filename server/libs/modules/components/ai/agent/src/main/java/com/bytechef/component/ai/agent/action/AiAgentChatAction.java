@@ -140,7 +140,7 @@ public class AiAgentChatAction {
                 .tools(
                     getTools(
                         clusterElementMap.get(ToolFunction.TOOLS), connectionParameters,
-                        actionContextAware.isEditorEnvironment()))
+                        actionContextAware.isEditorEnvironment(), actionContext))
                 .call();
 
             return LLMUtils.getChatResponse(call, inputParameters, actionContext);
@@ -216,7 +216,7 @@ public class AiAgentChatAction {
     @SuppressFBWarnings("NP")
     private List<ToolCallback> getTools(
         List<ClusterElement> toolClusterElements, Map<String, ComponentConnection> connectionParameters,
-        boolean editorEnvironment) {
+        boolean editorEnvironment, ActionContext actionContext) {
 
         List<ToolCallback> toolCallbacks = new ArrayList<>();
 
@@ -233,7 +233,7 @@ public class AiAgentChatAction {
                 getToolCallbackFunction(
                     clusterElement.getComponentName(), clusterElement.getComponentVersion(),
                     clusterElementDefinition.getName(), clusterElement.getParameters(), componentConnection,
-                    editorEnvironment))
+                    editorEnvironment, actionContext))
                 .inputType(Map.class)
                 .inputSchema(JsonSchemaGeneratorUtils.generateInputSchema(clusterElementDefinition.getProperties()));
 
@@ -249,10 +249,14 @@ public class AiAgentChatAction {
 
     private Function<Map<String, Object>, Object> getToolCallbackFunction(
         String componentName, int componentVersion, String clusterElementName, Map<String, ?> parameters,
-        ComponentConnection componentConnection, boolean editorEnvironment) {
+        ComponentConnection componentConnection, boolean editorEnvironment, ActionContext actionContext) {
+
+        ActionContextAware actionContextAware = (ActionContextAware) actionContext;
 
         return request -> clusterElementDefinitionFacade.executeTool(
-            componentName, componentVersion, clusterElementName,
+            componentName, componentVersion, clusterElementName, actionContextAware.getModeType(),
+            actionContextAware.getJobPrincipalId(), actionContextAware.getJobPrincipalWorkflowId(),
+            actionContextAware.getJobId(), actionContextAware.getWorkflowId(),
             MapUtils.concat(request, new HashMap<>(parameters)), componentConnection, editorEnvironment);
     }
 }

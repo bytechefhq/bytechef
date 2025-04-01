@@ -16,7 +16,7 @@
 
 package com.bytechef.platform.component.facade;
 
-import com.bytechef.component.definition.Context;
+import com.bytechef.component.definition.ActionContext;
 import com.bytechef.platform.component.ComponentConnection;
 import com.bytechef.platform.component.definition.ContextFactory;
 import com.bytechef.platform.component.exception.ActionDefinitionErrorType;
@@ -24,6 +24,7 @@ import com.bytechef.platform.component.service.ClusterElementDefinitionService;
 import com.bytechef.platform.component.util.TokenRefreshHelper;
 import com.bytechef.platform.connection.domain.Connection;
 import com.bytechef.platform.connection.service.ConnectionService;
+import com.bytechef.platform.constant.ModeType;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Map;
 import javax.annotation.Nullable;
@@ -57,32 +58,29 @@ public class ClusterElementDefinitionFacadeImpl implements ClusterElementDefinit
         @Nullable Long connectionId) {
 
         return executeTool(
-            componentName, componentVersion, clusterElementName, inputParameters, getComponentConnection(connectionId));
+            componentName, componentVersion, clusterElementName, null, null, null, null, null, inputParameters,
+            getComponentConnection(connectionId), false);
     }
 
     @Override
     public Object executeTool(
-        String componentName, int componentVersion, String clusterElementName, Map<String, ?> inputParameters,
-        @Nullable ComponentConnection componentConnection) {
-
-        return executeTool(
-            componentName, componentVersion, clusterElementName, inputParameters, componentConnection, false);
-    }
-
-    @Override
-    public Object executeTool(
-        String componentName, int componentVersion, String clusterElementName, Map<String, ?> inputParameters,
+        String componentName, int componentVersion, String clusterElementName,
+        @Nullable ModeType type, @Nullable Long jobPrincipalId, @Nullable Long jobPrincipalWorkflowId,
+        @Nullable Long jobId, @Nullable String workflowId, Map<String, ?> inputParameters,
         @Nullable ComponentConnection componentConnection, boolean editorEnvironment) {
 
-        Context context = contextFactory.createContext(componentName, componentConnection, editorEnvironment);
+        ActionContext context = contextFactory.createActionContext(
+            componentName, componentVersion, clusterElementName, type, jobPrincipalId, jobPrincipalWorkflowId, workflowId, jobId,
+            componentConnection, editorEnvironment);
 
         return tokenRefreshHelper.executeSingleConnectionFunction(
             componentName, componentVersion, componentConnection, context, ActionDefinitionErrorType.EXECUTE_PERFORM,
             (componentConnection1, actionContext1) -> clusterElementDefinitionService.executeTool(
                 componentName, componentVersion, clusterElementName, inputParameters, componentConnection1,
                 actionContext1),
-            componentConnection1 -> contextFactory.createContext(
-                componentName, componentConnection, editorEnvironment));
+            componentConnection1 -> contextFactory.createActionContext(
+                componentName, componentVersion, clusterElementName, type, jobPrincipalId, jobPrincipalWorkflowId,
+                workflowId, jobId, componentConnection1, editorEnvironment));
     }
 
     private ComponentConnection getComponentConnection(Long connectionId) {

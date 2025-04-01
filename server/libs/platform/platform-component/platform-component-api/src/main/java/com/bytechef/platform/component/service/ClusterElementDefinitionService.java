@@ -16,8 +16,8 @@
 
 package com.bytechef.platform.component.service;
 
+import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ClusterElementDefinition.ClusterElementType;
-import com.bytechef.component.definition.Context;
 import com.bytechef.platform.component.ComponentConnection;
 import com.bytechef.platform.component.domain.ClusterElementDefinition;
 import java.util.List;
@@ -31,7 +31,7 @@ public interface ClusterElementDefinitionService {
 
     Object executeTool(
         String componentName, int componentVersion, String clusterElementName, Map<String, ?> inputParameters,
-        @Nullable ComponentConnection componentConnection, Context context);
+        @Nullable ComponentConnection componentConnection, ActionContext context);
 
     ClusterElementDefinition getClusterElementDefinition(String componentName, String clusterElementName);
 

@@ -18,9 +18,9 @@ package com.bytechef.platform.component.service;
 
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.OptionalUtils;
+import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ClusterElementDefinition.ClusterElementType;
 import com.bytechef.component.definition.ComponentDefinition;
-import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.ai.agent.SingleConnectionToolFunction;
 import com.bytechef.component.exception.ProviderException;
 import com.bytechef.platform.component.ComponentConnection;
@@ -51,7 +51,7 @@ public class ClusterElementDefinitionServiceImpl implements ClusterElementDefini
     @Override
     public Object executeTool(
         String componentName, int componentVersion, String clusterElementName, Map<String, ?> inputParameters,
-        @Nullable ComponentConnection componentConnection, Context context) {
+        @Nullable ComponentConnection componentConnection, ActionContext context) {
 
         SingleConnectionToolFunction toolFunction = getClusterElementObject(
             componentName, componentVersion, clusterElementName);

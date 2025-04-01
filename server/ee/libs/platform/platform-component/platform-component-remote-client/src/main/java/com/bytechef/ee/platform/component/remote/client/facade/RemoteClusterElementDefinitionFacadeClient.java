@@ -9,6 +9,7 @@ package com.bytechef.ee.platform.component.remote.client.facade;
 
 import com.bytechef.platform.component.ComponentConnection;
 import com.bytechef.platform.component.facade.ClusterElementDefinitionFacade;
+import com.bytechef.platform.constant.ModeType;
 import java.util.Map;
 import javax.annotation.Nullable;
 import org.springframework.stereotype.Component;
@@ -20,6 +21,7 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public class RemoteClusterElementDefinitionFacadeClient implements ClusterElementDefinitionFacade {
+
     @Override
     public Object executeTool(
         String componentName, int componentVersion, String clusterElementName, Map<String, ?> inputParameters,
@@ -30,15 +32,9 @@ public class RemoteClusterElementDefinitionFacadeClient implements ClusterElemen
 
     @Override
     public Object executeTool(
-        String componentName, int componentVersion, String clusterElementName, Map<String, ?> inputParameters,
-        @Nullable ComponentConnection componentConnection) {
-
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public Object executeTool(
-        String componentName, int componentVersion, String clusterElementName, Map<String, ?> inputParameters,
+        String componentName, int componentVersion, String clusterElementName,
+        @Nullable ModeType type, @Nullable Long jobPrincipalId, @Nullable Long jobPrincipalWorkflowId,
+        @Nullable Long jobId, @Nullable String workflowId, Map<String, ?> inputParameters,
         @Nullable ComponentConnection componentConnection, boolean editorEnvironment) {
 
         throw new UnsupportedOperationException();
