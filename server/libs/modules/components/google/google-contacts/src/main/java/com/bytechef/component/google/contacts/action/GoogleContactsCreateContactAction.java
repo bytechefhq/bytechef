@@ -20,9 +20,6 @@ import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.google.contacts.constant.GoogleContactsConstants.CONTACT_OUTPUT_PROPERTY;
-import static com.bytechef.component.google.contacts.constant.GoogleContactsConstants.CREATE_CONTACT;
-import static com.bytechef.component.google.contacts.constant.GoogleContactsConstants.CREATE_CONTACT_DESCRIPTION;
-import static com.bytechef.component.google.contacts.constant.GoogleContactsConstants.CREATE_CONTACT_TITLE;
 import static com.bytechef.component.google.contacts.constant.GoogleContactsConstants.EMAIL;
 import static com.bytechef.component.google.contacts.constant.GoogleContactsConstants.FAMILY_NAME;
 import static com.bytechef.component.google.contacts.constant.GoogleContactsConstants.GIVEN_NAME;
@@ -36,16 +33,12 @@ import static com.bytechef.component.google.contacts.util.GoogleContactsUtils.cr
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.definition.Property;
 import com.bytechef.component.definition.Property.ControlType;
-import com.bytechef.component.definition.Property.ObjectProperty;
-import com.bytechef.definition.BaseOutputDefinition.OutputSchema;
 import com.bytechef.google.commons.GoogleServices;
 import com.google.api.services.people.v1.PeopleService;
 import com.google.api.services.people.v1.model.EmailAddress;
 import com.google.api.services.people.v1.model.Person;
 import com.google.api.services.people.v1.model.PhoneNumber;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.IOException;
 import java.util.List;
 
@@ -54,47 +47,41 @@ import java.util.List;
  */
 public class GoogleContactsCreateContactAction {
 
-    @SuppressFBWarnings("MS")
-    public static final Property[] PROPERTIES = {
-        string(GIVEN_NAME)
-            .label("First Name")
-            .description("The first name of the contact.")
-            .required(true),
-        string(MIDDLE_NAME)
-            .label("Middle Name")
-            .description("The middle name of the contact.")
-            .required(false),
-        string(FAMILY_NAME)
-            .label("Last Name")
-            .description("The last name of the contact.")
-            .required(true),
-        string(TITLE)
-            .label("Job Title")
-            .description("The job title of the contact.")
-            .required(false),
-        string(NAME)
-            .label("Company")
-            .description("The company of the contact.")
-            .required(false),
-        string(EMAIL)
-            .label("Email")
-            .description("The email addresses of the contact.")
-            .controlType(ControlType.EMAIL)
-            .required(false),
-        string(PHONE_NUMBER)
-            .label("Phone Number")
-            .description("The phone numbers of the contact.")
-            .controlType(ControlType.PHONE)
-            .required(false)
-    };
-
-    public static final OutputSchema<ObjectProperty> OUTPUT_SCHEMA = outputSchema(CONTACT_OUTPUT_PROPERTY);
-
-    public static final ModifiableActionDefinition ACTION_DEFINITION = action(CREATE_CONTACT)
-        .title(CREATE_CONTACT_TITLE)
-        .description(CREATE_CONTACT_DESCRIPTION)
-        .properties(PROPERTIES)
-        .output(OUTPUT_SCHEMA)
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action("createContact")
+        .title("Create Contact")
+        .description("Creates a new contact.")
+        .properties(
+            string(GIVEN_NAME)
+                .label("First Name")
+                .description("The first name of the contact.")
+                .required(true),
+            string(MIDDLE_NAME)
+                .label("Middle Name")
+                .description("The middle name of the contact.")
+                .required(false),
+            string(FAMILY_NAME)
+                .label("Last Name")
+                .description("The last name of the contact.")
+                .required(true),
+            string(TITLE)
+                .label("Job Title")
+                .description("The job title of the contact.")
+                .required(false),
+            string(NAME)
+                .label("Company")
+                .description("The company of the contact.")
+                .required(false),
+            string(EMAIL)
+                .label("Email")
+                .description("The email addresses of the contact.")
+                .controlType(ControlType.EMAIL)
+                .required(false),
+            string(PHONE_NUMBER)
+                .label("Phone Number")
+                .description("The phone numbers of the contact.")
+                .controlType(ControlType.PHONE)
+                .required(false))
+        .output(outputSchema(CONTACT_OUTPUT_PROPERTY))
         .perform(GoogleContactsCreateContactAction::perform);
 
     private GoogleContactsCreateContactAction() {

@@ -22,9 +22,6 @@ import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.FORMAT;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.FORMAT_PROPERTY;
-import static com.bytechef.component.google.mail.constant.GoogleMailConstants.GET_THREAD;
-import static com.bytechef.component.google.mail.constant.GoogleMailConstants.GET_THREAD_DESCRIPTION;
-import static com.bytechef.component.google.mail.constant.GoogleMailConstants.GET_THREAD_TITLE;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.HISTORY_ID;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.ID;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.ME;
@@ -40,7 +37,6 @@ import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.definition.Property;
 import com.bytechef.component.google.mail.definition.Format;
 import com.bytechef.component.google.mail.util.GoogleMailUtils;
 import com.bytechef.component.google.mail.util.GoogleMailUtils.SimpleMessage;
@@ -60,21 +56,17 @@ import java.util.List;
  */
 public class GoogleMailGetThreadAction {
 
-    @SuppressFBWarnings("MS")
-    public static final Property[] PROPERTIES = {
-        string(ID)
-            .label("Thread ID")
-            .description("The ID of the thread to retrieve.")
-            .options((ActionOptionsFunction<String>) GoogleMailUtils::getThreadIdOptions)
-            .required(true),
-        FORMAT_PROPERTY,
-        METADATA_HEADERS_PROPERTY
-    };
-
-    public static final ModifiableActionDefinition ACTION_DEFINITION = action(GET_THREAD)
-        .title(GET_THREAD_TITLE)
-        .description(GET_THREAD_DESCRIPTION)
-        .properties(PROPERTIES)
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action("getThread")
+        .title("Get Thread")
+        .description("Gets the specified thread.")
+        .properties(
+            string(ID)
+                .label("Thread ID")
+                .description("The ID of the thread to retrieve.")
+                .options((ActionOptionsFunction<String>) GoogleMailUtils::getThreadIdOptions)
+                .required(true),
+            FORMAT_PROPERTY,
+            METADATA_HEADERS_PROPERTY)
         .output(GoogleMailGetThreadAction::getOutput)
         .perform(GoogleMailGetThreadAction::perform);
 

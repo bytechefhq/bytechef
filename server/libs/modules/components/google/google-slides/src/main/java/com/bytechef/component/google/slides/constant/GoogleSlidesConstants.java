@@ -24,11 +24,6 @@ public class GoogleSlidesConstants {
     private GoogleSlidesConstants() {
     }
 
-    public static final String CREATE_PRESENTATION_BASED_ON_TEMPLATE = "createPresentationBasedOnTemplate";
-    public static final String CREATE_PRESENTATION_BASED_ON_TEMPLATE_DESCRIPTION =
-        "Creates a new presentation based on an existing one and can replace any placeholder variables found in " +
-            "your template presentation, like [[name]], [[email]], etc.";
-    public static final String CREATE_PRESENTATION_BASED_ON_TEMPLATE_TITLE = "Create Presentation Based on Template";
     public static final String NAME = "name";
     public static final String VALUES = "values";
 }

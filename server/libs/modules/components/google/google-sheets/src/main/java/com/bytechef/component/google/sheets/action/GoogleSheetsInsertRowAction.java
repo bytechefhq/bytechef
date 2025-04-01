@@ -18,9 +18,6 @@ package com.bytechef.component.google.sheets.action;
 
 import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.dynamicProperties;
-import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.INSERT_ROW;
-import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.INSERT_ROW_DESCRIPTION;
-import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.INSERT_ROW_TITLE;
 import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.IS_THE_FIRST_ROW_HEADER;
 import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.IS_THE_FIRST_ROW_HEADER_PROPERTY;
 import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.ROW;
@@ -38,12 +35,10 @@ import static com.bytechef.component.google.sheets.util.GoogleSheetsUtils.getRow
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.definition.Property;
 import com.bytechef.component.google.sheets.util.GoogleSheetsUtils;
 import com.bytechef.google.commons.GoogleServices;
 import com.google.api.services.sheets.v4.Sheets;
 import com.google.api.services.sheets.v4.model.ValueRange;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Map;
 
@@ -52,22 +47,18 @@ import java.util.Map;
  */
 public class GoogleSheetsInsertRowAction {
 
-    @SuppressFBWarnings("MS")
-    public static final Property[] PROPERTIES = {
-        SPREADSHEET_ID_PROPERTY,
-        SHEET_NAME_PROPERTY,
-        VALUE_INPUT_PROPERTY,
-        IS_THE_FIRST_ROW_HEADER_PROPERTY,
-        dynamicProperties(ROW)
-            .propertiesLookupDependsOn(SPREADSHEET_ID, SHEET_NAME, IS_THE_FIRST_ROW_HEADER)
-            .properties(GoogleSheetsUtils.createPropertiesForNewRows(true))
-            .required(true)
-    };
-
-    public static final ModifiableActionDefinition ACTION_DEFINITION = action(INSERT_ROW)
-        .title(INSERT_ROW_TITLE)
-        .description(INSERT_ROW_DESCRIPTION)
-        .properties(PROPERTIES)
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action("insertRow")
+        .title("Insert Row")
+        .description("Append a row of values to an existing sheet.")
+        .properties(
+            SPREADSHEET_ID_PROPERTY,
+            SHEET_NAME_PROPERTY,
+            VALUE_INPUT_PROPERTY,
+            IS_THE_FIRST_ROW_HEADER_PROPERTY,
+            dynamicProperties(ROW)
+                .propertiesLookupDependsOn(SPREADSHEET_ID, SHEET_NAME, IS_THE_FIRST_ROW_HEADER)
+                .properties(GoogleSheetsUtils.createPropertiesForNewRows(true))
+                .required(true))
         .output()
         .perform(GoogleSheetsInsertRowAction::perform);
 

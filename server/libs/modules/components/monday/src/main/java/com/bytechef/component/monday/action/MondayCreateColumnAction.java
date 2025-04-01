@@ -22,9 +22,6 @@ import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.monday.constant.MondayConstants.BOARD_ID;
 import static com.bytechef.component.monday.constant.MondayConstants.COLUMN_TYPE;
-import static com.bytechef.component.monday.constant.MondayConstants.CREATE_COLUMN;
-import static com.bytechef.component.monday.constant.MondayConstants.CREATE_COLUMN_DESCRIPTION;
-import static com.bytechef.component.monday.constant.MondayConstants.CREATE_COLUMN_TITLE;
 import static com.bytechef.component.monday.constant.MondayConstants.DATA;
 import static com.bytechef.component.monday.constant.MondayConstants.ID;
 import static com.bytechef.component.monday.constant.MondayConstants.TITLE;
@@ -36,11 +33,7 @@ import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.definition.Property;
-import com.bytechef.component.definition.Property.ObjectProperty;
 import com.bytechef.component.monday.util.MondayOptionUtils;
-import com.bytechef.definition.BaseOutputDefinition.OutputSchema;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Map;
 
 /**
@@ -48,44 +41,39 @@ import java.util.Map;
  */
 public class MondayCreateColumnAction {
 
-    @SuppressFBWarnings("MS")
-    public static final Property[] PROPERTIES = {
-        string(WORKSPACE_ID)
-            .label("Workspace ID")
-            .options((ActionOptionsFunction<String>) MondayOptionUtils::getWorkspaceIdOptions)
-            .required(true),
-        string(BOARD_ID)
-            .label("Board ID")
-            .description("Id of the board where the new column should be created.")
-            .options((ActionOptionsFunction<String>) MondayOptionUtils::getBoardIdOptions)
-            .optionsLookupDependsOn(WORKSPACE_ID)
-            .required(true),
-        string(TITLE)
-            .label("Title")
-            .description("The new column's title.")
-            .required(true),
-        string(COLUMN_TYPE)
-            .label("Column Type")
-            .description("The type of column to create.")
-            .options(getColumnTypeOptions())
-            .required(true)
-    };
-
-    public static final OutputSchema<ObjectProperty> OUTPUT_SCHEMA = outputSchema(
-        object()
-            .properties(
-                object("create_column")
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action("createColumn")
+        .title("Create Column")
+        .description("Create a new column in board.")
+        .properties(
+            string(WORKSPACE_ID)
+                .label("Workspace ID")
+                .options((ActionOptionsFunction<String>) MondayOptionUtils::getWorkspaceIdOptions)
+                .required(true),
+            string(BOARD_ID)
+                .label("Board ID")
+                .description("Id of the board where the new column should be created.")
+                .options((ActionOptionsFunction<String>) MondayOptionUtils::getBoardIdOptions)
+                .optionsLookupDependsOn(WORKSPACE_ID)
+                .required(true),
+            string(TITLE)
+                .label("Title")
+                .description("The new column's title.")
+                .required(true),
+            string(COLUMN_TYPE)
+                .label("Column Type")
+                .description("The type of column to create.")
+                .options(getColumnTypeOptions())
+                .required(true))
+        .output(
+            outputSchema(
+                object()
                     .properties(
-                        string(ID)
-                            .description("ID of the column."),
-                        string(TITLE)
-                            .description("Title of the column."))));
-
-    public static final ModifiableActionDefinition ACTION_DEFINITION = action(CREATE_COLUMN)
-        .title(CREATE_COLUMN_TITLE)
-        .description(CREATE_COLUMN_DESCRIPTION)
-        .properties(PROPERTIES)
-        .output(OUTPUT_SCHEMA)
+                        object("create_column")
+                            .properties(
+                                string(ID)
+                                    .description("ID of the column."),
+                                string(TITLE)
+                                    .description("Title of the column.")))))
         .perform(MondayCreateColumnAction::perform);
 
     private MondayCreateColumnAction() {

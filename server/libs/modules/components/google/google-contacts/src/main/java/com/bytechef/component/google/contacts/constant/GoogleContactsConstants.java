@@ -27,12 +27,6 @@ import com.bytechef.component.definition.ComponentDsl.ModifiableObjectProperty;
  */
 public class GoogleContactsConstants {
 
-    public static final String CREATE_CONTACT = "createContact";
-    public static final String CREATE_CONTACT_DESCRIPTION = "Creates a new contact.";
-    public static final String CREATE_CONTACT_TITLE = "Create Contact";
-    public static final String CREATE_GROUP = "createGroup";
-    public static final String CREATE_GROUP_DESCRIPTION = "Creates a new group.";
-    public static final String CREATE_GROUP_TITLE = "Create Group";
     public static final String EMAIL = "email";
     public static final String FAMILY_NAME = "familyName";
     public static final String GIVEN_NAME = "givenName";
@@ -43,13 +37,7 @@ public class GoogleContactsConstants {
     public static final String QUERY = "query";
     public static final String READ_MASK = "readMask";
     public static final String RESOURCE_NAME = "resourceName";
-    public static final String SEARCH_CONTACTS = "searchContacts";
-    public static final String SEARCH_CONTACTS_DESCRIPTION = "Searches the contacts in Google Contacts account.";
-    public static final String SEARCH_CONTACTS_TITLE = "Search Contacts";
     public static final String TITLE = "title";
-    public static final String UPDATE_CONTACT = "updateContact";
-    public static final String UPDATE_CONTACT_DESCRIPTION = "Modifies an existing contact.";
-    public static final String UPDATE_CONTACT_TITLE = "Update Contact";
 
     public static final ModifiableObjectProperty CONTACT_OUTPUT_PROPERTY =
         object()

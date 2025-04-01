@@ -16,9 +16,6 @@
 
 package com.bytechef.component.baserow.action;
 
-import static com.bytechef.component.baserow.constant.BaserowConstants.CREATE_ROW;
-import static com.bytechef.component.baserow.constant.BaserowConstants.CREATE_ROW_DESCRIPTION;
-import static com.bytechef.component.baserow.constant.BaserowConstants.CREATE_ROW_TITLE;
 import static com.bytechef.component.baserow.constant.BaserowConstants.FIELDS;
 import static com.bytechef.component.baserow.constant.BaserowConstants.FIELDS_DYNAMIC_PROPERTY;
 import static com.bytechef.component.baserow.constant.BaserowConstants.TABLE_ID;
@@ -31,29 +28,23 @@ import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.definition.Property;
 import com.bytechef.component.definition.TypeReference;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 /**
  * @author Monika Kušter
  */
 public class BaserowCreateRowAction {
 
-    @SuppressFBWarnings("MS")
-    public static final Property[] PROPERTIES = {
-        integer(TABLE_ID)
-            .label("Table ID")
-            .description("ID of the table where the row must be created in.")
-            .required(true),
-        USER_FIELD_NAMES_PROPERTY,
-        FIELDS_DYNAMIC_PROPERTY
-    };
-
-    public static final ModifiableActionDefinition ACTION_DEFINITION = action(CREATE_ROW)
-        .title(CREATE_ROW_TITLE)
-        .description(CREATE_ROW_DESCRIPTION)
-        .properties(PROPERTIES)
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action("createRow")
+        .title("Create Row")
+        .description("Creates a new row.")
+        .properties(
+            integer(TABLE_ID)
+                .label("Table ID")
+                .description("ID of the table where the row must be created in.")
+                .required(true),
+            USER_FIELD_NAMES_PROPERTY,
+            FIELDS_DYNAMIC_PROPERTY)
         .output()
         .perform(BaserowCreateRowAction::perform);
 

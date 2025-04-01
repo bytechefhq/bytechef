@@ -22,9 +22,6 @@ import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.monday.constant.MondayConstants.BOARD_ID;
-import static com.bytechef.component.monday.constant.MondayConstants.CREATE_ITEM;
-import static com.bytechef.component.monday.constant.MondayConstants.CREATE_ITEM_DESCRIPTION;
-import static com.bytechef.component.monday.constant.MondayConstants.CREATE_ITEM_TITLE;
 import static com.bytechef.component.monday.constant.MondayConstants.DATA;
 import static com.bytechef.component.monday.constant.MondayConstants.GROUP_ID;
 import static com.bytechef.component.monday.constant.MondayConstants.ID;
@@ -38,12 +35,8 @@ import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.definition.Property;
-import com.bytechef.component.definition.Property.ObjectProperty;
 import com.bytechef.component.monday.util.MondayOptionUtils;
 import com.bytechef.component.monday.util.MondayPropertiesUtils;
-import com.bytechef.definition.BaseOutputDefinition.OutputSchema;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Map;
 
 /**
@@ -51,49 +44,44 @@ import java.util.Map;
  */
 public class MondayCreateItemAction {
 
-    @SuppressFBWarnings("MS")
-    public static final Property[] PROPERTIES = {
-        string(WORKSPACE_ID)
-            .label("Workspace ID")
-            .options((ActionOptionsFunction<String>) MondayOptionUtils::getWorkspaceIdOptions)
-            .required(true),
-        string(BOARD_ID)
-            .label("Board ID")
-            .description("ID of the board where new item will be created.")
-            .options((ActionOptionsFunction<String>) MondayOptionUtils::getBoardIdOptions)
-            .optionsLookupDependsOn(WORKSPACE_ID)
-            .required(true),
-        string(GROUP_ID)
-            .label("Group ID")
-            .description("The item's group.")
-            .options((ActionOptionsFunction<String>) MondayOptionUtils::getGroupIdOptions)
-            .optionsLookupDependsOn(WORKSPACE_ID, BOARD_ID)
-            .required(false),
-        string(ITEM_NAME)
-            .label("Item Name")
-            .description("The item's name.")
-            .required(true),
-        dynamicProperties("columnValues")
-            .properties(MondayPropertiesUtils::createPropertiesForItem)
-            .propertiesLookupDependsOn(WORKSPACE_ID, BOARD_ID, GROUP_ID)
-            .required(false)
-    };
-
-    public static final OutputSchema<ObjectProperty> OUTPUT_SCHEMA = outputSchema(
-        object()
-            .properties(
-                object("create_item")
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action("createItem")
+        .title("Create Item")
+        .description("Create a new item in a board.")
+        .properties(
+            string(WORKSPACE_ID)
+                .label("Workspace ID")
+                .options((ActionOptionsFunction<String>) MondayOptionUtils::getWorkspaceIdOptions)
+                .required(true),
+            string(BOARD_ID)
+                .label("Board ID")
+                .description("ID of the board where new item will be created.")
+                .options((ActionOptionsFunction<String>) MondayOptionUtils::getBoardIdOptions)
+                .optionsLookupDependsOn(WORKSPACE_ID)
+                .required(true),
+            string(GROUP_ID)
+                .label("Group ID")
+                .description("The item's group.")
+                .options((ActionOptionsFunction<String>) MondayOptionUtils::getGroupIdOptions)
+                .optionsLookupDependsOn(WORKSPACE_ID, BOARD_ID)
+                .required(false),
+            string(ITEM_NAME)
+                .label("Item Name")
+                .description("The item's name.")
+                .required(true),
+            dynamicProperties("columnValues")
+                .properties(MondayPropertiesUtils::createPropertiesForItem)
+                .propertiesLookupDependsOn(WORKSPACE_ID, BOARD_ID, GROUP_ID)
+                .required(false))
+        .output(
+            outputSchema(
+                object()
                     .properties(
-                        string(ID)
-                            .description("ID of the item."),
-                        string(NAME)
-                            .description("Name of the item."))));
-
-    public static final ModifiableActionDefinition ACTION_DEFINITION = action(CREATE_ITEM)
-        .title(CREATE_ITEM_TITLE)
-        .description(CREATE_ITEM_DESCRIPTION)
-        .properties(PROPERTIES)
-        .output(OUTPUT_SCHEMA)
+                        object("create_item")
+                            .properties(
+                                string(ID)
+                                    .description("ID of the item."),
+                                string(NAME)
+                                    .description("Name of the item.")))))
         .perform(MondayCreateItemAction::perform);
 
     private MondayCreateItemAction() {

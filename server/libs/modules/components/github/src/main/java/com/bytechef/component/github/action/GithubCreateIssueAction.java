@@ -23,9 +23,6 @@ import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.Context.Http.ResponseType;
 import static com.bytechef.component.definition.Context.Http.responseType;
 import static com.bytechef.component.github.constant.GithubConstants.BODY;
-import static com.bytechef.component.github.constant.GithubConstants.CREATE_ISSUE;
-import static com.bytechef.component.github.constant.GithubConstants.CREATE_ISSUE_DESCRIPTION;
-import static com.bytechef.component.github.constant.GithubConstants.CREATE_ISSUE_TITLE;
 import static com.bytechef.component.github.constant.GithubConstants.ISSUE_OUTPUT_PROPERTY;
 import static com.bytechef.component.github.constant.GithubConstants.REPOSITORY;
 import static com.bytechef.component.github.constant.GithubConstants.TITLE;
@@ -35,41 +32,31 @@ import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http.Body;
 import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.definition.Property;
-import com.bytechef.component.definition.Property.ObjectProperty;
 import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.github.util.GithubUtils;
-import com.bytechef.definition.BaseOutputDefinition.OutputSchema;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Map;
 
 public class GithubCreateIssueAction {
 
-    @SuppressFBWarnings("MS")
-    public static final Property[] PROPERTIES = {
-        string(REPOSITORY)
-            .label("Repository")
-            .description("Repository where new issue will be created.")
-            .options((ActionOptionsFunction<String>) GithubUtils::getRepositoryOptions)
-            .required(true),
-        string(TITLE)
-            .label("Title")
-            .description("Title of the issue.")
-            .maxLength(100)
-            .required(false),
-        string(BODY)
-            .label("Description")
-            .description("The description of the issue.")
-            .required(false)
-    };
-
-    public static final OutputSchema<ObjectProperty> OUTPUT_SCHEMA = outputSchema(ISSUE_OUTPUT_PROPERTY);
-
-    public static final ModifiableActionDefinition ACTION_DEFINITION = action(CREATE_ISSUE)
-        .title(CREATE_ISSUE_TITLE)
-        .description(CREATE_ISSUE_DESCRIPTION)
-        .properties(PROPERTIES)
-        .output(OUTPUT_SCHEMA)
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action("createIssue")
+        .title("Create Issue")
+        .description("Create Issue in GitHub Repository")
+        .properties(
+            string(REPOSITORY)
+                .label("Repository")
+                .description("Repository where new issue will be created.")
+                .options((ActionOptionsFunction<String>) GithubUtils::getRepositoryOptions)
+                .required(true),
+            string(TITLE)
+                .label("Title")
+                .description("Title of the issue.")
+                .maxLength(100)
+                .required(false),
+            string(BODY)
+                .label("Description")
+                .description("The description of the issue.")
+                .required(false))
+        .output(outputSchema(ISSUE_OUTPUT_PROPERTY))
         .perform(GithubCreateIssueAction::perform);
 
     private GithubCreateIssueAction() {

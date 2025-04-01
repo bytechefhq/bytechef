@@ -20,9 +20,6 @@ import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.array;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
-import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.ADD_ATTENDEES_TO_EVENT;
-import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.ADD_ATTENDEES_TO_EVENT_DESCRIPTION;
-import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.ADD_ATTENDEES_TO_EVENT_TITLE;
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.ATTENDEES;
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.CALENDAR_ID;
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.CALENDAR_ID_PROPERTY;
@@ -36,14 +33,10 @@ import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.definition.Property;
-import com.bytechef.component.definition.Property.ObjectProperty;
 import com.bytechef.component.google.calendar.util.GoogleCalendarUtils;
 import com.bytechef.component.google.calendar.util.GoogleCalendarUtils.CustomEvent;
-import com.bytechef.definition.BaseOutputDefinition.OutputSchema;
 import com.google.api.services.calendar.model.Event;
 import com.google.api.services.calendar.model.EventAttendee;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.IOException;
 import java.util.List;
 
@@ -52,32 +45,26 @@ import java.util.List;
  */
 public class GoogleCalendarAddAttendeesToEventAction {
 
-    @SuppressFBWarnings("MS")
-    public static final Property[] PROPERTIES = {
-        CALENDAR_ID_PROPERTY,
-        string(EVENT_ID)
-            .label("Event ID")
-            .description("ID of the event to add attendees to.")
-            .options((ActionOptionsFunction<String>) GoogleCalendarUtils::getEventIdOptions)
-            .optionsLookupDependsOn(CALENDAR_ID)
-            .required(true),
-        array(ATTENDEES)
-            .label("Attendees")
-            .description("The attendees of the event.")
-            .items(
-                string()
-                    .label("Email")
-                    .description("The attendee's email address."))
-            .required(true)
-    };
-
-    public static final OutputSchema<ObjectProperty> OUTPUT_SCHEMA = outputSchema(EVENT_OUTPUT_PROPERTY);
-
-    public static final ModifiableActionDefinition ACTION_DEFINITION = action(ADD_ATTENDEES_TO_EVENT)
-        .title(ADD_ATTENDEES_TO_EVENT_TITLE)
-        .description(ADD_ATTENDEES_TO_EVENT_DESCRIPTION)
-        .properties(PROPERTIES)
-        .output(OUTPUT_SCHEMA)
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action("addAttendeesToEvent")
+        .title("Add Attendees to Event")
+        .description("Invites one or more person to an existing event.")
+        .properties(
+            CALENDAR_ID_PROPERTY,
+            string(EVENT_ID)
+                .label("Event ID")
+                .description("ID of the event to add attendees to.")
+                .options((ActionOptionsFunction<String>) GoogleCalendarUtils::getEventIdOptions)
+                .optionsLookupDependsOn(CALENDAR_ID)
+                .required(true),
+            array(ATTENDEES)
+                .label("Attendees")
+                .description("The attendees of the event.")
+                .items(
+                    string()
+                        .label("Email")
+                        .description("The attendee's email address."))
+                .required(true))
+        .output(outputSchema(EVENT_OUTPUT_PROPERTY))
         .perform(GoogleCalendarAddAttendeesToEventAction::perform);
 
     private GoogleCalendarAddAttendeesToEventAction() {

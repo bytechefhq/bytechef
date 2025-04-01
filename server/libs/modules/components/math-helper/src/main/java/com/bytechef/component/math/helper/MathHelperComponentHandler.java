@@ -17,6 +17,7 @@
 package com.bytechef.component.math.helper;
 
 import static com.bytechef.component.definition.ComponentDsl.component;
+import static com.bytechef.component.definition.ComponentDsl.tool;
 
 import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.definition.ComponentCategory;
@@ -26,11 +27,6 @@ import com.bytechef.component.math.helper.action.MathHelperDivisionAction;
 import com.bytechef.component.math.helper.action.MathHelperModuloAction;
 import com.bytechef.component.math.helper.action.MathHelperMultiplicationAction;
 import com.bytechef.component.math.helper.action.MathHelperSubtractionAction;
-import com.bytechef.component.math.helper.cluster.MathHelperAdditionTool;
-import com.bytechef.component.math.helper.cluster.MathHelperDivisionTool;
-import com.bytechef.component.math.helper.cluster.MathHelperModuloTool;
-import com.bytechef.component.math.helper.cluster.MathHelperMultiplicationTool;
-import com.bytechef.component.math.helper.cluster.MathHelperSubtractionTool;
 import com.google.auto.service.AutoService;
 
 /**
@@ -51,11 +47,11 @@ public class MathHelperComponentHandler implements ComponentHandler {
             MathHelperMultiplicationAction.ACTION_DEFINITION,
             MathHelperSubtractionAction.ACTION_DEFINITION)
         .clusterElements(
-            MathHelperAdditionTool.CLUSTER_ELEMENT_DEFINITION,
-            MathHelperDivisionTool.CLUSTER_ELEMENT_DEFINITION,
-            MathHelperModuloTool.CLUSTER_ELEMENT_DEFINITION,
-            MathHelperMultiplicationTool.CLUSTER_ELEMENT_DEFINITION,
-            MathHelperSubtractionTool.CLUSTER_ELEMENT_DEFINITION);
+            tool(MathHelperAdditionAction.ACTION_DEFINITION),
+            tool(MathHelperDivisionAction.ACTION_DEFINITION),
+            tool(MathHelperModuloAction.ACTION_DEFINITION),
+            tool(MathHelperMultiplicationAction.ACTION_DEFINITION),
+            tool(MathHelperSubtractionAction.ACTION_DEFINITION));
 
     @Override
     public ComponentDefinition getDefinition() {

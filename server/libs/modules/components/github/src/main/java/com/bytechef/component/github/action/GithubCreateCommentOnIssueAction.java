@@ -22,9 +22,6 @@ import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.Context.Http.ResponseType;
 import static com.bytechef.component.definition.Context.Http.responseType;
 import static com.bytechef.component.github.constant.GithubConstants.BODY;
-import static com.bytechef.component.github.constant.GithubConstants.CREATE_COMMENT_ON_ISSUE;
-import static com.bytechef.component.github.constant.GithubConstants.CREATE_COMMENT_ON_ISSUE_DESCRIPTION;
-import static com.bytechef.component.github.constant.GithubConstants.CREATE_COMMENT_ON_ISSUE_TITLE;
 import static com.bytechef.component.github.constant.GithubConstants.ISSUE;
 import static com.bytechef.component.github.constant.GithubConstants.ISSUE_OUTPUT_PROPERTY;
 import static com.bytechef.component.github.constant.GithubConstants.REPOSITORY;
@@ -35,12 +32,8 @@ import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http.Body;
 import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.definition.Property;
-import com.bytechef.component.definition.Property.ObjectProperty;
 import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.github.util.GithubUtils;
-import com.bytechef.definition.BaseOutputDefinition.OutputSchema;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Map;
 
 /**
@@ -48,31 +41,25 @@ import java.util.Map;
  */
 public class GithubCreateCommentOnIssueAction {
 
-    @SuppressFBWarnings("MS")
-    public static final Property[] PROPERTIES = {
-        string(REPOSITORY)
-            .options((ActionOptionsFunction<String>) GithubUtils::getRepositoryOptions)
-            .label("Repository")
-            .required(true),
-        string(ISSUE)
-            .options((ActionOptionsFunction<String>) GithubUtils::getIssueOptions)
-            .optionsLookupDependsOn(REPOSITORY)
-            .label("Issue Number")
-            .description("The number of the issue to comment on.")
-            .required(true),
-        string(BODY)
-            .label("Comment")
-            .description("The comment to add to the issue.")
-            .required(true)
-    };
-
-    public static final OutputSchema<ObjectProperty> OUTPUT_SCHEMA = outputSchema(ISSUE_OUTPUT_PROPERTY);
-
-    public static final ModifiableActionDefinition ACTION_DEFINITION = action(CREATE_COMMENT_ON_ISSUE)
-        .title(CREATE_COMMENT_ON_ISSUE_TITLE)
-        .description(CREATE_COMMENT_ON_ISSUE_DESCRIPTION)
-        .properties(PROPERTIES)
-        .output(OUTPUT_SCHEMA)
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action("createCommentOnIssue")
+        .title("Create Comment on Issue")
+        .description("Adds a comment to the specified issue.")
+        .properties(
+            string(REPOSITORY)
+                .options((ActionOptionsFunction<String>) GithubUtils::getRepositoryOptions)
+                .label("Repository")
+                .required(true),
+            string(ISSUE)
+                .options((ActionOptionsFunction<String>) GithubUtils::getIssueOptions)
+                .optionsLookupDependsOn(REPOSITORY)
+                .label("Issue Number")
+                .description("The number of the issue to comment on.")
+                .required(true),
+            string(BODY)
+                .label("Comment")
+                .description("The comment to add to the issue.")
+                .required(true))
+        .output(outputSchema(ISSUE_OUTPUT_PROPERTY))
         .perform(GithubCreateCommentOnIssueAction::perform);
 
     private GithubCreateCommentOnIssueAction() {

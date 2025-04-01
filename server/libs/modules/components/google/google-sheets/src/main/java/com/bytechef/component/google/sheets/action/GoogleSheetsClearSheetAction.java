@@ -17,9 +17,6 @@
 package com.bytechef.component.google.sheets.action;
 
 import static com.bytechef.component.definition.ComponentDsl.action;
-import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.CLEAR_SHEET;
-import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.CLEAR_SHEET_DESCRIPTION;
-import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.CLEAR_SHEET_TITLE;
 import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.IS_THE_FIRST_ROW_HEADER;
 import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.IS_THE_FIRST_ROW_HEADER_PROPERTY;
 import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.SHEET_ID;
@@ -30,14 +27,12 @@ import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstant
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.definition.Property;
 import com.bytechef.google.commons.GoogleServices;
 import com.google.api.services.sheets.v4.Sheets;
 import com.google.api.services.sheets.v4.model.BatchUpdateSpreadsheetRequest;
 import com.google.api.services.sheets.v4.model.GridRange;
 import com.google.api.services.sheets.v4.model.Request;
 import com.google.api.services.sheets.v4.model.UpdateCellsRequest;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 
 /**
@@ -45,17 +40,13 @@ import java.util.List;
  */
 public class GoogleSheetsClearSheetAction {
 
-    @SuppressFBWarnings("MS")
-    public static final Property[] PROPERTIES = {
-        SPREADSHEET_ID_PROPERTY,
-        SHEET_ID_PROPERTY,
-        IS_THE_FIRST_ROW_HEADER_PROPERTY
-    };
-
-    public static final ModifiableActionDefinition ACTION_DEFINITION = action(CLEAR_SHEET)
-        .title(CLEAR_SHEET_TITLE)
-        .description(CLEAR_SHEET_DESCRIPTION)
-        .properties(PROPERTIES)
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action("clearSheet")
+        .title("Clear Sheet")
+        .description("Clear a sheet of all values while preserving formats.")
+        .properties(
+            SPREADSHEET_ID_PROPERTY,
+            SHEET_ID_PROPERTY,
+            IS_THE_FIRST_ROW_HEADER_PROPERTY)
         .perform(GoogleSheetsClearSheetAction::perform);
 
     private GoogleSheetsClearSheetAction() {

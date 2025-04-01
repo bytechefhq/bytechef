@@ -17,6 +17,7 @@
 package com.bytechef.component.baserow;
 
 import static com.bytechef.component.definition.ComponentDsl.component;
+import static com.bytechef.component.definition.ComponentDsl.tool;
 
 import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.baserow.action.BaserowCreateRowAction;
@@ -24,11 +25,6 @@ import com.bytechef.component.baserow.action.BaserowDeleteRowAction;
 import com.bytechef.component.baserow.action.BaserowGetRowAction;
 import com.bytechef.component.baserow.action.BaserowListRowsAction;
 import com.bytechef.component.baserow.action.BaserowUpdateRowAction;
-import com.bytechef.component.baserow.cluster.BaserowCreateRowTool;
-import com.bytechef.component.baserow.cluster.BaserowDeleteRowTool;
-import com.bytechef.component.baserow.cluster.BaserowGetRowTool;
-import com.bytechef.component.baserow.cluster.BaserowListRowsTool;
-import com.bytechef.component.baserow.cluster.BaserowUpdateRowTool;
 import com.bytechef.component.baserow.connection.BaserowConnection;
 import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDefinition;
@@ -56,11 +52,11 @@ public class BaserowComponentHandler implements ComponentHandler {
             BaserowListRowsAction.ACTION_DEFINITION,
             BaserowUpdateRowAction.ACTION_DEFINITION)
         .clusterElements(
-            BaserowCreateRowTool.CLUSTER_ELEMENT_DEFINITION,
-            BaserowDeleteRowTool.CLUSTER_ELEMENT_DEFINITION,
-            BaserowGetRowTool.CLUSTER_ELEMENT_DEFINITION,
-            BaserowListRowsTool.CLUSTER_ELEMENT_DEFINITION,
-            BaserowUpdateRowTool.CLUSTER_ELEMENT_DEFINITION);
+            tool(BaserowCreateRowAction.ACTION_DEFINITION),
+            tool(BaserowDeleteRowAction.ACTION_DEFINITION),
+            tool(BaserowGetRowAction.ACTION_DEFINITION),
+            tool(BaserowListRowsAction.ACTION_DEFINITION),
+            tool(BaserowUpdateRowAction.ACTION_DEFINITION));
 
     @Override
     public ComponentDefinition getDefinition() {
