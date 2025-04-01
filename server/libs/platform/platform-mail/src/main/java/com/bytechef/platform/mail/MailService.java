@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.platform.user.service;
+package com.bytechef.platform.mail;
 
 import com.bytechef.config.ApplicationProperties;
 import com.bytechef.config.ApplicationProperties.Mail;
@@ -45,9 +45,9 @@ import org.thymeleaf.spring6.SpringTemplateEngine;
  * @author Ivica Cardic
  */
 @Service
-public class MailServiceImpl implements MailService {
+public class MailService {
 
-    private final Logger log = LoggerFactory.getLogger(MailServiceImpl.class);
+    private final Logger log = LoggerFactory.getLogger(MailService.class);
 
     private static final String[] PROPERTY_NAMES = {
         "spring.mail.host", "spring.mail.port", "spring.mail.protocol", "spring.mail.ssl.enabled",
@@ -65,7 +65,7 @@ public class MailServiceImpl implements MailService {
     private final SpringTemplateEngine templateEngine;
 
     @SuppressFBWarnings("EI")
-    public MailServiceImpl(
+    public MailService(
         JavaMailSender javaMailSender, ApplicationProperties applicationProperties, MessageSource messageSource,
         SpringTemplateEngine templateEngine, Environment environment) {
 
@@ -87,19 +87,16 @@ public class MailServiceImpl implements MailService {
         }
     }
 
-    @Override
     @Async
     public void sendEmail(String to, String subject, String content, boolean isMultipart, boolean isHtml) {
         this.sendEmailSync(to, subject, content, isMultipart, isHtml);
     }
 
-    @Override
     @Async
     public void sendEmailFromTemplate(User user, String templateName, String titleKey) {
         this.sendEmailFromTemplateSync(user, templateName, titleKey);
     }
 
-    @Override
     @Async
     public void sendActivationEmail(User user) {
         log.debug("Sending activation email to '{}'", user.getEmail());
@@ -107,7 +104,6 @@ public class MailServiceImpl implements MailService {
         this.sendEmailFromTemplateSync(user, "mail/activationEmail", "email.activation.title");
     }
 
-    @Override
     @Async
     public void sendCreationEmail(User user) {
         log.debug("Sending creation email to '{}'", user.getEmail());
@@ -115,7 +111,6 @@ public class MailServiceImpl implements MailService {
         this.sendEmailFromTemplateSync(user, "mail/creationEmail", "email.activation.title");
     }
 
-    @Override
     @Async
     public void sendPasswordResetMail(User user) {
         log.debug("Sending password reset email to '{}'", user.getEmail());
