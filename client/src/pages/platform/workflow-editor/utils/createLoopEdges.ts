@@ -6,32 +6,34 @@ import {Edge, Node} from '@xyflow/react';
 /**
  * Creates the base loop structure edges (loop -> top ghost -> left ghost -> bottom ghost)
  */
-function createBaseLoopStructureEdges(loopNode: Node): Edge[] {
-    const nodeId = loopNode.id;
+function createBaseLoopStructureEdges(loopId: string): Edge[] {
+    const topGhostId = `${loopId}-loop-top-ghost`;
+    const bottomGhostId = `${loopId}-loop-bottom-ghost`;
+    const leftGhostId = `${loopId}-loop-left-ghost`;
 
     const edgeFromLoopToTopGhost = {
-        id: `${nodeId}=>${nodeId}-loop-top-ghost`,
-        source: nodeId,
+        id: `${loopId}=>${topGhostId}`,
+        source: loopId,
         style: EDGE_STYLES,
-        target: `${nodeId}-loop-top-ghost`,
+        target: topGhostId,
         type: 'smoothstep',
     };
 
     const edgeFromTopGhostToLeftGhost = {
-        id: `${nodeId}-loop-top-ghost=>${nodeId}-loop-left-ghost`,
-        source: `${nodeId}-loop-top-ghost`,
-        sourceHandle: `${nodeId}-loop-top-ghost-left`,
+        id: `${topGhostId}=>${leftGhostId}`,
+        source: topGhostId,
+        sourceHandle: `${topGhostId}-left`,
         style: EDGE_STYLES,
-        target: `${nodeId}-loop-left-ghost`,
+        target: leftGhostId,
         type: 'smoothstep',
     };
 
     const edgeFromLeftGhostToBottomGhost = {
-        id: `${nodeId}-loop-left-ghost=>${nodeId}-loop-bottom-ghost`,
-        source: `${nodeId}-loop-left-ghost`,
+        id: `${leftGhostId}=>${bottomGhostId}`,
+        source: leftGhostId,
         style: EDGE_STYLES,
-        target: `${nodeId}-loop-bottom-ghost`,
-        targetHandle: `${nodeId}-loop-bottom-ghost-left`,
+        target: bottomGhostId,
+        targetHandle: `${bottomGhostId}-left`,
         type: 'smoothstep',
     };
 
@@ -41,24 +43,26 @@ function createBaseLoopStructureEdges(loopNode: Node): Edge[] {
 /**
  * Creates edges for empty loop (with placeholder)
  */
-function createEdgesForEmptyLoop(loopNode: Node): Edge[] {
-    const nodeId = loopNode.id;
+function createEdgesForEmptyLoop(loopId: string): Edge[] {
+    const topGhostId = `${loopId}-loop-top-ghost`;
+    const bottomGhostId = `${loopId}-loop-bottom-ghost`;
+    const placeholderId = `${loopId}-loop-placeholder-0`;
 
     const edgeFromTopGhostToPlaceholder = {
-        id: `${nodeId}-loop-top-ghost=>${nodeId}-loop-placeholder-0`,
-        source: `${nodeId}-loop-top-ghost`,
-        sourceHandle: `${nodeId}-loop-top-ghost-right`,
+        id: `${topGhostId}=>${placeholderId}`,
+        source: topGhostId,
+        sourceHandle: `${topGhostId}-right`,
         style: EDGE_STYLES,
-        target: `${nodeId}-loop-placeholder-0`,
+        target: placeholderId,
         type: 'smoothstep',
     };
 
     const edgeFromPlaceholderToBottomGhost = {
-        id: `${nodeId}-loop-placeholder-0=>${nodeId}-loop-bottom-ghost`,
-        source: `${nodeId}-loop-placeholder-0`,
+        id: `${placeholderId}=>${bottomGhostId}`,
+        source: placeholderId,
         style: EDGE_STYLES,
-        target: `${nodeId}-loop-bottom-ghost`,
-        targetHandle: `${nodeId}-loop-bottom-ghost-right`,
+        target: bottomGhostId,
+        targetHandle: `${bottomGhostId}-right`,
         type: 'smoothstep',
     };
 
@@ -68,18 +72,20 @@ function createEdgesForEmptyLoop(loopNode: Node): Edge[] {
 /**
  * Creates edges between loop tasks
  */
-function createLoopSubtaskEdges(loopNode: Node, loopChildTasks: Array<WorkflowTask>): Edge[] {
+function createLoopSubtaskEdges(loopId: string, loopChildTasks: Array<WorkflowTask>): Edge[] {
     const edges: Edge[] = [];
-    const nodeId = loopNode.id;
+
+    const topGhostId = `${loopId}-loop-top-ghost`;
+    const bottomGhostId = `${loopId}-loop-bottom-ghost`;
 
     if (loopChildTasks.length === 0) {
         return [];
     }
 
     const edgeFromTopGhostToFirstLoopChildTask = {
-        id: `${nodeId}-loop-top-ghost=>${loopChildTasks[0].name}`,
-        source: `${nodeId}-loop-top-ghost`,
-        sourceHandle: `${nodeId}-loop-top-ghost-right`,
+        id: `${topGhostId}=>${loopChildTasks[0].name}`,
+        source: topGhostId,
+        sourceHandle: `${topGhostId}-right`,
         style: EDGE_STYLES,
         target: loopChildTasks[0].name,
         type: 'workflow',
@@ -90,6 +96,7 @@ function createLoopSubtaskEdges(loopNode: Node, loopChildTasks: Array<WorkflowTa
     loopChildTasks.forEach((task, index) => {
         const sourceTaskName = task.name;
         const sourceTaskComponentName = task.name.split('_')[0];
+
         const isTaskDispatcher = TASK_DISPATCHER_NAMES.includes(sourceTaskComponentName);
         const isLastTask = index === loopChildTasks.length - 1;
 
@@ -97,8 +104,8 @@ function createLoopSubtaskEdges(loopNode: Node, loopChildTasks: Array<WorkflowTa
         let targetHandleId;
 
         if (isLastTask) {
-            targetId = `${nodeId}-loop-bottom-ghost`;
-            targetHandleId = `${nodeId}-loop-bottom-ghost-right`;
+            targetId = bottomGhostId;
+            targetHandleId = `${bottomGhostId}-right`;
         } else {
             targetId = loopChildTasks[index + 1].name;
             targetHandleId = undefined;
@@ -150,18 +157,18 @@ export default function createLoopEdges(loopNode: Node): Edge[] {
     const edges: Edge[] = [];
     const nodeData: NodeDataType = loopNode.data as NodeDataType;
 
-    const baseStructureEdges = createBaseLoopStructureEdges(loopNode);
+    const baseStructureEdges = createBaseLoopStructureEdges(loopNode.id);
 
     edges.push(...baseStructureEdges);
 
     if (!nodeData.parameters?.iteratee?.length) {
-        const emptyLoopEdges = createEdgesForEmptyLoop(loopNode);
+        const emptyLoopEdges = createEdgesForEmptyLoop(loopNode.id);
 
         edges.push(...emptyLoopEdges);
     } else {
         const loopChildTasks: Array<WorkflowTask> = nodeData.parameters.iteratee;
 
-        const iterationEdges = createLoopSubtaskEdges(loopNode, loopChildTasks);
+        const iterationEdges = createLoopSubtaskEdges(loopNode.id, loopChildTasks);
 
         edges.push(...iterationEdges);
     }
