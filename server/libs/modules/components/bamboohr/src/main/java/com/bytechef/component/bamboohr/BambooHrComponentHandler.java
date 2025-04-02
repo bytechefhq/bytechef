@@ -41,7 +41,7 @@ public class BambooHrComponentHandler implements ComponentHandler {
             "BambooHR is a human resources software that helps HR teams manage employee data, hiring, onboarding, " +
                 "time tracking, payroll, performance management, and more in one platform.")
         .icon("path:assets/bamboohr.svg")
-        .categories(ComponentCategory.CRM)
+        .categories(ComponentCategory.HRIS)
         .connection(BambooHrConnection.CONNECTION_DEFINITION)
         .actions(
             BambooHrCreateEmployeeAction.ACTION_DEFINITION,

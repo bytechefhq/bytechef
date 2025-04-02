@@ -40,7 +40,7 @@ public class BambooHrConnection {
                         .description("Text before .bamboohr.com when logged in to BambooHR.")
                         .required(true),
                     string(USERNAME)
-                        .label("API key")
+                        .label("API Key")
                         .required(true)))
         .baseUri((connectionParameters, context) -> "https://api.bamboohr.com/api/gateway.php/"
             + connectionParameters.getRequiredString(COMPANY_DOMAIN) + "/v1");
