@@ -17,6 +17,7 @@
 package com.bytechef.component.bambooHR;
 
 import static com.bytechef.component.definition.ComponentDsl.component;
+import static com.bytechef.component.definition.ComponentDsl.tool;
 
 import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.bambooHR.action.BambooHRCreateEmployeeAction;
@@ -42,7 +43,12 @@ public class BambooHRComponentHandler implements ComponentHandler {
             BambooHRCreateEmployeeAction.ACTION_DEFINITION,
             BambooHRUpdateEmployeeAction.ACTION_DEFINITION,
             BambooHRGetEmployeeAction.ACTION_DEFINITION,
-            BambooHRUpdateEmployeeFileAction.ACTION_DEFINITION);
+            BambooHRUpdateEmployeeFileAction.ACTION_DEFINITION)
+        .clusterElements(
+            tool(BambooHRCreateEmployeeAction.ACTION_DEFINITION),
+            tool(BambooHRUpdateEmployeeAction.ACTION_DEFINITION),
+            tool(BambooHRGetEmployeeAction.ACTION_DEFINITION),
+            tool(BambooHRUpdateEmployeeFileAction.ACTION_DEFINITION));
 
     @Override
     public ComponentDefinition getDefinition() {
