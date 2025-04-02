@@ -3,8 +3,10 @@ import {Tabs, TabsContent, TabsList, TabsTrigger} from '@/components/ui/tabs';
 import {ComponentDefinitionBasic, TaskDispatcherDefinition} from '@/shared/middleware/platform/configuration';
 import {useFeatureFlagsStore} from '@/shared/stores/useFeatureFlagsStore';
 import {ClickedDefinitionType} from '@/shared/types';
-import {useMemo} from 'react';
+import {useEffect, useMemo, useState} from 'react';
 
+import {useComponentFiltering} from '../hooks/useComponentFiltering';
+import ActionComponentsFilter from './ActionComponentsFilter';
 import WorkflowNodesTabsItem from './WorkflowNodesTabsItem';
 
 type DefinitionType = (ComponentDefinitionBasic | TaskDispatcherDefinition) & {
@@ -35,15 +37,20 @@ const WorkflowNodesTabs = ({
     taskDispatcherDefinitions,
     triggerComponentDefinitions,
 }: WorkflowNodesTabsProps) => {
+    const [activeTab, setActiveTab] = useState(!hideTriggerComponents ? 'triggers' : 'components');
+    const [previousComponentListLength, setPreviousComponentListLength] = useState(actionComponentDefinitions.length);
+
     const ff_1057 = useFeatureFlagsStore()('ff-1057');
 
-    const defaultTabValue = useMemo(() => {
-        if (hideActionComponents) {
-            return 'triggers';
-        }
-
-        return 'components';
-    }, [hideActionComponents]);
+    const {
+        deselectAllCategories,
+        filterState,
+        filteredCategories,
+        filteredComponents,
+        setActiveView,
+        setSearchValue,
+        toggleCategory,
+    } = useComponentFiltering({actionComponentDefinitions});
 
     const availableTriggers = useMemo(() => {
         return triggerComponentDefinitions.map(
@@ -75,29 +82,62 @@ const WorkflowNodesTabs = ({
         );
     }, [ff_1057, taskDispatcherDefinitions]);
 
+    useEffect(() => {
+        if (previousComponentListLength === actionComponentDefinitions.length) {
+            return;
+        }
+
+        setPreviousComponentListLength(actionComponentDefinitions.length);
+
+        if (filterState.selectedCategories.length > 0) {
+            setActiveView(filterState.activeView);
+        } else if (filterState.activeView === 'filtered') {
+            setActiveView('all');
+        }
+    }, [
+        actionComponentDefinitions.length,
+        filterState.activeView,
+        filterState.selectedCategories.length,
+        previousComponentListLength,
+        setActiveView,
+    ]);
+
     return (
-        <Tabs className="flex h-full flex-col" defaultValue={defaultTabValue}>
-            <div className="px-3">
-                <TabsList className="my-2 flex w-full justify-between">
+        <Tabs className="flex h-full flex-col" onValueChange={setActiveTab} value={activeTab}>
+            <div className="px-2">
+                <TabsList className="my-2 flex w-full justify-between bg-surface-neutral-secondary">
                     {!hideTriggerComponents && (
-                        <TabsTrigger className="w-full" value="triggers">
+                        <TabsTrigger className="w-full data-[state=active]:shadow-none" value="triggers">
                             Triggers
                         </TabsTrigger>
                     )}
 
                     {!hideActionComponents && (
-                        <TabsTrigger className="w-full" value="components">
+                        <TabsTrigger className="w-full data-[state=active]:shadow-none" value="components">
                             Actions
                         </TabsTrigger>
                     )}
 
                     {!hideTaskDispatchers && (
-                        <TabsTrigger className="w-full" value="taskDispatchers">
+                        <TabsTrigger className="w-full data-[state=active]:shadow-none" value="taskDispatchers">
                             Flows
                         </TabsTrigger>
                     )}
                 </TabsList>
             </div>
+
+            {activeTab === 'components' && (
+                <ActionComponentsFilter
+                    actionComponentDefinitions={actionComponentDefinitions}
+                    deselectAllCategories={deselectAllCategories}
+                    filterState={filterState}
+                    filteredCategories={filteredCategories}
+                    filteredComponents={filteredComponents}
+                    setActiveView={setActiveView}
+                    setSearchValue={setSearchValue}
+                    toggleCategory={toggleCategory}
+                />
+            )}
 
             {!hideTriggerComponents && (
                 <ScrollArea className="overflow-y-auto px-3">
@@ -128,13 +168,19 @@ const WorkflowNodesTabs = ({
                 <ScrollArea className="overflow-y-auto px-3">
                     <TabsContent className="mt-0 w-full flex-1" value="components">
                         <ul className="space-y-2" role="list">
-                            {!actionComponentDefinitions.length && (
+                            {actionComponentDefinitions.length === 0 && filterState.activeView === 'all' && (
                                 <span className="block px-3 py-2 text-xs text-content-neutral-secondary">
                                     No action components found.
                                 </span>
                             )}
 
-                            {actionComponentDefinitions?.map((componentDefinition) => (
+                            {filteredComponents?.length === 0 && filterState.activeView === 'filtered' && (
+                                <span className="block px-3 py-2 text-xs text-content-neutral-secondary">
+                                    No filtered components found.
+                                </span>
+                            )}
+
+                            {filteredComponents?.map((componentDefinition) => (
                                 <WorkflowNodesTabsItem
                                     draggable={itemsDraggable}
                                     handleClick={() =>
