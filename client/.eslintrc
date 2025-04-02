@@ -100,6 +100,7 @@
                     "border-stroke-neutral-secondary",
                     "border-stroke-neutral-tertiary",
                     "divide-muted",
+                    "fill-content-neutral-secondary",
                     "h-connection-list-item-taglist-height",
                     "h-footer-height",
                     "h-header-height",
@@ -146,6 +147,7 @@
                     "right-data-pill-panel-placement",
                     "right-minimap-placement",
                     "rounded-xs",
+                    "stroke-destructive",
                     "text-accent-foreground",
                     "text-content-brand-primary",
                     "text-content-neutral-primary",
@@ -160,9 +162,11 @@
                     "w-112",
                     "w-appearance-theme-choice-skeleton-large-width",
                     "w-appearance-theme-choice-skeleton-small-width",
+                    "w-node-popover-width",
                     "w-sidebar-width",
                     "w-workflow-nodes-popover-menu-width",
-                    "w-workflow-outputs-sheet-dialog-width"
+                    "w-workflow-outputs-sheet-dialog-width",
+                    "w-task-filter-dropdown-menu-width"
                 ]
             }
         ],
