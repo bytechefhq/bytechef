@@ -24,12 +24,12 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.bytechef.ee.tenant.multi.sql.MultiTenantDataSource;
+import com.bytechef.platform.mail.MailService;
 import com.bytechef.platform.security.constant.AuthorityConstants;
 import com.bytechef.platform.user.constant.UserConstants;
 import com.bytechef.platform.user.domain.User;
 import com.bytechef.platform.user.dto.AdminUserDTO;
 import com.bytechef.platform.user.repository.UserRepository;
-import com.bytechef.platform.user.service.MailService;
 import com.bytechef.platform.user.service.UserService;
 import com.bytechef.platform.user.web.rest.config.UserIntTestConfiguration;
 import com.bytechef.platform.user.web.rest.config.UserIntTestConfigurationSharedMocks;

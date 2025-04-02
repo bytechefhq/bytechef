@@ -17,7 +17,7 @@
 package com.bytechef.platform.configuration.notification;
 
 import com.bytechef.platform.configuration.domain.notification.Notification;
-import com.bytechef.platform.user.service.MailService;
+import com.bytechef.platform.mail.MailService;
 import java.util.Map;
 import org.springframework.stereotype.Component;
 

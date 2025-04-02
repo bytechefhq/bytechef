@@ -35,7 +35,8 @@ import org.springframework.mail.javamail.JavaMailSenderImpl;
  * @author Ivica Cardic
  */
 @ComponentScan(basePackages = {
-    "com.bytechef.platform.user", "com.bytechef.web.rest", "com.bytechef.tenant", "com.bytechef.ee.tenant"
+    "com.bytechef.platform.mail", "com.bytechef.platform.user", "com.bytechef.web.rest", "com.bytechef.tenant",
+    "com.bytechef.ee.tenant"
 })
 @EnableAutoConfiguration
 @EnableConfigurationProperties(ApplicationProperties.class)

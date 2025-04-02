@@ -10,3 +10,14 @@ spring:
     import: optional:configserver:http://localhost:6111
   profiles:
     active: #spring.profiles.active#
+  mail:
+    host: http://127.0.0.1
+    port: 8080
+    username: noreply@app.bytechef.io
+    password: your-password
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
