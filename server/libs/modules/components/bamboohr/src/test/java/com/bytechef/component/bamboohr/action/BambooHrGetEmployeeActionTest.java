@@ -16,13 +16,17 @@
 
 package com.bytechef.component.bamboohr.action;
 
+import static com.bytechef.component.bamboohr.constant.BambooHrConstants.FIELDS;
 import static com.bytechef.component.bamboohr.constant.BambooHrConstants.ID;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
+import com.bytechef.component.definition.TypeReference;
+import com.bytechef.component.test.definition.MockParametersFactory;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
@@ -31,28 +35,36 @@ import org.mockito.ArgumentCaptor;
 /**
  * @author Marija Horvat
  */
-class BambooHrGetEmployeeActionTest extends AbstractBambooHRActionTest {
+class BambooHrGetEmployeeActionTest {
 
-    private final Parameters mockedParameters = mock(Parameters.class);
-    private final ArgumentCaptor<Map<String, List<String>>> queryArgumentCaptor = ArgumentCaptor.forClass(Map.class);
+    private final Context mockedContext = mock(Context.class);
+    private final Object mockedObject = mock(Object.class);
+    private final Context.Http.Executor mockedExecutor = mock(Context.Http.Executor.class);
+    private final Context.Http.Response mockedResponse = mock(Context.Http.Response.class);
+    private final ArgumentCaptor<String> stringArgumentCaptor = ArgumentCaptor.forClass(String.class);
+    private final Parameters mockedParameters = MockParametersFactory.create(
+        Map.of(ID, 1, FIELDS, List.of("firstName", "lastName", "employeeNumber")));
 
     @Test
     void testPerform() {
-        when(mockedExecutor.queryParameters(queryArgumentCaptor.capture()))
+        when(mockedContext.http(any()))
             .thenReturn(mockedExecutor);
-        when(mockedExecutor.headers(any()))
+        when(mockedExecutor.queryParameter(stringArgumentCaptor.capture(), stringArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
-
-        when(mockedParameters.getRequiredString(ID)).thenReturn("1");
-        when(mockedParameters.getArray("fields")).thenReturn(new String[] {
-            "firstName", "lastName", "employeeNumber"
-        });
+        when(mockedExecutor.header(stringArgumentCaptor.capture(), stringArgumentCaptor.capture()))
+            .thenReturn(mockedExecutor);
+        when(mockedExecutor.configuration(any()))
+            .thenReturn(mockedExecutor);
+        when(mockedExecutor.execute())
+            .thenReturn(mockedResponse);
+        when(mockedResponse.getBody(any(TypeReference.class)))
+            .thenReturn(mockedObject);
 
         Object result = BambooHrGetEmployeeAction.perform(mockedParameters, mockedParameters, mockedContext);
 
-        assertEquals(responseMap, result);
+        assertEquals(mockedObject, result);
 
-        Map<String, List<String>> query = queryArgumentCaptor.getValue();
-        assertEquals(Map.of("fields", List.of("firstName,lastName,employeeNumber")), query);
+        assertEquals(List.of(FIELDS, "firstName,lastName,employeeNumber", "accept", "application/json"),
+            stringArgumentCaptor.getAllValues());
     }
 }
