@@ -16,35 +16,50 @@
 
 package com.bytechef.component.bamboohr.action;
 
+import static com.bytechef.component.bamboohr.constant.BambooHrConstants.CATEGORY_ID;
 import static com.bytechef.component.bamboohr.constant.BambooHrConstants.FILE_ID;
 import static com.bytechef.component.bamboohr.constant.BambooHrConstants.ID;
+import static com.bytechef.component.bamboohr.constant.BambooHrConstants.NAME;
+import static com.bytechef.component.bamboohr.constant.BambooHrConstants.SHARE_WITH_EMPLOYEE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import com.bytechef.component.definition.Context;
+import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.test.definition.MockParametersFactory;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 
 /**
  * @author Marija Horvat
  */
-class BambooHrUpdateEmployeeFileActionTest extends AbstractBambooHRActionTest {
+class BambooHrUpdateEmployeeFileActionTest {
 
+    private final Context mockedContext = mock(Context.class);
+    private final Http.Executor mockedExecutor = mock(Http.Executor.class);
+    private final ArgumentCaptor<Http.Body> bodyArgumentCaptor = ArgumentCaptor.forClass(Http.Body.class);
     private final Parameters mockedParameters = MockParametersFactory.create(
-        Map.of(
-            ID, "1", FILE_ID, "1", "name", "test",
-            "categoryId", "1", "shareWithEmployee", "true"));
+        Map.of(ID, "1", FILE_ID, "1", NAME, "test", CATEGORY_ID, "1", SHARE_WITH_EMPLOYEE, "true"));
 
     @Test
     void testPerform() {
+        when(mockedContext.http(any()))
+            .thenReturn(mockedExecutor);
+        when(mockedExecutor.body(bodyArgumentCaptor.capture()))
+            .thenReturn(mockedExecutor);
+
         Object result = BambooHrUpdateEmployeeFileAction.perform(mockedParameters, mockedParameters, mockedContext);
 
-        assertEquals(responseMap, result);
+        assertNull(result);
 
-        Context.Http.Body body = bodyArgumentCaptor.getValue();
-        Map<String, Object> expected = Map.of(
-            "name", "test", "categoryId", "1", "shareWithEmployee", "true");
-        assertEquals(expected, body.getContent());
+        Http.Body body = bodyArgumentCaptor.getValue();
+        Map<String, Object> expectedBody = Map.of(NAME, "test", CATEGORY_ID, "1", SHARE_WITH_EMPLOYEE, "true");
+
+        assertEquals(expectedBody, body.getContent());
     }
 }

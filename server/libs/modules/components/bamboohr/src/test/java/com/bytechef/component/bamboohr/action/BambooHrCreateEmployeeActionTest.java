@@ -20,19 +20,31 @@ import static com.bytechef.component.bamboohr.constant.BambooHrConstants.EMPLOYE
 import static com.bytechef.component.bamboohr.constant.BambooHrConstants.EMPLOYMENT_STATUS;
 import static com.bytechef.component.bamboohr.constant.BambooHrConstants.FIRST_NAME;
 import static com.bytechef.component.bamboohr.constant.BambooHrConstants.HIRE_DATE;
+import static com.bytechef.component.bamboohr.constant.BambooHrConstants.ID;
 import static com.bytechef.component.bamboohr.constant.BambooHrConstants.JOB_TITLE;
 import static com.bytechef.component.bamboohr.constant.BambooHrConstants.LAST_NAME;
 import static com.bytechef.component.bamboohr.constant.BambooHrConstants.LOCATION;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
+import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.test.definition.MockParametersFactory;
+import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 
-class BambooHrCreateEmployeeActionTest extends AbstractBambooHRActionTest {
+class BambooHrCreateEmployeeActionTest {
 
+    private final Context mockedContext = mock(Context.class);
+    private final Http.Executor mockedExecutor = mock(Http.Executor.class);
+    private final Http.Response mockedResponse = mock(Http.Response.class);
+    private final ArgumentCaptor<Http.Body> bodyArgumentCaptor = ArgumentCaptor.forClass(Http.Body.class);
+    private final ArgumentCaptor<String> stringArgumentCaptor = ArgumentCaptor.forClass(String.class);
     private final Parameters mockedParameters = MockParametersFactory.create(
         Map.of(
             EMPLOYEE_NUMBER, "1", FIRST_NAME, "test", LAST_NAME, "test",
@@ -41,15 +53,29 @@ class BambooHrCreateEmployeeActionTest extends AbstractBambooHRActionTest {
 
     @Test
     void testPerform() {
+        String url = "https://api.bamboohr.com/api/gateway.php/bytechef/v1/employees/1";
+
+        when(mockedContext.http(any()))
+            .thenReturn(mockedExecutor);
+        when(mockedExecutor.body(bodyArgumentCaptor.capture()))
+            .thenReturn(mockedExecutor);
+        when(mockedExecutor.execute())
+            .thenReturn(mockedResponse);
+        when(mockedResponse.getHeader(stringArgumentCaptor.capture()))
+            .thenReturn(List.of(url));
+
         Object result = BambooHrCreateEmployeeAction.perform(mockedParameters, mockedParameters, mockedContext);
 
-        assertEquals(responseMap, result);
+        assertEquals(Map.of("url", url, ID, "1"), result);
+        assertEquals("location", stringArgumentCaptor.getValue());
 
-        Http.Body body = bodyArgumentCaptor.getValue();
-        Map<String, Object> expected = Map.of(
+        Map<String, Object> expectedBody = Map.of(
             EMPLOYEE_NUMBER, "1", FIRST_NAME, "test", LAST_NAME, "test",
             JOB_TITLE, "Software Engineer", LOCATION, "London, UK",
             EMPLOYMENT_STATUS, "Full-Time", HIRE_DATE, "04/01/2025");
-        assertEquals(expected, body.getContent());
+
+        Http.Body body = bodyArgumentCaptor.getValue();
+
+        assertEquals(expectedBody, body.getContent());
     }
 }
