@@ -5,7 +5,7 @@
  */
 package com.bytechef.platform.configuration.web.rest;
 
-import com.bytechef.platform.configuration.web.rest.model.GetWorkflowNodeDescription200ResponseModel;
+import com.bytechef.platform.configuration.web.rest.model.NotificationEventModel;
 import io.swagger.v3.oas.annotations.ExternalDocumentation;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -34,46 +34,43 @@ import jakarta.annotation.Generated;
 
 @Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-04-13T22:23:09.531481+02:00[Europe/Zagreb]", comments = "Generator version: 7.12.0")
 @Validated
-@Tag(name = "workflow-node-description", description = "The Platform Workflow Node Description Internal API")
-public interface WorkflowNodeDescriptionApi {
+@Tag(name = "notification-event", description = "The platform Notification Event API")
+public interface NotificationEventApi {
 
     default Optional<NativeWebRequest> getRequest() {
         return Optional.empty();
     }
 
     /**
-     * GET /workflows/{id}/descriptions/{workflowNodeName} : Get an action description shown in the editor
-     * Get an action description shown in the editor.
+     * GET /notifications/events : Get a list of possible notification events
+     * Get a list of possible notification events
      *
-     * @param id The workflow id (required)
-     * @param workflowNodeName The name of an workflow&#39;s action task or trigger (E.g. mailchimp_1) (required)
-     * @return The editor description. (status code 200)
+     * @return Successful operation. (status code 200)
      */
     @Operation(
-        operationId = "getWorkflowNodeDescription",
-        summary = "Get an action description shown in the editor",
-        description = "Get an action description shown in the editor.",
-        tags = { "workflow-node-description" },
+        operationId = "getNotificationEvents",
+        summary = "Get a list of possible notification events",
+        description = "Get a list of possible notification events",
+        tags = { "notification-event" },
         responses = {
-            @ApiResponse(responseCode = "200", description = "The editor description.", content = {
-                @Content(mediaType = "application/json", schema = @Schema(implementation = GetWorkflowNodeDescription200ResponseModel.class))
+            @ApiResponse(responseCode = "200", description = "Successful operation.", content = {
+                @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = NotificationEventModel.class)))
             })
         }
     )
     @RequestMapping(
         method = RequestMethod.GET,
-        value = "/workflows/{id}/descriptions/{workflowNodeName}",
+        value = "/notifications/events",
         produces = { "application/json" }
     )
     
-    default ResponseEntity<GetWorkflowNodeDescription200ResponseModel> getWorkflowNodeDescription(
-        @Parameter(name = "id", description = "The workflow id", required = true, in = ParameterIn.PATH) @PathVariable("id") String id,
-        @Parameter(name = "workflowNodeName", description = "The name of an workflow's action task or trigger (E.g. mailchimp_1)", required = true, in = ParameterIn.PATH) @PathVariable("workflowNodeName") String workflowNodeName
+    default ResponseEntity<List<NotificationEventModel>> getNotificationEvents(
+        
     ) {
         getRequest().ifPresent(request -> {
             for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
                 if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
-                    String exampleString = "{ \"description\" : \"description\" }";
+                    String exampleString = "[ { \"id\" : 6, \"type\" : \"JOB_CANCELLED\" }, { \"id\" : 6, \"type\" : \"JOB_CANCELLED\" } ]";
                     ApiUtil.setExampleResponse(request, "application/json", exampleString);
                     break;
                 }
