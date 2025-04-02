@@ -31,10 +31,13 @@ import static com.bytechef.component.definition.Context.Http.responseType;
 import com.bytechef.component.bambooHR.util.BambooHRUtils;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context;
-import com.bytechef.component.definition.OptionsDataSource;
+import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
 
+/**
+ * @author Marija Horvat
+ */
 public class BambooHRCreateEmployeeAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("createEmployee")
@@ -56,17 +59,17 @@ public class BambooHRCreateEmployeeAction {
             string(JOB_TITLE)
                 .label("Job Title")
                 .description("The job title of the employee.")
-                .options((OptionsDataSource.ActionOptionsFunction<String>) BambooHRUtils::getJobTitleOptions)
+                .options(BambooHRUtils.getOptions("Job Title"))
                 .required(false),
             string(LOCATION)
                 .label("Location")
                 .description("The employee's current location.")
-                .options((OptionsDataSource.ActionOptionsFunction<String>) BambooHRUtils::getLocationOptions)
+                .options(BambooHRUtils.getOptions("Location"))
                 .required(false),
             string(EMPLOYMENT_STATUS)
                 .label("Employee Status")
                 .description("The employment status of the employee.")
-                .options((OptionsDataSource.ActionOptionsFunction<String>) BambooHRUtils::getEmploymentStatusOptions)
+                .options(BambooHRUtils.getOptions("Employment Status"))
                 .required(false),
             date(HIRE_DATE)
                 .label("Hire Date")
@@ -77,13 +80,10 @@ public class BambooHRCreateEmployeeAction {
     private BambooHRCreateEmployeeAction() {
     }
 
-    public static String perform(
-        Parameters inputParameters, Parameters connectionParameters, Context context) {
-
+    public static String perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
         return context
             .http(http -> http.post("/employees/"))
-            .configuration(responseType(Context.Http.ResponseType.JSON))
-            .body(Context.Http.Body.of(
+            .body(Http.Body.of(
                 EMPLOYEE_NUMBER, inputParameters.getRequiredString(EMPLOYEE_NUMBER),
                 FIRST_NAME, inputParameters.getRequiredString(FIRST_NAME),
                 LAST_NAME, inputParameters.getRequiredString(LAST_NAME),
@@ -91,6 +91,7 @@ public class BambooHRCreateEmployeeAction {
                 LOCATION, inputParameters.getString(LOCATION),
                 EMPLOYMENT_STATUS, inputParameters.getString(EMPLOYMENT_STATUS),
                 HIRE_DATE, inputParameters.getString(HIRE_DATE)))
+            .configuration(responseType(Http.ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});
     }
