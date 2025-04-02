@@ -16,18 +16,25 @@
 
 package com.bytechef.component.bambooHR.constant;
 
+/**
+ * @author Marija Horvat
+ */
 public class BambooHRConstants {
 
-    public static final String FIRST_NAME = "firstName";
-    public static final String LAST_NAME = "lastName";
+    public static final String CATEGORY_ID = "categoryId";
     public static final String COMPANY_DOMAIN = "companyDomain";
-    public static final String JOB_TITLE = "jobTitle";
-    public static final String LOCATION = "location";
-    public static final String ID = "id";
-    public static final String FILE_ID = "fileId";
     public static final String EMPLOYEE_NUMBER = "employeeNumber";
     public static final String EMPLOYMENT_STATUS = "employmentHistoryStatus";
+    public static final String FIELDS = "fields";
+    public static final String FILE_ID = "fileId";
+    public static final String FIRST_NAME = "firstName";
     public static final String HIRE_DATE = "hireDate";
+    public static final String ID = "id";
+    public static final String JOB_TITLE = "jobTitle";
+    public static final String LAST_NAME = "lastName";
+    public static final String LOCATION = "location";
+    public static final String NAME = "name";
+    public static final String SHARE_WITH_EMPLOYEE = "shareWithEmployee";
 
     private BambooHRConstants() {
     }

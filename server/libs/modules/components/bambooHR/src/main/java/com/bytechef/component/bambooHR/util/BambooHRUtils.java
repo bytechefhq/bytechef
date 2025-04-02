@@ -16,12 +16,13 @@
 
 package com.bytechef.component.bambooHR.util;
 
+import static com.bytechef.component.bambooHR.constant.BambooHRConstants.NAME;
 import static com.bytechef.component.definition.ComponentDsl.option;
 import static com.bytechef.component.definition.Context.Http.responseType;
 
-import com.bytechef.component.definition.Context;
+import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Option;
-import com.bytechef.component.definition.Parameters;
+import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.TypeReference;
 import java.util.ArrayList;
 import java.util.List;
@@ -32,64 +33,34 @@ import java.util.Map;
  */
 public class BambooHRUtils {
 
-    public static List<Option<String>> getLocationOptions(
-        Parameters inputParameters, Parameters connectionParameters, Map<String, String> stringStringMap, String s,
-        Context context) {
+    public static ActionOptionsFunction<String> getOptions(String targetName) {
+        return (inputParameters, connectionParameters, arrayIndex, searchText, context) -> {
 
-        List<Map<String, Object>> body = context
-            .http(http -> http.get("/meta/lists"))
-            .headers(Map.of("accept", List.of("application/json")))
-            .configuration(responseType(Context.Http.ResponseType.JSON))
-            .execute()
-            .getBody(new TypeReference<>() {});
+            List<Map<String, Object>> body = context
+                .http(http -> http.get("/meta/lists"))
+                .header("accept", "application/json")
+                .configuration(responseType(Http.ResponseType.JSON))
+                .execute()
+                .getBody(new TypeReference<>() {});
 
-        return getOptions(body, "Location");
-    }
+            List<Option<String>> options = new ArrayList<>();
 
-    public static List<Option<String>> getJobTitleOptions(
-        Parameters inputParameters, Parameters connectionParameters, Map<String, String> stringStringMap, String s,
-        Context context) {
-
-        List<Map<String, Object>> body = context
-            .http(http -> http.get("/meta/lists"))
-            .headers(Map.of("accept", List.of("application/json")))
-            .configuration(responseType(Context.Http.ResponseType.JSON))
-            .execute()
-            .getBody(new TypeReference<>() {});
-
-        return getOptions(body, "Job Title");
-    }
-
-    public static List<Option<String>> getEmploymentStatusOptions(
-        Parameters inputParameters, Parameters connectionParameters, Map<String, String> stringStringMap, String s,
-        Context context) {
-
-        List<Map<String, Object>> body = context
-            .http(http -> http.get("/meta/lists"))
-            .headers(Map.of("accept", List.of("application/json")))
-            .configuration(responseType(Context.Http.ResponseType.JSON))
-            .execute()
-            .getBody(new TypeReference<>() {});
-
-        return getOptions(body, "Employment Status");
-    }
-
-    private static List<Option<String>> getOptions(List<Map<String, Object>> body, String targetName) {
-        List<Option<String>> options = new ArrayList<>();
-
-        for (Map<String, Object> entry : body) {
-            if (targetName.equals(entry.get("name"))) {
-                Object optionsObj = entry.get("options");
-                if (optionsObj instanceof List<?>) {
-                    List<Map<String, Object>> extractedOptions = (List<Map<String, Object>>) optionsObj;
-                    for (Map<String, Object> stringObjectMap : extractedOptions) {
-                        options.add(option((String) stringObjectMap.get("name"), (String) stringObjectMap.get("name")));
+            for (Map<String, Object> entry : body) {
+                if (targetName.equals(entry.get(NAME))) {
+                    if (entry.get("options") instanceof List<?> list) {
+                        for (Object object : list) {
+                            if (object instanceof Map<?, ?> map) {
+                                options.add(option((String) map.get(NAME), (String) map.get(NAME)));
+                            }
+                        }
                     }
+
+                    break;
                 }
-                break;
             }
-        }
-        return options;
+
+            return options;
+        };
     }
 
     private BambooHRUtils() {

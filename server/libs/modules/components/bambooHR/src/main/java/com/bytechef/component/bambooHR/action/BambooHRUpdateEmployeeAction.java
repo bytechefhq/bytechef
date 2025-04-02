@@ -31,7 +31,7 @@ import static com.bytechef.component.definition.Context.Http.responseType;
 import com.bytechef.component.bambooHR.util.BambooHRUtils;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context;
-import com.bytechef.component.definition.OptionsDataSource;
+import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
 
@@ -59,17 +59,17 @@ public class BambooHRUpdateEmployeeAction {
             string(JOB_TITLE)
                 .label("Updated Job Title")
                 .description("The updated job title of the employee.")
-                .options((OptionsDataSource.ActionOptionsFunction<String>) BambooHRUtils::getJobTitleOptions)
+                .options(BambooHRUtils.getOptions("Job Title"))
                 .required(false),
             string(LOCATION)
                 .label("Updated Location")
                 .description("The updated employee's current location.")
-                .options((OptionsDataSource.ActionOptionsFunction<String>) BambooHRUtils::getLocationOptions)
+                .options(BambooHRUtils.getOptions("Location"))
                 .required(false),
             string(EMPLOYMENT_STATUS)
                 .label("Updated Employee Status")
                 .description("The updated employment status of the employee.")
-                .options((OptionsDataSource.ActionOptionsFunction<String>) BambooHRUtils::getEmploymentStatusOptions)
+                .options(BambooHRUtils.getOptions("Employment Status"))
                 .required(false),
             date(HIRE_DATE)
                 .label("Updated Hire Date")
@@ -80,19 +80,18 @@ public class BambooHRUpdateEmployeeAction {
     private BambooHRUpdateEmployeeAction() {
     }
 
-    public static String perform(
-        Parameters inputParameters, Parameters connectionParameters, Context context) {
-
+    public static String perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
         return context
             .http(http -> http.post("/employees/" + inputParameters.getRequiredString(ID)))
-            .configuration(responseType(Context.Http.ResponseType.JSON))
-            .body(Context.Http.Body.of(
-                FIRST_NAME, inputParameters.getString(FIRST_NAME),
-                LAST_NAME, inputParameters.getString(LAST_NAME),
-                JOB_TITLE, inputParameters.getString(JOB_TITLE),
-                LOCATION, inputParameters.getString(LOCATION),
-                EMPLOYMENT_STATUS, inputParameters.getString(EMPLOYMENT_STATUS),
-                HIRE_DATE, inputParameters.getString(HIRE_DATE)))
+            .body(
+                Http.Body.of(
+                    FIRST_NAME, inputParameters.getString(FIRST_NAME),
+                    LAST_NAME, inputParameters.getString(LAST_NAME),
+                    JOB_TITLE, inputParameters.getString(JOB_TITLE),
+                    LOCATION, inputParameters.getString(LOCATION),
+                    EMPLOYMENT_STATUS, inputParameters.getString(EMPLOYMENT_STATUS),
+                    HIRE_DATE, inputParameters.getString(HIRE_DATE)))
+            .configuration(responseType(Http.ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});
     }

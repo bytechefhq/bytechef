@@ -25,6 +25,9 @@ import static com.bytechef.component.definition.ComponentDsl.string;
 import com.bytechef.component.definition.Authorization.AuthorizationType;
 import com.bytechef.component.definition.ComponentDsl.ModifiableConnectionDefinition;
 
+/**
+ * @author Marija Horvat
+ */
 public class BambooHRConnection {
 
     public static final ModifiableConnectionDefinition CONNECTION_DEFINITION = connection()

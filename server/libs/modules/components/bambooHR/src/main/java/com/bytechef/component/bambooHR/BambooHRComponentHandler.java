@@ -29,13 +29,17 @@ import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDefinition;
 import com.google.auto.service.AutoService;
 
+/**
+ * @author Marija Horvat
+ */
 @AutoService(ComponentHandler.class)
 public class BambooHRComponentHandler implements ComponentHandler {
 
     private static final ComponentDefinition COMPONENT_DEFINITION = component("bambooHR")
         .title("BambooHR")
-        .description("BambooHR is a Human Resources software that helps HR teams manage employee data, " +
-            "hiring, onboarding, time tracking, payroll, performance management, and more in one platform.")
+        .description(
+            "BambooHR is a human resources software that helps HR teams manage employee data, hiring, onboarding, " +
+                "time tracking, payroll, performance management, and more in one platform.")
         .icon("path:assets/bambooHR.svg")
         .categories(ComponentCategory.CRM)
         .connection(BambooHRConnection.CONNECTION_DEFINITION)

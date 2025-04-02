@@ -16,8 +16,11 @@
 
 package com.bytechef.component.bambooHR.action;
 
+import static com.bytechef.component.bambooHR.constant.BambooHRConstants.CATEGORY_ID;
 import static com.bytechef.component.bambooHR.constant.BambooHRConstants.FILE_ID;
 import static com.bytechef.component.bambooHR.constant.BambooHRConstants.ID;
+import static com.bytechef.component.bambooHR.constant.BambooHRConstants.NAME;
+import static com.bytechef.component.bambooHR.constant.BambooHRConstants.SHARE_WITH_EMPLOYEE;
 import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.bool;
 import static com.bytechef.component.definition.ComponentDsl.string;
@@ -25,10 +28,9 @@ import static com.bytechef.component.definition.Context.Http.responseType;
 
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context;
+import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
-import java.util.List;
-import java.util.Map;
 
 /**
  * @author Marija Horvat
@@ -47,15 +49,15 @@ public class BambooHRUpdateEmployeeFileAction {
                 .label("File ID")
                 .description("The ID of the employee file being updated.")
                 .required(true),
-            string("name")
+            string(NAME)
                 .label("Updated Name Of The File")
                 .description("Use if you want to rename the file.")
                 .required(false),
-            string("categoryId")
+            string(CATEGORY_ID)
                 .label("Updated Category ID")
                 .description("Use if you want to move the file to a different category.")
                 .required(false),
-            bool("shareWithEmployee")
+            bool(SHARE_WITH_EMPLOYEE)
                 .label("Update Sharing The File")
                 .description("Use if you want to update whether this file is shared or not.")
                 .required(false))
@@ -64,18 +66,18 @@ public class BambooHRUpdateEmployeeFileAction {
     private BambooHRUpdateEmployeeFileAction() {
     }
 
-    public static String perform(
-        Parameters inputParameters, Parameters connectionParameters, Context context) {
-
+    public static String perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
         return context
-            .http(http -> http.post("/employees/" + inputParameters.getRequiredString(ID)
-                + "/files/" + inputParameters.getRequiredString(FILE_ID)))
-            .headers(Map.of("accept", List.of("application/json")))
-            .configuration(responseType(Context.Http.ResponseType.JSON))
-            .body(Context.Http.Body.of(
-                "name", inputParameters.getString("name"),
-                "categoryId", inputParameters.getString("categoryId"),
-                "shareWithEmployee", inputParameters.getString("shareWithEmployee")))
+            .http(http -> http.post(
+                "/employees/" + inputParameters.getRequiredString(ID)
+                    + "/files/" + inputParameters.getRequiredString(FILE_ID)))
+            .header("accept", "application/json")
+            .configuration(responseType(Http.ResponseType.JSON))
+            .body(
+                Http.Body.of(
+                    NAME, inputParameters.getString(NAME),
+                    CATEGORY_ID, inputParameters.getString(CATEGORY_ID),
+                    SHARE_WITH_EMPLOYEE, inputParameters.getString(SHARE_WITH_EMPLOYEE)))
             .execute()
             .getBody(new TypeReference<>() {});
     }

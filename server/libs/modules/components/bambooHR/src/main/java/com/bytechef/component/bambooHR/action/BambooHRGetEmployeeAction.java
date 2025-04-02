@@ -16,6 +16,7 @@
 
 package com.bytechef.component.bambooHR.action;
 
+import static com.bytechef.component.bambooHR.constant.BambooHRConstants.FIELDS;
 import static com.bytechef.component.bambooHR.constant.BambooHRConstants.ID;
 import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.array;
@@ -24,10 +25,10 @@ import static com.bytechef.component.definition.Context.Http.responseType;
 
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context;
+import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
 import java.util.List;
-import java.util.Map;
 
 /**
  * @author Marija Horvat
@@ -42,7 +43,7 @@ public class BambooHRGetEmployeeAction {
                 .label("Employee ID")
                 .description("The ID of the employee.")
                 .required(true),
-            array("fields")
+            array(FIELDS)
                 .description("Fields you want to get from employee. See documentation for available fields.")
                 .items(string())
                 .required(true))
@@ -52,23 +53,15 @@ public class BambooHRGetEmployeeAction {
     private BambooHRGetEmployeeAction() {
     }
 
-    public static Object perform(
-        Parameters inputParameters, Parameters connectionParameters, Context context) {
-
-        Object[] inputArray = inputParameters.getArray("fields");
-        StringBuilder queryParameter = new StringBuilder();
-        for (int i = 0; i < inputArray.length; i++) {
-            queryParameter.append(inputArray[i]);
-            if (i != inputArray.length - 1) {
-                queryParameter.append(",");
-            }
-        }
+    public static Object perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
+        List<String> fields = inputParameters.getRequiredList(FIELDS, String.class);
+        String queryParameter = String.join(",", fields);
 
         return context
             .http(http -> http.get("/employees/" + inputParameters.getRequiredString(ID)))
-            .queryParameters(Map.of("fields", List.of(queryParameter.toString())))
-            .headers(Map.of("accept", List.of("application/json")))
-            .configuration(responseType(Context.Http.ResponseType.JSON))
+            .queryParameter(FIELDS, queryParameter)
+            .header("accept", "application/json")
+            .configuration(responseType(Http.ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});
     }
