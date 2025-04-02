@@ -61,8 +61,7 @@ public class EncryptionHelperEncryptAction {
         .properties(
             string(PUBLIC_KEY)
                 .label("Public PGP Key")
-                .description(
-                    "Public PGP key of the recipient of the encrypted file.")
+                .description("Public PGP key of the recipient of the encrypted file.")
                 .controlType(ControlType.TEXT_AREA)
                 .required(true),
             fileEntry(FILE)
@@ -102,8 +101,9 @@ public class EncryptionHelperEncryptAction {
             .setWithIntegrityPacket(true);
 
         PGPEncryptedDataGenerator encGen = new PGPEncryptedDataGenerator(encryptorBuilder);
-        encGen.addMethod(new JcePublicKeyKeyEncryptionMethodGenerator(publicKey)
-            .setProvider(BouncyCastleProvider.PROVIDER_NAME));
+        encGen.addMethod(
+            new JcePublicKeyKeyEncryptionMethodGenerator(publicKey)
+                .setProvider(BouncyCastleProvider.PROVIDER_NAME));
 
         ByteArrayOutputStream encryptedData = new ByteArrayOutputStream();
 
@@ -113,13 +113,12 @@ public class EncryptionHelperEncryptAction {
 
         String armoredMessage = armorMessage(encryptedData.toByteArray());
 
-        return context.file(file -> file.storeContent("encrypted.",
-            new ByteArrayInputStream(armoredMessage.getBytes(StandardCharsets.UTF_8))));
+        return context.file(
+            file -> file.storeContent("encrypted.",
+                new ByteArrayInputStream(armoredMessage.getBytes(StandardCharsets.UTF_8))));
     }
 
-    private static PGPPublicKey getPublicKey(JcaPGPPublicKeyRingCollection pgpPublicKeyRingCollection)
-        throws IOException, PGPException {
-
+    private static PGPPublicKey getPublicKey(JcaPGPPublicKeyRingCollection pgpPublicKeyRingCollection) {
         PGPPublicKey publicKey = null;
 
         Iterator<PGPPublicKeyRing> keyRingIter = pgpPublicKeyRingCollection.getKeyRings();

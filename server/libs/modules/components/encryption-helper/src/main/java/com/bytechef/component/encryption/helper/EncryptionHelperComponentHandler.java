@@ -35,8 +35,8 @@ public class EncryptionHelperComponentHandler implements ComponentHandler {
     private static final ComponentDefinition COMPONENT_DEFINITION = component("encryptionHelper")
         .title("Encryption Helper")
         .description(
-            "A secure PGP encryption and decryption service powered by Bouncy Castle," +
-                " enabling users to encrypt, decrypt, and manage sensitive data with OpenPGP standards.")
+            "A secure PGP encryption and decryption service powered by Bouncy Castle, enabling users to encrypt, " +
+                "decrypt, and manage sensitive data with OpenPGP standards.")
         .icon("path:assets/encryption-helper.svg")
         .categories(ComponentCategory.HELPERS)
         .actions(

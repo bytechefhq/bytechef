@@ -26,7 +26,7 @@ class EncryptionHelperComponentHandlerTest {
 
     @Test
     void testGetComponentDefinition() {
-        JsonFileAssert.assertEquals("definition/encryption-helper_v1.json",
-            new EncryptionHelperComponentHandler().getDefinition());
+        JsonFileAssert.assertEquals(
+            "definition/encryption-helper_v1.json", new EncryptionHelperComponentHandler().getDefinition());
     }
 }
