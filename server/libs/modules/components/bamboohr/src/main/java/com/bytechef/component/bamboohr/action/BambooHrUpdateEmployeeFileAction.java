@@ -24,13 +24,13 @@ import static com.bytechef.component.bamboohr.constant.BambooHrConstants.SHARE_W
 import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.bool;
 import static com.bytechef.component.definition.ComponentDsl.string;
-import static com.bytechef.component.definition.Context.Http.responseType;
 
+import com.bytechef.component.bamboohr.util.BambooHrUtils;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http;
+import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.definition.TypeReference;
 
 /**
  * @author Marija Horvat
@@ -44,10 +44,13 @@ public class BambooHrUpdateEmployeeFileAction {
             string(ID)
                 .label("Employee ID")
                 .description("The ID of the employee.")
+                .options((ActionOptionsFunction<String>) BambooHrUtils::getEmployeeIdOptions)
                 .required(true),
             string(FILE_ID)
                 .label("File ID")
                 .description("The ID of the employee file being updated.")
+                .options((ActionOptionsFunction<String>) BambooHrUtils::getEmployeeFilesIdOptions)
+                .optionsLookupDependsOn(ID)
                 .required(true),
             string(NAME)
                 .label("Updated Name Of The File")
@@ -67,18 +70,17 @@ public class BambooHrUpdateEmployeeFileAction {
     }
 
     public static String perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
-        return context
+        context
             .http(http -> http.post(
-                "/employees/" + inputParameters.getRequiredString(ID)
-                    + "/files/" + inputParameters.getRequiredString(FILE_ID)))
-            .header("accept", "application/json")
-            .configuration(responseType(Http.ResponseType.JSON))
+                "/employees/" + inputParameters.getRequiredString(ID) + "/files/" +
+                    inputParameters.getRequiredString(FILE_ID)))
             .body(
                 Http.Body.of(
                     NAME, inputParameters.getString(NAME),
                     CATEGORY_ID, inputParameters.getString(CATEGORY_ID),
                     SHARE_WITH_EMPLOYEE, inputParameters.getString(SHARE_WITH_EMPLOYEE)))
-            .execute()
-            .getBody(new TypeReference<>() {});
+            .execute();
+
+        return null;
     }
 }

@@ -26,14 +26,13 @@ import static com.bytechef.component.bamboohr.constant.BambooHrConstants.LOCATIO
 import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.date;
 import static com.bytechef.component.definition.ComponentDsl.string;
-import static com.bytechef.component.definition.Context.Http.responseType;
 
 import com.bytechef.component.bamboohr.util.BambooHrUtils;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http;
+import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.definition.TypeReference;
 
 /**
  * @author Marija Horvat
@@ -47,6 +46,7 @@ public class BambooHrUpdateEmployeeAction {
             string(ID)
                 .label("Employee ID")
                 .description("The ID of the employee.")
+                .options((ActionOptionsFunction<String>) BambooHrUtils::getEmployeeIdOptions)
                 .required(true),
             string(FIRST_NAME)
                 .label("Updated First Name")
@@ -80,8 +80,8 @@ public class BambooHrUpdateEmployeeAction {
     private BambooHrUpdateEmployeeAction() {
     }
 
-    public static String perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
-        return context
+    public static Object perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
+        context
             .http(http -> http.post("/employees/" + inputParameters.getRequiredString(ID)))
             .body(
                 Http.Body.of(
@@ -91,8 +91,8 @@ public class BambooHrUpdateEmployeeAction {
                     LOCATION, inputParameters.getString(LOCATION),
                     EMPLOYMENT_STATUS, inputParameters.getString(EMPLOYMENT_STATUS),
                     HIRE_DATE, inputParameters.getString(HIRE_DATE)))
-            .configuration(responseType(Http.ResponseType.JSON))
-            .execute()
-            .getBody(new TypeReference<>() {});
+            .execute();
+
+        return null;
     }
 }

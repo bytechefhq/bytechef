@@ -16,13 +16,16 @@
 
 package com.bytechef.component.bamboohr.util;
 
+import static com.bytechef.component.bamboohr.constant.BambooHrConstants.ID;
 import static com.bytechef.component.bamboohr.constant.BambooHrConstants.NAME;
 import static com.bytechef.component.definition.ComponentDsl.option;
 import static com.bytechef.component.definition.Context.Http.responseType;
 
+import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
+import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
 import java.util.ArrayList;
 import java.util.List;
@@ -32,6 +35,78 @@ import java.util.Map;
  * @author Marija Horvat
  */
 public class BambooHrUtils {
+
+    public static List<Option<String>> getEmployeeIdOptions(
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> stringStringMap, String s,
+        Context context) {
+
+        Map<String, Object> body = context
+            .http(http -> http.get("/employees/directory"))
+            .header("accept", "application/json")
+            .configuration(responseType(Http.ResponseType.JSON))
+            .execute()
+            .getBody(new TypeReference<>() {});
+
+        List<Option<String>> options = new ArrayList<>();
+
+        if (body.get("employees") instanceof List<?> list) {
+            for (Object o : list) {
+                if (o instanceof Map<?, ?> map) {
+                    String id = (String) map.get(ID);
+
+                    options.add(option(map.get("displayName") + " - " + id, id));
+                }
+            }
+        }
+
+        return options;
+    }
+
+    public static List<Option<String>> getEmployeeFilesIdOptions(
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> stringStringMap, String s,
+        Context context) {
+
+        Map<String, Object> body = context
+            .http(http -> http.get("/employees/%s/files/view".formatted(inputParameters.getRequiredString(ID))))
+            .header("accept", "application/xml")
+            .configuration(responseType(Http.ResponseType.XML))
+            .execute()
+            .getBody(new TypeReference<>() {});
+
+        List<Option<String>> options = new ArrayList<>();
+
+        if (body.get("category") instanceof List<?> list) {
+            for (Object o : list) {
+                if (o instanceof Map<?, ?> map) {
+                    options.add(option((String) map.get(NAME), (String) map.get(ID)));
+                }
+            }
+        }
+
+        return options;
+    }
+
+    public static List<Option<String>> getFieldOptions(
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> stringStringMap, String s,
+        Context context) {
+
+        List<Map<String, Object>> body = context
+            .http(http -> http.get("/meta/fields"))
+            .header("accept", "application/json")
+            .configuration(responseType(Http.ResponseType.JSON))
+            .execute()
+            .getBody(new TypeReference<>() {});
+
+        List<Option<String>> options = new ArrayList<>();
+
+        for (Map<String, Object> map : body) {
+            if (map.get("alias") != null) {
+                options.add(option((String) map.get(NAME), (String) map.get("alias")));
+            }
+        }
+
+        return options;
+    }
 
     public static ActionOptionsFunction<String> getOptions(String targetName) {
         return (inputParameters, connectionParameters, arrayIndex, searchText, context) -> {
