@@ -61,8 +61,7 @@ public class EncryptionHelperDecryptAction {
         .properties(
             string(PRIVATE_KEY)
                 .label("Private PGP Key")
-                .description(
-                    "Private PGP key that will decrypt the file.")
+                .description("Private PGP key that will decrypt the file.")
                 .controlType(ControlType.TEXT_AREA)
                 .required(true),
             fileEntry(FILE)
@@ -92,26 +91,25 @@ public class EncryptionHelperDecryptAction {
 
         ByteArrayInputStream encryptedInputStream = new ByteArrayInputStream(encryptedBytes);
 
-        PGPObjectFactory pgpObjectFactory =
-            new PGPObjectFactory(PGPUtil.getDecoderStream(encryptedInputStream), new JcaKeyFingerprintCalculator());
+        PGPObjectFactory pgpObjectFactory = new PGPObjectFactory(
+            PGPUtil.getDecoderStream(encryptedInputStream), new JcaKeyFingerprintCalculator());
         PGPEncryptedDataList encDataList = (PGPEncryptedDataList) pgpObjectFactory.nextObject();
 
         PGPPublicKeyEncryptedData pgpPublicKeyEncryptedData = (PGPPublicKeyEncryptedData) encDataList.get(0);
 
         PGPPrivateKey privateKey = getPrivateKey(
-            inputParameters.getRequiredString(PRIVATE_KEY),
-            inputParameters.getRequiredString(PASSPHRASE),
-            encDataList);
+            inputParameters.getRequiredString(PRIVATE_KEY), inputParameters.getRequiredString(PASSPHRASE), encDataList);
 
         InputStream decryptedDataStream =
-            pgpPublicKeyEncryptedData.getDataStream(new JcePublicKeyDataDecryptorFactoryBuilder()
-                .setProvider(BouncyCastleProvider.PROVIDER_NAME)
-                .build(privateKey));
+            pgpPublicKeyEncryptedData.getDataStream(
+                new JcePublicKeyDataDecryptorFactoryBuilder()
+                    .setProvider(BouncyCastleProvider.PROVIDER_NAME)
+                    .build(privateKey));
 
         ByteArrayOutputStream decryptedData = getDecryptedDataFromStream(decryptedDataStream);
 
-        return context
-            .file(file -> file.storeContent("decrypted.", new ByteArrayInputStream(decryptedData.toByteArray())));
+        return context.file(
+            file -> file.storeContent("decrypted.", new ByteArrayInputStream(decryptedData.toByteArray())));
     }
 
     private static PGPPrivateKey
