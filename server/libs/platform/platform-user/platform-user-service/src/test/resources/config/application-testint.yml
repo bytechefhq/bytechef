@@ -1,8 +1,3 @@
 spring:
   liquibase:
     contexts: user
-
-bytechef:
-  mail:
-    base-url: http://127.0.0.1:8080
-    from: noreply@app.bytechef.io

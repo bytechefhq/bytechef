@@ -20,6 +20,7 @@ dependencies {
     implementation("org.springframework.cloud:spring-cloud-starter-config")
     implementation("org.springframework.cloud:spring-cloud-starter-loadbalancer")
     implementation("org.springframework.retry:spring-retry")
+    implementation("org.springframework:spring-context-support")
     implementation(project(":server:libs:atlas:atlas-configuration:atlas-configuration-config"))
     implementation(project(":server:libs:atlas:atlas-configuration:atlas-configuration-converter"))
     implementation(project(":server:libs:atlas:atlas-configuration:atlas-configuration-repository:atlas-configuration-repository-git"))
