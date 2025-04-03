@@ -46,7 +46,7 @@ export default defineConfig({
                         {
                             label: 'Build Workflows',
                             items: [
-                                {label: 'Overview', link: '/automation/build-workflows/overview'},
+                                {label: 'Overview', link: '/automation/build-workflows/build-workflows-overview'},
                                 {label: 'Project Guides', link: '/automation/build-workflows/project-guides'},
                                 {label: 'Workflow Guides', link: '/automation/build-workflows/workflow-guides'}
                             ],
@@ -59,8 +59,8 @@ export default defineConfig({
                         {
                             label: 'Getting Started',
                             items: [
-                                // { label: 'Introduction', link: '/embedded/getting-started/introduction' },
-                                {label: 'Quick Start', link: '/embedded/getting-started/quick-start'},
+                                // {label: 'Introduction', link: '/embedded/getting-started/embedded-introduction'},
+                                {label: 'Quick Start', link: '/embedded/getting-started/embedded-quick-start'}
                             ]
                         },
                     ],
@@ -96,8 +96,14 @@ export default defineConfig({
                         {
                             label: 'Generate Component',
                             items: [
-                                {label: 'Overview', link: '/developer-guide/generate-component/overview'},
-                                {label: 'Initial Setup', link: '/developer-guide/generate-component/initial-setup'},
+                                {
+                                    label: 'Overview',
+                                    link: '/developer-guide/generate-component/generate-component-overview'
+                                },
+                                {
+                                    label: 'Initial Setup',
+                                    link: '/developer-guide/generate-component/generate-component-initial-setup'
+                                },
                                 {
                                     label: 'OpenAPI Specification',
                                     link: '/developer-guide/generate-component/open-api-specification'
@@ -108,7 +114,7 @@ export default defineConfig({
                                 },
                                 {
                                     label: 'Create Trigger',
-                                    link: '/developer-guide/generate-component/create-trigger'
+                                    link: '/developer-guide/generate-component/generate-trigger'
                                 }
                             ],
                             collapsed: true,
@@ -116,7 +122,10 @@ export default defineConfig({
                         {
                             label: 'Testing Triggers',
                             items: [
-                                {label: 'Working with Triggers', link: '/developer-guide/testing-triggers/triggers'},
+                                {
+                                    label: 'Working with Triggers',
+                                    link: '/developer-guide/testing-triggers/testing-triggers'
+                                }
                             ],
                             collapsed: true,
                         },
