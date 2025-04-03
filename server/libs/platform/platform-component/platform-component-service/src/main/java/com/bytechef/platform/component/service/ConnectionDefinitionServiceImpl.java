@@ -109,7 +109,7 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
             componentName, connectionVersion, authorizationName);
 
         ApplyFunction applyFunction = OptionalUtils.orElse(
-            authorization.getApply(), getDefaultApply(authorization.getType()));
+            authorization.getApply(), getDefaultApplyFunction(authorization.getType()));
 
         try {
             return applyFunction.apply(ParametersFactory.createParameters(connectionParameters), context);
@@ -129,7 +129,7 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
 
         if (authorization.getType() == AuthorizationType.OAUTH2_AUTHORIZATION_CODE_PKCE) {
             PkceFunction pkceFunction = OptionalUtils.orElse(
-                authorization.getPkce(), getDefaultPkce());
+                authorization.getPkce(), getDefaultPkceFunction());
 
             // TODO pkce
             Authorization.Pkce pkce;
@@ -351,7 +351,7 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
         }
     }
 
-    private static ApplyFunction getDefaultApply(AuthorizationType type) {
+    private static ApplyFunction getDefaultApplyFunction(AuthorizationType type) {
         return switch (type) {
             case API_KEY -> (Parameters connectionParameters, Context context) -> {
                 String addTo = MapUtils.getString(
@@ -521,7 +521,7 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
         return MapUtils.getString(connectionParameters, Authorization.REFRESH_TOKEN);
     }
 
-    private static PkceFunction getDefaultPkce() {
+    private static PkceFunction getDefaultPkceFunction() {
         return (verifier, challenge, challengeMethod, context) -> new Authorization.Pkce(verifier, challenge,
             challengeMethod);
     }
