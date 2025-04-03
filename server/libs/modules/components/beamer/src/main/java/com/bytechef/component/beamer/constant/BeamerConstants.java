@@ -23,9 +23,11 @@ public class BeamerConstants {
 
     public static final String CATEGORY = "category";
     public static final String CONTENT = "content";
+    public static final String DATE_FROM = "dateFrom";
     public static final String FEATURE_REQUEST = "featureRequest";
     public static final String FEATURE_REQUEST_ID = "requestId";
     public static final String ID = "id";
+    public static final String LAST_TIME_CHECKED = "lastTimeChecked";
     public static final String POST = "post";
     public static final String POST_ID = "postId";
     public static final String TEXT = "text";
