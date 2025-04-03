@@ -35,6 +35,7 @@ public class BambooHrConstants {
     public static final String LOCATION = "location";
     public static final String NAME = "name";
     public static final String SHARE_WITH_EMPLOYEE = "shareWithEmployee";
+    public static final String LAST_TIME_CHECKED = "lastTimeChecked";
 
     private BambooHrConstants() {
     }

@@ -16,7 +16,10 @@
 
 package com.bytechef.component.bamboohr.util;
 
+import static com.bytechef.component.bamboohr.constant.BambooHrConstants.EMPLOYEE_NUMBER;
+import static com.bytechef.component.bamboohr.constant.BambooHrConstants.FIRST_NAME;
 import static com.bytechef.component.bamboohr.constant.BambooHrConstants.ID;
+import static com.bytechef.component.bamboohr.constant.BambooHrConstants.LAST_NAME;
 import static com.bytechef.component.bamboohr.constant.BambooHrConstants.NAME;
 import static com.bytechef.component.definition.ComponentDsl.option;
 import static com.bytechef.component.definition.Context.Http.responseType;
@@ -26,6 +29,7 @@ import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.Parameters;
+import com.bytechef.component.definition.TriggerContext;
 import com.bytechef.component.definition.TypeReference;
 import java.util.ArrayList;
 import java.util.List;
@@ -106,6 +110,34 @@ public class BambooHrUtils {
         }
 
         return options;
+    }
+
+    public static String addWebhook(
+        String webhookUrl, TriggerContext context) {
+
+        Map<String, ?> body = context.http(http -> http.post("/webhooks"))
+            .body(Context.Http.Body.of(
+                "name", "bambooHRWebhook",
+                "monitorFields", List.of(FIRST_NAME, LAST_NAME, EMPLOYEE_NUMBER),
+                "postFields", Map.of(
+                    FIRST_NAME, FIRST_NAME,
+                    LAST_NAME, LAST_NAME,
+                    EMPLOYEE_NUMBER, EMPLOYEE_NUMBER),
+                "url", webhookUrl,
+                "format", "json"))
+            .headers(Map.of("accept", List.of("application/json")))
+            .configuration(Context.Http.responseType(Context.Http.ResponseType.JSON))
+            .execute()
+            .getBody(new TypeReference<>() {});
+
+        return (String) body.get(ID);
+    }
+
+    public static void deleteWebhook(Parameters outputParameters, Context context) {
+        context.http(http -> http.delete("/webhooks/" + outputParameters.getString(ID)))
+            .headers(Map.of("accept", List.of("application/json")))
+            .configuration(Context.Http.responseType(Context.Http.ResponseType.JSON))
+            .execute();
     }
 
     public static ActionOptionsFunction<String> getOptions(String targetName) {
