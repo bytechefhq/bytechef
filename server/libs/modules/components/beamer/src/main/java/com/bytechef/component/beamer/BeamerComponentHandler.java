@@ -25,6 +25,7 @@ import com.bytechef.component.beamer.action.BeamerGetFeedAction;
 import com.bytechef.component.beamer.action.BeamerNewCommentAction;
 import com.bytechef.component.beamer.action.BeamerNewVoteAction;
 import com.bytechef.component.beamer.connection.BeamerConnection;
+import com.bytechef.component.beamer.trigger.BeamerNewPostTrigger;
 import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDefinition;
 import com.google.auto.service.AutoService;
@@ -48,7 +49,8 @@ public class BeamerComponentHandler implements ComponentHandler {
             BeamerCreatePostAction.ACTION_DEFINITION,
             BeamerGetFeedAction.ACTION_DEFINITION,
             BeamerNewCommentAction.ACTION_DEFINITION,
-            BeamerNewVoteAction.ACTION_DEFINITION);
+            BeamerNewVoteAction.ACTION_DEFINITION)
+        .triggers(BeamerNewPostTrigger.TRIGGER_DEFINITION);
 
     @Override
     public ComponentDefinition getDefinition() {
