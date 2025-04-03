@@ -87,11 +87,12 @@ public class EncryptionHelperEncryptAction {
         InputStream publicKeyInputStream = PGPUtil.getDecoderStream(
             new ByteArrayInputStream(publicKeyString.getBytes(StandardCharsets.UTF_8)));
 
-        JcaPGPPublicKeyRingCollection pgpPublicKeyRingCollection =
-            new JcaPGPPublicKeyRingCollection(publicKeyInputStream);
+        JcaPGPPublicKeyRingCollection pgpPublicKeyRingCollection = new JcaPGPPublicKeyRingCollection(
+            publicKeyInputStream);
+
         publicKeyInputStream.close();
 
-        PGPPublicKey publicKey = getPublicKey(pgpPublicKeyRingCollection);
+        PGPPublicKey pgpPublicKey = getPublicKey(pgpPublicKeyRingCollection);
 
         byte[] inputFileBytes = context.file(file -> file.readAllBytes(inputParameters.getRequiredFileEntry(FILE)));
 
@@ -100,14 +101,15 @@ public class EncryptionHelperEncryptAction {
             .setSecureRandom(new SecureRandom())
             .setWithIntegrityPacket(true);
 
-        PGPEncryptedDataGenerator encGen = new PGPEncryptedDataGenerator(encryptorBuilder);
-        encGen.addMethod(
-            new JcePublicKeyKeyEncryptionMethodGenerator(publicKey)
+        PGPEncryptedDataGenerator pgpEncryptedDataGenerator = new PGPEncryptedDataGenerator(encryptorBuilder);
+
+        pgpEncryptedDataGenerator.addMethod(
+            new JcePublicKeyKeyEncryptionMethodGenerator(pgpPublicKey)
                 .setProvider(BouncyCastleProvider.PROVIDER_NAME));
 
         ByteArrayOutputStream encryptedData = new ByteArrayOutputStream();
 
-        try (OutputStream cOut = encGen.open(encryptedData, inputFileBytes.length)) {
+        try (OutputStream cOut = pgpEncryptedDataGenerator.open(encryptedData, inputFileBytes.length)) {
             cOut.write(inputFileBytes);
         }
 
@@ -120,10 +122,10 @@ public class EncryptionHelperEncryptAction {
 
     private static PGPPublicKey getPublicKey(JcaPGPPublicKeyRingCollection pgpPublicKeyRingCollection) {
         PGPPublicKey publicKey = null;
+        Iterator<PGPPublicKeyRing> keyRingIterator = pgpPublicKeyRingCollection.getKeyRings();
 
-        Iterator<PGPPublicKeyRing> keyRingIter = pgpPublicKeyRingCollection.getKeyRings();
-        while (keyRingIter.hasNext()) {
-            PGPPublicKeyRing keyRing = keyRingIter.next();
+        while (keyRingIterator.hasNext()) {
+            PGPPublicKeyRing keyRing = keyRingIterator.next();
             Iterator<PGPPublicKey> keyIter = keyRing.getPublicKeys();
 
             while (keyIter.hasNext()) {
@@ -131,6 +133,7 @@ public class EncryptionHelperEncryptAction {
 
                 if (key.isEncryptionKey()) {
                     publicKey = key;
+
                     break;
                 }
             }
@@ -140,12 +143,13 @@ public class EncryptionHelperEncryptAction {
     }
 
     private static String armorMessage(byte[] encryptedData) throws IOException {
-        ByteArrayOutputStream armoredStream = new ByteArrayOutputStream();
-        ArmoredOutputStream armoredOut = new ArmoredOutputStream(armoredStream);
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
 
-        armoredOut.write(encryptedData);
-        armoredOut.close();
+        ArmoredOutputStream armoredOutputStream = new ArmoredOutputStream(byteArrayOutputStream);
 
-        return armoredStream.toString(StandardCharsets.UTF_8);
+        armoredOutputStream.write(encryptedData);
+        armoredOutputStream.close();
+
+        return byteArrayOutputStream.toString(StandardCharsets.UTF_8);
     }
 }
