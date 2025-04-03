@@ -127,7 +127,7 @@ Creates a new empty folder in Google Drive.
 
 ___Sample Output:___
 
-```{name=new-file.txt, mimeType=plain/text, id=1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr}```
+```{id=1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr, name=new-file.txt, mimeType=plain/text}```
 
 
 
@@ -191,7 +191,7 @@ Creates a new text file in Google Drive.
 
 ___Sample Output:___
 
-```{name=new-file.txt, mimeType=plain/text, id=1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr}```
+```{id=1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr, name=new-file.txt, mimeType=plain/text}```
 
 
 
@@ -392,7 +392,7 @@ Uploads a file in your Google Drive.
 
 ___Sample Output:___
 
-```{name=new-file.txt, mimeType=plain/text, id=1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr}```
+```{id=1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr, name=new-file.txt, mimeType=plain/text}```
 
 
 
