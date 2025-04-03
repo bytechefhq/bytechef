@@ -1,7 +1,7 @@
 {
   "componentCategories" : [ {
     "name" : "hris",
-    "label" : "hris"
+    "label" : "Human Resources Information System"
   } ],
   "customAction" : null,
   "customActionHelp" : null,
@@ -13,6 +13,75 @@
   "resources" : null,
   "version" : 1,
   "title" : "BambooHR",
+  "connection" : {
+    "authorizations" : [ {
+      "detectOn" : null,
+      "description" : null,
+      "name" : "basic_auth",
+      "properties" : [ {
+        "advancedOption" : null,
+        "description" : "Text before .bamboohr.com when logged in to BambooHR.",
+        "displayCondition" : null,
+        "expressionEnabled" : null,
+        "hidden" : null,
+        "metadata" : { },
+        "required" : true,
+        "name" : "companyDomain",
+        "type" : "STRING",
+        "defaultValue" : null,
+        "exampleValue" : null,
+        "label" : "Company Domain",
+        "placeholder" : null,
+        "controlType" : "TEXT",
+        "languageId" : null,
+        "maxLength" : null,
+        "minLength" : null,
+        "options" : null,
+        "optionsDataSource" : null
+      }, {
+        "advancedOption" : null,
+        "description" : null,
+        "displayCondition" : null,
+        "expressionEnabled" : null,
+        "hidden" : null,
+        "metadata" : { },
+        "required" : true,
+        "name" : "username",
+        "type" : "STRING",
+        "defaultValue" : null,
+        "exampleValue" : null,
+        "label" : "API Key",
+        "placeholder" : null,
+        "controlType" : "TEXT",
+        "languageId" : null,
+        "maxLength" : null,
+        "minLength" : null,
+        "options" : null,
+        "optionsDataSource" : null
+      } ],
+      "refreshOn" : null,
+      "title" : "Basic Auth",
+      "type" : "BASIC_AUTH",
+      "acquire" : null,
+      "authorizationUrl" : null,
+      "clientSecret" : null,
+      "refreshToken" : null,
+      "apply" : null,
+      "clientId" : null,
+      "pkce" : null,
+      "refresh" : null,
+      "refreshUrl" : null,
+      "scopes" : null,
+      "tokenUrl" : null,
+      "oauth2AuthorizationExtraQueryParameters" : null,
+      "authorizationCallback" : null
+    } ],
+    "properties" : null,
+    "version" : 1,
+    "authorizationRequired" : null,
+    "baseUri" : { },
+    "test" : null
+  },
   "actions" : [ {
     "batch" : null,
     "deprecated" : null,
@@ -81,8 +150,8 @@
             "options" : null,
             "optionsDataSource" : null
           } ],
-          "controlType" : "OBJECT_BUILDER",
-          "optionsDataSource" : null
+          "optionsDataSource" : null,
+          "controlType" : "OBJECT_BUILDER"
         },
         "sampleOutput" : null,
         "placeholder" : null
@@ -145,8 +214,8 @@
           "options" : null,
           "optionsDataSource" : null
         } ],
-        "controlType" : "OBJECT_BUILDER",
-        "optionsDataSource" : null
+        "optionsDataSource" : null,
+        "controlType" : "OBJECT_BUILDER"
       },
       "sampleOutput" : null
     },
@@ -294,13 +363,13 @@
       "label" : "Hire Date",
       "placeholder" : null,
       "options" : null,
-      "controlType" : "DATE",
-      "optionsDataSource" : null
+      "optionsDataSource" : null,
+      "controlType" : "DATE"
     } ],
     "title" : "Create Employee",
     "perform" : { },
-    "workflowNodeDescription" : null,
-    "processErrorResponse" : null
+    "processErrorResponse" : null,
+    "workflowNodeDescription" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -456,13 +525,13 @@
       "label" : "Updated Hire Date",
       "placeholder" : null,
       "options" : null,
-      "controlType" : "DATE",
-      "optionsDataSource" : null
+      "optionsDataSource" : null,
+      "controlType" : "DATE"
     } ],
     "title" : "Update Employee",
     "perform" : { },
-    "workflowNodeDescription" : null,
-    "processErrorResponse" : null
+    "processErrorResponse" : null,
+    "workflowNodeDescription" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -538,16 +607,16 @@
       "minItems" : null,
       "multipleValues" : null,
       "options" : null,
-      "controlType" : "MULTI_SELECT",
       "optionsDataSource" : {
         "optionsLookupDependsOn" : null,
         "options" : { }
-      }
+      },
+      "controlType" : "MULTI_SELECT"
     } ],
     "title" : "Get Employee",
     "perform" : { },
-    "workflowNodeDescription" : null,
-    "processErrorResponse" : null
+    "processErrorResponse" : null,
+    "workflowNodeDescription" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -669,8 +738,8 @@
     } ],
     "title" : "Update Employee File",
     "perform" : { },
-    "workflowNodeDescription" : null,
-    "processErrorResponse" : null
+    "processErrorResponse" : null,
+    "workflowNodeDescription" : null
   } ],
   "clusterElements" : [ {
     "description" : "Add a new employee.",
@@ -736,8 +805,8 @@
             "options" : null,
             "optionsDataSource" : null
           } ],
-          "controlType" : "OBJECT_BUILDER",
-          "optionsDataSource" : null
+          "optionsDataSource" : null,
+          "controlType" : "OBJECT_BUILDER"
         },
         "sampleOutput" : null,
         "placeholder" : null
@@ -800,8 +869,8 @@
           "options" : null,
           "optionsDataSource" : null
         } ],
-        "controlType" : "OBJECT_BUILDER",
-        "optionsDataSource" : null
+        "optionsDataSource" : null,
+        "controlType" : "OBJECT_BUILDER"
       },
       "sampleOutput" : null
     },
@@ -949,8 +1018,8 @@
       "label" : "Hire Date",
       "placeholder" : null,
       "options" : null,
-      "controlType" : "DATE",
-      "optionsDataSource" : null
+      "optionsDataSource" : null,
+      "controlType" : "DATE"
     } ],
     "title" : "Create Employee",
     "type" : {
@@ -1112,8 +1181,8 @@
       "label" : "Updated Hire Date",
       "placeholder" : null,
       "options" : null,
-      "controlType" : "DATE",
-      "optionsDataSource" : null
+      "optionsDataSource" : null,
+      "controlType" : "DATE"
     } ],
     "title" : "Update Employee",
     "type" : {
@@ -1195,11 +1264,11 @@
       "minItems" : null,
       "multipleValues" : null,
       "options" : null,
-      "controlType" : "MULTI_SELECT",
       "optionsDataSource" : {
         "optionsLookupDependsOn" : null,
         "options" : { }
-      }
+      },
+      "controlType" : "MULTI_SELECT"
     } ],
     "title" : "Get Employee",
     "type" : {
@@ -1336,74 +1405,5 @@
     "element" : { }
   } ],
   "unifiedApi" : null,
-  "triggers" : null,
-  "connection" : {
-    "authorizations" : [ {
-      "detectOn" : null,
-      "description" : null,
-      "name" : "basic_auth",
-      "properties" : [ {
-        "advancedOption" : null,
-        "description" : "Text before .bamboohr.com when logged in to BambooHR.",
-        "displayCondition" : null,
-        "expressionEnabled" : null,
-        "hidden" : null,
-        "metadata" : { },
-        "required" : true,
-        "name" : "companyDomain",
-        "type" : "STRING",
-        "defaultValue" : null,
-        "exampleValue" : null,
-        "label" : "Company Domain",
-        "placeholder" : null,
-        "controlType" : "TEXT",
-        "languageId" : null,
-        "maxLength" : null,
-        "minLength" : null,
-        "options" : null,
-        "optionsDataSource" : null
-      }, {
-        "advancedOption" : null,
-        "description" : null,
-        "displayCondition" : null,
-        "expressionEnabled" : null,
-        "hidden" : null,
-        "metadata" : { },
-        "required" : true,
-        "name" : "username",
-        "type" : "STRING",
-        "defaultValue" : null,
-        "exampleValue" : null,
-        "label" : "API Key",
-        "placeholder" : null,
-        "controlType" : "TEXT",
-        "languageId" : null,
-        "maxLength" : null,
-        "minLength" : null,
-        "options" : null,
-        "optionsDataSource" : null
-      } ],
-      "refreshOn" : null,
-      "title" : "Basic Auth",
-      "type" : "BASIC_AUTH",
-      "acquire" : null,
-      "apply" : null,
-      "authorizationCallback" : null,
-      "authorizationUrl" : null,
-      "clientId" : null,
-      "clientSecret" : null,
-      "oauth2AuthorizationExtraQueryParameters" : null,
-      "pkce" : null,
-      "refresh" : null,
-      "refreshUrl" : null,
-      "scopes" : null,
-      "refreshToken" : null,
-      "tokenUrl" : null
-    } ],
-    "properties" : null,
-    "version" : 1,
-    "authorizationRequired" : null,
-    "baseUri" : { },
-    "test" : null
-  }
+  "triggers" : null
 }

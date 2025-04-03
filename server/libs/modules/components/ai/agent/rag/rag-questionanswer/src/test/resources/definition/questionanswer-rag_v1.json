@@ -2,7 +2,7 @@
   "actions" : [ ],
   "componentCategories" : [ {
     "name" : "artificial-intelligence",
-    "label" : "artificial-intelligence"
+    "label" : "Artificial Intelligence"
   } ],
   "connection" : null,
   "customAction" : null,
@@ -51,8 +51,8 @@
       "minValue" : 0.0,
       "numberPrecision" : null,
       "options" : null,
-      "controlType" : "NUMBER",
-      "optionsDataSource" : null
+      "optionsDataSource" : null,
+      "controlType" : "NUMBER"
     }, {
       "advancedOption" : null,
       "description" : "The top 'k' similar results to return.",
@@ -70,8 +70,8 @@
       "maxValue" : null,
       "minValue" : 0,
       "options" : null,
-      "controlType" : "INTEGER",
-      "optionsDataSource" : null
+      "optionsDataSource" : null,
+      "controlType" : "INTEGER"
     } ],
     "title" : "Question Answer RAG",
     "type" : {

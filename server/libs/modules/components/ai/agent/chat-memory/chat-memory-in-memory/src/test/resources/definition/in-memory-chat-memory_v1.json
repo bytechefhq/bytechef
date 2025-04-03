@@ -1,7 +1,7 @@
 {
   "componentCategories" : [ {
     "name" : "artificial-intelligence",
-    "label" : "artificial-intelligence"
+    "label" : "Artificial Intelligence"
   } ],
   "customAction" : null,
   "customActionHelp" : null,
@@ -13,6 +13,7 @@
   "resources" : null,
   "version" : 1,
   "title" : "In Memory Chat Memory",
+  "connection" : null,
   "actions" : null,
   "clusterElements" : [ {
     "description" : "Memory is retrieved added into the prompt's system text.",
@@ -30,6 +31,5 @@
     "element" : { }
   } ],
   "unifiedApi" : null,
-  "triggers" : null,
-  "connection" : null
+  "triggers" : null
 }

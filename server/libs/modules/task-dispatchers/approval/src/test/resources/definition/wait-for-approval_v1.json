@@ -55,9 +55,6 @@
       },
       "placeholder" : null
     },
-    "sampleOutput" : {
-      "approved" : true
-    },
     "outputSchema" : {
       "advancedOption" : null,
       "displayCondition" : null,
@@ -101,6 +98,9 @@
         "controlType" : "SELECT"
       } ],
       "controlType" : "OBJECT_BUILDER"
+    },
+    "sampleOutput" : {
+      "approved" : true
     }
   },
   "properties" : null,

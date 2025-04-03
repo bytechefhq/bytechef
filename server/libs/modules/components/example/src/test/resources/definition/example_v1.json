@@ -1,7 +1,7 @@
 {
   "componentCategories" : [ {
     "name" : "helpers",
-    "label" : "helpers"
+    "label" : "Helpers"
   } ],
   "customAction" : null,
   "customActionHelp" : null,
@@ -13,6 +13,14 @@
   "resources" : null,
   "version" : 1,
   "title" : "Example",
+  "connection" : {
+    "authorizations" : [ ],
+    "properties" : null,
+    "version" : 1,
+    "authorizationRequired" : null,
+    "baseUri" : { },
+    "test" : null
+  },
   "actions" : [ {
     "batch" : null,
     "deprecated" : null,
@@ -47,7 +55,6 @@
         "sampleOutput" : null,
         "placeholder" : null
       },
-      "sampleOutput" : null,
       "outputSchema" : {
         "advancedOption" : null,
         "description" : null,
@@ -68,22 +75,15 @@
         "minLength" : null,
         "options" : null,
         "optionsDataSource" : null
-      }
+      },
+      "sampleOutput" : null
     },
     "properties" : [ ],
     "title" : "Title",
-    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "perform" : { }
   } ],
-  "connection" : {
-    "authorizations" : [ ],
-    "properties" : null,
-    "version" : 1,
-    "authorizationRequired" : null,
-    "baseUri" : { },
-    "test" : null
-  },
   "clusterElements" : null,
   "unifiedApi" : null,
   "triggers" : [ {
@@ -119,7 +119,6 @@
         "sampleOutput" : null,
         "placeholder" : null
       },
-      "sampleOutput" : null,
       "outputSchema" : {
         "advancedOption" : null,
         "description" : null,
@@ -140,24 +139,25 @@
         "minLength" : null,
         "options" : null,
         "optionsDataSource" : null
-      }
+      },
+      "sampleOutput" : null
     },
     "properties" : [ ],
     "title" : "Updated Issue",
     "type" : "DYNAMIC_WEBHOOK",
     "webhookRawBody" : null,
     "workflowSyncExecution" : null,
-    "poll" : null,
-    "deduplicate" : null,
-    "webhookDisable" : { },
-    "webhookEnable" : { },
-    "dynamicWebhookRefresh" : null,
     "processErrorResponse" : null,
     "workflowNodeDescription" : null,
+    "dynamicWebhookRefresh" : null,
+    "webhookValidateOnEnable" : null,
+    "webhookDisable" : { },
+    "webhookEnable" : { },
     "webhookRequest" : { },
     "listenerDisable" : null,
     "listenerEnable" : null,
     "webhookValidate" : { },
-    "webhookValidateOnEnable" : null
+    "deduplicate" : null,
+    "poll" : null
   } ]
 }

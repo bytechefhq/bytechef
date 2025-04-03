@@ -1,7 +1,7 @@
 {
   "componentCategories" : [ {
     "name" : "productivity-and-collaboration",
-    "label" : "productivity-and-collaboration"
+    "label" : "Productivity and Collaboration"
   } ],
   "customAction" : true,
   "customActionHelp" : null,
@@ -13,6 +13,55 @@
   "resources" : null,
   "version" : 1,
   "title" : "Baserow",
+  "connection" : {
+    "authorizations" : [ {
+      "detectOn" : null,
+      "description" : null,
+      "name" : "custom",
+      "properties" : [ {
+        "advancedOption" : null,
+        "description" : null,
+        "displayCondition" : null,
+        "expressionEnabled" : null,
+        "hidden" : null,
+        "metadata" : { },
+        "required" : true,
+        "name" : "token",
+        "type" : "STRING",
+        "defaultValue" : null,
+        "exampleValue" : null,
+        "label" : "Database Token",
+        "placeholder" : null,
+        "controlType" : "TEXT",
+        "languageId" : null,
+        "maxLength" : null,
+        "minLength" : null,
+        "options" : null,
+        "optionsDataSource" : null
+      } ],
+      "refreshOn" : null,
+      "title" : null,
+      "type" : "CUSTOM",
+      "acquire" : null,
+      "authorizationUrl" : null,
+      "clientSecret" : null,
+      "refreshToken" : null,
+      "apply" : { },
+      "clientId" : null,
+      "pkce" : null,
+      "refresh" : null,
+      "refreshUrl" : null,
+      "scopes" : null,
+      "tokenUrl" : null,
+      "oauth2AuthorizationExtraQueryParameters" : null,
+      "authorizationCallback" : null
+    } ],
+    "properties" : null,
+    "version" : 1,
+    "authorizationRequired" : null,
+    "baseUri" : { },
+    "test" : null
+  },
   "actions" : [ {
     "batch" : null,
     "deprecated" : null,
@@ -43,8 +92,8 @@
       "maxValue" : null,
       "minValue" : null,
       "options" : null,
-      "controlType" : "INTEGER",
-      "optionsDataSource" : null
+      "optionsDataSource" : null,
+      "controlType" : "INTEGER"
     }, {
       "advancedOption" : null,
       "description" : "The field names returned by this endpoint will be the actual names of the fields.",
@@ -86,9 +135,9 @@
       }
     } ],
     "title" : "Create Row",
-    "workflowNodeDescription" : null,
     "perform" : { },
-    "processErrorResponse" : null
+    "processErrorResponse" : null,
+    "workflowNodeDescription" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -114,8 +163,8 @@
       "maxValue" : null,
       "minValue" : null,
       "options" : null,
-      "controlType" : "INTEGER",
-      "optionsDataSource" : null
+      "optionsDataSource" : null,
+      "controlType" : "INTEGER"
     }, {
       "advancedOption" : null,
       "description" : "ID of the row to be deleted.",
@@ -133,13 +182,13 @@
       "maxValue" : null,
       "minValue" : null,
       "options" : null,
-      "controlType" : "INTEGER",
-      "optionsDataSource" : null
+      "optionsDataSource" : null,
+      "controlType" : "INTEGER"
     } ],
     "title" : "Delete Row",
-    "workflowNodeDescription" : null,
     "perform" : { },
-    "processErrorResponse" : null
+    "processErrorResponse" : null,
+    "workflowNodeDescription" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -170,8 +219,8 @@
       "maxValue" : null,
       "minValue" : null,
       "options" : null,
-      "controlType" : "INTEGER",
-      "optionsDataSource" : null
+      "optionsDataSource" : null,
+      "controlType" : "INTEGER"
     }, {
       "advancedOption" : null,
       "description" : "ID of the row to get.",
@@ -189,8 +238,8 @@
       "maxValue" : null,
       "minValue" : null,
       "options" : null,
-      "controlType" : "INTEGER",
-      "optionsDataSource" : null
+      "optionsDataSource" : null,
+      "controlType" : "INTEGER"
     }, {
       "advancedOption" : null,
       "description" : "The field names returned by this endpoint will be the actual names of the fields.",
@@ -217,9 +266,9 @@
       "controlType" : "SELECT"
     } ],
     "title" : "Get Row",
-    "workflowNodeDescription" : null,
     "perform" : { },
-    "processErrorResponse" : null
+    "processErrorResponse" : null,
+    "workflowNodeDescription" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -250,8 +299,8 @@
       "maxValue" : null,
       "minValue" : null,
       "options" : null,
-      "controlType" : "INTEGER",
-      "optionsDataSource" : null
+      "optionsDataSource" : null,
+      "controlType" : "INTEGER"
     }, {
       "advancedOption" : null,
       "description" : "The maximum number of rows to retrieve.",
@@ -269,8 +318,8 @@
       "maxValue" : null,
       "minValue" : null,
       "options" : null,
-      "controlType" : "INTEGER",
-      "optionsDataSource" : null
+      "optionsDataSource" : null,
+      "controlType" : "INTEGER"
     }, {
       "advancedOption" : null,
       "description" : "If provided rows will be order by specific field. Use - sign for descending ordering.",
@@ -317,9 +366,9 @@
       "controlType" : "SELECT"
     } ],
     "title" : "List Rows",
-    "workflowNodeDescription" : null,
     "perform" : { },
-    "processErrorResponse" : null
+    "processErrorResponse" : null,
+    "workflowNodeDescription" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -350,8 +399,8 @@
       "maxValue" : null,
       "minValue" : null,
       "options" : null,
-      "controlType" : "INTEGER",
-      "optionsDataSource" : null
+      "optionsDataSource" : null,
+      "controlType" : "INTEGER"
     }, {
       "advancedOption" : null,
       "description" : "ID of the row to be updated.",
@@ -369,8 +418,8 @@
       "maxValue" : null,
       "minValue" : null,
       "options" : null,
-      "controlType" : "INTEGER",
-      "optionsDataSource" : null
+      "optionsDataSource" : null,
+      "controlType" : "INTEGER"
     }, {
       "advancedOption" : null,
       "description" : "The field names returned by this endpoint will be the actual names of the fields.",
@@ -412,59 +461,10 @@
       }
     } ],
     "title" : "Update Row",
-    "workflowNodeDescription" : null,
     "perform" : { },
-    "processErrorResponse" : null
+    "processErrorResponse" : null,
+    "workflowNodeDescription" : null
   } ],
-  "connection" : {
-    "authorizations" : [ {
-      "detectOn" : null,
-      "description" : null,
-      "name" : "custom",
-      "properties" : [ {
-        "advancedOption" : null,
-        "description" : null,
-        "displayCondition" : null,
-        "expressionEnabled" : null,
-        "hidden" : null,
-        "metadata" : { },
-        "required" : true,
-        "name" : "token",
-        "type" : "STRING",
-        "defaultValue" : null,
-        "exampleValue" : null,
-        "label" : "Database Token",
-        "placeholder" : null,
-        "controlType" : "TEXT",
-        "languageId" : null,
-        "maxLength" : null,
-        "minLength" : null,
-        "options" : null,
-        "optionsDataSource" : null
-      } ],
-      "refreshOn" : null,
-      "title" : null,
-      "type" : "CUSTOM",
-      "acquire" : null,
-      "apply" : { },
-      "authorizationCallback" : null,
-      "authorizationUrl" : null,
-      "clientId" : null,
-      "clientSecret" : null,
-      "oauth2AuthorizationExtraQueryParameters" : null,
-      "pkce" : null,
-      "refresh" : null,
-      "refreshUrl" : null,
-      "scopes" : null,
-      "refreshToken" : null,
-      "tokenUrl" : null
-    } ],
-    "properties" : null,
-    "version" : 1,
-    "authorizationRequired" : null,
-    "baseUri" : { },
-    "test" : null
-  },
   "clusterElements" : [ {
     "description" : "Creates a new row.",
     "name" : "createRow",
@@ -491,8 +491,8 @@
       "maxValue" : null,
       "minValue" : null,
       "options" : null,
-      "controlType" : "INTEGER",
-      "optionsDataSource" : null
+      "optionsDataSource" : null,
+      "controlType" : "INTEGER"
     }, {
       "advancedOption" : null,
       "description" : "The field names returned by this endpoint will be the actual names of the fields.",
@@ -563,8 +563,8 @@
       "maxValue" : null,
       "minValue" : null,
       "options" : null,
-      "controlType" : "INTEGER",
-      "optionsDataSource" : null
+      "optionsDataSource" : null,
+      "controlType" : "INTEGER"
     }, {
       "advancedOption" : null,
       "description" : "ID of the row to be deleted.",
@@ -582,8 +582,8 @@
       "maxValue" : null,
       "minValue" : null,
       "options" : null,
-      "controlType" : "INTEGER",
-      "optionsDataSource" : null
+      "optionsDataSource" : null,
+      "controlType" : "INTEGER"
     } ],
     "title" : "Delete Row",
     "type" : {
@@ -620,8 +620,8 @@
       "maxValue" : null,
       "minValue" : null,
       "options" : null,
-      "controlType" : "INTEGER",
-      "optionsDataSource" : null
+      "optionsDataSource" : null,
+      "controlType" : "INTEGER"
     }, {
       "advancedOption" : null,
       "description" : "ID of the row to get.",
@@ -639,8 +639,8 @@
       "maxValue" : null,
       "minValue" : null,
       "options" : null,
-      "controlType" : "INTEGER",
-      "optionsDataSource" : null
+      "optionsDataSource" : null,
+      "controlType" : "INTEGER"
     }, {
       "advancedOption" : null,
       "description" : "The field names returned by this endpoint will be the actual names of the fields.",
@@ -701,8 +701,8 @@
       "maxValue" : null,
       "minValue" : null,
       "options" : null,
-      "controlType" : "INTEGER",
-      "optionsDataSource" : null
+      "optionsDataSource" : null,
+      "controlType" : "INTEGER"
     }, {
       "advancedOption" : null,
       "description" : "The maximum number of rows to retrieve.",
@@ -720,8 +720,8 @@
       "maxValue" : null,
       "minValue" : null,
       "options" : null,
-      "controlType" : "INTEGER",
-      "optionsDataSource" : null
+      "optionsDataSource" : null,
+      "controlType" : "INTEGER"
     }, {
       "advancedOption" : null,
       "description" : "If provided rows will be order by specific field. Use - sign for descending ordering.",
@@ -802,8 +802,8 @@
       "maxValue" : null,
       "minValue" : null,
       "options" : null,
-      "controlType" : "INTEGER",
-      "optionsDataSource" : null
+      "optionsDataSource" : null,
+      "controlType" : "INTEGER"
     }, {
       "advancedOption" : null,
       "description" : "ID of the row to be updated.",
@@ -821,8 +821,8 @@
       "maxValue" : null,
       "minValue" : null,
       "options" : null,
-      "controlType" : "INTEGER",
-      "optionsDataSource" : null
+      "optionsDataSource" : null,
+      "controlType" : "INTEGER"
     }, {
       "advancedOption" : null,
       "description" : "The field names returned by this endpoint will be the actual names of the fields.",

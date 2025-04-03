@@ -1,7 +1,7 @@
 {
   "componentCategories" : [ {
     "name" : "helpers",
-    "label" : "helpers"
+    "label" : "Helpers"
   } ],
   "customAction" : null,
   "customActionHelp" : null,
@@ -13,6 +13,7 @@
   "resources" : null,
   "version" : 1,
   "title" : "XML File",
+  "connection" : null,
   "actions" : [ {
     "batch" : null,
     "deprecated" : null,
@@ -206,9 +207,9 @@
       "optionsDataSource" : null
     } ],
     "title" : "Read from File",
-    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "perform" : { }
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -509,12 +510,11 @@
       "optionsDataSource" : null
     } ],
     "title" : "Write to File",
-    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "perform" : { }
   } ],
-  "clusterElements" : null,
-  "unifiedApi" : null,
   "triggers" : null,
-  "connection" : null
+  "unifiedApi" : null,
+  "clusterElements" : null
 }

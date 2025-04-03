@@ -9,9 +9,9 @@
     "outputDefinition" : null,
     "properties" : [ ],
     "title" : "Load Data",
+    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
-    "perform" : { }
+    "workflowNodeDescription" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -47,13 +47,13 @@
       "optionsDataSource" : null
     } ],
     "title" : "Search Data",
+    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
-    "perform" : { }
+    "workflowNodeDescription" : null
   } ],
   "componentCategories" : [ {
     "name" : "artificial-intelligence",
-    "label" : "artificial-intelligence"
+    "label" : "Artificial Intelligence"
   } ],
   "connection" : {
     "authorizations" : [ {
@@ -106,17 +106,17 @@
       "type" : "CUSTOM",
       "acquire" : null,
       "apply" : null,
-      "authorizationCallback" : null,
-      "authorizationUrl" : null,
       "clientId" : null,
-      "clientSecret" : null,
-      "oauth2AuthorizationExtraQueryParameters" : null,
       "pkce" : null,
       "refresh" : null,
       "refreshUrl" : null,
       "scopes" : null,
+      "tokenUrl" : null,
+      "authorizationUrl" : null,
+      "clientSecret" : null,
       "refreshToken" : null,
-      "tokenUrl" : null
+      "authorizationCallback" : null,
+      "oauth2AuthorizationExtraQueryParameters" : null
     } ],
     "properties" : null,
     "version" : 1,
@@ -151,10 +151,6 @@
   "triggers" : null,
   "unifiedApi" : null,
   "version" : 1,
-  "actionClusterElementTypes" : {
-    "search" : [ "DOCUMENT_READER", "DOCUMENT_TRANSFORMER", "EMBEDDING" ],
-    "load" : [ "EMBEDDING" ]
-  },
   "clusterElementType" : [ {
     "name" : "DOCUMENT_READER",
     "key" : "documentReader",
@@ -173,5 +169,9 @@
     "label" : "Embedding",
     "multipleElements" : false,
     "required" : true
-  } ]
+  } ],
+  "actionClusterElementTypes" : {
+    "load" : [ "EMBEDDING" ],
+    "search" : [ "DOCUMENT_READER", "DOCUMENT_TRANSFORMER", "EMBEDDING" ]
+  }
 }

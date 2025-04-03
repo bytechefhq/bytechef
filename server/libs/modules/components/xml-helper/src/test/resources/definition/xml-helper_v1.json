@@ -1,7 +1,7 @@
 {
   "componentCategories" : [ {
     "name" : "helpers",
-    "label" : "helpers"
+    "label" : "Helpers"
   } ],
   "customAction" : null,
   "customActionHelp" : null,
@@ -13,6 +13,7 @@
   "resources" : null,
   "version" : 1,
   "title" : "XML Helper",
+  "connection" : null,
   "actions" : [ {
     "batch" : null,
     "deprecated" : null,
@@ -92,9 +93,9 @@
       "optionsDataSource" : null
     } ],
     "title" : "Convert from XML String",
-    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "perform" : { }
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -223,12 +224,11 @@
       "optionsDataSource" : null
     } ],
     "title" : "Convert to XML String",
-    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "perform" : { }
   } ],
-  "connection" : null,
-  "clusterElements" : null,
   "unifiedApi" : null,
-  "triggers" : null
+  "triggers" : null,
+  "clusterElements" : null
 }

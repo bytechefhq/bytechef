@@ -1,7 +1,7 @@
 {
   "componentCategories" : [ {
     "name" : "crm",
-    "label" : "crm"
+    "label" : "CRM"
   } ],
   "customAction" : true,
   "customActionHelp" : null,
@@ -13,6 +13,55 @@
   "resources" : null,
   "version" : 1,
   "title" : "Salesflare",
+  "connection" : {
+    "authorizations" : [ {
+      "detectOn" : null,
+      "description" : null,
+      "name" : "bearer_token",
+      "properties" : [ {
+        "advancedOption" : null,
+        "description" : null,
+        "displayCondition" : null,
+        "expressionEnabled" : null,
+        "hidden" : null,
+        "metadata" : { },
+        "required" : true,
+        "name" : "token",
+        "type" : "STRING",
+        "defaultValue" : null,
+        "exampleValue" : null,
+        "label" : "Token",
+        "placeholder" : null,
+        "controlType" : "TEXT",
+        "languageId" : null,
+        "maxLength" : null,
+        "minLength" : null,
+        "options" : null,
+        "optionsDataSource" : null
+      } ],
+      "refreshOn" : null,
+      "title" : "Bearer Token",
+      "type" : "BEARER_TOKEN",
+      "acquire" : null,
+      "apply" : null,
+      "clientId" : null,
+      "pkce" : null,
+      "refresh" : null,
+      "refreshUrl" : null,
+      "scopes" : null,
+      "tokenUrl" : null,
+      "authorizationUrl" : null,
+      "clientSecret" : null,
+      "refreshToken" : null,
+      "oauth2AuthorizationExtraQueryParameters" : null,
+      "authorizationCallback" : null
+    } ],
+    "properties" : null,
+    "version" : 1,
+    "authorizationRequired" : null,
+    "baseUri" : { },
+    "test" : null
+  },
   "actions" : [ {
     "batch" : null,
     "deprecated" : null,
@@ -184,8 +233,8 @@
     } ],
     "title" : "Create Account",
     "perform" : null,
-    "workflowNodeDescription" : null,
-    "processErrorResponse" : null
+    "processErrorResponse" : null,
+    "workflowNodeDescription" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -559,8 +608,8 @@
     } ],
     "title" : "Create Contacts",
     "perform" : null,
-    "workflowNodeDescription" : null,
-    "processErrorResponse" : null
+    "processErrorResponse" : null,
+    "workflowNodeDescription" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -790,59 +839,10 @@
     } ],
     "title" : "Create Tasks",
     "perform" : null,
-    "workflowNodeDescription" : null,
-    "processErrorResponse" : null
+    "processErrorResponse" : null,
+    "workflowNodeDescription" : null
   } ],
-  "triggers" : [ ],
-  "clusterElements" : null,
   "unifiedApi" : null,
-  "connection" : {
-    "authorizations" : [ {
-      "detectOn" : null,
-      "description" : null,
-      "name" : "bearer_token",
-      "properties" : [ {
-        "advancedOption" : null,
-        "description" : null,
-        "displayCondition" : null,
-        "expressionEnabled" : null,
-        "hidden" : null,
-        "metadata" : { },
-        "required" : true,
-        "name" : "token",
-        "type" : "STRING",
-        "defaultValue" : null,
-        "exampleValue" : null,
-        "label" : "Token",
-        "placeholder" : null,
-        "controlType" : "TEXT",
-        "languageId" : null,
-        "maxLength" : null,
-        "minLength" : null,
-        "options" : null,
-        "optionsDataSource" : null
-      } ],
-      "refreshOn" : null,
-      "title" : "Bearer Token",
-      "type" : "BEARER_TOKEN",
-      "acquire" : null,
-      "apply" : null,
-      "authorizationCallback" : null,
-      "authorizationUrl" : null,
-      "clientId" : null,
-      "clientSecret" : null,
-      "oauth2AuthorizationExtraQueryParameters" : null,
-      "pkce" : null,
-      "refresh" : null,
-      "refreshUrl" : null,
-      "scopes" : null,
-      "refreshToken" : null,
-      "tokenUrl" : null
-    } ],
-    "properties" : null,
-    "version" : 1,
-    "authorizationRequired" : null,
-    "baseUri" : { },
-    "test" : null
-  }
+  "triggers" : [ ],
+  "clusterElements" : null
 }

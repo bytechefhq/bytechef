@@ -1,7 +1,7 @@
 {
   "componentCategories" : [ {
     "name" : "helpers",
-    "label" : "helpers"
+    "label" : "Helpers"
   } ],
   "customAction" : null,
   "customActionHelp" : null,
@@ -13,6 +13,7 @@
   "resources" : null,
   "version" : 1,
   "title" : "Text Helper",
+  "connection" : null,
   "actions" : [ {
     "batch" : null,
     "deprecated" : null,
@@ -120,9 +121,9 @@
       "optionsDataSource" : null
     } ],
     "title" : "Base64 Decode",
-    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "perform" : { }
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -219,8 +220,8 @@
       "minItems" : null,
       "multipleValues" : null,
       "options" : null,
-      "controlType" : "ARRAY_BUILDER",
-      "optionsDataSource" : null
+      "optionsDataSource" : null,
+      "controlType" : "ARRAY_BUILDER"
     }, {
       "advancedOption" : null,
       "description" : "The text that separates the texts you want to concatenate.",
@@ -243,9 +244,9 @@
       "optionsDataSource" : null
     } ],
     "title" : "Concatenate",
-    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "perform" : { }
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -377,9 +378,9 @@
       "controlType" : "SELECT"
     } ],
     "title" : "Extract Content from HTML",
-    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "perform" : { }
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -487,9 +488,9 @@
       "optionsDataSource" : null
     } ],
     "title" : "Find",
-    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "perform" : { }
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -569,9 +570,9 @@
       "optionsDataSource" : null
     } ],
     "title" : "HTML to Markdown",
-    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "perform" : { }
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -651,9 +652,9 @@
       "optionsDataSource" : null
     } ],
     "title" : "Markdown to HTML",
-    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "perform" : { }
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -797,9 +798,9 @@
       "controlType" : "SELECT"
     } ],
     "title" : "Replace",
-    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "perform" : { }
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -849,8 +850,8 @@
           "minItems" : null,
           "multipleValues" : null,
           "options" : null,
-          "controlType" : "ARRAY_BUILDER",
-          "optionsDataSource" : null
+          "optionsDataSource" : null,
+          "controlType" : "ARRAY_BUILDER"
         },
         "sampleOutput" : null,
         "placeholder" : null
@@ -894,8 +895,8 @@
         "minItems" : null,
         "multipleValues" : null,
         "options" : null,
-        "controlType" : "ARRAY_BUILDER",
-        "optionsDataSource" : null
+        "optionsDataSource" : null,
+        "controlType" : "ARRAY_BUILDER"
       },
       "sampleOutput" : null
     },
@@ -941,11 +942,10 @@
       "optionsDataSource" : null
     } ],
     "title" : "Split",
-    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "perform" : { }
   } ],
-  "connection" : null,
   "clusterElements" : null,
   "unifiedApi" : null,
   "triggers" : null

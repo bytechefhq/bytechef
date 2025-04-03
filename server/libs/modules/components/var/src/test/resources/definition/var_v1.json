@@ -1,7 +1,7 @@
 {
   "componentCategories" : [ {
     "name" : "helpers",
-    "label" : "helpers"
+    "label" : "Helpers"
   } ],
   "customAction" : null,
   "customActionHelp" : null,
@@ -13,6 +13,7 @@
   "resources" : null,
   "version" : 1,
   "title" : "Var",
+  "connection" : null,
   "actions" : [ {
     "batch" : null,
     "deprecated" : null,
@@ -262,11 +263,10 @@
     } ],
     "title" : "Set Value",
     "processErrorResponse" : null,
-    "perform" : { },
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "perform" : { }
   } ],
-  "clusterElements" : null,
   "unifiedApi" : null,
   "triggers" : null,
-  "connection" : null
+  "clusterElements" : null
 }

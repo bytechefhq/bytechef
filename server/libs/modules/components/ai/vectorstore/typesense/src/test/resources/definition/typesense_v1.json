@@ -53,7 +53,7 @@
   } ],
   "componentCategories" : [ {
     "name" : "artificial-intelligence",
-    "label" : "artificial-intelligence"
+    "label" : "Artificial Intelligence"
   } ],
   "connection" : {
     "authorizations" : [ {
@@ -177,8 +177,8 @@
         "maxValue" : null,
         "minValue" : null,
         "options" : null,
-        "controlType" : "INTEGER",
-        "optionsDataSource" : null
+        "optionsDataSource" : null,
+        "controlType" : "INTEGER"
       }, {
         "advancedOption" : null,
         "description" : "Whether to initialize the schema.",
@@ -208,18 +208,18 @@
       "title" : null,
       "type" : "CUSTOM",
       "acquire" : null,
-      "apply" : null,
-      "authorizationCallback" : null,
       "authorizationUrl" : null,
-      "clientId" : null,
       "clientSecret" : null,
-      "oauth2AuthorizationExtraQueryParameters" : null,
+      "refreshToken" : null,
+      "apply" : null,
+      "clientId" : null,
       "pkce" : null,
       "refresh" : null,
       "refreshUrl" : null,
       "scopes" : null,
-      "refreshToken" : null,
-      "tokenUrl" : null
+      "tokenUrl" : null,
+      "authorizationCallback" : null,
+      "oauth2AuthorizationExtraQueryParameters" : null
     } ],
     "properties" : null,
     "version" : 1,
@@ -240,10 +240,6 @@
   "triggers" : null,
   "unifiedApi" : null,
   "version" : 1,
-  "actionClusterElementTypes" : {
-    "load" : [ "EMBEDDING" ],
-    "search" : [ "DOCUMENT_READER", "DOCUMENT_TRANSFORMER", "EMBEDDING" ]
-  },
   "clusterElementType" : [ {
     "name" : "DOCUMENT_READER",
     "key" : "documentReader",
@@ -262,5 +258,9 @@
     "label" : "Embedding",
     "multipleElements" : false,
     "required" : true
-  } ]
+  } ],
+  "actionClusterElementTypes" : {
+    "load" : [ "EMBEDDING" ],
+    "search" : [ "DOCUMENT_READER", "DOCUMENT_TRANSFORMER", "EMBEDDING" ]
+  }
 }

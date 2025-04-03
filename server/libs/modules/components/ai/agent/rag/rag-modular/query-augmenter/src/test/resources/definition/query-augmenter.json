@@ -1,7 +1,7 @@
 {
   "componentCategories" : [ {
     "name" : "artificial-intelligence",
-    "label" : "artificial-intelligence"
+    "label" : "Artificial Intelligence"
   } ],
   "customAction" : null,
   "customActionHelp" : null,
@@ -13,6 +13,7 @@
   "resources" : null,
   "version" : 1,
   "title" : "Query Augmenter",
+  "connection" : null,
   "actions" : null,
   "clusterElements" : [ {
     "description" : "Augments the user query with contextual data from the content of the provided\ndocuments.\n",
@@ -30,6 +31,5 @@
     "element" : { }
   } ],
   "unifiedApi" : null,
-  "triggers" : null,
-  "connection" : null
+  "triggers" : null
 }

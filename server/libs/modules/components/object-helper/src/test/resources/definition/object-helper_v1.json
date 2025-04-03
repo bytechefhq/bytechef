@@ -1,7 +1,7 @@
 {
   "componentCategories" : [ {
     "name" : "helpers",
-    "label" : "helpers"
+    "label" : "Helpers"
   } ],
   "customAction" : null,
   "customActionHelp" : null,
@@ -13,6 +13,7 @@
   "resources" : null,
   "version" : 1,
   "title" : "Object Helper",
+  "connection" : null,
   "actions" : [ {
     "batch" : null,
     "deprecated" : null,
@@ -321,8 +322,8 @@
     } ],
     "title" : "Add Value to the Object by Key",
     "processErrorResponse" : null,
-    "perform" : { },
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "perform" : { }
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -990,8 +991,8 @@
     } ],
     "title" : "Add Key-Value Pairs to Object or Array",
     "processErrorResponse" : null,
-    "perform" : { },
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "perform" : { }
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -1100,8 +1101,8 @@
     } ],
     "title" : "Contains",
     "processErrorResponse" : null,
-    "perform" : { },
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "perform" : { }
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -1158,8 +1159,8 @@
     } ],
     "title" : "Delete Key-Value Pair",
     "processErrorResponse" : null,
-    "perform" : { },
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "perform" : { }
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -1268,8 +1269,8 @@
     } ],
     "title" : "Equals",
     "processErrorResponse" : null,
-    "perform" : { },
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "perform" : { }
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -1326,11 +1327,10 @@
     } ],
     "title" : "Merge Two Objects",
     "processErrorResponse" : null,
-    "perform" : { },
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "perform" : { }
   } ],
-  "clusterElements" : null,
   "unifiedApi" : null,
   "triggers" : null,
-  "connection" : null
+  "clusterElements" : null
 }

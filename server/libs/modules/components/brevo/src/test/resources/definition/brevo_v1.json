@@ -1,7 +1,7 @@
 {
   "componentCategories" : [ {
     "name" : "marketing-automation",
-    "label" : "marketing-automation"
+    "label" : "Marketing Automation"
   } ],
   "customAction" : null,
   "customActionHelp" : null,
@@ -13,6 +13,75 @@
   "resources" : null,
   "version" : 1,
   "title" : "Brevo",
+  "connection" : {
+    "authorizations" : [ {
+      "detectOn" : null,
+      "description" : null,
+      "name" : "api_key",
+      "properties" : [ {
+        "advancedOption" : null,
+        "description" : null,
+        "displayCondition" : null,
+        "expressionEnabled" : null,
+        "hidden" : true,
+        "metadata" : { },
+        "required" : true,
+        "name" : "key",
+        "type" : "STRING",
+        "defaultValue" : "api-key",
+        "exampleValue" : null,
+        "label" : "Key",
+        "placeholder" : null,
+        "controlType" : "TEXT",
+        "languageId" : null,
+        "maxLength" : null,
+        "minLength" : null,
+        "options" : null,
+        "optionsDataSource" : null
+      }, {
+        "advancedOption" : null,
+        "description" : null,
+        "displayCondition" : null,
+        "expressionEnabled" : null,
+        "hidden" : null,
+        "metadata" : { },
+        "required" : true,
+        "name" : "value",
+        "type" : "STRING",
+        "defaultValue" : null,
+        "exampleValue" : null,
+        "label" : "API key",
+        "placeholder" : null,
+        "controlType" : "TEXT",
+        "languageId" : null,
+        "maxLength" : null,
+        "minLength" : null,
+        "options" : null,
+        "optionsDataSource" : null
+      } ],
+      "refreshOn" : null,
+      "title" : "API Key",
+      "type" : "API_KEY",
+      "acquire" : null,
+      "authorizationUrl" : null,
+      "clientSecret" : null,
+      "refreshToken" : null,
+      "apply" : null,
+      "clientId" : null,
+      "pkce" : null,
+      "refresh" : null,
+      "refreshUrl" : null,
+      "scopes" : null,
+      "tokenUrl" : null,
+      "oauth2AuthorizationExtraQueryParameters" : null,
+      "authorizationCallback" : null
+    } ],
+    "properties" : null,
+    "version" : 1,
+    "authorizationRequired" : null,
+    "baseUri" : { },
+    "test" : null
+  },
   "actions" : [ {
     "batch" : null,
     "deprecated" : null,
@@ -57,11 +126,11 @@
             "maxValue" : null,
             "minValue" : null,
             "options" : null,
-            "controlType" : "INTEGER",
-            "optionsDataSource" : null
+            "optionsDataSource" : null,
+            "controlType" : "INTEGER"
           } ],
-          "controlType" : "OBJECT_BUILDER",
-          "optionsDataSource" : null
+          "optionsDataSource" : null,
+          "controlType" : "OBJECT_BUILDER"
         },
         "sampleOutput" : null,
         "placeholder" : null
@@ -100,11 +169,11 @@
           "maxValue" : null,
           "minValue" : null,
           "options" : null,
-          "controlType" : "INTEGER",
-          "optionsDataSource" : null
+          "optionsDataSource" : null,
+          "controlType" : "INTEGER"
         } ],
-        "controlType" : "OBJECT_BUILDER",
-        "optionsDataSource" : null
+        "optionsDataSource" : null,
+        "controlType" : "OBJECT_BUILDER"
       },
       "sampleOutput" : null
     },
@@ -171,8 +240,8 @@
     } ],
     "title" : "Create Contact",
     "perform" : { },
-    "workflowNodeDescription" : null,
-    "processErrorResponse" : null
+    "processErrorResponse" : null,
+    "workflowNodeDescription" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -247,8 +316,8 @@
     } ],
     "title" : "Update Contact",
     "perform" : { },
-    "workflowNodeDescription" : null,
-    "processErrorResponse" : null
+    "processErrorResponse" : null,
+    "workflowNodeDescription" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -297,8 +366,8 @@
             "options" : null,
             "optionsDataSource" : null
           } ],
-          "controlType" : "OBJECT_BUILDER",
-          "optionsDataSource" : null
+          "optionsDataSource" : null,
+          "controlType" : "OBJECT_BUILDER"
         },
         "sampleOutput" : null,
         "placeholder" : null
@@ -341,8 +410,8 @@
           "options" : null,
           "optionsDataSource" : null
         } ],
-        "controlType" : "OBJECT_BUILDER",
-        "optionsDataSource" : null
+        "optionsDataSource" : null,
+        "controlType" : "OBJECT_BUILDER"
       },
       "sampleOutput" : null
     },
@@ -408,11 +477,11 @@
       "minItems" : 1,
       "multipleValues" : null,
       "options" : null,
-      "controlType" : "MULTI_SELECT",
       "optionsDataSource" : {
         "optionsLookupDependsOn" : null,
         "options" : { }
-      }
+      },
+      "controlType" : "MULTI_SELECT"
     }, {
       "advancedOption" : null,
       "description" : "The Bcc recipients for the message.",
@@ -452,11 +521,11 @@
       "minItems" : null,
       "multipleValues" : null,
       "options" : null,
-      "controlType" : "MULTI_SELECT",
       "optionsDataSource" : {
         "optionsLookupDependsOn" : null,
         "options" : { }
-      }
+      },
+      "controlType" : "MULTI_SELECT"
     }, {
       "advancedOption" : null,
       "description" : "The Cc recipients for the message.",
@@ -496,11 +565,11 @@
       "minItems" : null,
       "multipleValues" : null,
       "options" : null,
-      "controlType" : "MULTI_SELECT",
       "optionsDataSource" : {
         "optionsLookupDependsOn" : null,
         "options" : { }
-      }
+      },
+      "controlType" : "MULTI_SELECT"
     }, {
       "advancedOption" : null,
       "description" : "Subject of the email.",
@@ -592,8 +661,8 @@
     } ],
     "title" : "Send Transactional Email",
     "perform" : { },
-    "workflowNodeDescription" : null,
-    "processErrorResponse" : null
+    "processErrorResponse" : null,
+    "workflowNodeDescription" : null
   } ],
   "clusterElements" : [ {
     "description" : "Creates new contact.",
@@ -635,11 +704,11 @@
             "maxValue" : null,
             "minValue" : null,
             "options" : null,
-            "controlType" : "INTEGER",
-            "optionsDataSource" : null
+            "optionsDataSource" : null,
+            "controlType" : "INTEGER"
           } ],
-          "controlType" : "OBJECT_BUILDER",
-          "optionsDataSource" : null
+          "optionsDataSource" : null,
+          "controlType" : "OBJECT_BUILDER"
         },
         "sampleOutput" : null,
         "placeholder" : null
@@ -678,11 +747,11 @@
           "maxValue" : null,
           "minValue" : null,
           "options" : null,
-          "controlType" : "INTEGER",
-          "optionsDataSource" : null
+          "optionsDataSource" : null,
+          "controlType" : "INTEGER"
         } ],
-        "controlType" : "OBJECT_BUILDER",
-        "optionsDataSource" : null
+        "optionsDataSource" : null,
+        "controlType" : "OBJECT_BUILDER"
       },
       "sampleOutput" : null
     },
@@ -877,8 +946,8 @@
             "options" : null,
             "optionsDataSource" : null
           } ],
-          "controlType" : "OBJECT_BUILDER",
-          "optionsDataSource" : null
+          "optionsDataSource" : null,
+          "controlType" : "OBJECT_BUILDER"
         },
         "sampleOutput" : null,
         "placeholder" : null
@@ -921,8 +990,8 @@
           "options" : null,
           "optionsDataSource" : null
         } ],
-        "controlType" : "OBJECT_BUILDER",
-        "optionsDataSource" : null
+        "optionsDataSource" : null,
+        "controlType" : "OBJECT_BUILDER"
       },
       "sampleOutput" : null
     },
@@ -988,11 +1057,11 @@
       "minItems" : 1,
       "multipleValues" : null,
       "options" : null,
-      "controlType" : "MULTI_SELECT",
       "optionsDataSource" : {
         "optionsLookupDependsOn" : null,
         "options" : { }
-      }
+      },
+      "controlType" : "MULTI_SELECT"
     }, {
       "advancedOption" : null,
       "description" : "The Bcc recipients for the message.",
@@ -1032,11 +1101,11 @@
       "minItems" : null,
       "multipleValues" : null,
       "options" : null,
-      "controlType" : "MULTI_SELECT",
       "optionsDataSource" : {
         "optionsLookupDependsOn" : null,
         "options" : { }
-      }
+      },
+      "controlType" : "MULTI_SELECT"
     }, {
       "advancedOption" : null,
       "description" : "The Cc recipients for the message.",
@@ -1076,11 +1145,11 @@
       "minItems" : null,
       "multipleValues" : null,
       "options" : null,
-      "controlType" : "MULTI_SELECT",
       "optionsDataSource" : {
         "optionsLookupDependsOn" : null,
         "options" : { }
-      }
+      },
+      "controlType" : "MULTI_SELECT"
     }, {
       "advancedOption" : null,
       "description" : "Subject of the email.",
@@ -1181,74 +1250,5 @@
     "element" : { }
   } ],
   "unifiedApi" : null,
-  "triggers" : null,
-  "connection" : {
-    "authorizations" : [ {
-      "detectOn" : null,
-      "description" : null,
-      "name" : "api_key",
-      "properties" : [ {
-        "advancedOption" : null,
-        "description" : null,
-        "displayCondition" : null,
-        "expressionEnabled" : null,
-        "hidden" : true,
-        "metadata" : { },
-        "required" : true,
-        "name" : "key",
-        "type" : "STRING",
-        "defaultValue" : "api-key",
-        "exampleValue" : null,
-        "label" : "Key",
-        "placeholder" : null,
-        "controlType" : "TEXT",
-        "languageId" : null,
-        "maxLength" : null,
-        "minLength" : null,
-        "options" : null,
-        "optionsDataSource" : null
-      }, {
-        "advancedOption" : null,
-        "description" : null,
-        "displayCondition" : null,
-        "expressionEnabled" : null,
-        "hidden" : null,
-        "metadata" : { },
-        "required" : true,
-        "name" : "value",
-        "type" : "STRING",
-        "defaultValue" : null,
-        "exampleValue" : null,
-        "label" : "API key",
-        "placeholder" : null,
-        "controlType" : "TEXT",
-        "languageId" : null,
-        "maxLength" : null,
-        "minLength" : null,
-        "options" : null,
-        "optionsDataSource" : null
-      } ],
-      "refreshOn" : null,
-      "title" : "API Key",
-      "type" : "API_KEY",
-      "acquire" : null,
-      "apply" : null,
-      "authorizationCallback" : null,
-      "authorizationUrl" : null,
-      "clientId" : null,
-      "clientSecret" : null,
-      "oauth2AuthorizationExtraQueryParameters" : null,
-      "pkce" : null,
-      "refresh" : null,
-      "refreshUrl" : null,
-      "scopes" : null,
-      "refreshToken" : null,
-      "tokenUrl" : null
-    } ],
-    "properties" : null,
-    "version" : 1,
-    "authorizationRequired" : null,
-    "baseUri" : { },
-    "test" : null
-  }
+  "triggers" : null
 }

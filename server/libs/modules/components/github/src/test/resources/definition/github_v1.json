@@ -1,7 +1,7 @@
 {
   "componentCategories" : [ {
     "name" : "developer-tools",
-    "label" : "developer-tools"
+    "label" : "Developer Tools"
   } ],
   "customAction" : true,
   "customActionHelp" : null,
@@ -13,6 +13,75 @@
   "resources" : null,
   "version" : 1,
   "title" : "GitHub",
+  "connection" : {
+    "authorizations" : [ {
+      "detectOn" : null,
+      "description" : null,
+      "name" : "oauth2_authorization_code",
+      "properties" : [ {
+        "advancedOption" : null,
+        "description" : null,
+        "displayCondition" : null,
+        "expressionEnabled" : null,
+        "hidden" : null,
+        "metadata" : { },
+        "required" : true,
+        "name" : "clientId",
+        "type" : "STRING",
+        "defaultValue" : null,
+        "exampleValue" : null,
+        "label" : "Client id",
+        "placeholder" : null,
+        "controlType" : "TEXT",
+        "languageId" : null,
+        "maxLength" : null,
+        "minLength" : null,
+        "options" : null,
+        "optionsDataSource" : null
+      }, {
+        "advancedOption" : null,
+        "description" : null,
+        "displayCondition" : null,
+        "expressionEnabled" : null,
+        "hidden" : null,
+        "metadata" : { },
+        "required" : true,
+        "name" : "clientSecret",
+        "type" : "STRING",
+        "defaultValue" : null,
+        "exampleValue" : null,
+        "label" : "Client secret",
+        "placeholder" : null,
+        "controlType" : "TEXT",
+        "languageId" : null,
+        "maxLength" : null,
+        "minLength" : null,
+        "options" : null,
+        "optionsDataSource" : null
+      } ],
+      "refreshOn" : null,
+      "title" : "OAuth2 Authorization Code",
+      "type" : "OAUTH2_AUTHORIZATION_CODE",
+      "acquire" : null,
+      "authorizationCallback" : null,
+      "oauth2AuthorizationExtraQueryParameters" : null,
+      "authorizationUrl" : { },
+      "clientSecret" : null,
+      "refreshToken" : null,
+      "apply" : null,
+      "clientId" : null,
+      "pkce" : null,
+      "refresh" : null,
+      "refreshUrl" : null,
+      "scopes" : { },
+      "tokenUrl" : { }
+    } ],
+    "properties" : null,
+    "version" : 1,
+    "authorizationRequired" : null,
+    "baseUri" : { },
+    "test" : null
+  },
   "actions" : [ {
     "batch" : null,
     "deprecated" : null,
@@ -100,8 +169,8 @@
             "minValue" : null,
             "numberPrecision" : null,
             "options" : null,
-            "controlType" : "NUMBER",
-            "optionsDataSource" : null
+            "optionsDataSource" : null,
+            "controlType" : "NUMBER"
           }, {
             "advancedOption" : null,
             "description" : "A unique number identifying the issue within its repository.",
@@ -119,8 +188,8 @@
             "maxValue" : null,
             "minValue" : null,
             "options" : null,
-            "controlType" : "INTEGER",
-            "optionsDataSource" : null
+            "optionsDataSource" : null,
+            "controlType" : "INTEGER"
           }, {
             "advancedOption" : null,
             "description" : "The title or headline of the issue.",
@@ -273,15 +342,15 @@
                 "options" : null,
                 "optionsDataSource" : null
               } ],
-              "controlType" : "OBJECT_BUILDER",
-              "optionsDataSource" : null
+              "optionsDataSource" : null,
+              "controlType" : "OBJECT_BUILDER"
             } ],
             "maxItems" : null,
             "minItems" : null,
             "multipleValues" : null,
             "options" : null,
-            "controlType" : "ARRAY_BUILDER",
-            "optionsDataSource" : null
+            "optionsDataSource" : null,
+            "controlType" : "ARRAY_BUILDER"
           }, {
             "advancedOption" : null,
             "description" : "A collection of labels associated with the issue.",
@@ -374,15 +443,15 @@
                 "options" : null,
                 "optionsDataSource" : null
               } ],
-              "controlType" : "OBJECT_BUILDER",
-              "optionsDataSource" : null
+              "optionsDataSource" : null,
+              "controlType" : "OBJECT_BUILDER"
             } ],
             "maxItems" : null,
             "minItems" : null,
             "multipleValues" : null,
             "options" : null,
-            "controlType" : "ARRAY_BUILDER",
-            "optionsDataSource" : null
+            "optionsDataSource" : null,
+            "controlType" : "ARRAY_BUILDER"
           }, {
             "advancedOption" : null,
             "description" : "The main content of the issue.",
@@ -404,8 +473,8 @@
             "options" : null,
             "optionsDataSource" : null
           } ],
-          "controlType" : "OBJECT_BUILDER",
-          "optionsDataSource" : null
+          "optionsDataSource" : null,
+          "controlType" : "OBJECT_BUILDER"
         },
         "sampleOutput" : null,
         "placeholder" : null
@@ -487,8 +556,8 @@
           "minValue" : null,
           "numberPrecision" : null,
           "options" : null,
-          "controlType" : "NUMBER",
-          "optionsDataSource" : null
+          "optionsDataSource" : null,
+          "controlType" : "NUMBER"
         }, {
           "advancedOption" : null,
           "description" : "A unique number identifying the issue within its repository.",
@@ -506,8 +575,8 @@
           "maxValue" : null,
           "minValue" : null,
           "options" : null,
-          "controlType" : "INTEGER",
-          "optionsDataSource" : null
+          "optionsDataSource" : null,
+          "controlType" : "INTEGER"
         }, {
           "advancedOption" : null,
           "description" : "The title or headline of the issue.",
@@ -660,15 +729,15 @@
               "options" : null,
               "optionsDataSource" : null
             } ],
-            "controlType" : "OBJECT_BUILDER",
-            "optionsDataSource" : null
+            "optionsDataSource" : null,
+            "controlType" : "OBJECT_BUILDER"
           } ],
           "maxItems" : null,
           "minItems" : null,
           "multipleValues" : null,
           "options" : null,
-          "controlType" : "ARRAY_BUILDER",
-          "optionsDataSource" : null
+          "optionsDataSource" : null,
+          "controlType" : "ARRAY_BUILDER"
         }, {
           "advancedOption" : null,
           "description" : "A collection of labels associated with the issue.",
@@ -761,15 +830,15 @@
               "options" : null,
               "optionsDataSource" : null
             } ],
-            "controlType" : "OBJECT_BUILDER",
-            "optionsDataSource" : null
+            "optionsDataSource" : null,
+            "controlType" : "OBJECT_BUILDER"
           } ],
           "maxItems" : null,
           "minItems" : null,
           "multipleValues" : null,
           "options" : null,
-          "controlType" : "ARRAY_BUILDER",
-          "optionsDataSource" : null
+          "optionsDataSource" : null,
+          "controlType" : "ARRAY_BUILDER"
         }, {
           "advancedOption" : null,
           "description" : "The main content of the issue.",
@@ -791,8 +860,8 @@
           "options" : null,
           "optionsDataSource" : null
         } ],
-        "controlType" : "OBJECT_BUILDER",
-        "optionsDataSource" : null
+        "optionsDataSource" : null,
+        "controlType" : "OBJECT_BUILDER"
       },
       "sampleOutput" : null
     },
@@ -881,16 +950,16 @@
       "minItems" : null,
       "multipleValues" : null,
       "options" : null,
-      "controlType" : "MULTI_SELECT",
       "optionsDataSource" : {
         "optionsLookupDependsOn" : [ "repository" ],
         "options" : { }
-      }
+      },
+      "controlType" : "MULTI_SELECT"
     } ],
     "title" : "Add Assignee to Issue",
-    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "perform" : { }
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -1013,15 +1082,15 @@
               "options" : null,
               "optionsDataSource" : null
             } ],
-            "controlType" : "OBJECT_BUILDER",
-            "optionsDataSource" : null
+            "optionsDataSource" : null,
+            "controlType" : "OBJECT_BUILDER"
           } ],
           "maxItems" : null,
           "minItems" : null,
           "multipleValues" : null,
           "options" : null,
-          "controlType" : "ARRAY_BUILDER",
-          "optionsDataSource" : null
+          "optionsDataSource" : null,
+          "controlType" : "ARRAY_BUILDER"
         },
         "sampleOutput" : null,
         "placeholder" : null
@@ -1138,15 +1207,15 @@
             "options" : null,
             "optionsDataSource" : null
           } ],
-          "controlType" : "OBJECT_BUILDER",
-          "optionsDataSource" : null
+          "optionsDataSource" : null,
+          "controlType" : "OBJECT_BUILDER"
         } ],
         "maxItems" : null,
         "minItems" : null,
         "multipleValues" : null,
         "options" : null,
-        "controlType" : "ARRAY_BUILDER",
-        "optionsDataSource" : null
+        "optionsDataSource" : null,
+        "controlType" : "ARRAY_BUILDER"
       },
       "sampleOutput" : null
     },
@@ -1235,16 +1304,16 @@
       "minItems" : null,
       "multipleValues" : null,
       "options" : null,
-      "controlType" : "MULTI_SELECT",
       "optionsDataSource" : {
         "optionsLookupDependsOn" : [ "repository" ],
         "options" : { }
-      }
+      },
+      "controlType" : "MULTI_SELECT"
     } ],
     "title" : "Add Labels to Issue",
-    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "perform" : { }
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -1332,8 +1401,8 @@
             "minValue" : null,
             "numberPrecision" : null,
             "options" : null,
-            "controlType" : "NUMBER",
-            "optionsDataSource" : null
+            "optionsDataSource" : null,
+            "controlType" : "NUMBER"
           }, {
             "advancedOption" : null,
             "description" : "A unique number identifying the issue within its repository.",
@@ -1351,8 +1420,8 @@
             "maxValue" : null,
             "minValue" : null,
             "options" : null,
-            "controlType" : "INTEGER",
-            "optionsDataSource" : null
+            "optionsDataSource" : null,
+            "controlType" : "INTEGER"
           }, {
             "advancedOption" : null,
             "description" : "The title or headline of the issue.",
@@ -1505,15 +1574,15 @@
                 "options" : null,
                 "optionsDataSource" : null
               } ],
-              "controlType" : "OBJECT_BUILDER",
-              "optionsDataSource" : null
+              "optionsDataSource" : null,
+              "controlType" : "OBJECT_BUILDER"
             } ],
             "maxItems" : null,
             "minItems" : null,
             "multipleValues" : null,
             "options" : null,
-            "controlType" : "ARRAY_BUILDER",
-            "optionsDataSource" : null
+            "optionsDataSource" : null,
+            "controlType" : "ARRAY_BUILDER"
           }, {
             "advancedOption" : null,
             "description" : "A collection of labels associated with the issue.",
@@ -1606,15 +1675,15 @@
                 "options" : null,
                 "optionsDataSource" : null
               } ],
-              "controlType" : "OBJECT_BUILDER",
-              "optionsDataSource" : null
+              "optionsDataSource" : null,
+              "controlType" : "OBJECT_BUILDER"
             } ],
             "maxItems" : null,
             "minItems" : null,
             "multipleValues" : null,
             "options" : null,
-            "controlType" : "ARRAY_BUILDER",
-            "optionsDataSource" : null
+            "optionsDataSource" : null,
+            "controlType" : "ARRAY_BUILDER"
           }, {
             "advancedOption" : null,
             "description" : "The main content of the issue.",
@@ -1636,8 +1705,8 @@
             "options" : null,
             "optionsDataSource" : null
           } ],
-          "controlType" : "OBJECT_BUILDER",
-          "optionsDataSource" : null
+          "optionsDataSource" : null,
+          "controlType" : "OBJECT_BUILDER"
         },
         "sampleOutput" : null,
         "placeholder" : null
@@ -1719,8 +1788,8 @@
           "minValue" : null,
           "numberPrecision" : null,
           "options" : null,
-          "controlType" : "NUMBER",
-          "optionsDataSource" : null
+          "optionsDataSource" : null,
+          "controlType" : "NUMBER"
         }, {
           "advancedOption" : null,
           "description" : "A unique number identifying the issue within its repository.",
@@ -1738,8 +1807,8 @@
           "maxValue" : null,
           "minValue" : null,
           "options" : null,
-          "controlType" : "INTEGER",
-          "optionsDataSource" : null
+          "optionsDataSource" : null,
+          "controlType" : "INTEGER"
         }, {
           "advancedOption" : null,
           "description" : "The title or headline of the issue.",
@@ -1892,15 +1961,15 @@
               "options" : null,
               "optionsDataSource" : null
             } ],
-            "controlType" : "OBJECT_BUILDER",
-            "optionsDataSource" : null
+            "optionsDataSource" : null,
+            "controlType" : "OBJECT_BUILDER"
           } ],
           "maxItems" : null,
           "minItems" : null,
           "multipleValues" : null,
           "options" : null,
-          "controlType" : "ARRAY_BUILDER",
-          "optionsDataSource" : null
+          "optionsDataSource" : null,
+          "controlType" : "ARRAY_BUILDER"
         }, {
           "advancedOption" : null,
           "description" : "A collection of labels associated with the issue.",
@@ -1993,15 +2062,15 @@
               "options" : null,
               "optionsDataSource" : null
             } ],
-            "controlType" : "OBJECT_BUILDER",
-            "optionsDataSource" : null
+            "optionsDataSource" : null,
+            "controlType" : "OBJECT_BUILDER"
           } ],
           "maxItems" : null,
           "minItems" : null,
           "multipleValues" : null,
           "options" : null,
-          "controlType" : "ARRAY_BUILDER",
-          "optionsDataSource" : null
+          "optionsDataSource" : null,
+          "controlType" : "ARRAY_BUILDER"
         }, {
           "advancedOption" : null,
           "description" : "The main content of the issue.",
@@ -2023,8 +2092,8 @@
           "options" : null,
           "optionsDataSource" : null
         } ],
-        "controlType" : "OBJECT_BUILDER",
-        "optionsDataSource" : null
+        "optionsDataSource" : null,
+        "controlType" : "OBJECT_BUILDER"
       },
       "sampleOutput" : null
     },
@@ -2096,9 +2165,9 @@
       "optionsDataSource" : null
     } ],
     "title" : "Create Comment on Issue",
-    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "perform" : { }
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -2186,8 +2255,8 @@
             "minValue" : null,
             "numberPrecision" : null,
             "options" : null,
-            "controlType" : "NUMBER",
-            "optionsDataSource" : null
+            "optionsDataSource" : null,
+            "controlType" : "NUMBER"
           }, {
             "advancedOption" : null,
             "description" : "A unique number identifying the issue within its repository.",
@@ -2205,8 +2274,8 @@
             "maxValue" : null,
             "minValue" : null,
             "options" : null,
-            "controlType" : "INTEGER",
-            "optionsDataSource" : null
+            "optionsDataSource" : null,
+            "controlType" : "INTEGER"
           }, {
             "advancedOption" : null,
             "description" : "The title or headline of the issue.",
@@ -2359,15 +2428,15 @@
                 "options" : null,
                 "optionsDataSource" : null
               } ],
-              "controlType" : "OBJECT_BUILDER",
-              "optionsDataSource" : null
+              "optionsDataSource" : null,
+              "controlType" : "OBJECT_BUILDER"
             } ],
             "maxItems" : null,
             "minItems" : null,
             "multipleValues" : null,
             "options" : null,
-            "controlType" : "ARRAY_BUILDER",
-            "optionsDataSource" : null
+            "optionsDataSource" : null,
+            "controlType" : "ARRAY_BUILDER"
           }, {
             "advancedOption" : null,
             "description" : "A collection of labels associated with the issue.",
@@ -2460,15 +2529,15 @@
                 "options" : null,
                 "optionsDataSource" : null
               } ],
-              "controlType" : "OBJECT_BUILDER",
-              "optionsDataSource" : null
+              "optionsDataSource" : null,
+              "controlType" : "OBJECT_BUILDER"
             } ],
             "maxItems" : null,
             "minItems" : null,
             "multipleValues" : null,
             "options" : null,
-            "controlType" : "ARRAY_BUILDER",
-            "optionsDataSource" : null
+            "optionsDataSource" : null,
+            "controlType" : "ARRAY_BUILDER"
           }, {
             "advancedOption" : null,
             "description" : "The main content of the issue.",
@@ -2490,8 +2559,8 @@
             "options" : null,
             "optionsDataSource" : null
           } ],
-          "controlType" : "OBJECT_BUILDER",
-          "optionsDataSource" : null
+          "optionsDataSource" : null,
+          "controlType" : "OBJECT_BUILDER"
         },
         "sampleOutput" : null,
         "placeholder" : null
@@ -2573,8 +2642,8 @@
           "minValue" : null,
           "numberPrecision" : null,
           "options" : null,
-          "controlType" : "NUMBER",
-          "optionsDataSource" : null
+          "optionsDataSource" : null,
+          "controlType" : "NUMBER"
         }, {
           "advancedOption" : null,
           "description" : "A unique number identifying the issue within its repository.",
@@ -2592,8 +2661,8 @@
           "maxValue" : null,
           "minValue" : null,
           "options" : null,
-          "controlType" : "INTEGER",
-          "optionsDataSource" : null
+          "optionsDataSource" : null,
+          "controlType" : "INTEGER"
         }, {
           "advancedOption" : null,
           "description" : "The title or headline of the issue.",
@@ -2746,15 +2815,15 @@
               "options" : null,
               "optionsDataSource" : null
             } ],
-            "controlType" : "OBJECT_BUILDER",
-            "optionsDataSource" : null
+            "optionsDataSource" : null,
+            "controlType" : "OBJECT_BUILDER"
           } ],
           "maxItems" : null,
           "minItems" : null,
           "multipleValues" : null,
           "options" : null,
-          "controlType" : "ARRAY_BUILDER",
-          "optionsDataSource" : null
+          "optionsDataSource" : null,
+          "controlType" : "ARRAY_BUILDER"
         }, {
           "advancedOption" : null,
           "description" : "A collection of labels associated with the issue.",
@@ -2847,15 +2916,15 @@
               "options" : null,
               "optionsDataSource" : null
             } ],
-            "controlType" : "OBJECT_BUILDER",
-            "optionsDataSource" : null
+            "optionsDataSource" : null,
+            "controlType" : "OBJECT_BUILDER"
           } ],
           "maxItems" : null,
           "minItems" : null,
           "multipleValues" : null,
           "options" : null,
-          "controlType" : "ARRAY_BUILDER",
-          "optionsDataSource" : null
+          "optionsDataSource" : null,
+          "controlType" : "ARRAY_BUILDER"
         }, {
           "advancedOption" : null,
           "description" : "The main content of the issue.",
@@ -2877,8 +2946,8 @@
           "options" : null,
           "optionsDataSource" : null
         } ],
-        "controlType" : "OBJECT_BUILDER",
-        "optionsDataSource" : null
+        "optionsDataSource" : null,
+        "controlType" : "OBJECT_BUILDER"
       },
       "sampleOutput" : null
     },
@@ -2947,9 +3016,9 @@
       "optionsDataSource" : null
     } ],
     "title" : "Create Issue",
-    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "perform" : { }
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -3037,8 +3106,8 @@
             "minValue" : null,
             "numberPrecision" : null,
             "options" : null,
-            "controlType" : "NUMBER",
-            "optionsDataSource" : null
+            "optionsDataSource" : null,
+            "controlType" : "NUMBER"
           }, {
             "advancedOption" : null,
             "description" : "A unique number identifying the issue within its repository.",
@@ -3056,8 +3125,8 @@
             "maxValue" : null,
             "minValue" : null,
             "options" : null,
-            "controlType" : "INTEGER",
-            "optionsDataSource" : null
+            "optionsDataSource" : null,
+            "controlType" : "INTEGER"
           }, {
             "advancedOption" : null,
             "description" : "The title or headline of the issue.",
@@ -3210,15 +3279,15 @@
                 "options" : null,
                 "optionsDataSource" : null
               } ],
-              "controlType" : "OBJECT_BUILDER",
-              "optionsDataSource" : null
+              "optionsDataSource" : null,
+              "controlType" : "OBJECT_BUILDER"
             } ],
             "maxItems" : null,
             "minItems" : null,
             "multipleValues" : null,
             "options" : null,
-            "controlType" : "ARRAY_BUILDER",
-            "optionsDataSource" : null
+            "optionsDataSource" : null,
+            "controlType" : "ARRAY_BUILDER"
           }, {
             "advancedOption" : null,
             "description" : "A collection of labels associated with the issue.",
@@ -3311,15 +3380,15 @@
                 "options" : null,
                 "optionsDataSource" : null
               } ],
-              "controlType" : "OBJECT_BUILDER",
-              "optionsDataSource" : null
+              "optionsDataSource" : null,
+              "controlType" : "OBJECT_BUILDER"
             } ],
             "maxItems" : null,
             "minItems" : null,
             "multipleValues" : null,
             "options" : null,
-            "controlType" : "ARRAY_BUILDER",
-            "optionsDataSource" : null
+            "optionsDataSource" : null,
+            "controlType" : "ARRAY_BUILDER"
           }, {
             "advancedOption" : null,
             "description" : "The main content of the issue.",
@@ -3341,8 +3410,8 @@
             "options" : null,
             "optionsDataSource" : null
           } ],
-          "controlType" : "OBJECT_BUILDER",
-          "optionsDataSource" : null
+          "optionsDataSource" : null,
+          "controlType" : "OBJECT_BUILDER"
         },
         "sampleOutput" : null,
         "placeholder" : null
@@ -3424,8 +3493,8 @@
           "minValue" : null,
           "numberPrecision" : null,
           "options" : null,
-          "controlType" : "NUMBER",
-          "optionsDataSource" : null
+          "optionsDataSource" : null,
+          "controlType" : "NUMBER"
         }, {
           "advancedOption" : null,
           "description" : "A unique number identifying the issue within its repository.",
@@ -3443,8 +3512,8 @@
           "maxValue" : null,
           "minValue" : null,
           "options" : null,
-          "controlType" : "INTEGER",
-          "optionsDataSource" : null
+          "optionsDataSource" : null,
+          "controlType" : "INTEGER"
         }, {
           "advancedOption" : null,
           "description" : "The title or headline of the issue.",
@@ -3597,15 +3666,15 @@
               "options" : null,
               "optionsDataSource" : null
             } ],
-            "controlType" : "OBJECT_BUILDER",
-            "optionsDataSource" : null
+            "optionsDataSource" : null,
+            "controlType" : "OBJECT_BUILDER"
           } ],
           "maxItems" : null,
           "minItems" : null,
           "multipleValues" : null,
           "options" : null,
-          "controlType" : "ARRAY_BUILDER",
-          "optionsDataSource" : null
+          "optionsDataSource" : null,
+          "controlType" : "ARRAY_BUILDER"
         }, {
           "advancedOption" : null,
           "description" : "A collection of labels associated with the issue.",
@@ -3698,15 +3767,15 @@
               "options" : null,
               "optionsDataSource" : null
             } ],
-            "controlType" : "OBJECT_BUILDER",
-            "optionsDataSource" : null
+            "optionsDataSource" : null,
+            "controlType" : "OBJECT_BUILDER"
           } ],
           "maxItems" : null,
           "minItems" : null,
           "multipleValues" : null,
           "options" : null,
-          "controlType" : "ARRAY_BUILDER",
-          "optionsDataSource" : null
+          "optionsDataSource" : null,
+          "controlType" : "ARRAY_BUILDER"
         }, {
           "advancedOption" : null,
           "description" : "The main content of the issue.",
@@ -3728,8 +3797,8 @@
           "options" : null,
           "optionsDataSource" : null
         } ],
-        "controlType" : "OBJECT_BUILDER",
-        "optionsDataSource" : null
+        "optionsDataSource" : null,
+        "controlType" : "OBJECT_BUILDER"
       },
       "sampleOutput" : null
     },
@@ -3781,9 +3850,9 @@
       }
     } ],
     "title" : "Get Issue",
-    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "perform" : { }
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -3885,8 +3954,8 @@
               "minValue" : null,
               "numberPrecision" : null,
               "options" : null,
-              "controlType" : "NUMBER",
-              "optionsDataSource" : null
+              "optionsDataSource" : null,
+              "controlType" : "NUMBER"
             }, {
               "advancedOption" : null,
               "description" : "A unique number identifying the issue within its repository.",
@@ -3904,8 +3973,8 @@
               "maxValue" : null,
               "minValue" : null,
               "options" : null,
-              "controlType" : "INTEGER",
-              "optionsDataSource" : null
+              "optionsDataSource" : null,
+              "controlType" : "INTEGER"
             }, {
               "advancedOption" : null,
               "description" : "The title or headline of the issue.",
@@ -4058,15 +4127,15 @@
                   "options" : null,
                   "optionsDataSource" : null
                 } ],
-                "controlType" : "OBJECT_BUILDER",
-                "optionsDataSource" : null
+                "optionsDataSource" : null,
+                "controlType" : "OBJECT_BUILDER"
               } ],
               "maxItems" : null,
               "minItems" : null,
               "multipleValues" : null,
               "options" : null,
-              "controlType" : "ARRAY_BUILDER",
-              "optionsDataSource" : null
+              "optionsDataSource" : null,
+              "controlType" : "ARRAY_BUILDER"
             }, {
               "advancedOption" : null,
               "description" : "A collection of labels associated with the issue.",
@@ -4159,15 +4228,15 @@
                   "options" : null,
                   "optionsDataSource" : null
                 } ],
-                "controlType" : "OBJECT_BUILDER",
-                "optionsDataSource" : null
+                "optionsDataSource" : null,
+                "controlType" : "OBJECT_BUILDER"
               } ],
               "maxItems" : null,
               "minItems" : null,
               "multipleValues" : null,
               "options" : null,
-              "controlType" : "ARRAY_BUILDER",
-              "optionsDataSource" : null
+              "optionsDataSource" : null,
+              "controlType" : "ARRAY_BUILDER"
             }, {
               "advancedOption" : null,
               "description" : "The main content of the issue.",
@@ -4189,15 +4258,15 @@
               "options" : null,
               "optionsDataSource" : null
             } ],
-            "controlType" : "OBJECT_BUILDER",
-            "optionsDataSource" : null
+            "optionsDataSource" : null,
+            "controlType" : "OBJECT_BUILDER"
           } ],
           "maxItems" : null,
           "minItems" : null,
           "multipleValues" : null,
           "options" : null,
-          "controlType" : "ARRAY_BUILDER",
-          "optionsDataSource" : null
+          "optionsDataSource" : null,
+          "controlType" : "ARRAY_BUILDER"
         },
         "sampleOutput" : null,
         "placeholder" : null
@@ -4293,8 +4362,8 @@
             "minValue" : null,
             "numberPrecision" : null,
             "options" : null,
-            "controlType" : "NUMBER",
-            "optionsDataSource" : null
+            "optionsDataSource" : null,
+            "controlType" : "NUMBER"
           }, {
             "advancedOption" : null,
             "description" : "A unique number identifying the issue within its repository.",
@@ -4312,8 +4381,8 @@
             "maxValue" : null,
             "minValue" : null,
             "options" : null,
-            "controlType" : "INTEGER",
-            "optionsDataSource" : null
+            "optionsDataSource" : null,
+            "controlType" : "INTEGER"
           }, {
             "advancedOption" : null,
             "description" : "The title or headline of the issue.",
@@ -4466,15 +4535,15 @@
                 "options" : null,
                 "optionsDataSource" : null
               } ],
-              "controlType" : "OBJECT_BUILDER",
-              "optionsDataSource" : null
+              "optionsDataSource" : null,
+              "controlType" : "OBJECT_BUILDER"
             } ],
             "maxItems" : null,
             "minItems" : null,
             "multipleValues" : null,
             "options" : null,
-            "controlType" : "ARRAY_BUILDER",
-            "optionsDataSource" : null
+            "optionsDataSource" : null,
+            "controlType" : "ARRAY_BUILDER"
           }, {
             "advancedOption" : null,
             "description" : "A collection of labels associated with the issue.",
@@ -4567,15 +4636,15 @@
                 "options" : null,
                 "optionsDataSource" : null
               } ],
-              "controlType" : "OBJECT_BUILDER",
-              "optionsDataSource" : null
+              "optionsDataSource" : null,
+              "controlType" : "OBJECT_BUILDER"
             } ],
             "maxItems" : null,
             "minItems" : null,
             "multipleValues" : null,
             "options" : null,
-            "controlType" : "ARRAY_BUILDER",
-            "optionsDataSource" : null
+            "optionsDataSource" : null,
+            "controlType" : "ARRAY_BUILDER"
           }, {
             "advancedOption" : null,
             "description" : "The main content of the issue.",
@@ -4597,15 +4666,15 @@
             "options" : null,
             "optionsDataSource" : null
           } ],
-          "controlType" : "OBJECT_BUILDER",
-          "optionsDataSource" : null
+          "optionsDataSource" : null,
+          "controlType" : "OBJECT_BUILDER"
         } ],
         "maxItems" : null,
         "minItems" : null,
         "multipleValues" : null,
         "options" : null,
-        "controlType" : "ARRAY_BUILDER",
-        "optionsDataSource" : null
+        "optionsDataSource" : null,
+        "controlType" : "ARRAY_BUILDER"
       },
       "sampleOutput" : null
     },
@@ -4687,9 +4756,9 @@
       "optionsDataSource" : null
     } ],
     "title" : "List Issues",
-    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "perform" : { }
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -4791,8 +4860,8 @@
               "minValue" : null,
               "numberPrecision" : null,
               "options" : null,
-              "controlType" : "NUMBER",
-              "optionsDataSource" : null
+              "optionsDataSource" : null,
+              "controlType" : "NUMBER"
             }, {
               "advancedOption" : null,
               "description" : "A unique number identifying the issue within its repository.",
@@ -4810,8 +4879,8 @@
               "maxValue" : null,
               "minValue" : null,
               "options" : null,
-              "controlType" : "INTEGER",
-              "optionsDataSource" : null
+              "optionsDataSource" : null,
+              "controlType" : "INTEGER"
             }, {
               "advancedOption" : null,
               "description" : "The title or headline of the issue.",
@@ -4964,15 +5033,15 @@
                   "options" : null,
                   "optionsDataSource" : null
                 } ],
-                "controlType" : "OBJECT_BUILDER",
-                "optionsDataSource" : null
+                "optionsDataSource" : null,
+                "controlType" : "OBJECT_BUILDER"
               } ],
               "maxItems" : null,
               "minItems" : null,
               "multipleValues" : null,
               "options" : null,
-              "controlType" : "ARRAY_BUILDER",
-              "optionsDataSource" : null
+              "optionsDataSource" : null,
+              "controlType" : "ARRAY_BUILDER"
             }, {
               "advancedOption" : null,
               "description" : "A collection of labels associated with the issue.",
@@ -5065,15 +5134,15 @@
                   "options" : null,
                   "optionsDataSource" : null
                 } ],
-                "controlType" : "OBJECT_BUILDER",
-                "optionsDataSource" : null
+                "optionsDataSource" : null,
+                "controlType" : "OBJECT_BUILDER"
               } ],
               "maxItems" : null,
               "minItems" : null,
               "multipleValues" : null,
               "options" : null,
-              "controlType" : "ARRAY_BUILDER",
-              "optionsDataSource" : null
+              "optionsDataSource" : null,
+              "controlType" : "ARRAY_BUILDER"
             }, {
               "advancedOption" : null,
               "description" : "The main content of the issue.",
@@ -5095,15 +5164,15 @@
               "options" : null,
               "optionsDataSource" : null
             } ],
-            "controlType" : "OBJECT_BUILDER",
-            "optionsDataSource" : null
+            "optionsDataSource" : null,
+            "controlType" : "OBJECT_BUILDER"
           } ],
           "maxItems" : null,
           "minItems" : null,
           "multipleValues" : null,
           "options" : null,
-          "controlType" : "ARRAY_BUILDER",
-          "optionsDataSource" : null
+          "optionsDataSource" : null,
+          "controlType" : "ARRAY_BUILDER"
         },
         "sampleOutput" : null,
         "placeholder" : null
@@ -5199,8 +5268,8 @@
             "minValue" : null,
             "numberPrecision" : null,
             "options" : null,
-            "controlType" : "NUMBER",
-            "optionsDataSource" : null
+            "optionsDataSource" : null,
+            "controlType" : "NUMBER"
           }, {
             "advancedOption" : null,
             "description" : "A unique number identifying the issue within its repository.",
@@ -5218,8 +5287,8 @@
             "maxValue" : null,
             "minValue" : null,
             "options" : null,
-            "controlType" : "INTEGER",
-            "optionsDataSource" : null
+            "optionsDataSource" : null,
+            "controlType" : "INTEGER"
           }, {
             "advancedOption" : null,
             "description" : "The title or headline of the issue.",
@@ -5372,15 +5441,15 @@
                 "options" : null,
                 "optionsDataSource" : null
               } ],
-              "controlType" : "OBJECT_BUILDER",
-              "optionsDataSource" : null
+              "optionsDataSource" : null,
+              "controlType" : "OBJECT_BUILDER"
             } ],
             "maxItems" : null,
             "minItems" : null,
             "multipleValues" : null,
             "options" : null,
-            "controlType" : "ARRAY_BUILDER",
-            "optionsDataSource" : null
+            "optionsDataSource" : null,
+            "controlType" : "ARRAY_BUILDER"
           }, {
             "advancedOption" : null,
             "description" : "A collection of labels associated with the issue.",
@@ -5473,15 +5542,15 @@
                 "options" : null,
                 "optionsDataSource" : null
               } ],
-              "controlType" : "OBJECT_BUILDER",
-              "optionsDataSource" : null
+              "optionsDataSource" : null,
+              "controlType" : "OBJECT_BUILDER"
             } ],
             "maxItems" : null,
             "minItems" : null,
             "multipleValues" : null,
             "options" : null,
-            "controlType" : "ARRAY_BUILDER",
-            "optionsDataSource" : null
+            "optionsDataSource" : null,
+            "controlType" : "ARRAY_BUILDER"
           }, {
             "advancedOption" : null,
             "description" : "The main content of the issue.",
@@ -5503,15 +5572,15 @@
             "options" : null,
             "optionsDataSource" : null
           } ],
-          "controlType" : "OBJECT_BUILDER",
-          "optionsDataSource" : null
+          "optionsDataSource" : null,
+          "controlType" : "OBJECT_BUILDER"
         } ],
         "maxItems" : null,
         "minItems" : null,
         "multipleValues" : null,
         "options" : null,
-        "controlType" : "ARRAY_BUILDER",
-        "optionsDataSource" : null
+        "optionsDataSource" : null,
+        "controlType" : "ARRAY_BUILDER"
       },
       "sampleOutput" : null
     },
@@ -5540,9 +5609,9 @@
       }
     } ],
     "title" : "List Repository Issues",
-    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "perform" : { }
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -5593,9 +5662,9 @@
       "optionsDataSource" : null
     } ],
     "title" : "Star Repository",
-    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "perform" : { }
   } ],
   "clusterElements" : null,
   "unifiedApi" : null,
@@ -5702,8 +5771,8 @@
               "minValue" : null,
               "numberPrecision" : null,
               "options" : null,
-              "controlType" : "NUMBER",
-              "optionsDataSource" : null
+              "optionsDataSource" : null,
+              "controlType" : "NUMBER"
             }, {
               "advancedOption" : null,
               "description" : "A unique number identifying the issue within its repository.",
@@ -5721,8 +5790,8 @@
               "maxValue" : null,
               "minValue" : null,
               "options" : null,
-              "controlType" : "INTEGER",
-              "optionsDataSource" : null
+              "optionsDataSource" : null,
+              "controlType" : "INTEGER"
             }, {
               "advancedOption" : null,
               "description" : "The title or headline of the issue.",
@@ -5875,15 +5944,15 @@
                   "options" : null,
                   "optionsDataSource" : null
                 } ],
-                "controlType" : "OBJECT_BUILDER",
-                "optionsDataSource" : null
+                "optionsDataSource" : null,
+                "controlType" : "OBJECT_BUILDER"
               } ],
               "maxItems" : null,
               "minItems" : null,
               "multipleValues" : null,
               "options" : null,
-              "controlType" : "ARRAY_BUILDER",
-              "optionsDataSource" : null
+              "optionsDataSource" : null,
+              "controlType" : "ARRAY_BUILDER"
             }, {
               "advancedOption" : null,
               "description" : "A collection of labels associated with the issue.",
@@ -5976,15 +6045,15 @@
                   "options" : null,
                   "optionsDataSource" : null
                 } ],
-                "controlType" : "OBJECT_BUILDER",
-                "optionsDataSource" : null
+                "optionsDataSource" : null,
+                "controlType" : "OBJECT_BUILDER"
               } ],
               "maxItems" : null,
               "minItems" : null,
               "multipleValues" : null,
               "options" : null,
-              "controlType" : "ARRAY_BUILDER",
-              "optionsDataSource" : null
+              "optionsDataSource" : null,
+              "controlType" : "ARRAY_BUILDER"
             }, {
               "advancedOption" : null,
               "description" : "The main content of the issue.",
@@ -6006,8 +6075,8 @@
               "options" : null,
               "optionsDataSource" : null
             } ],
-            "controlType" : "OBJECT_BUILDER",
-            "optionsDataSource" : null
+            "optionsDataSource" : null,
+            "controlType" : "OBJECT_BUILDER"
           }, {
             "advancedOption" : null,
             "description" : "Information about the author of the issue.",
@@ -6062,11 +6131,11 @@
               "maxValue" : null,
               "minValue" : null,
               "options" : null,
-              "controlType" : "INTEGER",
-              "optionsDataSource" : null
+              "optionsDataSource" : null,
+              "controlType" : "INTEGER"
             } ],
-            "controlType" : "OBJECT_BUILDER",
-            "optionsDataSource" : null
+            "optionsDataSource" : null,
+            "controlType" : "OBJECT_BUILDER"
           }, {
             "advancedOption" : null,
             "description" : "The action performed on the issue, such as 'opened', 'closed', or 'reopened'.",
@@ -6121,8 +6190,8 @@
               "maxValue" : null,
               "minValue" : null,
               "options" : null,
-              "controlType" : "INTEGER",
-              "optionsDataSource" : null
+              "optionsDataSource" : null,
+              "controlType" : "INTEGER"
             }, {
               "advancedOption" : null,
               "description" : "Name of the repository.",
@@ -6217,11 +6286,11 @@
                 "maxValue" : null,
                 "minValue" : null,
                 "options" : null,
-                "controlType" : "INTEGER",
-                "optionsDataSource" : null
+                "optionsDataSource" : null,
+                "controlType" : "INTEGER"
               } ],
-              "controlType" : "OBJECT_BUILDER",
-              "optionsDataSource" : null
+              "optionsDataSource" : null,
+              "controlType" : "OBJECT_BUILDER"
             }, {
               "advancedOption" : null,
               "description" : "The visibility status of the repository, such as public or private.",
@@ -6259,8 +6328,8 @@
               "maxValue" : null,
               "minValue" : null,
               "options" : null,
-              "controlType" : "INTEGER",
-              "optionsDataSource" : null
+              "optionsDataSource" : null,
+              "controlType" : "INTEGER"
             }, {
               "advancedOption" : null,
               "description" : "The current number of open issues in the repository.",
@@ -6278,8 +6347,8 @@
               "maxValue" : null,
               "minValue" : null,
               "options" : null,
-              "controlType" : "INTEGER",
-              "optionsDataSource" : null
+              "optionsDataSource" : null,
+              "controlType" : "INTEGER"
             }, {
               "advancedOption" : null,
               "description" : "The name of the default branch in the repository, typically 'main' or 'master'.",
@@ -6301,11 +6370,11 @@
               "options" : null,
               "optionsDataSource" : null
             } ],
-            "controlType" : "OBJECT_BUILDER",
-            "optionsDataSource" : null
+            "optionsDataSource" : null,
+            "controlType" : "OBJECT_BUILDER"
           } ],
-          "controlType" : "OBJECT_BUILDER",
-          "optionsDataSource" : null
+          "optionsDataSource" : null,
+          "controlType" : "OBJECT_BUILDER"
         },
         "sampleOutput" : null,
         "placeholder" : null
@@ -6404,8 +6473,8 @@
             "minValue" : null,
             "numberPrecision" : null,
             "options" : null,
-            "controlType" : "NUMBER",
-            "optionsDataSource" : null
+            "optionsDataSource" : null,
+            "controlType" : "NUMBER"
           }, {
             "advancedOption" : null,
             "description" : "A unique number identifying the issue within its repository.",
@@ -6423,8 +6492,8 @@
             "maxValue" : null,
             "minValue" : null,
             "options" : null,
-            "controlType" : "INTEGER",
-            "optionsDataSource" : null
+            "optionsDataSource" : null,
+            "controlType" : "INTEGER"
           }, {
             "advancedOption" : null,
             "description" : "The title or headline of the issue.",
@@ -6577,15 +6646,15 @@
                 "options" : null,
                 "optionsDataSource" : null
               } ],
-              "controlType" : "OBJECT_BUILDER",
-              "optionsDataSource" : null
+              "optionsDataSource" : null,
+              "controlType" : "OBJECT_BUILDER"
             } ],
             "maxItems" : null,
             "minItems" : null,
             "multipleValues" : null,
             "options" : null,
-            "controlType" : "ARRAY_BUILDER",
-            "optionsDataSource" : null
+            "optionsDataSource" : null,
+            "controlType" : "ARRAY_BUILDER"
           }, {
             "advancedOption" : null,
             "description" : "A collection of labels associated with the issue.",
@@ -6678,15 +6747,15 @@
                 "options" : null,
                 "optionsDataSource" : null
               } ],
-              "controlType" : "OBJECT_BUILDER",
-              "optionsDataSource" : null
+              "optionsDataSource" : null,
+              "controlType" : "OBJECT_BUILDER"
             } ],
             "maxItems" : null,
             "minItems" : null,
             "multipleValues" : null,
             "options" : null,
-            "controlType" : "ARRAY_BUILDER",
-            "optionsDataSource" : null
+            "optionsDataSource" : null,
+            "controlType" : "ARRAY_BUILDER"
           }, {
             "advancedOption" : null,
             "description" : "The main content of the issue.",
@@ -6708,8 +6777,8 @@
             "options" : null,
             "optionsDataSource" : null
           } ],
-          "controlType" : "OBJECT_BUILDER",
-          "optionsDataSource" : null
+          "optionsDataSource" : null,
+          "controlType" : "OBJECT_BUILDER"
         }, {
           "advancedOption" : null,
           "description" : "Information about the author of the issue.",
@@ -6764,11 +6833,11 @@
             "maxValue" : null,
             "minValue" : null,
             "options" : null,
-            "controlType" : "INTEGER",
-            "optionsDataSource" : null
+            "optionsDataSource" : null,
+            "controlType" : "INTEGER"
           } ],
-          "controlType" : "OBJECT_BUILDER",
-          "optionsDataSource" : null
+          "optionsDataSource" : null,
+          "controlType" : "OBJECT_BUILDER"
         }, {
           "advancedOption" : null,
           "description" : "The action performed on the issue, such as 'opened', 'closed', or 'reopened'.",
@@ -6823,8 +6892,8 @@
             "maxValue" : null,
             "minValue" : null,
             "options" : null,
-            "controlType" : "INTEGER",
-            "optionsDataSource" : null
+            "optionsDataSource" : null,
+            "controlType" : "INTEGER"
           }, {
             "advancedOption" : null,
             "description" : "Name of the repository.",
@@ -6919,11 +6988,11 @@
               "maxValue" : null,
               "minValue" : null,
               "options" : null,
-              "controlType" : "INTEGER",
-              "optionsDataSource" : null
+              "optionsDataSource" : null,
+              "controlType" : "INTEGER"
             } ],
-            "controlType" : "OBJECT_BUILDER",
-            "optionsDataSource" : null
+            "optionsDataSource" : null,
+            "controlType" : "OBJECT_BUILDER"
           }, {
             "advancedOption" : null,
             "description" : "The visibility status of the repository, such as public or private.",
@@ -6961,8 +7030,8 @@
             "maxValue" : null,
             "minValue" : null,
             "options" : null,
-            "controlType" : "INTEGER",
-            "optionsDataSource" : null
+            "optionsDataSource" : null,
+            "controlType" : "INTEGER"
           }, {
             "advancedOption" : null,
             "description" : "The current number of open issues in the repository.",
@@ -6980,8 +7049,8 @@
             "maxValue" : null,
             "minValue" : null,
             "options" : null,
-            "controlType" : "INTEGER",
-            "optionsDataSource" : null
+            "optionsDataSource" : null,
+            "controlType" : "INTEGER"
           }, {
             "advancedOption" : null,
             "description" : "The name of the default branch in the repository, typically 'main' or 'master'.",
@@ -7003,11 +7072,11 @@
             "options" : null,
             "optionsDataSource" : null
           } ],
-          "controlType" : "OBJECT_BUILDER",
-          "optionsDataSource" : null
+          "optionsDataSource" : null,
+          "controlType" : "OBJECT_BUILDER"
         } ],
-        "controlType" : "OBJECT_BUILDER",
-        "optionsDataSource" : null
+        "optionsDataSource" : null,
+        "controlType" : "OBJECT_BUILDER"
       },
       "sampleOutput" : null
     },
@@ -7039,18 +7108,18 @@
     "type" : "DYNAMIC_WEBHOOK",
     "webhookRawBody" : null,
     "workflowSyncExecution" : null,
-    "poll" : null,
-    "deduplicate" : null,
-    "webhookDisable" : { },
-    "webhookEnable" : { },
-    "dynamicWebhookRefresh" : null,
-    "webhookRequest" : { },
-    "listenerDisable" : null,
     "processErrorResponse" : null,
     "workflowNodeDescription" : null,
+    "dynamicWebhookRefresh" : null,
+    "webhookValidateOnEnable" : null,
+    "webhookDisable" : { },
+    "webhookEnable" : { },
+    "webhookRequest" : { },
+    "listenerDisable" : null,
     "listenerEnable" : null,
     "webhookValidate" : null,
-    "webhookValidateOnEnable" : null
+    "deduplicate" : null,
+    "poll" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -7094,8 +7163,8 @@
             "maxValue" : null,
             "minValue" : null,
             "options" : null,
-            "controlType" : "INTEGER",
-            "optionsDataSource" : null
+            "optionsDataSource" : null,
+            "controlType" : "INTEGER"
           }, {
             "advancedOption" : null,
             "description" : null,
@@ -7130,8 +7199,8 @@
               "maxValue" : null,
               "minValue" : null,
               "options" : null,
-              "controlType" : "INTEGER",
-              "optionsDataSource" : null
+              "optionsDataSource" : null,
+              "controlType" : "INTEGER"
             }, {
               "advancedOption" : null,
               "description" : "The current state of the pull request, such as open or closed.",
@@ -7209,11 +7278,11 @@
               "maxValue" : null,
               "minValue" : null,
               "options" : null,
-              "controlType" : "INTEGER",
-              "optionsDataSource" : null
+              "optionsDataSource" : null,
+              "controlType" : "INTEGER"
             } ],
-            "controlType" : "OBJECT_BUILDER",
-            "optionsDataSource" : null
+            "optionsDataSource" : null,
+            "controlType" : "OBJECT_BUILDER"
           }, {
             "advancedOption" : null,
             "description" : "Information about the author of the pull request.",
@@ -7268,11 +7337,11 @@
               "maxValue" : null,
               "minValue" : null,
               "options" : null,
-              "controlType" : "INTEGER",
-              "optionsDataSource" : null
+              "optionsDataSource" : null,
+              "controlType" : "INTEGER"
             } ],
-            "controlType" : "OBJECT_BUILDER",
-            "optionsDataSource" : null
+            "optionsDataSource" : null,
+            "controlType" : "OBJECT_BUILDER"
           }, {
             "advancedOption" : null,
             "description" : "The action performed on the pull request, such as opened, closed, or synchronized.",
@@ -7327,8 +7396,8 @@
               "maxValue" : null,
               "minValue" : null,
               "options" : null,
-              "controlType" : "INTEGER",
-              "optionsDataSource" : null
+              "optionsDataSource" : null,
+              "controlType" : "INTEGER"
             }, {
               "advancedOption" : null,
               "description" : "Name of the repository.",
@@ -7423,11 +7492,11 @@
                 "maxValue" : null,
                 "minValue" : null,
                 "options" : null,
-                "controlType" : "INTEGER",
-                "optionsDataSource" : null
+                "optionsDataSource" : null,
+                "controlType" : "INTEGER"
               } ],
-              "controlType" : "OBJECT_BUILDER",
-              "optionsDataSource" : null
+              "optionsDataSource" : null,
+              "controlType" : "OBJECT_BUILDER"
             }, {
               "advancedOption" : null,
               "description" : "The visibility status of the repository, such as public or private.",
@@ -7465,8 +7534,8 @@
               "maxValue" : null,
               "minValue" : null,
               "options" : null,
-              "controlType" : "INTEGER",
-              "optionsDataSource" : null
+              "optionsDataSource" : null,
+              "controlType" : "INTEGER"
             }, {
               "advancedOption" : null,
               "description" : "The current number of open issues in the repository.",
@@ -7484,8 +7553,8 @@
               "maxValue" : null,
               "minValue" : null,
               "options" : null,
-              "controlType" : "INTEGER",
-              "optionsDataSource" : null
+              "optionsDataSource" : null,
+              "controlType" : "INTEGER"
             }, {
               "advancedOption" : null,
               "description" : "The name of the default branch in the repository, typically 'main' or 'master'.",
@@ -7507,11 +7576,11 @@
               "options" : null,
               "optionsDataSource" : null
             } ],
-            "controlType" : "OBJECT_BUILDER",
-            "optionsDataSource" : null
+            "optionsDataSource" : null,
+            "controlType" : "OBJECT_BUILDER"
           } ],
-          "controlType" : "OBJECT_BUILDER",
-          "optionsDataSource" : null
+          "optionsDataSource" : null,
+          "controlType" : "OBJECT_BUILDER"
         },
         "sampleOutput" : null,
         "placeholder" : null
@@ -7550,8 +7619,8 @@
           "maxValue" : null,
           "minValue" : null,
           "options" : null,
-          "controlType" : "INTEGER",
-          "optionsDataSource" : null
+          "optionsDataSource" : null,
+          "controlType" : "INTEGER"
         }, {
           "advancedOption" : null,
           "description" : null,
@@ -7586,8 +7655,8 @@
             "maxValue" : null,
             "minValue" : null,
             "options" : null,
-            "controlType" : "INTEGER",
-            "optionsDataSource" : null
+            "optionsDataSource" : null,
+            "controlType" : "INTEGER"
           }, {
             "advancedOption" : null,
             "description" : "The current state of the pull request, such as open or closed.",
@@ -7665,11 +7734,11 @@
             "maxValue" : null,
             "minValue" : null,
             "options" : null,
-            "controlType" : "INTEGER",
-            "optionsDataSource" : null
+            "optionsDataSource" : null,
+            "controlType" : "INTEGER"
           } ],
-          "controlType" : "OBJECT_BUILDER",
-          "optionsDataSource" : null
+          "optionsDataSource" : null,
+          "controlType" : "OBJECT_BUILDER"
         }, {
           "advancedOption" : null,
           "description" : "Information about the author of the pull request.",
@@ -7724,11 +7793,11 @@
             "maxValue" : null,
             "minValue" : null,
             "options" : null,
-            "controlType" : "INTEGER",
-            "optionsDataSource" : null
+            "optionsDataSource" : null,
+            "controlType" : "INTEGER"
           } ],
-          "controlType" : "OBJECT_BUILDER",
-          "optionsDataSource" : null
+          "optionsDataSource" : null,
+          "controlType" : "OBJECT_BUILDER"
         }, {
           "advancedOption" : null,
           "description" : "The action performed on the pull request, such as opened, closed, or synchronized.",
@@ -7783,8 +7852,8 @@
             "maxValue" : null,
             "minValue" : null,
             "options" : null,
-            "controlType" : "INTEGER",
-            "optionsDataSource" : null
+            "optionsDataSource" : null,
+            "controlType" : "INTEGER"
           }, {
             "advancedOption" : null,
             "description" : "Name of the repository.",
@@ -7879,11 +7948,11 @@
               "maxValue" : null,
               "minValue" : null,
               "options" : null,
-              "controlType" : "INTEGER",
-              "optionsDataSource" : null
+              "optionsDataSource" : null,
+              "controlType" : "INTEGER"
             } ],
-            "controlType" : "OBJECT_BUILDER",
-            "optionsDataSource" : null
+            "optionsDataSource" : null,
+            "controlType" : "OBJECT_BUILDER"
           }, {
             "advancedOption" : null,
             "description" : "The visibility status of the repository, such as public or private.",
@@ -7921,8 +7990,8 @@
             "maxValue" : null,
             "minValue" : null,
             "options" : null,
-            "controlType" : "INTEGER",
-            "optionsDataSource" : null
+            "optionsDataSource" : null,
+            "controlType" : "INTEGER"
           }, {
             "advancedOption" : null,
             "description" : "The current number of open issues in the repository.",
@@ -7940,8 +8009,8 @@
             "maxValue" : null,
             "minValue" : null,
             "options" : null,
-            "controlType" : "INTEGER",
-            "optionsDataSource" : null
+            "optionsDataSource" : null,
+            "controlType" : "INTEGER"
           }, {
             "advancedOption" : null,
             "description" : "The name of the default branch in the repository, typically 'main' or 'master'.",
@@ -7963,11 +8032,11 @@
             "options" : null,
             "optionsDataSource" : null
           } ],
-          "controlType" : "OBJECT_BUILDER",
-          "optionsDataSource" : null
+          "optionsDataSource" : null,
+          "controlType" : "OBJECT_BUILDER"
         } ],
-        "controlType" : "OBJECT_BUILDER",
-        "optionsDataSource" : null
+        "optionsDataSource" : null,
+        "controlType" : "OBJECT_BUILDER"
       },
       "sampleOutput" : null
     },
@@ -7999,86 +8068,17 @@
     "type" : "DYNAMIC_WEBHOOK",
     "webhookRawBody" : null,
     "workflowSyncExecution" : null,
-    "poll" : null,
-    "deduplicate" : null,
-    "webhookDisable" : { },
-    "webhookEnable" : { },
-    "dynamicWebhookRefresh" : null,
-    "webhookRequest" : { },
-    "listenerDisable" : null,
     "processErrorResponse" : null,
     "workflowNodeDescription" : null,
+    "dynamicWebhookRefresh" : null,
+    "webhookValidateOnEnable" : null,
+    "webhookDisable" : { },
+    "webhookEnable" : { },
+    "webhookRequest" : { },
+    "listenerDisable" : null,
     "listenerEnable" : null,
     "webhookValidate" : null,
-    "webhookValidateOnEnable" : null
-  } ],
-  "connection" : {
-    "authorizations" : [ {
-      "detectOn" : null,
-      "description" : null,
-      "name" : "oauth2_authorization_code",
-      "properties" : [ {
-        "advancedOption" : null,
-        "description" : null,
-        "displayCondition" : null,
-        "expressionEnabled" : null,
-        "hidden" : null,
-        "metadata" : { },
-        "required" : true,
-        "name" : "clientId",
-        "type" : "STRING",
-        "defaultValue" : null,
-        "exampleValue" : null,
-        "label" : "Client id",
-        "placeholder" : null,
-        "controlType" : "TEXT",
-        "languageId" : null,
-        "maxLength" : null,
-        "minLength" : null,
-        "options" : null,
-        "optionsDataSource" : null
-      }, {
-        "advancedOption" : null,
-        "description" : null,
-        "displayCondition" : null,
-        "expressionEnabled" : null,
-        "hidden" : null,
-        "metadata" : { },
-        "required" : true,
-        "name" : "clientSecret",
-        "type" : "STRING",
-        "defaultValue" : null,
-        "exampleValue" : null,
-        "label" : "Client secret",
-        "placeholder" : null,
-        "controlType" : "TEXT",
-        "languageId" : null,
-        "maxLength" : null,
-        "minLength" : null,
-        "options" : null,
-        "optionsDataSource" : null
-      } ],
-      "refreshOn" : null,
-      "title" : "OAuth2 Authorization Code",
-      "type" : "OAUTH2_AUTHORIZATION_CODE",
-      "acquire" : null,
-      "apply" : null,
-      "authorizationCallback" : null,
-      "authorizationUrl" : { },
-      "clientId" : null,
-      "clientSecret" : null,
-      "oauth2AuthorizationExtraQueryParameters" : null,
-      "pkce" : null,
-      "refresh" : null,
-      "refreshUrl" : null,
-      "scopes" : { },
-      "refreshToken" : null,
-      "tokenUrl" : { }
-    } ],
-    "properties" : null,
-    "version" : 1,
-    "authorizationRequired" : null,
-    "baseUri" : { },
-    "test" : null
-  }
+    "deduplicate" : null,
+    "poll" : null
+  } ]
 }

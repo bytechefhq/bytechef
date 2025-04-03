@@ -1,7 +1,7 @@
 {
   "componentCategories" : [ {
     "name" : "productivity-and-collaboration",
-    "label" : "productivity-and-collaboration"
+    "label" : "Productivity and Collaboration"
   } ],
   "customAction" : true,
   "customActionHelp" : null,
@@ -13,6 +13,75 @@
   "resources" : null,
   "version" : 1,
   "title" : "Calendly",
+  "connection" : {
+    "authorizations" : [ {
+      "detectOn" : null,
+      "description" : null,
+      "name" : "oauth2_authorization_code",
+      "properties" : [ {
+        "advancedOption" : null,
+        "description" : null,
+        "displayCondition" : null,
+        "expressionEnabled" : null,
+        "hidden" : null,
+        "metadata" : { },
+        "required" : true,
+        "name" : "clientId",
+        "type" : "STRING",
+        "defaultValue" : null,
+        "exampleValue" : null,
+        "label" : "Client Id",
+        "placeholder" : null,
+        "controlType" : "TEXT",
+        "languageId" : null,
+        "maxLength" : null,
+        "minLength" : null,
+        "options" : null,
+        "optionsDataSource" : null
+      }, {
+        "advancedOption" : null,
+        "description" : null,
+        "displayCondition" : null,
+        "expressionEnabled" : null,
+        "hidden" : null,
+        "metadata" : { },
+        "required" : true,
+        "name" : "clientSecret",
+        "type" : "STRING",
+        "defaultValue" : null,
+        "exampleValue" : null,
+        "label" : "Client Secret",
+        "placeholder" : null,
+        "controlType" : "TEXT",
+        "languageId" : null,
+        "maxLength" : null,
+        "minLength" : null,
+        "options" : null,
+        "optionsDataSource" : null
+      } ],
+      "refreshOn" : null,
+      "title" : "OAuth2 Authorization Code",
+      "type" : "OAUTH2_AUTHORIZATION_CODE",
+      "acquire" : null,
+      "authorizationUrl" : { },
+      "clientSecret" : null,
+      "refreshToken" : null,
+      "refreshUrl" : { },
+      "scopes" : null,
+      "tokenUrl" : { },
+      "apply" : null,
+      "clientId" : null,
+      "pkce" : null,
+      "refresh" : null,
+      "authorizationCallback" : null,
+      "oauth2AuthorizationExtraQueryParameters" : null
+    } ],
+    "properties" : null,
+    "version" : 1,
+    "authorizationRequired" : null,
+    "baseUri" : { },
+    "test" : null
+  },
   "actions" : [ {
     "batch" : null,
     "deprecated" : null,
@@ -139,14 +208,14 @@
               "label" : null,
               "placeholder" : null,
               "options" : null,
-              "controlType" : "DATE_TIME",
-              "optionsDataSource" : null
+              "optionsDataSource" : null,
+              "controlType" : "DATE_TIME"
             } ],
-            "controlType" : "OBJECT_BUILDER",
-            "optionsDataSource" : null
+            "optionsDataSource" : null,
+            "controlType" : "OBJECT_BUILDER"
           } ],
-          "controlType" : "OBJECT_BUILDER",
-          "optionsDataSource" : null
+          "optionsDataSource" : null,
+          "controlType" : "OBJECT_BUILDER"
         },
         "sampleOutput" : null,
         "placeholder" : null
@@ -262,14 +331,14 @@
             "label" : null,
             "placeholder" : null,
             "options" : null,
-            "controlType" : "DATE_TIME",
-            "optionsDataSource" : null
+            "optionsDataSource" : null,
+            "controlType" : "DATE_TIME"
           } ],
-          "controlType" : "OBJECT_BUILDER",
-          "optionsDataSource" : null
+          "optionsDataSource" : null,
+          "controlType" : "OBJECT_BUILDER"
         } ],
-        "controlType" : "OBJECT_BUILDER",
-        "optionsDataSource" : null
+        "optionsDataSource" : null,
+        "controlType" : "OBJECT_BUILDER"
       },
       "sampleOutput" : null
     },
@@ -344,121 +413,6 @@
     "perform" : null,
     "processErrorResponse" : null,
     "workflowNodeDescription" : null
-  } ],
-  "triggers" : [ {
-    "batch" : null,
-    "deprecated" : null,
-    "description" : "Triggers when an invitee cancels a scheduled event.",
-    "help" : null,
-    "name" : "inviteeCanceled",
-    "outputDefinition" : {
-      "output" : null,
-      "outputResponse" : null,
-      "outputSchema" : null,
-      "sampleOutput" : null
-    },
-    "properties" : [ {
-      "advancedOption" : null,
-      "description" : null,
-      "displayCondition" : null,
-      "expressionEnabled" : null,
-      "hidden" : null,
-      "metadata" : { },
-      "required" : true,
-      "name" : "scope",
-      "type" : "STRING",
-      "defaultValue" : null,
-      "exampleValue" : null,
-      "label" : "Scope",
-      "placeholder" : null,
-      "controlType" : "SELECT",
-      "languageId" : null,
-      "maxLength" : null,
-      "minLength" : null,
-      "options" : [ {
-        "description" : null,
-        "label" : "User",
-        "value" : "user"
-      }, {
-        "description" : null,
-        "label" : "Organization",
-        "value" : "organization"
-      } ],
-      "optionsDataSource" : null
-    } ],
-    "title" : "Invitee Canceled",
-    "type" : "DYNAMIC_WEBHOOK",
-    "webhookRawBody" : null,
-    "workflowSyncExecution" : null,
-    "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
-    "poll" : null,
-    "deduplicate" : null,
-    "webhookDisable" : { },
-    "webhookEnable" : { },
-    "dynamicWebhookRefresh" : null,
-    "listenerDisable" : null,
-    "listenerEnable" : null,
-    "webhookRequest" : { },
-    "webhookValidate" : null,
-    "webhookValidateOnEnable" : null
-  }, {
-    "batch" : null,
-    "deprecated" : null,
-    "description" : "Triggers when an invitee schedules an event.",
-    "help" : null,
-    "name" : "inviteeCreated",
-    "outputDefinition" : {
-      "output" : null,
-      "outputResponse" : null,
-      "outputSchema" : null,
-      "sampleOutput" : null
-    },
-    "properties" : [ {
-      "advancedOption" : null,
-      "description" : null,
-      "displayCondition" : null,
-      "expressionEnabled" : null,
-      "hidden" : null,
-      "metadata" : { },
-      "required" : true,
-      "name" : "scope",
-      "type" : "STRING",
-      "defaultValue" : null,
-      "exampleValue" : null,
-      "label" : "Scope",
-      "placeholder" : null,
-      "controlType" : "SELECT",
-      "languageId" : null,
-      "maxLength" : null,
-      "minLength" : null,
-      "options" : [ {
-        "description" : null,
-        "label" : "User",
-        "value" : "user"
-      }, {
-        "description" : null,
-        "label" : "Organization",
-        "value" : "organization"
-      } ],
-      "optionsDataSource" : null
-    } ],
-    "title" : "Invitee Created",
-    "type" : "DYNAMIC_WEBHOOK",
-    "webhookRawBody" : null,
-    "workflowSyncExecution" : null,
-    "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
-    "poll" : null,
-    "deduplicate" : null,
-    "webhookDisable" : { },
-    "webhookEnable" : { },
-    "dynamicWebhookRefresh" : null,
-    "listenerDisable" : null,
-    "listenerEnable" : null,
-    "webhookRequest" : { },
-    "webhookValidate" : null,
-    "webhookValidateOnEnable" : null
   } ],
   "clusterElements" : [ {
     "description" : "Cancels specified event.",
@@ -577,14 +531,14 @@
               "label" : null,
               "placeholder" : null,
               "options" : null,
-              "controlType" : "DATE_TIME",
-              "optionsDataSource" : null
+              "optionsDataSource" : null,
+              "controlType" : "DATE_TIME"
             } ],
-            "controlType" : "OBJECT_BUILDER",
-            "optionsDataSource" : null
+            "optionsDataSource" : null,
+            "controlType" : "OBJECT_BUILDER"
           } ],
-          "controlType" : "OBJECT_BUILDER",
-          "optionsDataSource" : null
+          "optionsDataSource" : null,
+          "controlType" : "OBJECT_BUILDER"
         },
         "sampleOutput" : null,
         "placeholder" : null
@@ -700,14 +654,14 @@
             "label" : null,
             "placeholder" : null,
             "options" : null,
-            "controlType" : "DATE_TIME",
-            "optionsDataSource" : null
+            "optionsDataSource" : null,
+            "controlType" : "DATE_TIME"
           } ],
-          "controlType" : "OBJECT_BUILDER",
-          "optionsDataSource" : null
+          "optionsDataSource" : null,
+          "controlType" : "OBJECT_BUILDER"
         } ],
-        "controlType" : "OBJECT_BUILDER",
-        "optionsDataSource" : null
+        "optionsDataSource" : null,
+        "controlType" : "OBJECT_BUILDER"
       },
       "sampleOutput" : null
     },
@@ -788,74 +742,120 @@
     },
     "element" : { }
   } ],
-  "unifiedApi" : null,
-  "connection" : {
-    "authorizations" : [ {
-      "detectOn" : null,
+  "triggers" : [ {
+    "batch" : null,
+    "deprecated" : null,
+    "description" : "Triggers when an invitee cancels a scheduled event.",
+    "help" : null,
+    "name" : "inviteeCanceled",
+    "outputDefinition" : {
+      "output" : null,
+      "outputResponse" : null,
+      "outputSchema" : null,
+      "sampleOutput" : null
+    },
+    "properties" : [ {
+      "advancedOption" : null,
       "description" : null,
-      "name" : "oauth2_authorization_code",
-      "properties" : [ {
-        "advancedOption" : null,
+      "displayCondition" : null,
+      "expressionEnabled" : null,
+      "hidden" : null,
+      "metadata" : { },
+      "required" : true,
+      "name" : "scope",
+      "type" : "STRING",
+      "defaultValue" : null,
+      "exampleValue" : null,
+      "label" : "Scope",
+      "placeholder" : null,
+      "controlType" : "SELECT",
+      "languageId" : null,
+      "maxLength" : null,
+      "minLength" : null,
+      "options" : [ {
         "description" : null,
-        "displayCondition" : null,
-        "expressionEnabled" : null,
-        "hidden" : null,
-        "metadata" : { },
-        "required" : true,
-        "name" : "clientId",
-        "type" : "STRING",
-        "defaultValue" : null,
-        "exampleValue" : null,
-        "label" : "Client Id",
-        "placeholder" : null,
-        "controlType" : "TEXT",
-        "languageId" : null,
-        "maxLength" : null,
-        "minLength" : null,
-        "options" : null,
-        "optionsDataSource" : null
+        "label" : "User",
+        "value" : "user"
       }, {
-        "advancedOption" : null,
         "description" : null,
-        "displayCondition" : null,
-        "expressionEnabled" : null,
-        "hidden" : null,
-        "metadata" : { },
-        "required" : true,
-        "name" : "clientSecret",
-        "type" : "STRING",
-        "defaultValue" : null,
-        "exampleValue" : null,
-        "label" : "Client Secret",
-        "placeholder" : null,
-        "controlType" : "TEXT",
-        "languageId" : null,
-        "maxLength" : null,
-        "minLength" : null,
-        "options" : null,
-        "optionsDataSource" : null
+        "label" : "Organization",
+        "value" : "organization"
       } ],
-      "refreshOn" : null,
-      "title" : "OAuth2 Authorization Code",
-      "type" : "OAUTH2_AUTHORIZATION_CODE",
-      "acquire" : null,
-      "apply" : null,
-      "authorizationCallback" : null,
-      "authorizationUrl" : { },
-      "clientId" : null,
-      "clientSecret" : null,
-      "oauth2AuthorizationExtraQueryParameters" : null,
-      "pkce" : null,
-      "refresh" : null,
-      "refreshUrl" : { },
-      "scopes" : null,
-      "refreshToken" : null,
-      "tokenUrl" : { }
+      "optionsDataSource" : null
     } ],
-    "properties" : null,
-    "version" : 1,
-    "authorizationRequired" : null,
-    "baseUri" : { },
-    "test" : null
-  }
+    "title" : "Invitee Canceled",
+    "type" : "DYNAMIC_WEBHOOK",
+    "webhookRawBody" : null,
+    "workflowSyncExecution" : null,
+    "webhookEnable" : { },
+    "listenerDisable" : null,
+    "listenerEnable" : null,
+    "webhookRequest" : { },
+    "webhookValidate" : null,
+    "webhookDisable" : { },
+    "deduplicate" : null,
+    "poll" : null,
+    "processErrorResponse" : null,
+    "workflowNodeDescription" : null,
+    "dynamicWebhookRefresh" : null,
+    "webhookValidateOnEnable" : null
+  }, {
+    "batch" : null,
+    "deprecated" : null,
+    "description" : "Triggers when an invitee schedules an event.",
+    "help" : null,
+    "name" : "inviteeCreated",
+    "outputDefinition" : {
+      "output" : null,
+      "outputResponse" : null,
+      "outputSchema" : null,
+      "sampleOutput" : null
+    },
+    "properties" : [ {
+      "advancedOption" : null,
+      "description" : null,
+      "displayCondition" : null,
+      "expressionEnabled" : null,
+      "hidden" : null,
+      "metadata" : { },
+      "required" : true,
+      "name" : "scope",
+      "type" : "STRING",
+      "defaultValue" : null,
+      "exampleValue" : null,
+      "label" : "Scope",
+      "placeholder" : null,
+      "controlType" : "SELECT",
+      "languageId" : null,
+      "maxLength" : null,
+      "minLength" : null,
+      "options" : [ {
+        "description" : null,
+        "label" : "User",
+        "value" : "user"
+      }, {
+        "description" : null,
+        "label" : "Organization",
+        "value" : "organization"
+      } ],
+      "optionsDataSource" : null
+    } ],
+    "title" : "Invitee Created",
+    "type" : "DYNAMIC_WEBHOOK",
+    "webhookRawBody" : null,
+    "workflowSyncExecution" : null,
+    "webhookEnable" : { },
+    "listenerDisable" : null,
+    "listenerEnable" : null,
+    "webhookRequest" : { },
+    "webhookValidate" : null,
+    "webhookDisable" : { },
+    "deduplicate" : null,
+    "poll" : null,
+    "processErrorResponse" : null,
+    "workflowNodeDescription" : null,
+    "dynamicWebhookRefresh" : null,
+    "webhookValidateOnEnable" : null
+  } ],
+  "unifiedApi" : null
 }

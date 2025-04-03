@@ -2,7 +2,7 @@
   "actions" : [ ],
   "componentCategories" : [ {
     "name" : "artificial-intelligence",
-    "label" : "artificial-intelligence"
+    "label" : "Artificial Intelligence"
   } ],
   "connection" : null,
   "customAction" : null,
@@ -52,8 +52,8 @@
       "maxValue" : null,
       "minValue" : null,
       "options" : null,
-      "controlType" : "INTEGER",
-      "optionsDataSource" : null
+      "optionsDataSource" : null,
+      "controlType" : "INTEGER"
     } ],
     "title" : "Multi Query Expander",
     "type" : {

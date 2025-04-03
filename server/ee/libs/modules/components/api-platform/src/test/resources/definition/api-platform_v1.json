@@ -65,13 +65,13 @@
       }
     } ],
     "title" : "Response to API Request",
-    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "perform" : { }
   } ],
   "componentCategories" : [ {
     "name" : "helpers",
-    "label" : "helpers"
+    "label" : "Helpers"
   } ],
   "connection" : null,
   "customAction" : null,
@@ -174,8 +174,8 @@
         "options" : null,
         "optionsDataSource" : null
       } ],
-      "controlType" : "OBJECT_BUILDER",
-      "optionsDataSource" : null
+      "optionsDataSource" : null,
+      "controlType" : "OBJECT_BUILDER"
     }, {
       "advancedOption" : null,
       "description" : "The schema definition for the response output.",
@@ -274,8 +274,8 @@
         "options" : null,
         "optionsDataSource" : null
       } ],
-      "controlType" : "OBJECT_BUILDER",
-      "optionsDataSource" : null
+      "optionsDataSource" : null,
+      "controlType" : "OBJECT_BUILDER"
     }, {
       "advancedOption" : null,
       "description" : "The incoming request will time out after the specified number of milliseconds. The max wait time before a timeout is 5 minutes.",
@@ -293,25 +293,25 @@
       "maxValue" : null,
       "minValue" : null,
       "options" : null,
-      "controlType" : "INTEGER",
-      "optionsDataSource" : null
+      "optionsDataSource" : null,
+      "controlType" : "INTEGER"
     } ],
     "title" : "New API Request",
     "type" : "STATIC_WEBHOOK",
     "webhookRawBody" : null,
     "workflowSyncExecution" : true,
-    "deduplicate" : null,
-    "poll" : null,
+    "dynamicWebhookRefresh" : null,
+    "processErrorResponse" : null,
+    "webhookValidateOnEnable" : null,
+    "workflowNodeDescription" : null,
     "webhookDisable" : null,
     "webhookEnable" : null,
     "webhookRequest" : { },
     "listenerDisable" : null,
     "listenerEnable" : null,
     "webhookValidate" : null,
-    "dynamicWebhookRefresh" : null,
-    "processErrorResponse" : null,
-    "webhookValidateOnEnable" : null,
-    "workflowNodeDescription" : null
+    "deduplicate" : null,
+    "poll" : null
   } ],
   "unifiedApi" : null,
   "version" : 1

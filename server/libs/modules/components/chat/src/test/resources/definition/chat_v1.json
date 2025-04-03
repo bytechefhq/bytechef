@@ -1,7 +1,7 @@
 {
   "componentCategories" : [ {
     "name" : "helpers",
-    "label" : "helpers"
+    "label" : "Helpers"
   } ],
   "customAction" : null,
   "customActionHelp" : null,
@@ -13,6 +13,7 @@
   "resources" : null,
   "version" : 1,
   "title" : "Chat",
+  "connection" : null,
   "actions" : [ {
     "batch" : null,
     "deprecated" : null,
@@ -161,12 +162,12 @@
       "minItems" : null,
       "multipleValues" : null,
       "options" : null,
-      "controlType" : "ARRAY_BUILDER",
-      "optionsDataSource" : null
+      "optionsDataSource" : null,
+      "controlType" : "ARRAY_BUILDER"
     } ],
     "title" : "Response to Chat Request",
-    "processErrorResponse" : null,
     "perform" : { },
+    "processErrorResponse" : null,
     "workflowNodeDescription" : null
   } ],
   "clusterElements" : null,
@@ -352,11 +353,11 @@
             "minItems" : null,
             "multipleValues" : null,
             "options" : null,
-            "controlType" : "ARRAY_BUILDER",
-            "optionsDataSource" : null
+            "optionsDataSource" : null,
+            "controlType" : "ARRAY_BUILDER"
           } ],
-          "controlType" : "OBJECT_BUILDER",
-          "optionsDataSource" : null
+          "optionsDataSource" : null,
+          "controlType" : "OBJECT_BUILDER"
         },
         "sampleOutput" : null,
         "placeholder" : null
@@ -533,11 +534,11 @@
           "minItems" : null,
           "multipleValues" : null,
           "options" : null,
-          "controlType" : "ARRAY_BUILDER",
-          "optionsDataSource" : null
+          "optionsDataSource" : null,
+          "controlType" : "ARRAY_BUILDER"
         } ],
-        "controlType" : "OBJECT_BUILDER",
-        "optionsDataSource" : null
+        "optionsDataSource" : null,
+        "controlType" : "OBJECT_BUILDER"
       },
       "sampleOutput" : null
     },
@@ -566,25 +567,24 @@
         "label" : "Embedded Chat",
         "value" : 2
       } ],
-      "controlType" : "SELECT",
-      "optionsDataSource" : null
+      "optionsDataSource" : null,
+      "controlType" : "SELECT"
     } ],
     "title" : "New Chat Request",
     "type" : "STATIC_WEBHOOK",
     "webhookRawBody" : null,
     "workflowSyncExecution" : true,
-    "deduplicate" : null,
     "webhookDisable" : null,
     "webhookEnable" : null,
     "webhookRequest" : { },
     "listenerDisable" : null,
     "listenerEnable" : null,
-    "poll" : null,
-    "processErrorResponse" : null,
-    "dynamicWebhookRefresh" : null,
     "webhookValidate" : null,
+    "deduplicate" : null,
+    "poll" : null,
+    "dynamicWebhookRefresh" : null,
+    "processErrorResponse" : null,
     "webhookValidateOnEnable" : null,
     "workflowNodeDescription" : null
-  } ],
-  "connection" : null
+  } ]
 }

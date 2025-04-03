@@ -1,7 +1,7 @@
 {
   "componentCategories" : [ {
     "name" : "project-management",
-    "label" : "project-management"
+    "label" : "Project Management"
   } ],
   "customAction" : true,
   "customActionHelp" : null,
@@ -13,6 +13,95 @@
   "resources" : null,
   "version" : 1,
   "title" : "Jira",
+  "connection" : {
+    "authorizations" : [ {
+      "detectOn" : null,
+      "description" : null,
+      "name" : "oauth2_authorization_code",
+      "properties" : [ {
+        "advancedOption" : null,
+        "description" : "e.g https://{yourDomain}}.atlassian.net",
+        "displayCondition" : null,
+        "expressionEnabled" : null,
+        "hidden" : null,
+        "metadata" : { },
+        "required" : true,
+        "name" : "yourDomain",
+        "type" : "STRING",
+        "defaultValue" : null,
+        "exampleValue" : null,
+        "label" : "Your domain",
+        "placeholder" : null,
+        "controlType" : "TEXT",
+        "languageId" : null,
+        "maxLength" : null,
+        "minLength" : null,
+        "options" : null,
+        "optionsDataSource" : null
+      }, {
+        "advancedOption" : null,
+        "description" : null,
+        "displayCondition" : null,
+        "expressionEnabled" : null,
+        "hidden" : null,
+        "metadata" : { },
+        "required" : true,
+        "name" : "clientId",
+        "type" : "STRING",
+        "defaultValue" : null,
+        "exampleValue" : null,
+        "label" : "Client Id",
+        "placeholder" : null,
+        "controlType" : "TEXT",
+        "languageId" : null,
+        "maxLength" : null,
+        "minLength" : null,
+        "options" : null,
+        "optionsDataSource" : null
+      }, {
+        "advancedOption" : null,
+        "description" : null,
+        "displayCondition" : null,
+        "expressionEnabled" : null,
+        "hidden" : null,
+        "metadata" : { },
+        "required" : true,
+        "name" : "clientSecret",
+        "type" : "STRING",
+        "defaultValue" : null,
+        "exampleValue" : null,
+        "label" : "Client Secret",
+        "placeholder" : null,
+        "controlType" : "TEXT",
+        "languageId" : null,
+        "maxLength" : null,
+        "minLength" : null,
+        "options" : null,
+        "optionsDataSource" : null
+      } ],
+      "refreshOn" : null,
+      "title" : "OAuth2 Authorization Code",
+      "type" : "OAUTH2_AUTHORIZATION_CODE",
+      "acquire" : null,
+      "authorizationUrl" : { },
+      "clientSecret" : null,
+      "refreshToken" : null,
+      "apply" : null,
+      "clientId" : null,
+      "pkce" : null,
+      "refresh" : null,
+      "refreshUrl" : { },
+      "scopes" : { },
+      "tokenUrl" : { },
+      "oauth2AuthorizationExtraQueryParameters" : null,
+      "authorizationCallback" : null
+    } ],
+    "properties" : null,
+    "version" : 1,
+    "authorizationRequired" : null,
+    "baseUri" : { },
+    "test" : null
+  },
   "actions" : [ {
     "batch" : null,
     "deprecated" : null,
@@ -101,8 +190,8 @@
             "options" : null,
             "optionsDataSource" : null
           } ],
-          "controlType" : "OBJECT_BUILDER",
-          "optionsDataSource" : null
+          "optionsDataSource" : null,
+          "controlType" : "OBJECT_BUILDER"
         },
         "sampleOutput" : null,
         "placeholder" : null
@@ -185,8 +274,8 @@
           "options" : null,
           "optionsDataSource" : null
         } ],
-        "controlType" : "OBJECT_BUILDER",
-        "optionsDataSource" : null
+        "optionsDataSource" : null,
+        "controlType" : "OBJECT_BUILDER"
       },
       "sampleOutput" : null
     },
@@ -519,8 +608,8 @@
               "options" : null,
               "optionsDataSource" : null
             } ],
-            "controlType" : "OBJECT_BUILDER",
-            "optionsDataSource" : null
+            "optionsDataSource" : null,
+            "controlType" : "OBJECT_BUILDER"
           }, {
             "advancedOption" : null,
             "description" : null,
@@ -643,8 +732,8 @@
               "options" : null,
               "optionsDataSource" : null
             } ],
-            "controlType" : "OBJECT_BUILDER",
-            "optionsDataSource" : null
+            "optionsDataSource" : null,
+            "controlType" : "OBJECT_BUILDER"
           }, {
             "advancedOption" : null,
             "description" : null,
@@ -763,11 +852,11 @@
               "options" : null,
               "optionsDataSource" : null
             } ],
-            "controlType" : "OBJECT_BUILDER",
-            "optionsDataSource" : null
+            "optionsDataSource" : null,
+            "controlType" : "OBJECT_BUILDER"
           } ],
-          "controlType" : "OBJECT_BUILDER",
-          "optionsDataSource" : null
+          "optionsDataSource" : null,
+          "controlType" : "OBJECT_BUILDER"
         },
         "sampleOutput" : null,
         "placeholder" : null
@@ -931,8 +1020,8 @@
             "options" : null,
             "optionsDataSource" : null
           } ],
-          "controlType" : "OBJECT_BUILDER",
-          "optionsDataSource" : null
+          "optionsDataSource" : null,
+          "controlType" : "OBJECT_BUILDER"
         }, {
           "advancedOption" : null,
           "description" : null,
@@ -1055,8 +1144,8 @@
             "options" : null,
             "optionsDataSource" : null
           } ],
-          "controlType" : "OBJECT_BUILDER",
-          "optionsDataSource" : null
+          "optionsDataSource" : null,
+          "controlType" : "OBJECT_BUILDER"
         }, {
           "advancedOption" : null,
           "description" : null,
@@ -1175,11 +1264,11 @@
             "options" : null,
             "optionsDataSource" : null
           } ],
-          "controlType" : "OBJECT_BUILDER",
-          "optionsDataSource" : null
+          "optionsDataSource" : null,
+          "controlType" : "OBJECT_BUILDER"
         } ],
-        "controlType" : "OBJECT_BUILDER",
-        "optionsDataSource" : null
+        "optionsDataSource" : null,
+        "controlType" : "OBJECT_BUILDER"
       },
       "sampleOutput" : null
     },
@@ -1416,8 +1505,8 @@
                 "options" : null,
                 "optionsDataSource" : null
               } ],
-              "controlType" : "OBJECT_BUILDER",
-              "optionsDataSource" : null
+              "optionsDataSource" : null,
+              "controlType" : "OBJECT_BUILDER"
             }, {
               "advancedOption" : null,
               "description" : null,
@@ -1476,8 +1565,8 @@
                 "options" : null,
                 "optionsDataSource" : null
               } ],
-              "controlType" : "OBJECT_BUILDER",
-              "optionsDataSource" : null
+              "optionsDataSource" : null,
+              "controlType" : "OBJECT_BUILDER"
             }, {
               "advancedOption" : null,
               "description" : null,
@@ -1536,8 +1625,8 @@
                 "options" : null,
                 "optionsDataSource" : null
               } ],
-              "controlType" : "OBJECT_BUILDER",
-              "optionsDataSource" : null
+              "optionsDataSource" : null,
+              "controlType" : "OBJECT_BUILDER"
             }, {
               "advancedOption" : null,
               "description" : null,
@@ -1596,8 +1685,8 @@
                 "options" : null,
                 "optionsDataSource" : null
               } ],
-              "controlType" : "OBJECT_BUILDER",
-              "optionsDataSource" : null
+              "optionsDataSource" : null,
+              "controlType" : "OBJECT_BUILDER"
             }, {
               "advancedOption" : null,
               "description" : "Summary of the issue.",
@@ -1619,11 +1708,11 @@
               "options" : null,
               "optionsDataSource" : null
             } ],
-            "controlType" : "OBJECT_BUILDER",
-            "optionsDataSource" : null
+            "optionsDataSource" : null,
+            "controlType" : "OBJECT_BUILDER"
           } ],
-          "controlType" : "OBJECT_BUILDER",
-          "optionsDataSource" : null
+          "optionsDataSource" : null,
+          "controlType" : "OBJECT_BUILDER"
         },
         "sampleOutput" : null,
         "placeholder" : null
@@ -1780,8 +1869,8 @@
               "options" : null,
               "optionsDataSource" : null
             } ],
-            "controlType" : "OBJECT_BUILDER",
-            "optionsDataSource" : null
+            "optionsDataSource" : null,
+            "controlType" : "OBJECT_BUILDER"
           }, {
             "advancedOption" : null,
             "description" : null,
@@ -1840,8 +1929,8 @@
               "options" : null,
               "optionsDataSource" : null
             } ],
-            "controlType" : "OBJECT_BUILDER",
-            "optionsDataSource" : null
+            "optionsDataSource" : null,
+            "controlType" : "OBJECT_BUILDER"
           }, {
             "advancedOption" : null,
             "description" : null,
@@ -1900,8 +1989,8 @@
               "options" : null,
               "optionsDataSource" : null
             } ],
-            "controlType" : "OBJECT_BUILDER",
-            "optionsDataSource" : null
+            "optionsDataSource" : null,
+            "controlType" : "OBJECT_BUILDER"
           }, {
             "advancedOption" : null,
             "description" : null,
@@ -1960,8 +2049,8 @@
               "options" : null,
               "optionsDataSource" : null
             } ],
-            "controlType" : "OBJECT_BUILDER",
-            "optionsDataSource" : null
+            "optionsDataSource" : null,
+            "controlType" : "OBJECT_BUILDER"
           }, {
             "advancedOption" : null,
             "description" : "Summary of the issue.",
@@ -1983,11 +2072,11 @@
             "options" : null,
             "optionsDataSource" : null
           } ],
-          "controlType" : "OBJECT_BUILDER",
-          "optionsDataSource" : null
+          "optionsDataSource" : null,
+          "controlType" : "OBJECT_BUILDER"
         } ],
-        "controlType" : "OBJECT_BUILDER",
-        "optionsDataSource" : null
+        "optionsDataSource" : null,
+        "controlType" : "OBJECT_BUILDER"
       },
       "sampleOutput" : null
     },
@@ -2218,8 +2307,8 @@
                   "options" : null,
                   "optionsDataSource" : null
                 } ],
-                "controlType" : "OBJECT_BUILDER",
-                "optionsDataSource" : null
+                "optionsDataSource" : null,
+                "controlType" : "OBJECT_BUILDER"
               }, {
                 "advancedOption" : null,
                 "description" : null,
@@ -2278,8 +2367,8 @@
                   "options" : null,
                   "optionsDataSource" : null
                 } ],
-                "controlType" : "OBJECT_BUILDER",
-                "optionsDataSource" : null
+                "optionsDataSource" : null,
+                "controlType" : "OBJECT_BUILDER"
               }, {
                 "advancedOption" : null,
                 "description" : null,
@@ -2338,8 +2427,8 @@
                   "options" : null,
                   "optionsDataSource" : null
                 } ],
-                "controlType" : "OBJECT_BUILDER",
-                "optionsDataSource" : null
+                "optionsDataSource" : null,
+                "controlType" : "OBJECT_BUILDER"
               }, {
                 "advancedOption" : null,
                 "description" : null,
@@ -2398,8 +2487,8 @@
                   "options" : null,
                   "optionsDataSource" : null
                 } ],
-                "controlType" : "OBJECT_BUILDER",
-                "optionsDataSource" : null
+                "optionsDataSource" : null,
+                "controlType" : "OBJECT_BUILDER"
               }, {
                 "advancedOption" : null,
                 "description" : "Summary of the issue.",
@@ -2421,18 +2510,18 @@
                 "options" : null,
                 "optionsDataSource" : null
               } ],
-              "controlType" : "OBJECT_BUILDER",
-              "optionsDataSource" : null
+              "optionsDataSource" : null,
+              "controlType" : "OBJECT_BUILDER"
             } ],
-            "controlType" : "OBJECT_BUILDER",
-            "optionsDataSource" : null
+            "optionsDataSource" : null,
+            "controlType" : "OBJECT_BUILDER"
           } ],
           "maxItems" : null,
           "minItems" : null,
           "multipleValues" : null,
           "options" : null,
-          "controlType" : "ARRAY_BUILDER",
-          "optionsDataSource" : null
+          "optionsDataSource" : null,
+          "controlType" : "ARRAY_BUILDER"
         },
         "sampleOutput" : null,
         "placeholder" : null
@@ -2603,8 +2692,8 @@
                 "options" : null,
                 "optionsDataSource" : null
               } ],
-              "controlType" : "OBJECT_BUILDER",
-              "optionsDataSource" : null
+              "optionsDataSource" : null,
+              "controlType" : "OBJECT_BUILDER"
             }, {
               "advancedOption" : null,
               "description" : null,
@@ -2663,8 +2752,8 @@
                 "options" : null,
                 "optionsDataSource" : null
               } ],
-              "controlType" : "OBJECT_BUILDER",
-              "optionsDataSource" : null
+              "optionsDataSource" : null,
+              "controlType" : "OBJECT_BUILDER"
             }, {
               "advancedOption" : null,
               "description" : null,
@@ -2723,8 +2812,8 @@
                 "options" : null,
                 "optionsDataSource" : null
               } ],
-              "controlType" : "OBJECT_BUILDER",
-              "optionsDataSource" : null
+              "optionsDataSource" : null,
+              "controlType" : "OBJECT_BUILDER"
             }, {
               "advancedOption" : null,
               "description" : null,
@@ -2783,8 +2872,8 @@
                 "options" : null,
                 "optionsDataSource" : null
               } ],
-              "controlType" : "OBJECT_BUILDER",
-              "optionsDataSource" : null
+              "optionsDataSource" : null,
+              "controlType" : "OBJECT_BUILDER"
             }, {
               "advancedOption" : null,
               "description" : "Summary of the issue.",
@@ -2806,18 +2895,18 @@
               "options" : null,
               "optionsDataSource" : null
             } ],
-            "controlType" : "OBJECT_BUILDER",
-            "optionsDataSource" : null
+            "optionsDataSource" : null,
+            "controlType" : "OBJECT_BUILDER"
           } ],
-          "controlType" : "OBJECT_BUILDER",
-          "optionsDataSource" : null
+          "optionsDataSource" : null,
+          "controlType" : "OBJECT_BUILDER"
         } ],
         "maxItems" : null,
         "minItems" : null,
         "multipleValues" : null,
         "options" : null,
-        "controlType" : "ARRAY_BUILDER",
-        "optionsDataSource" : null
+        "optionsDataSource" : null,
+        "controlType" : "ARRAY_BUILDER"
       },
       "sampleOutput" : null
     },
@@ -2858,8 +2947,8 @@
       "maxValue" : 100,
       "minValue" : 1,
       "options" : null,
-      "controlType" : "INTEGER",
-      "optionsDataSource" : null
+      "optionsDataSource" : null,
+      "controlType" : "INTEGER"
     } ],
     "title" : "Search Issues",
     "perform" : { },
@@ -2950,8 +3039,8 @@
             "options" : null,
             "optionsDataSource" : null
           } ],
-          "controlType" : "OBJECT_BUILDER",
-          "optionsDataSource" : null
+          "optionsDataSource" : null,
+          "controlType" : "OBJECT_BUILDER"
         },
         "sampleOutput" : null,
         "placeholder" : null
@@ -3034,8 +3123,8 @@
           "options" : null,
           "optionsDataSource" : null
         } ],
-        "controlType" : "OBJECT_BUILDER",
-        "optionsDataSource" : null
+        "optionsDataSource" : null,
+        "controlType" : "OBJECT_BUILDER"
       },
       "sampleOutput" : null
     },
@@ -3369,8 +3458,8 @@
               "options" : null,
               "optionsDataSource" : null
             } ],
-            "controlType" : "OBJECT_BUILDER",
-            "optionsDataSource" : null
+            "optionsDataSource" : null,
+            "controlType" : "OBJECT_BUILDER"
           }, {
             "advancedOption" : null,
             "description" : null,
@@ -3493,8 +3582,8 @@
               "options" : null,
               "optionsDataSource" : null
             } ],
-            "controlType" : "OBJECT_BUILDER",
-            "optionsDataSource" : null
+            "optionsDataSource" : null,
+            "controlType" : "OBJECT_BUILDER"
           }, {
             "advancedOption" : null,
             "description" : null,
@@ -3613,11 +3702,11 @@
               "options" : null,
               "optionsDataSource" : null
             } ],
-            "controlType" : "OBJECT_BUILDER",
-            "optionsDataSource" : null
+            "optionsDataSource" : null,
+            "controlType" : "OBJECT_BUILDER"
           } ],
-          "controlType" : "OBJECT_BUILDER",
-          "optionsDataSource" : null
+          "optionsDataSource" : null,
+          "controlType" : "OBJECT_BUILDER"
         },
         "sampleOutput" : null,
         "placeholder" : null
@@ -3781,8 +3870,8 @@
             "options" : null,
             "optionsDataSource" : null
           } ],
-          "controlType" : "OBJECT_BUILDER",
-          "optionsDataSource" : null
+          "optionsDataSource" : null,
+          "controlType" : "OBJECT_BUILDER"
         }, {
           "advancedOption" : null,
           "description" : null,
@@ -3905,8 +3994,8 @@
             "options" : null,
             "optionsDataSource" : null
           } ],
-          "controlType" : "OBJECT_BUILDER",
-          "optionsDataSource" : null
+          "optionsDataSource" : null,
+          "controlType" : "OBJECT_BUILDER"
         }, {
           "advancedOption" : null,
           "description" : null,
@@ -4025,11 +4114,11 @@
             "options" : null,
             "optionsDataSource" : null
           } ],
-          "controlType" : "OBJECT_BUILDER",
-          "optionsDataSource" : null
+          "optionsDataSource" : null,
+          "controlType" : "OBJECT_BUILDER"
         } ],
-        "controlType" : "OBJECT_BUILDER",
-        "optionsDataSource" : null
+        "optionsDataSource" : null,
+        "controlType" : "OBJECT_BUILDER"
       },
       "sampleOutput" : null
     },
@@ -4267,8 +4356,8 @@
                 "options" : null,
                 "optionsDataSource" : null
               } ],
-              "controlType" : "OBJECT_BUILDER",
-              "optionsDataSource" : null
+              "optionsDataSource" : null,
+              "controlType" : "OBJECT_BUILDER"
             }, {
               "advancedOption" : null,
               "description" : null,
@@ -4327,8 +4416,8 @@
                 "options" : null,
                 "optionsDataSource" : null
               } ],
-              "controlType" : "OBJECT_BUILDER",
-              "optionsDataSource" : null
+              "optionsDataSource" : null,
+              "controlType" : "OBJECT_BUILDER"
             }, {
               "advancedOption" : null,
               "description" : null,
@@ -4387,8 +4476,8 @@
                 "options" : null,
                 "optionsDataSource" : null
               } ],
-              "controlType" : "OBJECT_BUILDER",
-              "optionsDataSource" : null
+              "optionsDataSource" : null,
+              "controlType" : "OBJECT_BUILDER"
             }, {
               "advancedOption" : null,
               "description" : null,
@@ -4447,8 +4536,8 @@
                 "options" : null,
                 "optionsDataSource" : null
               } ],
-              "controlType" : "OBJECT_BUILDER",
-              "optionsDataSource" : null
+              "optionsDataSource" : null,
+              "controlType" : "OBJECT_BUILDER"
             }, {
               "advancedOption" : null,
               "description" : "Summary of the issue.",
@@ -4470,11 +4559,11 @@
               "options" : null,
               "optionsDataSource" : null
             } ],
-            "controlType" : "OBJECT_BUILDER",
-            "optionsDataSource" : null
+            "optionsDataSource" : null,
+            "controlType" : "OBJECT_BUILDER"
           } ],
-          "controlType" : "OBJECT_BUILDER",
-          "optionsDataSource" : null
+          "optionsDataSource" : null,
+          "controlType" : "OBJECT_BUILDER"
         },
         "sampleOutput" : null,
         "placeholder" : null
@@ -4631,8 +4720,8 @@
               "options" : null,
               "optionsDataSource" : null
             } ],
-            "controlType" : "OBJECT_BUILDER",
-            "optionsDataSource" : null
+            "optionsDataSource" : null,
+            "controlType" : "OBJECT_BUILDER"
           }, {
             "advancedOption" : null,
             "description" : null,
@@ -4691,8 +4780,8 @@
               "options" : null,
               "optionsDataSource" : null
             } ],
-            "controlType" : "OBJECT_BUILDER",
-            "optionsDataSource" : null
+            "optionsDataSource" : null,
+            "controlType" : "OBJECT_BUILDER"
           }, {
             "advancedOption" : null,
             "description" : null,
@@ -4751,8 +4840,8 @@
               "options" : null,
               "optionsDataSource" : null
             } ],
-            "controlType" : "OBJECT_BUILDER",
-            "optionsDataSource" : null
+            "optionsDataSource" : null,
+            "controlType" : "OBJECT_BUILDER"
           }, {
             "advancedOption" : null,
             "description" : null,
@@ -4811,8 +4900,8 @@
               "options" : null,
               "optionsDataSource" : null
             } ],
-            "controlType" : "OBJECT_BUILDER",
-            "optionsDataSource" : null
+            "optionsDataSource" : null,
+            "controlType" : "OBJECT_BUILDER"
           }, {
             "advancedOption" : null,
             "description" : "Summary of the issue.",
@@ -4834,11 +4923,11 @@
             "options" : null,
             "optionsDataSource" : null
           } ],
-          "controlType" : "OBJECT_BUILDER",
-          "optionsDataSource" : null
+          "optionsDataSource" : null,
+          "controlType" : "OBJECT_BUILDER"
         } ],
-        "controlType" : "OBJECT_BUILDER",
-        "optionsDataSource" : null
+        "optionsDataSource" : null,
+        "controlType" : "OBJECT_BUILDER"
       },
       "sampleOutput" : null
     },
@@ -5070,8 +5159,8 @@
                   "options" : null,
                   "optionsDataSource" : null
                 } ],
-                "controlType" : "OBJECT_BUILDER",
-                "optionsDataSource" : null
+                "optionsDataSource" : null,
+                "controlType" : "OBJECT_BUILDER"
               }, {
                 "advancedOption" : null,
                 "description" : null,
@@ -5130,8 +5219,8 @@
                   "options" : null,
                   "optionsDataSource" : null
                 } ],
-                "controlType" : "OBJECT_BUILDER",
-                "optionsDataSource" : null
+                "optionsDataSource" : null,
+                "controlType" : "OBJECT_BUILDER"
               }, {
                 "advancedOption" : null,
                 "description" : null,
@@ -5190,8 +5279,8 @@
                   "options" : null,
                   "optionsDataSource" : null
                 } ],
-                "controlType" : "OBJECT_BUILDER",
-                "optionsDataSource" : null
+                "optionsDataSource" : null,
+                "controlType" : "OBJECT_BUILDER"
               }, {
                 "advancedOption" : null,
                 "description" : null,
@@ -5250,8 +5339,8 @@
                   "options" : null,
                   "optionsDataSource" : null
                 } ],
-                "controlType" : "OBJECT_BUILDER",
-                "optionsDataSource" : null
+                "optionsDataSource" : null,
+                "controlType" : "OBJECT_BUILDER"
               }, {
                 "advancedOption" : null,
                 "description" : "Summary of the issue.",
@@ -5273,18 +5362,18 @@
                 "options" : null,
                 "optionsDataSource" : null
               } ],
-              "controlType" : "OBJECT_BUILDER",
-              "optionsDataSource" : null
+              "optionsDataSource" : null,
+              "controlType" : "OBJECT_BUILDER"
             } ],
-            "controlType" : "OBJECT_BUILDER",
-            "optionsDataSource" : null
+            "optionsDataSource" : null,
+            "controlType" : "OBJECT_BUILDER"
           } ],
           "maxItems" : null,
           "minItems" : null,
           "multipleValues" : null,
           "options" : null,
-          "controlType" : "ARRAY_BUILDER",
-          "optionsDataSource" : null
+          "optionsDataSource" : null,
+          "controlType" : "ARRAY_BUILDER"
         },
         "sampleOutput" : null,
         "placeholder" : null
@@ -5455,8 +5544,8 @@
                 "options" : null,
                 "optionsDataSource" : null
               } ],
-              "controlType" : "OBJECT_BUILDER",
-              "optionsDataSource" : null
+              "optionsDataSource" : null,
+              "controlType" : "OBJECT_BUILDER"
             }, {
               "advancedOption" : null,
               "description" : null,
@@ -5515,8 +5604,8 @@
                 "options" : null,
                 "optionsDataSource" : null
               } ],
-              "controlType" : "OBJECT_BUILDER",
-              "optionsDataSource" : null
+              "optionsDataSource" : null,
+              "controlType" : "OBJECT_BUILDER"
             }, {
               "advancedOption" : null,
               "description" : null,
@@ -5575,8 +5664,8 @@
                 "options" : null,
                 "optionsDataSource" : null
               } ],
-              "controlType" : "OBJECT_BUILDER",
-              "optionsDataSource" : null
+              "optionsDataSource" : null,
+              "controlType" : "OBJECT_BUILDER"
             }, {
               "advancedOption" : null,
               "description" : null,
@@ -5635,8 +5724,8 @@
                 "options" : null,
                 "optionsDataSource" : null
               } ],
-              "controlType" : "OBJECT_BUILDER",
-              "optionsDataSource" : null
+              "optionsDataSource" : null,
+              "controlType" : "OBJECT_BUILDER"
             }, {
               "advancedOption" : null,
               "description" : "Summary of the issue.",
@@ -5658,18 +5747,18 @@
               "options" : null,
               "optionsDataSource" : null
             } ],
-            "controlType" : "OBJECT_BUILDER",
-            "optionsDataSource" : null
+            "optionsDataSource" : null,
+            "controlType" : "OBJECT_BUILDER"
           } ],
-          "controlType" : "OBJECT_BUILDER",
-          "optionsDataSource" : null
+          "optionsDataSource" : null,
+          "controlType" : "OBJECT_BUILDER"
         } ],
         "maxItems" : null,
         "minItems" : null,
         "multipleValues" : null,
         "options" : null,
-        "controlType" : "ARRAY_BUILDER",
-        "optionsDataSource" : null
+        "optionsDataSource" : null,
+        "controlType" : "ARRAY_BUILDER"
       },
       "sampleOutput" : null
     },
@@ -5710,8 +5799,8 @@
       "maxValue" : 100,
       "minValue" : 1,
       "options" : null,
-      "controlType" : "INTEGER",
-      "optionsDataSource" : null
+      "optionsDataSource" : null,
+      "controlType" : "INTEGER"
     } ],
     "title" : "Search Issues",
     "type" : {
@@ -5897,8 +5986,8 @@
                 "options" : null,
                 "optionsDataSource" : null
               } ],
-              "controlType" : "OBJECT_BUILDER",
-              "optionsDataSource" : null
+              "optionsDataSource" : null,
+              "controlType" : "OBJECT_BUILDER"
             }, {
               "advancedOption" : null,
               "description" : null,
@@ -5957,8 +6046,8 @@
                 "options" : null,
                 "optionsDataSource" : null
               } ],
-              "controlType" : "OBJECT_BUILDER",
-              "optionsDataSource" : null
+              "optionsDataSource" : null,
+              "controlType" : "OBJECT_BUILDER"
             }, {
               "advancedOption" : null,
               "description" : null,
@@ -6017,8 +6106,8 @@
                 "options" : null,
                 "optionsDataSource" : null
               } ],
-              "controlType" : "OBJECT_BUILDER",
-              "optionsDataSource" : null
+              "optionsDataSource" : null,
+              "controlType" : "OBJECT_BUILDER"
             }, {
               "advancedOption" : null,
               "description" : null,
@@ -6077,8 +6166,8 @@
                 "options" : null,
                 "optionsDataSource" : null
               } ],
-              "controlType" : "OBJECT_BUILDER",
-              "optionsDataSource" : null
+              "optionsDataSource" : null,
+              "controlType" : "OBJECT_BUILDER"
             }, {
               "advancedOption" : null,
               "description" : "Summary of the issue.",
@@ -6100,11 +6189,11 @@
               "options" : null,
               "optionsDataSource" : null
             } ],
-            "controlType" : "OBJECT_BUILDER",
-            "optionsDataSource" : null
+            "optionsDataSource" : null,
+            "controlType" : "OBJECT_BUILDER"
           } ],
-          "controlType" : "OBJECT_BUILDER",
-          "optionsDataSource" : null
+          "optionsDataSource" : null,
+          "controlType" : "OBJECT_BUILDER"
         },
         "sampleOutput" : null,
         "placeholder" : null
@@ -6261,8 +6350,8 @@
               "options" : null,
               "optionsDataSource" : null
             } ],
-            "controlType" : "OBJECT_BUILDER",
-            "optionsDataSource" : null
+            "optionsDataSource" : null,
+            "controlType" : "OBJECT_BUILDER"
           }, {
             "advancedOption" : null,
             "description" : null,
@@ -6321,8 +6410,8 @@
               "options" : null,
               "optionsDataSource" : null
             } ],
-            "controlType" : "OBJECT_BUILDER",
-            "optionsDataSource" : null
+            "optionsDataSource" : null,
+            "controlType" : "OBJECT_BUILDER"
           }, {
             "advancedOption" : null,
             "description" : null,
@@ -6381,8 +6470,8 @@
               "options" : null,
               "optionsDataSource" : null
             } ],
-            "controlType" : "OBJECT_BUILDER",
-            "optionsDataSource" : null
+            "optionsDataSource" : null,
+            "controlType" : "OBJECT_BUILDER"
           }, {
             "advancedOption" : null,
             "description" : null,
@@ -6441,8 +6530,8 @@
               "options" : null,
               "optionsDataSource" : null
             } ],
-            "controlType" : "OBJECT_BUILDER",
-            "optionsDataSource" : null
+            "optionsDataSource" : null,
+            "controlType" : "OBJECT_BUILDER"
           }, {
             "advancedOption" : null,
             "description" : "Summary of the issue.",
@@ -6464,11 +6553,11 @@
             "options" : null,
             "optionsDataSource" : null
           } ],
-          "controlType" : "OBJECT_BUILDER",
-          "optionsDataSource" : null
+          "optionsDataSource" : null,
+          "controlType" : "OBJECT_BUILDER"
         } ],
-        "controlType" : "OBJECT_BUILDER",
-        "optionsDataSource" : null
+        "optionsDataSource" : null,
+        "controlType" : "OBJECT_BUILDER"
       },
       "sampleOutput" : null
     },
@@ -6523,17 +6612,17 @@
     "type" : "DYNAMIC_WEBHOOK",
     "webhookRawBody" : null,
     "workflowSyncExecution" : null,
-    "poll" : null,
-    "deduplicate" : null,
     "webhookDisable" : { },
     "webhookEnable" : { },
-    "dynamicWebhookRefresh" : null,
-    "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
     "webhookRequest" : { },
     "listenerDisable" : null,
     "listenerEnable" : null,
     "webhookValidate" : null,
+    "deduplicate" : null,
+    "poll" : null,
+    "processErrorResponse" : null,
+    "workflowNodeDescription" : null,
+    "dynamicWebhookRefresh" : null,
     "webhookValidateOnEnable" : null
   }, {
     "batch" : null,
@@ -6696,8 +6785,8 @@
                 "options" : null,
                 "optionsDataSource" : null
               } ],
-              "controlType" : "OBJECT_BUILDER",
-              "optionsDataSource" : null
+              "optionsDataSource" : null,
+              "controlType" : "OBJECT_BUILDER"
             }, {
               "advancedOption" : null,
               "description" : null,
@@ -6756,8 +6845,8 @@
                 "options" : null,
                 "optionsDataSource" : null
               } ],
-              "controlType" : "OBJECT_BUILDER",
-              "optionsDataSource" : null
+              "optionsDataSource" : null,
+              "controlType" : "OBJECT_BUILDER"
             }, {
               "advancedOption" : null,
               "description" : null,
@@ -6816,8 +6905,8 @@
                 "options" : null,
                 "optionsDataSource" : null
               } ],
-              "controlType" : "OBJECT_BUILDER",
-              "optionsDataSource" : null
+              "optionsDataSource" : null,
+              "controlType" : "OBJECT_BUILDER"
             }, {
               "advancedOption" : null,
               "description" : null,
@@ -6876,8 +6965,8 @@
                 "options" : null,
                 "optionsDataSource" : null
               } ],
-              "controlType" : "OBJECT_BUILDER",
-              "optionsDataSource" : null
+              "optionsDataSource" : null,
+              "controlType" : "OBJECT_BUILDER"
             }, {
               "advancedOption" : null,
               "description" : "Summary of the issue.",
@@ -6899,11 +6988,11 @@
               "options" : null,
               "optionsDataSource" : null
             } ],
-            "controlType" : "OBJECT_BUILDER",
-            "optionsDataSource" : null
+            "optionsDataSource" : null,
+            "controlType" : "OBJECT_BUILDER"
           } ],
-          "controlType" : "OBJECT_BUILDER",
-          "optionsDataSource" : null
+          "optionsDataSource" : null,
+          "controlType" : "OBJECT_BUILDER"
         },
         "sampleOutput" : null,
         "placeholder" : null
@@ -7060,8 +7149,8 @@
               "options" : null,
               "optionsDataSource" : null
             } ],
-            "controlType" : "OBJECT_BUILDER",
-            "optionsDataSource" : null
+            "optionsDataSource" : null,
+            "controlType" : "OBJECT_BUILDER"
           }, {
             "advancedOption" : null,
             "description" : null,
@@ -7120,8 +7209,8 @@
               "options" : null,
               "optionsDataSource" : null
             } ],
-            "controlType" : "OBJECT_BUILDER",
-            "optionsDataSource" : null
+            "optionsDataSource" : null,
+            "controlType" : "OBJECT_BUILDER"
           }, {
             "advancedOption" : null,
             "description" : null,
@@ -7180,8 +7269,8 @@
               "options" : null,
               "optionsDataSource" : null
             } ],
-            "controlType" : "OBJECT_BUILDER",
-            "optionsDataSource" : null
+            "optionsDataSource" : null,
+            "controlType" : "OBJECT_BUILDER"
           }, {
             "advancedOption" : null,
             "description" : null,
@@ -7240,8 +7329,8 @@
               "options" : null,
               "optionsDataSource" : null
             } ],
-            "controlType" : "OBJECT_BUILDER",
-            "optionsDataSource" : null
+            "optionsDataSource" : null,
+            "controlType" : "OBJECT_BUILDER"
           }, {
             "advancedOption" : null,
             "description" : "Summary of the issue.",
@@ -7263,11 +7352,11 @@
             "options" : null,
             "optionsDataSource" : null
           } ],
-          "controlType" : "OBJECT_BUILDER",
-          "optionsDataSource" : null
+          "optionsDataSource" : null,
+          "controlType" : "OBJECT_BUILDER"
         } ],
-        "controlType" : "OBJECT_BUILDER",
-        "optionsDataSource" : null
+        "optionsDataSource" : null,
+        "controlType" : "OBJECT_BUILDER"
       },
       "sampleOutput" : null
     },
@@ -7322,106 +7411,17 @@
     "type" : "DYNAMIC_WEBHOOK",
     "webhookRawBody" : null,
     "workflowSyncExecution" : null,
-    "poll" : null,
-    "deduplicate" : null,
     "webhookDisable" : { },
     "webhookEnable" : { },
-    "dynamicWebhookRefresh" : null,
-    "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
     "webhookRequest" : { },
     "listenerDisable" : null,
     "listenerEnable" : null,
     "webhookValidate" : null,
+    "deduplicate" : null,
+    "poll" : null,
+    "processErrorResponse" : null,
+    "workflowNodeDescription" : null,
+    "dynamicWebhookRefresh" : null,
     "webhookValidateOnEnable" : null
-  } ],
-  "connection" : {
-    "authorizations" : [ {
-      "detectOn" : null,
-      "description" : null,
-      "name" : "oauth2_authorization_code",
-      "properties" : [ {
-        "advancedOption" : null,
-        "description" : "e.g https://{yourDomain}}.atlassian.net",
-        "displayCondition" : null,
-        "expressionEnabled" : null,
-        "hidden" : null,
-        "metadata" : { },
-        "required" : true,
-        "name" : "yourDomain",
-        "type" : "STRING",
-        "defaultValue" : null,
-        "exampleValue" : null,
-        "label" : "Your domain",
-        "placeholder" : null,
-        "controlType" : "TEXT",
-        "languageId" : null,
-        "maxLength" : null,
-        "minLength" : null,
-        "options" : null,
-        "optionsDataSource" : null
-      }, {
-        "advancedOption" : null,
-        "description" : null,
-        "displayCondition" : null,
-        "expressionEnabled" : null,
-        "hidden" : null,
-        "metadata" : { },
-        "required" : true,
-        "name" : "clientId",
-        "type" : "STRING",
-        "defaultValue" : null,
-        "exampleValue" : null,
-        "label" : "Client Id",
-        "placeholder" : null,
-        "controlType" : "TEXT",
-        "languageId" : null,
-        "maxLength" : null,
-        "minLength" : null,
-        "options" : null,
-        "optionsDataSource" : null
-      }, {
-        "advancedOption" : null,
-        "description" : null,
-        "displayCondition" : null,
-        "expressionEnabled" : null,
-        "hidden" : null,
-        "metadata" : { },
-        "required" : true,
-        "name" : "clientSecret",
-        "type" : "STRING",
-        "defaultValue" : null,
-        "exampleValue" : null,
-        "label" : "Client Secret",
-        "placeholder" : null,
-        "controlType" : "TEXT",
-        "languageId" : null,
-        "maxLength" : null,
-        "minLength" : null,
-        "options" : null,
-        "optionsDataSource" : null
-      } ],
-      "refreshOn" : null,
-      "title" : "OAuth2 Authorization Code",
-      "type" : "OAUTH2_AUTHORIZATION_CODE",
-      "acquire" : null,
-      "apply" : null,
-      "authorizationCallback" : null,
-      "authorizationUrl" : { },
-      "clientId" : null,
-      "clientSecret" : null,
-      "oauth2AuthorizationExtraQueryParameters" : null,
-      "pkce" : null,
-      "refresh" : null,
-      "refreshUrl" : { },
-      "scopes" : { },
-      "refreshToken" : null,
-      "tokenUrl" : { }
-    } ],
-    "properties" : null,
-    "version" : 1,
-    "authorizationRequired" : null,
-    "baseUri" : { },
-    "test" : null
-  }
+  } ]
 }

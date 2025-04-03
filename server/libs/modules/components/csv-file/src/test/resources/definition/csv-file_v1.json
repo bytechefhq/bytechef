@@ -1,7 +1,7 @@
 {
   "componentCategories" : [ {
     "name" : "helpers",
-    "label" : "helpers"
+    "label" : "Helpers"
   } ],
   "customAction" : null,
   "customActionHelp" : null,
@@ -13,6 +13,7 @@
   "resources" : null,
   "version" : 1,
   "title" : "CSV File",
+  "connection" : null,
   "actions" : [ {
     "batch" : null,
     "deprecated" : null,
@@ -274,9 +275,9 @@
       "controlType" : "SELECT"
     } ],
     "title" : "Read from File",
-    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "perform" : { }
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -632,10 +633,12 @@
       "optionsDataSource" : null
     } ],
     "title" : "Write to CSV File",
-    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "perform" : { }
   } ],
+  "unifiedApi" : null,
+  "triggers" : null,
   "clusterElements" : [ {
     "description" : null,
     "name" : "reader",
@@ -1054,8 +1057,5 @@
       "required" : false
     },
     "element" : { }
-  } ],
-  "unifiedApi" : null,
-  "triggers" : null,
-  "connection" : null
+  } ]
 }

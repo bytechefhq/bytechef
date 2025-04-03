@@ -1,7 +1,7 @@
 {
   "componentCategories" : [ {
     "name" : "helpers",
-    "label" : "helpers"
+    "label" : "Helpers"
   } ],
   "customAction" : null,
   "customActionHelp" : null,
@@ -13,6 +13,7 @@
   "resources" : null,
   "version" : 1,
   "title" : "JSON Helper",
+  "connection" : null,
   "actions" : [ {
     "batch" : null,
     "deprecated" : null,
@@ -48,9 +49,9 @@
       "optionsDataSource" : null
     } ],
     "title" : "Convert from JSON String",
-    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "perform" : { }
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -110,8 +111,8 @@
       "multipleValues" : null,
       "options" : null,
       "properties" : null,
-      "controlType" : "OBJECT_BUILDER",
-      "optionsDataSource" : null
+      "optionsDataSource" : null,
+      "controlType" : "OBJECT_BUILDER"
     }, {
       "advancedOption" : null,
       "description" : "The data to convert to JSON string.",
@@ -131,16 +132,15 @@
       "minItems" : null,
       "multipleValues" : null,
       "options" : null,
-      "controlType" : "ARRAY_BUILDER",
-      "optionsDataSource" : null
+      "optionsDataSource" : null,
+      "controlType" : "ARRAY_BUILDER"
     } ],
     "title" : "Convert to JSON String",
-    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "perform" : { }
   } ],
-  "connection" : null,
   "clusterElements" : null,
-  "unifiedApi" : null,
-  "triggers" : null
+  "triggers" : null,
+  "unifiedApi" : null
 }

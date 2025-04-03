@@ -2,7 +2,7 @@
   "actions" : [ ],
   "componentCategories" : [ {
     "name" : "helpers",
-    "label" : "helpers"
+    "label" : "Helpers"
   } ],
   "connection" : null,
   "customAction" : null,
@@ -24,8 +24,8 @@
     "outputDefinition" : {
       "output" : { },
       "outputResponse" : null,
-      "outputSchema" : null,
-      "sampleOutput" : null
+      "sampleOutput" : null,
+      "outputSchema" : null
     },
     "properties" : [ {
       "advancedOption" : null,
@@ -44,28 +44,28 @@
       "maxValue" : null,
       "minValue" : null,
       "options" : null,
-      "controlType" : "SELECT",
       "optionsDataSource" : {
         "optionsLookupDependsOn" : null,
         "options" : { }
-      }
+      },
+      "controlType" : "SELECT"
     } ],
     "title" : "New Event",
     "type" : "STATIC_WEBHOOK",
     "webhookRawBody" : null,
     "workflowSyncExecution" : null,
     "dynamicWebhookRefresh" : null,
+    "processErrorResponse" : null,
+    "webhookValidateOnEnable" : null,
+    "workflowNodeDescription" : null,
+    "webhookDisable" : null,
+    "webhookEnable" : null,
     "webhookRequest" : { },
     "listenerDisable" : null,
     "listenerEnable" : null,
-    "poll" : null,
-    "processErrorResponse" : null,
     "webhookValidate" : null,
-    "webhookValidateOnEnable" : null,
-    "workflowNodeDescription" : null,
     "deduplicate" : null,
-    "webhookDisable" : null,
-    "webhookEnable" : null
+    "poll" : null
   } ],
   "unifiedApi" : null,
   "version" : 1

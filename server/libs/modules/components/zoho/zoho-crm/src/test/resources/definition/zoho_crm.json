@@ -1,7 +1,7 @@
 {
   "componentCategories" : [ {
     "name" : "crm",
-    "label" : "crm"
+    "label" : "CRM"
   } ],
   "customAction" : null,
   "customActionHelp" : null,
@@ -13,6 +13,119 @@
   "resources" : null,
   "version" : 1,
   "title" : "Zoho CRM",
+  "connection" : {
+    "authorizations" : [ {
+      "detectOn" : null,
+      "description" : null,
+      "name" : "oauth2_authorization_code",
+      "properties" : [ {
+        "advancedOption" : null,
+        "description" : null,
+        "displayCondition" : null,
+        "expressionEnabled" : null,
+        "hidden" : null,
+        "metadata" : { },
+        "required" : true,
+        "name" : "region",
+        "type" : "STRING",
+        "defaultValue" : null,
+        "exampleValue" : null,
+        "label" : "Region",
+        "placeholder" : null,
+        "controlType" : "SELECT",
+        "languageId" : null,
+        "maxLength" : null,
+        "minLength" : null,
+        "options" : [ {
+          "description" : null,
+          "label" : "zoho.eu (Europe)",
+          "value" : "zoho.eu"
+        }, {
+          "description" : null,
+          "label" : "zoho.com (United States)",
+          "value" : "zoho.com"
+        }, {
+          "description" : null,
+          "label" : "zoho.com.au (Australia)",
+          "value" : "zoho.com.au"
+        }, {
+          "description" : null,
+          "label" : "zoho.jp (Japan)",
+          "value" : "zoho.jp"
+        }, {
+          "description" : null,
+          "label" : "zoho.in (India)",
+          "value" : "zoho.in"
+        }, {
+          "description" : null,
+          "label" : "zohocloud.ca (Canada)",
+          "value" : "zohocloud.ca"
+        } ],
+        "optionsDataSource" : null
+      }, {
+        "advancedOption" : null,
+        "description" : null,
+        "displayCondition" : null,
+        "expressionEnabled" : null,
+        "hidden" : null,
+        "metadata" : { },
+        "required" : true,
+        "name" : "clientId",
+        "type" : "STRING",
+        "defaultValue" : null,
+        "exampleValue" : null,
+        "label" : "Client Id",
+        "placeholder" : null,
+        "controlType" : "TEXT",
+        "languageId" : null,
+        "maxLength" : null,
+        "minLength" : null,
+        "options" : null,
+        "optionsDataSource" : null
+      }, {
+        "advancedOption" : null,
+        "description" : null,
+        "displayCondition" : null,
+        "expressionEnabled" : null,
+        "hidden" : null,
+        "metadata" : { },
+        "required" : true,
+        "name" : "clientSecret",
+        "type" : "STRING",
+        "defaultValue" : null,
+        "exampleValue" : null,
+        "label" : "Client Secret",
+        "placeholder" : null,
+        "controlType" : "TEXT",
+        "languageId" : null,
+        "maxLength" : null,
+        "minLength" : null,
+        "options" : null,
+        "optionsDataSource" : null
+      } ],
+      "refreshOn" : null,
+      "title" : "OAuth2 Authorization Code",
+      "type" : "OAUTH2_AUTHORIZATION_CODE",
+      "acquire" : null,
+      "authorizationCallback" : null,
+      "oauth2AuthorizationExtraQueryParameters" : null,
+      "apply" : { },
+      "clientId" : null,
+      "pkce" : null,
+      "refresh" : null,
+      "refreshUrl" : { },
+      "scopes" : { },
+      "tokenUrl" : { },
+      "authorizationUrl" : { },
+      "clientSecret" : null,
+      "refreshToken" : null
+    } ],
+    "properties" : null,
+    "version" : 1,
+    "authorizationRequired" : null,
+    "baseUri" : { },
+    "test" : null
+  },
   "actions" : [ {
     "batch" : null,
     "deprecated" : null,
@@ -1652,6 +1765,8 @@
     "workflowNodeDescription" : null,
     "perform" : { }
   } ],
+  "unifiedApi" : null,
+  "triggers" : null,
   "clusterElements" : [ {
     "description" : "Add user to your organization.",
     "name" : "addUser",
@@ -3293,120 +3408,5 @@
       "required" : false
     },
     "element" : { }
-  } ],
-  "unifiedApi" : null,
-  "triggers" : null,
-  "connection" : {
-    "authorizations" : [ {
-      "detectOn" : null,
-      "description" : null,
-      "name" : "oauth2_authorization_code",
-      "properties" : [ {
-        "advancedOption" : null,
-        "description" : null,
-        "displayCondition" : null,
-        "expressionEnabled" : null,
-        "hidden" : null,
-        "metadata" : { },
-        "required" : true,
-        "name" : "region",
-        "type" : "STRING",
-        "defaultValue" : null,
-        "exampleValue" : null,
-        "label" : "Region",
-        "placeholder" : null,
-        "controlType" : "SELECT",
-        "languageId" : null,
-        "maxLength" : null,
-        "minLength" : null,
-        "options" : [ {
-          "description" : null,
-          "label" : "zoho.eu (Europe)",
-          "value" : "zoho.eu"
-        }, {
-          "description" : null,
-          "label" : "zoho.com (United States)",
-          "value" : "zoho.com"
-        }, {
-          "description" : null,
-          "label" : "zoho.com.au (Australia)",
-          "value" : "zoho.com.au"
-        }, {
-          "description" : null,
-          "label" : "zoho.jp (Japan)",
-          "value" : "zoho.jp"
-        }, {
-          "description" : null,
-          "label" : "zoho.in (India)",
-          "value" : "zoho.in"
-        }, {
-          "description" : null,
-          "label" : "zohocloud.ca (Canada)",
-          "value" : "zohocloud.ca"
-        } ],
-        "optionsDataSource" : null
-      }, {
-        "advancedOption" : null,
-        "description" : null,
-        "displayCondition" : null,
-        "expressionEnabled" : null,
-        "hidden" : null,
-        "metadata" : { },
-        "required" : true,
-        "name" : "clientId",
-        "type" : "STRING",
-        "defaultValue" : null,
-        "exampleValue" : null,
-        "label" : "Client Id",
-        "placeholder" : null,
-        "controlType" : "TEXT",
-        "languageId" : null,
-        "maxLength" : null,
-        "minLength" : null,
-        "options" : null,
-        "optionsDataSource" : null
-      }, {
-        "advancedOption" : null,
-        "description" : null,
-        "displayCondition" : null,
-        "expressionEnabled" : null,
-        "hidden" : null,
-        "metadata" : { },
-        "required" : true,
-        "name" : "clientSecret",
-        "type" : "STRING",
-        "defaultValue" : null,
-        "exampleValue" : null,
-        "label" : "Client Secret",
-        "placeholder" : null,
-        "controlType" : "TEXT",
-        "languageId" : null,
-        "maxLength" : null,
-        "minLength" : null,
-        "options" : null,
-        "optionsDataSource" : null
-      } ],
-      "refreshOn" : null,
-      "title" : "OAuth2 Authorization Code",
-      "type" : "OAUTH2_AUTHORIZATION_CODE",
-      "acquire" : null,
-      "apply" : { },
-      "authorizationCallback" : null,
-      "clientId" : null,
-      "authorizationUrl" : { },
-      "clientSecret" : null,
-      "oauth2AuthorizationExtraQueryParameters" : null,
-      "pkce" : null,
-      "refresh" : null,
-      "refreshUrl" : { },
-      "scopes" : { },
-      "refreshToken" : null,
-      "tokenUrl" : { }
-    } ],
-    "properties" : null,
-    "version" : 1,
-    "authorizationRequired" : null,
-    "baseUri" : { },
-    "test" : null
-  }
+  } ]
 }

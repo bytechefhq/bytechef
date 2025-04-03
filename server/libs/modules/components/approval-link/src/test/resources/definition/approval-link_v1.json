@@ -1,10 +1,10 @@
 {
   "componentCategories" : [ {
     "name" : "developer-tools",
-    "label" : "developer-tools"
+    "label" : "Developer Tools"
   }, {
     "name" : "file-storage",
-    "label" : "file-storage"
+    "label" : "File Storage"
   } ],
   "customAction" : null,
   "customActionHelp" : null,
@@ -16,6 +16,7 @@
   "resources" : null,
   "version" : 1,
   "title" : "Approval Link",
+  "connection" : null,
   "actions" : [ {
     "batch" : null,
     "deprecated" : null,
@@ -31,12 +32,11 @@
     },
     "properties" : [ ],
     "title" : "Create Approval Links",
+    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
-    "perform" : { }
+    "workflowNodeDescription" : null
   } ],
-  "clusterElements" : null,
   "unifiedApi" : null,
   "triggers" : null,
-  "connection" : null
+  "clusterElements" : null
 }

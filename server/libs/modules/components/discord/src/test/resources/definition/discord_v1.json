@@ -1,7 +1,7 @@
 {
   "componentCategories" : [ {
     "name" : "communication",
-    "label" : "communication"
+    "label" : "Communication"
   } ],
   "customAction" : true,
   "customActionHelp" : null,
@@ -13,6 +13,55 @@
   "resources" : null,
   "version" : 1,
   "title" : "Discord",
+  "connection" : {
+    "authorizations" : [ {
+      "detectOn" : null,
+      "description" : null,
+      "name" : "bearer_token",
+      "properties" : [ {
+        "advancedOption" : null,
+        "description" : null,
+        "displayCondition" : null,
+        "expressionEnabled" : null,
+        "hidden" : null,
+        "metadata" : { },
+        "required" : true,
+        "name" : "token",
+        "type" : "STRING",
+        "defaultValue" : null,
+        "exampleValue" : null,
+        "label" : "Bot token",
+        "placeholder" : null,
+        "controlType" : "TEXT",
+        "languageId" : null,
+        "maxLength" : null,
+        "minLength" : null,
+        "options" : null,
+        "optionsDataSource" : null
+      } ],
+      "refreshOn" : null,
+      "title" : "Bearer Token",
+      "type" : "BEARER_TOKEN",
+      "acquire" : null,
+      "oauth2AuthorizationExtraQueryParameters" : null,
+      "authorizationCallback" : null,
+      "apply" : { },
+      "clientId" : null,
+      "pkce" : null,
+      "refresh" : null,
+      "refreshUrl" : null,
+      "scopes" : null,
+      "tokenUrl" : null,
+      "authorizationUrl" : null,
+      "clientSecret" : null,
+      "refreshToken" : null
+    } ],
+    "properties" : null,
+    "version" : 1,
+    "authorizationRequired" : null,
+    "baseUri" : { },
+    "test" : null
+  },
   "actions" : [ {
     "batch" : null,
     "deprecated" : null,
@@ -112,8 +161,8 @@
             } ],
             "controlType" : "SELECT"
           } ],
-          "optionsDataSource" : null,
-          "controlType" : "OBJECT_BUILDER"
+          "controlType" : "OBJECT_BUILDER",
+          "optionsDataSource" : null
         },
         "sampleOutput" : null,
         "placeholder" : null
@@ -202,8 +251,8 @@
           } ],
           "controlType" : "SELECT"
         } ],
-        "optionsDataSource" : null,
-        "controlType" : "OBJECT_BUILDER"
+        "controlType" : "OBJECT_BUILDER",
+        "optionsDataSource" : null
       },
       "sampleOutput" : null
     },
@@ -305,9 +354,9 @@
       "controlType" : "SELECT"
     } ],
     "title" : "Send Channel Message",
-    "perform" : null,
+    "processErrorResponse" : null,
     "workflowNodeDescription" : null,
-    "processErrorResponse" : null
+    "perform" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -379,8 +428,8 @@
             "maxValue" : null,
             "minValue" : null,
             "options" : null,
-            "optionsDataSource" : null,
-            "controlType" : "INTEGER"
+            "controlType" : "INTEGER",
+            "optionsDataSource" : null
           }, {
             "advancedOption" : null,
             "description" : null,
@@ -402,8 +451,8 @@
             "options" : null,
             "optionsDataSource" : null
           } ],
-          "optionsDataSource" : null,
-          "controlType" : "OBJECT_BUILDER"
+          "controlType" : "OBJECT_BUILDER",
+          "optionsDataSource" : null
         },
         "sampleOutput" : null,
         "placeholder" : null
@@ -464,8 +513,8 @@
           "maxValue" : null,
           "minValue" : null,
           "options" : null,
-          "optionsDataSource" : null,
-          "controlType" : "INTEGER"
+          "controlType" : "INTEGER",
+          "optionsDataSource" : null
         }, {
           "advancedOption" : null,
           "description" : null,
@@ -487,8 +536,8 @@
           "options" : null,
           "optionsDataSource" : null
         } ],
-        "optionsDataSource" : null,
-        "controlType" : "OBJECT_BUILDER"
+        "controlType" : "OBJECT_BUILDER",
+        "optionsDataSource" : null
       },
       "sampleOutput" : null
     },
@@ -570,13 +619,13 @@
         "label" : "GUILD_CATEGORY",
         "value" : 4
       } ],
-      "optionsDataSource" : null,
-      "controlType" : "SELECT"
+      "controlType" : "SELECT",
+      "optionsDataSource" : null
     } ],
     "title" : "Create Channel",
-    "perform" : null,
+    "processErrorResponse" : null,
     "workflowNodeDescription" : null,
-    "processErrorResponse" : null
+    "perform" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -642,11 +691,11 @@
               "options" : null,
               "optionsDataSource" : null
             } ],
-            "optionsDataSource" : null,
-            "controlType" : "OBJECT_BUILDER"
+            "controlType" : "OBJECT_BUILDER",
+            "optionsDataSource" : null
           } ],
-          "optionsDataSource" : null,
-          "controlType" : "OBJECT_BUILDER"
+          "controlType" : "OBJECT_BUILDER",
+          "optionsDataSource" : null
         },
         "sampleOutput" : null,
         "placeholder" : null
@@ -706,11 +755,11 @@
             "options" : null,
             "optionsDataSource" : null
           } ],
-          "optionsDataSource" : null,
-          "controlType" : "OBJECT_BUILDER"
+          "controlType" : "OBJECT_BUILDER",
+          "optionsDataSource" : null
         } ],
-        "optionsDataSource" : null,
-        "controlType" : "OBJECT_BUILDER"
+        "controlType" : "OBJECT_BUILDER",
+        "optionsDataSource" : null
       },
       "sampleOutput" : null
     },
@@ -806,10 +855,12 @@
       "controlType" : "SELECT"
     } ],
     "title" : "Send Direct Message",
-    "perform" : { },
+    "processErrorResponse" : null,
     "workflowNodeDescription" : null,
-    "processErrorResponse" : null
+    "perform" : { }
   } ],
+  "triggers" : [ ],
+  "unifiedApi" : null,
   "clusterElements" : [ {
     "description" : "Post a new message to a specific #channel you choose.",
     "name" : "sendChannelMessage",
@@ -900,8 +951,8 @@
             } ],
             "controlType" : "SELECT"
           } ],
-          "optionsDataSource" : null,
-          "controlType" : "OBJECT_BUILDER"
+          "controlType" : "OBJECT_BUILDER",
+          "optionsDataSource" : null
         },
         "sampleOutput" : null,
         "placeholder" : null
@@ -990,8 +1041,8 @@
           } ],
           "controlType" : "SELECT"
         } ],
-        "optionsDataSource" : null,
-        "controlType" : "OBJECT_BUILDER"
+        "controlType" : "OBJECT_BUILDER",
+        "optionsDataSource" : null
       },
       "sampleOutput" : null
     },
@@ -1163,8 +1214,8 @@
             "maxValue" : null,
             "minValue" : null,
             "options" : null,
-            "optionsDataSource" : null,
-            "controlType" : "INTEGER"
+            "controlType" : "INTEGER",
+            "optionsDataSource" : null
           }, {
             "advancedOption" : null,
             "description" : null,
@@ -1186,8 +1237,8 @@
             "options" : null,
             "optionsDataSource" : null
           } ],
-          "optionsDataSource" : null,
-          "controlType" : "OBJECT_BUILDER"
+          "controlType" : "OBJECT_BUILDER",
+          "optionsDataSource" : null
         },
         "sampleOutput" : null,
         "placeholder" : null
@@ -1248,8 +1299,8 @@
           "maxValue" : null,
           "minValue" : null,
           "options" : null,
-          "optionsDataSource" : null,
-          "controlType" : "INTEGER"
+          "controlType" : "INTEGER",
+          "optionsDataSource" : null
         }, {
           "advancedOption" : null,
           "description" : null,
@@ -1271,8 +1322,8 @@
           "options" : null,
           "optionsDataSource" : null
         } ],
-        "optionsDataSource" : null,
-        "controlType" : "OBJECT_BUILDER"
+        "controlType" : "OBJECT_BUILDER",
+        "optionsDataSource" : null
       },
       "sampleOutput" : null
     },
@@ -1354,8 +1405,8 @@
         "label" : "GUILD_CATEGORY",
         "value" : 4
       } ],
-      "optionsDataSource" : null,
-      "controlType" : "SELECT"
+      "controlType" : "SELECT",
+      "optionsDataSource" : null
     } ],
     "title" : "Create Channel",
     "type" : {
@@ -1427,11 +1478,11 @@
               "options" : null,
               "optionsDataSource" : null
             } ],
-            "optionsDataSource" : null,
-            "controlType" : "OBJECT_BUILDER"
+            "controlType" : "OBJECT_BUILDER",
+            "optionsDataSource" : null
           } ],
-          "optionsDataSource" : null,
-          "controlType" : "OBJECT_BUILDER"
+          "controlType" : "OBJECT_BUILDER",
+          "optionsDataSource" : null
         },
         "sampleOutput" : null,
         "placeholder" : null
@@ -1491,11 +1542,11 @@
             "options" : null,
             "optionsDataSource" : null
           } ],
-          "optionsDataSource" : null,
-          "controlType" : "OBJECT_BUILDER"
+          "controlType" : "OBJECT_BUILDER",
+          "optionsDataSource" : null
         } ],
-        "optionsDataSource" : null,
-        "controlType" : "OBJECT_BUILDER"
+        "controlType" : "OBJECT_BUILDER",
+        "optionsDataSource" : null
       },
       "sampleOutput" : null
     },
@@ -1599,56 +1650,5 @@
       "required" : false
     },
     "element" : { }
-  } ],
-  "unifiedApi" : null,
-  "triggers" : [ ],
-  "connection" : {
-    "authorizations" : [ {
-      "detectOn" : null,
-      "description" : null,
-      "name" : "bearer_token",
-      "properties" : [ {
-        "advancedOption" : null,
-        "description" : null,
-        "displayCondition" : null,
-        "expressionEnabled" : null,
-        "hidden" : null,
-        "metadata" : { },
-        "required" : true,
-        "name" : "token",
-        "type" : "STRING",
-        "defaultValue" : null,
-        "exampleValue" : null,
-        "label" : "Bot token",
-        "placeholder" : null,
-        "controlType" : "TEXT",
-        "languageId" : null,
-        "maxLength" : null,
-        "minLength" : null,
-        "options" : null,
-        "optionsDataSource" : null
-      } ],
-      "refreshOn" : null,
-      "title" : "Bearer Token",
-      "type" : "BEARER_TOKEN",
-      "acquire" : null,
-      "apply" : { },
-      "authorizationCallback" : null,
-      "authorizationUrl" : null,
-      "clientId" : null,
-      "clientSecret" : null,
-      "oauth2AuthorizationExtraQueryParameters" : null,
-      "pkce" : null,
-      "refresh" : null,
-      "refreshUrl" : null,
-      "scopes" : null,
-      "refreshToken" : null,
-      "tokenUrl" : null
-    } ],
-    "properties" : null,
-    "version" : 1,
-    "authorizationRequired" : null,
-    "baseUri" : { },
-    "test" : null
-  }
+  } ]
 }

@@ -10,6 +10,136 @@
   "resources" : null,
   "version" : 1,
   "title" : "Petstore",
+  "connection" : {
+    "authorizations" : [ {
+      "detectOn" : null,
+      "description" : null,
+      "name" : "oauth2_implicit_code",
+      "properties" : [ {
+        "advancedOption" : null,
+        "description" : null,
+        "displayCondition" : null,
+        "expressionEnabled" : null,
+        "hidden" : null,
+        "metadata" : { },
+        "required" : true,
+        "name" : "clientId",
+        "type" : "STRING",
+        "defaultValue" : null,
+        "exampleValue" : null,
+        "label" : "Client Id",
+        "placeholder" : null,
+        "controlType" : "TEXT",
+        "languageId" : null,
+        "maxLength" : null,
+        "minLength" : null,
+        "options" : null,
+        "optionsDataSource" : null
+      }, {
+        "advancedOption" : null,
+        "description" : null,
+        "displayCondition" : null,
+        "expressionEnabled" : null,
+        "hidden" : null,
+        "metadata" : { },
+        "required" : true,
+        "name" : "clientSecret",
+        "type" : "STRING",
+        "defaultValue" : null,
+        "exampleValue" : null,
+        "label" : "Client Secret",
+        "placeholder" : null,
+        "controlType" : "TEXT",
+        "languageId" : null,
+        "maxLength" : null,
+        "minLength" : null,
+        "options" : null,
+        "optionsDataSource" : null
+      } ],
+      "refreshOn" : null,
+      "title" : "OAuth2 Implicit",
+      "type" : "OAUTH2_IMPLICIT_CODE",
+      "acquire" : null,
+      "oauth2AuthorizationExtraQueryParameters" : null,
+      "authorizationCallback" : null,
+      "apply" : null,
+      "clientId" : null,
+      "pkce" : null,
+      "refresh" : null,
+      "refreshUrl" : null,
+      "scopes" : { },
+      "tokenUrl" : null,
+      "authorizationUrl" : { },
+      "clientSecret" : null,
+      "refreshToken" : null
+    }, {
+      "detectOn" : null,
+      "description" : null,
+      "name" : "api_key",
+      "properties" : [ {
+        "advancedOption" : null,
+        "description" : null,
+        "displayCondition" : null,
+        "expressionEnabled" : null,
+        "hidden" : true,
+        "metadata" : { },
+        "required" : true,
+        "name" : "key",
+        "type" : "STRING",
+        "defaultValue" : "api_key",
+        "exampleValue" : null,
+        "label" : "Key",
+        "placeholder" : null,
+        "controlType" : "TEXT",
+        "languageId" : null,
+        "maxLength" : null,
+        "minLength" : null,
+        "options" : null,
+        "optionsDataSource" : null
+      }, {
+        "advancedOption" : null,
+        "description" : null,
+        "displayCondition" : null,
+        "expressionEnabled" : null,
+        "hidden" : null,
+        "metadata" : { },
+        "required" : true,
+        "name" : "value",
+        "type" : "STRING",
+        "defaultValue" : null,
+        "exampleValue" : null,
+        "label" : "Value",
+        "placeholder" : null,
+        "controlType" : "TEXT",
+        "languageId" : null,
+        "maxLength" : null,
+        "minLength" : null,
+        "options" : null,
+        "optionsDataSource" : null
+      } ],
+      "refreshOn" : null,
+      "title" : "API Key",
+      "type" : "API_KEY",
+      "acquire" : null,
+      "oauth2AuthorizationExtraQueryParameters" : null,
+      "authorizationCallback" : null,
+      "apply" : null,
+      "clientId" : null,
+      "pkce" : null,
+      "refresh" : null,
+      "refreshUrl" : null,
+      "scopes" : null,
+      "tokenUrl" : null,
+      "authorizationUrl" : null,
+      "clientSecret" : null,
+      "refreshToken" : null
+    } ],
+    "properties" : null,
+    "version" : 1,
+    "authorizationRequired" : null,
+    "baseUri" : { },
+    "test" : null
+  },
   "actions" : [ {
     "batch" : null,
     "deprecated" : null,
@@ -302,7 +432,6 @@
         "sampleOutput" : null,
         "placeholder" : null
       },
-      "sampleOutput" : null,
       "outputSchema" : {
         "advancedOption" : null,
         "description" : null,
@@ -576,7 +705,8 @@
         } ],
         "controlType" : "OBJECT_BUILDER",
         "optionsDataSource" : null
-      }
+      },
+      "sampleOutput" : null
     },
     "properties" : [ {
       "advancedOption" : null,
@@ -845,9 +975,9 @@
       "optionsDataSource" : null
     } ],
     "title" : "Add a new pet to the store",
-    "perform" : null,
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "perform" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -1140,7 +1270,6 @@
         "sampleOutput" : null,
         "placeholder" : null
       },
-      "sampleOutput" : null,
       "outputSchema" : {
         "advancedOption" : null,
         "description" : null,
@@ -1414,7 +1543,8 @@
         } ],
         "controlType" : "OBJECT_BUILDER",
         "optionsDataSource" : null
-      }
+      },
+      "sampleOutput" : null
     },
     "properties" : [ {
       "advancedOption" : null,
@@ -1683,9 +1813,9 @@
       "optionsDataSource" : null
     } ],
     "title" : "Update an existing pet",
-    "perform" : null,
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "perform" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -1997,7 +2127,6 @@
         "sampleOutput" : null,
         "placeholder" : null
       },
-      "sampleOutput" : null,
       "outputSchema" : {
         "advancedOption" : null,
         "description" : null,
@@ -2292,7 +2421,8 @@
         "options" : null,
         "controlType" : "ARRAY_BUILDER",
         "optionsDataSource" : null
-      }
+      },
+      "sampleOutput" : null
     },
     "properties" : [ {
       "advancedOption" : null,
@@ -2330,9 +2460,9 @@
       "optionsDataSource" : null
     } ],
     "title" : "Finds Pets by status",
-    "perform" : null,
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "perform" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -2644,7 +2774,6 @@
         "sampleOutput" : null,
         "placeholder" : null
       },
-      "sampleOutput" : null,
       "outputSchema" : {
         "advancedOption" : null,
         "description" : null,
@@ -2939,7 +3068,8 @@
         "options" : null,
         "controlType" : "ARRAY_BUILDER",
         "optionsDataSource" : null
-      }
+      },
+      "sampleOutput" : null
     },
     "properties" : [ {
       "advancedOption" : null,
@@ -2986,9 +3116,9 @@
       "optionsDataSource" : null
     } ],
     "title" : "Finds Pets by tags",
-    "perform" : null,
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "perform" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -3045,9 +3175,9 @@
       "optionsDataSource" : null
     } ],
     "title" : "Deletes a pet",
-    "perform" : null,
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "perform" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -3338,7 +3468,6 @@
         "sampleOutput" : null,
         "placeholder" : null
       },
-      "sampleOutput" : null,
       "outputSchema" : {
         "advancedOption" : null,
         "description" : null,
@@ -3612,7 +3741,8 @@
         } ],
         "controlType" : "OBJECT_BUILDER",
         "optionsDataSource" : null
-      }
+      },
+      "sampleOutput" : null
     },
     "properties" : [ {
       "advancedOption" : null,
@@ -3637,9 +3767,9 @@
       "optionsDataSource" : null
     } ],
     "title" : "Find pet by ID",
-    "perform" : null,
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "perform" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -3718,9 +3848,9 @@
       "optionsDataSource" : null
     } ],
     "title" : "Updates a pet in the store with form data",
-    "perform" : null,
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "perform" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -3821,7 +3951,6 @@
         "sampleOutput" : null,
         "placeholder" : null
       },
-      "sampleOutput" : null,
       "outputSchema" : {
         "advancedOption" : null,
         "description" : null,
@@ -3903,7 +4032,8 @@
         } ],
         "controlType" : "OBJECT_BUILDER",
         "optionsDataSource" : null
-      }
+      },
+      "sampleOutput" : null
     },
     "properties" : [ {
       "advancedOption" : null,
@@ -4048,9 +4178,9 @@
       "controlType" : "FILE_ENTRY"
     } ],
     "title" : "uploads an image",
-    "perform" : null,
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "perform" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -4109,7 +4239,6 @@
         "sampleOutput" : null,
         "placeholder" : null
       },
-      "sampleOutput" : null,
       "outputSchema" : {
         "advancedOption" : null,
         "description" : null,
@@ -4151,13 +4280,14 @@
         "properties" : null,
         "controlType" : "OBJECT_BUILDER",
         "optionsDataSource" : null
-      }
+      },
+      "sampleOutput" : null
     },
     "properties" : [ ],
     "title" : "Returns pet inventories by status",
-    "perform" : null,
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "perform" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -4329,7 +4459,6 @@
         "sampleOutput" : null,
         "placeholder" : null
       },
-      "sampleOutput" : null,
       "outputSchema" : {
         "advancedOption" : null,
         "description" : null,
@@ -4482,7 +4611,8 @@
         } ],
         "controlType" : "OBJECT_BUILDER",
         "optionsDataSource" : null
-      }
+      },
+      "sampleOutput" : null
     },
     "properties" : [ {
       "advancedOption" : null,
@@ -4628,9 +4758,9 @@
       "controlType" : "SELECT"
     } ],
     "title" : "Place an order for a pet",
-    "perform" : null,
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "perform" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -4665,9 +4795,9 @@
       "optionsDataSource" : null
     } ],
     "title" : "Delete purchase order by ID",
-    "perform" : null,
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "perform" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -4837,7 +4967,6 @@
         "sampleOutput" : null,
         "placeholder" : null
       },
-      "sampleOutput" : null,
       "outputSchema" : {
         "advancedOption" : null,
         "description" : null,
@@ -4990,7 +5119,8 @@
         } ],
         "controlType" : "OBJECT_BUILDER",
         "optionsDataSource" : null
-      }
+      },
+      "sampleOutput" : null
     },
     "properties" : [ {
       "advancedOption" : null,
@@ -5015,9 +5145,9 @@
       "optionsDataSource" : null
     } ],
     "title" : "Find purchase order by ID",
-    "perform" : null,
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "perform" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -5217,7 +5347,6 @@
         "sampleOutput" : null,
         "placeholder" : null
       },
-      "sampleOutput" : null,
       "outputSchema" : {
         "advancedOption" : null,
         "description" : null,
@@ -5398,7 +5527,8 @@
         } ],
         "controlType" : "OBJECT_BUILDER",
         "optionsDataSource" : null
-      }
+      },
+      "sampleOutput" : null
     },
     "properties" : [ {
       "advancedOption" : null,
@@ -5576,9 +5706,9 @@
       "optionsDataSource" : null
     } ],
     "title" : "Create user",
-    "perform" : null,
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "perform" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -5799,7 +5929,6 @@
         "sampleOutput" : null,
         "placeholder" : null
       },
-      "sampleOutput" : null,
       "outputSchema" : {
         "advancedOption" : null,
         "description" : null,
@@ -6001,7 +6130,8 @@
         "options" : null,
         "controlType" : "ARRAY_BUILDER",
         "optionsDataSource" : null
-      }
+      },
+      "sampleOutput" : null
     },
     "properties" : [ {
       "advancedOption" : null,
@@ -6206,9 +6336,9 @@
       "optionsDataSource" : null
     } ],
     "title" : "Creates list of users with given input array",
-    "perform" : null,
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "perform" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -6244,9 +6374,9 @@
       "optionsDataSource" : null
     } ],
     "title" : "Delete user",
-    "perform" : null,
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "perform" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -6444,7 +6574,6 @@
         "sampleOutput" : null,
         "placeholder" : null
       },
-      "sampleOutput" : null,
       "outputSchema" : {
         "advancedOption" : null,
         "description" : null,
@@ -6625,7 +6754,8 @@
         } ],
         "controlType" : "OBJECT_BUILDER",
         "optionsDataSource" : null
-      }
+      },
+      "sampleOutput" : null
     },
     "properties" : [ {
       "advancedOption" : null,
@@ -6651,9 +6781,9 @@
       "optionsDataSource" : null
     } ],
     "title" : "Get user by user name",
-    "perform" : null,
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "perform" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -6853,7 +6983,6 @@
         "sampleOutput" : null,
         "placeholder" : null
       },
-      "sampleOutput" : null,
       "outputSchema" : {
         "advancedOption" : null,
         "description" : null,
@@ -7034,7 +7163,8 @@
         } ],
         "controlType" : "OBJECT_BUILDER",
         "optionsDataSource" : null
-      }
+      },
+      "sampleOutput" : null
     },
     "properties" : [ {
       "advancedOption" : null,
@@ -7234,141 +7364,11 @@
       "optionsDataSource" : null
     } ],
     "title" : "Update user",
-    "perform" : null,
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "perform" : null
   } ],
   "triggers" : [ ],
-  "clusterElements" : null,
   "unifiedApi" : null,
-  "connection" : {
-    "authorizations" : [ {
-      "detectOn" : null,
-      "description" : null,
-      "name" : "oauth2_implicit_code",
-      "properties" : [ {
-        "advancedOption" : null,
-        "description" : null,
-        "displayCondition" : null,
-        "expressionEnabled" : null,
-        "hidden" : null,
-        "metadata" : { },
-        "required" : true,
-        "name" : "clientId",
-        "type" : "STRING",
-        "defaultValue" : null,
-        "exampleValue" : null,
-        "label" : "Client Id",
-        "placeholder" : null,
-        "controlType" : "TEXT",
-        "languageId" : null,
-        "maxLength" : null,
-        "minLength" : null,
-        "options" : null,
-        "optionsDataSource" : null
-      }, {
-        "advancedOption" : null,
-        "description" : null,
-        "displayCondition" : null,
-        "expressionEnabled" : null,
-        "hidden" : null,
-        "metadata" : { },
-        "required" : true,
-        "name" : "clientSecret",
-        "type" : "STRING",
-        "defaultValue" : null,
-        "exampleValue" : null,
-        "label" : "Client Secret",
-        "placeholder" : null,
-        "controlType" : "TEXT",
-        "languageId" : null,
-        "maxLength" : null,
-        "minLength" : null,
-        "options" : null,
-        "optionsDataSource" : null
-      } ],
-      "refreshOn" : null,
-      "title" : "OAuth2 Implicit",
-      "type" : "OAUTH2_IMPLICIT_CODE",
-      "acquire" : null,
-      "apply" : null,
-      "authorizationCallback" : null,
-      "authorizationUrl" : { },
-      "clientId" : null,
-      "clientSecret" : null,
-      "oauth2AuthorizationExtraQueryParameters" : null,
-      "pkce" : null,
-      "refresh" : null,
-      "refreshUrl" : null,
-      "scopes" : { },
-      "refreshToken" : null,
-      "tokenUrl" : null
-    }, {
-      "detectOn" : null,
-      "description" : null,
-      "name" : "api_key",
-      "properties" : [ {
-        "advancedOption" : null,
-        "description" : null,
-        "displayCondition" : null,
-        "expressionEnabled" : null,
-        "hidden" : true,
-        "metadata" : { },
-        "required" : true,
-        "name" : "key",
-        "type" : "STRING",
-        "defaultValue" : "api_key",
-        "exampleValue" : null,
-        "label" : "Key",
-        "placeholder" : null,
-        "controlType" : "TEXT",
-        "languageId" : null,
-        "maxLength" : null,
-        "minLength" : null,
-        "options" : null,
-        "optionsDataSource" : null
-      }, {
-        "advancedOption" : null,
-        "description" : null,
-        "displayCondition" : null,
-        "expressionEnabled" : null,
-        "hidden" : null,
-        "metadata" : { },
-        "required" : true,
-        "name" : "value",
-        "type" : "STRING",
-        "defaultValue" : null,
-        "exampleValue" : null,
-        "label" : "Value",
-        "placeholder" : null,
-        "controlType" : "TEXT",
-        "languageId" : null,
-        "maxLength" : null,
-        "minLength" : null,
-        "options" : null,
-        "optionsDataSource" : null
-      } ],
-      "refreshOn" : null,
-      "title" : "API Key",
-      "type" : "API_KEY",
-      "acquire" : null,
-      "apply" : null,
-      "authorizationCallback" : null,
-      "authorizationUrl" : null,
-      "clientId" : null,
-      "clientSecret" : null,
-      "oauth2AuthorizationExtraQueryParameters" : null,
-      "pkce" : null,
-      "refresh" : null,
-      "refreshUrl" : null,
-      "scopes" : null,
-      "refreshToken" : null,
-      "tokenUrl" : null
-    } ],
-    "properties" : null,
-    "version" : 1,
-    "authorizationRequired" : null,
-    "baseUri" : { },
-    "test" : null
-  }
+  "clusterElements" : null
 }

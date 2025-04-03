@@ -1,7 +1,7 @@
 {
   "componentCategories" : [ {
     "name" : "artificial-intelligence",
-    "label" : "artificial-intelligence"
+    "label" : "Artificial Intelligence"
   } ],
   "customAction" : null,
   "customActionHelp" : null,
@@ -13,7 +13,10 @@
   "resources" : null,
   "version" : 1,
   "title" : "Document Reader",
+  "connection" : null,
   "actions" : null,
+  "unifiedApi" : null,
+  "triggers" : null,
   "clusterElements" : [ {
     "description" : "Reads JSON documents and converts them into a list of Document objects.",
     "name" : "json",
@@ -605,8 +608,5 @@
       "required" : true
     },
     "element" : { }
-  } ],
-  "unifiedApi" : null,
-  "triggers" : null,
-  "connection" : null
+  } ]
 }

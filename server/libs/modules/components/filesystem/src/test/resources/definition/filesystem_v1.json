@@ -1,7 +1,7 @@
 {
   "componentCategories" : [ {
     "name" : "helpers",
-    "label" : "helpers"
+    "label" : "Helpers"
   } ],
   "customAction" : null,
   "customActionHelp" : null,
@@ -13,6 +13,7 @@
   "resources" : null,
   "version" : 1,
   "title" : "Filesystem",
+  "connection" : null,
   "actions" : [ {
     "batch" : null,
     "deprecated" : null,
@@ -1050,8 +1051,7 @@
     "processErrorResponse" : null,
     "workflowNodeDescription" : null
   } ],
-  "connection" : null,
-  "clusterElements" : null,
   "unifiedApi" : null,
-  "triggers" : null
+  "triggers" : null,
+  "clusterElements" : null
 }

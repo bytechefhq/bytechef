@@ -1,10 +1,10 @@
 {
   "componentCategories" : [ {
     "name" : "file-storage",
-    "label" : "file-storage"
+    "label" : "File Storage"
   }, {
     "name" : "helpers",
-    "label" : "helpers"
+    "label" : "Helpers"
   } ],
   "customAction" : null,
   "customActionHelp" : null,
@@ -16,6 +16,7 @@
   "resources" : null,
   "version" : 1,
   "title" : "File Storage",
+  "connection" : null,
   "actions" : [ {
     "batch" : null,
     "deprecated" : null,
@@ -685,6 +686,5 @@
   } ],
   "clusterElements" : null,
   "unifiedApi" : null,
-  "triggers" : null,
-  "connection" : null
+  "triggers" : null
 }
