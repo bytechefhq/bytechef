@@ -6,7 +6,7 @@ description: "Beamer is a customer engagement platform that helps businesses com
 Beamer is a customer engagement platform that helps businesses communicate updates, collect feedback, and boost user engagement through in-app notifications, changelogs, and announcements.
 
 
-Categories: productivity-and-collaboration
+Categories: Productivity and Collaboration
 
 
 Type: beamer/v1
@@ -386,4 +386,57 @@ Type: OBJECT
 
 
 
+
+## Triggers
+
+
+### New Post
+Name: newPost
+
+Triggers when a new post is added.
+
+Type: POLLING
+
+
+#### Output
+
+
+
+Type: ARRAY
+
+
+Items Type: OBJECT
+
+
+#### Properties
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| autoOpen | BOOLEAN <details> <summary> Options </summary> true, false </details> | Whether the post is auto opened. |
+| category | STRING | Category of the post. |
+| clicks | INTEGER | How many clicks does the post have. |
+| date | DATE | Date when the post was created. |
+| feedbackEnabled | BOOLEAN <details> <summary> Options </summary> true, false </details> | Whether the users can give feedback on the post. |
+| feedbacks | INTEGER | How many feedbacks does the post have. |
+| negativeReactions | INTEGER | How many negative reactions does the post have |
+| neutralReactions | INTEGER | How many neutral reactions does the post have |
+| positiveReactions | INTEGER | How many positive reactions does the post have |
+| published | BOOLEAN <details> <summary> Options </summary> true, false </details> | Whether the post is published. |
+| reactionsEnabled | BOOLEAN <details> <summary> Options </summary> true, false </details> | Whether the reactions are enabled. |
+| translations | ARRAY <details> <summary> Items </summary> [{STRING\(category), STRING\(content), STRING\(contentHtml), STRING\(language), STRING\(postUrl), STRING\(title)}, INTEGER\($uniqueViews), INTEGER\($views)] </details> |  |
+
+
+
+
+
+#### JSON Example
+```json
+{
+  "label" : "New Post",
+  "name" : "newPost",
+  "type" : "beamer/v1/newPost"
+}
+```
+
+
+<hr />
 
