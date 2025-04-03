@@ -27,7 +27,7 @@ import {useForm} from 'react-hook-form';
 import {z} from 'zod';
 
 const formSchema = z.object({
-    enabled: z.boolean().default(false),
+    enabled: z.boolean(),
     httpMethod: z.custom<HttpMethod>((value) => !!value),
     name: z.string().min(2, {
         message: 'Name must be at least 2 characters.',
@@ -59,6 +59,7 @@ const ApiCollectionEndpointDialog = ({
 
     const form = useForm<z.infer<typeof formSchema>>({
         defaultValues: {
+            enabled: apiEndpoint?.enabled || false,
             httpMethod: apiEndpoint?.httpMethod,
             name: apiEndpoint?.name || '',
             path: apiEndpoint?.path || '',

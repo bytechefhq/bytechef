@@ -30,7 +30,7 @@ const formSchema = z.object({
     collectionVersion: z.coerce.number().min(1),
     contextPath: z.coerce.string().min(1),
     description: z.string(),
-    enabled: z.boolean().default(false),
+    enabled: z.boolean(),
     name: z.string().min(2, {
         message: 'Name must be at least 2 characters.',
     }),
@@ -62,6 +62,7 @@ const ApiCollectionDialog = ({apiCollection, onClose, triggerNode}: ApiCollectio
             collectionVersion: apiCollection?.collectionVersion || 1,
             contextPath: apiCollection?.contextPath || '',
             description: apiCollection?.description || '',
+            enabled: apiCollection?.enabled || false,
             name: apiCollection?.name || '',
             projectId: apiCollection?.projectId,
             projectVersion: apiCollection?.projectVersion,
