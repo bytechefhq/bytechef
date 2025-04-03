@@ -893,7 +893,7 @@ public final class ComponentDsl {
             return this;
         }
 
-        public ModifiableAuthorization refreshTokenFunction(RefreshTokenFunction refreshTokenFunction) {
+        public ModifiableAuthorization refreshToken(RefreshTokenFunction refreshTokenFunction) {
             if (refreshTokenFunction != null) {
                 this.refreshTokenFunction = refreshTokenFunction;
             }
@@ -912,12 +912,6 @@ public final class ComponentDsl {
 
         public ModifiableAuthorization refresh(RefreshFunction refresh) {
             this.refreshFunction = refresh;
-
-            return this;
-        }
-
-        public ModifiableAuthorization refreshToken(RefreshTokenFunction refreshTokenFunction) {
-            this.refreshTokenFunction = Objects.requireNonNull(refreshTokenFunction);
 
             return this;
         }
