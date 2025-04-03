@@ -1,15 +1,15 @@
 ---
 title: "BambooHR"
-description: "BambooHR is a Human Resources software that helps HR teams manage employee data, hiring, onboarding, time tracking, payroll, performance management, and more in one platform."
+description: "BambooHR is a human resources software that helps HR teams manage employee data, hiring, onboarding, time tracking, payroll, performance management, and more in one platform."
 ---
 
-BambooHR is a Human Resources software that helps HR teams manage employee data, hiring, onboarding, time tracking, payroll, performance management, and more in one platform.
+BambooHR is a human resources software that helps HR teams manage employee data, hiring, onboarding, time tracking, payroll, performance management, and more in one platform.
 
 
-Categories: crm
+Categories: hris
 
 
-Type: bambooHR/v1
+Type: bambooHr/v1
 
 <hr />
 
@@ -27,7 +27,7 @@ Version: 1
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | companyDomain | Company Domain | STRING | Text before .bamboohr.com when logged in to BambooHR. | true |
-| username | API key | STRING |  | true |
+| username | API Key | STRING |  | true |
 
 
 
@@ -49,9 +49,9 @@ Add a new employee.
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| employeeNumber | Employee Number | STRING | The employee number of the employee. | true |
 | firstName | First Name | STRING | The first name of the employee. | true |
 | lastName | Last Name | STRING | The last name of the employee. | true |
+| employeeNumber | Employee Number | STRING | The employee number of the employee. | false |
 | jobTitle | Job Title | STRING | The job title of the employee. | false |
 | location | Location | STRING | The employee's current location. | false |
 | employmentHistoryStatus | Employee Status | STRING | The employment status of the employee. | false |
@@ -63,23 +63,42 @@ Add a new employee.
   "label" : "Create Employee",
   "name" : "createEmployee",
   "parameters" : {
-    "employeeNumber" : "",
     "firstName" : "",
     "lastName" : "",
+    "employeeNumber" : "",
     "jobTitle" : "",
     "location" : "",
     "employmentHistoryStatus" : "",
     "hireDate" : "2021-01-01"
   },
-  "type" : "bambooHR/v1/createEmployee"
+  "type" : "bambooHr/v1/createEmployee"
 }
 ```
 
 #### Output
 
-This action does not produce any output.
 
 
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| url | STRING | The URL to view the employee in the web app. |
+| id | STRING | The ID of the employee. |
+
+
+
+
+#### Output Example
+```json
+{
+  "url" : "",
+  "id" : ""
+}
+```
 
 
 ### Update Employee
@@ -113,7 +132,7 @@ Update an employee, based on employee ID.
     "employmentHistoryStatus" : "",
     "hireDate" : "2021-01-01"
   },
-  "type" : "bambooHR/v1/updateEmployee"
+  "type" : "bambooHr/v1/updateEmployee"
 }
 ```
 
@@ -145,7 +164,7 @@ Get employee data, based on employee ID.
     "id" : "",
     "fields" : [ "" ]
   },
-  "type" : "bambooHR/v1/getEmployee"
+  "type" : "bambooHr/v1/getEmployee"
 }
 ```
 
@@ -166,7 +185,7 @@ Update an employee file.
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | id | Employee ID | STRING | The ID of the employee. | true |
-| fileId | File ID | STRING | The ID of the employee file being updated. | true |
+| fileId | File ID | STRING <details> <summary> Depends On </summary> id </details> | The ID of the employee file being updated. | true |
 | name | Updated Name Of The File | STRING | Use if you want to rename the file. | false |
 | categoryId | Updated Category ID | STRING | Use if you want to move the file to a different category. | false |
 | shareWithEmployee | Update Sharing The File | BOOLEAN <details> <summary> Options </summary> true, false </details> | Use if you want to update whether this file is shared or not. | false |
@@ -183,7 +202,7 @@ Update an employee file.
     "categoryId" : "",
     "shareWithEmployee" : false
   },
-  "type" : "bambooHR/v1/updateEmployeeFile"
+  "type" : "bambooHr/v1/updateEmployeeFile"
 }
 ```
 
