@@ -27,6 +27,7 @@ public class BrevoConstants {
     public static final String CONTENT_TYPE = "contentType";
     public static final String EMAIL = "email";
     public static final String FIRST_NAME = "FIRSTNAME";
+    public static final String ID = "id";
     public static final String LAST_NAME = "LASTNAME";
     public static final String NAME = "name";
     public static final String RECIPIENT_EMAIL = "recipientEmail";
