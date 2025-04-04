@@ -24,6 +24,7 @@ import com.bytechef.component.brevo.action.BrevoCreateContactAction;
 import com.bytechef.component.brevo.action.BrevoSendTransactionalEmailAction;
 import com.bytechef.component.brevo.action.BrevoUpdateContactAction;
 import com.bytechef.component.brevo.connection.BrevoConnection;
+import com.bytechef.component.brevo.trigger.BrevoTransactionalEmailOpenedTrigger;
 import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDefinition;
 import com.google.auto.service.AutoService;
@@ -46,6 +47,8 @@ public class BrevoComponentHandler implements ComponentHandler {
             BrevoCreateContactAction.ACTION_DEFINITION,
             BrevoUpdateContactAction.ACTION_DEFINITION,
             BrevoSendTransactionalEmailAction.ACTION_DEFINITION)
+        .triggers(
+            BrevoTransactionalEmailOpenedTrigger.TRIGGER_DEFINITION)
         .clusterElements(
             tool(BrevoCreateContactAction.ACTION_DEFINITION),
             tool(BrevoUpdateContactAction.ACTION_DEFINITION),
