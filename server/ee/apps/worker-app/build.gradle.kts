@@ -162,6 +162,7 @@ dependencies {
     implementation(project(":server:libs:modules:components:myob"))
     implementation(project(":server:libs:modules:components:mysql"))
     implementation(project(":server:libs:modules:components:nifty"))
+    implementation(project(":server:libs:modules:components:notion"))
     implementation(project(":server:libs:modules:components:nutshell"))
     implementation(project(":server:libs:modules:components:object-helper"))
     implementation(project(":server:libs:modules:components:ods-file"))
