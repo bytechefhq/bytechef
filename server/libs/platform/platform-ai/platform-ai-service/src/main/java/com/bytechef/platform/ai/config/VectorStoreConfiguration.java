@@ -18,6 +18,12 @@ package com.bytechef.platform.ai.config;
 
 import com.bytechef.config.ApplicationProperties;
 import com.bytechef.platform.ai.service.VectorStoreService;
+import com.bytechef.platform.component.domain.ActionDefinition;
+import com.bytechef.platform.component.domain.ComponentDefinition;
+import com.bytechef.platform.component.domain.TriggerDefinition;
+import com.bytechef.platform.component.service.ComponentDefinitionService;
+import com.bytechef.platform.workflow.task.dispatcher.domain.TaskDispatcherDefinition;
+import com.bytechef.platform.workflow.task.dispatcher.service.TaskDispatcherDefinitionService;
 import com.knuddels.jtokkit.api.EncodingType;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.IOException;
@@ -60,16 +66,19 @@ public class VectorStoreConfiguration {
     private static final String DOCUMENTATION = "documentation";
     private static final String WORKFLOWS = "workflows";
     private static final String COMPONENTS = "components";
+    private static final String FLOWS = "flows";
 
     private final ApplicationProperties.Ai.Paths paths;
     private final TokenCountBatchingStrategy strategy;
     private final VectorStore vectorStore;
     private final VectorStoreService vectorStoreService;
+    private final ComponentDefinitionService componentDefinitionService;
+    private final TaskDispatcherDefinitionService taskDispatcherDefinitionService;
 
     @SuppressFBWarnings("EI")
     @Autowired
     public VectorStoreConfiguration(
-        VectorStore vectorStore, VectorStoreService vectorStoreService, ApplicationProperties applicationProperties) {
+        VectorStore vectorStore, VectorStoreService vectorStoreService, ComponentDefinitionService componentDefinitionService, TaskDispatcherDefinitionService taskDispatcherDefinitionService, ApplicationProperties applicationProperties) {
 
         this.paths = applicationProperties.getAi()
             .getPaths();
@@ -77,6 +86,8 @@ public class VectorStoreConfiguration {
         this.vectorStoreService = vectorStoreService;
         this.strategy = new TokenCountBatchingStrategy(
             EncodingType.CL100K_BASE, 8191, 0.1, Document.DEFAULT_CONTENT_FORMATTER, MetadataMode.ALL);
+        this.componentDefinitionService = componentDefinitionService;
+        this.taskDispatcherDefinitionService = taskDispatcherDefinitionService;
     }
 
     @EventListener(ApplicationStartedEvent.class)
@@ -92,13 +103,13 @@ public class VectorStoreConfiguration {
         }
 
         initializeVectorStoreTable(
-            Paths.get(paths.getComponentsPath()), Paths.get(paths.getDocumentationPath()),
+            Paths.get(paths.getDocumentationPath()),
             Paths.get(paths.getWelcomePath()),
             Paths.get(paths.getWorkflowsPath()));
     }
 
     private void initializeVectorStoreTable(
-        Path componentsPath, Path documentationPath, Path welcomePath, Path workflowsPath) {
+        Path documentationPath, Path welcomePath, Path workflowsPath) {
 
         if (vectorStoreService.count() > 0) {
             List<com.bytechef.platform.ai.domain.VectorStore> vectorsStores = vectorStoreService.findAll();
@@ -106,9 +117,9 @@ public class VectorStoreConfiguration {
                 .map(com.bytechef.platform.ai.domain.VectorStore::getMetadata)
                 .toList();
 
-            storeDocuments(vectorsMetadataList, componentsPath, documentationPath, welcomePath, workflowsPath);
+            storeDocuments(vectorsMetadataList, documentationPath, welcomePath, workflowsPath);
         } else {
-            storeDocuments(List.of(), componentsPath, documentationPath, welcomePath, workflowsPath);
+            storeDocuments(List.of(), documentationPath, welcomePath, workflowsPath);
         }
     }
 
@@ -192,6 +203,182 @@ public class VectorStoreConfiguration {
         return chunks;
     }
 
+    private String getSampleValue(PropertyDecorator property){
+        return switch (property.getType()) {
+            case ARRAY -> getArrayParameters(property.getItems());
+            case BOOLEAN -> "false";
+            case DATE -> "\"1980-01-01\"";
+            case DATE_TIME -> "\"1980-01-01T00:00:00\"";
+            case DYNAMIC_PROPERTIES -> "{}";
+            case INTEGER -> "1";
+            case NUMBER -> "0.0";
+            case OBJECT -> getObjectParameters(property.getObjectProperties());
+            case FILE_ENTRY -> getObjectParameters(property.getFileEntryProperties());
+            case TIME -> "\"00:00:00\"";
+            default -> "\"\"";
+        };
+    }
+
+    private String createJsonExample(ActionDefinition actionDefinition) {
+        StringBuilder json = new StringBuilder();
+
+        json.append("{").append("\n")
+            .append("\"label\": \"").append(actionDefinition.getTitle()).append("\",").append("\n")
+            .append("\"name\": \"").append(actionDefinition.getName()).append("\",").append("\n")
+            .append("\"type\": \"").append(actionDefinition.getComponentName()).append("/v").append(actionDefinition.getComponentVersion()).append("/").append(actionDefinition.getName()).append("\",\n");
+
+        List<PropertyDecorator> properties = PropertyDecorator.toPropertyDecoratorList(actionDefinition.getProperties());
+        if (!properties.isEmpty()) {
+            json.append("\"parameters\": ").append(getObjectParameters(properties));
+        }
+        return json.append("}").toString();
+    }
+
+    private String createJsonExample(TriggerDefinition triggerDefinition) {
+        StringBuilder json = new StringBuilder();
+
+        json.append("{").append("\n")
+            .append("\"label\": \"").append(triggerDefinition.getTitle()).append("\",").append("\n")
+            .append("\"name\": \"").append(triggerDefinition.getName()).append("\",").append("\n")
+            .append("\"type\": \"").append(triggerDefinition.getComponentName()).append("/v").append(triggerDefinition.getComponentVersion()).append("/").append(triggerDefinition.getName()).append("\",\n");
+
+        List<PropertyDecorator> properties = PropertyDecorator.toPropertyDecoratorList(triggerDefinition.getProperties());
+        if (!properties.isEmpty()) {
+            json.append("\"parameters\": ").append(getObjectParameters(properties));
+        }
+        return json.append("}").toString();
+    }
+
+    private String createJsonExample(TaskDispatcherDefinition taskDispatcherDefinition) {
+        StringBuilder json = new StringBuilder();
+
+        json.append("{").append("\n")
+            .append("\"label\": \"").append(taskDispatcherDefinition.getTitle()).append("\",").append("\n")
+            .append("\"name\": \"").append(taskDispatcherDefinition.getName()).append("\",").append("\n")
+            .append("\"type\": \"").append(taskDispatcherDefinition.getName()).append("/v").append(taskDispatcherDefinition.getVersion()).append("/").append("\",\n");
+
+        List<PropertyDecorator> properties = PropertyDecorator.toPropertyDecoratorList(taskDispatcherDefinition.getProperties());
+        if (!properties.isEmpty()) {
+            json.append("\"parameters\": ").append(getObjectParameters(properties));
+        }
+        return json.append("}").toString();
+    }
+
+    private String getObjectParameters(List<PropertyDecorator> properties) {
+        StringBuilder parameters = new StringBuilder();
+
+        parameters.append("{").append("\n");
+        for(var property : properties){
+            parameters.append("\"").append(property.getName()).append("\": ").append(getSampleValue(property)).append(",\n");
+        }
+
+        if (parameters.length() > 2) {
+            parameters.setLength(parameters.length() - 2);
+        }
+
+        return parameters.append("}").toString();
+    }
+
+    private String getArrayParameters(List<PropertyDecorator> properties) {
+        StringBuilder parameters = new StringBuilder();
+
+        parameters.append("[\n");
+        for(var property : properties){
+            parameters.append(getSampleValue(property)).append(",\n");
+        }
+
+        if (parameters.length() > 2) {
+            parameters.setLength(parameters.length() - 2);
+        }
+
+        return parameters.append("]").toString();
+    }
+
+    private String componentDefinitionToString(ComponentDefinition componentDefinition) {
+        StringBuilder definitionText = new StringBuilder();
+
+        definitionText.append("Component Name: ").append(componentDefinition.getName()).append("\n")
+            .append("Description: ").append(componentDefinition.getDescription()).append("\n");
+
+        if(!componentDefinition.getTriggers().isEmpty()){
+            definitionText.append("Triggers:\n");
+            for (TriggerDefinition triggerDefinition : componentDefinition.getTriggers()) {
+                definitionText.append("Trigger Name: ").append(triggerDefinition.getName()).append("\n")
+                    .append("Description: ").append(triggerDefinition.getDescription()).append("\n")
+                    .append("Example JSON Structure: \n").append(createJsonExample(triggerDefinition)).append("\n");
+            }
+        }
+
+        if(!componentDefinition.getActions().isEmpty()) {
+            definitionText.append("Actions:\n");
+            for (ActionDefinition actionDefinition : componentDefinition.getActions()) {
+                if(!actionDefinition.getName().equals("customAction")) {
+                    definitionText.append("Action Name: ").append(actionDefinition.getName()).append("\n")
+                        .append("Description: ").append(actionDefinition.getDescription()).append("\n")
+                        .append("Example JSON Structure: \n").append(createJsonExample(actionDefinition)).append("\n");
+                    if (actionDefinition.isOutputDefined() && actionDefinition.getOutputResponse() != null) {
+                        definitionText.append("Output JSON: \n").append(getSampleValue(new PropertyDecorator(actionDefinition.getOutputResponse().outputSchema()))).append("\n");
+                    }
+                }
+            }
+        }
+
+        return definitionText.toString();
+    }
+
+    private String taskDispatcherDefinitionToString(TaskDispatcherDefinition taskDispatcherDefinition) {
+        StringBuilder definitionText = new StringBuilder();
+
+        definitionText.append("Task Dispatcher Name: ").append(taskDispatcherDefinition.getName()).append("\n")
+            .append("Description: ").append(taskDispatcherDefinition.getDescription()).append("\n")
+            .append("Example JSON Structure: \n").append(createJsonExample(taskDispatcherDefinition)).append("\n");
+
+        if (taskDispatcherDefinition.isOutputDefined() && taskDispatcherDefinition.getOutputResponse() != null) {
+            definitionText.append("Output JSON: \n").append(getSampleValue(new PropertyDecorator(taskDispatcherDefinition.getOutputResponse().outputSchema()))).append("\n");
+        }
+
+        return definitionText.toString();
+    }
+
+    private void storeDocumentsFromComponentDefinitions(
+        TokenCountBatchingStrategy batchingStrategy,
+        List<Map<String, Object>> vectorStoreList, VectorStore vectorStore) {
+        List<Document> documentList = new ArrayList<>();
+
+        for(TaskDispatcherDefinition taskDispatcherDefinition : taskDispatcherDefinitionService.getTaskDispatcherDefinitions()) {
+            if(!taskDispatcherDefinition.getName().equals("waitForApproval")) {
+                String json = taskDispatcherDefinitionToString(taskDispatcherDefinition);
+
+                addToDocumentList(vectorStoreList, taskDispatcherDefinition.getName(), json, documentList, FLOWS);
+            }
+        }
+
+        for(ComponentDefinition componentDefinition : componentDefinitionService.getComponentDefinitions()) {
+            String json = componentDefinitionToString(componentDefinition);
+
+            addToDocumentList(vectorStoreList, componentDefinition.getName(), json, documentList, COMPONENTS);
+        }
+
+        for (List<Document> batch : batchingStrategy.batch(documentList)) {
+            vectorStore.add(batch);
+        }
+    }
+
+    private static void addToDocumentList(List<Map<String, Object>> vectorStoreList, String name, String json, List<Document> documentList, String category) {
+        if(!vectorStoreListContainsFile(vectorStoreList, name, category)) {
+            String cleanedDocument = preprocessDocument(json);
+
+            if (!cleanedDocument.isEmpty()) {
+                // Split the document into chunks
+                List<String> chunks = splitDocument(cleanedDocument.split("\\s+"), 1536);
+
+                for (String chunk : chunks) {
+                    documentList.add(new Document(chunk, Map.of(CATEGORY, category, NAME, name)));
+                }
+            }
+        }
+    }
+
     private static void storeDocumentsFromPath(
         String categoryName, Path path, String suffix, BatchingStrategy batchingStrategy,
         List<Map<String, Object>> vectorStoreList, VectorStore vectorStore) throws IOException {
@@ -209,26 +396,9 @@ public class VectorStoreConfiguration {
 
                     fileName = fileName.replace(suffix, "");
 
-                    // check if already exists
-                    if (vectorStoreListContainsFile(vectorStoreList, fileName, categoryName)) {
-                        return FileVisitResult.CONTINUE;
-                    }
-
                     String document = Files.readString(filePath);
 
-                    // Preprocess the document
-                    String cleanedDocument = preprocessDocument(document);
-
-                    if (!cleanedDocument.isEmpty()) {
-                        // Split the document into chunks
-                        List<String> chunks = splitDocument(cleanedDocument.split("\\s+"), 1536);
-
-                        for (String chunk : chunks) {
-                            // TODO add versioning to files
-                            documentList.add(new Document(chunk, Map.of(CATEGORY, categoryName, NAME, fileName)));
-                        }
-                    }
-
+                    addToDocumentList(vectorStoreList, fileName, document, documentList, categoryName);
                 }
 
                 return FileVisitResult.CONTINUE;
@@ -248,13 +418,13 @@ public class VectorStoreConfiguration {
     }
 
     private void storeDocuments(
-        List<Map<String, Object>> vectorStoreList, Path componentsPath, Path documentationPath, Path welcomePath,
+        List<Map<String, Object>> vectorStoreList, Path documentationPath, Path welcomePath,
         Path workflowsPath) {
 
         try {
             storeDocumentsFromPath(DOCUMENTATION, documentationPath, ".md", strategy, vectorStoreList, vectorStore);
             storeDocumentsFromPath(WORKFLOWS, workflowsPath, ".json", strategy, vectorStoreList, vectorStore);
-            storeDocumentsFromPath(COMPONENTS, componentsPath, ".md", strategy, vectorStoreList, vectorStore);
+            storeDocumentsFromComponentDefinitions(strategy, vectorStoreList, vectorStore);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
