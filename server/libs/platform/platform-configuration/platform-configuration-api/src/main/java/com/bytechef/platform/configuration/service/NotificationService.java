@@ -16,8 +16,8 @@
 
 package com.bytechef.platform.configuration.service;
 
-import com.bytechef.platform.configuration.domain.notification.Event;
-import com.bytechef.platform.configuration.domain.notification.Notification;
+import com.bytechef.platform.configuration.domain.Event;
+import com.bytechef.platform.configuration.domain.Notification;
 import java.util.List;
 import java.util.Map;
 
@@ -26,9 +26,9 @@ import java.util.Map;
  */
 public interface NotificationService {
 
-    List<Notification> findAll();
+    List<Notification> getNotifications();
 
-    List<Notification> fetchNotifications(Event.Type eventType);
+    List<Notification> getNotifications(Event.Type eventType);
 
     Notification create(String name, Notification.Type type, Map<String, String> settings, List<Long> eventIds);
 }

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.platform.configuration.domain.notification;
+package com.bytechef.platform.configuration.domain;
 
 import java.util.Objects;
 import org.springframework.data.annotation.Id;

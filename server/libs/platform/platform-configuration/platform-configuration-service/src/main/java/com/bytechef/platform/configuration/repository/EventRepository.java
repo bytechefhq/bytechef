@@ -16,7 +16,7 @@
 
 package com.bytechef.platform.configuration.repository;
 
-import com.bytechef.platform.configuration.domain.notification.Event;
+import com.bytechef.platform.configuration.domain.Event;
 import java.util.List;
 import org.springframework.data.repository.ListCrudRepository;
 import org.springframework.stereotype.Repository;

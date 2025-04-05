@@ -16,8 +16,8 @@
 
 package com.bytechef.platform.configuration.service;
 
-import com.bytechef.platform.configuration.domain.notification.Event;
-import com.bytechef.platform.configuration.domain.notification.Notification;
+import com.bytechef.platform.configuration.domain.Event;
+import com.bytechef.platform.configuration.domain.Notification;
 import com.bytechef.platform.configuration.repository.NotificationRepository;
 import java.util.List;
 import java.util.Map;
@@ -40,12 +40,12 @@ public class NotificationServiceImpl implements NotificationService {
     }
 
     @Override
-    public List<Notification> findAll() {
+    public List<Notification> getNotifications() {
         return notificationRepository.findAll();
     }
 
     @Override
-    public List<Notification> fetchNotifications(Event.Type eventType) {
+    public List<Notification> getNotifications(Event.Type eventType) {
         return notificationRepository.findAllByEventType(eventType.toString());
     }
 

@@ -16,17 +16,19 @@
 
 package com.bytechef.platform.configuration.web.rest.mapper;
 
-import com.bytechef.platform.configuration.domain.notification.Event;
-import com.bytechef.platform.configuration.domain.notification.Notification;
+import com.bytechef.platform.configuration.domain.Event;
+import com.bytechef.platform.configuration.domain.Notification;
 import com.bytechef.platform.configuration.service.EventService;
 import com.bytechef.platform.configuration.web.rest.mapper.config.PlatformConfigurationMapperSpringConfig;
 import com.bytechef.platform.configuration.web.rest.model.NotificationEventModel;
 import com.bytechef.platform.configuration.web.rest.model.NotificationModel;
 import java.util.List;
 import org.mapstruct.AfterMapping;
+import org.mapstruct.InheritInverseConfiguration;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
+import org.mapstruct.extensions.spring.DelegatingConverter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.convert.converter.Converter;
 
@@ -39,13 +41,18 @@ public abstract class NotificationMapper implements Converter<Notification, Noti
     @Autowired
     protected EventService eventService;
 
-    @Mapping(source = "type", target = "notificationType")
     @Override
+    @Mapping(target = "events", ignore = true)
+    @Mapping(source = "type", target = "notificationType")
     public abstract NotificationModel convert(Notification notification);
+
+    @InheritInverseConfiguration
+    @DelegatingConverter
+    public abstract Notification invertConvert(NotificationModel notificationModel);
 
     @AfterMapping
     protected void afterMapping(@MappingTarget NotificationModel notificationModel, Notification notification) {
-        List<Event> events = eventService.findAllIn(notification.getEventIds());
+        List<Event> events = eventService.getEvents(notification.getEventIds());
         notificationModel.setEvents(events.stream()
             .map(event -> new NotificationEventModel(event.getId())
                 .type(NotificationEventModel.TypeEnum.valueOf(event.getType()

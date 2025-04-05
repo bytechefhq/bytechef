@@ -16,8 +16,8 @@
 
 package com.bytechef.platform.configuration.notification;
 
-import com.bytechef.platform.configuration.domain.notification.Event;
-import com.bytechef.platform.configuration.domain.notification.Notification;
+import com.bytechef.platform.configuration.domain.Event;
+import com.bytechef.platform.configuration.domain.Notification;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
