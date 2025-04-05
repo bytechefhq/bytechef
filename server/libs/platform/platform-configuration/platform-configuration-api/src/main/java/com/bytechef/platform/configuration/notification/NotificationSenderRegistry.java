@@ -17,7 +17,7 @@
 package com.bytechef.platform.configuration.notification;
 
 import com.bytechef.commons.util.MapUtils;
-import com.bytechef.platform.configuration.domain.notification.Notification;
+import com.bytechef.platform.configuration.domain.Notification;
 import java.util.List;
 import java.util.Map;
 import org.springframework.lang.NonNull;

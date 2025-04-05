@@ -16,7 +16,7 @@
 
 package com.bytechef.platform.configuration.service;
 
-import com.bytechef.platform.configuration.domain.notification.Event;
+import com.bytechef.platform.configuration.domain.Event;
 import java.util.List;
 
 /**
@@ -24,7 +24,7 @@ import java.util.List;
  */
 public interface EventService {
 
-    List<Event> findAll();
+    List<Event> getEvents();
 
-    List<Event> findAllIn(List<Long> eventIds);
+    List<Event> getEvents(List<Long> eventIds);
 }

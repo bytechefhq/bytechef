@@ -21,8 +21,8 @@ import com.bytechef.atlas.coordinator.event.JobStatusApplicationEvent;
 import com.bytechef.atlas.coordinator.event.listener.ApplicationEventListener;
 import com.bytechef.atlas.execution.domain.Job;
 import com.bytechef.atlas.execution.service.JobService;
-import com.bytechef.platform.configuration.domain.notification.Event;
-import com.bytechef.platform.configuration.domain.notification.Notification;
+import com.bytechef.platform.configuration.domain.Event;
+import com.bytechef.platform.configuration.domain.Notification;
 import com.bytechef.platform.configuration.notification.NotificationHandler;
 import com.bytechef.platform.configuration.notification.NotificationHandlerContext;
 import com.bytechef.platform.configuration.notification.NotificationHandlerRegistry;
@@ -64,7 +64,7 @@ public class JobStatusApplicationEventListener implements ApplicationEventListen
                 eventType, jobService.getJob(jobStatusApplicationEvent.getJobId()));
 
             List<Notification> notifications =
-                notificationService.fetchNotifications(eventType);
+                notificationService.getNotifications(eventType);
 
             for (Notification notification : notifications) {
                 NotificationSender notificationSender = notificationSenderRegistry.getNotificationSender(

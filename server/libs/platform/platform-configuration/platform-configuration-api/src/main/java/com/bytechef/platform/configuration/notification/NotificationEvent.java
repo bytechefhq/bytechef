@@ -16,7 +16,7 @@
 
 package com.bytechef.platform.configuration.notification;
 
-import com.bytechef.platform.configuration.domain.notification.Event;
+import com.bytechef.platform.configuration.domain.Event;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;

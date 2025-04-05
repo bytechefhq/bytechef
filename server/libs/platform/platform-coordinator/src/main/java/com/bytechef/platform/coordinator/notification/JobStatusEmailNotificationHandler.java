@@ -16,7 +16,7 @@
 
 package com.bytechef.platform.coordinator.notification;
 
-import com.bytechef.platform.configuration.domain.notification.Event;
+import com.bytechef.platform.configuration.domain.Event;
 import com.bytechef.platform.configuration.notification.EmailNotificationHandler;
 import com.bytechef.platform.configuration.notification.NotificationEvent;
 import com.bytechef.platform.configuration.notification.NotificationHandlerContext;

@@ -44,7 +44,7 @@ public class NotificationEventApiController implements NotificationEventApi {
     @Override
     public ResponseEntity<List<NotificationEventModel>> getNotificationEvents() {
         return ResponseEntity.ok(
-            eventService.findAll()
+            eventService.getEvents()
                 .stream()
                 .map(event -> conversionService.convert(event, NotificationEventModel.class))
                 .toList());

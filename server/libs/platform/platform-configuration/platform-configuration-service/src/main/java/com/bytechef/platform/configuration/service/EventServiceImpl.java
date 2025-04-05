@@ -16,7 +16,7 @@
 
 package com.bytechef.platform.configuration.service;
 
-import com.bytechef.platform.configuration.domain.notification.Event;
+import com.bytechef.platform.configuration.domain.Event;
 import com.bytechef.platform.configuration.repository.EventRepository;
 import java.util.List;
 import org.springframework.stereotype.Service;
@@ -34,12 +34,12 @@ public class EventServiceImpl implements EventService {
     }
 
     @Override
-    public List<Event> findAll() {
+    public List<Event> getEvents() {
         return eventRepository.findAll();
     }
 
     @Override
-    public List<Event> findAllIn(List<Long> eventIds) {
+    public List<Event> getEvents(List<Long> eventIds) {
         return eventRepository.findByIdIn(eventIds);
     }
 }
