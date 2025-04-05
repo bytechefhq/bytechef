@@ -19,5 +19,6 @@ dependencies {
     testImplementation(project(":server:libs:config:security-config"))
     testImplementation(project(":server:libs:config:tenant-single-security-config"))
     testImplementation(project(":server:libs:platform:platform-mail"))
+    testImplementation(project(":server:libs:platform:platform-user:platform-user-service"))
     testImplementation(project(":server:libs:test:test-int-support"))
 }
