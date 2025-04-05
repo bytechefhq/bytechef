@@ -19,8 +19,8 @@ package com.bytechef.platform.configuration.service;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.bytechef.platform.configuration.config.NotificationIntTestConfiguration;
-import com.bytechef.platform.configuration.domain.notification.Event;
-import com.bytechef.platform.configuration.domain.notification.Notification;
+import com.bytechef.platform.configuration.domain.Event;
+import com.bytechef.platform.configuration.domain.Notification;
 import com.bytechef.platform.configuration.repository.EventRepository;
 import com.bytechef.platform.configuration.repository.NotificationRepository;
 import java.util.List;
@@ -61,7 +61,7 @@ public class NotificationServiceIntTest {
             .hasFieldOrPropertyWithValue("settings", Map.of("to", "john@email.com"));
         assertThat(notification.getEventIds()).containsExactlyInAnyOrder(1L);
 
-        List<Notification> notifications = notificationService.fetchNotifications(Event.Type.JOB_CANCELLED);
+        List<Notification> notifications = notificationService.getNotifications(Event.Type.JOB_CANCELLED);
 
         assertThat(notifications).hasSize(1)
             .contains(notification);

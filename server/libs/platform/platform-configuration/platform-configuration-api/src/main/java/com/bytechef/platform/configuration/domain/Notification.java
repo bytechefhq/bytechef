@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.platform.configuration.domain.notification;
+package com.bytechef.platform.configuration.domain;
 
 import com.bytechef.commons.data.jdbc.wrapper.MapWrapper;
 import java.time.Instant;
