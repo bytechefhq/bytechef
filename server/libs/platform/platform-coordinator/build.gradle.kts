@@ -5,6 +5,9 @@ dependencies {
 
     implementation("org.apache.commons:commons-lang3")
     implementation("org.slf4j:slf4j-api")
+    implementation("org.springframework.retry:spring-retry")
+    implementation("org.springframework:spring-web")
+    implementation(project(":server:libs:atlas:atlas-coordinator:atlas-coordinator-api"))
     implementation(project(":server:libs:atlas:atlas-coordinator:atlas-coordinator-impl"))
     implementation(project(":server:libs:atlas:atlas-execution:atlas-execution-service"))
     implementation(project(":server:libs:atlas:atlas-worker:atlas-worker-impl"))
