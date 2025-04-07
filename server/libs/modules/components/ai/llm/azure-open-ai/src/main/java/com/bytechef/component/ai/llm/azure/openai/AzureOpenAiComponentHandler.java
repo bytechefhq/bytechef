@@ -22,6 +22,7 @@ import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.ai.llm.azure.openai.action.AzureOpenAiChatAction;
 import com.bytechef.component.ai.llm.azure.openai.action.AzureOpenAiCreateImageAction;
 import com.bytechef.component.ai.llm.azure.openai.action.AzureOpenAiCreateTranscriptionAction;
+import com.bytechef.component.ai.llm.azure.openai.cluster.AzureOpenAiChatModel;
 import com.bytechef.component.ai.llm.azure.openai.connection.AzureOpenAiConnection;
 import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDefinition;
@@ -45,7 +46,8 @@ public class AzureOpenAiComponentHandler implements ComponentHandler {
         .actions(
             AzureOpenAiChatAction.ACTION_DEFINITION,
             AzureOpenAiCreateImageAction.ACTION_DEFINITION,
-            AzureOpenAiCreateTranscriptionAction.ACTION_DEFINITION);
+            AzureOpenAiCreateTranscriptionAction.ACTION_DEFINITION)
+        .clusterElements(AzureOpenAiChatModel.CLUSTER_ELEMENT_DEFINITION);
 
     @Override
     public ComponentDefinition getDefinition() {

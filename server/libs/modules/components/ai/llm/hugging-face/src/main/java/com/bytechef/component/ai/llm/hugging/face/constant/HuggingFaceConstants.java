@@ -16,13 +16,21 @@
 
 package com.bytechef.component.ai.llm.hugging.face.constant;
 
+import static com.bytechef.component.definition.ComponentDsl.string;
+
+import com.bytechef.component.definition.ComponentDsl.ModifiableStringProperty;
+
 /**
- * @author Monika Domiter
+ * @author Monika Kušter
  * @author Marko Kriskovic
  */
 public final class HuggingFaceConstants {
 
     public static final String URL = "url";
+
+    public static final ModifiableStringProperty URL_PROPERTY = string(URL)
+        .label("URL")
+        .description("Url of the inference endpoint");
 
     private HuggingFaceConstants() {
     }

@@ -34,9 +34,9 @@ import static com.bytechef.component.ai.llm.constant.LLMConstants.TOP_P;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.TOP_P_PROPERTY;
 import static com.bytechef.component.ai.llm.mistral.constant.MistralConstants.CHAT_MODEL_PROPERTY;
 import static com.bytechef.component.ai.llm.mistral.constant.MistralConstants.SAFE_PROMPT;
+import static com.bytechef.component.ai.llm.mistral.constant.MistralConstants.SAFE_PROMPT_PROPERTY;
 import static com.bytechef.component.definition.Authorization.TOKEN;
 import static com.bytechef.component.definition.ComponentDsl.action;
-import static com.bytechef.component.definition.ComponentDsl.bool;
 
 import com.bytechef.component.ai.llm.ChatModel;
 import com.bytechef.component.ai.llm.ChatModel.ResponseFormat;
@@ -66,11 +66,7 @@ public class MistralChatAction {
             TOP_P_PROPERTY,
             STOP_PROPERTY,
             SEED_PROPERTY,
-            bool(SAFE_PROMPT)
-                .label("Safe prompt")
-                .description("Should the prompt be safe for work?")
-                .defaultValue(true)
-                .advancedOption(true))
+            SAFE_PROMPT_PROPERTY)
         .output(LLMUtils::output)
         .perform(MistralChatAction::perform);
 
@@ -99,9 +95,7 @@ public class MistralChatAction {
     private MistralChatAction() {
     }
 
-    public static Object perform(
-        Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
-
+    public static Object perform(Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
         return CHAT_MODEL.getResponse(inputParameters, connectionParameters, context);
     }
 }
