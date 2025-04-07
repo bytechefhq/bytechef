@@ -37,6 +37,7 @@ import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TriggerContext;
 import com.bytechef.component.definition.TriggerDefinition.WebhookBody;
 import com.bytechef.component.definition.TypeReference;
+import com.bytechef.component.exception.ProviderException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -57,9 +58,10 @@ public class MailerLiteUtils {
         return body.getContent(new TypeReference<>() {});
     }
 
-    public static List<Option<String>> getGroups(
+    public static List<Option<String>> getGroupIdOptions(
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> stringStringMap, String s,
         Context context) {
+
         Map<String, Object> body = context.http(GET_GROUPS_CONTEXT_FUNCTION)
             .configuration(responseType(Http.ResponseType.JSON))
             .execute()
@@ -68,33 +70,10 @@ public class MailerLiteUtils {
         return getOptions(body.get(DATA), NAME);
     }
 
-    private static String getIdFromBody(Map<String, Object> body) {
-        String id = "";
-        if (body.get("data") instanceof Map data) {
-            id = (String) data.get(ID);
-        }
-
-        return id;
-    }
-
-    private static List<Option<String>> getOptions(Object data, String label) {
-
-        List<Option<String>> options = new ArrayList<>();
-
-        if (data instanceof List<?> dataList) {
-            for (Object optionObject : dataList) {
-                if (optionObject instanceof Map<?, ?> option) {
-                    options.add(option((String) option.get(label), (String) option.get(ID)));
-                }
-            }
-        }
-
-        return options;
-    }
-
-    public static List<Option<String>> getSubscribers(
+    public static List<Option<String>> getSubscriberIdOptions(
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> stringStringMap, String s,
         Context context) {
+
         Map<String, Object> body = context.http(GET_SUBSCRIBERS_CONTEXT_FUNCTION)
             .configuration(responseType(Http.ResponseType.JSON))
             .execute()
@@ -103,8 +82,9 @@ public class MailerLiteUtils {
         return getOptions(body.get(DATA), EMAIL);
     }
 
-    public static String
-        subscribeWebhook(String triggerName, String events, String webhookUrl, TriggerContext context) {
+    public static String subscribeWebhook(
+        String triggerName, String events, String webhookUrl, TriggerContext context) {
+
         Map<String, Object> body = context
             .http(http -> http.post("/webhooks"))
             .body(Body.of(
@@ -116,11 +96,29 @@ public class MailerLiteUtils {
             .execute()
             .getBody(new TypeReference<>() {});
 
-        return getIdFromBody(body);
+        if (body.get("data") instanceof Map<?, ?> data) {
+            return (String) data.get(ID);
+        }
+
+        throw new ProviderException("Failed to subscribe to webhook.");
     }
 
     public static void unsubscribeWebhook(String webhookId, TriggerContext context) {
         context.http(http -> http.delete("/webhooks/" + webhookId))
             .execute();
+    }
+
+    private static List<Option<String>> getOptions(Object data, String label) {
+        List<Option<String>> options = new ArrayList<>();
+
+        if (data instanceof List<?> dataList) {
+            for (Object optionObject : dataList) {
+                if (optionObject instanceof Map<?, ?> option) {
+                    options.add(option((String) option.get(label), (String) option.get(ID)));
+                }
+            }
+        }
+
+        return options;
     }
 }

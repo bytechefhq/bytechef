@@ -18,16 +18,13 @@ package com.bytechef.component.mailerlite.action;
 
 import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.string;
-import static com.bytechef.component.definition.Context.Http.responseType;
 import static com.bytechef.component.mailerlite.constant.MailerLiteConstants.GROUP_ID;
 import static com.bytechef.component.mailerlite.constant.MailerLiteConstants.SUBSCRIBER_ID;
 
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context;
-import com.bytechef.component.definition.Context.Http.ResponseType;
 import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.mailerlite.util.MailerLiteUtils;
 
 /**
@@ -40,27 +37,26 @@ public class MailerLiteRemoveSubscriberFromGroupAction {
         .description("Remove selected subscriber from the group.")
         .properties(
             string(SUBSCRIBER_ID)
-                .label("Subscriber Email")
-                .description("User that will be added to the selected group.")
-                .options((ActionOptionsFunction<String>) MailerLiteUtils::getSubscribers)
+                .label("Subscriber")
+                .description("ID of the user that will be added to the selected group.")
+                .options((ActionOptionsFunction<String>) MailerLiteUtils::getSubscriberIdOptions)
                 .required(true),
             string(GROUP_ID)
-                .label("Group")
-                .description("Group to which the user will be added.")
-                .options((ActionOptionsFunction<String>) MailerLiteUtils::getGroups)
+                .label("Group ID")
+                .description("ID of the group to which the user will be added.")
+                .options((ActionOptionsFunction<String>) MailerLiteUtils::getGroupIdOptions)
                 .required(true))
         .perform(MailerLiteRemoveSubscriberFromGroupAction::perform);
 
     private MailerLiteRemoveSubscriberFromGroupAction() {
     }
 
-    protected static Object perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
+    public static Object perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
+        context.http(http -> http.delete(
+            "/subscribers/%s/groups/%s".formatted(
+                inputParameters.getRequiredString(SUBSCRIBER_ID), inputParameters.getRequiredString(GROUP_ID))))
+            .execute();
 
-        return context.http(http -> http.delete(
-            "/subscribers/" + inputParameters.getRequiredString(SUBSCRIBER_ID) + "/groups/"
-                + inputParameters.getRequiredString(GROUP_ID)))
-            .configuration(responseType(ResponseType.JSON))
-            .execute()
-            .getBody(new TypeReference<>() {});
+        return null;
     }
 }

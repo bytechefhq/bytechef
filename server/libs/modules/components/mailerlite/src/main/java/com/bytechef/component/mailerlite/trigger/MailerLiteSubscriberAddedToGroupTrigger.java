@@ -25,8 +25,6 @@ import static com.bytechef.component.definition.ComponentDsl.trigger;
 import static com.bytechef.component.mailerlite.constant.MailerLiteConstants.DATA;
 import static com.bytechef.component.mailerlite.constant.MailerLiteConstants.EMAIL;
 import static com.bytechef.component.mailerlite.constant.MailerLiteConstants.ID;
-import static com.bytechef.component.mailerlite.constant.MailerLiteConstants.SUBSCRIBER_ADDED_TO_GROUP_TRIGGER_EVENT;
-import static com.bytechef.component.mailerlite.constant.MailerLiteConstants.SUBSCRIBER_ADDED_TO_GROUP_TRIGGER_NAME;
 import static com.bytechef.component.mailerlite.util.MailerLiteUtils.getContent;
 import static com.bytechef.component.mailerlite.util.MailerLiteUtils.subscribeWebhook;
 import static com.bytechef.component.mailerlite.util.MailerLiteUtils.unsubscribeWebhook;
@@ -47,7 +45,7 @@ import java.util.Map;
  */
 public class MailerLiteSubscriberAddedToGroupTrigger {
 
-    public static final ModifiableTriggerDefinition TRIGGER_DEFINITION = trigger(SUBSCRIBER_ADDED_TO_GROUP_TRIGGER_NAME)
+    public static final ModifiableTriggerDefinition TRIGGER_DEFINITION = trigger("subscriberAddedToGroup")
         .title("Subscriber Added to the Group")
         .description("Triggers when a subscriber is added to the group.")
         .type(TriggerType.DYNAMIC_WEBHOOK)
@@ -90,8 +88,9 @@ public class MailerLiteSubscriberAddedToGroupTrigger {
         String workflowExecutionId, TriggerContext context) {
 
         return new WebhookEnableOutput(
-            Map.of(ID, subscribeWebhook(TRIGGER_DEFINITION.getName(), SUBSCRIBER_ADDED_TO_GROUP_TRIGGER_EVENT,
-                webhookUrl, context)),
+            Map.of(ID,
+                subscribeWebhook(
+                    TRIGGER_DEFINITION.getName(), "subscriber.added_to_group", webhookUrl, context)),
             null);
     }
 

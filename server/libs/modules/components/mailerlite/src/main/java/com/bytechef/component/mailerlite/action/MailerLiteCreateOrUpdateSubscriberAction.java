@@ -53,8 +53,9 @@ public class MailerLiteCreateOrUpdateSubscriberAction {
                 .description("The email address of the subscriber.")
                 .required(true),
             string(GROUP_ID)
-                .description("Group to which you want to add the subscriber to.")
-                .options((ActionOptionsFunction<String>) MailerLiteUtils::getGroups)
+                .label("Group ID")
+                .description("ID of the group to which you want to add the subscriber to.")
+                .options((ActionOptionsFunction<String>) MailerLiteUtils::getGroupIdOptions)
                 .required(false))
         .output(
             outputSchema(
@@ -85,16 +86,15 @@ public class MailerLiteCreateOrUpdateSubscriberAction {
     private MailerLiteCreateOrUpdateSubscriberAction() {
     }
 
-    protected static Object perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
-
+    public static Object perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
         return context.http(http -> http.post("/subscribers"))
             .configuration(responseType(ResponseType.JSON))
-            .body(Body.of(
-                Map.of(
-                    EMAIL, inputParameters.getRequiredString(EMAIL),
-                    GROUPS, List.of(inputParameters.getRequiredString(GROUP_ID)))))
+            .body(
+                Body.of(
+                    Map.of(
+                        EMAIL, inputParameters.getRequiredString(EMAIL),
+                        GROUPS, List.of(inputParameters.getRequiredString(GROUP_ID)))))
             .execute()
             .getBody(new TypeReference<>() {});
-
     }
 }

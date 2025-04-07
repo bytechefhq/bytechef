@@ -18,13 +18,16 @@ package com.bytechef.component.mailerlite.action;
 
 import static com.bytechef.component.mailerlite.constant.MailerLiteConstants.GROUP_ID;
 import static com.bytechef.component.mailerlite.constant.MailerLiteConstants.SUBSCRIBER_ID;
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import com.bytechef.component.definition.Context;
+import com.bytechef.component.definition.Context.Http;
+import com.bytechef.component.definition.Context.Http.Executor;
+import com.bytechef.component.definition.Context.Http.Response;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.test.definition.MockParametersFactory;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
@@ -32,22 +35,24 @@ import org.junit.jupiter.api.Test;
 /**
  * @author Nikolina Spehar
  */
-class MailerLiteRemoveSubscriberFromGroupActionTest extends AbstractMailerLiteActionTest {
+class MailerLiteRemoveSubscriberFromGroupActionTest {
 
+    private final Context mockedContext = mock(Context.class);
+    private final Executor mockedExecutor = mock(Http.Executor.class);
+    private final Response mockedResponse = mock(Response.class);
     private final Parameters mockedParameters = MockParametersFactory.create(
-        Map.of(
-            SUBSCRIBER_ID, "subscriber_id1",
-            GROUP_ID, "id1"));
-    private final Map<String, Object> responseMap = mock(Map.class);
+        Map.of(SUBSCRIBER_ID, "subscriber_id1", GROUP_ID, "id1"));
 
     @Test
     void perform() {
-        when(mockedResponse.getBody(any(TypeReference.class)))
-            .thenReturn(responseMap);
+        when(mockedContext.http(any()))
+            .thenReturn(mockedExecutor);
+        when(mockedExecutor.execute())
+            .thenReturn(mockedResponse);
 
-        Object result = MailerLiteAddSubscriberToGroupAction.perform(
-            mockedParameters, mockedParameters, mockedContext);
+        Object result =
+            MailerLiteRemoveSubscriberFromGroupAction.perform(mockedParameters, mockedParameters, mockedContext);
 
-        assertEquals(responseMap, result);
+        assertNull(result);
     }
 }

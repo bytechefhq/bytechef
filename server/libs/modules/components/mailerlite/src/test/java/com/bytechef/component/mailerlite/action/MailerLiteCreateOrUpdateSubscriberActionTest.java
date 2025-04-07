@@ -23,38 +23,52 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import com.bytechef.component.definition.Context;
+import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Context.Http.Body;
+import com.bytechef.component.definition.Context.Http.Executor;
+import com.bytechef.component.definition.Context.Http.Response;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.test.definition.MockParametersFactory;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 
 /**
  * @author Nikolina Spehar
  */
-class MailerLiteCreateOrUpdateSubscriberActionTest extends AbstractMailerLiteActionTest {
+class MailerLiteCreateOrUpdateSubscriberActionTest {
 
+    private final ArgumentCaptor<Body> bodyArgumentCaptor = ArgumentCaptor.forClass(Body.class);
+    private final Context mockedContext = mock(Context.class);
+    private final Executor mockedExecutor = mock(Http.Executor.class);
+    private final Object mockedObject = mock(Object.class);
+    private final Response mockedResponse = mock(Response.class);
     private final Parameters mockedParameters = MockParametersFactory.create(
-        Map.of(
-            EMAIL, "testTest@gmail.com",
-            GROUP_ID, "id1"));
-    private final Object responseObject = mock(Object.class);
+        Map.of(EMAIL, "testTest@gmail.com", GROUP_ID, "id1"));
 
     @Test
     void perform() {
+        when(mockedContext.http(any()))
+            .thenReturn(mockedExecutor);
+        when(mockedExecutor.body(bodyArgumentCaptor.capture()))
+            .thenReturn(mockedExecutor);
+        when(mockedExecutor.configuration(any()))
+            .thenReturn(mockedExecutor);
+        when(mockedExecutor.execute())
+            .thenReturn(mockedResponse);
         when(mockedResponse.getBody(any(TypeReference.class)))
-            .thenReturn(responseObject);
+            .thenReturn(mockedObject);
 
         Object result = MailerLiteCreateOrUpdateSubscriberAction.perform(
             mockedParameters, mockedParameters, mockedContext);
 
-        assertEquals(responseObject, result);
+        assertEquals(mockedObject, result);
 
         Body body = bodyArgumentCaptor.getValue();
 
-        assertEquals(Map.of(EMAIL, "testTest@gmail.com", "groups", List.of("id1")),
-            body.getContent());
+        assertEquals(Map.of(EMAIL, "testTest@gmail.com", "groups", List.of("id1")), body.getContent());
     }
 }

@@ -29,13 +29,7 @@ public class MailerLiteConstants {
     public static final String GROUPS = "groups";
     public static final String ID = "id";
     public static final String NAME = "name";
-    public static final String SUBSCRIBER_ADDED_TO_GROUP_TRIGGER_EVENT = "subscriber.added_to_group";
-    public static final String SUBSCRIBER_ADDED_TO_GROUP_TRIGGER_NAME = "subscriberAddedToGroup";
-    public static final String SUBSCRIBER_CREATED_TRIGGER_EVENT = "subscriber.created";
-    public static final String SUBSCRIBER_CREATED_TRIGGER_NAME = "subscriberCreated";
     public static final String SUBSCRIBER_ID = "subscriber_id";
-    public static final String SUBSCRIBER_UNSUBSCRIBED_TRIGGER_EVENT = "subscriber.unsubscribed";
-    public static final String SUBSCRIBER_UNSUBSCRIBED_TRIGGER_NAME = "subscriberUnsubscribed";
     public static final String TRIGGER_NAME = "name";
     public static final String URL = "url";
 

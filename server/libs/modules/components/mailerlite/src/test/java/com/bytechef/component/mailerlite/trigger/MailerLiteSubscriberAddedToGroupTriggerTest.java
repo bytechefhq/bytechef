@@ -17,8 +17,6 @@
 package com.bytechef.component.mailerlite.trigger;
 
 import static com.bytechef.component.mailerlite.constant.MailerLiteConstants.ID;
-import static com.bytechef.component.mailerlite.constant.MailerLiteConstants.SUBSCRIBER_ADDED_TO_GROUP_TRIGGER_EVENT;
-import static com.bytechef.component.mailerlite.constant.MailerLiteConstants.SUBSCRIBER_ADDED_TO_GROUP_TRIGGER_NAME;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import com.bytechef.component.definition.TriggerDefinition.WebhookEnableOutput;
@@ -51,7 +49,7 @@ class MailerLiteSubscriberAddedToGroupTriggerTest extends AbstractsMailerLiteTri
         assertEquals(expectedWebhookEnableOutput, webhookEnableOutput);
 
         assertEquals(
-            List.of(SUBSCRIBER_ADDED_TO_GROUP_TRIGGER_NAME, SUBSCRIBER_ADDED_TO_GROUP_TRIGGER_EVENT, webhookUrl),
+            List.of("subscriberAddedToGroup", "subscriber.added_to_group", webhookUrl),
             stringArgumentCaptor.getAllValues());
         assertEquals(mockedTriggerContext, triggerContextArgumentCaptor.getValue());
     }

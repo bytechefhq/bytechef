@@ -36,7 +36,6 @@ import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.mailerlite.util.MailerLiteUtils;
-import java.util.Map;
 
 /**
  * @author Nikolina Spehar
@@ -49,13 +48,13 @@ public class MailerLiteAddSubscriberToGroupAction {
         .properties(
             string(SUBSCRIBER_ID)
                 .label("Subscriber Email")
-                .description("User that will be added to the selected group.")
-                .options((ActionOptionsFunction<String>) MailerLiteUtils::getSubscribers)
+                .description("ID of the user that will be added to the selected group.")
+                .options((ActionOptionsFunction<String>) MailerLiteUtils::getSubscriberIdOptions)
                 .required(true),
             string(GROUP_ID)
-                .label("Group")
-                .description("Group to which the user will be added.")
-                .options((ActionOptionsFunction<String>) MailerLiteUtils::getGroups)
+                .label("Group ID")
+                .description("ID of the group to which the user will be added.")
+                .options((ActionOptionsFunction<String>) MailerLiteUtils::getGroupIdOptions)
                 .required(true))
         .output(
             outputSchema(
@@ -97,9 +96,7 @@ public class MailerLiteAddSubscriberToGroupAction {
     private MailerLiteAddSubscriberToGroupAction() {
     }
 
-    protected static Map<String, Object>
-        perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
-
+    public static Object perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
         return context.http(http -> http.post(
             "/subscribers/" + inputParameters.getRequiredString(SUBSCRIBER_ID) + "/groups/"
                 + inputParameters.getRequiredString(GROUP_ID)))
