@@ -32,7 +32,6 @@ import static com.bytechef.component.definition.ComponentDsl.trigger;
 import static com.bytechef.component.definition.Context.Http.responseType;
 
 import com.bytechef.component.definition.ComponentDsl.ModifiableTriggerDefinition;
-import com.bytechef.component.definition.Context.Http.Response;
 import com.bytechef.component.definition.Context.Http.ResponseType;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TriggerContext;
@@ -96,9 +95,9 @@ public class BeamerNewPostTrigger {
                                                         "Language of th post (in ISO-639 two-letter code format)."),
                                                 string("postUrl")
                                                     .description(
-                                                        "The URL where users will be redirected when they click on the header of "
-                                                            +
-                                                            "the post or the link shown at the bottom of it."),
+                                                        "The URL where users will be redirected when they click on " +
+                                                            "the header of the post or the link shown at the bottom " +
+                                                            "of it."),
                                                 string(TITLE)
                                                     .description("Title of post.")),
                                         integer("uniqueViews")
@@ -120,14 +119,13 @@ public class BeamerNewPostTrigger {
 
         LocalDateTime startDate = closureParameters.getLocalDateTime(LAST_TIME_CHECKED, now.minusHours(3));
 
-        Response response = triggerContext.http(http -> http.get("/posts"))
+        List<Map<String, Object>> posts = triggerContext.http(http -> http.get("/posts"))
             .queryParameter(DATE_FROM, startDate.toString())
             .configuration(responseType(ResponseType.JSON))
-            .execute();
+            .execute()
+            .getBody(new TypeReference<>() {});
 
-        List<Map<String, Object>> body = response.getBody(new TypeReference<>() {});
-
-        return new PollOutput(body, Map.of(LAST_TIME_CHECKED, now), false);
+        return new PollOutput(posts, Map.of(LAST_TIME_CHECKED, now), false);
     }
 
 }
