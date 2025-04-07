@@ -24,6 +24,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.component.definition.Context;
+import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
@@ -41,9 +42,9 @@ class BinanceUtilsTest {
         option("ETHBTC", "ETHBTC"),
         option("LTCBTC", "LTCBTC"));
     private final Context mockedContext = mock(Context.class);
-    private final Context.Http.Executor mockedExecutor = mock(Context.Http.Executor.class);
+    private final Http.Executor mockedExecutor = mock(Http.Executor.class);
     private final Parameters mockedParameters = mock(Parameters.class);
-    private final Context.Http.Response mockedResponse = mock(Context.Http.Response.class);
+    private final Http.Response mockedResponse = mock(Http.Response.class);
 
     @Test
     void testGetSymbolsOptions() {
@@ -54,10 +55,7 @@ class BinanceUtilsTest {
         when(mockedExecutor.execute())
             .thenReturn(mockedResponse);
         when(mockedResponse.getBody(any(TypeReference.class)))
-            .thenReturn(Map.of(
-                "symbols", List.of(
-                    Map.of(SYMBOL, "ETHBTC"),
-                    Map.of(SYMBOL, "LTCBTC"))));
+            .thenReturn(Map.of("symbols", List.of(Map.of(SYMBOL, "ETHBTC"), Map.of(SYMBOL, "LTCBTC"))));
 
         List<Option<String>> result = BinanceUtils.getSymbolsOptions(
             mockedParameters, mockedParameters, Map.of(), "", mockedContext);

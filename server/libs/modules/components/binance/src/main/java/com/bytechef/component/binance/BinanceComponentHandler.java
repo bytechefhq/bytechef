@@ -35,8 +35,7 @@ public class BinanceComponentHandler implements ComponentHandler {
         .description("Binance is an online exchange where users can trade cryptocurrencies.")
         .icon("path:assets/binance.svg")
         .categories(ComponentCategory.PAYMENT_PROCESSING)
-        .actions(
-            BinanceFetchPairPriceAction.ACTION_DEFINITION);
+        .actions(BinanceFetchPairPriceAction.ACTION_DEFINITION);
 
     @Override
     public ComponentDefinition getDefinition() {
