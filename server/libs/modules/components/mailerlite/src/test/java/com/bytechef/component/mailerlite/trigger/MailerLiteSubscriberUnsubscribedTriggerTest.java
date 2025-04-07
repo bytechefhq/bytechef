@@ -17,8 +17,6 @@
 package com.bytechef.component.mailerlite.trigger;
 
 import static com.bytechef.component.mailerlite.constant.MailerLiteConstants.ID;
-import static com.bytechef.component.mailerlite.constant.MailerLiteConstants.SUBSCRIBER_UNSUBSCRIBED_TRIGGER_EVENT;
-import static com.bytechef.component.mailerlite.constant.MailerLiteConstants.SUBSCRIBER_UNSUBSCRIBED_TRIGGER_NAME;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import com.bytechef.component.definition.TriggerDefinition.WebhookEnableOutput;
@@ -50,7 +48,7 @@ class MailerLiteSubscriberUnsubscribedTriggerTest extends AbstractsMailerLiteTri
 
         assertEquals(expectedWebhookEnableOutput, webhookEnableOutput);
 
-        assertEquals(List.of(SUBSCRIBER_UNSUBSCRIBED_TRIGGER_NAME, SUBSCRIBER_UNSUBSCRIBED_TRIGGER_EVENT, webhookUrl),
+        assertEquals(List.of("subscriberUnsubscribed", "subscriber.unsubscribed", webhookUrl),
             stringArgumentCaptor.getAllValues());
         assertEquals(mockedTriggerContext, triggerContextArgumentCaptor.getValue());
     }

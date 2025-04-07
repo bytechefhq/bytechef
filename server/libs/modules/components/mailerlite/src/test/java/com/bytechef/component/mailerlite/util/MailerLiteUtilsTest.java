@@ -67,7 +67,7 @@ class MailerLiteUtilsTest {
                 "name", "group2")));
 
     @Test
-    void testGetGroups() {
+    void testGetGroupIdOptions() {
         List<Option<String>> result = httpCall(GROUP);
 
         List<Option<String>> expected = List.of(
@@ -78,7 +78,7 @@ class MailerLiteUtilsTest {
     }
 
     @Test
-    void testGetSubscribers() {
+    void testGetSubscriberIdOptions() {
         List<Option<String>> result = httpCall("subscribers");
 
         List<Option<String>> expected = List.of(
@@ -103,10 +103,10 @@ class MailerLiteUtilsTest {
         List<Option<String>> result;
 
         if (option.equals(GROUP)) {
-            result = MailerLiteUtils.getGroups(
+            result = MailerLiteUtils.getGroupIdOptions(
                 mockedParameters, mockedParameters, Map.of(), "", mockedContext);
         } else {
-            result = MailerLiteUtils.getSubscribers(
+            result = MailerLiteUtils.getSubscriberIdOptions(
                 mockedParameters, mockedParameters, Map.of(), "", mockedContext);
         }
 

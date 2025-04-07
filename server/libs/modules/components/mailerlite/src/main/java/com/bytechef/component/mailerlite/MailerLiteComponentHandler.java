@@ -39,7 +39,8 @@ public class MailerLiteComponentHandler implements ComponentHandler {
     private static final ComponentDefinition COMPONENT_DEFINITION = component("mailerLite")
         .title("MailerLite")
         .description(
-            "MailerLite is an intuitive email marketing platform that offers automation, landing pages, and subscriber management for businesses and creators.")
+            "MailerLite is an intuitive email marketing platform that offers automation, landing pages, and " +
+                "subscriber management for businesses and creators.")
         .icon("path:assets/mailerlite.svg")
         .categories(ComponentCategory.MARKETING_AUTOMATION)
         .connection(MailerLiteConnection.CONNECTION_DEFINITION)

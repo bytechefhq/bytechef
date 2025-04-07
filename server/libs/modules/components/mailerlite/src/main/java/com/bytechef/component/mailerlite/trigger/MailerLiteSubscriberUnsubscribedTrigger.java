@@ -25,8 +25,6 @@ import static com.bytechef.component.definition.ComponentDsl.trigger;
 import static com.bytechef.component.mailerlite.constant.MailerLiteConstants.DATA;
 import static com.bytechef.component.mailerlite.constant.MailerLiteConstants.EMAIL;
 import static com.bytechef.component.mailerlite.constant.MailerLiteConstants.ID;
-import static com.bytechef.component.mailerlite.constant.MailerLiteConstants.SUBSCRIBER_UNSUBSCRIBED_TRIGGER_EVENT;
-import static com.bytechef.component.mailerlite.constant.MailerLiteConstants.SUBSCRIBER_UNSUBSCRIBED_TRIGGER_NAME;
 import static com.bytechef.component.mailerlite.util.MailerLiteUtils.getContent;
 import static com.bytechef.component.mailerlite.util.MailerLiteUtils.subscribeWebhook;
 import static com.bytechef.component.mailerlite.util.MailerLiteUtils.unsubscribeWebhook;
@@ -47,7 +45,7 @@ import java.util.Map;
  */
 public class MailerLiteSubscriberUnsubscribedTrigger {
 
-    public static final ModifiableTriggerDefinition TRIGGER_DEFINITION = trigger(SUBSCRIBER_UNSUBSCRIBED_TRIGGER_NAME)
+    public static final ModifiableTriggerDefinition TRIGGER_DEFINITION = trigger("subscriberUnsubscribed")
         .title("Subscriber Unsubscribed")
         .description("Triggers when a subscriber unsubscribes.")
         .type(TriggerType.DYNAMIC_WEBHOOK)
@@ -90,7 +88,7 @@ public class MailerLiteSubscriberUnsubscribedTrigger {
         String workflowExecutionId, TriggerContext context) {
 
         return new WebhookEnableOutput(
-            Map.of(ID, subscribeWebhook(TRIGGER_DEFINITION.getName(), SUBSCRIBER_UNSUBSCRIBED_TRIGGER_EVENT, webhookUrl,
+            Map.of(ID, subscribeWebhook(TRIGGER_DEFINITION.getName(), "subscriber.unsubscribed", webhookUrl,
                 context)),
             null);
     }
