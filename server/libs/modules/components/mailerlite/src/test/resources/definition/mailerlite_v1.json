@@ -784,7 +784,7 @@
     },
     "properties" : [ {
       "advancedOption" : null,
-      "description" : "User that will be added to the selected group.",
+      "description" : "ID of the user that will be added to the selected group.",
       "displayCondition" : null,
       "expressionEnabled" : null,
       "hidden" : null,
@@ -807,7 +807,7 @@
       }
     }, {
       "advancedOption" : null,
-      "description" : "Group to which the user will be added.",
+      "description" : "ID of the group to which the user will be added.",
       "displayCondition" : null,
       "expressionEnabled" : null,
       "hidden" : null,
@@ -817,7 +817,7 @@
       "type" : "STRING",
       "defaultValue" : null,
       "exampleValue" : null,
-      "label" : "Group",
+      "label" : "Group ID",
       "placeholder" : null,
       "controlType" : "SELECT",
       "languageId" : null,
@@ -830,9 +830,9 @@
       }
     } ],
     "title" : "Add Subscriber to Group",
-    "processErrorResponse" : null,
+    "perform" : { },
     "workflowNodeDescription" : null,
-    "perform" : { }
+    "processErrorResponse" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -1506,7 +1506,7 @@
       "optionsDataSource" : null
     }, {
       "advancedOption" : null,
-      "description" : "Group to which you want to add the subscriber to.",
+      "description" : "ID of the group to which you want to add the subscriber to.",
       "displayCondition" : null,
       "expressionEnabled" : null,
       "hidden" : null,
@@ -1516,7 +1516,7 @@
       "type" : "STRING",
       "defaultValue" : null,
       "exampleValue" : null,
-      "label" : null,
+      "label" : "Group ID",
       "placeholder" : null,
       "controlType" : "SELECT",
       "languageId" : null,
@@ -1529,9 +1529,9 @@
       }
     } ],
     "title" : "Create or Update Subscriber",
-    "processErrorResponse" : null,
+    "perform" : { },
     "workflowNodeDescription" : null,
-    "perform" : { }
+    "processErrorResponse" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -1542,7 +1542,7 @@
     "outputDefinition" : null,
     "properties" : [ {
       "advancedOption" : null,
-      "description" : "User that will be added to the selected group.",
+      "description" : "ID of the user that will be added to the selected group.",
       "displayCondition" : null,
       "expressionEnabled" : null,
       "hidden" : null,
@@ -1552,7 +1552,7 @@
       "type" : "STRING",
       "defaultValue" : null,
       "exampleValue" : null,
-      "label" : "Subscriber Email",
+      "label" : "Subscriber",
       "placeholder" : null,
       "controlType" : "SELECT",
       "languageId" : null,
@@ -1565,7 +1565,7 @@
       }
     }, {
       "advancedOption" : null,
-      "description" : "Group to which the user will be added.",
+      "description" : "ID of the group to which the user will be added.",
       "displayCondition" : null,
       "expressionEnabled" : null,
       "hidden" : null,
@@ -1575,7 +1575,7 @@
       "type" : "STRING",
       "defaultValue" : null,
       "exampleValue" : null,
-      "label" : "Group",
+      "label" : "Group ID",
       "placeholder" : null,
       "controlType" : "SELECT",
       "languageId" : null,
@@ -1588,59 +1588,10 @@
       }
     } ],
     "title" : "Remove Subscriber from Group",
-    "processErrorResponse" : null,
+    "perform" : { },
     "workflowNodeDescription" : null,
-    "perform" : { }
+    "processErrorResponse" : null
   } ],
-  "connection" : {
-    "authorizations" : [ {
-      "detectOn" : null,
-      "description" : null,
-      "name" : "bearer_token",
-      "properties" : [ {
-        "advancedOption" : null,
-        "description" : "API Token needed for authorization.",
-        "displayCondition" : null,
-        "expressionEnabled" : null,
-        "hidden" : null,
-        "metadata" : { },
-        "required" : true,
-        "name" : "token",
-        "type" : "STRING",
-        "defaultValue" : null,
-        "exampleValue" : null,
-        "label" : "API Token",
-        "placeholder" : null,
-        "controlType" : "TEXT",
-        "languageId" : null,
-        "maxLength" : null,
-        "minLength" : null,
-        "options" : null,
-        "optionsDataSource" : null
-      } ],
-      "refreshOn" : null,
-      "title" : null,
-      "type" : "BEARER_TOKEN",
-      "acquire" : null,
-      "apply" : null,
-      "authorizationCallback" : null,
-      "authorizationUrl" : null,
-      "clientId" : null,
-      "clientSecret" : null,
-      "oauth2AuthorizationExtraQueryParameters" : null,
-      "pkce" : null,
-      "refresh" : null,
-      "refreshUrl" : null,
-      "scopes" : null,
-      "refreshToken" : null,
-      "tokenUrl" : null
-    } ],
-    "properties" : null,
-    "version" : 1,
-    "authorizationRequired" : null,
-    "baseUri" : { },
-    "test" : null
-  },
   "clusterElements" : null,
   "unifiedApi" : null,
   "triggers" : [ {
@@ -2343,10 +2294,10 @@
     "webhookDisable" : { },
     "webhookEnable" : { },
     "dynamicWebhookRefresh" : null,
+    "workflowNodeDescription" : null,
+    "processErrorResponse" : null,
     "webhookRequest" : { },
     "listenerDisable" : null,
-    "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
     "listenerEnable" : null,
     "webhookValidate" : null,
     "webhookValidateOnEnable" : null
@@ -3210,10 +3161,10 @@
     "webhookDisable" : { },
     "webhookEnable" : { },
     "dynamicWebhookRefresh" : null,
+    "workflowNodeDescription" : null,
+    "processErrorResponse" : null,
     "webhookRequest" : { },
     "listenerDisable" : null,
-    "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
     "listenerEnable" : null,
     "webhookValidate" : null,
     "webhookValidateOnEnable" : null
@@ -3917,12 +3868,61 @@
     "webhookDisable" : { },
     "webhookEnable" : { },
     "dynamicWebhookRefresh" : null,
+    "workflowNodeDescription" : null,
+    "processErrorResponse" : null,
     "webhookRequest" : { },
     "listenerDisable" : null,
-    "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
     "listenerEnable" : null,
     "webhookValidate" : null,
     "webhookValidateOnEnable" : null
-  } ]
+  } ],
+  "connection" : {
+    "authorizations" : [ {
+      "detectOn" : null,
+      "description" : null,
+      "name" : "bearer_token",
+      "properties" : [ {
+        "advancedOption" : null,
+        "description" : "API Token needed for authorization.",
+        "displayCondition" : null,
+        "expressionEnabled" : null,
+        "hidden" : null,
+        "metadata" : { },
+        "required" : true,
+        "name" : "token",
+        "type" : "STRING",
+        "defaultValue" : null,
+        "exampleValue" : null,
+        "label" : "API Token",
+        "placeholder" : null,
+        "controlType" : "TEXT",
+        "languageId" : null,
+        "maxLength" : null,
+        "minLength" : null,
+        "options" : null,
+        "optionsDataSource" : null
+      } ],
+      "refreshOn" : null,
+      "title" : null,
+      "type" : "BEARER_TOKEN",
+      "acquire" : null,
+      "apply" : null,
+      "authorizationCallback" : null,
+      "authorizationUrl" : null,
+      "clientId" : null,
+      "clientSecret" : null,
+      "oauth2AuthorizationExtraQueryParameters" : null,
+      "pkce" : null,
+      "refresh" : null,
+      "refreshUrl" : null,
+      "scopes" : null,
+      "refreshToken" : null,
+      "tokenUrl" : null
+    } ],
+    "properties" : null,
+    "version" : 1,
+    "authorizationRequired" : null,
+    "baseUri" : { },
+    "test" : null
+  }
 }
