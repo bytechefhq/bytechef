@@ -36,12 +36,13 @@ import org.springframework.stereotype.Component;
  * @author Matija Petanjek
  */
 @Component
+@SuppressWarnings("unchecked")
 public class JobStatusApplicationEventListener implements ApplicationEventListener {
 
-    private JobService jobService;
-    private NotificationHandlerRegistry notificationHandlerRegistry;
-    private NotificationSenderRegistry notificationSenderRegistry;
-    private NotificationService notificationService;
+    private final JobService jobService;
+    private final NotificationHandlerRegistry notificationHandlerRegistry;
+    private final NotificationSenderRegistry notificationSenderRegistry;
+    private final NotificationService notificationService;
 
     public JobStatusApplicationEventListener(
         JobService jobService, NotificationHandlerRegistry notificationHandlerRegistry,
