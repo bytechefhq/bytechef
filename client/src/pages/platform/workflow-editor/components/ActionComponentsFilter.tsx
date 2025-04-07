@@ -84,7 +84,7 @@ const ActionComponentsFilter = ({
                 </Button>
             </div>
 
-            <DropdownMenu onOpenChange={handleDropdownOpenChange}>
+            <DropdownMenu modal={false} onOpenChange={handleDropdownOpenChange}>
                 <Tooltip>
                     <DropdownMenuTrigger asChild>
                         <TooltipTrigger asChild>
@@ -129,12 +129,12 @@ const ActionComponentsFilter = ({
 
                     <Button
                         className={twMerge(
-                            'flex h-auto w-full justify-start rounded-md bg-transparent px-3 py-1.5 font-normal text-destructive shadow-none hover:bg-surface-error-secondary hover:text-destructive',
+                            'flex h-auto w-full justify-start rounded-md bg-transparent px-3 py-1.5 font-normal text-content-destructive shadow-none hover:bg-surface-destructive-secondary hover:text-content-destructive',
                             filterState.selectedCategories.length > 0 ? 'inline-flex' : 'hidden'
                         )}
                         onClick={() => deselectAllCategories()}
                     >
-                        <CircleMinusIcon className="stroke-destructive" /> Clear all selected categories
+                        <CircleMinusIcon /> Clear all selected categories
                     </Button>
 
                     <ScrollArea className="h-48 overflow-y-auto pr-1">

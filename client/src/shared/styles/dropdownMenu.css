@@ -14,9 +14,9 @@
 
 .dropdown-menu-item-destructive {
     @apply dropdown-menu-item-base;
-    @apply !text-destructive;
-    @apply hover:!bg-surface-error-secondary;
-    @apply hover:!text-destructive;
-    @apply focus:!bg-surface-error-secondary;
-    @apply focus:!text-destructive;
+    @apply !text-content-destructive;
+    @apply hover:!bg-surface-destructive-secondary;
+    @apply hover:!text-content-destructive;
+    @apply focus:!bg-surface-destructive-secondary;
+    @apply focus:!text-content-destructive;
 }
