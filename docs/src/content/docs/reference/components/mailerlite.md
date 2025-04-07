@@ -48,8 +48,8 @@ Adding a subscriber to a selected group.
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| subscriber_id | Subscriber Email | STRING | User that will be added to the selected group. | true |
-| group_id | Group | STRING | Group to which the user will be added. | true |
+| subscriber_id | Subscriber Email | STRING | ID of the user that will be added to the selected group. | true |
+| group_id | Group ID | STRING | ID of the group to which the user will be added. | true |
 
 #### Example JSON Structure
 ```json
@@ -118,7 +118,7 @@ Create new user or update an existing user.
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | email | null | STRING | The email address of the subscriber. | true |
-| group_id | null | STRING | Group to which you want to add the subscriber to. | false |
+| group_id | Group ID | STRING | ID of the group to which you want to add the subscriber to. | false |
 
 #### Example JSON Structure
 ```json
@@ -181,8 +181,8 @@ Remove selected subscriber from the group.
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| subscriber_id | Subscriber Email | STRING | User that will be added to the selected group. | true |
-| group_id | Group | STRING | Group to which the user will be added. | true |
+| subscriber_id | Subscriber | STRING | ID of the user that will be added to the selected group. | true |
+| group_id | Group ID | STRING | ID of the group to which the user will be added. | true |
 
 #### Example JSON Structure
 ```json
