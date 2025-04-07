@@ -27,16 +27,16 @@ import org.springframework.stereotype.Component;
  * @author Matija Petanjek
  */
 @Component
-public class NotificationSenderRegistry {
-    private final Map<Notification.Type, NotificationSender> notificationSenderMap;
+public class NotificationSenderRegistry<T extends NotificationHandler> {
+    private final Map<Notification.Type, NotificationSender<T>> notificationSenderMap;
 
-    public NotificationSenderRegistry(List<NotificationSender> notificationSenders) {
+    public NotificationSenderRegistry(List<NotificationSender<T>> notificationSenders) {
         this.notificationSenderMap = MapUtils.toMap(
             notificationSenders, NotificationSender::getType, notificationSender -> notificationSender);
     }
 
     @NonNull
-    public NotificationSender getNotificationSender(Notification.Type type) {
+    public NotificationSender<T> getNotificationSender(Notification.Type type) {
         return notificationSenderMap.get(type);
     }
 }
