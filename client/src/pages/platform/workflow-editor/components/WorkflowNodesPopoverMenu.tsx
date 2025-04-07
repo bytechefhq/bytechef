@@ -165,6 +165,7 @@ const WorkflowNodesPopoverMenu = ({
     return (
         <Popover
             key={`${sourceNodeId}-popoverMenu-${nodeIndex}`}
+            modal
             onOpenChange={(open) => {
                 setPopoverOpen(open);
 

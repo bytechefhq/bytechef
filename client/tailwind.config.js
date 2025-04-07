@@ -122,9 +122,7 @@ module.exports = {
                         primary: 'hsl(var(--surface-destructive-primary))',
                         'primary-active': 'hsl(var(--surface-destructive-primary-active))',
                         'primary-hover': 'hsl(var(--surface-destructive-primary-hover))',
-                    },
-                    error: {
-                        secondary: 'hsl(var(--surface-error-secondary))',
+                        secondary: 'hsl(var(--surface-destructive-secondary))',
                     },
                     main: 'hsl(var(--surface-main))',
                     neutral: {
