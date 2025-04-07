@@ -19,7 +19,6 @@ package com.bytechef.component.beamer.trigger;
 import static com.bytechef.component.beamer.constant.BeamerConstants.DATE_FROM;
 import static com.bytechef.component.beamer.constant.BeamerConstants.LAST_TIME_CHECKED;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
@@ -49,6 +48,7 @@ class BeamerNewPostTriggerTest {
     private final Http.Response mockedResponse = mock(Http.Response.class);
     private final TriggerContext mockedTriggerContext = mock(TriggerContext.class);
     private final ArgumentCaptor<String> stringArgumentCaptor = ArgumentCaptor.forClass(String.class);
+    private final ArgumentCaptor<ZoneId> zoneIdArgumentCaptor = ArgumentCaptor.forClass(ZoneId.class);
     private final List<Map<String, Object>> responseList = List.of(Map.of());
 
     @Test
@@ -62,11 +62,9 @@ class BeamerNewPostTriggerTest {
         try (MockedStatic<LocalDateTime> localDateTimeMockedStatic = mockStatic(
             LocalDateTime.class, Mockito.CALLS_REAL_METHODS)) {
 
-            localDateTimeMockedStatic.when(() -> LocalDateTime.now(any(ZoneId.class)))
+            localDateTimeMockedStatic.when(() -> LocalDateTime.now(zoneIdArgumentCaptor.capture()))
                 .thenReturn(endDate);
 
-            when(mockedParameters.getLocalDateTime(LAST_TIME_CHECKED, LocalDateTime.now(ZoneId.of("GMT"))))
-                .thenReturn(startDate);
             when(mockedTriggerContext.http(any()))
                 .thenReturn(mockedExecutor);
             when(mockedExecutor.queryParameter(stringArgumentCaptor.capture(), stringArgumentCaptor.capture()))
@@ -81,9 +79,11 @@ class BeamerNewPostTriggerTest {
             PollOutput pollOutput = BeamerNewPostTrigger.poll(
                 mockedParameters, mockedParameters, mockedParameters, mockedTriggerContext);
 
-            assertEquals(List.of(Map.of()), pollOutput.records());
-            assertFalse(pollOutput.pollImmediately());
+            PollOutput expectedPollOutput = new PollOutput(
+                List.of(Map.of()), Map.of(LAST_TIME_CHECKED, endDate), false);
 
+            assertEquals(expectedPollOutput, pollOutput);
+            assertEquals(ZoneId.of("GMT"), zoneIdArgumentCaptor.getValue());
             assertEquals(List.of(DATE_FROM, startDate.toString()), stringArgumentCaptor.getAllValues());
         }
     }
