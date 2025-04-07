@@ -29,8 +29,6 @@ public class BrevoConstants {
     public static final String FIRST_NAME = "FIRSTNAME";
     public static final String ID = "id";
     public static final String LAST_NAME = "LASTNAME";
-    public static final String NAME = "name";
-    public static final String RECIPIENT_EMAIL = "recipientEmail";
     public static final String SENDER_EMAIL = "senderEmail";
     public static final String SUBJECT = "subject";
     public static final String TO = "to";

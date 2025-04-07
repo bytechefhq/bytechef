@@ -17,7 +17,6 @@
 package com.bytechef.component.brevo.util;
 
 import static com.bytechef.component.brevo.constant.BrevoConstants.EMAIL;
-import static com.bytechef.component.brevo.constant.BrevoConstants.ID;
 import static com.bytechef.component.definition.ComponentDsl.option;
 import static com.bytechef.component.definition.Context.Http.responseType;
 
@@ -25,7 +24,6 @@ import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.definition.TriggerContext;
 import com.bytechef.component.definition.TypeReference;
 import java.util.ArrayList;
 import java.util.List;
@@ -84,26 +82,4 @@ public class BrevoUtils {
 
         return options;
     }
-
-    public static String createWebhook(
-        String webhookUrl, TriggerContext context) {
-
-        Map<String, ?> body = context.http(http -> http.post("/webhooks"))
-            .body(Context.Http.Body.of(
-                "url", webhookUrl,
-                "events", List.of("opened")))
-            .configuration(Context.Http.responseType(Context.Http.ResponseType.JSON))
-            .execute()
-            .getBody(new TypeReference<>() {});
-
-        return body.get(ID)
-            .toString();
-    }
-
-    public static void deleteWebhook(Parameters outputParameters, Context context) {
-        context.http(http -> http.delete("/webhooks/" + outputParameters.getString(ID)))
-            .configuration(Context.Http.responseType(Context.Http.ResponseType.JSON))
-            .execute();
-    }
-
 }

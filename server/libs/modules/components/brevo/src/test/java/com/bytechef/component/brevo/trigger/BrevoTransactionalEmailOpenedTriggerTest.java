@@ -18,75 +18,72 @@ package com.bytechef.component.brevo.trigger;
 
 import static com.bytechef.component.brevo.constant.BrevoConstants.ID;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
 
-import com.bytechef.component.brevo.util.BrevoUtils;
+import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TriggerContext;
-import com.bytechef.component.definition.TriggerDefinition;
-import java.time.LocalDateTime;
+import com.bytechef.component.definition.TriggerDefinition.HttpHeaders;
+import com.bytechef.component.definition.TriggerDefinition.HttpParameters;
+import com.bytechef.component.definition.TriggerDefinition.WebhookBody;
+import com.bytechef.component.definition.TriggerDefinition.WebhookEnableOutput;
+import com.bytechef.component.definition.TriggerDefinition.WebhookMethod;
+import com.bytechef.component.definition.TypeReference;
+import com.bytechef.component.test.definition.MockParametersFactory;
+import java.util.List;
 import java.util.Map;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.MockedStatic;
+import org.mockito.ArgumentCaptor;
 
 /**
  * @author Marija Horvat
  */
 class BrevoTransactionalEmailOpenedTriggerTest {
 
-    protected TriggerDefinition.WebhookEnableOutput mockedWebhookEnableOutput =
-        mock(TriggerDefinition.WebhookEnableOutput.class);
-    protected TriggerDefinition.WebhookBody mockedWebhookBody = mock(TriggerDefinition.WebhookBody.class);
-    protected TriggerDefinition.HttpHeaders mockedHttpHeaders = mock(TriggerDefinition.HttpHeaders.class);
-    protected TriggerDefinition.HttpParameters mockedHttpParameters = mock(TriggerDefinition.HttpParameters.class);
-    protected TriggerDefinition.WebhookMethod mockedWebhookMethod = mock(TriggerDefinition.WebhookMethod.class);
-    protected Parameters mockedParameters = mock(Parameters.class);
-    protected TriggerContext mockedTriggerContext = mock(TriggerContext.class);
-    protected MockedStatic<BrevoUtils> brevoUtilsMockedStatic;
-    protected String workflowExecutionId = "testWorkflowExecutionId";
+    private final WebhookEnableOutput mockedWebhookEnableOutput = mock(WebhookEnableOutput.class);
+    private final ArgumentCaptor<Http.Body> bodyArgumentCaptor = ArgumentCaptor.forClass(Http.Body.class);
+    private final WebhookBody mockedWebhookBody = mock(WebhookBody.class);
+    private final HttpHeaders mockedHttpHeaders = mock(HttpHeaders.class);
+    private final HttpParameters mockedHttpParameters = mock(HttpParameters.class);
+    private final WebhookMethod mockedWebhookMethod = mock(WebhookMethod.class);
+    private final Parameters mockedParameters = MockParametersFactory.create(Map.of(ID, "id"));
+    private final TriggerContext mockedTriggerContext = mock(TriggerContext.class);
     private final Object mockedObject = mock(Object.class);
-
-    @BeforeEach
-    public void beforeEach() {
-        brevoUtilsMockedStatic = mockStatic(BrevoUtils.class);
-    }
-
-    @AfterEach
-    public void afterEach() {
-        brevoUtilsMockedStatic.close();
-    }
+    private final Http.Executor mockedExecutor = mock(Http.Executor.class);
+    private final Http.Response mockedResponse = mock(Http.Response.class);
 
     @Test
     void testWebhookEnable() {
         String webhookUrl = "testWebhookUrl";
+        String workflowExecutionId = "testWorkflowExecutionId";
 
-        when(mockedParameters.getRequiredString(ID))
-            .thenReturn("id");
+        when(mockedTriggerContext.http(any()))
+            .thenReturn(mockedExecutor);
+        when(mockedExecutor.body(bodyArgumentCaptor.capture()))
+            .thenReturn(mockedExecutor);
+        when(mockedExecutor.configuration(any()))
+            .thenReturn(mockedExecutor);
+        when(mockedExecutor.execute())
+            .thenReturn(mockedResponse);
+        when(mockedResponse.getBody(any(TypeReference.class)))
+            .thenReturn(Map.of(ID, "123"));
 
-        brevoUtilsMockedStatic.when(
-            () -> BrevoUtils.createWebhook(webhookUrl, mockedTriggerContext))
-            .thenReturn("123");
-
-        TriggerDefinition.WebhookEnableOutput webhookEnableOutput = BrevoTransactionalEmailOpenedTrigger.webhookEnable(
+        WebhookEnableOutput webhookEnableOutput = BrevoTransactionalEmailOpenedTrigger.webhookEnable(
             mockedParameters, mockedParameters, webhookUrl, workflowExecutionId, mockedTriggerContext);
 
-        Map<String, ?> parameters = webhookEnableOutput.parameters();
-        LocalDateTime webhookExpirationDate = webhookEnableOutput.webhookExpirationDate();
+        WebhookEnableOutput expectedWebhookEnableOutput = new WebhookEnableOutput(Map.of(ID, "123"), null);
 
-        Map<String, Object> expectedParameters = Map.of(ID, "123");
+        assertEquals(expectedWebhookEnableOutput, webhookEnableOutput);
 
-        assertEquals(expectedParameters, parameters);
-        assertNull(webhookExpirationDate);
+        Http.Body body = bodyArgumentCaptor.getValue();
+
+        assertEquals(Map.of("url", webhookUrl, "events", List.of("opened")), body.getContent());
     }
 
     @Test
     void testWebhookRequest() {
-
         when(mockedWebhookBody.getContent())
             .thenReturn(mockedObject);
 
