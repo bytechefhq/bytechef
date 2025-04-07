@@ -14,17 +14,22 @@
  * limitations under the License.
  */
 
-package com.bytechef.component.ai.llm.mistral.cluster;
+package com.bytechef.component.ai.llm.perplexity.cluster;
 
+import static com.bytechef.component.ai.llm.constant.LLMConstants.FREQUENCY_PENALTY_PROPERTY;
+import static com.bytechef.component.ai.llm.constant.LLMConstants.LOGIT_BIAS_PROPERTY;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.MAX_TOKENS_PROPERTY;
-import static com.bytechef.component.ai.llm.constant.LLMConstants.SEED_PROPERTY;
+import static com.bytechef.component.ai.llm.constant.LLMConstants.MESSAGES_PROPERTY;
+import static com.bytechef.component.ai.llm.constant.LLMConstants.N_PROPERTY;
+import static com.bytechef.component.ai.llm.constant.LLMConstants.PRESENCE_PENALTY_PROPERTY;
+import static com.bytechef.component.ai.llm.constant.LLMConstants.RESPONSE_PROPERTY;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.STOP_PROPERTY;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.TEMPERATURE_PROPERTY;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.TOP_P_PROPERTY;
-import static com.bytechef.component.ai.llm.mistral.constant.MistralConstants.CHAT_MODEL_PROPERTY;
-import static com.bytechef.component.ai.llm.mistral.constant.MistralConstants.SAFE_PROMPT_PROPERTY;
+import static com.bytechef.component.ai.llm.constant.LLMConstants.USER_PROPERTY;
+import static com.bytechef.component.ai.llm.perplexity.constant.PerplexityConstants.CHAT_MODEL_PROPERTY;
 
-import com.bytechef.component.ai.llm.mistral.action.MistralChatAction;
+import com.bytechef.component.ai.llm.perplexity.action.PerplexityChatAction;
 import com.bytechef.component.definition.ClusterElementDefinition;
 import com.bytechef.component.definition.ComponentDsl;
 import com.bytechef.component.definition.Parameters;
@@ -32,26 +37,31 @@ import com.bytechef.platform.component.definition.ai.agent.ModelFunction;
 import org.springframework.ai.chat.model.ChatModel;
 
 /**
- * @author Ivica Cardic
+ * @author Monika Kušter
  */
-public class MistralAiChatModel {
+public class PerplexityChatModel {
 
     public static final ClusterElementDefinition<ModelFunction> CLUSTER_ELEMENT_DEFINITION =
         ComponentDsl.<ModelFunction>clusterElement("model")
-            .title("MistralAI Model")
-            .description("MistralAI model.")
+            .title("Perplexity Model")
+            .description("Perplexity model.")
             .type(ModelFunction.MODEL)
-            .object(() -> MistralAiChatModel::apply)
+            .object(() -> PerplexityChatModel::apply)
             .properties(
                 CHAT_MODEL_PROPERTY,
+                MESSAGES_PROPERTY,
+                RESPONSE_PROPERTY,
                 MAX_TOKENS_PROPERTY,
+                N_PROPERTY,
                 TEMPERATURE_PROPERTY,
                 TOP_P_PROPERTY,
+                FREQUENCY_PENALTY_PROPERTY,
+                PRESENCE_PENALTY_PROPERTY,
+                LOGIT_BIAS_PROPERTY,
                 STOP_PROPERTY,
-                SEED_PROPERTY,
-                SAFE_PROMPT_PROPERTY);
+                USER_PROPERTY);
 
     protected static ChatModel apply(Parameters inputParameters, Parameters connectionParameters) {
-        return MistralChatAction.CHAT_MODEL.createChatModel(inputParameters, connectionParameters);
+        return PerplexityChatAction.CHAT_MODEL.createChatModel(inputParameters, connectionParameters);
     }
 }

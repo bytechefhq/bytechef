@@ -20,6 +20,7 @@ import static com.bytechef.component.definition.ComponentDsl.component;
 
 import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.ai.llm.groq.action.GroqChatAction;
+import com.bytechef.component.ai.llm.groq.cluster.GroqChatModel;
 import com.bytechef.component.ai.llm.groq.connection.GroqConnection;
 import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDefinition;
@@ -40,7 +41,8 @@ public class GroqComponentHandler implements ComponentHandler {
         .icon("path:assets/groq.svg")
         .categories(ComponentCategory.ARTIFICIAL_INTELLIGENCE)
         .connection(GroqConnection.CONNECTION_DEFINITION)
-        .actions(GroqChatAction.ACTION_DEFINITION);
+        .actions(GroqChatAction.ACTION_DEFINITION)
+        .clusterElements(GroqChatModel.CLUSTER_ELEMENT_DEFINITION);
 
     @Override
     public ComponentDefinition getDefinition() {

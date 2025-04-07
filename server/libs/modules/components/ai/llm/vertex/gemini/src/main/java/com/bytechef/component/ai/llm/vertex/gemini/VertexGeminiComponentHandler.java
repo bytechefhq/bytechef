@@ -20,6 +20,7 @@ import static com.bytechef.component.definition.ComponentDsl.component;
 
 import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.ai.llm.vertex.gemini.action.VertexGeminiChatAction;
+import com.bytechef.component.ai.llm.vertex.gemini.cluster.VertexGeminiChatModel;
 import com.bytechef.component.ai.llm.vertex.gemini.connection.VertexGeminiConnection;
 import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDefinition;
@@ -39,7 +40,8 @@ public class VertexGeminiComponentHandler implements ComponentHandler {
         .icon("path:assets/google-vertex.svg")
         .categories(ComponentCategory.ARTIFICIAL_INTELLIGENCE)
         .connection(VertexGeminiConnection.CONNECTION_DEFINITION)
-        .actions(VertexGeminiChatAction.ACTION_DEFINITION);
+        .actions(VertexGeminiChatAction.ACTION_DEFINITION)
+        .clusterElements(VertexGeminiChatModel.CLUSTER_ELEMENT_DEFINITION);
 
     @Override
     public ComponentDefinition getDefinition() {

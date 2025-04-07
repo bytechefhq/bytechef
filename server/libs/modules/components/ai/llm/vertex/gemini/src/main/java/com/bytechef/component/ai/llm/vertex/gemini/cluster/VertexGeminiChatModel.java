@@ -14,17 +14,17 @@
  * limitations under the License.
  */
 
-package com.bytechef.component.ai.llm.mistral.cluster;
+package com.bytechef.component.ai.llm.vertex.gemini.cluster;
 
 import static com.bytechef.component.ai.llm.constant.LLMConstants.MAX_TOKENS_PROPERTY;
-import static com.bytechef.component.ai.llm.constant.LLMConstants.SEED_PROPERTY;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.STOP_PROPERTY;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.TEMPERATURE_PROPERTY;
+import static com.bytechef.component.ai.llm.constant.LLMConstants.TOP_K_PROPERTY;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.TOP_P_PROPERTY;
-import static com.bytechef.component.ai.llm.mistral.constant.MistralConstants.CHAT_MODEL_PROPERTY;
-import static com.bytechef.component.ai.llm.mistral.constant.MistralConstants.SAFE_PROMPT_PROPERTY;
+import static com.bytechef.component.ai.llm.vertex.gemini.constant.VertexGeminiConstants.CANDIDATE_COUNT_PROPERTY;
+import static com.bytechef.component.ai.llm.vertex.gemini.constant.VertexGeminiConstants.CHAT_MODEL_PROPERTY;
 
-import com.bytechef.component.ai.llm.mistral.action.MistralChatAction;
+import com.bytechef.component.ai.llm.vertex.gemini.action.VertexGeminiChatAction;
 import com.bytechef.component.definition.ClusterElementDefinition;
 import com.bytechef.component.definition.ComponentDsl;
 import com.bytechef.component.definition.Parameters;
@@ -32,26 +32,26 @@ import com.bytechef.platform.component.definition.ai.agent.ModelFunction;
 import org.springframework.ai.chat.model.ChatModel;
 
 /**
- * @author Ivica Cardic
+ * @author Monika Kušter
  */
-public class MistralAiChatModel {
+public class VertexGeminiChatModel {
 
     public static final ClusterElementDefinition<ModelFunction> CLUSTER_ELEMENT_DEFINITION =
         ComponentDsl.<ModelFunction>clusterElement("model")
-            .title("MistralAI Model")
-            .description("MistralAI model.")
+            .title("Vertex AI Gemini Model")
+            .description("Vertex AI Gemini model.")
             .type(ModelFunction.MODEL)
-            .object(() -> MistralAiChatModel::apply)
+            .object(() -> VertexGeminiChatModel::apply)
             .properties(
                 CHAT_MODEL_PROPERTY,
                 MAX_TOKENS_PROPERTY,
+                CANDIDATE_COUNT_PROPERTY,
                 TEMPERATURE_PROPERTY,
                 TOP_P_PROPERTY,
-                STOP_PROPERTY,
-                SEED_PROPERTY,
-                SAFE_PROMPT_PROPERTY);
+                TOP_K_PROPERTY,
+                STOP_PROPERTY);
 
     protected static ChatModel apply(Parameters inputParameters, Parameters connectionParameters) {
-        return MistralChatAction.CHAT_MODEL.createChatModel(inputParameters, connectionParameters);
+        return VertexGeminiChatAction.CHAT_MODEL.createChatModel(inputParameters, connectionParameters);
     }
 }

@@ -14,17 +14,16 @@
  * limitations under the License.
  */
 
-package com.bytechef.component.ai.llm.mistral.cluster;
+package com.bytechef.component.ai.llm.anthropic.cluster;
 
-import static com.bytechef.component.ai.llm.constant.LLMConstants.MAX_TOKENS_PROPERTY;
-import static com.bytechef.component.ai.llm.constant.LLMConstants.SEED_PROPERTY;
+import static com.bytechef.component.ai.llm.anthropic.constant.AnthropicConstants.CHAT_MODEL_PROPERTY;
+import static com.bytechef.component.ai.llm.anthropic.constant.AnthropicConstants.MAX_TOKENS_PROPERTY;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.STOP_PROPERTY;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.TEMPERATURE_PROPERTY;
+import static com.bytechef.component.ai.llm.constant.LLMConstants.TOP_K_PROPERTY;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.TOP_P_PROPERTY;
-import static com.bytechef.component.ai.llm.mistral.constant.MistralConstants.CHAT_MODEL_PROPERTY;
-import static com.bytechef.component.ai.llm.mistral.constant.MistralConstants.SAFE_PROMPT_PROPERTY;
 
-import com.bytechef.component.ai.llm.mistral.action.MistralChatAction;
+import com.bytechef.component.ai.llm.anthropic.action.AnthropicChatAction;
 import com.bytechef.component.definition.ClusterElementDefinition;
 import com.bytechef.component.definition.ComponentDsl;
 import com.bytechef.component.definition.Parameters;
@@ -32,26 +31,25 @@ import com.bytechef.platform.component.definition.ai.agent.ModelFunction;
 import org.springframework.ai.chat.model.ChatModel;
 
 /**
- * @author Ivica Cardic
+ * @author Monika Kušter
  */
-public class MistralAiChatModel {
+public class AntropicChatModel {
 
     public static final ClusterElementDefinition<ModelFunction> CLUSTER_ELEMENT_DEFINITION =
         ComponentDsl.<ModelFunction>clusterElement("model")
-            .title("MistralAI Model")
-            .description("MistralAI model.")
+            .title("Antropic Model")
+            .description("Antropic model.")
             .type(ModelFunction.MODEL)
-            .object(() -> MistralAiChatModel::apply)
+            .object(() -> AntropicChatModel::apply)
             .properties(
                 CHAT_MODEL_PROPERTY,
                 MAX_TOKENS_PROPERTY,
                 TEMPERATURE_PROPERTY,
                 TOP_P_PROPERTY,
-                STOP_PROPERTY,
-                SEED_PROPERTY,
-                SAFE_PROMPT_PROPERTY);
+                TOP_K_PROPERTY,
+                STOP_PROPERTY);
 
     protected static ChatModel apply(Parameters inputParameters, Parameters connectionParameters) {
-        return MistralChatAction.CHAT_MODEL.createChatModel(inputParameters, connectionParameters);
+        return AnthropicChatAction.CHAT_MODEL.createChatModel(inputParameters, connectionParameters);
     }
 }

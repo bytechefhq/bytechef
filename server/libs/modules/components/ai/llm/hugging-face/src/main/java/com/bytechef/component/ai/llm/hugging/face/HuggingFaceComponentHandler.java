@@ -20,6 +20,7 @@ import static com.bytechef.component.definition.ComponentDsl.component;
 
 import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.ai.llm.hugging.face.action.HuggingFaceChatAction;
+import com.bytechef.component.ai.llm.hugging.face.cluster.HuggingFaceChatModel;
 import com.bytechef.component.ai.llm.hugging.face.connection.HuggingFaceConnection;
 import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDefinition;
@@ -40,7 +41,8 @@ public class HuggingFaceComponentHandler implements ComponentHandler {
         .icon("path:assets/hugging-face.svg")
         .categories(ComponentCategory.ARTIFICIAL_INTELLIGENCE)
         .connection(HuggingFaceConnection.CONNECTION_DEFINITION)
-        .actions(HuggingFaceChatAction.ACTION_DEFINITION);
+        .actions(HuggingFaceChatAction.ACTION_DEFINITION)
+        .clusterElements(HuggingFaceChatModel.CLUSTER_ELEMENT_DEFINITION);
 
     @Override
     public ComponentDefinition getDefinition() {
