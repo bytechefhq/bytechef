@@ -21,6 +21,7 @@ import static com.bytechef.component.definition.ComponentDsl.option;
 import static com.bytechef.component.definition.Context.Http.responseType;
 
 import com.bytechef.component.definition.Context;
+import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
@@ -42,15 +43,15 @@ public class BinanceUtils {
 
         Map<String, Object> body = context
             .http(http -> http.get("https://api.binance.com/api/v3/exchangeInfo"))
-            .configuration(responseType(Context.Http.ResponseType.JSON))
+            .configuration(responseType(Http.ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});
 
         List<Option<String>> options = new ArrayList<>();
 
-        if (body.get("symbols") instanceof List<?> contacts) {
-            for (Object contact : contacts) {
-                if (contact instanceof Map<?, ?> map) {
+        if (body.get("symbols") instanceof List<?> symbols) {
+            for (Object object : symbols) {
+                if (object instanceof Map<?, ?> map) {
                     String symbol = (String) map.get(SYMBOL);
 
                     options.add(option(symbol, symbol));

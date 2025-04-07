@@ -23,9 +23,11 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.component.definition.Context;
+import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.test.definition.MockParametersFactory;
+import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -35,13 +37,12 @@ import org.mockito.ArgumentCaptor;
  */
 class BinanceFetchPairPriceActionTest {
 
-    protected Context mockedContext = mock(Context.class);
-    protected Context.Http.Executor mockedExecutor = mock(Context.Http.Executor.class);
-    protected Context.Http.Response mockedResponse = mock(Context.Http.Response.class);
-    protected Map<String, Object> responseMap = Map.of(SYMBOL, "test", "price", "1");
+    private final Context mockedContext = mock(Context.class);
+    private final Http.Executor mockedExecutor = mock(Http.Executor.class);
+    private final Parameters mockedParameters = MockParametersFactory.create(Map.of(SYMBOL, "test"));
+    private final Http.Response mockedResponse = mock(Http.Response.class);
+    private final Map<String, Object> responseMap = Map.of(SYMBOL, "test", "price", "1");
     private final ArgumentCaptor<String> stringArgumentCaptor = ArgumentCaptor.forClass(String.class);
-    private final Parameters mockedParameters = MockParametersFactory.create(
-        Map.of(SYMBOL, "test"));
 
     @Test
     void testPerform() {
@@ -60,8 +61,6 @@ class BinanceFetchPairPriceActionTest {
 
         assertEquals(responseMap, result);
 
-        String query = stringArgumentCaptor.getValue();
-
-        assertEquals("test", query);
+        assertEquals(List.of(SYMBOL, "test"), stringArgumentCaptor.getAllValues());
     }
 }
