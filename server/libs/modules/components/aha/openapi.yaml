@@ -20,6 +20,9 @@ paths:
           schema:
             title: "Release ID"
             type: "string"
+            x-dynamic-options: true
+            x-dynamic-options-dependency:
+              - "productId"
       requestBody:
         content:
           application/json:
@@ -144,6 +147,7 @@ paths:
           schema:
             title: "Product ID"
             type: "string"
+            x-dynamic-options: true
       requestBody:
         content:
           application/json:
