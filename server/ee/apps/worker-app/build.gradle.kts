@@ -55,6 +55,7 @@ dependencies {
     implementation(project(":server:libs:modules:components:active-campaign"))
     implementation(project(":server:libs:modules:components:acumbamail"))
     implementation(project(":server:libs:modules:components:affinity"))
+    implementation(project(":server:libs:modules:components:aha"))
     implementation(project(":server:libs:modules:components:ai:agent"))
     implementation(project(":server:libs:modules:components:ai:agent:chat-memory"))
     implementation(project(":server:libs:modules:components:ai:agent:chat-memory:chat-memory-in-memory"))
