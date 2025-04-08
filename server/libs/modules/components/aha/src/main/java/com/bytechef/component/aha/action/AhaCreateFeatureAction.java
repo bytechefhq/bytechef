@@ -28,7 +28,9 @@ import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.Context.Http.BodyContentType;
 import static com.bytechef.component.definition.Context.Http.ResponseType;
 
+import com.bytechef.component.aha.util.AhaUtils;
 import com.bytechef.component.definition.ComponentDsl;
+import com.bytechef.component.definition.OptionsDataSource;
 import java.util.Map;
 
 /**
@@ -50,6 +52,8 @@ public class AhaCreateFeatureAction {
         .properties(string("releaseId").label("Release ID")
             .description("Numeric ID or key of the release.")
             .required(true)
+            .options((OptionsDataSource.ActionOptionsFunction<String>) AhaUtils::getReleaseIdOptions)
+            .optionsLookupDependsOn("productId")
             .metadata(
                 Map.of(
                     "type", PropertyType.PATH)),
