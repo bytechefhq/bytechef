@@ -1,9 +1,12 @@
 {
-  "componentCategories" : null,
-  "customAction" : null,
+  "componentCategories" : [ {
+    "name" : "productivity-and-collaboration",
+    "label" : "Productivity and Collaboration"
+  } ],
+  "customAction" : true,
   "customActionHelp" : null,
   "description" : "Aha! is a comprehensive product management software platform that helps teams set strategy, capture ideas, and plan, prioritize, and track work to build products customers love.",
-  "icon" : null,
+  "icon" : "path:assets/aha.svg",
   "tags" : null,
   "metadata" : null,
   "name" : "aha",
@@ -158,8 +161,8 @@
               "maxValue" : null,
               "minValue" : null,
               "options" : null,
-              "controlType" : "INTEGER",
-              "optionsDataSource" : null
+              "optionsDataSource" : null,
+              "controlType" : "INTEGER"
             }, {
               "advancedOption" : null,
               "description" : "Score assigned to the feature.",
@@ -177,8 +180,8 @@
               "maxValue" : null,
               "minValue" : null,
               "options" : null,
-              "controlType" : "INTEGER",
-              "optionsDataSource" : null
+              "optionsDataSource" : null,
+              "controlType" : "INTEGER"
             }, {
               "advancedOption" : null,
               "description" : "Timestamp when the feature was created.",
@@ -194,8 +197,8 @@
               "label" : null,
               "placeholder" : null,
               "options" : null,
-              "controlType" : "DATE_TIME",
-              "optionsDataSource" : null
+              "optionsDataSource" : null,
+              "controlType" : "DATE_TIME"
             }, {
               "advancedOption" : null,
               "description" : "Timestamp when the feature was last updated.",
@@ -211,8 +214,8 @@
               "label" : null,
               "placeholder" : null,
               "options" : null,
-              "controlType" : "DATE_TIME",
-              "optionsDataSource" : null
+              "optionsDataSource" : null,
+              "controlType" : "DATE_TIME"
             }, {
               "advancedOption" : null,
               "description" : "ID of the associated product.",
@@ -250,8 +253,8 @@
               "maxValue" : null,
               "minValue" : null,
               "options" : null,
-              "controlType" : "INTEGER",
-              "optionsDataSource" : null
+              "optionsDataSource" : null,
+              "controlType" : "INTEGER"
             }, {
               "advancedOption" : null,
               "description" : "Source of the progress information.",
@@ -287,8 +290,8 @@
               "label" : null,
               "placeholder" : null,
               "options" : null,
-              "controlType" : "DATE",
-              "optionsDataSource" : null
+              "optionsDataSource" : null,
+              "controlType" : "DATE"
             }, {
               "advancedOption" : null,
               "description" : null,
@@ -381,8 +384,8 @@
                 "label" : null,
                 "placeholder" : null,
                 "options" : null,
-                "controlType" : "DATE_TIME",
-                "optionsDataSource" : null
+                "optionsDataSource" : null,
+                "controlType" : "DATE_TIME"
               }, {
                 "advancedOption" : null,
                 "description" : "Timestamp when the user account was last updated.",
@@ -398,11 +401,11 @@
                 "label" : null,
                 "placeholder" : null,
                 "options" : null,
-                "controlType" : "DATE_TIME",
-                "optionsDataSource" : null
+                "optionsDataSource" : null,
+                "controlType" : "DATE_TIME"
               } ],
-              "controlType" : "OBJECT_BUILDER",
-              "optionsDataSource" : null
+              "optionsDataSource" : null,
+              "controlType" : "OBJECT_BUILDER"
             }, {
               "advancedOption" : null,
               "description" : null,
@@ -461,8 +464,8 @@
                 "options" : null,
                 "optionsDataSource" : null
               } ],
-              "controlType" : "OBJECT_BUILDER",
-              "optionsDataSource" : null
+              "optionsDataSource" : null,
+              "controlType" : "OBJECT_BUILDER"
             }, {
               "advancedOption" : null,
               "description" : "Status of the feature.",
@@ -537,8 +540,8 @@
                 "maxValue" : null,
                 "minValue" : null,
                 "options" : null,
-                "controlType" : "INTEGER",
-                "optionsDataSource" : null
+                "optionsDataSource" : null,
+                "controlType" : "INTEGER"
               }, {
                 "advancedOption" : null,
                 "description" : "Indicates if the status is marked as complete.",
@@ -584,14 +587,14 @@
                 "options" : null,
                 "optionsDataSource" : null
               } ],
-              "controlType" : "OBJECT_BUILDER",
-              "optionsDataSource" : null
+              "optionsDataSource" : null,
+              "controlType" : "OBJECT_BUILDER"
             } ],
-            "controlType" : "OBJECT_BUILDER",
-            "optionsDataSource" : null
+            "optionsDataSource" : null,
+            "controlType" : "OBJECT_BUILDER"
           } ],
-          "controlType" : "OBJECT_BUILDER",
-          "optionsDataSource" : null
+          "optionsDataSource" : null,
+          "controlType" : "OBJECT_BUILDER"
         },
         "sampleOutput" : null,
         "placeholder" : null
@@ -729,8 +732,8 @@
             "maxValue" : null,
             "minValue" : null,
             "options" : null,
-            "controlType" : "INTEGER",
-            "optionsDataSource" : null
+            "optionsDataSource" : null,
+            "controlType" : "INTEGER"
           }, {
             "advancedOption" : null,
             "description" : "Score assigned to the feature.",
@@ -748,8 +751,8 @@
             "maxValue" : null,
             "minValue" : null,
             "options" : null,
-            "controlType" : "INTEGER",
-            "optionsDataSource" : null
+            "optionsDataSource" : null,
+            "controlType" : "INTEGER"
           }, {
             "advancedOption" : null,
             "description" : "Timestamp when the feature was created.",
@@ -765,8 +768,8 @@
             "label" : null,
             "placeholder" : null,
             "options" : null,
-            "controlType" : "DATE_TIME",
-            "optionsDataSource" : null
+            "optionsDataSource" : null,
+            "controlType" : "DATE_TIME"
           }, {
             "advancedOption" : null,
             "description" : "Timestamp when the feature was last updated.",
@@ -782,8 +785,8 @@
             "label" : null,
             "placeholder" : null,
             "options" : null,
-            "controlType" : "DATE_TIME",
-            "optionsDataSource" : null
+            "optionsDataSource" : null,
+            "controlType" : "DATE_TIME"
           }, {
             "advancedOption" : null,
             "description" : "ID of the associated product.",
@@ -821,8 +824,8 @@
             "maxValue" : null,
             "minValue" : null,
             "options" : null,
-            "controlType" : "INTEGER",
-            "optionsDataSource" : null
+            "optionsDataSource" : null,
+            "controlType" : "INTEGER"
           }, {
             "advancedOption" : null,
             "description" : "Source of the progress information.",
@@ -858,8 +861,8 @@
             "label" : null,
             "placeholder" : null,
             "options" : null,
-            "controlType" : "DATE",
-            "optionsDataSource" : null
+            "optionsDataSource" : null,
+            "controlType" : "DATE"
           }, {
             "advancedOption" : null,
             "description" : null,
@@ -952,8 +955,8 @@
               "label" : null,
               "placeholder" : null,
               "options" : null,
-              "controlType" : "DATE_TIME",
-              "optionsDataSource" : null
+              "optionsDataSource" : null,
+              "controlType" : "DATE_TIME"
             }, {
               "advancedOption" : null,
               "description" : "Timestamp when the user account was last updated.",
@@ -969,11 +972,11 @@
               "label" : null,
               "placeholder" : null,
               "options" : null,
-              "controlType" : "DATE_TIME",
-              "optionsDataSource" : null
+              "optionsDataSource" : null,
+              "controlType" : "DATE_TIME"
             } ],
-            "controlType" : "OBJECT_BUILDER",
-            "optionsDataSource" : null
+            "optionsDataSource" : null,
+            "controlType" : "OBJECT_BUILDER"
           }, {
             "advancedOption" : null,
             "description" : null,
@@ -1032,8 +1035,8 @@
               "options" : null,
               "optionsDataSource" : null
             } ],
-            "controlType" : "OBJECT_BUILDER",
-            "optionsDataSource" : null
+            "optionsDataSource" : null,
+            "controlType" : "OBJECT_BUILDER"
           }, {
             "advancedOption" : null,
             "description" : "Status of the feature.",
@@ -1108,8 +1111,8 @@
               "maxValue" : null,
               "minValue" : null,
               "options" : null,
-              "controlType" : "INTEGER",
-              "optionsDataSource" : null
+              "optionsDataSource" : null,
+              "controlType" : "INTEGER"
             }, {
               "advancedOption" : null,
               "description" : "Indicates if the status is marked as complete.",
@@ -1155,18 +1158,41 @@
               "options" : null,
               "optionsDataSource" : null
             } ],
-            "controlType" : "OBJECT_BUILDER",
-            "optionsDataSource" : null
+            "optionsDataSource" : null,
+            "controlType" : "OBJECT_BUILDER"
           } ],
-          "controlType" : "OBJECT_BUILDER",
-          "optionsDataSource" : null
+          "optionsDataSource" : null,
+          "controlType" : "OBJECT_BUILDER"
         } ],
-        "controlType" : "OBJECT_BUILDER",
-        "optionsDataSource" : null
+        "optionsDataSource" : null,
+        "controlType" : "OBJECT_BUILDER"
       },
       "sampleOutput" : null
     },
     "properties" : [ {
+      "advancedOption" : null,
+      "description" : "ID of the product to which the release belongs.",
+      "displayCondition" : null,
+      "expressionEnabled" : null,
+      "hidden" : null,
+      "metadata" : { },
+      "required" : true,
+      "name" : "productId",
+      "type" : "STRING",
+      "defaultValue" : null,
+      "exampleValue" : null,
+      "label" : "Product ID",
+      "placeholder" : null,
+      "controlType" : "SELECT",
+      "languageId" : null,
+      "maxLength" : null,
+      "minLength" : null,
+      "options" : null,
+      "optionsDataSource" : {
+        "optionsLookupDependsOn" : null,
+        "options" : { }
+      }
+    }, {
       "advancedOption" : null,
       "description" : "Numeric ID or key of the release.",
       "displayCondition" : null,
@@ -1182,12 +1208,15 @@
       "exampleValue" : null,
       "label" : "Release ID",
       "placeholder" : null,
-      "controlType" : "TEXT",
+      "controlType" : "SELECT",
       "languageId" : null,
       "maxLength" : null,
       "minLength" : null,
       "options" : null,
-      "optionsDataSource" : null
+      "optionsDataSource" : {
+        "optionsLookupDependsOn" : [ "productId" ],
+        "options" : { }
+      }
     }, {
       "advancedOption" : null,
       "description" : "Name of the feature.",
@@ -1213,8 +1242,8 @@
     } ],
     "title" : "Create Feature",
     "perform" : null,
-    "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "processErrorResponse" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -1343,8 +1372,8 @@
               "maxValue" : null,
               "minValue" : null,
               "options" : null,
-              "controlType" : "INTEGER",
-              "optionsDataSource" : null
+              "optionsDataSource" : null,
+              "controlType" : "INTEGER"
             }, {
               "advancedOption" : null,
               "description" : "Date and time when the idea was created.",
@@ -1360,8 +1389,8 @@
               "label" : null,
               "placeholder" : null,
               "options" : null,
-              "controlType" : "DATE_TIME",
-              "optionsDataSource" : null
+              "optionsDataSource" : null,
+              "controlType" : "DATE_TIME"
             }, {
               "advancedOption" : null,
               "description" : "Timestamp when the idea was last updated.",
@@ -1377,8 +1406,8 @@
               "label" : null,
               "placeholder" : null,
               "options" : null,
-              "controlType" : "DATE_TIME",
-              "optionsDataSource" : null
+              "optionsDataSource" : null,
+              "controlType" : "DATE_TIME"
             }, {
               "advancedOption" : null,
               "description" : "ID of the product to which the idea belongs.",
@@ -1416,8 +1445,8 @@
               "maxValue" : null,
               "minValue" : null,
               "options" : null,
-              "controlType" : "INTEGER",
-              "optionsDataSource" : null
+              "optionsDataSource" : null,
+              "controlType" : "INTEGER"
             }, {
               "advancedOption" : null,
               "description" : "Initial number of votes the idea had.",
@@ -1435,8 +1464,8 @@
               "maxValue" : null,
               "minValue" : null,
               "options" : null,
-              "controlType" : "INTEGER",
-              "optionsDataSource" : null
+              "optionsDataSource" : null,
+              "controlType" : "INTEGER"
             }, {
               "advancedOption" : null,
               "description" : "Timestamp when the status of the idea last changed.",
@@ -1452,8 +1481,8 @@
               "label" : null,
               "placeholder" : null,
               "options" : null,
-              "controlType" : "DATE_TIME",
-              "optionsDataSource" : null
+              "optionsDataSource" : null,
+              "controlType" : "DATE_TIME"
             }, {
               "advancedOption" : null,
               "description" : "Status of the idea.",
@@ -1528,8 +1557,8 @@
                 "maxValue" : null,
                 "minValue" : null,
                 "options" : null,
-                "controlType" : "INTEGER",
-                "optionsDataSource" : null
+                "optionsDataSource" : null,
+                "controlType" : "INTEGER"
               }, {
                 "advancedOption" : null,
                 "description" : "Indicates if the status is marked as complete.",
@@ -1575,8 +1604,8 @@
                 "options" : null,
                 "optionsDataSource" : null
               } ],
-              "controlType" : "OBJECT_BUILDER",
-              "optionsDataSource" : null
+              "optionsDataSource" : null,
+              "controlType" : "OBJECT_BUILDER"
             }, {
               "advancedOption" : null,
               "description" : "Description of the idea.",
@@ -1649,8 +1678,8 @@
                 "label" : null,
                 "placeholder" : null,
                 "options" : null,
-                "controlType" : "DATE_TIME",
-                "optionsDataSource" : null
+                "optionsDataSource" : null,
+                "controlType" : "DATE_TIME"
               }, {
                 "advancedOption" : null,
                 "description" : "Timestamp when the description was last updated.",
@@ -1666,11 +1695,11 @@
                 "label" : null,
                 "placeholder" : null,
                 "options" : null,
-                "controlType" : "DATE_TIME",
-                "optionsDataSource" : null
+                "optionsDataSource" : null,
+                "controlType" : "DATE_TIME"
               } ],
-              "controlType" : "OBJECT_BUILDER",
-              "optionsDataSource" : null
+              "optionsDataSource" : null,
+              "controlType" : "OBJECT_BUILDER"
             }, {
               "advancedOption" : null,
               "description" : "Visibility level of the idea.",
@@ -1847,8 +1876,8 @@
                 "label" : null,
                 "placeholder" : null,
                 "options" : null,
-                "controlType" : "DATE_TIME",
-                "optionsDataSource" : null
+                "optionsDataSource" : null,
+                "controlType" : "DATE_TIME"
               }, {
                 "advancedOption" : null,
                 "description" : "Type of workspace for the product.",
@@ -1890,8 +1919,8 @@
                 "options" : null,
                 "optionsDataSource" : null
               } ],
-              "controlType" : "OBJECT_BUILDER",
-              "optionsDataSource" : null
+              "optionsDataSource" : null,
+              "controlType" : "OBJECT_BUILDER"
             }, {
               "advancedOption" : null,
               "description" : null,
@@ -1984,8 +2013,8 @@
                 "label" : null,
                 "placeholder" : null,
                 "options" : null,
-                "controlType" : "DATE_TIME",
-                "optionsDataSource" : null
+                "optionsDataSource" : null,
+                "controlType" : "DATE_TIME"
               }, {
                 "advancedOption" : null,
                 "description" : "Timestamp when the user account was last updated.",
@@ -2001,11 +2030,11 @@
                 "label" : null,
                 "placeholder" : null,
                 "options" : null,
-                "controlType" : "DATE_TIME",
-                "optionsDataSource" : null
+                "optionsDataSource" : null,
+                "controlType" : "DATE_TIME"
               } ],
-              "controlType" : "OBJECT_BUILDER",
-              "optionsDataSource" : null
+              "optionsDataSource" : null,
+              "controlType" : "OBJECT_BUILDER"
             }, {
               "advancedOption" : null,
               "description" : "Count of endorsements for the idea.",
@@ -2023,8 +2052,8 @@
               "maxValue" : null,
               "minValue" : null,
               "options" : null,
-              "controlType" : "INTEGER",
-              "optionsDataSource" : null
+              "optionsDataSource" : null,
+              "controlType" : "INTEGER"
             }, {
               "advancedOption" : null,
               "description" : "Count of comments on the idea.",
@@ -2042,8 +2071,8 @@
               "maxValue" : null,
               "minValue" : null,
               "options" : null,
-              "controlType" : "INTEGER",
-              "optionsDataSource" : null
+              "optionsDataSource" : null,
+              "controlType" : "INTEGER"
             }, {
               "advancedOption" : null,
               "description" : null,
@@ -2130,8 +2159,8 @@
                   "label" : null,
                   "placeholder" : null,
                   "options" : null,
-                  "controlType" : "DATE_TIME",
-                  "optionsDataSource" : null
+                  "optionsDataSource" : null,
+                  "controlType" : "DATE_TIME"
                 }, {
                   "advancedOption" : null,
                   "description" : "Timestamp when the status ended, if applicable.",
@@ -2147,18 +2176,18 @@
                   "label" : null,
                   "placeholder" : null,
                   "options" : null,
-                  "controlType" : "DATE_TIME",
-                  "optionsDataSource" : null
+                  "optionsDataSource" : null,
+                  "controlType" : "DATE_TIME"
                 } ],
-                "controlType" : "OBJECT_BUILDER",
-                "optionsDataSource" : null
+                "optionsDataSource" : null,
+                "controlType" : "OBJECT_BUILDER"
               } ],
               "maxItems" : null,
               "minItems" : null,
               "multipleValues" : null,
               "options" : null,
-              "controlType" : "ARRAY_BUILDER",
-              "optionsDataSource" : null
+              "optionsDataSource" : null,
+              "controlType" : "ARRAY_BUILDER"
             }, {
               "advancedOption" : null,
               "description" : "URL to the submitted idea portal record.",
@@ -2180,11 +2209,11 @@
               "options" : null,
               "optionsDataSource" : null
             } ],
-            "controlType" : "OBJECT_BUILDER",
-            "optionsDataSource" : null
+            "optionsDataSource" : null,
+            "controlType" : "OBJECT_BUILDER"
           } ],
-          "controlType" : "OBJECT_BUILDER",
-          "optionsDataSource" : null
+          "optionsDataSource" : null,
+          "controlType" : "OBJECT_BUILDER"
         },
         "sampleOutput" : null,
         "placeholder" : null
@@ -2302,8 +2331,8 @@
             "maxValue" : null,
             "minValue" : null,
             "options" : null,
-            "controlType" : "INTEGER",
-            "optionsDataSource" : null
+            "optionsDataSource" : null,
+            "controlType" : "INTEGER"
           }, {
             "advancedOption" : null,
             "description" : "Date and time when the idea was created.",
@@ -2319,8 +2348,8 @@
             "label" : null,
             "placeholder" : null,
             "options" : null,
-            "controlType" : "DATE_TIME",
-            "optionsDataSource" : null
+            "optionsDataSource" : null,
+            "controlType" : "DATE_TIME"
           }, {
             "advancedOption" : null,
             "description" : "Timestamp when the idea was last updated.",
@@ -2336,8 +2365,8 @@
             "label" : null,
             "placeholder" : null,
             "options" : null,
-            "controlType" : "DATE_TIME",
-            "optionsDataSource" : null
+            "optionsDataSource" : null,
+            "controlType" : "DATE_TIME"
           }, {
             "advancedOption" : null,
             "description" : "ID of the product to which the idea belongs.",
@@ -2375,8 +2404,8 @@
             "maxValue" : null,
             "minValue" : null,
             "options" : null,
-            "controlType" : "INTEGER",
-            "optionsDataSource" : null
+            "optionsDataSource" : null,
+            "controlType" : "INTEGER"
           }, {
             "advancedOption" : null,
             "description" : "Initial number of votes the idea had.",
@@ -2394,8 +2423,8 @@
             "maxValue" : null,
             "minValue" : null,
             "options" : null,
-            "controlType" : "INTEGER",
-            "optionsDataSource" : null
+            "optionsDataSource" : null,
+            "controlType" : "INTEGER"
           }, {
             "advancedOption" : null,
             "description" : "Timestamp when the status of the idea last changed.",
@@ -2411,8 +2440,8 @@
             "label" : null,
             "placeholder" : null,
             "options" : null,
-            "controlType" : "DATE_TIME",
-            "optionsDataSource" : null
+            "optionsDataSource" : null,
+            "controlType" : "DATE_TIME"
           }, {
             "advancedOption" : null,
             "description" : "Status of the idea.",
@@ -2487,8 +2516,8 @@
               "maxValue" : null,
               "minValue" : null,
               "options" : null,
-              "controlType" : "INTEGER",
-              "optionsDataSource" : null
+              "optionsDataSource" : null,
+              "controlType" : "INTEGER"
             }, {
               "advancedOption" : null,
               "description" : "Indicates if the status is marked as complete.",
@@ -2534,8 +2563,8 @@
               "options" : null,
               "optionsDataSource" : null
             } ],
-            "controlType" : "OBJECT_BUILDER",
-            "optionsDataSource" : null
+            "optionsDataSource" : null,
+            "controlType" : "OBJECT_BUILDER"
           }, {
             "advancedOption" : null,
             "description" : "Description of the idea.",
@@ -2608,8 +2637,8 @@
               "label" : null,
               "placeholder" : null,
               "options" : null,
-              "controlType" : "DATE_TIME",
-              "optionsDataSource" : null
+              "optionsDataSource" : null,
+              "controlType" : "DATE_TIME"
             }, {
               "advancedOption" : null,
               "description" : "Timestamp when the description was last updated.",
@@ -2625,11 +2654,11 @@
               "label" : null,
               "placeholder" : null,
               "options" : null,
-              "controlType" : "DATE_TIME",
-              "optionsDataSource" : null
+              "optionsDataSource" : null,
+              "controlType" : "DATE_TIME"
             } ],
-            "controlType" : "OBJECT_BUILDER",
-            "optionsDataSource" : null
+            "optionsDataSource" : null,
+            "controlType" : "OBJECT_BUILDER"
           }, {
             "advancedOption" : null,
             "description" : "Visibility level of the idea.",
@@ -2806,8 +2835,8 @@
               "label" : null,
               "placeholder" : null,
               "options" : null,
-              "controlType" : "DATE_TIME",
-              "optionsDataSource" : null
+              "optionsDataSource" : null,
+              "controlType" : "DATE_TIME"
             }, {
               "advancedOption" : null,
               "description" : "Type of workspace for the product.",
@@ -2849,8 +2878,8 @@
               "options" : null,
               "optionsDataSource" : null
             } ],
-            "controlType" : "OBJECT_BUILDER",
-            "optionsDataSource" : null
+            "optionsDataSource" : null,
+            "controlType" : "OBJECT_BUILDER"
           }, {
             "advancedOption" : null,
             "description" : null,
@@ -2943,8 +2972,8 @@
               "label" : null,
               "placeholder" : null,
               "options" : null,
-              "controlType" : "DATE_TIME",
-              "optionsDataSource" : null
+              "optionsDataSource" : null,
+              "controlType" : "DATE_TIME"
             }, {
               "advancedOption" : null,
               "description" : "Timestamp when the user account was last updated.",
@@ -2960,11 +2989,11 @@
               "label" : null,
               "placeholder" : null,
               "options" : null,
-              "controlType" : "DATE_TIME",
-              "optionsDataSource" : null
+              "optionsDataSource" : null,
+              "controlType" : "DATE_TIME"
             } ],
-            "controlType" : "OBJECT_BUILDER",
-            "optionsDataSource" : null
+            "optionsDataSource" : null,
+            "controlType" : "OBJECT_BUILDER"
           }, {
             "advancedOption" : null,
             "description" : "Count of endorsements for the idea.",
@@ -2982,8 +3011,8 @@
             "maxValue" : null,
             "minValue" : null,
             "options" : null,
-            "controlType" : "INTEGER",
-            "optionsDataSource" : null
+            "optionsDataSource" : null,
+            "controlType" : "INTEGER"
           }, {
             "advancedOption" : null,
             "description" : "Count of comments on the idea.",
@@ -3001,8 +3030,8 @@
             "maxValue" : null,
             "minValue" : null,
             "options" : null,
-            "controlType" : "INTEGER",
-            "optionsDataSource" : null
+            "optionsDataSource" : null,
+            "controlType" : "INTEGER"
           }, {
             "advancedOption" : null,
             "description" : null,
@@ -3089,8 +3118,8 @@
                 "label" : null,
                 "placeholder" : null,
                 "options" : null,
-                "controlType" : "DATE_TIME",
-                "optionsDataSource" : null
+                "optionsDataSource" : null,
+                "controlType" : "DATE_TIME"
               }, {
                 "advancedOption" : null,
                 "description" : "Timestamp when the status ended, if applicable.",
@@ -3106,18 +3135,18 @@
                 "label" : null,
                 "placeholder" : null,
                 "options" : null,
-                "controlType" : "DATE_TIME",
-                "optionsDataSource" : null
+                "optionsDataSource" : null,
+                "controlType" : "DATE_TIME"
               } ],
-              "controlType" : "OBJECT_BUILDER",
-              "optionsDataSource" : null
+              "optionsDataSource" : null,
+              "controlType" : "OBJECT_BUILDER"
             } ],
             "maxItems" : null,
             "minItems" : null,
             "multipleValues" : null,
             "options" : null,
-            "controlType" : "ARRAY_BUILDER",
-            "optionsDataSource" : null
+            "optionsDataSource" : null,
+            "controlType" : "ARRAY_BUILDER"
           }, {
             "advancedOption" : null,
             "description" : "URL to the submitted idea portal record.",
@@ -3139,11 +3168,11 @@
             "options" : null,
             "optionsDataSource" : null
           } ],
-          "controlType" : "OBJECT_BUILDER",
-          "optionsDataSource" : null
+          "optionsDataSource" : null,
+          "controlType" : "OBJECT_BUILDER"
         } ],
-        "controlType" : "OBJECT_BUILDER",
-        "optionsDataSource" : null
+        "optionsDataSource" : null,
+        "controlType" : "OBJECT_BUILDER"
       },
       "sampleOutput" : null
     },
@@ -3163,12 +3192,15 @@
       "exampleValue" : null,
       "label" : "Product ID",
       "placeholder" : null,
-      "controlType" : "TEXT",
+      "controlType" : "SELECT",
       "languageId" : null,
       "maxLength" : null,
       "minLength" : null,
       "options" : null,
-      "optionsDataSource" : null
+      "optionsDataSource" : {
+        "optionsLookupDependsOn" : null,
+        "options" : { }
+      }
     }, {
       "advancedOption" : null,
       "description" : "Name of the idea.",
@@ -3216,15 +3248,38 @@
     } ],
     "title" : "Create Ides",
     "perform" : null,
-    "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "processErrorResponse" : null
   } ],
+  "clusterElements" : null,
+  "unifiedApi" : null,
+  "triggers" : [ ],
   "connection" : {
     "authorizations" : [ {
       "detectOn" : null,
       "description" : null,
       "name" : "oauth2_authorization_code",
       "properties" : [ {
+        "advancedOption" : null,
+        "description" : "The subdomain of your Aha! account. For example, if your Aha! URL is https://mycompany.aha.io, then the subdomain is mycompany.",
+        "displayCondition" : null,
+        "expressionEnabled" : null,
+        "hidden" : null,
+        "metadata" : { },
+        "required" : true,
+        "name" : "subdomain",
+        "type" : "STRING",
+        "defaultValue" : null,
+        "exampleValue" : null,
+        "label" : "Subdomain",
+        "placeholder" : null,
+        "controlType" : "TEXT",
+        "languageId" : null,
+        "maxLength" : null,
+        "minLength" : null,
+        "options" : null,
+        "optionsDataSource" : null
+      }, {
         "advancedOption" : null,
         "description" : null,
         "displayCondition" : null,
@@ -3269,26 +3324,23 @@
       "title" : "OAuth2 Authorization Code",
       "type" : "OAUTH2_AUTHORIZATION_CODE",
       "acquire" : null,
-      "scopes" : null,
-      "authorizationUrl" : { },
-      "tokenUrl" : { },
-      "refreshUrl" : null,
       "apply" : null,
       "authorizationCallback" : null,
+      "authorizationUrl" : { },
       "clientId" : null,
       "clientSecret" : null,
       "oauth2AuthorizationExtraQueryParameters" : null,
       "pkce" : null,
       "refresh" : null,
-      "refreshToken" : null
+      "refreshUrl" : null,
+      "scopes" : null,
+      "refreshToken" : null,
+      "tokenUrl" : { }
     } ],
     "properties" : null,
     "version" : 1,
     "authorizationRequired" : null,
-    "test" : null,
-    "baseUri" : { }
-  },
-  "triggers" : [ ],
-  "clusterElements" : null,
-  "unifiedApi" : null
+    "baseUri" : { },
+    "test" : null
+  }
 }
