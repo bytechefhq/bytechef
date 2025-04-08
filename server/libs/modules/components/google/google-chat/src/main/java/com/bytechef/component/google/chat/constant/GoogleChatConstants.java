@@ -22,9 +22,9 @@ package com.bytechef.component.google.chat.constant;
 public class GoogleChatConstants {
 
     public static final String DISPLAY_NAME = "displayName";
-    public static final String MESSAGE_TEXT = "messageText";
     public static final String SPACE = "SPACE";
     public static final String SPACE_TYPE = "spaceType";
+    public static final String TEXT = "text";
 
     private GoogleChatConstants() {
     }

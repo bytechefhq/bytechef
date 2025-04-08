@@ -21,8 +21,8 @@ import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.Context.Http.responseType;
-import static com.bytechef.component.google.chat.constant.GoogleChatConstants.MESSAGE_TEXT;
 import static com.bytechef.component.google.chat.constant.GoogleChatConstants.SPACE;
+import static com.bytechef.component.google.chat.constant.GoogleChatConstants.TEXT;
 
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context;
@@ -44,8 +44,11 @@ public class GoogleChatCreateMessageAction {
         .description("Creates a new message in selected space.")
         .properties(
             string(SPACE)
-                .options((ActionOptionsFunction<String>) GoogleChatUtils::getSpaces),
-            string(MESSAGE_TEXT)
+                .label("Space")
+                .description("Space in which the message will be created.")
+                .options((ActionOptionsFunction<String>) GoogleChatUtils::getSpaceOptions)
+                .required(true),
+            string(TEXT)
                 .label("Message Text")
                 .description("Text of the message.")
                 .required(true))
@@ -81,8 +84,9 @@ public class GoogleChatCreateMessageAction {
     private GoogleChatCreateMessageAction() {
     }
 
-    public static Map<String, Object>
-        perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
+    public static Map<String, Object> perform(
+        Parameters inputParameters, Parameters connectionParameters, Context context) {
+
         return context.http(
             http -> http.post(
                 "https://chat.googleapis.com/v1/" + inputParameters.getRequiredString(SPACE) + "/messages"))
@@ -90,7 +94,7 @@ public class GoogleChatCreateMessageAction {
             .body(
                 Body.of(
                     Map.of(
-                        "text", inputParameters.getRequiredString(MESSAGE_TEXT))))
+                        TEXT, inputParameters.getRequiredString(TEXT))))
             .execute()
             .getBody(new TypeReference<>() {});
     }

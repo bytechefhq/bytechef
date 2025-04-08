@@ -35,10 +35,9 @@ public class GoogleChatComponentHandler implements ComponentHandler {
 
     private static final ComponentDefinition COMPONENT_DEFINITION = component("googleChat")
         .title("Google Chat")
-        .description(
-            "Google Chat is an intelligent and secure communication and collaboration tool, built for teams.")
+        .description("Google Chat is an intelligent and secure communication and collaboration tool, built for teams.")
         .icon("path:assets/google-chat.svg")
-        .categories(ComponentCategory.HELPERS)
+        .categories(ComponentCategory.COMMUNICATION)
         .connection(GoogleChatConnection.CONNECTION_DEFINITION)
         .actions(
             GoogleChatCreateMessageAction.ACTION_DEFINITION,
