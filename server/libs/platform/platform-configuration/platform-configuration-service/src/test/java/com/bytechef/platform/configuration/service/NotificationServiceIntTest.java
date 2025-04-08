@@ -23,18 +23,23 @@ import com.bytechef.platform.configuration.domain.Event;
 import com.bytechef.platform.configuration.domain.Notification;
 import com.bytechef.platform.configuration.repository.EventRepository;
 import com.bytechef.platform.configuration.repository.NotificationRepository;
+import com.bytechef.platform.mail.MailService;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 /**
  * @author Matija Petanjek
  */
 @SpringBootTest(classes = NotificationIntTestConfiguration.class)
 public class NotificationServiceIntTest {
+
+    @MockitoBean
+    private MailService mailService;
 
     @Autowired
     private EventRepository eventRepository;

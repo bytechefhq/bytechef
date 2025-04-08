@@ -72,7 +72,7 @@ public class NotificationHandlerContext {
 
     private NotificationHandlerContext() {
 
-    };
+    }
 
     private Event.Type eventType;
     private Long jobId;

@@ -29,6 +29,7 @@ import com.bytechef.platform.configuration.notification.NotificationHandlerRegis
 import com.bytechef.platform.configuration.notification.NotificationSender;
 import com.bytechef.platform.configuration.notification.NotificationSenderRegistry;
 import com.bytechef.platform.configuration.service.NotificationService;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import org.springframework.stereotype.Component;
 
@@ -36,7 +37,6 @@ import org.springframework.stereotype.Component;
  * @author Matija Petanjek
  */
 @Component
-@SuppressWarnings("unchecked")
 public class JobStatusApplicationEventListener implements ApplicationEventListener {
 
     private final JobService jobService;
@@ -44,6 +44,7 @@ public class JobStatusApplicationEventListener implements ApplicationEventListen
     private final NotificationSenderRegistry notificationSenderRegistry;
     private final NotificationService notificationService;
 
+    @SuppressFBWarnings("EI")
     public JobStatusApplicationEventListener(
         JobService jobService, NotificationHandlerRegistry notificationHandlerRegistry,
         NotificationSenderRegistry notificationSenderRegistry, NotificationService notificationService) {
@@ -55,6 +56,9 @@ public class JobStatusApplicationEventListener implements ApplicationEventListen
 
     }
 
+    @SuppressWarnings({
+        "rawtypes", "unchecked"
+    })
     public void onApplicationEvent(ApplicationEvent applicationEvent) {
         if (applicationEvent instanceof JobStatusApplicationEvent jobStatusApplicationEvent) {
 
