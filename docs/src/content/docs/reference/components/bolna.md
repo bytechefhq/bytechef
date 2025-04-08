@@ -1,0 +1,129 @@
+---
+title: "Bolna"
+description: "Bolna AI is an open-source platform that enables businesses to create and deploy voice-driven conversational agents"
+---
+
+Bolna AI is an open-source platform that enables businesses to create and deploy voice-driven conversational agents
+
+
+Categories: Artificial Intelligence
+
+
+Type: bolna/v1
+
+<hr />
+
+
+
+## Connections
+
+Version: 1
+
+
+### Bearer Token
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| token | API Key | STRING |  | true |
+
+
+
+
+
+<hr />
+
+
+
+## Actions
+
+
+### Make Phone Call
+Name: makePhoneCall
+
+Make a phone call using voice AI agent.
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| agent_id | Agent ID | STRING | Agent id which will initiate the outbound call. | true |
+| recipient_phone_number | Recipient Phone Number | STRING | Phone number of the recipient alongwith country code (in E.164 format). | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Make Phone Call",
+  "name" : "makePhoneCall",
+  "parameters" : {
+    "agent_id" : "",
+    "recipient_phone_number" : ""
+  },
+  "type" : "bolna/v1/makePhoneCall"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| message | STRING | Response message for the call initiated. |
+| status | STRING | Status of the call. |
+| execution_id | STRING | Unique execution id or call id identifier of the call. |
+
+
+
+
+#### Output Example
+```json
+{
+  "message" : "",
+  "status" : "",
+  "execution_id" : ""
+}
+```
+
+
+
+
+## Triggers
+
+
+### Call Completion Report
+Name: callCompletionReport
+
+Triggers when a call is completed.
+
+Type: STATIC_WEBHOOK
+
+
+#### Output
+
+
+
+Type: STRING
+
+
+
+
+
+#### JSON Example
+```json
+{
+  "label" : "Call Completion Report",
+  "name" : "callCompletionReport",
+  "type" : "bolna/v1/callCompletionReport"
+}
+```
+
+
+<hr />
+
