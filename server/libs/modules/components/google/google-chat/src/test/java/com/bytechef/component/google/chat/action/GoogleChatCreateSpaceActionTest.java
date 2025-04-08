@@ -40,16 +40,15 @@ import org.mockito.ArgumentCaptor;
  */
 class GoogleChatCreateSpaceActionTest {
 
+    private final ArgumentCaptor<Body> bodyArgumentCaptor = ArgumentCaptor.forClass(Http.Body.class);
     private final Context mockedContext = mock(Context.class);
     private final Executor mockedExecutor = mock(Executor.class);
-    private final ArgumentCaptor<Body> bodyArgumentCaptor = ArgumentCaptor.forClass(Http.Body.class);
     private final Http.Response mockedResponse = mock(Http.Response.class);
     private final Map<String, Object> responseMap = Map.of();
-    private final Parameters mockedParameters = MockParametersFactory.create(
-        Map.of(DISPLAY_NAME, "testDisplayName"));
+    private final Parameters mockedParameters = MockParametersFactory.create(Map.of(DISPLAY_NAME, "testDisplayName"));
 
     @Test
-    void perform() throws Exception {
+    void perform() {
         when(mockedContext.http(any()))
             .thenReturn(mockedExecutor);
         when(mockedExecutor.configuration(any()))
@@ -68,8 +67,6 @@ class GoogleChatCreateSpaceActionTest {
 
         Body body = bodyArgumentCaptor.getValue();
 
-        assertEquals(Map.of(
-            SPACE_TYPE, SPACE,
-            DISPLAY_NAME, "testDisplayName"), body.getContent());
+        assertEquals(Map.of(SPACE_TYPE, SPACE, DISPLAY_NAME, "testDisplayName"), body.getContent());
     }
 }

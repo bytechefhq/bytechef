@@ -41,13 +41,12 @@ class GoogleChatUtilsTest {
     private final Context mockedContext = mock(Context.class);
     private final Executor mockedExecutor = mock(Executor.class);
     private final Http.Response mockedResponse = mock(Http.Response.class);
-    private final Map<String, Object> responseMap = Map.of("spaces", List.of(
-        Map.of("name", "testName",
-            DISPLAY_NAME, "testDisplayName")));
     private final Parameters mockedParameters = mock(Parameters.class);
+    private final Map<String, Object> responseMap = Map.of(
+        "spaces", List.of(Map.of("name", "testName", DISPLAY_NAME, "testDisplayName")));
 
     @Test
-    void perform() throws Exception {
+    void perform() {
         when(mockedContext.http(any()))
             .thenReturn(mockedExecutor);
         when(mockedExecutor.configuration(any()))
@@ -57,11 +56,10 @@ class GoogleChatUtilsTest {
         when(mockedResponse.getBody(any(TypeReference.class)))
             .thenReturn(responseMap);
 
-        List<Option<String>> result = GoogleChatUtils.getSpaces(
+        List<Option<String>> result = GoogleChatUtils.getSpaceOptions(
             mockedParameters, mockedParameters, null, "", mockedContext);
 
-        List<Option<String>> expected = List.of(
-            option("testDisplayName", "testName"));
+        List<Option<String>> expected = List.of(option("testDisplayName", "testName"));
 
         assertEquals(expected, result);
     }

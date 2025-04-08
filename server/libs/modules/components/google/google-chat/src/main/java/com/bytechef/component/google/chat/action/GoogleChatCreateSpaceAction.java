@@ -72,8 +72,9 @@ public class GoogleChatCreateSpaceAction {
     private GoogleChatCreateSpaceAction() {
     }
 
-    public static Map<String, Object>
-        perform(Parameters inputParameters, Parameters connectionParameters, Context context) throws Exception {
+    public static Map<String, Object> perform(
+        Parameters inputParameters, Parameters connectionParameters, Context context) {
+
         return context.http(http -> http.post("https://chat.googleapis.com/v1/spaces"))
             .configuration(responseType(Http.ResponseType.JSON))
             .body(
