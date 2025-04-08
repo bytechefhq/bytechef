@@ -52,6 +52,7 @@ const ActionComponentsFilter = ({
         <div className="flex justify-between px-3 pb-2">
             <div>
                 <Button
+                    aria-label="All button"
                     className={twMerge(
                         'border-none bg-transparent text-xs text-content-neutral-secondary shadow-none hover:bg-transparent hover:text-content-neutral-primary',
                         (filterState.activeView === 'all' || filterState.selectedCategories.length === 0) &&
@@ -66,6 +67,7 @@ const ActionComponentsFilter = ({
                 </Button>
 
                 <Button
+                    aria-label="Filtered button"
                     className={twMerge(
                         'border-none bg-transparent text-xs text-content-neutral-secondary shadow-none hover:bg-transparent hover:text-content-neutral-primary',
                         filterState.activeView === 'filtered' &&
@@ -89,7 +91,7 @@ const ActionComponentsFilter = ({
                     <DropdownMenuTrigger asChild>
                         <TooltipTrigger asChild>
                             <Button
-                                aria-label="Sort by"
+                                aria-label="Filter actions"
                                 className="border-none bg-transparent p-2 text-content-neutral-secondary shadow-none hover:bg-transparent hover:text-content-neutral-primary data-[state=open]:bg-surface-brand-secondary data-[state=open]:text-content-brand-primary"
                                 size="icon"
                                 variant="outline"
@@ -108,6 +110,7 @@ const ActionComponentsFilter = ({
                             <SearchIcon className="absolute left-3 top-2.5 size-4 text-muted-foreground" />
 
                             <Input
+                                aria-label="Find category"
                                 className="pl-9 pr-7 text-sm"
                                 onChange={(event) => setSearchValue(event.target.value)}
                                 onKeyDown={(event) => event.stopPropagation()}
@@ -117,6 +120,7 @@ const ActionComponentsFilter = ({
 
                             {filterState.searchValue !== '' && (
                                 <Button
+                                    aria-label="Clear search input"
                                     className="absolute right-1 top-2.5 mx-1 h-auto p-0 text-muted-foreground hover:bg-transparent hover:text-muted-foreground"
                                     onClick={() => setSearchValue('')}
                                     variant="ghost"
@@ -128,6 +132,7 @@ const ActionComponentsFilter = ({
                     </div>
 
                     <Button
+                        aria-label="Deselect button"
                         className={twMerge(
                             'flex h-auto w-full justify-start rounded-md bg-transparent px-3 py-1.5 font-normal text-content-destructive shadow-none hover:bg-surface-destructive-secondary hover:text-content-destructive',
                             filterState.selectedCategories.length > 0 ? 'inline-flex' : 'hidden'
