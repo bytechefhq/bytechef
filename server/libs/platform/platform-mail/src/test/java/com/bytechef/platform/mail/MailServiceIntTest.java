@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.platform.user.service;
+package com.bytechef.platform.mail;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.fail;
@@ -27,7 +27,7 @@ import static org.mockito.Mockito.when;
 
 import com.bytechef.config.ApplicationProperties;
 import com.bytechef.config.ApplicationProperties.Mail;
-import com.bytechef.platform.user.config.UserIntTestConfiguration;
+import com.bytechef.platform.mail.config.MailIntTestConfiguration;
 import com.bytechef.platform.user.constant.UserConstants;
 import com.bytechef.platform.user.domain.User;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -61,7 +61,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 /**
  * Integration tests for {@link MailService}.
  */
-@SpringBootTest(classes = UserIntTestConfiguration.class)
+@SpringBootTest(classes = MailIntTestConfiguration.class)
 class MailServiceIntTest {
 
     private static final String[] languages = {

@@ -14,22 +14,21 @@
  * limitations under the License.
  */
 
-package com.bytechef.platform.user.service;
+package com.bytechef.platform.configuration.service;
 
-import com.bytechef.platform.user.domain.User;
+import com.bytechef.platform.configuration.domain.Event;
+import com.bytechef.platform.configuration.domain.Notification;
+import java.util.List;
+import java.util.Map;
 
 /**
- * @author Ivica Cardic
+ * @author Matija Petanjek
  */
-public interface MailService {
+public interface NotificationService {
 
-    void sendEmail(String to, String subject, String content, boolean isMultipart, boolean isHtml);
+    List<Notification> getNotifications();
 
-    void sendActivationEmail(User user);
+    List<Notification> getNotifications(Event.Type eventType);
 
-    void sendCreationEmail(User user);
-
-    void sendEmailFromTemplate(User user, String templateName, String titleKey);
-
-    void sendPasswordResetMail(User user);
+    Notification create(String name, Notification.Type type, Map<String, String> settings, List<Long> eventIds);
 }

@@ -2,6 +2,8 @@ apis/ActionDefinitionApi.ts
 apis/ClusterElementDefinitionApi.ts
 apis/ComponentDefinitionApi.ts
 apis/ConnectionDefinitionApi.ts
+apis/NotificationApi.ts
+apis/NotificationEventApi.ts
 apis/Oauth2Api.ts
 apis/TaskDispatcherDefinitionApi.ts
 apis/TriggerDefinitionApi.ts
@@ -45,6 +47,8 @@ models/GetWorkflowNodeDescription200Response.ts
 models/GetWorkflowNodeParameterDisplayConditions200Response.ts
 models/Help.ts
 models/IntegerProperty.ts
+models/Notification.ts
+models/NotificationEvent.ts
 models/NullProperty.ts
 models/NumberProperty.ts
 models/OAuth2AuthorizationParameters.ts

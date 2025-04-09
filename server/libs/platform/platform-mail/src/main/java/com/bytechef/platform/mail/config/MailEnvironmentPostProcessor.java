@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.platform.user.config;
+package com.bytechef.platform.mail.config;
 
 import java.util.HashMap;
 import java.util.Map;

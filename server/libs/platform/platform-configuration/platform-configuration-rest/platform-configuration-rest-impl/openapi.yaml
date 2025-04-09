@@ -14,6 +14,10 @@ tags:
     description: "The Platform Component Definition Internal API"
   - name: "connection-definition"
     description: "The Platform Connection Definition Internal API"
+  - name: "notification"
+    description: "The Platform Notification Internal API"
+  - name: "notification-event"
+    description: "The platform Notification Event API"
   - name: "task-dispatcher-definition"
     description: "The Platform Task Dispatcher Definition Internal API"
   - name: "trigger-definition"
@@ -417,6 +421,57 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/TriggerDefinition"
+  /notifications:
+    get:
+      description: "Get a list of notifications"
+      summary: "Get a list of notifications"
+      tags:
+        - "notification"
+      operationId: "getNotifications"
+      responses:
+        "200":
+          description: "Successful operation."
+          content:
+            application/json:
+              schema:
+                type: "array"
+                items:
+                  $ref: "#/components/schemas/Notification"
+    post:
+      description: "Create a notification entry"
+      summary: "Create a notification entry"
+      tags:
+        - "notification"
+      operationId: "postNotification"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Notification"
+      responses:
+        "200":
+          description: "Successful operation."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Notification"
+  /notifications/events:
+    get:
+      description: "Get a list of possible notification events"
+      summary: "Get a list of possible notification events"
+      tags:
+        - "notification-event"
+      operationId: "getNotificationEvents"
+      responses:
+        "200":
+          description: "Successful operation."
+          content:
+            application/json:
+              schema:
+                type: "array"
+                items:
+                  $ref: "#/components/schemas/NotificationEvent"
   /oauth2/authorization-parameters:
     post:
       description: "Retrieves oauth2 authorization parameters."
@@ -1797,6 +1852,76 @@ components:
               $ref: "#/components/schemas/Option"
           optionsDataSource:
             $ref: "#/components/schemas/OptionsDataSource"
+    Notification:
+      description: "A Notification definition."
+      type: "object"
+      required:
+        - "name"
+        - "notificationType"
+        - "settings"
+        - "events"
+      properties:
+        id:
+          description: "Notification Id"
+          type: "integer"
+          format: "int64"
+          readOnly: true
+        createdBy:
+          description: "The created by."
+          type: "string"
+          readOnly: true
+        createdDate:
+          description: "The created date."
+          type: "string"
+          format: "date-time"
+          readOnly: true
+        lastModifiedBy:
+          description: "The last modified by."
+          type: "string"
+          readOnly: true
+        lastModifiedDate:
+          description: "The last modified date."
+          type: "string"
+          format: "date-time"
+          readOnly: true
+        name:
+          description: "Notification name"
+          type: "string"
+        notificationType:
+          description: "Type of the notification"
+          type: "string"
+          enum:
+            - "EMAIL"
+            - "WEBHOOK"
+        settings:
+          description: "Notification type related settings"
+          type: "object"
+          additionalProperties:
+            type: "string"
+        events:
+          description: "List of events for which notification will be triggered"
+          type: "array"
+          items:
+            $ref: "#/components/schemas/NotificationEvent"
+    NotificationEvent:
+      type: "object"
+      description: "A notification event definition."
+      required:
+        - "id"
+      properties:
+        id:
+          description: "Notification Id"
+          type: "integer"
+          format: "int64"
+          readOnly: true
+        type:
+          type: "string"
+          enum:
+            - "JOB_CANCELLED"
+            - "JOB_CREATED"
+            - "JOB_COMPLETED"
+            - "JOB_FAILED"
+            - "JOB_STARTED"
     NullProperty:
       description: "A null property type."
       type: "object"
