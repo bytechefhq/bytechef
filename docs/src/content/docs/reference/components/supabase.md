@@ -1,0 +1,107 @@
+---
+title: "Supabase"
+description: "Supabase is an open source Firebase alternative. Start your project with a Postgres database, Authentication, instant APIs, Edge Functions, Realtime subscriptions, Storage, and Vector embeddings."
+---
+
+Supabase is an open source Firebase alternative. Start your project with a Postgres database, Authentication, instant APIs, Edge Functions, Realtime subscriptions, Storage, and Vector embeddings.
+
+
+Categories: Developer Tools
+
+
+Type: supabase/v1
+
+<hr />
+
+
+
+## Connections
+
+Version: 1
+
+
+### bearer_token
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| projectUrl | Project URL | STRING | Can be found in Project Settings -> Data API. | null |
+| token | Project API Key | STRING | Can be found in Project Settings -> Data API. Choose service_role/secret API key. | null |
+
+
+
+
+
+<hr />
+
+
+
+## Actions
+
+
+### Upload File
+Name: uploadFile
+
+Upload file to Supabase Bucket.
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| bucketName | Bucket Name | STRING |  | true |
+| fileName | File Name | STRING | Name of the file that will be uploaded. | true |
+| file | File | FILE_ENTRY | File you want to upload to Supabase. | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Upload File",
+  "name" : "uploadFile",
+  "parameters" : {
+    "bucketName" : "",
+    "fileName" : "",
+    "file" : {
+      "extension" : "",
+      "mimeType" : "",
+      "name" : "",
+      "url" : ""
+    }
+  },
+  "type" : "supabase/v1/uploadFile"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| Key | STRING | Key of the file that was uploaded. |
+| Id | STRING | Id of the file that was uploaded. |
+
+
+
+
+#### Output Example
+```json
+{
+  "Key" : "",
+  "Id" : ""
+}
+```
+
+
+
+
+<hr />
+
+# Additional instructions
+<hr />
+
