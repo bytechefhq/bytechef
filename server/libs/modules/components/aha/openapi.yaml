@@ -1,0 +1,338 @@
+---
+openapi: "3.0.1"
+info:
+  title: "Aha!"
+  description: "Aha! is a comprehensive product management software platform that helps teams set strategy, capture ideas, and plan, prioritize, and track work to build products customers love."
+  version: "v1"
+servers:
+  - url: "https://{subdomain}.aha.io/api/v1"
+paths:
+  /releases/{releaseId}/features:
+    post:
+      summary: "Create Feature"
+      description: "Creates a new feature."
+      operationId: "createFeature"
+      parameters:
+        - name: "releaseId"
+          description: "Numeric ID or key of the release."
+          in: "path"
+          required: true
+          schema:
+            title: "Release ID"
+            type: "string"
+            x-dynamic-options: true
+            x-dynamic-options-dependency:
+              - "productId"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              title: "Feature"
+              type: "object"
+              required:
+                - "name"
+              properties:
+                name:
+                  type: "string"
+                  title: "Name"
+                  description: "Name of the feature."
+      responses:
+        200:
+          description: "Successful operation."
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  feature:
+                    type: "object"
+                    properties:
+                      id:
+                        type: "string"
+                        description: "ID of the feature."
+                      name:
+                        type: "string"
+                        description: "Name of the feature."
+                      reference_num:
+                        type: "string"
+                        description: "Reference number for the feature."
+                      release_reference_num:
+                        type: "string"
+                        description: "Reference number for the associated release."
+                      position:
+                        type: "integer"
+                        description: "Position of the feature in the list."
+                      score:
+                        type: "integer"
+                        description: "Score assigned to the feature."
+                      created_at:
+                        type: "string"
+                        format: "date-time"
+                        description: "Timestamp when the feature was created."
+                      updated_at:
+                        type: "string"
+                        format: "date-time"
+                        description: "Timestamp when the feature was last updated."
+                      product_id:
+                        type: "string"
+                        description: "ID of the associated product."
+                      progress:
+                        type: "integer"
+                        description: "Progress completed on the feature."
+                      progress_source:
+                        type: "string"
+                        description: "Source of the progress information."
+                      status_changed_on:
+                        type: "string"
+                        format: "date"
+                        description: "Date when the status of the feature last changed."
+                      created_by_user:
+                        type: "object"
+                        properties:
+                          id:
+                            type: "string"
+                            description: "ID of the user who created the feature."
+                          name:
+                            type: "string"
+                            description: "Name of the user who created the feature."
+                          email:
+                            type: "string"
+                            description: "Email of the user who created the feature."
+                          created_at:
+                            type: "string"
+                            format: "date-time"
+                            description: "Timestamp when the user account was created."
+                          updated_at:
+                            type: "string"
+                            format: "date-time"
+                            description: "Timestamp when the user account was last updated."
+                      workflow_kind:
+                        type: "object"
+                        properties:
+                          id:
+                            type: "string"
+                            description: "Identifier for the workflow kind."
+                          name:
+                            type: "string"
+                            description: "Name of the workflow kind."
+                      workflow_status:
+                        type: "object"
+                        description: "Status of the feature."
+                        properties:
+                          id:
+                            type: "string"
+                            description: "ID of the status."
+                          name:
+                            type: "string"
+                            description: "Name of the status."
+                          position:
+                            type: "integer"
+                            description: "Position of the status."
+                          complete:
+                            type: "boolean"
+                            description: "Indicates if the status is marked as complete."
+                          color:
+                            type: "string"
+                            description: "Color code associated with the status."
+  /products/{productId}/ideas:
+    post:
+      summary: "Create Ides"
+      description: "Creates a new idea."
+      operationId: "createIdea"
+      parameters:
+        - name: "productId"
+          description: "Numeric ID or key of the product."
+          in: "path"
+          required: true
+          schema:
+            title: "Product ID"
+            type: "string"
+            x-dynamic-options: true
+      requestBody:
+        content:
+          application/json:
+            schema:
+              title: "Idea"
+              type: "object"
+              required:
+                - "name"
+              properties:
+                name:
+                  type: "string"
+                  title: "Name"
+                  description: "Name of the idea."
+                description:
+                  type: "string"
+                  title: "Description"
+                  description: "Description of the idea."
+      responses:
+        200:
+          description: "Successful operation."
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  idea:
+                    type: "object"
+                    properties:
+                      id:
+                        type: "string"
+                        description: "ID of the idea."
+                      name:
+                        type: "string"
+                        description: "Name of the idea."
+                      reference_number:
+                        type: "string"
+                        description: "Reference number of the idea."
+                      score:
+                        type: "integer"
+                        description: "Score of the idea."
+                      created_at:
+                        type: "string"
+                        description: "Date and time when the idea was created."
+                        format: "date-time"
+                      updated_at:
+                        type: "string"
+                        format: "date-time"
+                        description: "Timestamp when the idea was last updated."
+                      product_id:
+                        type: "string"
+                        description: "ID of the product to which the idea belongs."
+                      votes:
+                        type: "integer"
+                        description: "Number of votes the idea has received."
+                      initial_votes:
+                        type: "integer"
+                        description: "Initial number of votes the idea had."
+                      status_changed_at:
+                        type: "string"
+                        format: "date-time"
+                        description: "Timestamp when the status of the idea last changed."
+                      workflow_status:
+                        type: "object"
+                        description: "Status of the idea."
+                        properties:
+                          id:
+                            type: "string"
+                            description: "ID of the status."
+                          name:
+                            type: "string"
+                            description: "Name of the status."
+                          position:
+                            type: "integer"
+                            description: "Position of the status in the workflow."
+                          complete:
+                            type: "boolean"
+                            description: "Indicates if the status is marked as complete."
+                          color:
+                            type: "string"
+                            description: "Color code associated with the status."
+                      description:
+                        type: "object"
+                        description: "Description of the idea."
+                        properties:
+                          id:
+                            type: "string"
+                            description: "Identifier for the description."
+                          body:
+                            type: "string"
+                            description: "HTML content of the description."
+                          created_at:
+                            type: "string"
+                            format: "date-time"
+                            description: "Timestamp when the description was created."
+                          updated_at:
+                            type: "string"
+                            format: "date-time"
+                            description: "Timestamp when the description was last updated."
+                      visibility:
+                        type: "string"
+                        description: "Visibility level of the idea."
+                      url:
+                        type: "string"
+                        description: "URL to view the idea."
+                      resource:
+                        type: "string"
+                        description: "API resource URL for the idea."
+                      product:
+                        type: "object"
+                        properties:
+                          id:
+                            type: "string"
+                            description: "ID for the product."
+                          reference_prefix:
+                            type: "string"
+                            description: "Reference prefix for the product."
+                          name:
+                            type: "string"
+                            description: "Name of the product."
+                          product_line:
+                            type: "boolean"
+                            description: "Indicates if the product is part of a product line."
+                          created_at:
+                            type: "string"
+                            format: "date-time"
+                            description: "Timestamp when the product was created."
+                          workspace_type:
+                            type: "string"
+                            description: "Type of workspace for the product."
+                          url:
+                            type: "string"
+                            description: "URL to view the product."
+                      created_by_user:
+                        type: "object"
+                        properties:
+                          id:
+                            type: "string"
+                            description: "ID of the user who created the idea."
+                          name:
+                            type: "string"
+                            description: "Name of the user who created the idea."
+                          email:
+                            type: "string"
+                            description: "Email of the user who created the idea."
+                          created_at:
+                            type: "string"
+                            format: "date-time"
+                            description: "Timestamp when the user account was created."
+                          updated_at:
+                            type: "string"
+                            format: "date-time"
+                            description: "Timestamp when the user account was last updated."
+                      endorsements_count:
+                        type: "integer"
+                        description: "Count of endorsements for the idea."
+                      comments_count:
+                        type: "integer"
+                        description: "Count of comments on the idea."
+                      workflow_status_times:
+                        type: "array"
+                        items:
+                          type: "object"
+                          properties:
+                            status_id:
+                              type: "string"
+                              description: "ID for the status."
+                            status_name:
+                              type: "string"
+                              description: "Name of the status."
+                            started_at:
+                              type: "string"
+                              format: "date-time"
+                              description: "Timestamp when the status started."
+                            ended_at:
+                              type: "string"
+                              format: "date-time"
+                              description: "Timestamp when the status ended, if applicable."
+                      submitted_idea_portal_record_url:
+                        type: "string"
+                        description: "URL to the submitted idea portal record."
+components:
+  securitySchemes:
+    oauth2:
+      type: "oauth2"
+      flows:
+        authorizationCode:
+          authorizationUrl: "https://{subdomain}.aha.io/oauth/authorize"
+          tokenUrl: "https://{subdomain}.aha.io/oauth/token"
