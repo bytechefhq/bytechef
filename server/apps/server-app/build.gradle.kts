@@ -215,6 +215,7 @@ dependencies {
     implementation(project(":server:libs:modules:components:google:google-drive"))
     implementation(project(":server:libs:modules:components:google:google-forms"))
     implementation(project(":server:libs:modules:components:google:google-mail"))
+    implementation(project(":server:libs:modules:components:google:google-meet"))
     implementation(project(":server:libs:modules:components:google:google-sheets"))
     implementation(project(":server:libs:modules:components:google:google-slides"))
     implementation(project(":server:libs:modules:components:google:google-tasks"))
