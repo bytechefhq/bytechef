@@ -177,8 +177,8 @@
         "maxValue" : null,
         "minValue" : null,
         "options" : null,
-        "optionsDataSource" : null,
-        "controlType" : "INTEGER"
+        "controlType" : "INTEGER",
+        "optionsDataSource" : null
       }, {
         "advancedOption" : null,
         "description" : "Whether to initialize the schema.",
@@ -208,18 +208,18 @@
       "title" : null,
       "type" : "CUSTOM",
       "acquire" : null,
-      "authorizationUrl" : null,
-      "clientSecret" : null,
-      "refreshToken" : null,
       "apply" : null,
+      "authorizationCallback" : null,
+      "authorizationUrl" : null,
       "clientId" : null,
+      "clientSecret" : null,
+      "oauth2AuthorizationExtraQueryParameters" : null,
       "pkce" : null,
       "refresh" : null,
       "refreshUrl" : null,
       "scopes" : null,
-      "tokenUrl" : null,
-      "authorizationCallback" : null,
-      "oauth2AuthorizationExtraQueryParameters" : null
+      "refreshToken" : null,
+      "tokenUrl" : null
     } ],
     "properties" : null,
     "version" : 1,
@@ -229,7 +229,21 @@
   },
   "customAction" : null,
   "customActionHelp" : null,
-  "clusterElements" : null,
+  "clusterElements" : [ {
+    "description" : "Typesense VectorStore.",
+    "name" : "vectorStore",
+    "outputDefinition" : null,
+    "properties" : null,
+    "title" : "Typesense VectorStore",
+    "type" : {
+      "name" : "VECTOR_STORE",
+      "key" : "vectorStore",
+      "label" : "Vector Store",
+      "multipleElements" : false,
+      "required" : true
+    },
+    "element" : { }
+  } ],
   "description" : "Typesense is an open-source, in-memory search engine designed for fast, typo-tolerant, and relevance-focused full-text search across large datasets.",
   "icon" : "path:assets/typesense.svg",
   "tags" : null,
@@ -240,6 +254,10 @@
   "triggers" : null,
   "unifiedApi" : null,
   "version" : 1,
+  "actionClusterElementTypes" : {
+    "load" : [ "EMBEDDING" ],
+    "search" : [ "DOCUMENT_READER", "DOCUMENT_TRANSFORMER", "EMBEDDING" ]
+  },
   "clusterElementType" : [ {
     "name" : "DOCUMENT_READER",
     "key" : "documentReader",
@@ -258,9 +276,5 @@
     "label" : "Embedding",
     "multipleElements" : false,
     "required" : true
-  } ],
-  "actionClusterElementTypes" : {
-    "load" : [ "EMBEDDING" ],
-    "search" : [ "DOCUMENT_READER", "DOCUMENT_TRANSFORMER", "EMBEDDING" ]
-  }
+  } ]
 }

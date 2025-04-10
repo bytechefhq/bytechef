@@ -16,6 +16,7 @@
 
 package com.bytechef.component.ai.llm.azure.openai.action;
 
+import static com.bytechef.component.ai.llm.azure.openai.constant.AzureOpenAiConstants.CHAT_MODEL_PROPERTY;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.ASK;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.ENDPOINT;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.FREQUENCY_PENALTY;
@@ -43,7 +44,6 @@ import static com.bytechef.component.ai.llm.constant.LLMConstants.USER;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.USER_PROPERTY;
 import static com.bytechef.component.definition.Authorization.TOKEN;
 import static com.bytechef.component.definition.ComponentDsl.action;
-import static com.bytechef.component.definition.ComponentDsl.string;
 import static org.springframework.ai.azure.openai.AzureOpenAiResponseFormat.JSON;
 import static org.springframework.ai.azure.openai.AzureOpenAiResponseFormat.TEXT;
 
@@ -69,11 +69,7 @@ public class AzureOpenAiChatAction {
         .title("Ask")
         .description("Ask anything you want.")
         .properties(
-            string(MODEL)
-                .label("Model")
-                .description("Deployment name, written in string.")
-                .exampleValue("gpt-4o")
-                .required(true),
+            CHAT_MODEL_PROPERTY,
             MESSAGES_PROPERTY,
             RESPONSE_PROPERTY,
             MAX_TOKENS_PROPERTY,

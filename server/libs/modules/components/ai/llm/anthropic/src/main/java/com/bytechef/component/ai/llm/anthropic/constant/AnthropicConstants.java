@@ -16,7 +16,14 @@
 
 package com.bytechef.component.ai.llm.anthropic.constant;
 
+import static com.bytechef.component.ai.llm.constant.LLMConstants.MAX_TOKENS;
+import static com.bytechef.component.ai.llm.constant.LLMConstants.MODEL;
+import static com.bytechef.component.definition.ComponentDsl.integer;
+import static com.bytechef.component.definition.ComponentDsl.string;
+
 import com.bytechef.component.ai.llm.util.LLMUtils;
+import com.bytechef.component.definition.ComponentDsl.ModifiableIntegerProperty;
+import com.bytechef.component.definition.ComponentDsl.ModifiableStringProperty;
 import com.bytechef.component.definition.Option;
 import java.util.Arrays;
 import java.util.List;
@@ -28,6 +35,17 @@ import org.springframework.ai.anthropic.api.AnthropicApi.ChatModel;
  */
 public class AnthropicConstants {
 
+    public static final ModifiableIntegerProperty MAX_TOKENS_PROPERTY = integer(MAX_TOKENS)
+        .label("Max Tokens")
+        .description("The maximum number of tokens to generate in the chat completion.")
+        .required(true);
+
     public static final List<Option<String>> MODELS = LLMUtils.getEnumOptions(Arrays.stream(ChatModel.values())
         .collect(Collectors.toMap(ChatModel::getValue, ChatModel::getValue)));
+
+    public static final ModifiableStringProperty CHAT_MODEL_PROPERTY = string(MODEL)
+        .label("Model")
+        .description("ID of the model to use.")
+        .options(MODELS)
+        .required(true);
 }

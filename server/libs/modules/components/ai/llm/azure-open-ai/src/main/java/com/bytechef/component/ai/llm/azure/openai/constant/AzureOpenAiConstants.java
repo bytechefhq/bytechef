@@ -16,7 +16,11 @@
 
 package com.bytechef.component.ai.llm.azure.openai.constant;
 
+import static com.bytechef.component.ai.llm.constant.LLMConstants.MODEL;
+import static com.bytechef.component.definition.ComponentDsl.string;
+
 import com.bytechef.component.ai.llm.util.LLMUtils;
+import com.bytechef.component.definition.ComponentDsl.ModifiableStringProperty;
 import com.bytechef.component.definition.Option;
 import java.util.Arrays;
 import java.util.List;
@@ -24,6 +28,12 @@ import java.util.stream.Collectors;
 import org.springframework.ai.azure.openai.AzureOpenAiImageOptions;
 
 public class AzureOpenAiConstants {
+
+    public static final ModifiableStringProperty CHAT_MODEL_PROPERTY = string(MODEL)
+        .label("Model")
+        .description("Deployment name, written in string.")
+        .exampleValue("gpt-4o")
+        .required(true);
 
     public static final List<Option<String>> IMAGE_MODELS = LLMUtils.getEnumOptions(
         Arrays.stream(AzureOpenAiImageOptions.ImageModel.values())

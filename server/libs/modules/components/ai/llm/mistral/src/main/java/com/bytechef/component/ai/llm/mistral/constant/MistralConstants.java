@@ -17,9 +17,11 @@
 package com.bytechef.component.ai.llm.mistral.constant;
 
 import static com.bytechef.component.ai.llm.constant.LLMConstants.MODEL;
+import static com.bytechef.component.definition.ComponentDsl.bool;
 import static com.bytechef.component.definition.ComponentDsl.string;
 
 import com.bytechef.component.ai.llm.util.LLMUtils;
+import com.bytechef.component.definition.ComponentDsl.ModifiableBooleanProperty;
 import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Property;
 import java.util.Arrays;
@@ -28,7 +30,7 @@ import java.util.stream.Collectors;
 import org.springframework.ai.mistralai.api.MistralAiApi;
 
 /**
- * @author Monika Domiter
+ * @author Monika Kušter
  */
 public final class MistralConstants {
 
@@ -47,6 +49,12 @@ public final class MistralConstants {
         .description("ID of the model to use.")
         .required(true)
         .options(CHAT_MODELS);
+
+    public static final ModifiableBooleanProperty SAFE_PROMPT_PROPERTY = bool(SAFE_PROMPT)
+        .label("Safe prompt")
+        .description("Should the prompt be safe for work?")
+        .defaultValue(true)
+        .advancedOption(true);
 
     private MistralConstants() {
     }

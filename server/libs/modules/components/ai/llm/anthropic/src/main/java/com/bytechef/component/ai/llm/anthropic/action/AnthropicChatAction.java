@@ -16,6 +16,8 @@
 
 package com.bytechef.component.ai.llm.anthropic.action;
 
+import static com.bytechef.component.ai.llm.anthropic.constant.AnthropicConstants.CHAT_MODEL_PROPERTY;
+import static com.bytechef.component.ai.llm.anthropic.constant.AnthropicConstants.MAX_TOKENS_PROPERTY;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.ASK;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.MAX_TOKENS;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.MESSAGES_PROPERTY;
@@ -31,11 +33,8 @@ import static com.bytechef.component.ai.llm.constant.LLMConstants.TOP_P;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.TOP_P_PROPERTY;
 import static com.bytechef.component.definition.Authorization.TOKEN;
 import static com.bytechef.component.definition.ComponentDsl.action;
-import static com.bytechef.component.definition.ComponentDsl.integer;
-import static com.bytechef.component.definition.ComponentDsl.string;
 
 import com.bytechef.component.ai.llm.ChatModel;
-import com.bytechef.component.ai.llm.anthropic.constant.AnthropicConstants;
 import com.bytechef.component.ai.llm.util.LLMUtils;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
@@ -54,16 +53,9 @@ public class AnthropicChatAction {
         .title("Ask")
         .description("Ask anything you want.")
         .properties(
-            string(MODEL)
-                .label("Model")
-                .description("ID of the model to use.")
-                .required(true)
-                .options(AnthropicConstants.MODELS),
+            CHAT_MODEL_PROPERTY,
             MESSAGES_PROPERTY,
-            integer(MAX_TOKENS)
-                .label("Max Tokens")
-                .description("The maximum number of tokens to generate in the chat completion.")
-                .required(true),
+            MAX_TOKENS_PROPERTY,
             RESPONSE_PROPERTY,
             TEMPERATURE_PROPERTY,
             TOP_P_PROPERTY,

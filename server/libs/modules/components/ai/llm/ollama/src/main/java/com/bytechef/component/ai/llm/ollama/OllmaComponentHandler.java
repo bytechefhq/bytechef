@@ -20,6 +20,7 @@ import static com.bytechef.component.definition.ComponentDsl.component;
 
 import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.ai.llm.ollama.action.OllamaChatAction;
+import com.bytechef.component.ai.llm.ollama.cluster.OllamaChatModel;
 import com.bytechef.component.ai.llm.ollama.connection.OllamaConnection;
 import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDefinition;
@@ -39,7 +40,8 @@ public class OllmaComponentHandler implements ComponentHandler {
         .icon("path:assets/ollama.svg")
         .categories(ComponentCategory.ARTIFICIAL_INTELLIGENCE)
         .connection(OllamaConnection.CONNECTION_DEFINITION)
-        .actions(OllamaChatAction.ACTION_DEFINITION);
+        .actions(OllamaChatAction.ACTION_DEFINITION)
+        .clusterElements(OllamaChatModel.CLUSTER_ELEMENT_DEFINITION);
 
     @Override
     public ComponentDefinition getDefinition() {

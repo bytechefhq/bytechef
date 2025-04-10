@@ -22,6 +22,7 @@ import static com.bytechef.component.definition.ComponentDsl.component;
 import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.ai.vectorstore.typesense.action.TypesenseLoadAction;
 import com.bytechef.component.ai.vectorstore.typesense.action.TypesenseSearchAction;
+import com.bytechef.component.ai.vectorstore.typesense.cluster.TypesenseVectorStore;
 import com.bytechef.component.ai.vectorstore.typesense.connection.TypesenseConnection;
 import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDefinition;
@@ -53,7 +54,8 @@ public class TypesenseComponentHandler implements ComponentHandler {
             .connection(TypesenseConnection.CONNECTION_DEFINITION)
             .actions(
                 new TypesenseSearchAction(clusterElementDefinitionService).actionDefinition,
-                new TypesenseLoadAction(clusterElementDefinitionService, contextFactory).actionDefinition));
+                new TypesenseLoadAction(clusterElementDefinitionService, contextFactory).actionDefinition)
+            .clusterElements(new TypesenseVectorStore(clusterElementDefinitionService).clusterElementDefinition));
     }
 
     @Override

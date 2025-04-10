@@ -16,16 +16,13 @@
 
 package com.bytechef.component.ai.llm.mistral.cluster;
 
-import static com.bytechef.component.ai.llm.constant.LLMConstants.FREQUENCY_PENALTY_PROPERTY;
-import static com.bytechef.component.ai.llm.constant.LLMConstants.LOGIT_BIAS_PROPERTY;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.MAX_TOKENS_PROPERTY;
-import static com.bytechef.component.ai.llm.constant.LLMConstants.N_PROPERTY;
-import static com.bytechef.component.ai.llm.constant.LLMConstants.PRESENCE_PENALTY_PROPERTY;
+import static com.bytechef.component.ai.llm.constant.LLMConstants.SEED_PROPERTY;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.STOP_PROPERTY;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.TEMPERATURE_PROPERTY;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.TOP_P_PROPERTY;
-import static com.bytechef.component.ai.llm.constant.LLMConstants.USER_PROPERTY;
 import static com.bytechef.component.ai.llm.mistral.constant.MistralConstants.CHAT_MODEL_PROPERTY;
+import static com.bytechef.component.ai.llm.mistral.constant.MistralConstants.SAFE_PROMPT_PROPERTY;
 
 import com.bytechef.component.ai.llm.mistral.action.MistralChatAction;
 import com.bytechef.component.definition.ClusterElementDefinition;
@@ -41,21 +38,18 @@ public class MistralAiChatModel {
 
     public static final ClusterElementDefinition<ModelFunction> CLUSTER_ELEMENT_DEFINITION =
         ComponentDsl.<ModelFunction>clusterElement("model")
-            .title("Mistral Model")
-            .description("Mistral model.")
+            .title("MistralAI Model")
+            .description("MistralAI model.")
             .type(ModelFunction.MODEL)
             .object(() -> MistralAiChatModel::apply)
             .properties(
                 CHAT_MODEL_PROPERTY,
                 MAX_TOKENS_PROPERTY,
-                N_PROPERTY,
                 TEMPERATURE_PROPERTY,
                 TOP_P_PROPERTY,
-                FREQUENCY_PENALTY_PROPERTY,
-                PRESENCE_PENALTY_PROPERTY,
-                LOGIT_BIAS_PROPERTY,
                 STOP_PROPERTY,
-                USER_PROPERTY);
+                SEED_PROPERTY,
+                SAFE_PROMPT_PROPERTY);
 
     protected static ChatModel apply(Parameters inputParameters, Parameters connectionParameters) {
         return MistralChatAction.CHAT_MODEL.createChatModel(inputParameters, connectionParameters);

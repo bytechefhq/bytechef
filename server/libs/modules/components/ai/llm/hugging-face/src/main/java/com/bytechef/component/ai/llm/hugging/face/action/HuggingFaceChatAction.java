@@ -20,9 +20,9 @@ import static com.bytechef.component.ai.llm.constant.LLMConstants.ASK;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.MESSAGES_PROPERTY;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.RESPONSE_PROPERTY;
 import static com.bytechef.component.ai.llm.hugging.face.constant.HuggingFaceConstants.URL;
+import static com.bytechef.component.ai.llm.hugging.face.constant.HuggingFaceConstants.URL_PROPERTY;
 import static com.bytechef.component.definition.Authorization.TOKEN;
 import static com.bytechef.component.definition.ComponentDsl.action;
-import static com.bytechef.component.definition.ComponentDsl.string;
 
 import com.bytechef.component.ai.llm.ChatModel;
 import com.bytechef.component.ai.llm.util.LLMUtils;
@@ -40,9 +40,7 @@ public class HuggingFaceChatAction {
         .title("Ask")
         .description("Ask anything you want.")
         .properties(
-            string(URL)
-                .label("URL")
-                .description("Url of the inference endpoint"),
+            URL_PROPERTY,
             MESSAGES_PROPERTY,
             RESPONSE_PROPERTY)
         .output(LLMUtils::output)

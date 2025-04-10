@@ -20,13 +20,13 @@ import static com.bytechef.component.definition.ComponentDsl.component;
 
 import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.ai.llm.watsonx.action.WatsonxChatAction;
+import com.bytechef.component.ai.llm.watsonx.cluster.WatsonxChatModel;
 import com.bytechef.component.ai.llm.watsonx.connection.WatsonxConnection;
 import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDefinition;
 import com.google.auto.service.AutoService;
 
 /**
- * @author Monika Domiter
  * @author Marko Kriskovic
  */
 @AutoService(ComponentHandler.class)
@@ -41,7 +41,8 @@ public class WatsonxComponentHandler implements ComponentHandler {
         .icon("path:assets/watsonx.svg")
         .categories(ComponentCategory.ARTIFICIAL_INTELLIGENCE)
         .connection(WatsonxConnection.CONNECTION_DEFINITION)
-        .actions(WatsonxChatAction.ACTION_DEFINITION);
+        .actions(WatsonxChatAction.ACTION_DEFINITION)
+        .clusterElements(WatsonxChatModel.CLUSTER_ELEMENT_DEFINITION);
 
     @Override
     public ComponentDefinition getDefinition() {

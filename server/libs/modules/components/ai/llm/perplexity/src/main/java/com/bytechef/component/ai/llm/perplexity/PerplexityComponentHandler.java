@@ -20,6 +20,7 @@ import static com.bytechef.component.definition.ComponentDsl.component;
 
 import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.ai.llm.perplexity.action.PerplexityChatAction;
+import com.bytechef.component.ai.llm.perplexity.cluster.PerplexityChatModel;
 import com.bytechef.component.ai.llm.perplexity.connection.PerplexityConnection;
 import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDefinition;
@@ -34,11 +35,13 @@ public class PerplexityComponentHandler implements ComponentHandler {
     private static final ComponentDefinition COMPONENT_DEFINITION = component("perplexity")
         .title("Perplexity")
         .description(
-            "Perplexity AI provides a unique AI service that integrates its language models with real-time search capabilities.")
+            "Perplexity AI provides a unique AI service that integrates its language models with real-time search " +
+                "capabilities.")
         .icon("path:assets/perplexity.svg")
         .categories(ComponentCategory.ARTIFICIAL_INTELLIGENCE)
         .connection(PerplexityConnection.CONNECTION_DEFINITION)
-        .actions(PerplexityChatAction.ACTION_DEFINITION);
+        .actions(PerplexityChatAction.ACTION_DEFINITION)
+        .clusterElements(PerplexityChatModel.CLUSTER_ELEMENT_DEFINITION);
 
     @Override
     public ComponentDefinition getDefinition() {

@@ -13,55 +13,6 @@
   "resources" : null,
   "version" : 1,
   "title" : "MistralAI",
-  "connection" : {
-    "authorizations" : [ {
-      "detectOn" : null,
-      "description" : null,
-      "name" : "bearer_token",
-      "properties" : [ {
-        "advancedOption" : null,
-        "description" : null,
-        "displayCondition" : null,
-        "expressionEnabled" : null,
-        "hidden" : null,
-        "metadata" : { },
-        "required" : true,
-        "name" : "token",
-        "type" : "STRING",
-        "defaultValue" : null,
-        "exampleValue" : null,
-        "label" : "Token",
-        "placeholder" : null,
-        "controlType" : "TEXT",
-        "languageId" : null,
-        "maxLength" : null,
-        "minLength" : null,
-        "options" : null,
-        "optionsDataSource" : null
-      } ],
-      "refreshOn" : null,
-      "title" : "Bearer Token",
-      "type" : "BEARER_TOKEN",
-      "acquire" : null,
-      "authorizationUrl" : null,
-      "clientSecret" : null,
-      "refreshToken" : null,
-      "apply" : null,
-      "clientId" : null,
-      "pkce" : null,
-      "refresh" : null,
-      "refreshUrl" : null,
-      "scopes" : null,
-      "tokenUrl" : null,
-      "authorizationCallback" : null,
-      "oauth2AuthorizationExtraQueryParameters" : null
-    } ],
-    "properties" : null,
-    "version" : 1,
-    "authorizationRequired" : null,
-    "baseUri" : { },
-    "test" : null
-  },
   "actions" : [ {
     "batch" : null,
     "deprecated" : null,
@@ -341,18 +292,18 @@
           "minItems" : null,
           "multipleValues" : null,
           "options" : null,
-          "optionsDataSource" : null,
-          "controlType" : "ARRAY_BUILDER"
+          "controlType" : "ARRAY_BUILDER",
+          "optionsDataSource" : null
         } ],
-        "optionsDataSource" : null,
-        "controlType" : "OBJECT_BUILDER"
+        "controlType" : "OBJECT_BUILDER",
+        "optionsDataSource" : null
       } ],
       "maxItems" : null,
       "minItems" : null,
       "multipleValues" : null,
       "options" : null,
-      "optionsDataSource" : null,
-      "controlType" : "ARRAY_BUILDER"
+      "controlType" : "ARRAY_BUILDER",
+      "optionsDataSource" : null
     }, {
       "advancedOption" : null,
       "description" : "The response from the API.",
@@ -419,8 +370,8 @@
         "options" : null,
         "optionsDataSource" : null
       } ],
-      "optionsDataSource" : null,
-      "controlType" : "OBJECT_BUILDER"
+      "controlType" : "OBJECT_BUILDER",
+      "optionsDataSource" : null
     }, {
       "advancedOption" : true,
       "description" : "The maximum number of tokens to generate in the chat completion.",
@@ -438,8 +389,8 @@
       "maxValue" : null,
       "minValue" : null,
       "options" : null,
-      "optionsDataSource" : null,
-      "controlType" : "INTEGER"
+      "controlType" : "INTEGER",
+      "optionsDataSource" : null
     }, {
       "advancedOption" : true,
       "description" : "Controls randomness:  Higher values will make the output more random, while lower values like will make it more focused and deterministic.",
@@ -460,8 +411,8 @@
       "minValue" : 0.0,
       "numberPrecision" : null,
       "options" : null,
-      "optionsDataSource" : null,
-      "controlType" : "NUMBER"
+      "controlType" : "NUMBER",
+      "optionsDataSource" : null
     }, {
       "advancedOption" : true,
       "description" : "An alternative to sampling with temperature, called nucleus sampling,  where the model considers the results of the tokens with top_p probability mass. So 0.1 means only the tokens comprising the top 10% probability mass are considered.",
@@ -482,8 +433,8 @@
       "minValue" : null,
       "numberPrecision" : null,
       "options" : null,
-      "optionsDataSource" : null,
-      "controlType" : "NUMBER"
+      "controlType" : "NUMBER",
+      "optionsDataSource" : null
     }, {
       "advancedOption" : true,
       "description" : "Up to 4 sequences where the API will stop generating further tokens.",
@@ -523,8 +474,8 @@
       "minItems" : null,
       "multipleValues" : null,
       "options" : null,
-      "optionsDataSource" : null,
-      "controlType" : "ARRAY_BUILDER"
+      "controlType" : "ARRAY_BUILDER",
+      "optionsDataSource" : null
     }, {
       "advancedOption" : true,
       "description" : "Keeping the same seed would output the same response.",
@@ -542,8 +493,8 @@
       "maxValue" : null,
       "minValue" : null,
       "options" : null,
-      "optionsDataSource" : null,
-      "controlType" : "INTEGER"
+      "controlType" : "INTEGER",
+      "optionsDataSource" : null
     }, {
       "advancedOption" : true,
       "description" : "Should the prompt be safe for work?",
@@ -570,10 +521,59 @@
       "controlType" : "SELECT"
     } ],
     "title" : "Ask",
-    "perform" : { },
     "processErrorResponse" : null,
+    "perform" : { },
     "workflowNodeDescription" : null
   } ],
+  "connection" : {
+    "authorizations" : [ {
+      "detectOn" : null,
+      "description" : null,
+      "name" : "bearer_token",
+      "properties" : [ {
+        "advancedOption" : null,
+        "description" : null,
+        "displayCondition" : null,
+        "expressionEnabled" : null,
+        "hidden" : null,
+        "metadata" : { },
+        "required" : true,
+        "name" : "token",
+        "type" : "STRING",
+        "defaultValue" : null,
+        "exampleValue" : null,
+        "label" : "Token",
+        "placeholder" : null,
+        "controlType" : "TEXT",
+        "languageId" : null,
+        "maxLength" : null,
+        "minLength" : null,
+        "options" : null,
+        "optionsDataSource" : null
+      } ],
+      "refreshOn" : null,
+      "title" : "Bearer Token",
+      "type" : "BEARER_TOKEN",
+      "acquire" : null,
+      "apply" : null,
+      "authorizationCallback" : null,
+      "authorizationUrl" : null,
+      "clientId" : null,
+      "clientSecret" : null,
+      "oauth2AuthorizationExtraQueryParameters" : null,
+      "pkce" : null,
+      "refresh" : null,
+      "refreshUrl" : null,
+      "scopes" : null,
+      "refreshToken" : null,
+      "tokenUrl" : null
+    } ],
+    "properties" : null,
+    "version" : 1,
+    "authorizationRequired" : null,
+    "baseUri" : { },
+    "test" : null
+  },
   "clusterElements" : [ {
     "description" : "Mistral embedding.",
     "name" : "embedding",
@@ -613,7 +613,7 @@
     },
     "element" : { }
   }, {
-    "description" : "Mistral model.",
+    "description" : "MistralAI model.",
     "name" : "model",
     "outputDefinition" : null,
     "properties" : [ {
@@ -701,27 +701,8 @@
       "maxValue" : null,
       "minValue" : null,
       "options" : null,
-      "optionsDataSource" : null,
-      "controlType" : "INTEGER"
-    }, {
-      "advancedOption" : true,
-      "description" : "How many chat completion choices to generate for each input message.",
-      "displayCondition" : null,
-      "expressionEnabled" : null,
-      "hidden" : null,
-      "metadata" : { },
-      "required" : null,
-      "name" : "n",
-      "type" : "INTEGER",
-      "defaultValue" : 1,
-      "exampleValue" : null,
-      "label" : "Number of Chat Completion Choices",
-      "placeholder" : null,
-      "maxValue" : null,
-      "minValue" : null,
-      "options" : null,
-      "optionsDataSource" : null,
-      "controlType" : "INTEGER"
+      "controlType" : "INTEGER",
+      "optionsDataSource" : null
     }, {
       "advancedOption" : true,
       "description" : "Controls randomness:  Higher values will make the output more random, while lower values like will make it more focused and deterministic.",
@@ -742,8 +723,8 @@
       "minValue" : 0.0,
       "numberPrecision" : null,
       "options" : null,
-      "optionsDataSource" : null,
-      "controlType" : "NUMBER"
+      "controlType" : "NUMBER",
+      "optionsDataSource" : null
     }, {
       "advancedOption" : true,
       "description" : "An alternative to sampling with temperature, called nucleus sampling,  where the model considers the results of the tokens with top_p probability mass. So 0.1 means only the tokens comprising the top 10% probability mass are considered.",
@@ -764,94 +745,8 @@
       "minValue" : null,
       "numberPrecision" : null,
       "options" : null,
-      "optionsDataSource" : null,
-      "controlType" : "NUMBER"
-    }, {
-      "advancedOption" : true,
-      "description" : "Number between -2.0 and 2.0. Positive values penalize new tokens based on their existing frequency in the text so far, decreasing the model's likelihood to repeat the same line verbatim.",
-      "displayCondition" : null,
-      "expressionEnabled" : null,
-      "hidden" : null,
-      "metadata" : { },
-      "required" : null,
-      "name" : "frequencyPenalty",
-      "type" : "NUMBER",
-      "defaultValue" : 0.0,
-      "exampleValue" : null,
-      "label" : "Frequency Penalty",
-      "placeholder" : null,
-      "maxNumberPrecision" : null,
-      "maxValue" : 2.0,
-      "minNumberPrecision" : null,
-      "minValue" : -2.0,
-      "numberPrecision" : null,
-      "options" : null,
-      "optionsDataSource" : null,
-      "controlType" : "NUMBER"
-    }, {
-      "advancedOption" : true,
-      "description" : "Number between -2.0 and 2.0. Positive values penalize new tokens based on whether they appear in the text so far, increasing the model's likelihood to talk about new topics.",
-      "displayCondition" : null,
-      "expressionEnabled" : null,
-      "hidden" : null,
-      "metadata" : { },
-      "required" : null,
-      "name" : "presencePenalty",
-      "type" : "NUMBER",
-      "defaultValue" : 0.0,
-      "exampleValue" : null,
-      "label" : "Presence Penalty",
-      "placeholder" : null,
-      "maxNumberPrecision" : null,
-      "maxValue" : 2.0,
-      "minNumberPrecision" : null,
-      "minValue" : -2.0,
-      "numberPrecision" : null,
-      "options" : null,
-      "optionsDataSource" : null,
-      "controlType" : "NUMBER"
-    }, {
-      "advancedOption" : true,
-      "description" : "Modify the likelihood of specified tokens appearing in the completion.",
-      "displayCondition" : null,
-      "expressionEnabled" : null,
-      "hidden" : null,
-      "metadata" : { },
-      "required" : null,
-      "name" : "logitBias",
-      "type" : "OBJECT",
-      "defaultValue" : null,
-      "exampleValue" : null,
-      "label" : "Logit Bias",
-      "placeholder" : null,
-      "additionalProperties" : [ {
-        "advancedOption" : null,
-        "description" : null,
-        "displayCondition" : null,
-        "expressionEnabled" : null,
-        "hidden" : null,
-        "metadata" : { },
-        "required" : null,
-        "name" : null,
-        "type" : "NUMBER",
-        "defaultValue" : null,
-        "exampleValue" : null,
-        "label" : null,
-        "placeholder" : null,
-        "maxNumberPrecision" : null,
-        "maxValue" : null,
-        "minNumberPrecision" : null,
-        "minValue" : null,
-        "numberPrecision" : null,
-        "options" : null,
-        "optionsDataSource" : null,
-        "controlType" : "NUMBER"
-      } ],
-      "multipleValues" : null,
-      "options" : null,
-      "properties" : null,
-      "optionsDataSource" : null,
-      "controlType" : "OBJECT_BUILDER"
+      "controlType" : "NUMBER",
+      "optionsDataSource" : null
     }, {
       "advancedOption" : true,
       "description" : "Up to 4 sequences where the API will stop generating further tokens.",
@@ -891,30 +786,53 @@
       "minItems" : null,
       "multipleValues" : null,
       "options" : null,
-      "optionsDataSource" : null,
-      "controlType" : "ARRAY_BUILDER"
+      "controlType" : "ARRAY_BUILDER",
+      "optionsDataSource" : null
     }, {
       "advancedOption" : true,
-      "description" : "A unique identifier representing your end-user, which can help admins to monitor and detect abuse.",
+      "description" : "Keeping the same seed would output the same response.",
       "displayCondition" : null,
       "expressionEnabled" : null,
       "hidden" : null,
       "metadata" : { },
-      "required" : false,
-      "name" : "user",
-      "type" : "STRING",
+      "required" : null,
+      "name" : "seed",
+      "type" : "INTEGER",
       "defaultValue" : null,
       "exampleValue" : null,
-      "label" : "User",
+      "label" : "Seed",
       "placeholder" : null,
-      "controlType" : "TEXT",
-      "languageId" : null,
-      "maxLength" : null,
-      "minLength" : null,
+      "maxValue" : null,
+      "minValue" : null,
       "options" : null,
+      "controlType" : "INTEGER",
       "optionsDataSource" : null
+    }, {
+      "advancedOption" : true,
+      "description" : "Should the prompt be safe for work?",
+      "displayCondition" : null,
+      "expressionEnabled" : null,
+      "hidden" : null,
+      "metadata" : { },
+      "required" : null,
+      "name" : "safePrompt",
+      "type" : "BOOLEAN",
+      "defaultValue" : true,
+      "exampleValue" : null,
+      "label" : "Safe prompt",
+      "placeholder" : null,
+      "options" : [ {
+        "description" : null,
+        "label" : "True",
+        "value" : true
+      }, {
+        "description" : null,
+        "label" : "False",
+        "value" : false
+      } ],
+      "controlType" : "SELECT"
     } ],
-    "title" : "Mistral Model",
+    "title" : "MistralAI Model",
     "type" : {
       "name" : "MODEL",
       "key" : "model",

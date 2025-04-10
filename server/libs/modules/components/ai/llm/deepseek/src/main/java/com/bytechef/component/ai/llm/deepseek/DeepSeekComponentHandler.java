@@ -20,6 +20,7 @@ import static com.bytechef.component.definition.ComponentDsl.component;
 
 import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.ai.llm.deepseek.action.DeepSeekChatAction;
+import com.bytechef.component.ai.llm.deepseek.cluster.DeepSeekChatModel;
 import com.bytechef.component.ai.llm.deepseek.connection.DeepSeekConnection;
 import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDefinition;
@@ -39,7 +40,8 @@ public class DeepSeekComponentHandler implements ComponentHandler {
         .icon("path:assets/deepseek.svg")
         .categories(ComponentCategory.ARTIFICIAL_INTELLIGENCE)
         .connection(DeepSeekConnection.CONNECTION_DEFINITION)
-        .actions(DeepSeekChatAction.ACTION_DEFINITION);
+        .actions(DeepSeekChatAction.ACTION_DEFINITION)
+        .clusterElements(DeepSeekChatModel.CLUSTER_ELEMENT_DEFINITION);
 
     @Override
     public ComponentDefinition getDefinition() {

@@ -20,6 +20,7 @@ import static com.bytechef.component.definition.ComponentDsl.component;
 
 import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.ai.llm.nvidia.action.NvidiaChatAction;
+import com.bytechef.component.ai.llm.nvidia.cluster.NvidiaChatModel;
 import com.bytechef.component.ai.llm.nvidia.connection.NvidiaConnection;
 import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDefinition;
@@ -41,7 +42,8 @@ public class NvidiaComponentHandler implements ComponentHandler {
         .icon("path:assets/nvidia.svg")
         .categories(ComponentCategory.ARTIFICIAL_INTELLIGENCE)
         .connection(NvidiaConnection.CONNECTION_DEFINITION)
-        .actions(NvidiaChatAction.ACTION_DEFINITION);
+        .actions(NvidiaChatAction.ACTION_DEFINITION)
+        .clusterElements(NvidiaChatModel.CLUSTER_ELEMENT_DEFINITION);
 
     @Override
     public ComponentDefinition getDefinition() {

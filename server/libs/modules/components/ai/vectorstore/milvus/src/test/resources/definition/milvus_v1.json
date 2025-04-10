@@ -229,18 +229,18 @@
       "title" : null,
       "type" : "CUSTOM",
       "acquire" : null,
-      "authorizationUrl" : null,
-      "clientSecret" : null,
-      "refreshToken" : null,
       "apply" : null,
+      "authorizationCallback" : null,
+      "authorizationUrl" : null,
       "clientId" : null,
+      "clientSecret" : null,
+      "oauth2AuthorizationExtraQueryParameters" : null,
       "pkce" : null,
       "refresh" : null,
       "refreshUrl" : null,
       "scopes" : null,
-      "tokenUrl" : null,
-      "oauth2AuthorizationExtraQueryParameters" : null,
-      "authorizationCallback" : null
+      "refreshToken" : null,
+      "tokenUrl" : null
     } ],
     "properties" : null,
     "version" : 1,
@@ -250,7 +250,21 @@
   },
   "customAction" : null,
   "customActionHelp" : null,
-  "clusterElements" : null,
+  "clusterElements" : [ {
+    "description" : "Milvus VectorStore.",
+    "name" : "vectorStore",
+    "outputDefinition" : null,
+    "properties" : null,
+    "title" : "Milvus VectorStore",
+    "type" : {
+      "name" : "VECTOR_STORE",
+      "key" : "vectorStore",
+      "label" : "Vector Store",
+      "multipleElements" : false,
+      "required" : true
+    },
+    "element" : { }
+  } ],
   "description" : "Milvus is an open-source vector database that has garnered significant attention in the fields of data science and machine learning.",
   "icon" : "path:assets/milvus.svg",
   "tags" : null,
@@ -261,6 +275,10 @@
   "triggers" : null,
   "unifiedApi" : null,
   "version" : 1,
+  "actionClusterElementTypes" : {
+    "load" : [ "EMBEDDING" ],
+    "search" : [ "DOCUMENT_READER", "DOCUMENT_TRANSFORMER", "EMBEDDING" ]
+  },
   "clusterElementType" : [ {
     "name" : "DOCUMENT_READER",
     "key" : "documentReader",
@@ -279,9 +297,5 @@
     "label" : "Embedding",
     "multipleElements" : false,
     "required" : true
-  } ],
-  "actionClusterElementTypes" : {
-    "load" : [ "EMBEDDING" ],
-    "search" : [ "DOCUMENT_READER", "DOCUMENT_TRANSFORMER", "EMBEDDING" ]
-  }
+  } ]
 }

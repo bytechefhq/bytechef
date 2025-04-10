@@ -33,16 +33,15 @@ import static com.bytechef.component.ai.llm.constant.LLMConstants.TOP_K;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.TOP_K_PROPERTY;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.TOP_P;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.TOP_P_PROPERTY;
+import static com.bytechef.component.ai.llm.vertex.gemini.constant.VertexGeminiConstants.CANDIDATE_COUNT_PROPERTY;
+import static com.bytechef.component.ai.llm.vertex.gemini.constant.VertexGeminiConstants.CHAT_MODEL_PROPERTY;
 import static com.bytechef.component.ai.llm.vertex.gemini.constant.VertexGeminiConstants.LOCATION;
 import static com.bytechef.component.ai.llm.vertex.gemini.constant.VertexGeminiConstants.PROJECT_ID;
 import static com.bytechef.component.definition.ComponentDsl.action;
-import static com.bytechef.component.definition.ComponentDsl.integer;
-import static com.bytechef.component.definition.ComponentDsl.string;
 
 import com.bytechef.component.ai.llm.ChatModel;
 import com.bytechef.component.ai.llm.ChatModel.ResponseFormat;
 import com.bytechef.component.ai.llm.util.LLMUtils;
-import com.bytechef.component.ai.llm.vertex.gemini.constant.VertexGeminiConstants;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Parameters;
@@ -60,21 +59,11 @@ public class VertexGeminiChatAction {
         .title("Ask Gemini")
         .description("Ask anything you want.")
         .properties(
-            string(MODEL)
-                .label("Model")
-                .description("ID of the model to use.")
-                .required(true)
-                .options(VertexGeminiConstants.MODELS),
+            CHAT_MODEL_PROPERTY,
             MESSAGES_PROPERTY,
             RESPONSE_PROPERTY,
             MAX_TOKENS_PROPERTY,
-            integer(N)
-                .label("Candidate Count")
-                .description(
-                    "The number of generated response messages to return. This value must be between [1, 8], inclusive. Defaults to 1.")
-                .minValue(0)
-                .maxValue(8)
-                .advancedOption(true),
+            CANDIDATE_COUNT_PROPERTY,
             TEMPERATURE_PROPERTY,
             TOP_P_PROPERTY,
             TOP_K_PROPERTY,

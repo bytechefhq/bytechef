@@ -38,9 +38,9 @@ import static com.bytechef.component.ai.llm.constant.LLMConstants.TOP_P;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.TOP_P_PROPERTY;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.USER;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.USER_PROPERTY;
+import static com.bytechef.component.ai.llm.perplexity.constant.PerplexityConstants.CHAT_MODEL_PROPERTY;
 import static com.bytechef.component.definition.Authorization.TOKEN;
 import static com.bytechef.component.definition.ComponentDsl.action;
-import static com.bytechef.component.definition.ComponentDsl.string;
 
 import com.bytechef.component.ai.llm.ChatModel;
 import com.bytechef.component.ai.llm.util.LLMUtils;
@@ -53,7 +53,6 @@ import org.springframework.ai.openai.OpenAiChatOptions;
 import org.springframework.ai.openai.api.OpenAiApi;
 
 /**
- * @author Monika Domiter
  * @author Marko Kriskovic
  */
 public class PerplexityChatAction {
@@ -62,10 +61,7 @@ public class PerplexityChatAction {
         .title("Ask")
         .description("Ask anything you want.")
         .properties(
-            string(MODEL)
-                .label("Model")
-                .description("ID of the model to use.")
-                .required(true),
+            CHAT_MODEL_PROPERTY,
             MESSAGES_PROPERTY,
             RESPONSE_PROPERTY,
             MAX_TOKENS_PROPERTY,

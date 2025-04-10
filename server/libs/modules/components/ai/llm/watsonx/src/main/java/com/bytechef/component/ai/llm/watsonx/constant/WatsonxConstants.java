@@ -16,8 +16,16 @@
 
 package com.bytechef.component.ai.llm.watsonx.constant;
 
+import static com.bytechef.component.ai.llm.constant.LLMConstants.MODEL;
+import static com.bytechef.component.definition.ComponentDsl.ModifiableIntegerProperty;
+import static com.bytechef.component.definition.ComponentDsl.ModifiableNumberProperty;
+import static com.bytechef.component.definition.ComponentDsl.ModifiableStringProperty;
+import static com.bytechef.component.definition.ComponentDsl.integer;
+import static com.bytechef.component.definition.ComponentDsl.number;
+import static com.bytechef.component.definition.ComponentDsl.string;
+
 /**
- * @author Monika Domiter
+ * @author Monika Kušter
  * @author Marko Kriskovic
  */
 public final class WatsonxConstants {
@@ -28,6 +36,30 @@ public final class WatsonxConstants {
     public static final String REPETITION_PENALTY = "repetitionPenalty";
     public static final String STREAM_ENDPOINT = "streamEndpoint";
     public static final String TEXT_ENDPOINT = "textEndpoint";
+
+    public static final ModifiableStringProperty CHAT_MODEL_PROPERTY = string(MODEL)
+        .label("Model")
+        .description("Model is the identifier of the LLM Model to be used.")
+        .exampleValue("google/flan-ul2")
+        .required(false);
+
+    public static final ModifiableStringProperty DECODING_METHOD_PROPERTY = string(DECODING_METHOD)
+        .label("Decoding Method")
+        .description("Decoding is the process that a model uses to choose the tokens in the generated output.")
+        .exampleValue("greedy")
+        .advancedOption(true);
+
+    public static final ModifiableIntegerProperty MIN_TOKENS_PROPERTY = integer(MIN_TOKENS)
+        .label("Min Tokens")
+        .description("Sets how many tokens must the LLM generate.")
+        .advancedOption(true);
+
+    public static final ModifiableNumberProperty REPETITION_PENALTY_PROPERTY = number(REPETITION_PENALTY)
+        .label("Repetition Penalty")
+        .description(
+            "Sets how strongly to penalize repetitions. A higher value (e.g., 1.8) will penalize repetitions more " +
+                "strongly, while a lower value (e.g., 1.1) will be more lenient.")
+        .advancedOption(true);
 
     private WatsonxConstants() {
     }

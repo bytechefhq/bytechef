@@ -33,17 +33,18 @@ import static com.bytechef.component.ai.llm.constant.LLMConstants.TOP_K_PROPERTY
 import static com.bytechef.component.ai.llm.constant.LLMConstants.TOP_P;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.TOP_P_PROPERTY;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.URL;
+import static com.bytechef.component.ai.llm.watsonx.constant.WatsonxConstants.CHAT_MODEL_PROPERTY;
 import static com.bytechef.component.ai.llm.watsonx.constant.WatsonxConstants.DECODING_METHOD;
+import static com.bytechef.component.ai.llm.watsonx.constant.WatsonxConstants.DECODING_METHOD_PROPERTY;
 import static com.bytechef.component.ai.llm.watsonx.constant.WatsonxConstants.MIN_TOKENS;
+import static com.bytechef.component.ai.llm.watsonx.constant.WatsonxConstants.MIN_TOKENS_PROPERTY;
 import static com.bytechef.component.ai.llm.watsonx.constant.WatsonxConstants.PROJECT_ID;
 import static com.bytechef.component.ai.llm.watsonx.constant.WatsonxConstants.REPETITION_PENALTY;
+import static com.bytechef.component.ai.llm.watsonx.constant.WatsonxConstants.REPETITION_PENALTY_PROPERTY;
 import static com.bytechef.component.ai.llm.watsonx.constant.WatsonxConstants.STREAM_ENDPOINT;
 import static com.bytechef.component.ai.llm.watsonx.constant.WatsonxConstants.TEXT_ENDPOINT;
 import static com.bytechef.component.definition.Authorization.TOKEN;
 import static com.bytechef.component.definition.ComponentDsl.action;
-import static com.bytechef.component.definition.ComponentDsl.integer;
-import static com.bytechef.component.definition.ComponentDsl.number;
-import static com.bytechef.component.definition.ComponentDsl.string;
 
 import com.bytechef.component.ai.llm.ChatModel;
 import com.bytechef.component.ai.llm.util.LLMUtils;
@@ -64,27 +65,12 @@ public class WatsonxChatAction {
         .title("Ask")
         .description("Ask anything you want.")
         .properties(
-            string(MODEL)
-                .label("Model")
-                .description("Model is the identifier of the LLM Model to be used.")
-                .exampleValue("google/flan-ul2")
-                .required(false),
+            CHAT_MODEL_PROPERTY,
             MESSAGES_PROPERTY,
             RESPONSE_PROPERTY,
-            string(DECODING_METHOD)
-                .label("Decoding Method")
-                .description("Decoding is the process that a model uses to choose the tokens in the generated output.")
-                .exampleValue("greedy")
-                .advancedOption(true),
-            number(REPETITION_PENALTY)
-                .label("Repetition Penalty")
-                .description(
-                    "Sets how strongly to penalize repetitions. A higher value (e.g., 1.8) will penalize repetitions more strongly, while a lower value (e.g., 1.1) will be more lenient.")
-                .advancedOption(true),
-            integer(MIN_TOKENS)
-                .label("Min Tokens")
-                .description("Sets how many tokens must the LLM generate.")
-                .advancedOption(true),
+            DECODING_METHOD_PROPERTY,
+            REPETITION_PENALTY_PROPERTY,
+            MIN_TOKENS_PROPERTY,
             MAX_TOKENS_PROPERTY,
             TEMPERATURE_PROPERTY,
             TOP_P_PROPERTY,
