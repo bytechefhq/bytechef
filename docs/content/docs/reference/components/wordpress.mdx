@@ -1,0 +1,804 @@
+---
+title: "Wordpress"
+description: "WordPress is a web content management system."
+---
+
+WordPress is a web content management system.
+
+
+Categories: Productivity and Collaboration
+
+
+Type: wordpress/v1
+
+<hr />
+
+
+
+## Connections
+
+Version: 1
+
+
+### basic_auth
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| username | Application Password Name | STRING | `Wordpress application password name.` | true |
+| password | Application Password | STRING | `Application password, found in Users -> Profile.` | true |
+| website | Wordpress Website | STRING | `Wordpress website of your Wordpress site. Can be found in user settings.` | true |
+
+
+
+
+
+<hr />
+
+
+
+## Actions
+
+
+### Get Post
+Name: getPost
+
+`Get a post by post ID.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| postId | Post ID | STRING | `ID of the post that will be fetched.` | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Get Post",
+  "name" : "getPost",
+  "parameters" : {
+    "postId" : ""
+  },
+  "type" : "wordpress/v1/getPost"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| id | INTEGER | Unique identifier for the post. |
+| date | STRING | The date the post was published, in the site's timezone. |
+| date_gmt | STRING | The date the post was published, in GMT. |
+| guid | OBJECT <details> <summary> Properties </summary> &#123;STRING\(rendered)&#125; </details> | The globally unique identifier for the post. |
+| modified | STRING | The date the post was last modified, in the site's timezone. |
+| modified_gmt | STRING | The date the post was last modified, in GMT. |
+| slug | STRING | An alphanumeric identifier for the post unique to its type. |
+| status | STRING <details> <summary> Options </summary> publish, future, draft, pending, private </details> | The publication status of the post. |
+| type | STRING | Type of the object (post). |
+| link | STRING | URL to the post. |
+| title | OBJECT <details> <summary> Properties </summary> &#123;STRING\(rendered), STRING\(raw)&#125; </details> | The title for the post. |
+| content | OBJECT <details> <summary> Properties </summary> &#123;STRING\(rendered), BOOLEAN\(protected)&#125; </details> | The content for the post. |
+| excerpt | OBJECT <details> <summary> Properties </summary> &#123;STRING\(rendered), BOOLEAN\(protected)&#125; </details> | The excerpt for the post. |
+| author | INTEGER | The ID for the author of the post. |
+| featured_media | INTEGER | The ID of the featured media for the post. |
+| comment_status | STRING <details> <summary> Options </summary> open, closed </details> | Whether comments are allowed for the post. |
+| ping_status | STRING <details> <summary> Options </summary> open, closed </details> | Whether pingbacks or trackbacks are allowed. |
+| sticky | BOOLEAN <details> <summary> Options </summary> true, false </details> | Weather the post is pinned to the top of the page. |
+| template | STRING | The theme file used to display the post. |
+| format | STRING | The format of the post. |
+| meta | OBJECT <details> <summary> Properties </summary> &#123;STRING\(footnotes)&#125; </details> | Meta fields associated with the post. |
+| categories | ARRAY <details> <summary> Items </summary> [INTEGER] </details> | Categories of the post. |
+| tags | ARRAY <details> <summary> Items </summary> [STRING] </details> | Tags of the post. |
+| class_list | ARRAY <details> <summary> Items </summary> [STRING] </details> | Class list of the post. |
+| _links | OBJECT <details> <summary> Properties </summary> &#123;[&#123;STRING\(href), &#123;[STRING]\(allow)&#125;\(targetHints)&#125;]\(self), [&#123;STRING\(href)&#125;]\(collection), [&#123;STRING\(href)&#125;]\(about), [&#123;STRING\(href), BOOLEAN\(embeddable)&#125;]\(author), [&#123;STRING\(href), BOOLEAN\(embeddable)&#125;]\(replies), [&#123;STRING\(href), INTEGER\(count)&#125;]\(version-history), [&#123;STRING\(href), INTEGER\(id)&#125;]\(predecessor-version), [&#123;STRING\(href)&#125;]\(wp:attachment), [&#123;STRING\(href), STRING\(taxonomy), BOOLEAN\(embeddable)&#125;]\(wp:term), [&#123;STRING\(name), STRING\(href), BOOLEAN\(templated)&#125;]\(curies)&#125; </details> | Links to other related resources. |
+
+
+
+
+#### Output Example
+```json
+{
+  "id" : 1,
+  "date" : "",
+  "date_gmt" : "",
+  "guid" : {
+    "rendered" : ""
+  },
+  "modified" : "",
+  "modified_gmt" : "",
+  "slug" : "",
+  "status" : "",
+  "type" : "",
+  "link" : "",
+  "title" : {
+    "rendered" : "",
+    "raw" : ""
+  },
+  "content" : {
+    "rendered" : "",
+    "protected" : false
+  },
+  "excerpt" : {
+    "rendered" : "",
+    "protected" : false
+  },
+  "author" : 1,
+  "featured_media" : 1,
+  "comment_status" : "",
+  "ping_status" : "",
+  "sticky" : false,
+  "template" : "",
+  "format" : "",
+  "meta" : {
+    "footnotes" : ""
+  },
+  "categories" : [ 1 ],
+  "tags" : [ "" ],
+  "class_list" : [ "" ],
+  "_links" : {
+    "self" : [ {
+      "href" : "",
+      "targetHints" : {
+        "allow" : [ "" ]
+      }
+    } ],
+    "collection" : [ {
+      "href" : ""
+    } ],
+    "about" : [ {
+      "href" : ""
+    } ],
+    "author" : [ {
+      "href" : "",
+      "embeddable" : false
+    } ],
+    "replies" : [ {
+      "href" : "",
+      "embeddable" : false
+    } ],
+    "version-history" : [ {
+      "href" : "",
+      "count" : 1
+    } ],
+    "predecessor-version" : [ {
+      "href" : "",
+      "id" : 1
+    } ],
+    "wp:attachment" : [ {
+      "href" : ""
+    } ],
+    "wp:term" : [ {
+      "href" : "",
+      "taxonomy" : "",
+      "embeddable" : false
+    } ],
+    "curies" : [ {
+      "name" : "",
+      "href" : "",
+      "templated" : false
+    } ]
+  }
+}
+```
+
+
+### Update Post
+Name: updatePost
+
+`Update a post.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| postId | Post ID | STRING | `ID of the post that will be fetched.` | true |
+| title | Title | STRING | `Title of the post.` | false |
+| content | Content | STRING | `Content of the post, uses the WordPress Text Editor which supports HTML.` | false |
+| status | Status | STRING <details> <summary> Options </summary> publish, future, draft, pending, private </details> | `Status of the post.` | false |
+| slug | Slug | STRING | `Slug of the post identifier.` | false |
+| categories | Categories | ARRAY <details> <summary> Items </summary> [INTEGER] </details> | `Categories of the post.` | false |
+| comment_status | Enable Comments | STRING <details> <summary> Options </summary> open, closed </details> | `Enable comments on the post.` | false |
+| ping_status | Open to Pinging | STRING <details> <summary> Options </summary> open, closed </details> | `Enable pinging on the post.` | false |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Update Post",
+  "name" : "updatePost",
+  "parameters" : {
+    "postId" : "",
+    "title" : "",
+    "content" : "",
+    "status" : "",
+    "slug" : "",
+    "categories" : [ 1 ],
+    "comment_status" : "",
+    "ping_status" : ""
+  },
+  "type" : "wordpress/v1/updatePost"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| id | INTEGER | Unique identifier for the post. |
+| date | STRING | The date the post was published, in the site's timezone. |
+| date_gmt | STRING | The date the post was published, in GMT. |
+| guid | OBJECT <details> <summary> Properties </summary> &#123;STRING\(rendered), STRING\(raw)&#125; </details> | The globally unique identifier for the post. |
+| modified | STRING | The date the post was last modified, in the site's timezone. |
+| modified_gmt | STRING | The date the post was last modified, in GMT. |
+| password | STRING | Password for accessing the post. |
+| slug | STRING | An alphanumeric identifier for the post unique to its type. |
+| status | STRING <details> <summary> Options </summary> publish, future, draft, pending, private </details> | The publication status of the post. |
+| type | STRING | Type of the object (post). |
+| link | STRING | URL to the post. |
+| title | OBJECT <details> <summary> Properties </summary> &#123;STRING\(rendered), STRING\(raw)&#125; </details> | The title for the post. |
+| content | OBJECT <details> <summary> Properties </summary> &#123;STRING\(rendered), STRING\(raw), BOOLEAN\(protected), INTEGER\(block_version)&#125; </details> | The content for the post. |
+| excerpt | OBJECT <details> <summary> Properties </summary> &#123;STRING\(raw), STRING\(rendered), BOOLEAN\(protected)&#125; </details> | The excerpt for the post. |
+| author | INTEGER | The ID for the author of the post. |
+| featured_media | INTEGER | The ID of the featured media for the post. |
+| comment_status | STRING <details> <summary> Options </summary> open, closed </details> | Whether comments are allowed for the post. |
+| ping_status | STRING <details> <summary> Options </summary> open, closed </details> | Whether pingbacks or trackbacks are allowed. |
+| sticky | BOOLEAN <details> <summary> Options </summary> true, false </details> | Weather the post is pinned to the top of the page. |
+| template | STRING | The theme file used to display the post. |
+| format | STRING | The format of the post. |
+| meta | OBJECT <details> <summary> Properties </summary> &#123;STRING\(footnotes)&#125; </details> | Meta fields associated with the post. |
+| categories | ARRAY <details> <summary> Items </summary> [INTEGER] </details> | Categories of the post. |
+| tags | ARRAY <details> <summary> Items </summary> [STRING] </details> | Tags of the post. |
+| permalink_template | STRING | Permalink template of the post. |
+| generated_slug | STRING | Generated slug of the post. |
+| class_list | ARRAY <details> <summary> Items </summary> [STRING] </details> | Class list of the post. |
+| _links | OBJECT <details> <summary> Properties </summary> &#123;[&#123;STRING\(href), &#123;[STRING]\(allow)&#125;\(targetHints)&#125;]\(self), [&#123;STRING\(href)&#125;]\(collection), [&#123;STRING\(href)&#125;]\(about), [&#123;STRING\(href), BOOLEAN\(embeddable)&#125;]\(author), [&#123;STRING\(href), BOOLEAN\(embeddable)&#125;]\(replies), [&#123;STRING\(href), INTEGER\(count)&#125;]\(version-history), [&#123;STRING\(href), INTEGER\(id)&#125;]\(predecessor-version), [&#123;STRING\(href)&#125;]\(wp:attachment), [&#123;STRING\(href), STRING\(taxonomy), BOOLEAN\(embeddable)&#125;]\(wp:term), [&#123;STRING\(href)&#125;]\(wp:action-publish), [&#123;STRING\(href)&#125;]\(wp:action-unfiltered-html), [&#123;STRING\(href)&#125;]\(wp:action-sticky), [&#123;STRING\(href)&#125;]\(wp:action-assign-author), [&#123;STRING\(href)&#125;]\(wp:action-create-categories), [&#123;STRING\(href)&#125;]\(wp:action-assign-categories), [&#123;STRING\(href)&#125;]\(wp:action-assign-tags), [&#123;STRING\(href)&#125;]\(wp:action-create-tags), [&#123;STRING\(name), STRING\(href), BOOLEAN\(templated)&#125;]\(curies)&#125; </details> | Links to other related resources. |
+
+
+
+
+#### Output Example
+```json
+{
+  "id" : 1,
+  "date" : "",
+  "date_gmt" : "",
+  "guid" : {
+    "rendered" : "",
+    "raw" : ""
+  },
+  "modified" : "",
+  "modified_gmt" : "",
+  "password" : "",
+  "slug" : "",
+  "status" : "",
+  "type" : "",
+  "link" : "",
+  "title" : {
+    "rendered" : "",
+    "raw" : ""
+  },
+  "content" : {
+    "rendered" : "",
+    "raw" : "",
+    "protected" : false,
+    "block_version" : 1
+  },
+  "excerpt" : {
+    "raw" : "",
+    "rendered" : "",
+    "protected" : false
+  },
+  "author" : 1,
+  "featured_media" : 1,
+  "comment_status" : "",
+  "ping_status" : "",
+  "sticky" : false,
+  "template" : "",
+  "format" : "",
+  "meta" : {
+    "footnotes" : ""
+  },
+  "categories" : [ 1 ],
+  "tags" : [ "" ],
+  "permalink_template" : "",
+  "generated_slug" : "",
+  "class_list" : [ "" ],
+  "_links" : {
+    "self" : [ {
+      "href" : "",
+      "targetHints" : {
+        "allow" : [ "" ]
+      }
+    } ],
+    "collection" : [ {
+      "href" : ""
+    } ],
+    "about" : [ {
+      "href" : ""
+    } ],
+    "author" : [ {
+      "href" : "",
+      "embeddable" : false
+    } ],
+    "replies" : [ {
+      "href" : "",
+      "embeddable" : false
+    } ],
+    "version-history" : [ {
+      "href" : "",
+      "count" : 1
+    } ],
+    "predecessor-version" : [ {
+      "href" : "",
+      "id" : 1
+    } ],
+    "wp:attachment" : [ {
+      "href" : ""
+    } ],
+    "wp:term" : [ {
+      "href" : "",
+      "taxonomy" : "",
+      "embeddable" : false
+    } ],
+    "wp:action-publish" : [ {
+      "href" : ""
+    } ],
+    "wp:action-unfiltered-html" : [ {
+      "href" : ""
+    } ],
+    "wp:action-sticky" : [ {
+      "href" : ""
+    } ],
+    "wp:action-assign-author" : [ {
+      "href" : ""
+    } ],
+    "wp:action-create-categories" : [ {
+      "href" : ""
+    } ],
+    "wp:action-assign-categories" : [ {
+      "href" : ""
+    } ],
+    "wp:action-assign-tags" : [ {
+      "href" : ""
+    } ],
+    "wp:action-create-tags" : [ {
+      "href" : ""
+    } ],
+    "curies" : [ {
+      "name" : "",
+      "href" : "",
+      "templated" : false
+    } ]
+  }
+}
+```
+
+
+### Create Post
+Name: createPost
+
+`Creates a new post.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| title | Title | STRING | `Title of the post about to be created.` | true |
+| content | Content | STRING | `Content of the post about to be created. Uses the WordPress Text Editor which supports HTML.` | true |
+| status | Status | STRING <details> <summary> Options </summary> publish, future, draft, pending, private </details> | `Status of the post about to be added.` | false |
+| slug | Slug | STRING | `Slug of the post identifier.` | false |
+| categories | Categories | ARRAY <details> <summary> Items </summary> [INTEGER] </details> | `Categories of the post.` | false |
+| comment_status | Enable Comments | STRING <details> <summary> Options </summary> open, closed </details> | `Enable comments on the post.` | false |
+| ping_status | Open to Pinging | STRING <details> <summary> Options </summary> open, closed </details> | `Enable pinging on the post.` | false |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Create Post",
+  "name" : "createPost",
+  "parameters" : {
+    "title" : "",
+    "content" : "",
+    "status" : "",
+    "slug" : "",
+    "categories" : [ 1 ],
+    "comment_status" : "",
+    "ping_status" : ""
+  },
+  "type" : "wordpress/v1/createPost"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| id | INTEGER | Unique identifier for the post. |
+| date | STRING | The date the post was published, in the site's timezone. |
+| date_gmt | STRING | The date the post was published, in GMT. |
+| guid | OBJECT <details> <summary> Properties </summary> &#123;STRING\(rendered), STRING\(raw)&#125; </details> | The globally unique identifier for the post. |
+| modified | STRING | The date the post was last modified, in the site's timezone. |
+| modified_gmt | STRING | The date the post was last modified, in GMT. |
+| password | STRING | Password for accessing the post. |
+| slug | STRING | An alphanumeric identifier for the post unique to its type. |
+| status | STRING <details> <summary> Options </summary> publish, future, draft, pending, private </details> | The publication status of the post. |
+| type | STRING | Type of the object (post). |
+| link | STRING | URL to the post. |
+| title | OBJECT <details> <summary> Properties </summary> &#123;STRING\(rendered), STRING\(raw)&#125; </details> | The title for the post. |
+| content | OBJECT <details> <summary> Properties </summary> &#123;STRING\(rendered), STRING\(raw), BOOLEAN\(protected), INTEGER\(block_version)&#125; </details> | The content for the post. |
+| excerpt | OBJECT <details> <summary> Properties </summary> &#123;STRING\(raw), STRING\(rendered), BOOLEAN\(protected)&#125; </details> | The excerpt for the post. |
+| author | INTEGER | The ID for the author of the post. |
+| featured_media | INTEGER | The ID of the featured media for the post. |
+| comment_status | STRING <details> <summary> Options </summary> open, closed </details> | Whether comments are allowed for the post. |
+| ping_status | STRING <details> <summary> Options </summary> open, closed </details> | Whether pingbacks or trackbacks are allowed. |
+| sticky | BOOLEAN <details> <summary> Options </summary> true, false </details> | Weather the post is pinned to the top of the page. |
+| template | STRING | The theme file used to display the post. |
+| format | STRING | The format of the post. |
+| meta | OBJECT <details> <summary> Properties </summary> &#123;STRING\(footnotes)&#125; </details> | Meta fields associated with the post. |
+| categories | ARRAY <details> <summary> Items </summary> [INTEGER] </details> | Categories of the post. |
+| tags | ARRAY <details> <summary> Items </summary> [STRING] </details> | Tags of the post. |
+| permalink_template | STRING | Permalink template of the post. |
+| generated_slug | STRING | Generated slug of the post. |
+| class_list | ARRAY <details> <summary> Items </summary> [STRING] </details> | Class list of the post. |
+| _links | OBJECT <details> <summary> Properties </summary> &#123;[&#123;STRING\(href), &#123;[STRING]\(allow)&#125;\(targetHints)&#125;]\(self), [&#123;STRING\(href)&#125;]\(collection), [&#123;STRING\(href)&#125;]\(about), [&#123;STRING\(href), BOOLEAN\(embeddable)&#125;]\(author), [&#123;STRING\(href), BOOLEAN\(embeddable)&#125;]\(replies), [&#123;STRING\(href), INTEGER\(count)&#125;]\(version-history), [&#123;STRING\(href)&#125;]\(wp:attachment), [&#123;STRING\(href)&#125;]\(wp:action-publish), [&#123;STRING\(href)&#125;]\(wp:action-unfiltered-html), [&#123;STRING\(href)&#125;]\(wp:action-assign-author), [&#123;STRING\(name), STRING\(href), BOOLEAN\(templated)&#125;]\(curies)&#125; </details> | Links to other related resources. |
+
+
+
+
+#### Output Example
+```json
+{
+  "id" : 1,
+  "date" : "",
+  "date_gmt" : "",
+  "guid" : {
+    "rendered" : "",
+    "raw" : ""
+  },
+  "modified" : "",
+  "modified_gmt" : "",
+  "password" : "",
+  "slug" : "",
+  "status" : "",
+  "type" : "",
+  "link" : "",
+  "title" : {
+    "rendered" : "",
+    "raw" : ""
+  },
+  "content" : {
+    "rendered" : "",
+    "raw" : "",
+    "protected" : false,
+    "block_version" : 1
+  },
+  "excerpt" : {
+    "raw" : "",
+    "rendered" : "",
+    "protected" : false
+  },
+  "author" : 1,
+  "featured_media" : 1,
+  "comment_status" : "",
+  "ping_status" : "",
+  "sticky" : false,
+  "template" : "",
+  "format" : "",
+  "meta" : {
+    "footnotes" : ""
+  },
+  "categories" : [ 1 ],
+  "tags" : [ "" ],
+  "permalink_template" : "",
+  "generated_slug" : "",
+  "class_list" : [ "" ],
+  "_links" : {
+    "self" : [ {
+      "href" : "",
+      "targetHints" : {
+        "allow" : [ "" ]
+      }
+    } ],
+    "collection" : [ {
+      "href" : ""
+    } ],
+    "about" : [ {
+      "href" : ""
+    } ],
+    "author" : [ {
+      "href" : "",
+      "embeddable" : false
+    } ],
+    "replies" : [ {
+      "href" : "",
+      "embeddable" : false
+    } ],
+    "version-history" : [ {
+      "href" : "",
+      "count" : 1
+    } ],
+    "wp:attachment" : [ {
+      "href" : ""
+    } ],
+    "wp:action-publish" : [ {
+      "href" : ""
+    } ],
+    "wp:action-unfiltered-html" : [ {
+      "href" : ""
+    } ],
+    "wp:action-assign-author" : [ {
+      "href" : ""
+    } ],
+    "curies" : [ {
+      "name" : "",
+      "href" : "",
+      "templated" : false
+    } ]
+  }
+}
+```
+
+
+### Create Page
+Name: createPage
+
+`Creates a new page.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| title | Title | STRING | `Title of the page about to be added.` | true |
+| content | Content | STRING | `Content of the page about to be added. Uses the WordPress Text Editor which supports HTML.` | true |
+| status | Status | STRING <details> <summary> Options </summary> publish, future, draft, pending, private </details> | `Status of the page about to be added.` | false |
+| slug | Slug | STRING | `Slug of the page identifier.` | false |
+| comment_status | Enable Comments | STRING <details> <summary> Options </summary> open, closed </details> | `Enable comments on the page.` | false |
+| ping_status | Open to Pinging | STRING <details> <summary> Options </summary> open, closed </details> | `Enable pinging on the page.` | false |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Create Page",
+  "name" : "createPage",
+  "parameters" : {
+    "title" : "",
+    "content" : "",
+    "status" : "",
+    "slug" : "",
+    "comment_status" : "",
+    "ping_status" : ""
+  },
+  "type" : "wordpress/v1/createPage"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| id | INTEGER | Unique identifier for the page. |
+| date | STRING | The date the page was published, in the site's timezone. |
+| date_gmt | STRING | The date the page was published, in GMT. |
+| guid | OBJECT <details> <summary> Properties </summary> &#123;STRING\(rendered), STRING\(raw)&#125; </details> | The globally unique identifier for the page. |
+| modified | STRING | The date the page was last modified, in the site's timezone. |
+| modified_gmt | STRING | The date the page was last modified, in GMT. |
+| password | STRING | Password for accessing the page. |
+| slug | STRING | An alphanumeric identifier for the page unique to its type. |
+| status | STRING <details> <summary> Options </summary> publish, future, draft, pending, private </details> | The publication status of the page. |
+| type | STRING | Type of the object (page). |
+| link | STRING | URL to the page. |
+| title | OBJECT <details> <summary> Properties </summary> &#123;STRING\(rendered), STRING\(raw)&#125; </details> | The title for the page. |
+| content | OBJECT <details> <summary> Properties </summary> &#123;STRING\(rendered), STRING\(raw), BOOLEAN\(protected), INTEGER\(block_version)&#125; </details> | The content for the page. |
+| excerpt | OBJECT <details> <summary> Properties </summary> &#123;STRING\(raw), STRING\(rendered), BOOLEAN\(protected)&#125; </details> | The excerpt for the page. |
+| author | INTEGER | The ID for the author of the page. |
+| featured_media | INTEGER | The ID of the featured media for the page. |
+| parent | INTEGER | The ID of the parent page, if any. |
+| menu_order | INTEGER | The order of the page in menus. |
+| comment_status | STRING <details> <summary> Options </summary> open, closed </details> | Whether comments are allowed for the page. |
+| ping_status | STRING <details> <summary> Options </summary> open, closed </details> | Whether pingbacks or trackbacks are allowed. |
+| template | STRING | The theme file used to display the page. |
+| meta | OBJECT <details> <summary> Properties </summary> &#123;STRING\(footnotes)&#125; </details> | Meta fields associated with the page. |
+| permalink_template | STRING | Permalink template of the page. |
+| generated_slug | STRING | Generated slug of the page. |
+| class_list | ARRAY <details> <summary> Items </summary> [STRING] </details> | Class list of the page. |
+| _links | OBJECT <details> <summary> Properties </summary> &#123;[&#123;STRING\(href), &#123;[STRING]\(allow)&#125;\(targetHints)&#125;]\(self), [&#123;STRING\(href)&#125;]\(collection), [&#123;STRING\(href)&#125;]\(about), [&#123;STRING\(href), BOOLEAN\(embeddable)&#125;]\(author), [&#123;STRING\(href), BOOLEAN\(embeddable)&#125;]\(replies), [&#123;STRING\(href), INTEGER\(count)&#125;]\(version-history), [&#123;STRING\(href)&#125;]\(wp:attachment), [&#123;STRING\(href)&#125;]\(wp:action-publish), [&#123;STRING\(href)&#125;]\(wp:action-unfiltered-html), [&#123;STRING\(href)&#125;]\(wp:action-assign-author), [&#123;STRING\(name), STRING\(href), BOOLEAN\(templated)&#125;]\(curies)&#125; </details> | Links to other related resources. |
+
+
+
+
+#### Output Example
+```json
+{
+  "id" : 1,
+  "date" : "",
+  "date_gmt" : "",
+  "guid" : {
+    "rendered" : "",
+    "raw" : ""
+  },
+  "modified" : "",
+  "modified_gmt" : "",
+  "password" : "",
+  "slug" : "",
+  "status" : "",
+  "type" : "",
+  "link" : "",
+  "title" : {
+    "rendered" : "",
+    "raw" : ""
+  },
+  "content" : {
+    "rendered" : "",
+    "raw" : "",
+    "protected" : false,
+    "block_version" : 1
+  },
+  "excerpt" : {
+    "raw" : "",
+    "rendered" : "",
+    "protected" : false
+  },
+  "author" : 1,
+  "featured_media" : 1,
+  "parent" : 1,
+  "menu_order" : 1,
+  "comment_status" : "",
+  "ping_status" : "",
+  "template" : "",
+  "meta" : {
+    "footnotes" : ""
+  },
+  "permalink_template" : "",
+  "generated_slug" : "",
+  "class_list" : [ "" ],
+  "_links" : {
+    "self" : [ {
+      "href" : "",
+      "targetHints" : {
+        "allow" : [ "" ]
+      }
+    } ],
+    "collection" : [ {
+      "href" : ""
+    } ],
+    "about" : [ {
+      "href" : ""
+    } ],
+    "author" : [ {
+      "href" : "",
+      "embeddable" : false
+    } ],
+    "replies" : [ {
+      "href" : "",
+      "embeddable" : false
+    } ],
+    "version-history" : [ {
+      "href" : "",
+      "count" : 1
+    } ],
+    "wp:attachment" : [ {
+      "href" : ""
+    } ],
+    "wp:action-publish" : [ {
+      "href" : ""
+    } ],
+    "wp:action-unfiltered-html" : [ {
+      "href" : ""
+    } ],
+    "wp:action-assign-author" : [ {
+      "href" : ""
+    } ],
+    "curies" : [ {
+      "name" : "",
+      "href" : "",
+      "templated" : false
+    } ]
+  }
+}
+```
+
+
+
+
+## Triggers
+
+
+### New Post
+Name: newPost
+
+`Triggers when a new post is added.`
+
+Type: POLLING
+
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| id | INTEGER | Unique identifier for the post. |
+| date | STRING | The date the post was published, in the site's timezone. |
+| date_gmt | STRING | The date the post was published, in GMT. |
+| guid | OBJECT <details> <summary> Properties </summary> &#123;STRING\(rendered)&#125; </details> | The globally unique identifier for the post. |
+| modified | STRING | The date the post was last modified, in the site's timezone. |
+| modified_gmt | STRING | The date the post was last modified, in GMT. |
+| slug | STRING | An alphanumeric identifier for the post unique to its type. |
+| status | STRING | The publication status of the post. |
+| type | STRING | Type of the object (post). |
+| link | STRING | URL to the post. |
+| title | OBJECT <details> <summary> Properties </summary> &#123;STRING\(rendered), STRING\(raw)&#125; </details> | The title for the post. |
+| content | OBJECT <details> <summary> Properties </summary> &#123;STRING\(rendered), BOOLEAN\(protected)&#125; </details> | The content for the post. |
+| excerpt | OBJECT <details> <summary> Properties </summary> &#123;STRING\(rendered), BOOLEAN\(protected)&#125; </details> | The excerpt for the post. |
+| author | INTEGER | The ID for the author of the post. |
+| featured_media | INTEGER | The ID of the featured media for the post. |
+| comment_status | STRING | Whether comments are allowed for the post. |
+| ping_status | STRING | Whether pingbacks or trackbacks are allowed. |
+| sticky | BOOLEAN <details> <summary> Options </summary> true, false </details> | Weather the post is pinned to the top of the page. |
+| template | STRING | The theme file used to display the post. |
+| format | STRING | The format of the post. |
+| meta | OBJECT <details> <summary> Properties </summary> &#123;STRING\(footnotes)&#125; </details> | Meta fields associated with the post. |
+| categories | ARRAY <details> <summary> Items </summary> [INTEGER] </details> | Categories of the post. |
+| tags | ARRAY <details> <summary> Items </summary> [STRING] </details> | Tags of the post. |
+| class_list | ARRAY <details> <summary> Items </summary> [STRING] </details> | Class list of the post. |
+| _links | OBJECT <details> <summary> Properties </summary> &#123;[&#123;STRING\(href), &#123;[STRING]\(allow)&#125;\(targetHints)&#125;]\(self), [&#123;STRING\(href)&#125;]\(collection), [&#123;STRING\(href)&#125;]\(about), [&#123;STRING\(href), BOOLEAN\(embeddable)&#125;]\(author), [&#123;STRING\(href), BOOLEAN\(embeddable)&#125;]\(replies), [&#123;STRING\(href), INTEGER\(count)&#125;]\(version-history), [&#123;STRING\(href), INTEGER\(id)&#125;]\(predecessor-version), [&#123;STRING\(href)&#125;]\(wp:attachment), [&#123;STRING\(href), STRING\(taxonomy), BOOLEAN\(embeddable)&#125;]\(wp:term), [&#123;STRING\(name), STRING\(href), BOOLEAN\(templated)&#125;]\(curies)&#125; </details> | Links to other related resources. |
+
+
+
+
+#### JSON Example
+```json
+{
+  "label" : "New Post",
+  "name" : "newPost",
+  "type" : "wordpress/v1/newPost"
+}
+```
+
+
+<hr />
+
+<hr />
+
+# Additional instructions
+<hr />
+
+For authentification use Application Passwords
+    - As of 5.6, WordPress has shipped with Application Passwords, which can be generated from an Edit User page (wp-admin -> Users -> Edit User).
+
+Permalink Structure
+    Settings -> Permalink Settings -> Permalink structure -> "Post name" option
