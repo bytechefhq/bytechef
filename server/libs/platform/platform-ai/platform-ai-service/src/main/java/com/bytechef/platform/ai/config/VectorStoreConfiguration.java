@@ -22,6 +22,7 @@ import com.bytechef.platform.component.domain.ActionDefinition;
 import com.bytechef.platform.component.domain.ComponentDefinition;
 import com.bytechef.platform.component.domain.TriggerDefinition;
 import com.bytechef.platform.component.service.ComponentDefinitionService;
+import com.bytechef.platform.domain.OutputResponse;
 import com.bytechef.platform.workflow.task.dispatcher.domain.TaskDispatcherDefinition;
 import com.bytechef.platform.workflow.task.dispatcher.service.TaskDispatcherDefinitionService;
 import com.knuddels.jtokkit.api.EncodingType;
@@ -78,7 +79,9 @@ public class VectorStoreConfiguration {
     @SuppressFBWarnings("EI")
     @Autowired
     public VectorStoreConfiguration(
-        VectorStore vectorStore, VectorStoreService vectorStoreService, ComponentDefinitionService componentDefinitionService, TaskDispatcherDefinitionService taskDispatcherDefinitionService, ApplicationProperties applicationProperties) {
+        VectorStore vectorStore, VectorStoreService vectorStoreService,
+        ComponentDefinitionService componentDefinitionService,
+        TaskDispatcherDefinitionService taskDispatcherDefinitionService, ApplicationProperties applicationProperties) {
 
         this.paths = applicationProperties.getAi()
             .getPaths();
@@ -203,7 +206,7 @@ public class VectorStoreConfiguration {
         return chunks;
     }
 
-    private String getSampleValue(PropertyDecorator property){
+    private String getSampleValue(PropertyDecorator property) {
         return switch (property.getType()) {
             case ARRAY -> getArrayParameters(property.getItems());
             case BOOLEAN -> "false";
@@ -222,102 +225,180 @@ public class VectorStoreConfiguration {
     private String createJsonExample(ActionDefinition actionDefinition) {
         StringBuilder json = new StringBuilder();
 
-        json.append("{").append("\n")
-            .append("\"label\": \"").append(actionDefinition.getTitle()).append("\",").append("\n")
-            .append("\"name\": \"").append(actionDefinition.getName()).append("\",").append("\n")
-            .append("\"type\": \"").append(actionDefinition.getComponentName()).append("/v").append(actionDefinition.getComponentVersion()).append("/").append(actionDefinition.getName()).append("\",\n");
+        json.append("{")
+            .append("\n")
+            .append("\"label\": \"")
+            .append(actionDefinition.getTitle())
+            .append("\",")
+            .append("\n")
+            .append("\"name\": \"")
+            .append(actionDefinition.getName())
+            .append("\",")
+            .append("\n")
+            .append("\"type\": \"")
+            .append(actionDefinition.getComponentName())
+            .append("/v")
+            .append(actionDefinition.getComponentVersion())
+            .append("/")
+            .append(actionDefinition.getName())
+            .append("\",\n");
 
-        List<PropertyDecorator> properties = PropertyDecorator.toPropertyDecoratorList(actionDefinition.getProperties());
+        List<PropertyDecorator> properties =
+            PropertyDecorator.toPropertyDecoratorList(actionDefinition.getProperties());
         if (!properties.isEmpty()) {
-            json.append("\"parameters\": ").append(getObjectParameters(properties));
+            json.append("\"parameters\": ")
+                .append(getObjectParameters(properties));
         }
-        return json.append("}").toString();
+        return json.append("}")
+            .toString();
     }
 
     private String createJsonExample(TriggerDefinition triggerDefinition) {
         StringBuilder json = new StringBuilder();
 
-        json.append("{").append("\n")
-            .append("\"label\": \"").append(triggerDefinition.getTitle()).append("\",").append("\n")
-            .append("\"name\": \"").append(triggerDefinition.getName()).append("\",").append("\n")
-            .append("\"type\": \"").append(triggerDefinition.getComponentName()).append("/v").append(triggerDefinition.getComponentVersion()).append("/").append(triggerDefinition.getName()).append("\",\n");
+        json.append("{")
+            .append("\n")
+            .append("\"label\": \"")
+            .append(triggerDefinition.getTitle())
+            .append("\",")
+            .append("\n")
+            .append("\"name\": \"")
+            .append(triggerDefinition.getName())
+            .append("\",")
+            .append("\n")
+            .append("\"type\": \"")
+            .append(triggerDefinition.getComponentName())
+            .append("/v")
+            .append(triggerDefinition.getComponentVersion())
+            .append("/")
+            .append(triggerDefinition.getName())
+            .append("\",\n");
 
-        List<PropertyDecorator> properties = PropertyDecorator.toPropertyDecoratorList(triggerDefinition.getProperties());
+        List<PropertyDecorator> properties =
+            PropertyDecorator.toPropertyDecoratorList(triggerDefinition.getProperties());
         if (!properties.isEmpty()) {
-            json.append("\"parameters\": ").append(getObjectParameters(properties));
+            json.append("\"parameters\": ")
+                .append(getObjectParameters(properties));
         }
-        return json.append("}").toString();
+        return json.append("}")
+            .toString();
     }
 
     private String createJsonExample(TaskDispatcherDefinition taskDispatcherDefinition) {
         StringBuilder json = new StringBuilder();
 
-        json.append("{").append("\n")
-            .append("\"label\": \"").append(taskDispatcherDefinition.getTitle()).append("\",").append("\n")
-            .append("\"name\": \"").append(taskDispatcherDefinition.getName()).append("\",").append("\n")
-            .append("\"type\": \"").append(taskDispatcherDefinition.getName()).append("/v").append(taskDispatcherDefinition.getVersion()).append("/").append("\",\n");
+        json.append("{")
+            .append("\n")
+            .append("\"label\": \"")
+            .append(taskDispatcherDefinition.getTitle())
+            .append("\",")
+            .append("\n")
+            .append("\"name\": \"")
+            .append(taskDispatcherDefinition.getName())
+            .append("\",")
+            .append("\n")
+            .append("\"type\": \"")
+            .append(taskDispatcherDefinition.getName())
+            .append("/v")
+            .append(taskDispatcherDefinition.getVersion())
+            .append("/")
+            .append("\",\n");
 
-        List<PropertyDecorator> properties = PropertyDecorator.toPropertyDecoratorList(taskDispatcherDefinition.getProperties());
+        List<PropertyDecorator> properties =
+            PropertyDecorator.toPropertyDecoratorList(taskDispatcherDefinition.getProperties());
         if (!properties.isEmpty()) {
-            json.append("\"parameters\": ").append(getObjectParameters(properties));
+            json.append("\"parameters\": ")
+                .append(getObjectParameters(properties));
         }
-        return json.append("}").toString();
+        return json.append("}")
+            .toString();
     }
 
     private String getObjectParameters(List<PropertyDecorator> properties) {
         StringBuilder parameters = new StringBuilder();
 
-        parameters.append("{").append("\n");
-        for(var property : properties){
-            parameters.append("\"").append(property.getName()).append("\": ").append(getSampleValue(property)).append(",\n");
+        parameters.append("{")
+            .append("\n");
+        for (var property : properties) {
+            parameters.append("\"")
+                .append(property.getName())
+                .append("\": ")
+                .append(getSampleValue(property))
+                .append(",\n");
         }
 
         if (parameters.length() > 2) {
             parameters.setLength(parameters.length() - 2);
         }
 
-        return parameters.append("}").toString();
+        return parameters.append("}")
+            .toString();
     }
 
     private String getArrayParameters(List<PropertyDecorator> properties) {
         StringBuilder parameters = new StringBuilder();
 
         parameters.append("[\n");
-        for(var property : properties){
-            parameters.append(getSampleValue(property)).append(",\n");
+        for (var property : properties) {
+            parameters.append(getSampleValue(property))
+                .append(",\n");
         }
 
         if (parameters.length() > 2) {
             parameters.setLength(parameters.length() - 2);
         }
 
-        return parameters.append("]").toString();
+        return parameters.append("]")
+            .toString();
     }
 
     private String componentDefinitionToString(ComponentDefinition componentDefinition) {
         StringBuilder definitionText = new StringBuilder();
 
-        definitionText.append("Component Name: ").append(componentDefinition.getName()).append("\n")
-            .append("Description: ").append(componentDefinition.getDescription()).append("\n");
+        definitionText.append("Component Name: ")
+            .append(componentDefinition.getName())
+            .append("\n")
+            .append("Description: ")
+            .append(componentDefinition.getDescription())
+            .append("\n");
 
-        if(!componentDefinition.getTriggers().isEmpty()){
+        if (!componentDefinition.getTriggers()
+            .isEmpty()) {
             definitionText.append("Triggers:\n");
             for (TriggerDefinition triggerDefinition : componentDefinition.getTriggers()) {
-                definitionText.append("Trigger Name: ").append(triggerDefinition.getName()).append("\n")
-                    .append("Description: ").append(triggerDefinition.getDescription()).append("\n")
-                    .append("Example JSON Structure: \n").append(createJsonExample(triggerDefinition)).append("\n");
+                definitionText.append("Trigger Name: ")
+                    .append(triggerDefinition.getName())
+                    .append("\n")
+                    .append("Description: ")
+                    .append(triggerDefinition.getDescription())
+                    .append("\n")
+                    .append("Example JSON Structure: \n")
+                    .append(createJsonExample(triggerDefinition))
+                    .append("\n");
             }
         }
 
-        if(!componentDefinition.getActions().isEmpty()) {
+        if (!componentDefinition.getActions()
+            .isEmpty()) {
             definitionText.append("Actions:\n");
             for (ActionDefinition actionDefinition : componentDefinition.getActions()) {
-                if(!actionDefinition.getName().equals("customAction")) {
-                    definitionText.append("Action Name: ").append(actionDefinition.getName()).append("\n")
-                        .append("Description: ").append(actionDefinition.getDescription()).append("\n")
-                        .append("Example JSON Structure: \n").append(createJsonExample(actionDefinition)).append("\n");
-                    if (actionDefinition.isOutputDefined() && actionDefinition.getOutputResponse() != null) {
-                        definitionText.append("Output JSON: \n").append(getSampleValue(new PropertyDecorator(actionDefinition.getOutputResponse().outputSchema()))).append("\n");
+                if (!actionDefinition.getName()
+                    .equals("customAction")) {
+                    definitionText.append("Action Name: ")
+                        .append(actionDefinition.getName())
+                        .append("\n")
+                        .append("Description: ")
+                        .append(actionDefinition.getDescription())
+                        .append("\n")
+                        .append("Example JSON Structure: \n")
+                        .append(createJsonExample(actionDefinition))
+                        .append("\n");
+
+                    OutputResponse outputResponse = actionDefinition.getOutputResponse();
+                    if (actionDefinition.isOutputDefined() && outputResponse != null) {
+                        definitionText.append("Output JSON: \n")
+                            .append(getSampleValue(new PropertyDecorator(outputResponse.outputSchema())))
+                            .append("\n");
                     }
                 }
             }
@@ -329,12 +410,21 @@ public class VectorStoreConfiguration {
     private String taskDispatcherDefinitionToString(TaskDispatcherDefinition taskDispatcherDefinition) {
         StringBuilder definitionText = new StringBuilder();
 
-        definitionText.append("Task Dispatcher Name: ").append(taskDispatcherDefinition.getName()).append("\n")
-            .append("Description: ").append(taskDispatcherDefinition.getDescription()).append("\n")
-            .append("Example JSON Structure: \n").append(createJsonExample(taskDispatcherDefinition)).append("\n");
+        definitionText.append("Task Dispatcher Name: ")
+            .append(taskDispatcherDefinition.getName())
+            .append("\n")
+            .append("Description: ")
+            .append(taskDispatcherDefinition.getDescription())
+            .append("\n")
+            .append("Example JSON Structure: \n")
+            .append(createJsonExample(taskDispatcherDefinition))
+            .append("\n");
 
-        if (taskDispatcherDefinition.isOutputDefined() && taskDispatcherDefinition.getOutputResponse() != null) {
-            definitionText.append("Output JSON: \n").append(getSampleValue(new PropertyDecorator(taskDispatcherDefinition.getOutputResponse().outputSchema()))).append("\n");
+        OutputResponse outputResponse = taskDispatcherDefinition.getOutputResponse();
+        if (taskDispatcherDefinition.isOutputDefined() && outputResponse != null) {
+            definitionText.append("Output JSON: \n")
+                .append(getSampleValue(new PropertyDecorator(outputResponse.outputSchema())))
+                .append("\n");
         }
 
         return definitionText.toString();
@@ -345,15 +435,17 @@ public class VectorStoreConfiguration {
         List<Map<String, Object>> vectorStoreList, VectorStore vectorStore) {
         List<Document> documentList = new ArrayList<>();
 
-        for(TaskDispatcherDefinition taskDispatcherDefinition : taskDispatcherDefinitionService.getTaskDispatcherDefinitions()) {
-            if(!taskDispatcherDefinition.getName().equals("waitForApproval")) {
+        for (TaskDispatcherDefinition taskDispatcherDefinition : taskDispatcherDefinitionService
+            .getTaskDispatcherDefinitions()) {
+            if (!taskDispatcherDefinition.getName()
+                .equals("waitForApproval")) {
                 String json = taskDispatcherDefinitionToString(taskDispatcherDefinition);
 
                 addToDocumentList(vectorStoreList, taskDispatcherDefinition.getName(), json, documentList, FLOWS);
             }
         }
 
-        for(ComponentDefinition componentDefinition : componentDefinitionService.getComponentDefinitions()) {
+        for (ComponentDefinition componentDefinition : componentDefinitionService.getComponentDefinitions()) {
             String json = componentDefinitionToString(componentDefinition);
 
             addToDocumentList(vectorStoreList, componentDefinition.getName(), json, documentList, COMPONENTS);
@@ -364,8 +456,10 @@ public class VectorStoreConfiguration {
         }
     }
 
-    private static void addToDocumentList(List<Map<String, Object>> vectorStoreList, String name, String json, List<Document> documentList, String category) {
-        if(!vectorStoreListContainsFile(vectorStoreList, name, category)) {
+    private static void addToDocumentList(
+        List<Map<String, Object>> vectorStoreList, String name, String json, List<Document> documentList,
+        String category) {
+        if (!vectorStoreListContainsFile(vectorStoreList, name, category)) {
             String cleanedDocument = preprocessDocument(json);
 
             if (!cleanedDocument.isEmpty()) {
