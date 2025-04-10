@@ -31,8 +31,8 @@ public class PostHogConstants {
 
     public static final String API_KEY = "api_key";
     public static final String DISTINCT_ID = "distinct_id";
-    public static final String ID = "id";
     public static final String EVENT = "event";
+    public static final String ID = "id";
     public static final String NAME = "name";
 
     public static final ModifiableObjectProperty PROJECT_OUTPUT_SCHEMA =

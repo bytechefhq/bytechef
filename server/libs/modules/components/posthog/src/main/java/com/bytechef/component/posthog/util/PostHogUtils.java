@@ -32,7 +32,7 @@ import java.util.Map;
 /**
  * @author Nikolina Spehar
  */
-public class PosthogUtils {
+public class PostHogUtils {
 
     public static List<Option<String>> getOrganizationOptions(
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> stringStringMap, String s,

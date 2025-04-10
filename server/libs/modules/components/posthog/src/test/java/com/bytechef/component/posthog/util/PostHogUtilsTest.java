@@ -37,7 +37,7 @@ import org.junit.jupiter.api.Test;
 /**
  * @author Nikolina Spehar
  */
-class PosthogUtilsTest {
+class PostHogUtilsTest {
 
     private final Context mockedContext = mock(Context.class);
     private final Executor mockedExecutor = mock(Http.Executor.class);
@@ -58,7 +58,7 @@ class PosthogUtilsTest {
         when(mockedResponse.getBody(any(TypeReference.class)))
             .thenReturn(responseMap);
 
-        List<Option<String>> organizationOptions = PosthogUtils.getOrganizationOptions(
+        List<Option<String>> organizationOptions = PostHogUtils.getOrganizationOptions(
             mockedParameters, mockedParameters, Map.of(), "", mockedContext);
 
         List<Option<String>> expectedOrganizationOptions = List.of(
