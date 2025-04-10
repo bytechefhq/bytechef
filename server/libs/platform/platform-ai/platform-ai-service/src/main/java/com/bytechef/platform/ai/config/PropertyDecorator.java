@@ -1,7 +1,22 @@
+/*
+ * Copyright 2023-present ByteChef Inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.bytechef.platform.ai.config;
 
 import com.bytechef.platform.domain.BaseProperty;
-
 import java.util.List;
 
 public class PropertyDecorator {
@@ -109,7 +124,10 @@ public class PropertyDecorator {
                 this.type = Type.TIME;
                 this.location = Location.COMPONENT;
             }
-            default -> throw new IllegalStateException("Unexpected value: " + property);
+            default -> {
+                this.type = Type.NULL;
+                this.location = Location.TAKS_DISPATCHER;
+            }
         }
     }
 
@@ -142,44 +160,40 @@ public class PropertyDecorator {
         return type;
     }
 
-    public String getName(){
+    public String getName() {
         return property.getName();
     }
 
     public List<PropertyDecorator> getItems() {
-        return switch (location){
-            case TAKS_DISPATCHER -> PropertyDecorator.toPropertyDecoratorList(((com.bytechef.platform.workflow.task.dispatcher.domain.ArrayProperty) property).getItems());
-            case COMPONENT -> PropertyDecorator.toPropertyDecoratorList(((com.bytechef.platform.component.domain.ArrayProperty) property).getItems());
+        return switch (location) {
+            case TAKS_DISPATCHER -> toPropertyDecoratorList(
+                ((com.bytechef.platform.workflow.task.dispatcher.domain.ArrayProperty) property).getItems());
+            case COMPONENT ->
+                toPropertyDecoratorList(((com.bytechef.platform.component.domain.ArrayProperty) property).getItems());
         };
     }
 
     public List<PropertyDecorator> getObjectProperties() {
-        return switch (location){
-            case TAKS_DISPATCHER -> PropertyDecorator.toPropertyDecoratorList(((com.bytechef.platform.workflow.task.dispatcher.domain.ObjectProperty) property).getProperties());
-            case COMPONENT -> PropertyDecorator.toPropertyDecoratorList(((com.bytechef.platform.component.domain.ObjectProperty) property).getProperties());
+        return switch (location) {
+            case TAKS_DISPATCHER -> toPropertyDecoratorList(
+                ((com.bytechef.platform.workflow.task.dispatcher.domain.ObjectProperty) property).getProperties());
+            case COMPONENT -> toPropertyDecoratorList(
+                ((com.bytechef.platform.component.domain.ObjectProperty) property).getProperties());
         };
     }
 
     public List<PropertyDecorator> getFileEntryProperties() {
-        return switch (location){
-            case TAKS_DISPATCHER -> PropertyDecorator.toPropertyDecoratorList(((com.bytechef.platform.workflow.task.dispatcher.domain.FileEntryProperty) property).getProperties());
-            case COMPONENT -> PropertyDecorator.toPropertyDecoratorList(((com.bytechef.platform.component.domain.FileEntryProperty) property).getProperties());
+        return switch (location) {
+            case TAKS_DISPATCHER -> toPropertyDecoratorList(
+                ((com.bytechef.platform.workflow.task.dispatcher.domain.FileEntryProperty) property).getProperties());
+            case COMPONENT -> toPropertyDecoratorList(
+                ((com.bytechef.platform.component.domain.FileEntryProperty) property).getProperties());
         };
     }
 
     public static List<PropertyDecorator> toPropertyDecoratorList(List<? extends BaseProperty> properties) {
         return properties.stream()
-            .map(property -> {
-                if (property instanceof com.bytechef.platform.component.domain.Property) {
-                    com.bytechef.platform.component.domain.Property p =
-                        (com.bytechef.platform.component.domain.Property) property;
-                    return new PropertyDecorator(p);
-                } else {
-                    com.bytechef.platform.workflow.task.dispatcher.domain.Property p =
-                        (com.bytechef.platform.workflow.task.dispatcher.domain.Property) property;
-                    return new PropertyDecorator(p);
-                }
-            })
+            .map(PropertyDecorator::new)
             .toList();
     }
 }
