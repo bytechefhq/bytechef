@@ -26,6 +26,6 @@ class PostHogComponentHandlerTest {
 
     @Test
     void testGetComponentDefinition() {
-        JsonFileAssert.assertEquals("definition/postHog_v1.json", new PostHogComponentHandler().getDefinition());
+        JsonFileAssert.assertEquals("definition/posthog_v1.json", new PostHogComponentHandler().getDefinition());
     }
 }

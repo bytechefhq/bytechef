@@ -36,8 +36,8 @@ public class PostHogComponentHandler implements ComponentHandler {
     private static final ComponentDefinition COMPONENT_DEFINITION = component("postHog")
         .title("PostHog")
         .description(
-            "PostHog is the only all-in-one platform for product analytics, feature flags, " +
-                "session replays, experiments, and surveys that's built for developers.")
+            "PostHog is the only all-in-one platform for product analytics, feature flags, session replays, " +
+                "experiments, and surveys that's built for developers.")
         .icon("path:assets/posthog.svg")
         .categories(ComponentCategory.ANALYTICS)
         .connection(PostHogConnection.CONNECTION_DEFINITION)

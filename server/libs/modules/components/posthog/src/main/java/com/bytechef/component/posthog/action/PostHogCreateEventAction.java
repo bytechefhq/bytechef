@@ -45,8 +45,8 @@ public class PostHogCreateEventAction {
             string(API_KEY)
                 .label("Api Key Project")
                 .description(
-                    "The project API key used to create a new event." +
-                        "Found in Settings -> Project -> Project ID -> Project API key.")
+                    "The project API key used to create a new event." + "Found in Settings -> Project -> " +
+                        "Project ID -> Project API key.")
                 .required(true),
             string(EVENT)
                 .label("Event")
@@ -55,8 +55,8 @@ public class PostHogCreateEventAction {
             string(DISTINCT_ID)
                 .label("Distinct ID")
                 .description(
-                    "A unique identifier for the user creating the event, " +
-                        "such as their username, email address, or system-assigned ID.")
+                    "A unique identifier for the user creating the event, such as their username, email address, or " +
+                        "system-assigned ID.")
                 .required(true))
         .output(
             outputSchema(
@@ -69,16 +69,15 @@ public class PostHogCreateEventAction {
     private PostHogCreateEventAction() {
     }
 
-    public static Map<String, Object>
-        perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
+    public static Map<String, Object> perform(
+        Parameters inputParameters, Parameters connectionParameters, Context context) {
+
         return context.http(http -> http.post("/capture/"))
             .body(
                 Body.of(
-                    Map.of(
-                        API_KEY, inputParameters.getRequiredString(API_KEY),
-                        EVENT, inputParameters.getRequiredString(EVENT),
-                        "properties", Map.of(
-                            DISTINCT_ID, inputParameters.getRequiredString(DISTINCT_ID)))))
+                    API_KEY, inputParameters.getRequiredString(API_KEY),
+                    EVENT, inputParameters.getRequiredString(EVENT),
+                    "properties", Map.of(DISTINCT_ID, inputParameters.getRequiredString(DISTINCT_ID))))
             .configuration(responseType(ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});

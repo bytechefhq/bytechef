@@ -1,5 +1,5 @@
 ---
-title: "Posthog"
+title: "PostHog"
 description: "PostHog is the only all-in-one platform for product analytics, feature flags, session replays, experiments, and surveys that's built for developers."
 ---
 
@@ -9,7 +9,7 @@ PostHog is the only all-in-one platform for product analytics, feature flags, se
 Categories: Analytics
 
 
-Type: posthog/v1
+Type: postHog/v1
 
 <hr />
 
@@ -62,7 +62,7 @@ Create a new event.
     "event" : "",
     "distinct_id" : ""
   },
-  "type" : "posthog/v1/createEvent"
+  "type" : "postHog/v1/createEvent"
 }
 ```
 
@@ -111,7 +111,7 @@ Create a new Project.
     "id" : "",
     "name" : ""
   },
-  "type" : "posthog/v1/createProject"
+  "type" : "postHog/v1/createProject"
 }
 ```
 

@@ -31,7 +31,7 @@ import com.bytechef.component.definition.Context.Http.ResponseType;
 import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
-import com.bytechef.component.posthog.util.PosthogUtils;
+import com.bytechef.component.posthog.util.PostHogUtils;
 import java.util.Map;
 
 /**
@@ -45,7 +45,7 @@ public class PostHogCreateProjectAction {
         .properties(
             string(ID)
                 .label("Organization ID")
-                .options((ActionOptionsFunction<String>) PosthogUtils::getOrganizationOptions)
+                .options((ActionOptionsFunction<String>) PostHogUtils::getOrganizationOptions)
                 .required(true),
             string(NAME)
                 .label("Project Name")
@@ -56,11 +56,11 @@ public class PostHogCreateProjectAction {
     private PostHogCreateProjectAction() {
     }
 
-    public static Map<String, Object>
-        perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
+    public static Map<String, Object> perform(
+        Parameters inputParameters, Parameters connectionParameters, Context context) {
+
         return context.http(http -> http.post(
-            "/api/organizations/%s/projects".formatted(
-                inputParameters.getRequiredString(ID))))
+            "/api/organizations/%s/projects".formatted(inputParameters.getRequiredString(ID))))
             .body(
                 Body.of(
                     Map.of(NAME, inputParameters.getRequiredString(NAME))))
