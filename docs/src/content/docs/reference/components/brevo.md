@@ -6,7 +6,7 @@ description: "Brevo is an email marketing platform that offers a cloud-based mar
 Brevo is an email marketing platform that offers a cloud-based marketing communication software suite with transactional email, marketing automation, customer-relationship management and more.
 
 
-Categories: marketing-automation
+Categories: Marketing Automation
 
 
 Type: brevo/v1
@@ -186,4 +186,31 @@ Type: OBJECT
 
 
 
+
+## Triggers
+
+
+### Transactional Email Opened
+Name: transactionalEmailOpened
+
+Triggers when transactional email is opened.
+
+Type: DYNAMIC_WEBHOOK
+
+
+#### Output
+
+The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
+
+#### JSON Example
+```json
+{
+  "label" : "Transactional Email Opened",
+  "name" : "transactionalEmailOpened",
+  "type" : "brevo/v1/transactionalEmailOpened"
+}
+```
+
+
+<hr />
 

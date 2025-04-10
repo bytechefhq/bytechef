@@ -23,6 +23,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.component.definition.Context;
+import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
@@ -41,9 +42,9 @@ class BrevoUtilsTest {
         option("contact1@test.com", "contact1@test.com"),
         option("contact2@test.com", "contact2@test.com"));
     private final Context mockedContext = mock(Context.class);
-    private final Context.Http.Executor mockedExecutor = mock(Context.Http.Executor.class);
+    private final Http.Executor mockedExecutor = mock(Http.Executor.class);
     private final Parameters mockedParameters = mock(Parameters.class);
-    private final Context.Http.Response mockedResponse = mock(Context.Http.Response.class);
+    private final Http.Response mockedResponse = mock(Http.Response.class);
 
     @BeforeEach
     void beforeEach() {

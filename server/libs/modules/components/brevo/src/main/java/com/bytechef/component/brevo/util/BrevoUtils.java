@@ -82,5 +82,4 @@ public class BrevoUtils {
 
         return options;
     }
-
 }
