@@ -67,15 +67,19 @@ public class GoogleCalendarUtils {
     }
 
     public static Temporal convertToTemporalFromEventDateTime(EventDateTime eventDateTime) {
-        DateTime dateTime = eventDateTime.getDateTime();
+        if (eventDateTime != null) {
+            DateTime dateTime = eventDateTime.getDateTime();
 
-        if (dateTime != null) {
-            return LocalDateTime.ofInstant(Instant.parse(dateTime.toString()), ZoneId.systemDefault());
+            if (dateTime != null) {
+                return LocalDateTime.ofInstant(Instant.parse(dateTime.toString()), ZoneId.systemDefault());
+            }
+
+            DateTime allDayDate = eventDateTime.getDate();
+
+            return LocalDate.parse(allDayDate.toString(), DateTimeFormatter.ISO_LOCAL_DATE);
+        } else {
+            return null;
         }
-
-        DateTime allDayDate = eventDateTime.getDate();
-
-        return LocalDate.parse(allDayDate.toString(), DateTimeFormatter.ISO_LOCAL_DATE);
     }
 
     public static EventDateTime createEventDateTime(Parameters inputParameters, String time) {
