@@ -25,8 +25,8 @@ import static com.bytechef.component.google.meet.constant.GoogleMeetConstants.ME
 import static com.bytechef.component.google.meet.constant.GoogleMeetConstants.NAME;
 
 import com.bytechef.component.definition.Context;
+import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.definition.TypeReference;
 
 /**
  * @author Marija Horvat
@@ -50,8 +50,8 @@ public class GoogleMeetGetMeetingSpaceAction {
     public static Object perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
         return context
             .http(http -> http.get("https://meet.googleapis.com/v2/" + inputParameters.getRequiredString(NAME)))
-            .configuration(responseType(Context.Http.ResponseType.JSON))
+            .configuration(responseType(Http.ResponseType.JSON))
             .execute()
-            .getBody(new TypeReference<>() {});
+            .getBody();
     }
 }

@@ -27,9 +27,9 @@ import static com.bytechef.component.google.meet.constant.GoogleMeetConstants.CO
 import static com.bytechef.component.google.meet.constant.GoogleMeetConstants.NAME;
 
 import com.bytechef.component.definition.Context;
+import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.google.meet.util.GoogleMeetUtils;
 
 /**
@@ -39,8 +39,8 @@ public class GoogleMeetListParticipantsAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("listParticipants")
         .title("List Participants")
-        .description("Lists the participants in a conference record. By default, ordered by join time " +
-            "and in descending order.")
+        .description(
+            "Lists the participants in a conference record. By default, ordered by join time and in descending order.")
         .properties(
             string(CONFERENCE_RECORDS)
                 .label("Conference Records")
@@ -54,16 +54,20 @@ public class GoogleMeetListParticipantsAction {
                         array("participants")
                             .description("List of participants in one page.")
                             .items(
-                                string(NAME)
-                                    .description("Resource name of the participant. " +
-                                        "Format: conferenceRecords/{conferenceRecord}/participants/{participant}"),
-                                object("user")
-                                    .description("User can be of type: signedinUser, anonymousUser, phoneUser"),
-                                string("earliestStartTime")
-                                    .description("Time when the participant first joined the meeting."),
-                                string("latestEndTime")
-                                    .description("Time when the participant left the meeting for the last time. " +
-                                        "This can be null if it's an active meeting.")))))
+                                object()
+                                    .properties(
+                                        string(NAME)
+                                            .description(
+                                                "Resource name of the participant.Format: " +
+                                                    "conferenceRecords/{conferenceRecord}/participants/{participant}"),
+                                        object("user")
+                                            .description("User can be of type: signedinUser, anonymousUser, phoneUser"),
+                                        string("earliestStartTime")
+                                            .description("Time when the participant first joined the meeting."),
+                                        string("latestEndTime")
+                                            .description(
+                                                "Time when the participant left the meeting for the last time. This " +
+                                                    "can be null if it's an active meeting."))))))
         .perform(GoogleMeetListParticipantsAction::perform);
 
     private GoogleMeetListParticipantsAction() {
@@ -71,10 +75,11 @@ public class GoogleMeetListParticipantsAction {
 
     public static Object perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
         return context
-            .http(http -> http.get("https://meet.googleapis.com/v2/" +
-                inputParameters.getRequiredString(CONFERENCE_RECORDS) + "/participants"))
-            .configuration(responseType(Context.Http.ResponseType.JSON))
+            .http(http -> http.get(
+                "https://meet.googleapis.com/v2/%s/participants".formatted(
+                    inputParameters.getRequiredString(CONFERENCE_RECORDS))))
+            .configuration(responseType(Http.ResponseType.JSON))
             .execute()
-            .getBody(new TypeReference<>() {});
+            .getBody();
     }
 }

@@ -20,6 +20,7 @@ import static com.bytechef.component.definition.ComponentDsl.option;
 import static com.bytechef.component.definition.Context.Http.responseType;
 
 import com.bytechef.component.definition.Context;
+import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
@@ -33,23 +34,27 @@ import java.util.Map;
 public class GoogleMeetUtils {
 
     public static List<Option<String>> getConferenceRecordsOptions(
-        Parameters inputParameters, Parameters connectionParameters, Map<String, String> stringStringMap, String s,
-        Context context) {
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
+        String searchText, Context context) {
 
-        Map<?, ?> map =
-            context.http(http -> http.get("https://meet.googleapis.com/v2/conferenceRecords"))
-                .configuration(responseType(Context.Http.ResponseType.JSON))
-                .execute()
-                .getBody(new TypeReference<>() {});
+        Map<String, ?> body = context
+            .http(http -> http.get("https://meet.googleapis.com/v2/conferenceRecords"))
+            .configuration(responseType(Http.ResponseType.JSON))
+            .execute()
+            .getBody(new TypeReference<>() {});
 
         List<Option<String>> options = new ArrayList<>();
 
-        List<Map<String, String>> items = (List<Map<String, String>>) map.get("conferenceRecords");
+        if (body.get("conferenceRecords") instanceof List<?> list) {
+            for (Object object : list) {
+                if (object instanceof Map<?, ?> map) {
+                    String name = (String) map.get("name");
 
-        for (Map<String, String> item : items) {
-            String name = item.get("name");
-            options.add(option(name.substring("conferenceRecords/".length()), name));
+                    options.add(option(name.substring("conferenceRecords/".length()), name));
+                }
+            }
         }
+
         return options;
     }
 }
