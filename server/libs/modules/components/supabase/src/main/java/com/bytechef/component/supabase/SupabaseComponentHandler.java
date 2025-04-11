@@ -26,14 +26,17 @@ import com.bytechef.component.supabase.action.SupabaseUploadFileAction;
 import com.bytechef.component.supabase.connection.SupabaseConnection;
 import com.google.auto.service.AutoService;
 
+/**
+ * @author Nikolina Spehar
+ */
 @AutoService(ComponentHandler.class)
 public class SupabaseComponentHandler implements ComponentHandler {
 
     private static final ComponentDefinition COMPONENT_DEFINITION = component("supabase")
         .title("Supabase")
-        .description("Supabase is an open source Firebase alternative. Start your project with " +
-            "a Postgres database, Authentication, instant APIs, Edge Functions," +
-            " Realtime subscriptions, Storage, and Vector embeddings.")
+        .description(
+            "Supabase is an open source Firebase alternative. Start your project with a Postgres database, " +
+                "Authentication, instant APIs, Edge Functions, Realtime subscriptions, Storage, and Vector embeddings.")
         .icon("path:assets/supabase.svg")
         .categories(ComponentCategory.DEVELOPER_TOOLS)
         .connection(SupabaseConnection.CONNECTION_DEFINITION)

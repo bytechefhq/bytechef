@@ -42,10 +42,7 @@ class SupabaseUtilsTest {
     private final Executor mockedExecutor = mock(Executor.class);
     private final Parameters mockedParameters = MockParametersFactory.create(Map.of());
     private final Response mockedResponse = mock(Response.class);
-    private final Object[] mockedArray = {
-        Map.of("name", "test1"),
-        Map.of("name", "test2")
-    };
+    private final List<Map<String, Object>> buckets = List.of(Map.of("name", "test1"), Map.of("name", "test2"));
 
     @Test
     void getBucketNameOptions() {
@@ -56,7 +53,7 @@ class SupabaseUtilsTest {
         when(mockedExecutor.execute())
             .thenReturn(mockedResponse);
         when(mockedResponse.getBody(any(TypeReference.class)))
-            .thenReturn(mockedArray);
+            .thenReturn(buckets);
 
         List<Option<String>> result = SupabaseUtils.getBucketNameOptions(
             mockedParameters, mockedParameters, Map.of(), "", mockedContext);
