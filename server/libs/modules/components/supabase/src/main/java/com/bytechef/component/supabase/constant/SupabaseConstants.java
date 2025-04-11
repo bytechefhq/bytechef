@@ -16,6 +16,9 @@
 
 package com.bytechef.component.supabase.constant;
 
+/**
+ * @author Nikolina Spehar
+ */
 public class SupabaseConstants {
 
     public static final String BUCKET_NAME = "bucketName";

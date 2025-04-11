@@ -35,6 +35,9 @@ import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 
+/**
+ * @author Nikolina Spehar
+ */
 class SupabaseUploadFileActionTest {
 
     private final ArgumentCaptor<Body> bodyArgumentCaptor = ArgumentCaptor.forClass(Body.class);
@@ -68,7 +71,7 @@ class SupabaseUploadFileActionTest {
         Map<String, Object> result = SupabaseUploadFileAction.perform(
             mockedParameters, mockedParameters, mockedContext);
 
-        assertEquals(Map.of(), result);
+        assertEquals(responseMap, result);
 
         Body body = bodyArgumentCaptor.getValue();
 

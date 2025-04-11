@@ -34,19 +34,20 @@ import java.util.Map;
 public class SupabaseUtils {
 
     public static List<Option<String>> getBucketNameOptions(
-        Parameters parameters, Parameters parameters1, Map<String, String> stringStringMap, String s, Context context) {
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
+        String searchText, Context context) {
 
-        Object[] buckets = context.http(http -> http.get("/storage/v1/bucket/"))
+        List<Map<String, Object>> buckets = context.http(http -> http.get("/storage/v1/bucket/"))
             .configuration(responseType(ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});
 
         List<Option<String>> bucketOptions = new ArrayList<>();
 
-        for (Object bucket : buckets) {
-            if (bucket instanceof Map<?, ?> bucketMap) {
-                bucketOptions.add(option((String) bucketMap.get("name"), (String) bucketMap.get("name")));
-            }
+        for (Map<String, Object> bucket : buckets) {
+            String name = (String) bucket.get("name");
+
+            bucketOptions.add(option(name, name));
         }
 
         return bucketOptions;

@@ -25,6 +25,9 @@ import static com.bytechef.component.supabase.constant.SupabaseConstants.PROJECT
 import com.bytechef.component.definition.Authorization.AuthorizationType;
 import com.bytechef.component.definition.ComponentDsl.ModifiableConnectionDefinition;
 
+/**
+ * @author Nikolina Spehar
+ */
 public class SupabaseConnection {
 
     public static final ModifiableConnectionDefinition CONNECTION_DEFINITION = connection()
@@ -34,11 +37,13 @@ public class SupabaseConnection {
                 .properties(
                     string(PROJECT_URL)
                         .label("Project URL")
-                        .description("Can be found in Project Settings -> Data API."),
+                        .description("Can be found in Project Settings -> Data API.")
+                        .required(true),
                     string(TOKEN)
                         .label("Project API Key")
                         .description(
-                            "Can be found in Project Settings -> Data API. Choose service_role/secret API key.")));
+                            "Can be found in Project Settings -> Data API. Choose service_role/secret API key.")
+                        .required(true)));
 
     private SupabaseConnection() {
     }

@@ -36,6 +36,9 @@ import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.supabase.util.SupabaseUtils;
 import java.util.Map;
 
+/**
+ * @author Nikolina Spehar
+ */
 public class SupabaseUploadFileAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("uploadFile")
@@ -70,8 +73,9 @@ public class SupabaseUploadFileAction {
     public static Map<String, Object> perform(
         Parameters inputParameters, Parameters connectionParameters, Context context) {
 
-        return context.http(http -> http.post("/storage/v1/object/%s/%s".formatted(
-            inputParameters.getRequiredString(BUCKET_NAME), inputParameters.getRequiredString(FILE_NAME))))
+        return context.http(http -> http.post(
+            "/storage/v1/object/%s/%s".formatted(
+                inputParameters.getRequiredString(BUCKET_NAME), inputParameters.getRequiredString(FILE_NAME))))
             .body(
                 Body.of(
                     inputParameters.getRequiredFileEntry(FILE)))

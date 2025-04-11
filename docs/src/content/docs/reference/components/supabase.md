@@ -26,8 +26,8 @@ Version: 1
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| projectUrl | Project URL | STRING | Can be found in Project Settings -> Data API. | null |
-| token | Project API Key | STRING | Can be found in Project Settings -> Data API. Choose service_role/secret API key. | null |
+| projectUrl | Project URL | STRING | Can be found in Project Settings -> Data API. | true |
+| token | Project API Key | STRING | Can be found in Project Settings -> Data API. Choose service_role/secret API key. | true |
 
 
 
