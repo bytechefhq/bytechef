@@ -26,7 +26,6 @@ import static org.mockito.Mockito.when;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.test.definition.MockParametersFactory;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
@@ -56,10 +55,15 @@ class GoogleMeetCreateMeetingSpaceActionTest {
             .thenReturn(mockedExecutor);
         when(mockedExecutor.execute())
             .thenReturn(mockedResponse);
-        when(mockedResponse.getBody(any(TypeReference.class)))
+        when(mockedResponse.getBody())
             .thenReturn(responseMap);
+
         Object result = GoogleMeetCreateMeetingSpaceAction.perform(mockedParameters, mockedParameters, mockedContext);
 
         assertEquals(responseMap, result);
+
+        Http.Body body = bodyArgumentCaptor.getValue();
+
+        assertEquals(Map.of("config", Map.of(ACCESS_TYPE, "TRUSTED")), body.getContent());
     }
 }

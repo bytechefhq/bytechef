@@ -186,7 +186,7 @@ Type: OBJECT
 
 |     Name     |     Type     |     Description     |
 |:------------:|:------------:|:-------------------:|
-| participants | ARRAY <details> <summary> Items </summary> [STRING\($name), {}\($user), STRING\($earliestStartTime), STRING\($latestEndTime)] </details> | List of participants in one page. |
+| participants | ARRAY <details> <summary> Items </summary> [{STRING\(name), {}\(user), STRING\(earliestStartTime), STRING\(latestEndTime)}] </details> | List of participants in one page. |
 
 
 
@@ -194,7 +194,12 @@ Type: OBJECT
 #### Output Example
 ```json
 {
-  "participants" : [ "", { }, "", "" ]
+  "participants" : [ {
+    "name" : "",
+    "user" : { },
+    "earliestStartTime" : "",
+    "latestEndTime" : ""
+  } ]
 }
 ```
 

@@ -28,7 +28,6 @@ import static com.bytechef.component.google.meet.constant.GoogleMeetConstants.ME
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.definition.TypeReference;
 import java.util.Map;
 
 /**
@@ -50,8 +49,8 @@ public class GoogleMeetCreateMeetingSpaceAction {
                     option("Open", "OPEN",
                         "Anyone with the join information can join without knocking."),
                     option("Trusted", "TRUSTED",
-                        "Members of the host's organization, invited external users, " +
-                            "and dial-in users can join without knocking. Everyone else must knock."),
+                        "Members of the host's organization, invited external users, and dial-in users can join " +
+                            "without knocking. Everyone else must knock."),
                     option("Restricted", "RESTRICTED",
                         "Only invitees can join without knocking. Everyone else must knock."))
                 .required(false))
@@ -64,10 +63,9 @@ public class GoogleMeetCreateMeetingSpaceAction {
     public static Object perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
         return context
             .http(http -> http.post("https://meet.googleapis.com/v2/spaces"))
-            .body(Http.Body.of(
-                "config", Map.of(ACCESS_TYPE, inputParameters.getString(ACCESS_TYPE))))
+            .body(Http.Body.of("config", Map.of(ACCESS_TYPE, inputParameters.getString(ACCESS_TYPE))))
             .configuration(responseType(Http.ResponseType.JSON))
             .execute()
-            .getBody(new TypeReference<>() {});
+            .getBody();
     }
 }

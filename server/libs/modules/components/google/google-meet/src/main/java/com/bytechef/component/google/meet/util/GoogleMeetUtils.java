@@ -36,7 +36,7 @@ public class GoogleMeetUtils {
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> stringStringMap, String s,
         Context context) {
 
-        Map<?, ?> map =
+        Map<String, ?> body =
             context.http(http -> http.get("https://meet.googleapis.com/v2/conferenceRecords"))
                 .configuration(responseType(Context.Http.ResponseType.JSON))
                 .execute()
@@ -44,12 +44,16 @@ public class GoogleMeetUtils {
 
         List<Option<String>> options = new ArrayList<>();
 
-        List<Map<String, String>> items = (List<Map<String, String>>) map.get("conferenceRecords");
+        if (body.get("conferenceRecords") instanceof List<?> list) {
+            for (Object object : list) {
+                if (object instanceof Map<?, ?> map) {
+                    String name = (String) map.get("name");
 
-        for (Map<String, String> item : items) {
-            String name = item.get("name");
-            options.add(option(name.substring("conferenceRecords/".length()), name));
+                    options.add(option(name.substring("conferenceRecords/".length()), name));
+                }
+            }
         }
+
         return options;
     }
 }
