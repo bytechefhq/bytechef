@@ -1,0 +1,208 @@
+---
+title: "Google Meet"
+description: "Google Meet is a communication service designed to help you have interactions with your friends, family, colleagues and classmates."
+---
+
+Google Meet is a communication service designed to help you have interactions with your friends, family, colleagues and classmates.
+
+
+Categories: Communication
+
+
+Type: googleMeet/v1
+
+<hr />
+
+
+
+## Connections
+
+Version: 1
+
+
+### OAuth2 Authorization Code
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| clientId | Client Id | STRING |  | true |
+| clientSecret | Client Secret | STRING |  | true |
+
+
+
+
+
+<hr />
+
+
+
+## Actions
+
+
+### Create Meeting Space
+Name: createMeetingSpace
+
+Creates a meeting space.
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| accessType | Access Type | STRING <details> <summary> Options </summary> ACCESS_TYPE_UNSPECIFIED, OPEN, TRUSTED, RESTRICTED </details> | Access type of the meeting space that determines who can join without knocking. | false |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Create Meeting Space",
+  "name" : "createMeetingSpace",
+  "parameters" : {
+    "accessType" : ""
+  },
+  "type" : "googleMeet/v1/createMeetingSpace"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| name | STRING | The name of the meeting space. |
+| meetingUri | STRING | URI used to join meetings. |
+| meetingCode | STRING | Type friendly unique string used to join the meeting. |
+| config | OBJECT <details> <summary> Properties </summary> {STRING\(accessType), STRING\(entryPointAccess)} </details> |  |
+
+
+
+
+#### Output Example
+```json
+{
+  "name" : "",
+  "meetingUri" : "",
+  "meetingCode" : "",
+  "config" : {
+    "accessType" : "",
+    "entryPointAccess" : ""
+  }
+}
+```
+
+
+### Get Meeting Space
+Name: getMeetingSpace
+
+Gets details about a meeting space.
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| name | Name | STRING | The name of the meeting space or meeting code in format spaces/{meetingCode}. | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Get Meeting Space",
+  "name" : "getMeetingSpace",
+  "parameters" : {
+    "name" : ""
+  },
+  "type" : "googleMeet/v1/getMeetingSpace"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| name | STRING | The name of the meeting space. |
+| meetingUri | STRING | URI used to join meetings. |
+| meetingCode | STRING | Type friendly unique string used to join the meeting. |
+| config | OBJECT <details> <summary> Properties </summary> {STRING\(accessType), STRING\(entryPointAccess)} </details> |  |
+
+
+
+
+#### Output Example
+```json
+{
+  "name" : "",
+  "meetingUri" : "",
+  "meetingCode" : "",
+  "config" : {
+    "accessType" : "",
+    "entryPointAccess" : ""
+  }
+}
+```
+
+
+### List Participants
+Name: listParticipants
+
+Lists the participants in a conference record. By default, ordered by join time and in descending order.
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| conferenceRecords | Conference Records | STRING | Conference Records | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "List Participants",
+  "name" : "listParticipants",
+  "parameters" : {
+    "conferenceRecords" : ""
+  },
+  "type" : "googleMeet/v1/listParticipants"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| participants | ARRAY <details> <summary> Items </summary> [{STRING\(name), {}\(user), STRING\(earliestStartTime), STRING\(latestEndTime)}] </details> | List of participants in one page. |
+
+
+
+
+#### Output Example
+```json
+{
+  "participants" : [ {
+    "name" : "",
+    "user" : { },
+    "earliestStartTime" : "",
+    "latestEndTime" : ""
+  } ]
+}
+```
+
+
+
+
