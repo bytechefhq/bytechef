@@ -24,12 +24,11 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.component.definition.Context;
+import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.test.definition.MockParametersFactory;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
-import org.mockito.ArgumentCaptor;
 
 /**
  * @author Marija Horvat
@@ -37,27 +36,24 @@ import org.mockito.ArgumentCaptor;
 class GoogleMeetGetMeetingSpaceActionTest {
 
     private final Context mockedContext = mock(Context.class);
-    private final Context.Http.Executor mockedExecutor = mock(Context.Http.Executor.class);
+    private final Http.Executor mockedExecutor = mock(Http.Executor.class);
     private final Parameters mockedParameters = MockParametersFactory.create(Map.of(NAME, "test"));
-    private final Context.Http.Response mockedResponse = mock(Context.Http.Response.class);
+    private final Http.Response mockedResponse = mock(Http.Response.class);
     private final Map<String, Object> responseMap = Map.of(
         NAME, "test", "meetingUri", "https://meet.google.com/test",
         "meetingCode", "test", ACCESS_TYPE, "TRUSTED", "entryPointAccess", "ALL");
-    private final ArgumentCaptor<Context.Http.Body> bodyArgumentCaptor =
-        ArgumentCaptor.forClass(Context.Http.Body.class);
 
     @Test
     void testPerform() {
         when(mockedContext.http(any()))
             .thenReturn(mockedExecutor);
-        when(mockedExecutor.body(bodyArgumentCaptor.capture()))
-            .thenReturn(mockedExecutor);
         when(mockedExecutor.configuration(any()))
             .thenReturn(mockedExecutor);
         when(mockedExecutor.execute())
             .thenReturn(mockedResponse);
-        when(mockedResponse.getBody(any(TypeReference.class)))
+        when(mockedResponse.getBody())
             .thenReturn(responseMap);
+
         Object result = GoogleMeetGetMeetingSpaceAction.perform(mockedParameters, mockedParameters, mockedContext);
 
         assertEquals(responseMap, result);

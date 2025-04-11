@@ -16,11 +16,9 @@
 
 package com.bytechef.component.google.meet.constant;
 
-import static com.bytechef.component.definition.ComponentDsl.array;
 import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.string;
 
-import com.bytechef.component.definition.ComponentDsl.ModifiableArrayProperty;
 import com.bytechef.component.definition.ComponentDsl.ModifiableObjectProperty;
 
 /**
@@ -28,9 +26,9 @@ import com.bytechef.component.definition.ComponentDsl.ModifiableObjectProperty;
  */
 public class GoogleMeetConstants {
 
-    public static final String NAME = "name";
     public static final String ACCESS_TYPE = "accessType";
     public static final String CONFERENCE_RECORDS = "conferenceRecords";
+    public static final String NAME = "name";
 
     public static final ModifiableObjectProperty MEETING_SPACE_OUTPUT_PROPERTY =
         object()
@@ -44,22 +42,12 @@ public class GoogleMeetConstants {
                 object("config")
                     .properties(
                         string(ACCESS_TYPE)
-                            .description("Access type of the meeting space that determines who " +
-                                "can join without knocking."),
+                            .description(
+                                "Access type of the meeting space that determines who can join without knocking."),
                         string("entryPointAccess")
-                            .description("Defines the entry points that can be used to join meetings " +
-                                "hosted in this meeting space. Default: EntryPointAccess.ALL")));
-
-    public static final ModifiableArrayProperty PARTICIPANT_OUTPUT_PROPERTY =
-        array()
-            .items(
-                string(NAME)
-                    .description("Resource name of the participant."),
-                string("earliestStartTime")
-                    .description("Time when the participant first joined the meeting."),
-                string("latestEndTime")
-                    .description("Time when the participant left the meeting for the last time. " +
-                        "This can be null if it's an active meeting."));
+                            .description(
+                                "Defines the entry points that can be used to join meetings hosted in this meeting " +
+                                    "space. Default: EntryPointAccess.ALL")));
 
     private GoogleMeetConstants() {
     }
