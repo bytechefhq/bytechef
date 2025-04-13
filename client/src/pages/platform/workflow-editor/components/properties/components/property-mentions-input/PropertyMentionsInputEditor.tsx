@@ -89,15 +89,7 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
                         class: 'property-mention',
                     },
                     renderHTML({node, options}) {
-                        let svg = getComponentIcon(node.attrs.label ?? node.attrs.id);
-
-                        svg =
-                            'data:image/svg+xml;utf8,' +
-                            svg
-                                .replaceAll(/#/g, '%23')
-                                .replaceAll(/"/g, "'")
-                                .replaceAll(/&/g, '&amp;')
-                                .replaceAll(/\n/g, '');
+                        const svg = getComponentIcon(node.attrs.label ?? node.attrs.id);
 
                         return [
                             'span',

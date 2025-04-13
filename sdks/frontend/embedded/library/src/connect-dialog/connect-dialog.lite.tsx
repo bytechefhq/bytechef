@@ -52,7 +52,7 @@ export default function ConnectDialog(props: ConnectDialogProps) {
                 <div css={{
                     width: '24px',
                 }}>
-                    <img src={`data:image/svg+xml;utf8,${integration?.icon}`} alt={integration?.title}/>
+                    <img src={integration?.icon} alt={integration?.title}/>
                 </div>
 
                 <div css={{

@@ -35,7 +35,7 @@ function ConnectDialog(props: ConnectDialogProps) {
           <div className="div-bd60b4a4-3">
             <div className="div-bd60b4a4-4">
               <img
-                src={`data:image/svg+xml;utf8,${integration?.icon}`}
+                src={integration?.icon}
                 alt={integration?.title}
               />
             </div>
