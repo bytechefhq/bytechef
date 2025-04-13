@@ -112,36 +112,19 @@ class HttpClientExecutor {
             headers, queryParameters, configuration, componentName, componentVersion, componentOperationName,
             componentConnection, context)) {
 
-            HttpRequest httpRequest = createHTTPRequest(
+            HttpRequest httpRequest = createHttpRequest(
                 urlString, requestMethod, headers, queryParameters, body, componentName, componentConnection, context);
 
             if (logger.isDebugEnabled()) {
                 logger.debug(
                     "uri: {}, requestMethod: {}, headers: {}, queryParameters: {}, responseType: {}",
-                    httpRequest.uri(), requestMethod, headers, queryParameters, requestMethod);
+                    httpRequest.uri(), requestMethod, headers, queryParameters, configuration.getResponseType());
             }
 
-            httpResponse = httpClient.send(httpRequest, createBodyHandler(configuration));
+            httpResponse = httpClient.send(httpRequest, createResponseBodyHandler(configuration));
         }
 
         return handleResponse(httpResponse, configuration);
-    }
-
-    HttpResponse.BodyHandler<?> createBodyHandler(Configuration configuration) {
-        HttpResponse.BodyHandler<?> bodyHandler;
-        ResponseType responseType = configuration.getResponseType();
-
-        if (responseType == null) {
-            bodyHandler = HttpResponse.BodyHandlers.discarding();
-        } else {
-            if (responseType == Http.ResponseType.BINARY) {
-                bodyHandler = HttpResponse.BodyHandlers.ofInputStream();
-            } else {
-                bodyHandler = HttpResponse.BodyHandlers.ofString();
-            }
-        }
-
-        return bodyHandler;
     }
 
     BodyPublisher createBodyPublisher(Body body) {
@@ -234,7 +217,7 @@ class HttpClientExecutor {
         return builder.build();
     }
 
-    HttpRequest createHTTPRequest(
+    HttpRequest createHttpRequest(
         String urlString, RequestMethod requestMethod, Map<String, List<String>> headers,
         Map<String, List<String>> queryParameters, Body body, String componentName,
         ComponentConnection componentConnection, Context context) {
@@ -285,6 +268,23 @@ class HttpClientExecutor {
             case XML -> new ResponseImpl(httpHeaders.map(), XmlUtils.read(httpResponseBody.toString()), statusCode);
             default -> new ResponseImpl(httpHeaders.map(), httpResponseBody.toString(), statusCode);
         };
+    }
+
+    HttpResponse.BodyHandler<?> createResponseBodyHandler(Configuration configuration) {
+        HttpResponse.BodyHandler<?> bodyHandler;
+        ResponseType responseType = configuration.getResponseType();
+
+        if (responseType == null) {
+            bodyHandler = HttpResponse.BodyHandlers.discarding();
+        } else {
+            if (responseType == Http.ResponseType.BINARY) {
+                bodyHandler = HttpResponse.BodyHandlers.ofInputStream();
+            } else {
+                bodyHandler = HttpResponse.BodyHandlers.ofString();
+            }
+        }
+
+        return bodyHandler;
     }
 
     private void addFileEntry(MultipartBodyPublisher.Builder builder, String name, FileEntry fileEntry) {

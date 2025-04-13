@@ -88,15 +88,14 @@ public class HttpClientExecutorTest {
     }
 
     @Test
-    public void testCreateBodyHandler() {
-        HttpResponse.BodyHandler<?> bodyHandler = httpClientExecutor.createBodyHandler(
-            configuration);
+    public void testCreateResponseBodyHandler() {
+        HttpResponse.BodyHandler<?> bodyHandler = httpClientExecutor.createResponseBodyHandler(configuration);
 
         assertEquals(bodyHandler, HttpResponse.BodyHandlers.discarding());
 
         //
 
-        bodyHandler = httpClientExecutor.createBodyHandler(
+        bodyHandler = httpClientExecutor.createResponseBodyHandler(
             Http.responseType(Http.ResponseType.BINARY)
                 .build());
 
@@ -104,7 +103,7 @@ public class HttpClientExecutorTest {
 
         //
 
-        bodyHandler = httpClientExecutor.createBodyHandler(
+        bodyHandler = httpClientExecutor.createResponseBodyHandler(
             Http.responseType(Http.ResponseType.XML)
                 .build());
 
@@ -407,8 +406,8 @@ public class HttpClientExecutorTest {
     }
 
     @Test
-    public void testCreateHTTPRequest() {
-        HttpRequest httpRequest = httpClientExecutor.createHTTPRequest(
+    public void testCreateHttpRequest() {
+        HttpRequest httpRequest = httpClientExecutor.createHttpRequest(
             "http://localhost:8080", Http.RequestMethod.DELETE, Map.of("header1", List.of("value1")),
             Map.of("param1", List.of("value1")), null, "componentName",
             new ComponentConnection("componentName", 1, -1L, Map.of(), null),
