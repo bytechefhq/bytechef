@@ -46,6 +46,7 @@ class GraphQlClientQueryActionTest {
             created
           }
         }""";
+
     private final ArgumentCaptor<Http.Body> bodyArgumentCaptor = ArgumentCaptor.forClass(Http.Body.class);
     private final ArgumentCaptor<Map<String, List<String>>> mapArgumentCaptor = ArgumentCaptor.forClass(Map.class);
     private final Context mockedContext = mock(Context.class);
