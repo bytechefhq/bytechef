@@ -44,7 +44,7 @@ public class BoxUtils {
     }
 
     public static List<Option<String>> getFileIdOptions(
-        Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
         String searchText, ActionContext context) {
 
         String parentFolder = inputParameters.getRequiredString(ID);
@@ -59,7 +59,7 @@ public class BoxUtils {
     }
 
     public static List<Option<String>> getRootFolderOptions(
-        Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
         String searchText, Context context) {
 
         Map<String, Object> body = context.http(http -> http.get("/folders/0/items"))

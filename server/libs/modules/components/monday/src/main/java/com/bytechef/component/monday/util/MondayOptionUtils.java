@@ -44,7 +44,7 @@ public class MondayOptionUtils {
     }
 
     public static List<Option<String>> getBoardIdOptions(
-        Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
         String searchText, Context context) {
 
         String query = "query{boards(workspace_ids: [%s], order_by: created_at){id name}}"
@@ -66,7 +66,7 @@ public class MondayOptionUtils {
     }
 
     public static List<Option<String>> getBoardItemsOptions(
-        Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
         String searchText, Context context) {
 
         String query = "query{boards(ids: [%s]){items_page{items{id name}}}}"
@@ -100,7 +100,7 @@ public class MondayOptionUtils {
     }
 
     public static List<Option<String>> getGroupIdOptions(
-        Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
         String searchText, Context context) {
 
         String query =
@@ -125,7 +125,7 @@ public class MondayOptionUtils {
     }
 
     public static List<Option<String>> getWorkspaceIdOptions(
-        Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
         String searchText, Context context) {
 
         String query = "query{workspaces{id name}}";

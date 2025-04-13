@@ -69,7 +69,7 @@ public class IntercomUtils {
     }
 
     public static List<Option<String>> getContactIdOptions(
-        Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
         String searchText, ActionContext context) {
 
         Map<String, Object> body = context.http(GET_CONTACTS_CONTEXT_FUNCTION)

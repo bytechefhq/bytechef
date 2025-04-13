@@ -89,7 +89,7 @@ public class GoogleSheetsUtils {
     }
 
     public static List<ValueProperty<?>> createPropertiesToUpdateRow(
-        Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
         ActionContext actionContext) throws Exception {
 
         boolean isFirstRowHeader = inputParameters.getRequiredBoolean(IS_THE_FIRST_ROW_HEADER);
@@ -169,7 +169,7 @@ public class GoogleSheetsUtils {
     }
 
     public static ActionPropertiesFunction createPropertiesForNewRows(boolean insertOneRow) {
-        return (inputParameters, connectionParameters, dependencyPaths, context) -> {
+        return (inputParameters, connectionParameters, lookupDependsOnPaths, context) -> {
 
             boolean isFirstRowHeader = inputParameters.getRequiredBoolean(IS_THE_FIRST_ROW_HEADER);
 
@@ -303,7 +303,7 @@ public class GoogleSheetsUtils {
     }
 
     public static List<Option<String>> getSheetIdOptions(
-        Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
         String searchText, ActionContext context) throws Exception {
 
         List<Option<String>> options = new ArrayList<>();
@@ -324,7 +324,7 @@ public class GoogleSheetsUtils {
     }
 
     public static List<Option<String>> getSheetNameOptions(
-        Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
         String searchText, Context context) throws Exception {
 
         List<Option<String>> options = new ArrayList<>();

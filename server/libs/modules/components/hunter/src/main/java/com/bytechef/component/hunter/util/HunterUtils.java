@@ -36,7 +36,7 @@ public class HunterUtils extends AbstractHunterUtils {
     }
 
     public static List<Option<Long>> getLeadListIdOptions(
-        Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
         String searchText, Context context) {
 
         Map<String, Map<String, Object>> body = context

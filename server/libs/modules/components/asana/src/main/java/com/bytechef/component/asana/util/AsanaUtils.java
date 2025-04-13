@@ -37,7 +37,7 @@ public class AsanaUtils extends AbstractAsanaUtils {
     }
 
     public static List<Option<String>> getAssigneeOptions(
-        Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
         String searchText, Context context) {
 
         Map<String, List<Map<String, String>>> body = context
@@ -50,7 +50,7 @@ public class AsanaUtils extends AbstractAsanaUtils {
     }
 
     public static List<Option<String>> getProjectOptions(
-        Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
         String searchText, Context context) {
 
         Map<String, List<Map<String, String>>> body = context
@@ -63,7 +63,7 @@ public class AsanaUtils extends AbstractAsanaUtils {
     }
 
     public static List<Option<String>> getTagsOptions(
-        Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
         String searchText, Context context) {
 
         Map<String, List<Map<String, String>>> body = context.http(http -> http.get("/tags"))
@@ -75,7 +75,7 @@ public class AsanaUtils extends AbstractAsanaUtils {
     }
 
     public static List<Option<String>> getTeamOptions(
-        Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
         String searchText, Context context) {
 
         Map<String, List<Map<String, String>>> body = context
@@ -90,7 +90,7 @@ public class AsanaUtils extends AbstractAsanaUtils {
     }
 
     public static List<Option<String>> getWorkspaceOptions(
-        Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
         String searchText, Context context) {
 
         Map<String, List<Map<String, String>>> body = context.http(http -> http.get("/workspaces"))

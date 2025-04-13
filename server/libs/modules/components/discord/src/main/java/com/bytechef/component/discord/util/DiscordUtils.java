@@ -39,7 +39,7 @@ public class DiscordUtils extends AbstractDiscordUtils {
     }
 
     public static List<Option<String>> getChannelIdOptions(
-        Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
         String searchText, Context context) {
 
         List<Map<String, Object>> body = context.http(http -> http
@@ -60,7 +60,7 @@ public class DiscordUtils extends AbstractDiscordUtils {
     }
 
     public static List<Option<String>> getGuildIdOptions(
-        Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
         String searchText, Context context) {
 
         List<Map<String, Object>> body = context.http(http -> http.get("/users/@me/guilds"))
@@ -72,7 +72,7 @@ public class DiscordUtils extends AbstractDiscordUtils {
     }
 
     public static List<Option<String>> getGuildMemberIdOptions(
-        Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
         String searchText, ActionContext context) {
 
         List<Map<String, ?>> body = context.http(http -> http

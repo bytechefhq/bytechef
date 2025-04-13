@@ -36,7 +36,7 @@ public class TeamworkUtils extends AbstractTeamworkUtils {
     }
 
     public static List<Option<Long>> getTasklistIdOptions(
-        Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
         String searchText, Context context) {
 
         Map<String, ?> body = context.http(http -> http.get("/tasklists"))

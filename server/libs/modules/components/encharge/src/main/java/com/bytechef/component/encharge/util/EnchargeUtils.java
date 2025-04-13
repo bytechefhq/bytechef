@@ -41,7 +41,7 @@ public class EnchargeUtils {
         http -> http.get("/people/all");
 
     public static List<Option<String>> getUserEmailOptions(
-        Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
         String searchText, ActionContext context) {
 
         Map<String, ?> body = context.http(GET_PEOPLE_CONTEXT_FUNCTION)

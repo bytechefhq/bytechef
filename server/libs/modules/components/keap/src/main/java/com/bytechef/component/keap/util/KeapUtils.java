@@ -36,7 +36,7 @@ public class KeapUtils {
     }
 
     public static List<Option<Long>> getCompanyIdOptions(
-        Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
         String searchText, ActionContext context) {
 
         Map<String, ?> body = context

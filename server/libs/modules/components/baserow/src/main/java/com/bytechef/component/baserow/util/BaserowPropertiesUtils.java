@@ -50,7 +50,7 @@ public class BaserowPropertiesUtils {
     }
 
     public static List<ValueProperty<?>> createPropertiesForRow(
-        Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
         ActionContext context) {
 
         List<Map<String, ?>> tableFields =

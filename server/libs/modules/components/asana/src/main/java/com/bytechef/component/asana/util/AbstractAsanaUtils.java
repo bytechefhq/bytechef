@@ -30,7 +30,7 @@ import java.util.Map;
 public abstract class AbstractAsanaUtils {
     public static List<Option<String>> getProjectOptions(
         Parameters inputParameters,
-        Parameters connectionParameters, Map<String, String> dependencyPaths, String searchText,
+        Parameters connectionParameters, Map<String, String> lookupDependsOnPaths, String searchText,
         Context context) {
 
         return List.of();
@@ -38,7 +38,7 @@ public abstract class AbstractAsanaUtils {
 
     public static List<Option<String>> getAssigneeOptions(
         Parameters inputParameters,
-        Parameters connectionParameters, Map<String, String> dependencyPaths, String searchText,
+        Parameters connectionParameters, Map<String, String> lookupDependsOnPaths, String searchText,
         Context context) {
 
         return List.of();
@@ -46,7 +46,7 @@ public abstract class AbstractAsanaUtils {
 
     public static List<Option<String>> getTeamOptions(
         Parameters inputParameters,
-        Parameters connectionParameters, Map<String, String> dependencyPaths, String searchText,
+        Parameters connectionParameters, Map<String, String> lookupDependsOnPaths, String searchText,
         Context context) {
 
         return List.of();
@@ -54,7 +54,7 @@ public abstract class AbstractAsanaUtils {
 
     public static List<Option<String>> getTagsOptions(
         Parameters inputParameters,
-        Parameters connectionParameters, Map<String, String> dependencyPaths, String searchText,
+        Parameters connectionParameters, Map<String, String> lookupDependsOnPaths, String searchText,
         Context context) {
 
         return List.of();
@@ -62,7 +62,7 @@ public abstract class AbstractAsanaUtils {
 
     public static List<Option<String>> getWorkspaceOptions(
         Parameters inputParameters,
-        Parameters connectionParameters, Map<String, String> dependencyPaths, String searchText,
+        Parameters connectionParameters, Map<String, String> lookupDependsOnPaths, String searchText,
         Context context) {
 
         return List.of();

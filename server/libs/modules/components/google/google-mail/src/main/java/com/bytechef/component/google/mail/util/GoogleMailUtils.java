@@ -287,7 +287,7 @@ public class GoogleMailUtils {
     }
 
     public static List<Option<String>> getLabelOptions(
-        Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
         String searchText, ActionContext context)
         throws IOException {
 
@@ -319,7 +319,7 @@ public class GoogleMailUtils {
     }
 
     public static List<Option<String>> getMessageIdOptions(
-        Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
         String searchText, ActionContext context)
         throws IOException {
 
@@ -477,7 +477,7 @@ public class GoogleMailUtils {
     }
 
     public static List<Option<String>> getThreadIdOptions(
-        Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
         String searchText, ActionContext context) throws IOException {
 
         List<Thread> threads = GoogleServices.getMail(connectionParameters)

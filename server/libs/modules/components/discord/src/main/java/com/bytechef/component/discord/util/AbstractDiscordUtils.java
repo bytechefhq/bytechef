@@ -30,7 +30,7 @@ import java.util.Map;
 public abstract class AbstractDiscordUtils {
     public static List<Option<String>> getGuildIdOptions(
         Parameters inputParameters,
-        Parameters connectionParameters, Map<String, String> dependencyPaths, String searchText,
+        Parameters connectionParameters, Map<String, String> lookupDependsOnPaths, String searchText,
         Context context) {
 
         return List.of();
@@ -38,7 +38,7 @@ public abstract class AbstractDiscordUtils {
 
     public static List<Option<String>> getChannelIdOptions(
         Parameters inputParameters,
-        Parameters connectionParameters, Map<String, String> dependencyPaths, String searchText,
+        Parameters connectionParameters, Map<String, String> lookupDependsOnPaths, String searchText,
         Context context) {
 
         return List.of();

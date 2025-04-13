@@ -47,7 +47,7 @@ public class ReckonUtils extends AbstractReckonUtils {
     }
 
     public static List<Option<String>> getBookIdOptions(
-        Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
         String searchText, Context context) {
 
         Map<String, List<Map<String, Object>>> body = context
@@ -61,7 +61,7 @@ public class ReckonUtils extends AbstractReckonUtils {
     }
 
     public static List<Option<String>> getCustomerOptions(
-        Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
         String searchText, Context context) {
 
         Map<String, List<Map<String, Object>>> body = context
@@ -75,7 +75,7 @@ public class ReckonUtils extends AbstractReckonUtils {
     }
 
     public static List<Option<String>> getSupplierOptions(
-        Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
         String searchText, Context context) {
 
         Map<String, List<Map<String, Object>>> body = context

@@ -49,7 +49,7 @@ public class HubspotUtils extends AbstractHubspotUtils {
     }
 
     public static List<Option<String>> getContactIdOptions(
-        Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
         String searchText, Context context) {
 
         Map<String, Object> response = context
@@ -76,7 +76,7 @@ public class HubspotUtils extends AbstractHubspotUtils {
     }
 
     public static List<Option<String>> getDealstageOptions(
-        Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
         String searchText, Context context) {
 
         Map<String, ?> itemMap = inputParameters.getMap("__item");
@@ -97,7 +97,7 @@ public class HubspotUtils extends AbstractHubspotUtils {
     }
 
     public static List<Option<String>> getHubspotOwnerIdOptions(
-        Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
         String searchText, Context context) {
 
         Map<String, Object> body =
@@ -111,7 +111,7 @@ public class HubspotUtils extends AbstractHubspotUtils {
     }
 
     public static List<Option<String>> getPipelineOptions(
-        Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
         String searchText, Context context) {
 
         Map<String, Object> body =

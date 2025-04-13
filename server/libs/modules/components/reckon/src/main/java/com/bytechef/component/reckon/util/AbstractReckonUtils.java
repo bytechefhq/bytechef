@@ -30,7 +30,7 @@ import java.util.Map;
 public abstract class AbstractReckonUtils {
     public static List<Option<String>> getBookIdOptions(
         Parameters inputParameters,
-        Parameters connectionParameters, Map<String, String> dependencyPaths, String searchText,
+        Parameters connectionParameters, Map<String, String> lookupDependsOnPaths, String searchText,
         Context context) {
 
         return List.of();
@@ -38,7 +38,7 @@ public abstract class AbstractReckonUtils {
 
     public static List<Option<String>> getCustomerOptions(
         Parameters inputParameters,
-        Parameters connectionParameters, Map<String, String> dependencyPaths, String searchText,
+        Parameters connectionParameters, Map<String, String> lookupDependsOnPaths, String searchText,
         Context context) {
 
         return List.of();
@@ -46,7 +46,7 @@ public abstract class AbstractReckonUtils {
 
     public static List<Option<String>> getSupplierOptions(
         Parameters inputParameters,
-        Parameters connectionParameters, Map<String, String> dependencyPaths, String searchText,
+        Parameters connectionParameters, Map<String, String> lookupDependsOnPaths, String searchText,
         Context context) {
 
         return List.of();

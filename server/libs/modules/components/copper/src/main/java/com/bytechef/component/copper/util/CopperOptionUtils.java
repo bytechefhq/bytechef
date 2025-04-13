@@ -54,7 +54,7 @@ public class CopperOptionUtils {
 
     @SuppressWarnings("unchecked")
     public static List<Option<String>> getActivityTypeOptions(
-        Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
         String searchText, ActionContext context) {
 
         Map<String, ArrayList<Map<String, Object>>> body = null;
@@ -84,7 +84,7 @@ public class CopperOptionUtils {
     }
 
     public static List<Option<String>> getCompanyIdOptions(
-        Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
         String searchText, ActionContext context) {
 
         List<Map<String, Object>> body = context.http(http -> http.post("/companies/search"))
@@ -96,7 +96,7 @@ public class CopperOptionUtils {
     }
 
     public static List<Option<String>> getContactTypesOptions(
-        Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
         String searchText, ActionContext context) {
 
         List<Map<String, Object>> body = context.http(http -> http.get("/contact_types"))
@@ -109,7 +109,7 @@ public class CopperOptionUtils {
 
     @SuppressWarnings("unchecked")
     public static List<Option<String>> getParentOptions(
-        Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
         String searchText, ActionContext context) {
 
         String parentType = inputParameters.getRequiredString(TYPE);
@@ -140,7 +140,7 @@ public class CopperOptionUtils {
     }
 
     public static List<Option<String>> getTagsOptions(
-        Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
         String searchText, ActionContext context) {
 
         List<Map<String, Object>> body = context.http(http -> http.get("/tags"))
@@ -160,7 +160,7 @@ public class CopperOptionUtils {
     }
 
     public static List<Option<String>> getUserOptions(
-        Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
         String searchText, ActionContext context) {
 
         List<Map<String, Object>> body = context.http(http -> http.post("/users/search"))

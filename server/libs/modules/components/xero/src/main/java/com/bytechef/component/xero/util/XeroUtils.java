@@ -105,7 +105,7 @@ public class XeroUtils {
     }
 
     public static List<Option<String>> getAccountCodeOptions(
-        Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
         String searchText, ActionContext context) {
 
         Map<String, Object> body = context
@@ -128,7 +128,7 @@ public class XeroUtils {
     }
 
     public static List<Option<String>> getBrandingThemeIdOptions(
-        Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
         String searchText, ActionContext context) {
 
         Map<String, Object> body = context
@@ -151,7 +151,7 @@ public class XeroUtils {
     }
 
     public static List<Option<String>> getContactIdOptions(
-        Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
         String searchText, ActionContext context) {
 
         Map<String, Object> body = context
@@ -174,7 +174,7 @@ public class XeroUtils {
     }
 
     public static List<Option<String>> getCurrencyCodeOptions(
-        Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
         String searchText, ActionContext context) {
 
         Map<String, Object> body = context

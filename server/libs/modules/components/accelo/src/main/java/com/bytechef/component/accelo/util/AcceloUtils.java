@@ -41,13 +41,14 @@ public class AcceloUtils extends AbstractAcceloUtils {
     }
 
     public static List<Option<String>> getAgainstIdOptions(
-        Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
         String searchText, ActionContext context) {
 
         String againstType = inputParameters.getRequiredString(AGAINST_TYPE);
 
         if (Objects.equals("company", againstType)) {
-            return getCompanyIdOptions(inputParameters, connectionParameters, dependencyPaths, searchText, context);
+            return getCompanyIdOptions(inputParameters, connectionParameters, lookupDependsOnPaths, searchText,
+                context);
         } else {
             Map<String, ?> body = context
                 .http(http -> http.get(againstType + "s"))
@@ -70,7 +71,7 @@ public class AcceloUtils extends AbstractAcceloUtils {
     }
 
     public static List<Option<String>> getCompanyIdOptions(
-        Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
         String searchText, Context context) {
 
         Map<String, ?> body = context

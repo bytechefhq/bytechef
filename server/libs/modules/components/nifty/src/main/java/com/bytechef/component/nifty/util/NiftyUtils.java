@@ -41,7 +41,7 @@ public class NiftyUtils extends AbstractNiftyUtils {
     }
 
     public static List<Option<String>> getAppIdOptions(
-        Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
         String searchText, TriggerContext triggerContext) {
 
         Map<String, Object> body = triggerContext.http(http -> http.get("/apps"))
@@ -64,7 +64,7 @@ public class NiftyUtils extends AbstractNiftyUtils {
     }
 
     public static List<Option<String>> getTaskGroupIdOptions(
-        Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
         String searchText, Context context) {
 
         Map<String, Object> body = context
@@ -78,7 +78,7 @@ public class NiftyUtils extends AbstractNiftyUtils {
     }
 
     public static List<Option<String>> getProjectIdOptions(
-        Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
         String searchText, Context context) {
 
         Map<String, Object> body = context.http(http -> http.get("/projects"))
@@ -90,7 +90,7 @@ public class NiftyUtils extends AbstractNiftyUtils {
     }
 
     public static List<Option<String>> getTemplateIdOptions(
-        Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
         String searchText, Context context) {
 
         Map<String, Object> body = context.http(http -> http.get("/templates"))
@@ -103,7 +103,7 @@ public class NiftyUtils extends AbstractNiftyUtils {
     }
 
     public static List<Option<String>> getTaskIdOptions(
-        Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
         String searchText, Context context) {
 
         Map<String, Object> body = context.http(http -> http.get("/tasks"))

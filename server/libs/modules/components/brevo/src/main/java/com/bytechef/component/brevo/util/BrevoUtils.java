@@ -38,7 +38,7 @@ public class BrevoUtils {
     }
 
     public static List<Option<String>> getContactsOptions(
-        Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
         String searchText, Context context) {
 
         Map<String, Object> body = context
@@ -63,7 +63,7 @@ public class BrevoUtils {
     }
 
     public static List<Option<String>> getSendersOptions(
-        Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
         String searchText, Context context) {
 
         Map<String, List<Map<String, Object>>> body = context

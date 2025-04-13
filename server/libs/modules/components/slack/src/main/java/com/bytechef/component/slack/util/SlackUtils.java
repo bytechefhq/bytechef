@@ -56,7 +56,7 @@ public class SlackUtils {
     }
 
     public static List<Option<String>> getChannelOptions(
-        Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
         String searchText, ActionContext context) {
 
         Map<String, Object> body = context
@@ -79,7 +79,7 @@ public class SlackUtils {
     }
 
     public static List<Option<String>> getUserOptions(
-        Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
         String searchText, ActionContext context) {
 
         Map<String, Object> body = context

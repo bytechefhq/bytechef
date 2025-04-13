@@ -37,7 +37,7 @@ public class GoogleTasksUtils {
     }
 
     public static List<Option<String>> getListsIdOptions(
-        Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
         String searchText, ActionContext actionContext) {
 
         Map<String, Object> response = actionContext
@@ -50,7 +50,7 @@ public class GoogleTasksUtils {
     }
 
     public static List<Option<String>> getTasksIdOptions(
-        Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
         String searchText, ActionContext actionContext) {
 
         Map<String, Object> response = actionContext

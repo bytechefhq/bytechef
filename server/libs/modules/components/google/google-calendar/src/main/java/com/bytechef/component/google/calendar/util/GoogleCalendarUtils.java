@@ -104,7 +104,7 @@ public class GoogleCalendarUtils {
     }
 
     public static List<Option<String>> getCalendarIdOptions(
-        Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
         String searchText, Context context) throws IOException {
 
         List<CalendarListEntry> calendarListEntries = GoogleServices.getCalendar(connectionParameters)
@@ -220,7 +220,7 @@ public class GoogleCalendarUtils {
     }
 
     public static List<Option<String>> getEventIdOptions(
-        Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
         String searchText, Context context) throws IOException {
 
         Calendar calendar = GoogleServices.getCalendar(connectionParameters);
