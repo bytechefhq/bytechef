@@ -58,7 +58,13 @@ const ApiCollections = () => {
         isLoading: apiCollectionsIsLoading,
     } = useGetApiCollectionsQuery({
         environment:
-            environment === undefined ? undefined : environment === 1 ? Environment.Test : Environment.Production,
+            environment === undefined
+                ? undefined
+                : environment === 1
+                  ? Environment.Development
+                  : environment === 2
+                    ? Environment.Staging
+                    : Environment.Production,
         id: currentWorkspaceId!,
         projectId: searchParams.get('projectId') ? parseInt(searchParams.get('projectId')!) : undefined,
         tagId: searchParams.get('tagId') ? parseInt(searchParams.get('tagId')!) : undefined,

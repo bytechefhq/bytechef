@@ -97,7 +97,13 @@ export const WorkflowExecutions = () => {
 
     const {data: projectDeployments} = useGetWorkspaceProjectDeploymentsQuery({
         environment:
-            filterEnvironment === 0 ? undefined : filterEnvironment === 1 ? Environment.Test : Environment.Production,
+            filterEnvironment === 0
+                ? undefined
+                : filterEnvironment === 1
+                  ? Environment.Development
+                  : filterEnvironment === 2
+                    ? Environment.Development
+                    : Environment.Production,
         id: currentWorkspaceId!,
         includeAllFields: false,
         projectId: filterProjectId,
@@ -111,7 +117,13 @@ export const WorkflowExecutions = () => {
         isLoading: workflowExecutionsIsLoading,
     } = useGetWorkflowExecutionsQuery({
         environment:
-            filterEnvironment === 0 ? undefined : filterEnvironment === 1 ? Environment.Test : Environment.Production,
+            filterEnvironment === 0
+                ? undefined
+                : filterEnvironment === 1
+                  ? Environment.Development
+                  : filterEnvironment === 2
+                    ? Environment.Development
+                    : Environment.Production,
         jobEndDate: filterEndDate,
         jobStartDate: filterStartDate,
         jobStatus: filterStatus,
@@ -345,9 +357,11 @@ export const WorkflowExecutions = () => {
                             <SelectContent>
                                 <SelectItem value="0">All Environments</SelectItem>
 
-                                <SelectItem value="1">Test</SelectItem>
+                                <SelectItem value="1">Development</SelectItem>
 
-                                <SelectItem value="2">Production</SelectItem>
+                                <SelectItem value="2">Staging</SelectItem>
+
+                                <SelectItem value="3">Production</SelectItem>
                             </SelectContent>
                         </Select>
                     </div>

@@ -72,7 +72,7 @@ const IntegrationInstanceConfigurationDialog = ({
         defaultValues: {
             description: integrationInstanceConfiguration?.description || undefined,
             enabled: integrationInstanceConfiguration?.enabled || false,
-            environment: integrationInstanceConfiguration?.environment || Environment.Test,
+            environment: integrationInstanceConfiguration?.environment || Environment.Development,
             integrationId: integrationInstanceConfiguration?.integrationId || undefined,
             integrationInstanceConfigurationWorkflows: [],
             integrationVersion: integrationInstanceConfiguration?.integrationVersion || undefined,
@@ -198,7 +198,7 @@ const IntegrationInstanceConfigurationDialog = ({
 
         setTimeout(() => {
             reset({
-                environment: Environment.Test,
+                environment: Environment.Development,
                 integrationInstanceConfigurationWorkflows: [],
             });
 

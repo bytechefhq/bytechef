@@ -53,7 +53,13 @@ const ProjectDeployments = () => {
         isLoading: projectDeploymentsIsLoading,
     } = useGetWorkspaceProjectDeploymentsQuery({
         environment:
-            environment === undefined ? undefined : environment === 1 ? Environment.Test : Environment.Production,
+            environment === undefined
+                ? undefined
+                : environment === 1
+                  ? Environment.Development
+                  : environment === 2
+                    ? Environment.Staging
+                    : Environment.Production,
         id: currentWorkspaceId!,
         projectId: searchParams.get('projectId') ? parseInt(searchParams.get('projectId')!) : undefined,
         tagId: searchParams.get('tagId') ? parseInt(searchParams.get('tagId')!) : undefined,
@@ -97,8 +103,10 @@ const ProjectDeployments = () => {
                                             environment === undefined
                                                 ? undefined
                                                 : environment === 1
-                                                  ? Environment.Test
-                                                  : Environment.Production,
+                                                  ? Environment.Development
+                                                  : environment === 2
+                                                    ? Environment.Staging
+                                                    : Environment.Production,
                                     } as ProjectDeployment
                                 }
                                 triggerNode={<Button>New Deployment</Button>}
@@ -122,8 +130,9 @@ const ProjectDeployments = () => {
                             <>
                                 {[
                                     {label: 'All Environments'},
-                                    {label: 'Test', value: 1},
-                                    {label: 'Production', value: 2},
+                                    {label: 'Development', value: 1},
+                                    {label: 'Staging', value: 2},
+                                    {label: 'Production', value: 3},
                                 ]?.map((item) => (
                                     <LeftSidebarNavItem
                                         item={{
@@ -224,7 +233,12 @@ const ProjectDeployments = () => {
                             <ProjectDeploymentDialog
                                 projectDeployment={
                                     {
-                                        environment: environment === 1 ? Environment.Test : Environment.Production,
+                                        environment:
+                                            environment === 1
+                                                ? Environment.Development
+                                                : environment === 2
+                                                  ? Environment.Staging
+                                                  : Environment.Production,
                                     } as ProjectDeployment
                                 }
                                 triggerNode={<Button>Create Deployment</Button>}

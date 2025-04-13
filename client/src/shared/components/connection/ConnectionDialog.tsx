@@ -482,7 +482,7 @@ const ConnectionDialog = ({
                                                             <SelectContent>
                                                                 <SelectItem value="DEVELOPMENT">Development</SelectItem>
 
-                                                                <SelectItem value="TEST">Test</SelectItem>
+                                                                <SelectItem value="STAGING">Staging</SelectItem>
 
                                                                 <SelectItem value="PRODUCTION">Production</SelectItem>
                                                             </SelectContent>

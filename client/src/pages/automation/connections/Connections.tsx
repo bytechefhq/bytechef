@@ -65,7 +65,7 @@ export const Connections = () => {
                 : environment === 1
                   ? ConnectionEnvironment.Development
                   : environment === 2
-                    ? ConnectionEnvironment.Test
+                    ? ConnectionEnvironment.Staging
                     : ConnectionEnvironment.Production,
         id: currentWorkspaceId!,
         tagId: searchParams.get('tagId') ? parseInt(searchParams.get('tagId')!) : undefined,
@@ -91,7 +91,7 @@ export const Connections = () => {
                                                 : environment === 1
                                                   ? ConnectionEnvironment.Development
                                                   : environment === 2
-                                                    ? ConnectionEnvironment.Test
+                                                    ? ConnectionEnvironment.Staging
                                                     : ConnectionEnvironment.Production,
                                     } as Connection
                                 }
@@ -121,7 +121,7 @@ export const Connections = () => {
                                 {[
                                     {label: 'All Environments'},
                                     {label: 'Development', value: 1},
-                                    {label: 'Test', value: 2},
+                                    {label: 'Staging', value: 2},
                                     {label: 'Production', value: 3},
                                 ]?.map((item) => (
                                     <LeftSidebarNavItem
@@ -213,7 +213,7 @@ export const Connections = () => {
                                             environment === 1
                                                 ? ConnectionEnvironment.Development
                                                 : environment === 2
-                                                  ? ConnectionEnvironment.Test
+                                                  ? ConnectionEnvironment.Staging
                                                   : ConnectionEnvironment.Production,
                                     } as Connection
                                 }

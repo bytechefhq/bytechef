@@ -39,7 +39,7 @@ const ConnectionsFilterTitle = ({
                         : environment === 1
                           ? 'Development'
                           : environment === 2
-                            ? 'Test'
+                            ? 'Staging'
                             : 'Production'}
                 </span>
             </Badge>

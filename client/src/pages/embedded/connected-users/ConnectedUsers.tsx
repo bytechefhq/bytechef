@@ -136,8 +136,10 @@ const ConnectedUsers = () => {
             : undefined,
         environment: searchParams.get('environment')
             ? +searchParams.get('environment')! === 1
-                ? Environment.Test
-                : Environment.Production
+                ? Environment.Staging
+                : +searchParams.get('environment')! === 2
+                  ? Environment.Development
+                  : Environment.Production
             : undefined,
         integrationId: searchParams.get('integrationId') ? +searchParams.get('integrationId')! : undefined,
         pageNumber: searchParams.get('pageNumber') ? +searchParams.get('pageNumber')! : undefined,
@@ -242,9 +244,11 @@ const ConnectedUsers = () => {
                                             <SelectContent>
                                                 <SelectItem value="0">All Environments</SelectItem>
 
-                                                <SelectItem value="1">Test</SelectItem>
+                                                <SelectItem value="1">Development</SelectItem>
 
-                                                <SelectItem value="2">Production</SelectItem>
+                                                <SelectItem value="2">Staging</SelectItem>
+
+                                                <SelectItem value="3">Production</SelectItem>
                                             </SelectContent>
                                         </Select>
                                     </FormControl>

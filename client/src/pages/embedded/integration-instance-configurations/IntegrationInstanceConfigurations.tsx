@@ -61,7 +61,13 @@ const IntegrationInstanceConfigurations = () => {
         isLoading: integrationInstanceConfigurationsLoading,
     } = useGetIntegrationInstanceConfigurationsQuery({
         environment:
-            environment === undefined ? undefined : environment === 1 ? Environment.Test : Environment.Production,
+            environment === undefined
+                ? undefined
+                : environment === 1
+                  ? Environment.Development
+                  : environment === 2
+                    ? Environment.Staging
+                    : Environment.Production,
         integrationId: searchParams.get('integrationId') ? parseInt(searchParams.get('integrationId')!) : undefined,
         tagId: searchParams.get('tagId') ? parseInt(searchParams.get('tagId')!) : undefined,
     });
@@ -114,8 +120,10 @@ const IntegrationInstanceConfigurations = () => {
                                                 environment === undefined
                                                     ? undefined
                                                     : environment === 1
-                                                      ? Environment.Test
-                                                      : Environment.Production,
+                                                      ? Environment.Development
+                                                      : environment === 2
+                                                        ? Environment.Staging
+                                                        : Environment.Production,
                                         } as IntegrationInstanceConfiguration
                                     }
                                     triggerNode={<Button>New Instance Configuration</Button>}
@@ -140,8 +148,9 @@ const IntegrationInstanceConfigurations = () => {
                             <>
                                 {[
                                     {label: 'All Environments'},
-                                    {label: 'Test', value: 1},
-                                    {label: 'Production', value: 2},
+                                    {label: 'Development', value: 1},
+                                    {label: 'Staging', value: 2},
+                                    {label: 'Production', value: 3},
                                 ]?.map((item) => (
                                     <LeftSidebarNavItem
                                         item={{
@@ -303,7 +312,12 @@ const IntegrationInstanceConfigurations = () => {
                             <IntegrationInstanceConfigurationDialog
                                 integrationInstanceConfiguration={
                                     {
-                                        environment: environment === 1 ? Environment.Test : Environment.Production,
+                                        environment:
+                                            environment === 1
+                                                ? Environment.Development
+                                                : environment === 2
+                                                  ? Environment.Staging
+                                                  : Environment.Production,
                                     } as IntegrationInstanceConfiguration
                                 }
                                 triggerNode={<Button>Create Instance Configuration</Button>}

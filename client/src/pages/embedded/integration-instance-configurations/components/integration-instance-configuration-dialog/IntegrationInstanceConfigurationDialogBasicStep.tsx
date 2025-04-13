@@ -137,7 +137,9 @@ const IntegrationInstanceConfigurationDialogBasicStep = ({
                                     </SelectTrigger>
 
                                     <SelectContent>
-                                        <SelectItem value="TEST">Test</SelectItem>
+                                        <SelectItem value="DEVELOPMENT">Development</SelectItem>
+
+                                        <SelectItem value="STAGING">Staging</SelectItem>
 
                                         <SelectItem value="PRODUCTION">Production</SelectItem>
                                     </SelectContent>

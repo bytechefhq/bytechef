@@ -20,20 +20,22 @@ const ApiPlatformLeftSidebarNav = ({environment, filterData, projects, tags}: Ap
             <LeftSidebarNav
                 body={
                     <>
-                        {[{label: 'All Environments'}, {label: 'Test', value: 1}, {label: 'Production', value: 2}]?.map(
-                            (item) => (
-                                <LeftSidebarNavItem
-                                    item={{
-                                        current:
-                                            environment === item.value && !location.pathname.includes('api-clients'),
-                                        id: item.value,
-                                        name: item.label,
-                                    }}
-                                    key={item.value ?? ''}
-                                    toLink={`../api-collections?environment=${item.value ?? ''}${filterData?.id ? `&${filterData.type === Type.Project ? 'projectId' : 'tagId'}=${filterData.id}` : ''}`}
-                                />
-                            )
-                        )}
+                        {[
+                            {label: 'All Environments'},
+                            {label: 'Development', value: 1},
+                            {label: 'Staging', value: 2},
+                            {label: 'Production', value: 3},
+                        ]?.map((item) => (
+                            <LeftSidebarNavItem
+                                item={{
+                                    current: environment === item.value && !location.pathname.includes('api-clients'),
+                                    id: item.value,
+                                    name: item.label,
+                                }}
+                                key={item.value ?? ''}
+                                toLink={`../api-collections?environment=${item.value ?? ''}${filterData?.id ? `&${filterData.type === Type.Project ? 'projectId' : 'tagId'}=${filterData.id}` : ''}`}
+                            />
+                        ))}
                     </>
                 }
                 title="Environments"

@@ -16,8 +16,10 @@ const ConnectedUsersFilterTitle = ({
                     {!filterData.environment
                         ? 'All Environments'
                         : filterData.environment === 1
-                          ? 'Test'
-                          : 'Production'}
+                          ? 'Development'
+                          : filterData.environment === 2
+                            ? 'Staging'
+                            : 'Production'}
                 </span>
             </Badge>
 

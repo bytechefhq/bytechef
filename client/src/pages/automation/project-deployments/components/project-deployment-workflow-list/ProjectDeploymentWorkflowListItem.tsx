@@ -203,7 +203,7 @@ const ProjectDeploymentWorkflowListItem = ({
                                 disabled={!projectDeploymentWorkflow.enabled}
                                 onClick={() =>
                                     window.open(
-                                        `/chat/${environment === Environment.Production ? '' : 'test/'}` +
+                                        `/chat/${environment === Environment.Production ? '' : environment === Environment.Staging ? 'staging/' : 'development/'}` +
                                             projectDeploymentWorkflow.staticWebhookUrl?.substring(
                                                 projectDeploymentWorkflow.staticWebhookUrl?.lastIndexOf('/webhooks/') +
                                                     10,

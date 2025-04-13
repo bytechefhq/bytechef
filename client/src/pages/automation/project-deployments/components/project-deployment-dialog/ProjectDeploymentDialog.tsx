@@ -65,7 +65,7 @@ const ProjectDeploymentDialog = ({
         defaultValues: {
             description: projectDeployment?.description || undefined,
             enabled: projectDeployment?.enabled || false,
-            environment: projectDeployment?.environment || Environment.Test,
+            environment: projectDeployment?.environment || Environment.Development,
             name: projectDeployment?.name || undefined,
             projectDeploymentWorkflows: [],
             projectId: projectDeployment?.projectId || undefined,
@@ -153,7 +153,7 @@ const ProjectDeploymentDialog = ({
 
         setTimeout(() => {
             reset({
-                environment: Environment.Test,
+                environment: Environment.Development,
                 projectDeploymentWorkflows: [],
             });
 
