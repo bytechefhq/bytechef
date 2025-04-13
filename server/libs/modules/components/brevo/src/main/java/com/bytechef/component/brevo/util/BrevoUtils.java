@@ -41,8 +41,7 @@ public class BrevoUtils {
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
         String searchText, Context context) {
 
-        Map<String, Object> body = context
-            .http(http -> http.get("/contacts"))
+        Map<String, Object> body = context.http(http -> http.get("/contacts"))
             .configuration(responseType(Http.ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});
@@ -66,8 +65,7 @@ public class BrevoUtils {
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
         String searchText, Context context) {
 
-        Map<String, List<Map<String, Object>>> body = context
-            .http(http -> http.get("/senders"))
+        Map<String, List<Map<String, Object>>> body = context.http(http -> http.get("/senders"))
             .configuration(responseType(Http.ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});
