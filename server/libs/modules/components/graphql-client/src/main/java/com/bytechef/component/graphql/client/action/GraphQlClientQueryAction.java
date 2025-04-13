@@ -74,11 +74,11 @@ public class GraphQlClientQueryAction {
     public static Object perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
         Map<String, Object> headers = inputParameters.getMap(HEADERS, Object.class, Map.of());
 
-        Map<String, List<String>> headerMap = headers
-            .entrySet()
+        Map<String, List<String>> headerMap = headers.entrySet()
             .stream()
             .collect(Collectors.toMap(
-                Map.Entry::getKey, entry -> {
+                Map.Entry::getKey,
+                entry -> {
                     Object value = entry.getValue();
 
                     return List.of(value.toString());
