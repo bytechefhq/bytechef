@@ -21,7 +21,7 @@ import jakarta.annotation.Generated;
  */
 
 @JsonTypeName("checkWorkflowNodeTestOutputExists_200_response")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-03-30T21:05:08.054229+02:00[Europe/Zagreb]", comments = "Generator version: 7.12.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-04-03T22:34:21.891782+02:00[Europe/Zagreb]", comments = "Generator version: 7.12.0")
 public class CheckWorkflowNodeTestOutputExists200ResponseModel {
 
   private Boolean exists;

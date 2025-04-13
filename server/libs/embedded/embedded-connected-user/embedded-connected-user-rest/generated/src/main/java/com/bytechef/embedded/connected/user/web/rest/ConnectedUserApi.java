@@ -35,7 +35,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-03-14T15:53:14.170215+01:00[Europe/Zagreb]", comments = "Generator version: 7.12.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-04-03T22:34:19.955847+02:00[Europe/Zagreb]", comments = "Generator version: 7.12.0")
 @Validated
 @Tag(name = "connected-user", description = "The Embedded Connected User Internal API")
 public interface ConnectedUserApi {
@@ -134,7 +134,7 @@ public interface ConnectedUserApi {
         getRequest().ifPresent(request -> {
             for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
                 if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
-                    String exampleString = "{ \"metadata\" : { \"key\" : \"\" }, \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"lastModifiedBy\" : \"lastModifiedBy\", \"externalId\" : \"externalId\", \"integrationInstances\" : [ { \"integrationInstanceConfigurationId\" : 5, \"integrationVersion\" : 5, \"integrationId\" : 1, \"connectionId\" : 2, \"componentName\" : \"componentName\", \"id\" : 6, \"enabled\" : true, \"credentialStatus\" : \"VALID\" }, { \"integrationInstanceConfigurationId\" : 5, \"integrationVersion\" : 5, \"integrationId\" : 1, \"connectionId\" : 2, \"componentName\" : \"componentName\", \"id\" : 6, \"enabled\" : true, \"credentialStatus\" : \"VALID\" } ], \"enabled\" : true, \"__version\" : 7, \"environment\" : \"TEST\", \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"createdBy\" : \"createdBy\", \"name\" : \"name\", \"id\" : 0, \"email\" : \"email\" }";
+                    String exampleString = "{ \"metadata\" : { \"key\" : \"\" }, \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"lastModifiedBy\" : \"lastModifiedBy\", \"externalId\" : \"externalId\", \"integrationInstances\" : [ { \"integrationInstanceConfigurationId\" : 5, \"integrationVersion\" : 5, \"integrationId\" : 1, \"connectionId\" : 2, \"componentName\" : \"componentName\", \"id\" : 6, \"enabled\" : true, \"credentialStatus\" : \"VALID\" }, { \"integrationInstanceConfigurationId\" : 5, \"integrationVersion\" : 5, \"integrationId\" : 1, \"connectionId\" : 2, \"componentName\" : \"componentName\", \"id\" : 6, \"enabled\" : true, \"credentialStatus\" : \"VALID\" } ], \"enabled\" : true, \"__version\" : 7, \"environment\" : \"DEVELOPMENT\", \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"createdBy\" : \"createdBy\", \"name\" : \"name\", \"id\" : 0, \"email\" : \"email\" }";
                     ApiUtil.setExampleResponse(request, "application/json", exampleString);
                     break;
                 }
