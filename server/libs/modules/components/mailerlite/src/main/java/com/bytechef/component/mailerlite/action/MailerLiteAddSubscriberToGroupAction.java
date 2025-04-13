@@ -98,8 +98,8 @@ public class MailerLiteAddSubscriberToGroupAction {
 
     public static Object perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
         return context.http(http -> http.post(
-            "/subscribers/" + inputParameters.getRequiredString(SUBSCRIBER_ID) + "/groups/"
-                + inputParameters.getRequiredString(GROUP_ID)))
+                "/subscribers/" + inputParameters.getRequiredString(SUBSCRIBER_ID) + "/groups/" +
+                    inputParameters.getRequiredString(GROUP_ID)))
             .configuration(responseType(ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});
