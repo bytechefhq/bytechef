@@ -16,12 +16,14 @@
 
 package com.bytechef.platform.ai.config;
 
+import com.bytechef.component.definition.Property.Type;
 import com.bytechef.config.ApplicationProperties;
 import com.bytechef.platform.ai.service.VectorStoreService;
 import com.bytechef.platform.component.domain.ActionDefinition;
 import com.bytechef.platform.component.domain.ComponentDefinition;
 import com.bytechef.platform.component.domain.TriggerDefinition;
 import com.bytechef.platform.component.service.ComponentDefinitionService;
+import com.bytechef.platform.domain.BaseProperty;
 import com.bytechef.platform.domain.OutputResponse;
 import com.bytechef.platform.workflow.task.dispatcher.domain.TaskDispatcherDefinition;
 import com.bytechef.platform.workflow.task.dispatcher.service.TaskDispatcherDefinitionService;
@@ -63,6 +65,7 @@ public class VectorStoreConfiguration {
     private static final Logger LOGGER = LoggerFactory.getLogger(VectorStoreConfiguration.class);
 
     private static final String CATEGORY = "category";
+    private static final int MAX_TOKENS = 1536;
     private static final String NAME = "name";
     private static final String DOCUMENTATION = "documentation";
     private static final String WORKFLOWS = "workflows";
@@ -106,17 +109,182 @@ public class VectorStoreConfiguration {
         }
 
         initializeVectorStoreTable(
-            Paths.get(paths.getDocumentationPath()),
-            Paths.get(paths.getWelcomePath()),
+            Paths.get(paths.getDocumentationPath()), Paths.get(paths.getWelcomePath()),
             Paths.get(paths.getWorkflowsPath()));
     }
 
-    private void initializeVectorStoreTable(
-        Path documentationPath, Path welcomePath, Path workflowsPath) {
+    private static void addToDocuments(
+        List<Map<String, Object>> vectorStores, String name, String json, List<Document> documents, String category) {
 
+        if (!containsFile(vectorStores, name, category)) {
+            String cleanedDocument = preprocessDocument(json);
+
+            if (!cleanedDocument.isEmpty()) {
+                // Split the document into chunks
+                List<String> chunks = splitDocument(cleanedDocument.split("\\s+"));
+
+                for (String chunk : chunks) {
+                    documents.add(new Document(chunk, Map.of(CATEGORY, category, NAME, name)));
+                }
+            }
+        }
+    }
+
+    private String createJsonExample(ActionDefinition actionDefinition) {
+        StringBuilder json = new StringBuilder();
+
+        json.append("{")
+            .append("\n")
+            .append("\"label\": \"")
+            .append(actionDefinition.getTitle())
+            .append("\",")
+            .append("\n")
+            .append("\"name\": \"")
+            .append(actionDefinition.getName())
+            .append("\",")
+            .append("\n")
+            .append("\"type\": \"")
+            .append(actionDefinition.getComponentName())
+            .append("/v")
+            .append(actionDefinition.getComponentVersion())
+            .append("/")
+            .append(actionDefinition.getName())
+            .append("\",\n");
+
+        List<PropertyDecorator> properties = PropertyDecorator.toPropertyDecorators(actionDefinition.getProperties());
+
+        if (!properties.isEmpty()) {
+            json.append("\"parameters\": ")
+                .append(getObjectValue(properties));
+        }
+
+        return json.append("}")
+            .toString();
+    }
+
+    private String createJsonExample(TriggerDefinition triggerDefinition) {
+        StringBuilder json = new StringBuilder();
+
+        json.append("{")
+            .append("\n")
+            .append("\"label\": \"")
+            .append(triggerDefinition.getTitle())
+            .append("\",")
+            .append("\n")
+            .append("\"name\": \"")
+            .append(triggerDefinition.getName())
+            .append("\",")
+            .append("\n")
+            .append("\"type\": \"")
+            .append(triggerDefinition.getComponentName())
+            .append("/v")
+            .append(triggerDefinition.getComponentVersion())
+            .append("/")
+            .append(triggerDefinition.getName())
+            .append("\",\n");
+
+        List<PropertyDecorator> properties = PropertyDecorator.toPropertyDecorators(triggerDefinition.getProperties());
+
+        if (!properties.isEmpty()) {
+            json.append("\"parameters\": ")
+                .append(getObjectValue(properties));
+        }
+        return json.append("}")
+            .toString();
+    }
+
+    private String createJsonExample(TaskDispatcherDefinition taskDispatcherDefinition) {
+        StringBuilder json = new StringBuilder();
+
+        json.append("{")
+            .append("\n")
+            .append("\"label\": \"")
+            .append(taskDispatcherDefinition.getTitle())
+            .append("\",")
+            .append("\n")
+            .append("\"name\": \"")
+            .append(taskDispatcherDefinition.getName())
+            .append("\",")
+            .append("\n")
+            .append("\"type\": \"")
+            .append(taskDispatcherDefinition.getName())
+            .append("/v")
+            .append(taskDispatcherDefinition.getVersion())
+            .append("/")
+            .append("\",\n");
+
+        List<PropertyDecorator> properties = PropertyDecorator.toPropertyDecorators(
+            taskDispatcherDefinition.getProperties());
+
+        if (!properties.isEmpty()) {
+            json.append("\"parameters\": ")
+                .append(getObjectValue(properties));
+        }
+
+        return json.append("}")
+            .toString();
+    }
+
+    private String getArrayValue(List<PropertyDecorator> properties) {
+        StringBuilder parameters = new StringBuilder();
+
+        parameters.append("[\n");
+
+        for (var property : properties) {
+            parameters.append(getSampleValue(property))
+                .append(",\n");
+        }
+
+        if (parameters.length() > 2) {
+            parameters.setLength(parameters.length() - 2);
+        }
+
+        return parameters.append("]")
+            .toString();
+    }
+
+    private String getSampleValue(PropertyDecorator property) {
+        return switch (property.getType()) {
+            case ARRAY -> getArrayValue(property.getItems());
+            case BOOLEAN -> "false";
+            case DATE -> "\"1980-01-01\"";
+            case DATE_TIME -> "\"1980-01-01T00:00:00\"";
+            case DYNAMIC_PROPERTIES -> "{}";
+            case INTEGER -> "1";
+            case NUMBER -> "0.0";
+            case OBJECT -> getObjectValue(property.getObjectProperties());
+            case FILE_ENTRY -> getObjectValue(property.getFileEntryProperties());
+            case TIME -> "\"00:00:00\"";
+            default -> "\"\"";
+        };
+    }
+
+    private String getObjectValue(List<PropertyDecorator> properties) {
+        StringBuilder parameters = new StringBuilder();
+
+        parameters.append("{")
+            .append("\n");
+
+        for (var property : properties) {
+            parameters.append("\"")
+                .append(property.getName())
+                .append("\": ")
+                .append(getSampleValue(property))
+                .append(",\n");
+        }
+
+        if (parameters.length() > 2) {
+            parameters.setLength(parameters.length() - 2);
+        }
+
+        return parameters.append("}")
+            .toString();
+    }
+
+    private void initializeVectorStoreTable(Path documentationPath, Path welcomePath, Path workflowsPath) {
         if (vectorStoreService.count() > 0) {
-            List<com.bytechef.platform.ai.domain.VectorStore> vectorsStores = vectorStoreService.findAll();
-            List<Map<String, Object>> vectorsMetadataList = vectorsStores.stream()
+            List<Map<String, Object>> vectorsMetadataList = vectorStoreService.findAll()
+                .stream()
                 .map(com.bytechef.platform.ai.domain.VectorStore::getMetadata)
                 .toList();
 
@@ -180,13 +348,14 @@ public class VectorStoreConfiguration {
     }
 
     // Function to split a document into chunks based on a maximum token limit
-    private static List<String> splitDocument(String[] tokens, int maxTokens) {
+
+    private static List<String> splitDocument(String[] tokens) {
         List<String> chunks = new ArrayList<>();
         StringBuilder currentChunk = new StringBuilder();
         int tokenCount = 0;
 
         for (String token : tokens) {
-            if (tokenCount + 1 > maxTokens) {
+            if (tokenCount + 1 > MAX_TOKENS) {
                 chunks.add(StringUtils.trim(currentChunk.toString()));
 
                 currentChunk.setLength(0); // Reset the current chunk
@@ -206,153 +375,7 @@ public class VectorStoreConfiguration {
         return chunks;
     }
 
-    private String getSampleValue(PropertyDecorator property) {
-        return switch (property.getType()) {
-            case ARRAY -> getArrayParameters(property.getItems());
-            case BOOLEAN -> "false";
-            case DATE -> "\"1980-01-01\"";
-            case DATE_TIME -> "\"1980-01-01T00:00:00\"";
-            case DYNAMIC_PROPERTIES -> "{}";
-            case INTEGER -> "1";
-            case NUMBER -> "0.0";
-            case OBJECT -> getObjectParameters(property.getObjectProperties());
-            case FILE_ENTRY -> getObjectParameters(property.getFileEntryProperties());
-            case TIME -> "\"00:00:00\"";
-            default -> "\"\"";
-        };
-    }
-
-    private String createJsonExample(ActionDefinition actionDefinition) {
-        StringBuilder json = new StringBuilder();
-
-        json.append("{")
-            .append("\n")
-            .append("\"label\": \"")
-            .append(actionDefinition.getTitle())
-            .append("\",")
-            .append("\n")
-            .append("\"name\": \"")
-            .append(actionDefinition.getName())
-            .append("\",")
-            .append("\n")
-            .append("\"type\": \"")
-            .append(actionDefinition.getComponentName())
-            .append("/v")
-            .append(actionDefinition.getComponentVersion())
-            .append("/")
-            .append(actionDefinition.getName())
-            .append("\",\n");
-
-        List<PropertyDecorator> properties =
-            PropertyDecorator.toPropertyDecoratorList(actionDefinition.getProperties());
-        if (!properties.isEmpty()) {
-            json.append("\"parameters\": ")
-                .append(getObjectParameters(properties));
-        }
-        return json.append("}")
-            .toString();
-    }
-
-    private String createJsonExample(TriggerDefinition triggerDefinition) {
-        StringBuilder json = new StringBuilder();
-
-        json.append("{")
-            .append("\n")
-            .append("\"label\": \"")
-            .append(triggerDefinition.getTitle())
-            .append("\",")
-            .append("\n")
-            .append("\"name\": \"")
-            .append(triggerDefinition.getName())
-            .append("\",")
-            .append("\n")
-            .append("\"type\": \"")
-            .append(triggerDefinition.getComponentName())
-            .append("/v")
-            .append(triggerDefinition.getComponentVersion())
-            .append("/")
-            .append(triggerDefinition.getName())
-            .append("\",\n");
-
-        List<PropertyDecorator> properties =
-            PropertyDecorator.toPropertyDecoratorList(triggerDefinition.getProperties());
-        if (!properties.isEmpty()) {
-            json.append("\"parameters\": ")
-                .append(getObjectParameters(properties));
-        }
-        return json.append("}")
-            .toString();
-    }
-
-    private String createJsonExample(TaskDispatcherDefinition taskDispatcherDefinition) {
-        StringBuilder json = new StringBuilder();
-
-        json.append("{")
-            .append("\n")
-            .append("\"label\": \"")
-            .append(taskDispatcherDefinition.getTitle())
-            .append("\",")
-            .append("\n")
-            .append("\"name\": \"")
-            .append(taskDispatcherDefinition.getName())
-            .append("\",")
-            .append("\n")
-            .append("\"type\": \"")
-            .append(taskDispatcherDefinition.getName())
-            .append("/v")
-            .append(taskDispatcherDefinition.getVersion())
-            .append("/")
-            .append("\",\n");
-
-        List<PropertyDecorator> properties =
-            PropertyDecorator.toPropertyDecoratorList(taskDispatcherDefinition.getProperties());
-        if (!properties.isEmpty()) {
-            json.append("\"parameters\": ")
-                .append(getObjectParameters(properties));
-        }
-        return json.append("}")
-            .toString();
-    }
-
-    private String getObjectParameters(List<PropertyDecorator> properties) {
-        StringBuilder parameters = new StringBuilder();
-
-        parameters.append("{")
-            .append("\n");
-        for (var property : properties) {
-            parameters.append("\"")
-                .append(property.getName())
-                .append("\": ")
-                .append(getSampleValue(property))
-                .append(",\n");
-        }
-
-        if (parameters.length() > 2) {
-            parameters.setLength(parameters.length() - 2);
-        }
-
-        return parameters.append("}")
-            .toString();
-    }
-
-    private String getArrayParameters(List<PropertyDecorator> properties) {
-        StringBuilder parameters = new StringBuilder();
-
-        parameters.append("[\n");
-        for (var property : properties) {
-            parameters.append(getSampleValue(property))
-                .append(",\n");
-        }
-
-        if (parameters.length() > 2) {
-            parameters.setLength(parameters.length() - 2);
-        }
-
-        return parameters.append("]")
-            .toString();
-    }
-
-    private String componentDefinitionToString(ComponentDefinition componentDefinition) {
+    private String toString(ComponentDefinition componentDefinition) {
         StringBuilder definitionText = new StringBuilder();
 
         definitionText.append("Component Name: ")
@@ -362,10 +385,11 @@ public class VectorStoreConfiguration {
             .append(componentDefinition.getDescription())
             .append("\n");
 
-        if (!componentDefinition.getTriggers()
-            .isEmpty()) {
+        List<TriggerDefinition> triggers = componentDefinition.getTriggers();
+
+        if (!triggers.isEmpty()) {
             definitionText.append("Triggers:\n");
-            for (TriggerDefinition triggerDefinition : componentDefinition.getTriggers()) {
+            for (TriggerDefinition triggerDefinition : triggers) {
                 definitionText.append("Trigger Name: ")
                     .append(triggerDefinition.getName())
                     .append("\n")
@@ -378,14 +402,16 @@ public class VectorStoreConfiguration {
             }
         }
 
-        if (!componentDefinition.getActions()
-            .isEmpty()) {
+        List<ActionDefinition> actions = componentDefinition.getActions();
+
+        if (!actions.isEmpty()) {
             definitionText.append("Actions:\n");
-            for (ActionDefinition actionDefinition : componentDefinition.getActions()) {
-                if (!actionDefinition.getName()
-                    .equals("customAction")) {
+            for (ActionDefinition actionDefinition : actions) {
+                String name = actionDefinition.getName();
+
+                if (!name.equals("customAction")) {
                     definitionText.append("Action Name: ")
-                        .append(actionDefinition.getName())
+                        .append(name)
                         .append("\n")
                         .append("Description: ")
                         .append(actionDefinition.getDescription())
@@ -395,6 +421,7 @@ public class VectorStoreConfiguration {
                         .append("\n");
 
                     OutputResponse outputResponse = actionDefinition.getOutputResponse();
+
                     if (actionDefinition.isOutputDefined() && outputResponse != null) {
                         definitionText.append("Output JSON: \n")
                             .append(getSampleValue(new PropertyDecorator(outputResponse.outputSchema())))
@@ -407,7 +434,7 @@ public class VectorStoreConfiguration {
         return definitionText.toString();
     }
 
-    private String taskDispatcherDefinitionToString(TaskDispatcherDefinition taskDispatcherDefinition) {
+    private String toString(TaskDispatcherDefinition taskDispatcherDefinition) {
         StringBuilder definitionText = new StringBuilder();
 
         definitionText.append("Task Dispatcher Name: ")
@@ -430,25 +457,27 @@ public class VectorStoreConfiguration {
         return definitionText.toString();
     }
 
-    private void storeDocumentsFromComponentDefinitions(
-        TokenCountBatchingStrategy batchingStrategy,
-        List<Map<String, Object>> vectorStoreList, VectorStore vectorStore) {
+    private void storeDocuments(
+        TokenCountBatchingStrategy batchingStrategy, List<Map<String, Object>> vectorStores, VectorStore vectorStore) {
+
         List<Document> documentList = new ArrayList<>();
 
         for (TaskDispatcherDefinition taskDispatcherDefinition : taskDispatcherDefinitionService
             .getTaskDispatcherDefinitions()) {
-            if (!taskDispatcherDefinition.getName()
-                .equals("waitForApproval")) {
-                String json = taskDispatcherDefinitionToString(taskDispatcherDefinition);
 
-                addToDocumentList(vectorStoreList, taskDispatcherDefinition.getName(), json, documentList, FLOWS);
+            String name = taskDispatcherDefinition.getName();
+
+            if (!name.equals("waitForApproval")) {
+                String json = toString(taskDispatcherDefinition);
+
+                addToDocuments(vectorStores, name, json, documentList, FLOWS);
             }
         }
 
         for (ComponentDefinition componentDefinition : componentDefinitionService.getComponentDefinitions()) {
-            String json = componentDefinitionToString(componentDefinition);
+            String json = toString(componentDefinition);
 
-            addToDocumentList(vectorStoreList, componentDefinition.getName(), json, documentList, COMPONENTS);
+            addToDocuments(vectorStores, componentDefinition.getName(), json, documentList, COMPONENTS);
         }
 
         for (List<Document> batch : batchingStrategy.batch(documentList)) {
@@ -456,21 +485,11 @@ public class VectorStoreConfiguration {
         }
     }
 
-    private static void addToDocumentList(
-        List<Map<String, Object>> vectorStoreList, String name, String json, List<Document> documentList,
-        String category) {
-        if (!vectorStoreListContainsFile(vectorStoreList, name, category)) {
-            String cleanedDocument = preprocessDocument(json);
+    private static boolean containsFile(
+        List<Map<String, Object>> vectorStoreList, String fileName, String categoryName) {
 
-            if (!cleanedDocument.isEmpty()) {
-                // Split the document into chunks
-                List<String> chunks = splitDocument(cleanedDocument.split("\\s+"), 1536);
-
-                for (String chunk : chunks) {
-                    documentList.add(new Document(chunk, Map.of(CATEGORY, category, NAME, name)));
-                }
-            }
-        }
+        return !vectorStoreList.isEmpty() && vectorStoreList.stream()
+            .anyMatch(map -> fileName.equals(map.get(NAME)) && categoryName.equals(map.get(CATEGORY)));
     }
 
     private static void storeDocumentsFromPath(
@@ -480,6 +499,7 @@ public class VectorStoreConfiguration {
         List<Document> documentList = new ArrayList<>();
 
         Files.walkFileTree(path, new SimpleFileVisitor<>() {
+
             @Override
             @SuppressFBWarnings("NP")
             public FileVisitResult visitFile(Path filePath, BasicFileAttributes attrs) throws IOException {
@@ -492,7 +512,7 @@ public class VectorStoreConfiguration {
 
                     String document = Files.readString(filePath);
 
-                    addToDocumentList(vectorStoreList, fileName, document, documentList, categoryName);
+                    addToDocuments(vectorStoreList, fileName, document, documentList, categoryName);
                 }
 
                 return FileVisitResult.CONTINUE;
@@ -504,13 +524,6 @@ public class VectorStoreConfiguration {
         }
     }
 
-    private static boolean vectorStoreListContainsFile(
-        List<Map<String, Object>> vectorStoreList, String fileName, String categoryName) {
-
-        return !vectorStoreList.isEmpty() && vectorStoreList.stream()
-            .anyMatch(map -> fileName.equals(map.get(NAME)) && categoryName.equals(map.get(CATEGORY)));
-    }
-
     private void storeDocuments(
         List<Map<String, Object>> vectorStoreList, Path documentationPath, Path welcomePath,
         Path workflowsPath) {
@@ -518,7 +531,7 @@ public class VectorStoreConfiguration {
         try {
             storeDocumentsFromPath(DOCUMENTATION, documentationPath, ".md", strategy, vectorStoreList, vectorStore);
             storeDocumentsFromPath(WORKFLOWS, workflowsPath, ".json", strategy, vectorStoreList, vectorStore);
-            storeDocumentsFromComponentDefinitions(strategy, vectorStoreList, vectorStore);
+            storeDocuments(strategy, vectorStoreList, vectorStore);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -531,6 +544,160 @@ public class VectorStoreConfiguration {
             vectorStore.add(List.of(new Document(cleanedDocument, Map.of(CATEGORY, DOCUMENTATION, NAME, "welcome"))));
         } catch (IOException e) {
             throw new RuntimeException(e);
+        }
+    }
+
+    private static class PropertyDecorator {
+
+        enum Location {
+            COMPONENT,
+            TASK_DISPATCHER
+        }
+
+        private final BaseProperty property;
+        private final Type type;
+        private final Location location;
+
+        public PropertyDecorator(BaseProperty property) {
+            this.property = property;
+
+            switch (property) {
+                case com.bytechef.platform.workflow.task.dispatcher.domain.ArrayProperty ignored -> {
+                    this.type = Type.ARRAY;
+                    this.location = Location.TASK_DISPATCHER;
+                }
+                case com.bytechef.platform.component.domain.ArrayProperty ignored -> {
+                    this.type = Type.ARRAY;
+                    this.location = Location.COMPONENT;
+                }
+                case com.bytechef.platform.workflow.task.dispatcher.domain.BooleanProperty ignored -> {
+                    this.type = Type.BOOLEAN;
+                    this.location = Location.TASK_DISPATCHER;
+                }
+                case com.bytechef.platform.component.domain.BooleanProperty ignored -> {
+                    this.type = Type.BOOLEAN;
+                    this.location = Location.COMPONENT;
+                }
+                case com.bytechef.platform.workflow.task.dispatcher.domain.DateProperty ignored -> {
+                    this.type = Type.DATE;
+                    this.location = Location.TASK_DISPATCHER;
+                }
+                case com.bytechef.platform.component.domain.DateProperty ignored -> {
+                    this.type = Type.DATE;
+                    this.location = Location.COMPONENT;
+                }
+                case com.bytechef.platform.workflow.task.dispatcher.domain.DateTimeProperty ignored -> {
+                    this.type = Type.DATE_TIME;
+                    this.location = Location.TASK_DISPATCHER;
+                }
+                case com.bytechef.platform.component.domain.DateTimeProperty ignored -> {
+                    this.type = Type.DATE_TIME;
+                    this.location = Location.COMPONENT;
+                }
+                case com.bytechef.platform.component.domain.DynamicPropertiesProperty ignored -> {
+                    this.type = Type.DYNAMIC_PROPERTIES;
+                    this.location = Location.COMPONENT;
+                }
+                case com.bytechef.platform.workflow.task.dispatcher.domain.IntegerProperty ignored -> {
+                    this.type = Type.INTEGER;
+                    this.location = Location.TASK_DISPATCHER;
+                }
+                case com.bytechef.platform.component.domain.IntegerProperty ignored -> {
+                    this.type = Type.INTEGER;
+                    this.location = Location.COMPONENT;
+                }
+                case com.bytechef.platform.workflow.task.dispatcher.domain.FileEntryProperty ignored -> {
+                    this.type = Type.FILE_ENTRY;
+                    this.location = Location.TASK_DISPATCHER;
+                }
+                case com.bytechef.platform.component.domain.FileEntryProperty ignored -> {
+                    this.type = Type.FILE_ENTRY;
+                    this.location = Location.COMPONENT;
+                }
+                case com.bytechef.platform.workflow.task.dispatcher.domain.NullProperty ignored -> {
+                    this.type = Type.NULL;
+                    this.location = Location.TASK_DISPATCHER;
+                }
+                case com.bytechef.platform.component.domain.NullProperty ignored -> {
+                    this.type = Type.NULL;
+                    this.location = Location.COMPONENT;
+                }
+                case com.bytechef.platform.workflow.task.dispatcher.domain.NumberProperty ignored -> {
+                    this.type = Type.NUMBER;
+                    this.location = Location.TASK_DISPATCHER;
+                }
+                case com.bytechef.platform.component.domain.NumberProperty ignored -> {
+                    this.type = Type.NUMBER;
+                    this.location = Location.COMPONENT;
+                }
+                case com.bytechef.platform.workflow.task.dispatcher.domain.ObjectProperty ignored -> {
+                    this.type = Type.OBJECT;
+                    this.location = Location.TASK_DISPATCHER;
+                }
+                case com.bytechef.platform.component.domain.ObjectProperty ignored -> {
+                    this.type = Type.OBJECT;
+                    this.location = Location.COMPONENT;
+                }
+                case com.bytechef.platform.workflow.task.dispatcher.domain.StringProperty ignored -> {
+                    this.type = Type.STRING;
+                    this.location = Location.TASK_DISPATCHER;
+                }
+                case com.bytechef.platform.component.domain.StringProperty ignored -> {
+                    this.type = Type.STRING;
+                    this.location = Location.COMPONENT;
+                }
+                case com.bytechef.platform.workflow.task.dispatcher.domain.TimeProperty ignored -> {
+                    this.type = Type.TIME;
+                    this.location = Location.TASK_DISPATCHER;
+                }
+                case com.bytechef.platform.component.domain.TimeProperty ignored -> {
+                    this.type = Type.TIME;
+                    this.location = Location.COMPONENT;
+                }
+                default -> throw new IllegalStateException("Unexpected value: " + property.getClass());
+            }
+        }
+
+        public List<PropertyDecorator> getItems() {
+            return switch (location) {
+                case TASK_DISPATCHER -> toPropertyDecorators(
+                    ((com.bytechef.platform.workflow.task.dispatcher.domain.ArrayProperty) property).getItems());
+                case COMPONENT ->
+                    toPropertyDecorators(((com.bytechef.platform.component.domain.ArrayProperty) property).getItems());
+            };
+        }
+
+        public List<PropertyDecorator> getFileEntryProperties() {
+            return switch (location) {
+                case TASK_DISPATCHER -> toPropertyDecorators(
+                    ((com.bytechef.platform.workflow.task.dispatcher.domain.FileEntryProperty) property)
+                        .getProperties());
+                case COMPONENT -> toPropertyDecorators(
+                    ((com.bytechef.platform.component.domain.FileEntryProperty) property).getProperties());
+            };
+        }
+
+        public String getName() {
+            return property.getName();
+        }
+
+        public List<PropertyDecorator> getObjectProperties() {
+            return switch (location) {
+                case TASK_DISPATCHER -> toPropertyDecorators(
+                    ((com.bytechef.platform.workflow.task.dispatcher.domain.ObjectProperty) property).getProperties());
+                case COMPONENT -> toPropertyDecorators(
+                    ((com.bytechef.platform.component.domain.ObjectProperty) property).getProperties());
+            };
+        }
+
+        public Type getType() {
+            return type;
+        }
+
+        public static List<PropertyDecorator> toPropertyDecorators(List<? extends BaseProperty> properties) {
+            return properties.stream()
+                .map(PropertyDecorator::new)
+                .toList();
         }
     }
 }
