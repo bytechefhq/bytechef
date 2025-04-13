@@ -38,11 +38,11 @@ public class GoogleChatUtils {
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> stringStringMap, String s,
         Context context) {
 
-        Map<String, List<Map<String, Object>>> spacesMap =
-            context.http(http -> http.get("https://chat.googleapis.com/v1/spaces"))
-                .configuration(responseType(Http.ResponseType.JSON))
-                .execute()
-                .getBody(new TypeReference<>() {});
+        Map<String, List<Map<String, Object>>> spacesMap = context
+            .http(http -> http.get("https://chat.googleapis.com/v1/spaces"))
+            .configuration(responseType(Http.ResponseType.JSON))
+            .execute()
+            .getBody(new TypeReference<>() {});
 
         List<Option<String>> options = new ArrayList<>();
 
