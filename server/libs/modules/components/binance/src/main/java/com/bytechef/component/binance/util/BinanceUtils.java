@@ -41,8 +41,7 @@ public class BinanceUtils {
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
         String searchText, Context context) {
 
-        Map<String, Object> body = context
-            .http(http -> http.get("https://api.binance.com/api/v3/exchangeInfo"))
+        Map<String, Object> body = context.http(http -> http.get("https://api.binance.com/api/v3/exchangeInfo"))
             .configuration(responseType(Http.ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});
