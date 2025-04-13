@@ -98,8 +98,9 @@ public class MauticGetContactAction {
     private MauticGetContactAction() {
     }
 
-    public static Map<String, Object>
-        perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
+    public static Map<String, Object> perform(
+        Parameters inputParameters, Parameters connectionParameters, Context context) {
+
         return context.http(http -> http.get("/contacts/" + inputParameters.getRequiredString(ID)))
             .configuration(responseType(ResponseType.JSON))
             .execute()

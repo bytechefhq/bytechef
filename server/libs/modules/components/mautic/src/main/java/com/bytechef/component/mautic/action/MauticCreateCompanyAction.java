@@ -93,8 +93,9 @@ public class MauticCreateCompanyAction {
     private MauticCreateCompanyAction() {
     }
 
-    public static Map<String, Object>
-        perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
+    public static Map<String, Object> perform(
+        Parameters inputParameters, Parameters connectionParameters, Context context) {
+
         return context.http(http -> http.post("/companies/new"))
             .body(
                 Body.of(
