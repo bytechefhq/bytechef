@@ -36,6 +36,7 @@ import org.mockito.MockedStatic;
  * @author Nikolina Spehar
  */
 abstract class AbstractsMailerLiteTriggerTest {
+
     protected WebhookEnableOutput mockedWebhookEnableOutput = mock(WebhookEnableOutput.class);
     protected WebhookBody mockedWebhookBody = mock(WebhookBody.class);
     protected HttpHeaders mockedHttpHeaders = mock(HttpHeaders.class);
@@ -45,8 +46,8 @@ abstract class AbstractsMailerLiteTriggerTest {
     protected TriggerContext mockedTriggerContext = mock(TriggerContext.class);
     protected MockedStatic<MailerLiteUtils> mailerLiteUtilsMockedStatic;
     protected ArgumentCaptor<String> stringArgumentCaptor = ArgumentCaptor.forClass(String.class);
-    protected ArgumentCaptor<TriggerContext> triggerContextArgumentCaptor =
-        ArgumentCaptor.forClass(TriggerContext.class);
+    protected ArgumentCaptor<TriggerContext> triggerContextArgumentCaptor = ArgumentCaptor.forClass(
+        TriggerContext.class);
     protected ArgumentCaptor<WebhookBody> webhookBodyArgumentCaptor = ArgumentCaptor.forClass(WebhookBody.class);
     protected String workflowExecutionId = "testWorkflowExecutionId";
 
