@@ -47,8 +47,8 @@ public class MauticUtils {
     }
 
     public static List<Option<String>> getContactOptions(
-        Parameters inputParameters, Parameters connectionParameters, Map<String, String> stringStringMap, String s,
-        Context context) {
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
+        String searchText, Context context) {
 
         List<Map<String, Object>> contactsList = context.http(http -> http.get("/contacts"))
             .configuration(responseType(ResponseType.JSON))
@@ -62,10 +62,7 @@ public class MauticUtils {
         List<Option<String>> optionsList = new ArrayList<>();
 
         for (Map<String, Object> option : options) {
-            optionsList.add(option(option.get(ID)
-                .toString(),
-                option.get(ID)
-                    .toString()));
+            optionsList.add(option(String.valueOf(option.get(ID)), String.valueOf(option.get(ID))));
         }
 
         return optionsList;

@@ -111,8 +111,9 @@ public class MauticCreateContactAction {
     private MauticCreateContactAction() {
     }
 
-    public static Map<String, Object>
-        perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
+    public static Map<String, Object> perform(
+        Parameters inputParameters, Parameters connectionParameters, Context context) {
+
         return context.http(http -> http.post("/contacts/new"))
             .body(
                 Body.of(
