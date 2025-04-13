@@ -158,8 +158,7 @@ class HttpClientExecutor {
         String componentName, int componentVersion, String componentOperationName,
         ComponentConnection componentConnection, Context context) {
 
-        Methanol.Builder builder = Methanol.newBuilder()
-            .version(HttpClient.Version.HTTP_1_1);
+        Methanol.Builder builder = Methanol.newBuilder();
 
         if (configuration.isAllowUnauthorizedCerts()) {
             try {
