@@ -100,8 +100,7 @@ public class NotionGetDatabaseAction {
     }
 
     public static Object perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
-        return context
-            .http(http -> http.get("/databases/%s".formatted(inputParameters.getRequiredString(ID))))
+        return context.http(http -> http.get("/databases/%s".formatted(inputParameters.getRequiredString(ID))))
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});

@@ -59,8 +59,7 @@ public class NotionCreatePageAction {
     }
 
     public static Object perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
-        return context
-            .http(http -> http.post("/pages"))
+        return context.http(http -> http.post("/pages"))
             .body(Http.Body.of(
                 Map.of(
                     "parent", Map.of("page_id", inputParameters.getRequiredString(ID)),
