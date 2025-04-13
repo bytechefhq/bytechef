@@ -16,7 +16,7 @@
 
 package com.bytechef.platform.configuration.web.rest.mapper;
 
-import com.bytechef.platform.configuration.domain.Event;
+import com.bytechef.platform.configuration.domain.NotificationEvent;
 import com.bytechef.platform.configuration.web.rest.mapper.config.PlatformConfigurationMapperSpringConfig;
 import com.bytechef.platform.configuration.web.rest.model.NotificationEventModel;
 import org.mapstruct.Mapper;
@@ -26,8 +26,8 @@ import org.springframework.core.convert.converter.Converter;
  * @author Matija Petanjek
  */
 @Mapper(config = PlatformConfigurationMapperSpringConfig.class)
-public interface NotificationEventMapper extends Converter<Event, NotificationEventModel> {
+public interface NotificationEventMapper extends Converter<NotificationEvent, NotificationEventModel> {
 
     @Override
-    NotificationEventModel convert(Event event);
+    NotificationEventModel convert(NotificationEvent notificationEvent);
 }

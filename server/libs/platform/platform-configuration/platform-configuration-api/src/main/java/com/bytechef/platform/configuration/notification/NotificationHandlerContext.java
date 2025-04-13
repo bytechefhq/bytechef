@@ -16,7 +16,7 @@
 
 package com.bytechef.platform.configuration.notification;
 
-import com.bytechef.platform.configuration.domain.Event;
+import com.bytechef.platform.configuration.domain.NotificationEvent;
 
 /**
  * @author Matija Petanjek
@@ -35,7 +35,7 @@ public class NotificationHandlerContext {
             return notificationHandlerContext;
         }
 
-        public Builder eventType(Event.Type eventType) {
+        public Builder eventType(NotificationEvent.Type eventType) {
             this.eventType = eventType;
 
             return this;
@@ -53,12 +53,12 @@ public class NotificationHandlerContext {
             return this;
         }
 
-        private Event.Type eventType;
+        private NotificationEvent.Type eventType;
         private Long jobId;
         private String jobName;
     }
 
-    public Event.Type getEventType() {
+    public NotificationEvent.Type getEventType() {
         return eventType;
     }
 
@@ -74,7 +74,7 @@ public class NotificationHandlerContext {
 
     }
 
-    private Event.Type eventType;
+    private NotificationEvent.Type eventType;
     private Long jobId;
     private String jobName;
 

@@ -48,5 +48,4 @@ public class EmailNotificationSender implements NotificationSender<EmailNotifica
             (String) settings.get("to"), emailNotificationHandler.getSubject(notificationHandlerContext),
             emailNotificationHandler.getContent(notificationHandlerContext), false, emailNotificationHandler.isHtml());
     }
-
 }

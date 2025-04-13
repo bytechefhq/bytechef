@@ -8,6 +8,15 @@
             <column name="id" type="BIGINT" autoIncrement="true">
                 <constraints primaryKey="true" nullable="false"/>
             </column>
+            <column name="name" type="VARCHAR(256)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="type" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="settings" type="TEXT">
+                <constraints nullable="false"/>
+            </column>
             <column name="created_by" type="VARCHAR(50)">
                 <constraints nullable="false"/>
             </column>
@@ -20,13 +29,7 @@
             <column name="last_modified_date" type="TIMESTAMP">
                 <constraints nullable="false"/>
             </column>
-            <column name="name" type="VARCHAR(256)">
-                <constraints nullable="false"/>
-            </column>
-            <column name="type" type="VARCHAR(256)">
-                <constraints nullable="false"/>
-            </column>
-            <column name="settings" type="TEXT">
+            <column name="version" type="BIGINT">
                 <constraints nullable="false"/>
             </column>
         </createTable>
@@ -44,7 +47,7 @@
             <column name="id" type="BIGINT" autoIncrement="true">
                 <constraints primaryKey="true" nullable="false"/>
             </column>
-            <column name="type" type="VARCHAR(256)">
+            <column name="type" type="INT">
                 <constraints nullable="false"/>
             </column>
         </createTable>
@@ -70,23 +73,23 @@
 
         <insert tableName="notification_event">
             <column name="id" value="1" />
-            <column name="type" value="JOB_CANCELLED" />
+            <column name="type" value="0" />
         </insert>
         <insert tableName="notification_event">
             <column name="id" value="2" />
-            <column name="type" value="JOB_CREATED" />
+            <column name="type" value="1" />
         </insert>
         <insert tableName="notification_event">
             <column name="id" value="3" />
-            <column name="type" value="JOB_COMPLETED" />
+            <column name="type" value="2" />
         </insert>
         <insert tableName="notification_event">
             <column name="id" value="4" />
-            <column name="type" value="JOB_FAILED" />
+            <column name="type" value="3" />
         </insert>
         <insert tableName="notification_event">
             <column name="id" value="5" />
-            <column name="type" value="JOB_STARTED" />
+            <column name="type" value="4" />
         </insert>
     </changeSet>
 </databaseChangeLog>

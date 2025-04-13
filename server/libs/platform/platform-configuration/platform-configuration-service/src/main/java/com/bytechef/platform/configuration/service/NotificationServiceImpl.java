@@ -16,11 +16,10 @@
 
 package com.bytechef.platform.configuration.service;
 
-import com.bytechef.platform.configuration.domain.Event;
 import com.bytechef.platform.configuration.domain.Notification;
+import com.bytechef.platform.configuration.domain.NotificationEvent;
 import com.bytechef.platform.configuration.repository.NotificationRepository;
 import java.util.List;
-import java.util.Map;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -31,11 +30,9 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class NotificationServiceImpl implements NotificationService {
 
-    private NotificationRepository notificationRepository;
+    private final NotificationRepository notificationRepository;
 
-    public NotificationServiceImpl(
-        NotificationRepository notificationRepository) {
-
+    public NotificationServiceImpl(NotificationRepository notificationRepository) {
         this.notificationRepository = notificationRepository;
     }
 
@@ -45,20 +42,12 @@ public class NotificationServiceImpl implements NotificationService {
     }
 
     @Override
-    public List<Notification> getNotifications(Event.Type eventType) {
-        return notificationRepository.findAllByEventType(eventType.toString());
+    public List<Notification> getNotifications(NotificationEvent.Type eventType) {
+        return notificationRepository.findAllByEventType(eventType.ordinal());
     }
 
     @Override
-    public Notification create(
-        String name, Notification.Type notificationType, Map<String, String> settings, List<Long> eventIds) {
-        Notification notification = new Notification();
-
-        notification.setName(name);
-        notification.setType(notificationType);
-        notification.setSettings(settings);
-        notification.setEventIds(eventIds);
-
+    public Notification create(Notification notification) {
         return notificationRepository.save(notification);
     }
 }

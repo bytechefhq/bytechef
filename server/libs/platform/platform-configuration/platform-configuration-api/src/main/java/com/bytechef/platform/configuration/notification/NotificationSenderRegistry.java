@@ -17,10 +17,9 @@
 package com.bytechef.platform.configuration.notification;
 
 import com.bytechef.commons.util.MapUtils;
-import com.bytechef.platform.configuration.domain.Notification;
+import com.bytechef.platform.configuration.domain.Notification.Type;
 import java.util.List;
 import java.util.Map;
-import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
 
 /**
@@ -28,15 +27,15 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public class NotificationSenderRegistry {
-    private final Map<Notification.Type, NotificationSender<?>> notificationSenderMap;
+
+    private final Map<Type, NotificationSender<?>> notificationSenderMap;
 
     public NotificationSenderRegistry(List<NotificationSender<?>> notificationSenders) {
         this.notificationSenderMap = MapUtils.toMap(
             notificationSenders, NotificationSender::getType, notificationSender -> notificationSender);
     }
 
-    @NonNull
-    public NotificationSender<?> getNotificationSender(Notification.Type type) {
+    public NotificationSender<?> getNotificationSender(Type type) {
         return notificationSenderMap.get(type);
     }
 }

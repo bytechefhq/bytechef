@@ -7,11 +7,10 @@
 
 package com.bytechef.ee.platform.workflow.configuration.remote.client.service;
 
-import com.bytechef.platform.configuration.domain.Event;
 import com.bytechef.platform.configuration.domain.Notification;
+import com.bytechef.platform.configuration.domain.NotificationEvent;
 import com.bytechef.platform.configuration.service.NotificationService;
 import java.util.List;
-import java.util.Map;
 import org.springframework.stereotype.Component;
 
 /**
@@ -23,17 +22,17 @@ import org.springframework.stereotype.Component;
 public class RemoteNotificationServiceClient implements NotificationService {
 
     @Override
+    public Notification create(Notification notification) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public List<Notification> getNotifications() {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public List<Notification> getNotifications(Event.Type eventType) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public Notification create(String name, Notification.Type type, Map<String, String> settings, List<Long> eventIds) {
+    public List<Notification> getNotifications(NotificationEvent.Type eventType) {
         throw new UnsupportedOperationException();
     }
 }

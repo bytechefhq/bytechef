@@ -17,7 +17,7 @@
 package com.bytechef.platform.configuration.web.rest;
 
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
-import com.bytechef.platform.configuration.service.EventService;
+import com.bytechef.platform.configuration.service.NotificationEventService;
 import com.bytechef.platform.configuration.web.rest.model.NotificationEventModel;
 import java.util.List;
 import org.springframework.core.convert.ConversionService;
@@ -33,20 +33,22 @@ import org.springframework.web.bind.annotation.RestController;
 @ConditionalOnCoordinator
 public class NotificationEventApiController implements NotificationEventApi {
 
-    private ConversionService conversionService;
-    private EventService eventService;
+    private final ConversionService conversionService;
+    private final NotificationEventService notificationEventService;
 
-    public NotificationEventApiController(ConversionService conversionService, EventService eventService) {
+    public NotificationEventApiController(
+        ConversionService conversionService, NotificationEventService notificationEventService) {
+
         this.conversionService = conversionService;
-        this.eventService = eventService;
+        this.notificationEventService = notificationEventService;
     }
 
     @Override
     public ResponseEntity<List<NotificationEventModel>> getNotificationEvents() {
         return ResponseEntity.ok(
-            eventService.getEvents()
+            notificationEventService.getNotificationEvents()
                 .stream()
-                .map(event -> conversionService.convert(event, NotificationEventModel.class))
+                .map(notificationEvent -> conversionService.convert(notificationEvent, NotificationEventModel.class))
                 .toList());
     }
 }

@@ -16,9 +16,9 @@
 
 package com.bytechef.platform.coordinator.notification;
 
-import com.bytechef.platform.configuration.domain.Event;
+import com.bytechef.platform.configuration.domain.NotificationEvent.Type;
 import com.bytechef.platform.configuration.notification.EmailNotificationHandler;
-import com.bytechef.platform.configuration.notification.NotificationEvent;
+import com.bytechef.platform.configuration.notification.NotificationEventType;
 import com.bytechef.platform.configuration.notification.NotificationHandlerContext;
 import java.util.Locale;
 import org.springframework.context.MessageSource;
@@ -28,9 +28,8 @@ import org.springframework.stereotype.Component;
  * @author Matija Petanjek
  */
 @Component
-@NotificationEvent({
-    Event.Type.JOB_CANCELLED, Event.Type.JOB_CREATED, Event.Type.JOB_COMPLETED, Event.Type.JOB_FAILED,
-    Event.Type.JOB_STARTED
+@NotificationEventType({
+    Type.JOB_CANCELLED, Type.JOB_CREATED, Type.JOB_COMPLETED, Type.JOB_FAILED, Type.JOB_STARTED
 })
 public class JobStatusEmailNotificationHandler implements EmailNotificationHandler {
 

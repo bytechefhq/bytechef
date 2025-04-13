@@ -17,7 +17,7 @@ tags:
   - name: "notification"
     description: "The Platform Notification Internal API"
   - name: "notification-event"
-    description: "The platform Notification Event API"
+    description: "The platform Notification Event Internal API"
   - name: "task-dispatcher-definition"
     description: "The Platform Task Dispatcher Definition Internal API"
   - name: "trigger-definition"
@@ -442,7 +442,7 @@ paths:
       summary: "Create a notification entry"
       tags:
         - "notification"
-      operationId: "postNotification"
+      operationId: "createNotification"
       requestBody:
         required: true
         content:
@@ -1857,7 +1857,7 @@ components:
       type: "object"
       required:
         - "name"
-        - "notificationType"
+        - "type"
         - "settings"
         - "events"
       properties:
@@ -1887,7 +1887,7 @@ components:
         name:
           description: "Notification name"
           type: "string"
-        notificationType:
+        type:
           description: "Type of the notification"
           type: "string"
           enum:
@@ -1897,12 +1897,22 @@ components:
           description: "Notification type related settings"
           type: "object"
           additionalProperties:
-            type: "string"
-        events:
+            type: "object"
+        notificationEvents:
           description: "List of events for which notification will be triggered"
           type: "array"
           items:
             $ref: "#/components/schemas/NotificationEvent"
+          readOnly: true
+        notificationEventIds:
+          description: "List of event ids for which notification will be triggered"
+          type: "array"
+          items:
+            type: "integer"
+            format: "int64"
+          writeOnly: true
+        __version:
+          type: "integer"
     NotificationEvent:
       type: "object"
       description: "A notification event definition."

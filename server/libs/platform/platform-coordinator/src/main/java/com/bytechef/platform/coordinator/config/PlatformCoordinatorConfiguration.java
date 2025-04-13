@@ -24,7 +24,7 @@ import com.bytechef.platform.configuration.service.NotificationService;
 import com.bytechef.platform.coordinator.event.listener.JobStatusApplicationEventListener;
 import com.bytechef.platform.coordinator.event.listener.WebhookJobStatusApplicationEventListener;
 import com.bytechef.platform.coordinator.event.listener.WebhookTaskStartedApplicationEventListener;
-import org.springframework.beans.factory.annotation.Autowired;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -35,17 +35,21 @@ import org.springframework.context.annotation.Configuration;
 @ConditionalOnCoordinator
 public class PlatformCoordinatorConfiguration {
 
-    @Autowired
-    private JobService jobService;
+    private final JobService jobService;
+    private final NotificationHandlerRegistry notificationHandlerRegistry;
+    private final NotificationSenderRegistry notificationSenderRegistry;
+    private final NotificationService notificationService;
 
-    @Autowired
-    private NotificationHandlerRegistry notificationHandlerRegistry;
+    @SuppressFBWarnings("EI")
+    public PlatformCoordinatorConfiguration(
+        JobService jobService, NotificationHandlerRegistry notificationHandlerRegistry,
+        NotificationSenderRegistry notificationSenderRegistry, NotificationService notificationService) {
 
-    @Autowired
-    private NotificationSenderRegistry notificationSenderRegistry;
-
-    @Autowired
-    private NotificationService notificationService;
+        this.jobService = jobService;
+        this.notificationHandlerRegistry = notificationHandlerRegistry;
+        this.notificationSenderRegistry = notificationSenderRegistry;
+        this.notificationService = notificationService;
+    }
 
     @Bean
     WebhookJobStatusApplicationEventListener webhookJobStatusApplicationEventListener() {

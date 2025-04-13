@@ -19,9 +19,8 @@ package com.bytechef.platform.configuration.service;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.bytechef.platform.configuration.config.NotificationIntTestConfiguration;
-import com.bytechef.platform.configuration.domain.Event;
 import com.bytechef.platform.configuration.domain.Notification;
-import com.bytechef.platform.configuration.repository.EventRepository;
+import com.bytechef.platform.configuration.domain.NotificationEvent;
 import com.bytechef.platform.configuration.repository.NotificationRepository;
 import com.bytechef.platform.mail.MailService;
 import java.util.List;
@@ -42,9 +41,6 @@ public class NotificationServiceIntTest {
     private MailService mailService;
 
     @Autowired
-    private EventRepository eventRepository;
-
-    @Autowired
     private NotificationService notificationService;
 
     @Autowired
@@ -57,19 +53,24 @@ public class NotificationServiceIntTest {
 
     @Test
     public void testCreateNotification() {
-        Notification notification = notificationService.create(
-            "My Notification", Notification.Type.EMAIL, Map.of("to", "john@email.com"), List.of(1L));
+        Notification notification = new Notification();
+
+        notification.setName("My Notification");
+        notification.setType(Notification.Type.EMAIL);
+        notification.setSettings(Map.of("to", "john@email.com"));
+        notification.setNotificationEventIds(List.of(1L));
+
+        notification = notificationService.create(notification);
 
         assertThat(notification)
             .hasFieldOrPropertyWithValue("name", "My Notification")
             .hasFieldOrPropertyWithValue("type", Notification.Type.EMAIL)
             .hasFieldOrPropertyWithValue("settings", Map.of("to", "john@email.com"));
-        assertThat(notification.getEventIds()).containsExactlyInAnyOrder(1L);
+        assertThat(notification.getNotificationEventIds()).containsExactlyInAnyOrder(1L);
 
-        List<Notification> notifications = notificationService.getNotifications(Event.Type.JOB_CANCELLED);
+        List<Notification> notifications = notificationService.getNotifications(NotificationEvent.Type.JOB_CANCELLED);
 
         assertThat(notifications).hasSize(1)
             .contains(notification);
     }
-
 }
