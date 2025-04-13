@@ -89,10 +89,10 @@ public class MailerLiteUtils {
             .http(http -> http.post("/webhooks"))
             .body(
                 Body.of(
-                Map.of(
-                    TRIGGER_NAME, triggerName,
-                    EVENTS, List.of(events),
-                    URL, webhookUrl)))
+                    Map.of(
+                        TRIGGER_NAME, triggerName,
+                        EVENTS, List.of(events),
+                        URL, webhookUrl)))
             .configuration(responseType(ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});
