@@ -88,9 +88,8 @@ public class MailerLiteSubscriberAddedToGroupTrigger {
         String workflowExecutionId, TriggerContext context) {
 
         return new WebhookEnableOutput(
-            Map.of(ID,
-                subscribeWebhook(
-                    TRIGGER_DEFINITION.getName(), "subscriber.added_to_group", webhookUrl, context)),
+            Map.of(
+                ID, subscribeWebhook(TRIGGER_DEFINITION.getName(), "subscriber.added_to_group", webhookUrl, context)),
             null);
     }
 

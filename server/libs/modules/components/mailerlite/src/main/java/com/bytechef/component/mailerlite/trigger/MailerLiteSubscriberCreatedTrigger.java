@@ -92,8 +92,7 @@ public class MailerLiteSubscriberCreatedTrigger {
         String workflowExecutionId, TriggerContext context) {
 
         return new WebhookEnableOutput(
-            Map.of(ID,
-                subscribeWebhook(TRIGGER_DEFINITION.getName(), "subscriber.created", webhookUrl, context)),
+            Map.of(ID, subscribeWebhook(TRIGGER_DEFINITION.getName(), "subscriber.created", webhookUrl, context)),
             null);
     }
 

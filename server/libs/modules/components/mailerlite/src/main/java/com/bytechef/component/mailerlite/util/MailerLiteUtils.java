@@ -59,8 +59,8 @@ public class MailerLiteUtils {
     }
 
     public static List<Option<String>> getGroupIdOptions(
-        Parameters inputParameters, Parameters connectionParameters, Map<String, String> stringStringMap, String s,
-        Context context) {
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
+        String searchText, Context context) {
 
         Map<String, Object> body = context.http(GET_GROUPS_CONTEXT_FUNCTION)
             .configuration(responseType(Http.ResponseType.JSON))
@@ -71,8 +71,8 @@ public class MailerLiteUtils {
     }
 
     public static List<Option<String>> getSubscriberIdOptions(
-        Parameters inputParameters, Parameters connectionParameters, Map<String, String> stringStringMap, String s,
-        Context context) {
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
+        String searchText, Context context) {
 
         Map<String, Object> body = context.http(GET_SUBSCRIBERS_CONTEXT_FUNCTION)
             .configuration(responseType(Http.ResponseType.JSON))
@@ -87,7 +87,8 @@ public class MailerLiteUtils {
 
         Map<String, Object> body = context
             .http(http -> http.post("/webhooks"))
-            .body(Body.of(
+            .body(
+                Body.of(
                 Map.of(
                     TRIGGER_NAME, triggerName,
                     EVENTS, List.of(events),
