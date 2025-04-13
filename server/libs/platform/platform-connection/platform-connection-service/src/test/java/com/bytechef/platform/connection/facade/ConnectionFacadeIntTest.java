@@ -93,7 +93,7 @@ public class ConnectionFacadeIntTest {
         ConnectionDTO connectionDTO = ConnectionDTO.builder()
             .componentName("componentName")
             .connectionVersion(1)
-            .environment(ConnectionEnvironment.TEST)
+            .environment(ConnectionEnvironment.STAGING)
             .name("name1")
             .tags(List.of(new Tag("tag1")))
             .build();
@@ -109,7 +109,7 @@ public class ConnectionFacadeIntTest {
         ConnectionDTO connectionDTO1 = ConnectionDTO.builder()
             .componentName("componentName")
             .connectionVersion(1)
-            .environment(ConnectionEnvironment.TEST)
+            .environment(ConnectionEnvironment.STAGING)
             .name("name1")
             .tags(List.of(new Tag("tag1")))
             .build();
@@ -119,7 +119,7 @@ public class ConnectionFacadeIntTest {
         ConnectionDTO connectionDTO2 = ConnectionDTO.builder()
             .componentName("componentName")
             .connectionVersion(1)
-            .environment(ConnectionEnvironment.TEST)
+            .environment(ConnectionEnvironment.STAGING)
             .name("name2")
             .tags(List.of(new Tag("tag1")))
             .build();
@@ -248,7 +248,7 @@ public class ConnectionFacadeIntTest {
         ConnectionDTO connectionDTO = ConnectionDTO.builder()
             .componentName("componentName")
             .connectionVersion(1)
-            .environment(ConnectionEnvironment.TEST)
+            .environment(ConnectionEnvironment.STAGING)
             .name("name")
             .tags(List.of(tag1, tagRepository.save(new Tag("tag2"))))
             .build();

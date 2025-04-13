@@ -114,7 +114,7 @@ public class ProjectDeploymentFacadeHelper {
         ProjectDeploymentDTO projectDeploymentDTO = ProjectDeploymentDTO.builder()
             .projectId(projectDTO.id())
             .name(PREFIX_PROJECT_DEPLOYMENT)
-            .environment(Environment.TEST)
+            .environment(Environment.DEVELOPMENT)
             .projectVersion(lastPublishedVersion.getVersion())
             .projectDeploymentWorkflows(List.of(projectDeploymentWorkflowDTO))
             .build();

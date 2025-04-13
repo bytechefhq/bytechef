@@ -23,5 +23,5 @@ package com.bytechef.ai.toolkit;
  */
 public enum Environment {
 
-    PRODUCTION, TEST
+    DEVELOPMENT, STAGING, PRODUCTION
 }

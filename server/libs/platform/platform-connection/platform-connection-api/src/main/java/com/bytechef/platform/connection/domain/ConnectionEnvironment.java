@@ -21,5 +21,5 @@ package com.bytechef.platform.connection.domain;
  */
 public enum ConnectionEnvironment {
 
-    DEVELOPMENT, TEST, PRODUCTION
+    DEVELOPMENT, STAGING, PRODUCTION
 }
