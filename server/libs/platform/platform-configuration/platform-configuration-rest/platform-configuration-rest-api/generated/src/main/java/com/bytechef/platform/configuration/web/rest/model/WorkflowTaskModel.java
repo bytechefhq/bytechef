@@ -28,8 +28,11 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "WorkflowTask", description = "Represents a definition of a workflow task.")
 @JsonTypeName("WorkflowTask")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-04-03T22:34:21.891782+02:00[Europe/Zagreb]", comments = "Generator version: 7.12.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-04-10T13:01:49.567605+02:00[Europe/Zagreb]", comments = "Generator version: 7.12.0")
 public class WorkflowTaskModel {
+
+  @Valid
+  private Map<String, Object> clusterElements = new HashMap<>();
 
   @Valid
   private List<@Valid ComponentConnectionModel> connections = new ArrayList<>();
@@ -71,6 +74,34 @@ public class WorkflowTaskModel {
   public WorkflowTaskModel(String name, String type) {
     this.name = name;
     this.type = type;
+  }
+
+  public WorkflowTaskModel clusterElements(Map<String, Object> clusterElements) {
+    this.clusterElements = clusterElements;
+    return this;
+  }
+
+  public WorkflowTaskModel putClusterElementsItem(String key, Object clusterElementsItem) {
+    if (this.clusterElements == null) {
+      this.clusterElements = new HashMap<>();
+    }
+    this.clusterElements.put(key, clusterElementsItem);
+    return this;
+  }
+
+  /**
+   * Get clusterElements
+   * @return clusterElements
+   */
+  
+  @Schema(name = "clusterElements", accessMode = Schema.AccessMode.READ_ONLY, requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("clusterElements")
+  public Map<String, Object> getClusterElements() {
+    return clusterElements;
+  }
+
+  public void setClusterElements(Map<String, Object> clusterElements) {
+    this.clusterElements = clusterElements;
   }
 
   public WorkflowTaskModel connections(List<@Valid ComponentConnectionModel> connections) {
@@ -370,7 +401,8 @@ public class WorkflowTaskModel {
       return false;
     }
     WorkflowTaskModel workflowTask = (WorkflowTaskModel) o;
-    return Objects.equals(this.connections, workflowTask.connections) &&
+    return Objects.equals(this.clusterElements, workflowTask.clusterElements) &&
+        Objects.equals(this.connections, workflowTask.connections) &&
         Objects.equals(this.description, workflowTask.description) &&
         Objects.equals(this.finalize, workflowTask.finalize) &&
         Objects.equals(this.label, workflowTask.label) &&
@@ -386,13 +418,14 @@ public class WorkflowTaskModel {
 
   @Override
   public int hashCode() {
-    return Objects.hash(connections, description, finalize, label, metadata, name, node, parameters, post, pre, timeout, type);
+    return Objects.hash(clusterElements, connections, description, finalize, label, metadata, name, node, parameters, post, pre, timeout, type);
   }
 
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
     sb.append("class WorkflowTaskModel {\n");
+    sb.append("    clusterElements: ").append(toIndentedString(clusterElements)).append("\n");
     sb.append("    connections: ").append(toIndentedString(connections)).append("\n");
     sb.append("    description: ").append(toIndentedString(description)).append("\n");
     sb.append("    finalize: ").append(toIndentedString(finalize)).append("\n");

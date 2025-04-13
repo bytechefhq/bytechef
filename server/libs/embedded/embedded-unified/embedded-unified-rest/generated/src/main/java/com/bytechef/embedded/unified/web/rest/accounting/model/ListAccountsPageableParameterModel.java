@@ -21,7 +21,7 @@ import jakarta.annotation.Generated;
  */
 
 @JsonTypeName("listAccounts_pageable_parameter")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-04-04T06:51:18.462143+02:00[Europe/Zagreb]", comments = "Generator version: 7.12.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-04-10T13:01:48.647939+02:00[Europe/Zagreb]", comments = "Generator version: 7.12.0")
 public class ListAccountsPageableParameterModel {
 
   private @Nullable String direction;
