@@ -21,11 +21,11 @@ export default defineConfig({
                     },
                 },
             ],
-            social: {
-                discord: 'https://discord.gg/JcNSqJ7vK8',
-                github: 'https://github.com/bytechefhq/bytechef',
-                twitter: 'https://twitter.com/bytechefhq',
-            },
+            social: [
+                { icon: 'discord', label: 'Discord', href: 'https://discord.gg/JcNSqJ7vK8'},
+                { icon: 'github', label: 'GitHub', href: 'https://github.com/bytechefhq/bytechef'},
+                { icon: 'twitter', label: 'Twitter', href: 'https://twitter.com/bytechefhq'},
+            ],
             editLink: {
                 baseUrl: 'https://github.com/bytechefhq/bytechef/edit/master/docs/',
             },
