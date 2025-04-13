@@ -19,7 +19,8 @@ https://tailwindcss.com/docs/adding-custom-styles#using-css-and-layer
     --sl-color-gray-4: #545861;
     --sl-color-gray-5: #353841;
     --sl-color-gray-6: #24272f;
-    --sl-color-black: #17181c;
+    /*--sl-color-black: #17181c;*/
+    --sl-color-black: #000000;
 
     --sl-color-bg-nav: var(--sl-color-black);
     --sl-color-bg-sidebar: var(--sl-color-black);
@@ -42,13 +43,26 @@ https://tailwindcss.com/docs/adding-custom-styles#using-css-and-layer
     --sl-color-bg-nav: var(--sl-color-bg);
 }
 
+.large {
+    font-size: 0.95rem !important;
+    font-weight: 500 !important;
+}
+
+.caret {
+    font-size: 0.9rem !important;
+}
+
 .site-title {
     color: var(--sl-color-white);
+    gap: 0.8rem;
+
+    img {
+        width: 28px !important;
+        height: 28px !important;
+    }
 }
 
 .header {
-    border-bottom: none;
-
     .social-icons {
         a {
             color: var(--sl-color-white);
@@ -56,16 +70,19 @@ https://tailwindcss.com/docs/adding-custom-styles#using-css-and-layer
     }
 }
 
+.main-pane {
+    --sl-content-margin-inline: auto !important;
+
+    width: calc(var(--sl-content-width) + (100% - var(--sl-content-width)/1.5)) !important;
+}
+
 .sidebar-pane {
-    border-inline-end: none;
-}
+    width: 20rem !important;
 
-.content-panel+.content-panel {
-    border-top: none;
-}
-
-.right-sidebar {
-    border-inline-start: none;
+    [aria-current=page] {
+        color: var(--sl-color-text-accent);
+        background-color: transparent !important;
+    }
 }
 
 .pagination-links {
