@@ -127,5 +127,4 @@ public class BeamerNewPostTrigger {
 
         return new PollOutput(posts, Map.of(LAST_TIME_CHECKED, now), false);
     }
-
 }
