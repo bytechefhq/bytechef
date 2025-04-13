@@ -36,7 +36,7 @@ public class TwilioUtils {
     }
 
     public static List<Option<String>> getContentSidOptions(
-        Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
         String searchText, Context context) {
 
         Map<String, Object> body = context.http(http -> http.get("https://content.twilio.com/v1/Content"))

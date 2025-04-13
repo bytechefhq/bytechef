@@ -46,7 +46,7 @@ public class JiraOptionsUtils {
     }
 
     public static List<Option<String>> getIssueIdOptions(
-        Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
         String searchText, ActionContext context) {
 
         String encode = URLEncoder.encode(
@@ -72,7 +72,7 @@ public class JiraOptionsUtils {
     }
 
     public static List<Option<String>> getIssueTypesIdOptions(
-        Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
         String searchText, Context context) {
 
         List<Object> body = context
@@ -86,7 +86,7 @@ public class JiraOptionsUtils {
     }
 
     public static List<Option<String>> getPriorityIdOptions(
-        Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
         String searchText, ActionContext context) {
 
         List<Object> body = context
@@ -99,7 +99,7 @@ public class JiraOptionsUtils {
     }
 
     public static List<Option<String>> getProjectIdOptions(
-        Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
         String searchText, Context context) {
 
         Map<String, Object> body = context
@@ -122,7 +122,7 @@ public class JiraOptionsUtils {
     }
 
     public static List<Option<String>> getUserIdOptions(
-        Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
         String searchText, ActionContext context) {
 
         List<Object> body = context

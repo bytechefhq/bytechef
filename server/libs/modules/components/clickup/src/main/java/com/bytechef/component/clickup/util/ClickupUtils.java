@@ -43,7 +43,7 @@ public class ClickupUtils extends AbstractClickupUtils {
     }
 
     public static List<Option<String>> getListIdOptions(
-        Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
         String searchText, Context context) {
 
         List<Option<String>> options = new ArrayList<>();
@@ -67,7 +67,7 @@ public class ClickupUtils extends AbstractClickupUtils {
     }
 
     public static List<Option<String>> getFolderIdOptions(
-        Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
         String searchText, Context context) {
 
         return getOptions(
@@ -76,7 +76,7 @@ public class ClickupUtils extends AbstractClickupUtils {
     }
 
     public static List<Option<String>> getSpaceIdOptions(
-        Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
         String searchText, Context context) {
 
         return getOptions(
@@ -85,7 +85,7 @@ public class ClickupUtils extends AbstractClickupUtils {
     }
 
     public static List<Option<String>> getWorkspaceIdOptions(
-        Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
         String searchText, Context context) {
 
         return getOptions(fetchDataFromHttpEndpoint("/team", context), "teams");

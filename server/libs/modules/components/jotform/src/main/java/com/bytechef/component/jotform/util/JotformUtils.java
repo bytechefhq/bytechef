@@ -36,7 +36,7 @@ public class JotformUtils extends AbstractJotformUtils {
     }
 
     public static List<Option<String>> getFormIdOptions(
-        Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
         String searchText, Context context) {
 
         Map<String, Object> body = context.http(http -> http.get("/user/forms"))

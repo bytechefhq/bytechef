@@ -30,7 +30,7 @@ import java.util.Map;
 public abstract class AbstractTeamworkUtils {
     public static List<Option<Long>> getTasklistIdOptions(
         Parameters inputParameters,
-        Parameters connectionParameters, Map<String, String> dependencyPaths, String searchText,
+        Parameters connectionParameters, Map<String, String> lookupDependsOnPaths, String searchText,
         Context context) {
 
         return List.of();

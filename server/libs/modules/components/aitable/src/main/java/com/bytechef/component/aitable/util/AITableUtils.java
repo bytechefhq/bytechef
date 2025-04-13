@@ -55,7 +55,7 @@ public class AITableUtils {
     }
 
     public static List<? extends ValueProperty<?>> createPropertiesForRecord(
-        Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
         ActionContext context) {
 
         List<FieldTypeInfo> datasheetFields = createDatasheetFields(inputParameters, context);
@@ -172,7 +172,7 @@ public class AITableUtils {
     }
 
     public static List<Option<String>> getDatasheetIdOptions(
-        Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
         String searchText, ActionContext context) {
 
         String spaceId = inputParameters.getRequiredString(SPACE_ID);

@@ -75,16 +75,17 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
         Map<String, ?> inputParameters, List<String> lookupDependsOnPaths,
         ComponentConnection connection, ActionContext context) {
 
-        WrapResult wrapResult = wrap(inputParameters, lookupDependsOnPaths, connection);
+        ConvertResult convertResult = convert(inputParameters, lookupDependsOnPaths, connection);
 
         try {
             ActionPropertiesFunction propertiesFunction = getComponentPropertiesFunction(
-                componentName, componentVersion, actionName, propertyName, wrapResult.inputParameters,
-                wrapResult.connectionParameters, wrapResult.lookupDependsOnPathsMap, context);
+                componentName, componentVersion, actionName, propertyName, convertResult.inputParameters,
+                convertResult.connectionParameters, convertResult.lookupDependsOnPathsMap, context);
 
             return propertiesFunction
                 .apply(
-                    wrapResult.inputParameters, wrapResult.connectionParameters, wrapResult.lookupDependsOnPathsMap,
+                    convertResult.inputParameters, convertResult.connectionParameters,
+                    convertResult.lookupDependsOnPathsMap,
                     context)
                 .stream()
                 .map(valueProperty -> (Property) Property.toProperty(valueProperty))
@@ -152,16 +153,16 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
         ComponentConnection connection, ActionContext context) {
 
         try {
-            WrapResult wrapResult = wrap(inputParameters, lookupDependsOnPaths, connection);
+            ConvertResult convertResult = convert(inputParameters, lookupDependsOnPaths, connection);
 
             ActionOptionsFunction<?> optionsFunction = getComponentOptionsFunction(
-                componentName, componentVersion, actionName, propertyName, wrapResult.inputParameters(),
-                wrapResult.connectionParameters(), wrapResult.lookupDependsOnPathsMap(), context);
+                componentName, componentVersion, actionName, propertyName, convertResult.inputParameters(),
+                convertResult.connectionParameters(), convertResult.lookupDependsOnPathsMap(), context);
 
             return optionsFunction
                 .apply(
-                    wrapResult.inputParameters(), wrapResult.connectionParameters(),
-                    wrapResult.lookupDependsOnPathsMap(), searchText, context)
+                    convertResult.inputParameters(), convertResult.connectionParameters(),
+                    convertResult.lookupDependsOnPathsMap(), searchText, context)
                 .stream()
                 .map(Option::new)
                 .toList();
@@ -332,14 +333,12 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
     }
 
     private com.bytechef.component.definition.ActionDefinition.ActionWorkflowNodeDescriptionFunction
-        getWorkflowNodeDescriptionFunction(
-            String componentName, int componentVersion, String actionName) {
+        getWorkflowNodeDescriptionFunction(String componentName, int componentVersion, String actionName) {
 
         if (!componentDefinitionRegistry.hasComponentDefinition(componentName, componentVersion)) {
             componentName = "missing";
             componentVersion = 1;
             actionName = "missing";
-
         }
 
         ComponentDefinition componentDefinition = componentDefinitionRegistry.getComponentDefinition(
@@ -366,17 +365,16 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
             outputResponse, PropertyFactory.OUTPUT_FACTORY_FUNCTION, PropertyFactory.PROPERTY_FACTORY);
     }
 
-    private static WrapResult wrap(
+    private static ConvertResult convert(
         Map<String, ?> inputParameters, List<String> lookupDependsOnPaths, ComponentConnection connection) {
 
-        return new WrapResult(
+        return new ConvertResult(
             ParametersFactory.createParameters(inputParameters),
-            ParametersFactory.createParameters(
-                connection == null ? Map.of() : connection.parameters()),
+            ParametersFactory.createParameters(connection == null ? Map.of() : connection.parameters()),
             getLookupDependsOnPathsMap(lookupDependsOnPaths));
     }
 
-    private record WrapResult(
+    private record ConvertResult(
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPathsMap) {
     }
 }

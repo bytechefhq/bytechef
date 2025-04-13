@@ -548,7 +548,7 @@ public class ComponentInitOpenApiGenerator {
             .addParameter(ParameterSpec.builder(
                 ParameterizedTypeName.get(ClassName.get(Map.class), ClassName.get(String.class),
                     ClassName.get(String.class)),
-                "dependencyPaths")
+                "lookupDependsOnPaths")
                 .build())
             .addParameter(ParameterSpec.builder(String.class, "searchText")
                 .build())
@@ -573,7 +573,7 @@ public class ComponentInitOpenApiGenerator {
             .addParameter(ParameterSpec.builder(
                 ParameterizedTypeName.get(ClassName.get(Map.class), ClassName.get(String.class),
                     ClassName.get(String.class)),
-                "dependencyPaths")
+                "lookupDependsOnPaths")
                 .build())
             .addParameter(ParameterSpec.builder(Context.class, "context")
                 .build())

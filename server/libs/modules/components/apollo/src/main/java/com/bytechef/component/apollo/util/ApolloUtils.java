@@ -36,21 +36,21 @@ public class ApolloUtils extends AbstractApolloUtils {
     }
 
     public static List<Option<String>> getAccountIdOptions(
-        Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
         String searchText, Context context) {
 
         return getOptions("/mixed_companies/search", "organizations", context);
     }
 
     public static List<Option<String>> getOwnerIdOptions(
-        Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
         String searchText, Context context) {
 
         return getOptions("/users/search", "users", context);
     }
 
     public static List<Option<String>> getOpportunityIdOptions(
-        Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
         String searchText, Context context) {
 
         return getOptions("/opportunities/search", "opportunities", context);

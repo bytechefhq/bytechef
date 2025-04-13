@@ -38,7 +38,7 @@ public class ShopifyUtils extends AbstractShopifyUtils {
     }
 
     public static List<Option<Long>> getOrderIdOptions(
-        Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
         String searchText, Context context) {
 
         Map<String, List<Map<String, Object>>> body = context
@@ -57,7 +57,7 @@ public class ShopifyUtils extends AbstractShopifyUtils {
     }
 
     public static List<Option<Long>> getProductIdOptions(
-        Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
         String searchText, Context context) {
 
         Map<String, List<Map<String, Object>>> body = context
@@ -76,12 +76,12 @@ public class ShopifyUtils extends AbstractShopifyUtils {
     }
 
     public static List<Option<Long>> getVariantIdOptions(
-        Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
         String searchText, Context context) {
 
         Map<String, List<Map<String, Object>>> body = context.http(
             http -> http.get(
-                "/products/" + inputParameters.getRequiredFromPath(dependencyPaths.get(PRODUCT_ID), String.class) +
+                "/products/" + inputParameters.getRequiredFromPath(lookupDependsOnPaths.get(PRODUCT_ID), String.class) +
                     "/variants.json"))
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute()

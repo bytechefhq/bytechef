@@ -42,7 +42,7 @@ public class StripeUtils extends AbstractStripeUtils {
     }
 
     public static List<Option<String>> getCustomerOptions(
-        Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
         String searchText, Context context) {
 
         Map<String, Object> body = context.http(

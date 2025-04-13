@@ -31,7 +31,7 @@ import java.util.Map;
 public abstract class AbstractAirtableUtils {
     public static List<Option<String>> getBaseIdOptions(
         Parameters inputParameters,
-        Parameters connectionParameters, Map<String, String> dependencyPaths, String searchText,
+        Parameters connectionParameters, Map<String, String> lookupDependsOnPaths, String searchText,
         Context context) {
 
         return List.of();
@@ -39,7 +39,7 @@ public abstract class AbstractAirtableUtils {
 
     public static List<Option<String>> getTableIdOptions(
         Parameters inputParameters,
-        Parameters connectionParameters, Map<String, String> dependencyPaths, String searchText,
+        Parameters connectionParameters, Map<String, String> lookupDependsOnPaths, String searchText,
         Context context) {
 
         return List.of();

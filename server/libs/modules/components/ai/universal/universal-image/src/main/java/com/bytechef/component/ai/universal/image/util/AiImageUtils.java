@@ -46,7 +46,7 @@ public class AiImageUtils {
     }
 
     public static List<? extends Option<String>> getModelOptions(
-        Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
         String searchText, ActionContext context) {
 
         Provider provider = Provider.valueOf(inputParameters.getRequiredString(PROVIDER));

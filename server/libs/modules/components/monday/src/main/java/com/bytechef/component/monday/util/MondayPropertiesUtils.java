@@ -70,7 +70,7 @@ import java.util.Objects;
 public class MondayPropertiesUtils {
 
     public static List<ValueProperty<?>> createPropertiesForItem(
-        Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
         ActionContext context) {
 
         List<?> boardColumns = getBoardColumns(inputParameters.getRequiredString(BOARD_ID), context);

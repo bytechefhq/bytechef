@@ -41,7 +41,7 @@ public class WebflowUtils extends AbstractWebflowUtils {
     }
 
     public static List<Option<String>> getItemIdOptions(
-        Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
         String searchText, Context context) {
 
         Map<String, Object> body = context

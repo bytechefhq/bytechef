@@ -37,7 +37,7 @@ public class TodoistUtils extends AbstractTodoistUtils {
 
     public static List<Option<String>> getTaskIdOptions(
         Parameters inputParameters,
-        Parameters connectionParameters, Map<String, String> dependencyPaths, String searchText,
+        Parameters connectionParameters, Map<String, String> lookupDependsOnPaths, String searchText,
         Context context) {
 
         return getOptions(context, "/tasks", "content");
@@ -45,7 +45,7 @@ public class TodoistUtils extends AbstractTodoistUtils {
 
     public static List<Option<String>> getProjectIdOptions(
         Parameters inputParameters,
-        Parameters connectionParameters, Map<String, String> dependencyPaths, String searchText,
+        Parameters connectionParameters, Map<String, String> lookupDependsOnPaths, String searchText,
         Context context) {
 
         return getOptions(context, "/projects", "name");
