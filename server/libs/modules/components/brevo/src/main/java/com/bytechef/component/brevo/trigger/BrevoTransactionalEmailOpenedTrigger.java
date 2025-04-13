@@ -55,9 +55,7 @@ public class BrevoTransactionalEmailOpenedTrigger {
         String workflowExecutionId, TriggerContext context) {
 
         Map<String, ?> body = context.http(http -> http.post("/webhooks"))
-            .body(Http.Body.of(
-                "url", webhookUrl,
-                "events", List.of("opened")))
+            .body(Http.Body.of("url", webhookUrl, "events", List.of("opened")))
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});
