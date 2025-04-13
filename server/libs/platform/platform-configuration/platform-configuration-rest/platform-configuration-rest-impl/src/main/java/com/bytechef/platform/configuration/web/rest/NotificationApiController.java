@@ -19,7 +19,6 @@ package com.bytechef.platform.configuration.web.rest;
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
 import com.bytechef.platform.configuration.domain.Notification;
 import com.bytechef.platform.configuration.service.NotificationService;
-import com.bytechef.platform.configuration.web.rest.model.NotificationEventModel;
 import com.bytechef.platform.configuration.web.rest.model.NotificationModel;
 import java.util.List;
 import org.springframework.core.convert.ConversionService;
@@ -44,28 +43,19 @@ public class NotificationApiController implements NotificationApi {
     }
 
     @Override
+    public ResponseEntity<NotificationModel> createNotification(NotificationModel notificationModel) {
+        return ResponseEntity.ok(
+            conversionService.convert(
+                notificationService.create(conversionService.convert(notificationModel, Notification.class)),
+                NotificationModel.class));
+    }
+
+    @Override
     public ResponseEntity<List<NotificationModel>> getNotifications() {
         return ResponseEntity.ok(
             notificationService.getNotifications()
                 .stream()
                 .map(notification -> conversionService.convert(notification, NotificationModel.class))
                 .toList());
-    }
-
-    @Override
-    public ResponseEntity<NotificationModel> postNotification(NotificationModel notificationModel) {
-        return ResponseEntity.ok(
-            conversionService.convert(
-                notificationService.create(
-                    notificationModel.getName(),
-                    Notification.Type.valueOf(
-                        notificationModel.getNotificationType()
-                            .toString()),
-                    notificationModel.getSettings(),
-                    notificationModel.getEvents()
-                        .stream()
-                        .map(NotificationEventModel::getId)
-                        .toList()),
-                NotificationModel.class));
     }
 }

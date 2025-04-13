@@ -16,8 +16,8 @@
 
 package com.bytechef.platform.configuration.notification;
 
-import com.bytechef.platform.configuration.domain.Event;
 import com.bytechef.platform.configuration.domain.Notification;
+import com.bytechef.platform.configuration.domain.NotificationEvent;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -29,38 +29,43 @@ import org.springframework.util.Assert;
  */
 @Component
 public class NotificationHandlerRegistry {
-    private final Map<Event.Type, EmailNotificationHandler> emailNotificationHanlderMap = new HashMap<>();
-    private final Map<Event.Type, WebhookNotificationHandler> webhookNotificationHandlerMap = new HashMap<>();
+
+    private final Map<NotificationEvent.Type, EmailNotificationHandler> emailNotificationHanlderMap =
+        new HashMap<>();
+    private final Map<NotificationEvent.Type, WebhookNotificationHandler> webhookNotificationHandlerMap =
+        new HashMap<>();
 
     public NotificationHandlerRegistry(List<NotificationHandler> notificationHandlers) {
         for (NotificationHandler notificationHandler : notificationHandlers) {
-            NotificationEvent notificationEvent = notificationHandler.getClass()
-                .getAnnotation(NotificationEvent.class);
+            Class<? extends NotificationHandler> notificationHandlerClass = notificationHandler.getClass();
+
+            NotificationEventType notificationEventType = notificationHandlerClass.getAnnotation(
+                NotificationEventType.class);
 
             Assert.notNull(
-                notificationEvent,
-                "Notification handler " + notificationHandler.getClass()
-                    .getName() +
-                    "is missing NotificationEvent annotation");
+                notificationEventType,
+                "Notification handler %s is missing NotificationEvent annotation".formatted(
+                    notificationHandlerClass.getName()));
 
             if (notificationHandler instanceof EmailNotificationHandler emailNotificationHandler) {
-                for (Event.Type eventType : notificationEvent.value()) {
+                for (NotificationEvent.Type eventType : notificationEventType.value()) {
                     emailNotificationHanlderMap.put(eventType, emailNotificationHandler);
                 }
             } else if (notificationHandler instanceof WebhookNotificationHandler webhookNotificationHandler) {
-                for (Event.Type eventType : notificationEvent.value()) {
+                for (NotificationEvent.Type eventType : notificationEventType.value()) {
                     webhookNotificationHandlerMap.put(eventType, webhookNotificationHandler);
                 }
             }
         }
     }
 
-    public NotificationHandler getNotificationHandler(Event.Type eventType, Notification.Type notificationType) {
+    public NotificationHandler getNotificationHandler(
+        NotificationEvent.Type eventType, Notification.Type notificationType) {
+
         if (notificationType == Notification.Type.EMAIL) {
             return emailNotificationHanlderMap.get(eventType);
         }
 
         return webhookNotificationHandlerMap.get(eventType);
     }
-
 }

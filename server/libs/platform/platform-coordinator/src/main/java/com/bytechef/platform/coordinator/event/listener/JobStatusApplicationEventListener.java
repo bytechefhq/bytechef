@@ -21,8 +21,8 @@ import com.bytechef.atlas.coordinator.event.JobStatusApplicationEvent;
 import com.bytechef.atlas.coordinator.event.listener.ApplicationEventListener;
 import com.bytechef.atlas.execution.domain.Job;
 import com.bytechef.atlas.execution.service.JobService;
-import com.bytechef.platform.configuration.domain.Event;
 import com.bytechef.platform.configuration.domain.Notification;
+import com.bytechef.platform.configuration.domain.NotificationEvent;
 import com.bytechef.platform.configuration.notification.NotificationHandler;
 import com.bytechef.platform.configuration.notification.NotificationHandlerContext;
 import com.bytechef.platform.configuration.notification.NotificationHandlerRegistry;
@@ -62,14 +62,15 @@ public class JobStatusApplicationEventListener implements ApplicationEventListen
     public void onApplicationEvent(ApplicationEvent applicationEvent) {
         if (applicationEvent instanceof JobStatusApplicationEvent jobStatusApplicationEvent) {
 
-            Event.Type eventType = Event.Type.of(Event.Source.JOB, jobStatusApplicationEvent.getStatus()
-                .toString());
+            Job.Status status = jobStatusApplicationEvent.getStatus();
+
+            NotificationEvent.Type eventType =
+                NotificationEvent.Type.of(NotificationEvent.Source.JOB, status.toString());
 
             NotificationHandlerContext notificationHandlerContext = getNotificationHandlerContext(
                 eventType, jobService.getJob(jobStatusApplicationEvent.getJobId()));
 
-            List<Notification> notifications =
-                notificationService.getNotifications(eventType);
+            List<Notification> notifications = notificationService.getNotifications(eventType);
 
             for (Notification notification : notifications) {
                 NotificationSender notificationSender = notificationSenderRegistry.getNotificationSender(
@@ -83,7 +84,7 @@ public class JobStatusApplicationEventListener implements ApplicationEventListen
         }
     }
 
-    private NotificationHandlerContext getNotificationHandlerContext(Event.Type eventType, Job job) {
+    private NotificationHandlerContext getNotificationHandlerContext(NotificationEvent.Type eventType, Job job) {
         return new NotificationHandlerContext.Builder()
             .eventType(eventType)
             .jobId(job.getId())

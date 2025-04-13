@@ -7,8 +7,8 @@
 
 package com.bytechef.ee.platform.workflow.configuration.remote.client.service;
 
-import com.bytechef.platform.configuration.domain.Event;
-import com.bytechef.platform.configuration.service.EventService;
+import com.bytechef.platform.configuration.domain.NotificationEvent;
+import com.bytechef.platform.configuration.service.NotificationEventService;
 import java.util.List;
 import org.springframework.stereotype.Component;
 
@@ -18,15 +18,15 @@ import org.springframework.stereotype.Component;
  * @author Ivica Cardic
  */
 @Component
-public class RemoteEventServiceClient implements EventService {
+public class RemoteNotificationEventServiceClient implements NotificationEventService {
 
     @Override
-    public List<Event> getEvents() {
+    public List<NotificationEvent> getNotificationEvents() {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public List<Event> getEvents(List<Long> eventIds) {
+    public List<NotificationEvent> getNotificationEvents(List<Long> notificationEventIds) {
         throw new UnsupportedOperationException();
     }
 }

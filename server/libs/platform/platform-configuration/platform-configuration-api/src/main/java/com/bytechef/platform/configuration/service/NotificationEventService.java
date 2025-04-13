@@ -14,20 +14,17 @@
  * limitations under the License.
  */
 
-package com.bytechef.platform.configuration.notification;
+package com.bytechef.platform.configuration.service;
 
-import com.bytechef.platform.configuration.domain.Event;
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import com.bytechef.platform.configuration.domain.NotificationEvent;
+import java.util.List;
 
 /**
  * @author Matija Petanjek
  */
-@Retention(RetentionPolicy.RUNTIME)
-@Target(ElementType.TYPE)
-public @interface NotificationEvent {
+public interface NotificationEventService {
 
-    Event.Type[] value();
+    List<NotificationEvent> getNotificationEvents();
+
+    List<NotificationEvent> getNotificationEvents(List<Long> notificationEventIds);
 }

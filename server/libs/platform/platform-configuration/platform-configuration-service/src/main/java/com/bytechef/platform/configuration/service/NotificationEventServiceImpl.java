@@ -16,8 +16,8 @@
 
 package com.bytechef.platform.configuration.service;
 
-import com.bytechef.platform.configuration.domain.Event;
-import com.bytechef.platform.configuration.repository.EventRepository;
+import com.bytechef.platform.configuration.domain.NotificationEvent;
+import com.bytechef.platform.configuration.repository.NotificationEventRepository;
 import java.util.List;
 import org.springframework.stereotype.Service;
 
@@ -25,21 +25,21 @@ import org.springframework.stereotype.Service;
  * @author Matija Petanjek
  */
 @Service
-public class EventServiceImpl implements EventService {
+public class NotificationEventServiceImpl implements NotificationEventService {
 
-    private final EventRepository eventRepository;
+    private final NotificationEventRepository notificationEventRepository;
 
-    public EventServiceImpl(EventRepository eventRepository) {
-        this.eventRepository = eventRepository;
+    public NotificationEventServiceImpl(NotificationEventRepository notificationEventRepository) {
+        this.notificationEventRepository = notificationEventRepository;
     }
 
     @Override
-    public List<Event> getEvents() {
-        return eventRepository.findAll();
+    public List<NotificationEvent> getNotificationEvents() {
+        return notificationEventRepository.findAll();
     }
 
     @Override
-    public List<Event> getEvents(List<Long> eventIds) {
-        return eventRepository.findByIdIn(eventIds);
+    public List<NotificationEvent> getNotificationEvents(List<Long> notificationEventIds) {
+        return notificationEventRepository.findByIdIn(notificationEventIds);
     }
 }

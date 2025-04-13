@@ -29,6 +29,7 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.LastModifiedBy;
 import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.annotation.Version;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.MappedCollection;
 import org.springframework.data.relational.core.mapping.Table;
@@ -46,6 +47,18 @@ public class Notification {
     @Id
     private Long id;
 
+    @Column
+    private String name;
+
+    @Column
+    private int type;
+
+    @Column
+    private MapWrapper settings;
+
+    @MappedCollection(idColumn = "notification_id")
+    private Set<NotificationNotificationEvent> notificationEvents = new HashSet<>();
+
     @CreatedBy
     @Column("created_by")
     private String createdBy;
@@ -62,94 +75,93 @@ public class Notification {
     @LastModifiedDate
     private Instant lastModifiedDate;
 
-    @Column
-    private String name;
+    @Version
+    private int version;
 
-    @Column
-    private Type type;
-
-    @Column
-    private MapWrapper settings;
-
-    @MappedCollection(idColumn = "notification_id")
-    private Set<NotificationEvent> events = new HashSet<>();
-
-    public void setName(String name) {
-        this.name = name;
+    public Long getId() {
+        return id;
     }
 
     public String getName() {
         return name;
     }
 
-    public void setEventIds(List<Long> eventIds) {
-        this.events = new HashSet<>();
-
-        for (Long eventId : eventIds) {
-            events.add(new NotificationEvent(eventId));
-        }
+    public Type getType() {
+        return Type.values()[type];
     }
 
-    public List<Long> getEventIds() {
-        return events.stream()
-            .map(NotificationEvent::getEventId)
+    public Map<String, Object> getSettings() {
+        return Collections.unmodifiableMap(settings.getMap());
+    }
+
+    public List<Long> getNotificationEventIds() {
+        return notificationEvents.stream()
+            .map(NotificationNotificationEvent::getEventId)
             .toList();
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
     }
 
     public String getCreatedBy() {
         return createdBy;
     }
 
-    public void setCreatedBy(String createdBy) {
-        this.createdBy = createdBy;
-    }
-
     public Instant getCreatedDate() {
         return createdDate;
-    }
-
-    public void setCreatedDate(Instant createdDate) {
-        this.createdDate = createdDate;
     }
 
     public String getLastModifiedBy() {
         return lastModifiedBy;
     }
 
-    public void setLastModifiedBy(String lastModifiedBy) {
-        this.lastModifiedBy = lastModifiedBy;
-    }
-
     public Instant getLastModifiedDate() {
         return lastModifiedDate;
+    }
+
+    public int getVersion() {
+        return version;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setType(Type type) {
+        this.type = type.ordinal();
+    }
+
+    public void setSettings(Map<String, ?> settings) {
+        this.settings = new MapWrapper(settings);
+    }
+
+    public void setNotificationEventIds(List<Long> notificationEventIds) {
+        this.notificationEvents = new HashSet<>();
+
+        for (Long notificationEventId : notificationEventIds) {
+            notificationEvents.add(new NotificationNotificationEvent(notificationEventId));
+        }
+    }
+
+    public void setCreatedBy(String createdBy) {
+        this.createdBy = createdBy;
+    }
+
+    public void setCreatedDate(Instant createdDate) {
+        this.createdDate = createdDate;
+    }
+
+    public void setLastModifiedBy(String lastModifiedBy) {
+        this.lastModifiedBy = lastModifiedBy;
     }
 
     public void setLastModifiedDate(Instant lastModifiedDate) {
         this.lastModifiedDate = lastModifiedDate;
     }
 
-    public Type getType() {
-        return type;
-    }
-
-    public void setType(Type type) {
-        this.type = type;
-    }
-
-    public Map getSettings() {
-        return Collections.unmodifiableMap(settings.getMap());
-    }
-
-    public void setSettings(Map<String, ?> settings) {
-        this.settings = new MapWrapper(settings);
+    public void setVersion(int version) {
+        this.version = version;
     }
 
     @Override
@@ -170,5 +182,20 @@ public class Notification {
     @Override
     public int hashCode() {
         return getClass().hashCode();
+    }
+
+    @Override
+    public String toString() {
+        return "Notification{" +
+            "id=" + id +
+            ", createdBy='" + createdBy + '\'' +
+            ", createdDate=" + createdDate +
+            ", lastModifiedBy='" + lastModifiedBy + '\'' +
+            ", lastModifiedDate=" + lastModifiedDate +
+            ", name='" + name + '\'' +
+            ", type=" + type +
+            ", settings=" + settings +
+            ", notificationEvents=" + notificationEvents +
+            '}';
     }
 }

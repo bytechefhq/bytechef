@@ -14,17 +14,15 @@
  * limitations under the License.
  */
 
-package com.bytechef.platform.configuration.service;
+package com.bytechef.platform.configuration.facade;
 
-import com.bytechef.platform.configuration.domain.Event;
+import com.bytechef.platform.configuration.dto.NotificationDTO;
 import java.util.List;
 
 /**
- * @author Matija Petanjek
+ * @author Ivica Cardic
  */
-public interface EventService {
+public interface NotificationFacade {
 
-    List<Event> getEvents();
-
-    List<Event> getEvents(List<Long> eventIds);
+    List<NotificationDTO> getNotifications();
 }

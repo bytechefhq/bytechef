@@ -16,24 +16,16 @@
 
 package com.bytechef.platform.configuration.repository;
 
-import com.bytechef.platform.configuration.domain.Notification;
+import com.bytechef.platform.configuration.domain.NotificationEvent;
 import java.util.List;
-import org.springframework.data.jdbc.repository.query.Query;
 import org.springframework.data.repository.ListCrudRepository;
-import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 /**
  * @author Matija Petanjek
  */
 @Repository
-public interface NotificationRepository extends ListCrudRepository<Notification, Long> {
+public interface NotificationEventRepository extends ListCrudRepository<NotificationEvent, Long> {
 
-    @Query("""
-            SELECT * FROM notification
-            JOIN notification_notification_event ON notification.id = notification_notification_event.notification_id
-            JOIN notification_event ON notification_notification_event.event_id = notification_event.id
-            WHERE notification_event.type = :type
-        """)
-    List<Notification> findAllByEventType(@Param("type") int type);
+    List<NotificationEvent> findByIdIn(List<Long> notificationEventIds);
 }

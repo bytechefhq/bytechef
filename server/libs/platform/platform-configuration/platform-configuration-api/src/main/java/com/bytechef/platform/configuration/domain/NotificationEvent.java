@@ -17,21 +17,64 @@
 package com.bytechef.platform.configuration.domain;
 
 import java.util.Objects;
-import org.springframework.data.jdbc.core.mapping.AggregateReference;
+import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
 
 /**
  * @author Matija Petanjek
  */
-@Table("notification_notification_event")
+@Table("notification_event")
 public class NotificationEvent {
 
-    @Column("event_id")
-    private AggregateReference<Event, Long> eventId;
+    public enum Source {
+        JOB, TASK
+    }
 
-    public NotificationEvent(Long eventId) {
-        this.eventId = eventId == null ? null : AggregateReference.to(eventId);
+    public enum Type {
+
+        JOB_CANCELLED(Source.JOB, "CANCELLED"), JOB_CREATED(Source.JOB, "CREATED"),
+        JOB_COMPLETED(Source.JOB, "COMPLETED"), JOB_FAILED(Source.JOB, "FAILED"), JOB_STARTED(Source.JOB, "STARTED");
+
+        private final Source source;
+        private final String value;
+
+        Type(Source source, String value) {
+            this.source = source;
+            this.value = value;
+        }
+
+        public static Type of(Source source, String value) {
+            for (Type type : values()) {
+                if (source == type.source && value.equals(type.value)) {
+                    return type;
+                }
+            }
+
+            throw new IllegalArgumentException();
+        }
+    }
+
+    @Id
+    private Long id;
+
+    @Column
+    private int type;
+
+    public Long getId() {
+        return id;
+    }
+
+    public Type getType() {
+        return Type.values()[type];
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public void setType(Type type) {
+        this.type = type.ordinal();
     }
 
     @Override
@@ -40,20 +83,25 @@ public class NotificationEvent {
             return true;
         }
 
-        if (!(o instanceof NotificationEvent notificationEvent)) {
+        if (o == null || getClass() != o.getClass()) {
             return false;
         }
 
-        return Objects.equals(eventId, notificationEvent.eventId);
+        NotificationEvent notificationEvent = (NotificationEvent) o;
+
+        return Objects.equals(id, notificationEvent.id);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(eventId);
+        return getClass().hashCode();
     }
 
-    public Long getEventId() {
-        return eventId.getId();
+    @Override
+    public String toString() {
+        return "NotificationEvent{" +
+            "id=" + id +
+            ", type=" + type +
+            '}';
     }
-
 }
