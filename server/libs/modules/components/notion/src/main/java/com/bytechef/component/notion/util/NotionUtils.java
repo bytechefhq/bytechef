@@ -59,6 +59,7 @@ public class NotionUtils {
                         if (result instanceof Map<?, ?> resultMap &&
                             resultMap.get("properties") instanceof Map<?, ?> properties &&
                             properties.get(TITLE) instanceof Map<?, ?> title) {
+
                             options.add(getOption((String) resultMap.get(ID), title));
                         }
                     }
@@ -88,5 +89,4 @@ public class NotionUtils {
 
         return null;
     }
-
 }
