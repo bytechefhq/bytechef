@@ -19,15 +19,16 @@ package com.bytechef.platform.component.service;
 import com.bytechef.platform.component.domain.ComponentDefinition;
 import java.util.List;
 import java.util.Optional;
+import javax.annotation.Nullable;
 
 /**
  * @author Ivica Cardic
  */
 public interface ComponentDefinitionService {
 
-    Optional<ComponentDefinition> fetchComponentDefinition(String name, Integer version);
+    Optional<ComponentDefinition> fetchComponentDefinition(String name, @Nullable Integer version);
 
-    ComponentDefinition getComponentDefinition(String name, Integer version);
+    ComponentDefinition getComponentDefinition(String name, @Nullable Integer version);
 
     List<ComponentDefinition> getComponentDefinitions();
 
@@ -38,5 +39,5 @@ public interface ComponentDefinitionService {
 
     ComponentDefinition getConnectionComponentDefinition(String name, int connectionVersion);
 
-    boolean hasComponentDefinition(String name, Integer version);
+    boolean hasComponentDefinition(String name, @Nullable Integer version);
 }

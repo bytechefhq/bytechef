@@ -17,6 +17,7 @@
 package com.bytechef.platform.component.domain;
 
 import com.bytechef.commons.util.CollectionUtils;
+import com.bytechef.commons.util.IconUtils;
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.component.definition.ClusterElementDefinition.ClusterElementType;
 import com.bytechef.platform.component.definition.PropertyFactory;
@@ -55,7 +56,7 @@ public class ClusterElementDefinition {
         this.componentVersion = componentVersion;
         this.description = OptionalUtils.orElse(clusterElementDefinition.getDescription(), null);
         this.name = clusterElementDefinition.getName();
-        this.icon = icon;
+        this.icon = IconUtils.readIcon(icon);
         this.outputDefined = OptionalUtils.mapOrElse(
             clusterElementDefinition.getOutputDefinition(), outputDefinition -> true, false);
         this.outputFunctionDefined = OptionalUtils.mapOrElse(

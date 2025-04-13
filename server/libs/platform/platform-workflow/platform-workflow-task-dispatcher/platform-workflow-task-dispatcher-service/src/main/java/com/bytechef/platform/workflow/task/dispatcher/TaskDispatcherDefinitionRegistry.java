@@ -24,6 +24,8 @@ import com.bytechef.platform.workflow.task.dispatcher.definition.TaskDispatcherD
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
+import javax.annotation.Nullable;
 import org.springframework.stereotype.Component;
 
 /**
@@ -52,12 +54,28 @@ public class TaskDispatcherDefinitionRegistry {
         validate(taskDispatcherDefinitions);
     }
 
-    public TaskDispatcherDefinition getTaskDispatcherDefinition(String name, Integer version) {
-        return taskDispatcherDefinitions.stream()
-            .filter(taskDispatcherDefinition -> name.equalsIgnoreCase(taskDispatcherDefinition.getName()) &&
-                version == taskDispatcherDefinition.getVersion())
-            .findFirst()
-            .orElseThrow(IllegalStateException::new);
+    public Optional<TaskDispatcherDefinition> fetchTaskDispatcherDefinition(String name, @Nullable Integer version) {
+        TaskDispatcherDefinition taskDispatcherDefinition = null;
+
+        if (version == null) {
+            List<TaskDispatcherDefinition> filteredComponentDefinitions = getTaskDispatcherDefinitions(name);
+
+            taskDispatcherDefinition = filteredComponentDefinitions.getLast();
+        } else {
+            taskDispatcherDefinition = taskDispatcherDefinitions.stream()
+                .filter(curTaskDispatcherDefinition -> name.equalsIgnoreCase(curTaskDispatcherDefinition.getName()) &&
+                    version == curTaskDispatcherDefinition.getVersion())
+                .findFirst()
+                .orElse(null);
+        }
+
+        return Optional.ofNullable(taskDispatcherDefinition);
+    }
+
+    public TaskDispatcherDefinition getTaskDispatcherDefinition(String name, @Nullable Integer version) {
+        return fetchTaskDispatcherDefinition(name, version)
+            .orElseThrow(() -> new IllegalArgumentException(
+                String.format("Task dispatcher definition with name '%s' and version '%s' not found", name, version)));
     }
 
     @SuppressFBWarnings("EI")

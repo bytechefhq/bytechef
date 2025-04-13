@@ -19,6 +19,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
+import javax.annotation.Nullable;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Component;
@@ -42,12 +43,12 @@ public class RemoteComponentDefinitionServiceClient extends AbstractWorkerClient
     }
 
     @Override
-    public Optional<ComponentDefinition> fetchComponentDefinition(String name, Integer version) {
+    public Optional<ComponentDefinition> fetchComponentDefinition(String name, @Nullable Integer version) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public ComponentDefinition getComponentDefinition(String name, Integer version) {
+    public ComponentDefinition getComponentDefinition(String name, @Nullable Integer version) {
         return defaultRestClient.get(
             uriBuilder -> toUri(
                 uriBuilder, name, COMPONENT_DEFINITION_SERVICE + "/get-component-definition/{name}/{version}", name,
@@ -103,7 +104,7 @@ public class RemoteComponentDefinitionServiceClient extends AbstractWorkerClient
     }
 
     @Override
-    public boolean hasComponentDefinition(String name, Integer version) {
+    public boolean hasComponentDefinition(String name, @Nullable Integer version) {
         throw new UnsupportedOperationException();
     }
 

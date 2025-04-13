@@ -23,7 +23,9 @@ import com.bytechef.platform.configuration.web.rest.model.ComponentDefinitionBas
 import com.bytechef.platform.configuration.web.rest.model.ComponentDefinitionModel;
 import java.util.List;
 import java.util.stream.Collectors;
+import org.mapstruct.AfterMapping;
 import org.mapstruct.Mapper;
+import org.mapstruct.MappingTarget;
 import org.springframework.core.convert.converter.Converter;
 
 public class ComponentDefinitionMapper {
@@ -39,6 +41,14 @@ public class ComponentDefinitionMapper {
                 .map(ClusterElementType::name)
                 .collect(Collectors.toList());
         }
+
+        @AfterMapping
+        default void afterMapping(
+            ComponentDefinition componentDefinition,
+            @MappingTarget ComponentDefinitionModel componentDefinitionModel) {
+
+            componentDefinitionModel.setIcon("/icons/%s.svg".formatted(componentDefinition.getName()));
+        }
     }
 
     @Mapper(config = PlatformConfigurationMapperSpringConfig.class)
@@ -46,5 +56,13 @@ public class ComponentDefinitionMapper {
         extends Converter<ComponentDefinition, ComponentDefinitionBasicModel> {
 
         ComponentDefinitionBasicModel convert(ComponentDefinition componentDefinition);
+
+        @AfterMapping
+        default void afterMapping(
+            ComponentDefinition componentDefinition,
+            @MappingTarget ComponentDefinitionBasicModel componentDefinitionBasicModel) {
+
+            componentDefinitionBasicModel.setIcon("/icons/%s.svg".formatted(componentDefinition.getName()));
+        }
     }
 }

@@ -21,9 +21,11 @@ import com.bytechef.embedded.configuration.dto.IntegrationDTO;
 import com.bytechef.embedded.configuration.web.rest.mapper.config.EmbeddedConfigurationMapperSpringConfig;
 import com.bytechef.embedded.configuration.web.rest.model.IntegrationBasicModel;
 import com.bytechef.embedded.configuration.web.rest.model.IntegrationModel;
+import org.mapstruct.AfterMapping;
 import org.mapstruct.InheritInverseConfiguration;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import org.mapstruct.MappingTarget;
 import org.mapstruct.extensions.spring.DelegatingConverter;
 import org.springframework.core.convert.converter.Converter;
 
@@ -35,6 +37,11 @@ public class IntegrationMapper {
     @Mapper(config = EmbeddedConfigurationMapperSpringConfig.class)
     public interface IntegrationToIntegrationBasicModelMapper extends Converter<Integration, IntegrationBasicModel> {
 
+        @AfterMapping
+        default void afterMapping(Integration integration, @MappingTarget IntegrationBasicModel integrationBasicModel) {
+            integrationBasicModel.setIcon("/icons/%s.svg".formatted(integration.getComponentName()));
+        }
+
         @Override
         @Mapping(target = "icon", ignore = true)
         IntegrationBasicModel convert(Integration integration);
@@ -42,6 +49,11 @@ public class IntegrationMapper {
 
     @Mapper(config = EmbeddedConfigurationMapperSpringConfig.class)
     public interface IntegrationDTOToIntegrationModelMapper extends Converter<IntegrationDTO, IntegrationModel> {
+
+        @AfterMapping
+        default void afterMapping(Integration integration, @MappingTarget IntegrationModel integrationModel) {
+            integrationModel.setIcon("/icons/%s.svg".formatted(integration.getComponentName()));
+        }
 
         @Override
         IntegrationModel convert(IntegrationDTO integrationDTO);

@@ -26,6 +26,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Predicate;
+import javax.annotation.Nullable;
 import org.springframework.stereotype.Service;
 
 /**
@@ -42,13 +43,13 @@ public class ComponentDefinitionServiceImpl implements ComponentDefinitionServic
     }
 
     @Override
-    public Optional<ComponentDefinition> fetchComponentDefinition(String name, Integer version) {
+    public Optional<ComponentDefinition> fetchComponentDefinition(String name, @Nullable Integer version) {
         return componentDefinitionRegistry.fetchComponentDefinition(name, version)
             .map(ComponentDefinition::new);
     }
 
     @Override
-    public ComponentDefinition getComponentDefinition(String name, Integer version) {
+    public ComponentDefinition getComponentDefinition(String name, @Nullable Integer version) {
         com.bytechef.component.definition.ComponentDefinition componentDefinition =
             componentDefinitionRegistry.getComponentDefinition(name, version);
 
@@ -117,7 +118,7 @@ public class ComponentDefinitionServiceImpl implements ComponentDefinitionServic
     }
 
     @Override
-    public boolean hasComponentDefinition(String name, Integer version) {
+    public boolean hasComponentDefinition(String name, @Nullable Integer version) {
         return componentDefinitionRegistry.hasComponentDefinition(name, version);
     }
 

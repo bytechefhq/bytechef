@@ -28,6 +28,8 @@ import com.bytechef.platform.workflow.task.dispatcher.domain.TaskDispatcherDefin
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+import javax.annotation.Nullable;
 import org.springframework.stereotype.Service;
 
 /**
@@ -76,7 +78,13 @@ public class TaskDispatcherDefinitionServiceImpl implements TaskDispatcherDefini
     }
 
     @Override
-    public TaskDispatcherDefinition getTaskDispatcherDefinition(String name, int version) {
+    public Optional<TaskDispatcherDefinition> fetchTaskDispatcherDefinition(String name, @Nullable Integer version) {
+        return taskDispatcherDefinitionRegistry.fetchTaskDispatcherDefinition(name, version)
+            .map(TaskDispatcherDefinition::new);
+    }
+
+    @Override
+    public TaskDispatcherDefinition getTaskDispatcherDefinition(String name, @Nullable Integer version) {
         return new TaskDispatcherDefinition(
             taskDispatcherDefinitionRegistry.getTaskDispatcherDefinition(name, version));
     }

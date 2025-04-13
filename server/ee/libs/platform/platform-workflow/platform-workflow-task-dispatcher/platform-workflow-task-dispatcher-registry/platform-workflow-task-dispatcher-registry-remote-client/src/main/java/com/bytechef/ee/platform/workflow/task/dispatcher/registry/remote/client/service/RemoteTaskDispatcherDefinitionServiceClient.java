@@ -14,6 +14,8 @@ import com.bytechef.platform.workflow.task.dispatcher.service.TaskDispatcherDefi
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+import javax.annotation.Nullable;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Component;
 
@@ -55,7 +57,12 @@ public class RemoteTaskDispatcherDefinitionServiceClient implements TaskDispatch
     }
 
     @Override
-    public TaskDispatcherDefinition getTaskDispatcherDefinition(String name, int version) {
+    public Optional<TaskDispatcherDefinition> fetchTaskDispatcherDefinition(String name, @Nullable Integer version) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public TaskDispatcherDefinition getTaskDispatcherDefinition(String name, @Nullable Integer version) {
         return loadBalancedRestClient.get(
             uriBuilder -> uriBuilder
                 .host(COORDINATOR_APP)

@@ -20,6 +20,8 @@ import com.bytechef.platform.domain.OutputResponse;
 import com.bytechef.platform.workflow.task.dispatcher.domain.TaskDispatcherDefinition;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+import javax.annotation.Nullable;
 
 /**
  * @author Ivica Cardic
@@ -30,7 +32,9 @@ public interface TaskDispatcherDefinitionService {
 
     String executeWorkflowNodeDescription(String name, int version, Map<String, ?> inputParameters);
 
-    TaskDispatcherDefinition getTaskDispatcherDefinition(String name, int version);
+    Optional<TaskDispatcherDefinition> fetchTaskDispatcherDefinition(String name, @Nullable Integer version);
+
+    TaskDispatcherDefinition getTaskDispatcherDefinition(String name, @Nullable Integer version);
 
     List<TaskDispatcherDefinition> getTaskDispatcherDefinitions();
 

@@ -21,7 +21,9 @@ import com.bytechef.platform.component.domain.ClusterElementDefinition;
 import com.bytechef.platform.configuration.web.rest.mapper.config.PlatformConfigurationMapperSpringConfig;
 import com.bytechef.platform.configuration.web.rest.model.ClusterElementDefinitionBasicModel;
 import com.bytechef.platform.configuration.web.rest.model.ClusterElementDefinitionModel;
+import org.mapstruct.AfterMapping;
 import org.mapstruct.Mapper;
+import org.mapstruct.MappingTarget;
 import org.springframework.core.convert.converter.Converter;
 
 /**
@@ -32,6 +34,15 @@ public class ClusterElementDefinitionMapper {
     @Mapper(config = PlatformConfigurationMapperSpringConfig.class)
     public interface ClusterElementDefinitionToClusterElementDefinitionModelMapper
         extends Converter<ClusterElementDefinition, ClusterElementDefinitionModel> {
+
+        @AfterMapping
+        default void afterMapping(
+            ClusterElementDefinition clusterElementDefinition,
+            @MappingTarget ClusterElementDefinitionModel clusterElementDefinitionModel) {
+
+            clusterElementDefinitionModel.setIcon(
+                "/icons/%s.svg".formatted(clusterElementDefinition.getComponentName()));
+        }
 
         @Override
         ClusterElementDefinitionModel convert(ClusterElementDefinition clusterElementDefinition);
@@ -44,6 +55,15 @@ public class ClusterElementDefinitionMapper {
     @Mapper(config = PlatformConfigurationMapperSpringConfig.class)
     public interface ClusterElementDefinitionToClusterElementDefinitionBasicModelMapper
         extends Converter<ClusterElementDefinition, ClusterElementDefinitionBasicModel> {
+
+        @AfterMapping
+        default void afterMapping(
+            ClusterElementDefinition clusterElementDefinition,
+            @MappingTarget ClusterElementDefinitionBasicModel clusterElementDefinitionBasicModel) {
+
+            clusterElementDefinitionBasicModel.setIcon(
+                "/icons/%s.svg".formatted(clusterElementDefinition.getComponentName()));
+        }
 
         @Override
         ClusterElementDefinitionBasicModel convert(ClusterElementDefinition clusterElementDefinition);

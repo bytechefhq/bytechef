@@ -120,6 +120,54 @@ public class ComponentDefinitionRegistry {
         this.dynamicComponentHandlerListFactories = dynamicComponentHandlerRegistries;
     }
 
+    public Optional<ComponentDefinition> fetchComponentDefinition(String name, @Nullable Integer version) {
+        ComponentDefinition componentDefinition = null;
+
+        if (version == null) {
+            List<ComponentDefinition> filteredComponentDefinitions = getComponentDefinitions(name);
+
+            if (!filteredComponentDefinitions.isEmpty()) {
+                componentDefinition = filteredComponentDefinitions.getLast();
+            }
+        } else {
+            Map<Integer, ComponentDefinition> componentDefinitionMap = componentDefinitionsMap.get(
+                StringUtils.upperCase(name));
+
+            if (componentDefinitionMap != null) {
+                componentDefinition = componentDefinitionMap.get(version);
+
+                if (componentDefinition == null) {
+                    componentDefinition = dynamicComponentHandlerListFactories.stream()
+                        .map(
+                            dynamicComponentHandlerRegistry -> dynamicComponentHandlerRegistry.fetchComponentHandler(
+                                name, version))
+                        .filter(Optional::isPresent)
+                        .map(Optional::get)
+                        .findFirst()
+                        .map(ComponentHandler::getDefinition)
+                        .orElse(null);
+                }
+            }
+        }
+
+        return Optional.ofNullable(componentDefinition);
+    }
+
+    public List<ComponentDefinition> getComponentDefinitions() {
+        return CollectionUtils.sort(
+            CollectionUtils.concat(
+                componentDefinitionsMap.values()
+                    .stream()
+                    .flatMap(map -> CollectionUtils.stream(map.values()))
+                    .toList(),
+                dynamicComponentHandlerListFactories.stream()
+                    .flatMap(dynamicComponentHandlerRegistry -> CollectionUtils.stream(
+                        dynamicComponentHandlerRegistry.getComponentHandlers()))
+                    .map(ComponentHandler::getDefinition)
+                    .toList()),
+            this::compare);
+    }
+
     public ActionDefinition getActionDefinition(String componentName, int componentVersion, String actionName) {
         ComponentDefinition componentDefinition = getComponentDefinition(componentName, componentVersion);
 
@@ -167,60 +215,8 @@ public class ComponentDefinitionRegistry {
 
     public ComponentDefinition getComponentDefinition(String name, @Nullable Integer version) {
         return fetchComponentDefinition(name, version)
-            .orElseThrow(() -> new IllegalArgumentException("The component '%s' does not exist.".formatted(name)));
-    }
-
-    public boolean hasComponentDefinition(String name, @Nullable Integer version) {
-        List<ComponentDefinition> componentDefinitions = getComponentDefinitions(name);
-
-        return componentDefinitions.stream()
-            .anyMatch(curComponentDefinition -> (version == null) || (version == curComponentDefinition.getVersion()));
-    }
-
-    public Optional<ComponentDefinition> fetchComponentDefinition(String name, @Nullable Integer version) {
-        ComponentDefinition componentDefinition = null;
-
-        if (version == null) {
-            List<ComponentDefinition> filteredComponentDefinitions = getComponentDefinitions(name);
-
-            componentDefinition = filteredComponentDefinitions.getLast();
-        } else {
-            Map<Integer, ComponentDefinition> componentDefinitionMap = componentDefinitionsMap.get(
-                StringUtils.upperCase(name));
-
-            if (componentDefinitionMap != null) {
-                componentDefinition = componentDefinitionMap.get(version);
-
-                if (componentDefinition == null) {
-                    componentDefinition = dynamicComponentHandlerListFactories.stream()
-                        .map(
-                            dynamicComponentHandlerRegistry -> dynamicComponentHandlerRegistry.fetchComponentHandler(
-                                name, version))
-                        .filter(Optional::isPresent)
-                        .map(Optional::get)
-                        .findFirst()
-                        .map(ComponentHandler::getDefinition)
-                        .orElse(null);
-                }
-            }
-        }
-
-        return Optional.ofNullable(componentDefinition);
-    }
-
-    public List<ComponentDefinition> getComponentDefinitions() {
-        return CollectionUtils.sort(
-            CollectionUtils.concat(
-                componentDefinitionsMap.values()
-                    .stream()
-                    .flatMap(map -> CollectionUtils.stream(map.values()))
-                    .toList(),
-                dynamicComponentHandlerListFactories.stream()
-                    .flatMap(dynamicComponentHandlerRegistry -> CollectionUtils.stream(
-                        dynamicComponentHandlerRegistry.getComponentHandlers()))
-                    .map(ComponentHandler::getDefinition)
-                    .toList()),
-            this::compare);
+            .orElseThrow(() -> new IllegalArgumentException(
+                String.format("Component definition with name '%s' and version '%s' not found", name, version)));
     }
 
     public List<ComponentDefinition> getComponentDefinitions(String name) {
@@ -288,6 +284,13 @@ public class ComponentDefinitionRegistry {
         return getProperty(
             propertyName, OptionalUtils.get(triggerDefinition.getProperties()), inputParameters, connectionParameters,
             lookupDependsOnPaths, context);
+    }
+
+    public boolean hasComponentDefinition(String name, @Nullable Integer version) {
+        List<ComponentDefinition> componentDefinitions = getComponentDefinitions(name);
+
+        return componentDefinitions.stream()
+            .anyMatch(curComponentDefinition -> (version == null) || (version == curComponentDefinition.getVersion()));
     }
 
     private int compare(ComponentDefinition o1, ComponentDefinition o2) {

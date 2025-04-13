@@ -134,6 +134,7 @@ public class SecurityConfiguration {
                     .ignoringRequestMatchers("/api/o/**")
                     .ignoringRequestMatchers("/approvals/**")
                     .ignoringRequestMatchers("/graphql")
+                    .ignoringRequestMatchers("/icons/**")
                     .ignoringRequestMatchers("/mcp/**")
                     .ignoringRequestMatchers("/webhooks/**"));
 
@@ -199,6 +200,8 @@ public class SecurityConfiguration {
                     .requestMatchers(mvc.pattern("/graphql"))
                     .authenticated()
                     .requestMatchers(mvc.pattern("/i18n/**"))
+                    .permitAll()
+                    .requestMatchers(mvc.pattern("/icons/**"))
                     .permitAll()
                     .requestMatchers(mvc.pattern("/index.html"))
                     .permitAll()

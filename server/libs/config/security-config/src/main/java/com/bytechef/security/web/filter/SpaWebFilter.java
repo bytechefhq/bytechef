@@ -32,8 +32,8 @@ import org.springframework.web.filter.OncePerRequestFilter;
 public class SpaWebFilter extends OncePerRequestFilter {
 
     private static final List<String> NON_SPA_PATH_PREFIXES = Arrays.asList(
-        "/api", "/approvals", "/actuator", "/auditevents", "/file-entries", "/graphql", "/graphiql", "/mcp", "/sse",
-        "/v3/api-docs", "/webhooks");
+        "/api", "/approvals", "/actuator", "/auditevents", "/file-entries", "/graphql", "/graphiql", "/icons", "/mcp",
+        "/sse", "/v3/api-docs", "/webhooks");
 
     /**
      * Forwards any unmapped paths (except those containing a period) to the client {@code index.html}.
