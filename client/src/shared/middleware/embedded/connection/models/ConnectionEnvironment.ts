@@ -19,7 +19,7 @@
  */
 export const ConnectionEnvironment = {
     Development: 'DEVELOPMENT',
-    Test: 'TEST',
+    Staging: 'STAGING',
     Production: 'PRODUCTION'
 } as const;
 export type ConnectionEnvironment = typeof ConnectionEnvironment[keyof typeof ConnectionEnvironment];
