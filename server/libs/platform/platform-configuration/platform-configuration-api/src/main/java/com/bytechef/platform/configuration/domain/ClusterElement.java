@@ -21,7 +21,11 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.Objects;
 
-public final class ClusterElement {
+/**
+ *
+ * @author Ivica Cardic
+ */
+public class ClusterElement {
 
     private final String clusterElementName;
     private final String componentName;

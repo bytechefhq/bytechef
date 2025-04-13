@@ -60,8 +60,7 @@ public record ComponentConnection(
         Map<String, Map<String, ?>> connections = MapUtils.getMap(
             extensions, WorkflowExtConstants.CONNECTIONS, new TypeReference<>() {}, Map.of());
 
-        return connections
-            .entrySet()
+        return connections.entrySet()
             .stream()
             .map(entry -> {
                 Map<String, ?> connectionMap = entry.getValue();
@@ -69,10 +68,11 @@ public record ComponentConnection(
                 String name = MapUtils.getRequiredString(connectionMap, WorkflowExtConstants.COMPONENT_NAME);
                 int version = MapUtils.getRequiredInteger(connectionMap, WorkflowExtConstants.COMPONENT_VERSION);
 
-                return new ComponentConnection(
-                    name, version, workflowNodeName, entry.getKey(),
+                boolean required =
                     MapUtils.getBoolean(connectionMap, WorkflowExtConstants.AUTHORIZATION_REQUIRED, false) ||
-                        connectionRequiredFunction.apply(name, version));
+                        connectionRequiredFunction.apply(name, version);
+
+                return new ComponentConnection(name, version, workflowNodeName, entry.getKey(), required);
             })
             .toList();
     }

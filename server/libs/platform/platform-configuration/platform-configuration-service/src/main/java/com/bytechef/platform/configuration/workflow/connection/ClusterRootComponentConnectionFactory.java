@@ -113,8 +113,7 @@ public class ClusterRootComponentConnectionFactory
         if (componentDefinition.getConnection() != null) {
             componentConnection = ComponentConnection.of(
                 workflowNodeName, workflowConnectionKey, componentDefinition.getName(),
-                componentDefinition.getVersion(),
-                componentDefinition.isConnectionRequired());
+                componentDefinition.getVersion(), componentDefinition.isConnectionRequired());
         }
 
         return componentConnection;
