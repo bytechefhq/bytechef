@@ -76,10 +76,22 @@ public class ClusterRootComponentConnectionFactory
 
         Set<ComponentConnection> componentConnections = new HashSet<>();
 
-        for (Map.Entry<String, List<ClusterElement>> clusterElementEntriesMap : clusterElementMap.entrySet()) {
-            List<ClusterElement> clusterElementList = clusterElementEntriesMap.getValue();
+        for (Map.Entry<String, Object> entry : clusterElementMap.entrySet()) {
+            List<ClusterElement> clusterElements = new ArrayList<>();
 
-            for (ClusterElement clusterElement : clusterElementList) {
+            if (entry.getValue() instanceof List<?> list) {
+                for (Object item : list) {
+                    if (item instanceof ClusterElement clusterElement) {
+                        clusterElements.add(clusterElement);
+                    } else {
+                        throw new IllegalArgumentException("Invalid cluster element entry");
+                    }
+                }
+            } else {
+                clusterElements.add((ClusterElement) entry.getValue());
+            }
+
+            for (ClusterElement clusterElement : clusterElements) {
                 try {
                     ComponentConnection componentConnection = getWorkflowConnection(
                         workflowNodeName, clusterElement.getName(), clusterElement.getComponentName(),

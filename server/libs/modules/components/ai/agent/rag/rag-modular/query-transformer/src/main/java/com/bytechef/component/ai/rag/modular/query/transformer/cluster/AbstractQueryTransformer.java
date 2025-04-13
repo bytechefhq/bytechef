@@ -45,7 +45,7 @@ abstract class AbstractQueryTransformer {
         Map<String, ComponentConnection> componentConnections) throws Exception {
 
         ClusterElement clusterElement = ClusterElementMap.of(extensions)
-            .getFirst(MODEL);
+            .getClusterElement(MODEL);
 
         ModelFunction modelFunction = clusterElementDefinitionService.getClusterElement(
             clusterElement.getComponentName(), clusterElement.getComponentVersion(),

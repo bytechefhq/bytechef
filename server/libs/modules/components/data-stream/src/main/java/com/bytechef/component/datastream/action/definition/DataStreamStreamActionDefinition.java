@@ -79,7 +79,7 @@ public class DataStreamStreamActionDefinition extends AbstractActionDefinitionWr
         JobParameters jobParameters = new JobParameters(
             new HashMap<>() {
                 {
-                    ClusterElement clusterElement = clusterElementMap.getFirst(DESTINATION);
+                    ClusterElement clusterElement = clusterElementMap.getClusterElement(DESTINATION);
 
                     put(
                         DESTINATION.name(),
@@ -105,7 +105,7 @@ public class DataStreamStreamActionDefinition extends AbstractActionDefinitionWr
 
                     put(JOB_ID, new JobParameter<>(actionContextAware.getJobId(), Long.class));
 
-                    clusterElement = clusterElementMap.getFirst(SOURCE);
+                    clusterElement = clusterElementMap.getClusterElement(SOURCE);
 
                     put(
                         SOURCE.name(),

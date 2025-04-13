@@ -111,7 +111,7 @@ public class AiAgentChatAction {
 
             ClusterElementMap clusterElementMap = ClusterElementMap.of(extensions);
 
-            ClusterElement clusterElement = clusterElementMap.getFirst(MODEL);
+            ClusterElement clusterElement = clusterElementMap.getClusterElement(MODEL);
 
             ModelFunction modelFunction = clusterElementDefinitionService.getClusterElement(
                 clusterElement.getComponentName(), clusterElement.getComponentVersion(),
@@ -139,7 +139,7 @@ public class AiAgentChatAction {
                 .messages(LLMUtils.getMessages(inputParameters, actionContext))
                 .tools(
                     getTools(
-                        clusterElementMap.get(ToolFunction.TOOLS), connectionParameters,
+                        clusterElementMap.getClusterElements(ToolFunction.TOOLS), connectionParameters,
                         actionContextAware.isEditorEnvironment(), actionContext))
                 .call();
 
@@ -154,13 +154,13 @@ public class AiAgentChatAction {
 
         // memory
 
-        clusterElementMap.fetchFirst(CHAT_MEMORY)
+        clusterElementMap.fetchClusterElement(CHAT_MEMORY)
             .map(clusterElement -> getChatMemoryAdvisor(connectionParameters, clusterElement))
             .ifPresent(advisors::add);
 
         // RAG
 
-        clusterElementMap.fetchFirst(RAG)
+        clusterElementMap.fetchClusterElement(RAG)
             .map(clusterElement -> getRagAdvisor(connectionParameters, clusterElement))
             .ifPresent(advisors::add);
 

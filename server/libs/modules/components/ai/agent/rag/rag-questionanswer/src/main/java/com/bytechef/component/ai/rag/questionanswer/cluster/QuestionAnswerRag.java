@@ -92,7 +92,7 @@ public class QuestionAnswerRag {
         Map<String, ComponentConnection> componentConnections) throws Exception {
 
         ClusterElement clusterElement = ClusterElementMap.of(extensions)
-            .getFirst(VECTOR_STORE);
+            .getClusterElement(VECTOR_STORE);
 
         VectorStoreFunction vectorStoreFunction = clusterElementDefinitionService.getClusterElement(
             clusterElement.getComponentName(), clusterElement.getComponentVersion(),

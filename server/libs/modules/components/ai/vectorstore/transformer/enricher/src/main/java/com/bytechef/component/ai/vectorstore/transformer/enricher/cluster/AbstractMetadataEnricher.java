@@ -43,7 +43,7 @@ public abstract class AbstractMetadataEnricher {
         Parameters extensions, Map<String, ComponentConnection> componentConnections) {
 
         ClusterElement clusterElement = ClusterElementMap.of(extensions)
-            .getFirst(MODEL);
+            .getClusterElement(MODEL);
 
         ModelFunction modelFunction = clusterElementDefinitionService.getClusterElement(
             clusterElement.getComponentName(), clusterElement.getComponentVersion(),

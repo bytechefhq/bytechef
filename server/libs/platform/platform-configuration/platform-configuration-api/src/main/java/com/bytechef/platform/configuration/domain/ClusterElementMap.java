@@ -39,7 +39,7 @@ import org.slf4j.LoggerFactory;
  * @author Ivica Cardic
  */
 @SuppressFBWarnings("EI")
-public class ClusterElementMap extends AbstractMap<String, List<ClusterElement>> {
+public class ClusterElementMap extends AbstractMap<String, Object> {
 
     private static final Logger log = LoggerFactory.getLogger(ClusterElementMap.class);
 
@@ -47,15 +47,15 @@ public class ClusterElementMap extends AbstractMap<String, List<ClusterElement>>
         WorkflowConstants.NAME, WorkflowConstants.TYPE, WorkflowConstants.LABEL,
         WorkflowConstants.DESCRIPTION, WorkflowConstants.PARAMETERS);
 
-    private final Set<Map.Entry<String, List<ClusterElement>>> entrySet;
+    private final Set<Map.Entry<String, Object>> entrySet;
 
-    private ClusterElementMap(Set<Entry<String, List<ClusterElement>>> entrySet) {
+    private ClusterElementMap(Set<Entry<String, Object>> entrySet) {
         this.entrySet = entrySet;
     }
 
     @SuppressWarnings("unchecked")
     public static ClusterElementMap of(Map<String, ?> extensions) {
-        Set<Map.Entry<String, List<ClusterElement>>> clusterElementSet = new HashSet<>();
+        Set<Map.Entry<String, Object>> clusterElementSet = new HashSet<>();
 
         if (extensions.containsKey(WorkflowExtConstants.CLUSTER_ELEMENTS)) {
             Map<String, Object> clusterElementEntriesMap = MapUtils.get(
@@ -71,11 +71,14 @@ public class ClusterElementMap extends AbstractMap<String, List<ClusterElement>>
                             add((Map<String, ?>) map, clusterElements);
                         }
                     }
-                } else {
-                    add((Map<String, ?>) clusterElementEntryValue, clusterElements);
-                }
 
-                clusterElementSet.add(Map.entry(clusterElementsEntry.getKey(), clusterElements));
+                    clusterElementSet.add(Map.entry(clusterElementsEntry.getKey(), clusterElements));
+                } else {
+                    clusterElementSet.add(
+                        Map.entry(
+                            clusterElementsEntry.getKey(),
+                            toClusterElement((Map<String, ?>) clusterElementEntryValue)));
+                }
             }
         }
 
@@ -84,30 +87,29 @@ public class ClusterElementMap extends AbstractMap<String, List<ClusterElement>>
 
     @Override
     @NonNull
-    public Set<Entry<String, List<ClusterElement>>> entrySet() {
+    public Set<Entry<String, Object>> entrySet() {
         return entrySet;
     }
 
-    public Optional<ClusterElement> fetchFirst(ClusterElementType clusterElementType) {
-        return Optional.ofNullable(get(clusterElementType.key()))
-            .orElse(List.of())
-            .stream()
-            .findFirst();
+    public Optional<ClusterElement> fetchClusterElement(ClusterElementType clusterElementType) {
+        return Optional.ofNullable(super.get(clusterElementType.key()))
+            .map(value -> (ClusterElement) value);
     }
 
-    public List<ClusterElement> get(ClusterElementType clusterElementType) {
-        List<ClusterElement> clusterElements = super.get(clusterElementType.key());
+    public ClusterElement getClusterElement(ClusterElementType clusterElementType) {
+        Object value = super.get(clusterElementType.key());
+
+        if (value == null) {
+            throw new IllegalArgumentException("Cluster element type %s not found".formatted(clusterElementType));
+        }
+
+        return (ClusterElement) value;
+    }
+
+    public List<ClusterElement> getClusterElements(ClusterElementType clusterElementType) {
+        List<ClusterElement> clusterElements = (List<ClusterElement>) super.get(clusterElementType.key());
 
         return clusterElements == null ? List.of() : clusterElements;
-    }
-
-    public ClusterElement getFirst(ClusterElementType clusterElementType) {
-        return get(clusterElementType.key())
-            .stream()
-            .findFirst()
-            .orElseThrow(
-                () -> new IllegalArgumentException(
-                    "Cluster element type %s not found".formatted(clusterElementType)));
     }
 
     private static void add(Map<String, ?> clusterElementMap, List<ClusterElement> clusterElements) {

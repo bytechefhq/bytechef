@@ -82,7 +82,7 @@ public class ModularRag {
         Parameters extensions, Map<String, ComponentConnection> componentConnections) {
 
         return ClusterElementMap.of(extensions)
-            .fetchFirst(DOCUMENT_JOINER)
+            .fetchClusterElement(DOCUMENT_JOINER)
             .map(clusterElement -> {
                 DocumentJoinerFunction documentJoinerFunction = clusterElementDefinitionService.getClusterElement(
                     clusterElement.getComponentName(), clusterElement.getComponentVersion(),
@@ -105,7 +105,7 @@ public class ModularRag {
         Parameters extensions, Map<String, ComponentConnection> componentConnections) {
 
         return ClusterElementMap.of(extensions)
-            .fetchFirst(DOCUMENT_RETRIEVER)
+            .fetchClusterElement(DOCUMENT_RETRIEVER)
             .map(clusterElement -> {
                 DocumentRetrieverFunction documentRetrieverFunction =
                     clusterElementDefinitionService.getClusterElement(
@@ -131,7 +131,7 @@ public class ModularRag {
         Parameters extensions, Map<String, ComponentConnection> componentConnections) {
 
         return ClusterElementMap.of(extensions)
-            .fetchFirst(QUERY_AUGMENTER)
+            .fetchClusterElement(QUERY_AUGMENTER)
             .map(clusterElement -> {
                 QueryAugmenterFunction queryAugmenterFunction = clusterElementDefinitionService.getClusterElement(
                     clusterElement.getComponentName(), clusterElement.getComponentVersion(),
@@ -154,7 +154,7 @@ public class ModularRag {
         Parameters extensions, Map<String, ComponentConnection> componentConnections) {
 
         return ClusterElementMap.of(extensions)
-            .fetchFirst(QUERY_EXPANDER)
+            .fetchClusterElement(QUERY_EXPANDER)
             .map(clusterElement -> {
                 QueryExpanderFunction queryExpanderFunction = clusterElementDefinitionService.getClusterElement(
                     clusterElement.getComponentName(), clusterElement.getComponentVersion(),
@@ -180,7 +180,7 @@ public class ModularRag {
         List<QueryTransformer> queryTransformers = new ArrayList<>();
 
         List<ClusterElement> clusterElements = ClusterElementMap.of(extensions)
-            .get(QUERY_TRANSFORMER);
+            .getClusterElements(QUERY_TRANSFORMER);
 
         for (ClusterElement clusterElement : clusterElements) {
             QueryTransformerFunction queryTransformerFunction =

@@ -91,7 +91,7 @@ public abstract class AbstractLoadAction {
 
         ClusterElementMap clusterElementMap = ClusterElementMap.of(extensions);
 
-        ClusterElement clusterElement = clusterElementMap.getFirst(DOCUMENT_READER);
+        ClusterElement clusterElement = clusterElementMap.getClusterElement(DOCUMENT_READER);
 
         ComponentConnection componentConnection = componentConnections.get(componentName);
 
@@ -110,7 +110,7 @@ public abstract class AbstractLoadAction {
         Parameters extensions, Map<String, ComponentConnection> componentConnections) {
 
         return ClusterElementMap.of(extensions)
-            .get(DOCUMENT_TRANSFORMER)
+            .getClusterElements(DOCUMENT_TRANSFORMER)
             .stream()
             .map(clusterElement -> {
                 ComponentConnection componentConnection = componentConnections.get(componentName);

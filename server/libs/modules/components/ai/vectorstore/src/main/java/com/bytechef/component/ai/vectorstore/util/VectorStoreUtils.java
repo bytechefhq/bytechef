@@ -45,7 +45,7 @@ public class VectorStoreUtils {
 
         ClusterElementMap clusterElementMap = ClusterElementMap.of(extensions);
 
-        ClusterElement clusterElement = clusterElementMap.getFirst(EMBEDDING);
+        ClusterElement clusterElement = clusterElementMap.getClusterElement(EMBEDDING);
 
         EmbeddingFunction embeddingFunction = clusterElementDefinitionService.getClusterElement(
             clusterElement.getComponentName(), clusterElement.getComponentVersion(),
