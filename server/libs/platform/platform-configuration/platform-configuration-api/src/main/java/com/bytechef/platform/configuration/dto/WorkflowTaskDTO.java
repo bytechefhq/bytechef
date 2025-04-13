@@ -31,7 +31,7 @@ import java.util.Objects;
 public final class WorkflowTaskDTO {
 
     private final List<ComponentConnection> connections;
-    private final ClusterElementMap clusterElementMap;
+    private final ClusterElementMap clusterElements;
     private final String description;
     private final List<WorkflowTask> finalize;
     private final String label;
@@ -48,12 +48,12 @@ public final class WorkflowTaskDTO {
 
     @SuppressFBWarnings("EI")
     public WorkflowTaskDTO(
-        ClusterElementMap clusterElementMap, List<ComponentConnection> connections, String description,
+        ClusterElementMap clusterElements, List<ComponentConnection> connections, String description,
         List<WorkflowTask> finalize, String label, int maxRetries, Map<String, ?> metadata, String name, String node,
         Map<String, ?> parameters, List<WorkflowTask> post, List<WorkflowTask> pre, int taskNumber, String timeout,
         String type) {
 
-        this.clusterElementMap = clusterElementMap;
+        this.clusterElements = clusterElements;
         this.connections = Collections.unmodifiableList(connections);
         this.description = description;
         this.finalize = Collections.unmodifiableList(finalize);
@@ -72,10 +72,10 @@ public final class WorkflowTaskDTO {
 
     @SuppressFBWarnings("EI")
     public WorkflowTaskDTO(
-        WorkflowTask workflowTask, ClusterElementMap clusterElementMap, List<ComponentConnection> connections) {
+        WorkflowTask workflowTask, ClusterElementMap clusterElements, List<ComponentConnection> connections) {
 
         this(
-            clusterElementMap, connections, workflowTask.getDescription(), workflowTask.getFinalize(),
+            clusterElements, connections, workflowTask.getDescription(), workflowTask.getFinalize(),
             workflowTask.getLabel(), workflowTask.getMaxRetries(), workflowTask.getMetadata(), workflowTask.getName(),
             workflowTask.getNode(), workflowTask.getParameters(), workflowTask.getPost(), workflowTask.getPre(),
             workflowTask.getTaskNumber(), workflowTask.getTimeout(), workflowTask.getType());
@@ -83,7 +83,7 @@ public final class WorkflowTaskDTO {
 
     @SuppressFBWarnings("EI")
     public ClusterElementMap getClusterElements() {
-        return clusterElementMap;
+        return clusterElements;
     }
 
     public List<ComponentConnection> getConnections() {
@@ -154,7 +154,7 @@ public final class WorkflowTaskDTO {
 
         WorkflowTaskDTO that = (WorkflowTaskDTO) obj;
 
-        return Objects.equals(this.clusterElementMap, that.clusterElementMap) &&
+        return Objects.equals(this.clusterElements, that.clusterElements) &&
             Objects.equals(this.connections, that.connections) && Objects.equals(this.description, that.description) &&
             Objects.equals(this.finalize, that.finalize) && Objects.equals(this.label, that.label) &&
             this.maxRetries == that.maxRetries && Objects.equals(this.name, that.name) &&

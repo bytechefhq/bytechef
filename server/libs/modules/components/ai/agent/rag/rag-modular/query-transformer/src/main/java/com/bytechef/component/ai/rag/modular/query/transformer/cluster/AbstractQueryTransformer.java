@@ -51,7 +51,7 @@ abstract class AbstractQueryTransformer {
             clusterElement.getComponentName(), clusterElement.getComponentVersion(),
             clusterElement.getClusterElementName());
 
-        ComponentConnection componentConnection = componentConnections.get(clusterElement.getNodeName());
+        ComponentConnection componentConnection = componentConnections.get(clusterElement.getName());
 
         ChatModel chatModel = (ChatModel) modelFunction.apply(
             ParametersFactory.createParameters(clusterElement.getParameters()),

@@ -82,7 +82,7 @@ public class ClusterRootComponentConnectionFactory
             for (ClusterElement clusterElement : clusterElementList) {
                 try {
                     ComponentConnection componentConnection = getWorkflowConnection(
-                        workflowNodeName, clusterElement.getNodeName(), clusterElement.getComponentName(),
+                        workflowNodeName, clusterElement.getName(), clusterElement.getComponentName(),
                         clusterElement.getComponentVersion());
 
                     if (componentConnection != null) {

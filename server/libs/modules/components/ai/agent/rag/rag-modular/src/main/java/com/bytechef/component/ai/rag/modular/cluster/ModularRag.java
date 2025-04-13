@@ -88,7 +88,7 @@ public class ModularRag {
                     clusterElement.getComponentName(), clusterElement.getComponentVersion(),
                     clusterElement.getClusterElementName());
 
-                ComponentConnection componentConnection = componentConnections.get(clusterElement.getNodeName());
+                ComponentConnection componentConnection = componentConnections.get(clusterElement.getName());
 
                 try {
                     return documentJoinerFunction.apply(
@@ -112,7 +112,7 @@ public class ModularRag {
                         clusterElement.getComponentName(), clusterElement.getComponentVersion(),
                         clusterElement.getClusterElementName());
 
-                ComponentConnection componentConnection = componentConnections.get(clusterElement.getNodeName());
+                ComponentConnection componentConnection = componentConnections.get(clusterElement.getName());
 
                 try {
                     return documentRetrieverFunction.apply(
@@ -137,7 +137,7 @@ public class ModularRag {
                     clusterElement.getComponentName(), clusterElement.getComponentVersion(),
                     clusterElement.getClusterElementName());
 
-                ComponentConnection componentConnection = componentConnections.get(clusterElement.getNodeName());
+                ComponentConnection componentConnection = componentConnections.get(clusterElement.getName());
 
                 try {
                     return queryAugmenterFunction.apply(
@@ -160,7 +160,7 @@ public class ModularRag {
                     clusterElement.getComponentName(), clusterElement.getComponentVersion(),
                     clusterElement.getClusterElementName());
 
-                ComponentConnection componentConnection = componentConnections.get(clusterElement.getNodeName());
+                ComponentConnection componentConnection = componentConnections.get(clusterElement.getName());
 
                 try {
                     return queryExpanderFunction.apply(
@@ -188,7 +188,7 @@ public class ModularRag {
                     clusterElement.getComponentName(), clusterElement.getComponentVersion(),
                     clusterElement.getClusterElementName());
 
-            ComponentConnection componentConnection = componentConnections.get(clusterElement.getNodeName());
+            ComponentConnection componentConnection = componentConnections.get(clusterElement.getName());
 
             queryTransformers.add(
                 queryTransformerFunction.apply(

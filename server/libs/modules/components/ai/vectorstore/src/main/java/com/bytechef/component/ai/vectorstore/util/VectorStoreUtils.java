@@ -51,7 +51,7 @@ public class VectorStoreUtils {
             clusterElement.getComponentName(), clusterElement.getComponentVersion(),
             clusterElement.getClusterElementName());
 
-        ComponentConnection componentConnection = componentConnections.get(clusterElement.getNodeName());
+        ComponentConnection componentConnection = componentConnections.get(clusterElement.getName());
 
         return embeddingFunction.apply(
             ParametersFactory.createParameters(clusterElement.getParameters()),

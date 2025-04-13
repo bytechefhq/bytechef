@@ -31,20 +31,20 @@ public class ClusterElement {
     private final String componentName;
     private final int componentVersion;
     private final Map<String, ?> extensions;
-    private final String nodeName;
+    private final String name;
     private final String type;
     private final String label;
     private final String description;
     private final Map<String, ?> parameters;
 
     public ClusterElement(
-        String nodeName, String type, String label, String description, Map<String, ?> parameters,
+        String name, String type, String label, String description, Map<String, ?> parameters,
         Map<String, ?> extensions) {
 
         this.extensions = Collections.unmodifiableMap(extensions);
         this.description = description;
         this.label = label;
-        this.nodeName = nodeName;
+        this.name = name;
         this.parameters = Collections.unmodifiableMap(parameters);
         this.type = type;
 
@@ -71,8 +71,8 @@ public class ClusterElement {
         return Collections.unmodifiableMap(extensions);
     }
 
-    public String getNodeName() {
-        return nodeName;
+    public String getName() {
+        return name;
     }
 
     public String getType() {
@@ -103,20 +103,20 @@ public class ClusterElement {
 
         var that = (ClusterElement) obj;
 
-        return Objects.equals(this.nodeName, that.nodeName) && Objects.equals(this.type, that.type) &&
+        return Objects.equals(this.name, that.name) && Objects.equals(this.type, that.type) &&
             Objects.equals(this.label, that.label) && Objects.equals(this.description, that.description) &&
             Objects.equals(this.parameters, that.parameters);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(nodeName, type, label, description, parameters);
+        return Objects.hash(name, type, label, description, parameters);
     }
 
     @Override
     public String toString() {
         return "ClusterElement[" +
-            "name=" + nodeName + ", " +
+            "name=" + name + ", " +
             "type=" + type + ", " +
             "label=" + label + ", " +
             "description=" + description + ", " +

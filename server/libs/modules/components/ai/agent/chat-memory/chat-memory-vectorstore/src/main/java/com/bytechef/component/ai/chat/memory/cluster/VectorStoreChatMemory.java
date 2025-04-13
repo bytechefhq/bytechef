@@ -72,7 +72,7 @@ public class VectorStoreChatMemory {
             clusterElement.getComponentName(), clusterElement.getComponentVersion(),
             clusterElement.getClusterElementName());
 
-        ComponentConnection componentConnection = componentConnections.get(clusterElement.getNodeName());
+        ComponentConnection componentConnection = componentConnections.get(clusterElement.getName());
 
         Map<String, ?> componentConnectionConnectionParameters = componentConnection.getParameters();
 
