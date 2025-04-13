@@ -32,7 +32,7 @@ import org.springframework.core.convert.converter.Converter;
  */
 public class WorkflowTaskMapper {
 
-    @Mapper(config = PlatformConfigurationMapperSpringConfig.class, implementationName = "Platform<CLASS_NAME>Impl")
+    @Mapper(config = PlatformConfigurationMapperSpringConfig.class)
     public interface WorkflowTaskToWorkflowTaskModelMapper extends Converter<WorkflowTask, WorkflowTaskModel> {
 
         @Named(value = "workflowTaskToWorkflowTaskModelMapper")
@@ -43,7 +43,7 @@ public class WorkflowTaskMapper {
         List<WorkflowTaskModel> map(List<WorkflowTask> workflowTasks);
     }
 
-    @Mapper(config = PlatformConfigurationMapperSpringConfig.class, implementationName = "Platform<CLASS_NAME>Impl")
+    @Mapper(config = PlatformConfigurationMapperSpringConfig.class)
     public interface WorkflowTaskDTOToWorkflowTaskModelMapper extends Converter<WorkflowTaskDTO, WorkflowTaskModel> {
 
         @Named(value = "workflowTaskDTOToWorkflowTaskModelMapper")
