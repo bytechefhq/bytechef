@@ -59,8 +59,7 @@ public class BinanceFetchPairPriceAction {
     }
 
     public static Object perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
-        return context
-            .http(http -> http.get("https://api.binance.com/api/v3/ticker/price"))
+        return context.http(http -> http.get("https://api.binance.com/api/v3/ticker/price"))
             .queryParameter(SYMBOL, inputParameters.getRequiredString(SYMBOL))
             .configuration(responseType(Http.ResponseType.JSON))
             .execute()
