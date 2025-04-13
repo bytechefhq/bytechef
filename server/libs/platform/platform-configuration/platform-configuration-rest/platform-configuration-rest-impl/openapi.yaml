@@ -2586,6 +2586,10 @@ components:
         - "name"
         - "type"
       properties:
+        clusterElements:
+          type: object
+          additionalProperties: true
+          readOnly: true
         connections:
           type: "array"
           items:
