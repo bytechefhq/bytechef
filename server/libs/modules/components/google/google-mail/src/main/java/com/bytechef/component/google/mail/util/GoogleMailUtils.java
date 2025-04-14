@@ -293,18 +293,22 @@ public class GoogleMailUtils {
 
         List<Option<String>> options = new ArrayList<>();
 
-        List<Label> labels = GoogleServices.getMail(connectionParameters)
-            .users()
-            .labels()
-            .list(ME)
-            .execute()
-            .getLabels();
+        List<Label> labels = getLabels(GoogleServices.getMail(connectionParameters));
 
         for (Label label : labels) {
             options.add(option(label.getName(), label.getId()));
         }
 
         return options;
+    }
+
+    private static List<Label> getLabels(Gmail gmail) throws IOException {
+        return gmail
+            .users()
+            .labels()
+            .list(ME)
+            .execute()
+            .getLabels();
     }
 
     public static Message getMessage(Parameters inputParameters, Gmail service) throws IOException {
@@ -334,6 +338,36 @@ public class GoogleMailUtils {
 
         for (Message message : messages) {
             options.add(option(message.getId(), message.getId()));
+        }
+
+        return options;
+    }
+
+    public static List<Option<String>> getMessageLabelOptions(
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
+        String searchText, ActionContext context)
+        throws IOException {
+
+        Gmail gmail = GoogleServices.getMail(connectionParameters);
+        List<Label> labels = getLabels(gmail);
+
+        List<String> messageLabels = gmail
+            .users()
+            .messages()
+            .get(ME, inputParameters.getRequiredString(ID))
+            .execute()
+            .getLabelIds();
+
+        List<Option<String>> options = new ArrayList<>();
+
+        for (String messageLabel : messageLabels) {
+            for (Label label : labels) {
+                String id = label.getId();
+
+                if (id.equals(messageLabel)) {
+                    options.add(option(label.getName(), messageLabel));
+                }
+            }
         }
 
         return options;
