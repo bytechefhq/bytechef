@@ -99,19 +99,16 @@ spring:
         initialize-schema: true
   autoconfigure:
     exclude:
-      org.springframework.ai.autoconfigure.anthropic.AnthropicAutoConfiguration,
-      org.springframework.ai.autoconfigure.azure.openai.AzureOpenAiAutoConfiguration,
-      org.springframework.ai.autoconfigure.huggingface.HuggingfaceChatAutoConfiguration,
-      org.springframework.ai.autoconfigure.mistralai.MistralAiAutoConfiguration,
-      org.springframework.ai.autoconfigure.ollama.OllamaAutoConfiguration,
-      org.springframework.ai.autoconfigure.stabilityai.StabilityAiImageAutoConfiguration,
-      org.springframework.ai.autoconfigure.vertexai.gemini.VertexAiGeminiAutoConfiguration,
-      org.springframework.ai.autoconfigure.watsonxai.WatsonxAiAutoConfiguration,
-      org.springframework.ai.autoconfigure.vectorstore.milvus.MilvusVectorStoreAutoConfiguration,
-      org.springframework.ai.autoconfigure.vectorstore.pinecone.PineconeVectorStoreAutoConfiguration,
-      org.springframework.ai.autoconfigure.vectorstore.qdrant.QdrantVectorStoreAutoConfiguration,
-      org.springframework.ai.autoconfigure.vectorstore.typesense.TypesenseVectorStoreAutoConfiguration,
-      org.springframework.ai.autoconfigure.vectorstore.weaviate.WeaviateVectorStoreAutoConfiguration
+      org.springframework.ai.model.anthropic.autoconfigure.AnthropicChatAutoConfiguration,
+      org.springframework.ai.model.mistralai.autoconfigure.MistralAiChatAutoConfiguration,
+      org.springframework.ai.model.mistralai.autoconfigure.MistralAiEmbeddingAutoConfiguration,
+      org.springframework.ai.model.ollama.autoconfigure.OllamaChatAutoConfiguration,
+      org.springframework.ai.model.ollama.autoconfigure.OllamaEmbeddingAutoConfiguration,
+      org.springframework.ai.vectorstore.milvus.autoconfigure.MilvusVectorStoreAutoConfiguration,
+      org.springframework.ai.vectorstore.pinecone.autoconfigure.PineconeVectorStoreAutoConfiguration,
+      org.springframework.ai.vectorstore.qdrant.autoconfigure.QdrantVectorStoreAutoConfiguration,
+      org.springframework.ai.vectorstore.typesense.autoconfigure.TypesenseVectorStoreAutoConfiguration,
+      org.springframework.ai.vectorstore.weaviate.autoconfigure.WeaviateVectorStoreAutoConfiguration
   application:
     name: server-app
   cache:

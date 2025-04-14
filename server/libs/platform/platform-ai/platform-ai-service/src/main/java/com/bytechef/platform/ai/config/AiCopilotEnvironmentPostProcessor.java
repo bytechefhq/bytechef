@@ -43,8 +43,8 @@ public class AiCopilotEnvironmentPostProcessor implements EnvironmentPostProcess
                 source.put(
                     "spring.autoconfigure.exclude",
                     environment.getProperty("spring.autoconfigure.exclude") +
-                        ",org.springframework.ai.autoconfigure.openai.OpenAiAutoConfiguration" +
-                        ",org.springframework.ai.autoconfigure.vectorstore.pgvector.PgVectorStoreAutoConfiguration");
+                        ",org.springframework.ai.model.openai.autoconfigure.OpenAiChatAutoConfiguration" +
+                        ",org.springframework.ai.vectorstore.pgvector.autoconfigure.PgVectorStoreAutoConfiguration");
             }
 
             // TODO Add support for other providers

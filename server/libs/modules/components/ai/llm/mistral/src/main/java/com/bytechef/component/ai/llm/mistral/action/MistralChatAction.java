@@ -24,6 +24,7 @@ import static com.bytechef.component.ai.llm.constant.LLMConstants.MODEL;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.RESPONSE;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.RESPONSE_FORMAT;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.RESPONSE_PROPERTY;
+import static com.bytechef.component.ai.llm.constant.LLMConstants.RESPONSE_SCHEMA;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.SEED;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.SEED_PROPERTY;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.STOP;
@@ -45,6 +46,7 @@ import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
+import java.util.Map;
 import org.springframework.ai.mistralai.MistralAiChatModel;
 import org.springframework.ai.mistralai.MistralAiChatOptions;
 import org.springframework.ai.mistralai.api.MistralAiApi;
@@ -71,9 +73,14 @@ public class MistralChatAction {
         .perform(MistralChatAction::perform);
 
     public static final ChatModel CHAT_MODEL = (inputParameters, connectionParameters) -> {
+        Map<String, Object> jsonSchema = null;
         String type = inputParameters.getFromPath(
             RESPONSE + "." + RESPONSE_FORMAT, ResponseFormat.class, ResponseFormat.TEXT) == ResponseFormat.TEXT
                 ? "text" : "json_object";
+
+        if (type.equals("json_object")) {
+            jsonSchema = inputParameters.getFromPath(RESPONSE + "." + RESPONSE_SCHEMA, new TypeReference<>() {});
+        }
 
         return MistralAiChatModel.builder()
             .mistralAiApi(
@@ -87,7 +94,7 @@ public class MistralChatAction {
                     .stop(inputParameters.getList(STOP, new TypeReference<>() {}))
                     .safePrompt(inputParameters.getBoolean(SAFE_PROMPT))
                     .randomSeed(inputParameters.getInteger(SEED))
-                    .responseFormat(new MistralAiApi.ChatCompletionRequest.ResponseFormat(type))
+                    .responseFormat(new MistralAiApi.ChatCompletionRequest.ResponseFormat(type, jsonSchema))
                     .build())
             .build();
     };

@@ -47,8 +47,8 @@ public class PineconeConstants {
             if (matcher.find()) {
                 return PineconeVectorStore.builder(embeddingModel)
                     .apiKey(connectionParameters.getRequiredString(API_KEY))
-                    .projectId(matcher.group(2))
-                    .environment(matcher.group(3))
+//                    .projectId(matcher.group(2))
+//                    .environment(matcher.group(3))
                     .indexName(matcher.group(1))
                     .build();
             } else {

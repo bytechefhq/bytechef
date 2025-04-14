@@ -23,9 +23,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.modelcontextprotocol.server.McpServer;
 import io.modelcontextprotocol.server.McpSyncServer;
-import io.modelcontextprotocol.server.transport.WebMvcSseServerTransport;
+import io.modelcontextprotocol.server.transport.WebMvcSseServerTransportProvider;
 import io.modelcontextprotocol.spec.McpSchema;
-import io.modelcontextprotocol.spec.ServerMcpTransport;
+import io.modelcontextprotocol.spec.McpServerTransportProvider;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -51,20 +51,20 @@ public class McpServerConfiguration {
     }
 
     @Bean
-    WebMvcSseServerTransport webMvcSseServerTransport(ObjectMapper objectMapper) {
+    WebMvcSseServerTransportProvider webMvcSseServerTransportProvider(ObjectMapper objectMapper) {
         // TODO - Set /embedded/mcp/message, check ConnectedUserAuthenticationFilter
         // TODO - Set /embedded/sse
 
-        return new WebMvcSseServerTransport(objectMapper, "/api/embedded/v1/mcp/message");
+        return new WebMvcSseServerTransportProvider(objectMapper, "/api/embedded/v1/mcp/message");
     }
 
     @Bean
-    RouterFunction<ServerResponse> routerFunction(WebMvcSseServerTransport transport) {
-        return transport.getRouterFunction();
+    RouterFunction<ServerResponse> routerFunction(WebMvcSseServerTransportProvider transportProvider) {
+        return transportProvider.getRouterFunction();
     }
 
     @Bean
-    McpSyncServer mcpServer(ServerMcpTransport transport) {
+    McpSyncServer mcpServer(McpServerTransportProvider transportProvider) {
         var capabilities = McpSchema.ServerCapabilities.builder()
             .resources(false, true)
             .tools(true)
@@ -72,10 +72,10 @@ public class McpServerConfiguration {
             .logging()
             .build();
 
-        return McpServer.sync(transport)
+        return McpServer.sync(transportProvider)
             .serverInfo("MCP ByteChef Embedded Server", "1.0.0")
             .capabilities(capabilities)
-            .tools(McpToolUtils.toSyncToolRegistration(getToolCallbacks()))
+            .tools(McpToolUtils.toSyncToolSpecification(getToolCallbacks()))
             .build();
     }
 

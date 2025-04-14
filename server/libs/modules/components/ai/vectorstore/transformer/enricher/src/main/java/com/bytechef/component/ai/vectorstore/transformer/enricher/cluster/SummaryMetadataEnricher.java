@@ -21,7 +21,6 @@ import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.option;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.platform.component.definition.ai.vectorstore.DocumentTransformerFunction.DOCUMENT_TRANSFORMER;
-import static org.springframework.ai.transformer.SummaryMetadataEnricher.SummaryType;
 
 import com.bytechef.component.definition.ClusterElementDefinition;
 import com.bytechef.component.definition.ComponentDsl;
@@ -32,6 +31,7 @@ import com.bytechef.platform.component.service.ClusterElementDefinitionService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Map;
+import org.springframework.ai.chat.transformer.SummaryMetadataEnricher.SummaryType;
 import org.springframework.ai.document.DocumentTransformer;
 
 /**
@@ -81,7 +81,7 @@ public class SummaryMetadataEnricher extends AbstractMetadataEnricher {
             .map(SummaryType::valueOf)
             .toList();
 
-        return new org.springframework.ai.transformer.SummaryMetadataEnricher(
+        return new org.springframework.ai.chat.transformer.SummaryMetadataEnricher(
             getModel(extensions, componentConnections), summaryTypes);
     }
 
