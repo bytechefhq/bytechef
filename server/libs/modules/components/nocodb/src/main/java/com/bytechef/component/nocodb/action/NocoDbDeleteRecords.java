@@ -77,8 +77,9 @@ public class NocoDbDeleteRecords {
             recordIds.add(Map.of("Id", recordId));
         }
 
-        return context.http(http -> http.delete(
-            "/api/v2/tables/%s/records".formatted(inputParameters.getRequiredString(TABLE_ID))))
+        return context
+            .http(http -> http.delete(
+                "/api/v2/tables/%s/records".formatted(inputParameters.getRequiredString(TABLE_ID))))
             .body(Http.Body.of(recordIds))
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute()

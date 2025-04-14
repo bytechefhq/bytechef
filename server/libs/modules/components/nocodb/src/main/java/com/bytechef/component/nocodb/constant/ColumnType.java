@@ -54,5 +54,4 @@ public enum ColumnType {
 
         return null;
     }
-
 }

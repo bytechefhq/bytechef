@@ -53,6 +53,9 @@ import java.util.Map;
  */
 public class NocoDbUtils {
 
+    private NocoDbUtils() {
+    }
+
     public static ActionPropertiesFunction createPropertiesForRecord(boolean isNewRecord) {
         return (inputParameters, connectionParameters, dependencyPaths, context) -> {
 
@@ -68,6 +71,7 @@ public class NocoDbUtils {
                 for (Object o : list) {
                     if (o instanceof Map<?, ?> map) {
                         String uidt = (String) map.get("uidt");
+
                         ColumnType columnType = ColumnType.getColumnType(uidt);
 
                         if (columnType != null) {
@@ -119,7 +123,6 @@ public class NocoDbUtils {
                                 }
                             }
                         }
-
                     }
                 }
             }
@@ -141,23 +144,6 @@ public class NocoDbUtils {
                     .minItems(1)
                     .required(true));
         };
-    }
-
-    private static List<Option<String>> getColumnOptions(Map<?, ?> map) {
-        List<Option<String>> options = new ArrayList<>();
-
-        if (map.get("colOptions") instanceof Map<?, ?> colOptions
-            && colOptions.get("options") instanceof List<?> list) {
-            for (Object option : list) {
-                if (option instanceof Map<?, ?> optionMap) {
-                    String title = (String) optionMap.get(TITLE);
-
-                    options.add(option(title, title));
-                }
-            }
-        }
-
-        return options;
     }
 
     public static List<Option<String>> getBaseIdOptions(
@@ -190,6 +176,7 @@ public class NocoDbUtils {
             for (Object object : list) {
                 if (object instanceof Map<?, ?> map) {
                     long id = (Integer) map.get("Id");
+
                     options.add(option(String.valueOf(id), id));
                 }
             }
@@ -215,13 +202,64 @@ public class NocoDbUtils {
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
         String searchText, Context context) {
 
-        Map<String, Object> body = context
-            .http(http -> http.get("/api/v1/workspaces"))
+        Map<String, Object> body = context.http(http -> http.get("/api/v1/workspaces"))
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});
 
         return getOptions(body);
+    }
+
+    public static List<Map<String, Object>> transformRecordsForInsertion(Parameters inputParameters) {
+        Map<String, List<Map<String, Object>>> tableColumns = inputParameters.getMap(
+            TABLE_COLUMNS, new TypeReference<>() {});
+
+        List<Map<String, Object>> records = tableColumns.get(RECORDS);
+        List<Map<String, Object>> newRecords = new ArrayList<>();
+
+        for (Map<String, Object> record : records) {
+            Map<String, Object> valueMap = new HashMap<>();
+
+            for (String key : record.keySet()) {
+                Object value = record.get(key);
+
+                if (value instanceof List<?> list) {
+                    List<String> valueList = new ArrayList<>();
+
+                    for (Object item : list) {
+                        valueList.add(item.toString());
+                    }
+
+                    String join = String.join(",", valueList);
+
+                    valueMap.put(key, join);
+                } else {
+                    valueMap.put(key, value);
+                }
+            }
+
+            newRecords.add(valueMap);
+        }
+
+        return newRecords;
+    }
+
+    private static List<Option<String>> getColumnOptions(Map<?, ?> map) {
+        List<Option<String>> options = new ArrayList<>();
+
+        if (map.get("colOptions") instanceof Map<?, ?> colOptions &&
+            colOptions.get("options") instanceof List<?> list) {
+
+            for (Object option : list) {
+                if (option instanceof Map<?, ?> optionMap) {
+                    String title = (String) optionMap.get(TITLE);
+
+                    options.add(option(title, title));
+                }
+            }
+        }
+
+        return options;
     }
 
     private static List<Option<String>> getOptions(Map<String, Object> body) {
@@ -236,43 +274,5 @@ public class NocoDbUtils {
         }
 
         return options;
-    }
-
-    private NocoDbUtils() {
-    }
-
-    public static List<Map<String, Object>> transformRecordsForInsertion(Parameters inputParameters) {
-        Map<String, List<Map<String, Object>>> tableColumns = inputParameters.getMap(
-            TABLE_COLUMNS, new TypeReference<>() {});
-
-        List<Map<String, Object>> records = tableColumns.get(RECORDS);
-
-        List<Map<String, Object>> newRecords = new ArrayList<>();
-
-        for (Map<String, Object> record : records) {
-            Map<String, Object> valueMap = new HashMap<>();
-            record.keySet()
-                .forEach(key -> {
-                    Object value = record.get(key);
-
-                    if (value instanceof List<?> list) {
-                        List<String> valueList = new ArrayList<>();
-
-                        for (Object item : list) {
-                            valueList.add(item.toString());
-                        }
-
-                        String join = String.join(",", valueList);
-
-                        valueMap.put(key, join);
-                    } else {
-                        valueMap.put(key, value);
-                    }
-                });
-
-            newRecords.add(valueMap);
-        }
-
-        return newRecords;
     }
 }

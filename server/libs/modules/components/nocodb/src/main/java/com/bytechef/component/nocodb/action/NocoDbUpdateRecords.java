@@ -69,8 +69,9 @@ public class NocoDbUpdateRecords {
     public static Object perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
         List<Map<String, Object>> newRecords = transformRecordsForInsertion(inputParameters);
 
-        return context.http(http -> http.patch(
-            "/api/v2/tables/%s/records".formatted(inputParameters.getRequiredString(TABLE_ID))))
+        return context
+            .http(http -> http.patch(
+                "/api/v2/tables/%s/records".formatted(inputParameters.getRequiredString(TABLE_ID))))
             .body(Http.Body.of(newRecords))
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute()

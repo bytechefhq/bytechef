@@ -58,8 +58,9 @@ public class NocoDbCreateRecords {
             outputSchema(
                 array()
                     .items(object()
-                        .properties(integer("Id")
-                            .description("Id of the created record.")))))
+                        .properties(
+                            integer("Id")
+                                .description("Id of the created record.")))))
         .perform(NocoDbCreateRecords::perform);
 
     private NocoDbCreateRecords() {
@@ -68,8 +69,8 @@ public class NocoDbCreateRecords {
     public static Object perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
         List<Map<String, Object>> newRecords = transformRecordsForInsertion(inputParameters);
 
-        return context.http(
-            http -> http.post("/api/v2/tables/%s/records".formatted(inputParameters.getRequiredString(TABLE_ID))))
+        return context
+            .http(http -> http.post("/api/v2/tables/%s/records".formatted(inputParameters.getRequiredString(TABLE_ID))))
             .body(Http.Body.of(newRecords))
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute()
