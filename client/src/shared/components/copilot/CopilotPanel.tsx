@@ -2,7 +2,7 @@ import {Button} from '@/components/ui/button';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {CopilotRuntimeProvider} from '@/shared/components/copilot/runtime-providers/CopilotRuntimeProvider';
 import {useCopilotStore} from '@/shared/components/copilot/stores/useCopilotStore';
-import {Thread} from '@assistant-ui/react';
+import {Thread} from '@assistant-ui/react-ui';
 import {Cross2Icon} from '@radix-ui/react-icons';
 import {BotMessageSquareIcon, MessageSquareOffIcon} from 'lucide-react';
 import {useEffect} from 'react';

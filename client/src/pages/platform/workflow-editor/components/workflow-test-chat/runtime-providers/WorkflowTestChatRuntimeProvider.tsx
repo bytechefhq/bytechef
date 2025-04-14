@@ -37,7 +37,7 @@ export function WorkflowTestChatRuntimeProvider({
 
         const input = message.content[0].text;
 
-        setMessage({attachments: [...message.attachments], content: input, role: 'user'});
+        setMessage({attachments: [...(message.attachments ?? [])], content: input, role: 'user'});
         setIsRunning(true);
         setWorkflowIsRunning(true);
 

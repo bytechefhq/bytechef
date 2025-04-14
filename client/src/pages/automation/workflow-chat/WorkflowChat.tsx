@@ -1,6 +1,6 @@
 import {WorkflowTestChatRuntimeProvider} from '@/pages/automation/workflow-chat/runtime-providers/WorkflowChatRuntimeProvider';
 import {useWorkflowChatStore} from '@/pages/automation/workflow-chat/stores/useWorkflowChatStore';
-import {Thread} from '@assistant-ui/react';
+import {Thread} from '@assistant-ui/react-ui';
 import {useEffect} from 'react';
 import {useParams} from 'react-router-dom';
 import {twMerge} from 'tailwind-merge';

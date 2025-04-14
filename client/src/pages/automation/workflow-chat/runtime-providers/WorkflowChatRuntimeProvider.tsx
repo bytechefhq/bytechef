@@ -34,7 +34,7 @@ export function WorkflowTestChatRuntimeProvider({
 
         const input = message.content[0].text;
 
-        setMessage({attachments: [...message.attachments], content: input, role: 'user'});
+        setMessage({attachments: [...(message.attachments ?? [])], content: input, role: 'user'});
         setIsRunning(true);
 
         const formData = new FormData();
@@ -42,7 +42,7 @@ export function WorkflowTestChatRuntimeProvider({
         formData.append('conversationId', conversationId ?? '');
         formData.append('message', input ?? '');
 
-        for (const attachment of message.attachments) {
+        for (const attachment of message.attachments ?? []) {
             if (attachment.file) {
                 formData.append('attachments', attachment.file, attachment.name);
             }

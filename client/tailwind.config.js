@@ -8,7 +8,7 @@ module.exports = {
         require('@tailwindcss/forms'),
         require('tailwindcss-animate'),
         require('@tailwindcss/typography'),
-        require('@assistant-ui/react/tailwindcss')({
+        require('@assistant-ui/react-ui/tailwindcss')({
             components: ['thread'],
             shadcn: true,
         }),

@@ -1,6 +1,6 @@
 import {WorkflowTestChatRuntimeProvider} from '@/pages/platform/workflow-editor/components/workflow-test-chat/runtime-providers/WorkflowTestChatRuntimeProvider';
 import useWorkflowTestChatStore from '@/pages/platform/workflow-editor/stores/useWorkflowTestChatStore';
-import {Thread} from '@assistant-ui/react';
+import {Thread} from '@assistant-ui/react-ui';
 import {Cross2Icon} from '@radix-ui/react-icons';
 import {useEffect} from 'react';
 

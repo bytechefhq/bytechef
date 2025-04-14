@@ -36,7 +36,9 @@
     "build-storybook": "storybook build"
   },
   "dependencies": {
-    "@assistant-ui/react": "^0.7.86",
+    "@assistant-ui/react": "^0.9.1",
+    "@assistant-ui/react-markdown": "^0.9.1",
+    "@assistant-ui/react-ui": "^0.1.8",
     "@hookform/resolvers": "^5.0.1",
     "@monaco-editor/react": "^4.7.0",
     "@radix-ui/colors": "^3.0.0",
