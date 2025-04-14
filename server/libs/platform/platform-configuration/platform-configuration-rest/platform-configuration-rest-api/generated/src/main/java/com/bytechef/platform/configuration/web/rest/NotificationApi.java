@@ -32,7 +32,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-04-13T22:23:09.531481+02:00[Europe/Zagreb]", comments = "Generator version: 7.12.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-04-14T08:38:13.214902+02:00[Europe/Zagreb]", comments = "Generator version: 7.12.0")
 @Validated
 @Tag(name = "notification", description = "The Platform Notification Internal API")
 public interface NotificationApi {
@@ -40,6 +40,48 @@ public interface NotificationApi {
     default Optional<NativeWebRequest> getRequest() {
         return Optional.empty();
     }
+
+    /**
+     * POST /notifications : Create a notification entry
+     * Create a notification entry
+     *
+     * @param notificationModel  (required)
+     * @return Successful operation. (status code 200)
+     */
+    @Operation(
+        operationId = "createNotification",
+        summary = "Create a notification entry",
+        description = "Create a notification entry",
+        tags = { "notification" },
+        responses = {
+            @ApiResponse(responseCode = "200", description = "Successful operation.", content = {
+                @Content(mediaType = "application/json", schema = @Schema(implementation = NotificationModel.class))
+            })
+        }
+    )
+    @RequestMapping(
+        method = RequestMethod.POST,
+        value = "/notifications",
+        produces = { "application/json" },
+        consumes = { "application/json" }
+    )
+    
+    default ResponseEntity<NotificationModel> createNotification(
+        @Parameter(name = "NotificationModel", description = "", required = true) @Valid @RequestBody NotificationModel notificationModel
+    ) {
+        getRequest().ifPresent(request -> {
+            for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
+                if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
+                    String exampleString = "{ \"settings\" : { \"key\" : \"{}\" }, \"__version\" : 5, \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"createdBy\" : \"createdBy\", \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"lastModifiedBy\" : \"lastModifiedBy\", \"name\" : \"name\", \"id\" : 0, \"notificationEventIds\" : [ 1, 1 ], \"type\" : \"EMAIL\", \"notificationEvents\" : [ { \"id\" : 6, \"type\" : \"JOB_CANCELLED\" }, { \"id\" : 6, \"type\" : \"JOB_CANCELLED\" } ] }";
+                    ApiUtil.setExampleResponse(request, "application/json", exampleString);
+                    break;
+                }
+            }
+        });
+        return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
+
+    }
+
 
     /**
      * GET /notifications : Get a list of notifications
@@ -70,49 +112,7 @@ public interface NotificationApi {
         getRequest().ifPresent(request -> {
             for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
                 if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
-                    String exampleString = "[ { \"settings\" : { \"key\" : \"settings\" }, \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"createdBy\" : \"createdBy\", \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"lastModifiedBy\" : \"lastModifiedBy\", \"name\" : \"name\", \"id\" : 0, \"notificationType\" : \"EMAIL\", \"events\" : [ { \"id\" : 6, \"type\" : \"JOB_CANCELLED\" }, { \"id\" : 6, \"type\" : \"JOB_CANCELLED\" } ] }, { \"settings\" : { \"key\" : \"settings\" }, \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"createdBy\" : \"createdBy\", \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"lastModifiedBy\" : \"lastModifiedBy\", \"name\" : \"name\", \"id\" : 0, \"notificationType\" : \"EMAIL\", \"events\" : [ { \"id\" : 6, \"type\" : \"JOB_CANCELLED\" }, { \"id\" : 6, \"type\" : \"JOB_CANCELLED\" } ] } ]";
-                    ApiUtil.setExampleResponse(request, "application/json", exampleString);
-                    break;
-                }
-            }
-        });
-        return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
-
-    }
-
-
-    /**
-     * POST /notifications : Create a notification entry
-     * Create a notification entry
-     *
-     * @param notificationModel  (required)
-     * @return Successful operation. (status code 200)
-     */
-    @Operation(
-        operationId = "postNotification",
-        summary = "Create a notification entry",
-        description = "Create a notification entry",
-        tags = { "notification" },
-        responses = {
-            @ApiResponse(responseCode = "200", description = "Successful operation.", content = {
-                @Content(mediaType = "application/json", schema = @Schema(implementation = NotificationModel.class))
-            })
-        }
-    )
-    @RequestMapping(
-        method = RequestMethod.POST,
-        value = "/notifications",
-        produces = { "application/json" },
-        consumes = { "application/json" }
-    )
-    
-    default ResponseEntity<NotificationModel> postNotification(
-        @Parameter(name = "NotificationModel", description = "", required = true) @Valid @RequestBody NotificationModel notificationModel
-    ) {
-        getRequest().ifPresent(request -> {
-            for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
-                if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
-                    String exampleString = "{ \"settings\" : { \"key\" : \"settings\" }, \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"createdBy\" : \"createdBy\", \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"lastModifiedBy\" : \"lastModifiedBy\", \"name\" : \"name\", \"id\" : 0, \"notificationType\" : \"EMAIL\", \"events\" : [ { \"id\" : 6, \"type\" : \"JOB_CANCELLED\" }, { \"id\" : 6, \"type\" : \"JOB_CANCELLED\" } ] }";
+                    String exampleString = "[ { \"settings\" : { \"key\" : \"{}\" }, \"__version\" : 5, \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"createdBy\" : \"createdBy\", \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"lastModifiedBy\" : \"lastModifiedBy\", \"name\" : \"name\", \"id\" : 0, \"notificationEventIds\" : [ 1, 1 ], \"type\" : \"EMAIL\", \"notificationEvents\" : [ { \"id\" : 6, \"type\" : \"JOB_CANCELLED\" }, { \"id\" : 6, \"type\" : \"JOB_CANCELLED\" } ] }, { \"settings\" : { \"key\" : \"{}\" }, \"__version\" : 5, \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"createdBy\" : \"createdBy\", \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"lastModifiedBy\" : \"lastModifiedBy\", \"name\" : \"name\", \"id\" : 0, \"notificationEventIds\" : [ 1, 1 ], \"type\" : \"EMAIL\", \"notificationEvents\" : [ { \"id\" : 6, \"type\" : \"JOB_CANCELLED\" }, { \"id\" : 6, \"type\" : \"JOB_CANCELLED\" } ] } ]";
                     ApiUtil.setExampleResponse(request, "application/json", exampleString);
                     break;
                 }
