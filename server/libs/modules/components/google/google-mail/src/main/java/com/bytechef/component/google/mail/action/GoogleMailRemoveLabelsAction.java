@@ -83,8 +83,7 @@ public class GoogleMailRemoveLabelsAction {
         ModifyMessageRequest messageRequest = new ModifyMessageRequest()
             .setRemoveLabelIds(inputParameters.getRequiredList(LABEL_IDS, String.class));
 
-        return gmail
-            .users()
+        return gmail.users()
             .messages()
             .modify(ME, inputParameters.getRequiredString(ID), messageRequest)
             .execute();
