@@ -21,10 +21,8 @@ const PlaceholderNode = ({data, id}: {data: NodeDataType; id: string}) => {
 
     return (
         <WorkflowNodesPopoverMenu
-            conditionId={data.conditionId}
             hideTriggerComponents
             key={`${id}-${nodeIndex}`}
-            loopId={data.loopId}
             nodeIndex={nodeIndex}
             sourceNodeId={id}
         >

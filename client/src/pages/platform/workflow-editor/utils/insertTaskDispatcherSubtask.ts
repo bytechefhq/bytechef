@@ -50,6 +50,9 @@ interface InsertTaskDispatcherSubtaskProps {
     tasks: Array<WorkflowTask>;
 }
 
+/**
+ * Insert a new task into the task dispatcher subtask list.
+ */
 export default function insertTaskDispatcherSubtask({
     newTask,
     placeholderId,
@@ -71,18 +74,18 @@ export default function insertTaskDispatcherSubtask({
     const {extractContextFromPlaceholder, getParentTask, getSubtasks, initializeParameters, updateTaskParameters} =
         config;
 
-    let task = tasks.find((task) => task.name === taskDispatcherId);
+    let targetTaskDispatcher = tasks.find((task) => task.name === taskDispatcherId);
 
-    if (!task) {
-        task = getParentTask({taskDispatcherId, tasks});
+    if (!targetTaskDispatcher) {
+        targetTaskDispatcher = getParentTask({taskDispatcherId, tasks});
     }
 
-    if (!task) {
+    if (!targetTaskDispatcher) {
         return tasks;
     }
 
-    if (!task.parameters) {
-        task.parameters = initializeParameters();
+    if (!targetTaskDispatcher.parameters) {
+        targetTaskDispatcher.parameters = initializeParameters();
     }
 
     let context: TaskDispatcherContextType = {...taskDispatcherContext};
@@ -93,7 +96,7 @@ export default function insertTaskDispatcherSubtask({
         context = {...context, ...placeholderContext};
     }
 
-    const subtasks = getSubtasks({context, task});
+    const subtasks = getSubtasks({context, task: targetTaskDispatcher});
 
     let updatedSubtasks: Array<WorkflowTask>;
 
@@ -105,7 +108,7 @@ export default function insertTaskDispatcherSubtask({
         updatedSubtasks.splice(context.index, 0, newTask);
     }
 
-    const updatedTask = updateTaskParameters({context, task, updatedSubtasks});
+    const updatedTaskDispatcher = updateTaskParameters({context, task: targetTaskDispatcher, updatedSubtasks});
 
-    return updateTasksRecursively(tasks, updatedTask);
+    return updateTasksRecursively(tasks, updatedTaskDispatcher);
 }

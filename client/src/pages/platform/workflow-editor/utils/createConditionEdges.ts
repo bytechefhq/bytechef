@@ -302,7 +302,7 @@ export function hasTaskInConditionBranches(conditionId: string, taskId: string, 
 /**
  * Creates all edges for a condition node and its branches
  */
-export default function createAllConditionEdges(conditionNode: Node, allNodes: Node[]): Edge[] {
+export default function createConditionEdges(conditionNode: Node, allNodes: Node[]): Edge[] {
     const edges: Edge[] = [];
     const conditionNodeData: NodeDataType = conditionNode.data as NodeDataType;
     const conditionId = conditionNode.id;

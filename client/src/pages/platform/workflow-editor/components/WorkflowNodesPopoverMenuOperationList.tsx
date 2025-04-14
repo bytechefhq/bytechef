@@ -28,9 +28,7 @@ import saveWorkflowDefinition from '../utils/saveWorkflowDefinition';
 
 interface WorkflowNodesPopoverMenuOperationListProps {
     componentDefinition: ComponentDefinition;
-    conditionId?: string;
     edgeId?: string;
-    loopId?: string;
     setPopoverOpen: (open: boolean) => void;
     sourceNodeId: string;
     trigger?: boolean;
@@ -38,9 +36,7 @@ interface WorkflowNodesPopoverMenuOperationListProps {
 
 const WorkflowNodesPopoverMenuOperationList = ({
     componentDefinition,
-    conditionId,
     edgeId,
-    loopId,
     setPopoverOpen,
     sourceNodeId,
     trigger,
@@ -199,7 +195,7 @@ const WorkflowNodesPopoverMenuOperationList = ({
 
                 const taskDispatcherContext = getTaskDispatcherContext({edge: clickedEdge, nodes});
 
-                if (taskDispatcherContext?.conditionId || taskDispatcherContext.loopId) {
+                if (taskDispatcherContext?.taskDispatcherId) {
                     handleTaskDispatcherSubtaskOperationClick({
                         operation: clickedOperation,
                         operationDefinition: clickedComponentActionDefinition,
@@ -225,18 +221,7 @@ const WorkflowNodesPopoverMenuOperationList = ({
 
                 const taskDispatcherContext = getTaskDispatcherContext({node: sourceNode});
 
-                if (taskDispatcherContext?.loopId || loopId) {
-                    handleTaskDispatcherSubtaskOperationClick({
-                        operation: clickedOperation,
-                        operationDefinition: clickedComponentActionDefinition,
-                        placeholderId: sourceNodeId,
-                        projectId: +projectId!,
-                        queryClient,
-                        taskDispatcherContext,
-                        updateWorkflowMutation,
-                        workflow,
-                    });
-                } else if (taskDispatcherContext?.conditionId || conditionId) {
+                if (taskDispatcherContext?.taskDispatcherId) {
                     handleTaskDispatcherSubtaskOperationClick({
                         operation: clickedOperation,
                         operationDefinition: clickedComponentActionDefinition,
@@ -285,8 +270,6 @@ const WorkflowNodesPopoverMenuOperationList = ({
             trigger,
             edgeId,
             sourceNodeId,
-            loopId,
-            conditionId,
             nodes,
             edges,
             workflow,
