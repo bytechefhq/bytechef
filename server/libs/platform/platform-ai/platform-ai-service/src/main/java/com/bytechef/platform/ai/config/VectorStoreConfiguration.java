@@ -654,7 +654,10 @@ public class VectorStoreConfiguration {
                     this.type = Type.TIME;
                     this.location = Location.COMPONENT;
                 }
-                default -> throw new IllegalStateException("Unexpected value: " + property.getClass());
+                default -> {
+                    this.type = Type.NULL;
+                    this.location = Location.COMPONENT;
+                }
             }
         }
 
