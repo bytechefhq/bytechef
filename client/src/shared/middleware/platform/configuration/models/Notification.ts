@@ -68,30 +68,42 @@ export interface Notification {
      * @type {string}
      * @memberof Notification
      */
-    notificationType: NotificationNotificationTypeEnum;
+    type: NotificationTypeEnum;
     /**
      * Notification type related settings
-     * @type {{ [key: string]: string; }}
+     * @type {{ [key: string]: object; }}
      * @memberof Notification
      */
-    settings: { [key: string]: string; };
+    settings: { [key: string]: object; };
     /**
      * List of events for which notification will be triggered
      * @type {Array<NotificationEvent>}
      * @memberof Notification
      */
-    events: Array<NotificationEvent>;
+    readonly notificationEvents?: Array<NotificationEvent>;
+    /**
+     * List of event ids for which notification will be triggered
+     * @type {Array<number>}
+     * @memberof Notification
+     */
+    notificationEventIds?: Array<number>;
+    /**
+     * 
+     * @type {number}
+     * @memberof Notification
+     */
+    version?: number;
 }
 
 
 /**
  * @export
  */
-export const NotificationNotificationTypeEnum = {
+export const NotificationTypeEnum = {
     Email: 'EMAIL',
     Webhook: 'WEBHOOK'
 } as const;
-export type NotificationNotificationTypeEnum = typeof NotificationNotificationTypeEnum[keyof typeof NotificationNotificationTypeEnum];
+export type NotificationTypeEnum = typeof NotificationTypeEnum[keyof typeof NotificationTypeEnum];
 
 
 /**
@@ -99,9 +111,8 @@ export type NotificationNotificationTypeEnum = typeof NotificationNotificationTy
  */
 export function instanceOfNotification(value: object): value is Notification {
     if (!('name' in value) || value['name'] === undefined) return false;
-    if (!('notificationType' in value) || value['notificationType'] === undefined) return false;
+    if (!('type' in value) || value['type'] === undefined) return false;
     if (!('settings' in value) || value['settings'] === undefined) return false;
-    if (!('events' in value) || value['events'] === undefined) return false;
     return true;
 }
 
@@ -121,9 +132,11 @@ export function NotificationFromJSONTyped(json: any, ignoreDiscriminator: boolea
         'lastModifiedBy': json['lastModifiedBy'] == null ? undefined : json['lastModifiedBy'],
         'lastModifiedDate': json['lastModifiedDate'] == null ? undefined : (new Date(json['lastModifiedDate'])),
         'name': json['name'],
-        'notificationType': json['notificationType'],
+        'type': json['type'],
         'settings': json['settings'],
-        'events': ((json['events'] as Array<any>).map(NotificationEventFromJSON)),
+        'notificationEvents': json['notificationEvents'] == null ? undefined : ((json['notificationEvents'] as Array<any>).map(NotificationEventFromJSON)),
+        'notificationEventIds': json['notificationEventIds'] == null ? undefined : json['notificationEventIds'],
+        'version': json['__version'] == null ? undefined : json['__version'],
     };
 }
 
@@ -131,7 +144,7 @@ export function NotificationToJSON(json: any): Notification {
     return NotificationToJSONTyped(json, false);
 }
 
-export function NotificationToJSONTyped(value?: Omit<Notification, 'id'|'createdBy'|'createdDate'|'lastModifiedBy'|'lastModifiedDate'> | null, ignoreDiscriminator: boolean = false): any {
+export function NotificationToJSONTyped(value?: Omit<Notification, 'id'|'createdBy'|'createdDate'|'lastModifiedBy'|'lastModifiedDate'|'notificationEvents'> | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
@@ -139,9 +152,10 @@ export function NotificationToJSONTyped(value?: Omit<Notification, 'id'|'created
     return {
         
         'name': value['name'],
-        'notificationType': value['notificationType'],
+        'type': value['type'],
         'settings': value['settings'],
-        'events': ((value['events'] as Array<any>).map(NotificationEventToJSON)),
+        'notificationEventIds': value['notificationEventIds'],
+        '__version': value['version'],
     };
 }
 

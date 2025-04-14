@@ -22,14 +22,52 @@ import {
     NotificationToJSON,
 } from '../models/index';
 
-export interface PostNotificationRequest {
-    notification: Omit<Notification, 'id'|'createdBy'|'createdDate'|'lastModifiedBy'|'lastModifiedDate'>;
+export interface CreateNotificationRequest {
+    notification: Omit<Notification, 'id'|'createdBy'|'createdDate'|'lastModifiedBy'|'lastModifiedDate'|'notificationEvents'>;
 }
 
 /**
  * 
  */
 export class NotificationApi extends runtime.BaseAPI {
+
+    /**
+     * Create a notification entry
+     * Create a notification entry
+     */
+    async createNotificationRaw(requestParameters: CreateNotificationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Notification>> {
+        if (requestParameters['notification'] == null) {
+            throw new runtime.RequiredError(
+                'notification',
+                'Required parameter "notification" was null or undefined when calling createNotification().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        headerParameters['Content-Type'] = 'application/json';
+
+        const response = await this.request({
+            path: `/notifications`,
+            method: 'POST',
+            headers: headerParameters,
+            query: queryParameters,
+            body: NotificationToJSON(requestParameters['notification']),
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => NotificationFromJSON(jsonValue));
+    }
+
+    /**
+     * Create a notification entry
+     * Create a notification entry
+     */
+    async createNotification(requestParameters: CreateNotificationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Notification> {
+        const response = await this.createNotificationRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
 
     /**
      * Get a list of notifications
@@ -56,44 +94,6 @@ export class NotificationApi extends runtime.BaseAPI {
      */
     async getNotifications(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<Notification>> {
         const response = await this.getNotificationsRaw(initOverrides);
-        return await response.value();
-    }
-
-    /**
-     * Create a notification entry
-     * Create a notification entry
-     */
-    async postNotificationRaw(requestParameters: PostNotificationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Notification>> {
-        if (requestParameters['notification'] == null) {
-            throw new runtime.RequiredError(
-                'notification',
-                'Required parameter "notification" was null or undefined when calling postNotification().'
-            );
-        }
-
-        const queryParameters: any = {};
-
-        const headerParameters: runtime.HTTPHeaders = {};
-
-        headerParameters['Content-Type'] = 'application/json';
-
-        const response = await this.request({
-            path: `/notifications`,
-            method: 'POST',
-            headers: headerParameters,
-            query: queryParameters,
-            body: NotificationToJSON(requestParameters['notification']),
-        }, initOverrides);
-
-        return new runtime.JSONApiResponse(response, (jsonValue) => NotificationFromJSON(jsonValue));
-    }
-
-    /**
-     * Create a notification entry
-     * Create a notification entry
-     */
-    async postNotification(requestParameters: PostNotificationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Notification> {
-        const response = await this.postNotificationRaw(requestParameters, initOverrides);
         return await response.value();
     }
 
