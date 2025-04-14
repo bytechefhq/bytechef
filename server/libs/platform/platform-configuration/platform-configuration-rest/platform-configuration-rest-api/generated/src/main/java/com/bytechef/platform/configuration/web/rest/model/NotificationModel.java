@@ -31,7 +31,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "Notification", description = "A Notification definition.")
 @JsonTypeName("Notification")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-04-13T22:23:09.531481+02:00[Europe/Zagreb]", comments = "Generator version: 7.12.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-04-14T08:38:13.214902+02:00[Europe/Zagreb]", comments = "Generator version: 7.12.0")
 public class NotificationModel {
 
   private @Nullable Long id;
@@ -51,14 +51,14 @@ public class NotificationModel {
   /**
    * Type of the notification
    */
-  public enum NotificationTypeEnum {
+  public enum TypeEnum {
     EMAIL("EMAIL"),
     
     WEBHOOK("WEBHOOK");
 
     private String value;
 
-    NotificationTypeEnum(String value) {
+    TypeEnum(String value) {
       this.value = value;
     }
 
@@ -73,8 +73,8 @@ public class NotificationModel {
     }
 
     @JsonCreator
-    public static NotificationTypeEnum fromValue(String value) {
-      for (NotificationTypeEnum b : NotificationTypeEnum.values()) {
+    public static TypeEnum fromValue(String value) {
+      for (TypeEnum b : TypeEnum.values()) {
         if (b.value.equals(value)) {
           return b;
         }
@@ -83,13 +83,18 @@ public class NotificationModel {
     }
   }
 
-  private NotificationTypeEnum notificationType;
+  private TypeEnum type;
 
   @Valid
-  private Map<String, String> settings = new HashMap<>();
+  private Map<String, Object> settings = new HashMap<>();
 
   @Valid
-  private List<@Valid NotificationEventModel> events = new ArrayList<>();
+  private List<@Valid NotificationEventModel> notificationEvents = new ArrayList<>();
+
+  @Valid
+  private List<Long> notificationEventIds = new ArrayList<>();
+
+  private @Nullable Integer version;
 
   public NotificationModel() {
     super();
@@ -98,11 +103,10 @@ public class NotificationModel {
   /**
    * Constructor with only required parameters
    */
-  public NotificationModel(String name, NotificationTypeEnum notificationType, Map<String, String> settings, List<@Valid NotificationEventModel> events) {
+  public NotificationModel(String name, TypeEnum type, Map<String, Object> settings) {
     this.name = name;
-    this.notificationType = notificationType;
+    this.type = type;
     this.settings = settings;
-    this.events = events;
   }
 
   public NotificationModel id(Long id) {
@@ -225,32 +229,32 @@ public class NotificationModel {
     this.name = name;
   }
 
-  public NotificationModel notificationType(NotificationTypeEnum notificationType) {
-    this.notificationType = notificationType;
+  public NotificationModel type(TypeEnum type) {
+    this.type = type;
     return this;
   }
 
   /**
    * Type of the notification
-   * @return notificationType
+   * @return type
    */
   @NotNull 
-  @Schema(name = "notificationType", description = "Type of the notification", requiredMode = Schema.RequiredMode.REQUIRED)
-  @JsonProperty("notificationType")
-  public NotificationTypeEnum getNotificationType() {
-    return notificationType;
+  @Schema(name = "type", description = "Type of the notification", requiredMode = Schema.RequiredMode.REQUIRED)
+  @JsonProperty("type")
+  public TypeEnum getType() {
+    return type;
   }
 
-  public void setNotificationType(NotificationTypeEnum notificationType) {
-    this.notificationType = notificationType;
+  public void setType(TypeEnum type) {
+    this.type = type;
   }
 
-  public NotificationModel settings(Map<String, String> settings) {
+  public NotificationModel settings(Map<String, Object> settings) {
     this.settings = settings;
     return this;
   }
 
-  public NotificationModel putSettingsItem(String key, String settingsItem) {
+  public NotificationModel putSettingsItem(String key, Object settingsItem) {
     if (this.settings == null) {
       this.settings = new HashMap<>();
     }
@@ -265,40 +269,88 @@ public class NotificationModel {
   @NotNull 
   @Schema(name = "settings", description = "Notification type related settings", requiredMode = Schema.RequiredMode.REQUIRED)
   @JsonProperty("settings")
-  public Map<String, String> getSettings() {
+  public Map<String, Object> getSettings() {
     return settings;
   }
 
-  public void setSettings(Map<String, String> settings) {
+  public void setSettings(Map<String, Object> settings) {
     this.settings = settings;
   }
 
-  public NotificationModel events(List<@Valid NotificationEventModel> events) {
-    this.events = events;
+  public NotificationModel notificationEvents(List<@Valid NotificationEventModel> notificationEvents) {
+    this.notificationEvents = notificationEvents;
     return this;
   }
 
-  public NotificationModel addEventsItem(NotificationEventModel eventsItem) {
-    if (this.events == null) {
-      this.events = new ArrayList<>();
+  public NotificationModel addNotificationEventsItem(NotificationEventModel notificationEventsItem) {
+    if (this.notificationEvents == null) {
+      this.notificationEvents = new ArrayList<>();
     }
-    this.events.add(eventsItem);
+    this.notificationEvents.add(notificationEventsItem);
     return this;
   }
 
   /**
    * List of events for which notification will be triggered
-   * @return events
+   * @return notificationEvents
    */
-  @NotNull @Valid 
-  @Schema(name = "events", description = "List of events for which notification will be triggered", requiredMode = Schema.RequiredMode.REQUIRED)
-  @JsonProperty("events")
-  public List<@Valid NotificationEventModel> getEvents() {
-    return events;
+  @Valid 
+  @Schema(name = "notificationEvents", accessMode = Schema.AccessMode.READ_ONLY, description = "List of events for which notification will be triggered", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("notificationEvents")
+  public List<@Valid NotificationEventModel> getNotificationEvents() {
+    return notificationEvents;
   }
 
-  public void setEvents(List<@Valid NotificationEventModel> events) {
-    this.events = events;
+  public void setNotificationEvents(List<@Valid NotificationEventModel> notificationEvents) {
+    this.notificationEvents = notificationEvents;
+  }
+
+  public NotificationModel notificationEventIds(List<Long> notificationEventIds) {
+    this.notificationEventIds = notificationEventIds;
+    return this;
+  }
+
+  public NotificationModel addNotificationEventIdsItem(Long notificationEventIdsItem) {
+    if (this.notificationEventIds == null) {
+      this.notificationEventIds = new ArrayList<>();
+    }
+    this.notificationEventIds.add(notificationEventIdsItem);
+    return this;
+  }
+
+  /**
+   * List of event ids for which notification will be triggered
+   * @return notificationEventIds
+   */
+  
+  @Schema(name = "notificationEventIds", description = "List of event ids for which notification will be triggered", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("notificationEventIds")
+  public List<Long> getNotificationEventIds() {
+    return notificationEventIds;
+  }
+
+  public void setNotificationEventIds(List<Long> notificationEventIds) {
+    this.notificationEventIds = notificationEventIds;
+  }
+
+  public NotificationModel version(Integer version) {
+    this.version = version;
+    return this;
+  }
+
+  /**
+   * Get version
+   * @return version
+   */
+  
+  @Schema(name = "__version", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("__version")
+  public Integer getVersion() {
+    return version;
+  }
+
+  public void setVersion(Integer version) {
+    this.version = version;
   }
 
   @Override
@@ -316,14 +368,16 @@ public class NotificationModel {
         Objects.equals(this.lastModifiedBy, notification.lastModifiedBy) &&
         Objects.equals(this.lastModifiedDate, notification.lastModifiedDate) &&
         Objects.equals(this.name, notification.name) &&
-        Objects.equals(this.notificationType, notification.notificationType) &&
+        Objects.equals(this.type, notification.type) &&
         Objects.equals(this.settings, notification.settings) &&
-        Objects.equals(this.events, notification.events);
+        Objects.equals(this.notificationEvents, notification.notificationEvents) &&
+        Objects.equals(this.notificationEventIds, notification.notificationEventIds) &&
+        Objects.equals(this.version, notification.version);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(id, createdBy, createdDate, lastModifiedBy, lastModifiedDate, name, notificationType, settings, events);
+    return Objects.hash(id, createdBy, createdDate, lastModifiedBy, lastModifiedDate, name, type, settings, notificationEvents, notificationEventIds, version);
   }
 
   @Override
@@ -336,9 +390,11 @@ public class NotificationModel {
     sb.append("    lastModifiedBy: ").append(toIndentedString(lastModifiedBy)).append("\n");
     sb.append("    lastModifiedDate: ").append(toIndentedString(lastModifiedDate)).append("\n");
     sb.append("    name: ").append(toIndentedString(name)).append("\n");
-    sb.append("    notificationType: ").append(toIndentedString(notificationType)).append("\n");
+    sb.append("    type: ").append(toIndentedString(type)).append("\n");
     sb.append("    settings: ").append(toIndentedString(settings)).append("\n");
-    sb.append("    events: ").append(toIndentedString(events)).append("\n");
+    sb.append("    notificationEvents: ").append(toIndentedString(notificationEvents)).append("\n");
+    sb.append("    notificationEventIds: ").append(toIndentedString(notificationEventIds)).append("\n");
+    sb.append("    version: ").append(toIndentedString(version)).append("\n");
     sb.append("}");
     return sb.toString();
   }
