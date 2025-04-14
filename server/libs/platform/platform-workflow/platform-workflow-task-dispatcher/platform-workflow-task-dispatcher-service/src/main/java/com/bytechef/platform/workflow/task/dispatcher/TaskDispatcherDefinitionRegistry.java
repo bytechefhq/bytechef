@@ -58,9 +58,11 @@ public class TaskDispatcherDefinitionRegistry {
         TaskDispatcherDefinition taskDispatcherDefinition = null;
 
         if (version == null) {
-            List<TaskDispatcherDefinition> filteredComponentDefinitions = getTaskDispatcherDefinitions(name);
+            List<TaskDispatcherDefinition> filteredTaskDispatcherDefinitions = getTaskDispatcherDefinitions(name);
 
-            taskDispatcherDefinition = filteredComponentDefinitions.getLast();
+            if (!filteredTaskDispatcherDefinitions.isEmpty()) {
+                taskDispatcherDefinition = filteredTaskDispatcherDefinitions.getLast();
+            }
         } else {
             taskDispatcherDefinition = taskDispatcherDefinitions.stream()
                 .filter(curTaskDispatcherDefinition -> name.equalsIgnoreCase(curTaskDispatcherDefinition.getName()) &&
