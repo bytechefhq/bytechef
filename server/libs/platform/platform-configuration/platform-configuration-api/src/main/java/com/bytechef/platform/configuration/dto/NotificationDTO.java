@@ -20,7 +20,6 @@ import com.bytechef.platform.configuration.domain.Notification;
 import com.bytechef.platform.configuration.domain.Notification.Type;
 import com.bytechef.platform.configuration.domain.NotificationEvent;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-
 import java.time.Instant;
 import java.util.List;
 import java.util.Map;
@@ -34,7 +33,8 @@ public record NotificationDTO(
     String createdBy, Instant createdDate, String lastModifiedBy, Instant lastModifiedDate, int version) {
 
     public NotificationDTO(Notification notification, List<NotificationEvent> notificationEvents) {
-        this(notification.getId(), notification.getName(), notification.getType(), notification.getSettings(),
+        this(
+            notification.getId(), notification.getName(), notification.getType(), notification.getSettings(),
             notificationEvents, notification.getCreatedBy(), notification.getCreatedDate(),
             notification.getLastModifiedBy(), notification.getLastModifiedDate(), notification.getVersion());
     }

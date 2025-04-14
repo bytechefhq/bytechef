@@ -45,6 +45,5 @@ public class NotificationFacadeImpl implements NotificationFacade {
             .map(notification -> new NotificationDTO(
                 notification, notificationEventService.getNotificationEvents(notification.getNotificationEventIds())))
             .toList();
-
     }
 }
