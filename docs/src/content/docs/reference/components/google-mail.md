@@ -6,7 +6,7 @@ description: "Gmail is a widely used email service by Google, offering free and 
 Gmail is a widely used email service by Google, offering free and feature-rich communication, organization, and storage capabilities accessible through web browsers and mobile apps.
 
 
-Categories: communication
+Categories: Communication
 
 
 Type: googleMail/v1
@@ -189,6 +189,59 @@ Gets the specified thread.
 The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
 
 
+
+
+### Remove Labels
+Name: removeLabels
+
+Remove labels from an email in your Gmail account.
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| id | Message ID | STRING | ID of the message to add labels | true |
+| labelIds | Labels | ARRAY <details> <summary> Items </summary> [STRING] </details> | Labels to remove from this message. | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Remove Labels",
+  "name" : "removeLabels",
+  "parameters" : {
+    "id" : "",
+    "labelIds" : [ "" ]
+  },
+  "type" : "googleMail/v1/removeLabels"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| id | STRING | The ID of the message. |
+| threadId | STRING | The ID of the thread the message belongs to. |
+| labelIds | ARRAY <details> <summary> Items </summary> [STRING] </details> | List of IDs of labels applied to this message. |
+
+
+
+
+#### Output Example
+```json
+{
+  "id" : "",
+  "threadId" : "",
+  "labelIds" : [ "" ]
+}
+```
 
 
 ### Reply to Email
