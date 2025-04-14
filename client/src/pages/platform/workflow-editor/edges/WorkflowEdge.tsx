@@ -8,6 +8,7 @@ import {useShallow} from 'zustand/react/shallow';
 
 import WorkflowNodesPopoverMenu from '../components/WorkflowNodesPopoverMenu';
 import useWorkflowDataStore from '../stores/useWorkflowDataStore';
+import BranchCaseLabel from './BranchCaseLabel';
 
 export default function WorkflowEdge({
     id,
@@ -43,12 +44,20 @@ export default function WorkflowEdge({
     const sourceNode = nodes.find((node) => node.id === sourceNodeId);
     const targetNode = nodes.find((node) => node.id === targetNodeId);
 
+    const caseKey = (targetNode?.data as NodeDataType)?.branchData?.caseKey;
+
     const sourceNodeComponentName = useMemo(() => (sourceNode?.data as NodeDataType)?.componentName, [sourceNode]);
+
+    const isSourceTaskDispatcherTopGhostNode = sourceNode?.type === 'taskDispatcherTopGhostNode';
 
     const buttonPosition = useMemo(() => {
         const isVerticalEdge = Math.abs(sourceY - targetY) > Math.abs(sourceX - targetX);
 
-        if (isVerticalEdge) {
+        const isEdgeFromBranchTopGhostNode =
+            sourceNode?.type === 'taskDispatcherTopGhostNode' &&
+            (sourceNode?.data as NodeDataType)?.taskDispatcherId?.startsWith('branch');
+
+        if (isVerticalEdge && !isEdgeFromBranchTopGhostNode) {
             return {
                 x: edgeCenterX,
                 y: edgeCenterY,
@@ -66,6 +75,10 @@ export default function WorkflowEdge({
 
         if (sourceNode?.type === 'taskDispatcherTopGhostNode') {
             posX = targetX;
+
+            if (targetNode?.type === 'workflow' && isEdgeFromBranchTopGhostNode) {
+                posY += 15;
+            }
         } else if (sourceNode?.type === 'taskDispatcherBottomGhostNode') {
             posX = sourceX;
         } else if (targetNode?.type === 'taskDispatcherBottomGhostNode') {
@@ -81,11 +94,13 @@ export default function WorkflowEdge({
         sourceX,
         targetX,
         sourceNode?.type,
+        sourceNode?.data,
         targetNode?.type,
         sourceNodeComponentName,
         edgeCenterX,
         edgeCenterY,
     ]);
+
     return (
         <>
             <BaseEdge
@@ -95,6 +110,10 @@ export default function WorkflowEdge({
                 path={edgePath}
                 style={style}
             />
+
+            {caseKey && isSourceTaskDispatcherTopGhostNode && (
+                <BranchCaseLabel caseKey={caseKey} edgeId={id} sourceY={sourceY} targetX={targetX} />
+            )}
 
             <EdgeLabelRenderer key={id}>
                 <WorkflowNodesPopoverMenu edgeId={id} hideTriggerComponents sourceNodeId={sourceNodeId}>

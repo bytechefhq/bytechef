@@ -109,13 +109,21 @@ export type ClickedOperationType = {
 
 export type TabNameType = 'description' | 'clusterElements' | 'connection' | 'properties' | 'output';
 
-export type ConditionDataType = {
+type ConditionDataType = {
     conditionCase: string;
     conditionId: string;
     index: number;
 };
 
+type BranchDataType = {
+    branchId: string;
+    caseKey: string;
+    index: number;
+};
+
 export type NodeDataType = {
+    branchData?: BranchDataType;
+    branchId?: string;
     componentName: string;
     conditionCase?: 'caseTrue' | 'caseFalse';
     conditionData?: ConditionDataType;
@@ -152,6 +160,11 @@ export type NodeDataType = {
     triggerType?: TriggerType;
     version?: number;
     workflowNodeName: string;
+};
+
+export type BranchCaseType = {
+    key: string;
+    tasks: Array<WorkflowTask>;
 };
 
 export type SubPropertyType = PropertyAllType & {custom: boolean};
@@ -252,6 +265,8 @@ export type PropertyAllType = Omit<PropertyTypeAllType, 'controlType'> & {
 export type UpdateWorkflowMutationType = UseMutationResult<void, Error, UpdateWorkflowRequestI, unknown>;
 
 export type TaskDispatcherContextType = {
+    branchId?: string;
+    caseKey?: string;
     conditionCase?: 'caseTrue' | 'caseFalse';
     conditionId?: string;
     index?: number;
@@ -270,3 +285,7 @@ export type UpdateTaskParametersType = {
     task: WorkflowTask;
     updatedSubtasks: Array<WorkflowTask>;
 };
+
+export type ConditionChildTasksType = {[conditionId: string]: {caseTrue: string[]; caseFalse: string[]}};
+export type LoopChildTasksType = {[loopId: string]: {iteratee: string[]}};
+export type BranchChildTasksType = {[branchId: string]: {cases: {[caseKey: string]: string[]}; default: string[]}};

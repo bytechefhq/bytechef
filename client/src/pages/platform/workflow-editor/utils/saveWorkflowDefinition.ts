@@ -6,7 +6,7 @@ import {
 } from '@/shared/middleware/platform/configuration';
 import {ProjectWorkflowKeys} from '@/shared/queries/automation/projectWorkflows.queries';
 import {ComponentDefinitionKeys} from '@/shared/queries/platform/componentDefinitions.queries';
-import {NodeDataType, TaskDispatcherContextType, WorkflowDefinitionType} from '@/shared/types';
+import {BranchCaseType, NodeDataType, TaskDispatcherContextType, WorkflowDefinitionType} from '@/shared/types';
 import {QueryClient, UseMutationResult} from '@tanstack/react-query';
 
 import useWorkflowDataStore from '../stores/useWorkflowDataStore';
@@ -127,14 +127,34 @@ export default async function saveWorkflowDefinition({
 
     const existingWorkflowTask = workflowDefinition.tasks?.find((task) => task.name === newTask.name);
 
+    const differenceInCaseCount =
+        existingWorkflowTask &&
+        componentName === 'branch' &&
+        (existingWorkflowTask?.parameters?.cases as BranchCaseType[])?.length !== newTask.parameters?.cases.length;
+
+    const differenceInCaseKeys =
+        existingWorkflowTask &&
+        componentName === 'branch' &&
+        (existingWorkflowTask?.parameters?.cases as BranchCaseType[])?.some((caseItem, index) => {
+            const newCaseItem = newTask.parameters?.cases?.[index];
+
+            return caseItem.key !== newCaseItem?.key;
+        });
+
+    const differenceInParameters =
+        existingWorkflowTask?.parameters &&
+        JSON.stringify(existingWorkflowTask.parameters) !== JSON.stringify(newTask.parameters);
+
+    const differenceInType = existingWorkflowTask?.type !== newTask.type;
+
     if (
         existingWorkflowTask &&
         !decorative &&
         !subtask &&
-        (!operationName ||
-            (existingWorkflowTask.parameters &&
-                JSON.stringify(existingWorkflowTask.parameters) === JSON.stringify(newTask.parameters))) &&
-        existingWorkflowTask.type === newTask.type
+        (!operationName || !differenceInParameters) &&
+        !differenceInType &&
+        !differenceInCaseCount &&
+        !differenceInCaseKeys
     ) {
         return;
     }

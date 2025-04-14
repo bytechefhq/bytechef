@@ -1,4 +1,5 @@
 import {
+    CONDITION_CASE_FALSE,
     CONDITION_CASE_TRUE,
     DIRECTION,
     EDGE_STYLES,
@@ -13,7 +14,13 @@ import {
     TaskDispatcherDefinitionBasic,
     WorkflowTask,
 } from '@/shared/middleware/platform/configuration';
-import {NodeDataType} from '@/shared/types';
+import {
+    BranchCaseType,
+    BranchChildTasksType,
+    ConditionChildTasksType,
+    LoopChildTasksType,
+    NodeDataType,
+} from '@/shared/types';
 import dagre from '@dagrejs/dagre';
 import {Edge, Node} from '@xyflow/react';
 import {ComponentIcon} from 'lucide-react';
@@ -165,13 +172,16 @@ export const getLayoutedElements = (nodes: Node[], edges: Edge[], canvasWidth: n
     // Filter edges so that only one edge is kept for each source node
     sourceEdgeMap.forEach((sourceEdges, source) => {
         const sourceNode = allNodes.find((node) => node.id === source);
+
         if (sourceEdges.length === 0 || !sourceNode) {
             return;
         }
 
         const isSourceTaskDispatcherTopGhostNode = sourceNode.type === 'taskDispatcherTopGhostNode';
 
-        if (isSourceTaskDispatcherTopGhostNode) {
+        const isSourceBranchNode = sourceNode.data.componentName === 'branch';
+
+        if (isSourceTaskDispatcherTopGhostNode || isSourceBranchNode) {
             filteredEdges.push(...sourceEdges);
         } else {
             filteredEdges.push(sourceEdges[0]);
@@ -301,6 +311,8 @@ export const createEdgeFromTaskDispatcherBottomGhostNode = ({
             return false;
         } else if (subsequentNodeData.loopData && subsequentNodeData.loopData.loopId === taskDispatcherId) {
             return false;
+        } else if (subsequentNodeData.branchData && subsequentNodeData.branchData.branchId === taskDispatcherId) {
+            return false;
         }
 
         for (const task of tasks || []) {
@@ -314,6 +326,12 @@ export const createEdgeFromTaskDispatcherBottomGhostNode = ({
                 const loopSubtasks: WorkflowTask[] = task.parameters.iteratee;
 
                 if (loopSubtasks.some((subtask) => subtask.name === subsequentNode.id)) {
+                    return false;
+                }
+            } else if (task.type?.startsWith('branch') && task.parameters) {
+                const branchSubtasks = [...(task.parameters.default || []), ...(task.parameters.cases || [])];
+
+                if (branchSubtasks.some((subtask) => subtask.name === subsequentNode.id)) {
                     return false;
                 }
             }
@@ -340,3 +358,137 @@ export const createEdgeFromTaskDispatcherBottomGhostNode = ({
         type: 'placeholder',
     };
 };
+
+/**
+ * Collects nested tasks for all task dispatchers in the workflow
+ */
+export function collectTaskDispatcherData(
+    task: WorkflowTask,
+    branchChildTasks: BranchChildTasksType,
+    conditionChildTasks: ConditionChildTasksType,
+    loopChildTasks: LoopChildTasksType
+): void {
+    const {name, parameters, type} = task;
+    const componentName = type.split('/')[0];
+
+    if (!TASK_DISPATCHER_NAMES.includes(componentName)) {
+        return;
+    }
+
+    if (componentName === 'condition' && parameters) {
+        conditionChildTasks[name] = {
+            caseFalse: (parameters.caseFalse || []).map((caseFalseSubtask: WorkflowTask) => caseFalseSubtask.name),
+            caseTrue: (parameters.caseTrue || []).map((caseTrueSubtask: WorkflowTask) => caseTrueSubtask.name),
+        };
+    } else if (componentName === 'loop' && parameters?.iteratee) {
+        loopChildTasks[name] = {
+            iteratee: parameters.iteratee.map((iteratee: WorkflowTask) => iteratee.name),
+        };
+    } else if (componentName === 'branch' && parameters) {
+        branchChildTasks[name] = {
+            cases: (parameters.cases || []).reduce((acc: {[key: string]: string[]}, caseItem: BranchCaseType) => {
+                const caseKey = caseItem.key;
+
+                const taskNames = (caseItem.tasks || []).map((task: WorkflowTask) => task.name);
+
+                acc[caseKey] = taskNames;
+
+                return acc;
+            }, {}),
+            default: (parameters.default || []).map((defaultSubtask: WorkflowTask) => defaultSubtask.name),
+        };
+    }
+}
+
+/**
+ * Detects if a task is nested inside a task dispatcher and returns relevant nesting data
+ */
+export function getTaskAncestry(
+    taskName: string,
+    conditionChildTasks: ConditionChildTasksType,
+    loopChildTasks: LoopChildTasksType,
+    branchChildTasks: BranchChildTasksType
+): {nestingData: Record<string, unknown>; isNested: boolean} {
+    let isNested = false;
+    let nestingData = {};
+
+    for (const [conditionId, conditionCases] of Object.entries(conditionChildTasks)) {
+        const conditionCasesList = [
+            {taskNames: conditionCases.caseTrue, value: CONDITION_CASE_TRUE},
+            {taskNames: conditionCases.caseFalse, value: CONDITION_CASE_FALSE},
+        ];
+
+        const matchingCase = conditionCasesList.find((conditionCase) => conditionCase.taskNames.includes(taskName));
+
+        if (matchingCase) {
+            nestingData = {
+                conditionData: {
+                    conditionCase: matchingCase.value,
+                    conditionId,
+                    index: matchingCase.taskNames.indexOf(taskName),
+                },
+            };
+
+            isNested = true;
+
+            break;
+        }
+    }
+
+    if (!isNested) {
+        for (const [loopId, loopData] of Object.entries(loopChildTasks)) {
+            if (loopData.iteratee.includes(taskName)) {
+                nestingData = {
+                    loopData: {
+                        index: loopData.iteratee.indexOf(taskName),
+                        loopId,
+                    },
+                };
+
+                isNested = true;
+
+                break;
+            }
+        }
+    }
+
+    if (!isNested) {
+        for (const [branchId, branchData] of Object.entries(branchChildTasks)) {
+            if (branchData.default.includes(taskName)) {
+                nestingData = {
+                    branchData: {
+                        branchId,
+                        caseKey: 'default',
+                        index: branchData.default.indexOf(taskName),
+                    },
+                };
+
+                isNested = true;
+
+                break;
+            }
+
+            for (const [caseKey, caseTasks] of Object.entries(branchData.cases)) {
+                if (caseTasks.includes(taskName)) {
+                    nestingData = {
+                        branchData: {
+                            branchId,
+                            caseKey,
+                            index: caseTasks.indexOf(taskName),
+                        },
+                    };
+
+                    isNested = true;
+
+                    break;
+                }
+            }
+
+            if (isNested) {
+                break;
+            }
+        }
+    }
+
+    return {isNested, nestingData};
+}

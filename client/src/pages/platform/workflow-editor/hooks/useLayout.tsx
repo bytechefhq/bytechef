@@ -1,31 +1,25 @@
-import {
-    CONDITION_CASE_FALSE,
-    CONDITION_CASE_TRUE,
-    EDGE_STYLES,
-    FINAL_PLACEHOLDER_NODE_ID,
-    TASK_DISPATCHER_NAMES,
-} from '@/shared/constants';
+import {EDGE_STYLES, FINAL_PLACEHOLDER_NODE_ID, TASK_DISPATCHER_NAMES} from '@/shared/constants';
 import defaultNodes from '@/shared/defaultNodes';
-import {
-    ComponentDefinitionBasic,
-    TaskDispatcherDefinitionBasic,
-    WorkflowTask,
-} from '@/shared/middleware/platform/configuration';
-import {NodeDataType} from '@/shared/types';
+import {ComponentDefinitionBasic, TaskDispatcherDefinitionBasic} from '@/shared/middleware/platform/configuration';
+import {BranchCaseType, NodeDataType} from '@/shared/types';
 import {Edge, Node} from '@xyflow/react';
 import {ComponentIcon} from 'lucide-react';
 import {useEffect, useMemo} from 'react';
 import {useShallow} from 'zustand/react/shallow';
 
 import useWorkflowDataStore from '../stores/useWorkflowDataStore';
-import createAllConditionEdges, {hasTaskInConditionBranches} from '../utils/createConditionEdges';
+import createBranchEdges from '../utils/createBranchEdges';
+import createBranchNode from '../utils/createBranchNode';
+import createConditionEdges, {hasTaskInConditionBranches} from '../utils/createConditionEdges';
 import createConditionNode from '../utils/createConditionNode';
 import createLoopEdges from '../utils/createLoopEdges';
 import createLoopNode from '../utils/createLoopNode';
 import {
+    collectTaskDispatcherData,
     convertTaskToNode,
     createEdgeFromTaskDispatcherBottomGhostNode,
     getLayoutedElements,
+    getTaskAncestry,
 } from '../utils/layoutUtils';
 
 export default function useLayout({
@@ -65,41 +59,23 @@ export default function useLayout({
 
     let allNodes: Array<Node> = [triggerNode];
 
-    const conditionChildTasks: {[key: string]: {caseTrue: string[]; caseFalse: string[]}} = {};
-    const loopChildTasks: {[key: string]: {iteratee: string[]}} = {};
-
     if (tasks) {
+        const branchChildTasks = {};
+        const conditionChildTasks = {};
+        const loopChildTasks = {};
+
+        // First pass: collect all task dispatcher data and save it in the corresponding objects
         tasks.forEach((task) => {
-            const {name, parameters} = task;
-
-            const componentName = task.type.split('/')[0];
-
-            if (!TASK_DISPATCHER_NAMES.includes(componentName)) {
-                return;
-            }
-
-            if (componentName === 'condition' && parameters) {
-                conditionChildTasks[name] = {
-                    caseFalse: (parameters.caseFalse || []).map(
-                        (caseFalseSubtask: WorkflowTask) => caseFalseSubtask.name
-                    ),
-                    caseTrue: (parameters.caseTrue || []).map((caseTrueSubtask: WorkflowTask) => caseTrueSubtask.name),
-                };
-            } else if (componentName === 'loop' && parameters?.iteratee) {
-                loopChildTasks[name] = {
-                    iteratee: parameters.iteratee.map((iteratee: WorkflowTask) => iteratee.name),
-                };
-            }
+            collectTaskDispatcherData(task, branchChildTasks, conditionChildTasks, loopChildTasks);
         });
 
         tasks.forEach((task) => {
             const {name, parameters, type} = task;
+
             const componentName = type.split('/')[0];
             const isTaskDispatcher = TASK_DISPATCHER_NAMES.includes(componentName);
 
             let taskNode: Node;
-            let isNested = false;
-            let nestingData = {};
 
             const taskDefinition = [...componentDefinitions, ...taskDispatcherDefinitions].find(
                 (definition) => definition.name === componentName
@@ -124,53 +100,17 @@ export default function useLayout({
                 };
             }
 
-            // Check for nesting in conditions
-            for (const [conditionId, conditionCases] of Object.entries(conditionChildTasks)) {
-                const conditionCasesList = [
-                    {taskNames: conditionCases.caseTrue, value: CONDITION_CASE_TRUE},
-                    {taskNames: conditionCases.caseFalse, value: CONDITION_CASE_FALSE},
-                ];
+            const {isNested, nestingData: detectedNestingData} = getTaskAncestry(
+                name,
+                conditionChildTasks,
+                loopChildTasks,
+                branchChildTasks
+            );
 
-                const matchingCase = conditionCasesList.find((conditionCase) => conditionCase.taskNames.includes(name));
-
-                if (matchingCase) {
-                    nestingData = {
-                        conditionData: {
-                            conditionCase: matchingCase.value,
-                            conditionId,
-                            index: matchingCase.taskNames.indexOf(name),
-                        },
-                    };
-
-                    isNested = true;
-
-                    break;
-                }
-            }
-
-            // Only check for loop nesting if not already nested in a condition
-            if (!isNested) {
-                for (const [loopId, loopData] of Object.entries(loopChildTasks)) {
-                    if (loopData.iteratee.includes(name)) {
-                        nestingData = {
-                            loopData: {
-                                index: loopData.iteratee.indexOf(name),
-                                loopId,
-                            },
-                        };
-
-                        isNested = true;
-
-                        break;
-                    }
-                }
-            }
-
-            // Apply nesting data if found
             if (isNested) {
                 taskNode.data = {
                     ...taskNode.data,
-                    ...nestingData,
+                    ...detectedNestingData,
                 };
             }
 
@@ -199,6 +139,24 @@ export default function useLayout({
                         createPlaceholder: !hasSubtasks,
                     },
                 });
+            } else if (componentName === 'branch') {
+                const hasDefaultSubtasks = parameters?.default?.length > 0;
+
+                const casesWithoutTasks = (parameters?.cases as BranchCaseType[])?.filter(
+                    (taskCase) => taskCase.tasks?.length === 0
+                );
+
+                const emptyCaseKeys = casesWithoutTasks?.map((taskCase) => taskCase.key);
+
+                allNodes = createBranchNode({
+                    allNodes: [...allNodes, taskNode],
+                    branchId: taskNode.id,
+                    isNested,
+                    options: {
+                        createDefaultPlaceholder: !hasDefaultSubtasks,
+                        emptyCaseKeys,
+                    },
+                });
             } else {
                 allNodes.push(taskNode);
             }
@@ -222,15 +180,18 @@ export default function useLayout({
 
         const isConditionNode = nodeData.componentName === 'condition';
         const isLoopNode = nodeData.componentName === 'loop';
+        const isBranchNode = nodeData.componentName === 'branch';
 
         const isConditionPlaceholderNode = nodeData.conditionId && node.type === 'placeholder';
+        const isBranchPlaceholderNode = nodeData.branchId && node.type === 'placeholder';
 
         const isConditionChildTask = nodeData.conditionData;
 
         const nextNode = allNodes[index + 1];
 
+        // Create initial edges for the Condition node
         if (isConditionNode) {
-            const conditionEdges = createAllConditionEdges(node, allNodes);
+            const conditionEdges = createConditionEdges(node, allNodes);
 
             taskEdges.push(...conditionEdges);
 
@@ -246,6 +207,15 @@ export default function useLayout({
             return;
         }
 
+        // Create initial edges for the Branch node
+        if (isBranchNode) {
+            const branchEdges = createBranchEdges(node);
+
+            taskEdges.push(...branchEdges);
+
+            return;
+        }
+
         if (nextNode && tasks) {
             const isNextNodeTaskDispatcherBottomNode = nextNode.type === 'taskDispatcherBottomGhostNode';
 
@@ -254,13 +224,18 @@ export default function useLayout({
             const isTaskDispatcherBottomGhostNode = node.type === 'taskDispatcherBottomGhostNode';
 
             if (isTaskDispatcherBottomGhostNode) {
-                const edge = createEdgeFromTaskDispatcherBottomGhostNode({allNodes, index, node, tasks});
+                const edgeFromTaskDispatcherBottomGhost = createEdgeFromTaskDispatcherBottomGhostNode({
+                    allNodes,
+                    index,
+                    node,
+                    tasks,
+                });
 
-                if (edge) {
-                    taskEdges.push(edge);
+                if (edgeFromTaskDispatcherBottomGhost) {
+                    taskEdges.push(edgeFromTaskDispatcherBottomGhost);
 
                     if (
-                        edge.target === FINAL_PLACEHOLDER_NODE_ID &&
+                        edgeFromTaskDispatcherBottomGhost.target === FINAL_PLACEHOLDER_NODE_ID &&
                         !allNodes.some((node) => node.id === FINAL_PLACEHOLDER_NODE_ID)
                     ) {
                         allNodes.push(finalPlaceholderNode);
@@ -292,7 +267,7 @@ export default function useLayout({
                 }
             }
 
-            if (isConditionPlaceholderNode) {
+            if (isConditionPlaceholderNode || isBranchPlaceholderNode) {
                 return;
             }
 

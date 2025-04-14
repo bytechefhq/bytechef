@@ -12,8 +12,7 @@ import {DragEventHandler, useCallback, useEffect, useMemo} from 'react';
 import {twMerge} from 'tailwind-merge';
 import {useShallow} from 'zustand/react/shallow';
 
-import ConditionEdge from '../edges/ConditionEdge';
-import LoopDecorativeEdge from '../edges/LoopDecorativeEdge';
+import LabeledBranchCaseEdge from '../edges/LabeledBranchCaseEdge';
 import PlaceholderEdge from '../edges/PlaceholderEdge';
 import WorkflowEdge from '../edges/WorkflowEdge';
 import useHandleDrop from '../hooks/useHandleDrop';
@@ -70,8 +69,7 @@ const WorkflowEditor = ({
 
     const edgeTypes = useMemo(
         () => ({
-            condition: ConditionEdge,
-            loopDecorative: LoopDecorativeEdge,
+            labeledBranchCase: LabeledBranchCaseEdge,
             placeholder: PlaceholderEdge,
             workflow: WorkflowEdge,
         }),
