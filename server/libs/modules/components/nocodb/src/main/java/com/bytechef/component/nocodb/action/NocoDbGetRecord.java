@@ -67,9 +67,10 @@ public class NocoDbGetRecord {
     }
 
     public static Object perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
-        return context.http(http -> http.get(
-            "/api/v2/tables/%s/records/%s".formatted(
-                inputParameters.getRequiredString(TABLE_ID), inputParameters.getRequiredString(RECORD_ID))))
+        return context
+            .http(http -> http.get(
+                "/api/v2/tables/%s/records/%s".formatted(
+                    inputParameters.getRequiredString(TABLE_ID), inputParameters.getRequiredString(RECORD_ID))))
             .queryParameter(FIELDS, String.join(",", inputParameters.getList(FIELDS, String.class, List.of())))
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute()
