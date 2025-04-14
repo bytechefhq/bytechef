@@ -116,6 +116,7 @@ export const MINIMAP_MASK_COLOR = '#f1f5f9';
 export const MINIMAP_NODE_COLOR = '#e2e8f0';
 
 export const TASK_DISPATCHER_SUBTASK_COLLECTIONS = {
+    branch: ['default', 'cases'],
     condition: ['caseTrue', 'caseFalse'],
     loop: ['iteratee'],
 };

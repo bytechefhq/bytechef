@@ -44,11 +44,7 @@ export default function handleTaskDispatcherSubtaskOperationClick({
         return;
     }
 
-    const taskDispatcherId =
-        taskDispatcherContext!.loopId ||
-        taskDispatcherContext!.conditionId ||
-        taskDispatcherContext!.taskDispatcherId ||
-        '';
+    const taskDispatcherId = taskDispatcherContext!.taskDispatcherId;
 
     const componentName = taskDispatcherId.split('_')[0] as keyof typeof TASK_DISPATCHER_CONFIG;
 

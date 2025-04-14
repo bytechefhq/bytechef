@@ -1,6 +1,7 @@
 import {CONDITION_CASE_FALSE, CONDITION_CASE_TRUE, TASK_DISPATCHER_NAMES} from '@/shared/constants';
 import {WorkflowTask} from '@/shared/middleware/platform/configuration';
 import {
+    BranchCaseType,
     BuildNodeDataType,
     NodeDataType,
     PropertyAllType,
@@ -11,49 +12,44 @@ import {
 import getParametersWithDefaultValues from './getParametersWithDefaultValues';
 import getParentTaskDispatcherTask from './getParentTaskDispatcherTask';
 
-export const DISPATCHER_TYPE_MAP = {
-    condition: {
-        contextIdentifier: 'conditionId',
-        dataKey: 'conditionData',
-    },
-    loop: {
-        contextIdentifier: 'loopId',
-        dataKey: 'loopData',
-    },
-} as const;
-
 export function buildGenericNodeData(
     baseNodeData: NodeDataType,
     taskDispatcherContext: TaskDispatcherContextType,
     taskDispatcherId: string,
-    dispatcherType: keyof typeof DISPATCHER_TYPE_MAP
+    dispatcherType: keyof typeof TASK_DISPATCHER_CONFIG
 ): NodeDataType {
-    const {contextIdentifier} = DISPATCHER_TYPE_MAP[dispatcherType];
+    const {contextIdentifier} = TASK_DISPATCHER_CONFIG[dispatcherType];
 
     const newNodeData = {
         ...baseNodeData,
         [contextIdentifier]: taskDispatcherId,
     };
 
-    for (const [type, config] of Object.entries(DISPATCHER_TYPE_MAP)) {
-        const contextId = taskDispatcherContext[config.contextIdentifier as 'conditionId' | 'loopId'];
+    for (const [type, config] of Object.entries(TASK_DISPATCHER_CONFIG)) {
+        const taskDispatcherId =
+            taskDispatcherContext[config.contextIdentifier as 'branchId' | 'conditionId' | 'loopId'];
 
-        if (contextId) {
+        if (taskDispatcherId) {
             if (type === 'condition') {
-                newNodeData[config.dataKey] = {
-                    [config.contextIdentifier]: contextId,
+                newNodeData.conditionData = {
                     conditionCase: taskDispatcherContext.conditionCase || CONDITION_CASE_TRUE,
-                    conditionId: contextId,
+                    conditionId: taskDispatcherId,
                     index: taskDispatcherContext.index ?? 0,
                 };
             } else if (type === 'loop') {
-                newNodeData[config.dataKey] = {
+                newNodeData.loopData = {
                     index: taskDispatcherContext.index ?? 0,
-                    loopId: contextId,
+                    loopId: taskDispatcherId,
+                };
+            } else if (type === 'branch') {
+                newNodeData.branchData = {
+                    branchId: taskDispatcherId,
+                    caseKey: taskDispatcherContext.caseKey ?? 'default',
+                    index: taskDispatcherContext.index ?? 0,
                 };
             }
 
-            newNodeData.taskDispatcherId = contextId;
+            newNodeData.taskDispatcherId = taskDispatcherId;
 
             break;
         }
@@ -66,18 +62,123 @@ export const TASK_DISPATCHER_CONFIG = {
     branch: {
         buildNodeData: ({baseNodeData, taskDispatcherContext, taskDispatcherId}: BuildNodeDataType): NodeDataType =>
             buildGenericNodeData(baseNodeData, taskDispatcherContext, taskDispatcherId, 'branch'),
+        contextIdentifier: 'branchId',
+        dataKey: 'branchData',
+        extractContextFromPlaceholder: (placeholderId: string): TaskDispatcherContextType => {
+            const parts = placeholderId.split('-');
+
+            const index = parseInt(parts[parts.length - 1] || '-1');
+            const caseKey = parts[2];
+
+            return {
+                caseKey,
+                index,
+                taskDispatcherId: parts[0],
+            };
+        },
         getDispatcherId: (context: TaskDispatcherContextType) => context.branchId,
         getInitialParameters: (properties: Array<PropertyAllType>) => ({
             ...getParametersWithDefaultValues({properties}),
+            cases: [
+                {
+                    key: 'case_0',
+                    tasks: [],
+                },
+            ],
+            default: [],
         }),
+        getNewCaseKey: (cases: Array<BranchCaseType>): string => {
+            if (!cases) {
+                return 'case_0';
+            }
+
+            const newCaseKey = `case_${cases.length}`;
+
+            const isNewCaseKeyDuplicate = cases.some((caseItem) => caseItem.key === newCaseKey);
+
+            if (isNewCaseKeyDuplicate) {
+                return `${newCaseKey} (1)`;
+            }
+
+            const existingCaseIndex = cases.findIndex((caseItem) => caseItem.key === newCaseKey);
+
+            if (existingCaseIndex >= 0) {
+                return TASK_DISPATCHER_CONFIG.branch.getNewCaseKey(cases);
+            }
+
+            return newCaseKey;
+        },
+        getParentTask: getParentTaskDispatcherTask,
+        getSubtasks: ({
+            context,
+            task,
+        }: {
+            context?: TaskDispatcherContextType;
+            task: WorkflowTask;
+        }): Array<WorkflowTask> => {
+            const caseKey = context?.caseKey || 'default';
+
+            if (caseKey === 'default') {
+                return task.parameters?.default || [];
+            }
+
+            const cases = [...(task.parameters?.cases || [])];
+
+            const existingCaseIndex = cases.findIndex((caseItem) => caseItem.key === caseKey);
+
+            if (existingCaseIndex >= 0) {
+                return cases[existingCaseIndex].tasks;
+            }
+
+            return [];
+        },
         initializeParameters: () => ({
             cases: [],
             default: [],
         }),
+        updateTaskParameters: ({context, task, updatedSubtasks}: UpdateTaskParametersType): WorkflowTask => {
+            const caseKey = context?.caseKey || 'default';
+
+            if (caseKey === 'default') {
+                return {
+                    ...task,
+                    parameters: {
+                        ...task.parameters,
+                        default: updatedSubtasks,
+                    },
+                };
+            }
+
+            const cases = [...(task.parameters?.cases || [])];
+
+            const existingCaseIndex = cases.findIndex((c) => c.key === caseKey);
+
+            if (existingCaseIndex >= 0) {
+                cases[existingCaseIndex] = {
+                    ...cases[existingCaseIndex],
+                    tasks: updatedSubtasks,
+                };
+            } else {
+                cases.push({
+                    key: caseKey,
+                    tasks: updatedSubtasks,
+                });
+            }
+
+            return {
+                ...task,
+                parameters: {
+                    ...task.parameters,
+                    cases: cases,
+                },
+            };
+        },
     },
     condition: {
         buildNodeData: ({baseNodeData, taskDispatcherContext, taskDispatcherId}: BuildNodeDataType): NodeDataType =>
             buildGenericNodeData(baseNodeData, taskDispatcherContext, taskDispatcherId, 'condition'),
+        contextIdentifier: 'conditionId',
+        dataKey: 'conditionData',
         extractContextFromPlaceholder: (placeholderId: string): TaskDispatcherContextType => {
             const parts = placeholderId.split('-');
             const index = parseInt(parts[parts.length - 1] || '-1');
@@ -104,6 +205,7 @@ export const TASK_DISPATCHER_CONFIG = {
             task: WorkflowTask;
         }): Array<WorkflowTask> => {
             const conditionCase = (context?.conditionCase as 'caseTrue' | 'caseFalse') || CONDITION_CASE_TRUE;
+
             return conditionCase === CONDITION_CASE_TRUE
                 ? task.parameters?.caseTrue || []
                 : task.parameters?.caseFalse || [];
@@ -127,6 +229,8 @@ export const TASK_DISPATCHER_CONFIG = {
     loop: {
         buildNodeData: ({baseNodeData, taskDispatcherContext, taskDispatcherId}: BuildNodeDataType): NodeDataType =>
             buildGenericNodeData(baseNodeData, taskDispatcherContext, taskDispatcherId, 'loop'),
+        contextIdentifier: 'loopId',
+        dataKey: 'loopData',
         extractContextFromPlaceholder: (placeholderId: string): TaskDispatcherContextType => {
             const parts = placeholderId.split('-');
             const index = parseInt(parts[parts.length - 1] || '-1');

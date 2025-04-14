@@ -1,9 +1,9 @@
 import useWorkflowTestChatStore from '@/pages/platform/workflow-editor/stores/useWorkflowTestChatStore';
-import {CONDITION_CASE_FALSE, CONDITION_CASE_TRUE, SPACE} from '@/shared/constants';
+import {SPACE} from '@/shared/constants';
 import {Workflow, WorkflowTask} from '@/shared/middleware/platform/configuration';
 import {ProjectWorkflowKeys} from '@/shared/queries/automation/projectWorkflows.queries';
 import {WorkflowNodeOutputKeys} from '@/shared/queries/platform/workflowNodeOutputs.queries';
-import {ConditionTaskDispatcherType, NodeDataType, WorkflowDefinitionType, WorkflowTaskType} from '@/shared/types';
+import {BranchCaseType, NodeDataType, WorkflowDefinitionType, WorkflowTaskType} from '@/shared/types';
 import {QueryClient, UseMutationResult} from '@tanstack/react-query';
 
 import {WorkflowTaskDataType} from '../stores/useWorkflowDataStore';
@@ -49,79 +49,79 @@ export default function handleDeleteTask({
 
         const taskConditionCase = data.conditionData.conditionCase;
 
-        if (parentConditionTask?.parameters) {
-            parentConditionTask.parameters[taskConditionCase as string] = (
-                parentConditionTask.parameters[taskConditionCase] as Array<WorkflowTask>
-            ).filter((childTask) => childTask.name !== data.name);
-
-            updatedTasks = workflowTasks.map((task) => {
-                if (task.name !== parentConditionTask.name) {
-                    return task;
-                }
-
-                return parentConditionTask;
-            }) as Array<WorkflowTaskType>;
-        } else {
-            updatedTasks = workflowTasks.map((task) => {
-                if (task.name !== data.conditionData?.conditionId) {
-                    return task;
-                }
-
-                const {conditionCase} = data.conditionData;
-
-                let {caseFalse, caseTrue} = (task as ConditionTaskDispatcherType).parameters;
-
-                if (conditionCase === CONDITION_CASE_TRUE) {
-                    caseTrue = caseTrue.filter((childTask) => childTask.name !== data.name);
-                } else if (conditionCase === CONDITION_CASE_FALSE) {
-                    caseFalse = caseFalse.filter((childTask) => childTask.name !== data.name);
-                }
-
-                return {
-                    ...task,
-                    parameters: {
-                        ...task.parameters,
-                        caseFalse,
-                        caseTrue,
-                    },
-                };
-            });
+        if (!parentConditionTask?.parameters) {
+            return;
         }
+
+        parentConditionTask.parameters[taskConditionCase as string] = (
+            parentConditionTask.parameters[taskConditionCase] as Array<WorkflowTask>
+        ).filter((childTask) => childTask.name !== data.name);
+
+        updatedTasks = workflowTasks.map((task) => {
+            if (task.name !== parentConditionTask.name) {
+                return task;
+            }
+
+            return parentConditionTask;
+        }) as Array<WorkflowTaskType>;
     } else if (data.loopData) {
         const parentLoopTask = getParentTaskDispatcherTask({
             taskDispatcherId: data.loopData.loopId,
             tasks: workflowTasks,
         });
 
-        if (parentLoopTask?.parameters) {
-            parentLoopTask.parameters.iteratee = (parentLoopTask.parameters.iteratee as Array<WorkflowTask>).filter(
+        if (!parentLoopTask?.parameters) {
+            return;
+        }
+
+        parentLoopTask.parameters.iteratee = (parentLoopTask.parameters.iteratee as Array<WorkflowTask>).filter(
+            (childTask) => childTask.name !== data.name
+        );
+
+        updatedTasks = workflowTasks.map((task) => {
+            if (task.name !== parentLoopTask.name) {
+                return task;
+            }
+
+            return parentLoopTask;
+        }) as Array<WorkflowTaskType>;
+    } else if (data.branchData) {
+        const parentBranchTask = getParentTaskDispatcherTask({
+            taskDispatcherId: data.branchData.branchId,
+            tasks: workflowTasks,
+        });
+
+        if (!parentBranchTask?.parameters) {
+            return;
+        }
+
+        const {caseKey} = data.branchData;
+        const {name, parameters} = parentBranchTask;
+
+        if (caseKey === 'default') {
+            parentBranchTask.parameters.default = (parameters.default as Array<WorkflowTask>).filter(
                 (childTask) => childTask.name !== data.name
             );
-
-            updatedTasks = workflowTasks.map((task) => {
-                if (task.name !== parentLoopTask.name) {
-                    return task;
+        } else if (parameters.cases) {
+            parameters.cases = (parameters.cases as BranchCaseType[]).map((caseItem) => {
+                if (caseItem.key === caseKey) {
+                    return {
+                        ...caseItem,
+                        tasks: (caseItem.tasks || []).filter((childTask) => childTask.name !== data.name),
+                    };
                 }
 
-                return parentLoopTask;
-            }) as Array<WorkflowTaskType>;
-        } else {
-            updatedTasks = workflowTasks.map((task) => {
-                if (task.name !== data.loopData?.loopId) {
-                    return task;
-                }
-
-                return {
-                    ...task,
-                    parameters: {
-                        ...task.parameters,
-                        iteratee: (task.parameters?.iteratee as Array<WorkflowTask>).filter(
-                            (childTask) => childTask.name !== data.name
-                        ),
-                    },
-                };
+                return caseItem;
             });
         }
+
+        updatedTasks = workflowTasks.map((task) => {
+            if (task.name !== name) {
+                return task;
+            }
+
+            return parentBranchTask;
+        }) as Array<WorkflowTaskType>;
     } else {
         updatedTasks = workflowTasks.filter((task: WorkflowTask) => task.name !== data.name);
     }

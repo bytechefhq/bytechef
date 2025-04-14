@@ -76,6 +76,12 @@ export default async function handleTaskDispatcherClick({
                 index: (taskDispatcherContext.index ?? 0) as number,
                 loopId: taskDispatcherContext.loopId as string,
             };
+        } else if (taskDispatcherContext.branchId) {
+            newNodeData.branchData = {
+                branchId: taskDispatcherContext.branchId as string,
+                caseKey: taskDispatcherContext.caseKey as string,
+                index: (taskDispatcherContext.index ?? 0) as number,
+            };
         }
     }
 

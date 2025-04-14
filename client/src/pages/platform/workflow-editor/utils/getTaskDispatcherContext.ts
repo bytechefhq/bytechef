@@ -23,6 +23,11 @@ function getContextFromTaskNodeData(nodeData: NodeDataType, indexIncrement: numb
         context.loopId = nodeData.loopData.loopId as string;
         context.index = (nodeData.loopData.index as number) + indexIncrement;
         context.taskDispatcherId = nodeData.loopData.loopId as string;
+    } else if (nodeData.branchData) {
+        context.branchId = nodeData.branchData.branchId as string;
+        context.caseKey = nodeData.branchData.caseKey as string;
+        context.index = (nodeData.branchData.index as number) + indexIncrement;
+        context.taskDispatcherId = nodeData.branchData.branchId as string;
     }
 
     return context;
@@ -31,33 +36,41 @@ function getContextFromTaskNodeData(nodeData: NodeDataType, indexIncrement: numb
 /**
  * Creates context from a placeholder node
  */
-function getContextFromPlaceholderNode(node: Node): TaskDispatcherContextType {
+function getContextFromPlaceholderNode(placeholderNode: Node): TaskDispatcherContextType {
+    const isPlaceholder = placeholderNode.type === 'placeholder';
+    const isLoopPlaceholder = placeholderNode.id.includes('loop') && isPlaceholder;
+    const isConditionPlaceholder = placeholderNode.id.includes('condition') && isPlaceholder;
+    const isBranchPlaceholder = placeholderNode.id.includes('branch') && isPlaceholder;
+
     const context: TaskDispatcherContextType = {
-        taskDispatcherId: node.data?.taskDispatcherId as string,
+        taskDispatcherId: placeholderNode.data?.taskDispatcherId as string,
     };
 
-    if (!node) {
+    if (!placeholderNode) {
         return context;
     }
 
-    if (node.id.includes('loop-placeholder')) {
-        const loopId = node.id.split('-loop-placeholder')[0];
-        const placeholderIndex = parseInt(node.id.split('-').pop() || '0');
+    const placeholderIndex = parseInt(placeholderNode.id.split('-').pop() || '0');
+
+    context.index = placeholderIndex;
+
+    if (isLoopPlaceholder) {
+        const loopId = placeholderNode.id.split('-loop-placeholder')[0];
 
         context.loopId = loopId;
-        context.index = placeholderIndex;
         context.taskDispatcherId = loopId;
-    } else if (node.id.includes('condition-placeholder')) {
-        context.conditionId = node.data?.conditionId as string;
-        context.conditionCase = node.data?.conditionCase as 'caseTrue' | 'caseFalse';
-        context.index = 0;
-        context.taskDispatcherId = node.data?.conditionId as string;
-    } else {
-        context.conditionCase = node.data?.conditionCase as 'caseTrue' | 'caseFalse';
-        context.conditionId = node.data?.conditionId as string;
-        context.loopId = node.data?.loopId as string;
-        context.index = 0;
-        context.taskDispatcherId = node.data?.conditionId as string;
+    } else if (isConditionPlaceholder) {
+        const conditionId = placeholderNode.data.conditionId as string;
+
+        context.conditionId = conditionId;
+        context.conditionCase = placeholderNode.data?.conditionCase as 'caseTrue' | 'caseFalse';
+        context.taskDispatcherId = conditionId;
+    } else if (isBranchPlaceholder) {
+        const branchId = placeholderNode.data.branchId as string;
+
+        context.branchId = branchId;
+        context.caseKey = placeholderNode.data?.caseKey as string;
+        context.taskDispatcherId = branchId;
     }
 
     return context;
