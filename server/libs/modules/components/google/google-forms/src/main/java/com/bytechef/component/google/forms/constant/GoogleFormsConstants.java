@@ -27,6 +27,7 @@ public class GoogleFormsConstants {
     public static final String FILE_UPLOAD_ANSWERS = "fileUploadAnswers";
     public static final String FORM_ID = "formId";
     public static final String NEXT_PAGE_TOKEN = "nextPageToken";
+    public static final String RESPONDENT_EMAIL = "respondentEmail";
     public static final String RESPONSE_ID = "responseId";
     public static final String RESPONSES = "responses";
     public static final String TEXT_ANSWERS = "textAnswers";

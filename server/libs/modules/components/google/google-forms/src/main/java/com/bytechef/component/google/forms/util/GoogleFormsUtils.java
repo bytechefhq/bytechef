@@ -21,6 +21,7 @@ import static com.bytechef.component.google.forms.constant.GoogleFormsConstants.
 import static com.bytechef.component.google.forms.constant.GoogleFormsConstants.FILE_UPLOAD_ANSWERS;
 import static com.bytechef.component.google.forms.constant.GoogleFormsConstants.FORM_ID;
 import static com.bytechef.component.google.forms.constant.GoogleFormsConstants.NEXT_PAGE_TOKEN;
+import static com.bytechef.component.google.forms.constant.GoogleFormsConstants.RESPONDENT_EMAIL;
 import static com.bytechef.component.google.forms.constant.GoogleFormsConstants.RESPONSES;
 import static com.bytechef.component.google.forms.constant.GoogleFormsConstants.RESPONSE_ID;
 import static com.bytechef.component.google.forms.constant.GoogleFormsConstants.TEXT_ANSWERS;
@@ -53,6 +54,7 @@ public class GoogleFormsUtils {
 
         responses.put(FORM_ID, formId);
         responses.put(RESPONSE_ID, response.get(RESPONSE_ID));
+        responses.put(RESPONDENT_EMAIL, response.get(RESPONDENT_EMAIL));
 
         if (response.get(ANSWERS) instanceof Map<?, ?> answers) {
             int index = 1;
