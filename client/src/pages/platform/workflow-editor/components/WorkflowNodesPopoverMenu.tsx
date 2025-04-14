@@ -25,12 +25,10 @@ import WorkflowNodesPopoverMenuOperationList from './WorkflowNodesPopoverMenuOpe
 
 interface WorkflowNodesPopoverMenuProps extends PropsWithChildren {
     agentData?: AgentDataType;
-    conditionId?: string;
     edgeId?: string;
     hideActionComponents?: boolean;
     hideTriggerComponents?: boolean;
     hideTaskDispatchers?: boolean;
-    loopId?: string;
     nodeIndex?: number;
     setAgentData?: (data: AgentDataType) => void;
     sourceData?: ClusterElementDefinitionBasic[];
@@ -40,12 +38,10 @@ interface WorkflowNodesPopoverMenuProps extends PropsWithChildren {
 const WorkflowNodesPopoverMenu = ({
     agentData,
     children,
-    conditionId,
     edgeId,
     hideActionComponents = false,
     hideTaskDispatchers = false,
     hideTriggerComponents = false,
-    loopId,
     nodeIndex,
     setAgentData,
     sourceData,
@@ -246,12 +242,9 @@ const WorkflowNodesPopoverMenu = ({
                     {!sourceData && actionPanelOpen && componentDefinitionToBeAdded && (
                         <WorkflowNodesPopoverMenuOperationList
                             componentDefinition={componentDefinitionToBeAdded}
-                            conditionId={conditionId}
                             edgeId={edgeId}
-                            loopId={loopId}
                             setPopoverOpen={setPopoverOpen}
                             sourceNodeId={sourceNodeId}
-                            // taskDispatcherContext={taskDispatcherContext}
                             trigger={trigger}
                         />
                     )}
