@@ -133,7 +133,7 @@ export default function BranchCaseLabel({caseKey, edgeId, sourceY, targetX}: Bra
                     (branchCase) => branchCase.key === caseKeyValue
                 );
 
-            if (isDuplicate) {
+            if (isDuplicate || caseKeyValue === 'default') {
                 setIsCaseKeyEditable(false);
 
                 setCaseKeyValue(caseKey);
@@ -144,25 +144,27 @@ export default function BranchCaseLabel({caseKey, edgeId, sourceY, targetX}: Bra
 
         setIsCaseKeyEditable(caseKeyEditable);
 
-        if (caseKeyEditable) {
+        const newCases = (parentBranchNodeData.parameters?.cases as BranchCaseType[]).map((branchCase) => {
+            if (branchCase.key === caseKey) {
+                return {
+                    ...branchCase,
+                    key: caseKeyValue,
+                };
+            }
+
+            return branchCase;
+        });
+
+        if (!caseKeyValue) {
             setCaseKeyValue(caseKey);
-        } else {
-            const newCases = (parentBranchNodeData.parameters?.cases as BranchCaseType[]).map((branchCase) => {
-                if (branchCase.key === caseKey) {
-                    return {
-                        ...branchCase,
-                        key: caseKeyValue,
-                    };
-                }
 
-                return branchCase;
-            });
-
-            saveBranchChange({
-                ...parentBranchNodeData.parameters,
-                cases: newCases,
-            });
+            return;
         }
+
+        saveBranchChange({
+            ...parentBranchNodeData.parameters,
+            cases: newCases,
+        });
     }, [caseKey, caseKeyValue, isCaseKeyEditable, parentBranchNodeData.parameters, saveBranchChange]);
 
     useEffect(() => {
