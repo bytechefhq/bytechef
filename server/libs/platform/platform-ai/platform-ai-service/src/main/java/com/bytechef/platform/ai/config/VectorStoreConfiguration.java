@@ -67,7 +67,6 @@ public class VectorStoreConfiguration {
     private static final String CATEGORY = "category";
     private static final int MAX_TOKENS = 1536;
     private static final String NAME = "name";
-    private static final String DOCUMENTATION = "documentation";
     private static final String WORKFLOWS = "workflows";
     private static final String COMPONENTS = "components";
     private static final String FLOWS = "flows";
@@ -98,8 +97,7 @@ public class VectorStoreConfiguration {
 
     @EventListener(ApplicationStartedEvent.class)
     public void onApplicationStartedEvent() {
-        if (paths.getWelcomePath() == null || paths.getDocumentationPath() == null ||
-            paths.getComponentsPath() == null || paths.getWorkflowsPath() == null) {
+        if (paths.getWorkflowsPath() == null) {
 
             if (LOGGER.isWarnEnabled()) {
                 LOGGER.warn("Documentation paths not set.");
@@ -108,9 +106,7 @@ public class VectorStoreConfiguration {
             return;
         }
 
-        initializeVectorStoreTable(
-            Paths.get(paths.getDocumentationPath()), Paths.get(paths.getWelcomePath()),
-            Paths.get(paths.getWorkflowsPath()));
+        initializeVectorStoreTable(Paths.get(paths.getWorkflowsPath()));
     }
 
     private static void addToDocuments(
@@ -281,16 +277,16 @@ public class VectorStoreConfiguration {
             .toString();
     }
 
-    private void initializeVectorStoreTable(Path documentationPath, Path welcomePath, Path workflowsPath) {
+    private void initializeVectorStoreTable(Path documentationPath) {
         if (vectorStoreService.count() > 0) {
             List<Map<String, Object>> vectorsMetadataList = vectorStoreService.findAll()
                 .stream()
                 .map(com.bytechef.platform.ai.domain.VectorStore::getMetadata)
                 .toList();
 
-            storeDocuments(vectorsMetadataList, documentationPath, welcomePath, workflowsPath);
+            storeDocuments(vectorsMetadataList, documentationPath);
         } else {
-            storeDocuments(List.of(), documentationPath, welcomePath, workflowsPath);
+            storeDocuments(List.of(), documentationPath);
         }
     }
 
@@ -525,23 +521,11 @@ public class VectorStoreConfiguration {
     }
 
     private void storeDocuments(
-        List<Map<String, Object>> vectorStoreList, Path documentationPath, Path welcomePath,
-        Path workflowsPath) {
+        List<Map<String, Object>> vectorStoreList, Path workflowsPath) {
 
         try {
-            storeDocumentsFromPath(DOCUMENTATION, documentationPath, ".md", strategy, vectorStoreList, vectorStore);
             storeDocumentsFromPath(WORKFLOWS, workflowsPath, ".json", strategy, vectorStoreList, vectorStore);
             storeDocuments(strategy, vectorStoreList, vectorStore);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-
-        try {
-            String welcome = Files.readString(welcomePath);
-
-            String cleanedDocument = preprocessDocument(welcome);
-
-            vectorStore.add(List.of(new Document(cleanedDocument, Map.of(CATEGORY, DOCUMENTATION, NAME, "welcome"))));
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
