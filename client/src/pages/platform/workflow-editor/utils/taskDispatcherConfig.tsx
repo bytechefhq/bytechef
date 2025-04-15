@@ -1,4 +1,9 @@
-import {CONDITION_CASE_FALSE, CONDITION_CASE_TRUE, TASK_DISPATCHER_NAMES} from '@/shared/constants';
+import {
+    CONDITION_CASE_FALSE,
+    CONDITION_CASE_TRUE,
+    TASK_DISPATCHER_NAMES,
+    TASK_DISPATCHER_SUBTASK_COLLECTIONS,
+} from '@/shared/constants';
 import {WorkflowTask} from '@/shared/middleware/platform/configuration';
 import {
     BranchCaseType,
@@ -108,7 +113,6 @@ export const TASK_DISPATCHER_CONFIG = {
 
             return newCaseKey;
         },
-        getParentTask: getParentTaskDispatcherTask,
         getSubtasks: ({
             context,
             getAllSubtasks = false,
@@ -140,6 +144,7 @@ export const TASK_DISPATCHER_CONFIG = {
 
             return [];
         },
+        getTask: getTaskDispatcherTask,
         initializeParameters: () => ({
             cases: [],
             default: [],
@@ -204,7 +209,6 @@ export const TASK_DISPATCHER_CONFIG = {
             caseFalse: [],
             caseTrue: [],
         }),
-        getParentTask: getParentTaskDispatcherTask,
         getSubtasks: ({
             context,
             getAllSubtasks = false,
@@ -224,6 +228,7 @@ export const TASK_DISPATCHER_CONFIG = {
                 ? task.parameters?.caseTrue || []
                 : task.parameters?.caseFalse || [];
         },
+        getTask: getTaskDispatcherTask,
         initializeParameters: () => ({
             caseFalse: [],
             caseTrue: [],
@@ -255,8 +260,8 @@ export const TASK_DISPATCHER_CONFIG = {
         getInitialParameters: (properties: Array<PropertyAllType>) => ({
             ...getParametersWithDefaultValues({properties}),
         }),
-        getParentTask: getParentTaskDispatcherTask,
         getSubtasks: ({task}: {task: WorkflowTask}): Array<WorkflowTask> => task.parameters?.iteratee || [],
+        getTask: getTaskDispatcherTask,
         initializeParameters: () => ({
             iteratee: [],
         }),
@@ -273,7 +278,7 @@ export const TASK_DISPATCHER_CONFIG = {
 /**
  * Find the parent task dispatcher ID for a nested task
  */
-export function findParentTaskDispatcher(taskId: string, tasks: WorkflowTask[]): WorkflowTask | undefined {
+export function getParentTaskDispatcherTask(taskId: string, tasks: WorkflowTask[]): WorkflowTask | undefined {
     return tasks.find((task) => {
         if (task.name === taskId) {
             return false;
@@ -309,4 +314,42 @@ export function findParentTaskDispatcher(taskId: string, tasks: WorkflowTask[]):
 
         return allSubtasks.some((subtask) => subtask.name === taskId);
     });
+}
+
+const ALL_COLLECTION_NAMES = Object.values(TASK_DISPATCHER_SUBTASK_COLLECTIONS).flat();
+
+type GetParentTaskDispatcherTaskType = {
+    taskDispatcherId: string;
+    tasks: Array<WorkflowTask>;
+};
+
+export function getTaskDispatcherTask({
+    taskDispatcherId,
+    tasks,
+}: GetParentTaskDispatcherTaskType): WorkflowTask | undefined {
+    for (const task of tasks) {
+        if (task.name === taskDispatcherId) {
+            return task;
+        }
+
+        if (task.parameters) {
+            for (const collectionName of ALL_COLLECTION_NAMES) {
+                let subtasks = task.parameters[collectionName];
+
+                if (collectionName === 'cases') {
+                    subtasks = subtasks?.flatMap((branchCase: BranchCaseType) => branchCase.tasks);
+                }
+
+                if (Array.isArray(subtasks) && subtasks.length > 0) {
+                    const foundTask = getTaskDispatcherTask({taskDispatcherId, tasks: subtasks});
+
+                    if (foundTask) {
+                        return foundTask;
+                    }
+                }
+            }
+        }
+    }
+
+    return undefined;
 }

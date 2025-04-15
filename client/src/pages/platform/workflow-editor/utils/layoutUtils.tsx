@@ -28,7 +28,7 @@ import InlineSVG from 'react-inlinesvg';
 
 import useWorkflowDataStore from '../stores/useWorkflowDataStore';
 import {getConditionBranchSide} from './createConditionEdges';
-import {TASK_DISPATCHER_CONFIG, findParentTaskDispatcher, getAllTaskDispatcherSubtasks} from './taskDispatcherConfig';
+import {getParentTaskDispatcherTask, getTaskDispatcherTask, TASK_DISPATCHER_CONFIG} from './taskDispatcherConfig';
 
 export const calculateNodeHeight = (node: Node) => {
     const isTopGhostNode = node.type === 'taskDispatcherTopGhostNode';
@@ -248,7 +248,7 @@ export const createEdgeFromTaskDispatcherBottomGhostNode = ({
 
     // Connect to the parent task dispatcher if this is a nested task dispatcher
     if (node.data.isNestedBottomGhost) {
-        const parentTaskDispatcher = findParentTaskDispatcher(taskDispatcherId, tasks);
+        const parentTaskDispatcher = getParentTaskDispatcherTask(taskDispatcherId, tasks);
 
         if (!parentTaskDispatcher) {
             return null;

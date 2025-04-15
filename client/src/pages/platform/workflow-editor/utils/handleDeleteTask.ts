@@ -8,7 +8,7 @@ import {QueryClient, UseMutationResult} from '@tanstack/react-query';
 
 import {WorkflowTaskDataType} from '../stores/useWorkflowDataStore';
 import useWorkflowNodeDetailsPanelStore from '../stores/useWorkflowNodeDetailsPanelStore';
-import getParentTaskDispatcherTask from './getParentTaskDispatcherTask';
+import {getParentTaskDispatcherTask, TASK_DISPATCHER_CONFIG} from './taskDispatcherConfig';
 
 interface HandleDeleteTaskProps {
     currentNode?: NodeDataType;
@@ -42,7 +42,7 @@ export default function handleDeleteTask({
     let updatedTasks: Array<WorkflowTaskType>;
 
     if (data.conditionData) {
-        const parentConditionTask = getParentTaskDispatcherTask({
+        const parentConditionTask = TASK_DISPATCHER_CONFIG.condition.getTask({
             taskDispatcherId: data.conditionData.conditionId,
             tasks: workflowTasks,
         });
@@ -65,7 +65,7 @@ export default function handleDeleteTask({
             return parentConditionTask;
         }) as Array<WorkflowTaskType>;
     } else if (data.loopData) {
-        const parentLoopTask = getParentTaskDispatcherTask({
+        const parentLoopTask = TASK_DISPATCHER_CONFIG.loop.getTask({
             taskDispatcherId: data.loopData.loopId,
             tasks: workflowTasks,
         });
@@ -86,7 +86,7 @@ export default function handleDeleteTask({
             return parentLoopTask;
         }) as Array<WorkflowTaskType>;
     } else if (data.branchData) {
-        const parentBranchTask = getParentTaskDispatcherTask({
+        const parentBranchTask = TASK_DISPATCHER_CONFIG.branch.getTask({
             taskDispatcherId: data.branchData.branchId,
             tasks: workflowTasks,
         });

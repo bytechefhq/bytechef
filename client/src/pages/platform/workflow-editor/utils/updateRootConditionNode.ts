@@ -3,16 +3,14 @@ import {NodeDataType} from '@/shared/types';
 import {Node} from '@xyflow/react';
 
 import {WorkflowTaskDataType} from '../stores/useWorkflowDataStore';
-import getParentTaskDispatcherTask from './getParentTaskDispatcherTask';
+import {TASK_DISPATCHER_CONFIG} from './taskDispatcherConfig';
 
 interface UpdateRootConditionNodeProps {
-    conditionCase: string;
-    conditionId: string;
     nodeIndex: number;
+    nodes: Array<Node>;
     tasks: Array<WorkflowTask>;
     updatedParentConditionNodeData: NodeDataType;
     updatedParentConditionTask: WorkflowTask;
-    nodes: Array<Node>;
     workflow: Workflow & WorkflowTaskDataType;
 }
 
@@ -29,7 +27,7 @@ export default function updateRootConditionNode({
     let currentTaskNodeConditionData = updatedParentConditionNodeData.conditionData;
 
     while (currentTaskNodeConditionData) {
-        const parentConditionTask = getParentTaskDispatcherTask({
+        const parentConditionTask = TASK_DISPATCHER_CONFIG.condition.getTask({
             taskDispatcherId: currentTaskNodeConditionData.conditionId,
             tasks,
         });

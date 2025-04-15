@@ -71,13 +71,12 @@ export default function insertTaskDispatcherSubtask({
         return tasks;
     }
 
-    const {extractContextFromPlaceholder, getParentTask, getSubtasks, initializeParameters, updateTaskParameters} =
-        config;
+    const {extractContextFromPlaceholder, getSubtasks, getTask, initializeParameters, updateTaskParameters} = config;
 
     let targetTaskDispatcher = tasks.find((task) => task.name === taskDispatcherId);
 
     if (!targetTaskDispatcher) {
-        targetTaskDispatcher = getParentTask({taskDispatcherId, tasks});
+        targetTaskDispatcher = getTask({taskDispatcherId, tasks});
     }
 
     if (!targetTaskDispatcher) {

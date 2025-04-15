@@ -3,15 +3,14 @@ import {NodeDataType} from '@/shared/types';
 import {Node} from '@xyflow/react';
 
 import {WorkflowTaskDataType} from '../stores/useWorkflowDataStore';
-import getParentTaskDispatcherTask from './getParentTaskDispatcherTask';
+import {TASK_DISPATCHER_CONFIG} from './taskDispatcherConfig';
 
 interface UpdateRootLoopNodeProps {
-    loopId: string;
     nodeIndex: number;
+    nodes: Array<Node>;
     tasks: Array<WorkflowTask>;
     updatedParentLoopNodeData: NodeDataType;
     updatedParentLoopTask: WorkflowTask;
-    nodes: Array<Node>;
     workflow: Workflow & WorkflowTaskDataType;
 }
 
@@ -28,7 +27,10 @@ export default function updateRootLoopNode({
     let currentTaskNodeLoopData = updatedParentLoopNodeData.loopData;
 
     while (currentTaskNodeLoopData) {
-        const parentLoopTask = getParentTaskDispatcherTask({taskDispatcherId: currentTaskNodeLoopData.loopId, tasks});
+        const parentLoopTask = TASK_DISPATCHER_CONFIG.loop.getTask({
+            taskDispatcherId: currentTaskNodeLoopData.loopId,
+            tasks,
+        });
 
         if (!parentLoopTask) {
             break;
