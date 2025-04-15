@@ -40,7 +40,6 @@ import reactor.core.publisher.Flux;
 public class AiCopilotFacadeImpl implements AiCopilotFacade {
 
     private final ChatClient chatClientWorkflow;
-    private final ChatClient chatClientDocs;
     private final ChatClient chatClientScript;
     private final WorkflowService workflowService;
 
@@ -54,12 +53,6 @@ public class AiCopilotFacadeImpl implements AiCopilotFacade {
 
         SearchRequest.Builder searchRequestBuilder = SearchRequest.builder();
 
-        SearchRequest.Builder documentationBuilder =
-            searchRequestBuilder.filterExpression("category == 'documentation'");
-
-        QuestionAnswerAdvisor questionAnswerAdvisorDocs = new QuestionAnswerAdvisor(
-            vectorStore, documentationBuilder.build());
-
         SearchRequest.Builder componentsBuilder = searchRequestBuilder.filterExpression("category == 'components'");
 
         QuestionAnswerAdvisor questionAnswerAdvisorComponents = new QuestionAnswerAdvisor(
@@ -69,14 +62,6 @@ public class AiCopilotFacadeImpl implements AiCopilotFacade {
 
         QuestionAnswerAdvisor questionAnswerAdvisorWorkflow = new QuestionAnswerAdvisor(
             vectorStore, workflowsBuilder.build());
-
-        this.chatClientDocs = chatClientBuilder.clone()
-            // TODO add multiuser, multitenant history
-            .defaultAdvisors(
-                messageChatMemoryAdvisor,
-                questionAnswerAdvisorDocs,
-                questionAnswerAdvisorComponents)
-            .build();
 
         this.chatClientWorkflow = chatClientBuilder.clone()
             // TODO add multiuser, multitenant history
@@ -110,23 +95,7 @@ public class AiCopilotFacadeImpl implements AiCopilotFacade {
         final String messageString = "message";
 
         return switch (contextDTO.source()) {
-            case WORKFLOW_EDITOR -> {
-                ChatClient.ChatClientRequestSpec advisors = chatClientDocs.prompt()
-                    .system(
-                        """
-                            You are a ByteChef assistant. You answer questions about ByteChef and help users with
-                            problems. If a user asks you about generating a workflow: answer only with a json in a
-                            format similar to the json objects in the vector database. Only use the actions, triggers
-                            and parameters which you know exist.
-                            """)
-                    .user(message)
-                    .advisors(advisor -> advisor
-                        .param(AbstractChatMemoryAdvisor.CHAT_MEMORY_CONVERSATION_ID_KEY, conversationId));
-                yield advisors.stream()
-                    .content()
-                    .map(content -> Map.of("text", content));
-            }
-            case WORKFLOW_EDITOR_COMPONENTS_POPOVER_MENU ->
+            case WORKFLOW_EDITOR, WORKFLOW_EDITOR_COMPONENTS_POPOVER_MENU ->
                 chatClientWorkflow.prompt()
                     .system(
                         """
