@@ -111,11 +111,20 @@ export const TASK_DISPATCHER_CONFIG = {
         getParentTask: getParentTaskDispatcherTask,
         getSubtasks: ({
             context,
+            getAllSubtasks = false,
             task,
         }: {
             context?: TaskDispatcherContextType;
+            getAllSubtasks?: boolean;
             task: WorkflowTask;
         }): Array<WorkflowTask> => {
+            if (getAllSubtasks) {
+                return [
+                    ...(task.parameters?.default || []),
+                    ...(task.parameters?.cases || []).flatMap((caseItem: BranchCaseType) => caseItem.tasks || []),
+                ];
+            }
+
             const caseKey = context?.caseKey || 'default';
 
             if (caseKey === 'default') {
@@ -123,7 +132,6 @@ export const TASK_DISPATCHER_CONFIG = {
             }
 
             const cases = [...(task.parameters?.cases || [])];
-
             const existingCaseIndex = cases.findIndex((caseItem) => caseItem.key === caseKey);
 
             if (existingCaseIndex >= 0) {
@@ -199,11 +207,17 @@ export const TASK_DISPATCHER_CONFIG = {
         getParentTask: getParentTaskDispatcherTask,
         getSubtasks: ({
             context,
+            getAllSubtasks = false,
             task,
         }: {
             context?: TaskDispatcherContextType;
+            getAllSubtasks?: boolean;
             task: WorkflowTask;
         }): Array<WorkflowTask> => {
+            if (getAllSubtasks) {
+                return [...(task.parameters?.caseTrue || []), ...(task.parameters?.caseFalse || [])];
+            }
+
             const conditionCase = (context?.conditionCase as 'caseTrue' | 'caseFalse') || CONDITION_CASE_TRUE;
 
             return conditionCase === CONDITION_CASE_TRUE

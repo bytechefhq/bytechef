@@ -28,7 +28,7 @@ import InlineSVG from 'react-inlinesvg';
 
 import useWorkflowDataStore from '../stores/useWorkflowDataStore';
 import {getConditionBranchSide} from './createConditionEdges';
-import {TASK_DISPATCHER_CONFIG, findParentTaskDispatcher} from './taskDispatcherConfig';
+import {TASK_DISPATCHER_CONFIG, findParentTaskDispatcher, getAllTaskDispatcherSubtasks} from './taskDispatcherConfig';
 
 export const calculateNodeHeight = (node: Node) => {
     const isTopGhostNode = node.type === 'taskDispatcherTopGhostNode';
@@ -336,24 +336,19 @@ export const createEdgeFromTaskDispatcherBottomGhostNode = ({
         }
 
         for (const task of tasks || []) {
-            if (task.type?.startsWith('condition') && task.parameters) {
-                const conditionSubtasks = [...(task.parameters.caseTrue || []), ...(task.parameters.caseFalse || [])];
+            const componentName = task.type?.split('/')[0];
 
-                if (conditionSubtasks.some((subtask) => subtask.name === subsequentNode.id)) {
-                    return false;
-                }
-            } else if (task.type?.startsWith('loop') && task.parameters?.iteratee) {
-                const loopSubtasks: WorkflowTask[] = task.parameters.iteratee;
+            if (!TASK_DISPATCHER_NAMES.includes(componentName)) {
+                continue;
+            }
 
-                if (loopSubtasks.some((subtask) => subtask.name === subsequentNode.id)) {
-                    return false;
-                }
-            } else if (task.type?.startsWith('branch') && task.parameters) {
-                const branchSubtasks = [...(task.parameters.default || []), ...(task.parameters.cases || [])];
+            const subtasks = TASK_DISPATCHER_CONFIG[componentName as keyof typeof TASK_DISPATCHER_CONFIG].getSubtasks({
+                getAllSubtasks: true,
+                task,
+            });
 
-                if (branchSubtasks.some((subtask) => subtask.name === subsequentNode.id)) {
-                    return false;
-                }
+            if (subtasks.some((subtask) => subtask.name === subsequentNode.id)) {
+                return false;
             }
         }
 
