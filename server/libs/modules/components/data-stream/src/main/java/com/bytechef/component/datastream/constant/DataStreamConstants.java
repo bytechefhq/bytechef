@@ -26,7 +26,7 @@ public class DataStreamConstants {
     public static final String INPUT_PARAMETERS = "inputParameters";
     public static final String JOB_ID = "jobId";
     public static final String MODE_TYPE = "modeType";
-    public static final String COMPONENT_OPERATION = "componentOperation";
+    public static final String CLUSTER_ELEMENT_NAME = "clusterElementName";
     public static final String PRINCIPAL_ID = "principalId";
     public static final String PRINCIPAL_WORKFLOW_ID = "principalWorkflowId";
     public static final String STREAM = "stream";

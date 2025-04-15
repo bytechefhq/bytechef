@@ -16,7 +16,7 @@
 
 package com.bytechef.component.datastream.item;
 
-import static com.bytechef.component.datastream.constant.DataStreamConstants.COMPONENT_OPERATION;
+import static com.bytechef.component.datastream.constant.DataStreamConstants.CLUSTER_ELEMENT_NAME;
 import static com.bytechef.component.datastream.constant.DataStreamConstants.CONNECTION_PARAMETERS;
 import static com.bytechef.component.datastream.constant.DataStreamConstants.INPUT_PARAMETERS;
 import static com.bytechef.component.datastream.constant.DataStreamConstants.TENANT_ID;
@@ -44,7 +44,7 @@ public abstract class AbstractItemDelegate {
 
     protected boolean editorEnvironment;
     protected String componentName;
-    protected String componentOperation;
+    protected String clusterElementName;
     protected int componentVersion;
     protected Parameters connectionParameters;
     protected ContextFactory contextFactory;
@@ -67,18 +67,18 @@ public abstract class AbstractItemDelegate {
 
         JobParameter<?> jobParameter = Objects.requireNonNull(jobParameters.getParameter(clusterElementType.name()));
 
-        Map<String, ?> clusterElementTypeMap = (Map<String, ?>) jobParameter.getValue();
+        Map<String, ?> clusterElementMap = (Map<String, ?>) jobParameter.getValue();
 
-        componentName = MapUtils.getRequiredString(clusterElementTypeMap, COMPONENT_NAME);
-        componentVersion = MapUtils.getRequiredInteger(clusterElementTypeMap, COMPONENT_VERSION);
-        componentOperation = MapUtils.getRequiredString(clusterElementTypeMap, COMPONENT_OPERATION);
+        componentName = MapUtils.getRequiredString(clusterElementMap, COMPONENT_NAME);
+        componentVersion = MapUtils.getRequiredInteger(clusterElementMap, COMPONENT_VERSION);
+        clusterElementName = MapUtils.getRequiredString(clusterElementMap, CLUSTER_ELEMENT_NAME);
 
-        Map<String, ?> connectionParameterMap = MapUtils.getMap(clusterElementTypeMap, CONNECTION_PARAMETERS);
+        Map<String, ?> connectionParameterMap = MapUtils.getMap(clusterElementMap, CONNECTION_PARAMETERS);
 
         connectionParameters = connectionParameterMap == null
             ? null : ParametersFactory.createParameters(connectionParameterMap);
 
-        inputParameters = ParametersFactory.createParameters(MapUtils.getMap(clusterElementTypeMap, INPUT_PARAMETERS));
+        inputParameters = ParametersFactory.createParameters(MapUtils.getMap(clusterElementMap, INPUT_PARAMETERS));
 
         jobParameter = Validate.notNull(jobParameters.getParameter(TENANT_ID), "tenantId is required");
 

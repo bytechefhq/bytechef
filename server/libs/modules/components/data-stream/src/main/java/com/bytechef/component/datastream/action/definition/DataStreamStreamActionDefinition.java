@@ -16,7 +16,7 @@
 
 package com.bytechef.component.datastream.action.definition;
 
-import static com.bytechef.component.datastream.constant.DataStreamConstants.COMPONENT_OPERATION;
+import static com.bytechef.component.datastream.constant.DataStreamConstants.CLUSTER_ELEMENT_NAME;
 import static com.bytechef.component.datastream.constant.DataStreamConstants.CONNECTION_PARAMETERS;
 import static com.bytechef.component.datastream.constant.DataStreamConstants.INPUT_PARAMETERS;
 import static com.bytechef.component.datastream.constant.DataStreamConstants.JOB_ID;
@@ -87,7 +87,7 @@ public class DataStreamStreamActionDefinition extends AbstractActionDefinitionWr
                             Map.of(
                                 COMPONENT_NAME, clusterElement.getComponentName(),
                                 COMPONENT_VERSION, clusterElement.getComponentVersion(),
-                                COMPONENT_OPERATION, clusterElement.getClusterElementName(),
+                                CLUSTER_ELEMENT_NAME, clusterElement.getClusterElementName(),
                                 CONNECTION_PARAMETERS, connectionParameters.get(
                                     DESTINATION.key() + "_" + clusterElement.getClusterElementName()),
                                 INPUT_PARAMETERS, clusterElement.getParameters()),
@@ -113,7 +113,7 @@ public class DataStreamStreamActionDefinition extends AbstractActionDefinitionWr
                             Map.of(
                                 COMPONENT_NAME, clusterElement.getComponentName(),
                                 COMPONENT_VERSION, clusterElement.getComponentVersion(),
-                                COMPONENT_OPERATION, clusterElement.getClusterElementName(),
+                                CLUSTER_ELEMENT_NAME, clusterElement.getClusterElementName(),
                                 CONNECTION_PARAMETERS, connectionParameters.get(
                                     SOURCE.key() + "_" + clusterElement.getClusterElementName()),
                                 INPUT_PARAMETERS, clusterElement.getParameters()),

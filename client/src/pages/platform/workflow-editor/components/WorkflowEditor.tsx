@@ -264,7 +264,7 @@ const WorkflowEditor = ({
                 zoomOnScroll={false}
             >
                 <MiniMap
-                    className={twMerge('mb-2 mr-16', rightSidebarOpen && 'absolute right-minimap-placement')}
+                    className={twMerge('mb-3 mr-16', rightSidebarOpen && 'absolute right-minimap-placement')}
                     maskColor={MINIMAP_MASK_COLOR}
                     nodeBorderRadius={24}
                     nodeColor={MINIMAP_NODE_COLOR}
@@ -273,7 +273,7 @@ const WorkflowEditor = ({
                 <Background color="#ccc" variant={BackgroundVariant.Dots} />
 
                 <Controls
-                    className="m-2 rounded-md border border-stroke-neutral-secondary bg-background"
+                    className="m-2 mb-3 rounded-md border border-stroke-neutral-secondary bg-background"
                     fitViewOptions={{duration: 500, minZoom: 0.2}}
                     showInteractive={false}
                 />
