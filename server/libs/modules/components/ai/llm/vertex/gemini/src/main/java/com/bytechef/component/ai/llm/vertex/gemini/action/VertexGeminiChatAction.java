@@ -22,8 +22,6 @@ import static com.bytechef.component.ai.llm.constant.LLMConstants.MAX_TOKENS_PRO
 import static com.bytechef.component.ai.llm.constant.LLMConstants.MESSAGES_PROPERTY;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.MODEL;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.N;
-import static com.bytechef.component.ai.llm.constant.LLMConstants.RESPONSE;
-import static com.bytechef.component.ai.llm.constant.LLMConstants.RESPONSE_FORMAT;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.RESPONSE_PROPERTY;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.STOP;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.STOP_PROPERTY;
@@ -40,7 +38,6 @@ import static com.bytechef.component.ai.llm.vertex.gemini.constant.VertexGeminiC
 import static com.bytechef.component.definition.ComponentDsl.action;
 
 import com.bytechef.component.ai.llm.ChatModel;
-import com.bytechef.component.ai.llm.ChatModel.ResponseFormat;
 import com.bytechef.component.ai.llm.util.LLMUtils;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
@@ -72,9 +69,8 @@ public class VertexGeminiChatAction {
         .perform(VertexGeminiChatAction::perform);
 
     public static final ChatModel CHAT_MODEL = (inputParameters, connectionParameters) -> {
-        String type = inputParameters.getFromPath(
-            RESPONSE + "." + RESPONSE_FORMAT, ResponseFormat.class, ResponseFormat.TEXT) == ResponseFormat.TEXT
-                ? "text/plain" : "application/json";
+//        ResponseFormat responseFormat = inputParameters.getFromPath(
+//            RESPONSE + "." + RESPONSE_FORMAT, ResponseFormat.class, ResponseFormat.TEXT);
 
         return new VertexAiGeminiChatModel(
             new VertexAI(connectionParameters.getString(PROJECT_ID), connectionParameters.getString(LOCATION)),
@@ -86,7 +82,7 @@ public class VertexGeminiChatAction {
                 .stopSequences(inputParameters.getList(STOP, new TypeReference<>() {}))
                 .topK(inputParameters.getInteger(TOP_K))
                 .candidateCount(inputParameters.getInteger(N))
-                .responseMimeType(type)
+//                .responseMimeType(responseFormat == ResponseFormat.TEXT ? "text/plain" : "application/json")
                 .build());
     };
 

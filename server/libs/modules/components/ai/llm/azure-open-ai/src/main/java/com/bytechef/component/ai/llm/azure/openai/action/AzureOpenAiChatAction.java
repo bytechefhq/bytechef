@@ -31,8 +31,6 @@ import static com.bytechef.component.ai.llm.constant.LLMConstants.N;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.N_PROPERTY;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.PRESENCE_PENALTY;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.PRESENCE_PENALTY_PROPERTY;
-import static com.bytechef.component.ai.llm.constant.LLMConstants.RESPONSE;
-import static com.bytechef.component.ai.llm.constant.LLMConstants.RESPONSE_FORMAT;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.RESPONSE_PROPERTY;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.STOP;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.STOP_PROPERTY;
@@ -44,13 +42,10 @@ import static com.bytechef.component.ai.llm.constant.LLMConstants.USER;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.USER_PROPERTY;
 import static com.bytechef.component.definition.Authorization.TOKEN;
 import static com.bytechef.component.definition.ComponentDsl.action;
-import static org.springframework.ai.azure.openai.AzureOpenAiResponseFormat.JSON;
-import static org.springframework.ai.azure.openai.AzureOpenAiResponseFormat.TEXT;
 
 import com.azure.ai.openai.OpenAIClientBuilder;
 import com.azure.core.credential.KeyCredential;
 import com.bytechef.component.ai.llm.ChatModel;
-import com.bytechef.component.ai.llm.ChatModel.ResponseFormat;
 import com.bytechef.component.ai.llm.util.LLMUtils;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
@@ -58,7 +53,6 @@ import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
 import org.springframework.ai.azure.openai.AzureOpenAiChatModel;
 import org.springframework.ai.azure.openai.AzureOpenAiChatOptions;
-import org.springframework.ai.azure.openai.AzureOpenAiResponseFormat;
 
 /**
  * @author Marko Kriskovic
@@ -85,10 +79,8 @@ public class AzureOpenAiChatAction {
         .perform(AzureOpenAiChatAction::perform);
 
     public static final ChatModel CHAT_MODEL = (inputParameters, connectionParameters) -> {
-        AzureOpenAiResponseFormat format =
-            inputParameters.getFromPath(
-                RESPONSE + "." + RESPONSE_FORMAT, ResponseFormat.class, ResponseFormat.TEXT) == ResponseFormat.TEXT
-                    ? TEXT : JSON;
+//        ResponseFormat responseFormat = inputParameters.getFromPath(
+//            RESPONSE + "." + RESPONSE_FORMAT, ResponseFormat.class, ResponseFormat.TEXT);
 
         return AzureOpenAiChatModel.builder()
             .openAIClientBuilder(
@@ -107,7 +99,7 @@ public class AzureOpenAiChatAction {
                     .temperature(inputParameters.getDouble(TEMPERATURE))
                     .topP(inputParameters.getDouble(TOP_P))
                     .user(inputParameters.getString(USER))
-                    .responseFormat(format)
+//                    .responseFormat(responseFormat == ResponseFormat.TEXT ? TEXT : JSON)
                     .build())
             .build();
     };
