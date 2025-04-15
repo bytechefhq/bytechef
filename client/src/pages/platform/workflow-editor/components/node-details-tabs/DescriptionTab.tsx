@@ -129,7 +129,6 @@ const DescriptionTab = ({
             }
 
             nodeData = updateRootLoopNode({
-                loopId: currentNode.loopData.loopId,
                 nodeIndex: taskIndex,
                 nodes,
                 tasks,
