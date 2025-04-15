@@ -301,7 +301,7 @@ const WorkflowNodesPopoverMenuOperationList = ({
                 </div>
             </header>
 
-            <ul className="h-96 space-y-2 overflow-scroll rounded-br-lg bg-muted p-3">
+            <ul className="h-96 space-y-2 overflow-auto rounded-br-lg bg-muted p-3">
                 {operations?.map((operation) => (
                     <li
                         className="cursor-pointer space-y-1 rounded border-2 border-transparent bg-white px-2 py-1 hover:border-blue-200"
