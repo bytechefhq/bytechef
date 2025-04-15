@@ -63,9 +63,9 @@ import org.springframework.web.client.RestClient;
  * @author Monika Kušter
  * @author Marko Kriskovic
  */
-public class LLMUtils {
+public class ModelUtils {
 
-    private LLMUtils() {
+    private ModelUtils() {
     }
 
     @SuppressFBWarnings("NP")

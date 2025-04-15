@@ -29,7 +29,7 @@ import static com.bytechef.component.definition.ComponentDsl.number;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
 
-import com.bytechef.component.ai.llm.util.LLMUtils;
+import com.bytechef.component.ai.llm.util.ModelUtils;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.FileEntry;
@@ -63,7 +63,7 @@ public class OpenAiCreateSpeechAction {
                 .required(true)
                 .description("Text-to-Speech model which will generate the audio.")
                 .options(
-                    LLMUtils.getEnumOptions(
+                    ModelUtils.getEnumOptions(
                         Arrays.stream(TtsModel.values())
                             .collect(Collectors.toMap(TtsModel::getValue, TtsModel::getValue)))),
             string(INPUT)
@@ -75,7 +75,7 @@ public class OpenAiCreateSpeechAction {
                 .label("Voice")
                 .description("The voice to use when generating the audio.")
                 .options(
-                    LLMUtils.getEnumOptions(
+                    ModelUtils.getEnumOptions(
                         Arrays.stream(SpeechRequest.Voice.values())
                             .collect(Collectors.toMap(OpenAiAudioApi.SpeechRequest.Voice::getValue, Enum::name))))
                 .required(true),
@@ -83,7 +83,7 @@ public class OpenAiCreateSpeechAction {
                 .label("Response format")
                 .description("The format to audio in.")
                 .options(
-                    LLMUtils.getEnumOptions(
+                    ModelUtils.getEnumOptions(
                         Arrays.stream(AudioResponseFormat.values())
                             .collect(
                                 Collectors.toMap(

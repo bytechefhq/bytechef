@@ -23,7 +23,7 @@ import static com.bytechef.component.definition.ComponentDsl.integer;
 import static com.bytechef.component.definition.ComponentDsl.number;
 import static com.bytechef.component.definition.ComponentDsl.string;
 
-import com.bytechef.component.ai.llm.util.LLMUtils;
+import com.bytechef.component.ai.llm.util.ModelUtils;
 import com.bytechef.component.definition.ComponentDsl.ModifiableBooleanProperty;
 import com.bytechef.component.definition.ComponentDsl.ModifiableIntegerProperty;
 import com.bytechef.component.definition.ComponentDsl.ModifiableNumberProperty;
@@ -186,7 +186,7 @@ public final class OllamaConstants {
         .description("ID of the model to use.")
         .required(true)
         .options(
-            LLMUtils.getEnumOptions(
+            ModelUtils.getEnumOptions(
                 Arrays.stream(OllamaModel.values())
                     .collect(Collectors.toMap(OllamaModel::getName, OllamaModel::getName))));
     public static final ModifiableIntegerProperty MAX_TOKENS_PROPERTY = integer(MAX_TOKENS)

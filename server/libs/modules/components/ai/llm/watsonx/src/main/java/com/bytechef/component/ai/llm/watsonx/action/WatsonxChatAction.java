@@ -47,7 +47,7 @@ import static com.bytechef.component.definition.Authorization.TOKEN;
 import static com.bytechef.component.definition.ComponentDsl.action;
 
 import com.bytechef.component.ai.llm.ChatModel;
-import com.bytechef.component.ai.llm.util.LLMUtils;
+import com.bytechef.component.ai.llm.util.ModelUtils;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Parameters;
@@ -77,7 +77,7 @@ public class WatsonxChatAction {
             TOP_K_PROPERTY,
             STOP_PROPERTY,
             SEED_PROPERTY)
-        .output(LLMUtils::output)
+        .output(ModelUtils::output)
         .perform(WatsonxChatAction::perform);
 
     public static final ChatModel CHAT_MODEL = (inputParameters, connectionParameters) -> new WatsonxAiChatModel(
@@ -85,7 +85,7 @@ public class WatsonxChatAction {
             connectionParameters.getString(URL),
             connectionParameters.getString(STREAM_ENDPOINT), connectionParameters.getString(TEXT_ENDPOINT),
             null, connectionParameters.getString(PROJECT_ID), connectionParameters.getString(TOKEN),
-            LLMUtils.getRestClientBuilder()),
+            ModelUtils.getRestClientBuilder()),
         WatsonxAiChatOptions.builder()
             .model(inputParameters.getString(MODEL))
             .temperature(inputParameters.getDouble(TEMPERATURE))

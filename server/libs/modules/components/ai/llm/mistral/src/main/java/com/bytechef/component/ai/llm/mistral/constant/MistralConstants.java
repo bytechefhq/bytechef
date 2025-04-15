@@ -20,7 +20,7 @@ import static com.bytechef.component.ai.llm.constant.LLMConstants.MODEL;
 import static com.bytechef.component.definition.ComponentDsl.bool;
 import static com.bytechef.component.definition.ComponentDsl.string;
 
-import com.bytechef.component.ai.llm.util.LLMUtils;
+import com.bytechef.component.ai.llm.util.ModelUtils;
 import com.bytechef.component.definition.ComponentDsl.ModifiableBooleanProperty;
 import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Property;
@@ -36,11 +36,11 @@ public final class MistralConstants {
 
     public static final String SAFE_PROMPT = "safePrompt";
 
-    public static final List<Option<String>> CHAT_MODELS = LLMUtils.getEnumOptions(
+    public static final List<Option<String>> CHAT_MODELS = ModelUtils.getEnumOptions(
         Arrays.stream(MistralAiApi.ChatModel.values())
             .collect(Collectors.toMap(MistralAiApi.ChatModel::getValue, MistralAiApi.ChatModel::getValue)));
 
-    public static final List<Option<String>> EMBEDDING_MODELS = LLMUtils.getEnumOptions(
+    public static final List<Option<String>> EMBEDDING_MODELS = ModelUtils.getEnumOptions(
         Arrays.stream(MistralAiApi.EmbeddingModel.values())
             .collect(Collectors.toMap(MistralAiApi.EmbeddingModel::getValue, MistralAiApi.EmbeddingModel::getValue)));
 

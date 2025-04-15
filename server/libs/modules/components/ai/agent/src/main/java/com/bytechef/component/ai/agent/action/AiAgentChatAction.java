@@ -28,7 +28,7 @@ import static com.bytechef.platform.component.definition.ai.agent.RagFunction.RA
 import static org.springframework.ai.chat.client.advisor.AbstractChatMemoryAdvisor.CHAT_MEMORY_CONVERSATION_ID_KEY;
 
 import com.bytechef.commons.util.MapUtils;
-import com.bytechef.component.ai.llm.util.LLMUtils;
+import com.bytechef.component.ai.llm.util.ModelUtils;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ActionDefinition;
 import com.bytechef.component.definition.Parameters;
@@ -87,7 +87,7 @@ public class AiAgentChatAction {
                         .description("The conversation id used in conjunction with memory."))
                 .output(
                     (MultipleConnectionsOutputFunction) (
-                        inputParameters, componentConnections, extensions, context) -> LLMUtils.output(
+                        inputParameters, componentConnections, extensions, context) -> ModelUtils.output(
                             inputParameters, null, context)));
 
         this.clusterElementDefinitionFacade = clusterElementDefinitionFacade;
@@ -136,14 +136,14 @@ public class AiAgentChatAction {
                         advisor.param(CHAT_MEMORY_CONVERSATION_ID_KEY, conversationId);
                     }
                 })
-                .messages(LLMUtils.getMessages(inputParameters, actionContext))
+                .messages(ModelUtils.getMessages(inputParameters, actionContext))
                 .tools(
                     getTools(
                         clusterElementMap.getClusterElements(ToolFunction.TOOLS), connectionParameters,
                         actionContextAware.isEditorEnvironment(), actionContext))
                 .call();
 
-            return LLMUtils.getChatResponse(call, inputParameters, actionContext);
+            return ModelUtils.getChatResponse(call, inputParameters, actionContext);
         }
     }
 

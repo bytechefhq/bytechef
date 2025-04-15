@@ -19,7 +19,7 @@ package com.bytechef.component.ai.llm.azure.openai.constant;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.MODEL;
 import static com.bytechef.component.definition.ComponentDsl.string;
 
-import com.bytechef.component.ai.llm.util.LLMUtils;
+import com.bytechef.component.ai.llm.util.ModelUtils;
 import com.bytechef.component.definition.ComponentDsl.ModifiableStringProperty;
 import com.bytechef.component.definition.Option;
 import java.util.Arrays;
@@ -35,7 +35,7 @@ public class AzureOpenAiConstants {
         .exampleValue("gpt-4o")
         .required(true);
 
-    public static final List<Option<String>> IMAGE_MODELS = LLMUtils.getEnumOptions(
+    public static final List<Option<String>> IMAGE_MODELS = ModelUtils.getEnumOptions(
         Arrays.stream(AzureOpenAiImageOptions.ImageModel.values())
             .collect(
                 Collectors.toMap(

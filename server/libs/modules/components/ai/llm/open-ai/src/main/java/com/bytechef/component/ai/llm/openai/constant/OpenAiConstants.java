@@ -19,7 +19,7 @@ package com.bytechef.component.ai.llm.openai.constant;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.MODEL;
 import static com.bytechef.component.definition.ComponentDsl.string;
 
-import com.bytechef.component.ai.llm.util.LLMUtils;
+import com.bytechef.component.ai.llm.util.ModelUtils;
 import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Property;
 import java.util.Arrays;
@@ -36,15 +36,15 @@ public final class OpenAiConstants {
 
     public static final String QUALITY = "quality";
 
-    public static final List<Option<String>> IMAGE_MODELS = LLMUtils.getEnumOptions(
+    public static final List<Option<String>> IMAGE_MODELS = ModelUtils.getEnumOptions(
         Arrays.stream(OpenAiImageApi.ImageModel.values())
             .collect(Collectors.toMap(OpenAiImageApi.ImageModel::getValue, OpenAiImageApi.ImageModel::getValue)));
 
-    public static final List<Option<String>> CHAT_MODELS = LLMUtils.getEnumOptions(
+    public static final List<Option<String>> CHAT_MODELS = ModelUtils.getEnumOptions(
         Arrays.stream(OpenAiApi.ChatModel.values())
             .collect(Collectors.toMap(OpenAiApi.ChatModel::getValue, OpenAiApi.ChatModel::getValue)));
 
-    public static final List<Option<String>> EMBEDDING_MODELS = LLMUtils.getEnumOptions(
+    public static final List<Option<String>> EMBEDDING_MODELS = ModelUtils.getEnumOptions(
         Arrays.stream(OpenAiApi.EmbeddingModel.values())
             .collect(Collectors.toMap(OpenAiApi.EmbeddingModel::getValue, OpenAiApi.EmbeddingModel::getValue)));
 

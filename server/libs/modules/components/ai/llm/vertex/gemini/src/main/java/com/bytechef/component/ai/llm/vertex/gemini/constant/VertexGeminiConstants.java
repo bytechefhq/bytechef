@@ -21,7 +21,7 @@ import static com.bytechef.component.ai.llm.constant.LLMConstants.N;
 import static com.bytechef.component.definition.ComponentDsl.integer;
 import static com.bytechef.component.definition.ComponentDsl.string;
 
-import com.bytechef.component.ai.llm.util.LLMUtils;
+import com.bytechef.component.ai.llm.util.ModelUtils;
 import com.bytechef.component.definition.ComponentDsl;
 import com.bytechef.component.definition.ComponentDsl.ModifiableIntegerProperty;
 import com.bytechef.component.definition.Option;
@@ -48,7 +48,7 @@ public final class VertexGeminiConstants {
         .maxValue(8)
         .advancedOption(true);
 
-    public static final List<Option<String>> MODELS = LLMUtils.getEnumOptions(
+    public static final List<Option<String>> MODELS = ModelUtils.getEnumOptions(
         Arrays.stream(VertexAiGeminiChatModel.ChatModel.values())
             .collect(
                 Collectors.toMap(

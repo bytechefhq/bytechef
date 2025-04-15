@@ -48,14 +48,14 @@ public interface ChatModel {
         org.springframework.ai.chat.model.ChatModel chatModel = createChatModel(inputParameters, connectionParameters);
 
         List<org.springframework.ai.chat.messages.Message> messages =
-            LLMUtils.getMessages(inputParameters, actionContext);
+            ModelUtils.getMessages(inputParameters, actionContext);
 
         ChatClient.CallResponseSpec callResponseSpec = ChatClient.create(chatModel)
             .prompt()
             .messages(messages)
             .call();
 
-        return LLMUtils.getChatResponse(callResponseSpec, inputParameters, actionContext);
+        return ModelUtils.getChatResponse(callResponseSpec, inputParameters, actionContext);
     }
 
     @SuppressFBWarnings("EI")

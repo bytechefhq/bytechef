@@ -21,7 +21,7 @@ import static com.bytechef.component.ai.llm.constant.LLMConstants.MODEL;
 import static com.bytechef.component.definition.ComponentDsl.integer;
 import static com.bytechef.component.definition.ComponentDsl.string;
 
-import com.bytechef.component.ai.llm.util.LLMUtils;
+import com.bytechef.component.ai.llm.util.ModelUtils;
 import com.bytechef.component.definition.ComponentDsl.ModifiableIntegerProperty;
 import com.bytechef.component.definition.ComponentDsl.ModifiableStringProperty;
 import com.bytechef.component.definition.Option;
@@ -40,7 +40,7 @@ public class AnthropicConstants {
         .description("The maximum number of tokens to generate in the chat completion.")
         .required(true);
 
-    public static final List<Option<String>> MODELS = LLMUtils.getEnumOptions(Arrays.stream(ChatModel.values())
+    public static final List<Option<String>> MODELS = ModelUtils.getEnumOptions(Arrays.stream(ChatModel.values())
         .collect(Collectors.toMap(ChatModel::getValue, ChatModel::getValue)));
 
     public static final ModifiableStringProperty CHAT_MODEL_PROPERTY = string(MODEL)

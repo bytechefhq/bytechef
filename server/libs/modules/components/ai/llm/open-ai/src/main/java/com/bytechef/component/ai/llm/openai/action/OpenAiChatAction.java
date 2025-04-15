@@ -43,7 +43,7 @@ import static com.bytechef.component.definition.Authorization.TOKEN;
 import static com.bytechef.component.definition.ComponentDsl.action;
 
 import com.bytechef.component.ai.llm.ChatModel;
-import com.bytechef.component.ai.llm.util.LLMUtils;
+import com.bytechef.component.ai.llm.util.ModelUtils;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Parameters;
@@ -74,14 +74,14 @@ public class OpenAiChatAction {
             LOGIT_BIAS_PROPERTY,
             STOP_PROPERTY,
             USER_PROPERTY)
-        .output(LLMUtils::output)
+        .output(ModelUtils::output)
         .perform(OpenAiChatAction::perform);
 
     public static final ChatModel CHAT_MODEL = (inputParameters, connectionParameters) -> OpenAiChatModel.builder()
         .openAiApi(
             OpenAiApi.builder()
                 .apiKey(connectionParameters.getString(TOKEN))
-                .restClientBuilder(LLMUtils.getRestClientBuilder())
+                .restClientBuilder(ModelUtils.getRestClientBuilder())
                 .build())
         .defaultOptions(
             OpenAiChatOptions.builder()

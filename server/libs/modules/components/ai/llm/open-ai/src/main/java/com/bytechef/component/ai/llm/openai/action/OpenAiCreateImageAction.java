@@ -46,7 +46,7 @@ import com.bytechef.component.ai.llm.ImageModel.ResponseFormat;
 import com.bytechef.component.ai.llm.ImageModel.Style;
 import com.bytechef.component.ai.llm.openai.constant.OpenAiConstants;
 import com.bytechef.component.ai.llm.openai.definition.Size;
-import com.bytechef.component.ai.llm.util.LLMUtils;
+import com.bytechef.component.ai.llm.util.ModelUtils;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Parameters;
@@ -119,7 +119,7 @@ public class OpenAiCreateImageAction {
         return new OpenAiImageModel(
             OpenAiImageApi.builder()
                 .apiKey(connectionParameters.getString(TOKEN))
-                .restClientBuilder(LLMUtils.getRestClientBuilder())
+                .restClientBuilder(ModelUtils.getRestClientBuilder())
                 .build(),
             OpenAiImageOptions.builder()
                 .height(size.getDimensions()[1])

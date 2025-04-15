@@ -36,7 +36,7 @@ import com.azure.ai.openai.OpenAIClientBuilder;
 import com.azure.core.credential.KeyCredential;
 import com.bytechef.component.ai.llm.AudioTranscriptionModel;
 import com.bytechef.component.ai.llm.definition.Language;
-import com.bytechef.component.ai.llm.util.LLMUtils;
+import com.bytechef.component.ai.llm.util.ModelUtils;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Parameters;
@@ -67,7 +67,7 @@ public class AzureOpenAiCreateTranscriptionAction {
                 .description("ID of the model to use.")
                 .required(true)
                 .options(
-                    LLMUtils.getEnumOptions(
+                    ModelUtils.getEnumOptions(
                         Arrays.stream(WhisperModel.values())
                             .collect(Collectors.toMap(WhisperModel::getValue, WhisperModel::getValue)))),
             LANGUAGE_PROPERTY,
@@ -81,7 +81,7 @@ public class AzureOpenAiCreateTranscriptionAction {
                 .label("Response Format")
                 .description("The format of the transcript output")
                 .options(
-                    LLMUtils.getEnumOptions(
+                    ModelUtils.getEnumOptions(
                         Arrays.stream(TranscriptResponseFormat.values())
                             .collect(Collectors.toMap(clazz -> String.valueOf(clazz.getValue()), Enum::name))))
                 .required(true),

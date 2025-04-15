@@ -41,7 +41,7 @@ import static com.bytechef.component.definition.ComponentDsl.string;
 import static org.springframework.ai.stabilityai.api.StabilityAiApi.DEFAULT_IMAGE_MODEL;
 
 import com.bytechef.component.ai.llm.ImageModel;
-import com.bytechef.component.ai.llm.util.LLMUtils;
+import com.bytechef.component.ai.llm.util.ModelUtils;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Parameters;
@@ -87,7 +87,7 @@ public class StabilityCreateImageAction {
                 .description(
                     "Pass in a style preset to guide the image model towards a particular style. This list of style presets is subject to change.")
                 .options(
-                    LLMUtils.getEnumOptions(
+                    ModelUtils.getEnumOptions(
                         Arrays.stream(StyleEnum.values())
                             .collect(Collectors.toMap(StyleEnum::toString, StyleEnum::name)))),
             integer(STEPS)

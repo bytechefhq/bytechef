@@ -32,7 +32,7 @@ import static com.bytechef.component.definition.ComponentDsl.string;
 
 import com.bytechef.component.ai.llm.AudioTranscriptionModel;
 import com.bytechef.component.ai.llm.definition.Language;
-import com.bytechef.component.ai.llm.util.LLMUtils;
+import com.bytechef.component.ai.llm.util.ModelUtils;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Parameters;
@@ -65,7 +65,7 @@ public class OpenAiCreateTranscriptionAction {
                 .description("ID of the model to use.")
                 .required(true)
                 .options(
-                    LLMUtils.getEnumOptions(
+                    ModelUtils.getEnumOptions(
                         Arrays.stream(WhisperModel.values())
                             .collect(Collectors.toMap(WhisperModel::getValue, WhisperModel::getValue)))),
             LANGUAGE_PROPERTY,
@@ -79,7 +79,7 @@ public class OpenAiCreateTranscriptionAction {
                 .label("Response format")
                 .description("The format of the transcript output")
                 .options(
-                    LLMUtils.getEnumOptions(
+                    ModelUtils.getEnumOptions(
                         Arrays.stream(TranscriptResponseFormat.values())
                             .collect(Collectors.toMap(OpenAiAudioApi.TranscriptResponseFormat::getValue, Enum::name))))
                 .required(true),
@@ -101,7 +101,7 @@ public class OpenAiCreateTranscriptionAction {
         return new OpenAiAudioTranscriptionModel(
             OpenAiAudioApi.builder()
                 .apiKey(connectionParameters.getString(TOKEN))
-                .restClientBuilder(LLMUtils.getRestClientBuilder())
+                .restClientBuilder(ModelUtils.getRestClientBuilder())
                 .build(),
             OpenAiAudioTranscriptionOptions.builder()
                 .model(inputParameters.getRequiredString(MODEL))
