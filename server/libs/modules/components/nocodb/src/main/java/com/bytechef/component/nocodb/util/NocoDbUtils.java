@@ -220,8 +220,8 @@ public class NocoDbUtils {
         for (Map<String, Object> record : records) {
             Map<String, Object> valueMap = new HashMap<>();
 
-            for (String key : record.keySet()) {
-                Object value = record.get(key);
+            for (Map.Entry<String, Object> entry : record.entrySet()) {
+                Object value = entry.getValue();
 
                 if (value instanceof List<?> list) {
                     List<String> valueList = new ArrayList<>();
@@ -232,9 +232,9 @@ public class NocoDbUtils {
 
                     String join = String.join(",", valueList);
 
-                    valueMap.put(key, join);
+                    valueMap.put(entry.getKey(), join);
                 } else {
-                    valueMap.put(key, value);
+                    valueMap.put(entry.getKey(), value);
                 }
             }
 
