@@ -29,6 +29,7 @@ import org.springframework.core.io.UrlResource;
 /**
  * @author Marko Kriskovic
  */
+@FunctionalInterface
 public interface AudioTranscriptionModel {
 
     Model<AudioTranscriptionPrompt, AudioTranscriptionResponse> createAudioTranscriptionModel(

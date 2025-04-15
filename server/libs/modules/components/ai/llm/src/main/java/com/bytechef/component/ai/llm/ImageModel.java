@@ -28,6 +28,7 @@ import org.springframework.ai.image.ImageResponse;
 /**
  * @author Marko Kriskovic
  */
+@FunctionalInterface
 public interface ImageModel {
 
     enum ResponseFormat {

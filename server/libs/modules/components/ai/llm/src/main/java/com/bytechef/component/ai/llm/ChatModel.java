@@ -16,7 +16,7 @@
 
 package com.bytechef.component.ai.llm;
 
-import com.bytechef.component.ai.llm.util.LLMUtils;
+import com.bytechef.component.ai.llm.util.ModelUtils;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.FileEntry;
 import com.bytechef.component.definition.Parameters;
@@ -28,6 +28,7 @@ import org.springframework.lang.Nullable;
 /**
  * @author Marko Kriskovic
  */
+@FunctionalInterface
 public interface ChatModel {
 
     enum ResponseFormat {
