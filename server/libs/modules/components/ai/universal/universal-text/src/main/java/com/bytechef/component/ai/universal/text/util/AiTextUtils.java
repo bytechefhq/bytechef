@@ -24,18 +24,19 @@ import static com.bytechef.component.ai.llm.Provider.AMAZON_BEDROCK_LLAMA;
 import static com.bytechef.component.ai.llm.Provider.AMAZON_BEDROCK_TITAN;
 import static com.bytechef.component.ai.llm.Provider.ANTHROPIC;
 import static com.bytechef.component.ai.llm.Provider.AZURE_OPEN_AI;
+import static com.bytechef.component.ai.llm.Provider.DEEPSEEK;
 import static com.bytechef.component.ai.llm.Provider.GROQ;
 import static com.bytechef.component.ai.llm.Provider.HUGGING_FACE;
 import static com.bytechef.component.ai.llm.Provider.MISTRAL;
 import static com.bytechef.component.ai.llm.Provider.NVIDIA;
 import static com.bytechef.component.ai.llm.Provider.OPEN_AI;
+import static com.bytechef.component.ai.llm.Provider.PERPLEXITY;
 import static com.bytechef.component.ai.llm.Provider.VERTEX_GEMINI;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.PROVIDER;
 import static com.bytechef.component.definition.ComponentDsl.option;
 
 import com.bytechef.component.ai.llm.Provider;
 import com.bytechef.component.ai.llm.anthropic.constant.AnthropicConstants;
-import com.bytechef.component.ai.llm.azure.openai.constant.AzureOpenAiConstants;
 import com.bytechef.component.ai.llm.mistral.constant.MistralConstants;
 import com.bytechef.component.ai.llm.openai.constant.OpenAiConstants;
 import com.bytechef.component.ai.llm.vertex.gemini.constant.VertexGeminiConstants;
@@ -81,7 +82,6 @@ public class AiTextUtils {
 //            case AMAZON_BEDROCK_LLAMA -> AmazonBedrockConstants.LLAMA_MODELS;
 //            case AMAZON_BEDROCK_TITAN -> AmazonBedrockConstants.TITAN_MODELS;
             case ANTHROPIC -> AnthropicConstants.MODELS;
-            case AZURE_OPEN_AI -> AzureOpenAiConstants.IMAGE_MODELS;
             case MISTRAL -> MistralConstants.CHAT_MODELS;
             case OPEN_AI -> OpenAiConstants.CHAT_MODELS;
             case VERTEX_GEMINI -> VertexGeminiConstants.MODELS;
@@ -187,6 +187,15 @@ public class AiTextUtils {
 
                 yield azureOpenAi.getApiKey() != null;
             }
+            case DEEPSEEK -> {
+                if (checkAiProvider(DEEPSEEK.getKey(), activeProviderKeys)) {
+                    yield true;
+                }
+
+                Ai.Provider.DeepSeek deepSeek = aiProvider.getDeepSeek();
+
+                yield deepSeek.getApiKey() != null;
+            }
             case HUGGING_FACE -> {
                 if (checkAiProvider(HUGGING_FACE.getKey(), activeProviderKeys)) {
                     yield true;
@@ -231,6 +240,15 @@ public class AiTextUtils {
                 Ai.Provider.OpenAi openAi = aiProvider.getOpenAi();
 
                 yield openAi.getApiKey() != null;
+            }
+            case PERPLEXITY -> {
+                if (checkAiProvider(PERPLEXITY.getKey(), activeProviderKeys)) {
+                    yield true;
+                }
+
+                Ai.Provider.Perplexity perplexity = aiProvider.getPerplexity();
+
+                yield perplexity.getApiKey() != null;
             }
             case VERTEX_GEMINI -> {
                 if (checkAiProvider(VERTEX_GEMINI.getKey(), activeProviderKeys)) {

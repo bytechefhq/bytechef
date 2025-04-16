@@ -55,7 +55,7 @@
     }, {
       "advancedOption" : null,
       "description" : "ID of the model to use.",
-      "displayCondition" : "{'AZURE_OPEN_AI','GROQ','NVIDIA'}.contains(provider)",
+      "displayCondition" : "{'AZURE_OPEN_AI','GROQ','NVIDIA','DEEPSEEK','PERPLEXITY'}.contains(provider)",
       "expressionEnabled" : null,
       "hidden" : null,
       "metadata" : { },
@@ -237,13 +237,13 @@
     } ],
     "title" : "Classify Text",
     "perform" : { },
+    "processErrorResponse" : null,
     "outputDefinition" : {
       "output" : null,
       "outputResponse" : null,
       "outputSchema" : null,
       "sampleOutput" : null
     },
-    "processErrorResponse" : null,
     "workflowNodeDescription" : null
   }, {
     "batch" : null,
@@ -301,7 +301,7 @@
     }, {
       "advancedOption" : null,
       "description" : "ID of the model to use.",
-      "displayCondition" : "{'AZURE_OPEN_AI','GROQ','NVIDIA'}.contains(provider)",
+      "displayCondition" : "{'AZURE_OPEN_AI','GROQ','NVIDIA','DEEPSEEK','PERPLEXITY'}.contains(provider)",
       "expressionEnabled" : null,
       "hidden" : null,
       "metadata" : { },
@@ -402,13 +402,13 @@
     } ],
     "title" : "Sentiment Analysis",
     "perform" : { },
+    "processErrorResponse" : null,
     "outputDefinition" : {
       "output" : null,
       "outputResponse" : null,
       "outputSchema" : null,
       "sampleOutput" : null
     },
-    "processErrorResponse" : null,
     "workflowNodeDescription" : null
   }, {
     "batch" : null,
@@ -466,7 +466,7 @@
     }, {
       "advancedOption" : null,
       "description" : "ID of the model to use.",
-      "displayCondition" : "{'AZURE_OPEN_AI','GROQ','NVIDIA'}.contains(provider)",
+      "displayCondition" : "{'AZURE_OPEN_AI','GROQ','NVIDIA','DEEPSEEK','PERPLEXITY'}.contains(provider)",
       "expressionEnabled" : null,
       "hidden" : null,
       "metadata" : { },
@@ -696,13 +696,13 @@
     } ],
     "title" : "Score",
     "perform" : { },
+    "processErrorResponse" : null,
     "outputDefinition" : {
       "output" : null,
       "outputResponse" : null,
       "outputSchema" : null,
       "sampleOutput" : null
     },
-    "processErrorResponse" : null,
     "workflowNodeDescription" : null
   }, {
     "batch" : null,
@@ -760,7 +760,7 @@
     }, {
       "advancedOption" : null,
       "description" : "ID of the model to use.",
-      "displayCondition" : "{'AZURE_OPEN_AI','GROQ','NVIDIA'}.contains(provider)",
+      "displayCondition" : "{'AZURE_OPEN_AI','GROQ','NVIDIA','DEEPSEEK','PERPLEXITY'}.contains(provider)",
       "expressionEnabled" : null,
       "hidden" : null,
       "metadata" : { },
@@ -921,13 +921,13 @@
     } ],
     "title" : "Summarize Text",
     "perform" : { },
+    "processErrorResponse" : null,
     "outputDefinition" : {
       "output" : null,
       "outputResponse" : null,
       "outputSchema" : null,
       "sampleOutput" : null
     },
-    "processErrorResponse" : null,
     "workflowNodeDescription" : null
   }, {
     "batch" : null,
@@ -985,7 +985,7 @@
     }, {
       "advancedOption" : null,
       "description" : "ID of the model to use.",
-      "displayCondition" : "{'AZURE_OPEN_AI','GROQ','NVIDIA'}.contains(provider)",
+      "displayCondition" : "{'AZURE_OPEN_AI','GROQ','NVIDIA','DEEPSEEK','PERPLEXITY'}.contains(provider)",
       "expressionEnabled" : null,
       "hidden" : null,
       "metadata" : { },
@@ -1144,13 +1144,13 @@
     } ],
     "title" : "Similarity Search",
     "perform" : { },
+    "processErrorResponse" : null,
     "outputDefinition" : {
       "output" : null,
       "outputResponse" : null,
       "outputSchema" : null,
       "sampleOutput" : null
     },
-    "processErrorResponse" : null,
     "workflowNodeDescription" : null
   }, {
     "batch" : null,
@@ -1208,7 +1208,7 @@
     }, {
       "advancedOption" : null,
       "description" : "ID of the model to use.",
-      "displayCondition" : "{'AZURE_OPEN_AI','GROQ','NVIDIA'}.contains(provider)",
+      "displayCondition" : "{'AZURE_OPEN_AI','GROQ','NVIDIA','DEEPSEEK','PERPLEXITY'}.contains(provider)",
       "expressionEnabled" : null,
       "hidden" : null,
       "metadata" : { },
@@ -1309,6 +1309,7 @@
     } ],
     "title" : "Text Generation",
     "perform" : { },
+    "processErrorResponse" : null,
     "outputDefinition" : {
       "output" : null,
       "outputResponse" : {
@@ -1359,7 +1360,6 @@
       },
       "sampleOutput" : "Generated text."
     },
-    "processErrorResponse" : null,
     "workflowNodeDescription" : null
   } ],
   "componentCategories" : [ {

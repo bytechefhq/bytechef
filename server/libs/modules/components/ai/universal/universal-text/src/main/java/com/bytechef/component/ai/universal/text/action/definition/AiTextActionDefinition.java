@@ -18,11 +18,13 @@ package com.bytechef.component.ai.universal.text.action.definition;
 
 import static com.bytechef.component.ai.llm.Provider.ANTHROPIC;
 import static com.bytechef.component.ai.llm.Provider.AZURE_OPEN_AI;
+import static com.bytechef.component.ai.llm.Provider.DEEPSEEK;
 import static com.bytechef.component.ai.llm.Provider.GROQ;
 import static com.bytechef.component.ai.llm.Provider.HUGGING_FACE;
 import static com.bytechef.component.ai.llm.Provider.MISTRAL;
 import static com.bytechef.component.ai.llm.Provider.NVIDIA;
 import static com.bytechef.component.ai.llm.Provider.OPEN_AI;
+import static com.bytechef.component.ai.llm.Provider.PERPLEXITY;
 import static com.bytechef.component.ai.llm.Provider.VERTEX_GEMINI;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.PROVIDER;
 import static com.bytechef.component.definition.Authorization.TOKEN;
@@ -31,6 +33,7 @@ import com.bytechef.component.ai.llm.ChatModel;
 import com.bytechef.component.ai.llm.Provider;
 import com.bytechef.component.ai.llm.anthropic.action.AnthropicChatAction;
 import com.bytechef.component.ai.llm.azure.openai.action.AzureOpenAiChatAction;
+import com.bytechef.component.ai.llm.deepseek.action.DeepSeekChatAction;
 import com.bytechef.component.ai.llm.hugging.face.action.HuggingFaceChatAction;
 import com.bytechef.component.ai.llm.mistral.action.MistralChatAction;
 import com.bytechef.component.ai.llm.nvidia.action.NvidiaChatAction;
@@ -44,11 +47,13 @@ import com.bytechef.component.definition.Parameters;
 import com.bytechef.config.ApplicationProperties;
 import com.bytechef.config.ApplicationProperties.Ai.Provider.Anthropic;
 import com.bytechef.config.ApplicationProperties.Ai.Provider.AzureOpenAi;
+import com.bytechef.config.ApplicationProperties.Ai.Provider.DeepSeek;
 import com.bytechef.config.ApplicationProperties.Ai.Provider.Groq;
 import com.bytechef.config.ApplicationProperties.Ai.Provider.HuggingFace;
 import com.bytechef.config.ApplicationProperties.Ai.Provider.Mistral;
 import com.bytechef.config.ApplicationProperties.Ai.Provider.Nvidia;
 import com.bytechef.config.ApplicationProperties.Ai.Provider.OpenAi;
+import com.bytechef.config.ApplicationProperties.Ai.Provider.Perplexity;
 import com.bytechef.config.ApplicationProperties.Ai.Provider.VertexGemini;
 import com.bytechef.platform.component.definition.AbstractActionDefinitionWrapper;
 import com.bytechef.platform.component.definition.ParametersFactory;
@@ -134,11 +139,13 @@ public class AiTextActionDefinition extends AbstractActionDefinitionWrapper {
 //            case AMAZON_BEDROCK_TITAN -> getAmazonBedrockTitanChatModel(activeProviderKeys);
             case ANTHROPIC -> getAnthropicChatModel(activeProviderKeys);
             case AZURE_OPEN_AI -> getAzureOpenAiChatModel(activeProviderKeys);
+            case DEEPSEEK -> getDeepSeekModel(activeProviderKeys);
             case GROQ -> getGroqChatModel(activeProviderKeys);
             case HUGGING_FACE -> getHuggingFaceChatModel(activeProviderKeys);
             case MISTRAL -> getMistralChatModel(activeProviderKeys);
             case NVIDIA -> getNvidiaChatModel(activeProviderKeys);
             case OPEN_AI -> getOpenAiChatModel(activeProviderKeys);
+            case PERPLEXITY -> getPerplexityChatModel(activeProviderKeys);
             case VERTEX_GEMINI -> getVertexGeminiChatModel(activeProviderKeys);
             default -> throw new IllegalArgumentException("Invalid provider");
         };
@@ -264,6 +271,18 @@ public class AiTextActionDefinition extends AbstractActionDefinitionWrapper {
         return new ChatModelResult(AzureOpenAiChatAction.CHAT_MODEL, token);
     }
 
+    private ChatModelResult getDeepSeekModel(List<String> activeProviderKeys) {
+        String token = getAiProviderToken(DEEPSEEK.getKey(), activeProviderKeys);
+
+        if (token == null) {
+            DeepSeek deepSeek = aiProvider.getDeepSeek();
+
+            token = deepSeek.getApiKey();
+        }
+
+        return new ChatModelResult(DeepSeekChatAction.CHAT_MODEL, token);
+    }
+
     private ChatModelResult getGroqChatModel(List<String> activeProviderKeys) {
         String token = getAiProviderToken(GROQ.getKey(), activeProviderKeys);
 
@@ -322,6 +341,18 @@ public class AiTextActionDefinition extends AbstractActionDefinitionWrapper {
         }
 
         return new ChatModelResult(OpenAiChatAction.CHAT_MODEL, token);
+    }
+
+    private ChatModelResult getPerplexityChatModel(List<String> activeProviderKeys) {
+        String token = getAiProviderToken(PERPLEXITY.getKey(), activeProviderKeys);
+
+        if (token == null) {
+            Perplexity perplexity = aiProvider.getPerplexity();
+
+            token = perplexity.getApiKey();
+        }
+
+        return new ChatModelResult(PerplexityChatAction.CHAT_MODEL, token);
     }
 
     private ChatModelResult getVertexGeminiChatModel(List<String> activeProviderKeys) {

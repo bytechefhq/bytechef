@@ -487,10 +487,13 @@ public class ApplicationProperties {
             private AmazonBedrockLlama amazonBedrockLlama = new AmazonBedrockLlama();
             private AmazonBedrockTitan amazonBedrockTitan = new AmazonBedrockTitan();
             private Anthropic anthropic = new Anthropic();
+            private AzureOpenAi azureOpenAi = new AzureOpenAi();
+            private DeepSeek deepSeek = new DeepSeek();
             private Groq groq = new Groq();
             private Mistral mistral = new Mistral();
             private Nvidia nvidia = new Nvidia();
             private OpenAi openAi = new OpenAi();
+            private Perplexity perplexity = new Perplexity();
             private Stability stability = new Stability();
             private VertexGemini vertexGemini = new VertexGemini();
 
@@ -522,10 +525,12 @@ public class ApplicationProperties {
                 return anthropic;
             }
 
-            private AzureOpenAi azureOpenAi = new AzureOpenAi();
-
             public AzureOpenAi getAzureOpenAi() {
                 return azureOpenAi;
+            }
+
+            public DeepSeek getDeepSeek() {
+                return deepSeek;
             }
 
             public Groq getGroq() {
@@ -548,6 +553,10 @@ public class ApplicationProperties {
 
             public OpenAi getOpenAi() {
                 return openAi;
+            }
+
+            public Perplexity getPerplexity() {
+                return perplexity;
             }
 
             public Stability getStability() {
@@ -590,6 +599,10 @@ public class ApplicationProperties {
                 this.azureOpenAi = azureOpenAi;
             }
 
+            public void setDeepSeek(DeepSeek deepSeek) {
+                this.deepSeek = deepSeek;
+            }
+
             public void setGroq(Groq groq) {
                 this.groq = groq;
             }
@@ -608,6 +621,10 @@ public class ApplicationProperties {
 
             public void setOpenAi(OpenAi openAi) {
                 this.openAi = openAi;
+            }
+
+            public void setPerplexity(Perplexity perplexity) {
+                this.perplexity = perplexity;
             }
 
             public void setStability(Stability stability) {
@@ -722,6 +739,19 @@ public class ApplicationProperties {
                 }
             }
 
+            public static class DeepSeek {
+
+                private String apiKey;
+
+                public String getApiKey() {
+                    return apiKey;
+                }
+
+                public void setApiKey(String apiKey) {
+                    this.apiKey = apiKey;
+                }
+            }
+
             public static class Groq {
 
                 private String apiKey;
@@ -775,6 +805,19 @@ public class ApplicationProperties {
             }
 
             public static class OpenAi {
+
+                private String apiKey;
+
+                public String getApiKey() {
+                    return apiKey;
+                }
+
+                public void setApiKey(String apiKey) {
+                    this.apiKey = apiKey;
+                }
+            }
+
+            public static class Perplexity {
 
                 private String apiKey;
 
