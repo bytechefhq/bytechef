@@ -2,7 +2,7 @@ import ComboBox from '@/components/ComboBox';
 import RequiredMark from '@/components/RequiredMark';
 import {Label} from '@/components/ui/label';
 import {ClusterElementType, ComponentDefinitionBasic} from '@/shared/middleware/platform/configuration';
-import {useGetRootComponentClusterElementDefinitions} from '@/shared/queries/platform/clusterElemetDefinitions.queries';
+import {useGetRootComponentClusterElementDefinitions} from '@/shared/queries/platform/clusterElementDefinitions.queries';
 
 export interface ClusterElementTypePanelProps {
     clusterElementType: ClusterElementType;
