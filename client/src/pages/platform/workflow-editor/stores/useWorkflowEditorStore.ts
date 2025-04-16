@@ -4,6 +4,9 @@ import {create} from 'zustand';
 import {devtools} from 'zustand/middleware';
 
 interface WorkflowEditorI {
+    aiAgentOpen: boolean;
+    setAiAgentOpen: (aiAgentOpen: boolean) => void;
+
     showBottomPanel: boolean;
     setShowBottomPanelOpen: (showBottomPanel: boolean) => void;
 
@@ -32,6 +35,12 @@ interface WorkflowEditorI {
 const useWorkflowEditorStore = create<WorkflowEditorI>()(
     devtools(
         (set) => ({
+            aiAgentOpen: false,
+            setAiAgentOpen: (aiAgentOpen) =>
+                set(() => ({
+                    aiAgentOpen: aiAgentOpen,
+                })),
+
             showBottomPanel: false,
             setShowBottomPanelOpen: (showBottomPanel) =>
                 set(() => ({
