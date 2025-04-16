@@ -20,7 +20,7 @@ export const ClusterElementDefinitionKeys = {
     filteredClusterElementDefinitions: (request: GetRootComponentClusterElementDefinitionsRequest) => [
         ...ClusterElementDefinitionKeys.clusterElementDefinitions,
         request.rootComponentName,
-        request.rootComponentName,
+        request.rootComponentVersion,
         request.clusterElementType,
     ],
     clusterElementDefinitions: ['clusterElementDefinitions'] as const,
