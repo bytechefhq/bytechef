@@ -131,6 +131,9 @@ module.exports = {
                         'secondary-hover': 'hsl(var(--surface-neutral-secondary-hover))',
                         tertiary: 'hsl(var(--surface-neutral-tertiary))',
                     },
+                    popover: {
+                        canvas: 'hsl(var(--surface-popover-canvas))',
+                    },
                 },
             },
             height: {
