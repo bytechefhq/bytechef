@@ -30,7 +30,6 @@ import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.definition.TypeReference;
 import java.util.Map;
 
 /**
@@ -68,7 +67,6 @@ public class BolnaMakePhoneCallAction {
     }
 
     public static Object perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
-
         return context
             .http(http -> http.post("/call"))
             .body(Http.Body.of(
@@ -77,6 +75,6 @@ public class BolnaMakePhoneCallAction {
                     RECIPIENT_PHONE_NUMBER, inputParameters.getRequiredString(RECIPIENT_PHONE_NUMBER))))
             .configuration(responseType(Http.ResponseType.JSON))
             .execute()
-            .getBody(new TypeReference<>() {});
+            .getBody();
     }
 }

@@ -35,8 +35,9 @@ public class BolnaComponentHandler implements ComponentHandler {
 
     private static final ComponentDefinition COMPONENT_DEFINITION = component("bolna")
         .title("Bolna")
-        .description("Bolna AI is an open-source platform that enables businesses to create and deploy voice-driven " +
-            "conversational agents")
+        .description(
+            "Bolna AI is an open-source platform that enables businesses to create and deploy voice-driven " +
+                "conversational agents")
         .icon("path:assets/bolna.svg")
         .categories(ComponentCategory.ARTIFICIAL_INTELLIGENCE)
         .connection(BolnaConnection.CONNECTION_DEFINITION)
