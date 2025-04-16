@@ -36,9 +36,9 @@ import {
     TabNameType,
     UpdateWorkflowMutationType,
 } from '@/shared/types';
-import {Cross2Icon, InfoCircledIcon} from '@radix-ui/react-icons';
 import {TooltipPortal} from '@radix-ui/react-tooltip';
 import {useQueryClient} from '@tanstack/react-query';
+import {InfoIcon, XIcon} from 'lucide-react';
 import {useCallback, useEffect, useMemo, useState} from 'react';
 import isEqual from 'react-fast-compare';
 import InlineSVG from 'react-inlinesvg';
@@ -47,6 +47,7 @@ import {twMerge} from 'tailwind-merge';
 import {useShallow} from 'zustand/react/shallow';
 
 import useWorkflowDataStore from '../stores/useWorkflowDataStore';
+import useWorkflowEditorStore from '../stores/useWorkflowEditorStore';
 import useWorkflowNodeDetailsPanelStore from '../stores/useWorkflowNodeDetailsPanelStore';
 import getDataPillsFromProperties from '../utils/getDataPillsFromProperties';
 import getParametersWithDefaultValues from '../utils/getParametersWithDefaultValues';
@@ -81,6 +82,7 @@ const TABS: Array<{label: string; name: TabNameType}> = [
 ];
 
 const WorkflowNodeDetailsPanel = ({
+    className,
     previousComponentDefinitions,
     updateWorkflowMutation,
     workflowNodeOutputs,
@@ -88,6 +90,7 @@ const WorkflowNodeDetailsPanel = ({
     previousComponentDefinitions: Array<ComponentDefinitionBasic>;
     updateWorkflowMutation: UpdateWorkflowMutationType;
     workflowNodeOutputs: WorkflowNodeOutput[];
+    className?: string;
 }) => {
     const [currentNodeName, setCurrentNodeName] = useState<string | undefined>();
     const [currentOperationName, setCurrentOperationName] = useState('');
@@ -112,6 +115,8 @@ const WorkflowNodeDetailsPanel = ({
             nodes: state.nodes,
         }))
     );
+
+    const {setAiAgentOpen} = useWorkflowEditorStore();
 
     const queryClient = useQueryClient();
 
@@ -445,7 +450,10 @@ const WorkflowNodeDetailsPanel = ({
         ]
     );
 
-    const handlePanelClose = useCallback(() => useWorkflowNodeDetailsPanelStore.getState().reset(), []);
+    const handlePanelClose = useCallback(() => {
+        setAiAgentOpen(false);
+        useWorkflowNodeDetailsPanelStore.getState().reset();
+    }, [setAiAgentOpen]);
 
     // Set current node name
     useEffect(() => {
@@ -654,7 +662,10 @@ const WorkflowNodeDetailsPanel = ({
 
     return (
         <div
-            className="absolute bottom-6 right-[69px] top-2 z-10 w-screen max-w-workflow-node-details-panel-width overflow-hidden rounded-md border border-stroke-neutral-secondary bg-background"
+            className={twMerge(
+                'absolute bottom-6 right-[69px] top-2 z-10 w-screen max-w-workflow-node-details-panel-width overflow-hidden rounded-md border border-stroke-neutral-secondary bg-background',
+                className
+            )}
             key={currentNode?.workflowNodeName}
         >
             {currentNode?.workflowNodeName && currentWorkflowNode && (
@@ -675,7 +686,7 @@ const WorkflowNodeDetailsPanel = ({
                         {currentWorkflowNode.description && (
                             <Tooltip delayDuration={500}>
                                 <TooltipTrigger>
-                                    <InfoCircledIcon className="size-4" />
+                                    <InfoIcon className="size-4" />
                                 </TooltipTrigger>
 
                                 <TooltipPortal>
@@ -693,7 +704,7 @@ const WorkflowNodeDetailsPanel = ({
                             className="ml-auto pr-0"
                             onClick={handlePanelClose}
                         >
-                            <Cross2Icon aria-hidden="true" className="size-4 cursor-pointer" />
+                            <XIcon aria-hidden="true" className="size-4 cursor-pointer" />
                         </button>
                     </header>
 

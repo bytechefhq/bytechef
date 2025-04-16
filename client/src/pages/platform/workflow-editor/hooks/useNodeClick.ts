@@ -5,6 +5,7 @@ import {useCallback} from 'react';
 import {useShallow} from 'zustand/react/shallow';
 
 import useWorkflowDataStore from '../stores/useWorkflowDataStore';
+import useWorkflowEditorStore from '../stores/useWorkflowEditorStore';
 import useWorkflowNodeDetailsPanelStore from '../stores/useWorkflowNodeDetailsPanelStore';
 
 export default function useNodeClick(data: NodeDataType, id: NodeProps['id'], activeTab?: TabNameType) {
@@ -18,6 +19,8 @@ export default function useNodeClick(data: NodeDataType, id: NodeProps['id'], ac
         }))
     );
 
+    const {setAiAgentOpen} = useWorkflowEditorStore();
+
     return useCallback(() => {
         const clickedNode = nodes.find((node) => node.id === id);
 
@@ -28,7 +31,13 @@ export default function useNodeClick(data: NodeDataType, id: NodeProps['id'], ac
         setRightSidebarOpen(false);
         setActiveTab(activeTab ?? 'description');
         setCurrentNode({...data, description: ''});
-        setWorkflowNodeDetailsPanelOpen(true);
+
+        if (data.componentName === 'aiAgent') {
+            setAiAgentOpen(true);
+            setWorkflowNodeDetailsPanelOpen(true);
+        } else {
+            setWorkflowNodeDetailsPanelOpen(true);
+        }
 
         if (data.type) {
             setCurrentComponent({
@@ -43,8 +52,9 @@ export default function useNodeClick(data: NodeDataType, id: NodeProps['id'], ac
         activeTab,
         setCurrentNode,
         data,
-        setWorkflowNodeDetailsPanelOpen,
         id,
+        setAiAgentOpen,
+        setWorkflowNodeDetailsPanelOpen,
         setCurrentComponent,
     ]);
 }
