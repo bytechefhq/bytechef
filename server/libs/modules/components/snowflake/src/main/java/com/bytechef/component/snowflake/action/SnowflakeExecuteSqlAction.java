@@ -19,18 +19,14 @@ package com.bytechef.component.snowflake.action;
 import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
-import static com.bytechef.component.definition.Context.Http.responseType;
+import static com.bytechef.component.snowflake.constant.SnowflakeConstants.SQL_STATEMENT_RESPONSE;
 import static com.bytechef.component.snowflake.constant.SnowflakeConstants.STATEMENT;
-import static com.bytechef.component.snowflake.constant.SnowflakeConstants.sqlStatementResponse;
 
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context;
-import com.bytechef.component.definition.Context.Http.Body;
-import com.bytechef.component.definition.Context.Http.ResponseType;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.Property.ControlType;
-import com.bytechef.component.definition.TypeReference;
-import java.util.Map;
+import com.bytechef.component.snowflake.util.SnowflakeUtils;
 
 /**
  * @author Nikolina Spehar
@@ -46,22 +42,13 @@ public class SnowflakeExecuteSqlAction {
                 .description("SQL statement that will be executed.")
                 .controlType(ControlType.TEXT_AREA)
                 .required(true))
-        .output(outputSchema(sqlStatementResponse))
+        .output(outputSchema(SQL_STATEMENT_RESPONSE))
         .perform(SnowflakeExecuteSqlAction::perform);
 
     private SnowflakeExecuteSqlAction() {
     }
 
-    public static Map<String, Object> perform(
-        Parameters inputParameters, Parameters connectionParameters, Context context) {
-
-        return context.http(http -> http.post("/api/v2/statements"))
-            .body(
-                Body.of(
-                    Map.of(
-                        STATEMENT, inputParameters.getRequiredString(STATEMENT))))
-            .configuration(responseType(ResponseType.JSON))
-            .execute()
-            .getBody(new TypeReference<>() {});
+    public static Object perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
+        return SnowflakeUtils.executeStatement(context, inputParameters.getRequiredString(STATEMENT));
     }
 }

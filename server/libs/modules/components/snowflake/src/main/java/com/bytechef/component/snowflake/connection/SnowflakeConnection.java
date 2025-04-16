@@ -17,6 +17,7 @@
 package com.bytechef.component.snowflake.connection;
 
 import static com.bytechef.component.definition.Authorization.ACCESS_TOKEN;
+import static com.bytechef.component.definition.Authorization.AUTHORIZATION;
 import static com.bytechef.component.definition.Authorization.CLIENT_ID;
 import static com.bytechef.component.definition.Authorization.CLIENT_SECRET;
 import static com.bytechef.component.definition.ComponentDsl.authorization;
@@ -50,21 +51,18 @@ public class SnowflakeConnection {
                     string(CLIENT_SECRET)
                         .description("Snowflake OAuth Client Secret.")
                         .required(true))
-                .authorizationUrl(
-                    (connectionParameters, context) -> "https://%s.snowflakecomputing.com/oauth/authorize".formatted(
-                        connectionParameters.getRequiredString(ACCOUNT_IDENTIFIER)))
+                .authorizationUrl((connectionParameters, context) -> "https://%s.snowflakecomputing.com/oauth/authorize"
+                    .formatted(connectionParameters.getRequiredString(ACCOUNT_IDENTIFIER)))
                 .scopes((connection, context) -> List.of("refresh_token"))
                 .tokenUrl((connectionParameters, context) -> "https://%s.snowflakecomputing.com/oauth/token-request"
-                    .formatted(
-                        connectionParameters.getRequiredString(ACCOUNT_IDENTIFIER)))
+                    .formatted(connectionParameters.getRequiredString(ACCOUNT_IDENTIFIER)))
                 .refreshUrl((connectionParameters, context) -> "https://%s.snowflakecomputing.com/oauth/token-request"
-                    .formatted(
-                        connectionParameters.getRequiredString(ACCOUNT_IDENTIFIER)))
+                    .formatted(connectionParameters.getRequiredString(ACCOUNT_IDENTIFIER)))
                 .apply((connectionParameters, context) -> ApplyResponse.ofHeaders(
-                    Map.of("Accept", List.of("application/json"),
-                        "Authorization", List.of("Bearer " + connectionParameters.getRequiredString(ACCESS_TOKEN))))));
+                    Map.of(
+                        "Accept", List.of("application/json"),
+                        AUTHORIZATION, List.of("Bearer " + connectionParameters.getRequiredString(ACCESS_TOKEN))))));
 
     private SnowflakeConnection() {
-
     }
 }

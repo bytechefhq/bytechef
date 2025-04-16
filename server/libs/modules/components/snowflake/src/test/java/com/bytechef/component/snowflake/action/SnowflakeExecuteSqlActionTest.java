@@ -18,52 +18,41 @@ package com.bytechef.component.snowflake.action;
 
 import static com.bytechef.component.snowflake.constant.SnowflakeConstants.STATEMENT;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.mockStatic;
 
 import com.bytechef.component.definition.Context;
-import com.bytechef.component.definition.Context.Http.Body;
-import com.bytechef.component.definition.Context.Http.Executor;
-import com.bytechef.component.definition.Context.Http.Response;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.definition.TypeReference;
+import com.bytechef.component.snowflake.util.SnowflakeUtils;
 import com.bytechef.component.test.definition.MockParametersFactory;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
+import org.mockito.MockedStatic;
 
 /**
  * @author Nikolina Spehar
  */
 class SnowflakeExecuteSqlActionTest {
-    private final ArgumentCaptor<Body> bodyArgumentCaptor = ArgumentCaptor.forClass(Body.class);
+
+    private final ArgumentCaptor<Context> contextArgumentCaptor = ArgumentCaptor.forClass(Context.class);
     private final Context mockedContext = mock(Context.class);
-    private final Executor mockedExecutor = mock(Executor.class);
+    private final Object mockedObject = mock(Object.class);
     private final Parameters mockedParameters = MockParametersFactory.create(Map.of(STATEMENT, "sql statement"));
-    private final Response mockedResponse = mock(Response.class);
-    private final Map<String, Object> reponseMap = Map.of();
+    private final ArgumentCaptor<String> stringArgumentCaptor = ArgumentCaptor.forClass(String.class);
 
     @Test
     void perform() {
-        when(mockedContext.http(any()))
-            .thenReturn(mockedExecutor);
-        when(mockedExecutor.configuration(any()))
-            .thenReturn(mockedExecutor);
-        when(mockedExecutor.body(bodyArgumentCaptor.capture()))
-            .thenReturn(mockedExecutor);
-        when(mockedExecutor.execute())
-            .thenReturn(mockedResponse);
-        when(mockedResponse.getBody(any(TypeReference.class)))
-            .thenReturn(reponseMap);
+        try (MockedStatic<SnowflakeUtils> snowflakeUtilsMockedStatic = mockStatic(SnowflakeUtils.class)) {
+            snowflakeUtilsMockedStatic
+                .when(() -> SnowflakeUtils.executeStatement(
+                    contextArgumentCaptor.capture(), stringArgumentCaptor.capture()))
+                .thenReturn(mockedObject);
+            Object result = SnowflakeExecuteSqlAction.perform(mockedParameters, mockedParameters, mockedContext);
 
-        Map<String, Object> result = SnowflakeExecuteSqlAction.perform(
-            mockedParameters, mockedParameters, mockedContext);
-
-        assertEquals(Map.of(), result);
-
-        Body body = bodyArgumentCaptor.getValue();
-
-        assertEquals(Map.of(STATEMENT, "sql statement"), body.getContent());
+            assertEquals(mockedObject, result);
+            assertEquals("sql statement", stringArgumentCaptor.getValue());
+            assertEquals(mockedContext, contextArgumentCaptor.getValue());
+        }
     }
 }
