@@ -86,6 +86,7 @@
                     "bg-surface-neutral-secondary",
                     "bg-surface-neutral-secondary-hover",
                     "bg-surface-neutral-tertiary",
+                    "bg-surface-popover-canvas",
                     "border-accent",
                     "border-content-neutral-tertiary",
                     "border-input",
