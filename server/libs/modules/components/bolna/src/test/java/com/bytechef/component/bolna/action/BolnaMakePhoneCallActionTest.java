@@ -26,7 +26,6 @@ import static org.mockito.Mockito.when;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.test.definition.MockParametersFactory;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
@@ -48,7 +47,6 @@ class BolnaMakePhoneCallActionTest {
 
     @Test
     void testPerform() {
-
         when(mockedContext.http(any()))
             .thenReturn(mockedExecutor);
         when(mockedExecutor.configuration(any()))
@@ -57,11 +55,15 @@ class BolnaMakePhoneCallActionTest {
             .thenReturn(mockedExecutor);
         when(mockedExecutor.execute())
             .thenReturn(mockedResponse);
-        when(mockedResponse.getBody(any(TypeReference.class)))
+        when(mockedResponse.getBody())
             .thenReturn(responseMap);
 
         Object result = BolnaMakePhoneCallAction.perform(mockedParameters, mockedParameters, mockedContext);
 
         assertEquals(responseMap, result);
+
+        Http.Body body = bodyArgumentCaptor.getValue();
+
+        assertEquals(Map.of(AGENT_ID, "1", RECIPIENT_PHONE_NUMBER, "12345789"), body.getContent());
     }
 }

@@ -23,7 +23,11 @@ import static org.mockito.Mockito.when;
 
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TriggerContext;
-import com.bytechef.component.definition.TriggerDefinition;
+import com.bytechef.component.definition.TriggerDefinition.HttpHeaders;
+import com.bytechef.component.definition.TriggerDefinition.HttpParameters;
+import com.bytechef.component.definition.TriggerDefinition.WebhookBody;
+import com.bytechef.component.definition.TriggerDefinition.WebhookEnableOutput;
+import com.bytechef.component.definition.TriggerDefinition.WebhookMethod;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -31,12 +35,11 @@ import org.junit.jupiter.api.Test;
  */
 class BolnaCallCompletionReportTriggerTest {
 
-    private final TriggerDefinition.WebhookEnableOutput mockedWebhookEnableOutput =
-        mock(TriggerDefinition.WebhookEnableOutput.class);
-    private final TriggerDefinition.WebhookBody mockedWebhookBody = mock(TriggerDefinition.WebhookBody.class);
-    private final TriggerDefinition.HttpHeaders mockedHttpHeaders = mock(TriggerDefinition.HttpHeaders.class);
-    private final TriggerDefinition.HttpParameters mockedHttpParameters = mock(TriggerDefinition.HttpParameters.class);
-    private final TriggerDefinition.WebhookMethod mockedWebhookMethod = mock(TriggerDefinition.WebhookMethod.class);
+    private final WebhookEnableOutput mockedWebhookEnableOutput = mock(WebhookEnableOutput.class);
+    private final WebhookBody mockedWebhookBody = mock(WebhookBody.class);
+    private final HttpHeaders mockedHttpHeaders = mock(HttpHeaders.class);
+    private final HttpParameters mockedHttpParameters = mock(HttpParameters.class);
+    private final WebhookMethod mockedWebhookMethod = mock(WebhookMethod.class);
     private final Object mockedObject = mock(Object.class);
     private final Parameters mockedParameters = mock(Parameters.class);
     private final TriggerContext mockedTriggerContext = mock(TriggerContext.class);
