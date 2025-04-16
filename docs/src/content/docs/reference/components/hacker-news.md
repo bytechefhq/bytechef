@@ -55,7 +55,15 @@ Items Type: OBJECT
 #### Properties
 |     Name     |     Type     |     Description     |
 |:------------:|:------------:|:-------------------:|
-null
+| by | STRING | The username of the item's author. |
+| descendants | INTEGER | In the case of stories or polls, the total comment count. |
+| id | INTEGER | The item's unique id. |
+| kids | ARRAY <details> <summary> Items </summary> [INTEGER] </details> | The ids of the item's comments, in ranked display order. |
+| score | INTEGER | The story's score, or the votes for a pollopt. |
+| time | INTEGER | Creation date of the item, in Unix Time. |
+| title | STRING | The title of the story, poll or job. HTML. |
+| type | STRING | The type of item. |
+| url | STRING | The URL of the story. |
 
 
 
@@ -63,7 +71,17 @@ null
 
 #### Output Example
 ```json
-[ { } ]
+[ {
+  "by" : "",
+  "descendants" : 1,
+  "id" : 1,
+  "kids" : [ 1 ],
+  "score" : 1,
+  "time" : 1,
+  "title" : "",
+  "type" : "",
+  "url" : ""
+} ]
 ```
 
 
