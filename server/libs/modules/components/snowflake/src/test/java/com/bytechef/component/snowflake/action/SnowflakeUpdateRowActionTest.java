@@ -20,23 +20,17 @@ import static com.bytechef.component.snowflake.constant.SnowflakeConstants.COLUM
 import static com.bytechef.component.snowflake.constant.SnowflakeConstants.CONDITION;
 import static com.bytechef.component.snowflake.constant.SnowflakeConstants.DATABASE;
 import static com.bytechef.component.snowflake.constant.SnowflakeConstants.SCHEMA;
-import static com.bytechef.component.snowflake.constant.SnowflakeConstants.STATEMENT;
 import static com.bytechef.component.snowflake.constant.SnowflakeConstants.TABLE;
 import static com.bytechef.component.snowflake.constant.SnowflakeConstants.VALUES;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
-import static org.mockito.Mockito.when;
 
 import com.bytechef.component.definition.Context;
-import com.bytechef.component.definition.Context.Http.Body;
-import com.bytechef.component.definition.Context.Http.Executor;
-import com.bytechef.component.definition.Context.Http.Response;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.snowflake.util.SnowflakeUtils;
 import com.bytechef.component.test.definition.MockParametersFactory;
+import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -46,52 +40,41 @@ import org.mockito.MockedStatic;
  * @author Nikolina Spehar
  */
 class SnowflakeUpdateRowActionTest {
-    private final ArgumentCaptor<Body> bodyArgumentCaptor = ArgumentCaptor.forClass(Body.class);
+
+    private final ArgumentCaptor<Context> contextArgumentCaptor = ArgumentCaptor.forClass(Context.class);
     private final Context mockedContext = mock(Context.class);
-    private final Executor mockedExecutor = mock(Executor.class);
+    private final Object mockedObject = mock(Object.class);
+    private final ArgumentCaptor<Parameters> parametersArgumentCaptor = ArgumentCaptor.forClass(Parameters.class);
+    private final ArgumentCaptor<String> stringArgumentCaptor = ArgumentCaptor.forClass(String.class);
     private final Parameters mockedParameters = MockParametersFactory.create(
         Map.of(
-            DATABASE, "database",
-            SCHEMA, "schema",
-            TABLE, "table",
-            COLUMN, "col1",
-            CONDITION, "2",
-            VALUES, "5,5"));
-    private final Response mockedResponse = mock(Response.class);
-    private final Map<String, Object> reponseMap = Map.of();
+            DATABASE, "database", SCHEMA, "schema", TABLE, "table", COLUMN, "col1",
+            CONDITION, "2", VALUES, "5,5"));
 
     @Test
     void perform() {
-        when(mockedContext.http(any()))
-            .thenReturn(mockedExecutor);
-        when(mockedExecutor.configuration(any()))
-            .thenReturn(mockedExecutor);
-        when(mockedExecutor.body(bodyArgumentCaptor.capture()))
-            .thenReturn(mockedExecutor);
-        when(mockedExecutor.execute())
-            .thenReturn(mockedResponse);
-        when(mockedResponse.getBody(any(TypeReference.class)))
-            .thenReturn(reponseMap);
-
         try (MockedStatic<SnowflakeUtils> snowflakeUtilsMockedStatic = mockStatic(SnowflakeUtils.class)) {
             snowflakeUtilsMockedStatic
-                .when(() -> SnowflakeUtils.getTableColumns(mockedParameters, mockedContext))
+                .when(() -> SnowflakeUtils.getTableColumns(
+                    parametersArgumentCaptor.capture(), contextArgumentCaptor.capture()))
                 .thenReturn("col1,col2");
             snowflakeUtilsMockedStatic
-                .when(() -> SnowflakeUtils.getColumnUpdateStatement(SnowflakeUtils.getTableColumns(
-                    mockedParameters, mockedContext), "5,5"))
+                .when(() -> SnowflakeUtils.getColumnUpdateStatement(
+                    stringArgumentCaptor.capture(), stringArgumentCaptor.capture()))
                 .thenReturn("col1=5,col2=5");
+            snowflakeUtilsMockedStatic
+                .when(() -> SnowflakeUtils.executeStatement(
+                    contextArgumentCaptor.capture(), stringArgumentCaptor.capture()))
+                .thenReturn(mockedObject);
 
-            Map<String, Object> result = SnowflakeUpdateRowAction.perform(
-                mockedParameters, mockedParameters, mockedContext);
+            Object result = SnowflakeUpdateRowAction.perform(mockedParameters, mockedParameters, mockedContext);
 
-            assertEquals(Map.of(), result);
-
-            Body body = bodyArgumentCaptor.getValue();
-
-            String expectedStatement = "UPDATE database.schema.table SET col1=5,col2=5 WHERE col1 = 2";
-
-            assertEquals(Map.of(STATEMENT, expectedStatement), body.getContent());
+            assertEquals(mockedObject, result);
+            assertEquals(mockedParameters, parametersArgumentCaptor.getValue());
+            assertEquals(List.of(mockedContext, mockedContext), contextArgumentCaptor.getAllValues());
+            assertEquals(
+                List.of("col1,col2", "5,5", "UPDATE database.schema.table SET col1=5,col2=5 WHERE col1 = 2"),
+                stringArgumentCaptor.getAllValues());
         }
     }
 }
