@@ -21,6 +21,7 @@ import static com.bytechef.component.definition.ComponentDsl.array;
 import static com.bytechef.component.definition.ComponentDsl.integer;
 import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
+import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.Context.Http.responseType;
 import static com.bytechef.component.hacker.news.constant.HackerNewsConstants.NUMBER_OF_STORIES;
 
@@ -47,7 +48,32 @@ public class HackerNewsFetchTopStoriesAction {
                 .description("Number of stories to fetch.")
                 .defaultValue(10)
                 .required(true))
-        .output(outputSchema(array().items(object())))
+        .output(
+            outputSchema(
+                array()
+                    .items(
+                        object()
+                            .properties(
+                                string("by")
+                                    .description("The username of the item's author."),
+                                integer("descendants")
+                                    .description("In the case of stories or polls, the total comment count."),
+                                integer("id")
+                                    .description("The item's unique id."),
+                                array("kids")
+                                    .description("The ids of the item's comments, in ranked display order.")
+                                    .items(
+                                        integer()),
+                                integer("score")
+                                    .description("The story's score, or the votes for a pollopt."),
+                                integer("time")
+                                    .description("Creation date of the item, in Unix Time."),
+                                string("title")
+                                    .description("The title of the story, poll or job. HTML."),
+                                string("type")
+                                    .description("The type of item."),
+                                string("url")
+                                    .description("The URL of the story.")))))
         .perform(HackerNewsFetchTopStoriesAction::perform);
 
     private HackerNewsFetchTopStoriesAction() {
