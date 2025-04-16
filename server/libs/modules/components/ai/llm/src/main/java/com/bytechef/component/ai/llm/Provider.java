@@ -38,7 +38,9 @@ public enum Provider {
     NVIDIA(12, "nvidia", "ai.provider.nvidia", "NVIDIA"),
     OPEN_AI(13, "openAi", "ai.provider.openAi", "Open AI"),
     STABILITY(15, "stability", "ai.provider.stability", "Stability"),
-    VERTEX_GEMINI(14, "vertexGemini", "ai.provider.vertexGemini", "Vertex Gemini");
+    VERTEX_GEMINI(14, "vertexGemini", "ai.provider.vertexGemini", "Vertex Gemini"),
+    PERPLEXITY(16, "perplexity", "ai.provider.perplexity", "Perplexity"),
+    DEEPSEEK(17, "deepseek", "ai.provider.deepseek", "DeepSeek");
 
     private final int id;
     private final String label;

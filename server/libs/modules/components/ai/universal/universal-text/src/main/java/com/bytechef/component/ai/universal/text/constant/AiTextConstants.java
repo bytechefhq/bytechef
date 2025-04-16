@@ -24,10 +24,12 @@ import static com.bytechef.component.ai.llm.Provider.AMAZON_BEDROCK_LLAMA;
 import static com.bytechef.component.ai.llm.Provider.AMAZON_BEDROCK_TITAN;
 import static com.bytechef.component.ai.llm.Provider.ANTHROPIC;
 import static com.bytechef.component.ai.llm.Provider.AZURE_OPEN_AI;
+import static com.bytechef.component.ai.llm.Provider.DEEPSEEK;
 import static com.bytechef.component.ai.llm.Provider.GROQ;
 import static com.bytechef.component.ai.llm.Provider.MISTRAL;
 import static com.bytechef.component.ai.llm.Provider.NVIDIA;
 import static com.bytechef.component.ai.llm.Provider.OPEN_AI;
+import static com.bytechef.component.ai.llm.Provider.PERPLEXITY;
 import static com.bytechef.component.ai.llm.Provider.VERTEX_GEMINI;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.MODEL;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.PROVIDER;
@@ -89,7 +91,8 @@ public class AiTextConstants {
     public static final ModifiableStringProperty MODEL_NO_OPTIONS_PROPERTY = string(MODEL)
         .label("Model")
         .description("ID of the model to use.")
-        .displayCondition("{'%s','%s','%s'}.contains(provider)".formatted(AZURE_OPEN_AI, GROQ, NVIDIA))
+        .displayCondition("{'%s','%s','%s','%s','%s'}.contains(provider)".formatted(AZURE_OPEN_AI, GROQ, NVIDIA,
+            DEEPSEEK, PERPLEXITY))
         .required(true);
 
     public static final ModifiableStringProperty MODEL_URL_PROPERTY = string(MODEL)
