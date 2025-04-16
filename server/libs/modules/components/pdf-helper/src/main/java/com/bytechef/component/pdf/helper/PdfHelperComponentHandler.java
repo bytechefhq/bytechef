@@ -17,11 +17,15 @@
 package com.bytechef.component.pdf.helper;
 
 import static com.bytechef.component.definition.ComponentDsl.component;
+import static com.bytechef.component.definition.ComponentDsl.tool;
 
 import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDefinition;
+import com.bytechef.component.pdf.helper.action.PdfHelperConvertToImageAction;
 import com.bytechef.component.pdf.helper.action.PdfHelperExtractTextAction;
+import com.bytechef.component.pdf.helper.action.PdfHelperImageToPdfAction;
+import com.bytechef.component.pdf.helper.action.PdfHelperTextToPdfAction;
 import com.google.auto.service.AutoService;
 
 /**
@@ -34,7 +38,12 @@ public class PdfHelperComponentHandler implements ComponentHandler {
         .title("PDF Helper")
         .icon("path:assets/pdf-helper.svg")
         .categories(ComponentCategory.HELPERS)
-        .actions(PdfHelperExtractTextAction.ACTION_DEFINITION);
+        .actions(
+            PdfHelperConvertToImageAction.ACTION_DEFINITION,
+            PdfHelperExtractTextAction.ACTION_DEFINITION,
+            PdfHelperImageToPdfAction.ACTION_DEFINITION,
+            PdfHelperTextToPdfAction.ACTION_DEFINITION)
+        .clusterElements(tool(PdfHelperTextToPdfAction.ACTION_DEFINITION));
 
     @Override
     public ComponentDefinition getDefinition() {
