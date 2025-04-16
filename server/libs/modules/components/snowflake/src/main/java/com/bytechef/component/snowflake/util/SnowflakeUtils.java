@@ -20,9 +20,11 @@ import static com.bytechef.component.definition.ComponentDsl.option;
 import static com.bytechef.component.definition.Context.Http.responseType;
 import static com.bytechef.component.snowflake.constant.SnowflakeConstants.DATABASE;
 import static com.bytechef.component.snowflake.constant.SnowflakeConstants.SCHEMA;
+import static com.bytechef.component.snowflake.constant.SnowflakeConstants.STATEMENT;
 import static com.bytechef.component.snowflake.constant.SnowflakeConstants.TABLE;
 
 import com.bytechef.component.definition.Context;
+import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Context.Http.ResponseType;
 import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Parameters;
@@ -36,6 +38,15 @@ import java.util.Map;
  * @author Nikolina Spehar
  */
 public class SnowflakeUtils {
+
+    public static Object executeStatement(Context context, String sqlStatement) {
+        return context.http(http -> http.post("/api/v2/statements"))
+            .body(Http.Body.of(Map.of(STATEMENT, sqlStatement)))
+            .configuration(responseType(ResponseType.JSON))
+            .execute()
+            .getBody();
+    }
+
     public static List<Option<String>> getColumnOptions(
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
         String searchText, Context context) {
@@ -54,7 +65,6 @@ public class SnowflakeUtils {
     }
 
     public static String getColumnUpdateStatement(String columns, String values) {
-
         String[] columnArray = columns.split(",");
         String[] valueArray = values.split(",");
 
@@ -87,16 +97,6 @@ public class SnowflakeUtils {
         return getOptions(result);
     }
 
-    private static List<Option<String>> getOptions(List<Map<String, Object>> dataList) {
-        List<Option<String>> options = new ArrayList<>();
-
-        for (Map<String, Object> data : dataList) {
-            options.add(option((String) data.get("name"), (String) data.get("name")));
-        }
-
-        return options;
-    }
-
     public static List<Option<String>> getSchemaNameOptions(
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
         String searchText, Context context) {
@@ -112,11 +112,12 @@ public class SnowflakeUtils {
     }
 
     public static String getTableColumns(Parameters inputParameters, Context context) {
-        Map<String, Object> table = context.http(http -> http.get(
-            "/api/v2/databases/%s/schemas/%s/tables/%s".formatted(
-                inputParameters.getRequiredString(DATABASE),
-                inputParameters.getRequiredString(SCHEMA),
-                inputParameters.getRequiredString(TABLE))))
+        Map<String, Object> table = context
+            .http(http -> http.get(
+                "/api/v2/databases/%s/schemas/%s/tables/%s".formatted(
+                    inputParameters.getRequiredString(DATABASE),
+                    inputParameters.getRequiredString(SCHEMA),
+                    inputParameters.getRequiredString(TABLE))))
             .configuration(responseType(ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});
@@ -133,6 +134,7 @@ public class SnowflakeUtils {
         }
 
         stringBuilder.deleteCharAt(stringBuilder.length() - 1);
+
         return stringBuilder.toString();
     }
 
@@ -148,5 +150,17 @@ public class SnowflakeUtils {
             .getBody(new TypeReference<>() {});
 
         return getOptions(result);
+    }
+
+    private static List<Option<String>> getOptions(List<Map<String, Object>> dataList) {
+        List<Option<String>> options = new ArrayList<>();
+
+        for (Map<String, Object> data : dataList) {
+            String name = (String) data.get("name");
+
+            options.add(option(name, name));
+        }
+
+        return options;
     }
 }

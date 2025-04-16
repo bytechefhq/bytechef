@@ -24,6 +24,9 @@ import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.string;
 
 import com.bytechef.component.definition.ComponentDsl.ModifiableObjectProperty;
+import com.bytechef.component.definition.ComponentDsl.ModifiableStringProperty;
+import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
+import com.bytechef.component.snowflake.util.SnowflakeUtils;
 
 /**
  * @author Nikolina Spehar
@@ -39,7 +42,24 @@ public class SnowflakeConstants {
     public static final String TABLE = "table";
     public static final String VALUES = "values";
 
-    public static final ModifiableObjectProperty sqlStatementResponse = object()
+    public static final ModifiableStringProperty DATABASE_PROPERTY = string(DATABASE)
+        .label("Database")
+        .options((ActionOptionsFunction<String>) SnowflakeUtils::getDatabaseNameOptions)
+        .required(true);
+
+    public static final ModifiableStringProperty SCHEMA_PROPERTY = string(SCHEMA)
+        .label("Schema")
+        .options((ActionOptionsFunction<String>) SnowflakeUtils::getSchemaNameOptions)
+        .optionsLookupDependsOn(DATABASE)
+        .required(true);
+
+    public static final ModifiableStringProperty TABLE_PROPERTY = string(TABLE)
+        .label("Table")
+        .options((ActionOptionsFunction<String>) SnowflakeUtils::getTableNameOptions)
+        .optionsLookupDependsOn(SCHEMA)
+        .required(true);
+
+    public static final ModifiableObjectProperty SQL_STATEMENT_RESPONSE = object()
         .properties(
             object("resultSetMetaData")
                 .properties(

@@ -19,24 +19,21 @@ package com.bytechef.component.snowflake.action;
 import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
-import static com.bytechef.component.definition.Context.Http.responseType;
 import static com.bytechef.component.snowflake.constant.SnowflakeConstants.COLUMN;
 import static com.bytechef.component.snowflake.constant.SnowflakeConstants.CONDITION;
 import static com.bytechef.component.snowflake.constant.SnowflakeConstants.DATABASE;
+import static com.bytechef.component.snowflake.constant.SnowflakeConstants.DATABASE_PROPERTY;
 import static com.bytechef.component.snowflake.constant.SnowflakeConstants.SCHEMA;
-import static com.bytechef.component.snowflake.constant.SnowflakeConstants.STATEMENT;
+import static com.bytechef.component.snowflake.constant.SnowflakeConstants.SCHEMA_PROPERTY;
+import static com.bytechef.component.snowflake.constant.SnowflakeConstants.SQL_STATEMENT_RESPONSE;
 import static com.bytechef.component.snowflake.constant.SnowflakeConstants.TABLE;
-import static com.bytechef.component.snowflake.constant.SnowflakeConstants.sqlStatementResponse;
+import static com.bytechef.component.snowflake.constant.SnowflakeConstants.TABLE_PROPERTY;
 
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context;
-import com.bytechef.component.definition.Context.Http.Body;
-import com.bytechef.component.definition.Context.Http.ResponseType;
 import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.snowflake.util.SnowflakeUtils;
-import java.util.Map;
 
 /**
  * @author Nikolina Spehar
@@ -47,20 +44,9 @@ public class SnowflakeDeleteRowAction {
         .title("Delete Row")
         .description("Delete row from the table.")
         .properties(
-            string(DATABASE)
-                .label("Database")
-                .options((ActionOptionsFunction<String>) SnowflakeUtils::getDatabaseNameOptions)
-                .required(true),
-            string(SCHEMA)
-                .label("Schema")
-                .options((ActionOptionsFunction<String>) SnowflakeUtils::getSchemaNameOptions)
-                .optionsLookupDependsOn(DATABASE)
-                .required(true),
-            string(TABLE)
-                .label("Table")
-                .options((ActionOptionsFunction<String>) SnowflakeUtils::getTableNameOptions)
-                .optionsLookupDependsOn(SCHEMA)
-                .required(true),
+            DATABASE_PROPERTY,
+            SCHEMA_PROPERTY,
+            TABLE_PROPERTY,
             string(COLUMN)
                 .label("Column")
                 .description("Column name that will be checked for condition.")
@@ -70,15 +56,13 @@ public class SnowflakeDeleteRowAction {
                 .label("Condition")
                 .description("Condition that will be checked in the column.")
                 .required(true))
-        .output(outputSchema(sqlStatementResponse))
-
+        .output(outputSchema(SQL_STATEMENT_RESPONSE))
         .perform(SnowflakeDeleteRowAction::perform);
 
     private SnowflakeDeleteRowAction() {
     }
 
-    public static Map<String, Object> perform(
-        Parameters inputParameters, Parameters connectionParameters, Context context) {
+    public static Object perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
         String sqlStatement = "DELETE FROM %s.%s.%s WHERE %s = %s".formatted(
             inputParameters.getRequiredString(DATABASE),
             inputParameters.getRequiredString(SCHEMA),
@@ -86,13 +70,6 @@ public class SnowflakeDeleteRowAction {
             inputParameters.getRequiredString(COLUMN),
             inputParameters.getRequiredString(CONDITION));
 
-        return context.http(http -> http.post("/api/v2/statements"))
-            .body(
-                Body.of(
-                    Map.of(
-                        STATEMENT, sqlStatement)))
-            .configuration(responseType(ResponseType.JSON))
-            .execute()
-            .getBody(new TypeReference<>() {});
+        return SnowflakeUtils.executeStatement(context, sqlStatement);
     }
 }

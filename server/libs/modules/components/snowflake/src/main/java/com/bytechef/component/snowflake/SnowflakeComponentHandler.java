@@ -38,8 +38,8 @@ public class SnowflakeComponentHandler implements ComponentHandler {
     private static final ComponentDefinition COMPONENT_DEFINITION = component("snowflake")
         .title("Snowflake")
         .description(
-            "Snowflake enables organizations to collaborate, build AI-powered data apps, " +
-                "and unlock data insights—all within a secure and scalable AI Data Cloud.")
+            "Snowflake enables organizations to collaborate, build AI-powered data apps, and unlock data " +
+                "insights—all within a secure and scalable AI Data Cloud.")
         .icon("path:assets/snowflake.svg")
         .categories(ComponentCategory.ANALYTICS)
         .connection(SnowflakeConnection.CONNECTION_DEFINITION)

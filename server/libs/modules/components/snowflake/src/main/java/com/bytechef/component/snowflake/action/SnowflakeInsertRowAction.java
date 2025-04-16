@@ -19,23 +19,19 @@ package com.bytechef.component.snowflake.action;
 import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
-import static com.bytechef.component.definition.Context.Http.responseType;
 import static com.bytechef.component.snowflake.constant.SnowflakeConstants.DATABASE;
+import static com.bytechef.component.snowflake.constant.SnowflakeConstants.DATABASE_PROPERTY;
 import static com.bytechef.component.snowflake.constant.SnowflakeConstants.SCHEMA;
-import static com.bytechef.component.snowflake.constant.SnowflakeConstants.STATEMENT;
+import static com.bytechef.component.snowflake.constant.SnowflakeConstants.SCHEMA_PROPERTY;
+import static com.bytechef.component.snowflake.constant.SnowflakeConstants.SQL_STATEMENT_RESPONSE;
 import static com.bytechef.component.snowflake.constant.SnowflakeConstants.TABLE;
+import static com.bytechef.component.snowflake.constant.SnowflakeConstants.TABLE_PROPERTY;
 import static com.bytechef.component.snowflake.constant.SnowflakeConstants.VALUES;
-import static com.bytechef.component.snowflake.constant.SnowflakeConstants.sqlStatementResponse;
 
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context;
-import com.bytechef.component.definition.Context.Http.Body;
-import com.bytechef.component.definition.Context.Http.ResponseType;
-import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.snowflake.util.SnowflakeUtils;
-import java.util.Map;
 
 /**
  * @author Nikolina Spehar
@@ -46,34 +42,20 @@ public class SnowflakeInsertRowAction {
         .title("Insert Row")
         .description("Insert row into the table.")
         .properties(
-            string(DATABASE)
-                .label("Database")
-                .options((ActionOptionsFunction<String>) SnowflakeUtils::getDatabaseNameOptions)
-                .required(true),
-            string(SCHEMA)
-                .label("Schema")
-                .options((ActionOptionsFunction<String>) SnowflakeUtils::getSchemaNameOptions)
-                .optionsLookupDependsOn(DATABASE)
-                .required(true),
-            string(TABLE)
-                .label("Table")
-                .options((ActionOptionsFunction<String>) SnowflakeUtils::getTableNameOptions)
-                .optionsLookupDependsOn(SCHEMA)
-                .required(true),
+            DATABASE_PROPERTY,
+            SCHEMA_PROPERTY,
+            TABLE_PROPERTY,
             string(VALUES)
                 .label("Values")
                 .description("Values to insert into the table. Seperated by comma.")
                 .required(true))
-        .output(outputSchema(sqlStatementResponse))
-
+        .output(outputSchema(SQL_STATEMENT_RESPONSE))
         .perform(SnowflakeInsertRowAction::perform);
 
     private SnowflakeInsertRowAction() {
     }
 
-    public static Map<String, Object> perform(
-        Parameters inputParameters, Parameters connectionParameters, Context context) {
-
+    public static Object perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
         String columns = SnowflakeUtils.getTableColumns(inputParameters, context);
 
         String sqlStatement = "INSERT INTO %s.%s.%s(%s) VALUES(%s)".formatted(
@@ -83,13 +65,6 @@ public class SnowflakeInsertRowAction {
             columns,
             inputParameters.getRequiredString(VALUES));
 
-        return context.http(http -> http.post("/api/v2/statements"))
-            .body(
-                Body.of(
-                    Map.of(
-                        STATEMENT, sqlStatement)))
-            .configuration(responseType(ResponseType.JSON))
-            .execute()
-            .getBody(new TypeReference<>() {});
+        return SnowflakeUtils.executeStatement(context, sqlStatement);
     }
 }
