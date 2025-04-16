@@ -14,18 +14,16 @@
  * limitations under the License.
  */
 
-package com.bytechef.component.hacker.news;
-
-import com.bytechef.test.jsonasssert.JsonFileAssert;
-import org.junit.jupiter.api.Test;
+package com.bytechef.component.hacker.news.constant;
 
 /**
- * @author Marija Horvat
+ * @author Monika Kušter
  */
-class HackerNewsComponentHandlerTest {
+public class HackerNewsConstants {
 
-    @Test
-    void testGetComponentDefinition() {
-        JsonFileAssert.assertEquals("definition/hacker-news_v1.json", new HackerNewsComponentHandler().getDefinition());
+    public static final String BASE_URL = "https://hacker-news.firebaseio.com/v0";
+    public static final String NUMBER_OF_STORIES = "numberOfStories";
+
+    private HackerNewsConstants() {
     }
 }
