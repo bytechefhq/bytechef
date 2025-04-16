@@ -1,5 +1,5 @@
 /*
- * Copyright 2023-present ByteChef Inc.
+ * Copyright 2025 ByteChef
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,10 +18,11 @@ package com.bytechef.component.snowflake.util;
 
 import static com.bytechef.component.definition.ComponentDsl.option;
 import static com.bytechef.component.snowflake.constant.SnowflakeConstants.DATABASE;
+import static com.bytechef.component.snowflake.constant.SnowflakeConstants.DATATYPE;
+import static com.bytechef.component.snowflake.constant.SnowflakeConstants.NAME;
 import static com.bytechef.component.snowflake.constant.SnowflakeConstants.SCHEMA;
 import static com.bytechef.component.snowflake.constant.SnowflakeConstants.TABLE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -33,8 +34,10 @@ import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.test.definition.MockParametersFactory;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -50,50 +53,17 @@ class SnowflakeUtilsTest {
         Map.of("name", "test2"));
 
     @Test
-    void getColumnOptions() {
-        Parameters mockedParameters = MockParametersFactory.create(
-            Map.of(DATABASE, "db", SCHEMA, "schema", TABLE, "table"));
-        Map<String, Object> resposneMap = Map.of(
-            "columns", List.of(Map.of("name", "col1"), Map.of("name", "col2")));
-
-        when(mockedContext.http(any()))
-            .thenReturn(mockedExecutor);
-        when(mockedExecutor.configuration(any()))
-            .thenReturn(mockedExecutor);
-        when(mockedExecutor.body(any()))
-            .thenReturn(mockedExecutor);
-        when(mockedExecutor.execute())
-            .thenReturn(mockedResponse);
-        when(mockedResponse.getBody(any(TypeReference.class)))
-            .thenReturn(resposneMap);
-
-        List<Option<String>> result = SnowflakeUtils.getColumnOptions(
-            mockedParameters, mockedParameters, Map.of(), "", mockedContext);
-
-        List<Option<String>> expected = List.of(option("col1", "col1"), option("col2", "col2"));
-
-        assertEquals(expected, result);
-    }
-
-    @Test
     void getColumnUpdateStatementValuesValid() {
-        String testColumns = "col1,col2,col3";
-        String testValues = "4,2,5";
+        Map<String, Object> testMap = new LinkedHashMap<>();
+        testMap.put("col1", 2);
+        testMap.put("col2", 3);
+        testMap.put("col3", 4);
 
-        String result = SnowflakeUtils.getColumnUpdateStatement(testColumns, testValues);
+        String result = SnowflakeUtils.getColumnUpdateStatement(testMap);
 
-        String expected = "col1=4,col2=2,col3=5";
+        String expected = "col1=2,col2=3,col3=4";
 
         assertEquals(expected, result);
-    }
-
-    @Test
-    void getColumnUpdateStatementValuesInvalid() {
-        String testColumns = "col1,col2,col3";
-        String testValues = "4,2";
-
-        assertThrows(IllegalArgumentException.class,
-            () -> SnowflakeUtils.getColumnUpdateStatement(testColumns, testValues));
     }
 
     @Test
@@ -147,7 +117,9 @@ class SnowflakeUtilsTest {
         Parameters mockedParameters = MockParametersFactory.create(
             Map.of(DATABASE, "db", SCHEMA, "schema", TABLE, "table"));
         Map<String, Object> resposneMap = Map.of(
-            "columns", List.of(Map.of("name", "col1"), Map.of("name", "col2")));
+            "columns", List.of(
+                Map.of(NAME, "col1", DATATYPE, "NUMBER"),
+                Map.of(NAME, "col2", DATATYPE, "NUMBER")));
 
         when(mockedContext.http(any()))
             .thenReturn(mockedExecutor);
@@ -160,7 +132,10 @@ class SnowflakeUtilsTest {
         when(mockedResponse.getBody(any(TypeReference.class)))
             .thenReturn(resposneMap);
 
-        String result = SnowflakeUtils.getTableColumns(mockedParameters, mockedContext);
+        String result = SnowflakeUtils.getTableColumns(mockedParameters, mockedContext)
+            .stream()
+            .map(value -> value.get(NAME))
+            .collect(Collectors.joining(","));
 
         assertEquals("col1,col2", result);
     }

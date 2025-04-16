@@ -1,5 +1,5 @@
 /*
- * Copyright 2023-present ByteChef Inc.
+ * Copyright 2025 ByteChef
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -43,12 +43,15 @@ public class SnowflakeConnection {
             authorization(AuthorizationType.OAUTH2_AUTHORIZATION_CODE)
                 .properties(
                     string(ACCOUNT_IDENTIFIER)
-                        .description("Account identifier.")
+                        .label("Account Identifier")
+                        .description("Account identifier of your account.")
                         .required(true),
                     string(CLIENT_ID)
+                        .label("Client ID")
                         .description("Snowflake OAuth Client ID.")
                         .required(true),
                     string(CLIENT_SECRET)
+                        .label("Client Secret")
                         .description("Snowflake OAuth Client Secret.")
                         .required(true))
                 .authorizationUrl((connectionParameters, context) -> "https://%s.snowflakecomputing.com/oauth/authorize"

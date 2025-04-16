@@ -1,5 +1,5 @@
 /*
- * Copyright 2023-present ByteChef Inc.
+ * Copyright 2025 ByteChef
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,6 @@
 
 package com.bytechef.component.snowflake.action;
 
-import static com.bytechef.component.snowflake.constant.SnowflakeConstants.COLUMN;
 import static com.bytechef.component.snowflake.constant.SnowflakeConstants.CONDITION;
 import static com.bytechef.component.snowflake.constant.SnowflakeConstants.DATABASE;
 import static com.bytechef.component.snowflake.constant.SnowflakeConstants.SCHEMA;
@@ -44,7 +43,7 @@ class SnowflakeDeleteRowActionTest {
     private final Object mockedObject = mock(Object.class);
     private final ArgumentCaptor<String> stringArgumentCaptor = ArgumentCaptor.forClass(String.class);
     private final Parameters mockedParameters = MockParametersFactory.create(
-        Map.of(DATABASE, "database", SCHEMA, "schema", TABLE, "table", COLUMN, "col1", CONDITION, "2"));
+        Map.of(DATABASE, "database", SCHEMA, "schema", TABLE, "table", CONDITION, "col1 = 2"));
 
     @Test
     void perform() {

@@ -1,5 +1,5 @@
 /*
- * Copyright 2023-present ByteChef Inc.
+ * Copyright 2025 ByteChef
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,13 +19,16 @@ package com.bytechef.component.snowflake.constant;
 import static com.bytechef.component.definition.ComponentDsl.array;
 import static com.bytechef.component.definition.ComponentDsl.bool;
 import static com.bytechef.component.definition.ComponentDsl.date;
+import static com.bytechef.component.definition.ComponentDsl.dynamicProperties;
 import static com.bytechef.component.definition.ComponentDsl.integer;
 import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.string;
 
+import com.bytechef.component.definition.ComponentDsl.ModifiableDynamicPropertiesProperty;
 import com.bytechef.component.definition.ComponentDsl.ModifiableObjectProperty;
 import com.bytechef.component.definition.ComponentDsl.ModifiableStringProperty;
 import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
+import com.bytechef.component.snowflake.util.SnowflakePropertiesUtils;
 import com.bytechef.component.snowflake.util.SnowflakeUtils;
 
 /**
@@ -37,6 +40,8 @@ public class SnowflakeConstants {
     public static final String COLUMN = "column";
     public static final String CONDITION = "condition";
     public static final String DATABASE = "database";
+    public static final String DATATYPE = "datatype";
+    public static final String NAME = "name";
     public static final String SCHEMA = "schema";
     public static final String STATEMENT = "statement";
     public static final String TABLE = "table";
@@ -57,6 +62,11 @@ public class SnowflakeConstants {
         .label("Table")
         .options((ActionOptionsFunction<String>) SnowflakeUtils::getTableNameOptions)
         .optionsLookupDependsOn(SCHEMA)
+        .required(true);
+
+    public static final ModifiableDynamicPropertiesProperty VALUES_DYNAMIC_PROPERTY = dynamicProperties(VALUES)
+        .propertiesLookupDependsOn(TABLE)
+        .properties(SnowflakePropertiesUtils::createPropertiesForColumn)
         .required(true);
 
     public static final ModifiableObjectProperty SQL_STATEMENT_RESPONSE = object()

@@ -1,5 +1,5 @@
 /*
- * Copyright 2023-present ByteChef Inc.
+ * Copyright 2025 ByteChef
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +19,6 @@ package com.bytechef.component.snowflake.action;
 import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
-import static com.bytechef.component.snowflake.constant.SnowflakeConstants.COLUMN;
 import static com.bytechef.component.snowflake.constant.SnowflakeConstants.CONDITION;
 import static com.bytechef.component.snowflake.constant.SnowflakeConstants.DATABASE;
 import static com.bytechef.component.snowflake.constant.SnowflakeConstants.DATABASE_PROPERTY;
@@ -29,12 +28,13 @@ import static com.bytechef.component.snowflake.constant.SnowflakeConstants.SQL_S
 import static com.bytechef.component.snowflake.constant.SnowflakeConstants.TABLE;
 import static com.bytechef.component.snowflake.constant.SnowflakeConstants.TABLE_PROPERTY;
 import static com.bytechef.component.snowflake.constant.SnowflakeConstants.VALUES;
+import static com.bytechef.component.snowflake.constant.SnowflakeConstants.VALUES_DYNAMIC_PROPERTY;
 import static com.bytechef.component.snowflake.util.SnowflakeUtils.getColumnUpdateStatement;
 
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context;
-import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.Parameters;
+import com.bytechef.component.definition.Property.ControlType;
 import com.bytechef.component.snowflake.util.SnowflakeUtils;
 
 /**
@@ -49,19 +49,12 @@ public class SnowflakeUpdateRowAction {
             DATABASE_PROPERTY,
             SCHEMA_PROPERTY,
             TABLE_PROPERTY,
-            string(COLUMN)
-                .label("Column")
-                .description("Column name that will be checked for condition.")
-                .options((ActionOptionsFunction<String>) SnowflakeUtils::getColumnOptions)
-                .required(true),
             string(CONDITION)
                 .label("Condition")
-                .description("Condition that will be checked in the column.")
+                .description("Condition that will be checked in the column. Example: column1=5")
+                .controlType(ControlType.TEXT_AREA)
                 .required(true),
-            string(VALUES)
-                .label("Values")
-                .description("Updated values of the table. Seperated by comma.")
-                .required(true))
+            VALUES_DYNAMIC_PROPERTY)
         .output(outputSchema(SQL_STATEMENT_RESPONSE))
         .perform(SnowflakeUpdateRowAction::perform);
 
@@ -69,14 +62,11 @@ public class SnowflakeUpdateRowAction {
     }
 
     public static Object perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
-        String values = inputParameters.getRequiredString(VALUES);
-
-        String sqlStatement = "UPDATE %s.%s.%s SET %s WHERE %s = %s".formatted(
+        String sqlStatement = "UPDATE %s.%s.%s SET %s WHERE %s".formatted(
             inputParameters.getRequiredString(DATABASE),
             inputParameters.getRequiredString(SCHEMA),
             inputParameters.getRequiredString(TABLE),
-            getColumnUpdateStatement(SnowflakeUtils.getTableColumns(inputParameters, context), values),
-            inputParameters.getRequiredString(COLUMN),
+            getColumnUpdateStatement(inputParameters.getRequiredMap(VALUES)),
             inputParameters.getRequiredString(CONDITION));
 
         return SnowflakeUtils.executeStatement(context, sqlStatement);

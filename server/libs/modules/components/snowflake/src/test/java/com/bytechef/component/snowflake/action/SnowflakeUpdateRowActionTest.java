@@ -1,5 +1,5 @@
 /*
- * Copyright 2023-present ByteChef Inc.
+ * Copyright 2025 ByteChef
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,6 @@
 
 package com.bytechef.component.snowflake.action;
 
-import static com.bytechef.component.snowflake.constant.SnowflakeConstants.COLUMN;
 import static com.bytechef.component.snowflake.constant.SnowflakeConstants.CONDITION;
 import static com.bytechef.component.snowflake.constant.SnowflakeConstants.DATABASE;
 import static com.bytechef.component.snowflake.constant.SnowflakeConstants.SCHEMA;
@@ -30,7 +29,6 @@ import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.snowflake.util.SnowflakeUtils;
 import com.bytechef.component.test.definition.MockParametersFactory;
-import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -44,23 +42,18 @@ class SnowflakeUpdateRowActionTest {
     private final ArgumentCaptor<Context> contextArgumentCaptor = ArgumentCaptor.forClass(Context.class);
     private final Context mockedContext = mock(Context.class);
     private final Object mockedObject = mock(Object.class);
-    private final ArgumentCaptor<Parameters> parametersArgumentCaptor = ArgumentCaptor.forClass(Parameters.class);
+    private final ArgumentCaptor<Map<String, ?>> mapArgumentCaptor = ArgumentCaptor.forClass(Map.class);
     private final ArgumentCaptor<String> stringArgumentCaptor = ArgumentCaptor.forClass(String.class);
     private final Parameters mockedParameters = MockParametersFactory.create(
         Map.of(
-            DATABASE, "database", SCHEMA, "schema", TABLE, "table", COLUMN, "col1",
-            CONDITION, "2", VALUES, "5,5"));
+            DATABASE, "database", SCHEMA, "schema", TABLE, "table",
+            CONDITION, "col1 = 2", VALUES, Map.of("col1", 5, "col2", 5)));
 
     @Test
     void perform() {
         try (MockedStatic<SnowflakeUtils> snowflakeUtilsMockedStatic = mockStatic(SnowflakeUtils.class)) {
             snowflakeUtilsMockedStatic
-                .when(() -> SnowflakeUtils.getTableColumns(
-                    parametersArgumentCaptor.capture(), contextArgumentCaptor.capture()))
-                .thenReturn("col1,col2");
-            snowflakeUtilsMockedStatic
-                .when(() -> SnowflakeUtils.getColumnUpdateStatement(
-                    stringArgumentCaptor.capture(), stringArgumentCaptor.capture()))
+                .when(() -> SnowflakeUtils.getColumnUpdateStatement(mapArgumentCaptor.capture()))
                 .thenReturn("col1=5,col2=5");
             snowflakeUtilsMockedStatic
                 .when(() -> SnowflakeUtils.executeStatement(
@@ -70,11 +63,11 @@ class SnowflakeUpdateRowActionTest {
             Object result = SnowflakeUpdateRowAction.perform(mockedParameters, mockedParameters, mockedContext);
 
             assertEquals(mockedObject, result);
-            assertEquals(mockedParameters, parametersArgumentCaptor.getValue());
-            assertEquals(List.of(mockedContext, mockedContext), contextArgumentCaptor.getAllValues());
+            assertEquals(mockedContext, contextArgumentCaptor.getValue());
+            assertEquals(mockedParameters.getRequiredMap(VALUES), mapArgumentCaptor.getValue());
             assertEquals(
-                List.of("col1,col2", "5,5", "UPDATE database.schema.table SET col1=5,col2=5 WHERE col1 = 2"),
-                stringArgumentCaptor.getAllValues());
+                "UPDATE database.schema.table SET col1=5,col2=5 WHERE col1 = 2",
+                stringArgumentCaptor.getValue());
         }
     }
 }
