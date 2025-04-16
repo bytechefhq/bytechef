@@ -25,13 +25,16 @@ import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.component.hacker.news.action.HackerNewsFetchTopStoriesAction;
 import com.google.auto.service.AutoService;
 
+/**
+ * @author Marija Horvat
+ */
 @AutoService(ComponentHandler.class)
 public class HackerNewsComponentHandler implements ComponentHandler {
 
     private static final ComponentDefinition COMPONENT_DEFINITION = component("hackerNews")
         .title("Hacker News")
-        .description("Hacker News is a social news website focused on computer science, " +
-            "startups, and technology-related topics.")
+        .description(
+            "Hacker News is a social news website focused on computer science, startups, and technology-related topics.")
         .icon("path:assets/hacker-news.svg")
         .categories(ComponentCategory.SOCIAL_MEDIA)
         .actions(HackerNewsFetchTopStoriesAction.ACTION_DEFINITION)

@@ -22,21 +22,27 @@ import static com.bytechef.component.definition.ComponentDsl.integer;
 import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.Context.Http.responseType;
+import static com.bytechef.component.hacker.news.constant.HackerNewsConstants.NUMBER_OF_STORIES;
 
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context;
+import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
-import java.util.ArrayList;
+import com.bytechef.component.hacker.news.constant.HackerNewsConstants;
 import java.util.List;
+import java.util.stream.Collectors;
 
+/**
+ * @author Marija Horvat
+ */
 public class HackerNewsFetchTopStoriesAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("fetchTopStories")
         .title("Fetch Top Stories")
         .description("Fetch top stories from Hacker News.")
         .properties(
-            integer("numberOfStories")
+            integer(NUMBER_OF_STORIES)
                 .label("Number Of Stories")
                 .description("Number of stories to fetch.")
                 .defaultValue(10)
@@ -49,28 +55,27 @@ public class HackerNewsFetchTopStoriesAction {
 
     public static Object perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
         List<String> storyIds = context
-            .http(http -> http.get("https://hacker-news.firebaseio.com/v0/topstories.json"))
-            .configuration(responseType(Context.Http.ResponseType.JSON))
+            .http(http -> http.get(HackerNewsConstants.BASE_URL + "/topstories.json"))
+            .configuration(responseType(Http.ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});
 
-        return getItems(inputParameters, context, storyIds);
+        return getStories(inputParameters.getRequiredInteger(NUMBER_OF_STORIES), context, storyIds);
     }
 
-    private static Object getItems(Parameters inputParameters, Context context, List<String> storyIds) {
-        List<Object> bodies = new ArrayList<>();
+    private static Object getStories(int numberOfStories, Context context, List<String> storyIds) {
+        return storyIds
+            .stream()
+            .limit(Math.min(numberOfStories, storyIds.size()))
+            .map(storyId -> fetchStory(context, storyId))
+            .collect(Collectors.toList());
+    }
 
-        for (int i = 0; i < Math.min(inputParameters.getInteger("numberOfStories"), storyIds.size()); i++) {
-            final String storyId = storyIds.get(i);
-
-            Object body = context
-                .http(http -> http.get("https://hacker-news.firebaseio.com/v0/item/" + storyId + ".json"))
-                .configuration(responseType(Context.Http.ResponseType.JSON))
-                .execute()
-                .getBody(new TypeReference<>() {});
-
-            bodies.add(body);
-        }
-        return bodies;
+    private static Object fetchStory(Context context, String storyId) {
+        return context
+            .http(http -> http.get(HackerNewsConstants.BASE_URL + "/item/" + storyId + ".json"))
+            .configuration(responseType(Http.ResponseType.JSON))
+            .execute()
+            .getBody();
     }
 }

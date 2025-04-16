@@ -16,6 +16,7 @@
 
 package com.bytechef.component.hacker.news.action;
 
+import static com.bytechef.component.hacker.news.constant.HackerNewsConstants.NUMBER_OF_STORIES;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
@@ -30,11 +31,14 @@ import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
 
+/**
+ * @author Marija Horvat
+ */
 class HackerNewsFetchTopStoriesActionTest {
 
     private final Context mockedContext = mock(Context.class);
     private final Http.Executor mockedExecutor = mock(Http.Executor.class);
-    private final Parameters mockedParameters = MockParametersFactory.create(Map.of("numberOfStories", 2));
+    private final Parameters mockedParameters = MockParametersFactory.create(Map.of(NUMBER_OF_STORIES, 2));
     private final Http.Response mockedTopStoriesResponse = mock(Http.Response.class);
     private final Http.Response mockedItem1Response = mock(Http.Response.class);
     private final Http.Response mockedItem2Response = mock(Http.Response.class);
@@ -50,15 +54,12 @@ class HackerNewsFetchTopStoriesActionTest {
         when(mockedExecutor.configuration(any()))
             .thenReturn(mockedExecutor);
         when(mockedExecutor.execute())
-            .thenReturn(mockedTopStoriesResponse)
-            .thenReturn(mockedItem1Response)
-            .thenReturn(mockedItem2Response);
-
+            .thenReturn(mockedTopStoriesResponse, mockedItem1Response, mockedItem2Response);
         when(mockedTopStoriesResponse.getBody(any(TypeReference.class)))
             .thenReturn(topStoryIds);
-        when(mockedItem1Response.getBody(any(TypeReference.class)))
+        when(mockedItem1Response.getBody())
             .thenReturn(item1);
-        when(mockedItem2Response.getBody(any(TypeReference.class)))
+        when(mockedItem2Response.getBody())
             .thenReturn(item2);
 
         Object result = HackerNewsFetchTopStoriesAction.perform(mockedParameters, mockedParameters, mockedContext);
