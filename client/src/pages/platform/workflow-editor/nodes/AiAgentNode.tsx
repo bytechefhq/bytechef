@@ -5,22 +5,14 @@ import {
     ClusterElementDefinitionBasic,
     GetRootComponentClusterElementDefinitionsRequest,
 } from '@/shared/middleware/platform/configuration';
-import {ClusterElementDefinitionKeys} from '@/shared/queries/platform/clusterElemetDefinitions.queries';
+import {ClusterElementDefinitionKeys} from '@/shared/queries/platform/clusterElementDefinitions.queries';
 import {useGetWorkflowNodeDescriptionQuery} from '@/shared/queries/platform/workflowNodeDescriptions.queries';
-import {NodeDataType} from '@/shared/types';
+import {ClusterElementItemType, ClusterElementsType, NodeDataType} from '@/shared/types';
 import {HoverCardPortal} from '@radix-ui/react-hover-card';
 import {useQueryClient} from '@tanstack/react-query';
 import {Handle, Position} from '@xyflow/react';
-import {
-    ChevronRightIcon,
-    ComponentIcon,
-    DatabaseIcon,
-    MemoryStick,
-    PencilIcon,
-    PlusIcon,
-    TrashIcon,
-} from 'lucide-react';
-import {memo, useState} from 'react';
+import {ComponentIcon, CpuIcon, DatabaseIcon, MemoryStick, PlusIcon, TrashIcon} from 'lucide-react';
+import {memo, useEffect, useMemo, useState} from 'react';
 import {useParams} from 'react-router-dom';
 import sanitize from 'sanitize-html';
 import {twMerge} from 'tailwind-merge';
@@ -33,20 +25,13 @@ import useWorkflowNodeDetailsPanelStore from '../stores/useWorkflowNodeDetailsPa
 import handleDeleteTask from '../utils/handleDeleteTask';
 import styles from './NodeTypes.module.css';
 
-export type AgentDataType = {
-    CHAT_MEMORY: string;
-    MODEL: string;
-    RAG: string;
-    TOOLS: string;
-};
-
-const AIAgentNode = ({data, id}: {data: NodeDataType; id: string}) => {
-    const [aiAgentDefinition, setAiAgentDefinition] = useState<ClusterElementDefinitionBasic[]>([]);
-    const [agentData, setAgentData] = useState<AgentDataType>({
-        CHAT_MEMORY: '',
-        MODEL: '',
-        RAG: '',
-        TOOLS: '',
+const AiAgentNode = ({data, id}: {data: NodeDataType; id: string}) => {
+    const [clusterElementDefinition, setClusterElementDefinition] = useState<ClusterElementDefinitionBasic[]>([]);
+    const [clusterElementsData, setClusterElementsData] = useState<ClusterElementsType>({
+        chatMemory: null,
+        model: null,
+        rag: null,
+        tools: [],
     });
     const [isHovered, setIsHovered] = useState(false);
     const [hoveredNodeName, setHoveredNodeName] = useState<string | undefined>();
@@ -86,9 +71,9 @@ const AIAgentNode = ({data, id}: {data: NodeDataType; id: string}) => {
         }
     };
 
-    const handleSelectModel = (model: string) => {
+    const handlePopoverMenuClusterElementClick = (type: string) => {
         const rootComponentClusterElementDefinitionRequest: GetRootComponentClusterElementDefinitionsRequest = {
-            clusterElementType: model,
+            clusterElementType: type,
             rootComponentName: data?.componentName || '',
             rootComponentVersion: data.version || 1,
         };
@@ -104,18 +89,42 @@ const AIAgentNode = ({data, id}: {data: NodeDataType; id: string}) => {
                 ),
             });
 
-            setAiAgentDefinition(rootComponentClusterElementDefinition);
+            setClusterElementDefinition(rootComponentClusterElementDefinition);
         };
 
         fetchRootComponentClusterElementDefinition();
     };
 
+    useEffect(() => {
+        if (data.clusterElements) {
+            setClusterElementsData({
+                chatMemory: data.clusterElements.chatMemory || null,
+                model: data.clusterElements.model || null,
+                rag: data.clusterElements.rag || null,
+                tools: data.clusterElements.tools || [],
+            });
+        }
+    }, [data.clusterElements]);
+
+    const getElementDisplayName = (element: ClusterElementItemType | null | undefined): string | undefined => {
+        if (!element) return undefined;
+
+        return element.label ? element.label.split('_')[0] : element.name.split('_')[0];
+    };
+
+    const {agentMemoryName, agentModelName, agentRagName, agentToolNames} = useMemo(
+        () => ({
+            agentMemoryName: getElementDisplayName(clusterElementsData?.chatMemory),
+            agentModelName: getElementDisplayName(clusterElementsData?.model),
+            agentRagName: getElementDisplayName(clusterElementsData?.rag),
+            agentToolNames: clusterElementsData?.tools?.map(getElementDisplayName).filter(Boolean),
+        }),
+        [clusterElementsData]
+    );
+
     return (
         <div
-            className={twMerge(
-                'nodrag relative flex min-w-60 cursor-pointer justify-center',
-                !data.taskDispatcher && 'items-center'
-            )}
+            className="nodrag relative flex min-w-60 cursor-pointer items-center justify-center"
             data-nodetype="aiAgentNode"
             key={id}
             onMouseOut={() => setIsHovered(false)}
@@ -123,26 +132,14 @@ const AIAgentNode = ({data, id}: {data: NodeDataType; id: string}) => {
         >
             {isHovered && (
                 <div className="absolute left-workflow-node-popover-hover pr-4">
-                    {data.trigger ? (
-                        <WorkflowNodesPopoverMenu hideActionComponents hideTaskDispatchers sourceNodeId={id}>
-                            <Button
-                                className="bg-white p-2 shadow-md hover:text-blue-500 hover:shadow-sm"
-                                title="Change trigger component"
-                                variant="outline"
-                            >
-                                <PencilIcon className="size-4" />
-                            </Button>
-                        </WorkflowNodesPopoverMenu>
-                    ) : (
-                        <Button
-                            className="bg-white p-2 shadow-md hover:text-red-500 hover:shadow-sm"
-                            onClick={() => handleDeleteNodeClick(data)}
-                            title="Delete a node"
-                            variant="outline"
-                        >
-                            <TrashIcon className="size-4" />
-                        </Button>
-                    )}
+                    <Button
+                        className="bg-white p-2 shadow-md hover:text-red-500 hover:shadow-sm"
+                        onClick={() => handleDeleteNodeClick(data)}
+                        title="Delete a node"
+                        variant="outline"
+                    >
+                        <TrashIcon className="size-4" />
+                    </Button>
                 </div>
             )}
 
@@ -156,58 +153,62 @@ const AIAgentNode = ({data, id}: {data: NodeDataType; id: string}) => {
                     }
                 }}
             >
-                <Button
+                <div
                     className={twMerge(
-                        'size-18 flex flex-col items-start rounded-md border-2 border-gray-300 bg-background p-4 text-content-neutral-primary shadow hover:bg-background hover:shadow-none [&_svg]:size-8',
+                        'size-18 flex cursor-pointer flex-col items-start gap-2 rounded-md border-2 border-gray-300 bg-background p-4 text-content-neutral-primary shadow hover:bg-background hover:shadow-none [&_svg]:size-8',
                         isSelected && workflowNodeDetailsPanelOpen && 'border-blue-300 bg-background shadow-none'
                     )}
                     onClick={handleNodeClick}
                 >
-                    <div className="flex w-full flex-1 items-center justify-between px-1">
+                    <div className="flex w-full flex-1 items-center justify-between">
                         <HoverCardTrigger>
-                            <div> {data.icon} </div>
+                            <div> {data.icon!} </div>
                         </HoverCardTrigger>
 
                         <WorkflowNodesPopoverMenu
-                            agentData={agentData}
-                            setAgentData={setAgentData}
-                            sourceData={aiAgentDefinition}
+                            clusterElementsData={clusterElementsData}
+                            setClusterElementsData={setClusterElementsData}
+                            sourceData={clusterElementDefinition}
                             sourceNodeId={id}
                         >
                             <Button
-                                className="[&>span]:line-clamp-0 border border-stroke-neutral-secondary bg-background px-3 py-2 text-content-neutral-primary shadow-none hover:bg-surface-neutral-primary-hover [&>span]:truncate [&>svg]:max-w-4"
+                                className="[&>span]:line-clamp-0 w-1/2 border border-stroke-neutral-secondary bg-background px-3 py-2 text-content-neutral-primary shadow-none hover:bg-surface-neutral-primary-hover [&>span]:truncate [&>svg]:max-w-4"
                                 onClick={(e) => {
                                     e.stopPropagation();
-                                    handleSelectModel('MODEL');
+                                    handlePopoverMenuClusterElementClick('MODEL');
                                 }}
                             >
-                                {agentData.MODEL ? agentData.MODEL : 'Set AI model'}
-
-                                <ChevronRightIcon />
+                                {clusterElementsData.model ? (
+                                    <>
+                                        <ComponentIcon /> {agentModelName}
+                                    </>
+                                ) : (
+                                    <>
+                                        <CpuIcon /> Model
+                                    </>
+                                )}
                             </Button>
                         </WorkflowNodesPopoverMenu>
                     </div>
 
-                    <div className="flex gap-2">
+                    <div className="flex w-full justify-between gap-1">
                         <WorkflowNodesPopoverMenu
-                            agentData={agentData}
-                            setAgentData={setAgentData}
-                            sourceData={aiAgentDefinition}
+                            clusterElementsData={clusterElementsData}
+                            setClusterElementsData={setClusterElementsData}
+                            sourceData={clusterElementDefinition}
                             sourceNodeId={id}
                         >
                             <Button
-                                className="rounded-full font-medium hover:bg-surface-neutral-secondary-hover [&>svg]:max-w-4"
+                                className="rounded-full px-2 font-medium hover:bg-surface-neutral-secondary-hover [&>svg]:max-w-4"
                                 onClick={(e) => {
                                     e.stopPropagation();
-                                    handleSelectModel('RAG');
+                                    handlePopoverMenuClusterElementClick('RAG');
                                 }}
                                 variant="outline"
                             >
-                                {agentData.RAG ? (
+                                {clusterElementsData?.rag ? (
                                     <>
-                                        <ComponentIcon />
-
-                                        {agentData.RAG}
+                                        <ComponentIcon /> {agentRagName}
                                     </>
                                 ) : (
                                     <>
@@ -218,22 +219,22 @@ const AIAgentNode = ({data, id}: {data: NodeDataType; id: string}) => {
                         </WorkflowNodesPopoverMenu>
 
                         <WorkflowNodesPopoverMenu
-                            agentData={agentData}
-                            setAgentData={setAgentData}
-                            sourceData={aiAgentDefinition}
+                            clusterElementsData={clusterElementsData}
+                            setClusterElementsData={setClusterElementsData}
+                            sourceData={clusterElementDefinition}
                             sourceNodeId={id}
                         >
                             <Button
-                                className="rounded-full hover:bg-surface-neutral-secondary-hover [&>svg]:max-w-4"
+                                className="rounded-full px-2 hover:bg-surface-neutral-secondary-hover [&>svg]:max-w-4"
                                 onClick={(e) => {
                                     e.stopPropagation();
-                                    handleSelectModel('CHAT_MEMORY');
+                                    handlePopoverMenuClusterElementClick('CHAT_MEMORY');
                                 }}
                                 variant="outline"
                             >
-                                {agentData.CHAT_MEMORY ? (
+                                {clusterElementsData?.chatMemory ? (
                                     <>
-                                        <ComponentIcon /> {agentData.CHAT_MEMORY}{' '}
+                                        <ComponentIcon /> {agentMemoryName}
                                     </>
                                 ) : (
                                     <>
@@ -244,33 +245,40 @@ const AIAgentNode = ({data, id}: {data: NodeDataType; id: string}) => {
                         </WorkflowNodesPopoverMenu>
                     </div>
 
-                    <WorkflowNodesPopoverMenu
-                        agentData={agentData}
-                        setAgentData={setAgentData}
-                        sourceData={aiAgentDefinition}
-                        sourceNodeId={id}
-                    >
-                        <Button
-                            className="rounded-full bg-surface-neutral-secondary hover:bg-surface-neutral-secondary-hover [&>svg]:max-w-4"
-                            onClick={(e) => {
-                                e.stopPropagation();
-                                handleSelectModel('TOOLS');
-                            }}
-                            variant="ghost"
+                    <div className="flex w-full items-center">
+                        {agentToolNames &&
+                            agentToolNames.map((tool, index) => (
+                                <Button key={index} onClick={(e) => e.stopPropagation()} variant="ghost">
+                                    {tool}
+                                </Button>
+                            ))}
+
+                        <WorkflowNodesPopoverMenu
+                            clusterElementsData={clusterElementsData}
+                            setClusterElementsData={setClusterElementsData}
+                            sourceData={clusterElementDefinition}
+                            sourceNodeId={id}
                         >
-                            {agentData.TOOLS ? (
-                                <>
-                                    <ComponentIcon /> {agentData.TOOLS}
-                                </>
-                            ) : (
-                                <>
-                                    <PlusIcon className="size-4" />
-                                    Tools
-                                </>
-                            )}
-                        </Button>
-                    </WorkflowNodesPopoverMenu>
-                </Button>
+                            <Button
+                                className={twMerge(
+                                    'rounded-full bg-surface-neutral-secondary px-3 hover:bg-surface-neutral-secondary-hover [&>svg]:max-w-4',
+                                    !!agentToolNames?.length && 'rounded-full p-3'
+                                )}
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    handlePopoverMenuClusterElementClick('TOOLS');
+                                }}
+                                variant="ghost"
+                            >
+                                <PlusIcon className="size-4" />
+
+                                <span className={twMerge(agentToolNames?.length ? 'hidden' : 'inline-block')}>
+                                    Tool
+                                </span>
+                            </Button>
+                        </WorkflowNodesPopoverMenu>
+                    </div>
+                </div>
 
                 <HoverCardPortal>
                     <HoverCardContent className="absolute left-56 w-fit min-w-72 max-w-xl text-sm" side="right">
@@ -302,14 +310,14 @@ const AIAgentNode = ({data, id}: {data: NodeDataType; id: string}) => {
             </div>
 
             <Handle
-                className={twMerge('left-[135px]', styles.handle)}
+                className={twMerge('left-[115px]', styles.handle)}
                 isConnectable={false}
                 position={Position.Top}
                 type="target"
             />
 
             <Handle
-                className={twMerge('left-[135px]', styles.handle)}
+                className={twMerge('left-[115px]', styles.handle)}
                 isConnectable={false}
                 position={Position.Bottom}
                 type="source"
@@ -317,4 +325,4 @@ const AIAgentNode = ({data, id}: {data: NodeDataType; id: string}) => {
         </div>
     );
 };
-export default memo(AIAgentNode);
+export default memo(AiAgentNode);

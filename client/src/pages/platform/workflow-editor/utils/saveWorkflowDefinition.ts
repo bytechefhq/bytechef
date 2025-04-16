@@ -48,8 +48,18 @@ export default async function saveWorkflowDefinition({
 
     const workflowDefinition: WorkflowDefinitionType = JSON.parse(workflow.definition!);
 
-    const {componentName, connections, description, label, metadata, name, parameters, taskDispatcher, trigger} =
-        nodeData;
+    const {
+        clusterElements,
+        componentName,
+        connections,
+        description,
+        label,
+        metadata,
+        name,
+        parameters,
+        taskDispatcher,
+        trigger,
+    } = nodeData;
 
     let {operationName, type, version} = nodeData;
 
@@ -117,6 +127,7 @@ export default async function saveWorkflowDefinition({
     }
 
     const newTask: WorkflowTask = {
+        clusterElements,
         description,
         label,
         metadata,
@@ -147,11 +158,15 @@ export default async function saveWorkflowDefinition({
 
     const differenceInType = existingWorkflowTask?.type !== newTask.type;
 
+    const differenceInClusterElements =
+        JSON.stringify(existingWorkflowTask?.clusterElements) !== JSON.stringify(newTask.clusterElements);
+
     if (
         existingWorkflowTask &&
         !decorative &&
         !subtask &&
         (!operationName || !differenceInParameters) &&
+        !differenceInClusterElements &&
         !differenceInType &&
         !differenceInCaseCount &&
         !differenceInCaseKeys

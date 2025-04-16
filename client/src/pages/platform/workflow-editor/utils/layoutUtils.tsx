@@ -26,6 +26,7 @@ import {Edge, Node} from '@xyflow/react';
 import {ComponentIcon} from 'lucide-react';
 import InlineSVG from 'react-inlinesvg';
 
+import useWorkflowDataStore from '../stores/useWorkflowDataStore';
 import {getConditionBranchSide} from './createConditionEdges';
 import {TASK_DISPATCHER_CONFIG, findParentTaskDispatcher} from './taskDispatcherConfig';
 
@@ -41,7 +42,11 @@ export const calculateNodeHeight = (node: Node) => {
     const aiAgentNodeHeight = 250;
 
     if (isPlaceholderNode || isGhostNode) {
-        height = PLACEHOLDER_NODE_HEIGHT;
+        if (node.id.includes('aiAgent')) {
+            height = 100;
+        } else {
+            height = PLACEHOLDER_NODE_HEIGHT;
+        }
 
         if (isBottomGhostNode) {
             height = NODE_HEIGHT;
@@ -64,9 +69,16 @@ export const convertTaskToNode = (
 
     const isTaskDispatcher = TASK_DISPATCHER_NAMES.includes(componentName);
 
+    const {workflow} = useWorkflowDataStore.getState();
+
+    const workflowDefinition = JSON.parse(workflow.definition!);
+
+    const currentTask = workflowDefinition.tasks.find((workflowTask: WorkflowTask) => workflowTask.name === task.name);
+
     return {
         data: {
             ...task,
+            clusterElements: currentTask?.clusterElements,
             componentName,
             icon: (
                 <InlineSVG
@@ -125,7 +137,7 @@ export const getLayoutedElements = (nodes: Node[], edges: Edge[], canvasWidth: n
         let positionX = dagreGraph.node(node.id).x + (canvasWidth / 2 - dagreGraph.node(nodes[0].id).x - 72 / 2);
 
         if (node.type === 'aiAgentNode') {
-            positionX -= 100;
+            positionX -= 80;
         }
 
         return {
@@ -177,11 +189,19 @@ export const getLayoutedElements = (nodes: Node[], edges: Edge[], canvasWidth: n
             return;
         }
 
-        const isSourceTaskDispatcherTopGhostNode = sourceNode.type === 'taskDispatcherTopGhostNode';
+        const multipleEdgesAllowed = [
+            {
+                condition: sourceNode.type === 'taskDispatcherTopGhostNode',
+            },
+            {
+                condition: sourceNode.data.componentName === 'aiAgent',
+            },
+            {
+                condition: sourceNode.data.componentName === 'branch',
+            },
+        ];
 
-        const isSourceBranchNode = sourceNode.data.componentName === 'branch';
-
-        if (isSourceTaskDispatcherTopGhostNode || isSourceBranchNode) {
+        if (multipleEdgesAllowed.some(({condition}) => condition)) {
             filteredEdges.push(...sourceEdges);
         } else {
             filteredEdges.push(sourceEdges[0]);

@@ -7,7 +7,7 @@ import {
     ComponentDefinitionApi,
 } from '@/shared/middleware/platform/configuration';
 import {ComponentDefinitionKeys} from '@/shared/queries/platform/componentDefinitions.queries';
-import {ClickedDefinitionType} from '@/shared/types';
+import {ClickedDefinitionType, ClusterElementsType} from '@/shared/types';
 import {useQueryClient} from '@tanstack/react-query';
 import {ComponentIcon} from 'lucide-react';
 import {PropsWithChildren, useCallback, useEffect, useMemo, useState} from 'react';
@@ -15,35 +15,39 @@ import {useParams} from 'react-router-dom';
 import {twMerge} from 'tailwind-merge';
 import {useShallow} from 'zustand/react/shallow';
 
-import {AgentDataType} from '../nodes/AIAgentNode';
 import {useWorkflowMutation} from '../providers/workflowMutationProvider';
 import useWorkflowDataStore from '../stores/useWorkflowDataStore';
+import getFormattedClusterElementName from '../utils/getFormattedClusterElementName';
 import getTaskDispatcherContext from '../utils/getTaskDispatcherContext';
 import handleTaskDispatcherClick from '../utils/handleTaskDispatcherClick';
+import saveWorkflowDefinition from '../utils/saveWorkflowDefinition';
 import WorkflowNodesPopoverMenuComponentList from './WorkflowNodesPopoverMenuComponentList';
 import WorkflowNodesPopoverMenuOperationList from './WorkflowNodesPopoverMenuOperationList';
 
+type ClusterElementsDefinitionType = 'CHAT_MEMORY' | 'MODEL' | 'RAG';
+type StoredClusterElementsType = 'chatMemory' | 'model' | 'rag';
+
 interface WorkflowNodesPopoverMenuProps extends PropsWithChildren {
-    agentData?: AgentDataType;
+    clusterElementsData?: ClusterElementsType;
     edgeId?: string;
     hideActionComponents?: boolean;
     hideTriggerComponents?: boolean;
     hideTaskDispatchers?: boolean;
     nodeIndex?: number;
-    setAgentData?: (data: AgentDataType) => void;
+    setClusterElementsData?: (data: ClusterElementsType) => void;
     sourceData?: ClusterElementDefinitionBasic[];
     sourceNodeId: string;
 }
 
 const WorkflowNodesPopoverMenu = ({
-    agentData,
     children,
+    clusterElementsData,
     edgeId,
     hideActionComponents = false,
     hideTaskDispatchers = false,
     hideTriggerComponents = false,
     nodeIndex,
-    setAgentData,
+    setClusterElementsData,
     sourceData,
     sourceNodeId,
 }: WorkflowNodesPopoverMenuProps) => {
@@ -132,15 +136,59 @@ const WorkflowNodesPopoverMenu = ({
     );
 
     const handleClusterElementClick = (data: ClusterElementDefinitionBasic) => {
-        if (agentData && setAgentData) {
-            let value = data.componentName;
+        if (!clusterElementsData || !sourceNode) return;
 
-            if (data.type === 'TOOLS') {
-                value = `${data.componentName}#${data.name}`;
+        const updatedClusterElementsData: ClusterElementsType = {
+            chatMemory: clusterElementsData.chatMemory,
+            model: clusterElementsData.model,
+            rag: clusterElementsData.rag,
+            tools: [...(clusterElementsData.tools || [])],
+        };
+
+        const propertyMap: Record<ClusterElementsDefinitionType, StoredClusterElementsType> = {
+            CHAT_MEMORY: 'chatMemory',
+            MODEL: 'model',
+            RAG: 'rag',
+        };
+
+        if (data.type === 'TOOLS') {
+            updatedClusterElementsData.tools = [
+                ...(clusterElementsData.tools || []),
+                {
+                    label: data.title,
+                    name: getFormattedClusterElementName(data.name, 'tools'),
+                    parameters: {},
+                    type: `${data.componentName}/v${data.componentVersion}/${data.name}`,
+                },
+            ];
+        } else {
+            if (data.type in propertyMap) {
+                updatedClusterElementsData[propertyMap[data.type as ClusterElementsDefinitionType]] = {
+                    label: data.title,
+                    name: getFormattedClusterElementName(
+                        data.componentName,
+                        propertyMap[data.type as ClusterElementsDefinitionType]
+                    ),
+                    parameters: {},
+                    type: `${data.componentName}/v${data.componentVersion}/${propertyMap[data.type as ClusterElementsDefinitionType]}`,
+                };
             }
-
-            setAgentData({...agentData, [data.type]: value});
         }
+
+        setClusterElementsData?.(updatedClusterElementsData);
+
+        saveWorkflowDefinition({
+            nodeData: {
+                ...sourceNode.data,
+                clusterElements: updatedClusterElementsData,
+                componentName: String(sourceNode.data.componentName),
+                name: String(sourceNode.data.name),
+                workflowNodeName: String(sourceNode.data.workflowNodeName),
+            },
+            projectId: +projectId!,
+            queryClient,
+            updateWorkflowMutation,
+        });
     };
 
     useEffect(() => {
@@ -189,13 +237,7 @@ const WorkflowNodesPopoverMenu = ({
                     {sourceData && sourceData.length > 0 && (
                         <div className="flex w-full flex-col">
                             <header className="flex items-center gap-1 rounded-t-lg bg-white p-3 text-center">
-                                <Input
-                                    disabled
-                                    // value={filter}
-                                    name="workflowNodeFilter"
-                                    // onChange={(event) => setFilter(event.target.value)}
-                                    placeholder="Search AI models"
-                                />
+                                <Input disabled name="workflowNodeFilter" placeholder="Search AI models" />
                             </header>
 
                             <ScrollArea className="w-full overflow-y-auto">
