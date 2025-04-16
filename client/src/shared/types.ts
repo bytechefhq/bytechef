@@ -121,9 +121,25 @@ type BranchDataType = {
     index: number;
 };
 
+export type ClusterElementItemType = {
+    label?: string;
+    name: string;
+    type: string;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    parameters?: {[key: string]: any};
+};
+
+export type ClusterElementsType = {
+    chatMemory?: ClusterElementItemType | null;
+    model?: ClusterElementItemType | null;
+    rag?: ClusterElementItemType | null;
+    tools?: ClusterElementItemType[] | null;
+};
+
 export type NodeDataType = {
     branchData?: BranchDataType;
     branchId?: string;
+    clusterElements?: ClusterElementsType;
     componentName: string;
     conditionCase?: 'caseTrue' | 'caseFalse';
     conditionData?: ConditionDataType;
@@ -191,6 +207,7 @@ export type WorkflowOutputType = {
 };
 
 export type WorkflowTaskType = {
+    clusterElements?: ClusterElementsType;
     connections: [
         {
             componentName: string;

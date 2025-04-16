@@ -138,3 +138,5 @@ export const COMPONENT_CATEGORY_ICON: Record<string, JSX.Element> = {
     'project-management': <SquareKanbanIcon />,
     'surveys-and-feedback': <SmileIcon />,
 };
+
+export const SORTED_CLUSTER_ELEMENTS_KEYS = ['rag', 'chatMemory', 'model', 'tools'];
