@@ -7,6 +7,7 @@ import '@xyflow/react/dist/base.css';
 import './WorkflowEditorLayout.css';
 
 import PageLoader from '@/components/PageLoader';
+import {Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle} from '@/components/ui/dialog';
 import useProjectsLeftSidebarStore from '@/pages/automation/project/stores/useProjectsLeftSidebarStore';
 import WorkflowCodeEditorSheet from '@/pages/platform/workflow-editor/components/WorkflowCodeEditorSheet';
 import WorkflowInputsSheet from '@/pages/platform/workflow-editor/components/WorkflowInputsSheet';
@@ -21,6 +22,7 @@ import useWorkflowEditorStore from '@/pages/platform/workflow-editor/stores/useW
 import {useCopilotStore} from '@/shared/components/copilot/stores/useCopilotStore';
 import {twMerge} from 'tailwind-merge';
 
+import AiAgentWorkflowEditor from '../ai-agent-editor/components/AiAgentWorkflowEditor';
 import DataPillPanel from './components/DataPillPanel';
 import WorkflowEditor from './components/WorkflowEditor';
 import useWorkflowDataStore from './stores/useWorkflowDataStore';
@@ -32,6 +34,8 @@ const WorkflowEditorLayout = () => {
     const {rightSidebarOpen} = useRightSidebarStore();
     const {workflow} = useWorkflowDataStore();
     const {
+        aiAgentOpen,
+        setAiAgentOpen,
         setShowWorkflowCodeEditorSheet,
         setShowWorkflowInputsSheet,
         setShowWorkflowOutputsSheet,
@@ -99,13 +103,37 @@ const WorkflowEditorLayout = () => {
                 </div>
             </PageLoader>
 
-            {currentComponent && (
+            {currentComponent && currentComponent.componentName !== 'aiAgent' && (
                 <WorkflowNodeDetailsPanel
                     previousComponentDefinitions={previousComponentDefinitions}
                     updateWorkflowMutation={updateWorkflowMutation}
                     workflowNodeOutputs={filteredWorkflowNodeOutputs ?? []}
                 />
             )}
+
+            <Dialog
+                onOpenChange={(open) => {
+                    setAiAgentOpen(open);
+                }}
+                open={aiAgentOpen}
+            >
+                <DialogHeader>
+                    <DialogTitle className="sr-only"></DialogTitle>
+
+                    <DialogDescription />
+                </DialogHeader>
+
+                <DialogContent className="absolute bottom-4 left-16 top-12 h-[calc(100vh-64px)] w-[calc(100vw-80px)] max-w-none translate-x-0 translate-y-0 gap-2 bg-surface-main p-0">
+                    <AiAgentWorkflowEditor />
+
+                    <WorkflowNodeDetailsPanel
+                        className="fixed inset-y-0 right-0 rounded-l-none border-none"
+                        previousComponentDefinitions={previousComponentDefinitions}
+                        updateWorkflowMutation={updateWorkflowMutation}
+                        workflowNodeOutputs={filteredWorkflowNodeOutputs ?? []}
+                    />
+                </DialogContent>
+            </Dialog>
 
             {workflow.id && <WorkflowTestChatPanel />}
 
