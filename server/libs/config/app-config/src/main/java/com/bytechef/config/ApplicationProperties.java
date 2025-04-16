@@ -357,7 +357,6 @@ public class ApplicationProperties {
 
         private Provider provider = new Provider();
         private Copilot copilot = new Copilot();
-        private Paths paths = new Paths();
 
         public Copilot getCopilot() {
             return copilot;
@@ -367,32 +366,12 @@ public class ApplicationProperties {
             return provider;
         }
 
-        public Paths getPaths() {
-            return paths;
-        }
-
         public void setCopilot(Copilot copilot) {
             this.copilot = copilot;
         }
 
         public void setProvider(Provider provider) {
             this.provider = provider;
-        }
-
-        public void setPaths(Paths paths) {
-            this.paths = paths;
-        }
-
-        public static class Paths {
-            private String workflowsPath;
-
-            public String getWorkflowsPath() {
-                return workflowsPath;
-            }
-
-            public void setWorkflowsPath(String workflowsPath) {
-                this.workflowsPath = workflowsPath;
-            }
         }
 
         public static class Copilot {

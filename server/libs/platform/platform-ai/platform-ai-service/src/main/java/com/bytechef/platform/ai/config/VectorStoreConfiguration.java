@@ -17,7 +17,6 @@
 package com.bytechef.platform.ai.config;
 
 import com.bytechef.component.definition.Property.Type;
-import com.bytechef.config.ApplicationProperties;
 import com.bytechef.platform.ai.service.VectorStoreService;
 import com.bytechef.platform.component.domain.ActionDefinition;
 import com.bytechef.platform.component.domain.ComponentDefinition;
@@ -54,6 +53,8 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.event.ApplicationStartedEvent;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.event.EventListener;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.Resource;
 
 /**
  * @author Marko Kriskovic
@@ -71,7 +72,6 @@ public class VectorStoreConfiguration {
     private static final String COMPONENTS = "components";
     private static final String FLOWS = "flows";
 
-    private final ApplicationProperties.Ai.Paths paths;
     private final TokenCountBatchingStrategy strategy;
     private final VectorStore vectorStore;
     private final VectorStoreService vectorStoreService;
@@ -83,10 +83,8 @@ public class VectorStoreConfiguration {
     public VectorStoreConfiguration(
         VectorStore vectorStore, VectorStoreService vectorStoreService,
         ComponentDefinitionService componentDefinitionService,
-        TaskDispatcherDefinitionService taskDispatcherDefinitionService, ApplicationProperties applicationProperties) {
+        TaskDispatcherDefinitionService taskDispatcherDefinitionService) {
 
-        this.paths = applicationProperties.getAi()
-            .getPaths();
         this.vectorStore = vectorStore;
         this.vectorStoreService = vectorStoreService;
         this.strategy = new TokenCountBatchingStrategy(
@@ -97,16 +95,17 @@ public class VectorStoreConfiguration {
 
     @EventListener(ApplicationStartedEvent.class)
     public void onApplicationStartedEvent() {
-        if (paths.getWorkflowsPath() == null) {
+        Resource resource = new ClassPathResource(WORKFLOWS);
 
-            if (LOGGER.isWarnEnabled()) {
-                LOGGER.warn("Documentation paths not set.");
+        try {
+            if (resource.exists() && resource.isFile()) {
+                Path resourcePath = Paths.get(resource.getURI());
+
+                initializeVectorStoreTable(resourcePath);
             }
-
-            return;
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
-
-        initializeVectorStoreTable(Paths.get(paths.getWorkflowsPath()));
     }
 
     private static void addToDocuments(
@@ -601,10 +600,6 @@ public class VectorStoreConfiguration {
                 case com.bytechef.platform.workflow.task.dispatcher.domain.NullProperty ignored -> {
                     this.type = Type.NULL;
                     this.location = Location.TASK_DISPATCHER;
-                }
-                case com.bytechef.platform.component.domain.NullProperty ignored -> {
-                    this.type = Type.NULL;
-                    this.location = Location.COMPONENT;
                 }
                 case com.bytechef.platform.workflow.task.dispatcher.domain.NumberProperty ignored -> {
                     this.type = Type.NUMBER;
