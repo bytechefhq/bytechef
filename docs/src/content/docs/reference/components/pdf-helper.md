@@ -19,6 +19,61 @@ Type: pdfHelper/v1
 ## Actions
 
 
+### Convert to Image
+Name: convertToImage
+
+Converts pdf to image.
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| file | PDF File | FILE_ENTRY | The PDF file which will be converted to image. | true |
+| filename | Image Name | STRING | Name of the image. Every image will have index of the corresponding page in its name. | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Convert to Image",
+  "name" : "convertToImage",
+  "parameters" : {
+    "file" : {
+      "extension" : "",
+      "mimeType" : "",
+      "name" : "",
+      "url" : ""
+    },
+    "filename" : ""
+  },
+  "type" : "pdfHelper/v1/convertToImage"
+}
+```
+
+#### Output
+
+
+
+Type: ARRAY
+
+
+Items Type: FILE_ENTRY
+
+
+
+
+
+
+#### Output Example
+```json
+[ {
+  "extension" : "",
+  "mimeType" : "",
+  "name" : "",
+  "url" : ""
+} ]
+```
+
+
 ### Extract Text
 Name: extractText
 
@@ -58,6 +113,121 @@ Type: STRING
 
 
 
+
+
+### Image to PDF
+Name: imageToPdf
+
+Converts image to PDF.
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| image | Image | FILE_ENTRY | The image which will be converted to PDF. | true |
+| filename | Filename | STRING | The name of the PDF file. | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Image to PDF",
+  "name" : "imageToPdf",
+  "parameters" : {
+    "image" : {
+      "extension" : "",
+      "mimeType" : "",
+      "name" : "",
+      "url" : ""
+    },
+    "filename" : ""
+  },
+  "type" : "pdfHelper/v1/imageToPdf"
+}
+```
+
+#### Output
+
+
+
+Type: FILE_ENTRY
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| extension | STRING |  |
+| mimeType | STRING |  |
+| name | STRING |  |
+| url | STRING |  |
+
+
+
+
+#### Output Example
+```json
+{
+  "extension" : "",
+  "mimeType" : "",
+  "name" : "",
+  "url" : ""
+}
+```
+
+
+### Text to PDF
+Name: textToPdf
+
+Converts text to PDF.
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| text | Text | STRING | The text which will be converted to PDF. | true |
+| filename | Filename | STRING | The name of the PDF file. | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Text to PDF",
+  "name" : "textToPdf",
+  "parameters" : {
+    "text" : "",
+    "filename" : ""
+  },
+  "type" : "pdfHelper/v1/textToPdf"
+}
+```
+
+#### Output
+
+
+
+Type: FILE_ENTRY
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| extension | STRING |  |
+| mimeType | STRING |  |
+| name | STRING |  |
+| url | STRING |  |
+
+
+
+
+#### Output Example
+```json
+{
+  "extension" : "",
+  "mimeType" : "",
+  "name" : "",
+  "url" : ""
+}
+```
 
 
 
