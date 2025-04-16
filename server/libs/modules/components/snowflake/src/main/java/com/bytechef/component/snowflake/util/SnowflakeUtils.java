@@ -1,5 +1,5 @@
 /*
- * Copyright 2023-present ByteChef Inc.
+ * Copyright 2025 ByteChef
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,8 @@ package com.bytechef.component.snowflake.util;
 import static com.bytechef.component.definition.ComponentDsl.option;
 import static com.bytechef.component.definition.Context.Http.responseType;
 import static com.bytechef.component.snowflake.constant.SnowflakeConstants.DATABASE;
+import static com.bytechef.component.snowflake.constant.SnowflakeConstants.DATATYPE;
+import static com.bytechef.component.snowflake.constant.SnowflakeConstants.NAME;
 import static com.bytechef.component.snowflake.constant.SnowflakeConstants.SCHEMA;
 import static com.bytechef.component.snowflake.constant.SnowflakeConstants.STATEMENT;
 import static com.bytechef.component.snowflake.constant.SnowflakeConstants.TABLE;
@@ -30,9 +32,11 @@ import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * @author Nikolina Spehar
@@ -47,30 +51,13 @@ public class SnowflakeUtils {
             .getBody();
     }
 
-    public static List<Option<String>> getColumnOptions(
-        Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
-        String searchText, Context context) {
-
-        String columnString = getTableColumns(inputParameters, context);
-
-        List<String> columnList = new ArrayList<>(Arrays.asList(columnString.split(",")));
-
-        List<Option<String>> options = new ArrayList<>();
-
-        for (String column : columnList) {
-            options.add(option(column, column));
-        }
-
-        return options;
-    }
-
-    public static String getColumnUpdateStatement(String columns, String values) {
-        String[] columnArray = columns.split(",");
-        String[] valueArray = values.split(",");
-
-        if (columnArray.length != valueArray.length) {
-            throw new IllegalArgumentException("Columns and values do not match.");
-        }
+    public static String getColumnUpdateStatement(Map<String, ?> values) {
+        String[] columnArray = values.keySet()
+            .toArray(new String[0]);
+        String[] valueArray = values.values()
+            .stream()
+            .map(String::valueOf)
+            .toArray(String[]::new);
 
         StringBuilder updateStatementBuilder = new StringBuilder();
 
@@ -83,6 +70,17 @@ public class SnowflakeUtils {
 
         updateStatementBuilder.deleteCharAt(updateStatementBuilder.length() - 1);
         return updateStatementBuilder.toString();
+    }
+
+    private static String extractBaseDataType(String sqlType) {
+        Pattern pattern = Pattern.compile("^([A-Za-z]+)");
+        Matcher matcher = pattern.matcher(sqlType);
+
+        if (matcher.find()) {
+            return matcher.group(1)
+                .toUpperCase();
+        }
+        return sqlType.toUpperCase();
     }
 
     public static List<Option<String>> getDatabaseNameOptions(
@@ -111,7 +109,7 @@ public class SnowflakeUtils {
         return getOptions(result);
     }
 
-    public static String getTableColumns(Parameters inputParameters, Context context) {
+    public static List<Map<String, String>> getTableColumns(Parameters inputParameters, Context context) {
         Map<String, Object> table = context
             .http(http -> http.get(
                 "/api/v2/databases/%s/schemas/%s/tables/%s".formatted(
@@ -122,20 +120,21 @@ public class SnowflakeUtils {
             .execute()
             .getBody(new TypeReference<>() {});
 
-        StringBuilder stringBuilder = new StringBuilder();
+        List<Map<String, String>> columns = new ArrayList<>();
 
         if (table.get("columns") instanceof List<?> columnList) {
             for (Object element : columnList) {
                 if (element instanceof Map<?, ?> column) {
-                    stringBuilder.append(column.get("name"))
-                        .append(",");
+                    Map<String, String> columnMap = new HashMap<>();
+
+                    columnMap.put(NAME, (String) column.get(NAME));
+                    columnMap.put(DATATYPE, extractBaseDataType((String) column.get(DATATYPE)));
+
+                    columns.add(columnMap);
                 }
             }
         }
-
-        stringBuilder.deleteCharAt(stringBuilder.length() - 1);
-
-        return stringBuilder.toString();
+        return columns;
     }
 
     public static List<Option<String>> getTableNameOptions(

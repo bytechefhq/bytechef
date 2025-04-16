@@ -1,5 +1,5 @@
 /*
- * Copyright 2023-present ByteChef Inc.
+ * Copyright 2025 ByteChef
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +19,6 @@ package com.bytechef.component.snowflake.action;
 import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
-import static com.bytechef.component.snowflake.constant.SnowflakeConstants.COLUMN;
 import static com.bytechef.component.snowflake.constant.SnowflakeConstants.CONDITION;
 import static com.bytechef.component.snowflake.constant.SnowflakeConstants.DATABASE;
 import static com.bytechef.component.snowflake.constant.SnowflakeConstants.DATABASE_PROPERTY;
@@ -31,7 +30,6 @@ import static com.bytechef.component.snowflake.constant.SnowflakeConstants.TABLE
 
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context;
-import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.snowflake.util.SnowflakeUtils;
 
@@ -47,14 +45,9 @@ public class SnowflakeDeleteRowAction {
             DATABASE_PROPERTY,
             SCHEMA_PROPERTY,
             TABLE_PROPERTY,
-            string(COLUMN)
-                .label("Column")
-                .description("Column name that will be checked for condition.")
-                .options((ActionOptionsFunction<String>) SnowflakeUtils::getColumnOptions)
-                .required(true),
             string(CONDITION)
                 .label("Condition")
-                .description("Condition that will be checked in the column.")
+                .description("Condition that will be checked in the column. Example: column1=5")
                 .required(true))
         .output(outputSchema(SQL_STATEMENT_RESPONSE))
         .perform(SnowflakeDeleteRowAction::perform);
@@ -63,11 +56,10 @@ public class SnowflakeDeleteRowAction {
     }
 
     public static Object perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
-        String sqlStatement = "DELETE FROM %s.%s.%s WHERE %s = %s".formatted(
+        String sqlStatement = "DELETE FROM %s.%s.%s WHERE %s".formatted(
             inputParameters.getRequiredString(DATABASE),
             inputParameters.getRequiredString(SCHEMA),
             inputParameters.getRequiredString(TABLE),
-            inputParameters.getRequiredString(COLUMN),
             inputParameters.getRequiredString(CONDITION));
 
         return SnowflakeUtils.executeStatement(context, sqlStatement);

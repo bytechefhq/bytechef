@@ -1,5 +1,5 @@
 /*
- * Copyright 2023-present ByteChef Inc.
+ * Copyright 2025 ByteChef
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,7 +18,6 @@ package com.bytechef.component.snowflake.action;
 
 import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
-import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.snowflake.constant.SnowflakeConstants.DATABASE;
 import static com.bytechef.component.snowflake.constant.SnowflakeConstants.DATABASE_PROPERTY;
 import static com.bytechef.component.snowflake.constant.SnowflakeConstants.SCHEMA;
@@ -27,11 +26,13 @@ import static com.bytechef.component.snowflake.constant.SnowflakeConstants.SQL_S
 import static com.bytechef.component.snowflake.constant.SnowflakeConstants.TABLE;
 import static com.bytechef.component.snowflake.constant.SnowflakeConstants.TABLE_PROPERTY;
 import static com.bytechef.component.snowflake.constant.SnowflakeConstants.VALUES;
+import static com.bytechef.component.snowflake.constant.SnowflakeConstants.VALUES_DYNAMIC_PROPERTY;
 
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.snowflake.util.SnowflakeUtils;
+import java.util.stream.Collectors;
 
 /**
  * @author Nikolina Spehar
@@ -45,10 +46,7 @@ public class SnowflakeInsertRowAction {
             DATABASE_PROPERTY,
             SCHEMA_PROPERTY,
             TABLE_PROPERTY,
-            string(VALUES)
-                .label("Values")
-                .description("Values to insert into the table. Seperated by comma.")
-                .required(true))
+            VALUES_DYNAMIC_PROPERTY)
         .output(outputSchema(SQL_STATEMENT_RESPONSE))
         .perform(SnowflakeInsertRowAction::perform);
 
@@ -56,14 +54,24 @@ public class SnowflakeInsertRowAction {
     }
 
     public static Object perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
-        String columns = SnowflakeUtils.getTableColumns(inputParameters, context);
+        String columns = inputParameters.getRequiredMap(VALUES)
+            .keySet()
+            .stream()
+            .map(Object::toString)
+            .collect(Collectors.joining(","));
+
+        String values = inputParameters.getRequiredMap(VALUES)
+            .values()
+            .stream()
+            .map(Object::toString)
+            .collect(Collectors.joining(","));
 
         String sqlStatement = "INSERT INTO %s.%s.%s(%s) VALUES(%s)".formatted(
             inputParameters.getRequiredString(DATABASE),
             inputParameters.getRequiredString(SCHEMA),
             inputParameters.getRequiredString(TABLE),
             columns,
-            inputParameters.getRequiredString(VALUES));
+            values);
 
         return SnowflakeUtils.executeStatement(context, sqlStatement);
     }
