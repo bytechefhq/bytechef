@@ -67,8 +67,7 @@ public class BolnaMakePhoneCallAction {
     }
 
     public static Object perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
-        return context
-            .http(http -> http.post("/call"))
+        return context.http(http -> http.post("/call"))
             .body(Http.Body.of(
                 Map.of(
                     AGENT_ID, inputParameters.getRequiredString(AGENT_ID),
