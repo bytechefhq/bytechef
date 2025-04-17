@@ -77,11 +77,11 @@ public class MailService {
         if (StringUtils.isBlank(mail.getHost()) && log.isWarnEnabled()) {
             log.warn("Mail server is not configured, not sending mails");
         } else {
-            if (log.isDebugEnabled()) {
-                log.debug("Listing mail server properties:");
+            if (log.isTraceEnabled()) {
+                log.trace("Listing mail server properties:");
 
                 for (String propertyName : PROPERTY_NAMES) {
-                    log.debug("{}: {}", propertyName, environment.getProperty(propertyName));
+                    log.trace("{}: {}", propertyName, environment.getProperty(propertyName));
                 }
             }
         }
