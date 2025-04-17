@@ -35,6 +35,7 @@ import com.bytechef.embedded.configuration.service.IntegrationWorkflowService;
 import com.bytechef.platform.category.domain.Category;
 import com.bytechef.platform.category.service.CategoryService;
 import com.bytechef.platform.component.service.ComponentDefinitionService;
+import com.bytechef.platform.configuration.annotation.WorkflowCacheEvict;
 import com.bytechef.platform.configuration.facade.WorkflowFacade;
 import com.bytechef.platform.configuration.service.WorkflowNodeTestOutputService;
 import com.bytechef.platform.configuration.service.WorkflowTestConfigurationService;
@@ -401,6 +402,9 @@ public class IntegrationFacadeImpl implements IntegrationFacade {
     }
 
     @Override
+    @WorkflowCacheEvict(cacheNames = {
+        "previousWorkflowNodeOutputs", "previousWorkflowNodeSampleOutputs"
+    })
     public void updateWorkflow(String workflowId, String definition, int version) {
         workflowService.update(workflowId, definition, version);
     }

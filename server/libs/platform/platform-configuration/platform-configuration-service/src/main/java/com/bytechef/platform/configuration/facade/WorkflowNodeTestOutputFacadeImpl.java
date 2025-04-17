@@ -31,6 +31,7 @@ import com.bytechef.platform.component.trigger.TriggerOutput;
 import com.bytechef.platform.component.trigger.WebhookRequest;
 import com.bytechef.platform.configuration.accessor.JobPrincipalAccessor;
 import com.bytechef.platform.configuration.accessor.JobPrincipalAccessorRegistry;
+import com.bytechef.platform.configuration.annotation.WorkflowCacheEvict;
 import com.bytechef.platform.configuration.domain.WorkflowNodeTestOutput;
 import com.bytechef.platform.configuration.domain.WorkflowTestConfigurationConnection;
 import com.bytechef.platform.configuration.domain.WorkflowTrigger;
@@ -82,6 +83,9 @@ public class WorkflowNodeTestOutputFacadeImpl implements WorkflowNodeTestOutputF
     }
 
     @Override
+    @WorkflowCacheEvict(cacheNames = {
+        "previousWorkflowNodeOutputs", "previousWorkflowNodeSampleOutputs"
+    })
     public WorkflowNodeTestOutput saveWorkflowNodeTestOutput(String workflowId, String workflowNodeName) {
         Workflow workflow = workflowService.getWorkflow(workflowId);
 
@@ -105,6 +109,9 @@ public class WorkflowNodeTestOutputFacadeImpl implements WorkflowNodeTestOutputF
     }
 
     @Override
+    @WorkflowCacheEvict(cacheNames = {
+        "previousWorkflowNodeOutputs", "previousWorkflowNodeSampleOutputs"
+    })
     public WorkflowNodeTestOutput saveWorkflowNodeTestOutput(
         String workflowId, String workflowNodeName, Object sampleOutput) {
 

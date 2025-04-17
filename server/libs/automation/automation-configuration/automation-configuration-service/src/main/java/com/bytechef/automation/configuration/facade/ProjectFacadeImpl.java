@@ -36,6 +36,7 @@ import com.bytechef.commons.util.JsonUtils;
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.platform.category.domain.Category;
 import com.bytechef.platform.category.service.CategoryService;
+import com.bytechef.platform.configuration.annotation.WorkflowCacheEvict;
 import com.bytechef.platform.configuration.facade.WorkflowFacade;
 import com.bytechef.platform.configuration.service.WorkflowNodeTestOutputService;
 import com.bytechef.platform.configuration.service.WorkflowTestConfigurationService;
@@ -390,6 +391,9 @@ public class ProjectFacadeImpl implements ProjectFacade {
     }
 
     @Override
+    @WorkflowCacheEvict(cacheNames = {
+        "previousWorkflowNodeOutputs", "previousWorkflowNodeSampleOutputs"
+    })
     public void updateWorkflow(String workflowId, String definition, int version) {
         workflowService.update(workflowId, definition, version);
     }

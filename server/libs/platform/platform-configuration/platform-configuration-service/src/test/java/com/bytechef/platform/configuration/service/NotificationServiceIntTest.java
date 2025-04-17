@@ -18,6 +18,7 @@ package com.bytechef.platform.configuration.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.platform.configuration.config.NotificationIntTestConfiguration;
 import com.bytechef.platform.configuration.domain.Notification;
 import com.bytechef.platform.configuration.domain.NotificationEvent;
@@ -39,6 +40,9 @@ public class NotificationServiceIntTest {
 
     @MockitoBean
     private MailService mailService;
+
+    @MockitoBean
+    private WorkflowService workflowService;
 
     @Autowired
     private NotificationService notificationService;

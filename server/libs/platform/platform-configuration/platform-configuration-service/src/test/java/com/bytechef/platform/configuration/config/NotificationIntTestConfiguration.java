@@ -28,6 +28,7 @@ import java.util.Arrays;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.FilterType;
@@ -50,6 +51,7 @@ import org.springframework.data.jdbc.repository.config.EnableJdbcRepositories;
     JacksonConfiguration.class, LiquibaseConfiguration.class, PostgreSQLContainerConfiguration.class
 })
 @EnableAutoConfiguration
+@EnableCaching
 @Configuration
 public class NotificationIntTestConfiguration {
 

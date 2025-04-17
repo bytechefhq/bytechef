@@ -31,6 +31,8 @@ import java.util.Objects;
 import java.util.Optional;
 import javax.annotation.Nullable;
 import org.apache.commons.lang3.Validate;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -69,6 +71,7 @@ public class WorkflowNodeTestOutputServiceImpl implements WorkflowNodeTestOutput
 
     @Override
     @Transactional(readOnly = true)
+    @Cacheable(value = "workflowTestNodeOutput")
     public Optional<WorkflowNodeTestOutput> fetchWorkflowTestNodeOutput(
         String workflowId, String workflowNodeName) {
 
@@ -124,6 +127,7 @@ public class WorkflowNodeTestOutputServiceImpl implements WorkflowNodeTestOutput
     }
 
     @Override
+    @CacheEvict(value = "workflowTestNodeOutput", key = "#workflowId + ':' + #workflowNodeName")
     public WorkflowNodeTestOutput save(
         String workflowId, String workflowNodeName, WorkflowNodeType workflowNodeType, OutputResponse outputResponse) {
 

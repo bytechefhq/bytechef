@@ -50,6 +50,7 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -120,6 +121,7 @@ public class WorkflowNodeOutputFacadeImpl implements WorkflowNodeOutputFacade {
     }
 
     @Override
+    @Cacheable(value = "previousWorkflowNodeOutputs")
     public List<WorkflowNodeOutputDTO> getPreviousWorkflowNodeOutputs(String workflowId, String lastWorkflowNodeName) {
         List<WorkflowNodeOutputDTO> workflowNodeOutputDTOs = new ArrayList<>();
 
@@ -149,6 +151,7 @@ public class WorkflowNodeOutputFacadeImpl implements WorkflowNodeOutputFacade {
     }
 
     @Override
+    @Cacheable(value = "previousWorkflowNodeSampleOutputs")
     public Map<String, ?> getPreviousWorkflowNodeSampleOutputs(String workflowId, String lastWorkflowNodeName) {
         return getPreviousWorkflowNodeOutputs(workflowId, lastWorkflowNodeName)
             .stream()
@@ -295,8 +298,7 @@ public class WorkflowNodeOutputFacadeImpl implements WorkflowNodeOutputFacade {
 
         OutputResponse finalOutputResponse = outputResponse;
 
-        outputResponse = workflowNodeTestOutputService
-            .fetchWorkflowTestNodeOutput(workflowId, workflowTask.getName())
+        outputResponse = workflowNodeTestOutputService.fetchWorkflowTestNodeOutput(workflowId, workflowTask.getName())
             .map(WorkflowNodeTestOutput::getOutput)
             .orElseGet(() -> checkOutput(workflowId, workflowTask, null, finalOutputResponse, workflowTasks));
 
