@@ -1,5 +1,5 @@
 import {WorkflowTask} from '@/shared/middleware/platform/configuration';
-import {TaskDispatcherContextType} from '@/shared/types';
+import {BranchCaseType, TaskDispatcherContextType} from '@/shared/types';
 
 import {TASK_DISPATCHER_CONFIG} from './taskDispatcherConfig';
 
@@ -37,6 +37,34 @@ function updateTasksRecursively(tasks: Array<WorkflowTask>, taskToReplace: Workf
                     iteratee: updateTasksRecursively(task.parameters.iteratee, taskToReplace),
                 },
             };
+        }
+
+        if (task.parameters?.cases) {
+            const updatedTask = {...task};
+
+            if (task.parameters.default) {
+                updatedTask.parameters = {
+                    ...updatedTask.parameters,
+                    default: updateTasksRecursively(task.parameters.default, taskToReplace),
+                };
+            }
+
+            if (task.parameters.cases) {
+                updatedTask.parameters = {
+                    ...updatedTask.parameters,
+                    cases: (task.parameters.cases as BranchCaseType[]).map((caseItem) => {
+                        const updatedCaseItem = {...caseItem};
+
+                        if (caseItem.tasks) {
+                            updatedCaseItem.tasks = updateTasksRecursively(caseItem.tasks, taskToReplace);
+                        }
+
+                        return updatedCaseItem;
+                    }),
+                };
+            }
+
+            return updatedTask;
         }
 
         return task;

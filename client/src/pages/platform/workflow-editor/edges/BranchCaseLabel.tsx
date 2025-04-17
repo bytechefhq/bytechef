@@ -10,6 +10,7 @@ import {useShallow} from 'zustand/react/shallow';
 
 import {useWorkflowMutation} from '../providers/workflowMutationProvider';
 import useWorkflowDataStore from '../stores/useWorkflowDataStore';
+import getUpdatedRootBranchNodeData from '../utils/getUpdatedRootBranchNodeData';
 import saveWorkflowDefinition from '../utils/saveWorkflowDefinition';
 import {TASK_DISPATCHER_CONFIG} from '../utils/taskDispatcherConfig';
 
@@ -57,17 +58,36 @@ export default function BranchCaseLabel({caseKey, edgeId, sourceY, targetX}: Bra
 
     const saveBranchChange = useCallback(
         (branchParameters: object) => {
-            saveWorkflowDefinition({
-                nodeData: {
-                    ...parentBranchNodeData,
+            const parentBranchTaskNode = nodes.find((node) => node.data.name === parentBranchNodeData?.name);
+
+            if (!parentBranchTaskNode) {
+                console.error('No parent branch task node found for task: ', parentBranchNodeData?.name);
+
+                return;
+            }
+
+            const updatedNode = {
+                ...parentBranchTaskNode,
+                data: {
+                    ...parentBranchTaskNode.data,
                     parameters: branchParameters,
                 },
+            };
+
+            const nodeData = getUpdatedRootBranchNodeData({
+                isStructuralUpdate: true,
+                updatedParentNodeData: updatedNode.data as NodeDataType,
+            });
+
+            saveWorkflowDefinition({
+                changedChildNodeId: updatedNode.id,
+                nodeData,
                 projectId: Number(projectId),
                 queryClient,
                 updateWorkflowMutation,
             });
         },
-        [parentBranchNodeData, projectId, queryClient, updateWorkflowMutation]
+        [nodes, parentBranchNodeData?.name, projectId, queryClient, updateWorkflowMutation]
     );
 
     const handleCreateCaseClick = useCallback(() => {

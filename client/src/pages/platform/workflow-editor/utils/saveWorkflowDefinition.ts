@@ -21,6 +21,7 @@ type UpdateWorkflowRequestType = {
 
 interface SaveWorkflowDefinitionProps {
     decorative?: boolean;
+    changedChildNodeId?: string;
     nodeData: NodeDataType;
     nodeIndex?: number;
     onSuccess?: () => void;
@@ -33,6 +34,7 @@ interface SaveWorkflowDefinitionProps {
 }
 
 export default async function saveWorkflowDefinition({
+    changedChildNodeId,
     decorative,
     nodeData,
     nodeIndex,
@@ -169,7 +171,8 @@ export default async function saveWorkflowDefinition({
         !differenceInClusterElements &&
         !differenceInType &&
         !differenceInCaseCount &&
-        !differenceInCaseKeys
+        !differenceInCaseKeys &&
+        !changedChildNodeId
     ) {
         return;
     }

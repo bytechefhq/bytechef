@@ -30,6 +30,7 @@ import {WorkflowNodeOptionKeys} from '@/shared/queries/platform/workflowNodeOpti
 import {useGetWorkflowNodeParameterDisplayConditionsQuery} from '@/shared/queries/platform/workflowNodeParameters.queries';
 import {useGetWorkflowTestConfigurationConnectionsQuery} from '@/shared/queries/platform/workflowTestConfigurations.queries';
 import {
+    BranchCaseType,
     ComponentPropertiesType,
     NodeDataType,
     PropertyAllType,
@@ -51,8 +52,10 @@ import useWorkflowEditorStore from '../stores/useWorkflowEditorStore';
 import useWorkflowNodeDetailsPanelStore from '../stores/useWorkflowNodeDetailsPanelStore';
 import getDataPillsFromProperties from '../utils/getDataPillsFromProperties';
 import getParametersWithDefaultValues from '../utils/getParametersWithDefaultValues';
+import getUpdatedRootBranchNodeData from '../utils/getUpdatedRootBranchNodeData';
+import getUpdatedRootConditionNodeData from '../utils/getUpdatedRootConditionNodeData';
+import getUpdatedRootLoopNodeData from '../utils/getUpdatedRootLoopNodeData';
 import saveWorkflowDefinition from '../utils/saveWorkflowDefinition';
-import updateRootConditionNode from '../utils/updateRootConditionNode';
 import CurrentOperationSelect from './CurrentOperationSelect';
 import DescriptionTab from './node-details-tabs/DescriptionTab';
 import ConnectionTab from './node-details-tabs/connection-tab/ConnectionTab';
@@ -376,44 +379,96 @@ const WorkflowNodeDetailsPanel = ({
                 }
 
                 const conditionCase = currentNode.conditionData.conditionCase;
-                const conditionParameters: Array<WorkflowTask> = (parentConditionNode.data as NodeDataType)
-                    ?.parameters?.[conditionCase];
+                const conditionSubtasks: Array<WorkflowTask> = (parentConditionNode.data as NodeDataType)?.parameters?.[
+                    conditionCase
+                ];
 
-                if (conditionParameters) {
-                    const taskIndex = conditionParameters.findIndex((subtask) => subtask.name === currentNode.name);
-
-                    if (taskIndex !== -1) {
-                        conditionParameters[taskIndex] = {
-                            ...conditionParameters[taskIndex],
-                            type: `${componentName}/v${currentComponentDefinition.version}/${newOperationName}`,
-                        };
-
-                        if (!workflow.definition) {
-                            return;
-                        }
-
-                        const tasks = JSON.parse(workflow.definition).tasks;
-
-                        const updatedParentConditionTask = workflow.tasks?.find(
-                            (task) => task.name === currentNode.conditionData?.conditionId
-                        );
-
-                        if (!updatedParentConditionTask) {
-                            return;
-                        }
-
-                        nodeData = updateRootConditionNode({
-                            conditionCase,
-                            conditionId: currentNode.conditionData.conditionId,
-                            nodeIndex: taskIndex,
-                            nodes,
-                            tasks,
-                            updatedParentConditionNodeData: parentConditionNode.data as NodeDataType,
-                            updatedParentConditionTask,
-                            workflow,
-                        });
-                    }
+                if (!conditionSubtasks) {
+                    return;
                 }
+
+                const subtaskIndex = conditionSubtasks.findIndex((subtask) => subtask.name === currentNode.name);
+
+                if (subtaskIndex === -1) {
+                    return;
+                }
+
+                conditionSubtasks[subtaskIndex] = {
+                    ...conditionSubtasks[subtaskIndex],
+                    type: `${componentName}/v${currentComponentDefinition.version}/${newOperationName}`,
+                };
+
+                nodeData = getUpdatedRootConditionNodeData({
+                    updatedParentNodeData: parentConditionNode.data as NodeDataType,
+                });
+            }
+
+            if (currentNode?.loopData) {
+                const parentLoopNode = nodes.find((node) => node.data.name === currentNode?.loopData?.loopId);
+
+                if (!parentLoopNode) {
+                    return;
+                }
+
+                const loopSubtasks: Array<WorkflowTask> = (parentLoopNode.data as NodeDataType)?.parameters?.iteratee;
+
+                if (!loopSubtasks) {
+                    return;
+                }
+
+                const subtaskIndex = loopSubtasks.findIndex((subtask) => subtask.name === currentNode.name);
+                if (subtaskIndex === -1) {
+                    return;
+                }
+
+                loopSubtasks[subtaskIndex] = {
+                    ...loopSubtasks[subtaskIndex],
+                    type: `${componentName}/v${currentComponentDefinition.version}/${newOperationName}`,
+                };
+
+                nodeData = getUpdatedRootLoopNodeData({
+                    updatedParentNodeData: parentLoopNode.data as NodeDataType,
+                });
+            }
+
+            if (currentNode?.branchData) {
+                const parentBranchNode = nodes.find((node) => node.data.name === currentNode?.branchData?.branchId);
+
+                if (!parentBranchNode) {
+                    return;
+                }
+
+                const branchCase = currentNode.branchData.caseKey;
+                let branchSubtasks: Array<WorkflowTask>;
+
+                if (branchCase === 'default') {
+                    branchSubtasks = (parentBranchNode.data as NodeDataType)?.parameters?.default;
+                } else {
+                    const cases = (parentBranchNode.data as NodeDataType)?.parameters?.cases;
+
+                    const caseObject = cases?.find((caseItem: BranchCaseType) => caseItem.key === branchCase);
+
+                    branchSubtasks = caseObject?.tasks;
+                }
+
+                if (!branchSubtasks) {
+                    return;
+                }
+
+                const subtaskIndex = branchSubtasks.findIndex((subtask) => subtask.name === currentNode.name);
+
+                if (subtaskIndex === -1) {
+                    return;
+                }
+
+                branchSubtasks[subtaskIndex] = {
+                    ...branchSubtasks[subtaskIndex],
+                    type: `${componentName}/v${currentComponentDefinition.version}/${newOperationName}`,
+                };
+
+                nodeData = getUpdatedRootBranchNodeData({
+                    updatedParentNodeData: parentBranchNode.data as NodeDataType,
+                });
             }
 
             saveWorkflowDefinition({
@@ -432,7 +487,7 @@ const WorkflowNodeDetailsPanel = ({
                 },
                 projectId: +projectId!,
                 queryClient,
-                subtask: !!currentNode?.conditionData,
+                subtask: !!currentNode?.conditionData || !!currentNode?.loopData || !!currentNode?.branchData,
                 updateWorkflowMutation,
             });
         },
@@ -446,7 +501,6 @@ const WorkflowNodeDetailsPanel = ({
             queryClient,
             setCurrentComponent,
             updateWorkflowMutation,
-            workflow,
         ]
     );
 

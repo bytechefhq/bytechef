@@ -16,9 +16,11 @@ import {useParams} from 'react-router-dom';
 import {useDebouncedCallback} from 'use-debounce';
 import {useShallow} from 'zustand/react/shallow';
 
+import getUpdatedRootBranchNodeData from '../../utils/getUpdatedRootBranchNodeData';
+import getUpdatedRootConditionNodeData from '../../utils/getUpdatedRootConditionNodeData';
+import getUpdatedRootLoopNodeData from '../../utils/getUpdatedRootLoopNodeData';
 import saveWorkflowDefinition from '../../utils/saveWorkflowDefinition';
-import updateRootConditionNode from '../../utils/updateRootConditionNode';
-import updateRootLoopNode from '../../utils/updateRootLoopNode';
+import {TASK_DISPATCHER_CONFIG} from '../../utils/taskDispatcherConfig';
 
 const DescriptionTab = ({
     nodeDefinition,
@@ -51,8 +53,6 @@ const DescriptionTab = ({
             name: currentNode.workflowNodeName,
         };
 
-        const tasks = JSON.parse(workflow.definition).tasks;
-
         if (currentNode.conditionData) {
             const parentConditionNode = nodes.find(
                 (node) => node.data.name === currentNode?.conditionData?.conditionId
@@ -63,42 +63,27 @@ const DescriptionTab = ({
             }
 
             const conditionCase = currentNode.conditionData.conditionCase;
-            const conditionParameters: Array<WorkflowTask> = (parentConditionNode.data as NodeDataType)?.parameters?.[
+            const conditionCaseSubtasks: Array<WorkflowTask> = (parentConditionNode.data as NodeDataType)?.parameters?.[
                 conditionCase
             ];
 
-            if (!conditionParameters) {
+            if (!conditionCaseSubtasks) {
                 return;
             }
 
-            const taskIndex = conditionParameters.findIndex((subtask) => subtask.name === currentNode.name);
+            const taskIndex = conditionCaseSubtasks.findIndex((subtask) => subtask.name === currentNode.name);
 
             if (taskIndex === -1) {
                 return;
             }
 
-            conditionParameters[taskIndex] = {
-                ...conditionParameters[taskIndex],
+            conditionCaseSubtasks[taskIndex] = {
+                ...conditionCaseSubtasks[taskIndex],
                 [field]: value,
             };
 
-            const updatedParentConditionTask = workflow.tasks?.find(
-                (task) => task.name === currentNode.conditionData?.conditionId
-            );
-
-            if (!updatedParentConditionTask) {
-                return;
-            }
-
-            nodeData = updateRootConditionNode({
-                conditionCase,
-                conditionId: currentNode.conditionData.conditionId,
-                nodeIndex: taskIndex,
-                nodes,
-                tasks,
-                updatedParentConditionNodeData: parentConditionNode.data as NodeDataType,
-                updatedParentConditionTask,
-                workflow,
+            nodeData = getUpdatedRootConditionNodeData({
+                updatedParentNodeData: parentConditionNode.data as NodeDataType,
             });
         }
 
@@ -109,32 +94,56 @@ const DescriptionTab = ({
                 return;
             }
 
-            const loopIteratees: Array<WorkflowTask> = (parentLoopNode.data as NodeDataType)?.parameters?.iteratee;
+            const loopSubtasks: Array<WorkflowTask> = (parentLoopNode.data as NodeDataType)?.parameters?.iteratee;
 
-            const taskIndex = loopIteratees.findIndex((subtask) => subtask.name === currentNode.name);
+            const taskIndex = loopSubtasks.findIndex((subtask) => subtask.name === currentNode.name);
 
             if (taskIndex === -1) {
                 return;
             }
 
-            loopIteratees[taskIndex] = {
-                ...loopIteratees[taskIndex],
+            loopSubtasks[taskIndex] = {
+                ...loopSubtasks[taskIndex],
                 [field]: value,
             };
 
-            const updatedParentLoopTask = workflow.tasks?.find((task) => task.name === currentNode.loopData?.loopId);
+            nodeData = getUpdatedRootLoopNodeData({
+                updatedParentNodeData: parentLoopNode.data as NodeDataType,
+            });
+        }
 
-            if (!updatedParentLoopTask) {
+        if (currentNode.branchData) {
+            const parentBranchNode = nodes.find((node) => node.data.name === currentNode?.branchData?.branchId);
+
+            if (!parentBranchNode) {
                 return;
             }
 
-            nodeData = updateRootLoopNode({
-                nodeIndex: taskIndex,
-                nodes,
-                tasks,
-                updatedParentLoopNodeData: parentLoopNode.data as NodeDataType,
-                updatedParentLoopTask,
-                workflow,
+            const branchCaseSubtasks = TASK_DISPATCHER_CONFIG.branch.getSubtasks({
+                context: {
+                    caseKey: currentNode.branchData.caseKey,
+                    taskDispatcherId: currentNode.branchData.branchId,
+                },
+                node: parentBranchNode,
+            });
+
+            if (!branchCaseSubtasks) {
+                return;
+            }
+
+            const taskIndex = branchCaseSubtasks.findIndex((subtask) => subtask.name === currentNode.name);
+
+            if (taskIndex === -1) {
+                return;
+            }
+
+            branchCaseSubtasks[taskIndex] = {
+                ...branchCaseSubtasks[taskIndex],
+                [field]: value,
+            };
+
+            nodeData = getUpdatedRootBranchNodeData({
+                updatedParentNodeData: parentBranchNode.data as NodeDataType,
             });
         }
 
@@ -153,7 +162,7 @@ const DescriptionTab = ({
             version: 'version' in nodeDefinition ? nodeDefinition.version : 1,
         };
 
-        if (currentNode.conditionData || currentNode.loopData) {
+        if (currentNode.conditionData || currentNode.loopData || currentNode.branchData) {
             nodeData = updateNodeData(event.target.value, 'label') ?? nodeData;
         }
 

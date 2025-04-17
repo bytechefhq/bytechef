@@ -13,9 +13,9 @@ import {
     TaskDispatcherContextType,
     UpdateTaskParametersType,
 } from '@/shared/types';
+import {Node} from '@xyflow/react';
 
 import getParametersWithDefaultValues from './getParametersWithDefaultValues';
-import getParentTaskDispatcherTask from './getParentTaskDispatcherTask';
 
 export function buildGenericNodeData(
     baseNodeData: NodeDataType,
@@ -116,26 +116,34 @@ export const TASK_DISPATCHER_CONFIG = {
         getSubtasks: ({
             context,
             getAllSubtasks = false,
+            node,
             task,
         }: {
             context?: TaskDispatcherContextType;
             getAllSubtasks?: boolean;
-            task: WorkflowTask;
+            node?: Node;
+            task?: WorkflowTask;
         }): Array<WorkflowTask> => {
+            const parameters = (node?.data as NodeDataType)?.parameters || task?.parameters;
+
+            if (!parameters) {
+                return [];
+            }
+
             if (getAllSubtasks) {
                 return [
-                    ...(task.parameters?.default || []),
-                    ...(task.parameters?.cases || []).flatMap((caseItem: BranchCaseType) => caseItem.tasks || []),
+                    ...(parameters?.default || []),
+                    ...(parameters?.cases || []).flatMap((caseItem: BranchCaseType) => caseItem.tasks || []),
                 ];
             }
 
             const caseKey = context?.caseKey || 'default';
 
             if (caseKey === 'default') {
-                return task.parameters?.default || [];
+                return parameters?.default || [];
             }
 
-            const cases = [...(task.parameters?.cases || [])];
+            const cases = [...(parameters?.cases || [])];
             const existingCaseIndex = cases.findIndex((caseItem) => caseItem.key === caseKey);
 
             if (existingCaseIndex >= 0) {
@@ -212,21 +220,27 @@ export const TASK_DISPATCHER_CONFIG = {
         getSubtasks: ({
             context,
             getAllSubtasks = false,
+            node,
             task,
         }: {
             context?: TaskDispatcherContextType;
             getAllSubtasks?: boolean;
-            task: WorkflowTask;
+            node?: Node;
+            task?: WorkflowTask;
         }): Array<WorkflowTask> => {
+            const parameters = (node?.data as NodeDataType)?.parameters || task?.parameters;
+
+            if (!parameters) {
+                return [];
+            }
+
             if (getAllSubtasks) {
-                return [...(task.parameters?.caseTrue || []), ...(task.parameters?.caseFalse || [])];
+                return [...(parameters?.caseTrue || []), ...(parameters?.caseFalse || [])];
             }
 
             const conditionCase = (context?.conditionCase as 'caseTrue' | 'caseFalse') || CONDITION_CASE_TRUE;
 
-            return conditionCase === CONDITION_CASE_TRUE
-                ? task.parameters?.caseTrue || []
-                : task.parameters?.caseFalse || [];
+            return conditionCase === CONDITION_CASE_TRUE ? parameters?.caseTrue || [] : parameters?.caseFalse || [];
         },
         getTask: getTaskDispatcherTask,
         initializeParameters: () => ({
@@ -260,7 +274,15 @@ export const TASK_DISPATCHER_CONFIG = {
         getInitialParameters: (properties: Array<PropertyAllType>) => ({
             ...getParametersWithDefaultValues({properties}),
         }),
-        getSubtasks: ({task}: {task: WorkflowTask}): Array<WorkflowTask> => task.parameters?.iteratee || [],
+        getSubtasks: ({node, task}: {node?: Node; task?: WorkflowTask}): Array<WorkflowTask> => {
+            const parameters = (node?.data as NodeDataType)?.parameters || task?.parameters;
+
+            if (!parameters) {
+                return [];
+            }
+
+            return parameters?.iteratee || [];
+        },
         getTask: getTaskDispatcherTask,
         initializeParameters: () => ({
             iteratee: [],
