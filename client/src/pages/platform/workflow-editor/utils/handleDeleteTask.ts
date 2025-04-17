@@ -8,7 +8,7 @@ import {QueryClient, UseMutationResult} from '@tanstack/react-query';
 
 import {WorkflowTaskDataType} from '../stores/useWorkflowDataStore';
 import useWorkflowNodeDetailsPanelStore from '../stores/useWorkflowNodeDetailsPanelStore';
-import {getParentTaskDispatcherTask, TASK_DISPATCHER_CONFIG} from './taskDispatcherConfig';
+import {TASK_DISPATCHER_CONFIG} from './taskDispatcherConfig';
 
 interface HandleDeleteTaskProps {
     currentNode?: NodeDataType;
