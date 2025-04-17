@@ -31,8 +31,8 @@ public class ObjectHelperConstants {
 
     public static final String INPUT = "input";
     public static final String KEY = "key";
+    public static final String LIST = "list";
     public static final String SOURCE = "source";
-    public static final String SOURCE_TYPE = "sourceType";
     public static final String TARGET = "target";
     public static final String TYPE = "type";
     public static final String VALUE = "value";

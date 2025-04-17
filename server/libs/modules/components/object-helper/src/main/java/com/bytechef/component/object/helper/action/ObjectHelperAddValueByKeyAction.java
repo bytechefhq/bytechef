@@ -121,8 +121,7 @@ public class ObjectHelperAddValueByKeyAction {
     protected static Object perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) {
 
-        Map<String, Object> modifiedObject =
-            new HashMap<>(Map.copyOf(inputParameters.getRequiredMap(SOURCE, Object.class)));
+        Map<String, Object> modifiedObject = new HashMap<>(inputParameters.getRequiredMap(SOURCE, Object.class));
 
         String targetKey = inputParameters.getRequiredString(KEY);
         Object value = inputParameters.getRequired(VALUE);

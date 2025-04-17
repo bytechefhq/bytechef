@@ -16,14 +16,12 @@
 
 package com.bytechef.component.object.helper.action;
 
+import static com.bytechef.component.object.helper.constant.ObjectHelperConstants.LIST;
 import static com.bytechef.component.object.helper.constant.ObjectHelperConstants.SOURCE;
-import static com.bytechef.component.object.helper.constant.ObjectHelperConstants.SOURCE_TYPE;
-import static com.bytechef.component.object.helper.constant.ObjectHelperConstants.VALUE;
 import static org.mockito.Mockito.mock;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.object.helper.constant.ValueType;
 import com.bytechef.component.test.definition.MockParametersFactory;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -36,30 +34,20 @@ class ObjectHelperAddKeyValuePairActionTest {
     private static final ObjectMapper objectMapper = new ObjectMapper();
 
     @Test
-    void testPerformForObject() throws JsonProcessingException {
-        testWith("{\"a\":1}", "{\"b\":2}", "{\"a\":1,\"b\":2}");
-        testWith("{\"a\":1}", "{\"a\":2}", "{\"a\":2}");
-        testWith("{\"a\":1}", "{\"a\":2,\"c\":3}", "{\"a\":2,\"c\":3}");
-        testWith("{\"a\":1}", "{\"b\":{\"a\":[{\"c\":1}]}}", "{\"a\":1,\"b\":{\"a\":[{\"c\":1}]}}");
-    }
-
-    @Test
-    void testPerformForArray() throws JsonProcessingException {
-        testWith("[{\"a\":1}]", "{\"b\":2}", "[{\"a\":1,\"b\":2}]");
-        testWith("[{\"a\":1}, {\"b\":1}]", "{\"a\":2}", "[{\"a\":2},{\"a\":2,\"b\":1}]");
-        testWith(
-            "[{\"a\":1}, {\"b\":1}]", "{\"b\":{\"a\":[{\"c\":1}]}}",
-            "[{\"a\":1,\"b\":{\"a\":[{\"c\":1}]}},{\"b\":{\"a\":[{\"c\":1}]}}]");
+    void testPerform() throws JsonProcessingException {
+        testWith("{\"a\":1}", "[{\"key\":\"b\", \"value\":2}]", "{\"a\":1,\"b\":2}");
+        testWith("{\"a\":1}", "[{\"key\":\"a\", \"value\":2}]", "{\"a\":2}");
+        testWith("{\"a\":1}", "[{\"key\":\"a\", \"value\":2}, {\"key\":\"c\", \"value\":3}]", "{\"a\":2,\"c\":3}");
+        testWith("{\"a\":1}", "[{\"key\":\"b\", \"value\":{\"a\":[{\"c\":1}]}}]",
+            "{\"a\":1,\"b\":{\"a\":[{\"c\":1}]}}");
     }
 
     private void testWith(String sourceJson, String valueJson, String expectedJson) throws JsonProcessingException {
         Object sourceObject = objectMapper.readValue(sourceJson, Object.class);
         Object valueObject = objectMapper.readValue(valueJson, Object.class);
         Object expectedObject = objectMapper.readValue(expectedJson, Object.class);
-        ValueType sourceType = sourceJson.startsWith("[") ? ValueType.ARRAY : ValueType.OBJECT;
 
-        Parameters mockedParameters = MockParametersFactory.create(
-            Map.of(SOURCE, sourceObject, SOURCE_TYPE, sourceType.name(), VALUE, valueObject));
+        Parameters mockedParameters = MockParametersFactory.create(Map.of(SOURCE, sourceObject, LIST, valueObject));
 
         Object resultObject = ObjectHelperAddKeyValuePairsAction.perform(
             mockedParameters, mockedParameters, mock(ActionContext.class));

@@ -45,8 +45,8 @@
       "multipleValues" : null,
       "options" : null,
       "properties" : null,
-      "controlType" : "OBJECT_BUILDER",
-      "optionsDataSource" : null
+      "optionsDataSource" : null,
+      "controlType" : "OBJECT_BUILDER"
     }, {
       "advancedOption" : null,
       "description" : "Key of the value to be added or updated.",
@@ -146,8 +146,8 @@
       "minItems" : null,
       "multipleValues" : null,
       "options" : null,
-      "controlType" : "ARRAY_BUILDER",
-      "optionsDataSource" : null
+      "optionsDataSource" : null,
+      "controlType" : "ARRAY_BUILDER"
     }, {
       "advancedOption" : null,
       "description" : "Value to be added or updated.",
@@ -187,8 +187,8 @@
       "label" : "Value",
       "placeholder" : null,
       "options" : null,
-      "controlType" : "DATE",
-      "optionsDataSource" : null
+      "optionsDataSource" : null,
+      "controlType" : "DATE"
     }, {
       "advancedOption" : null,
       "description" : "Value to be added or updated.",
@@ -204,8 +204,8 @@
       "label" : "Value",
       "placeholder" : null,
       "options" : null,
-      "controlType" : "DATE_TIME",
-      "optionsDataSource" : null
+      "optionsDataSource" : null,
+      "controlType" : "DATE_TIME"
     }, {
       "advancedOption" : null,
       "description" : "Value to be added or updated.",
@@ -223,8 +223,8 @@
       "maxValue" : null,
       "minValue" : null,
       "options" : null,
-      "controlType" : "INTEGER",
-      "optionsDataSource" : null
+      "optionsDataSource" : null,
+      "controlType" : "INTEGER"
     }, {
       "advancedOption" : null,
       "description" : "Value to be added or updated.",
@@ -260,8 +260,8 @@
       "minValue" : null,
       "numberPrecision" : null,
       "options" : null,
-      "controlType" : "NUMBER",
-      "optionsDataSource" : null
+      "optionsDataSource" : null,
+      "controlType" : "NUMBER"
     }, {
       "advancedOption" : null,
       "description" : "Value to be added or updated.",
@@ -280,8 +280,8 @@
       "multipleValues" : null,
       "options" : null,
       "properties" : null,
-      "controlType" : "OBJECT_BUILDER",
-      "optionsDataSource" : null
+      "optionsDataSource" : null,
+      "controlType" : "OBJECT_BUILDER"
     }, {
       "advancedOption" : null,
       "description" : "Value to be added or updated.",
@@ -317,295 +317,34 @@
       "label" : "Value",
       "placeholder" : null,
       "options" : null,
-      "controlType" : "TIME",
-      "optionsDataSource" : null
+      "optionsDataSource" : null,
+      "controlType" : "TIME"
     } ],
     "title" : "Add Value to the Object by Key",
+    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
-    "perform" : { }
+    "workflowNodeDescription" : null
   }, {
     "batch" : null,
     "deprecated" : null,
-    "description" : "Add values from list to object or array. If the source is object, the items in the list will be treated as Key-value pairs. If the value is array of objects, key-value pairs will be added to every object in the array.",
+    "description" : "Add values from list to object. The source object can either be empty or populated with properties. The items in the list will be treated as Key-value pairs.",
     "help" : null,
     "metadata" : null,
     "name" : "addKeyValuePairs",
     "outputDefinition" : {
-      "output" : null,
+      "output" : { },
       "outputResponse" : null,
       "outputSchema" : null,
       "sampleOutput" : null
     },
     "properties" : [ {
       "advancedOption" : null,
-      "description" : "Type of initial object to be added or updated.",
+      "description" : "Source object to be added or updated",
       "displayCondition" : null,
       "expressionEnabled" : null,
       "hidden" : null,
       "metadata" : { },
-      "required" : true,
-      "name" : "sourceType",
-      "type" : "STRING",
-      "defaultValue" : null,
-      "exampleValue" : null,
-      "label" : "Type of Initial Object",
-      "placeholder" : null,
-      "controlType" : "SELECT",
-      "languageId" : null,
-      "maxLength" : null,
-      "minLength" : null,
-      "options" : [ {
-        "description" : null,
-        "label" : "Array",
-        "value" : "ARRAY"
-      }, {
-        "description" : null,
-        "label" : "Object",
-        "value" : "OBJECT"
-      } ],
-      "optionsDataSource" : null
-    }, {
-      "advancedOption" : null,
-      "description" : "Source object to be added or updated",
-      "displayCondition" : "sourceType == 'ARRAY'",
-      "expressionEnabled" : null,
-      "hidden" : null,
-      "metadata" : { },
-      "required" : true,
-      "name" : "source",
-      "type" : "ARRAY",
-      "defaultValue" : null,
-      "exampleValue" : null,
-      "label" : "Source",
-      "placeholder" : null,
-      "items" : [ {
-        "advancedOption" : null,
-        "description" : null,
-        "displayCondition" : null,
-        "expressionEnabled" : null,
-        "hidden" : null,
-        "metadata" : { },
-        "required" : null,
-        "name" : null,
-        "type" : "OBJECT",
-        "defaultValue" : null,
-        "exampleValue" : null,
-        "label" : null,
-        "placeholder" : null,
-        "additionalProperties" : [ {
-          "advancedOption" : null,
-          "description" : null,
-          "displayCondition" : null,
-          "expressionEnabled" : null,
-          "hidden" : null,
-          "metadata" : { },
-          "required" : null,
-          "name" : null,
-          "type" : "ARRAY",
-          "defaultValue" : null,
-          "exampleValue" : null,
-          "label" : null,
-          "placeholder" : null,
-          "items" : null,
-          "maxItems" : null,
-          "minItems" : null,
-          "multipleValues" : null,
-          "options" : null,
-          "controlType" : "ARRAY_BUILDER",
-          "optionsDataSource" : null
-        }, {
-          "advancedOption" : null,
-          "description" : null,
-          "displayCondition" : null,
-          "expressionEnabled" : null,
-          "hidden" : null,
-          "metadata" : { },
-          "required" : null,
-          "name" : null,
-          "type" : "BOOLEAN",
-          "defaultValue" : null,
-          "exampleValue" : null,
-          "label" : null,
-          "placeholder" : null,
-          "options" : [ {
-            "description" : null,
-            "label" : "True",
-            "value" : true
-          }, {
-            "description" : null,
-            "label" : "False",
-            "value" : false
-          } ],
-          "controlType" : "SELECT"
-        }, {
-          "advancedOption" : null,
-          "description" : null,
-          "displayCondition" : null,
-          "expressionEnabled" : null,
-          "hidden" : null,
-          "metadata" : { },
-          "required" : null,
-          "name" : null,
-          "type" : "DATE",
-          "defaultValue" : null,
-          "exampleValue" : null,
-          "label" : null,
-          "placeholder" : null,
-          "options" : null,
-          "controlType" : "DATE",
-          "optionsDataSource" : null
-        }, {
-          "advancedOption" : null,
-          "description" : null,
-          "displayCondition" : null,
-          "expressionEnabled" : null,
-          "hidden" : null,
-          "metadata" : { },
-          "required" : null,
-          "name" : null,
-          "type" : "DATE_TIME",
-          "defaultValue" : null,
-          "exampleValue" : null,
-          "label" : null,
-          "placeholder" : null,
-          "options" : null,
-          "controlType" : "DATE_TIME",
-          "optionsDataSource" : null
-        }, {
-          "advancedOption" : null,
-          "description" : null,
-          "displayCondition" : null,
-          "expressionEnabled" : null,
-          "hidden" : null,
-          "metadata" : { },
-          "required" : null,
-          "name" : null,
-          "type" : "INTEGER",
-          "defaultValue" : null,
-          "exampleValue" : null,
-          "label" : null,
-          "placeholder" : null,
-          "maxValue" : null,
-          "minValue" : null,
-          "options" : null,
-          "controlType" : "INTEGER",
-          "optionsDataSource" : null
-        }, {
-          "advancedOption" : null,
-          "description" : null,
-          "displayCondition" : null,
-          "expressionEnabled" : null,
-          "hidden" : null,
-          "metadata" : { },
-          "required" : null,
-          "name" : null,
-          "type" : "NUMBER",
-          "defaultValue" : null,
-          "exampleValue" : null,
-          "label" : null,
-          "placeholder" : null,
-          "maxNumberPrecision" : null,
-          "maxValue" : null,
-          "minNumberPrecision" : null,
-          "minValue" : null,
-          "numberPrecision" : null,
-          "options" : null,
-          "controlType" : "NUMBER",
-          "optionsDataSource" : null
-        }, {
-          "advancedOption" : null,
-          "description" : null,
-          "displayCondition" : null,
-          "expressionEnabled" : null,
-          "hidden" : null,
-          "metadata" : { },
-          "required" : null,
-          "name" : null,
-          "type" : "NULL",
-          "defaultValue" : null,
-          "exampleValue" : null,
-          "label" : null,
-          "placeholder" : null,
-          "controlType" : "NULL"
-        }, {
-          "advancedOption" : null,
-          "description" : null,
-          "displayCondition" : null,
-          "expressionEnabled" : null,
-          "hidden" : null,
-          "metadata" : { },
-          "required" : null,
-          "name" : null,
-          "type" : "OBJECT",
-          "defaultValue" : null,
-          "exampleValue" : null,
-          "label" : null,
-          "placeholder" : null,
-          "additionalProperties" : null,
-          "multipleValues" : null,
-          "options" : null,
-          "properties" : null,
-          "controlType" : "OBJECT_BUILDER",
-          "optionsDataSource" : null
-        }, {
-          "advancedOption" : null,
-          "description" : null,
-          "displayCondition" : null,
-          "expressionEnabled" : null,
-          "hidden" : null,
-          "metadata" : { },
-          "required" : null,
-          "name" : null,
-          "type" : "STRING",
-          "defaultValue" : null,
-          "exampleValue" : null,
-          "label" : null,
-          "placeholder" : null,
-          "controlType" : "TEXT",
-          "languageId" : null,
-          "maxLength" : null,
-          "minLength" : null,
-          "options" : null,
-          "optionsDataSource" : null
-        }, {
-          "advancedOption" : null,
-          "description" : null,
-          "displayCondition" : null,
-          "expressionEnabled" : null,
-          "hidden" : null,
-          "metadata" : { },
-          "required" : null,
-          "name" : null,
-          "type" : "TIME",
-          "defaultValue" : null,
-          "exampleValue" : null,
-          "label" : null,
-          "placeholder" : null,
-          "options" : null,
-          "controlType" : "TIME",
-          "optionsDataSource" : null
-        } ],
-        "multipleValues" : null,
-        "options" : null,
-        "properties" : null,
-        "controlType" : "OBJECT_BUILDER",
-        "optionsDataSource" : null
-      } ],
-      "maxItems" : null,
-      "minItems" : null,
-      "multipleValues" : null,
-      "options" : null,
-      "controlType" : "ARRAY_BUILDER",
-      "optionsDataSource" : null
-    }, {
-      "advancedOption" : null,
-      "description" : "Source object to be added or updated",
-      "displayCondition" : "sourceType == 'OBJECT'",
-      "expressionEnabled" : null,
-      "hidden" : null,
-      "metadata" : { },
-      "required" : true,
+      "required" : null,
       "name" : "source",
       "type" : "OBJECT",
       "defaultValue" : null,
@@ -631,8 +370,8 @@
         "minItems" : null,
         "multipleValues" : null,
         "options" : null,
-        "controlType" : "ARRAY_BUILDER",
-        "optionsDataSource" : null
+        "optionsDataSource" : null,
+        "controlType" : "ARRAY_BUILDER"
       }, {
         "advancedOption" : null,
         "description" : null,
@@ -672,8 +411,8 @@
         "label" : null,
         "placeholder" : null,
         "options" : null,
-        "controlType" : "DATE",
-        "optionsDataSource" : null
+        "optionsDataSource" : null,
+        "controlType" : "DATE"
       }, {
         "advancedOption" : null,
         "description" : null,
@@ -689,8 +428,8 @@
         "label" : null,
         "placeholder" : null,
         "options" : null,
-        "controlType" : "DATE_TIME",
-        "optionsDataSource" : null
+        "optionsDataSource" : null,
+        "controlType" : "DATE_TIME"
       }, {
         "advancedOption" : null,
         "description" : null,
@@ -708,8 +447,8 @@
         "maxValue" : null,
         "minValue" : null,
         "options" : null,
-        "controlType" : "INTEGER",
-        "optionsDataSource" : null
+        "optionsDataSource" : null,
+        "controlType" : "INTEGER"
       }, {
         "advancedOption" : null,
         "description" : null,
@@ -730,8 +469,8 @@
         "minValue" : null,
         "numberPrecision" : null,
         "options" : null,
-        "controlType" : "NUMBER",
-        "optionsDataSource" : null
+        "optionsDataSource" : null,
+        "controlType" : "NUMBER"
       }, {
         "advancedOption" : null,
         "description" : null,
@@ -765,8 +504,8 @@
         "multipleValues" : null,
         "options" : null,
         "properties" : null,
-        "controlType" : "OBJECT_BUILDER",
-        "optionsDataSource" : null
+        "optionsDataSource" : null,
+        "controlType" : "OBJECT_BUILDER"
       }, {
         "advancedOption" : null,
         "description" : null,
@@ -802,14 +541,14 @@
         "label" : null,
         "placeholder" : null,
         "options" : null,
-        "controlType" : "TIME",
-        "optionsDataSource" : null
+        "optionsDataSource" : null,
+        "controlType" : "TIME"
       } ],
       "multipleValues" : null,
       "options" : null,
       "properties" : null,
-      "controlType" : "OBJECT_BUILDER",
-      "optionsDataSource" : null
+      "optionsDataSource" : null,
+      "controlType" : "OBJECT_BUILDER"
     }, {
       "advancedOption" : null,
       "description" : "Key-Value pairs to be added or updated.",
@@ -818,79 +557,13 @@
       "hidden" : null,
       "metadata" : { },
       "required" : true,
-      "name" : "value",
-      "type" : "OBJECT",
+      "name" : "list",
+      "type" : "ARRAY",
       "defaultValue" : null,
       "exampleValue" : null,
       "label" : "Key-Value Pairs",
       "placeholder" : null,
-      "additionalProperties" : [ {
-        "advancedOption" : null,
-        "description" : null,
-        "displayCondition" : null,
-        "expressionEnabled" : null,
-        "hidden" : null,
-        "metadata" : { },
-        "required" : null,
-        "name" : null,
-        "type" : "BOOLEAN",
-        "defaultValue" : null,
-        "exampleValue" : null,
-        "label" : null,
-        "placeholder" : null,
-        "options" : [ {
-          "description" : null,
-          "label" : "True",
-          "value" : true
-        }, {
-          "description" : null,
-          "label" : "False",
-          "value" : false
-        } ],
-        "controlType" : "SELECT"
-      }, {
-        "advancedOption" : null,
-        "description" : null,
-        "displayCondition" : null,
-        "expressionEnabled" : null,
-        "hidden" : null,
-        "metadata" : { },
-        "required" : null,
-        "name" : null,
-        "type" : "STRING",
-        "defaultValue" : null,
-        "exampleValue" : null,
-        "label" : null,
-        "placeholder" : null,
-        "controlType" : "TEXT",
-        "languageId" : null,
-        "maxLength" : null,
-        "minLength" : null,
-        "options" : null,
-        "optionsDataSource" : null
-      }, {
-        "advancedOption" : null,
-        "description" : null,
-        "displayCondition" : null,
-        "expressionEnabled" : null,
-        "hidden" : null,
-        "metadata" : { },
-        "required" : null,
-        "name" : null,
-        "type" : "NUMBER",
-        "defaultValue" : null,
-        "exampleValue" : null,
-        "label" : null,
-        "placeholder" : null,
-        "maxNumberPrecision" : null,
-        "maxValue" : null,
-        "minNumberPrecision" : null,
-        "minValue" : null,
-        "numberPrecision" : null,
-        "options" : null,
-        "controlType" : "NUMBER",
-        "optionsDataSource" : null
-      }, {
+      "items" : [ {
         "advancedOption" : null,
         "description" : null,
         "displayCondition" : null,
@@ -902,97 +575,298 @@
         "type" : "OBJECT",
         "defaultValue" : null,
         "exampleValue" : null,
-        "label" : null,
+        "label" : "Key-Value Pair",
         "placeholder" : null,
         "additionalProperties" : null,
         "multipleValues" : null,
         "options" : null,
-        "properties" : null,
-        "controlType" : "OBJECT_BUILDER",
-        "optionsDataSource" : null
-      }, {
-        "advancedOption" : null,
-        "description" : null,
-        "displayCondition" : null,
-        "expressionEnabled" : null,
-        "hidden" : null,
-        "metadata" : { },
-        "required" : null,
-        "name" : null,
-        "type" : "ARRAY",
-        "defaultValue" : null,
-        "exampleValue" : null,
-        "label" : null,
-        "placeholder" : null,
-        "items" : null,
-        "maxItems" : null,
-        "minItems" : null,
-        "multipleValues" : null,
-        "options" : null,
-        "controlType" : "ARRAY_BUILDER",
-        "optionsDataSource" : null
-      }, {
-        "advancedOption" : null,
-        "description" : null,
-        "displayCondition" : null,
-        "expressionEnabled" : null,
-        "hidden" : null,
-        "metadata" : { },
-        "required" : null,
-        "name" : null,
-        "type" : "DATE_TIME",
-        "defaultValue" : null,
-        "exampleValue" : null,
-        "label" : null,
-        "placeholder" : null,
-        "options" : null,
-        "controlType" : "DATE_TIME",
-        "optionsDataSource" : null
-      }, {
-        "advancedOption" : null,
-        "description" : null,
-        "displayCondition" : null,
-        "expressionEnabled" : null,
-        "hidden" : null,
-        "metadata" : { },
-        "required" : null,
-        "name" : null,
-        "type" : "DATE",
-        "defaultValue" : null,
-        "exampleValue" : null,
-        "label" : null,
-        "placeholder" : null,
-        "options" : null,
-        "controlType" : "DATE",
-        "optionsDataSource" : null
-      }, {
-        "advancedOption" : null,
-        "description" : null,
-        "displayCondition" : null,
-        "expressionEnabled" : null,
-        "hidden" : null,
-        "metadata" : { },
-        "required" : null,
-        "name" : null,
-        "type" : "TIME",
-        "defaultValue" : null,
-        "exampleValue" : null,
-        "label" : null,
-        "placeholder" : null,
-        "options" : null,
-        "controlType" : "TIME",
-        "optionsDataSource" : null
+        "properties" : [ {
+          "advancedOption" : null,
+          "description" : "Key of the value to be added or updated.",
+          "displayCondition" : null,
+          "expressionEnabled" : null,
+          "hidden" : null,
+          "metadata" : { },
+          "required" : true,
+          "name" : "key",
+          "type" : "STRING",
+          "defaultValue" : null,
+          "exampleValue" : null,
+          "label" : "Key",
+          "placeholder" : null,
+          "controlType" : "TEXT",
+          "languageId" : null,
+          "maxLength" : null,
+          "minLength" : null,
+          "options" : null,
+          "optionsDataSource" : null
+        }, {
+          "advancedOption" : null,
+          "description" : "Type of value to be added or updated.",
+          "displayCondition" : null,
+          "expressionEnabled" : false,
+          "hidden" : null,
+          "metadata" : { },
+          "required" : true,
+          "name" : "type",
+          "type" : "STRING",
+          "defaultValue" : null,
+          "exampleValue" : null,
+          "label" : "Type",
+          "placeholder" : null,
+          "controlType" : "SELECT",
+          "languageId" : null,
+          "maxLength" : null,
+          "minLength" : null,
+          "options" : [ {
+            "description" : null,
+            "label" : "Array",
+            "value" : "ARRAY"
+          }, {
+            "description" : null,
+            "label" : "Boolean",
+            "value" : "BOOLEAN"
+          }, {
+            "description" : null,
+            "label" : "Date",
+            "value" : "DATE"
+          }, {
+            "description" : null,
+            "label" : "Date Time",
+            "value" : "DATE_TIME"
+          }, {
+            "description" : null,
+            "label" : "Integer",
+            "value" : "INTEGER"
+          }, {
+            "description" : null,
+            "label" : "Nullable",
+            "value" : "NULL"
+          }, {
+            "description" : null,
+            "label" : "Number",
+            "value" : "NUMBER"
+          }, {
+            "description" : null,
+            "label" : "Object",
+            "value" : "OBJECT"
+          }, {
+            "description" : null,
+            "label" : "String",
+            "value" : "STRING"
+          }, {
+            "description" : null,
+            "label" : "Time",
+            "value" : "TIME"
+          } ],
+          "optionsDataSource" : null
+        }, {
+          "advancedOption" : null,
+          "description" : "Value to be added or updated.",
+          "displayCondition" : "list[index].type == 'ARRAY'",
+          "expressionEnabled" : null,
+          "hidden" : null,
+          "metadata" : { },
+          "required" : true,
+          "name" : "value",
+          "type" : "ARRAY",
+          "defaultValue" : null,
+          "exampleValue" : null,
+          "label" : "Value",
+          "placeholder" : null,
+          "items" : null,
+          "maxItems" : null,
+          "minItems" : null,
+          "multipleValues" : null,
+          "options" : null,
+          "optionsDataSource" : null,
+          "controlType" : "ARRAY_BUILDER"
+        }, {
+          "advancedOption" : null,
+          "description" : "Value to be added or updated.",
+          "displayCondition" : "list[index].type == 'BOOLEAN'",
+          "expressionEnabled" : null,
+          "hidden" : null,
+          "metadata" : { },
+          "required" : true,
+          "name" : "value",
+          "type" : "BOOLEAN",
+          "defaultValue" : null,
+          "exampleValue" : null,
+          "label" : "Value",
+          "placeholder" : null,
+          "options" : [ {
+            "description" : null,
+            "label" : "True",
+            "value" : true
+          }, {
+            "description" : null,
+            "label" : "False",
+            "value" : false
+          } ],
+          "controlType" : "SELECT"
+        }, {
+          "advancedOption" : null,
+          "description" : "Value to be added or updated.",
+          "displayCondition" : "list[index].type == 'DATE'",
+          "expressionEnabled" : null,
+          "hidden" : null,
+          "metadata" : { },
+          "required" : true,
+          "name" : "value",
+          "type" : "DATE",
+          "defaultValue" : null,
+          "exampleValue" : null,
+          "label" : "Value",
+          "placeholder" : null,
+          "options" : null,
+          "optionsDataSource" : null,
+          "controlType" : "DATE"
+        }, {
+          "advancedOption" : null,
+          "description" : "Value to be added or updated.",
+          "displayCondition" : "list[index].type == 'DATE_TIME'",
+          "expressionEnabled" : null,
+          "hidden" : null,
+          "metadata" : { },
+          "required" : true,
+          "name" : "value",
+          "type" : "DATE_TIME",
+          "defaultValue" : null,
+          "exampleValue" : null,
+          "label" : "Value",
+          "placeholder" : null,
+          "options" : null,
+          "optionsDataSource" : null,
+          "controlType" : "DATE_TIME"
+        }, {
+          "advancedOption" : null,
+          "description" : "Value to be added or updated.",
+          "displayCondition" : "list[index].type == 'INTEGER'",
+          "expressionEnabled" : null,
+          "hidden" : null,
+          "metadata" : { },
+          "required" : true,
+          "name" : "value",
+          "type" : "INTEGER",
+          "defaultValue" : null,
+          "exampleValue" : null,
+          "label" : "Value",
+          "placeholder" : null,
+          "maxValue" : null,
+          "minValue" : null,
+          "options" : null,
+          "optionsDataSource" : null,
+          "controlType" : "INTEGER"
+        }, {
+          "advancedOption" : null,
+          "description" : "Value to be added or updated.",
+          "displayCondition" : "list[index].type == 'NULL'",
+          "expressionEnabled" : null,
+          "hidden" : null,
+          "metadata" : { },
+          "required" : true,
+          "name" : "value",
+          "type" : "NULL",
+          "defaultValue" : null,
+          "exampleValue" : null,
+          "label" : "Value",
+          "placeholder" : null,
+          "controlType" : "NULL"
+        }, {
+          "advancedOption" : null,
+          "description" : "Value to be added or updated.",
+          "displayCondition" : "list[index].type == 'NUMBER'",
+          "expressionEnabled" : null,
+          "hidden" : null,
+          "metadata" : { },
+          "required" : true,
+          "name" : "value",
+          "type" : "NUMBER",
+          "defaultValue" : null,
+          "exampleValue" : null,
+          "label" : "Value",
+          "placeholder" : null,
+          "maxNumberPrecision" : null,
+          "maxValue" : null,
+          "minNumberPrecision" : null,
+          "minValue" : null,
+          "numberPrecision" : null,
+          "options" : null,
+          "optionsDataSource" : null,
+          "controlType" : "NUMBER"
+        }, {
+          "advancedOption" : null,
+          "description" : "Value to be added or updated.",
+          "displayCondition" : "list[index].type == 'OBJECT'",
+          "expressionEnabled" : null,
+          "hidden" : null,
+          "metadata" : { },
+          "required" : true,
+          "name" : "value",
+          "type" : "OBJECT",
+          "defaultValue" : null,
+          "exampleValue" : null,
+          "label" : "Value",
+          "placeholder" : null,
+          "additionalProperties" : null,
+          "multipleValues" : null,
+          "options" : null,
+          "properties" : null,
+          "optionsDataSource" : null,
+          "controlType" : "OBJECT_BUILDER"
+        }, {
+          "advancedOption" : null,
+          "description" : "Value to be added or updated.",
+          "displayCondition" : "list[index].type == 'STRING'",
+          "expressionEnabled" : null,
+          "hidden" : null,
+          "metadata" : { },
+          "required" : true,
+          "name" : "value",
+          "type" : "STRING",
+          "defaultValue" : null,
+          "exampleValue" : null,
+          "label" : "Value",
+          "placeholder" : null,
+          "controlType" : "TEXT",
+          "languageId" : null,
+          "maxLength" : null,
+          "minLength" : null,
+          "options" : null,
+          "optionsDataSource" : null
+        }, {
+          "advancedOption" : null,
+          "description" : "Value to be added or updated.",
+          "displayCondition" : "list[index].type == 'TIME'",
+          "expressionEnabled" : null,
+          "hidden" : null,
+          "metadata" : { },
+          "required" : true,
+          "name" : "value",
+          "type" : "TIME",
+          "defaultValue" : null,
+          "exampleValue" : null,
+          "label" : "Value",
+          "placeholder" : null,
+          "options" : null,
+          "optionsDataSource" : null,
+          "controlType" : "TIME"
+        } ],
+        "optionsDataSource" : null,
+        "controlType" : "OBJECT_BUILDER"
       } ],
+      "maxItems" : null,
+      "minItems" : null,
       "multipleValues" : null,
       "options" : null,
-      "properties" : null,
-      "controlType" : "OBJECT_BUILDER",
-      "optionsDataSource" : null
+      "optionsDataSource" : null,
+      "controlType" : "ARRAY_BUILDER"
     } ],
-    "title" : "Add Key-Value Pairs to Object or Array",
+    "title" : "Add Key-Value Pairs",
+    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
-    "perform" : { }
+    "workflowNodeDescription" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -1076,8 +950,8 @@
       "multipleValues" : null,
       "options" : null,
       "properties" : null,
-      "controlType" : "OBJECT_BUILDER",
-      "optionsDataSource" : null
+      "optionsDataSource" : null,
+      "controlType" : "OBJECT_BUILDER"
     }, {
       "advancedOption" : null,
       "description" : "Key to check for existence.",
@@ -1100,9 +974,9 @@
       "optionsDataSource" : null
     } ],
     "title" : "Contains",
+    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
-    "perform" : { }
+    "workflowNodeDescription" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -1134,8 +1008,8 @@
       "multipleValues" : null,
       "options" : null,
       "properties" : null,
-      "controlType" : "OBJECT_BUILDER",
-      "optionsDataSource" : null
+      "optionsDataSource" : null,
+      "controlType" : "OBJECT_BUILDER"
     }, {
       "advancedOption" : null,
       "description" : "The key of the key-value pair to delete.",
@@ -1158,9 +1032,9 @@
       "optionsDataSource" : null
     } ],
     "title" : "Delete Key-Value Pair",
+    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
-    "perform" : { }
+    "workflowNodeDescription" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -1244,8 +1118,8 @@
       "multipleValues" : null,
       "options" : null,
       "properties" : null,
-      "controlType" : "OBJECT_BUILDER",
-      "optionsDataSource" : null
+      "optionsDataSource" : null,
+      "controlType" : "OBJECT_BUILDER"
     }, {
       "advancedOption" : null,
       "description" : "The target object to compare against.",
@@ -1264,13 +1138,13 @@
       "multipleValues" : null,
       "options" : null,
       "properties" : null,
-      "controlType" : "OBJECT_BUILDER",
-      "optionsDataSource" : null
+      "optionsDataSource" : null,
+      "controlType" : "OBJECT_BUILDER"
     } ],
     "title" : "Equals",
+    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
-    "perform" : { }
+    "workflowNodeDescription" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -1302,8 +1176,8 @@
       "multipleValues" : null,
       "options" : null,
       "properties" : null,
-      "controlType" : "OBJECT_BUILDER",
-      "optionsDataSource" : null
+      "optionsDataSource" : null,
+      "controlType" : "OBJECT_BUILDER"
     }, {
       "advancedOption" : null,
       "description" : "The target object to merge into.",
@@ -1322,15 +1196,15 @@
       "multipleValues" : null,
       "options" : null,
       "properties" : null,
-      "controlType" : "OBJECT_BUILDER",
-      "optionsDataSource" : null
+      "optionsDataSource" : null,
+      "controlType" : "OBJECT_BUILDER"
     } ],
     "title" : "Merge Two Objects",
+    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
-    "perform" : { }
+    "workflowNodeDescription" : null
   } ],
+  "clusterElements" : null,
   "unifiedApi" : null,
-  "triggers" : null,
-  "clusterElements" : null
+  "triggers" : null
 }
