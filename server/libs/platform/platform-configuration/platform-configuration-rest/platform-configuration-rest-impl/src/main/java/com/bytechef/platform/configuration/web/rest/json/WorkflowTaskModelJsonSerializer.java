@@ -45,6 +45,10 @@ public class WorkflowTaskModelJsonSerializer extends JsonSerializer<WorkflowTask
 
         jsonGenerator.writeEndArray();
 
+        if (value.getClusterElements() != null) {
+            jsonGenerator.writeObjectField("clusterElements", value.getClusterElements());
+        }
+
         if (value.getDescription() != null) {
             jsonGenerator.writeStringField("description", value.getDescription());
         }
