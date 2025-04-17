@@ -84,9 +84,11 @@ public class JdbcComponentHandlerImpl implements ComponentHandler {
                 string(JdbcConstants.QUERY)
                     .label("Query")
                     .description(
-                        "The raw SQL query to execute. You can use :property1 and :property2 in conjunction with parameters.")
+                        "The raw SQL query to execute. You can use :property1 and :property2 in conjunction with " +
+                            "parameters.")
                     .placeholder(
                         "SELECT id, name FROM customer WHERE age > :age AND height <= :height")
+                    .controlType(Property.ControlType.TEXT_AREA)
                     .required(true),
                 object(JdbcConstants.PARAMETERS)
                     .label("Parameters")
@@ -185,9 +187,11 @@ public class JdbcComponentHandlerImpl implements ComponentHandler {
                 string(JdbcConstants.EXECUTE)
                     .label("Execute")
                     .description(
-                        "The raw DML or DDL statement to execute. You can use :property1 and :property2 in conjunction with parameters.")
+                        "The raw DML or DDL statement to execute. You can use :property1 and :property2 in " +
+                            "conjunction with parameters.")
                     .placeholder(
                         "UPDATE TABLE product set name = :name WHERE product > :product AND price <= :price")
+                    .controlType(Property.ControlType.TEXT_AREA)
                     .required(true),
                 array(JdbcConstants.COLUMNS)
                     .label("Fields to select")
