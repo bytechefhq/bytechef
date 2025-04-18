@@ -10,22 +10,22 @@ const ProjectDeploymentDialogWorkflowsStepItemConnections = ({
     control: Control<ProjectDeployment>;
     componentConnections: ComponentConnection[];
     workflowIndex: number;
-}) => {
-    return componentConnections.length ? (
-        <>
+}) => (
+    <>
+        {!componentConnections.length && <p className="text-sm">No defined connections.</p>}
+
+        <ul>
             {componentConnections.map((componentConnection, componentConnectionIndex) => (
                 <ProjectDeploymentDialogWorkflowsStepItemConnection
                     componentConnection={componentConnection}
                     componentConnectionIndex={componentConnectionIndex}
                     control={control}
-                    key={componentConnectionIndex + '_' + componentConnection.key}
+                    key={`${componentConnectionIndex}_${componentConnection.key}`}
                     workflowIndex={workflowIndex}
                 />
             ))}
-        </>
-    ) : (
-        <p className="text-sm">No defined connections.</p>
-    );
-};
+        </ul>
+    </>
+);
 
 export default ProjectDeploymentDialogWorkflowsStepItemConnections;
