@@ -170,9 +170,7 @@ module.exports = {
                 'placeholder-node-position': '22px',
             },
             maxHeight: {
-                'connection-dialog-height': '600px',
-                'integration-instance-configuration-dialog-height': '600px',
-                'project-deployment-dialog-height': '600px',
+                'dialog-height': '600px',
                 'select-content-available-height': 'var(--radix-select-content-available-height)',
                 'select-content-available-height-1/2': 'calc(var(--radix-select-content-available-height) / 2)',
                 'workflow-execution-content-height': '80vh',

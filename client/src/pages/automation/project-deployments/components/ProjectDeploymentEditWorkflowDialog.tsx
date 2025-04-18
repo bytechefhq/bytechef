@@ -128,25 +128,27 @@ const ProjectDeploymentEditWorkflowDialog = ({
             }}
             open={isOpen}
         >
-            <DialogContent onInteractOutside={(event) => event.preventDefault()}>
+            <DialogContent className="gap-0 p-0" onInteractOutside={(event) => event.preventDefault()}>
                 <Form {...form}>
-                    <DialogHeader className="flex flex-row items-center justify-between space-y-0">
+                    <DialogHeader className="flex flex-row items-center justify-between space-y-0 px-6 py-3">
                         <DialogTitle>{`Edit ${workflow?.label} Workflow`}</DialogTitle>
 
                         <DialogCloseButton />
                     </DialogHeader>
 
-                    <ProjectDeploymentDialogWorkflowsStepItem
-                        control={control}
-                        formState={formState}
-                        key={workflow.id!}
-                        setValue={setValue}
-                        switchHidden={true}
-                        workflow={workflow}
-                        workflowIndex={0}
-                    />
+                    <div className="max-h-dialog-height overflow-y-auto">
+                        <ProjectDeploymentDialogWorkflowsStepItem
+                            control={control}
+                            formState={formState}
+                            key={workflow.id!}
+                            setValue={setValue}
+                            switchHidden={true}
+                            workflow={workflow}
+                            workflowIndex={0}
+                        />
+                    </div>
 
-                    <DialogFooter>
+                    <DialogFooter className="px-6 py-3">
                         <DialogClose asChild>
                             <Button variant="outline">Cancel</Button>
                         </DialogClose>

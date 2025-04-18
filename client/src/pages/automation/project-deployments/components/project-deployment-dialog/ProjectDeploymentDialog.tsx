@@ -274,9 +274,9 @@ const ProjectDeploymentDialog = ({
         >
             {triggerNode && <DialogTrigger asChild>{triggerNode}</DialogTrigger>}
 
-            <DialogContent className={twMerge('flex flex-col')} onInteractOutside={(event) => event.preventDefault()}>
+            <DialogContent className="flex flex-col gap-0 p-0" onInteractOutside={(event) => event.preventDefault()}>
                 <Form {...form}>
-                    <DialogHeader className="flex flex-row items-center justify-between gap-1 space-y-0">
+                    <DialogHeader className="flex flex-row items-center justify-between gap-1 space-y-0 px-6 py-3">
                         <div className="flex w-full flex-col space-y-1">
                             <DialogTitle>
                                 {updateProjectVersion
@@ -311,15 +311,11 @@ const ProjectDeploymentDialog = ({
                         <DialogCloseButton />
                     </DialogHeader>
 
-                    <div
-                        className={twMerge(
-                            activeStepIndex === 1 && 'max-h-project-deployment-dialog-height overflow-y-auto'
-                        )}
-                    >
+                    <div className={twMerge('px-6', activeStepIndex === 1 && 'max-h-dialog-height overflow-y-auto')}>
                         {projectDeploymentDialogSteps[activeStepIndex].content}
                     </div>
 
-                    <DialogFooter>
+                    <DialogFooter className="px-6 py-3">
                         {activeStepIndex === 0 && (
                             <>
                                 <DialogClose asChild>

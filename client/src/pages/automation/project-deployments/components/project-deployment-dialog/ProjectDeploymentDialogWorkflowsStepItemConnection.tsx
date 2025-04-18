@@ -56,16 +56,14 @@ const ProjectDeploymentDialogWorkflowsStepItemConnection = ({
                 name={`projectDeploymentWorkflows.${workflowIndex!}.connections.${componentConnectionIndex}.connectionId`}
                 render={({field}) => (
                     <FormItem>
-                        <FormLabel className="flex items-center">
+                        <FormLabel className="flex items-center space-x-1">
                             {componentDefinition?.icon && (
                                 <InlineSVG className="size-4 flex-none" src={componentDefinition.icon} />
                             )}
 
-                            <span className="ml-1">{componentDefinition?.title} Connection</span>
+                            <span>{componentDefinition?.title} Connection</span>
 
-                            <span className="ml-0.5 text-xs text-gray-500">
-                                {`(${componentConnection.workflowNodeName})`}
-                            </span>
+                            <span className="text-xs text-gray-500">({componentConnection.workflowNodeName})</span>
                         </FormLabel>
 
                         <Select onValueChange={field.onChange} value={field.value ? field.value.toString() : undefined}>
@@ -106,11 +104,11 @@ const ProjectDeploymentDialogWorkflowsStepItemConnection = ({
                         </Select>
 
                         <FormDescription>
-                            {`Choose connection for the ${componentDefinition?.title}`}
+                            <span>{`Choose connection for the ${componentDefinition?.title}`}</span>
 
-                            <span className="text-xs text-gray-500">({componentConnection.key})</span>
+                            <span className="mx-1 text-xs text-gray-500">({componentConnection.key})</span>
 
-                            {` component.`}
+                            <span>component.</span>
                         </FormDescription>
 
                         <FormMessage />
@@ -118,6 +116,7 @@ const ProjectDeploymentDialogWorkflowsStepItemConnection = ({
                 )}
                 rules={{required: componentConnection.required}}
             />
+
             {showNewConnectionDialog && (
                 <Portal.Root>
                     <ConnectionDialog

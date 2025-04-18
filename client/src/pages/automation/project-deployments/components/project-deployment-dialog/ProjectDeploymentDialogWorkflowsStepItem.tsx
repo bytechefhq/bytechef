@@ -37,7 +37,7 @@ const ProjectDeploymentDialogWorkflowsStepItem = ({
         .concat((workflow?.triggers ?? []).flatMap((trigger) => trigger.connections ?? []));
 
     return (
-        <div>
+        <div className="px-6">
             {!switchHidden && (
                 <div className="flex cursor-pointer justify-between py-2">
                     <span className="font-semibold">{label}</span>
@@ -68,9 +68,9 @@ const ProjectDeploymentDialogWorkflowsStepItem = ({
             )}
 
             {(workflowEnabledMap.get(workflow.id!) || switchHidden) && (
-                <div className="mt-2 space-y-6">
-                    <div className="flex flex-col gap-3">
-                        <Label className="font-semibold">Inputs</Label>
+                <ul className="mt-2 space-y-6">
+                    <li className="flex flex-col gap-3">
+                        <Label className="text-base font-semibold">Inputs</Label>
 
                         <ProjectDeploymentDialogWorkflowsStepItemInputs
                             control={control}
@@ -78,18 +78,18 @@ const ProjectDeploymentDialogWorkflowsStepItem = ({
                             workflow={workflow}
                             workflowIndex={workflowIndex}
                         />
-                    </div>
+                    </li>
 
-                    <div className="flex flex-col gap-3">
-                        <Label className="font-semibold">Connections</Label>
+                    <li className="flex flex-col gap-3">
+                        <Label className="text-base font-semibold">Connections</Label>
 
                         <ProjectDeploymentDialogWorkflowsStepItemConnections
                             componentConnections={componentConnections}
                             control={control}
                             workflowIndex={workflowIndex}
                         />
-                    </div>
-                </div>
+                    </li>
+                </ul>
             )}
         </div>
     );

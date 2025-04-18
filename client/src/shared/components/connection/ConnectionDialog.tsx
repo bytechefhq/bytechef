@@ -383,9 +383,9 @@ const ConnectionDialog = ({
             {triggerNode && <DialogTrigger asChild>{triggerNode}</DialogTrigger>}
 
             {!componentDefinitionsLoading && (
-                <DialogContent onInteractOutside={(event) => event.preventDefault()}>
+                <DialogContent className="gap-0 p-0" onInteractOutside={(event) => event.preventDefault()}>
                     <Form {...form}>
-                        <DialogHeader className="flex flex-row items-center justify-between space-y-0">
+                        <DialogHeader className="flex flex-row items-center justify-between space-y-0 px-6 py-3">
                             <div className="flex flex-col space-y-1">
                                 <DialogTitle>{`${connection?.id ? 'Edit' : 'Create'} Connection`}</DialogTitle>
 
@@ -401,7 +401,7 @@ const ConnectionDialog = ({
 
                         {errors?.length > 0 && <Errors errors={errors} />}
 
-                        <div className="flex max-h-connection-dialog-height flex-col space-y-4 overflow-y-auto">
+                        <div className="flex max-h-dialog-height flex-col space-y-4 overflow-y-auto px-6">
                             {(wizardStep === 'configuration_step' || oAuth2AuthorizationParametersLoading) && (
                                 <>
                                     {!connection?.id && (
@@ -643,7 +643,7 @@ const ConnectionDialog = ({
                         </div>
 
                         {connection?.id && connectionDefinition && (
-                            <div className="px-6 pb-6">
+                            <div className="px-6 pt-6">
                                 <ConnectionParameters
                                     authorizationParameters={connection.authorizationParameters}
                                     connectionDefinition={connectionDefinition}
@@ -652,7 +652,7 @@ const ConnectionDialog = ({
                             </div>
                         )}
 
-                        <DialogFooter>
+                        <DialogFooter className="px-6 py-3">
                             {wizardStep === 'oauth_step' && (
                                 <Button
                                     onClick={() => {
