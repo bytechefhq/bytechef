@@ -23,6 +23,7 @@ import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.component.random.helper.action.RandomHelperRandomFloatAction;
 import com.bytechef.component.random.helper.action.RandomHelperRandomIntAction;
+import com.bytechef.component.random.helper.action.RandomHelperRandomStringAction;
 import com.google.auto.service.AutoService;
 
 /**
@@ -38,7 +39,8 @@ public class RandomHelperComponentHandler implements ComponentHandler {
         .categories(ComponentCategory.HELPERS)
         .actions(
             RandomHelperRandomIntAction.ACTION_DEFINITION,
-            RandomHelperRandomFloatAction.ACTION_DEFINITION);
+            RandomHelperRandomFloatAction.ACTION_DEFINITION,
+            RandomHelperRandomStringAction.ACTION_DEFINITION);
 
     @Override
     public ComponentDefinition getDefinition() {

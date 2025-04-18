@@ -21,7 +21,6 @@ import static com.bytechef.component.definition.ComponentDsl.component;
 import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDefinition;
-import com.bytechef.component.example.action.CryptoHelperGeneratePasswordAction;
 import com.bytechef.component.example.action.CryptoHelperHashAction;
 import com.bytechef.component.example.action.CryptoHelperHmacAction;
 import com.google.auto.service.AutoService;
@@ -38,7 +37,6 @@ public class CryptoHelperComponentHandler implements ComponentHandler {
         .icon("path:assets/crypto-helper.svg")
         .categories(ComponentCategory.HELPERS)
         .actions(
-            CryptoHelperGeneratePasswordAction.ACTION_DEFINITION,
             CryptoHelperHashAction.ACTION_DEFINITION,
             CryptoHelperHmacAction.ACTION_DEFINITION);
 
