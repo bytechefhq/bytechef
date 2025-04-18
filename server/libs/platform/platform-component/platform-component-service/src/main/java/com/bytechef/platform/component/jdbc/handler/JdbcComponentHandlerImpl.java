@@ -24,12 +24,19 @@ import static com.bytechef.component.definition.ComponentDsl.component;
 import static com.bytechef.component.definition.ComponentDsl.connection;
 import static com.bytechef.component.definition.ComponentDsl.date;
 import static com.bytechef.component.definition.ComponentDsl.dateTime;
+import static com.bytechef.component.definition.ComponentDsl.dynamicProperties;
 import static com.bytechef.component.definition.ComponentDsl.integer;
 import static com.bytechef.component.definition.ComponentDsl.nullable;
 import static com.bytechef.component.definition.ComponentDsl.number;
 import static com.bytechef.component.definition.ComponentDsl.object;
+import static com.bytechef.component.definition.ComponentDsl.option;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.ComponentDsl.time;
+import static com.bytechef.platform.component.jdbc.constant.JdbcConstants.COLUMNS;
+import static com.bytechef.platform.component.jdbc.constant.JdbcConstants.NAME;
+import static com.bytechef.platform.component.jdbc.constant.JdbcConstants.ROWS;
+import static com.bytechef.platform.component.jdbc.constant.JdbcConstants.TYPE;
+import static com.bytechef.platform.component.jdbc.constant.JdbcConstants.VALUES;
 
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.component.ComponentHandler;
@@ -38,7 +45,11 @@ import com.bytechef.component.definition.Authorization;
 import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.ComponentDsl.ModifiableConnectionDefinition;
+import com.bytechef.component.definition.Option;
+import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.Property;
+import com.bytechef.component.definition.Property.Type;
+import com.bytechef.component.definition.Property.ValueProperty;
 import com.bytechef.platform.component.definition.JdbcComponentDefinition;
 import com.bytechef.platform.component.jdbc.DataSourceFactory;
 import com.bytechef.platform.component.jdbc.constant.JdbcConstants;
@@ -48,13 +59,16 @@ import com.bytechef.platform.component.jdbc.operation.ExecuteJdbcOperation;
 import com.bytechef.platform.component.jdbc.operation.InsertJdbcOperation;
 import com.bytechef.platform.component.jdbc.operation.QueryJdbcOperation;
 import com.bytechef.platform.component.jdbc.operation.UpdateJdbcOperation;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 import org.springframework.jdbc.datasource.SingleConnectionDataSource;
 
 /**
  * @author Ivica Cardic
  * @author Igor Beslic
+ * @author Monika Kušter
  */
 public class JdbcComponentHandlerImpl implements ComponentHandler {
 
@@ -110,17 +124,25 @@ public class JdbcComponentHandlerImpl implements ComponentHandler {
                     .label("Table")
                     .description("Name of the table in which to insert data to.")
                     .required(true),
-                array(JdbcConstants.COLUMNS)
+                array(COLUMNS)
                     .label("Fields")
-                    .description(
-                        "The list of the table field names where corresponding values would be inserted.")
-                    .items(string()),
-                array(JdbcConstants.ROWS)
-                    .label("Values")
-                    .description("List of field values for corresponding field names")
-                    .items(object().additionalProperties(
-                        array(), bool(), date(), dateTime(), integer(), nullable(), number(), object(),
-                        string(), time())))
+                    .description("The list of the table field names where corresponding values would be inserted.")
+                    .items(
+                        object()
+                            .properties(
+                                string(NAME)
+                                    .label("Field Name")
+                                    .description("Name of the fields.")
+                                    .required(true),
+                                string(TYPE)
+                                    .label("Type")
+                                    .description("Type of the field.")
+                                    .options(getTypeOptions())
+                                    .defaultValue("STRING")
+                                    .required(true))),
+                dynamicProperties(VALUES)
+                    .properties(JdbcComponentHandlerImpl::createProperties)
+                    .propertiesLookupDependsOn(COLUMNS))
             .output()
             .perform(this::performInsert),
         action(JdbcConstants.UPDATE)
@@ -136,7 +158,7 @@ public class JdbcComponentHandlerImpl implements ComponentHandler {
                     .label("Table")
                     .description("Name of the table in which to update data in.")
                     .required(true),
-                array(JdbcConstants.COLUMNS)
+                array(COLUMNS)
                     .label("Fields")
                     .description(
                         "The list of the table field names whose values would be updated.")
@@ -193,7 +215,7 @@ public class JdbcComponentHandlerImpl implements ComponentHandler {
                         "UPDATE TABLE product set name = :name WHERE product > :product AND price <= :price")
                     .controlType(Property.ControlType.TEXT_AREA)
                     .required(true),
-                array(JdbcConstants.COLUMNS)
+                array(COLUMNS)
                     .label("Fields to select")
                     .description("List of fields to select from.")
                     .items(object().additionalProperties(
@@ -293,5 +315,80 @@ public class JdbcComponentHandlerImpl implements ComponentHandler {
 
     private SingleConnectionDataSource getDataSource(Map<String, ?> connectionParameters) {
         return DataSourceFactory.getDataSource(connectionParameters, databaseJdbcName, jdbcDriverClassName);
+    }
+
+    private List<Option<String>> getTypeOptions() {
+        List<Type> types = List.of(
+            Type.ARRAY, Type.BOOLEAN, Type.DATE, Type.DATE_TIME, Type.INTEGER, Type.NUMBER, Type.OBJECT, Type.STRING,
+            Type.TIME);
+
+        return types.stream()
+            .map(type -> option(type.name(), type.name()))
+            .collect(Collectors.toList());
+    }
+
+    public static List<ValueProperty<?>> createProperties(
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
+        ActionContext actionContext) {
+
+        List<Column> columns = inputParameters.getRequiredList(COLUMNS, Column.class);
+
+        List<ValueProperty<?>> properties = new ArrayList<>();
+
+        for (Column column : columns) {
+            final String name = column.name();
+            if (name != null) {
+                switch (Type.valueOf(column.type())) {
+                    case ARRAY -> properties.add(
+                        array(name)
+                            .label(name)
+                            .required(true));
+                    case BOOLEAN -> properties.add(
+                        bool(name)
+                            .label(name)
+                            .required(true));
+                    case DATE -> properties.add(
+                        date(name)
+                            .label(name)
+                            .required(true));
+                    case DATE_TIME -> properties.add(
+                        dateTime(name)
+                            .label(name)
+                            .required(true));
+                    case INTEGER -> properties.add(
+                        integer(name)
+                            .label(name)
+                            .required(true));
+                    case NUMBER -> properties.add(
+                        number(name)
+                            .label(name)
+                            .required(true));
+                    case OBJECT -> properties.add(
+                        object(name)
+                            .label(name)
+                            .required(true));
+                    case STRING -> properties.add(
+                        string(name)
+                            .label(name)
+                            .required(true));
+                    case TIME -> properties.add(
+                        time(name)
+                            .label(name)
+                            .required(true));
+                    default -> throw new RuntimeException("");
+                }
+            }
+        }
+
+        return List.of(
+            array(ROWS)
+                .label("Values")
+                .description("List of field values for corresponding field names.")
+                .items(
+                    object()
+                        .properties(properties)));
+    }
+
+    record Column(String name, String type) {
     }
 }
