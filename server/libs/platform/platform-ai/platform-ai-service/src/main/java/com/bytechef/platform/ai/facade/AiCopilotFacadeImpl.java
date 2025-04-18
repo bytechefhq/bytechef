@@ -40,8 +40,10 @@ import reactor.core.publisher.Flux;
 public class AiCopilotFacadeImpl implements AiCopilotFacade {
 
     private final ChatClient chatClientWorkflow;
+    private final ChatClient chatClientComponent;
     private final ChatClient chatClientScript;
     private final WorkflowService workflowService;
+    private final OrchestratorWorkers orchestratorWorkers;
 
     @SuppressFBWarnings("EI")
     public AiCopilotFacadeImpl(
@@ -63,12 +65,20 @@ public class AiCopilotFacadeImpl implements AiCopilotFacade {
         QuestionAnswerAdvisor questionAnswerAdvisorWorkflow = new QuestionAnswerAdvisor(
             vectorStore, workflowsBuilder.build());
 
+        this.chatClientComponent = chatClientBuilder.clone()
+            // TODO add multiuser, multitenant history
+            .defaultAdvisors(
+                messageChatMemoryAdvisor,
+                questionAnswerAdvisorComponents)
+            .build();
+
         this.chatClientWorkflow = chatClientBuilder.clone()
             // TODO add multiuser, multitenant history
             .defaultAdvisors(
                 messageChatMemoryAdvisor,
-                questionAnswerAdvisorWorkflow,
-                questionAnswerAdvisorComponents)
+                questionAnswerAdvisorWorkflow
+//                , questionAnswerAdvisorComponents
+            )
             .build();
 
         this.chatClientScript = chatClientBuilder.clone()
@@ -79,6 +89,10 @@ public class AiCopilotFacadeImpl implements AiCopilotFacade {
             // add script advisor
             )
             .build();
+
+        this.orchestratorWorkers = new OrchestratorWorkers(this.chatClientComponent,
+            "BAnalyze this task and break it down into subtasks so that the first subtask is a single Trigger, and each subsequent subtasks are either a single Action or a single Flow (example for-loop, if-statement ...).",
+            "Search the context for an existing Component or Flow and Trigger or Action that best match the described subtask. Only return Triggers, Actions or Flows that exist in the context with correct Parameters. Return them in the described JSON format.");
     }
 
     @Override
@@ -95,21 +109,25 @@ public class AiCopilotFacadeImpl implements AiCopilotFacade {
         final String messageString = "message";
 
         return switch (contextDTO.source()) {
-            case WORKFLOW_EDITOR, WORKFLOW_EDITOR_COMPONENTS_POPOVER_MENU ->
-                chatClientWorkflow.prompt()
-                    .system(
-                        """
-                            Answer only with a json in a format similar to the json objects in the vector database.
-                            Only use the actions, triggers and parameters which you know exist; look for JSON Example
-                            for the action or trigger. If a parameter is required, you must use it.""")
-                    .user(user -> user.text(userPrompt)
-                        .param(workflowString, workflow.getDefinition())
-                        .param(messageString, message))
+            case WORKFLOW_EDITOR, WORKFLOW_EDITOR_COMPONENTS_POPOVER_MENU -> {
+                OrchestratorWorkers.FinalResponse process = orchestratorWorkers.process(message);
+
+                yield chatClientWorkflow.prompt()
+//                    .system(
+//                        """
+//                            Answer only with a json in a format similar to the json objects in the context of the specific Component.
+//                            Only use the Actions, Triggers and Parameters which you know exist; look for JSON Example
+//                            for the action or trigger.
+//                            """)
+                    .user(user -> user.text("Merge all the subtasks into a json workflow similar to the ones in the context.")
+                        .param("task_analysis", process.analysis())
+                        .param("task_list", process.workerResponses()))
                     .advisors(advisor -> advisor.param(
                         AbstractChatMemoryAdvisor.CHAT_MEMORY_CONVERSATION_ID_KEY, conversationId))
                     .stream()
                     .content()
                     .map(content -> Map.of("text", content));
+            }
             case CODE_EDITOR -> {
                 Map<String, ?> parameters = contextDTO.parameters();
 
