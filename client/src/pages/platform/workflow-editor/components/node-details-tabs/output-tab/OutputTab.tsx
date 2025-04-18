@@ -5,6 +5,7 @@ import {Alert, AlertDescription, AlertTitle} from '@/components/ui/alert';
 import {Button} from '@/components/ui/button';
 import {DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger} from '@/components/ui/dropdown-menu';
 import {Input} from '@/components/ui/input';
+import {Skeleton} from '@/components/ui/skeleton';
 import {ModeType, useModeTypeStore} from '@/pages/home/stores/useModeTypeStore';
 import {
     GetComponentDefinitionsModeTypeEnum,
@@ -214,8 +215,32 @@ const OutputTab = ({connectionMissing, currentNode, outputDefined = false, workf
 
     if (!testing && workflowNodeOutputIsFetching) {
         return (
-            <div className="flex size-full items-center justify-center">
-                <LoadingIcon /> Loading...
+            <div className="flex size-full flex-col gap-4 p-4">
+                <div className="flex w-full justify-between">
+                    <Skeleton className="h-6 w-32" />
+
+                    <Skeleton className="h-8 w-32" />
+                </div>
+
+                <div className="flex flex-col gap-2">
+                    <Skeleton className="h-6 w-32" />
+
+                    <Skeleton className="ml-4 h-6 w-48" />
+
+                    <Skeleton className="ml-8 h-6 w-32" />
+
+                    <Skeleton className="ml-12 h-6 w-48" />
+
+                    <Skeleton className="h-6 w-32" />
+
+                    <Skeleton className="ml-4 h-6 w-32" />
+
+                    <Skeleton className="h-6 w-48" />
+
+                    <Skeleton className="ml-4 h-6 w-32" />
+
+                    <Skeleton className="ml-8 h-6 w-48" />
+                </div>
             </div>
         );
     }
