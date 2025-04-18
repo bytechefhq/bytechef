@@ -20,13 +20,14 @@ import static com.bytechef.platform.component.jdbc.constant.JdbcConstants.COLUMN
 import static com.bytechef.platform.component.jdbc.constant.JdbcConstants.ROWS;
 import static com.bytechef.platform.component.jdbc.constant.JdbcConstants.SCHEMA;
 import static com.bytechef.platform.component.jdbc.constant.JdbcConstants.TABLE;
+import static com.bytechef.platform.component.jdbc.constant.JdbcConstants.VALUES;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import com.bytechef.platform.component.jdbc.operation.config.JdbcOperationIntTestConfiguration;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
 import javax.sql.DataSource;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -64,14 +65,18 @@ public class InsertJdbcOperationIntTest {
     @Test
     public void testInsert() throws SQLException {
         Map<String, ?> inputParameters = Map.of(
-            COLUMNS, List.of("id", "name"),
-            ROWS, List.of(Map.of("id", "id1", "name", "name1"), Map.of("id", "id2", "name", "name2")),
+            COLUMNS, List.of(
+                Map.of("name", "name", "type", "STRING"),
+                Map.of("name", "id", "type", "STRING")),
+            VALUES, Map.of(
+                ROWS,
+                List.of(Map.of("id", "id1", "name", "name1"), Map.of("id", "id2", "name", "name2"))),
             SCHEMA, "public",
             TABLE, "test");
 
         Map<String, Integer> result = new InsertJdbcOperation().execute(
             inputParameters, new SingleConnectionDataSource(dataSource.getConnection(), false));
 
-        Assertions.assertEquals(2, result.get("rows"));
+        assertEquals(2, result.get(ROWS));
     }
 }
