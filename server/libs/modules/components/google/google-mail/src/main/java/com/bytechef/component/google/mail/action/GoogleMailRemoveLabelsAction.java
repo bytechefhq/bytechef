@@ -55,8 +55,7 @@ public class GoogleMailRemoveLabelsAction {
                 .label("Labels")
                 .description("Labels to remove from this message.")
                 .items(string())
-                .options((ActionOptionsFunction<String>) GoogleMailUtils::getMessageLabelOptions)
-                .optionsLookupDependsOn(ID)
+                .options((ActionOptionsFunction<String>) GoogleMailUtils::getLabelOptions)
                 .maxItems(100)
                 .required(true))
         .output(
