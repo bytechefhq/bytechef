@@ -6,7 +6,7 @@ description: "A toolbox with all the things you need to get your project to succ
 A toolbox with all the things you need to get your project to success:  Image resize and CDN, PDF and Screenshots generation, Currency Exchange and Discounts, Email Validation, QR codes, and much more!
 
 
-Categories: developer-tools
+Categories: Developer Tools
 
 
 Type: oneSimpleAPI/v1

@@ -6,7 +6,7 @@ description: "Document Joiner."
 Document Joiner.
 
 
-Categories: artificial-intelligence
+Categories: Artificial Intelligence
 
 
 Type: documentJoiner/v1

@@ -6,7 +6,7 @@ description: "Activating humanity's potential through generative AI. Open models
 Activating humanity's potential through generative AI. Open models in every modality, for everyone, everywhere.
 
 
-Categories: artificial-intelligence
+Categories: Artificial Intelligence
 
 
 Type: stability/v1

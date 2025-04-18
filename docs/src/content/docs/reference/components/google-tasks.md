@@ -6,7 +6,7 @@ description: "Google Tasks is a cloud-based task management tool that allows use
 Google Tasks is a cloud-based task management tool that allows users to create, edit, and organize to-do lists, set deadlines, and track tasks across devices in real-time.
 
 
-Categories: productivity-and-collaboration
+Categories: Productivity and Collaboration
 
 
 Type: googleTasks/v1

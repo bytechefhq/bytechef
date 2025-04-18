@@ -6,7 +6,7 @@ description: "The Random Helper allows you to generate random values."
 The Random Helper allows you to generate random values.
 
 
-Categories: helpers
+Categories: Helpers
 
 
 Type: randomHelper/v1
@@ -17,6 +17,80 @@ Type: randomHelper/v1
 
 
 ## Actions
+
+
+### Random Float
+Name: randomFloat
+
+Generates a random float value.
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| startInclusive | Start Inclusive | INTEGER | The minimum possible generated value. | true |
+| endInclusive | End Inclusive | INTEGER | The maximum possible generated value. | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Random Float",
+  "name" : "randomFloat",
+  "parameters" : {
+    "startInclusive" : 1,
+    "endInclusive" : 1
+  },
+  "type" : "randomHelper/v1/randomFloat"
+}
+```
+
+#### Output
+
+
+
+Type: NUMBER
+
+
+
+
+
+
+
+
+### Random Hex
+Name: randomHex
+
+Generates a random Hex.
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| length | Hex Byte Length | INTEGER | Hex byte length must be a positive integer smaller than or equal to 32. | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Random Hex",
+  "name" : "randomHex",
+  "parameters" : {
+    "length" : 1
+  },
+  "type" : "randomHelper/v1/randomHex"
+}
+```
+
+#### Output
+
+
+
+Type: STRING
+
+
+
+
+
+
 
 
 ### Random Integer
@@ -57,28 +131,28 @@ Type: INTEGER
 
 
 
-### Random Float
-Name: randomFloat
+### Random String
+Name: randomString
 
-Generates a random float value.
+Generates a random string value.
 
 #### Properties
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| startInclusive | Start Inclusive | INTEGER | The minimum possible generated value. | true |
-| endInclusive | End Inclusive | INTEGER | The maximum possible generated value. | true |
+| length | Length | INTEGER | The length of the generated string. | true |
+| characterSet | Character Set | STRING <details> <summary> Options </summary> ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789, ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789~`!@#$%^&*()-_=+[{]}\|;:'",<.>/? </details> | The character set to be used for generating string. | true |
 
 #### Example JSON Structure
 ```json
 {
-  "label" : "Random Float",
-  "name" : "randomFloat",
+  "label" : "Random String",
+  "name" : "randomString",
   "parameters" : {
-    "startInclusive" : 1,
-    "endInclusive" : 1
+    "length" : 1,
+    "characterSet" : ""
   },
-  "type" : "randomHelper/v1/randomFloat"
+  "type" : "randomHelper/v1/randomString"
 }
 ```
 
@@ -86,7 +160,34 @@ Generates a random float value.
 
 
 
-Type: NUMBER
+Type: STRING
+
+
+
+
+
+
+
+
+### Random UUID
+Name: randomUuid
+
+Generates a random UUID.
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Random UUID",
+  "name" : "randomUuid",
+  "type" : "randomHelper/v1/randomUuid"
+}
+```
+
+#### Output
+
+
+
+Type: STRING
 
 
 

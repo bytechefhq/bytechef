@@ -6,7 +6,7 @@ description: "Webflow is a web design and development platform that allows users
 Webflow is a web design and development platform that allows users to build responsive websites visually without writing code.
 
 
-Categories: developer-tools
+Categories: Developer Tools
 
 
 Type: webflow/v1

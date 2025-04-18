@@ -6,7 +6,7 @@ description: "Typeform is an online survey and form-building tool that enables u
 Typeform is an online survey and form-building tool that enables users to create interactive and engaging forms for collecting data and feedback.
 
 
-Categories: surveys-and-feedback
+Categories: Surveys and Feedback
 
 
 Type: typeform/v1

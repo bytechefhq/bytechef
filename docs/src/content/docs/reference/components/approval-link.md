@@ -6,7 +6,7 @@ description: "The Approval Link component that create approval/disapproval links
 The Approval Link component that create approval/disapproval links.
 
 
-Categories: developer-tools, file-storage
+Categories: Developer Tools, File Storage
 
 
 Type: approvalLink/v1

@@ -6,7 +6,7 @@ description: "Trello is a project management tool that uses boards, lists, and c
 Trello is a project management tool that uses boards, lists, and cards to help users organize tasks and collaborate with teams.
 
 
-Categories: productivity-and-collaboration
+Categories: Productivity and Collaboration
 
 
 Type: trello/v1

@@ -6,7 +6,7 @@ description: "IBM watsonx.ai AI studio is part of the IBM watsonx AI and data pl
 IBM watsonx.ai AI studio is part of the IBM watsonx AI and data platform, bringing together new generative AI (gen AI) capabilities powered by foundation models and traditional machine learning (ML) into a powerful studio spanning the AI lifecycle.
 
 
-Categories: artificial-intelligence
+Categories: Artificial Intelligence
 
 
 Type: watsonx/v1

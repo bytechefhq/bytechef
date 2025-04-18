@@ -6,7 +6,7 @@ description: "Reads and writes data from a XLS/XLSX file."
 Reads and writes data from a XLS/XLSX file.
 
 
-Categories: helpers
+Categories: Helpers
 
 
 Type: xlsxFile/v1

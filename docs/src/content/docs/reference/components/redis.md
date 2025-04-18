@@ -6,7 +6,7 @@ description: "Redis is an open-source, in-memory data structure store used as a 
 Redis is an open-source, in-memory data structure store used as a database, cache, and message broker, known for its high performance and support for various data structures like strings, hashes, lists, sets, and more.
 
 
-Categories: artificial-intelligence
+Categories: Artificial Intelligence
 
 
 Type: redis/v1

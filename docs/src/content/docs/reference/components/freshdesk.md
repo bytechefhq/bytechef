@@ -6,7 +6,7 @@ description: "Freshdesk is a cloud-based customer support software that helps bu
 Freshdesk is a cloud-based customer support software that helps businesses manage customer queries and tickets efficiently.
 
 
-Categories: customer-support
+Categories: Customer Support
 
 
 Type: freshdesk/v1

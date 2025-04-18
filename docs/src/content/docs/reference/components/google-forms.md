@@ -6,7 +6,7 @@ description: "Google Forms is a web-based application that allows users to creat
 Google Forms is a web-based application that allows users to create surveys, quizzes, and forms for data collection and analysis, with real-time collaboration and response tracking.
 
 
-Categories: surveys-and-feedback
+Categories: Surveys and Feedback
 
 
 Type: googleForms/v1

@@ -6,7 +6,7 @@ description: "Google Slides is a cloud-based presentation software that allows u
 Google Slides is a cloud-based presentation software that allows users to create, edit, and collaborate on presentations online in real-time.
 
 
-Categories: file-storage
+Categories: File Storage
 
 
 Type: googleSlides/v1

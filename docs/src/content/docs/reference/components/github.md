@@ -6,7 +6,7 @@ description: "GitHub is a web-based platform for version control and collaborati
 GitHub is a web-based platform for version control and collaboration using Git.
 
 
-Categories: developer-tools
+Categories: Developer Tools
 
 
 Type: github/v1

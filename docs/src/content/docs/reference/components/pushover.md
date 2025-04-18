@@ -6,7 +6,7 @@ description: "Pushover is a notification service that sends real-time alerts to 
 Pushover is a notification service that sends real-time alerts to mobile and desktop devices, integrating with apps, scripts, and services.
 
 
-Categories: communication
+Categories: Communication
 
 
 Type: pushover/v1

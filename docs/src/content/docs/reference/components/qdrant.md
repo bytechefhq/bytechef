@@ -6,7 +6,7 @@ description: "Qdrant is an open-source vector similarity search engine designed 
 Qdrant is an open-source vector similarity search engine designed to handle high-dimensional data, enabling efficient and scalable nearest neighbor search for applications like recommendation systems and machine learning.
 
 
-Categories: artificial-intelligence
+Categories: Artificial Intelligence
 
 
 Type: qdrant/v1

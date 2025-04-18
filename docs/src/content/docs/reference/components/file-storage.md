@@ -6,7 +6,7 @@ description: "Reads and writes data from a file stored inside the file storage."
 Reads and writes data from a file stored inside the file storage.
 
 
-Categories: file-storage, helpers
+Categories: File Storage, Helpers
 
 
 Type: fileStorage/v1

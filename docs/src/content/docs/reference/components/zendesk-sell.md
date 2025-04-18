@@ -6,7 +6,7 @@ description: "Zendesk Sell is a sales CRM software that helps businesses manage 
 Zendesk Sell is a sales CRM software that helps businesses manage leads, contacts, and deals efficiently.
 
 
-Categories: crm
+Categories: CRM
 
 
 Type: zendeskSell/v1

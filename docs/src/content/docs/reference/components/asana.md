@@ -6,7 +6,7 @@ description: "Asana is a web and mobile application designed to help teams organ
 Asana is a web and mobile application designed to help teams organize, track, and manage their work tasks and projects efficiently.
 
 
-Categories: project-management
+Categories: Project Management
 
 
 Type: asana/v1

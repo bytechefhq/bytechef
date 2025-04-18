@@ -6,7 +6,7 @@ description: "Query Transformer."
 Query Transformer.
 
 
-Categories: artificial-intelligence
+Categories: Artificial Intelligence
 
 
 Type: queryTransformer/v1

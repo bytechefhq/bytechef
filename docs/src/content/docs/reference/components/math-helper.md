@@ -6,7 +6,7 @@ description: "Helper component to perform mathematical operations."
 Helper component to perform mathematical operations.
 
 
-Categories: helpers
+Categories: Helpers
 
 
 Type: mathHelper/v1

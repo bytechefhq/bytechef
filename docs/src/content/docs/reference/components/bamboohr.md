@@ -6,7 +6,7 @@ description: "BambooHR is a human resources software that helps HR teams manage 
 BambooHR is a human resources software that helps HR teams manage employee data, hiring, onboarding, time tracking, payroll, performance management, and more in one platform.
 
 
-Categories: hris
+Categories: Human Resources Information System
 
 
 Type: bambooHr/v1

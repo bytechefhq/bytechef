@@ -6,7 +6,7 @@ description: "Actions and triggers for using with the chat widget."
 Actions and triggers for using with the chat widget.
 
 
-Categories: helpers
+Categories: Helpers
 
 
 Type: chat/v1

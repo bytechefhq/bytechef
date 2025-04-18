@@ -6,7 +6,7 @@ description: "Reckon is an accounting software used for financial management and
 Reckon is an accounting software used for financial management and bookkeeping tasks.
 
 
-Categories: accounting
+Categories: Accounting
 
 
 Type: reckon/v1

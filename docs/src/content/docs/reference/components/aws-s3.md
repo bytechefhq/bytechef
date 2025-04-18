@@ -6,7 +6,7 @@ description: "AWS S3 is a simple object storage service provided by Amazon Web S
 AWS S3 is a simple object storage service provided by Amazon Web Services.
 
 
-Categories: developer-tools, file-storage
+Categories: Developer Tools, File Storage
 
 
 Type: awsS3/v1

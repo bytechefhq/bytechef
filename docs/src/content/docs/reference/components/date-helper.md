@@ -6,7 +6,7 @@ description: "Helper component for date and time manipulation."
 Helper component for date and time manipulation.
 
 
-Categories: helpers
+Categories: Helpers
 
 
 Type: dateHelper/v1

@@ -6,7 +6,7 @@ description: "The Crypto Helper allows you to use cryptographic functions."
 The Crypto Helper allows you to use cryptographic functions.
 
 
-Categories: helpers
+Categories: Helpers
 
 
 Type: cryptoHelper/v1
@@ -17,44 +17,6 @@ Type: cryptoHelper/v1
 
 
 ## Actions
-
-
-### Generate Password
-Name: generatePassword
-
-Generate a random password of the specified length.
-
-#### Properties
-
-|      Name       |      Label     |     Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| length | Length | INTEGER | The length of the password. | true |
-| characterSet | Character Set | STRING <details> <summary> Options </summary> ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789, ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789~`!@#$%^&*()-_=+[{]}\|;:'",<.>/? </details> | The character set to be used for generating the password. | true |
-
-#### Example JSON Structure
-```json
-{
-  "label" : "Generate Password",
-  "name" : "generatePassword",
-  "parameters" : {
-    "length" : 1,
-    "characterSet" : ""
-  },
-  "type" : "cryptoHelper/v1/generatePassword"
-}
-```
-
-#### Output
-
-
-
-Type: STRING
-
-
-
-
-
-
 
 
 ### Hash

@@ -6,7 +6,7 @@ description: "Stripe is a payment processing platform that allows businesses to 
 Stripe is a payment processing platform that allows businesses to accept online payments and manage transactions securely.
 
 
-Categories: payment-processing
+Categories: Payment Processing
 
 
 Type: stripe/v1

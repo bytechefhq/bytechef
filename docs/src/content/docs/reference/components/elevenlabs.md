@@ -6,7 +6,7 @@ description: "ElevenLabs is an AI-powered voice synthesis company specializing i
 ElevenLabs is an AI-powered voice synthesis company specializing in ultra-realistic text-to-speech and voice cloning technology.
 
 
-Categories: artificial-intelligence
+Categories: Artificial Intelligence
 
 
 Type: elevenLabs/v1

@@ -6,7 +6,7 @@ description: "Apollo.io is a sales intelligence and engagement platform that pro
 Apollo.io is a sales intelligence and engagement platform that provides tools for prospecting, lead generation, and sales automation to help businesses improve their sales processes and outreach efforts.
 
 
-Categories: crm
+Categories: CRM
 
 
 Type: apollo/v1

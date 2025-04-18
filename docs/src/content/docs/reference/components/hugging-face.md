@@ -6,7 +6,7 @@ description: "Hugging Face is on a journey to advance and democratize artificial
 Hugging Face is on a journey to advance and democratize artificial intelligence through open source and open science.
 
 
-Categories: artificial-intelligence
+Categories: Artificial Intelligence
 
 
 Type: huggingFace/v1

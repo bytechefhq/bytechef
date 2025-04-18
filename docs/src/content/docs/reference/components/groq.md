@@ -6,7 +6,7 @@ description: "The LPU Inference Engine by Groq is a hardware and software platfo
 The LPU Inference Engine by Groq is a hardware and software platform that delivers exceptional compute speed, quality, and energy efficiency.
 
 
-Categories: artificial-intelligence
+Categories: Artificial Intelligence
 
 
 Type: groq/v1

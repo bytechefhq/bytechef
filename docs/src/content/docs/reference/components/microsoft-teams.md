@@ -6,7 +6,7 @@ description: "Microsoft Teams is a collaboration platform that combines workplac
 Microsoft Teams is a collaboration platform that combines workplace chat, video meetings, file storage, and application integration.
 
 
-Categories: communication
+Categories: Communication
 
 
 Type: microsoftTeams/v1

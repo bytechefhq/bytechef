@@ -6,7 +6,7 @@ description: "Open, efficient, helpful and trustworthy AI models through ground-
 Open, efficient, helpful and trustworthy AI models through ground-breaking innovations.
 
 
-Categories: artificial-intelligence
+Categories: Artificial Intelligence
 
 
 Type: mistral/v1
@@ -48,7 +48,7 @@ Ask anything you want.
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| model | Model | STRING <details> <summary> Options </summary> codestral-latest, ministral-3b-latest, ministral-8b-latest, mistral-large-latest, mistral-small-latest, open-codestral-mamba, open-mistral-7b, open-mistral-nemo, open-mixtral-8x22b, open-mixtral-8x7b, pixtral-12b-2409, pixtral-large-latest </details> | ID of the model to use. | true |
+| model | Model | STRING <details> <summary> Options </summary> codestral-latest, ministral-3b-latest, ministral-8b-latest, mistral-large-latest, mistral-small-latest, open-codestral-mamba, open-mistral-nemo, pixtral-12b-2409, pixtral-large-latest </details> | ID of the model to use. | true |
 | messages | Messages | ARRAY <details> <summary> Items </summary> [{STRING\(role), STRING\(content), [FILE_ENTRY]\(attachments)}] </details> | A list of messages comprising the conversation so far. | true |
 | response | Response | OBJECT <details> <summary> Properties </summary> {STRING\(responseFormat), STRING\(responseSchema)} </details> | The response from the API. | false |
 | maxTokens | Max Tokens | INTEGER | The maximum number of tokens to generate in the chat completion. | null |

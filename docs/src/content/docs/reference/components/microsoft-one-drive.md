@@ -6,7 +6,7 @@ description: "Microsoft OneDrive is a cloud storage service provided by Microsof
 Microsoft OneDrive is a cloud storage service provided by Microsoft for storing, accessing, and sharing files online.
 
 
-Categories: file-storage
+Categories: File Storage
 
 
 Type: microsoftOneDrive/v1
