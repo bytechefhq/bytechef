@@ -33,21 +33,36 @@ import static com.bytechef.component.definition.ComponentDsl.option;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.ComponentDsl.time;
 import static com.bytechef.platform.component.jdbc.constant.JdbcConstants.COLUMNS;
+import static com.bytechef.platform.component.jdbc.constant.JdbcConstants.DATABASE;
+import static com.bytechef.platform.component.jdbc.constant.JdbcConstants.DELETE;
+import static com.bytechef.platform.component.jdbc.constant.JdbcConstants.DELETE_KEY;
+import static com.bytechef.platform.component.jdbc.constant.JdbcConstants.EXECUTE;
+import static com.bytechef.platform.component.jdbc.constant.JdbcConstants.HOST;
+import static com.bytechef.platform.component.jdbc.constant.JdbcConstants.INSERT;
 import static com.bytechef.platform.component.jdbc.constant.JdbcConstants.NAME;
+import static com.bytechef.platform.component.jdbc.constant.JdbcConstants.PARAMETERS;
+import static com.bytechef.platform.component.jdbc.constant.JdbcConstants.PASSWORD;
+import static com.bytechef.platform.component.jdbc.constant.JdbcConstants.PORT;
+import static com.bytechef.platform.component.jdbc.constant.JdbcConstants.QUERY;
 import static com.bytechef.platform.component.jdbc.constant.JdbcConstants.ROWS;
+import static com.bytechef.platform.component.jdbc.constant.JdbcConstants.SCHEMA;
+import static com.bytechef.platform.component.jdbc.constant.JdbcConstants.TABLE;
 import static com.bytechef.platform.component.jdbc.constant.JdbcConstants.TYPE;
+import static com.bytechef.platform.component.jdbc.constant.JdbcConstants.UPDATE;
+import static com.bytechef.platform.component.jdbc.constant.JdbcConstants.UPDATE_KEY;
+import static com.bytechef.platform.component.jdbc.constant.JdbcConstants.USERNAME;
 import static com.bytechef.platform.component.jdbc.constant.JdbcConstants.VALUES;
 
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.definition.ActionContext;
-import com.bytechef.component.definition.Authorization;
+import com.bytechef.component.definition.Authorization.AuthorizationType;
 import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.ComponentDsl.ModifiableConnectionDefinition;
 import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.definition.Property;
+import com.bytechef.component.definition.Property.ControlType;
 import com.bytechef.component.definition.Property.Type;
 import com.bytechef.component.definition.Property.ValueProperty;
 import com.bytechef.platform.component.definition.JdbcComponentDefinition;
@@ -74,53 +89,55 @@ public class JdbcComponentHandlerImpl implements ComponentHandler {
 
     private static final ModifiableConnectionDefinition CONNECTION_DEFINITION = connection()
         .properties(
-            string(JdbcConstants.HOST).label("Host")
+            string(HOST)
+                .label("Host")
                 .required(true),
-            integer(JdbcConstants.PORT).label("Port")
+            integer(PORT)
+                .label("Port")
                 .required(true),
-            string(JdbcConstants.DATABASE).label("Database")
+            string(DATABASE)
+                .label("Database")
                 .required(true))
         .authorizations(
-            authorization(Authorization.AuthorizationType.CUSTOM).properties(
-                string(JdbcConstants.USERNAME)
-                    .label("Username")
-                    .required(true),
-                string(JdbcConstants.PASSWORD)
-                    .label("Password")
-                    .controlType(Property.ControlType.PASSWORD)
-                    .required(true)));
+            authorization(AuthorizationType.CUSTOM)
+                .properties(
+                    string(USERNAME)
+                        .label("Username")
+                        .required(true),
+                    string(PASSWORD)
+                        .label("Password")
+                        .controlType(ControlType.PASSWORD)
+                        .required(true)));
 
     private final List<ModifiableActionDefinition> actionDefinitions = List.of(
-        action(JdbcConstants.QUERY)
+        action(QUERY)
             .title("Query")
             .description("Execute an SQL query.")
             .properties(
-                string(JdbcConstants.QUERY)
+                string(QUERY)
                     .label("Query")
                     .description(
                         "The raw SQL query to execute. You can use :property1 and :property2 in conjunction with " +
                             "parameters.")
-                    .placeholder(
-                        "SELECT id, name FROM customer WHERE age > :age AND height <= :height")
-                    .controlType(Property.ControlType.TEXT_AREA)
+                    .placeholder("SELECT id, name FROM customer WHERE age > :age AND height <= :height")
+                    .controlType(ControlType.TEXT_AREA)
                     .required(true),
-                object(JdbcConstants.PARAMETERS)
+                object(PARAMETERS)
                     .label("Parameters")
-                    .description(
-                        "The list of properties which should be used as query parameters.")
+                    .description("The list of properties which should be used as query parameters.")
                     .additionalProperties(bool(), dateTime(), number(), string()))
             .output()
             .perform(this::performQuery),
-        action(JdbcConstants.INSERT)
+        action(INSERT)
             .title("Insert")
             .description("Insert rows in database.")
             .properties(
-                string(JdbcConstants.SCHEMA)
+                string(SCHEMA)
                     .label("Schema")
                     .description("Name of the schema the table belongs to.")
                     .required(true)
                     .defaultValue("public"),
-                string(JdbcConstants.TABLE)
+                string(TABLE)
                     .label("Table")
                     .description("Name of the table in which to insert data to.")
                     .required(true),
@@ -145,16 +162,16 @@ public class JdbcComponentHandlerImpl implements ComponentHandler {
                     .propertiesLookupDependsOn(COLUMNS))
             .output()
             .perform(this::performInsert),
-        action(JdbcConstants.UPDATE)
+        action(UPDATE)
             .title("Update")
             .description("Update rows in database.")
             .properties(
-                string(JdbcConstants.SCHEMA)
+                string(SCHEMA)
                     .label("Schema")
                     .description("Name of the schema the table belongs to.")
                     .required(true)
                     .defaultValue("public"),
-                string(JdbcConstants.TABLE)
+                string(TABLE)
                     .label("Table")
                     .description("Name of the table in which to update data in.")
                     .required(true),
@@ -163,12 +180,12 @@ public class JdbcComponentHandlerImpl implements ComponentHandler {
                     .description(
                         "The list of the table field names whose values would be updated.")
                     .items(string()),
-                string(JdbcConstants.UPDATE_KEY)
+                string(UPDATE_KEY)
                     .label("Update Key")
                     .description(
                         "The field name used as criteria to decide which rows in the database should be updated.")
                     .placeholder("id"),
-                array(JdbcConstants.ROWS)
+                array(ROWS)
                     .label("Values")
                     .description("List of field values for corresponding field names.")
                     .items(object().additionalProperties(
@@ -176,23 +193,22 @@ public class JdbcComponentHandlerImpl implements ComponentHandler {
                         string(), time())))
             .output()
             .perform(this::performUpdate),
-        action(JdbcConstants.DELETE)
+        action(DELETE)
             .title("Delete")
             .description("Delete rows from database.")
             .properties(
-                string(JdbcConstants.SCHEMA)
+                string(SCHEMA)
                     .label("Schema")
                     .description("Name of the schema the table belongs to.")
                     .required(true)
                     .defaultValue("public"),
-                string(JdbcConstants.TABLE)
+                string(TABLE)
                     .label("Table")
                     .description("Name of the table in which to update data in.")
                     .required(true),
-                string(JdbcConstants.DELETE_KEY)
+                string(DELETE_KEY)
                     .label("Delete Key")
-                    .description(
-                        "Name of the field which decides which rows in the database should be deleted.")
+                    .description("Name of the field which decides which rows in the database should be deleted.")
                     .placeholder("id"),
                 array(JdbcConstants.ROWS)
                     .label("Criteria Values")
@@ -202,18 +218,17 @@ public class JdbcComponentHandlerImpl implements ComponentHandler {
                         string(), time())))
             .output()
             .perform(this::performDelete),
-        action(JdbcConstants.EXECUTE)
+        action(EXECUTE)
             .title("Execute")
             .description("Execute an SQL DML or DML statement.")
             .properties(
-                string(JdbcConstants.EXECUTE)
+                string(EXECUTE)
                     .label("Execute")
                     .description(
                         "The raw DML or DDL statement to execute. You can use :property1 and :property2 in " +
                             "conjunction with parameters.")
-                    .placeholder(
-                        "UPDATE TABLE product set name = :name WHERE product > :product AND price <= :price")
-                    .controlType(Property.ControlType.TEXT_AREA)
+                    .placeholder("UPDATE TABLE product set name = :name WHERE product > :product AND price <= :price")
+                    .controlType(ControlType.TEXT_AREA)
                     .required(true),
                 array(COLUMNS)
                     .label("Fields to select")
@@ -221,7 +236,7 @@ public class JdbcComponentHandlerImpl implements ComponentHandler {
                     .items(object().additionalProperties(
                         array(), bool(), date(), dateTime(), integer(), nullable(), number(), object(),
                         string(), time())),
-                object(JdbcConstants.PARAMETERS)
+                object(PARAMETERS)
                     .label("Parameters")
                     .description(
                         "The list of values which should be used to replace corresponding criteria parameters.")
