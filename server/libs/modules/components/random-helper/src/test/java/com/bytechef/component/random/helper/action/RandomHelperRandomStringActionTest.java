@@ -14,19 +14,20 @@
  * limitations under the License.
  */
 
-package com.bytechef.component.random.helper;
+package com.bytechef.component.random.helper.action;
 
 import static com.bytechef.component.random.helper.constant.RandomHelperConstants.ALPHANUMERIC_CHARACTERS;
 import static com.bytechef.component.random.helper.constant.RandomHelperConstants.CHARACTER_SET;
 import static com.bytechef.component.random.helper.constant.RandomHelperConstants.LENGTH;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.random.helper.action.RandomHelperRandomStringAction;
 import com.bytechef.component.test.definition.MockParametersFactory;
 import java.util.Map;
+import java.util.stream.IntStream;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -40,8 +41,12 @@ class RandomHelperRandomStringActionTest {
 
     @Test
     void testPerform() {
-        String randomString = RandomHelperRandomStringAction.perform(mockedParameters, mockedParameters, mockedContext);
+        String result = RandomHelperRandomStringAction.perform(mockedParameters, mockedParameters, mockedContext);
 
-        assertEquals(8, randomString.length());
+        assertEquals(8, result.length());
+
+        IntStream chars = result.chars();
+
+        assertTrue(chars.allMatch(c -> ALPHANUMERIC_CHARACTERS.indexOf(c) >= 0));
     }
 }
