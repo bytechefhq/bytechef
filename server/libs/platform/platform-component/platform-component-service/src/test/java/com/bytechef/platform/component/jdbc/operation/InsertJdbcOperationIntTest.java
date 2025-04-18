@@ -20,6 +20,7 @@ import static com.bytechef.platform.component.jdbc.constant.JdbcConstants.COLUMN
 import static com.bytechef.platform.component.jdbc.constant.JdbcConstants.ROWS;
 import static com.bytechef.platform.component.jdbc.constant.JdbcConstants.SCHEMA;
 import static com.bytechef.platform.component.jdbc.constant.JdbcConstants.TABLE;
+import static com.bytechef.platform.component.jdbc.constant.JdbcConstants.VALUES;
 
 import com.bytechef.platform.component.jdbc.operation.config.JdbcOperationIntTestConfiguration;
 import java.sql.SQLException;
@@ -64,8 +65,8 @@ public class InsertJdbcOperationIntTest {
     @Test
     public void testInsert() throws SQLException {
         Map<String, ?> inputParameters = Map.of(
-            COLUMNS, List.of("id", "name"),
-            ROWS, List.of(Map.of("id", "id1", "name", "name1"), Map.of("id", "id2", "name", "name2")),
+            COLUMNS, List.of(Map.of("name", "status", "type", "STRING")),
+            VALUES, Map.of(ROWS, List.of(Map.of("status", "status1"), Map.of("status", "status2"))),
             SCHEMA, "public",
             TABLE, "test");
 

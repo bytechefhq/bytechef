@@ -38,6 +38,9 @@ public final class JdbcConstants {
     public static final String USERNAME = "username";
     public static final String PASSWORD = "password";
     public static final String PORT = "port";
+    public static final String NAME = "name";
+    public static final String TYPE = "type";
+    public static final String VALUES = "values";
 
     private JdbcConstants() {
     }
