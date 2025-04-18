@@ -13,117 +13,7 @@
   "resources" : null,
   "version" : 1,
   "title" : "Crypto Helper",
-  "connection" : null,
   "actions" : [ {
-    "batch" : null,
-    "deprecated" : null,
-    "description" : "Generate a random password of the specified length.",
-    "help" : null,
-    "metadata" : null,
-    "name" : "generatePassword",
-    "outputDefinition" : {
-      "output" : null,
-      "outputResponse" : {
-        "outputSchema" : {
-          "advancedOption" : null,
-          "description" : "Generated password",
-          "displayCondition" : null,
-          "expressionEnabled" : null,
-          "hidden" : null,
-          "metadata" : { },
-          "required" : null,
-          "name" : null,
-          "type" : "STRING",
-          "defaultValue" : null,
-          "exampleValue" : null,
-          "label" : null,
-          "placeholder" : null,
-          "controlType" : "TEXT",
-          "languageId" : null,
-          "maxLength" : null,
-          "minLength" : null,
-          "options" : null,
-          "optionsDataSource" : null
-        },
-        "sampleOutput" : null,
-        "placeholder" : null
-      },
-      "outputSchema" : {
-        "advancedOption" : null,
-        "description" : "Generated password",
-        "displayCondition" : null,
-        "expressionEnabled" : null,
-        "hidden" : null,
-        "metadata" : { },
-        "required" : null,
-        "name" : null,
-        "type" : "STRING",
-        "defaultValue" : null,
-        "exampleValue" : null,
-        "label" : null,
-        "placeholder" : null,
-        "controlType" : "TEXT",
-        "languageId" : null,
-        "maxLength" : null,
-        "minLength" : null,
-        "options" : null,
-        "optionsDataSource" : null
-      },
-      "sampleOutput" : null
-    },
-    "properties" : [ {
-      "advancedOption" : null,
-      "description" : "The length of the password.",
-      "displayCondition" : null,
-      "expressionEnabled" : null,
-      "hidden" : null,
-      "metadata" : { },
-      "required" : true,
-      "name" : "length",
-      "type" : "INTEGER",
-      "defaultValue" : 8,
-      "exampleValue" : null,
-      "label" : "Length",
-      "placeholder" : null,
-      "maxValue" : null,
-      "minValue" : null,
-      "options" : null,
-      "optionsDataSource" : null,
-      "controlType" : "INTEGER"
-    }, {
-      "advancedOption" : null,
-      "description" : "The character set to be used for generating the password.",
-      "displayCondition" : null,
-      "expressionEnabled" : null,
-      "hidden" : null,
-      "metadata" : { },
-      "required" : true,
-      "name" : "characterSet",
-      "type" : "STRING",
-      "defaultValue" : null,
-      "exampleValue" : null,
-      "label" : "Character Set",
-      "placeholder" : null,
-      "controlType" : "SELECT",
-      "languageId" : null,
-      "maxLength" : null,
-      "minLength" : null,
-      "options" : [ {
-        "description" : null,
-        "label" : "Alphanumeric",
-        "value" : "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"
-      }, {
-        "description" : null,
-        "label" : "Alphanumeric + Symbols",
-        "value" : "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789~`!@#$%^&*()-_=+[{]}\\|;:'\",<.>/?"
-      } ],
-      "optionsDataSource" : null
-    } ],
-    "title" : "Generate Password",
-    "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
-    "perform" : { }
-  }, {
     "batch" : null,
     "deprecated" : null,
     "description" : "Computes and returns the hash of the input.",
@@ -234,9 +124,9 @@
       "optionsDataSource" : null
     } ],
     "title" : "Hash",
+    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
-    "perform" : { }
+    "workflowNodeDescription" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -368,10 +258,11 @@
       "optionsDataSource" : null
     } ],
     "title" : "Hmac",
+    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
-    "perform" : { }
+    "workflowNodeDescription" : null
   } ],
+  "connection" : null,
   "clusterElements" : null,
   "unifiedApi" : null,
   "triggers" : null
