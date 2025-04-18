@@ -23,8 +23,13 @@ import java.util.Random;
  */
 public class RandomHelperConstants {
 
+    public static final String ALPHANUMERIC_CHARACTERS =
+        "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+    public static final String CHARACTER_SET = "characterSet";
     public static final String END_INCLUSIVE = "endInclusive";
+    public static final String LENGTH = "length";
     public static final String START_INCLUSIVE = "startInclusive";
+    public static final String SYMBOL_CHARACTERS = "~`!@#$%^&*()-_=+[{]}\\|;:'\",<.>/?";
 
     public static final Random RANDOM = new Random();
 }

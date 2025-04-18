@@ -14,16 +14,17 @@
  * limitations under the License.
  */
 
-package com.bytechef.component.example.action;
+package com.bytechef.component.random.helper;
 
-import static com.bytechef.component.example.constant.CryptoHelperConstants.ALPHANUMERIC_CHARACTERS;
-import static com.bytechef.component.example.constant.CryptoHelperConstants.CHARACTER_SET;
-import static com.bytechef.component.example.constant.CryptoHelperConstants.LENGTH;
+import static com.bytechef.component.random.helper.constant.RandomHelperConstants.ALPHANUMERIC_CHARACTERS;
+import static com.bytechef.component.random.helper.constant.RandomHelperConstants.CHARACTER_SET;
+import static com.bytechef.component.random.helper.constant.RandomHelperConstants.LENGTH;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 
-import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
+import com.bytechef.component.random.helper.action.RandomHelperRandomStringAction;
 import com.bytechef.component.test.definition.MockParametersFactory;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
@@ -31,17 +32,16 @@ import org.junit.jupiter.api.Test;
 /**
  * @author Nikolina Spehar
  */
-class CryptoHelperGeneratePasswordActionTest {
+class RandomHelperRandomStringActionTest {
 
-    private final ActionContext mockedActionContext = mock(ActionContext.class);
+    private final Context mockedContext = mock(Context.class);
     private final Parameters mockedParameters =
         MockParametersFactory.create(Map.of(LENGTH, 8, CHARACTER_SET, ALPHANUMERIC_CHARACTERS));
 
     @Test
     void testPerform() {
-        String password = CryptoHelperGeneratePasswordAction.perform(
-            mockedParameters, mockedParameters, mockedActionContext);
+        String randomString = RandomHelperRandomStringAction.perform(mockedParameters, mockedParameters, mockedContext);
 
-        assertEquals(8, password.length());
+        assertEquals(8, randomString.length());
     }
 }

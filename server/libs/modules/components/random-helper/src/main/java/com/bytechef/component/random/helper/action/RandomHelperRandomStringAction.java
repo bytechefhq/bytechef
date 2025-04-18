@@ -14,39 +14,39 @@
  * limitations under the License.
  */
 
-package com.bytechef.component.example.action;
+package com.bytechef.component.random.helper.action;
 
 import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.integer;
 import static com.bytechef.component.definition.ComponentDsl.option;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
-import static com.bytechef.component.example.constant.CryptoHelperConstants.ALPHANUMERIC_CHARACTERS;
-import static com.bytechef.component.example.constant.CryptoHelperConstants.CHARACTER_SET;
-import static com.bytechef.component.example.constant.CryptoHelperConstants.LENGTH;
-import static com.bytechef.component.example.constant.CryptoHelperConstants.SYMBOL_CHARACTERS;
+import static com.bytechef.component.random.helper.constant.RandomHelperConstants.ALPHANUMERIC_CHARACTERS;
+import static com.bytechef.component.random.helper.constant.RandomHelperConstants.CHARACTER_SET;
+import static com.bytechef.component.random.helper.constant.RandomHelperConstants.LENGTH;
+import static com.bytechef.component.random.helper.constant.RandomHelperConstants.SYMBOL_CHARACTERS;
 
-import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
+import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
 
 /**
  * @author Nikolina Spehar
  */
-public class CryptoHelperGeneratePasswordAction {
+public class RandomHelperRandomStringAction {
 
-    public static final ModifiableActionDefinition ACTION_DEFINITION = action("generatePassword")
-        .title("Generate Password")
-        .description("Generate a random password of the specified length.")
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action("randomString")
+        .title("Random String")
+        .description("Generates a random string value.")
         .properties(
             integer(LENGTH)
                 .label("Length")
-                .description("The length of the password.")
+                .description("The length of the generated string.")
                 .defaultValue(8)
                 .required(true),
             string(CHARACTER_SET)
                 .label("Character Set")
-                .description("The character set to be used for generating the password.")
+                .description("The character set to be used for generating string.")
                 .required(true)
                 .options(
                     option("Alphanumeric", ALPHANUMERIC_CHARACTERS),
@@ -54,25 +54,23 @@ public class CryptoHelperGeneratePasswordAction {
         .output(
             outputSchema(
                 string()
-                    .description("Generated password")))
-        .perform(CryptoHelperGeneratePasswordAction::perform);
+                    .description("Generated string.")))
+        .perform(RandomHelperRandomStringAction::perform);
 
-    private CryptoHelperGeneratePasswordAction() {
+    private RandomHelperRandomStringAction() {
     }
 
-    protected static String perform(
-        Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) {
-
-        StringBuilder password = new StringBuilder();
+    public static String perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
+        StringBuilder randomString = new StringBuilder();
 
         for (int i = 0; i < inputParameters.getRequiredInteger(LENGTH); i++) {
             String characterSet = inputParameters.getRequiredString(CHARACTER_SET);
 
             int randomIndex = (int) Math.floor(Math.random() * characterSet.length());
 
-            password.append(characterSet.charAt(randomIndex));
+            randomString.append(characterSet.charAt(randomIndex));
         }
 
-        return password.toString();
+        return randomString.toString();
     }
 }
