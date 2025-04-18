@@ -6,7 +6,7 @@ description: "GitLab is a web-based DevOps lifecycle tool that provides a Git re
 GitLab is a web-based DevOps lifecycle tool that provides a Git repository manager, CI/CD pipelines, issue tracking, and more in a single application.
 
 
-Categories: developer-tools
+Categories: Developer Tools
 
 
 Type: gitlab/v1

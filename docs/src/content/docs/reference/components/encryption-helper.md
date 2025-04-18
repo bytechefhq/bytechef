@@ -6,7 +6,7 @@ description: "A secure PGP encryption and decryption service powered by Bouncy C
 A secure PGP encryption and decryption service powered by Bouncy Castle, enabling users to encrypt, decrypt, and manage sensitive data with OpenPGP standards.
 
 
-Categories: helpers
+Categories: Helpers
 
 
 Type: encryptionHelper/v1

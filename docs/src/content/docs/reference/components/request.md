@@ -6,7 +6,7 @@ description: "Send an HTTP request from your application to a designated integra
 Send an HTTP request from your application to a designated integration and workflow, with the option to receive a synchronous response.
 
 
-Categories: helpers
+Categories: Helpers
 
 
 Type: request/v1

@@ -6,7 +6,7 @@ description: "VTiger is a comprehensive customer relationship management (CRM) p
 VTiger is a comprehensive customer relationship management (CRM) platform that offers sales, marketing, and support solutions to streamline business.
 
 
-Categories: crm
+Categories: CRM
 
 
 Type: vtiger/v1

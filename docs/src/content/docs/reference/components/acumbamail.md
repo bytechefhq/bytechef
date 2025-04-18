@@ -6,7 +6,7 @@ description: "Acumbamail is an email marketing and automation platform that allo
 Acumbamail is an email marketing and automation platform that allows users to create, manage, and analyze email campaigns, newsletters, and SMS marketing with an intuitive interface and API integration.
 
 
-Categories: marketing-automation
+Categories: Marketing Automation
 
 
 Type: acumbamail/v1

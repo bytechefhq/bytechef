@@ -6,7 +6,7 @@ description: "Reads and writes data from a ODS file."
 Reads and writes data from a ODS file.
 
 
-Categories: helpers
+Categories: Helpers
 
 
 Type: odsFile/v1

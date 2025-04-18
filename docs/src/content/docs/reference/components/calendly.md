@@ -6,7 +6,7 @@ description: "Calendly is a scheduling tool that allows users to easily set up a
 Calendly is a scheduling tool that allows users to easily set up and manage appointments and meetings.
 
 
-Categories: productivity-and-collaboration
+Categories: Productivity and Collaboration
 
 
 Type: calendly/v1

@@ -6,7 +6,7 @@ description: "Pipeliner CRM is a comprehensive sales management tool that helps 
 Pipeliner CRM is a comprehensive sales management tool that helps streamline sales processes through visual pipline management, contact organization, sales forecasting, and reporting.
 
 
-Categories: crm
+Categories: CRM
 
 
 Type: pipeliner/v1

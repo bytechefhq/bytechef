@@ -6,7 +6,7 @@ description: "Salesforce is a cloud-based customer relationship management (CRM)
 Salesforce is a cloud-based customer relationship management (CRM) platform that provides tools for sales, service, marketing, and analytics to help businesses manage customer interactions and data.
 
 
-Categories: crm
+Categories: CRM
 
 
 Type: salesforce/v1

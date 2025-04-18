@@ -6,7 +6,7 @@ description: "OpenAI is a research organization that aims to develop and direct 
 OpenAI is a research organization that aims to develop and direct artificial intelligence (AI) in ways that benefit humanity as a whole.
 
 
-Categories: artificial-intelligence
+Categories: Artificial Intelligence
 
 
 Type: openAi/v1
@@ -181,7 +181,7 @@ Generate an audio recording from the input text
 | model | Model | STRING <details> <summary> Options </summary> tts-1, tts-1-hd </details> | Text-to-Speech model which will generate the audio. | true |
 | input | Input | STRING | The text to generate audio for. | true |
 | voice | Voice | STRING <details> <summary> Options </summary> ALLOY, ASH, CORAL, ECHO, FABLE, NOVA, ONYX, SAGE, SHIMMER </details> | The voice to use when generating the audio. | true |
-| responseFormat | Response format | STRING <details> <summary> Options </summary> AAC, FLAC, MP3, OPUS </details> | The format to audio in. | false |
+| responseFormat | Response format | STRING <details> <summary> Options </summary> AAC, FLAC, MP3, OPUS, PCM, WAV </details> | The format to audio in. | false |
 | speed | Speed | NUMBER | The speed of the generated audio. | false |
 
 #### Example JSON Structure

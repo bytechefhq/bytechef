@@ -6,7 +6,7 @@ description: "Figma is a cloud-based design and prototyping tool that enables te
 Figma is a cloud-based design and prototyping tool that enables teams to collaborate in real-time on user interface and user experience projects.
 
 
-Categories: productivity-and-collaboration
+Categories: Productivity and Collaboration
 
 
 Type: figma/v1

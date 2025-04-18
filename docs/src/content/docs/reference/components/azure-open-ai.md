@@ -6,7 +6,7 @@ description: "Azure OpenAI is a research organization that aims to develop and d
 Azure OpenAI is a research organization that aims to develop and direct artificial intelligence (AI) in ways that benefit humanity as a whole.
 
 
-Categories: artificial-intelligence
+Categories: Artificial Intelligence
 
 
 Type: azureOpenAi/v1

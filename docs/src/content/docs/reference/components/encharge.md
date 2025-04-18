@@ -6,7 +6,7 @@ description: "Encharge is a marketing automation platform that helps businesses 
 Encharge is a marketing automation platform that helps businesses automate their customer communication and marketing campaigns.
 
 
-Categories: marketing-automation
+Categories: Marketing Automation
 
 
 Type: encharge/v1

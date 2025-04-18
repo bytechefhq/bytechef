@@ -6,7 +6,7 @@ description: "DeepSeek AI provides the open-source DeepSeek V3 model, renowned f
 DeepSeek AI provides the open-source DeepSeek V3 model, renowned for its cutting-edge reasoning and problem-solving capabilities.
 
 
-Categories: artificial-intelligence
+Categories: Artificial Intelligence
 
 
 Type: deepseek/v1

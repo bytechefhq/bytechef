@@ -6,7 +6,7 @@ description: "The Data Mapper enables you to configure data mappings."
 The Data Mapper enables you to configure data mappings.
 
 
-Categories: helpers
+Categories: Helpers
 
 
 Type: dataMapper/v1

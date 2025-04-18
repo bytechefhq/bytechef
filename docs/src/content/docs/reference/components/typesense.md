@@ -6,7 +6,7 @@ description: "Typesense is an open-source, in-memory search engine designed for 
 Typesense is an open-source, in-memory search engine designed for fast, typo-tolerant, and relevance-focused full-text search across large datasets.
 
 
-Categories: artificial-intelligence
+Categories: Artificial Intelligence
 
 
 Type: typesense/v1

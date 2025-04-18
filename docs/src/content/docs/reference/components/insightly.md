@@ -6,7 +6,7 @@ description: "Insightly is a customer relationship management (CRM) software tha
 Insightly is a customer relationship management (CRM) software that helps businesses manage contacts, sales, projects, and tasks in one platform.
 
 
-Categories: crm
+Categories: CRM
 
 
 Type: insightly/v1

@@ -6,7 +6,7 @@ description: "Nifty Project Management is a software tool that streamlines team 
 Nifty Project Management is a software tool that streamlines team collaboration and project tracking with features like task management, timelines, and communication tools to enhance productivity.
 
 
-Categories: project-management, productivity-and-collaboration
+Categories: Project Management, Productivity and Collaboration
 
 
 Type: nifty/v1

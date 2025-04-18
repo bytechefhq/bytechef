@@ -6,7 +6,7 @@ description: "With the Scheduled trigger, you can initiate customized workflows 
 With the Scheduled trigger, you can initiate customized workflows at specific time intervals.
 
 
-Categories: helpers
+Categories: Helpers
 
 
 Type: schedule/v1

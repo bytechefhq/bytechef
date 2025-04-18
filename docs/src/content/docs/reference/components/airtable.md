@@ -6,7 +6,7 @@ description: "Airtable is a user-friendly and flexible cloud-based database mana
 Airtable is a user-friendly and flexible cloud-based database management tool.
 
 
-Categories: productivity-and-collaboration
+Categories: Productivity and Collaboration
 
 
 Type: airtable/v1

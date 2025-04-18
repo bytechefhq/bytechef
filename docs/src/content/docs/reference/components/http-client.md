@@ -6,7 +6,7 @@ description: "Makes an HTTP request and returns the response data."
 Makes an HTTP request and returns the response data.
 
 
-Categories: helpers
+Categories: Helpers
 
 
 Type: httpClient/v1

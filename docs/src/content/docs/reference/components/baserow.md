@@ -6,7 +6,7 @@ description: "Baserow is an open-source, no-code database platform that enables 
 Baserow is an open-source, no-code database platform that enables users to create, manage, and collaborate on databases through a user-friendly interface.
 
 
-Categories: productivity-and-collaboration
+Categories: Productivity and Collaboration
 
 
 Type: baserow/v1

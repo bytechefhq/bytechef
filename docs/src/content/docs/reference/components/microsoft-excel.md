@@ -6,7 +6,7 @@ description: "Microsoft Excel is a spreadsheet program used for organizing, anal
 Microsoft Excel is a spreadsheet program used for organizing, analyzing, and visualizing data in tabular form.
 
 
-Categories: productivity-and-collaboration
+Categories: Productivity and Collaboration
 
 
 Type: microsoftExcel/v1

@@ -6,7 +6,7 @@ description: "Converts between XML string and object/array."
 Converts between XML string and object/array.
 
 
-Categories: helpers
+Categories: Helpers
 
 
 Type: xmlHelper/v1

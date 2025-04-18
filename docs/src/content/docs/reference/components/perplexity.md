@@ -6,7 +6,7 @@ description: "Perplexity AI provides a unique AI service that integrates its lan
 Perplexity AI provides a unique AI service that integrates its language models with real-time search capabilities.
 
 
-Categories: artificial-intelligence
+Categories: Artificial Intelligence
 
 
 Type: perplexity/v1

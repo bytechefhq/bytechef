@@ -6,7 +6,7 @@ description: "Microsoft To Do is a cloud-based task management application that 
 Microsoft To Do is a cloud-based task management application that helps users organize, prioritize, and track tasks across devices with features like lists, reminders, and collaboration.
 
 
-Categories: productivity-and-collaboration
+Categories: Productivity and Collaboration
 
 
 Type: microsoftToDo/v1

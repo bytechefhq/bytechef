@@ -6,7 +6,7 @@ description: "Google Contacts is a cloud-based address book service provided by 
 Google Contacts is a cloud-based address book service provided by Google, allowing users to store, manage, and synchronize their contact information across multiple devices and platforms.
 
 
-Categories: crm
+Categories: CRM
 
 
 Type: googleContacts/v1

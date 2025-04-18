@@ -6,7 +6,7 @@ description: "Reads and writes data from a JSON file."
 Reads and writes data from a JSON file.
 
 
-Categories: helpers
+Categories: Helpers
 
 
 Type: jsonFile/v1

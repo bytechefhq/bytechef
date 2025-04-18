@@ -6,7 +6,7 @@ description: "Google Chat is an intelligent and secure communication and collabo
 Google Chat is an intelligent and secure communication and collaboration tool, built for teams.
 
 
-Categories: Helpers
+Categories: Communication
 
 
 Type: googleChat/v1
@@ -49,8 +49,8 @@ Creates a new message in selected space.
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| SPACE | | STRING |  | null |
-| messageText | Message Text | STRING | Text of the message. | true |
+| SPACE | Space | STRING | Space in which the message will be created. | true |
+| text | Message Text | STRING | Text of the message. | true |
 
 #### Example JSON Structure
 ```json
@@ -59,7 +59,7 @@ Creates a new message in selected space.
   "name" : "createMessage",
   "parameters" : {
     "SPACE" : "",
-    "messageText" : ""
+    "text" : ""
   },
   "type" : "googleChat/v1/createMessage"
 }

@@ -6,7 +6,7 @@ description: "Anthropic is an AI safety and research company that's working to b
 Anthropic is an AI safety and research company that's working to build reliable, interpretable, and steerable AI systems.
 
 
-Categories: artificial-intelligence
+Categories: Artificial Intelligence
 
 
 Type: anthropic/v1
@@ -48,7 +48,7 @@ Ask anything you want.
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| model | Model | STRING <details> <summary> Options </summary> claude-2.0, claude-2.1, claude-3-5-haiku-latest, claude-3-5-sonnet-latest, claude-3-haiku-20240307, claude-3-opus-latest, claude-3-sonnet-20240229 </details> | ID of the model to use. | true |
+| model | Model | STRING <details> <summary> Options </summary> claude-2.0, claude-2.1, claude-3-5-haiku-latest, claude-3-5-sonnet-latest, claude-3-7-sonnet-latest, claude-3-haiku-20240307, claude-3-opus-latest, claude-3-sonnet-20240229 </details> | ID of the model to use. | true |
 | messages | Messages | ARRAY <details> <summary> Items </summary> [{STRING\(role), STRING\(content), [FILE_ENTRY]\(attachments)}] </details> | A list of messages comprising the conversation so far. | true |
 | maxTokens | Max Tokens | INTEGER | The maximum number of tokens to generate in the chat completion. | true |
 | response | Response | OBJECT <details> <summary> Properties </summary> {STRING\(responseFormat), STRING\(responseSchema)} </details> | The response from the API. | false |

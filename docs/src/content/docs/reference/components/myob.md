@@ -6,7 +6,7 @@ description: "MYOB is an accounting software that helps businesses manage their 
 MYOB is an accounting software that helps businesses manage their finances, invoicing, and payroll.
 
 
-Categories: accounting
+Categories: Accounting
 
 
 Type: myob/v1

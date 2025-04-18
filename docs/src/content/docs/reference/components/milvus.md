@@ -6,7 +6,7 @@ description: "Milvus is an open-source vector database that has garnered signifi
 Milvus is an open-source vector database that has garnered significant attention in the fields of data science and machine learning.
 
 
-Categories: artificial-intelligence
+Categories: Artificial Intelligence
 
 
 Type: milvus/v1

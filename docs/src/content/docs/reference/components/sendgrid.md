@@ -6,7 +6,7 @@ description: "Trusted for reliable email delivery at scale."
 Trusted for reliable email delivery at scale.
 
 
-Categories: communication, marketing-automation
+Categories: Communication, Marketing Automation
 
 
 Type: sendgrid/v1

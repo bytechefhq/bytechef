@@ -6,7 +6,7 @@ description: "JSON helper component provides actions for parsing and stringifyin
 JSON helper component provides actions for parsing and stringifying JSON.
 
 
-Categories: helpers
+Categories: Helpers
 
 
 Type: jsonHelper/v1

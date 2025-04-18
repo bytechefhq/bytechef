@@ -6,7 +6,7 @@ description: "Slack is a messaging platform for teams to communicate and collabo
 Slack is a messaging platform for teams to communicate and collaborate.
 
 
-Categories: communication, developer-tools
+Categories: Communication, Developer Tools
 
 
 Type: slack/v1

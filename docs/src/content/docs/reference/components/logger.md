@@ -6,7 +6,7 @@ description: "Logs a value to the system log."
 Logs a value to the system log.
 
 
-Categories: helpers
+Categories: Helpers
 
 
 Type: logger/v1

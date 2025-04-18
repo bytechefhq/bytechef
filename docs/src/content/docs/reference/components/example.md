@@ -6,7 +6,7 @@ description: "Component description."
 Component description.
 
 
-Categories: helpers
+Categories: Helpers
 
 
 Type: example/v1

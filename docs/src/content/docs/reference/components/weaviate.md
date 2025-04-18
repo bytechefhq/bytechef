@@ -6,7 +6,7 @@ description: "Weaviate is an open-source vector search engine and database that 
 Weaviate is an open-source vector search engine and database that enables efficient storage, retrieval, and management of high-dimensional data, often used in machine learning and AI applications.
 
 
-Categories: artificial-intelligence
+Categories: Artificial Intelligence
 
 
 Type: weaviate/v1

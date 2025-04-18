@@ -6,7 +6,7 @@ description: "Use one event from your app tot trigger workflows across any integ
 Use one event from your app tot trigger workflows across any integrations.
 
 
-Categories: helpers
+Categories: Helpers
 
 
 Type: appEvent/v1

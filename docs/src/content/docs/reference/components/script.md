@@ -6,7 +6,7 @@ description: "Executes user-defined code. User can write custom workflow logic i
 Executes user-defined code. User can write custom workflow logic in Java, JavaScript, Python, R or Ruby programming languages.
 
 
-Categories: helpers, developer-tools
+Categories: Helpers, Developer Tools
 
 
 Type: script/v1

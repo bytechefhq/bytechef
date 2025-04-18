@@ -6,7 +6,7 @@ description: "Object Helper allows you to do various operations on objects."
 Object Helper allows you to do various operations on objects.
 
 
-Categories: helpers
+Categories: Helpers
 
 
 Type: objectHelper/v1
@@ -64,29 +64,30 @@ The output for this action is dynamic and may vary depending on the input parame
 
 
 
-### Add Key-Value Pairs to Object or Array
+### Add Key-Value Pairs
 Name: addKeyValuePairs
 
-Add values from list to object or array. If the source is object, the items in the list will be treated as Key-value pairs. If the value is array of objects, key-value pairs will be added to every object in the array.
+Add values from list to object. The source object can either be empty or populated with properties. The items in the list will be treated as Key-value pairs.
 
 #### Properties
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| sourceType | Type of Initial Object | STRING <details> <summary> Options </summary> ARRAY, OBJECT </details> | Type of initial object to be added or updated. | true |
-| source | Source | ARRAY <details> <summary> Items </summary> [{}] </details> | Source object to be added or updated | true |
-| source | Source | OBJECT <details> <summary> Properties </summary> {} </details> | Source object to be added or updated | true |
-| value | Key-Value Pairs | OBJECT <details> <summary> Properties </summary> {} </details> | Key-Value pairs to be added or updated. | true |
+| source | Source | OBJECT <details> <summary> Properties </summary> {} </details> | Source object to be added or updated | null |
+| list | Key-Value Pairs | ARRAY <details> <summary> Items </summary> [{STRING\(key), STRING\(type), []\(value), BOOLEAN\(value), DATE\(value), DATE_TIME\(value), INTEGER\(value), NULL\(value), NUMBER\(value), {}\(value), STRING\(value), TIME\(value)}] </details> | Key-Value pairs to be added or updated. | true |
 
 #### Example JSON Structure
 ```json
 {
-  "label" : "Add Key-Value Pairs to Object or Array",
+  "label" : "Add Key-Value Pairs",
   "name" : "addKeyValuePairs",
   "parameters" : {
-    "sourceType" : "",
     "source" : { },
-    "value" : { }
+    "list" : [ {
+      "key" : "",
+      "type" : "",
+      "value" : "00:00:00"
+    } ]
   },
   "type" : "objectHelper/v1/addKeyValuePairs"
 }

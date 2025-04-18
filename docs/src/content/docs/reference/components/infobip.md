@@ -6,7 +6,7 @@ description: "Infobip is a global communications platform that provide cloud-bas
 Infobip is a global communications platform that provide cloud-based messaging and omnichannel communication solutions for businesses.
 
 
-Categories: communication
+Categories: Communication
 
 
 Type: infobip/v1

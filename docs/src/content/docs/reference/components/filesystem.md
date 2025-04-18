@@ -6,7 +6,7 @@ description: "Allows multiple operations over files on the filesystem."
 Allows multiple operations over files on the filesystem.
 
 
-Categories: helpers
+Categories: Helpers
 
 
 Type: filesystem/v1

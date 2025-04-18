@@ -6,7 +6,7 @@ description: "Zeplin is a collaboration tool that bridges the gap between design
 Zeplin is a collaboration tool that bridges the gap between designers and developers by providing a platform to share, organize, and translate design files into development.
 
 
-Categories: communication
+Categories: Communication
 
 
 Type: zeplin/v1

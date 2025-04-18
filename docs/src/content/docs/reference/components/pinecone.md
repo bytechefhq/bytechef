@@ -6,7 +6,7 @@ description: "Pinecone is a vector database designed for efficient similarity se
 Pinecone is a vector database designed for efficient similarity search and storage of high-dimensional data, commonly used in machine learning and AI applications.
 
 
-Categories: artificial-intelligence
+Categories: Artificial Intelligence
 
 
 Type: pinecone/v1

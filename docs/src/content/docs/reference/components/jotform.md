@@ -6,7 +6,7 @@ description: "JotForm is an online form builder that enables users to create cus
 JotForm is an online form builder that enables users to create customized forms for various purposes without needing coding skills.
 
 
-Categories: surveys-and-feedback
+Categories: Surveys and Feedback
 
 
 Type: jotform/v1

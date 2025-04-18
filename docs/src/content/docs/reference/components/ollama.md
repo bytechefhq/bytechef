@@ -6,7 +6,7 @@ description: "Get up and running with large language models."
 Get up and running with large language models.
 
 
-Categories: artificial-intelligence
+Categories: Artificial Intelligence
 
 
 Type: ollama/v1
@@ -48,7 +48,7 @@ Ask anything you want.
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| model | Model | STRING <details> <summary> Options </summary> codellama, dolphin-phi, gemma, llama2, llama2-uncensored, llama3, llama3.1, llama3.2, llama3.2-vision, llama3.2-vision:90b, llama3.2:1b, llava, mistral, mistral-nemo, moondream, mxbai-embed-large, neural-chat, nomic-embed-text, orca-mini, phi, phi3, qwen2.5, starling-lm </details> | ID of the model to use. | true |
+| model | Model | STRING <details> <summary> Options </summary> codellama, dolphin-phi, gemma, llama2, llama2-uncensored, llama3, llama3.1, llama3.2, llama3.2-vision, llama3.2-vision:90b, llama3.2:1b, llama3.2:3b, llava, mistral, mistral-nemo, moondream, mxbai-embed-large, neural-chat, nomic-embed-text, orca-mini, phi, phi3, qwen2.5, qwq, starling-lm </details> | ID of the model to use. | true |
 | messages | Messages | ARRAY <details> <summary> Items </summary> [{STRING\(role), STRING\(content), [FILE_ENTRY]\(attachments)}] </details> | A list of messages comprising the conversation so far. | true |
 | response | Response | OBJECT <details> <summary> Properties </summary> {STRING\(responseFormat), STRING\(responseSchema)} </details> | The response from the API. | false |
 | keepAlive | Keep alive for | STRING | Controls how long the model will stay loaded into memory following the request | null |

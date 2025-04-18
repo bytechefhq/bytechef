@@ -6,7 +6,7 @@ description: "Helper component which contains various actions for image manipula
 Helper component which contains various actions for image manipulation.
 
 
-Categories: helpers
+Categories: Helpers
 
 
 Type: imageHelper/v1

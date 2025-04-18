@@ -6,7 +6,7 @@ description: "Generative AI and digitalization are reshaping the $3 trillion aut
 Generative AI and digitalization are reshaping the $3 trillion automotive industry, from design and engineering to manufacturing, autonomous driving, and customer experience. NVIDIA is at the epicenter of this industrial transformation.
 
 
-Categories: artificial-intelligence
+Categories: Artificial Intelligence
 
 
 Type: nvidia/v1

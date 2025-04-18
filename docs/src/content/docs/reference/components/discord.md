@@ -6,7 +6,7 @@ description: "Discord is a communication platform designed for creating communit
 Discord is a communication platform designed for creating communities, chatting with friends, and connecting with others through text, voice, and video channels.
 
 
-Categories: communication
+Categories: Communication
 
 
 Type: discord/v1
