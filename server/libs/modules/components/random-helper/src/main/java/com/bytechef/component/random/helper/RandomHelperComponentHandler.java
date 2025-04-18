@@ -22,8 +22,10 @@ import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.component.random.helper.action.RandomHelperRandomFloatAction;
+import com.bytechef.component.random.helper.action.RandomHelperRandomHexAction;
 import com.bytechef.component.random.helper.action.RandomHelperRandomIntAction;
 import com.bytechef.component.random.helper.action.RandomHelperRandomStringAction;
+import com.bytechef.component.random.helper.action.RandomHelperRandomUuidAction;
 import com.google.auto.service.AutoService;
 
 /**
@@ -38,9 +40,11 @@ public class RandomHelperComponentHandler implements ComponentHandler {
         .icon("path:assets/random-helper.svg")
         .categories(ComponentCategory.HELPERS)
         .actions(
-            RandomHelperRandomIntAction.ACTION_DEFINITION,
             RandomHelperRandomFloatAction.ACTION_DEFINITION,
-            RandomHelperRandomStringAction.ACTION_DEFINITION);
+            RandomHelperRandomHexAction.ACTION_DEFINITION,
+            RandomHelperRandomIntAction.ACTION_DEFINITION,
+            RandomHelperRandomStringAction.ACTION_DEFINITION,
+            RandomHelperRandomUuidAction.ACTION_DEFINITION);
 
     @Override
     public ComponentDefinition getDefinition() {
