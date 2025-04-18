@@ -301,8 +301,8 @@
       }
     } ],
     "title" : "Add Labels",
-    "perform" : { },
     "workflowNodeDescription" : null,
+    "perform" : { },
     "processErrorResponse" : null
   }, {
     "batch" : null,
@@ -337,8 +337,8 @@
       }
     } ],
     "title" : "Delete Mail",
-    "perform" : { },
     "workflowNodeDescription" : null,
+    "perform" : { },
     "processErrorResponse" : null
   }, {
     "batch" : null,
@@ -459,8 +459,8 @@
       "optionsDataSource" : null
     } ],
     "title" : "Get Mail",
-    "perform" : { },
     "workflowNodeDescription" : null,
+    "perform" : { },
     "processErrorResponse" : null
   }, {
     "batch" : null,
@@ -581,8 +581,8 @@
       "optionsDataSource" : null
     } ],
     "title" : "Get Thread",
-    "perform" : { },
     "workflowNodeDescription" : null,
+    "perform" : { },
     "processErrorResponse" : null
   }, {
     "batch" : null,
@@ -867,13 +867,13 @@
       "options" : null,
       "controlType" : "MULTI_SELECT",
       "optionsDataSource" : {
-        "optionsLookupDependsOn" : [ "id" ],
+        "optionsLookupDependsOn" : null,
         "options" : { }
       }
     } ],
     "title" : "Remove Labels",
-    "perform" : { },
     "workflowNodeDescription" : null,
+    "perform" : { },
     "processErrorResponse" : null
   }, {
     "batch" : null,
@@ -1379,8 +1379,8 @@
       "optionsDataSource" : null
     } ],
     "title" : "Reply to Email",
-    "perform" : { },
     "workflowNodeDescription" : null,
+    "perform" : { },
     "processErrorResponse" : null
   }, {
     "batch" : null,
@@ -1905,8 +1905,8 @@
       "controlType" : "SELECT"
     } ],
     "title" : "Search Email",
-    "perform" : { },
     "workflowNodeDescription" : null,
+    "perform" : { },
     "processErrorResponse" : null
   }, {
     "batch" : null,
@@ -2450,8 +2450,8 @@
       "optionsDataSource" : null
     } ],
     "title" : "Send Email",
-    "perform" : { },
     "workflowNodeDescription" : null,
+    "perform" : { },
     "processErrorResponse" : null
   } ],
   "clusterElements" : [ {
@@ -3308,7 +3308,7 @@
       "options" : null,
       "controlType" : "MULTI_SELECT",
       "optionsDataSource" : {
-        "optionsLookupDependsOn" : [ "id" ],
+        "optionsLookupDependsOn" : null,
         "options" : { }
       }
     } ],
