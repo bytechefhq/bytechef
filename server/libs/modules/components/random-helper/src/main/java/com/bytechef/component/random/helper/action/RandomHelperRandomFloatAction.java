@@ -23,8 +23,8 @@ import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.random.helper.constant.RandomHelperConstants.END_INCLUSIVE;
 import static com.bytechef.component.random.helper.constant.RandomHelperConstants.START_INCLUSIVE;
 
-import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
+import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.random.helper.constant.RandomHelperConstants;
 
@@ -53,9 +53,7 @@ public class RandomHelperRandomFloatAction {
     /**
      * Generates a random float.
      */
-    protected static Float perform(
-        Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
-
+    protected static Float perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
         int startInclusive = inputParameters.getInteger(START_INCLUSIVE, 0);
         int endInclusive = inputParameters.getInteger(END_INCLUSIVE, 100);
 
