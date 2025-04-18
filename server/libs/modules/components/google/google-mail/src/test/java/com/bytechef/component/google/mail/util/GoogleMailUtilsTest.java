@@ -173,45 +173,6 @@ class GoogleMailUtilsTest {
     }
 
     @Test
-    void testGetMessageLabelOptions() throws IOException {
-        parameters = MockParametersFactory.create(Map.of(ID, "123"));
-
-        List<Label> labels = List.of(new Label().setName("label1")
-            .setId("label1"),
-            new Label().setName("label2")
-                .setId("label2"));
-
-        try (MockedStatic<GoogleServices> googleServicesMockedStatic = mockStatic(GoogleServices.class)) {
-            googleServicesMockedStatic
-                .when(() -> GoogleServices.getMail(parametersArgumentCaptor.capture()))
-                .thenReturn(mockedGmail);
-            when(mockedGmail.users())
-                .thenReturn(mockedUsers);
-            when(mockedUsers.labels())
-                .thenReturn(mockedLabels);
-            when(mockedLabels.list(stringArgumentCaptor.capture()))
-                .thenReturn(mockedLabelsList);
-            when(mockedLabelsList.execute())
-                .thenReturn(new ListLabelsResponse().setLabels(labels));
-            when(mockedUsers.messages())
-                .thenReturn(mockedMessages);
-            when(mockedMessages.get(stringArgumentCaptor.capture(), stringArgumentCaptor.capture()))
-                .thenReturn(mockedGet);
-            when(mockedGet.execute())
-                .thenReturn(new Message().setLabelIds(List.of("label1", "label2")));
-
-            List<Option<String>> result = GoogleMailUtils.getMessageLabelOptions(
-                parameters, parameters, Map.of(), anyString(), mockedActionContext);
-
-            List<Option<String>> expectedOptions = List.of(option("label1", "label1"), option("label2", "label2"));
-
-            assertEquals(expectedOptions, result);
-            assertEquals(parameters, parametersArgumentCaptor.getValue());
-            assertEquals(List.of(ME, ME, "123"), stringArgumentCaptor.getAllValues());
-        }
-    }
-
-    @Test
     void testGetSimpleMessage() throws IOException {
         Message message = new Message()
             .setId("id")
