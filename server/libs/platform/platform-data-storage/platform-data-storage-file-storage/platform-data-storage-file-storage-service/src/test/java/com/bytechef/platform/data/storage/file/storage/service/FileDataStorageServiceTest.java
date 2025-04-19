@@ -34,9 +34,9 @@ import org.junit.jupiter.api.extension.ExtendWith;
  * @author Ivica Cardic
  */
 @ExtendWith(ObjectMapperSetupExtension.class)
-public class DataFileStorageServiceTest {
+public class FileDataStorageServiceTest {
 
-    private static final DataFileStorageService FILE_DATA_STORAGE_SERVICE;
+    private static final FileDataStorageService FILE_DATA_STORAGE_SERVICE;
 
     static {
         try {
@@ -48,7 +48,7 @@ public class DataFileStorageServiceTest {
                 throw new RuntimeException("Failed to create base directory");
             }
 
-            FILE_DATA_STORAGE_SERVICE = new DataFileStorageServiceImpl(
+            FILE_DATA_STORAGE_SERVICE = new FileDataStorageServiceImpl(
                 new FilesystemFileStorageService(baseDir.getAbsolutePath()));
         } catch (IOException e) {
             throw new RuntimeException(e);

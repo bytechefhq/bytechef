@@ -31,14 +31,14 @@ import org.springframework.lang.NonNull;
 /**
  * @author Ivica Cardic
  */
-public class DataFileStorageServiceImpl implements DataFileStorageService {
+public class FileDataStorageServiceImpl implements FileDataStorageService {
 
     public static final String DATA_ENTRIES_ROOT_DIR = "data_entries/";
 
     private final FileStorageService fileStorageService;
 
     @SuppressFBWarnings("EI")
-    public DataFileStorageServiceImpl(FileStorageService fileStorageService) {
+    public FileDataStorageServiceImpl(FileStorageService fileStorageService) {
         this.fileStorageService = fileStorageService;
     }
 

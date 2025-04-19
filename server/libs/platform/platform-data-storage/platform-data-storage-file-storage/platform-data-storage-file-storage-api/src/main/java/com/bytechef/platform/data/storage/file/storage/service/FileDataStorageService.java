@@ -24,7 +24,7 @@ import java.util.Optional;
 /**
  * @author Ivica Cardic
  */
-public interface DataFileStorageService {
+public interface FileDataStorageService {
 
     void delete(
         String componentName, DataStorageScope scope, String scopeId, String key, ModeType type);

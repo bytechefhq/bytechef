@@ -23,8 +23,8 @@ import com.bytechef.platform.data.storage.DataStorage;
 import com.bytechef.platform.data.storage.annotation.ConditionalOnDataStorageProviderAws;
 import com.bytechef.platform.data.storage.annotation.ConditionalOnDataStorageProviderFilesystem;
 import com.bytechef.platform.data.storage.domain.DataStorageScope;
-import com.bytechef.platform.data.storage.file.storage.service.DataFileStorageService;
-import com.bytechef.platform.data.storage.file.storage.service.DataFileStorageServiceImpl;
+import com.bytechef.platform.data.storage.file.storage.service.FileDataStorageService;
+import com.bytechef.platform.data.storage.file.storage.service.FileDataStorageServiceImpl;
 import java.util.Map;
 import java.util.Optional;
 import org.slf4j.Logger;
@@ -37,9 +37,9 @@ import org.springframework.lang.NonNull;
  * @author Ivica Cardic
  */
 @Configuration
-public class DataFileStorageConfiguration {
+public class FileDataStorageConfiguration {
 
-    private static final Logger logger = LoggerFactory.getLogger(DataFileStorageConfiguration.class);
+    private static final Logger logger = LoggerFactory.getLogger(FileDataStorageConfiguration.class);
 
     @Bean
     @ConditionalOnDataStorageProviderAws
@@ -49,7 +49,7 @@ public class DataFileStorageConfiguration {
         }
 
         return new DataStorageImpl(
-            new DataFileStorageServiceImpl(
+            new FileDataStorageServiceImpl(
                 fileStorageServiceRegistry.getFileStorageService(
                     ApplicationProperties.DataStorage.Provider.AWS.name())));
     }
@@ -62,19 +62,19 @@ public class DataFileStorageConfiguration {
         }
 
         return new DataStorageImpl(
-            new DataFileStorageServiceImpl(
+            new FileDataStorageServiceImpl(
                 fileStorageServiceRegistry.getFileStorageService(
                     ApplicationProperties.DataStorage.Provider.FILESYSTEM.name())));
     }
 
-    private record DataStorageImpl(DataFileStorageService dataFileStorageService) implements DataStorage {
+    private record DataStorageImpl(FileDataStorageService fileDataStorageService) implements DataStorage {
 
         @NonNull
         @Override
         public <T> Optional<T> fetch(
             String componentName, DataStorageScope scope, String scopeId, String key, ModeType type) {
 
-            return dataFileStorageService.fetch(componentName, scope, scopeId, key, type);
+            return fileDataStorageService.fetch(componentName, scope, scopeId, key, type);
         }
 
         @NonNull
@@ -82,25 +82,25 @@ public class DataFileStorageConfiguration {
         public <T> T get(
             String componentName, DataStorageScope scope, String scopeId, String key, ModeType type) {
 
-            return dataFileStorageService.get(componentName, scope, scopeId, key, type);
+            return fileDataStorageService.get(componentName, scope, scopeId, key, type);
         }
 
         @NonNull
         @Override
         public <T> Map<String, T> getAll(String componentName, DataStorageScope scope, String scopeId, ModeType type) {
-            return dataFileStorageService.getAll(componentName, scope, scopeId, type);
+            return fileDataStorageService.getAll(componentName, scope, scopeId, type);
         }
 
         @Override
         public void put(
             String componentName, DataStorageScope scope, String scopeId, String key, ModeType type, Object value) {
 
-            dataFileStorageService.put(componentName, scope, scopeId, key, type, value);
+            fileDataStorageService.put(componentName, scope, scopeId, key, type, value);
         }
 
         @Override
         public void delete(String componentName, DataStorageScope scope, String scopeId, String key, ModeType type) {
-            dataFileStorageService.delete(componentName, scope, scopeId, key, type);
+            fileDataStorageService.delete(componentName, scope, scopeId, key, type);
         }
     }
 }
