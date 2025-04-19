@@ -17,6 +17,7 @@ import TsWorker from 'monaco-editor/esm/vs/language/typescript/ts.worker?worker'
 import YamlWorker from 'monaco-yaml/yaml.worker?worker';
 import posthog from 'posthog-js';
 import {PostHogProvider} from 'posthog-js/react';
+import CacheProvider from 'react-inlinesvg/provider';
 import {RouterProvider} from 'react-router-dom';
 
 import {getRouter} from './routes';
@@ -52,18 +53,18 @@ function renderApp() {
     const router = getRouter(queryClient);
 
     root.render(
-        // <React.StrictMode>
-        <ThemeProvider defaultTheme="light">
-            <QueryClientProvider client={queryClient}>
-                <PostHogProvider client={posthog}>
-                    <TooltipProvider>
-                        <RouterProvider router={router} />
-                    </TooltipProvider>
-                </PostHogProvider>
+        <React.StrictMode>
+            <ThemeProvider defaultTheme="light">
+                <QueryClientProvider client={queryClient}>
+                    <PostHogProvider client={posthog}>
+                        <TooltipProvider>
+                                <RouterProvider router={router} />
+                        </TooltipProvider>
+                    </PostHogProvider>
 
-                <ReactQueryDevtools buttonPosition="bottom-right" initialIsOpen={false} />
-            </QueryClientProvider>
-        </ThemeProvider>
-        // </React.StrictMode>
+                    <ReactQueryDevtools buttonPosition="bottom-right" initialIsOpen={false} />
+                </QueryClientProvider>
+            </ThemeProvider>
+        </React.StrictMode>
     );
 }
