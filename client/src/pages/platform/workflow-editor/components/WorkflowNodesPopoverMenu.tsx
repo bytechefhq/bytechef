@@ -56,7 +56,7 @@ const WorkflowNodesPopoverMenu = ({
     const [popoverOpen, setPopoverOpen] = useState(false);
     const [trigger, setTrigger] = useState(false);
 
-    const {componentDefinitions, taskDispatcherDefinitions, workflow} = useWorkflowDataStore();
+    const {workflow} = useWorkflowDataStore();
 
     const {edges, nodes} = useWorkflowDataStore(
         useShallow((state) => ({
@@ -71,8 +71,6 @@ const WorkflowNodesPopoverMenu = ({
 
     const {projectId} = useParams();
 
-    const memoizedComponentDefinitions = useMemo(() => componentDefinitions, [componentDefinitions]);
-    const memoizedTaskDispatcherDefinitions = useMemo(() => taskDispatcherDefinitions, [taskDispatcherDefinitions]);
     const sourceNode = useMemo(() => nodes.find((node) => node.id === sourceNodeId), [sourceNodeId, nodes]);
 
     const handleActionPanelClose = useCallback(() => {
@@ -135,7 +133,7 @@ const WorkflowNodesPopoverMenu = ({
         [sourceNodeId, nodeIndex]
     );
 
-    const handleClusterElementClick = (data: ClusterElementDefinitionBasic) => {
+    const handleClusterElementClick = useCallback(() => (data: ClusterElementDefinitionBasic) => {
         if (!clusterElementsData || !sourceNode) return;
 
         const updatedClusterElementsData: ClusterElementsType = {
@@ -189,7 +187,7 @@ const WorkflowNodesPopoverMenu = ({
             queryClient,
             updateWorkflowMutation,
         });
-    };
+    }, [clusterElementsData, projectId, queryClient, setClusterElementsData, sourceNode, updateWorkflowMutation]);
 
     useEffect(() => {
         if (componentDefinitionToBeAdded?.name) {
@@ -292,9 +290,6 @@ const WorkflowNodesPopoverMenu = ({
                         />
                     )}
 
-                    {!sourceData && (!memoizedComponentDefinitions || !memoizedTaskDispatcherDefinitions) && (
-                        <div className="px-3 py-2 text-xs">Something went wrong.</div>
-                    )}
                 </div>
             </PopoverContent>
         </Popover>
