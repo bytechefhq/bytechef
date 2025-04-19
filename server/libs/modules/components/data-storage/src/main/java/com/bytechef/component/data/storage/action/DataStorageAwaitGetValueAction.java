@@ -42,6 +42,8 @@ import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ActionContext.Data.Scope;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Parameters;
+import com.bytechef.component.definition.Property;
+import com.bytechef.definition.BaseOutputDefinition;
 import java.util.Optional;
 
 /**
@@ -114,8 +116,18 @@ public class DataStorageAwaitGetValueAction {
                 .minValue(1)
                 .maxValue(300)
                 .required(true))
-        .output()
+        .output(DataStorageAwaitGetValueAction::output)
         .perform(DataStorageAwaitGetValueAction::perform);
+
+    protected static BaseOutputDefinition.OutputResponse output(
+        Parameters inputParameters, Parameters connectionParameters, ActionContext context)
+        throws ClassNotFoundException {
+
+        Property.ValueProperty<?> property = DataStorageUtils.getValueProperty(
+            inputParameters.getRequired(TYPE, ValueType.class));
+
+        return BaseOutputDefinition.OutputResponse.of(property, null);
+    }
 
     protected static Object perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext context)

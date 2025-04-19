@@ -41,6 +41,8 @@ import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ActionContext.Data.Scope;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Parameters;
+import com.bytechef.component.definition.Property.ValueProperty;
+import com.bytechef.definition.BaseOutputDefinition.OutputResponse;
 import java.util.Optional;
 
 /**
@@ -108,8 +110,24 @@ public class DataStorageGetValueAction {
                 .label(DEFAULT_VALUE_LABEL)
                 .description("The default value to return if no value exists under the given key.")
                 .displayCondition("type == '%s'".formatted(ValueType.TIME)))
-        .output()
+        .output(DataStorageGetValueAction::output)
         .perform(DataStorageGetValueAction::perform);
+
+    protected static OutputResponse output(
+        Parameters inputParameters, Parameters connectionParameters, ActionContext context)
+        throws ClassNotFoundException {
+
+        Object value = perform(inputParameters, connectionParameters, context);
+
+        if (value == null) {
+            ValueProperty<?> property = DataStorageUtils.getValueProperty(
+                inputParameters.getRequired(TYPE, ValueType.class));
+
+            return OutputResponse.of(property, null);
+        } else {
+            return OutputResponse.of(value);
+        }
+    }
 
     protected static Object perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext context)

@@ -18,10 +18,20 @@ package com.bytechef.component.data.storage.util;
 
 import static com.bytechef.component.data.storage.constant.DataStorageConstants.TYPE;
 import static com.bytechef.component.data.storage.constant.DataStorageConstants.VALUE;
+import static com.bytechef.component.definition.ComponentDsl.array;
+import static com.bytechef.component.definition.ComponentDsl.bool;
+import static com.bytechef.component.definition.ComponentDsl.date;
+import static com.bytechef.component.definition.ComponentDsl.dateTime;
+import static com.bytechef.component.definition.ComponentDsl.integer;
 import static com.bytechef.component.definition.ComponentDsl.nullable;
+import static com.bytechef.component.definition.ComponentDsl.number;
+import static com.bytechef.component.definition.ComponentDsl.object;
+import static com.bytechef.component.definition.ComponentDsl.string;
+import static com.bytechef.component.definition.ComponentDsl.time;
 
 import com.bytechef.component.data.storage.constant.ValueType;
 import com.bytechef.component.definition.Parameters;
+import com.bytechef.component.definition.Property.ValueProperty;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -94,5 +104,20 @@ public class DataStorageUtils {
         }
 
         return value;
+    }
+
+    public static ValueProperty<?> getValueProperty(ValueType valueType) {
+        return switch (valueType) {
+            case ARRAY -> array();
+            case BOOLEAN -> bool();
+            case DATE -> date();
+            case DATE_TIME -> dateTime();
+            case INTEGER -> integer();
+            case NUMBER -> number();
+            case OBJECT -> object();
+            case STRING -> string();
+            case TIME -> time();
+            default -> nullable();
+        };
     }
 }
