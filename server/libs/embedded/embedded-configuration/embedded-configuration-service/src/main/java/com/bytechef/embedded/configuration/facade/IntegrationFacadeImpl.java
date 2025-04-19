@@ -403,7 +403,8 @@ public class IntegrationFacadeImpl implements IntegrationFacade {
 
     @Override
     @WorkflowCacheEvict(cacheNames = {
-        "previousWorkflowNodeOutputs", "previousWorkflowNodeSampleOutputs"
+        "WorkflowNodeOutputFacade.previousWorkflowNodeOutputs",
+        "WorkflowNodeOutputFacade.previousWorkflowNodeSampleOutputs"
     })
     public void updateWorkflow(String workflowId, String definition, int version) {
         workflowService.update(workflowId, definition, version);

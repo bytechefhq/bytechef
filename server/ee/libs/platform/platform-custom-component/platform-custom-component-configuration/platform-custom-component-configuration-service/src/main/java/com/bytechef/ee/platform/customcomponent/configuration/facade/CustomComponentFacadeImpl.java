@@ -24,6 +24,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.UUID;
+import org.springframework.cache.CacheManager;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -37,13 +38,16 @@ import org.springframework.transaction.annotation.Transactional;
 @ConditionalOnEEVersion
 public class CustomComponentFacadeImpl implements CustomComponentFacade {
 
+    private final CacheManager cacheManager;
     private final CustomComponentService customComponentService;
     private final CustomComponentFileStorage customComponentFileStorage;
 
     @SuppressFBWarnings("EI")
     public CustomComponentFacadeImpl(
+        CacheManager cacheManager,
         CustomComponentService customComponentService, CustomComponentFileStorage customComponentFileStorage) {
 
+        this.cacheManager = cacheManager;
         this.customComponentService = customComponentService;
         this.customComponentFileStorage = customComponentFileStorage;
     }
@@ -108,7 +112,7 @@ public class CustomComponentFacadeImpl implements CustomComponentFacade {
 
         try {
             ComponentHandler componentHandler = ComponentHandlerLoader.loadComponentHandler(
-                uri.toURL(), language, uri.toString() + UUID.randomUUID());
+                uri.toURL(), language, uri.toString() + UUID.randomUUID(), cacheManager);
 
             return componentHandler.getDefinition();
         } finally {

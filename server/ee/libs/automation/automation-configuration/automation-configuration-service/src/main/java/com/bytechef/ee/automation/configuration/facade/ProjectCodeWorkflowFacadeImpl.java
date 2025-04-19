@@ -28,6 +28,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Map;
 import java.util.UUID;
+import org.springframework.cache.CacheManager;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -41,6 +42,7 @@ import org.springframework.transaction.annotation.Transactional;
 @ConditionalOnEEVersion
 public class ProjectCodeWorkflowFacadeImpl implements ProjectCodeWorkflowFacade {
 
+    private final CacheManager cacheManager;
     private final ProjectService projectService;
     private final ProjectWorkflowService projectWorkflowService;
     private final CodeWorkflowContainerFacade codeWorkflowContainerFacade;
@@ -48,10 +50,11 @@ public class ProjectCodeWorkflowFacadeImpl implements ProjectCodeWorkflowFacade 
 
     @SuppressFBWarnings("EI")
     public ProjectCodeWorkflowFacadeImpl(
-        ProjectService projectService, ProjectWorkflowService projectWorkflowService,
+        CacheManager cacheManager, ProjectService projectService, ProjectWorkflowService projectWorkflowService,
         CodeWorkflowContainerFacade codeWorkflowContainerFacade,
         ProjectCodeWorkflowService projectCodeWorkflowService) {
 
+        this.cacheManager = cacheManager;
         this.projectService = projectService;
         this.projectWorkflowService = projectWorkflowService;
         this.codeWorkflowContainerFacade = codeWorkflowContainerFacade;
@@ -108,7 +111,7 @@ public class ProjectCodeWorkflowFacadeImpl implements ProjectCodeWorkflowFacade 
 
         try {
             ProjectHandler projectHandler = ProjectHandlerLoader.loadProjectHandler(
-                uri.toURL(), language, uri.toString() + UUID.randomUUID());
+                uri.toURL(), language, uri.toString() + UUID.randomUUID(), cacheManager);
 
             return projectHandler.getDefinition();
         } finally {

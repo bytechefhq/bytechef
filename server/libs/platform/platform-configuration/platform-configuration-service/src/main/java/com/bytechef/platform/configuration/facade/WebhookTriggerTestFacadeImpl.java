@@ -28,13 +28,13 @@ import com.bytechef.platform.component.trigger.WebhookRequest;
 import com.bytechef.platform.configuration.accessor.JobPrincipalAccessor;
 import com.bytechef.platform.configuration.accessor.JobPrincipalAccessorRegistry;
 import com.bytechef.platform.configuration.domain.WorkflowTrigger;
-import com.bytechef.platform.configuration.service.WorkflowNodeTestOutputService;
 import com.bytechef.platform.configuration.service.WorkflowTestConfigurationService;
 import com.bytechef.platform.constant.ModeType;
 import com.bytechef.platform.definition.WorkflowNodeType;
 import com.bytechef.platform.workflow.execution.WorkflowExecutionId;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.Callable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -52,12 +52,16 @@ public class WebhookTriggerTestFacadeImpl implements WebhookTriggerTestFacade {
 
     private static final Logger log = LoggerFactory.getLogger(WebhookTriggerTestFacadeImpl.class);
 
+    private static final String WORKFLOW_ENABLED_CACHE =
+        WebhookTriggerTestFacade.class.getName() + ".workflowEnabled";
+    private static final String WEBHOOK_ENABLE_OUTPUT_CACHE =
+        WebhookTriggerTestFacade.class.getName() + ".webhookEnableOutput";
+
     private final CacheManager cacheManager;
     private final JobPrincipalAccessorRegistry jobPrincipalAccessorRegistry;
     private final String webhookUrl;
     private final TriggerDefinitionFacade triggerDefinitionFacade;
     private final TriggerDefinitionService triggerDefinitionService;
-    private final WorkflowNodeTestOutputService workflowNodeTestOutputService;
     private final WorkflowService workflowService;
     private final WorkflowTestConfigurationService workflowTestConfigurationService;
 
@@ -65,15 +69,14 @@ public class WebhookTriggerTestFacadeImpl implements WebhookTriggerTestFacade {
     public WebhookTriggerTestFacadeImpl(
         CacheManager cacheManager, ApplicationProperties applicationProperties,
         JobPrincipalAccessorRegistry jobPrincipalAccessorRegistry, TriggerDefinitionFacade triggerDefinitionFacade,
-        TriggerDefinitionService triggerDefinitionService, WorkflowNodeTestOutputService workflowNodeTestOutputService,
-        WorkflowService workflowService, WorkflowTestConfigurationService workflowTestConfigurationService) {
+        TriggerDefinitionService triggerDefinitionService, WorkflowService workflowService,
+        WorkflowTestConfigurationService workflowTestConfigurationService) {
 
         this.cacheManager = cacheManager;
         this.jobPrincipalAccessorRegistry = jobPrincipalAccessorRegistry;
         this.webhookUrl = applicationProperties.getWebhookUrl();
         this.triggerDefinitionFacade = triggerDefinitionFacade;
         this.triggerDefinitionService = triggerDefinitionService;
-        this.workflowNodeTestOutputService = workflowNodeTestOutputService;
         this.workflowService = workflowService;
         this.workflowTestConfigurationService = workflowTestConfigurationService;
     }
@@ -98,7 +101,7 @@ public class WebhookTriggerTestFacadeImpl implements WebhookTriggerTestFacade {
 
     @Override
     public boolean isWorkflowEnabled(WorkflowExecutionId workflowExecutionId) {
-        Cache cache = getWebhookTriggerTestsCache();
+        Cache cache = Objects.requireNonNull(cacheManager.getCache(WORKFLOW_ENABLED_CACHE));
 
         Boolean enabled = cache.get(workflowExecutionId.toString(), Boolean.class);
 
@@ -140,7 +143,7 @@ public class WebhookTriggerTestFacadeImpl implements WebhookTriggerTestFacade {
             .fetchWorkflowTestConfigurationConnectionId(workflowId, workflowTrigger.getName())
             .orElse(null);
 
-        Cache cache = getWebhookTriggerTestsCache();
+        Cache cache = Objects.requireNonNull(cacheManager.getCache(WORKFLOW_ENABLED_CACHE));
 
         if (enable) {
             executeTriggerEnable(workflowExecutionId, triggerWorkflowNodeType, triggerParameters, connectionId);
@@ -171,7 +174,7 @@ public class WebhookTriggerTestFacadeImpl implements WebhookTriggerTestFacade {
 
         switch (triggerDefinition.getType()) {
             case HYBRID, DYNAMIC_WEBHOOK -> {
-                Cache cache = getWebhookEnableOutputCache();
+                Cache cache = Objects.requireNonNull(cacheManager.getCache(WEBHOOK_ENABLE_OUTPUT_CACHE));
 
                 triggerDefinitionFacade.executeWebhookDisable(
                     triggerWorkflowNodeType.name(), triggerWorkflowNodeType.version(),
@@ -209,7 +212,7 @@ public class WebhookTriggerTestFacadeImpl implements WebhookTriggerTestFacade {
                     workflowExecutionId.toString(), connectionId, getWebhookUrl(workflowExecutionId));
 
                 if (webhookEnableOutput != null) {
-                    Cache cache = getWebhookEnableOutputCache();
+                    Cache cache = Objects.requireNonNull(cacheManager.getCache(WEBHOOK_ENABLE_OUTPUT_CACHE));
 
                     cache.put(workflowExecutionId.toString(), webhookEnableOutput.parameters());
                 }
@@ -233,14 +236,6 @@ public class WebhookTriggerTestFacadeImpl implements WebhookTriggerTestFacade {
         JobPrincipalAccessor jobPrincipalAccessor = jobPrincipalAccessorRegistry.getJobPrincipalAccessor(type);
 
         return jobPrincipalAccessor.getLatestWorkflowId(workflowReferenceCode);
-    }
-
-    private Cache getWebhookEnableOutputCache() {
-        return cacheManager.getCache(WebhookTriggerTestFacade.class + ".webhookEnableOutputs");
-    }
-
-    private Cache getWebhookTriggerTestsCache() {
-        return cacheManager.getCache(WebhookTriggerTestFacade.class + "webhooks");
     }
 
     private String getWebhookUrl(WorkflowExecutionId workflowExecutionId) {

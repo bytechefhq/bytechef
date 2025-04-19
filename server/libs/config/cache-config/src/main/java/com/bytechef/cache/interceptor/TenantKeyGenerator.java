@@ -16,9 +16,10 @@
 
 package com.bytechef.cache.interceptor;
 
-import com.bytechef.tenant.cache.TenantCacheKeyGenerator;
+import com.bytechef.tenant.util.TenantCacheKeyUtils;
 import java.lang.reflect.Method;
 import org.springframework.cache.interceptor.KeyGenerator;
+import org.springframework.lang.NonNull;
 
 /**
  * @author Ivica Cardic
@@ -26,7 +27,8 @@ import org.springframework.cache.interceptor.KeyGenerator;
 public class TenantKeyGenerator implements KeyGenerator {
 
     @Override
-    public Object generate(Object target, Method method, Object... params) {
-        return TenantCacheKeyGenerator.generateKey(params);
+    @NonNull
+    public Object generate(@NonNull Object target, @NonNull Method method, @NonNull Object... params) {
+        return TenantCacheKeyUtils.getKey(params);
     }
 }

@@ -1,3 +1,3 @@
 dependencies {
-    implementation("com.github.ben-manes.caffeine:caffeine")
+    api("org.springframework:spring-context")
 }

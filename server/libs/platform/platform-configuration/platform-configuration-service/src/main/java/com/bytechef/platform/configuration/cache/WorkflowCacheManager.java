@@ -20,7 +20,7 @@ import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.domain.WorkflowTask;
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.platform.configuration.domain.WorkflowTrigger;
-import com.bytechef.tenant.TenantContext;
+import com.bytechef.tenant.util.TenantCacheKeyUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.ArrayList;
 import java.util.List;
@@ -83,9 +83,7 @@ public class WorkflowCacheManager {
 
         if (cache != null) {
             for (String workflowNodeName : workflowNodeNames) {
-                String cacheKey = TenantContext.getCurrentTenantId() + "_" + workflowId + "_" + workflowNodeName;
-
-                cache.evictIfPresent(cacheKey);
+                cache.evict(TenantCacheKeyUtils.getKey(workflowId, workflowNodeName));
             }
         }
     }

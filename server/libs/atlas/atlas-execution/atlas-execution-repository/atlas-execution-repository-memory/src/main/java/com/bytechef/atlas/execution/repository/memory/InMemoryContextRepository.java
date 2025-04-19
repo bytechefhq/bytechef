@@ -20,14 +20,15 @@ package com.bytechef.atlas.execution.repository.memory;
 
 import com.bytechef.atlas.execution.domain.Context;
 import com.bytechef.atlas.execution.repository.ContextRepository;
+import com.bytechef.commons.util.RandomUtils;
 import com.bytechef.file.storage.domain.FileEntry;
-import com.github.benmanes.caffeine.cache.Cache;
-import com.github.benmanes.caffeine.cache.Caffeine;
-import java.security.SecureRandom;
+import com.bytechef.tenant.util.TenantCacheKeyUtils;
 import java.util.Deque;
 import java.util.LinkedList;
+import java.util.Objects;
 import java.util.Optional;
-import java.util.concurrent.TimeUnit;
+import org.springframework.cache.Cache;
+import org.springframework.cache.CacheManager;
 
 /**
  * @author Arik Cohen
@@ -35,26 +36,26 @@ import java.util.concurrent.TimeUnit;
  */
 public class InMemoryContextRepository implements ContextRepository {
 
-    private static final SecureRandom RANDOM = new SecureRandom();
+    private static final String CACHE = InMemoryContextRepository.class.getName() + ".context";
 
-    private static final Cache<String, Deque<FileEntry>> CONTEXTS =
-        Caffeine.newBuilder()
-            .expireAfterAccess(10, TimeUnit.MINUTES)
-            .maximumSize(1000)
-            .build();
+    private final CacheManager cacheManager;
+
+    public InMemoryContextRepository(CacheManager cacheManager) {
+        this.cacheManager = cacheManager;
+    }
 
     @Override
     public Optional<Context> findTop1ByStackIdAndClassnameIdOrderByCreatedDateDesc(long stackId, int classnameId) {
-        Deque<FileEntry> linkedList = CONTEXTS.getIfPresent(getKey(stackId, null, classnameId));
+        Deque<FileEntry> stack = getStack(getKey(stackId, null, classnameId));
 
-        return Optional.ofNullable(linkedList == null ? null : new Context(linkedList.peek()));
+        return Optional.ofNullable(stack == null ? null : new Context(stack.peek()));
     }
 
     @Override
     public Optional<Context> findTop1ByStackIdAndSubStackIdAndClassnameIdOrderByCreatedDateDesc(
         long stackId, int subStackId, int classnameId) {
 
-        Deque<FileEntry> linkedList = CONTEXTS.getIfPresent(getKey(stackId, subStackId, classnameId));
+        Deque<FileEntry> linkedList = getStack(getKey(stackId, subStackId, classnameId));
 
         return Optional.ofNullable(linkedList == null ? null : new Context(linkedList.peek()));
     }
@@ -63,22 +64,30 @@ public class InMemoryContextRepository implements ContextRepository {
     public Context save(Context context) {
         String key = getKey(context.getStackId(), context.getSubStackId(), context.getClassnameId());
 
-        synchronized (CONTEXTS) {
-            Deque<FileEntry> stack = CONTEXTS.get(key, k -> new LinkedList<>());
+        synchronized (cacheManager) {
+            Deque<FileEntry> stack = getStack(key);
 
             if (context.isNew()) {
-                context.setId(Math.abs(Math.max(RANDOM.nextLong(), Long.MIN_VALUE + 1)));
+                context.setId(Math.abs(Math.max(RandomUtils.nextLong(), Long.MIN_VALUE + 1)));
             }
 
             stack.push(context.getValue());
 
-            CONTEXTS.put(key, stack);
+            Cache cache = Objects.requireNonNull(cacheManager.getCache(CACHE));
+
+            cache.put(key, stack);
         }
 
         return context;
     }
 
     private static String getKey(long stackId, Integer subStackId, int classnameId) {
-        return "" + stackId + subStackId + classnameId;
+        return TenantCacheKeyUtils.getKey(stackId, subStackId, classnameId);
+    }
+
+    private Deque<FileEntry> getStack(String key) {
+        Cache cache = Objects.requireNonNull(cacheManager.getCache(CACHE));
+
+        return cache.get(key, LinkedList::new);
     }
 }

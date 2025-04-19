@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.tenant.cache;
+package com.bytechef.tenant.util;
 
 import com.bytechef.tenant.TenantContext;
 import org.apache.commons.lang3.StringUtils;
@@ -22,9 +22,9 @@ import org.apache.commons.lang3.StringUtils;
 /**
  * @author Ivica Cardic
  */
-public class TenantCacheKeyGenerator {
+public class TenantCacheKeyUtils {
 
-    public static String generateKey(Object... params) {
+    public static String getKey(Object... params) {
         return TenantContext.getCurrentTenantId() + "_" + StringUtils.joinWith("_", params);
     }
 }

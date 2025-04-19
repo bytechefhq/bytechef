@@ -20,6 +20,7 @@ import com.bytechef.workflow.definition.WorkflowDefinition;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Objects;
+import org.springframework.cache.CacheManager;
 import org.springframework.stereotype.Component;
 
 /**
@@ -31,13 +32,16 @@ import org.springframework.stereotype.Component;
 @ConditionalOnEEVersion
 public class CodeWorkflowTaskExecutor {
 
+    private final CacheManager cacheManager;
     private final CodeWorkflowFileStorage codeWorkflowFileStorage;
     private final CodeWorkflowContainerService codeWorkflowContainerService;
 
     @SuppressFBWarnings("EI")
     public CodeWorkflowTaskExecutor(
-        CodeWorkflowFileStorage codeWorkflowFileStorage, CodeWorkflowContainerService codeWorkflowContainerService) {
+        CacheManager cacheManager, CodeWorkflowFileStorage codeWorkflowFileStorage,
+        CodeWorkflowContainerService codeWorkflowContainerService) {
 
+        this.cacheManager = cacheManager;
         this.codeWorkflowFileStorage = codeWorkflowFileStorage;
         this.codeWorkflowContainerService = codeWorkflowContainerService;
     }
@@ -74,7 +78,7 @@ public class CodeWorkflowTaskExecutor {
             ProjectHandler projectHandler = ProjectHandlerLoader.loadProjectHandler(
                 codeWorkflowFileStorage.getCodeWorkflowFileURL(codeWorkflowContainer.getWorkflowsFile()),
                 codeWorkflowContainer.getLanguage(),
-                EncodingUtils.base64EncodeToString(codeWorkflowContainer.toString()));
+                EncodingUtils.base64EncodeToString(codeWorkflowContainer.toString()), cacheManager);
 
             workflows = projectHandler.getWorkflows();
         }

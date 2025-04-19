@@ -24,6 +24,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.net.URL;
 import java.util.List;
 import java.util.Optional;
+import org.springframework.cache.CacheManager;
 import org.springframework.stereotype.Component;
 
 /**
@@ -35,13 +36,16 @@ import org.springframework.stereotype.Component;
 @ConditionalOnEEVersion
 public class CustomComponentDynamicComponentHandlerRegistry implements DynamicComponentHandlerRegistry {
 
+    private final CacheManager cacheManager;
     private final CustomComponentFileStorage customComponentFileStorage;
     private final CustomComponentService customComponentService;
 
     @SuppressFBWarnings("EI")
     public CustomComponentDynamicComponentHandlerRegistry(
-        CustomComponentFileStorage customComponentFileStorage, CustomComponentService customComponentService) {
+        CacheManager cacheManager, CustomComponentFileStorage customComponentFileStorage,
+        CustomComponentService customComponentService) {
 
+        this.cacheManager = cacheManager;
         this.customComponentFileStorage = customComponentFileStorage;
         this.customComponentService = customComponentService;
     }
@@ -65,7 +69,8 @@ public class CustomComponentDynamicComponentHandlerRegistry implements DynamicCo
         URL url = customComponentFileStorage.getCustomComponentFileURL(customComponent.getComponentFile());
 
         ComponentHandler componentHandler = ComponentHandlerLoader.loadComponentHandler(
-            url, customComponent.getLanguage(), EncodingUtils.base64EncodeToString(customComponent.toString()));
+            url, customComponent.getLanguage(), EncodingUtils.base64EncodeToString(customComponent.toString()),
+            cacheManager);
 
         ComponentDefinition componentDefinition = componentHandler.getDefinition();
 

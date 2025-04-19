@@ -110,7 +110,8 @@ public class WorkflowNodeTestOutputFacadeImpl implements WorkflowNodeTestOutputF
 
     @Override
     @WorkflowCacheEvict(cacheNames = {
-        "previousWorkflowNodeOutputs", "previousWorkflowNodeSampleOutputs"
+        "WorkflowNodeOutputFacade.previousWorkflowNodeOutputs",
+        "WorkflowNodeOutputFacade.previousWorkflowNodeSampleOutputs"
     })
     public WorkflowNodeTestOutput saveWorkflowNodeTestOutput(
         String workflowId, String workflowNodeName, Object sampleOutput) {

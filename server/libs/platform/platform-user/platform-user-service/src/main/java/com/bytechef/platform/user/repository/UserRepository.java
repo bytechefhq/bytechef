@@ -33,8 +33,8 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface UserRepository extends ListCrudRepository<User, Long>, ListPagingAndSortingRepository<User, Long> {
 
-    String USERS_BY_LOGIN_CACHE = "usersByLogin";
-    String USERS_BY_EMAIL_CACHE = "usersByEmail";
+    String USERS_BY_LOGIN_CACHE = "UserRepository.usersByLogin";
+    String USERS_BY_EMAIL_CACHE = "UserRepository.usersByEmail";
 
     long countAllByActivatedIsTrue();
 

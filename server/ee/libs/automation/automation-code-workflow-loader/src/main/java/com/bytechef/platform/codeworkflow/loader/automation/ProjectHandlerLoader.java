@@ -14,6 +14,7 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import org.springframework.cache.CacheManager;
 
 /**
  * @version ee
@@ -22,10 +23,12 @@ import java.nio.file.Paths;
  */
 public class ProjectHandlerLoader {
 
-    public static ProjectHandler loadProjectHandler(URL url, Language language, String cacheKey) {
+    public static ProjectHandler loadProjectHandler(
+        URL url, Language language, String cacheKey, CacheManager cacheManager) {
+
         try {
             return switch (language) {
-                case JAVA -> loadJavaProjectHandler(url, cacheKey);
+                case JAVA -> loadJavaProjectHandler(url, cacheKey, cacheManager);
                 case JAVASCRIPT, PYTHON, RUBY -> loadPolyglotProjectHandler(url, language);
             };
         } catch (Exception e) {
@@ -33,9 +36,11 @@ public class ProjectHandlerLoader {
         }
     }
 
-    private static ProjectHandler loadJavaProjectHandler(URL url, String cacheKey) throws IOException {
+    private static ProjectHandler loadJavaProjectHandler(URL url, String cacheKey, CacheManager cacheManager)
+        throws IOException {
+
         try (ProjectHandlerClassLoader projectHandlerClassLoader = ProjectHandlerClassLoader.of(
-            url, cacheKey)) {
+            url, cacheKey, cacheManager)) {
 
             return projectHandlerClassLoader.loadWorkflowHandler();
         }

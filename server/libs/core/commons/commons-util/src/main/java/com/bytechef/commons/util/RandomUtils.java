@@ -83,4 +83,8 @@ public final class RandomUtils {
 
         return token;
     }
+
+    public static long nextLong() {
+        return SECURE_RANDOM.nextLong();
+    }
 }

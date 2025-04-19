@@ -121,7 +121,7 @@ public class WorkflowNodeOutputFacadeImpl implements WorkflowNodeOutputFacade {
     }
 
     @Override
-    @Cacheable(value = "previousWorkflowNodeOutputs")
+    @Cacheable(value = "WorkflowNodeOutputFacade.previousWorkflowNodeOutputs")
     public List<WorkflowNodeOutputDTO> getPreviousWorkflowNodeOutputs(String workflowId, String lastWorkflowNodeName) {
         List<WorkflowNodeOutputDTO> workflowNodeOutputDTOs = new ArrayList<>();
 
@@ -151,7 +151,7 @@ public class WorkflowNodeOutputFacadeImpl implements WorkflowNodeOutputFacade {
     }
 
     @Override
-    @Cacheable(value = "previousWorkflowNodeSampleOutputs")
+    @Cacheable(value = "WorkflowNodeOutputFacade.previousWorkflowNodeSampleOutputs")
     public Map<String, ?> getPreviousWorkflowNodeSampleOutputs(String workflowId, String lastWorkflowNodeName) {
         return getPreviousWorkflowNodeOutputs(workflowId, lastWorkflowNodeName)
             .stream()

@@ -57,7 +57,8 @@ import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceTransactionManagerAutoConfiguration;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
-import org.springframework.cache.concurrent.ConcurrentMapCacheManager;
+import org.springframework.cache.CacheManager;
+import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
@@ -72,6 +73,7 @@ import org.springframework.core.io.support.ResourcePatternResolver;
     exclude = {
         DataSourceAutoConfiguration.class, DataSourceTransactionManagerAutoConfiguration.class
     })
+@EnableCaching
 @EnableConfigurationProperties(ApplicationProperties.class)
 @Configuration
 @Import(JacksonConfiguration.class)
@@ -119,13 +121,13 @@ public class ComponentTestIntConfiguration {
     }
 
     @Bean
-    ContextService contextService() {
-        return new ContextServiceImpl(new InMemoryContextRepository());
+    ContextService contextService(CacheManager cacheManager) {
+        return new ContextServiceImpl(new InMemoryContextRepository(cacheManager));
     }
 
     @Bean
-    CounterService counterService() {
-        return new CounterServiceImpl(new InMemoryCounterRepository());
+    CounterService counterService(CacheManager cacheManager) {
+        return new CounterServiceImpl(new InMemoryCounterRepository(cacheManager));
     }
 
     @Bean
@@ -149,18 +151,19 @@ public class ComponentTestIntConfiguration {
     }
 
     @Bean
-    JobService jobService(ObjectMapper objectMapper) {
-        return new JobServiceImpl(new InMemoryJobRepository(taskExecutionRepository(), objectMapper));
+    JobService jobService(CacheManager cacheManager, ObjectMapper objectMapper) {
+        return new JobServiceImpl(
+            new InMemoryJobRepository(cacheManager, taskExecutionRepository(cacheManager), objectMapper));
     }
 
     @Bean
-    TaskExecutionService taskExecutionService() {
-        return new TaskExecutionServiceImpl(taskExecutionRepository());
+    TaskExecutionService taskExecutionService(CacheManager cacheManager) {
+        return new TaskExecutionServiceImpl(taskExecutionRepository(cacheManager));
     }
 
     @Bean
-    InMemoryTaskExecutionRepository taskExecutionRepository() {
-        return new InMemoryTaskExecutionRepository();
+    InMemoryTaskExecutionRepository taskExecutionRepository(CacheManager cacheManager) {
+        return new InMemoryTaskExecutionRepository(cacheManager);
     }
 
     @Bean
@@ -169,7 +172,7 @@ public class ComponentTestIntConfiguration {
     }
 
     @Bean
-    WorkflowService workflowService(List<WorkflowRepository> workflowRepositories) {
-        return new WorkflowServiceImpl(new ConcurrentMapCacheManager(), Collections.emptyList(), workflowRepositories);
+    WorkflowService workflowService(CacheManager cacheManager, List<WorkflowRepository> workflowRepositories) {
+        return new WorkflowServiceImpl(cacheManager, Collections.emptyList(), workflowRepositories);
     }
 }

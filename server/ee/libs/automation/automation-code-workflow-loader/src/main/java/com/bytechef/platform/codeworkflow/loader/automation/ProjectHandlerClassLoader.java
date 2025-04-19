@@ -14,6 +14,7 @@ import com.bytechef.workflow.definition.ProjectDefinition;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.net.URL;
 import java.util.ServiceLoader;
+import org.springframework.cache.CacheManager;
 
 /**
  * @version ee
@@ -25,11 +26,12 @@ class ProjectHandlerClassLoader extends IsolatingClassLoader<ProjectHandler> {
     private final String cacheKey;
 
     @SuppressWarnings("PMD.AvoidBranchingStatementAsLastInLoop")
-    private ProjectHandlerClassLoader(URL jarUrl, String cacheKey) {
+    private ProjectHandlerClassLoader(URL jarUrl, String cacheKey, CacheManager cacheManager) {
         super(
             new URL[] {
                 jarUrl
             }, ProjectHandlerClassLoader.class.getClassLoader(),
+            cacheManager,
             (key, classLoader) -> {
                 ServiceLoader<ProjectHandler> loader = ServiceLoader.load(ProjectHandler.class, classLoader);
 
@@ -44,8 +46,8 @@ class ProjectHandlerClassLoader extends IsolatingClassLoader<ProjectHandler> {
     }
 
     @SuppressFBWarnings("DP")
-    static ProjectHandlerClassLoader of(URL jarUrl, String cacheKey) {
-        return new ProjectHandlerClassLoader(jarUrl, cacheKey);
+    static ProjectHandlerClassLoader of(URL jarUrl, String cacheKey, CacheManager cacheManager) {
+        return new ProjectHandlerClassLoader(jarUrl, cacheKey, cacheManager);
     }
 
     ProjectHandler loadWorkflowHandler() {

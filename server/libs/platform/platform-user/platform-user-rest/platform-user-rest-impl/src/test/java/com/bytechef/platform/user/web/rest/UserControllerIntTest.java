@@ -35,7 +35,7 @@ import com.bytechef.platform.user.mapper.UserMapper;
 import com.bytechef.platform.user.repository.UserRepository;
 import com.bytechef.platform.user.web.rest.config.UserIntTestConfiguration;
 import com.bytechef.platform.user.web.rest.config.UserIntTestConfigurationSharedMocks;
-import com.bytechef.tenant.cache.TenantCacheKeyGenerator;
+import com.bytechef.tenant.util.TenantCacheKeyUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Collections;
@@ -316,7 +316,7 @@ class UserControllerIntTest {
 
         assertThat(
             cacheManager.getCache(UserRepository.USERS_BY_LOGIN_CACHE)
-                .get(TenantCacheKeyGenerator.generateKey(user.getLogin()))).isNull();
+                .get(TenantCacheKeyUtils.getKey(user.getLogin()))).isNull();
 
         // Get the user
         restUserMockMvc
@@ -332,7 +332,7 @@ class UserControllerIntTest {
 
         assertThat(
             cacheManager.getCache(UserRepository.USERS_BY_LOGIN_CACHE)
-                .get(TenantCacheKeyGenerator.generateKey(user.getLogin()))).isNotNull();
+                .get(TenantCacheKeyUtils.getKey(user.getLogin()))).isNotNull();
     }
 
     @Test
@@ -565,7 +565,7 @@ class UserControllerIntTest {
 
         assertThat(
             cacheManager.getCache(UserRepository.USERS_BY_LOGIN_CACHE)
-                .get(TenantCacheKeyGenerator.generateKey(user.getLogin()))).isNull();
+                .get(TenantCacheKeyUtils.getKey(user.getLogin()))).isNull();
 
         // Validate the database is empty
         assertPersistedUsers(users -> assertThat(users).hasSize(databaseSizeBeforeDelete - 1));

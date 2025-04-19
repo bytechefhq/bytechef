@@ -19,6 +19,7 @@ import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.Optional;
 import java.util.ServiceLoader;
+import org.springframework.cache.CacheManager;
 import org.springframework.util.StreamUtils;
 
 /**
@@ -31,11 +32,12 @@ class ComponentHandlerClassLoader extends IsolatingClassLoader<ComponentHandler>
     private final String cacheKey;
 
     @SuppressWarnings("PMD.AvoidBranchingStatementAsLastInLoop")
-    private ComponentHandlerClassLoader(URL jarUrl, String cacheKey) {
+    private ComponentHandlerClassLoader(URL jarUrl, String cacheKey, CacheManager cacheManager) {
         super(
             new URL[] {
                 jarUrl
             }, ComponentHandlerClassLoader.class.getClassLoader(),
+            cacheManager,
             (key, classLoader) -> {
                 ServiceLoader<ComponentHandler> loader = ServiceLoader.load(ComponentHandler.class, classLoader);
 
@@ -50,8 +52,8 @@ class ComponentHandlerClassLoader extends IsolatingClassLoader<ComponentHandler>
     }
 
     @SuppressFBWarnings("DP")
-    static ComponentHandlerClassLoader of(URL jarUrl, String cacheKey) {
-        return new ComponentHandlerClassLoader(jarUrl, cacheKey);
+    static ComponentHandlerClassLoader of(URL jarUrl, String cacheKey, CacheManager cacheManager) {
+        return new ComponentHandlerClassLoader(jarUrl, cacheKey, cacheManager);
     }
 
     ComponentHandler loadComponentHandler() {

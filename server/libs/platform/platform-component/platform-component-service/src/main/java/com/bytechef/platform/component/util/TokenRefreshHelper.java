@@ -30,17 +30,18 @@ import com.bytechef.platform.connection.domain.Connection;
 import com.bytechef.platform.connection.service.ConnectionService;
 import com.bytechef.platform.exception.ConfigurationException;
 import com.bytechef.platform.exception.ExecutionException;
-import com.github.benmanes.caffeine.cache.Cache;
-import com.github.benmanes.caffeine.cache.Caffeine;
+import com.bytechef.tenant.util.TenantCacheKeyUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.BiFunction;
 import java.util.function.Function;
+import org.apache.commons.lang3.Validate;
+import org.springframework.cache.Cache;
+import org.springframework.cache.CacheManager;
 import org.springframework.stereotype.Component;
 
 /**
@@ -49,18 +50,18 @@ import org.springframework.stereotype.Component;
 @Component
 public class TokenRefreshHelper {
 
-    private static final Cache<Long, ReentrantLock> REENTRANT_LOCK_CACHE =
-        Caffeine.newBuilder()
-            .expireAfterAccess(1, TimeUnit.MINUTES)
-            .maximumSize(100000)
-            .build();
+    private static final String CACHE = TokenRefreshHelper.class.getName() + ".reentrantLock";
 
+    private final CacheManager cacheManager;
     private final ConnectionDefinitionService connectionDefinitionService;
     private final ConnectionService connectionService;
 
     @SuppressFBWarnings("EI_EXPOSE_REP2")
-    public TokenRefreshHelper(ConnectionDefinitionService connectionDefinitionService,
+    public TokenRefreshHelper(
+        CacheManager cacheManager, ConnectionDefinitionService connectionDefinitionService,
         ConnectionService connectionService) {
+
+        this.cacheManager = cacheManager;
         this.connectionDefinitionService = connectionDefinitionService;
         this.connectionService = connectionService;
     }
@@ -139,8 +140,12 @@ public class TokenRefreshHelper {
                     componentConnection.getParameters(), context);
             }
 
-            ReentrantLock reentrantLock = REENTRANT_LOCK_CACHE.get(
-                componentConnection.connectionId(), (key) -> new ReentrantLock(true));
+            Cache cache = Objects.requireNonNull(cacheManager.getCache(CACHE));
+
+            ReentrantLock reentrantLock = Validate.notNull(
+                cache.get(
+                    TenantCacheKeyUtils.getKey(componentConnection.connectionId()), () -> new ReentrantLock(true)),
+                "reentrantLock");
 
             reentrantLock.lock();
 

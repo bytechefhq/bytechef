@@ -20,15 +20,16 @@ import com.bytechef.atlas.execution.domain.Job;
 import com.bytechef.atlas.execution.domain.TaskExecution;
 import com.bytechef.atlas.execution.repository.JobRepository;
 import com.bytechef.commons.util.OptionalUtils;
+import com.bytechef.commons.util.RandomUtils;
+import com.bytechef.tenant.util.TenantCacheKeyUtils;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.github.benmanes.caffeine.cache.Cache;
-import com.github.benmanes.caffeine.cache.Caffeine;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import java.security.SecureRandom;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
-import java.util.concurrent.TimeUnit;
+import org.springframework.cache.Cache;
+import org.springframework.cache.CacheManager;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -37,20 +38,18 @@ import org.springframework.data.domain.Pageable;
  */
 public class InMemoryJobRepository implements JobRepository {
 
-    private static final SecureRandom RANDOM = new SecureRandom();
+    private static final String CACHE = InMemoryJobRepository.class.getName() + ".job";
 
+    private final CacheManager cacheManager;
     private final InMemoryTaskExecutionRepository inMemoryTaskExecutionRepository;
     private final ObjectMapper objectMapper;
 
-    private static final Cache<Long, Job> JOBS =
-        Caffeine.newBuilder()
-            .expireAfterAccess(10, TimeUnit.MINUTES)
-            .maximumSize(1000)
-            .build();
-
     @SuppressFBWarnings("EI2")
     public InMemoryJobRepository(
-        InMemoryTaskExecutionRepository inMemoryTaskExecutionRepository, ObjectMapper objectMapper) {
+        CacheManager cacheManager, InMemoryTaskExecutionRepository inMemoryTaskExecutionRepository,
+        ObjectMapper objectMapper) {
+
+        this.cacheManager = cacheManager;
         this.inMemoryTaskExecutionRepository = inMemoryTaskExecutionRepository;
         this.objectMapper = objectMapper;
     }
@@ -92,7 +91,9 @@ public class InMemoryJobRepository implements JobRepository {
 
     @Override
     public Optional<Job> findById(Long id) {
-        return Optional.ofNullable(JOBS.get(id, s -> null));
+        Cache cache = Objects.requireNonNull(cacheManager.getCache(CACHE));
+
+        return Optional.ofNullable(cache.get(TenantCacheKeyUtils.getKey(id), Job.class));
     }
 
     @Override
@@ -109,19 +110,25 @@ public class InMemoryJobRepository implements JobRepository {
     public Optional<Job> findByTaskExecutionId(Long taskExecutionId) {
         TaskExecution taskExecution = OptionalUtils.get(inMemoryTaskExecutionRepository.findById(taskExecutionId));
 
-        return Optional.ofNullable(JOBS.getIfPresent(taskExecution.getJobId()));
+        Cache cache = Objects.requireNonNull(cacheManager.getCache(CACHE));
+
+        return Optional.ofNullable(cache.get(TenantCacheKeyUtils.getKey(taskExecution.getJobId()), Job.class));
     }
 
     @Override
     public Job save(Job job) {
         if (job.isNew()) {
-            job.setId(Math.abs(Math.max(RANDOM.nextLong(), Long.MIN_VALUE + 1)));
+            job.setId(Math.abs(Math.max(RandomUtils.nextLong(), Long.MIN_VALUE + 1)));
         }
 
         try {
             // Emulate identical behaviour when storing in db by serialization and deserialization
 
-            JOBS.put(job.getId(), objectMapper.readValue(objectMapper.writeValueAsString(job), Job.class));
+            Cache cache = Objects.requireNonNull(cacheManager.getCache(CACHE));
+
+            cache.put(
+                TenantCacheKeyUtils.getKey(job.getId()),
+                objectMapper.readValue(objectMapper.writeValueAsString(job), Job.class));
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }

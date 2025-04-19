@@ -27,6 +27,7 @@ import com.bytechef.platform.data.storage.DataStorage;
 import com.bytechef.platform.file.storage.FilesFileStorage;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import javax.annotation.Nullable;
+import org.springframework.cache.CacheManager;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
@@ -38,6 +39,7 @@ import org.springframework.stereotype.Component;
 class ContextFactoryImpl implements ContextFactory {
 
     private final ApplicationContext applicationContext;
+    private final CacheManager cacheManager;
     private final ConnectionDefinitionService connectionDefinitionService;
     private final DataStorage dataStorage;
     private final ApplicationEventPublisher eventPublisher;
@@ -46,11 +48,12 @@ class ContextFactoryImpl implements ContextFactory {
 
     @SuppressFBWarnings("EI")
     public ContextFactoryImpl(
-        ApplicationContext applicationContext, ApplicationProperties applicationProperties,
+        ApplicationContext applicationContext, CacheManager cacheManager, ApplicationProperties applicationProperties,
         ConnectionDefinitionService connectionDefinitionService, DataStorage dataStorage,
         ApplicationEventPublisher eventPublisher, FilesFileStorage filesFileStorage) {
 
         this.applicationContext = applicationContext;
+        this.cacheManager = cacheManager;
         this.connectionDefinitionService = connectionDefinitionService;
         this.dataStorage = dataStorage;
         this.eventPublisher = eventPublisher;
@@ -97,7 +100,7 @@ class ContextFactoryImpl implements ContextFactory {
 
     private DataStorage getDataStorage(String workflowReference, boolean editorEnvironment) {
         if (editorEnvironment) {
-            return new InMemoryDataStorage(workflowReference);
+            return new InMemoryDataStorage(workflowReference, cacheManager);
         }
 
         return dataStorage;

@@ -862,10 +862,10 @@ public class ApplicationProperties {
          * Cache provider.
          */
         public enum Provider {
-            REDIS, SIMPLE
+            REDIS, CAFFEINE
         }
 
-        private Provider provider = Provider.SIMPLE;
+        private Provider provider = Provider.CAFFEINE;
 
         public Provider getProvider() {
             return provider;

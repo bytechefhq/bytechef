@@ -32,7 +32,7 @@ import com.bytechef.platform.user.exception.LoginAlreadyUsedException;
 import com.bytechef.platform.user.repository.AuthorityRepository;
 import com.bytechef.platform.user.repository.PersistentTokenRepository;
 import com.bytechef.platform.user.repository.UserRepository;
-import com.bytechef.tenant.cache.TenantCacheKeyGenerator;
+import com.bytechef.tenant.util.TenantCacheKeyUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.Instant;
 import java.time.LocalDate;
@@ -477,11 +477,11 @@ public class UserServiceImpl implements UserService {
     @SuppressFBWarnings("NP")
     private void clearUserCaches(User user) {
         Objects.requireNonNull(cacheManager.getCache(UserRepository.USERS_BY_LOGIN_CACHE))
-            .evict(TenantCacheKeyGenerator.generateKey(user.getLogin()));
+            .evict(TenantCacheKeyUtils.getKey(user.getLogin()));
 
         if (user.getEmail() != null) {
             Objects.requireNonNull(cacheManager.getCache(UserRepository.USERS_BY_EMAIL_CACHE))
-                .evict(TenantCacheKeyGenerator.generateKey(user.getEmail()));
+                .evict(TenantCacheKeyUtils.getKey(user.getEmail()));
         }
     }
 

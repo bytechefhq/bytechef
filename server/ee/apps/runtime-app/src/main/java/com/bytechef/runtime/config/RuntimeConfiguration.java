@@ -14,6 +14,7 @@ import com.bytechef.atlas.execution.repository.memory.InMemoryTaskExecutionRepos
 import com.bytechef.config.ApplicationProperties;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.cache.CacheManager;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -27,22 +28,22 @@ import org.springframework.context.annotation.Configuration;
 public class RuntimeConfiguration {
 
     @Bean
-    InMemoryContextRepository contextRepository() {
-        return new InMemoryContextRepository();
+    InMemoryContextRepository contextRepository(CacheManager cacheManager) {
+        return new InMemoryContextRepository(cacheManager);
     }
 
     @Bean
-    InMemoryCounterRepository counterRepository() {
-        return new InMemoryCounterRepository();
+    InMemoryCounterRepository counterRepository(CacheManager cacheManager) {
+        return new InMemoryCounterRepository(cacheManager);
     }
 
     @Bean
-    InMemoryJobRepository jobRepository(ObjectMapper objectMapper) {
-        return new InMemoryJobRepository(taskExecutionRepository(), objectMapper);
+    InMemoryJobRepository jobRepository(CacheManager cacheManager, ObjectMapper objectMapper) {
+        return new InMemoryJobRepository(cacheManager, taskExecutionRepository(cacheManager), objectMapper);
     }
 
     @Bean
-    InMemoryTaskExecutionRepository taskExecutionRepository() {
-        return new InMemoryTaskExecutionRepository();
+    InMemoryTaskExecutionRepository taskExecutionRepository(CacheManager cacheManager) {
+        return new InMemoryTaskExecutionRepository(cacheManager);
     }
 }

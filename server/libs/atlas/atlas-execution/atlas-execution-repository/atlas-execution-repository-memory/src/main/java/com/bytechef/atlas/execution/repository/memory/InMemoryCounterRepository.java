@@ -20,10 +20,11 @@ package com.bytechef.atlas.execution.repository.memory;
 
 import com.bytechef.atlas.execution.domain.Counter;
 import com.bytechef.atlas.execution.repository.CounterRepository;
-import com.github.benmanes.caffeine.cache.Cache;
-import com.github.benmanes.caffeine.cache.Caffeine;
+import com.bytechef.tenant.util.TenantCacheKeyUtils;
+import java.util.Objects;
 import java.util.Optional;
-import java.util.concurrent.TimeUnit;
+import org.springframework.cache.Cache;
+import org.springframework.cache.CacheManager;
 
 /**
  * @author Arik Cohen
@@ -32,31 +33,41 @@ import java.util.concurrent.TimeUnit;
  */
 public class InMemoryCounterRepository implements CounterRepository {
 
-    private static final Cache<Long, Long> COUNTERS =
-        Caffeine.newBuilder()
-            .expireAfterAccess(10, TimeUnit.MINUTES)
-            .maximumSize(1000)
-            .build();
+    private static final String CACHE = InMemoryCounterRepository.class.getName() + ".counter";
+
+    private final CacheManager cacheManager;
+
+    public InMemoryCounterRepository(CacheManager cacheManager) {
+        this.cacheManager = cacheManager;
+    }
 
     @Override
     public void deleteById(Long id) {
-        COUNTERS.invalidate(id);
+        Cache cache = Objects.requireNonNull(cacheManager.getCache(CACHE));
+
+        cache.evict(TenantCacheKeyUtils.getKey(id));
     }
 
     @Override
     public Optional<Long> findValueByIdForUpdate(Long id) {
-        return Optional.ofNullable(COUNTERS.getIfPresent(id));
+        Cache cache = Objects.requireNonNull(cacheManager.getCache(CACHE));
+
+        return Optional.ofNullable(cache.get(TenantCacheKeyUtils.getKey(id), Long.class));
     }
 
     @Override
     public Counter save(Counter counter) {
-        COUNTERS.put(counter.getId(), counter.getValue());
+        Cache cache = Objects.requireNonNull(cacheManager.getCache(CACHE));
+
+        cache.put(TenantCacheKeyUtils.getKey(counter.getId()), counter.getValue());
 
         return counter;
     }
 
     @Override
     public void update(Long id, long value) {
-        COUNTERS.put(id, value);
+        Cache cache = Objects.requireNonNull(cacheManager.getCache(CACHE));
+
+        cache.put(TenantCacheKeyUtils.getKey(id), value);
     }
 }

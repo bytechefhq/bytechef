@@ -19,12 +19,13 @@ package com.bytechef.platform.component.definition;
 import com.bytechef.platform.constant.ModeType;
 import com.bytechef.platform.data.storage.DataStorage;
 import com.bytechef.platform.data.storage.domain.DataStorageScope;
-import com.github.benmanes.caffeine.cache.Cache;
-import com.github.benmanes.caffeine.cache.Caffeine;
+import com.bytechef.tenant.util.TenantCacheKeyUtils;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
-import java.util.concurrent.TimeUnit;
+import org.springframework.cache.Cache;
+import org.springframework.cache.CacheManager;
 import org.springframework.lang.NonNull;
 
 /**
@@ -32,20 +33,21 @@ import org.springframework.lang.NonNull;
  */
 class InMemoryDataStorage implements DataStorage {
 
+    private static final String CACHE = InMemoryDataStorage.class.getName() + ".dataStorage";
+
+    private final CacheManager cacheManager;
     private final String workflowReference;
 
-    private static final Cache<String, Map<String, Object>> VALUES =
-        Caffeine.newBuilder()
-            .expireAfterAccess(10, TimeUnit.MINUTES)
-            .maximumSize(100000)
-            .build();
-
-    InMemoryDataStorage(String workflowReference) {
+    InMemoryDataStorage(String workflowReference, CacheManager cacheManager) {
+        this.cacheManager = cacheManager;
         this.workflowReference = workflowReference;
     }
 
     @Override
-    public void delete(String componentName, DataStorageScope scope, String scopeId, String key, ModeType type) {
+    public void delete(
+        @NonNull String componentName, @NonNull DataStorageScope scope, @NonNull String scopeId, @NonNull String key,
+        @NonNull ModeType type) {
+
         Map<String, Object> map = getValueMap(componentName, scope, scopeId, type);
 
         map.remove(key);
@@ -53,9 +55,10 @@ class InMemoryDataStorage implements DataStorage {
 
     @NonNull
     @Override
+    @SuppressWarnings("unchecked")
     public <T> Optional<T> fetch(
-        String componentName, DataStorageScope scope, String scopeId, String key,
-        ModeType type) {
+        @NonNull String componentName, @NonNull DataStorageScope scope, @NonNull String scopeId, @NonNull String key,
+        @NonNull ModeType type) {
 
         Map<String, Object> map = getValueMap(componentName, scope, scopeId, type);
 
@@ -64,7 +67,11 @@ class InMemoryDataStorage implements DataStorage {
 
     @NonNull
     @Override
-    public <T> T get(String componentName, DataStorageScope scope, String scopeId, String key, ModeType type) {
+    @SuppressWarnings("unchecked")
+    public <T> T get(
+        @NonNull String componentName, @NonNull DataStorageScope scope, @NonNull String scopeId, @NonNull String key,
+        @NonNull ModeType type) {
+
         Map<String, Object> map = getValueMap(componentName, scope, scopeId, type);
 
         return (T) map.get(key);
@@ -74,27 +81,28 @@ class InMemoryDataStorage implements DataStorage {
     @Override
     @SuppressWarnings("unchecked")
     public <T> Map<String, T> getAll(
-        String componentName, DataStorageScope scope, String scopeId,
-        ModeType type) {
+        @NonNull String componentName, @NonNull DataStorageScope scope, @NonNull String scopeId,
+        @NonNull ModeType type) {
+
         return (Map<String, T>) getValueMap(componentName, scope, scopeId, type);
     }
 
     @Override
     public void put(
-        String componentName, DataStorageScope scope, String scopeId, String key, ModeType type, Object value) {
+        @NonNull String componentName, @NonNull DataStorageScope scope, @NonNull String scopeId,
+        @NonNull String key, @NonNull ModeType type, @NonNull Object value) {
 
         Map<String, Object> map = getValueMap(componentName, scope, scopeId, type);
 
         map.put(key, value);
     }
 
-    private String getValueKey(String componentName, DataStorageScope scope, String scopeId, ModeType type) {
-        return workflowReference + "_" + componentName + "_" + scope + "_" + scopeId + "_" + type;
-    }
-
     private Map<String, Object> getValueMap(
         String componentName, DataStorageScope scope, String scopeId, ModeType type) {
 
-        return VALUES.get(getValueKey(componentName, scope, scopeId, type), s -> new HashMap<>());
+        Cache cache = Objects.requireNonNull(cacheManager.getCache(CACHE), CACHE);
+
+        return cache.get(
+            TenantCacheKeyUtils.getKey(workflowReference, componentName, scope, scopeId, type), HashMap::new);
     }
 }

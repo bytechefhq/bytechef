@@ -213,8 +213,8 @@ bytechef:
           options:
             model: gpt-4o
   cache:
-    # Cache provider (redis | simple) default: simple
-    provider: simple
+    # Cache provider (redis | caffeine) default: caffeine
+    provider: caffeine
   coordinator:
     trigger:
       scheduler:

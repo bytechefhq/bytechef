@@ -48,6 +48,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import org.apache.commons.lang3.Validate;
+import org.springframework.cache.CacheManager;
 import org.springframework.context.ApplicationEventPublisher;
 
 /**
@@ -57,11 +58,13 @@ import org.springframework.context.ApplicationEventPublisher;
  */
 public class MapTaskDispatcherAdapterTaskHandler implements TaskHandler<List<?>> {
 
+    private final CacheManager cacheManager;
     private final CurrentThreadExecutorService currentThreadExecutorService = new CurrentThreadExecutorService();
     private final TaskHandlerResolver taskHandlerResolver;
 
     @SuppressFBWarnings("EI")
-    public MapTaskDispatcherAdapterTaskHandler(TaskHandlerResolver taskHandlerResolver) {
+    public MapTaskDispatcherAdapterTaskHandler(CacheManager cacheManager, TaskHandlerResolver taskHandlerResolver) {
+        this.cacheManager = cacheManager;
         this.taskHandlerResolver = taskHandlerResolver;
     }
 
@@ -92,11 +95,11 @@ public class MapTaskDispatcherAdapterTaskHandler implements TaskHandler<List<?>>
         syncMessageBroker.receive(TaskCoordinatorMessageRoute.APPLICATION_EVENTS, e -> {});
 
         TaskExecutionService taskExecutionService =
-            new TaskExecutionServiceImpl(new InMemoryTaskExecutionRepository());
+            new TaskExecutionServiceImpl(new InMemoryTaskExecutionRepository(cacheManager));
 
         taskExecution = taskExecutionService.create(taskExecution);
 
-        ContextService contextService = new ContextServiceImpl(new InMemoryContextRepository());
+        ContextService contextService = new ContextServiceImpl(new InMemoryContextRepository(cacheManager));
 
         contextService.push(
             Validate.notNull(taskExecution.getId(), "id"), Context.Classname.TASK_EXECUTION,
@@ -109,7 +112,7 @@ public class MapTaskDispatcherAdapterTaskHandler implements TaskHandler<List<?>>
 
         MapTaskDispatcher mapTaskDispatcher = new MapTaskDispatcher(
             event -> syncMessageBroker.send(((MessageEvent<?>) event).getRoute(), event),
-            contextService, new CounterServiceImpl(new InMemoryCounterRepository()),
+            contextService, new CounterServiceImpl(new InMemoryCounterRepository(cacheManager)),
             curTaskExecution -> taskWorker.onTaskExecutionEvent(new TaskExecutionEvent(curTaskExecution)),
             taskExecutionService, taskFileStorage);
 

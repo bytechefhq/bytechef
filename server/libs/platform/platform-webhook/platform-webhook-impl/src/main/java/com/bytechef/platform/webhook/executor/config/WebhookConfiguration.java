@@ -56,6 +56,7 @@ import com.bytechef.task.dispatcher.map.completion.MapTaskCompletionHandler;
 import com.bytechef.task.dispatcher.parallel.ParallelTaskDispatcher;
 import com.bytechef.task.dispatcher.parallel.completion.ParallelTaskCompletionHandler;
 import java.util.List;
+import org.springframework.cache.CacheManager;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -68,12 +69,12 @@ public class WebhookConfiguration {
 
     @Bean
     WebhookWorkflowExecutor webhookExecutor(
-        ApplicationEventPublisher eventPublisher, ContextService contextService, CounterService counterService,
-        JobPrincipalAccessorRegistry jobPrincipalAccessorRegistry, PrincipalJobFacade principalJobFacade,
-        JobService jobService, List<TaskDispatcherPreSendProcessor> taskDispatcherPreSendProcessors,
-        TaskExecutionService taskExecutionService, TaskHandlerRegistry taskHandlerRegistry,
-        WebhookWorkflowSyncExecutor triggerSyncExecutor, TaskFileStorage taskFileStorage,
-        WorkflowService workflowService) {
+        ApplicationEventPublisher eventPublisher, CacheManager cacheManager, ContextService contextService,
+        CounterService counterService, JobPrincipalAccessorRegistry jobPrincipalAccessorRegistry,
+        PrincipalJobFacade principalJobFacade, JobService jobService,
+        List<TaskDispatcherPreSendProcessor> taskDispatcherPreSendProcessors, TaskExecutionService taskExecutionService,
+        TaskHandlerRegistry taskHandlerRegistry, WebhookWorkflowSyncExecutor triggerSyncExecutor,
+        TaskFileStorage taskFileStorage, WorkflowService workflowService) {
 
         SyncMessageBroker syncMessageBroker = new SyncMessageBroker();
 
@@ -84,7 +85,7 @@ public class WebhookConfiguration {
                 contextService, jobService, syncMessageBroker,
                 getTaskCompletionHandlerFactories(
                     contextService, counterService, taskExecutionService, taskFileStorage),
-                getTaskDispatcherAdapterFactories(), taskDispatcherPreSendProcessors,
+                getTaskDispatcherAdapterFactories(cacheManager), taskDispatcherPreSendProcessors,
                 getTaskDispatcherResolverFactories(
                     contextService, counterService, jobService, syncMessageBroker, taskExecutionService,
                     taskFileStorage),
@@ -119,14 +120,14 @@ public class WebhookConfiguration {
                 taskCompletionHandler, taskExecutionService));
     }
 
-    private List<TaskDispatcherAdapterFactory> getTaskDispatcherAdapterFactories() {
+    private List<TaskDispatcherAdapterFactory> getTaskDispatcherAdapterFactories(CacheManager cacheManager) {
 
         return List.of(
             new TaskDispatcherAdapterFactory() {
 
                 @Override
                 public TaskHandler<?> create(TaskHandlerResolver taskHandlerResolver) {
-                    return new MapTaskDispatcherAdapterTaskHandler(taskHandlerResolver);
+                    return new MapTaskDispatcherAdapterTaskHandler(cacheManager, taskHandlerResolver);
                 }
 
                 @Override

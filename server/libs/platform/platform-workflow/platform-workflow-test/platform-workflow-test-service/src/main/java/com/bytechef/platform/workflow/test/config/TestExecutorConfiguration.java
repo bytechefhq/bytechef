@@ -65,6 +65,7 @@ import com.bytechef.task.dispatcher.parallel.ParallelTaskDispatcher;
 import com.bytechef.task.dispatcher.parallel.completion.ParallelTaskCompletionHandler;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.List;
+import org.springframework.cache.CacheManager;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -77,17 +78,18 @@ public class TestExecutorConfiguration {
 
     @Bean
     JobTestExecutor jobTestExecutor(
-        ComponentDefinitionService componentDefinitionService, ObjectMapper objectMapper,
+        CacheManager cacheManager, ComponentDefinitionService componentDefinitionService, ObjectMapper objectMapper,
         TaskHandlerRegistry taskHandlerRegistry, TaskDispatcherDefinitionService taskDispatcherDefinitionService,
         WorkflowService workflowService) {
 
-        ContextService contextService = new ContextServiceImpl(new InMemoryContextRepository());
-        CounterService counterService = new CounterServiceImpl(new InMemoryCounterRepository());
+        ContextService contextService = new ContextServiceImpl(new InMemoryContextRepository(cacheManager));
+        CounterService counterService = new CounterServiceImpl(new InMemoryCounterRepository(cacheManager));
         SyncMessageBroker syncMessageBroker = new SyncMessageBroker();
 
-        InMemoryTaskExecutionRepository taskExecutionRepository = new InMemoryTaskExecutionRepository();
+        InMemoryTaskExecutionRepository taskExecutionRepository = new InMemoryTaskExecutionRepository(cacheManager);
 
-        JobService jobService = new JobServiceImpl(new InMemoryJobRepository(taskExecutionRepository, objectMapper));
+        JobService jobService = new JobServiceImpl(
+            new InMemoryJobRepository(cacheManager, taskExecutionRepository, objectMapper));
         TaskExecutionService taskExecutionService = new TaskExecutionServiceImpl(taskExecutionRepository);
 
         TaskFileStorage taskFileStorage = new TaskFileStorageImpl(new Base64FileStorageService());
@@ -98,7 +100,8 @@ public class TestExecutorConfiguration {
                 contextService, jobService, syncMessageBroker,
                 getTaskCompletionHandlerFactories(
                     contextService, counterService, taskExecutionService, taskFileStorage),
-                getTaskDispatcherAdapterFactories(), List.of(new TestTaskDispatcherPreSendProcessor(jobService)),
+                getTaskDispatcherAdapterFactories(cacheManager),
+                List.of(new TestTaskDispatcherPreSendProcessor(jobService)),
                 getTaskDispatcherResolverFactories(
                     contextService, counterService, jobService, syncMessageBroker,
                     taskExecutionService, taskFileStorage),
@@ -132,13 +135,13 @@ public class TestExecutorConfiguration {
                 taskCompletionHandler, taskExecutionService));
     }
 
-    private List<TaskDispatcherAdapterFactory> getTaskDispatcherAdapterFactories() {
+    private List<TaskDispatcherAdapterFactory> getTaskDispatcherAdapterFactories(CacheManager cacheManager) {
         return List.of(
             new TaskDispatcherAdapterFactory() {
 
                 @Override
                 public TaskHandler<?> create(TaskHandlerResolver taskHandlerResolver) {
-                    return new MapTaskDispatcherAdapterTaskHandler(taskHandlerResolver);
+                    return new MapTaskDispatcherAdapterTaskHandler(cacheManager, taskHandlerResolver);
                 }
 
                 @Override

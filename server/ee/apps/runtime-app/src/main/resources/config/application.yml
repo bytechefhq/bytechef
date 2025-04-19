@@ -81,8 +81,8 @@ spring:
 
 bytechef:
   cache:
-    # Cache provider (redis | simple) default: simple
-    provider: simple
+    # Cache provider (redis | caffeine) default: caffeine
+    provider: caffeine
   data-storage:
     # Data storage provider
     provider: filesystem

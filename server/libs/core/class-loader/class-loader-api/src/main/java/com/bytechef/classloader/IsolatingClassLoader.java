@@ -16,26 +16,25 @@
 
 package com.bytechef.classloader;
 
-import com.github.benmanes.caffeine.cache.Cache;
-import com.github.benmanes.caffeine.cache.Caffeine;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.Arrays;
 import java.util.Enumeration;
-import java.util.concurrent.TimeUnit;
+import java.util.Objects;
 import java.util.function.BiFunction;
 import java.util.stream.Stream;
+import org.springframework.cache.Cache;
+import org.springframework.cache.CacheManager;
 
 /**
  * @author Ivica Cardic
  */
 public abstract class IsolatingClassLoader<T> extends URLClassLoader {
 
-    private static final Cache<String, Object> ISOLATING_CLASS_LOADER_CACHE =
-        Caffeine.newBuilder()
-            .expireAfterAccess(10, TimeUnit.MINUTES)
-            .maximumSize(1000)
-            .build();
+    private static final String ISOLATING_CLASS_LOADER_CACHE =
+        IsolatingClassLoader.class.getName() + ".isolatingClassLoader";
+
+    private final CacheManager cacheManager;
 
     private static final String[] PACKAGE_PREFIXES = {
         "java.", "jdk.", "com.bytechef."
@@ -47,17 +46,20 @@ public abstract class IsolatingClassLoader<T> extends URLClassLoader {
 
     private final BiFunction<String, IsolatingClassLoader<T>, T> cacheMappingFunction;
 
-    protected IsolatingClassLoader(URL[] jarUrls, ClassLoader parent,
+    protected IsolatingClassLoader(
+        URL[] jarUrls, ClassLoader parent, CacheManager cacheManager,
         BiFunction<String, IsolatingClassLoader<T>, T> cacheMappingFunction) {
 
         super(jarUrls, parent);
 
+        this.cacheManager = cacheManager;
         this.cacheMappingFunction = cacheMappingFunction;
     }
 
-    @SuppressWarnings("unchecked")
     protected T get(String key) {
-        return (T) ISOLATING_CLASS_LOADER_CACHE.get(key, currentKey -> cacheMappingFunction.apply(currentKey, this));
+        Cache cache = Objects.requireNonNull(cacheManager.getCache(ISOLATING_CLASS_LOADER_CACHE));
+
+        return cache.get(key, () -> cacheMappingFunction.apply(key, this));
     }
 
     @Override
@@ -104,7 +106,9 @@ public abstract class IsolatingClassLoader<T> extends URLClassLoader {
     }
 
     protected void invalidateCache(String componentName) {
-        ISOLATING_CLASS_LOADER_CACHE.invalidate(componentName);
+        Cache cache = Objects.requireNonNull(cacheManager.getCache(ISOLATING_CLASS_LOADER_CACHE));
+
+        cache.evict(componentName);
     }
 
     @Override

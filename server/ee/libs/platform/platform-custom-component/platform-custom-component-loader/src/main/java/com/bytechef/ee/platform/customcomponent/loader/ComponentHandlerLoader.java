@@ -14,6 +14,7 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import org.springframework.cache.CacheManager;
 
 /**
  * @version ee
@@ -22,10 +23,12 @@ import java.nio.file.Paths;
  */
 public class ComponentHandlerLoader {
 
-    public static ComponentHandler loadComponentHandler(URL url, Language language, String cacheKey) {
+    public static ComponentHandler loadComponentHandler(
+        URL url, Language language, String cacheKey, CacheManager cacheManager) {
+
         try {
             return switch (language) {
-                case JAVA -> loadJavaComponentHandler(url, cacheKey);
+                case JAVA -> loadJavaComponentHandler(url, cacheKey, cacheManager);
                 case JAVASCRIPT, PYTHON, RUBY -> loadPolyglotComponentHandler(url, language);
             };
         } catch (Exception e) {
@@ -33,9 +36,11 @@ public class ComponentHandlerLoader {
         }
     }
 
-    private static ComponentHandler loadJavaComponentHandler(URL url, String cacheKey) throws IOException {
+    private static ComponentHandler loadJavaComponentHandler(
+        URL url, String cacheKey, CacheManager cacheManager) throws IOException {
+
         try (ComponentHandlerClassLoader codeComponentHandlerClassLoader = ComponentHandlerClassLoader.of(
-            url, cacheKey)) {
+            url, cacheKey, cacheManager)) {
 
             return codeComponentHandlerClassLoader.loadComponentHandler();
         }

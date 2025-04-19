@@ -1,6 +1,5 @@
 dependencies {
     implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-xml")
-    implementation("com.github.ben-manes.caffeine:caffeine")
     implementation(libs.com.github.mizosoft.methanol)
     implementation("org.apache.commons:commons-lang3")
     implementation("org.slf4j:slf4j-api")
@@ -14,6 +13,7 @@ dependencies {
     implementation(project(":server:libs:platform:platform-data-storage:platform-data-storage-api"))
     implementation(project(":server:libs:core:file-storage:file-storage-api"))
     implementation(project(":server:libs:core:file-storage:file-storage-filesystem-service"))
+    implementation(project(":server:libs:core:tenant:tenant-api"))
     implementation(project(":server:libs:platform:platform-component:platform-component-api"))
     implementation(project(":server:libs:platform:platform-connection:platform-connection-api"))
     implementation(project(":server:libs:platform:platform-file-storage:platform-file-storage-impl"))
