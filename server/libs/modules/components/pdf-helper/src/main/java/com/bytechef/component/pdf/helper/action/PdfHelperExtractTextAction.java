@@ -20,6 +20,7 @@ import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.fileEntry;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
+import static com.bytechef.component.pdf.helper.constant.PdfHelperConstants.FILE;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
@@ -35,8 +36,6 @@ import org.apache.pdfbox.text.PDFTextStripper;
  * @author Monika Kušter
  */
 public class PdfHelperExtractTextAction {
-
-    protected static final String FILE = "file";
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("extractText")
         .title("Extract Text")

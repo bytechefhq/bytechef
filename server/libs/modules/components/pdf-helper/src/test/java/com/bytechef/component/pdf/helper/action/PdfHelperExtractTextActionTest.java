@@ -16,7 +16,7 @@
 
 package com.bytechef.component.pdf.helper.action;
 
-import static com.bytechef.component.pdf.helper.action.PdfHelperExtractTextAction.FILE;
+import static com.bytechef.component.pdf.helper.constant.PdfHelperConstants.FILE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
@@ -46,6 +46,9 @@ class PdfHelperExtractTextActionTest {
     private final Parameters mockedParameters = mock(Parameters.class);
     private final PDDocument mockedPDDocument = mock(PDDocument.class);
 
+    /**
+     * @author Monika Kušter
+     */
     @Test
     void testPerform() throws IOException {
         when(mockedParameters.getRequiredFileEntry(FILE))
