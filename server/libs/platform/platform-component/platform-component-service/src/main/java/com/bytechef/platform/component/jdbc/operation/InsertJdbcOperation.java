@@ -19,6 +19,7 @@ package com.bytechef.platform.component.jdbc.operation;
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.platform.component.jdbc.JdbcExecutor;
 import com.bytechef.platform.component.jdbc.constant.JdbcConstants;
+import com.bytechef.platform.component.util.SqlUtils;
 import com.fasterxml.jackson.core.type.TypeReference;
 import java.util.Arrays;
 import java.util.List;
@@ -36,7 +37,7 @@ public class InsertJdbcOperation implements JdbcOperation<Map<String, Integer>> 
     @Override
     public Map<String, Integer> execute(Map<String, ?> inputParameters, DataSource dataSource) {
         List<String> columns = MapUtils.getList(inputParameters, JdbcConstants.COLUMNS, String.class, List.of());
-        List<Map<String, ?>> rows = MapUtils.getList(
+        List<Map<String, Object>> rows = MapUtils.getList(
             inputParameters, JdbcConstants.ROWS, new TypeReference<>() {}, List.of());
         String schema = MapUtils.getString(inputParameters, JdbcConstants.SCHEMA, "public");
         String table = MapUtils.getRequiredString(inputParameters, JdbcConstants.TABLE);
@@ -44,6 +45,8 @@ public class InsertJdbcOperation implements JdbcOperation<Map<String, Integer>> 
         String values = columns.stream()
             .map(column -> ":" + column)
             .collect(Collectors.joining(","));
+
+        SqlUtils.checkColumnTypes(schema, table, rows, dataSource);
 
         int[] rowsAffected = JdbcExecutor.batchUpdate(
             "INSERT INTO " + schema + "." + table + " (" + String.join(",", columns) + ") VALUES( " + values + ")",
