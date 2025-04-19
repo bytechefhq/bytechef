@@ -43,7 +43,7 @@ interface OutputTabProps {
 const webhookTriggerTestApi = new WebhookTriggerTestApi();
 
 const LoadingSkeleton = () => (
-    <div className="flex size-full flex-col gap-4 py-1">
+    <div className="flex size-full flex-col gap-4 p-4">
         <div className="flex w-full justify-between">
             <Skeleton className="h-6 w-32" />
 
@@ -249,9 +249,9 @@ const OutputTab = ({connectionMissing, currentNode, outputDefined = false, workf
     return (
         <div className="h-full p-4">
             {!testing && (
-                <>
+                <div className="h-full">
                     {outputSchema && (
-                        <>
+                        <div className="h-full">
                             <div className="mb-2 flex items-center justify-between">
                                 <h3 className="text-sm text-gray-500">Output Schema</h3>
 
@@ -325,7 +325,7 @@ const OutputTab = ({connectionMissing, currentNode, outputDefined = false, workf
                                     />
                                 </div>
                             )}
-                        </>
+                        </div>
                     )}
 
                     {!outputSchema && (
@@ -367,11 +367,11 @@ const OutputTab = ({connectionMissing, currentNode, outputDefined = false, workf
                             </div>
                         </div>
                     )}
-                </>
+                </div>
             )}
 
             {testing && (
-                <div className="flex size-full w-full flex-col items-center justify-center gap-6">
+                <div className="flex size-full flex-col items-center justify-center gap-6">
                     <div
                         className={twMerge(
                             'flex',
