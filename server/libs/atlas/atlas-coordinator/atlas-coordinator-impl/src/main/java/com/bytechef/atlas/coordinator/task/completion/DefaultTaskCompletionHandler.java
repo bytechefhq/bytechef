@@ -33,6 +33,7 @@ import com.bytechef.atlas.execution.service.TaskExecutionService;
 import com.bytechef.atlas.file.storage.TaskFileStorage;
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.evaluator.Evaluator;
+import com.bytechef.file.storage.domain.FileEntry;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.Instant;
 import java.util.HashMap;
@@ -100,13 +101,15 @@ public class DefaultTaskCompletionHandler implements TaskCompletionHandler {
 
             taskExecution = taskExecutionService.update(taskExecution);
 
-            if (taskExecution.getOutput() != null && taskExecution.getName() != null) {
+            String name = taskExecution.getName();
+            FileEntry output = taskExecution.getOutput();
+
+            if (output != null && name != null) {
                 Map<String, Object> newContext = new HashMap<>(
                     taskFileStorage.readContextValue(
                         contextService.peek(Validate.notNull(job.getId(), "id"), Context.Classname.JOB)));
 
-                newContext.put(
-                    taskExecution.getName(), taskFileStorage.readTaskExecutionOutput(taskExecution.getOutput()));
+                newContext.put(name, taskFileStorage.readTaskExecutionOutput(output));
 
                 long jobId = Objects.requireNonNull(job.getId());
 
@@ -116,8 +119,7 @@ public class DefaultTaskCompletionHandler implements TaskCompletionHandler {
             }
 
             logger.debug(
-                "Task id={}, type='{}', name='{}' completed",
-                taskExecution.getId(), taskExecution.getType(), taskExecution.getName());
+                "Task id={}, type='{}', name='{}' completed", taskExecution.getId(), taskExecution.getType(), name);
 
             if (hasMoreTasks(job)) {
                 job.setCurrentTask(job.getCurrentTask() + 1);

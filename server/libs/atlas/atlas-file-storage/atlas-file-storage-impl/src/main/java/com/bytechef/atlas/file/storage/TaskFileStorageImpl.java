@@ -89,7 +89,6 @@ public class TaskFileStorageImpl implements TaskFileStorage {
     @Override
     public FileEntry storeTaskExecutionOutput(long taskExecutionId, Object output) {
         return fileStorageService.storeFileContent(
-            TASK_EXECUTION_FILES_DIR, taskExecutionId + ".json",
-            CompressionUtils.compress(JsonUtils.write(output)));
+            TASK_EXECUTION_FILES_DIR, taskExecutionId + ".json", CompressionUtils.compress(JsonUtils.write(output)));
     }
 }

@@ -28,17 +28,22 @@ import org.springframework.lang.NonNull;
 public interface DataStorage {
 
     void delete(
-        String componentName, DataStorageScope scope, String scopeId, String key, ModeType type);
+        @NonNull String componentName, @NonNull DataStorageScope scope, @NonNull String scopeId, @NonNull String key,
+        @NonNull ModeType type);
 
-    @NonNull
-    <T> Optional<T> fetch(String componentName, DataStorageScope scope, String scopeId, String key, ModeType type);
+    <T> Optional<T> fetch(
+        @NonNull String componentName, @NonNull DataStorageScope scope, @NonNull String scopeId, @NonNull String key,
+        @NonNull ModeType type);
 
-    @NonNull
-    <T> T get(String componentName, DataStorageScope scope, String scopeId, String key, ModeType type);
+    <T> T get(
+        @NonNull String componentName, @NonNull DataStorageScope scope, @NonNull String scopeId, @NonNull String key,
+        @NonNull ModeType type);
 
-    @NonNull
-    <T> Map<String, T> getAll(String componentName, DataStorageScope scope, String scopeId, ModeType type);
+    <T> Map<String, T> getAll(
+        @NonNull String componentName, @NonNull DataStorageScope scope, @NonNull String scopeId,
+        @NonNull ModeType type);
 
     void put(
-        String componentName, DataStorageScope scope, String scopeId, String key, ModeType type, Object value);
+        @NonNull String componentName, @NonNull DataStorageScope scope, @NonNull String scopeId, @NonNull String key,
+        @NonNull ModeType type, @NonNull Object value);
 }

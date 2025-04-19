@@ -179,9 +179,8 @@ public class WorkflowNodeTestOutputFacadeImpl implements WorkflowNodeTestOutputF
             MapUtils.concat((Map<String, Object>) inputs, (Map<String, Object>) outputs));
 
         Object object = actionDefinitionFacade.executePerform(
-            workflowNodeType.name(), workflowNodeType.version(),
-            workflowNodeType.operation(), null, null, null, null, null, inputParameters,
-            connectionIds, Map.of(), true);
+            workflowNodeType.name(), workflowNodeType.version(), workflowNodeType.operation(), null, null, null, null,
+            null, inputParameters, connectionIds, Map.of(), true);
 
         BaseOutputDefinition.OutputResponse definitionOutputResponse = BaseOutputDefinition.OutputResponse.of(
             (BaseProperty.BaseValueProperty<?>) SchemaUtils.getOutputSchema(object, PropertyFactory.PROPERTY_FACTORY),

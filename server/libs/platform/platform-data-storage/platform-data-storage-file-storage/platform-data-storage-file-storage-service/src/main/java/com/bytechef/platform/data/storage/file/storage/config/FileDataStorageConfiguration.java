@@ -16,7 +16,8 @@
 
 package com.bytechef.platform.data.storage.file.storage.config;
 
-import com.bytechef.config.ApplicationProperties;
+import static com.bytechef.config.ApplicationProperties.DataStorage.Provider;
+
 import com.bytechef.file.storage.FileStorageServiceRegistry;
 import com.bytechef.platform.constant.ModeType;
 import com.bytechef.platform.data.storage.DataStorage;
@@ -49,9 +50,7 @@ public class FileDataStorageConfiguration {
         }
 
         return new DataStorageImpl(
-            new FileDataStorageServiceImpl(
-                fileStorageServiceRegistry.getFileStorageService(
-                    ApplicationProperties.DataStorage.Provider.AWS.name())));
+            new FileDataStorageServiceImpl(fileStorageServiceRegistry.getFileStorageService(Provider.AWS.name())));
     }
 
     @Bean
@@ -63,8 +62,7 @@ public class FileDataStorageConfiguration {
 
         return new DataStorageImpl(
             new FileDataStorageServiceImpl(
-                fileStorageServiceRegistry.getFileStorageService(
-                    ApplicationProperties.DataStorage.Provider.FILESYSTEM.name())));
+                fileStorageServiceRegistry.getFileStorageService(Provider.FILESYSTEM.name())));
     }
 
     private record DataStorageImpl(FileDataStorageService fileDataStorageService) implements DataStorage {
@@ -72,7 +70,8 @@ public class FileDataStorageConfiguration {
         @NonNull
         @Override
         public <T> Optional<T> fetch(
-            String componentName, DataStorageScope scope, String scopeId, String key, ModeType type) {
+            @NonNull String componentName, @NonNull DataStorageScope scope, @NonNull String scopeId,
+            @NonNull String key, @NonNull ModeType type) {
 
             return fileDataStorageService.fetch(componentName, scope, scopeId, key, type);
         }
@@ -80,26 +79,34 @@ public class FileDataStorageConfiguration {
         @NonNull
         @Override
         public <T> T get(
-            String componentName, DataStorageScope scope, String scopeId, String key, ModeType type) {
+            @NonNull String componentName, @NonNull DataStorageScope scope, @NonNull String scopeId,
+            @NonNull String key, @NonNull ModeType type) {
 
             return fileDataStorageService.get(componentName, scope, scopeId, key, type);
         }
 
         @NonNull
         @Override
-        public <T> Map<String, T> getAll(String componentName, DataStorageScope scope, String scopeId, ModeType type) {
+        public <T> Map<String, T> getAll(
+            @NonNull String componentName, @NonNull DataStorageScope scope, @NonNull String scopeId,
+            @NonNull ModeType type) {
+
             return fileDataStorageService.getAll(componentName, scope, scopeId, type);
         }
 
         @Override
         public void put(
-            String componentName, DataStorageScope scope, String scopeId, String key, ModeType type, Object value) {
+            @NonNull String componentName, @NonNull DataStorageScope scope, @NonNull String scopeId,
+            @NonNull String key, @NonNull ModeType type, @NonNull Object value) {
 
             fileDataStorageService.put(componentName, scope, scopeId, key, type, value);
         }
 
         @Override
-        public void delete(String componentName, DataStorageScope scope, String scopeId, String key, ModeType type) {
+        public void delete(
+            @NonNull String componentName, @NonNull DataStorageScope scope, @NonNull String scopeId,
+            @NonNull String key, @NonNull ModeType type) {
+
             fileDataStorageService.delete(componentName, scope, scopeId, key, type);
         }
     }

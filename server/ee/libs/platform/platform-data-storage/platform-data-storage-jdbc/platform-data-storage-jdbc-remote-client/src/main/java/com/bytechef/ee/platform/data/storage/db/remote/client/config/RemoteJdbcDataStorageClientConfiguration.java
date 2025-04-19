@@ -49,39 +49,48 @@ public class RemoteJdbcDataStorageClientConfiguration {
         return new RemoteJdbcDataStorageServiceClient(loadBalancedRestClient);
     }
 
-    private record DataStorageImpl(JdbcDataStorageService jdbcDataStorageService)
-        implements DataStorage {
+    private record DataStorageImpl(JdbcDataStorageService jdbcDataStorageService) implements DataStorage {
 
         @NonNull
         @Override
         public <T> Optional<T> fetch(
-            String componentName, DataStorageScope scope, String scopeId,
-            String key, ModeType type) {
+            @NonNull String componentName, @NonNull DataStorageScope scope, @NonNull String scopeId,
+            @NonNull String key, @NonNull ModeType type) {
 
             return jdbcDataStorageService.fetch(componentName, scope, scopeId, key, type);
         }
 
         @NonNull
         @Override
-        public <T> T get(String componentName, DataStorageScope scope, String scopeId, String key, ModeType type) {
+        public <T> T get(
+            @NonNull String componentName, @NonNull DataStorageScope scope, @NonNull String scopeId,
+            @NonNull String key, @NonNull ModeType type) {
+
             return jdbcDataStorageService.get(componentName, scope, scopeId, key, type);
         }
 
         @NonNull
         @Override
-        public <T> Map<String, T> getAll(String componentName, DataStorageScope scope, String scopeId, ModeType type) {
+        public <T> Map<String, T> getAll(
+            @NonNull String componentName, @NonNull DataStorageScope scope, @NonNull String scopeId,
+            @NonNull ModeType type) {
+
             return jdbcDataStorageService.getAll(componentName, scope, scopeId, type);
         }
 
         @Override
         public void put(
-            String componentName, DataStorageScope scope, String scopeId, String key, ModeType type, Object value) {
+            @NonNull String componentName, @NonNull DataStorageScope scope, @NonNull String scopeId,
+            @NonNull String key, @NonNull ModeType type, @NonNull Object value) {
 
             jdbcDataStorageService.put(componentName, scope, scopeId, key, type, value);
         }
 
         @Override
-        public void delete(String componentName, DataStorageScope scope, String scopeId, String key, ModeType type) {
+        public void delete(
+            @NonNull String componentName, @NonNull DataStorageScope scope, @NonNull String scopeId,
+            @NonNull String key, @NonNull ModeType type) {
+
             jdbcDataStorageService.delete(componentName, scope, scopeId, key, type);
         }
     }
