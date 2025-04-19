@@ -11,6 +11,7 @@ import {twMerge} from 'tailwind-merge';
 
 interface WorkflowNodesListProps {
     actionPanelOpen: boolean;
+    edgeId?: string;
     handleComponentClick?: (clickedItem: ClickedDefinitionType) => void;
     hideActionComponents?: boolean;
     hideTriggerComponents?: boolean;
@@ -21,6 +22,7 @@ interface WorkflowNodesListProps {
 const WorkflowNodesPopoverMenuComponentList = memo(
     ({
         actionPanelOpen,
+        edgeId,
         handleComponentClick,
         hideActionComponents = false,
         hideTaskDispatchers = false,
@@ -90,7 +92,7 @@ const WorkflowNodesPopoverMenuComponentList = memo(
                         value={filter}
                     />
 
-                    <CopilotButton source={Source.WORKFLOW_EDITOR_COMPONENTS_POPOVER_MENU} />
+                    <CopilotButton parameters={{edgeId}} source={Source.WORKFLOW_EDITOR_COMPONENTS_POPOVER_MENU} />
                 </header>
 
                 <div className="h-96 rounded-b-lg pb-3">

@@ -273,6 +273,7 @@ const WorkflowNodesPopoverMenu = ({
                     {!sourceData && (
                         <WorkflowNodesPopoverMenuComponentList
                             actionPanelOpen={actionPanelOpen}
+                            edgeId={edgeId}
                             handleComponentClick={handleComponentClick}
                             hideActionComponents={hideActionComponents}
                             hideTaskDispatchers={hideTaskDispatchers}
