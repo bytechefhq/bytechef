@@ -21,6 +21,8 @@ import com.bytechef.platform.component.domain.ComponentDefinition;
 import com.bytechef.platform.component.service.ComponentDefinitionService;
 import com.bytechef.platform.workflow.task.dispatcher.domain.TaskDispatcherDefinition;
 import com.bytechef.platform.workflow.task.dispatcher.service.TaskDispatcherDefinitionService;
+import java.util.concurrent.TimeUnit;
+import org.springframework.http.CacheControl;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -32,6 +34,10 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @ConditionalOnCoordinator
 public class IconController {
+
+    CacheControl cacheControl = CacheControl.maxAge(30, TimeUnit.DAYS)
+        .noTransform()
+        .mustRevalidate();
 
     private final ComponentDefinitionService componentDefinitionService;
     private final TaskDispatcherDefinitionService taskDispatcherDefinitionService;
@@ -58,6 +64,8 @@ public class IconController {
                 .build();
         }
 
-        return ResponseEntity.ok(icon);
+        return ResponseEntity.ok()
+            .cacheControl(cacheControl)
+            .body(icon);
     }
 }
