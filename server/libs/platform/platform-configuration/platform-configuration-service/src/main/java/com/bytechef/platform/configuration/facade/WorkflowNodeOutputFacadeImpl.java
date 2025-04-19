@@ -24,12 +24,10 @@ import com.bytechef.platform.component.domain.ActionDefinition;
 import com.bytechef.platform.component.domain.ArrayProperty;
 import com.bytechef.platform.component.domain.FileEntryProperty;
 import com.bytechef.platform.component.domain.TriggerDefinition;
-import com.bytechef.platform.component.facade.ActionDefinitionFacade;
 import com.bytechef.platform.component.facade.TriggerDefinitionFacade;
 import com.bytechef.platform.component.service.ActionDefinitionService;
 import com.bytechef.platform.component.service.TriggerDefinitionService;
 import com.bytechef.platform.configuration.domain.WorkflowNodeTestOutput;
-import com.bytechef.platform.configuration.domain.WorkflowTestConfigurationConnection;
 import com.bytechef.platform.configuration.domain.WorkflowTrigger;
 import com.bytechef.platform.configuration.dto.WorkflowNodeOutputDTO;
 import com.bytechef.platform.configuration.service.WorkflowNodeTestOutputService;
@@ -63,7 +61,6 @@ public class WorkflowNodeOutputFacadeImpl implements WorkflowNodeOutputFacade {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(WorkflowNodeOutputFacadeImpl.class);
 
-    private final ActionDefinitionFacade actionDefinitionFacade;
     private final ActionDefinitionService actionDefinitionService;
     private final TaskDispatcherDefinitionService taskDispatcherDefinitionService;
     private final TriggerDefinitionFacade triggerDefinitionFacade;
@@ -74,13 +71,12 @@ public class WorkflowNodeOutputFacadeImpl implements WorkflowNodeOutputFacade {
 
     @SuppressFBWarnings("EI")
     public WorkflowNodeOutputFacadeImpl(
-        ActionDefinitionFacade actionDefinitionFacade, ActionDefinitionService actionDefinitionService,
+        ActionDefinitionService actionDefinitionService,
         TaskDispatcherDefinitionService taskDispatcherDefinitionService,
         TriggerDefinitionFacade triggerDefinitionFacade, TriggerDefinitionService triggerDefinitionService,
         WorkflowService workflowService, WorkflowNodeTestOutputService workflowNodeTestOutputService,
         WorkflowTestConfigurationService workflowTestConfigurationService) {
 
-        this.actionDefinitionFacade = actionDefinitionFacade;
         this.actionDefinitionService = actionDefinitionService;
         this.taskDispatcherDefinitionService = taskDispatcherDefinitionService;
         this.triggerDefinitionFacade = triggerDefinitionFacade;
@@ -196,12 +192,6 @@ public class WorkflowNodeOutputFacadeImpl implements WorkflowNodeOutputFacade {
             Map<String, ?> inputParameters = workflowTask.evaluateParameters(
                 MapUtils.concat((Map<String, Object>) inputs, (Map<String, Object>) outputs));
 
-            Map<String, Long> connectionIds = MapUtils.toMap(
-                workflowTestConfigurationService.getWorkflowTestConfigurationConnections(
-                    workflowId, workflowTask.getName()),
-                WorkflowTestConfigurationConnection::getWorkflowConnectionKey,
-                WorkflowTestConfigurationConnection::getConnectionId);
-
             if (workflowNodeType.operation() == null) {
                 // TODO
                 // Remove hardcodes values, use the ones defined in variable properties,
@@ -239,10 +229,6 @@ public class WorkflowNodeOutputFacadeImpl implements WorkflowNodeOutputFacade {
                     outputResponse = taskDispatcherDefinitionService.executeOutput(
                         workflowNodeType.name(), workflowNodeType.version(), inputParameters);
                 }
-            } else {
-                outputResponse = actionDefinitionFacade.executeOutput(
-                    workflowNodeType.name(), workflowNodeType.version(),
-                    workflowNodeType.operation(), inputParameters, connectionIds);
             }
         }
 

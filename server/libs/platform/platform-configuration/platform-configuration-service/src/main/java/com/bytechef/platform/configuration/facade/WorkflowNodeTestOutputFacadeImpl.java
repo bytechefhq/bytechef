@@ -178,16 +178,9 @@ public class WorkflowNodeTestOutputFacadeImpl implements WorkflowNodeTestOutputF
         Map<String, ?> inputParameters = workflowTask.evaluateParameters(
             MapUtils.concat((Map<String, Object>) inputs, (Map<String, Object>) outputs));
 
-        Object object = actionDefinitionFacade.executePerform(
-            workflowNodeType.name(), workflowNodeType.version(), workflowNodeType.operation(), null, null, null, null,
-            null, inputParameters, connectionIds, Map.of(), true);
-
-        BaseOutputDefinition.OutputResponse definitionOutputResponse = BaseOutputDefinition.OutputResponse.of(
-            (BaseProperty.BaseValueProperty<?>) SchemaUtils.getOutputSchema(object, PropertyFactory.PROPERTY_FACTORY),
-            object);
-
-        OutputResponse outputResponse = SchemaUtils.toOutput(
-            definitionOutputResponse, PropertyFactory.OUTPUT_FACTORY_FUNCTION, PropertyFactory.PROPERTY_FACTORY);
+        OutputResponse outputResponse = actionDefinitionFacade.executeOutput(
+            workflowNodeType.name(), workflowNodeType.version(), workflowNodeType.operation(),
+            inputParameters, connectionIds);
 
         if (outputResponse == null || outputResponse.outputSchema() instanceof NullProperty) {
             return null;

@@ -34,6 +34,7 @@ import com.bytechef.component.definition.PropertiesDataSource.ActionPropertiesFu
 import com.bytechef.component.definition.Property.DynamicPropertiesProperty;
 import com.bytechef.component.exception.ProviderException;
 import com.bytechef.definition.BaseOutputDefinition;
+import com.bytechef.definition.BaseProperty.BaseValueProperty;
 import com.bytechef.platform.component.ComponentConnection;
 import com.bytechef.platform.component.ComponentDefinitionRegistry;
 import com.bytechef.platform.component.definition.MultipleConnectionsOutputFunction;
@@ -123,7 +124,18 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
                         e, inputParameters, ActionDefinitionErrorType.EXECUTE_OUTPUT);
                 }
             })
-            .orElse(null);
+            .orElseGet(() -> {
+                Object result = executeMultipleConnectionsPerform(
+                    componentName, componentVersion, actionName, inputParameters, connections, extensions, context);
+
+                BaseOutputDefinition.OutputResponse definitionOutputResponse = BaseOutputDefinition.OutputResponse.of(
+                    (BaseValueProperty<?>) SchemaUtils.getOutputSchema(result, PropertyFactory.PROPERTY_FACTORY),
+                    result);
+
+                return SchemaUtils.toOutput(
+                    definitionOutputResponse, PropertyFactory.OUTPUT_FACTORY_FUNCTION,
+                    PropertyFactory.PROPERTY_FACTORY);
+            });
     }
 
     @Override
@@ -226,7 +238,18 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
                         e, inputParameters, ActionDefinitionErrorType.EXECUTE_OUTPUT);
                 }
             })
-            .orElse(null);
+            .orElseGet(() -> {
+                Object result = executeSingleConnectionPerform(
+                    componentName, componentVersion, actionName, inputParameters, connection, context);
+
+                BaseOutputDefinition.OutputResponse definitionOutputResponse = BaseOutputDefinition.OutputResponse.of(
+                    (BaseValueProperty<?>) SchemaUtils.getOutputSchema(result, PropertyFactory.PROPERTY_FACTORY),
+                    result);
+
+                return SchemaUtils.toOutput(
+                    definitionOutputResponse, PropertyFactory.OUTPUT_FACTORY_FUNCTION,
+                    PropertyFactory.PROPERTY_FACTORY);
+            });
     }
 
     @Override
