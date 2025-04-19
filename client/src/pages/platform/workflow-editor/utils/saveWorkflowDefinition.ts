@@ -50,18 +50,8 @@ export default async function saveWorkflowDefinition({
 
     const workflowDefinition: WorkflowDefinitionType = JSON.parse(workflow.definition!);
 
-    const {
-        clusterElements,
-        componentName,
-        connections,
-        description,
-        label,
-        metadata,
-        name,
-        parameters,
-        taskDispatcher,
-        trigger,
-    } = nodeData;
+    const {clusterElements, componentName, description, label, metadata, name, parameters, taskDispatcher, trigger} =
+        nodeData;
 
     let {operationName, type, version} = nodeData;
 
@@ -71,7 +61,6 @@ export default async function saveWorkflowDefinition({
         }
 
         const newTrigger: WorkflowTrigger = {
-            connections,
             description,
             label,
             name,
