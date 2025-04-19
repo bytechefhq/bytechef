@@ -81,11 +81,13 @@ public class PolyglotEngine {
                 default -> throw new IllegalArgumentException("languageId: %s does not exist".formatted(languageId));
             }));
 
+            Map<String, Object> inputMap = removeNotEvaluatedEntries(inputParameters.getMap(INPUT, Object.class));
+            ContextProxyObject contextProxyObject = new ContextProxyObject(
+                actionContext, applicationContext, languageId, componentConnections);
+
             Value value = polyglotContext.getBindings(languageId)
                 .getMember("perform")
-                .execute(
-                    copyToGuestValue(inputParameters.getMap(INPUT, Object.class), languageId),
-                    new ContextProxyObject(actionContext, applicationContext, languageId, componentConnections));
+                .execute(copyToGuestValue(inputMap, languageId), contextProxyObject);
 
             return copyFromPolyglotContext(copyToJavaValue(value));
         }
@@ -217,6 +219,25 @@ public class PolyglotEngine {
         return Context.newBuilder()
             .engine(engine)
             .build();
+    }
+
+    @SuppressWarnings("unchecked")
+    private static Map<String, Object> removeNotEvaluatedEntries(Map<String, Object> result) {
+        Map<String, Object> newMap = new HashMap<>();
+
+        for (Map.Entry<String, Object> entry : result.entrySet()) {
+            if (entry.getValue() instanceof String string) {
+                if (!string.startsWith("${")) {
+                    newMap.put(entry.getKey(), entry.getValue());
+                }
+            } else if (entry.getValue() instanceof Map<?, ?> map) {
+                newMap.put(entry.getKey(), removeNotEvaluatedEntries((Map<String, Object>) map));
+            } else {
+                newMap.put(entry.getKey(), entry.getValue());
+            }
+        }
+
+        return newMap;
     }
 
     private record ActionProxyObject(
