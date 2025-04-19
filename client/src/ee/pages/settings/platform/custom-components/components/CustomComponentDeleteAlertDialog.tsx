@@ -17,8 +17,7 @@ const CustomComponentDeleteAlertDialog = ({onClose, onDelete}: {onClose: () => v
                     <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
 
                     <AlertDialogDescription>
-                        This action cannot be undone. This will permanently delete the project and workflows it
-                        contains.
+                        This action cannot be undone. This will permanently delete the custom component.
                     </AlertDialogDescription>
                 </AlertDialogHeader>
 

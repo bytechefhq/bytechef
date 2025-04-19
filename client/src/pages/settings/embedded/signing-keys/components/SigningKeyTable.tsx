@@ -51,8 +51,7 @@ const SigningKeyDeleteDialog = ({apiKeyId, onClose}: {apiKeyId: number; onClose:
                     <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
 
                     <AlertDialogDescription>
-                        This action cannot be undone. This will permanently delete the project and workflows it
-                        contains.
+                        This action cannot be undone. This will permanently delete the signing key.
                     </AlertDialogDescription>
                 </AlertDialogHeader>
 

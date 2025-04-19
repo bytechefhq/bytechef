@@ -50,8 +50,7 @@ const ApiClientDeleteDialog = ({apiClientId, onClose}: {apiClientId: number; onC
                     <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
 
                     <AlertDialogDescription>
-                        This action cannot be undone. This will permanently delete the project and workflows it
-                        contains.
+                        This action cannot be undone. This will permanently delete API key.
                     </AlertDialogDescription>
                 </AlertDialogHeader>
 
