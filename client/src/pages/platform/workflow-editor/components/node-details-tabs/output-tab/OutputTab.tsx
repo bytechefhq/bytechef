@@ -1,6 +1,5 @@
 /// <reference types="vite-plugin-svgr/client" />
 
-import LoadingIcon from '@/components/LoadingIcon';
 import {Alert, AlertDescription, AlertTitle} from '@/components/ui/alert';
 import {Button} from '@/components/ui/button';
 import {DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger} from '@/components/ui/dropdown-menu';
@@ -42,6 +41,36 @@ interface OutputTabProps {
 }
 
 const webhookTriggerTestApi = new WebhookTriggerTestApi();
+
+const LoadingSkeleton = () => (
+    <div className="flex size-full flex-col gap-4 py-1">
+        <div className="flex w-full justify-between">
+            <Skeleton className="h-6 w-32" />
+
+            <Skeleton className="h-8 w-32" />
+        </div>
+
+        <div className="flex flex-col gap-2">
+            <Skeleton className="h-6 w-32" />
+
+            <Skeleton className="ml-4 h-6 w-48" />
+
+            <Skeleton className="ml-8 h-6 w-32" />
+
+            <Skeleton className="ml-12 h-6 w-48" />
+
+            <Skeleton className="h-6 w-32" />
+
+            <Skeleton className="ml-4 h-6 w-32" />
+
+            <Skeleton className="h-6 w-48" />
+
+            <Skeleton className="ml-4 h-6 w-32" />
+
+            <Skeleton className="ml-8 h-6 w-48" />
+        </div>
+    </div>
+);
 
 const OutputTab = ({connectionMissing, currentNode, outputDefined = false, workflowId}: OutputTabProps) => {
     const [webhookTestCancelEnabled, setWebhookTestCancelEnabled] = useState(false);
@@ -214,35 +243,7 @@ const OutputTab = ({connectionMissing, currentNode, outputDefined = false, workf
     }, [startWebhookTest]);
 
     if (!testing && workflowNodeOutputIsFetching) {
-        return (
-            <div className="flex size-full flex-col gap-4 p-4">
-                <div className="flex w-full justify-between">
-                    <Skeleton className="h-6 w-32" />
-
-                    <Skeleton className="h-8 w-32" />
-                </div>
-
-                <div className="flex flex-col gap-2">
-                    <Skeleton className="h-6 w-32" />
-
-                    <Skeleton className="ml-4 h-6 w-48" />
-
-                    <Skeleton className="ml-8 h-6 w-32" />
-
-                    <Skeleton className="ml-12 h-6 w-48" />
-
-                    <Skeleton className="h-6 w-32" />
-
-                    <Skeleton className="ml-4 h-6 w-32" />
-
-                    <Skeleton className="h-6 w-48" />
-
-                    <Skeleton className="ml-4 h-6 w-32" />
-
-                    <Skeleton className="ml-8 h-6 w-48" />
-                </div>
-            </div>
-        );
+        return <LoadingSkeleton />;
     }
 
     return (
@@ -356,13 +357,7 @@ const OutputTab = ({connectionMissing, currentNode, outputDefined = false, workf
                                         onClick={() => setShowUploadDialog(true)}
                                         type="button"
                                     >
-                                        {uploadSampleOutputRequestMutation.isPending && (
-                                            <>
-                                                <LoadingIcon />
-
-                                                <span>Uploading...</span>
-                                            </>
-                                        )}
+                                        {uploadSampleOutputRequestMutation.isPending && <LoadingSkeleton />}
 
                                         {!uploadSampleOutputRequestMutation.isPending && (
                                             <span>Upload Sample Output Data</span>
@@ -389,9 +384,7 @@ const OutputTab = ({connectionMissing, currentNode, outputDefined = false, workf
                         )}
                     >
                         <div className={twMerge('flex items-center justify-center', !currentNode.trigger && 'w-full')}>
-                            <LoadingIcon />
-
-                            <span className="text-lg">{`Testing ${currentNode.trigger ? 'Trigger' : 'Action'}`}</span>
+                            <LoadingSkeleton />
                         </div>
 
                         {currentNode.trigger &&
