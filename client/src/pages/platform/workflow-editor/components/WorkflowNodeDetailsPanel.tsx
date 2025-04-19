@@ -40,7 +40,7 @@ import {
 import {TooltipPortal} from '@radix-ui/react-tooltip';
 import {useQueryClient} from '@tanstack/react-query';
 import {InfoIcon, XIcon} from 'lucide-react';
-import {useCallback, useEffect, useMemo, useState} from 'react';
+import {useCallback, useEffect, useMemo, useRef, useState} from 'react';
 import isEqual from 'react-fast-compare';
 import InlineSVG from 'react-inlinesvg';
 import {useParams} from 'react-router-dom';
@@ -821,96 +821,76 @@ const WorkflowNodeDetailsPanel = ({
                             </div>
                         )}
 
-                        <ScrollArea>
-                            {currentWorkflowNode && (
-                                <div className="size-full">
-                                    {activeTab === 'description' &&
-                                        (nodeDefinition ? (
-                                            <DescriptionTab
-                                                key={`${currentNode?.workflowNodeName}_description`}
-                                                nodeDefinition={nodeDefinition}
-                                                updateWorkflowMutation={updateWorkflowMutation}
-                                            />
-                                        ) : (
-                                            <div className="flex flex-col gap-y-4 p-4">
-                                                <div className="flex flex-col gap-y-2">
-                                                    <Skeleton className="h-6 w-1/4" />
+                        <ScrollArea className="h-full max-w-workflow-node-details-panel-width">
+                            <div className="size-full max-w-workflow-node-details-panel-width">
+                                {activeTab === 'description' &&
+                                    (nodeDefinition ? (
+                                        <DescriptionTab
+                                            key={`${currentNode?.workflowNodeName}_description`}
+                                            nodeDefinition={nodeDefinition}
+                                            updateWorkflowMutation={updateWorkflowMutation}
+                                        />
+                                    ) : (
+                                        <div className="flex flex-col gap-y-4 p-4">
+                                            <div className="flex flex-col gap-y-2">
+                                                <Skeleton className="h-6 w-1/4" />
 
-                                                    <Skeleton className="h-8 w-full" />
-                                                </div>
-
-                                                <div className="flex flex-col gap-y-2">
-                                                    <Skeleton className="h-6 w-1/4" />
-
-                                                    <Skeleton className="h-24 w-full" />
-                                                </div>
+                                                <Skeleton className="h-8 w-full" />
                                             </div>
-                                        ))}
 
-                                    {activeTab === 'connection' &&
-                                        currentWorkflowNodeConnections.length > 0 &&
-                                        currentNode &&
-                                        currentComponentDefinition && (
-                                            <ConnectionTab
-                                                componentConnections={currentWorkflowNodeConnections}
-                                                key={`${currentNode?.workflowNodeName}_connection`}
-                                                workflowId={workflow.id!}
-                                                workflowNodeName={currentNode?.workflowNodeName}
-                                                workflowTestConfigurationConnections={
-                                                    workflowTestConfigurationConnections
-                                                }
-                                            />
-                                        )}
+                                            <div className="flex flex-col gap-y-2">
+                                                <Skeleton className="h-6 w-1/4" />
 
-                                    {/*{activeTab === 'clusterElements' &&*/}
-
-                                    {/*    currentComponentDefinition?.clusterElementTypes && (*/}
-
-                                    {/*        <ClusterElementsTab*/}
-
-                                    {/*            clusterElementTypes={currentComponentDefinition.clusterElementTypes}*/}
-
-                                    {/*            componentName={currentComponentDefinition.name}*/}
-
-                                    {/*            componentVersion={currentComponentDefinition.version}*/}
-
-                                    {/*        />*/}
-
-                                    {/*    )}*/}
-
-                                    {activeTab === 'properties' &&
-                                        (!operationDataMissing && currentOperationProperties?.length ? (
-                                            <Properties
-                                                customClassName="p-4"
-                                                displayConditionsQuery={displayConditionsQuery}
-                                                key={`${currentNode?.workflowNodeName}_${currentOperationName}_properties`}
-                                                operationName={currentOperationName}
-                                                properties={currentOperationProperties}
-                                            />
-                                        ) : (
-                                            <div className="flex size-full items-center justify-center">
-                                                <LoadingIcon /> Loading...
+                                                <Skeleton className="h-24 w-full" />
                                             </div>
-                                        ))}
+                                        </div>
+                                    ))}
 
-                                    {activeTab === 'output' && currentNode && currentComponentDefinition && (
-                                        <OutputTab
-                                            connectionMissing={
-                                                currentComponentDefinition.connectionRequired &&
-                                                !workflowTestConfigurationConnections?.length
-                                            }
-                                            currentNode={currentNode}
-                                            key={`${currentNode?.workflowNodeName}_output`}
-                                            outputDefined={
-                                                (currentActionDefinition?.outputDefined ||
-                                                    currentTriggerDefinition?.outputDefined) ??
-                                                false
-                                            }
+                                {activeTab === 'connection' &&
+                                    currentWorkflowNodeConnections.length > 0 &&
+                                    currentNode &&
+                                    currentComponentDefinition && (
+                                        <ConnectionTab
+                                            componentConnections={currentWorkflowNodeConnections}
+                                            key={`${currentNode?.workflowNodeName}_connection`}
                                             workflowId={workflow.id!}
+                                            workflowNodeName={currentNode?.workflowNodeName}
+                                            workflowTestConfigurationConnections={workflowTestConfigurationConnections}
                                         />
                                     )}
-                                </div>
-                            )}
+
+                                {activeTab === 'properties' &&
+                                    (!operationDataMissing && currentOperationProperties?.length ? (
+                                        <Properties
+                                            customClassName="p-4"
+                                            displayConditionsQuery={displayConditionsQuery}
+                                            key={`${currentNode?.workflowNodeName}_${currentOperationName}_properties`}
+                                            operationName={currentOperationName}
+                                            properties={currentOperationProperties}
+                                        />
+                                    ) : (
+                                        <div className="flex size-full items-center justify-center">
+                                            <LoadingIcon /> Loading...
+                                        </div>
+                                    ))}
+
+                                {activeTab === 'output' && currentNode && currentComponentDefinition && (
+                                    <OutputTab
+                                        connectionMissing={
+                                            currentComponentDefinition.connectionRequired &&
+                                            !workflowTestConfigurationConnections?.length
+                                        }
+                                        currentNode={currentNode}
+                                        key={`${currentNode?.workflowNodeName}_output`}
+                                        outputDefined={
+                                            (currentActionDefinition?.outputDefined ||
+                                                currentTriggerDefinition?.outputDefined) ??
+                                            false
+                                        }
+                                        workflowId={workflow.id!}
+                                    />
+                                )}
+                            </div>
                         </ScrollArea>
                     </main>
 

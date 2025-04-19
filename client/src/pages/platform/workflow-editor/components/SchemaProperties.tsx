@@ -19,7 +19,7 @@ const SchemaProperties = ({
     sampleOutput,
     workflowNodeName,
 }: SchemaPropertiesProps) => (
-    <ul className="ml-2 h-full">
+    <ul className="ml-2">
         {properties.map((property, index) => {
             const {items, name, properties} = property;
 
