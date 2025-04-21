@@ -40,7 +40,7 @@ import {
 import {TooltipPortal} from '@radix-ui/react-tooltip';
 import {useQueryClient} from '@tanstack/react-query';
 import {InfoIcon, XIcon} from 'lucide-react';
-import {useCallback, useEffect, useMemo, useRef, useState} from 'react';
+import {useCallback, useEffect, useMemo, useState} from 'react';
 import isEqual from 'react-fast-compare';
 import InlineSVG from 'react-inlinesvg';
 import {useParams} from 'react-router-dom';
@@ -70,10 +70,6 @@ const TABS: Array<{label: string; name: TabNameType}> = [
         label: 'Connection',
         name: 'connection',
     },
-    // {
-    //     label: 'Elements',
-    //     name: 'clusterElements',
-    // },
     {
         label: 'Properties',
         name: 'properties',

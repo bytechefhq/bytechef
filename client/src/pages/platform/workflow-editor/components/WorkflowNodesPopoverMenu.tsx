@@ -133,61 +133,64 @@ const WorkflowNodesPopoverMenu = ({
         [sourceNodeId, nodeIndex]
     );
 
-    const handleClusterElementClick = useCallback(() => (data: ClusterElementDefinitionBasic) => {
-        if (!clusterElementsData || !sourceNode) return;
+    const handleClusterElementClick = useCallback(
+        (data: ClusterElementDefinitionBasic) => {
+            if (!clusterElementsData || !sourceNode) return;
 
-        const updatedClusterElementsData: ClusterElementsType = {
-            chatMemory: clusterElementsData.chatMemory,
-            model: clusterElementsData.model,
-            rag: clusterElementsData.rag,
-            tools: [...(clusterElementsData.tools || [])],
-        };
+            const updatedClusterElementsData: ClusterElementsType = {
+                chatMemory: clusterElementsData.chatMemory,
+                model: clusterElementsData.model,
+                rag: clusterElementsData.rag,
+                tools: [...(clusterElementsData.tools || [])],
+            };
 
-        const propertyMap: Record<ClusterElementsDefinitionType, StoredClusterElementsType> = {
-            CHAT_MEMORY: 'chatMemory',
-            MODEL: 'model',
-            RAG: 'rag',
-        };
+            const propertyMap: Record<ClusterElementsDefinitionType, StoredClusterElementsType> = {
+                CHAT_MEMORY: 'chatMemory',
+                MODEL: 'model',
+                RAG: 'rag',
+            };
 
-        if (data.type === 'TOOLS') {
-            updatedClusterElementsData.tools = [
-                ...(clusterElementsData.tools || []),
-                {
-                    label: data.title,
-                    name: getFormattedClusterElementName(data.name, 'tools'),
-                    parameters: {},
-                    type: `${data.componentName}/v${data.componentVersion}/${data.name}`,
-                },
-            ];
-        } else {
-            if (data.type in propertyMap) {
-                updatedClusterElementsData[propertyMap[data.type as ClusterElementsDefinitionType]] = {
-                    label: data.title,
-                    name: getFormattedClusterElementName(
-                        data.componentName,
-                        propertyMap[data.type as ClusterElementsDefinitionType]
-                    ),
-                    parameters: {},
-                    type: `${data.componentName}/v${data.componentVersion}/${propertyMap[data.type as ClusterElementsDefinitionType]}`,
-                };
+            if (data.type === 'TOOLS') {
+                updatedClusterElementsData.tools = [
+                    ...(clusterElementsData.tools || []),
+                    {
+                        label: data.title,
+                        name: getFormattedClusterElementName(data.name, 'tools'),
+                        parameters: {},
+                        type: `${data.componentName}/v${data.componentVersion}/${data.name}`,
+                    },
+                ];
+            } else {
+                if (data.type in propertyMap) {
+                    updatedClusterElementsData[propertyMap[data.type as ClusterElementsDefinitionType]] = {
+                        label: data.title,
+                        name: getFormattedClusterElementName(
+                            data.componentName,
+                            propertyMap[data.type as ClusterElementsDefinitionType]
+                        ),
+                        parameters: {},
+                        type: `${data.componentName}/v${data.componentVersion}/${propertyMap[data.type as ClusterElementsDefinitionType]}`,
+                    };
+                }
             }
-        }
 
-        setClusterElementsData?.(updatedClusterElementsData);
+            setClusterElementsData?.(updatedClusterElementsData);
 
-        saveWorkflowDefinition({
-            nodeData: {
-                ...sourceNode.data,
-                clusterElements: updatedClusterElementsData,
-                componentName: String(sourceNode.data.componentName),
-                name: String(sourceNode.data.name),
-                workflowNodeName: String(sourceNode.data.workflowNodeName),
-            },
-            projectId: +projectId!,
-            queryClient,
-            updateWorkflowMutation,
-        });
-    }, [clusterElementsData, projectId, queryClient, setClusterElementsData, sourceNode, updateWorkflowMutation]);
+            saveWorkflowDefinition({
+                nodeData: {
+                    ...sourceNode.data,
+                    clusterElements: updatedClusterElementsData,
+                    componentName: String(sourceNode.data.componentName),
+                    name: String(sourceNode.data.name),
+                    workflowNodeName: String(sourceNode.data.workflowNodeName),
+                },
+                projectId: +projectId!,
+                queryClient,
+                updateWorkflowMutation,
+            });
+        },
+        [clusterElementsData, projectId, queryClient, setClusterElementsData, sourceNode, updateWorkflowMutation]
+    );
 
     useEffect(() => {
         if (componentDefinitionToBeAdded?.name) {
@@ -289,7 +292,6 @@ const WorkflowNodesPopoverMenu = ({
                             trigger={trigger}
                         />
                     )}
-
                 </div>
             </PopoverContent>
         </Popover>
