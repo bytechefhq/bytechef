@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *
- * Modifications copyright (C) 2023 ByteChef Inc.
+ * Modifications copyright (C) 2025 ByteChef
  */
 
 package com.bytechef.atlas.worker.config;
