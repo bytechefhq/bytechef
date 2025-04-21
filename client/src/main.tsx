@@ -17,7 +17,6 @@ import TsWorker from 'monaco-editor/esm/vs/language/typescript/ts.worker?worker'
 import YamlWorker from 'monaco-yaml/yaml.worker?worker';
 import posthog from 'posthog-js';
 import {PostHogProvider} from 'posthog-js/react';
-import CacheProvider from 'react-inlinesvg/provider';
 import {RouterProvider} from 'react-router-dom';
 
 import {getRouter} from './routes';
@@ -58,7 +57,7 @@ function renderApp() {
                 <QueryClientProvider client={queryClient}>
                     <PostHogProvider client={posthog}>
                         <TooltipProvider>
-                                <RouterProvider router={router} />
+                            <RouterProvider router={router} />
                         </TooltipProvider>
                     </PostHogProvider>
 
