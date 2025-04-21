@@ -125,7 +125,7 @@ spotless {
 
         licenseHeader(
             "/*\n" +
-                " * Copyright 2023-present ByteChef Inc.\n" +
+                " * Copyright 2025 ByteChef\n" +
                 " *\n" +
                 " * Licensed under the Apache License, Version 2.0 (the \"License\");\n" +
                 " * you may not use this file except in compliance with the License.\n" +
@@ -158,7 +158,7 @@ spotless {
                 " * See the License for the specific language governing permissions and\n" +
                 " * limitations under the License.\n" +
                 " *\n" +
-                " * Modifications copyright (C) 2023 ByteChef Inc.\n" +
+                " * Modifications copyright (C) 2025 ByteChef\n" +
                 " */\n\n"
         ).named(
             "original"
@@ -167,7 +167,7 @@ spotless {
         )
         licenseHeader(
             "/*\n" +
-                " * Copyright 2023-present ByteChef Inc.\n" +
+                " * Copyright 2025 ByteChef\n" +
                 " *\n" +
                 " * Licensed under the ByteChef Enterprise license (the \"Enterprise License\");\n" +
                 " * you may not use this file except in compliance with the Enterprise License.\n" +
