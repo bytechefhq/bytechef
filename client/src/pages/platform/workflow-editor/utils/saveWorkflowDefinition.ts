@@ -20,17 +20,17 @@ type UpdateWorkflowRequestType = {
 };
 
 interface SaveWorkflowDefinitionProps {
-    decorative?: boolean;
     changedChildNodeId?: string;
-    nodeData: NodeDataType;
+    decorative?: boolean;
+    nodeData?: NodeDataType;
     nodeIndex?: number;
     onSuccess?: () => void;
     placeholderId?: string;
     projectId: number;
     queryClient: QueryClient;
-    subtask?: boolean;
     taskDispatcherContext?: TaskDispatcherContextType;
     updateWorkflowMutation: UseMutationResult<void, Error, UpdateWorkflowRequestType, unknown>;
+    updatedWorkflowTasks?: Array<WorkflowTask>;
 }
 
 export default async function saveWorkflowDefinition({
@@ -42,9 +42,9 @@ export default async function saveWorkflowDefinition({
     placeholderId,
     projectId,
     queryClient,
-    subtask,
     taskDispatcherContext,
     updateWorkflowMutation,
+    updatedWorkflowTasks,
 }: SaveWorkflowDefinitionProps) {
     const {workflow} = useWorkflowDataStore.getState();
 
@@ -54,9 +54,9 @@ export default async function saveWorkflowDefinition({
     const workflowDefinitionTasks: Array<WorkflowTask> = workflowDefinition.tasks ?? [];
 
     const {clusterElements, componentName, description, label, metadata, name, parameters, taskDispatcher, trigger} =
-        nodeData;
+        nodeData ?? {};
 
-    let {operationName, type, version} = nodeData;
+    let {operationName, type, version} = nodeData ?? {};
 
     if (trigger) {
         if (!type) {
@@ -94,7 +94,7 @@ export default async function saveWorkflowDefinition({
         return;
     }
 
-    if (!operationName && !taskDispatcher) {
+    if (!operationName && !taskDispatcher && componentName) {
         const newNodeComponentDefinition = await queryClient.fetchQuery({
             queryFn: () =>
                 new ComponentDefinitionApi().getComponentDefinition({componentName, componentVersion: version!}),
@@ -158,7 +158,6 @@ export default async function saveWorkflowDefinition({
     if (
         existingWorkflowTask &&
         !decorative &&
-        !subtask &&
         (!operationName || !differenceInParameters) &&
         !differenceInClusterElements &&
         !differenceInType &&
@@ -171,51 +170,57 @@ export default async function saveWorkflowDefinition({
 
     let updatedWorkflowDefinitionTasks = workflowDefinitionTasks;
 
-    if (existingWorkflowTask) {
-        const existingTaskIndex = workflowDefinitionTasks?.findIndex((task) => task.name === existingWorkflowTask.name);
-
-        if (existingTaskIndex === undefined && existingTaskIndex === -1) {
-            return;
-        }
-
-        let combinedParameters = {
-            ...existingWorkflowTask.parameters,
-            ...newTask.parameters,
-        };
-
-        if (existingWorkflowTask.type !== newTask.type) {
-            delete updatedWorkflowDefinitionTasks[existingTaskIndex].parameters;
-
-            combinedParameters = newTask.parameters ?? {};
-        }
-
-        const combinedTask: WorkflowTask = {
-            ...newTask,
-            parameters: combinedParameters,
-        };
-
-        updatedWorkflowDefinitionTasks[existingTaskIndex] = combinedTask;
+    if (updatedWorkflowTasks) {
+        updatedWorkflowDefinitionTasks = updatedWorkflowTasks;
     } else {
-        updatedWorkflowDefinitionTasks = [...(workflowDefinitionTasks || [])];
+        if (existingWorkflowTask) {
+            const existingTaskIndex = workflowDefinitionTasks?.findIndex(
+                (task) => task.name === existingWorkflowTask.name
+            );
 
-        if (taskDispatcherContext?.taskDispatcherId) {
-            updatedWorkflowDefinitionTasks = insertTaskDispatcherSubtask({
-                newTask,
-                placeholderId,
-                taskDispatcherContext,
-                tasks: updatedWorkflowDefinitionTasks,
-            });
-        } else if (nodeIndex !== undefined && nodeIndex > -1) {
-            const tasksAfterCurrent = updatedWorkflowDefinitionTasks.slice(nodeIndex);
+            if (existingTaskIndex === undefined || existingTaskIndex === -1) {
+                return;
+            }
 
-            updatedWorkflowDefinitionTasks = [
-                ...updatedWorkflowDefinitionTasks.slice(0, nodeIndex),
-                ...tasksAfterCurrent,
-            ];
+            let combinedParameters = {
+                ...existingWorkflowTask.parameters,
+                ...newTask.parameters,
+            };
 
-            updatedWorkflowDefinitionTasks.splice(nodeIndex, 0, newTask);
+            if (existingWorkflowTask.type !== newTask.type) {
+                delete updatedWorkflowDefinitionTasks[existingTaskIndex].parameters;
+
+                combinedParameters = newTask.parameters ?? {};
+            }
+
+            const combinedTask: WorkflowTask = {
+                ...newTask,
+                parameters: combinedParameters,
+            };
+
+            updatedWorkflowDefinitionTasks[existingTaskIndex] = combinedTask;
         } else {
-            updatedWorkflowDefinitionTasks.push(newTask);
+            updatedWorkflowDefinitionTasks = [...(workflowDefinitionTasks || [])];
+
+            if (taskDispatcherContext?.taskDispatcherId) {
+                updatedWorkflowDefinitionTasks = insertTaskDispatcherSubtask({
+                    newTask,
+                    placeholderId,
+                    taskDispatcherContext,
+                    tasks: updatedWorkflowDefinitionTasks,
+                });
+            } else if (nodeIndex !== undefined && nodeIndex > -1) {
+                const tasksAfterCurrent = updatedWorkflowDefinitionTasks.slice(nodeIndex);
+
+                updatedWorkflowDefinitionTasks = [
+                    ...updatedWorkflowDefinitionTasks.slice(0, nodeIndex),
+                    ...tasksAfterCurrent,
+                ];
+
+                updatedWorkflowDefinitionTasks.splice(nodeIndex, 0, newTask);
+            } else {
+                updatedWorkflowDefinitionTasks.push(newTask);
+            }
         }
     }
 

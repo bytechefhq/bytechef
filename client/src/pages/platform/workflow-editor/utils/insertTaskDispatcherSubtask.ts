@@ -1,75 +1,8 @@
 import {WorkflowTask} from '@/shared/middleware/platform/configuration';
-import {BranchCaseType, TaskDispatcherContextType} from '@/shared/types';
+import {TaskDispatcherContextType} from '@/shared/types';
 
+import getRecursivelyUpdatedTasks from './getRecursivelyUpdatedTasks';
 import {TASK_DISPATCHER_CONFIG} from './taskDispatcherConfig';
-
-function updateTasksRecursively(tasks: Array<WorkflowTask>, taskToReplace: WorkflowTask): Array<WorkflowTask> {
-    return tasks.map((task) => {
-        if (task.name === taskToReplace.name) {
-            return taskToReplace;
-        }
-
-        if (task.parameters?.caseTrue || task.parameters?.caseFalse) {
-            const updatedTask = {...task};
-
-            if (task.parameters.caseTrue) {
-                updatedTask.parameters = {
-                    ...updatedTask.parameters,
-                    caseTrue: updateTasksRecursively(task.parameters.caseTrue, taskToReplace),
-                };
-            }
-
-            if (task.parameters.caseFalse) {
-                updatedTask.parameters = {
-                    ...updatedTask.parameters,
-                    caseFalse: updateTasksRecursively(task.parameters.caseFalse, taskToReplace),
-                };
-            }
-
-            return updatedTask;
-        }
-
-        if (task.parameters?.iteratee) {
-            return {
-                ...task,
-                parameters: {
-                    ...task.parameters,
-                    iteratee: updateTasksRecursively(task.parameters.iteratee, taskToReplace),
-                },
-            };
-        }
-
-        if (task.parameters?.cases) {
-            const updatedTask = {...task};
-
-            if (task.parameters.default) {
-                updatedTask.parameters = {
-                    ...updatedTask.parameters,
-                    default: updateTasksRecursively(task.parameters.default, taskToReplace),
-                };
-            }
-
-            if (task.parameters.cases) {
-                updatedTask.parameters = {
-                    ...updatedTask.parameters,
-                    cases: (task.parameters.cases as BranchCaseType[]).map((caseItem) => {
-                        const updatedCaseItem = {...caseItem};
-
-                        if (caseItem.tasks) {
-                            updatedCaseItem.tasks = updateTasksRecursively(caseItem.tasks, taskToReplace);
-                        }
-
-                        return updatedCaseItem;
-                    }),
-                };
-            }
-
-            return updatedTask;
-        }
-
-        return task;
-    });
-}
 
 interface InsertTaskDispatcherSubtaskProps {
     newTask: WorkflowTask;
@@ -135,7 +68,7 @@ export default function insertTaskDispatcherSubtask({
         updatedSubtasks.splice(context.index, 0, newTask);
     }
 
-    const updatedTaskDispatcher = updateTaskParameters({context, task: targetTaskDispatcher, updatedSubtasks});
+    const updatedTaskDispatcherTask = updateTaskParameters({context, task: targetTaskDispatcher, updatedSubtasks});
 
-    return updateTasksRecursively(tasks, updatedTaskDispatcher);
+    return getRecursivelyUpdatedTasks(tasks, updatedTaskDispatcherTask);
 }
