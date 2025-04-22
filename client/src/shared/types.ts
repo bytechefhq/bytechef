@@ -110,7 +110,7 @@ export type ClickedOperationType = {
 export type TabNameType = 'description' | 'clusterElements' | 'connection' | 'properties' | 'output';
 
 type ConditionDataType = {
-    conditionCase: string;
+    conditionCase: 'caseTrue' | 'caseFalse';
     conditionId: string;
     index: number;
 };
