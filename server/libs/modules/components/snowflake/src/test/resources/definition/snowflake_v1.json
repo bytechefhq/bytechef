@@ -1181,30 +1181,7 @@
       }
     }, {
       "advancedOption" : null,
-      "description" : "Column name that will be checked for condition.",
-      "displayCondition" : null,
-      "expressionEnabled" : null,
-      "hidden" : null,
-      "metadata" : { },
-      "required" : true,
-      "name" : "column",
-      "type" : "STRING",
-      "defaultValue" : null,
-      "exampleValue" : null,
-      "label" : "Column",
-      "placeholder" : null,
-      "controlType" : "SELECT",
-      "languageId" : null,
-      "maxLength" : null,
-      "minLength" : null,
-      "options" : null,
-      "optionsDataSource" : {
-        "optionsLookupDependsOn" : null,
-        "options" : { }
-      }
-    }, {
-      "advancedOption" : null,
-      "description" : "Condition that will be checked in the column.",
+      "description" : "Condition that will be checked in the column. Example: column1=5",
       "displayCondition" : null,
       "expressionEnabled" : null,
       "hidden" : null,
@@ -1224,9 +1201,9 @@
       "optionsDataSource" : null
     } ],
     "title" : "Delete Row",
-    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "perform" : { }
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -2346,9 +2323,9 @@
       "optionsDataSource" : null
     } ],
     "title" : "Execute SQL",
-    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "perform" : { }
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -3517,29 +3494,24 @@
       }
     }, {
       "advancedOption" : null,
-      "description" : "Values to insert into the table. Seperated by comma.",
+      "description" : null,
       "displayCondition" : null,
       "expressionEnabled" : null,
       "hidden" : null,
       "metadata" : { },
       "required" : true,
       "name" : "values",
-      "type" : "STRING",
-      "defaultValue" : null,
-      "exampleValue" : null,
-      "label" : "Values",
-      "placeholder" : null,
-      "controlType" : "TEXT",
-      "languageId" : null,
-      "maxLength" : null,
-      "minLength" : null,
-      "options" : null,
-      "optionsDataSource" : null
+      "type" : "DYNAMIC_PROPERTIES",
+      "header" : null,
+      "dynamicPropertiesDataSource" : {
+        "propertiesLookupDependsOn" : [ "table" ],
+        "properties" : { }
+      }
     } ],
     "title" : "Insert Row",
-    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "perform" : { }
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -4708,30 +4680,7 @@
       }
     }, {
       "advancedOption" : null,
-      "description" : "Column name that will be checked for condition.",
-      "displayCondition" : null,
-      "expressionEnabled" : null,
-      "hidden" : null,
-      "metadata" : { },
-      "required" : true,
-      "name" : "column",
-      "type" : "STRING",
-      "defaultValue" : null,
-      "exampleValue" : null,
-      "label" : "Column",
-      "placeholder" : null,
-      "controlType" : "SELECT",
-      "languageId" : null,
-      "maxLength" : null,
-      "minLength" : null,
-      "options" : null,
-      "optionsDataSource" : {
-        "optionsLookupDependsOn" : null,
-        "options" : { }
-      }
-    }, {
-      "advancedOption" : null,
-      "description" : "Condition that will be checked in the column.",
+      "description" : "Condition that will be checked in the column. Example: column1=5",
       "displayCondition" : null,
       "expressionEnabled" : null,
       "hidden" : null,
@@ -4743,7 +4692,7 @@
       "exampleValue" : null,
       "label" : "Condition",
       "placeholder" : null,
-      "controlType" : "TEXT",
+      "controlType" : "TEXT_AREA",
       "languageId" : null,
       "maxLength" : null,
       "minLength" : null,
@@ -4751,119 +4700,25 @@
       "optionsDataSource" : null
     }, {
       "advancedOption" : null,
-      "description" : "Updated values of the table. Seperated by comma.",
+      "description" : null,
       "displayCondition" : null,
       "expressionEnabled" : null,
       "hidden" : null,
       "metadata" : { },
       "required" : true,
       "name" : "values",
-      "type" : "STRING",
-      "defaultValue" : null,
-      "exampleValue" : null,
-      "label" : "Values",
-      "placeholder" : null,
-      "controlType" : "TEXT",
-      "languageId" : null,
-      "maxLength" : null,
-      "minLength" : null,
-      "options" : null,
-      "optionsDataSource" : null
+      "type" : "DYNAMIC_PROPERTIES",
+      "header" : null,
+      "dynamicPropertiesDataSource" : {
+        "propertiesLookupDependsOn" : [ "table" ],
+        "properties" : { }
+      }
     } ],
     "title" : "Update Row",
-    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "perform" : { }
   } ],
-  "connection" : {
-    "authorizations" : [ {
-      "detectOn" : null,
-      "description" : null,
-      "name" : "oauth2_authorization_code",
-      "properties" : [ {
-        "advancedOption" : null,
-        "description" : "Account identifier.",
-        "displayCondition" : null,
-        "expressionEnabled" : null,
-        "hidden" : null,
-        "metadata" : { },
-        "required" : true,
-        "name" : "account_identifier",
-        "type" : "STRING",
-        "defaultValue" : null,
-        "exampleValue" : null,
-        "label" : null,
-        "placeholder" : null,
-        "controlType" : "TEXT",
-        "languageId" : null,
-        "maxLength" : null,
-        "minLength" : null,
-        "options" : null,
-        "optionsDataSource" : null
-      }, {
-        "advancedOption" : null,
-        "description" : "Snowflake OAuth Client ID.",
-        "displayCondition" : null,
-        "expressionEnabled" : null,
-        "hidden" : null,
-        "metadata" : { },
-        "required" : true,
-        "name" : "clientId",
-        "type" : "STRING",
-        "defaultValue" : null,
-        "exampleValue" : null,
-        "label" : null,
-        "placeholder" : null,
-        "controlType" : "TEXT",
-        "languageId" : null,
-        "maxLength" : null,
-        "minLength" : null,
-        "options" : null,
-        "optionsDataSource" : null
-      }, {
-        "advancedOption" : null,
-        "description" : "Snowflake OAuth Client Secret.",
-        "displayCondition" : null,
-        "expressionEnabled" : null,
-        "hidden" : null,
-        "metadata" : { },
-        "required" : true,
-        "name" : "clientSecret",
-        "type" : "STRING",
-        "defaultValue" : null,
-        "exampleValue" : null,
-        "label" : null,
-        "placeholder" : null,
-        "controlType" : "TEXT",
-        "languageId" : null,
-        "maxLength" : null,
-        "minLength" : null,
-        "options" : null,
-        "optionsDataSource" : null
-      } ],
-      "refreshOn" : null,
-      "title" : null,
-      "type" : "OAUTH2_AUTHORIZATION_CODE",
-      "acquire" : null,
-      "apply" : { },
-      "authorizationCallback" : null,
-      "authorizationUrl" : { },
-      "clientId" : null,
-      "clientSecret" : null,
-      "oauth2AuthorizationExtraQueryParameters" : null,
-      "pkce" : null,
-      "refresh" : null,
-      "refreshUrl" : { },
-      "scopes" : { },
-      "refreshToken" : null,
-      "tokenUrl" : { }
-    } ],
-    "properties" : null,
-    "version" : 1,
-    "authorizationRequired" : null,
-    "baseUri" : { },
-    "test" : null
-  },
   "clusterElements" : [ {
     "description" : "Delete row from the table.",
     "name" : "deleteRow",
@@ -6028,30 +5883,7 @@
       }
     }, {
       "advancedOption" : null,
-      "description" : "Column name that will be checked for condition.",
-      "displayCondition" : null,
-      "expressionEnabled" : null,
-      "hidden" : null,
-      "metadata" : { },
-      "required" : true,
-      "name" : "column",
-      "type" : "STRING",
-      "defaultValue" : null,
-      "exampleValue" : null,
-      "label" : "Column",
-      "placeholder" : null,
-      "controlType" : "SELECT",
-      "languageId" : null,
-      "maxLength" : null,
-      "minLength" : null,
-      "options" : null,
-      "optionsDataSource" : {
-        "optionsLookupDependsOn" : null,
-        "options" : { }
-      }
-    }, {
-      "advancedOption" : null,
-      "description" : "Condition that will be checked in the column.",
+      "description" : "Condition that will be checked in the column. Example: column1=5",
       "displayCondition" : null,
       "expressionEnabled" : null,
       "hidden" : null,
@@ -8366,24 +8198,19 @@
       }
     }, {
       "advancedOption" : null,
-      "description" : "Values to insert into the table. Seperated by comma.",
+      "description" : null,
       "displayCondition" : null,
       "expressionEnabled" : null,
       "hidden" : null,
       "metadata" : { },
       "required" : true,
       "name" : "values",
-      "type" : "STRING",
-      "defaultValue" : null,
-      "exampleValue" : null,
-      "label" : "Values",
-      "placeholder" : null,
-      "controlType" : "TEXT",
-      "languageId" : null,
-      "maxLength" : null,
-      "minLength" : null,
-      "options" : null,
-      "optionsDataSource" : null
+      "type" : "DYNAMIC_PROPERTIES",
+      "header" : null,
+      "dynamicPropertiesDataSource" : {
+        "propertiesLookupDependsOn" : [ "table" ],
+        "properties" : { }
+      }
     } ],
     "title" : "Insert Row",
     "type" : {
@@ -9558,30 +9385,7 @@
       }
     }, {
       "advancedOption" : null,
-      "description" : "Column name that will be checked for condition.",
-      "displayCondition" : null,
-      "expressionEnabled" : null,
-      "hidden" : null,
-      "metadata" : { },
-      "required" : true,
-      "name" : "column",
-      "type" : "STRING",
-      "defaultValue" : null,
-      "exampleValue" : null,
-      "label" : "Column",
-      "placeholder" : null,
-      "controlType" : "SELECT",
-      "languageId" : null,
-      "maxLength" : null,
-      "minLength" : null,
-      "options" : null,
-      "optionsDataSource" : {
-        "optionsLookupDependsOn" : null,
-        "options" : { }
-      }
-    }, {
-      "advancedOption" : null,
-      "description" : "Condition that will be checked in the column.",
+      "description" : "Condition that will be checked in the column. Example: column1=5",
       "displayCondition" : null,
       "expressionEnabled" : null,
       "hidden" : null,
@@ -9593,7 +9397,7 @@
       "exampleValue" : null,
       "label" : "Condition",
       "placeholder" : null,
-      "controlType" : "TEXT",
+      "controlType" : "TEXT_AREA",
       "languageId" : null,
       "maxLength" : null,
       "minLength" : null,
@@ -9601,24 +9405,19 @@
       "optionsDataSource" : null
     }, {
       "advancedOption" : null,
-      "description" : "Updated values of the table. Seperated by comma.",
+      "description" : null,
       "displayCondition" : null,
       "expressionEnabled" : null,
       "hidden" : null,
       "metadata" : { },
       "required" : true,
       "name" : "values",
-      "type" : "STRING",
-      "defaultValue" : null,
-      "exampleValue" : null,
-      "label" : "Values",
-      "placeholder" : null,
-      "controlType" : "TEXT",
-      "languageId" : null,
-      "maxLength" : null,
-      "minLength" : null,
-      "options" : null,
-      "optionsDataSource" : null
+      "type" : "DYNAMIC_PROPERTIES",
+      "header" : null,
+      "dynamicPropertiesDataSource" : {
+        "propertiesLookupDependsOn" : [ "table" ],
+        "properties" : { }
+      }
     } ],
     "title" : "Update Row",
     "type" : {
@@ -9631,5 +9430,94 @@
     "element" : { }
   } ],
   "unifiedApi" : null,
-  "triggers" : null
+  "triggers" : null,
+  "connection" : {
+    "authorizations" : [ {
+      "detectOn" : null,
+      "description" : null,
+      "name" : "oauth2_authorization_code",
+      "properties" : [ {
+        "advancedOption" : null,
+        "description" : "Account identifier of your account.",
+        "displayCondition" : null,
+        "expressionEnabled" : null,
+        "hidden" : null,
+        "metadata" : { },
+        "required" : true,
+        "name" : "account_identifier",
+        "type" : "STRING",
+        "defaultValue" : null,
+        "exampleValue" : null,
+        "label" : "Account Identifier",
+        "placeholder" : null,
+        "controlType" : "TEXT",
+        "languageId" : null,
+        "maxLength" : null,
+        "minLength" : null,
+        "options" : null,
+        "optionsDataSource" : null
+      }, {
+        "advancedOption" : null,
+        "description" : "Snowflake OAuth Client ID.",
+        "displayCondition" : null,
+        "expressionEnabled" : null,
+        "hidden" : null,
+        "metadata" : { },
+        "required" : true,
+        "name" : "clientId",
+        "type" : "STRING",
+        "defaultValue" : null,
+        "exampleValue" : null,
+        "label" : "Client ID",
+        "placeholder" : null,
+        "controlType" : "TEXT",
+        "languageId" : null,
+        "maxLength" : null,
+        "minLength" : null,
+        "options" : null,
+        "optionsDataSource" : null
+      }, {
+        "advancedOption" : null,
+        "description" : "Snowflake OAuth Client Secret.",
+        "displayCondition" : null,
+        "expressionEnabled" : null,
+        "hidden" : null,
+        "metadata" : { },
+        "required" : true,
+        "name" : "clientSecret",
+        "type" : "STRING",
+        "defaultValue" : null,
+        "exampleValue" : null,
+        "label" : "Client Secret",
+        "placeholder" : null,
+        "controlType" : "TEXT",
+        "languageId" : null,
+        "maxLength" : null,
+        "minLength" : null,
+        "options" : null,
+        "optionsDataSource" : null
+      } ],
+      "refreshOn" : null,
+      "title" : null,
+      "type" : "OAUTH2_AUTHORIZATION_CODE",
+      "acquire" : null,
+      "refresh" : null,
+      "pkce" : null,
+      "scopes" : { },
+      "apply" : { },
+      "authorizationCallback" : null,
+      "authorizationUrl" : { },
+      "clientId" : null,
+      "clientSecret" : null,
+      "oauth2AuthorizationExtraQueryParameters" : null,
+      "refreshUrl" : { },
+      "refreshToken" : null,
+      "tokenUrl" : { }
+    } ],
+    "properties" : null,
+    "version" : 1,
+    "authorizationRequired" : null,
+    "baseUri" : { },
+    "test" : null
+  }
 }
