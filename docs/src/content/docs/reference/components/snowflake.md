@@ -26,9 +26,9 @@ Version: 1
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| account_identifier | null | STRING | Account identifier. | true |
-| clientId | null | STRING | Snowflake OAuth Client ID. | true |
-| clientSecret | null | STRING | Snowflake OAuth Client Secret. | true |
+| account_identifier | Account Identifier | STRING | Account identifier of your account. | true |
+| clientId | Client ID | STRING | Snowflake OAuth Client ID. | true |
+| clientSecret | Client Secret | STRING | Snowflake OAuth Client Secret. | true |
 
 
 
@@ -53,8 +53,7 @@ Delete row from the table.
 | database | Database | STRING |  | true |
 | schema | Schema | STRING <details> <summary> Depends On </summary> database </details> |  | true |
 | table | Table | STRING <details> <summary> Depends On </summary> schema </details> |  | true |
-| column | Column | STRING | Column name that will be checked for condition. | true |
-| condition | Condition | STRING | Condition that will be checked in the column. | true |
+| condition | Condition | STRING | Condition that will be checked in the column. Example: column1=5 | true |
 
 #### Example JSON Structure
 ```json
@@ -65,7 +64,6 @@ Delete row from the table.
     "database" : "",
     "schema" : "",
     "table" : "",
-    "column" : "",
     "condition" : ""
   },
   "type" : "snowflake/v1/deleteRow"
@@ -197,7 +195,7 @@ Insert row into the table.
 | database | Database | STRING |  | true |
 | schema | Schema | STRING <details> <summary> Depends On </summary> database </details> |  | true |
 | table | Table | STRING <details> <summary> Depends On </summary> schema </details> |  | true |
-| values | Values | STRING | Values to insert into the table. Seperated by comma. | true |
+| values | | DYNAMIC_PROPERTIES <details> <summary> Depends On </summary> table </details> |  | true |
 
 #### Example JSON Structure
 ```json
@@ -208,7 +206,7 @@ Insert row into the table.
     "database" : "",
     "schema" : "",
     "table" : "",
-    "values" : ""
+    "values" : { }
   },
   "type" : "snowflake/v1/insertRow"
 }
@@ -271,9 +269,8 @@ Update row from the table.
 | database | Database | STRING |  | true |
 | schema | Schema | STRING <details> <summary> Depends On </summary> database </details> |  | true |
 | table | Table | STRING <details> <summary> Depends On </summary> schema </details> |  | true |
-| column | Column | STRING | Column name that will be checked for condition. | true |
-| condition | Condition | STRING | Condition that will be checked in the column. | true |
-| values | Values | STRING | Updated values of the table. Seperated by comma. | true |
+| condition | Condition | STRING | Condition that will be checked in the column. Example: column1=5 | true |
+| values | | DYNAMIC_PROPERTIES <details> <summary> Depends On </summary> table </details> |  | true |
 
 #### Example JSON Structure
 ```json
@@ -284,9 +281,8 @@ Update row from the table.
     "database" : "",
     "schema" : "",
     "table" : "",
-    "column" : "",
     "condition" : "",
-    "values" : ""
+    "values" : { }
   },
   "type" : "snowflake/v1/updateRow"
 }
@@ -344,3 +340,24 @@ Type: OBJECT
 # Additional instructions
 <hr />
 
+After creating you Snowflake account, you have to create SECURITY INTEGRATION.
+https://docs.snowflake.com/en/sql-reference/sql/create-security-integration-oauth-snowflake
+    1. Create SQL Worksheet
+    2. Change <name> and <callback url> to fit your application.
+           CREATE SECURITY INTEGRATION <name>
+           TYPE = oauth
+           ENABLED = true
+           OAUTH_CLIENT = custom
+           OAUTH_CLIENT_TYPE = 'CONFIDENTIAL'
+           OAUTH_REDIRECT_URI = '<callback url>'
+           OAUTH_ISSUE_REFRESH_TOKENS = TRUE
+           OAUTH_ALLOW_NON_TLS_REDIRECT_URI = true
+           OAUTH_REFRESH_TOKEN_VALIDITY = 86400;
+    3. Run the SQL Worksheet.
+
+To get your Client ID and Client Secret:
+https://docs.snowflake.com/sql-reference/functions/system_show_oauth_client_secrets
+    1. Create SQL Worksheet
+    2. Change <name> to name of your security integration:
+        select system$show_oauth_client_secrets( '<name>' )
+    3. Run the SQL Worksheet
