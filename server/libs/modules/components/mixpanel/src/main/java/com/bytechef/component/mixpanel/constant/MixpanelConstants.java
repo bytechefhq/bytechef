@@ -21,10 +21,11 @@ package com.bytechef.component.mixpanel.constant;
  */
 public class MixpanelConstants {
 
-    public static final String EVENT = "event";
-    public static final String TIME = "time";
     public static final String DISTINCT_ID = "distinct_id";
+    public static final String EVENT = "event";
+    public static final String EVENTS = "events";
     public static final String INSERT_ID = "$insert_id";
+    public static final String TIME = "time";
 
     private MixpanelConstants() {
     }
