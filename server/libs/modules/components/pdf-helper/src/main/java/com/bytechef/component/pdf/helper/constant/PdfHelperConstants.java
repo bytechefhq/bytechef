@@ -24,7 +24,6 @@ public class PdfHelperConstants {
     public static final int DPI = 300;
     public static final String FILE = "file";
     public static final String FILENAME = "filename";
-    public static final float FONT_SIZE = 12;
     public static final String IMAGE = "image";
     public static final String TEXT = "text";
 

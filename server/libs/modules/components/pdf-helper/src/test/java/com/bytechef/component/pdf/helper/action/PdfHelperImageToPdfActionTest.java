@@ -43,20 +43,19 @@ class PdfHelperImageToPdfActionTest {
     private final ArgumentCaptor<ByteArrayOutputStream> byteArrayOutputStreamArgumentCaptor =
         ArgumentCaptor.forClass(ByteArrayOutputStream.class);
     private final ArgumentCaptor<Context> contextArgumentCaptor = ArgumentCaptor.forClass(Context.class);
-    private final ArgumentCaptor<String> fileNameArgumentCaptor = ArgumentCaptor.forClass(String.class);
     private final Context mockedContext = mock(Context.class);
     private final File mockedFile = mock(File.class);
     private final FileEntry mockedFileEntry = mock(FileEntry.class);
     private final Parameters mockedParameters = mock(Parameters.class);
     private final PDImageXObject mockPDImageXObject = mock(PDImageXObject.class);
+    private final ArgumentCaptor<String> stringArgumentCaptor = ArgumentCaptor.forClass(String.class);
 
     @Test
-    void perform() {
+    void perform() throws Exception {
         when(mockedParameters.getRequiredFileEntry(FILE))
             .thenReturn(mockedFileEntry);
         when(mockedParameters.getRequiredString(FILENAME))
             .thenReturn("TestFile");
-
         when(mockedContext.file(any()))
             .thenReturn(mockedFile);
 
@@ -69,19 +68,14 @@ class PdfHelperImageToPdfActionTest {
             mockedPdfHelperUtils.when(() -> PdfHelperUtils.storeIntoFileEntry(
                 contextArgumentCaptor.capture(),
                 byteArrayOutputStreamArgumentCaptor.capture(),
-                fileNameArgumentCaptor.capture()))
+                stringArgumentCaptor.capture()))
                 .thenReturn(mockedFileEntry);
 
-            FileEntry result = PdfHelperImageToPdfAction.perform(
-                mockedParameters, mockedParameters, mockedContext);
+            FileEntry result = PdfHelperImageToPdfAction.perform(mockedParameters, mockedParameters, mockedContext);
 
             assertEquals(mockedFileEntry, result);
-
             assertEquals(mockedContext, contextArgumentCaptor.getValue());
-            assertEquals("TestFile.pdf", fileNameArgumentCaptor.getValue());
-
-        } catch (Exception e) {
-            throw new RuntimeException(e);
+            assertEquals("TestFile.pdf", stringArgumentCaptor.getValue());
         }
     }
 }
