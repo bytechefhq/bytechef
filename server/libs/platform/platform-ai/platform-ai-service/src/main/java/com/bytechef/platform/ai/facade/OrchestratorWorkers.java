@@ -12,33 +12,51 @@ public class OrchestratorWorkers {
     private final String workerPrompt;
 
     public static final String DEFAULT_ORCHESTRATOR_PROMPT = """
-			Analyze this task and break it down into 2-3 distinct approaches:
+			Analyze this task and break it down into subtasks so that the first subtask is always a single Trigger, and each subsequent subtask is either an Action or a Flow (only do 'condition' flow for 'if' statements and 'loop' flow for 'for' statements...):
 
 			Task: {task}
 
 			Return your response in this JSON format:
 			\\{
-			"analysis": "Explain your understanding of the task and which variations would be valuable.
-			             Focus on how each approach serves different aspects of the task.",
+			"analysis": "Explain your understanding of the task broken down into subtasks.",
 			"tasks": [
 				\\{
-				"type": "formal",
-				"description": "Write a precise, technical version that emphasizes specifications"
+				"type": "Trigger",
+			    "description": "The function of the trigger",
 				\\},
+                \\{
+                "type": "Flow",
+                "description": "The function of the flow",
+                \\},
 				\\{
-				"type": "conversational",
-				"description": "Write an engaging, friendly version that connects with readers"
+				"type": "Action",
+				"description": "The function of the action",
 				\\}
 			]
 			\\}
 			""";
 
     public static final String DEFAULT_WORKER_PROMPT = """
+			Search the context for an existing Component that best matches the tasks description.
+
 			Generate content based on:
-			Task: {original_task}
-			Style: {task_type}
-			Guidelines: {task_description}
+			Original task: {original_task}
+			Task Type: {task_type}
+			Task Description: {task_description}
+
+            Return your response in a JSON format like the one in the Component's context: 'Example JSON structure' and 'Output JSON' if it exists. Only use the properties and parameters described in the context with the task type and name.
+            If there is no such task, return the 'missing' Component with a custom label:
+            \\{
+            "structure": \\{
+               "label": "Name of missing action or trigger",
+               "name": "missingComponentName",
+               "type": "missing/v1/missing",
+               "parameters": \\{\\}
+               \\},
+            "output": \\{\\}
+            \\}
 			""";
+
 
     /**
      * Represents a subtask identified by the orchestrator that needs to be executed
@@ -48,7 +66,7 @@ public class OrchestratorWorkers {
      *                    "conversational")
      * @param description Detailed description of what the worker should accomplish
      */
-    public static record Task(String type, String description) {
+    public static record OrchestratorTask(String type, String description) {
     }
 
     /**
@@ -60,7 +78,7 @@ public class OrchestratorWorkers {
      * @param tasks    List of subtasks identified by the orchestrator to be
      *                 executed by workers
      */
-    public static record OrchestratorResponse(String analysis, List<Task> tasks) {
+    public static record OrchestratorResponse(String analysis, List<OrchestratorTask> tasks) {
     }
 
     /**
@@ -127,13 +145,16 @@ public class OrchestratorWorkers {
             orchestratorResponse.analysis(), orchestratorResponse.tasks()));
 
         // Step 2: Process each task
-        List<String> workerResponses = orchestratorResponse.tasks().stream().map(task -> this.chatClient.prompt()
+        List<String> workerResponses = orchestratorResponse.tasks()
+            .stream()
+            .map(task -> this.chatClient.prompt()
             .user(u -> u.text(this.workerPrompt)
-                .param("original_task", taskDescription)
+                .param("original_task", orchestratorResponse.analysis())
                 .param("task_type", task.type())
                 .param("task_description", task.description()))
             .call()
-            .content()).toList();
+            .content())
+            .toList();
 
         System.out.println("\n=== WORKER OUTPUT ===\n" + workerResponses);
 
