@@ -48,7 +48,7 @@ Send batches of events from your servers to Mixpanel.
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| Events | | ARRAY <details> <summary> Items </summary> [{STRING\(event), DATE_TIME\(time), STRING\(distinct_id), STRING\($insert_id)}] </details> |  | null |
+| events | Events | ARRAY <details> <summary> Items </summary> [{STRING\(event), DATE_TIME\(time), STRING\(distinct_id), STRING\($insert_id)}] </details> | A list of events to be sent to Mixpanel. | true |
 
 #### Example JSON Structure
 ```json
@@ -56,7 +56,7 @@ Send batches of events from your servers to Mixpanel.
   "label" : "Track Events",
   "name" : "trackEvents",
   "parameters" : {
-    "Events" : [ {
+    "events" : [ {
       "event" : "",
       "time" : "2021-01-01T00:00:00",
       "distinct_id" : "",
@@ -78,7 +78,9 @@ Type: OBJECT
 
 |     Name     |     Type     |     Description     |
 |:------------:|:------------:|:-------------------:|
-| response | OBJECT <details> <summary> Properties </summary> {INTEGER\(code), INTEGER\(num_records_imported), STRING\(status)} </details> |  |
+| code | INTEGER |  |
+| num_records_imported | INTEGER |  |
+| status | STRING |  |
 
 
 
@@ -86,11 +88,9 @@ Type: OBJECT
 #### Output Example
 ```json
 {
-  "response" : {
-    "code" : 1,
-    "num_records_imported" : 1,
-    "status" : ""
-  }
+  "code" : 1,
+  "num_records_imported" : 1,
+  "status" : ""
 }
 ```
 
