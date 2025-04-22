@@ -27,6 +27,7 @@ import static com.bytechef.component.definition.ComponentDsl.string;
  * @author Marija Horvat
  */
 public class MixpanelConnection {
+
     public static final ModifiableConnectionDefinition CONNECTION_DEFINITION = connection()
         .baseUri((connectionParameters, context) -> "https://api.mixpanel.com")
         .authorizations(

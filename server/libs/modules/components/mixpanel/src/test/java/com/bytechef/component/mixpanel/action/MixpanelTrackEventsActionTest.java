@@ -18,6 +18,7 @@ package com.bytechef.component.mixpanel.action;
 
 import static com.bytechef.component.mixpanel.constant.MixpanelConstants.DISTINCT_ID;
 import static com.bytechef.component.mixpanel.constant.MixpanelConstants.EVENT;
+import static com.bytechef.component.mixpanel.constant.MixpanelConstants.EVENTS;
 import static com.bytechef.component.mixpanel.constant.MixpanelConstants.INSERT_ID;
 import static com.bytechef.component.mixpanel.constant.MixpanelConstants.TIME;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -28,7 +29,6 @@ import static org.mockito.Mockito.when;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.test.definition.MockParametersFactory;
 import java.util.List;
 import java.util.Map;
@@ -45,15 +45,15 @@ class MixpanelTrackEventsActionTest {
     private final Http.Response mockedResponse = mock(Http.Response.class);
     private final Map<String, Object> responseMap = Map.of("key", "value");
     private final ArgumentCaptor<Http.Body> bodyArgumentCaptor = ArgumentCaptor.forClass(Http.Body.class);
+    private final ArgumentCaptor<String> stringArgumentCaptor = ArgumentCaptor.forClass(String.class);
     private final Parameters mockedParameters = MockParametersFactory.create(
-        Map.of("Events", List.of(
-            Map.of(EVENT, "test1", TIME, "2025-04-15T16:44:12", DISTINCT_ID, 1, INSERT_ID, 1))));
+        Map.of(EVENTS, List.of(Map.of(EVENT, "test1", TIME, "2025-04-15T16:44:12", DISTINCT_ID, 1, INSERT_ID, 1))));
 
     @Test
     void testPerform() {
         when(mockedContext.http(any()))
             .thenReturn(mockedExecutor);
-        when(mockedExecutor.queryParameter("strict", "1"))
+        when(mockedExecutor.queryParameter(stringArgumentCaptor.capture(), stringArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
         when(mockedExecutor.body(bodyArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
@@ -61,7 +61,7 @@ class MixpanelTrackEventsActionTest {
             .thenReturn(mockedExecutor);
         when(mockedExecutor.execute())
             .thenReturn(mockedResponse);
-        when(mockedResponse.getBody(any(TypeReference.class)))
+        when(mockedResponse.getBody())
             .thenReturn(responseMap);
 
         Object result = MixpanelTrackEventsAction.perform(mockedParameters, mockedParameters, mockedContext);
@@ -72,6 +72,8 @@ class MixpanelTrackEventsActionTest {
         List<Map<String, Object>> expected = List.of(Map.of(
             EVENT, "test1",
             "properties", Map.of(TIME, 1744735452L, DISTINCT_ID, 1, INSERT_ID, 1)));
+
         assertEquals(expected, body.getContent());
+        assertEquals(List.of("strict", "1"), stringArgumentCaptor.getAllValues());
     }
 }

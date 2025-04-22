@@ -35,15 +35,13 @@ public class MixpanelComponentHandler implements ComponentHandler {
     private static final ComponentDefinition COMPONENT_DEFINITION = component("mixpanel")
         .title("Mixpanel")
         .description(
-            "Mixpanel is a product analytics tool that helps you track user interactions and behaviors in " +
-                "your app or website to make data-driven decisions.")
+            "Mixpanel is a product analytics tool that helps you track user interactions and behaviors in your app " +
+                "or website to make data-driven decisions.")
         .icon("path:assets/mixpanel.svg")
         .categories(ComponentCategory.ANALYTICS)
         .connection(MixpanelConnection.CONNECTION_DEFINITION)
-        .actions(
-            MixpanelTrackEventsAction.ACTION_DEFINITION)
-        .clusterElements(
-            tool(MixpanelTrackEventsAction.ACTION_DEFINITION));
+        .actions(MixpanelTrackEventsAction.ACTION_DEFINITION)
+        .clusterElements(tool(MixpanelTrackEventsAction.ACTION_DEFINITION));
 
     @Override
     public ComponentDefinition getDefinition() {
