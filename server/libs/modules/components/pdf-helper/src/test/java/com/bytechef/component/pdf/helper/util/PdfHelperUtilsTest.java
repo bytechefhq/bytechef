@@ -35,20 +35,16 @@ class PdfHelperUtilsTest {
     private final Context mockedContext = mock(Context.class);
     private final FileEntry mockedFileEntry = mock(FileEntry.class);
 
-    private static final String mockedFileName = "test.pdf";
-
     @Test
-    void storeIntoFileEntry() throws Exception {
+    void storeIntoFileEntry() {
         when(mockedContext.file(any()))
             .thenReturn(mockedFileEntry);
-
         when(mockByteArrayOutputStream.toByteArray())
             .thenReturn(new byte[] {
                 1, 2, 3
             });
 
-        FileEntry result = PdfHelperUtils.storeIntoFileEntry(
-            mockedContext, mockByteArrayOutputStream, mockedFileName);
+        FileEntry result = PdfHelperUtils.storeIntoFileEntry(mockedContext, mockByteArrayOutputStream, "test.pdf");
 
         assertEquals(mockedFileEntry, result);
     }

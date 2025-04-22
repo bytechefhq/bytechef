@@ -22,8 +22,8 @@ import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.pdf.helper.constant.PdfHelperConstants.FILE;
 
-import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
+import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.FileEntry;
 import com.bytechef.component.definition.Parameters;
 import java.io.File;
@@ -51,14 +51,14 @@ public class PdfHelperExtractTextAction {
     private PdfHelperExtractTextAction() {
     }
 
-    protected static String perform(
-        Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) throws IOException {
+    public static String perform(Parameters inputParameters, Parameters connectionParameters, Context context)
+        throws IOException {
 
         FileEntry fileEntry = inputParameters.getRequiredFileEntry(FILE);
 
-        File file1 = actionContext.file(file -> file.toTempFile(fileEntry));
+        File file = context.file(file1 -> file1.toTempFile(fileEntry));
 
-        PDDocument document = Loader.loadPDF(file1);
+        PDDocument document = Loader.loadPDF(file);
 
         PDFTextStripper stripper = new PDFTextStripper();
 

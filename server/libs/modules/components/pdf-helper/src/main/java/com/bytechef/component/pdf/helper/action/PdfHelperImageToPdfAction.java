@@ -62,29 +62,29 @@ public class PdfHelperImageToPdfAction {
     private PdfHelperImageToPdfAction() {
     }
 
-    protected static FileEntry perform(
-        Parameters inputParameters, Parameters connectionParameters, Context context) throws Exception {
+    public static FileEntry perform(Parameters inputParameters, Parameters connectionParameters, Context context)
+        throws Exception {
 
         FileEntry fileEntry = inputParameters.getRequiredFileEntry(IMAGE);
         File image = context.file(file -> file.toTempFile(fileEntry));
 
-        PDDocument document = new PDDocument();
+        PDDocument pdDocument = new PDDocument();
 
         int pageWidth = (int) PDRectangle.A4.getWidth();
         int pageHeight = (int) PDRectangle.A4.getHeight();
 
-        PDPage page = new PDPage(new PDRectangle(pageWidth, pageHeight));
-        document.addPage(page);
+        PDPage pdPage = new PDPage(new PDRectangle(pageWidth, pageHeight));
+        pdDocument.addPage(pdPage);
 
-        PDPageContentStream pdPageContentStream = new PDPageContentStream(document, page);
+        PDPageContentStream pdPageContentStream = new PDPageContentStream(pdDocument, pdPage);
 
-        PDImageXObject imageXObject = PDImageXObject.createFromFileByContent(image, document);
+        PDImageXObject pdImageXObject = PDImageXObject.createFromFileByContent(image, pdDocument);
 
-        pdPageContentStream.drawImage(imageXObject, 0, 0, pageWidth, pageHeight);
+        pdPageContentStream.drawImage(pdImageXObject, 0, 0, pageWidth, pageHeight);
         pdPageContentStream.close();
 
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-        document.save(byteArrayOutputStream);
+        pdDocument.save(byteArrayOutputStream);
 
         String filename = inputParameters.getRequiredString(FILENAME) + ".pdf";
 

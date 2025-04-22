@@ -56,7 +56,7 @@ class PdfHelperTextToPdfActionTest {
     private final PdfWriter mockPdfWriter = mock(PdfWriter.class);
 
     @Test
-    void perform() {
+    void perform() throws Exception {
         try (MockedStatic<PdfWriter> mockedPdfWriter = mockStatic(PdfWriter.class);
             MockedConstruction<Document> mockedDocumentConstruction = mockConstruction(Document.class);
             MockedStatic<PdfHelperUtils> mockedPdfHelperUtils = mockStatic(PdfHelperUtils.class)) {
@@ -70,8 +70,7 @@ class PdfHelperTextToPdfActionTest {
                 fileNameArgumentCaptor.capture()))
                 .thenReturn(mockedFileEntry);
 
-            FileEntry result = PdfHelperTextToPdfAction.perform(
-                mockedParameters, mockedParameters, mockedContext);
+            FileEntry result = PdfHelperTextToPdfAction.perform(mockedParameters, mockedParameters, mockedContext);
 
             Document mockDocument = mockedDocumentConstruction.constructed()
                 .getFirst();
@@ -83,9 +82,6 @@ class PdfHelperTextToPdfActionTest {
             mockedPdfWriter.verify(() -> PdfWriter.getInstance(any(Document.class), any(ByteArrayOutputStream.class)));
 
             assertEquals(mockedFileEntry, result);
-
-        } catch (Exception e) {
-            throw new RuntimeException(e);
         }
     }
 }

@@ -38,6 +38,9 @@ import org.junit.jupiter.api.Test;
 import org.mockito.MockedConstruction;
 import org.mockito.MockedStatic;
 
+/**
+ * @author Nikolina Spehar
+ */
 class PdfHelperExtractTextActionTest {
 
     private final ActionContext mockedActionContext = mock(ActionContext.class);
@@ -46,9 +49,6 @@ class PdfHelperExtractTextActionTest {
     private final Parameters mockedParameters = mock(Parameters.class);
     private final PDDocument mockedPDDocument = mock(PDDocument.class);
 
-    /**
-     * @author Monika Kušter
-     */
     @Test
     void testPerform() throws IOException {
         when(mockedParameters.getRequiredFileEntry(FILE))

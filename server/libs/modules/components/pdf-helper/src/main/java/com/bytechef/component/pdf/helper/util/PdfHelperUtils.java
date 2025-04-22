@@ -28,10 +28,13 @@ import java.io.InputStream;
 public class PdfHelperUtils {
 
     public static FileEntry storeIntoFileEntry(
-        Context context, ByteArrayOutputStream byteArrayOutputStream, String filename) throws Exception {
+        Context context, ByteArrayOutputStream byteArrayOutputStream, String filename) {
 
         InputStream inputStream = new ByteArrayInputStream(byteArrayOutputStream.toByteArray());
 
         return context.file(file -> file.storeContent(filename, inputStream));
+    }
+
+    private PdfHelperUtils() {
     }
 }

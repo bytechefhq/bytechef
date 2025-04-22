@@ -51,27 +51,21 @@ class PdfHelperConvertToImageActionTest {
     private final ArgumentCaptor<ByteArrayOutputStream> byteArrayOutputStreamArgumentCaptor =
         ArgumentCaptor.forClass(ByteArrayOutputStream.class);
     private final ArgumentCaptor<Context> contextArgumentCaptor = ArgumentCaptor.forClass(Context.class);
-    private final ArgumentCaptor<String> fileNameArgumentCaptor = ArgumentCaptor.forClass(String.class);
-    private final BufferedImage mockBufferedImage = mock(BufferedImage.class);
-    private final ByteArrayOutputStream mockByteArrayOutputStream = new ByteArrayOutputStream();
+    private final ArgumentCaptor<String> stringArgumentCaptor = ArgumentCaptor.forClass(String.class);
+    private final BufferedImage mockedBufferedImage = mock(BufferedImage.class);
+    private final ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
     private final Context mockedContext = mock(Context.class);
     private final File mockedFile = mock(File.class);
     private final FileEntry mockedFileEntry = mock(FileEntry.class);
     private final Parameters mockedParameters = mock(Parameters.class);
     private final PDDocument mockedPDDocument = mock(PDDocument.class);
 
-    private static final int NUM_PAGES = 1;
-
-    /**
-     * @author Nikolina Spehar
-     */
     @Test
-    void perform() {
+    void perform() throws Exception {
         when(mockedParameters.getRequiredFileEntry(FILE))
             .thenReturn(mockedFileEntry);
         when(mockedParameters.getRequiredString(FILENAME))
             .thenReturn("TestFile");
-
         when(mockedContext.file(any()))
             .thenReturn(mockedFile);
 
@@ -80,21 +74,21 @@ class PdfHelperConvertToImageActionTest {
             MockedStatic<PdfHelperUtils> mockedPdfHelperUtils = mockStatic(PdfHelperUtils.class)) {
 
             mockConstruction(PDFRenderer.class, (mock, context) -> when(mock.renderImageWithDPI(0, DPI, ImageType.RGB))
-                .thenReturn(mockBufferedImage));
+                .thenReturn(mockedBufferedImage));
 
             mockedLoader.when(() -> Loader.loadPDF(mockedFile))
                 .thenReturn(mockedPDDocument);
 
             when(mockedPDDocument.getNumberOfPages())
-                .thenReturn(NUM_PAGES);
+                .thenReturn(1);
 
-            mockedImageIO.when(() -> ImageIO.write(mockBufferedImage, "jpeg", mockByteArrayOutputStream))
+            mockedImageIO.when(() -> ImageIO.write(mockedBufferedImage, "jpeg", byteArrayOutputStream))
                 .thenReturn(true);
 
             mockedPdfHelperUtils.when(() -> PdfHelperUtils.storeIntoFileEntry(
                 contextArgumentCaptor.capture(),
                 byteArrayOutputStreamArgumentCaptor.capture(),
-                fileNameArgumentCaptor.capture()))
+                stringArgumentCaptor.capture()))
                 .thenReturn(mockedFileEntry);
 
             List<FileEntry> result = PdfHelperConvertToImageAction.perform(
@@ -103,10 +97,7 @@ class PdfHelperConvertToImageActionTest {
             assertEquals(List.of(mockedFileEntry), result);
 
             assertEquals(mockedContext, contextArgumentCaptor.getValue());
-            assertEquals("TestFile1.jpeg", fileNameArgumentCaptor.getValue());
-
-        } catch (Exception e) {
-            throw new RuntimeException(e);
+            assertEquals("TestFile1.jpeg", stringArgumentCaptor.getValue());
         }
     }
 }

@@ -56,8 +56,7 @@ public class PdfHelperConvertToImageAction {
                 .required(true),
             string(FILENAME)
                 .label("Image Name")
-                .description(
-                    "Name of the image. Every image will have index of the corresponding page in its name.")
+                .description("Name of the image. Every image will have index of the corresponding page in its name.")
                 .required(true))
         .output(
             outputSchema(
@@ -70,20 +69,20 @@ public class PdfHelperConvertToImageAction {
     private PdfHelperConvertToImageAction() {
     }
 
-    protected static List<FileEntry> perform(
-        Parameters inputParameters, Parameters connectionParameters, Context context) throws Exception {
+    public static List<FileEntry> perform(Parameters inputParameters, Parameters connectionParameters, Context context)
+        throws Exception {
 
         FileEntry fileEntry = inputParameters.getRequiredFileEntry(FILE);
 
         File pdfFile = context.file(file -> file.toTempFile(fileEntry));
 
-        PDDocument document = Loader.loadPDF(pdfFile);
+        PDDocument pdDocument = Loader.loadPDF(pdfFile);
 
-        PDFRenderer pdfRenderer = new PDFRenderer(document);
+        PDFRenderer pdfRenderer = new PDFRenderer(pdDocument);
 
         List<FileEntry> images = new ArrayList<>();
 
-        for (int pageIndex = 0; pageIndex < document.getNumberOfPages(); pageIndex++) {
+        for (int pageIndex = 0; pageIndex < pdDocument.getNumberOfPages(); pageIndex++) {
             BufferedImage bufferedImage = pdfRenderer.renderImageWithDPI(pageIndex, DPI, ImageType.RGB);
 
             ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
@@ -92,8 +91,7 @@ public class PdfHelperConvertToImageAction {
 
             String filename = inputParameters.getRequiredString(FILENAME) + (pageIndex + 1) + ".jpeg";
 
-            images.add(storeIntoFileEntry(
-                context, byteArrayOutputStream, filename));
+            images.add(storeIntoFileEntry(context, byteArrayOutputStream, filename));
         }
 
         return images;
