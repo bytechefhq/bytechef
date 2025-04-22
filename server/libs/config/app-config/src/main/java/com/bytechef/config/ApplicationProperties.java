@@ -453,6 +453,16 @@ public class ApplicationProperties {
                     public void setModel(String model) {
                         this.model = model;
                     }
+
+                    private Double temperature;
+
+                    public Double getTemperature() {
+                        return temperature;
+                    }
+
+                    public void setTemperature(Double temperature) {
+                        this.temperature = temperature;
+                    }
                 }
             }
         }

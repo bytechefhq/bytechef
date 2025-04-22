@@ -375,10 +375,10 @@ public class VectorStoreConfiguration {
 
         definitionText.append("Component Name: ")
             .append(componentDefinition.getName())
-            .append("\n")
+            .append(",\n")
             .append("Description: ")
             .append(componentDefinition.getDescription())
-            .append("\n");
+            .append(",\n");
 
         List<TriggerDefinition> triggers = componentDefinition.getTriggers();
 
@@ -387,13 +387,21 @@ public class VectorStoreConfiguration {
             for (TriggerDefinition triggerDefinition : triggers) {
                 definitionText.append("Trigger Name: ")
                     .append(triggerDefinition.getName())
-                    .append("\n")
+                    .append(",\n")
                     .append("Description: ")
                     .append(triggerDefinition.getDescription())
-                    .append("\n")
+                    .append(",\n")
                     .append("Example JSON Structure: \n")
                     .append(createJsonExample(triggerDefinition))
-                    .append("\n");
+                    .append(";\n");
+
+                OutputResponse outputResponse = triggerDefinition.getOutputResponse();
+
+                if (triggerDefinition.isOutputDefined() && outputResponse != null && outputResponse.outputSchema() != null) {
+                    definitionText.append("Output JSON: \n")
+                        .append(getSampleValue(new PropertyDecorator(outputResponse.outputSchema())))
+                        .append(";\n");
+                }
             }
         }
 
@@ -407,20 +415,20 @@ public class VectorStoreConfiguration {
                 if (!name.equals("customAction")) {
                     definitionText.append("Action Name: ")
                         .append(name)
-                        .append("\n")
+                        .append(",\n")
                         .append("Description: ")
                         .append(actionDefinition.getDescription())
-                        .append("\n")
+                        .append(",\n")
                         .append("Example JSON Structure: \n")
                         .append(createJsonExample(actionDefinition))
-                        .append("\n");
+                        .append(";\n");
 
                     OutputResponse outputResponse = actionDefinition.getOutputResponse();
 
                     if (actionDefinition.isOutputDefined() && outputResponse != null) {
                         definitionText.append("Output JSON: \n")
                             .append(getSampleValue(new PropertyDecorator(outputResponse.outputSchema())))
-                            .append("\n");
+                            .append(";\n");
                     }
                 }
             }
@@ -432,21 +440,21 @@ public class VectorStoreConfiguration {
     private String toString(TaskDispatcherDefinition taskDispatcherDefinition) {
         StringBuilder definitionText = new StringBuilder();
 
-        definitionText.append("Task Dispatcher Name: ")
+        definitionText.append("Flow Name: ")
             .append(taskDispatcherDefinition.getName())
-            .append("\n")
+            .append(",\n")
             .append("Description: ")
             .append(taskDispatcherDefinition.getDescription())
-            .append("\n")
+            .append(",\n")
             .append("Example JSON Structure: \n")
             .append(createJsonExample(taskDispatcherDefinition))
-            .append("\n");
+            .append(";\n");
 
         OutputResponse outputResponse = taskDispatcherDefinition.getOutputResponse();
         if (taskDispatcherDefinition.isOutputDefined() && outputResponse != null) {
             definitionText.append("Output JSON: \n")
                 .append(getSampleValue(new PropertyDecorator(outputResponse.outputSchema())))
-                .append("\n");
+                .append(";\n");
         }
 
         return definitionText.toString();

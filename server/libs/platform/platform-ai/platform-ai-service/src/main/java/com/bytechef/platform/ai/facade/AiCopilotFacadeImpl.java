@@ -24,8 +24,10 @@ import java.util.Map;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.client.advisor.AbstractChatMemoryAdvisor;
 import org.springframework.ai.chat.client.advisor.MessageChatMemoryAdvisor;
+import org.springframework.ai.chat.client.advisor.SimpleLoggerAdvisor;
 import org.springframework.ai.chat.client.advisor.vectorstore.QuestionAnswerAdvisor;
 import org.springframework.ai.chat.memory.InMemoryChatMemory;
+import org.springframework.ai.model.ModelOptionsUtils;
 import org.springframework.ai.vectorstore.SearchRequest;
 import org.springframework.ai.vectorstore.VectorStore;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -53,23 +55,30 @@ public class AiCopilotFacadeImpl implements AiCopilotFacade {
 
         MessageChatMemoryAdvisor messageChatMemoryAdvisor = new MessageChatMemoryAdvisor(new InMemoryChatMemory());
 
-        SearchRequest.Builder searchRequestBuilder = SearchRequest.builder();
-
-        SearchRequest.Builder componentsBuilder = searchRequestBuilder.filterExpression("category == 'components'");
-
         QuestionAnswerAdvisor questionAnswerAdvisorComponents = new QuestionAnswerAdvisor(
-            vectorStore, componentsBuilder.build());
-
-        SearchRequest.Builder workflowsBuilder = searchRequestBuilder.filterExpression("category == 'workflows'");
+            vectorStore, SearchRequest.builder()
+            .filterExpression("category == 'components' or category == 'flows'")
+            .topK(10)
+            .build());
 
         QuestionAnswerAdvisor questionAnswerAdvisorWorkflow = new QuestionAnswerAdvisor(
-            vectorStore, workflowsBuilder.build());
+            vectorStore, SearchRequest.builder()
+            .filterExpression("category == 'workflows'")
+            .build());
+
+        SimpleLoggerAdvisor qaRetrievedDocuments = new SimpleLoggerAdvisor(
+            request -> "Retrieved documents: " + request.adviseContext().get("qa_retrieved_documents"),
+            response -> "Response: " + ModelOptionsUtils.toJsonStringPrettyPrinter(response),
+            1 // Log level
+        );
 
         this.chatClientComponent = chatClientBuilder.clone()
             // TODO add multiuser, multitenant history
             .defaultAdvisors(
-                messageChatMemoryAdvisor,
-                questionAnswerAdvisorComponents)
+//                messageChatMemoryAdvisor,
+                questionAnswerAdvisorComponents
+                , qaRetrievedDocuments
+            )
             .build();
 
         this.chatClientWorkflow = chatClientBuilder.clone()
@@ -90,9 +99,7 @@ public class AiCopilotFacadeImpl implements AiCopilotFacade {
             )
             .build();
 
-        this.orchestratorWorkers = new OrchestratorWorkers(this.chatClientComponent,
-            "BAnalyze this task and break it down into subtasks so that the first subtask is a single Trigger, and each subsequent subtasks are either a single Action or a single Flow (example for-loop, if-statement ...).",
-            "Search the context for an existing Component or Flow and Trigger or Action that best match the described subtask. Only return Triggers, Actions or Flows that exist in the context with correct Parameters. Return them in the described JSON format.");
+        this.orchestratorWorkers = new OrchestratorWorkers(this.chatClientComponent);
     }
 
     @Override
@@ -113,13 +120,24 @@ public class AiCopilotFacadeImpl implements AiCopilotFacade {
                 OrchestratorWorkers.FinalResponse process = orchestratorWorkers.process(message);
 
                 yield chatClientWorkflow.prompt()
-//                    .system(
-//                        """
-//                            Answer only with a json in a format similar to the json objects in the context of the specific Component.
-//                            Only use the Actions, Triggers and Parameters which you know exist; look for JSON Example
-//                            for the action or trigger.
-//                            """)
-                    .user(user -> user.text("Merge all the subtasks into a json workflow similar to the ones in the context.")
+                    .system("Return in a JSON format in a similar structure to the Workflows in the context.")
+                    .user(user -> user.text("""
+                        Merge all the task structures according to instructions. Only use tasks that are provided in this prompt. If the action or trigger is not provided, provide 'missing' Component:
+                        \\{
+                        "label": "...",
+                        "name": "...",
+                        "type": "missing/v1/missing",
+                        "parameters": \\{\\}
+                        \\}
+
+                        Return your response in a JSON format like the one in the context.
+
+                        instructions:
+                        {task_analysis}
+
+                        subtasks:
+                        {task_list}
+                        """)
                         .param("task_analysis", process.analysis())
                         .param("task_list", process.workerResponses()))
                     .advisors(advisor -> advisor.param(
