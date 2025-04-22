@@ -6,7 +6,7 @@ import {
 } from '@/shared/middleware/platform/configuration';
 import {ProjectWorkflowKeys} from '@/shared/queries/automation/projectWorkflows.queries';
 import {ComponentDefinitionKeys} from '@/shared/queries/platform/componentDefinitions.queries';
-import {BranchCaseType, NodeDataType, TaskDispatcherContextType, WorkflowDefinitionType} from '@/shared/types';
+import {BranchCaseType, NodeDataType, TaskDispatcherContextType} from '@/shared/types';
 import {QueryClient, UseMutationResult} from '@tanstack/react-query';
 
 import useWorkflowDataStore from '../stores/useWorkflowDataStore';
@@ -48,7 +48,10 @@ export default async function saveWorkflowDefinition({
 }: SaveWorkflowDefinitionProps) {
     const {workflow} = useWorkflowDataStore.getState();
 
-    const workflowDefinition: WorkflowDefinitionType = JSON.parse(workflow.definition!);
+    const workflowDefinition = JSON.parse(workflow.definition!);
+
+    const workflowTasks: Array<WorkflowTask> = workflow.tasks ?? [];
+    const workflowDefinitionTasks: Array<WorkflowTask> = workflowDefinition.tasks ?? [];
 
     const {clusterElements, componentName, description, label, metadata, name, parameters, taskDispatcher, trigger} =
         nodeData;
@@ -127,7 +130,7 @@ export default async function saveWorkflowDefinition({
         type: type ?? `${componentName}/v${version}/${operationName}`,
     };
 
-    const existingWorkflowTask = workflowDefinition.tasks?.find((task) => task.name === newTask.name);
+    const existingWorkflowTask = workflowTasks?.find((task) => task.name === newTask.name);
 
     const differenceInCaseCount =
         existingWorkflowTask &&
@@ -166,53 +169,53 @@ export default async function saveWorkflowDefinition({
         return;
     }
 
-    let tasks: WorkflowTask[];
+    let updatedWorkflowDefinitionTasks = workflowDefinitionTasks;
 
     if (existingWorkflowTask) {
-        const existingTaskIndex = workflowDefinition.tasks?.findIndex(
-            (task) => task.name === existingWorkflowTask.name
-        );
+        const existingTaskIndex = workflowDefinitionTasks?.findIndex((task) => task.name === existingWorkflowTask.name);
 
-        if (existingTaskIndex === undefined) {
+        if (existingTaskIndex === undefined && existingTaskIndex === -1) {
             return;
         }
 
-        tasks = [...(workflowDefinition.tasks || [])];
-
-        if (existingWorkflowTask.type !== newTask.type) {
-            delete tasks[existingTaskIndex].parameters;
-        }
-
-        const combinedParameters = {
+        let combinedParameters = {
             ...existingWorkflowTask.parameters,
             ...newTask.parameters,
         };
 
+        if (existingWorkflowTask.type !== newTask.type) {
+            delete updatedWorkflowDefinitionTasks[existingTaskIndex].parameters;
+
+            combinedParameters = newTask.parameters ?? {};
+        }
+
         const combinedTask: WorkflowTask = {
-            ...existingWorkflowTask,
             ...newTask,
             parameters: combinedParameters,
         };
 
-        tasks[existingTaskIndex] = combinedTask;
+        updatedWorkflowDefinitionTasks[existingTaskIndex] = combinedTask;
     } else {
-        tasks = [...(workflowDefinition.tasks || [])];
+        updatedWorkflowDefinitionTasks = [...(workflowDefinitionTasks || [])];
 
         if (taskDispatcherContext?.taskDispatcherId) {
-            tasks = insertTaskDispatcherSubtask({
+            updatedWorkflowDefinitionTasks = insertTaskDispatcherSubtask({
                 newTask,
                 placeholderId,
                 taskDispatcherContext,
-                tasks,
+                tasks: updatedWorkflowDefinitionTasks,
             });
         } else if (nodeIndex !== undefined && nodeIndex > -1) {
-            const tasksAfterCurrent = tasks.slice(nodeIndex);
+            const tasksAfterCurrent = updatedWorkflowDefinitionTasks.slice(nodeIndex);
 
-            tasks = [...tasks.slice(0, nodeIndex), ...tasksAfterCurrent];
+            updatedWorkflowDefinitionTasks = [
+                ...updatedWorkflowDefinitionTasks.slice(0, nodeIndex),
+                ...tasksAfterCurrent,
+            ];
 
-            tasks.splice(nodeIndex, 0, newTask);
+            updatedWorkflowDefinitionTasks.splice(nodeIndex, 0, newTask);
         } else {
-            tasks.push(newTask);
+            updatedWorkflowDefinitionTasks.push(newTask);
         }
     }
 
@@ -223,7 +226,7 @@ export default async function saveWorkflowDefinition({
                 definition: JSON.stringify(
                     {
                         ...workflowDefinition,
-                        tasks,
+                        tasks: updatedWorkflowDefinitionTasks,
                     },
                     null,
                     SPACE
