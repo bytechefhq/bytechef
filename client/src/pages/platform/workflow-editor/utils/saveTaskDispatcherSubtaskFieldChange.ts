@@ -1,6 +1,6 @@
 import {TASK_DISPATCHER_DATA_KEY_MAP} from '@/shared/constants';
 import {ComponentDefinition, Workflow, WorkflowTask} from '@/shared/middleware/platform/configuration';
-import {PropertyAllType, TaskDispatcherContextType} from '@/shared/types';
+import {NodeDataType, PropertyAllType, TaskDispatcherContextType} from '@/shared/types';
 import {QueryClient, UseMutationResult} from '@tanstack/react-query';
 
 import useWorkflowDataStore from '../stores/useWorkflowDataStore';
@@ -162,8 +162,9 @@ export default function saveTaskDispatcherSubtaskFieldChange({
 
     saveWorkflowDefinition({
         onSuccess: () => {
-            let commonUpdates: Record<string, unknown> = {
+            let commonUpdates: NodeDataType = {
                 componentName,
+                name: currentNode.name,
                 workflowNodeName,
             };
 
