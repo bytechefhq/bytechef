@@ -357,14 +357,20 @@ public class GoogleMailUtils {
 
     public static SimpleMessage getSimpleMessage(Message message, Context context, Gmail service)
         throws IOException {
+
         MessagePart payload = message.getPayload();
+
         List<MessagePart> parts = payload.getParts();
 
-        MessagePart multipartAlternative = parts.stream()
-            .filter(part -> part.getMimeType()
-                .startsWith("multipart/alternative"))
-            .findFirst()
-            .orElse(null);
+        MessagePart multipartAlternative = null;
+
+        if (parts != null) {
+            multipartAlternative = parts.stream()
+                .filter(part -> part.getMimeType()
+                    .startsWith("multipart/alternative"))
+                .findFirst()
+                .orElse(null);
+        }
 
         List<MessagePart> messageParts = (multipartAlternative != null && multipartAlternative.getParts() != null)
             ? multipartAlternative.getParts() : parts;
@@ -445,22 +451,30 @@ public class GoogleMailUtils {
         MessagePart payload = message.getPayload();
         List<MessagePart> parts = payload.getParts();
 
+        if (parts == null) {
+            return List.of();
+        }
+
         List<FileEntry> fileEntries = new ArrayList<>();
 
         for (MessagePart messagePart : parts) {
             String mimeType = messagePart.getMimeType();
 
-            if (!mimeType.startsWith("multipart/alternative") &&
-                !mimeType.startsWith("text/plain") &&
+            if (!mimeType.startsWith("multipart/alternative") && !mimeType.startsWith("text/plain") &&
                 !mimeType.startsWith("text/html")) {
+
                 MessagePartBody messagePartBody = messagePart.getBody();
 
-                MessagePartBody attachment = getAttachment(service, message.getId(),
-                    messagePartBody.getAttachmentId());
+                if (messagePartBody.getAttachmentId() == null) {
+                    continue;
+                }
 
-                fileEntries.add(context.file(
-                    file -> file.storeContent(
-                        messagePart.getFilename(), new ByteArrayInputStream(attachment.decodeData()))));
+                MessagePartBody attachment = getAttachment(service, message.getId(), messagePartBody.getAttachmentId());
+
+                fileEntries.add(
+                    context.file(
+                        file -> file.storeContent(
+                            messagePart.getFilename(), new ByteArrayInputStream(attachment.decodeData()))));
             }
         }
         return fileEntries;
