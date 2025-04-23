@@ -148,6 +148,15 @@ public class ConditionTaskDispatcherIntTest {
         Assertions.assertEquals("false branch", testVarTaskHandler.get("endsWithResult"));
         Assertions.assertEquals("false branch", testVarTaskHandler.get("isEmptyResult"));
         Assertions.assertEquals("false branch", testVarTaskHandler.get("regexResult"));
+
+        taskDispatcherJobTestExecutor.execute(
+            EncodingUtils.base64EncodeToString("condition_v1-conditions-string".getBytes(StandardCharsets.UTF_8)),
+            Map.of("value1", "Hello World's", "value2", "Hello World's"),
+            this::getTaskCompletionHandlerFactories,
+            this::getTaskDispatcherResolverFactories,
+            this::getTaskHandlerMap);
+
+        Assertions.assertEquals("true branch", testVarTaskHandler.get("equalsResult"));
     }
 
     @SuppressWarnings("PMD")
