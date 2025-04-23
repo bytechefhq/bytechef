@@ -30,6 +30,7 @@ import {WorkflowNodeOptionKeys} from '@/shared/queries/platform/workflowNodeOpti
 import {useGetWorkflowNodeParameterDisplayConditionsQuery} from '@/shared/queries/platform/workflowNodeParameters.queries';
 import {useGetWorkflowTestConfigurationConnectionsQuery} from '@/shared/queries/platform/workflowTestConfigurations.queries';
 import {
+    BranchCaseType,
     ComponentPropertiesType,
     NodeDataType,
     PropertyAllType,
@@ -457,18 +458,55 @@ const WorkflowNodeDetailsPanel = ({
                 (task) => task.name === currentNode.conditionData?.conditionId
             );
 
+            if (!parentConditionTask) {
+                return;
+            }
+
             const {conditionCase} = currentNode.conditionData;
 
             const oppositeConditionCase =
                 conditionCase === CONDITION_CASE_TRUE ? CONDITION_CASE_FALSE : CONDITION_CASE_TRUE;
 
-            const oppositeConditionCaseNodeNames = parentConditionTask?.parameters?.[oppositeConditionCase].map(
+            const oppositeConditionCaseNodeNames = parentConditionTask.parameters?.[oppositeConditionCase].map(
                 (task: WorkflowTask) => task.name
             );
 
             filteredNodeNames = previousNodeNames.filter(
                 (nodeName) => !oppositeConditionCaseNodeNames?.includes(nodeName)
             );
+        } else if (currentNode?.branchData) {
+            const parentBranchTask = workflow.tasks?.find((task) => task.name === currentNode.branchData?.branchId);
+
+            if (!parentBranchTask || !parentBranchTask.parameters) {
+                return;
+            }
+
+            const {caseKey} = currentNode.branchData;
+            const branchCases: BranchCaseType[] = [
+                {key: 'default', tasks: parentBranchTask.parameters.default},
+                ...parentBranchTask.parameters.cases,
+            ];
+
+            let otherCaseKeys;
+
+            if (caseKey === 'default') {
+                otherCaseKeys = branchCases.map((caseItem) => caseItem.key);
+            } else {
+                otherCaseKeys = ['default'];
+
+                branchCases.forEach((caseItem) => {
+                    if (caseItem.key !== caseKey) {
+                        otherCaseKeys.push(caseItem.key);
+                    }
+                });
+            }
+
+            const otherCasesNodeNames = branchCases
+                .filter((caseItem) => otherCaseKeys.includes(caseItem.key))
+                .map((caseItem) => caseItem.tasks.map((task: WorkflowTask) => task.name))
+                .flat(Infinity);
+
+            filteredNodeNames = previousNodeNames.filter((nodeName) => !otherCasesNodeNames?.includes(nodeName));
         }
 
         const dataPills = getDataPillsFromProperties(previousComponentProperties!, filteredNodeNames);
