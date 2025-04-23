@@ -10,8 +10,7 @@ import {useShallow} from 'zustand/react/shallow';
 
 import {useWorkflowMutation} from '../providers/workflowMutationProvider';
 import useWorkflowDataStore from '../stores/useWorkflowDataStore';
-import getUpdatedRootBranchNodeData from '../utils/getUpdatedRootBranchNodeData';
-import saveWorkflowDefinition from '../utils/saveWorkflowDefinition';
+import saveRootTaskDispatcher from '../utils/saveRootTaskDispatcher';
 import {TASK_DISPATCHER_CONFIG} from '../utils/taskDispatcherConfig';
 
 interface BranchCaseLabelProps {
@@ -28,9 +27,10 @@ export default function BranchCaseLabel({caseKey, edgeId, sourceY, targetX}: Bra
 
     const inputRef = useRef<HTMLInputElement>(null);
 
-    const {nodes} = useWorkflowDataStore(
+    const {nodes, workflow} = useWorkflowDataStore(
         useShallow((state) => ({
             nodes: state.nodes,
+            workflow: state.workflow,
         }))
     );
 
@@ -58,40 +58,25 @@ export default function BranchCaseLabel({caseKey, edgeId, sourceY, targetX}: Bra
 
     const saveBranchChange = useCallback(
         (branchParameters: object) => {
-            const parentBranchTaskNode = nodes.find((node) => node.data.name === parentBranchNodeData?.name);
-
-            if (!parentBranchTaskNode) {
-                console.error('No parent branch task node found for task: ', parentBranchNodeData?.name);
-
+            if (!workflow.definition || !parentBranchNodeData) {
                 return;
             }
 
-            const updatedNode = {
-                ...parentBranchTaskNode,
-                data: {
-                    ...parentBranchTaskNode.data,
-                    parameters: branchParameters,
-                },
-            };
-
-            const nodeData = getUpdatedRootBranchNodeData({
-                isStructuralUpdate: true,
-                updatedParentNodeData: updatedNode.data as NodeDataType,
-            });
-
-            saveWorkflowDefinition({
-                changedChildNodeId: updatedNode.id,
-                nodeData,
+            saveRootTaskDispatcher({
+                nodes,
+                parentNodeData: parentBranchNodeData,
                 projectId: Number(projectId),
                 queryClient,
                 updateWorkflowMutation,
+                updatedParameters: branchParameters,
+                workflowDefinition: workflow.definition,
             });
         },
-        [nodes, parentBranchNodeData?.name, projectId, queryClient, updateWorkflowMutation]
+        [nodes, parentBranchNodeData, projectId, queryClient, updateWorkflowMutation, workflow.definition]
     );
 
     const handleCreateCaseClick = useCallback(() => {
-        if (!parentBranchNodeData.parameters?.cases) {
+        if (!parentBranchNodeData?.parameters?.cases) {
             return;
         }
 
@@ -111,13 +96,13 @@ export default function BranchCaseLabel({caseKey, edgeId, sourceY, targetX}: Bra
 
     const handleDeleteCaseClick = useCallback(
         (caseKeyToDelete: string) => {
-            if (!parentBranchNodeData) {
+            const parentBranchCases: BranchCaseType[] = parentBranchNodeData?.parameters?.cases;
+
+            if (!parentBranchCases) {
                 return;
             }
 
-            const newCases = (parentBranchNodeData.parameters?.cases as BranchCaseType[]).filter(
-                (branchCase) => branchCase.key !== caseKeyToDelete
-            );
+            const newCases = parentBranchCases.filter((branchCase) => branchCase.key !== caseKeyToDelete);
 
             saveBranchChange({
                 ...parentBranchNodeData.parameters,
@@ -128,43 +113,36 @@ export default function BranchCaseLabel({caseKey, edgeId, sourceY, targetX}: Bra
     );
 
     const handleEditCaseClick = useCallback(() => {
-        const caseKeyEditable = !isCaseKeyEditable;
+        setIsCaseKeyEditable(!isCaseKeyEditable);
 
-        setIsCaseKeyEditable(caseKeyEditable);
-
-        if (caseKeyEditable) {
+        if (!isCaseKeyEditable) {
             setTimeout(() => {
-                if (inputRef.current) {
-                    inputRef.current.focus();
+                inputRef.current?.focus();
 
-                    inputRef.current.select();
-                }
+                inputRef.current?.select();
             }, 0);
         }
     }, [isCaseKeyEditable]);
 
     const handleSaveCaseClick = useCallback(() => {
-        const caseKeyEditable = !isCaseKeyEditable;
-
-        if (!caseKeyEditable) {
-            const isDuplicate =
-                caseKeyValue !== caseKey &&
-                (parentBranchNodeData.parameters?.cases as BranchCaseType[]).some(
-                    (branchCase) => branchCase.key === caseKeyValue
-                );
-
-            if (isDuplicate || caseKeyValue === 'default') {
-                setIsCaseKeyEditable(false);
-
-                setCaseKeyValue(caseKey);
-
-                return;
-            }
+        if (!isCaseKeyEditable) {
+            return;
         }
 
-        setIsCaseKeyEditable(caseKeyEditable);
+        const parentBranchCases: BranchCaseType[] = parentBranchNodeData.parameters?.cases;
 
-        const newCases = (parentBranchNodeData.parameters?.cases as BranchCaseType[]).map((branchCase) => {
+        const isDuplicate =
+            caseKeyValue !== caseKey && (parentBranchCases || []).some((branchCase) => branchCase.key === caseKeyValue);
+
+        if (isDuplicate || caseKeyValue === 'default' || !caseKeyValue) {
+            setIsCaseKeyEditable(false);
+
+            setCaseKeyValue(caseKey);
+
+            return;
+        }
+
+        const newCases = (parentBranchCases || []).map((branchCase) => {
             if (branchCase.key === caseKey) {
                 return {
                     ...branchCase,
@@ -175,17 +153,13 @@ export default function BranchCaseLabel({caseKey, edgeId, sourceY, targetX}: Bra
             return branchCase;
         });
 
-        if (!caseKeyValue) {
-            setCaseKeyValue(caseKey);
-
-            return;
-        }
-
         saveBranchChange({
             ...parentBranchNodeData.parameters,
             cases: newCases,
         });
-    }, [caseKey, caseKeyValue, isCaseKeyEditable, parentBranchNodeData.parameters, saveBranchChange]);
+
+        setIsCaseKeyEditable(false);
+    }, [caseKey, caseKeyValue, isCaseKeyEditable, parentBranchNodeData?.parameters, saveBranchChange]);
 
     useEffect(() => {
         setCaseKeyValue(caseKey);
@@ -229,7 +203,7 @@ export default function BranchCaseLabel({caseKey, edgeId, sourceY, targetX}: Bra
                     </div>
                 )}
 
-                {!isDefaultCase && branchCases.length > 1 && (
+                {!isDefaultCase && branchCases?.length > 1 && (
                     <Button
                         className="ml-1 size-auto cursor-pointer p-1 text-content-destructive/50 hover:bg-surface-destructive-secondary hover:text-content-destructive [&_svg]:size-4"
                         onClick={
@@ -247,7 +221,7 @@ export default function BranchCaseLabel({caseKey, edgeId, sourceY, targetX}: Bra
                 {isLastCase && (
                     <Button
                         className="ml-1 size-auto cursor-pointer p-1 text-content-neutral-primary/50 hover:bg-surface-neutral-primary-hover hover:text-content-neutral-primary [&_svg]:size-4"
-                        onClick={() => handleCreateCaseClick()}
+                        onClick={handleCreateCaseClick}
                         size="icon"
                         variant="ghost"
                     >

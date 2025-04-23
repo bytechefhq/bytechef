@@ -121,6 +121,13 @@ type BranchDataType = {
     index: number;
 };
 
+type LoopDataType = {
+    index: number;
+    loopId: string;
+};
+
+export type TaskDispatcherDataType = BranchDataType & LoopDataType & ConditionDataType;
+
 export type ClusterElementItemType = {
     label?: string;
     name: string;
@@ -154,10 +161,7 @@ export type NodeDataType = {
     };
     icon?: JSX.Element | ReactNode | string;
     label?: string;
-    loopData?: {
-        index: number;
-        loopId: string;
-    };
+    loopData?: LoopDataType;
     loopId?: string;
     metadata?: {
         ui?: {

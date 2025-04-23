@@ -20,7 +20,6 @@ type UpdateWorkflowRequestType = {
 };
 
 interface SaveWorkflowDefinitionProps {
-    changedChildNodeId?: string;
     decorative?: boolean;
     nodeData?: NodeDataType;
     nodeIndex?: number;
@@ -34,7 +33,6 @@ interface SaveWorkflowDefinitionProps {
 }
 
 export default async function saveWorkflowDefinition({
-    changedChildNodeId,
     decorative,
     nodeData,
     nodeIndex,
@@ -66,7 +64,7 @@ export default async function saveWorkflowDefinition({
         const newTrigger: WorkflowTrigger = {
             description,
             label,
-            name,
+            name: name!,
             parameters,
             type,
         };
@@ -125,7 +123,7 @@ export default async function saveWorkflowDefinition({
         description,
         label,
         metadata,
-        name,
+        name: name!,
         parameters,
         type: type ?? `${componentName}/v${version}/${operationName}`,
     };
@@ -162,8 +160,7 @@ export default async function saveWorkflowDefinition({
         !differenceInClusterElements &&
         !differenceInType &&
         !differenceInCaseCount &&
-        !differenceInCaseKeys &&
-        !changedChildNodeId
+        !differenceInCaseKeys
     ) {
         return;
     }
