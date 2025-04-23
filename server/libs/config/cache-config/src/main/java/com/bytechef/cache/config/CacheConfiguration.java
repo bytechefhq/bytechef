@@ -69,6 +69,7 @@ public class CacheConfiguration implements CachingConfigurer {
             REENTRANT_LOCK_CACHE,
             Caffeine.newBuilder()
                 .expireAfterWrite(10, TimeUnit.MINUTES)
+                .recordStats()
                 .build());
 
         return caffeineCacheManager;
