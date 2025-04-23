@@ -20,6 +20,7 @@ import static com.bytechef.task.dispatcher.condition.constant.ConditionTaskDispa
 import static com.bytechef.task.dispatcher.condition.constant.ConditionTaskDispatcherConstants.RAW_EXPRESSION;
 
 import com.bytechef.atlas.execution.domain.TaskExecution;
+import com.bytechef.commons.util.EncodingUtils;
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.task.dispatcher.condition.constant.ConditionTaskDispatcherConstants;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -74,14 +75,18 @@ public class ConditionTaskUtils {
                 .get(operandType)
                 .get(MapUtils.getRequiredString(condition, ConditionTaskDispatcherConstants.OPERATION));
 
+            String value1 = MapUtils.getString(condition, ConditionTaskDispatcherConstants.VALUE_1, "");
+            String value2 = MapUtils.getString(condition, ConditionTaskDispatcherConstants.VALUE_2, "");
+
+            if (operandType.equals(ConditionTaskDispatcherConstants.STRING)) {
+                value1 = EncodingUtils.urlEncode(value1);
+                value2 = EncodingUtils.urlEncode(value2);
+            }
+
             conditionExpressions.add(
                 conditionTemplate
-                    .replace(
-                        "${value1}",
-                        MapUtils.getRequiredString(condition, ConditionTaskDispatcherConstants.VALUE_1))
-                    .replace(
-                        "${value2}",
-                        MapUtils.getRequiredString(condition, ConditionTaskDispatcherConstants.VALUE_2)));
+                    .replace("${value1}", value1)
+                    .replace("${value2}", value2));
         }
 
         return conditionExpressions;
