@@ -267,15 +267,6 @@ const OutputTab = ({connectionMissing, currentNode, outputDefined = false, workf
                                     </DropdownMenuTrigger>
 
                                     <DropdownMenuContent align="end" className="w-60 cursor-pointer">
-                                        {outputDefined && (
-                                            <DropdownMenuItem
-                                                className="cursor-pointer"
-                                                onClick={handlePredefinedOutputSchemaClick}
-                                            >
-                                                Use Predefined Output Schema
-                                            </DropdownMenuItem>
-                                        )}
-
                                         <DropdownMenuItem
                                             className="cursor-pointer"
                                             disabled={connectionMissing}
@@ -290,6 +281,15 @@ const OutputTab = ({connectionMissing, currentNode, outputDefined = false, workf
                                         >
                                             Upload Sample Output Data
                                         </DropdownMenuItem>
+
+                                        {outputDefined && (
+                                            <DropdownMenuItem
+                                                className="cursor-pointer"
+                                                onClick={handlePredefinedOutputSchemaClick}
+                                            >
+                                                Reset
+                                            </DropdownMenuItem>
+                                        )}
                                     </DropdownMenuContent>
                                 </DropdownMenu>
                             </div>
