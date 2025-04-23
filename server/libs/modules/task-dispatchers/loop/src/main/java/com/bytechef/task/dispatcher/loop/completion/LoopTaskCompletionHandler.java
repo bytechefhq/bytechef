@@ -40,6 +40,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import org.apache.commons.lang3.Validate;
 
 /**
@@ -205,23 +206,27 @@ public class LoopTaskCompletionHandler implements TaskCompletionHandler {
         taskDispatcher.dispatch(nextChildTaskExecution);
     }
 
-    private Map<String, Object>
-        updateParentContextValue(TaskExecution taskExecution, TaskExecution parentTaskExecution) {
+    private Map<String, Object> updateParentContextValue(
+        TaskExecution taskExecution, TaskExecution parentTaskExecution) {
+
+        long parentTaskExecutionId = Objects.requireNonNull(parentTaskExecution.getId());
+
         Map<String, Object> contextValue = new HashMap<>(
             taskFileStorage.readContextValue(
-                contextService.peek(
-                    Validate.notNull(parentTaskExecution.getId(), "id"), Classname.TASK_EXECUTION)));
+                contextService.peek(parentTaskExecutionId, Classname.TASK_EXECUTION)));
 
-        if (taskExecution.getOutput() != null && taskExecution.getName() != null) {
-            contextValue.put(
-                taskExecution.getName(),
-                taskFileStorage.readTaskExecutionOutput(taskExecution.getOutput()));
+        if (taskExecution.getName() != null) {
+            if (taskExecution.getOutput() != null) {
+                contextValue.put(
+                    taskExecution.getName(), taskFileStorage.readTaskExecutionOutput(taskExecution.getOutput()));
+            } else {
+                contextValue.put(taskExecution.getName(), null);
+            }
 
             contextService.push(
-                Validate.notNull(parentTaskExecution.getId(), "id"), Classname.TASK_EXECUTION,
+                parentTaskExecutionId, Classname.TASK_EXECUTION,
                 taskFileStorage.storeContextValue(
-                    Validate.notNull(parentTaskExecution.getId(), "id"), Classname.TASK_EXECUTION,
-                    contextValue));
+                    parentTaskExecutionId, Classname.TASK_EXECUTION, contextValue));
         }
 
         return contextValue;

@@ -38,7 +38,7 @@ import java.time.Instant;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import org.apache.commons.lang3.Validate;
+import java.util.Objects;
 
 /**
  * Handles {@link TaskExecution} completions which are the child execution tasks of a parent <code>
@@ -87,26 +87,29 @@ public class ForkJoinTaskCompletionHandler implements TaskCompletionHandler {
 
         taskExecution = taskExecutionService.update(taskExecution);
 
-        Validate.notNull(taskExecution.getParentId(), "'taskExecution.parentId' must not be null");
+        long taskExecutionParentId = Objects.requireNonNull(taskExecution.getParentId());
 
-        if (taskExecution.getOutput() != null && taskExecution.getName() != null) {
+        if (taskExecution.getName() != null) {
             int branch = MapUtils.getInteger(taskExecution.getParameters(), ForkJoinTaskDispatcherConstants.BRANCH);
 
             Map<String, Object> newContext = new HashMap<>(
                 taskFileStorage.readContextValue(
-                    contextService.peek(taskExecution.getParentId(), branch, Context.Classname.TASK_EXECUTION)));
+                    contextService.peek(taskExecutionParentId, branch, Context.Classname.TASK_EXECUTION)));
 
-            newContext.put(
-                taskExecution.getName(),
-                taskFileStorage.readTaskExecutionOutput(taskExecution.getOutput()));
+            if (taskExecution.getOutput() != null) {
+                newContext.put(
+                    taskExecution.getName(), taskFileStorage.readTaskExecutionOutput(taskExecution.getOutput()));
+            } else {
+                newContext.put(taskExecution.getName(), null);
+            }
 
             contextService.push(
-                taskExecution.getParentId(), branch, Context.Classname.TASK_EXECUTION,
+                taskExecutionParentId, branch, Context.Classname.TASK_EXECUTION,
                 taskFileStorage.storeContextValue(
-                    taskExecution.getParentId(), branch, Context.Classname.TASK_EXECUTION, newContext));
+                    taskExecutionParentId, branch, Context.Classname.TASK_EXECUTION, newContext));
         }
 
-        TaskExecution forkJoinTaskExecution = taskExecutionService.getTaskExecution(taskExecution.getParentId());
+        TaskExecution forkJoinTaskExecution = taskExecutionService.getTaskExecution(taskExecutionParentId);
         List<List<Map<String, Object>>> branches = MapUtils.getRequiredList(
             forkJoinTaskExecution.getParameters(), ForkJoinTaskDispatcherConstants.BRANCHES, new TypeReference<>() {});
 
@@ -122,10 +125,10 @@ public class ForkJoinTaskCompletionHandler implements TaskCompletionHandler {
 
             WorkflowTask branchWorkflowTask = branchWorkflowTasks.get(taskExecution.getTaskNumber());
 
-            Validate.notNull(taskExecution.getJobId(), "'taskExecution.jobId' must not be null");
+            long taskExecutionJobId = Objects.requireNonNull(taskExecution.getJobId());
 
             TaskExecution branchTaskExecution = TaskExecution.builder()
-                .jobId(taskExecution.getJobId())
+                .jobId(taskExecutionJobId)
                 .parentId(taskExecution.getId())
                 .priority(taskExecution.getPriority())
                 .taskNumber(taskExecution.getTaskNumber() + 1)
@@ -137,20 +140,21 @@ public class ForkJoinTaskCompletionHandler implements TaskCompletionHandler {
                 .build();
 
             Map<String, ?> context = taskFileStorage.readContextValue(
-                contextService.peek(taskExecution.getParentId(), branch, Context.Classname.TASK_EXECUTION));
+                contextService.peek(taskExecutionParentId, branch, Context.Classname.TASK_EXECUTION));
 
             branchTaskExecution.evaluate(context);
 
             branchTaskExecution = taskExecutionService.create(branchTaskExecution);
 
+            long branchTaskExecutionId = Objects.requireNonNull(branchTaskExecution.getId(), "id");
+
             contextService.push(
-                Validate.notNull(branchTaskExecution.getId(), "id"), Context.Classname.TASK_EXECUTION,
-                taskFileStorage.storeContextValue(
-                    Validate.notNull(branchTaskExecution.getId(), "id"), Context.Classname.TASK_EXECUTION, context));
+                branchTaskExecutionId, Context.Classname.TASK_EXECUTION,
+                taskFileStorage.storeContextValue(branchTaskExecutionId, Context.Classname.TASK_EXECUTION, context));
 
             taskDispatcher.dispatch(branchTaskExecution);
         } else {
-            long branchesLeft = counterService.decrement(Validate.notNull(taskExecution.getParentId(), "id"));
+            long branchesLeft = counterService.decrement(taskExecutionParentId);
 
             if (branchesLeft == 0) {
                 forkJoinTaskExecution.setEndDate(Instant.now());

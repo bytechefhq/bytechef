@@ -37,7 +37,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import org.apache.commons.lang3.Validate;
+import java.util.Objects;
 
 /**
  * @author Matija Petanjek
@@ -85,23 +85,24 @@ public class ConditionTaskCompletionHandler implements TaskCompletionHandler {
         taskExecution = taskExecutionService.update(taskExecution);
 
         TaskExecution conditionTaskExecution = taskExecutionService.getTaskExecution(
-            Validate.notNull(taskExecution.getParentId(), "parentId"));
+            Objects.requireNonNull(taskExecution.getParentId()));
 
-        if (taskExecution.getOutput() != null && taskExecution.getName() != null) {
+        long id = Objects.requireNonNull(conditionTaskExecution.getId());
+
+        if (taskExecution.getName() != null) {
             Map<String, Object> newContext = new HashMap<>(
-                taskFileStorage.readContextValue(
-                    contextService.peek(
-                        Validate.notNull(conditionTaskExecution.getId(), "id"), Context.Classname.TASK_EXECUTION)));
+                taskFileStorage.readContextValue(contextService.peek(id, Context.Classname.TASK_EXECUTION)));
 
-            newContext.put(
-                taskExecution.getName(),
-                taskFileStorage.readTaskExecutionOutput(taskExecution.getOutput()));
+            if (taskExecution.getOutput() != null) {
+                newContext.put(
+                    taskExecution.getName(), taskFileStorage.readTaskExecutionOutput(taskExecution.getOutput()));
+            } else {
+                newContext.put(taskExecution.getName(), null);
+            }
 
             contextService.push(
-                Validate.notNull(conditionTaskExecution.getId(), "id"), Context.Classname.TASK_EXECUTION,
-                taskFileStorage.storeContextValue(
-                    Validate.notNull(conditionTaskExecution.getId(), "id"), Context.Classname.TASK_EXECUTION,
-                    newContext));
+                id, Context.Classname.TASK_EXECUTION,
+                taskFileStorage.storeContextValue(id, Context.Classname.TASK_EXECUTION, newContext));
         }
 
         List<WorkflowTask> subWorkflowTasks;
@@ -124,17 +125,17 @@ public class ConditionTaskCompletionHandler implements TaskCompletionHandler {
                 .build();
 
             Map<String, ?> context = taskFileStorage.readContextValue(
-                contextService.peek(
-                    Validate.notNull(conditionTaskExecution.getId(), "id"), Context.Classname.TASK_EXECUTION));
+                contextService.peek(id, Context.Classname.TASK_EXECUTION));
 
             subTaskExecution.evaluate(context);
 
             subTaskExecution = taskExecutionService.create(subTaskExecution);
 
+            long subTaskExecutionId = Objects.requireNonNull(subTaskExecution.getId());
+
             contextService.push(
-                Validate.notNull(subTaskExecution.getId(), "id"), Context.Classname.TASK_EXECUTION,
-                taskFileStorage.storeContextValue(
-                    Validate.notNull(subTaskExecution.getId(), "id"), Context.Classname.TASK_EXECUTION, context));
+                subTaskExecutionId, Context.Classname.TASK_EXECUTION,
+                taskFileStorage.storeContextValue(subTaskExecutionId, Context.Classname.TASK_EXECUTION, context));
 
             taskDispatcher.dispatch(subTaskExecution);
         }

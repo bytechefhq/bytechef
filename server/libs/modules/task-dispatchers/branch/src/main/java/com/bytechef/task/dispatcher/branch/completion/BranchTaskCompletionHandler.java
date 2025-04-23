@@ -42,7 +42,8 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import org.apache.commons.lang3.Validate;
+import java.util.Objects;
+import org.springframework.util.Assert;
 
 /**
  * @author Arik Cohen
@@ -91,23 +92,26 @@ public class BranchTaskCompletionHandler implements TaskCompletionHandler {
 
         taskExecution = taskExecutionService.update(taskExecution);
 
-        TaskExecution branchTaskExecution = taskExecutionService.getTaskExecution(
-            Validate.notNull(taskExecution.getParentId(), "parentId"));
+        Long taskExecutionParentId = Objects.requireNonNull(taskExecution.getParentId());
 
-        if (taskExecution.getOutput() != null && taskExecution.getName() != null) {
+        TaskExecution branchTaskExecution = taskExecutionService.getTaskExecution(taskExecutionParentId);
+
+        long branchTaskExecutionId = Objects.requireNonNull(branchTaskExecution.getId());
+
+        if (taskExecution.getName() != null) {
             Map<String, Object> newContext = new HashMap<>(
-                taskFileStorage.readContextValue(
-                    contextService.peek(Validate.notNull(branchTaskExecution.getId(), "id"),
-                        Classname.TASK_EXECUTION)));
+                taskFileStorage.readContextValue(contextService.peek(branchTaskExecutionId, Classname.TASK_EXECUTION)));
 
-            newContext.put(
-                taskExecution.getName(),
-                taskFileStorage.readTaskExecutionOutput(taskExecution.getOutput()));
+            if (taskExecution.getOutput() != null) {
+                newContext.put(
+                    taskExecution.getName(), taskFileStorage.readTaskExecutionOutput(taskExecution.getOutput()));
+            } else {
+                newContext.put(taskExecution.getName(), null);
+            }
 
             contextService.push(
-                Validate.notNull(branchTaskExecution.getId(), "id"), Classname.TASK_EXECUTION,
-                taskFileStorage.storeContextValue(
-                    Validate.notNull(branchTaskExecution.getId(), "id"), Classname.TASK_EXECUTION, newContext));
+                branchTaskExecutionId, Classname.TASK_EXECUTION,
+                taskFileStorage.storeContextValue(branchTaskExecutionId, Classname.TASK_EXECUTION, newContext));
         }
 
         List<WorkflowTask> subWorkflowTasks = resolveCase(branchTaskExecution);
@@ -124,16 +128,17 @@ public class BranchTaskCompletionHandler implements TaskCompletionHandler {
                 .build();
 
             Map<String, ?> context = taskFileStorage.readContextValue(
-                contextService.peek(Validate.notNull(branchTaskExecution.getId(), "id"), Classname.TASK_EXECUTION));
+                contextService.peek(branchTaskExecutionId, Classname.TASK_EXECUTION));
 
             subTaskExecution.evaluate(context);
 
             subTaskExecution = taskExecutionService.create(subTaskExecution);
 
+            long subTaskExecutionId = Objects.requireNonNull(subTaskExecution.getId());
+
             contextService.push(
-                Validate.notNull(subTaskExecution.getId(), "id"), Classname.TASK_EXECUTION,
-                taskFileStorage.storeContextValue(
-                    Validate.notNull(subTaskExecution.getId(), "id"), Classname.TASK_EXECUTION, context));
+                subTaskExecutionId, Classname.TASK_EXECUTION,
+                taskFileStorage.storeContextValue(subTaskExecutionId, Classname.TASK_EXECUTION, context));
 
             taskDispatcher.dispatch(subTaskExecution);
         }
@@ -150,7 +155,7 @@ public class BranchTaskCompletionHandler implements TaskCompletionHandler {
         List<Map<String, ?>> branchCases = MapUtils.getList(
             taskExecution.getParameters(), CASES, new TypeReference<>() {}, Collections.emptyList());
 
-        Validate.notNull(branchCases, "you must specify 'cases' in a branch statement");
+        Assert.notNull(branchCases, "you must specify 'cases' in a branch statement");
 
         for (Map<String, ?> branchCase : branchCases) {
             Object key = MapUtils.getRequired(branchCase, KEY);
