@@ -20,6 +20,7 @@ import static com.bytechef.component.definition.ComponentDsl.component;
 
 import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.ai.llm.mistral.action.MistralChatAction;
+import com.bytechef.component.ai.llm.mistral.action.MistralOcrAction;
 import com.bytechef.component.ai.llm.mistral.cluster.MistralAiChatModel;
 import com.bytechef.component.ai.llm.mistral.cluster.MistralAiEmbedding;
 import com.bytechef.component.ai.llm.mistral.connection.MistralConnection;
@@ -40,7 +41,9 @@ public class MistralComponentHandler implements ComponentHandler {
         .icon("path:assets/mistral.svg")
         .categories(ComponentCategory.ARTIFICIAL_INTELLIGENCE)
         .connection(MistralConnection.CONNECTION_DEFINITION)
-        .actions(MistralChatAction.ACTION_DEFINITION)
+        .actions(
+            MistralChatAction.ACTION_DEFINITION,
+            MistralOcrAction.ACTION_DEFINITION)
         .clusterElements(
             MistralAiEmbedding.CLUSTER_ELEMENT_DEFINITION,
             MistralAiChatModel.CLUSTER_ELEMENT_DEFINITION);
