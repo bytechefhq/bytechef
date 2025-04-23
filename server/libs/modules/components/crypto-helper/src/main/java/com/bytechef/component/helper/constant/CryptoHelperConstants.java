@@ -28,6 +28,7 @@ public class CryptoHelperConstants {
     public static final String PASSPHRASE = "passphrase";
     public static final String PUBLIC_KEY = "publicKey";
     public static final String PRIVATE_KEY = "privateKey";
+    public static final String SIGNATURE = "signature";
 
     private CryptoHelperConstants() {
     }

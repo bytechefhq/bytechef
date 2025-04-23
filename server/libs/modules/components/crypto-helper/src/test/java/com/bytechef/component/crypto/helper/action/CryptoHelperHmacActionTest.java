@@ -22,7 +22,7 @@ import static com.bytechef.component.helper.constant.CryptoHelperConstants.KEY;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 
-import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.helper.action.CryptoHelperHmacAction;
 import com.bytechef.component.test.definition.MockParametersFactory;
@@ -35,7 +35,7 @@ import org.junit.jupiter.params.provider.CsvSource;
  */
 class CryptoHelperHmacActionTest {
 
-    private final ActionContext mockedActionContext = mock(ActionContext.class);
+    private final Context mockedContext = mock(Context.class);
 
     @ParameterizedTest
     @CsvSource({
@@ -47,7 +47,7 @@ class CryptoHelperHmacActionTest {
         Parameters mockedParameters =
             MockParametersFactory.create(Map.of(ALGORITHM, algorithm, INPUT, "test input", KEY, "test key"));
 
-        String result = CryptoHelperHmacAction.perform(mockedParameters, mockedParameters, mockedActionContext);
+        String result = CryptoHelperHmacAction.perform(mockedParameters, mockedParameters, mockedContext);
 
         assertEquals(expected, result);
     }

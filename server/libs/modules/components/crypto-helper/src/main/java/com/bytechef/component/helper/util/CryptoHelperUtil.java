@@ -19,7 +19,13 @@ package com.bytechef.component.helper.util;
 import static com.bytechef.component.definition.ComponentDsl.option;
 
 import com.bytechef.component.definition.Option;
+import java.security.KeyFactory;
+import java.security.PrivateKey;
+import java.security.PublicKey;
+import java.security.spec.PKCS8EncodedKeySpec;
+import java.security.spec.X509EncodedKeySpec;
 import java.util.Arrays;
+import java.util.Base64;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -51,5 +57,33 @@ public class CryptoHelperUtil {
         return Arrays.stream(CryptographicAlgorithmsEnum.values())
             .map(algorithm -> option(algorithm.getLabel(), algorithm.getHmacLabel()))
             .collect(Collectors.toList());
+    }
+
+    public static PublicKey getPublicRSAKeyFromString(String key) throws Exception {
+        String publicKeyPEM = key
+            .replace("-----BEGIN PUBLIC KEY-----", "")
+            .replace("-----END PUBLIC KEY-----", "")
+            .replaceAll("\\s", "");
+
+        byte[] encoded = Base64.getDecoder()
+            .decode(publicKeyPEM);
+
+        KeyFactory keyFactory = KeyFactory.getInstance("RSA");
+        X509EncodedKeySpec keySpec = new X509EncodedKeySpec(encoded);
+        return keyFactory.generatePublic(keySpec);
+    }
+
+    public static PrivateKey getPrivateRSAKeyFromString(String pemKey) throws Exception {
+        String privateKeyPEM = pemKey
+            .replace("-----BEGIN PRIVATE KEY-----", "")
+            .replace("-----END PRIVATE KEY-----", "")
+            .replaceAll("\\s", ""); // Remove all whitespace
+
+        byte[] encoded = Base64.getDecoder()
+            .decode(privateKeyPEM);
+
+        KeyFactory keyFactory = KeyFactory.getInstance("RSA");
+        PKCS8EncodedKeySpec keySpec = new PKCS8EncodedKeySpec(encoded);
+        return keyFactory.generatePrivate(keySpec);
     }
 }
