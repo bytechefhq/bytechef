@@ -276,7 +276,7 @@ const ProjectDeploymentDialog = ({
 
             <DialogContent className="flex flex-col gap-0 p-0" onInteractOutside={(event) => event.preventDefault()}>
                 <Form {...form}>
-                    <DialogHeader className="flex flex-row items-center justify-between gap-1 space-y-0 px-6 py-3">
+                    <DialogHeader className="flex flex-row items-center justify-between gap-1 space-y-0 p-6">
                         <div className="flex w-full flex-col space-y-1">
                             <DialogTitle>
                                 {updateProjectVersion
@@ -315,7 +315,7 @@ const ProjectDeploymentDialog = ({
                         {projectDeploymentDialogSteps[activeStepIndex].content}
                     </div>
 
-                    <DialogFooter className="px-6 py-3">
+                    <DialogFooter className="p-6">
                         {activeStepIndex === 0 && (
                             <>
                                 <DialogClose asChild>
