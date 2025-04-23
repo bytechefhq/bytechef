@@ -104,19 +104,23 @@ public class DefaultTaskCompletionHandler implements TaskCompletionHandler {
             String name = taskExecution.getName();
             FileEntry output = taskExecution.getOutput();
 
-            if (output != null && name != null) {
-                Map<String, Object> newContext = new HashMap<>(
-                    taskFileStorage.readContextValue(
-                        contextService.peek(Validate.notNull(job.getId(), "id"), Context.Classname.JOB)));
+            Map<String, Object> newContext = new HashMap<>(
+                taskFileStorage.readContextValue(
+                    contextService.peek(Validate.notNull(job.getId(), "id"), Context.Classname.JOB)));
 
-                newContext.put(name, taskFileStorage.readTaskExecutionOutput(output));
-
-                long jobId = Objects.requireNonNull(job.getId());
-
-                contextService.push(
-                    jobId, Context.Classname.JOB,
-                    taskFileStorage.storeContextValue(jobId, Context.Classname.JOB, newContext));
+            if (name != null) {
+                if (output == null) {
+                    newContext.put(name, null);
+                } else {
+                    newContext.put(name, taskFileStorage.readTaskExecutionOutput(output));
+                }
             }
+
+            long jobId = Objects.requireNonNull(job.getId());
+
+            contextService.push(
+                jobId, Context.Classname.JOB,
+                taskFileStorage.storeContextValue(jobId, Context.Classname.JOB, newContext));
 
             logger.debug(
                 "Task id={}, type='{}', name='{}' completed", taskExecution.getId(), taskExecution.getType(), name);
