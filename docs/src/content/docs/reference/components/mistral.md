@@ -97,5 +97,79 @@ The output for this action is dynamic and may vary depending on the input parame
 
 
 
+### Document OCR
+Name: ocr
+
+Extracts text and structured content from documents.
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| model | Model | STRING | Model to use. | true |
+| type | Type | STRING <details> <summary> Options </summary> image_url, document_url </details> | Type of the document to run OCR on. | true |
+| url | Image URL | STRING | Url of the image to run OCR on. | true |
+| url | Document URL | STRING | Url of the document to run OCR on. | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Document OCR",
+  "name" : "ocr",
+  "parameters" : {
+    "model" : "",
+    "type" : "",
+    "url" : ""
+  },
+  "type" : "mistral/v1/ocr"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| pages | ARRAY <details> <summary> Items </summary> [{INTEGER\(index), STRING\(markdown), [{STRING\(id), INTEGER\(top_left_x), INTEGER\(top_left_y), INTEGER\(bottom_right_x), INTEGER\(bottom_right_y)}]\(images), {INTEGER\(dpi), INTEGER\(height), INTEGER\(width)}\(dimensions)}] </details> |  |
+| model | STRING |  |
+| usage_info | OBJECT <details> <summary> Properties </summary> {INTEGER\(pages_processed), INTEGER\(doc_size_bytes)} </details> |  |
+
+
+
+
+#### Output Example
+```json
+{
+  "pages" : [ {
+    "index" : 1,
+    "markdown" : "",
+    "images" : [ {
+      "id" : "",
+      "top_left_x" : 1,
+      "top_left_y" : 1,
+      "bottom_right_x" : 1,
+      "bottom_right_y" : 1
+    } ],
+    "dimensions" : {
+      "dpi" : 1,
+      "height" : 1,
+      "width" : 1
+    }
+  } ],
+  "model" : "",
+  "usage_info" : {
+    "pages_processed" : 1,
+    "doc_size_bytes" : 1
+  }
+}
+```
+
+
 
 
