@@ -38,9 +38,9 @@ public class LoggerErrorAction {
     protected static Object perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
 
-        Object text = inputParameters.getRequired(TEXT);
+        Object text = inputParameters.get(TEXT);
 
-        context.log(logger -> logger.error(text.toString()));
+        context.log(logger -> logger.error(String.valueOf(text)));
 
         return null;
     }
