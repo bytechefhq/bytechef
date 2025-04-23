@@ -14,7 +14,7 @@ const ProjectDeploymentDialogWorkflowsStepItemConnections = ({
     <>
         {!componentConnections.length && <p className="text-sm">No defined connections.</p>}
 
-        <ul>
+        <ul className="space-y-4">
             {componentConnections.map((componentConnection, componentConnectionIndex) => (
                 <ProjectDeploymentDialogWorkflowsStepItemConnection
                     componentConnection={componentConnection}

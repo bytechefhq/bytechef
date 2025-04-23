@@ -37,7 +37,7 @@ const ProjectDeploymentDialogWorkflowsStepItem = ({
         .concat((workflow?.triggers ?? []).flatMap((trigger) => trigger.connections ?? []));
 
     return (
-        <div className="px-6">
+        <div>
             {!switchHidden && (
                 <div className="flex cursor-pointer justify-between py-2">
                     <span className="font-semibold">{label}</span>

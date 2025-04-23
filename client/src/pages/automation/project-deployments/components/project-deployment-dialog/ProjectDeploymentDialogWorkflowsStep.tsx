@@ -17,7 +17,7 @@ const ProjectDeploymentDialogWorkflowsStep = ({
     workflows,
 }: ProjectDeploymentDialogWorkflowsStepProps) => {
     return (
-        <ul className="h-full space-y-4">
+        <div className="h-full space-y-4">
             {workflows?.map((workflow, workflowIndex) => (
                 <ProjectDeploymentDialogWorkflowsStepItem
                     control={control}
@@ -29,7 +29,7 @@ const ProjectDeploymentDialogWorkflowsStep = ({
                     workflowIndex={workflowIndex}
                 />
             ))}
-        </ul>
+        </div>
     );
 };
 

@@ -19,7 +19,7 @@ const IntegrationInstanceConfigurationDialogWorkflowsStep = ({
     workflows,
 }: IntegrationInstanceConfigurationDialogWorkflowsStepProps) => {
     return (
-        <ul className="h-full space-y-4">
+        <div className="h-full space-y-4">
             {workflows?.map((workflow, workflowIndex) => (
                 <IntegrationInstanceConfigurationDialogWorkflowsStepItem
                     componentName={componentName}
@@ -32,7 +32,7 @@ const IntegrationInstanceConfigurationDialogWorkflowsStep = ({
                     workflowIndex={workflowIndex}
                 />
             ))}
-        </ul>
+        </div>
     );
 };
 
