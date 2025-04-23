@@ -35,6 +35,8 @@ import org.springframework.ai.mistralai.api.MistralAiApi;
 public final class MistralConstants {
 
     public static final String SAFE_PROMPT = "safePrompt";
+    public static final String TYPE = "type";
+    public static final String URL = "url";
 
     public static final List<Option<String>> CHAT_MODELS = ModelUtils.getEnumOptions(
         Arrays.stream(MistralAiApi.ChatModel.values())
