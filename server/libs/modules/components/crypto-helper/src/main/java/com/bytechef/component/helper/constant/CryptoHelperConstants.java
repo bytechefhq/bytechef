@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.component.example.constant;
+package com.bytechef.component.helper.constant;
 
 /**
  * @author Nikolina Spehar
@@ -24,6 +24,10 @@ public class CryptoHelperConstants {
     public static final String ALGORITHM = "algorithm";
     public static final String INPUT = "input";
     public static final String KEY = "key";
+    public static final String FILE = "file";
+    public static final String PASSPHRASE = "passphrase";
+    public static final String PUBLIC_KEY = "publicKey";
+    public static final String PRIVATE_KEY = "privateKey";
 
     private CryptoHelperConstants() {
     }

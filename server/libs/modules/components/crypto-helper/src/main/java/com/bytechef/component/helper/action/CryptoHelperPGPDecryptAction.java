@@ -1,4 +1,4 @@
-/*
+package com.bytechef.component.helper.action;/*
  * Copyright 2025 ByteChef
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,15 +14,13 @@
  * limitations under the License.
  */
 
-package com.bytechef.component.encryption.helper.action;
-
 import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.fileEntry;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
-import static com.bytechef.component.encryption.helper.constant.EncryptionHelperConstants.FILE;
-import static com.bytechef.component.encryption.helper.constant.EncryptionHelperConstants.PASSPHRASE;
-import static com.bytechef.component.encryption.helper.constant.EncryptionHelperConstants.PRIVATE_KEY;
+import static com.bytechef.component.helper.constant.CryptoHelperConstants.FILE;
+import static com.bytechef.component.helper.constant.CryptoHelperConstants.PASSPHRASE;
+import static com.bytechef.component.helper.constant.CryptoHelperConstants.PRIVATE_KEY;
 
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context;
@@ -53,15 +51,15 @@ import org.bouncycastle.openpgp.operator.jcajce.JcePublicKeyDataDecryptorFactory
 /**
  * @author Nikolina Spehar
  */
-public class EncryptionHelperDecryptAction {
+public class CryptoHelperPGPDecryptAction {
 
-    public static final ModifiableActionDefinition ACTION_DEFINITION = action("decrypt")
-        .title("Decrypt")
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action("PGPdecrypt")
+        .title("PGP Decrypt")
         .description("Decrypts PGP encrypted file using private key and passphrase.")
         .properties(
             string(PRIVATE_KEY)
                 .label("Private PGP Key")
-                .description("Private PGP key that will decrypt the file.")
+                .description("Private PGP key that will decrypt the file. Make sure there is a new line after the PGP header.")
                 .controlType(ControlType.TEXT_AREA)
                 .required(true),
             fileEntry(FILE)
@@ -76,9 +74,9 @@ public class EncryptionHelperDecryptAction {
             outputSchema(
                 fileEntry()
                     .description("Decrypted file.")))
-        .perform(EncryptionHelperDecryptAction::perform);
+        .perform(CryptoHelperPGPDecryptAction::perform);
 
-    private EncryptionHelperDecryptAction() {
+    private CryptoHelperPGPDecryptAction() {
     }
 
     public static FileEntry perform(Parameters inputParameters, Parameters connectionParameters, Context context)

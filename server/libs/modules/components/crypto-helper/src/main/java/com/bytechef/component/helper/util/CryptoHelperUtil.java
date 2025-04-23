@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.component.example.util;
+package com.bytechef.component.helper.util;
 
 import static com.bytechef.component.definition.ComponentDsl.option;
 

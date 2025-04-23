@@ -14,19 +14,20 @@
  * limitations under the License.
  */
 
-package com.bytechef.component.encryption.helper;
+package com.bytechef.component.crypto.helper;
 
+import com.bytechef.component.helper.CryptoHelperComponentHandler;
 import com.bytechef.test.jsonasssert.JsonFileAssert;
 import org.junit.jupiter.api.Test;
 
 /**
  * @author Nikolina Spehar
  */
-class EncryptionHelperComponentHandlerTest {
+class CryptoHelperComponentHandlerTest {
 
     @Test
     void testGetComponentDefinition() {
-        JsonFileAssert.assertEquals(
-            "definition/encryption-helper_v1.json", new EncryptionHelperComponentHandler().getDefinition());
+        JsonFileAssert.assertEquals("definition/crypto-helper_v1.json",
+            new CryptoHelperComponentHandler().getDefinition());
     }
 }
