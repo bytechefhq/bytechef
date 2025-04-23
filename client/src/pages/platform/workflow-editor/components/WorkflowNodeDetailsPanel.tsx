@@ -44,14 +44,13 @@ import isEqual from 'react-fast-compare';
 import InlineSVG from 'react-inlinesvg';
 import {useParams} from 'react-router-dom';
 import {twMerge} from 'tailwind-merge';
-import {useShallow} from 'zustand/react/shallow';
 
 import useWorkflowDataStore from '../stores/useWorkflowDataStore';
 import useWorkflowEditorStore from '../stores/useWorkflowEditorStore';
 import useWorkflowNodeDetailsPanelStore from '../stores/useWorkflowNodeDetailsPanelStore';
 import getDataPillsFromProperties from '../utils/getDataPillsFromProperties';
 import getParametersWithDefaultValues from '../utils/getParametersWithDefaultValues';
-import handleTaskDispatcherSubtaskOperationChange from '../utils/handleTaskDispatcherSubtaskOperationChange';
+import saveTaskDispatcherSubtaskFieldChange from '../utils/saveTaskDispatcherSubtaskFieldChange';
 import saveWorkflowDefinition from '../utils/saveWorkflowDefinition';
 import CurrentOperationSelect from './CurrentOperationSelect';
 import DescriptionTab from './node-details-tabs/DescriptionTab';
@@ -361,11 +360,14 @@ const WorkflowNodeDetailsPanel = ({
             );
 
             if (isTaskDispatcherSubtask) {
-                handleTaskDispatcherSubtaskOperationChange({
+                saveTaskDispatcherSubtaskFieldChange({
                     currentComponentDefinition,
                     currentNodeIndex: currentNodeIndex ?? 0,
                     currentOperationProperties,
-                    newOperationName,
+                    fieldUpdate: {
+                        field: 'operation',
+                        value: newOperationName,
+                    },
                     projectId: +projectId!,
                     queryClient,
                     updateWorkflowMutation,
