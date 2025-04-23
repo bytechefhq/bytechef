@@ -14,16 +14,16 @@
  * limitations under the License.
  */
 
-package com.bytechef.component.example.action;
+package com.bytechef.component.crypto.helper.action;
 
-import static com.bytechef.component.example.constant.CryptoHelperConstants.ALGORITHM;
-import static com.bytechef.component.example.constant.CryptoHelperConstants.INPUT;
-import static com.bytechef.component.example.constant.CryptoHelperConstants.KEY;
+import static com.bytechef.component.helper.constant.CryptoHelperConstants.ALGORITHM;
+import static com.bytechef.component.helper.constant.CryptoHelperConstants.INPUT;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.Parameters;
+import com.bytechef.component.helper.action.CryptoHelperHashAction;
 import com.bytechef.component.test.definition.MockParametersFactory;
 import java.util.Map;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -32,21 +32,20 @@ import org.junit.jupiter.params.provider.CsvSource;
 /**
  * @author Nikolina Spehar
  */
-class CryptoHelperHmacActionTest {
+class CryptoHelperHashActionTest {
 
     private final ActionContext mockedActionContext = mock(ActionContext.class);
 
     @ParameterizedTest
     @CsvSource({
-        "HmacMD5, 626d45975138d2543278261a81575f36",
-        "HmacSHA1, 9912b5f2b0b4356049f5ca692500f1ee408c17a8",
-        "HmacSHA256, d6f01175dbe45290787c9b2d2832fb6b05765184643931a8898848a284958822"
+        "MD5, 5eed650258ee02f6a77c87b748b764ec",
+        "SHA1, 49883b34e5a0f48224dd6230f471e9dc1bdbeaf5",
+        "SHA256, 9dfe6f15d1ab73af898739394fd22fd72a03db01834582f24bb2e1c66c7aaeae"
     })
     void testPerform(String algorithm, String expected) {
-        Parameters mockedParameters =
-            MockParametersFactory.create(Map.of(ALGORITHM, algorithm, INPUT, "test input", KEY, "test key"));
+        Parameters mockedParameters = MockParametersFactory.create(Map.of(ALGORITHM, algorithm, INPUT, "test input"));
 
-        String result = CryptoHelperHmacAction.perform(mockedParameters, mockedParameters, mockedActionContext);
+        String result = CryptoHelperHashAction.perform(mockedParameters, mockedParameters, mockedActionContext);
 
         assertEquals(expected, result);
     }

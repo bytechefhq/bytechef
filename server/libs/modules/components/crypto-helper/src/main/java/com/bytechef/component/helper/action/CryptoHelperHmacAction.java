@@ -14,20 +14,20 @@
  * limitations under the License.
  */
 
-package com.bytechef.component.example.action;
+package com.bytechef.component.helper.action;
 
 import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
-import static com.bytechef.component.example.constant.CryptoHelperConstants.ALGORITHM;
-import static com.bytechef.component.example.constant.CryptoHelperConstants.INPUT;
-import static com.bytechef.component.example.constant.CryptoHelperConstants.KEY;
-import static com.bytechef.component.example.util.CryptoHelperUtil.convertBytesToHexString;
+import static com.bytechef.component.helper.constant.CryptoHelperConstants.ALGORITHM;
+import static com.bytechef.component.helper.constant.CryptoHelperConstants.INPUT;
+import static com.bytechef.component.helper.constant.CryptoHelperConstants.KEY;
+import static com.bytechef.component.helper.util.CryptoHelperUtil.convertBytesToHexString;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.example.util.CryptoHelperUtil;
+import com.bytechef.component.helper.util.CryptoHelperUtil;
 import java.nio.charset.StandardCharsets;
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;

@@ -14,37 +14,35 @@
  * limitations under the License.
  */
 
-package com.bytechef.component.encryption.helper;
+package com.bytechef.component.helper;
 
 import static com.bytechef.component.definition.ComponentDsl.component;
-import static com.bytechef.component.definition.ComponentDsl.tool;
 
 import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDefinition;
-import com.bytechef.component.encryption.helper.action.EncryptionHelperDecryptAction;
-import com.bytechef.component.encryption.helper.action.EncryptionHelperEncryptAction;
+import com.bytechef.component.helper.action.CryptoHelperHashAction;
+import com.bytechef.component.helper.action.CryptoHelperHmacAction;
+import com.bytechef.component.helper.action.CryptoHelperPGPDecryptAction;
+import com.bytechef.component.helper.action.CryptoHelperPGPEncryptAction;
 import com.google.auto.service.AutoService;
 
 /**
  * @author Nikolina Spehar
  */
 @AutoService(ComponentHandler.class)
-public class EncryptionHelperComponentHandler implements ComponentHandler {
+public class CryptoHelperComponentHandler implements ComponentHandler {
 
-    private static final ComponentDefinition COMPONENT_DEFINITION = component("encryptionHelper")
-        .title("Encryption Helper")
-        .description(
-            "A secure PGP encryption and decryption service powered by Bouncy Castle, enabling users to encrypt, " +
-                "decrypt, and manage sensitive data with OpenPGP standards.")
-        .icon("path:assets/encryption-helper.svg")
+    private static final ComponentDefinition COMPONENT_DEFINITION = component("cryptoHelper")
+        .title("Crypto Helper")
+        .description("The Crypto Helper allows you to use cryptographic functions.")
+        .icon("path:assets/crypto-helper.svg")
         .categories(ComponentCategory.HELPERS)
         .actions(
-            EncryptionHelperDecryptAction.ACTION_DEFINITION,
-            EncryptionHelperEncryptAction.ACTION_DEFINITION)
-        .clusterElements(
-            tool(EncryptionHelperDecryptAction.ACTION_DEFINITION),
-            tool(EncryptionHelperEncryptAction.ACTION_DEFINITION));
+            CryptoHelperHashAction.ACTION_DEFINITION,
+            CryptoHelperHmacAction.ACTION_DEFINITION,
+            CryptoHelperPGPDecryptAction.ACTION_DEFINITION,
+            CryptoHelperPGPEncryptAction.ACTION_DEFINITION);
 
     @Override
     public ComponentDefinition getDefinition() {
