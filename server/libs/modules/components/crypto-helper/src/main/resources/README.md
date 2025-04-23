@@ -1,0 +1,26 @@
+How to generate RSA key pair:
+
+    1. Run this command in terminal to create private_key.pem in the working directory:
+        openssl genpkey -algorithm RSA -out private_key.pem -pkeyopt rsa_keygen_bits:2048
+        
+    2. Run this command in terminal to extract public key form the private key:
+        openssl rsa -pubout -in private_key.pem -out public_key.pem
+    
+    3. To read the keys run this in terminal:
+        cat public_key.pem or cat private_key.pem
+
+How to generate PGP key pair:
+
+    Run these commands in terminal.
+
+    1. sudo apt install gnupg
+
+    2. gpg --full-generate-key
+
+    3. When prompted write your name, email address, comment and passphrase
+
+    4. To get public key run:
+        gpg --armor --export <our_email_address> > public_key.asc
+
+    5. To get private key run:
+        gpg --armor --export-secret-key <our_email_address> > private_key.asc

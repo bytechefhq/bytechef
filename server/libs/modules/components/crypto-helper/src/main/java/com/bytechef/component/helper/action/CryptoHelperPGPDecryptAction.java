@@ -1,4 +1,4 @@
-package com.bytechef.component.helper.action;/*
+/*
  * Copyright 2025 ByteChef
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,6 +13,8 @@ package com.bytechef.component.helper.action;/*
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+package com.bytechef.component.helper.action;
 
 import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.fileEntry;
@@ -59,7 +61,8 @@ public class CryptoHelperPGPDecryptAction {
         .properties(
             string(PRIVATE_KEY)
                 .label("Private PGP Key")
-                .description("Private PGP key that will decrypt the file. Make sure there is a new line after the PGP header.")
+                .description(
+                    "Private PGP key that will decrypt the file. Make sure there is a new line after the PGP header.")
                 .controlType(ControlType.TEXT_AREA)
                 .required(true),
             fileEntry(FILE)

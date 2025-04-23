@@ -20,6 +20,7 @@ import static com.bytechef.component.definition.ComponentDsl.option;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import com.bytechef.component.definition.Option;
+import com.bytechef.component.helper.util.CryptoHelperUtil;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import org.junit.jupiter.api.Test;

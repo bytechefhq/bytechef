@@ -13,13 +13,30 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.bytechef.component.helper.action;
+
+import static com.bytechef.component.definition.ComponentDsl.action;
+import static com.bytechef.component.definition.ComponentDsl.fileEntry;
+import static com.bytechef.component.definition.ComponentDsl.outputSchema;
+import static com.bytechef.component.definition.ComponentDsl.string;
+import static com.bytechef.component.helper.constant.CryptoHelperConstants.FILE;
+import static com.bytechef.component.helper.constant.CryptoHelperConstants.PUBLIC_KEY;
 
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.FileEntry;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.Property.ControlType;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.nio.charset.StandardCharsets;
+import java.security.SecureRandom;
+import java.security.Security;
+import java.util.Iterator;
 import org.bouncycastle.bcpg.ArmoredOutputStream;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.openpgp.PGPEncryptedData;
@@ -33,23 +50,6 @@ import org.bouncycastle.openpgp.operator.PGPDataEncryptorBuilder;
 import org.bouncycastle.openpgp.operator.jcajce.JcePGPDataEncryptorBuilder;
 import org.bouncycastle.openpgp.operator.jcajce.JcePublicKeyKeyEncryptionMethodGenerator;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.nio.charset.StandardCharsets;
-import java.security.SecureRandom;
-import java.security.Security;
-import java.util.Iterator;
-
-import static com.bytechef.component.definition.ComponentDsl.action;
-import static com.bytechef.component.definition.ComponentDsl.fileEntry;
-import static com.bytechef.component.definition.ComponentDsl.outputSchema;
-import static com.bytechef.component.definition.ComponentDsl.string;
-import static com.bytechef.component.helper.constant.CryptoHelperConstants.FILE;
-import static com.bytechef.component.helper.constant.CryptoHelperConstants.PUBLIC_KEY;
-
 /**
  * @author Nikolina Spehar
  */
@@ -57,11 +57,12 @@ public class CryptoHelperPGPEncryptAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("PGPencrypt")
         .title("PGP Encrypt")
-        .description("PGP encrypts the file using public key.")
+        .description("Encrypts the file using PGP public key.")
         .properties(
             string(PUBLIC_KEY)
                 .label("Public PGP Key")
-                .description("Public PGP key of the recipient of the encrypted file. Make sure there is a new line after the PGP header.")
+                .description(
+                    "Public PGP key of the recipient of the encrypted file. Make sure there is a new line after the PGP header.")
                 .controlType(ControlType.TEXT_AREA)
                 .required(true),
             fileEntry(FILE)
@@ -71,7 +72,7 @@ public class CryptoHelperPGPEncryptAction {
         .output(
             outputSchema(
                 fileEntry()
-                    .description("PGP encryption of the file.")))
+                    .description("PGP encrypted file.")))
         .perform(CryptoHelperPGPEncryptAction::perform);
 
     private CryptoHelperPGPEncryptAction() {

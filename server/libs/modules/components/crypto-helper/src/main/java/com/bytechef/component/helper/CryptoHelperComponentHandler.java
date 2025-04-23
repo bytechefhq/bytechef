@@ -25,6 +25,10 @@ import com.bytechef.component.helper.action.CryptoHelperHashAction;
 import com.bytechef.component.helper.action.CryptoHelperHmacAction;
 import com.bytechef.component.helper.action.CryptoHelperPGPDecryptAction;
 import com.bytechef.component.helper.action.CryptoHelperPGPEncryptAction;
+import com.bytechef.component.helper.action.CryptoHelperRSADecryptAction;
+import com.bytechef.component.helper.action.CryptoHelperRSAEncryptAction;
+import com.bytechef.component.helper.action.CryptoHelperSignAction;
+import com.bytechef.component.helper.action.CryptoHelperVerifyAction;
 import com.google.auto.service.AutoService;
 
 /**
@@ -42,7 +46,11 @@ public class CryptoHelperComponentHandler implements ComponentHandler {
             CryptoHelperHashAction.ACTION_DEFINITION,
             CryptoHelperHmacAction.ACTION_DEFINITION,
             CryptoHelperPGPDecryptAction.ACTION_DEFINITION,
-            CryptoHelperPGPEncryptAction.ACTION_DEFINITION);
+            CryptoHelperPGPEncryptAction.ACTION_DEFINITION,
+            CryptoHelperRSADecryptAction.ACTION_DEFINITION,
+            CryptoHelperRSAEncryptAction.ACTION_DEFINITION,
+            CryptoHelperSignAction.ACTION_DEFINITION,
+            CryptoHelperVerifyAction.ACTION_DEFINITION);
 
     @Override
     public ComponentDefinition getDefinition() {

@@ -24,8 +24,8 @@ import static com.bytechef.component.helper.constant.CryptoHelperConstants.INPUT
 import static com.bytechef.component.helper.constant.CryptoHelperConstants.KEY;
 import static com.bytechef.component.helper.util.CryptoHelperUtil.convertBytesToHexString;
 
-import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
+import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.helper.util.CryptoHelperUtil;
 import java.nio.charset.StandardCharsets;
@@ -63,8 +63,8 @@ public class CryptoHelperHmacAction {
     private CryptoHelperHmacAction() {
     }
 
-    protected static String perform(
-        Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) {
+    public static String perform(
+        Parameters inputParameters, Parameters connectionParameters, Context context) {
 
         try {
             String key = inputParameters.getRequiredString(KEY);
