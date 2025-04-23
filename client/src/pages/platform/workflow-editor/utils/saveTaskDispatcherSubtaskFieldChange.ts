@@ -10,25 +10,30 @@ import getRecursivelyUpdatedTasks from './getRecursivelyUpdatedTasks';
 import saveWorkflowDefinition from './saveWorkflowDefinition';
 import {TASK_DISPATCHER_CONFIG} from './taskDispatcherConfig';
 
-interface HandleTaskDispatcherSubtaskOperationChangeProps {
+type FieldUpdateType = {
+    field: 'operation' | 'label' | 'description';
+    value: string;
+};
+
+interface SaveTaskDispatcherSubtaskFieldChangeProps {
     currentComponentDefinition: ComponentDefinition;
     currentNodeIndex: number;
-    currentOperationProperties: Array<PropertyAllType>;
-    newOperationName: string;
+    currentOperationProperties?: Array<PropertyAllType>;
+    fieldUpdate: FieldUpdateType;
     projectId: string | number;
     queryClient: QueryClient;
     updateWorkflowMutation: UseMutationResult<void, Error, {id: string; workflow: Workflow}, unknown>;
 }
 
-export default function handleTaskDispatcherSubtaskOperationChange({
+export default function saveTaskDispatcherSubtaskFieldChange({
     currentComponentDefinition,
     currentNodeIndex,
     currentOperationProperties,
-    newOperationName,
+    fieldUpdate,
     projectId,
     queryClient,
     updateWorkflowMutation,
-}: HandleTaskDispatcherSubtaskOperationChangeProps): void {
+}: SaveTaskDispatcherSubtaskFieldChangeProps): void {
     const {currentComponent, currentNode, setCurrentComponent, setCurrentNode} =
         useWorkflowNodeDetailsPanelStore.getState();
 
@@ -50,8 +55,6 @@ export default function handleTaskDispatcherSubtaskOperationChange({
     switch (taskDispatcherDataKey) {
         case 'branchData': {
             if (!currentNode.branchData) {
-                console.error('No branch data found in current node');
-
                 break;
             }
 
@@ -67,8 +70,6 @@ export default function handleTaskDispatcherSubtaskOperationChange({
         }
         case 'conditionData': {
             if (!currentNode.conditionData) {
-                console.error('No condition data found in current node');
-
                 break;
             }
 
@@ -84,8 +85,6 @@ export default function handleTaskDispatcherSubtaskOperationChange({
         }
         case 'loopData': {
             if (!currentNode.loopData) {
-                console.error('No loop data found in current node');
-
                 break;
             }
 
@@ -99,8 +98,6 @@ export default function handleTaskDispatcherSubtaskOperationChange({
             break;
         }
         default: {
-            console.error('No task dispatcher data found');
-
             return;
         }
     }
@@ -119,7 +116,7 @@ export default function handleTaskDispatcherSubtaskOperationChange({
     });
 
     if (!parentTaskDispatcherTask) {
-        console.error(`No parent condition task found for ${taskDispatcherContext?.taskDispatcherId}`);
+        console.error(`No parent task dispatcher found for ${taskDispatcherContext?.taskDispatcherId}`);
 
         return;
     }
@@ -131,10 +128,25 @@ export default function handleTaskDispatcherSubtaskOperationChange({
 
     const updatedSubtasks = subtasks.map((subtask) => {
         if (subtask.name === currentNode.name) {
-            return {
-                ...subtask,
-                type: `${currentNode.componentName}/v${currentComponentDefinition.version}/${newOperationName}`,
-            };
+            switch (fieldUpdate.field) {
+                case 'operation':
+                    return {
+                        ...subtask,
+                        type: `${currentNode.componentName}/v${currentComponentDefinition.version}/${fieldUpdate.value}`,
+                    };
+                case 'label':
+                    return {
+                        ...subtask,
+                        label: fieldUpdate.value,
+                    };
+                case 'description':
+                    return {
+                        ...subtask,
+                        description: fieldUpdate.value,
+                    };
+                default:
+                    return subtask;
+            }
         }
 
         return subtask;
@@ -150,17 +162,25 @@ export default function handleTaskDispatcherSubtaskOperationChange({
 
     saveWorkflowDefinition({
         onSuccess: () => {
-            const commonUpdates = {
+            let commonUpdates: Record<string, unknown> = {
                 componentName,
-                displayConditions: {},
-                metadata: {},
-                operationName: newOperationName,
-                parameters: getParametersWithDefaultValues({
-                    properties: currentOperationProperties as Array<PropertyAllType>,
-                }),
-                type: `${componentName}/v${currentComponentDefinition.version}/${newOperationName}`,
                 workflowNodeName,
             };
+
+            if (fieldUpdate.field === 'operation') {
+                commonUpdates = {
+                    ...commonUpdates,
+                    displayConditions: {},
+                    metadata: {},
+                    operationName: fieldUpdate.value,
+                    parameters: getParametersWithDefaultValues({
+                        properties: currentOperationProperties as Array<PropertyAllType>,
+                    }),
+                    type: `${componentName}/v${currentComponentDefinition.version}/${fieldUpdate.value}`,
+                };
+            } else {
+                commonUpdates[fieldUpdate.field] = fieldUpdate.value;
+            }
 
             setCurrentComponent({
                 ...currentComponent,
