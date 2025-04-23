@@ -337,6 +337,9 @@ public class JsonUtils {
         if (includeNulls) {
             currentObjectMapper = currentObjectMapper.copy()
                 .setSerializationInclusion(JsonInclude.Include.ALWAYS);
+        } else {
+            currentObjectMapper = currentObjectMapper.copy()
+                .setSerializationInclusion(JsonInclude.Include.NON_NULL);
         }
 
         try {

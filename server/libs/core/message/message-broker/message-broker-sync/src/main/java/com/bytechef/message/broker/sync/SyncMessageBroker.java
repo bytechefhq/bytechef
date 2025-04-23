@@ -49,7 +49,7 @@ public class SyncMessageBroker implements MessageBroker {
 
         for (Receiver receiver : Validate.notNull(receivers, "receivers")) {
             receiver.receive(
-                ConvertUtils.convertValue(JsonUtils.read(JsonUtils.write(message, true)), message.getClass(), true));
+                ConvertUtils.convertValue(JsonUtils.read(JsonUtils.write(message)), message.getClass()));
         }
     }
 
