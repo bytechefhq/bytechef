@@ -26,6 +26,6 @@ class OllamaComponentHandlerTest {
 
     @Test
     void testGetComponentDefinition() {
-        JsonFileAssert.assertEquals("definition/ollama_v1.json", new OllmaComponentHandler().getDefinition());
+        JsonFileAssert.assertEquals("definition/ollama_v1.json", new OllamaComponentHandler().getDefinition());
     }
 }

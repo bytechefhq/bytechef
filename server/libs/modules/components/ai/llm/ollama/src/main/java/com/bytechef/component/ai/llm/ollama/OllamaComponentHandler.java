@@ -31,7 +31,7 @@ import com.google.auto.service.AutoService;
  * @author Marko Kriskovic
  */
 @AutoService(ComponentHandler.class)
-public class OllmaComponentHandler implements ComponentHandler {
+public class OllamaComponentHandler implements ComponentHandler {
 
     private static final ComponentDefinition COMPONENT_DEFINITION = component("ollama")
         .title("Ollama")
