@@ -352,6 +352,40 @@ The output for this action is dynamic and may vary depending on the input parame
 
 
 
+### Get Rows
+Name: getRows
+
+Get all rows from a Google Sheet.
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| spreadsheetId | Spreadsheet ID | STRING | The ID of the spreadsheet to apply the updates to. | true |
+| sheetName | Sheet Name | STRING <details> <summary> Depends On </summary> spreadsheetId </details> | The name of the sheet. | true |
+| isTheFirstRowHeader | Is the First Row Headers? | BOOLEAN <details> <summary> Options </summary> true, false </details> | If the first row is header. | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Get Rows",
+  "name" : "getRows",
+  "parameters" : {
+    "spreadsheetId" : "",
+    "sheetName" : "",
+    "isTheFirstRowHeader" : false
+  },
+  "type" : "googleSheets/v1/getRows"
+}
+```
+
+#### Output
+
+The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
+
+
+
+
 ### Insert Multiple Rows
 Name: insertMultipleRows
 
