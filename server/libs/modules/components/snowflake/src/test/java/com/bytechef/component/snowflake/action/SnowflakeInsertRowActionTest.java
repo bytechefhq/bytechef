@@ -44,7 +44,7 @@ class SnowflakeInsertRowActionTest {
     private final ArgumentCaptor<String> stringArgumentCaptor = ArgumentCaptor.forClass(String.class);
     private final Parameters mockedParameters = MockParametersFactory.create(
         Map.of(DATABASE, "database", SCHEMA, "schema", TABLE, "table",
-            VALUES, Map.of("col1", 5, "col2", 5)));
+            VALUES, Map.of("col1", 5, "col2", "abc")));
 
     @Test
     void testPerform() {
@@ -58,7 +58,9 @@ class SnowflakeInsertRowActionTest {
 
             assertEquals(mockedObject, result);
             assertEquals(mockedContext, contextArgumentCaptor.getValue());
-            assertEquals("INSERT INTO database.schema.table(col2,col1) VALUES(5,5)", stringArgumentCaptor.getValue());
+            assertEquals(
+                "INSERT INTO database.schema.table(col2,col1) VALUES('abc',5)",
+                stringArgumentCaptor.getValue());
         }
     }
 }

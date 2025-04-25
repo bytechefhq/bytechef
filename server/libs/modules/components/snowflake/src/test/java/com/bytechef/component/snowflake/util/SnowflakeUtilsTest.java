@@ -34,7 +34,6 @@ import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.test.definition.MockParametersFactory;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -44,6 +43,7 @@ import org.junit.jupiter.api.Test;
  * @author Nikolina Spehar
  */
 class SnowflakeUtilsTest {
+
     private final Context mockedContext = mock(Context.class);
     private final Executor mockedExecutor = mock(Executor.class);
     private final Parameters mockedParameters = MockParametersFactory.create(Map.of());
@@ -53,26 +53,10 @@ class SnowflakeUtilsTest {
         Map.of("name", "test2"));
 
     @Test
-    void getColumnUpdateStatementValuesValid() {
-        Map<String, Object> testMap = new LinkedHashMap<>();
-        testMap.put("col1", 2);
-        testMap.put("col2", 3);
-        testMap.put("col3", 4);
-
-        String result = SnowflakeUtils.getColumnUpdateStatement(testMap);
-
-        String expected = "col1=2,col2=3,col3=4";
-
-        assertEquals(expected, result);
-    }
-
-    @Test
     void getDatabaseNameOptions() {
         when(mockedContext.http(any()))
             .thenReturn(mockedExecutor);
         when(mockedExecutor.configuration(any()))
-            .thenReturn(mockedExecutor);
-        when(mockedExecutor.body(any()))
             .thenReturn(mockedExecutor);
         when(mockedExecutor.execute())
             .thenReturn(mockedResponse);
@@ -94,8 +78,6 @@ class SnowflakeUtilsTest {
         when(mockedContext.http(any()))
             .thenReturn(mockedExecutor);
         when(mockedExecutor.configuration(any()))
-            .thenReturn(mockedExecutor);
-        when(mockedExecutor.body(any()))
             .thenReturn(mockedExecutor);
         when(mockedExecutor.execute())
             .thenReturn(mockedResponse);
@@ -125,8 +107,6 @@ class SnowflakeUtilsTest {
             .thenReturn(mockedExecutor);
         when(mockedExecutor.configuration(any()))
             .thenReturn(mockedExecutor);
-        when(mockedExecutor.body(any()))
-            .thenReturn(mockedExecutor);
         when(mockedExecutor.execute())
             .thenReturn(mockedResponse);
         when(mockedResponse.getBody(any(TypeReference.class)))
@@ -145,8 +125,6 @@ class SnowflakeUtilsTest {
         when(mockedContext.http(any()))
             .thenReturn(mockedExecutor);
         when(mockedExecutor.configuration(any()))
-            .thenReturn(mockedExecutor);
-        when(mockedExecutor.body(any()))
             .thenReturn(mockedExecutor);
         when(mockedExecutor.execute())
             .thenReturn(mockedResponse);

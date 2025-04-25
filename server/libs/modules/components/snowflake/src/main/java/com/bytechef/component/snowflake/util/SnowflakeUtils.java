@@ -51,27 +51,6 @@ public class SnowflakeUtils {
             .getBody();
     }
 
-    public static String getColumnUpdateStatement(Map<String, ?> values) {
-        String[] columnArray = values.keySet()
-            .toArray(new String[0]);
-        String[] valueArray = values.values()
-            .stream()
-            .map(String::valueOf)
-            .toArray(String[]::new);
-
-        StringBuilder updateStatementBuilder = new StringBuilder();
-
-        for (int i = 0; i < columnArray.length; i++) {
-            updateStatementBuilder.append(columnArray[i])
-                .append("=")
-                .append(valueArray[i])
-                .append(",");
-        }
-
-        updateStatementBuilder.deleteCharAt(updateStatementBuilder.length() - 1);
-        return updateStatementBuilder.toString();
-    }
-
     private static String extractBaseDataType(String sqlType) {
         Pattern pattern = Pattern.compile("^([A-Za-z]+)");
         Matcher matcher = pattern.matcher(sqlType);
