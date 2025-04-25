@@ -1,5 +1,5 @@
 ---
-title: "Rocketchat"
+title: "Rocket.Chat"
 description: "Rocket.Chat is a communication platform that enables team collaboration through messaging, audio/video calls, and integrations, all customizable and self-hostable."
 ---
 
@@ -50,7 +50,7 @@ Send messages to users on your workspace.
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| username | Username | STRING | Username to send the direct message to. | true |
+| roomId | Username | STRING | Username to send the direct message to. | true |
 | text | Message | STRING | The message to send. | true |
 
 #### Example JSON Structure
@@ -59,7 +59,7 @@ Send messages to users on your workspace.
   "label" : "Send Direct Message",
   "name" : "sendDirectMessage",
   "parameters" : {
-    "username" : "",
+    "roomId" : "",
     "text" : ""
   },
   "type" : "rocketchat/v1/sendDirectMessage"
@@ -124,7 +124,7 @@ Send messages to channel on your workspace.
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| name | Channel Name | STRING | Channel name to send the message to. | true |
+| roomId | Channel Name | STRING | Channel name to send the message to. | true |
 | text | Message | STRING | The message to send. | true |
 
 #### Example JSON Structure
@@ -133,7 +133,7 @@ Send messages to channel on your workspace.
   "label" : "Send Channel Message",
   "name" : "sendChannelMessage",
   "parameters" : {
-    "name" : "",
+    "roomId" : "",
     "text" : ""
   },
   "type" : "rocketchat/v1/sendChannelMessage"
