@@ -17,6 +17,7 @@ export default function deleteProperty(
     >
 ) {
     const currentComponent = useWorkflowNodeDetailsPanelStore.getState().currentComponent;
+    const currentNode = useWorkflowNodeDetailsPanelStore.getState().currentNode;
 
     if (!currentComponent) {
         console.error('No current component found in the store');
@@ -33,11 +34,21 @@ export default function deleteProperty(
             id: workflowId,
         },
         {
-            onSuccess: (response) =>
-                useWorkflowNodeDetailsPanelStore.getState().setCurrentComponent({
+            onSuccess: (response) => {
+                const {setCurrentComponent, setCurrentNode} = useWorkflowNodeDetailsPanelStore.getState();
+
+                setCurrentComponent({
                     ...currentComponent,
                     parameters: response.parameters,
-                }),
+                });
+
+                if (currentNode) {
+                    setCurrentNode({
+                        ...currentNode,
+                        parameters: response.parameters,
+                    });
+                }
+            },
         }
     );
 }
