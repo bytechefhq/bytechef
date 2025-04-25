@@ -29,13 +29,14 @@ import static com.bytechef.component.snowflake.constant.SnowflakeConstants.TABLE
 import static com.bytechef.component.snowflake.constant.SnowflakeConstants.TABLE_PROPERTY;
 import static com.bytechef.component.snowflake.constant.SnowflakeConstants.VALUES;
 import static com.bytechef.component.snowflake.constant.SnowflakeConstants.VALUES_DYNAMIC_PROPERTY;
-import static com.bytechef.component.snowflake.util.SnowflakeUtils.getColumnUpdateStatement;
 
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.Property.ControlType;
 import com.bytechef.component.snowflake.util.SnowflakeUtils;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * @author Nikolina Spehar
@@ -70,5 +71,18 @@ public class SnowflakeUpdateRowAction {
             inputParameters.getRequiredString(CONDITION));
 
         return SnowflakeUtils.executeStatement(context, sqlStatement);
+    }
+
+    private static String getColumnUpdateStatement(Map<String, ?> values) {
+        return values
+            .entrySet()
+            .stream()
+            .map(entry -> {
+                String columnName = entry.getKey();
+                Object value = entry.getValue();
+
+                return "%s=%s".formatted(columnName, value instanceof String ? "'" + value + "'" : value);
+            })
+            .collect(Collectors.joining(","));
     }
 }

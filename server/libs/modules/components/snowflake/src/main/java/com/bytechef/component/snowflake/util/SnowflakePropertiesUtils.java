@@ -58,7 +58,6 @@ public class SnowflakePropertiesUtils {
         SnowflakeDataType snowflakeDataType = SnowflakeDataType.getSnowflakeDataType(datatype);
 
         return switch (snowflakeDataType) {
-            // ===== Numeric Types =====
             case NUMBER, DECIMAL, NUMERIC, FLOAT, FLOAT4, DOUBLE, FLOAT8, DOUBLE_PRECISION, REAL,
                 BINARY, VARBINARY -> number(name)
                     .label(name)
@@ -68,7 +67,6 @@ public class SnowflakePropertiesUtils {
                 .required(false);
             case VARCHAR, STRING, TEXT, CHAR, CHARACTER, NVARCHAR, NVARCHAR2, NCHAR -> string(name)
                 .label(name)
-                .description("Value must be inside single straight quotes ('example').")
                 .required(false);
             case BOOLEAN -> bool(name)
                 .label(name)
@@ -84,5 +82,4 @@ public class SnowflakePropertiesUtils {
                 .required(false);
         };
     }
-
 }

@@ -42,7 +42,6 @@ class SnowflakeUpdateRowActionTest {
     private final ArgumentCaptor<Context> contextArgumentCaptor = ArgumentCaptor.forClass(Context.class);
     private final Context mockedContext = mock(Context.class);
     private final Object mockedObject = mock(Object.class);
-    private final ArgumentCaptor<Map<String, ?>> mapArgumentCaptor = ArgumentCaptor.forClass(Map.class);
     private final ArgumentCaptor<String> stringArgumentCaptor = ArgumentCaptor.forClass(String.class);
     private final Parameters mockedParameters = MockParametersFactory.create(
         Map.of(
@@ -53,9 +52,6 @@ class SnowflakeUpdateRowActionTest {
     void perform() {
         try (MockedStatic<SnowflakeUtils> snowflakeUtilsMockedStatic = mockStatic(SnowflakeUtils.class)) {
             snowflakeUtilsMockedStatic
-                .when(() -> SnowflakeUtils.getColumnUpdateStatement(mapArgumentCaptor.capture()))
-                .thenReturn("col1=5,col2=5");
-            snowflakeUtilsMockedStatic
                 .when(() -> SnowflakeUtils.executeStatement(
                     contextArgumentCaptor.capture(), stringArgumentCaptor.capture()))
                 .thenReturn(mockedObject);
@@ -64,9 +60,8 @@ class SnowflakeUpdateRowActionTest {
 
             assertEquals(mockedObject, result);
             assertEquals(mockedContext, contextArgumentCaptor.getValue());
-            assertEquals(mockedParameters.getRequiredMap(VALUES), mapArgumentCaptor.getValue());
             assertEquals(
-                "UPDATE database.schema.table SET col1=5,col2=5 WHERE col1 = 2",
+                "UPDATE database.schema.table SET col2=5,col1=5 WHERE col1 = 2",
                 stringArgumentCaptor.getValue());
         }
     }

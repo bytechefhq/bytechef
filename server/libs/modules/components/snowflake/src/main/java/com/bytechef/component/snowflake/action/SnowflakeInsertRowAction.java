@@ -63,7 +63,7 @@ public class SnowflakeInsertRowAction {
         String values = inputParameters.getRequiredMap(VALUES)
             .values()
             .stream()
-            .map(Object::toString)
+            .map(value -> value instanceof String ? "'" + value + "'" : value.toString())
             .collect(Collectors.joining(","));
 
         String sqlStatement = "INSERT INTO %s.%s.%s(%s) VALUES(%s)".formatted(

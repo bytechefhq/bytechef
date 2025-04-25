@@ -26,7 +26,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
 
 import com.bytechef.component.definition.ActionContext;
-import com.bytechef.component.definition.ComponentDsl.ModifiableValueProperty;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.Property.ValueProperty;
 import com.bytechef.component.test.definition.MockParametersFactory;
@@ -55,23 +54,18 @@ class SnowflakePropertiesUtilsTest {
             List<ValueProperty<?>> propertiesFromColumn = SnowflakePropertiesUtils.createPropertiesForColumn(
                 mockedParameters, mockedParameters, Map.of(), mockedActionContext);
 
-            assertEquals(getExpectedProperties(), propertiesFromColumn);
+            List<ValueProperty<?>> expectedProperties = List.of(
+                number(NAME)
+                    .label(NAME)
+                    .required(false),
+                string(NAME)
+                    .label(NAME)
+                    .required(false),
+                bool(NAME)
+                    .label(NAME)
+                    .required(false));
+
+            assertEquals(expectedProperties, propertiesFromColumn);
         }
-    }
-
-    private static List<? extends ModifiableValueProperty<?, ? extends ModifiableValueProperty<?, ?>>>
-        getExpectedProperties() {
-
-        return List.of(
-            number(NAME)
-                .label(NAME)
-                .required(false),
-            string(NAME)
-                .label(NAME)
-                .description("Value must be inside single straight quotes ('example').")
-                .required(false),
-            bool(NAME)
-                .label(NAME)
-                .required(false));
     }
 }
