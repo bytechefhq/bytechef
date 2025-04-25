@@ -52,7 +52,7 @@ Delete row from the table.
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | database | Database | STRING |  | true |
 | schema | Schema | STRING <details> <summary> Depends On </summary> database </details> |  | true |
-| table | Table | STRING <details> <summary> Depends On </summary> schema </details> |  | true |
+| table | Table | STRING <details> <summary> Depends On </summary> schema, database </details> |  | true |
 | condition | Condition | STRING | Condition that will be checked in the column. Example: column1=5 | true |
 
 #### Example JSON Structure
@@ -194,7 +194,7 @@ Insert row into the table.
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | database | Database | STRING |  | true |
 | schema | Schema | STRING <details> <summary> Depends On </summary> database </details> |  | true |
-| table | Table | STRING <details> <summary> Depends On </summary> schema </details> |  | true |
+| table | Table | STRING <details> <summary> Depends On </summary> schema, database </details> |  | true |
 | values | | DYNAMIC_PROPERTIES <details> <summary> Depends On </summary> table </details> |  | true |
 
 #### Example JSON Structure
@@ -268,7 +268,7 @@ Update row from the table.
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | database | Database | STRING |  | true |
 | schema | Schema | STRING <details> <summary> Depends On </summary> database </details> |  | true |
-| table | Table | STRING <details> <summary> Depends On </summary> schema </details> |  | true |
+| table | Table | STRING <details> <summary> Depends On </summary> schema, database </details> |  | true |
 | condition | Condition | STRING | Condition that will be checked in the column. Example: column1=5 | true |
 | values | | DYNAMIC_PROPERTIES <details> <summary> Depends On </summary> table </details> |  | true |
 

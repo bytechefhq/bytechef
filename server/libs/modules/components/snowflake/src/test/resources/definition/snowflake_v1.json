@@ -1176,7 +1176,7 @@
       "minLength" : null,
       "options" : null,
       "optionsDataSource" : {
-        "optionsLookupDependsOn" : [ "schema" ],
+        "optionsLookupDependsOn" : [ "schema", "database" ],
         "options" : { }
       }
     }, {
@@ -1201,9 +1201,9 @@
       "optionsDataSource" : null
     } ],
     "title" : "Delete Row",
-    "processErrorResponse" : null,
+    "perform" : { },
     "workflowNodeDescription" : null,
-    "perform" : { }
+    "processErrorResponse" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -2323,9 +2323,9 @@
       "optionsDataSource" : null
     } ],
     "title" : "Execute SQL",
-    "processErrorResponse" : null,
+    "perform" : { },
     "workflowNodeDescription" : null,
-    "perform" : { }
+    "processErrorResponse" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -3489,7 +3489,7 @@
       "minLength" : null,
       "options" : null,
       "optionsDataSource" : {
-        "optionsLookupDependsOn" : [ "schema" ],
+        "optionsLookupDependsOn" : [ "schema", "database" ],
         "options" : { }
       }
     }, {
@@ -3509,9 +3509,9 @@
       }
     } ],
     "title" : "Insert Row",
-    "processErrorResponse" : null,
+    "perform" : { },
     "workflowNodeDescription" : null,
-    "perform" : { }
+    "processErrorResponse" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -4675,7 +4675,7 @@
       "minLength" : null,
       "options" : null,
       "optionsDataSource" : {
-        "optionsLookupDependsOn" : [ "schema" ],
+        "optionsLookupDependsOn" : [ "schema", "database" ],
         "options" : { }
       }
     }, {
@@ -4715,9 +4715,9 @@
       }
     } ],
     "title" : "Update Row",
-    "processErrorResponse" : null,
+    "perform" : { },
     "workflowNodeDescription" : null,
-    "perform" : { }
+    "processErrorResponse" : null
   } ],
   "clusterElements" : [ {
     "description" : "Delete row from the table.",
@@ -5878,7 +5878,7 @@
       "minLength" : null,
       "options" : null,
       "optionsDataSource" : {
-        "optionsLookupDependsOn" : [ "schema" ],
+        "optionsLookupDependsOn" : [ "schema", "database" ],
         "options" : { }
       }
     }, {
@@ -8193,7 +8193,7 @@
       "minLength" : null,
       "options" : null,
       "optionsDataSource" : {
-        "optionsLookupDependsOn" : [ "schema" ],
+        "optionsLookupDependsOn" : [ "schema", "database" ],
         "options" : { }
       }
     }, {
@@ -9380,7 +9380,7 @@
       "minLength" : null,
       "options" : null,
       "optionsDataSource" : {
-        "optionsLookupDependsOn" : [ "schema" ],
+        "optionsLookupDependsOn" : [ "schema", "database" ],
         "options" : { }
       }
     }, {
@@ -9501,16 +9501,16 @@
       "title" : null,
       "type" : "OAUTH2_AUTHORIZATION_CODE",
       "acquire" : null,
-      "refresh" : null,
-      "pkce" : null,
-      "scopes" : { },
       "apply" : { },
       "authorizationCallback" : null,
       "authorizationUrl" : { },
       "clientId" : null,
       "clientSecret" : null,
       "oauth2AuthorizationExtraQueryParameters" : null,
+      "pkce" : null,
+      "refresh" : null,
       "refreshUrl" : { },
+      "scopes" : { },
       "refreshToken" : null,
       "tokenUrl" : { }
     } ],
