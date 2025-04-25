@@ -37,7 +37,7 @@ import java.util.Map;
 public class SnowflakeConnection {
 
     public static final ModifiableConnectionDefinition CONNECTION_DEFINITION = connection()
-        .baseUri((connectionParameters, context) -> "https://%s.snowflakecomputing.com"
+        .baseUri((connectionParameters, context) -> "https://%s.snowflakecomputing.com/api/v2"
             .formatted(connectionParameters.getRequiredString(ACCOUNT_IDENTIFIER)))
         .authorizations(
             authorization(AuthorizationType.OAUTH2_AUTHORIZATION_CODE)

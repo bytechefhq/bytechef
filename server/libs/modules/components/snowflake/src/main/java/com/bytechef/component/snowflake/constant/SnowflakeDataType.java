@@ -20,6 +20,7 @@ package com.bytechef.component.snowflake.constant;
  * @author Nikolina Spehar
  */
 public enum SnowflakeDataType {
+
     NUMBER("NUMBER"),
     DECIMAL("DECIMAL"),
     NUMERIC("NUMERIC"),
@@ -35,7 +36,6 @@ public enum SnowflakeDataType {
     DOUBLE("DOUBLE"),
     DOUBLE_PRECISION("DOUBLE PRECISION"),
     REAL("REAL"),
-
     VARCHAR("VARCHAR"),
     CHAR("CHAR"),
     CHARACTER("CHARACTER"),
@@ -44,12 +44,9 @@ public enum SnowflakeDataType {
     NVARCHAR("NVARCHAR"),
     NVARCHAR2("NVARCHAR2"),
     NCHAR("NCHAR"),
-
     BINARY("BINARY"),
     VARBINARY("VARBINARY"),
-
     BOOLEAN("BOOLEAN"),
-
     DATE("DATE"),
     TIME("TIME"),
     TIMESTAMP("TIMESTAMP"),
@@ -57,11 +54,9 @@ public enum SnowflakeDataType {
     TIMESTAMP_LTZ("TIMESTAMP_LTZ"),
     TIMESTAMP_TZ("TIMESTAMP_TZ"),
     DATETIME("DATETIME"),
-
     VARIANT("VARIANT"),
     OBJECT("OBJECT"),
     ARRAY("ARRAY"),
-
     GEOGRAPHY("GEOGRAPHY"),
     GEOMETRY("GEOMETRY");
 
@@ -86,6 +81,7 @@ public enum SnowflakeDataType {
                 return type;
             }
         }
+
         throw new IllegalArgumentException("No SnowflakeDataType constant with text " + text + " found");
     }
 }
