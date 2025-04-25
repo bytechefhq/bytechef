@@ -31,6 +31,7 @@ import com.bytechef.component.google.sheets.action.GoogleSheetsDeleteColumnActio
 import com.bytechef.component.google.sheets.action.GoogleSheetsDeleteRowAction;
 import com.bytechef.component.google.sheets.action.GoogleSheetsDeleteSheetAction;
 import com.bytechef.component.google.sheets.action.GoogleSheetsFindRowByNumAction;
+import com.bytechef.component.google.sheets.action.GoogleSheetsGetRowsAction;
 import com.bytechef.component.google.sheets.action.GoogleSheetsInsertMultipleRowsAction;
 import com.bytechef.component.google.sheets.action.GoogleSheetsInsertRowAction;
 import com.bytechef.component.google.sheets.action.GoogleSheetsListSheetsAction;
@@ -62,6 +63,7 @@ public class GoogleSheetsComponentHandler implements ComponentHandler {
             GoogleSheetsDeleteRowAction.ACTION_DEFINITION,
             GoogleSheetsDeleteSheetAction.ACTION_DEFINITION,
             GoogleSheetsFindRowByNumAction.ACTION_DEFINITION,
+            GoogleSheetsGetRowsAction.ACTION_DEFINITION,
             GoogleSheetsInsertMultipleRowsAction.ACTION_DEFINITION,
             GoogleSheetsInsertRowAction.ACTION_DEFINITION,
             GoogleSheetsListSheetsAction.ACTION_DEFINITION,
@@ -75,6 +77,7 @@ public class GoogleSheetsComponentHandler implements ComponentHandler {
             tool(GoogleSheetsDeleteRowAction.ACTION_DEFINITION),
             tool(GoogleSheetsDeleteSheetAction.ACTION_DEFINITION),
             tool(GoogleSheetsFindRowByNumAction.ACTION_DEFINITION),
+            tool(GoogleSheetsGetRowsAction.ACTION_DEFINITION),
             tool(GoogleSheetsInsertMultipleRowsAction.ACTION_DEFINITION),
             tool(GoogleSheetsInsertRowAction.ACTION_DEFINITION),
             tool(GoogleSheetsListSheetsAction.ACTION_DEFINITION),
