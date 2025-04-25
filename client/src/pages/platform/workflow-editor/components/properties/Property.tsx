@@ -104,7 +104,7 @@ const Property = ({
 
         return property.defaultValue || '';
     });
-    const [lookupDependsOnValues, setLookupDependsOnValues] = useState<Array<string> | undefined>();
+    const [lookupDependsOnValues, setLookupDependsOnValues] = useState<Array<unknown> | undefined>();
     const [mentionInputValue, setMentionInputValue] = useState(property.defaultValue || '');
     const [mentionInput, setMentionInput] = useState(
         !control && MENTION_INPUT_PROPERTY_CONTROL_TYPES.includes(property.controlType!)
@@ -656,12 +656,9 @@ const Property = ({
             return;
         }
 
-        const optionsLookupDependsOnValues: string[] = optionsDataSource?.optionsLookupDependsOn.map(
+        const optionsLookupDependsOnValues: unknown[] = optionsDataSource?.optionsLookupDependsOn.map(
             (optionLookupDependency) =>
-                resolvePath(
-                    currentComponent?.parameters,
-                    optionLookupDependency.replace('[index]', `[${arrayIndex}]`)
-                )?.toString()
+                resolvePath(currentComponent?.parameters, optionLookupDependency.replace('[index]', `[${arrayIndex}]`))
         );
 
         setLookupDependsOnValues(optionsLookupDependsOnValues);
@@ -673,12 +670,12 @@ const Property = ({
             return;
         }
 
-        const propertiesLookupDependsOnValues: string[] = propertiesDataSource?.propertiesLookupDependsOn.map(
+        const propertiesLookupDependsOnValues: unknown[] = propertiesDataSource?.propertiesLookupDependsOn.map(
             (propertyLookupDependency) =>
                 resolvePath(
                     currentComponent?.parameters,
                     propertyLookupDependency.replace('[index]', `[${arrayIndex}]`)
-                )?.toString()
+                )
         );
 
         setLookupDependsOnValues(propertiesLookupDependsOnValues);

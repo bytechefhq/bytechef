@@ -12,9 +12,14 @@ import InlineSVG from 'react-inlinesvg';
 import {twMerge} from 'tailwind-merge';
 
 import useWorkflowNodeDetailsPanelStore from '../../../stores/useWorkflowNodeDetailsPanelStore';
+import getFormattedDependencyKey from '../../../utils/getFormattedDependencyKey';
 import InputTypeSwitchButton from './InputTypeSwitchButton';
 
-import type {Option, OptionsDataSource} from '@/shared/middleware/platform/configuration';
+import type {
+    GetWorkflowNodeOptionsRequest,
+    Option,
+    OptionsDataSource,
+} from '@/shared/middleware/platform/configuration';
 
 type ComboBoxItemType = {
     description?: string;
@@ -33,7 +38,7 @@ interface PropertyComboBoxProps {
     handleInputTypeSwitchButtonClick?: () => void;
     label?: string;
     lookupDependsOnPaths?: Array<string>;
-    lookupDependsOnValues?: Array<string>;
+    lookupDependsOnValues?: Array<unknown>;
     leadingIcon?: ReactNode;
     name?: string;
     onBlur?: FocusEventHandler;
@@ -101,9 +106,14 @@ const PropertyComboBox = ({
         return true;
     }, [currentNode?.connections?.length, currentNode?.connection, currentNode?.connectionId]);
 
-    const queryOptions = useMemo(
+    const lookupDependsOnValuesKey = getFormattedDependencyKey(lookupDependsOnValues);
+
+    const queryOptions: {
+        loadDependencyValueKey: string;
+        request: GetWorkflowNodeOptionsRequest;
+    } = useMemo(
         () => ({
-            loadDependencyValueKey: (lookupDependsOnValues ?? []).join(''),
+            loadDependencyValueKey: lookupDependsOnValuesKey,
             request: {
                 id: workflowId,
                 lookupDependsOnPaths,
@@ -111,7 +121,7 @@ const PropertyComboBox = ({
                 workflowNodeName,
             },
         }),
-        [lookupDependsOnPaths, lookupDependsOnValues, path, workflowId, workflowNodeName]
+        [lookupDependsOnPaths, lookupDependsOnValuesKey, path, workflowId, workflowNodeName]
     );
 
     const queryEnabled = useMemo(
