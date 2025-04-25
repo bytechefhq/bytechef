@@ -194,7 +194,7 @@ const ArrayProperty = ({onDeleteClick, parentArrayItems, path, property}: ArrayP
             });
 
             if (parameterArrayItems?.length) {
-                setArrayItems(parameterArrayItems as Array<ArrayPropertyType>);
+                setArrayItems(parameterArrayItems);
             }
         } else if (items?.length && items[0].type === 'OBJECT' && Array.isArray(parameterValue)) {
             const parameterArrayItems = parameterValue.map((parameterItem: ArrayPropertyType, index: number) => {
