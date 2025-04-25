@@ -107,7 +107,7 @@
     "react-inlinesvg": "^4.2.0",
     "react-json-view": "^1.21.3",
     "react-resizable-panels": "^2.1.7",
-    "react-router-dom": "^7.5.0",
+    "react-router-dom": "^7.5.2",
     "react-select": "^5.10.1",
     "react-textarea-autosize": "^8.5.9",
     "requireindex": "^1.2.0",
