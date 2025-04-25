@@ -37,7 +37,6 @@ import com.bytechef.component.snowflake.util.SnowflakeUtils;
 public class SnowflakeConstants {
 
     public static final String ACCOUNT_IDENTIFIER = "account_identifier";
-    public static final String COLUMN = "column";
     public static final String CONDITION = "condition";
     public static final String DATABASE = "database";
     public static final String DATATYPE = "datatype";
@@ -61,7 +60,7 @@ public class SnowflakeConstants {
     public static final ModifiableStringProperty TABLE_PROPERTY = string(TABLE)
         .label("Table")
         .options((ActionOptionsFunction<String>) SnowflakeUtils::getTableNameOptions)
-        .optionsLookupDependsOn(SCHEMA)
+        .optionsLookupDependsOn(SCHEMA, DATABASE)
         .required(true);
 
     public static final ModifiableDynamicPropertiesProperty VALUES_DYNAMIC_PROPERTY = dynamicProperties(VALUES)

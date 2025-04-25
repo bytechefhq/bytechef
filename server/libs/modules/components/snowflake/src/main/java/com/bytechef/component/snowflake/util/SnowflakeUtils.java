@@ -44,7 +44,7 @@ import java.util.regex.Pattern;
 public class SnowflakeUtils {
 
     public static Object executeStatement(Context context, String sqlStatement) {
-        return context.http(http -> http.post("/api/v2/statements"))
+        return context.http(http -> http.post("/statements"))
             .body(Http.Body.of(Map.of(STATEMENT, sqlStatement)))
             .configuration(responseType(ResponseType.JSON))
             .execute()
@@ -66,7 +66,7 @@ public class SnowflakeUtils {
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
         String searchText, Context context) {
 
-        List<Map<String, Object>> result = context.http(http -> http.get("/api/v2/databases"))
+        List<Map<String, Object>> result = context.http(http -> http.get("/databases"))
             .configuration(responseType(ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});
@@ -79,8 +79,7 @@ public class SnowflakeUtils {
         String searchText, Context context) {
 
         List<Map<String, Object>> result = context.http(http -> http.get(
-            "/api/v2/databases/%s/schemas".formatted(
-                inputParameters.getRequiredString(DATABASE))))
+            "/databases/%s/schemas".formatted(inputParameters.getRequiredString(DATABASE))))
             .configuration(responseType(ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});
@@ -91,7 +90,7 @@ public class SnowflakeUtils {
     public static List<Map<String, String>> getTableColumns(Parameters inputParameters, Context context) {
         Map<String, Object> table = context
             .http(http -> http.get(
-                "/api/v2/databases/%s/schemas/%s/tables/%s".formatted(
+                "/databases/%s/schemas/%s/tables/%s".formatted(
                     inputParameters.getRequiredString(DATABASE),
                     inputParameters.getRequiredString(SCHEMA),
                     inputParameters.getRequiredString(TABLE))))
@@ -113,6 +112,7 @@ public class SnowflakeUtils {
                 }
             }
         }
+
         return columns;
     }
 
@@ -121,7 +121,7 @@ public class SnowflakeUtils {
         String searchText, Context context) {
 
         List<Map<String, Object>> result = context.http(http -> http.get(
-            "/api/v2/databases/%s/schemas/%s/tables".formatted(
+            "/databases/%s/schemas/%s/tables".formatted(
                 inputParameters.getRequiredString(DATABASE), inputParameters.getRequiredString(SCHEMA))))
             .configuration(responseType(ResponseType.JSON))
             .execute()
@@ -134,7 +134,7 @@ public class SnowflakeUtils {
         List<Option<String>> options = new ArrayList<>();
 
         for (Map<String, Object> data : dataList) {
-            String name = (String) data.get("name");
+            String name = (String) data.get(NAME);
 
             options.add(option(name, name));
         }
