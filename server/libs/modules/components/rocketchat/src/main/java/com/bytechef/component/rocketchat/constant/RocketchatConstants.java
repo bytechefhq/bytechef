@@ -1,5 +1,5 @@
 /*
- * Copyright 2023-present ByteChef Inc.
+ * Copyright 2025 ByteChef
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,18 +23,22 @@ import static com.bytechef.component.definition.ComponentDsl.integer;
 import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.string;
 
+/**
+ * @author Marija Horvat
+ */
 public class RocketchatConstants {
 
-    public static final String AUTH_TOKEN = "X-Auth-Token";
-    public static final String USER_ID = "X-User-Id";
-    public static final String USERNAME = "username";
-    public static final String NAME = "name";
     public static final String DOMAIN = "domain";
-    public static final String TEXT = "text";
-    public static final String MEMBERS = "members";
-    public static final String READ_ONLY = "readOnly";
     public static final String EXCLUDE_SELF = "excludeSelf";
     public static final String ID = "id";
+    public static final String MEMBERS = "members";
+    public static final String NAME = "name";
+    public static final String READ_ONLY = "readOnly";
+    public static final String ROOM_ID = "roomId";
+    public static final String TEXT = "text";
+    public static final String USERNAME = "username";
+    public static final String X_AUTH_TOKEN = "X-Auth-Token";
+    public static final String X_USER_ID = "X-User-Id";
 
     public static final ModifiableObjectProperty POST_MESSAGE_RESPONSE_PROPERTY = object()
         .properties(

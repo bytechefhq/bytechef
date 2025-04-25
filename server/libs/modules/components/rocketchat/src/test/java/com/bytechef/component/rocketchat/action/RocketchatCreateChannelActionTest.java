@@ -1,5 +1,5 @@
 /*
- * Copyright 2023-present ByteChef Inc.
+ * Copyright 2025 ByteChef
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,30 +21,51 @@ import static com.bytechef.component.rocketchat.constant.RocketchatConstants.MEM
 import static com.bytechef.component.rocketchat.constant.RocketchatConstants.NAME;
 import static com.bytechef.component.rocketchat.constant.RocketchatConstants.READ_ONLY;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import com.bytechef.component.definition.Context;
+import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.test.definition.MockParametersFactory;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 
 /**
  * @author Marija Horvat
  */
-class RocketchatCreateChannelActionTest extends AbstractRocketchatActionTest {
+class RocketchatCreateChannelActionTest {
 
+    protected ArgumentCaptor<Http.Body> bodyArgumentCaptor = ArgumentCaptor.forClass(Http.Body.class);
+    protected Context mockedContext = mock(Context.class);
+    protected Http.Executor mockedExecutor = mock(Http.Executor.class);
+    protected Object mockedObject = mock(Object.class);
+    protected Http.Response mockedResponse = mock(Http.Response.class);
     private final Parameters mockedParameters = MockParametersFactory.create(
         Map.of(NAME, "test", MEMBERS, List.of("user1", "user2"), READ_ONLY, "false", EXCLUDE_SELF, "false"));
 
     @Test
     void testPerform() {
+        when(mockedContext.http(any()))
+            .thenReturn(mockedExecutor);
+        when(mockedExecutor.body(bodyArgumentCaptor.capture()))
+            .thenReturn(mockedExecutor);
+        when(mockedExecutor.configuration(any()))
+            .thenReturn(mockedExecutor);
+        when(mockedExecutor.execute())
+            .thenReturn(mockedResponse);
+        when(mockedResponse.getBody())
+            .thenReturn(mockedObject);
+
         Object result = RocketchatCreateChannelAction.perform(mockedParameters, mockedParameters, mockedContext);
 
-        assertEquals(responseMap, result);
+        assertEquals(mockedObject, result);
 
-        Context.Http.Body body = bodyArgumentCaptor.getValue();
+        Http.Body body = bodyArgumentCaptor.getValue();
         Map<String, Object> expected = new LinkedHashMap<>();
         expected.put(NAME, "test");
         expected.put(MEMBERS, List.of("user1", "user2"));

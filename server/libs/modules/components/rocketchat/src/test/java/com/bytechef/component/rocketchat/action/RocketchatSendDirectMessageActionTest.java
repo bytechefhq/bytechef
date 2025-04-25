@@ -1,5 +1,5 @@
 /*
- * Copyright 2023-present ByteChef Inc.
+ * Copyright 2025 ByteChef
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,31 +16,47 @@
 
 package com.bytechef.component.rocketchat.action;
 
+import static com.bytechef.component.rocketchat.constant.RocketchatConstants.ROOM_ID;
 import static com.bytechef.component.rocketchat.constant.RocketchatConstants.TEXT;
-import static com.bytechef.component.rocketchat.constant.RocketchatConstants.USERNAME;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.mock;
 
-import com.bytechef.component.definition.Context.Http;
+import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
+import com.bytechef.component.rocketchat.util.RocketchatUtils;
 import com.bytechef.component.test.definition.MockParametersFactory;
+import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
+import org.mockito.MockedStatic;
+import org.mockito.Mockito;
 
-class RocketchatSendDirectMessageActionTest extends AbstractRocketchatActionTest {
+/**
+ * @author Marija Horvat
+ */
+class RocketchatSendDirectMessageActionTest {
 
-    private final Parameters mockedParameters = MockParametersFactory.create(
-        Map.of(USERNAME, "test", TEXT, "This is test."));
+    private final ArgumentCaptor<String> stringArgumentCaptor = ArgumentCaptor.forClass(String.class);
+    private final ArgumentCaptor<Context> contextArgumentCaptor = ArgumentCaptor.forClass(Context.class);
+    private final Context mockedContext = mock(Context.class);
+    private final Object mockedObject = mock(Object.class);
+    private final Parameters mockedParameters =
+        MockParametersFactory.create(Map.of(ROOM_ID, "test", TEXT, "This is test."));
 
     @Test
     void testPerform() {
-        Object result = RocketchatSendDirectMessageAction.perform(mockedParameters, mockedParameters, mockedContext);
+        try (MockedStatic<RocketchatUtils> rocketchatUtilsMockedStatic = Mockito.mockStatic(RocketchatUtils.class)) {
+            rocketchatUtilsMockedStatic
+                .when(() -> RocketchatUtils.sendMessage(
+                    stringArgumentCaptor.capture(), stringArgumentCaptor.capture(), contextArgumentCaptor.capture()))
+                .thenReturn(mockedObject);
 
-        assertEquals(responseMap, result);
+            Object result =
+                RocketchatSendDirectMessageAction.perform(mockedParameters, mockedParameters, mockedContext);
 
-        Http.Body body = bodyArgumentCaptor.getValue();
-        Map<String, Object> expected = Map.of(
-            "roomId", "@test",
-            TEXT, "This is test.");
-        assertEquals(expected, body.getContent());
+            assertEquals(mockedObject, result);
+            assertEquals(List.of("@test", "This is test."), stringArgumentCaptor.getAllValues());
+        }
     }
 }

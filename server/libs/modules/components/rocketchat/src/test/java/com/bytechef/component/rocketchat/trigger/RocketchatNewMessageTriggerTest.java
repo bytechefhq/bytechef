@@ -1,5 +1,5 @@
 /*
- * Copyright 2023-present ByteChef Inc.
+ * Copyright 2025 ByteChef
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -81,14 +81,17 @@ class RocketchatNewMessageTriggerTest {
 
         Http.Body body = bodyArgumentCaptor.getValue();
 
-        assertEquals(Map.of("type", "webhook-outgoing",
-            USERNAME, "rocket.cat",
-            "channel", "all_public_channels, all_private_groups, all_direct_messages",
-            "event", "sendMessage",
-            "urls", List.of(webhookUrl),
-            "enabled", true,
-            NAME, "Message Sent Trigger",
-            "scriptEnabled", false), body.getContent());
+        assertEquals(
+            Map.of(
+                "type", "webhook-outgoing",
+                USERNAME, "rocket.cat",
+                "channel", "all_public_channels, all_private_groups, all_direct_messages",
+                "event", "sendMessage",
+                "urls", List.of(webhookUrl),
+                "enabled", true,
+                NAME, "Message Sent Trigger",
+                "scriptEnabled", false),
+            body.getContent());
     }
 
     @Test

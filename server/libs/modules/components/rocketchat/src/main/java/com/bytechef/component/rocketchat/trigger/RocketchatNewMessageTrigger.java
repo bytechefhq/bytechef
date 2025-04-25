@@ -1,5 +1,5 @@
 /*
- * Copyright 2023-present ByteChef Inc.
+ * Copyright 2025 ByteChef
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -60,22 +60,22 @@ public class RocketchatNewMessageTrigger {
         String workflowExecutionId, TriggerContext context) {
 
         Map<String, ?> body = context.http(http -> http.post("/integrations.create"))
-            .body(Body.of(
-                "type", "webhook-outgoing",
-                USERNAME, "rocket.cat",
-                "channel", "all_public_channels, all_private_groups, all_direct_messages",
-                "event", "sendMessage",
-                "urls", List.of(webhookUrl),
-                "enabled", true,
-                NAME, "Message Sent Trigger",
-                "scriptEnabled", false))
+            .body(
+                Body.of(
+                    "type", "webhook-outgoing",
+                    USERNAME, "rocket.cat",
+                    "channel", "all_public_channels, all_private_groups, all_direct_messages",
+                    "event", "sendMessage",
+                    "urls", List.of(webhookUrl),
+                    "enabled", true,
+                    NAME, "Message Sent Trigger",
+                    "scriptEnabled", false))
             .configuration(responseType(ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});
 
         if (body.get("integration") instanceof Map<?, ?> integration) {
-            String integrationId = (String) integration.get("_id");
-            return new WebhookEnableOutput(Map.of(ID, integrationId), null);
+            return new WebhookEnableOutput(Map.of(ID, (String) integration.get("_id")), null);
         }
 
         return null;
@@ -86,9 +86,10 @@ public class RocketchatNewMessageTrigger {
         String workflowExecutionId, TriggerContext context) {
 
         context.http(http -> http.post("/integrations.remove"))
-            .body(Body.of(
-                "integrationId", outputParameters.getRequiredString(ID),
-                "type", "webhook-outgoing"))
+            .body(
+                Body.of(
+                    "integrationId", outputParameters.getRequiredString(ID),
+                    "type", "webhook-outgoing"))
             .execute();
     }
 

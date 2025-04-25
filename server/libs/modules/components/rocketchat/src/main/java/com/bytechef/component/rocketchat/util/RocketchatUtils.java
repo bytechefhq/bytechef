@@ -1,5 +1,5 @@
 /*
- * Copyright 2023-present ByteChef Inc.
+ * Copyright 2025 ByteChef
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,9 +18,13 @@ package com.bytechef.component.rocketchat.util;
 
 import static com.bytechef.component.definition.ComponentDsl.option;
 import static com.bytechef.component.definition.Context.Http.responseType;
+import static com.bytechef.component.rocketchat.constant.RocketchatConstants.NAME;
+import static com.bytechef.component.rocketchat.constant.RocketchatConstants.ROOM_ID;
+import static com.bytechef.component.rocketchat.constant.RocketchatConstants.TEXT;
 import static com.bytechef.component.rocketchat.constant.RocketchatConstants.USERNAME;
 
 import com.bytechef.component.definition.Context;
+import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
@@ -41,7 +45,7 @@ public class RocketchatUtils {
         String searchText, Context context) {
 
         Map<String, Object> body = context.http(http -> http.get("/users.list"))
-            .configuration(responseType(Context.Http.ResponseType.JSON))
+            .configuration(responseType(Http.ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});
 
@@ -65,7 +69,7 @@ public class RocketchatUtils {
         String searchText, Context context) {
 
         Map<String, Object> body = context.http(http -> http.get("/channels.list"))
-            .configuration(responseType(Context.Http.ResponseType.JSON))
+            .configuration(responseType(Http.ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});
 
@@ -74,7 +78,7 @@ public class RocketchatUtils {
         if (body.get("channels") instanceof List<?> channels) {
             for (Object channel : channels) {
                 if (channel instanceof Map<?, ?> map) {
-                    String name = (String) map.get("name");
+                    String name = (String) map.get(NAME);
 
                     options.add(option(name, "#" + name));
                 }
@@ -82,5 +86,17 @@ public class RocketchatUtils {
         }
 
         return options;
+    }
+
+    public static Object sendMessage(String roomdId, String text, Context context) {
+        return context
+            .http(http -> http.post("/chat.postMessage"))
+            .body(
+                Http.Body.of(
+                    ROOM_ID, roomdId,
+                    TEXT, text))
+            .configuration(responseType(Http.ResponseType.JSON))
+            .execute()
+            .getBody();
     }
 }

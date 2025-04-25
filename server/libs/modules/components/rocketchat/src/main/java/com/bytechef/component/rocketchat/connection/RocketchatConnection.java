@@ -1,5 +1,5 @@
 /*
- * Copyright 2023-present ByteChef Inc.
+ * Copyright 2025 ByteChef
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,35 +19,40 @@ package com.bytechef.component.rocketchat.connection;
 import static com.bytechef.component.definition.ComponentDsl.authorization;
 import static com.bytechef.component.definition.ComponentDsl.connection;
 import static com.bytechef.component.definition.ComponentDsl.string;
-import static com.bytechef.component.rocketchat.constant.RocketchatConstants.AUTH_TOKEN;
 import static com.bytechef.component.rocketchat.constant.RocketchatConstants.DOMAIN;
-import static com.bytechef.component.rocketchat.constant.RocketchatConstants.USER_ID;
+import static com.bytechef.component.rocketchat.constant.RocketchatConstants.X_AUTH_TOKEN;
+import static com.bytechef.component.rocketchat.constant.RocketchatConstants.X_USER_ID;
 
-import com.bytechef.component.definition.Authorization;
+import com.bytechef.component.definition.Authorization.ApplyResponse;
+import com.bytechef.component.definition.Authorization.AuthorizationType;
 import com.bytechef.component.definition.ComponentDsl.ModifiableConnectionDefinition;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * @author Marija Horvat
+ */
 public class RocketchatConnection {
 
     public static final ModifiableConnectionDefinition CONNECTION_DEFINITION = connection()
         .baseUri((connectionParameters, context) -> "https://" + connectionParameters.getRequiredString(DOMAIN)
             + ".rocket.chat/api/v1")
         .authorizations(
-            authorization(Authorization.AuthorizationType.CUSTOM)
+            authorization(AuthorizationType.CUSTOM)
                 .properties(
                     string(DOMAIN)
                         .label("Domain")
                         .required(true),
-                    string(AUTH_TOKEN)
+                    string(X_AUTH_TOKEN)
                         .label("Auth Token")
                         .required(true),
-                    string(USER_ID)
+                    string(X_USER_ID)
                         .label("User ID")
                         .required(true))
-                .apply((connectionParameters, context) -> Authorization.ApplyResponse.ofHeaders(
-                    Map.of(AUTH_TOKEN, List.of(connectionParameters.getRequiredString(AUTH_TOKEN)),
-                        USER_ID, List.of(connectionParameters.getRequiredString(USER_ID))))));
+                .apply((connectionParameters, context) -> ApplyResponse.ofHeaders(
+                    Map.of(
+                        X_AUTH_TOKEN, List.of(connectionParameters.getRequiredString(X_AUTH_TOKEN)),
+                        X_USER_ID, List.of(connectionParameters.getRequiredString(X_USER_ID))))));
 
     private RocketchatConnection() {
     }

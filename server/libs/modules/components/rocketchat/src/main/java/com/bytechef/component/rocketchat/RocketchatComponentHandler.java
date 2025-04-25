@@ -1,5 +1,5 @@
 /*
- * Copyright 2023-present ByteChef Inc.
+ * Copyright 2025 ByteChef
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,17 +29,22 @@ import com.bytechef.component.rocketchat.connection.RocketchatConnection;
 import com.bytechef.component.rocketchat.trigger.RocketchatNewMessageTrigger;
 import com.google.auto.service.AutoService;
 
+/**
+ * @author Marija Horvat
+ */
 @AutoService(ComponentHandler.class)
 public class RocketchatComponentHandler implements ComponentHandler {
 
     private static final ComponentDefinition COMPONENT_DEFINITION = component("rocketchat")
-        .title("Rocketchat")
+        .title("Rocket.Chat")
         .description(
-            "Rocket.Chat is a communication platform that enables team collaboration through messaging, audio/video calls, and integrations, all customizable and self-hostable.")
+            "Rocket.Chat is a communication platform that enables team collaboration through messaging, " +
+                "audio/video calls, and integrations, all customizable and self-hostable.")
         .icon("path:assets/rocketchat.svg")
         .categories(ComponentCategory.COMMUNICATION)
         .connection(RocketchatConnection.CONNECTION_DEFINITION)
-        .actions(RocketchatSendDirectMessageAction.ACTION_DEFINITION,
+        .actions(
+            RocketchatSendDirectMessageAction.ACTION_DEFINITION,
             RocketchatSendChannelMessageAction.ACTION_DEFINITION,
             RocketchatCreateChannelAction.ACTION_DEFINITION)
         .triggers(RocketchatNewMessageTrigger.TRIGGER_DEFINITION)
