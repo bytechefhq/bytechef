@@ -90,6 +90,7 @@
                     "border-accent",
                     "border-content-neutral-tertiary",
                     "border-input",
+                    "border-l-border/50",
                     "border-muted",
                     "border-primary",
                     "border-stroke-brand-primary",
@@ -165,6 +166,7 @@
                     "w-appearance-theme-choice-skeleton-small-width",
                     "w-node-popover-width",
                     "w-sidebar-width",
+                    "w-workflow-nodes-popover-actions-menu-width",
                     "w-workflow-nodes-popover-menu-width",
                     "w-workflow-outputs-sheet-dialog-width",
                     "w-task-filter-dropdown-menu-width"
