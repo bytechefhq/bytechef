@@ -3,15 +3,16 @@ import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWor
 import useWorkflowNodeDetailsPanelStore from '@/pages/platform/workflow-editor/stores/useWorkflowNodeDetailsPanelStore';
 import {Property as PropertyModel} from '@/shared/middleware/platform/configuration';
 import {useGetWorkflowNodeDynamicPropertiesQuery} from '@/shared/queries/platform/workflowNodeDynamicProperties.queries';
-import {useEffect, useMemo, useState} from 'react';
+import {Fragment, useEffect, useMemo, useState} from 'react';
 
+import getFormattedDependencyKey from '../../../utils/getFormattedDependencyKey';
 import Property from '../Property';
 
 interface PropertyDynamicPropertiesProps {
     currentOperationName?: string;
     enabled: boolean;
-    lookupDependsOnPaths?: Array<string>;
-    lookupDependsOnValues?: Array<string>;
+    lookupDependsOnPaths?: Array<unknown>;
+    lookupDependsOnValues?: Array<unknown>;
     name?: string;
     path?: string;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -28,20 +29,23 @@ const PropertyDynamicProperties = ({
     path,
 }: PropertyDynamicPropertiesProps) => {
     const [subProperties, setSubProperties] = useState<PropertyModel[]>();
+    const [lastProcessedKey, setLastProcessedKey] = useState('');
 
     const {workflow} = useWorkflowDataStore();
     const {currentNode} = useWorkflowNodeDetailsPanelStore();
 
+    const lookupDependsOnValuesKey = getFormattedDependencyKey(lookupDependsOnValues);
+
     const queryOptions = useMemo(
         () => ({
-            lookupDependsOnValuesKey: (lookupDependsOnValues ?? []).join(','),
+            lookupDependsOnValuesKey,
             request: {
                 id: workflow.id!,
                 propertyName: name!,
                 workflowNodeName: currentNode?.name ?? '',
             },
         }),
-        [lookupDependsOnValues, name, workflow.id, currentNode]
+        [lookupDependsOnValuesKey, workflow.id, name, currentNode?.name]
     );
 
     const queryEnabled = useMemo(
@@ -54,11 +58,18 @@ const PropertyDynamicProperties = ({
 
     const {data: properties, isLoading} = useGetWorkflowNodeDynamicPropertiesQuery(queryOptions, Boolean(queryEnabled));
 
+    // Update subProperties and track which key generated these properties
     useEffect(() => {
-        setSubProperties(properties);
-    }, [properties]);
+        if (properties) {
+            setSubProperties(properties);
 
-    if (isLoading) {
+            setLastProcessedKey(lookupDependsOnValuesKey);
+        }
+    }, [properties, lookupDependsOnValuesKey]);
+
+    const isPending = lookupDependsOnValuesKey !== lastProcessedKey;
+
+    if (isLoading || isPending) {
         return (
             <ul className="flex flex-col gap-4">
                 <li className="flex flex-col space-y-1">
@@ -87,10 +98,10 @@ const PropertyDynamicProperties = ({
     }
 
     return (
-        <ul className="space-y-4" key={`${(lookupDependsOnValues ?? []).join('')}_DynamicProperty`}>
+        <ul className="space-y-4">
             {subProperties.map((property, index) => (
                 <Property
-                    key={`${property.name}_${index}_${(lookupDependsOnValues ?? []).join('')}_property`}
+                    key={`${property.name}_${index}_${lastProcessedKey}_property`}
                     objectName={name}
                     operationName={currentOperationName}
                     parameterValue={property.name ? parameterValue?.[property.name] : ''}

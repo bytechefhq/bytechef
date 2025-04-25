@@ -10,6 +10,7 @@ import {ReactNode, useEffect, useMemo, useState} from 'react';
 import {twMerge} from 'tailwind-merge';
 
 import useWorkflowNodeDetailsPanelStore from '../../../stores/useWorkflowNodeDetailsPanelStore';
+import getFormattedDependencyKey from '../../../utils/getFormattedDependencyKey';
 import InputTypeSwitchButton from './InputTypeSwitchButton';
 
 interface PropertyMultiSelectProps {
@@ -17,8 +18,8 @@ interface PropertyMultiSelectProps {
     deletePropertyButton: ReactNode;
     handleInputTypeSwitchButtonClick?: () => void;
     leadingIcon?: ReactNode;
-    lookupDependsOnPaths?: string[];
-    lookupDependsOnValues?: string[];
+    lookupDependsOnPaths?: Array<string>;
+    lookupDependsOnValues?: Array<unknown>;
     onChange?: (value: string[]) => void;
     options?: MultiSelectOptionType[];
     optionsDataSource?: OptionsDataSource;
@@ -60,9 +61,11 @@ const PropertyMultiSelect = ({
         return true;
     }, [currentNode?.connections?.length, currentNode?.connection, currentNode?.connectionId]);
 
+    const lookupDependsOnValuesKey = getFormattedDependencyKey(lookupDependsOnValues);
+
     const queryOptions = useMemo(
         () => ({
-            loadDependencyValueKey: (lookupDependsOnValues ?? []).join(''),
+            loadDependencyValueKey: lookupDependsOnValuesKey,
             request: {
                 id: workflowId,
                 lookupDependsOnPaths,
@@ -70,7 +73,7 @@ const PropertyMultiSelect = ({
                 workflowNodeName: workflowNodeName!,
             },
         }),
-        [lookupDependsOnPaths, lookupDependsOnValues, path, workflowId, workflowNodeName]
+        [lookupDependsOnPaths, lookupDependsOnValuesKey, path, workflowId, workflowNodeName]
     );
 
     const queryEnabled = useMemo(
