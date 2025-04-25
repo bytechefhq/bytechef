@@ -151,6 +151,7 @@ export type NodeDataType = {
     branchData?: BranchDataType;
     branchId?: string;
     clusterElements?: ClusterElementsType;
+    clusterElementType?: string;
     componentName: string;
     conditionCase?: 'caseTrue' | 'caseFalse';
     conditionData?: ConditionDataType;

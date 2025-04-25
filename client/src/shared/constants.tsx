@@ -141,6 +141,14 @@ export const COMPONENT_CATEGORY_ICON: Record<string, JSX.Element> = {
 
 export const SORTED_CLUSTER_ELEMENTS_KEYS = ['rag', 'chatMemory', 'model', 'tools'];
 
+export const AI_AGENT_EDGE_LABELS = {
+    rag: 'Rag',
+    // eslint-disable-next-line sort-keys
+    chatMemory: 'Chat Memory',
+    model: 'Model',
+    tools: 'Tools',
+};
+
 export const TASK_DISPATCHER_DATA_KEY_MAP = {
     branch: 'branchData',
     condition: 'conditionData',
