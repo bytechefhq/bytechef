@@ -1,5 +1,5 @@
 /*
- * Copyright 2023-present ByteChef Inc.
+ * Copyright 2025 ByteChef
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,8 @@
 package com.bytechef.component.rocketchat.util;
 
 import static com.bytechef.component.definition.ComponentDsl.option;
+import static com.bytechef.component.rocketchat.constant.RocketchatConstants.NAME;
+import static com.bytechef.component.rocketchat.constant.RocketchatConstants.USERNAME;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
@@ -57,8 +59,8 @@ class RocketchatUtilsTest {
         when(mockedResponse.getBody(any(TypeReference.class)))
             .thenReturn(Map.of(
                 "users", List.of(
-                    Map.of("username", "user1"),
-                    Map.of("username", "user2"))));
+                    Map.of(USERNAME, "user1"),
+                    Map.of(USERNAME, "user2"))));
 
         List<Option<String>> expectedOptions = List.of(
             option("user1", "user1"),
@@ -75,8 +77,8 @@ class RocketchatUtilsTest {
         when(mockedResponse.getBody(any(TypeReference.class)))
             .thenReturn(Map.of(
                 "channels", List.of(
-                    Map.of("name", "channel1"),
-                    Map.of("name", "channel2"))));
+                    Map.of(NAME, "channel1"),
+                    Map.of(NAME, "channel2"))));
 
         List<Option<String>> expectedOptions = List.of(
             option("channel1", "#channel1"),

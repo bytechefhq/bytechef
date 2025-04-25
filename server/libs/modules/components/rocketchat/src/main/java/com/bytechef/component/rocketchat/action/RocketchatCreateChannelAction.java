@@ -1,5 +1,5 @@
 /*
- * Copyright 2023-present ByteChef Inc.
+ * Copyright 2025 ByteChef
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,7 +30,8 @@ import static com.bytechef.component.rocketchat.constant.RocketchatConstants.NAM
 import static com.bytechef.component.rocketchat.constant.RocketchatConstants.READ_ONLY;
 
 import com.bytechef.component.definition.Context;
-import com.bytechef.component.definition.OptionsDataSource;
+import com.bytechef.component.definition.Context.Http;
+import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.rocketchat.util.RocketchatUtils;
 
@@ -50,9 +51,8 @@ public class RocketchatCreateChannelAction {
             array(MEMBERS)
                 .label("Members")
                 .description("An array of the users to be added to the channel when it is created.")
-                .items(
-                    string()
-                        .options((OptionsDataSource.ActionOptionsFunction<String>) RocketchatUtils::getUsersOptions))
+                .items(string())
+                .options((ActionOptionsFunction<String>) RocketchatUtils::getUsersOptions)
                 .required(false),
             bool(READ_ONLY)
                 .label("Read Only")
@@ -74,12 +74,13 @@ public class RocketchatCreateChannelAction {
     public static Object perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
         return context
             .http(http -> http.post("/channels.create"))
-            .body(Context.Http.Body.of(
-                NAME, inputParameters.getRequiredString(NAME),
-                MEMBERS, inputParameters.getList(MEMBERS),
-                READ_ONLY, inputParameters.getBoolean(READ_ONLY),
-                EXCLUDE_SELF, inputParameters.getBoolean(EXCLUDE_SELF)))
-            .configuration(responseType(Context.Http.ResponseType.JSON))
+            .body(
+                Http.Body.of(
+                    NAME, inputParameters.getRequiredString(NAME),
+                    MEMBERS, inputParameters.getList(MEMBERS),
+                    READ_ONLY, inputParameters.getBoolean(READ_ONLY),
+                    EXCLUDE_SELF, inputParameters.getBoolean(EXCLUDE_SELF)))
+            .configuration(responseType(Http.ResponseType.JSON))
             .execute()
             .getBody();
     }

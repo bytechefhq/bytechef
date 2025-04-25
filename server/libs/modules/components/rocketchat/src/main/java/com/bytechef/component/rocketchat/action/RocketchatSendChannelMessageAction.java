@@ -1,5 +1,5 @@
 /*
- * Copyright 2023-present ByteChef Inc.
+ * Copyright 2025 ByteChef
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,14 +19,14 @@ package com.bytechef.component.rocketchat.action;
 import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
-import static com.bytechef.component.definition.Context.Http.responseType;
-import static com.bytechef.component.rocketchat.constant.RocketchatConstants.NAME;
 import static com.bytechef.component.rocketchat.constant.RocketchatConstants.POST_MESSAGE_RESPONSE_PROPERTY;
+import static com.bytechef.component.rocketchat.constant.RocketchatConstants.ROOM_ID;
 import static com.bytechef.component.rocketchat.constant.RocketchatConstants.TEXT;
+import static com.bytechef.component.rocketchat.util.RocketchatUtils.sendMessage;
 
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context;
-import com.bytechef.component.definition.OptionsDataSource;
+import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.rocketchat.util.RocketchatUtils;
 
@@ -39,10 +39,10 @@ public class RocketchatSendChannelMessageAction {
         .title("Send Channel Message")
         .description("Send messages to channel on your workspace.")
         .properties(
-            string(NAME)
+            string(ROOM_ID)
                 .label("Channel Name")
                 .description("Channel name to send the message to.")
-                .options((OptionsDataSource.ActionOptionsFunction<String>) RocketchatUtils::getChannelsOptions)
+                .options((ActionOptionsFunction<String>) RocketchatUtils::getChannelsOptions)
                 .required(true),
             string(TEXT)
                 .label("Message")
@@ -55,13 +55,7 @@ public class RocketchatSendChannelMessageAction {
     }
 
     public static Object perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
-        return context
-            .http(http -> http.post("/chat.postMessage"))
-            .body(Context.Http.Body.of(
-                "roomId", inputParameters.getRequiredString(NAME),
-                TEXT, inputParameters.getRequiredString(TEXT)))
-            .configuration(responseType(Context.Http.ResponseType.JSON))
-            .execute()
-            .getBody();
+        return sendMessage(
+            inputParameters.getRequiredString(ROOM_ID), inputParameters.getRequiredString(TEXT), context);
     }
 }
