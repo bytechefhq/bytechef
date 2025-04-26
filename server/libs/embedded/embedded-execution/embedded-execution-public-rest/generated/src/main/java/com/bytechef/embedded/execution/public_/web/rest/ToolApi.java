@@ -36,7 +36,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-04-03T22:34:20.132774+02:00[Europe/Zagreb]", comments = "Generator version: 7.12.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-04-24T13:42:07.993902+02:00[Europe/Zagreb]", comments = "Generator version: 7.12.0")
 @Validated
 @Tag(name = "tool", description = "The Embedded AI Tool Public API")
 public interface ToolApi {
@@ -171,6 +171,7 @@ public interface ToolApi {
      * GET /tools : Returns a list with all the available tools
      * Returns a list with all the available tools.
      *
+     * @param externalUserId The external user id. (required)
      * @param xEnvironment The environment. (optional)
      * @param categories Filter by specific integration categories, depending on the integrations the user has connected. (optional)
      * @param components Filter by specific components, depending on the integrations the user has connected. (optional)
@@ -231,6 +232,7 @@ public interface ToolApi {
     )
     
     default ResponseEntity<Map<String, List<ToolModel>>> getTools(
+        @NotNull @Parameter(name = "externalUserId", description = "The external user id.", required = true, in = ParameterIn.QUERY) @Valid @RequestParam(value = "externalUserId", required = true) String externalUserId,
         @Parameter(name = "X-Environment", description = "The environment.", in = ParameterIn.HEADER) @RequestHeader(value = "X-Environment", required = false) EnvironmentModel xEnvironment,
         @Parameter(name = "categories", description = "Filter by specific integration categories, depending on the integrations the user has connected.", in = ParameterIn.QUERY) @Valid @RequestParam(value = "categories", required = false) List<String> categories,
         @Parameter(name = "components", description = "Filter by specific components, depending on the integrations the user has connected.", in = ParameterIn.QUERY) @Valid @RequestParam(value = "components", required = false) List<String> components,
