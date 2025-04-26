@@ -117,7 +117,7 @@ spotless {
         target("*.gradle", "*.md", ".gitignore")
 
         trimTrailingWhitespace()
-        indentWithSpaces(4)
+        leadingTabsToSpaces(4)
         endWithNewline()
     }
     java {
@@ -181,7 +181,7 @@ spotless {
         importOrder()
         removeUnusedImports()
         trimTrailingWhitespace()
-        indentWithSpaces(4)
+        leadingTabsToSpaces(4)
         endWithNewline()
     }
     yaml {
