@@ -26,7 +26,6 @@ import {useNavigate, useParams, useSearchParams} from 'react-router-dom';
 
 export const useProject = () => {
     const {setWorkflow, workflow} = useWorkflowDataStore();
-
     const {setCopilotPanelOpen} = useCopilotStore();
     const {setDataPillPanelOpen} = useDataPillPanelStore();
     const {setShowBottomPanelOpen, setShowEditWorkflowDialog} = useWorkflowEditorStore();
@@ -90,12 +89,7 @@ export const useProject = () => {
     });
 
     const updateWorkflowEditorMutation = useUpdatePlatformWorkflowMutation({
-        onSuccess: () => {
-            queryClient.invalidateQueries({
-                queryKey: ProjectWorkflowKeys.projectWorkflow(+projectId!, +projectWorkflowId!),
-            });
-        },
-        useUpdateWorkflowMutation: useUpdateWorkflowMutation,
+        useUpdateWorkflowMutation,
         workflowId: workflow.id!,
         workflowKeys: WorkflowKeys,
     });
@@ -112,7 +106,7 @@ export const useProject = () => {
 
             setShowEditWorkflowDialog(false);
         },
-        useUpdateWorkflowMutation: useUpdateWorkflowMutation,
+        useUpdateWorkflowMutation,
         workflowId: workflow.id!,
         workflowKeys: WorkflowKeys,
     });
