@@ -58,25 +58,26 @@ public class MailchimpSubscribeTrigger {
                 .label("List Id")
                 .description("The list id of intended audience to which you would like to add the contact.")
                 .required(true))
-        .output(outputSchema(
-            object()
-                .properties(
-                    object("data")
-                        .properties(
-                            string("email"),
-                            string("email_type"),
-                            string("id"),
-                            string("ip_opt"),
-                            string("ip_signup"),
-                            string("list_id"),
-                            object("merges")
-                                .properties(
-                                    string("EMAIL"),
-                                    string("FNAME"),
-                                    string("INTERESTS"),
-                                    string("LNAME"))),
-                    dateTime("fired_at"),
-                    string("type"))))
+        .output(
+            outputSchema(
+                object()
+                    .properties(
+                        object("data")
+                            .properties(
+                                string("email"),
+                                string("email_type"),
+                                string("id"),
+                                string("ip_opt"),
+                                string("ip_signup"),
+                                string("list_id"),
+                                object("merges")
+                                    .properties(
+                                        string("EMAIL"),
+                                        string("FNAME"),
+                                        string("INTERESTS"),
+                                        string("LNAME"))),
+                        dateTime("fired_at"),
+                        string("type"))))
         .webhookDisable(MailchimpSubscribeTrigger::webhookDisable)
         .webhookEnable(MailchimpSubscribeTrigger::webhookEnable)
         .webhookRequest(MailchimpSubscribeTrigger::webhookRequest);
