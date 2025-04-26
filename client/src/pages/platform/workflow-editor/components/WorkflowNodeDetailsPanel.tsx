@@ -848,6 +848,11 @@ const WorkflowNodeDetailsPanel = ({
                                                 currentTriggerDefinition?.outputDefined) ??
                                             false
                                         }
+                                        outputFunctionDefined={
+                                            (currentActionDefinition?.outputFunctionDefined ||
+                                                currentTriggerDefinition?.outputFunctionDefined) ??
+                                            false
+                                        }
                                         workflowId={workflow.id!}
                                     />
                                 )}

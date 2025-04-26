@@ -38,12 +38,19 @@ interface OutputTabProps {
     connectionMissing: boolean;
     currentNode: NodeDataType;
     outputDefined: boolean;
+    outputFunctionDefined: boolean;
     workflowId: string;
 }
 
 const webhookTriggerTestApi = new WebhookTriggerTestApi();
 
-const OutputTab = ({connectionMissing, currentNode, outputDefined = false, workflowId}: OutputTabProps) => {
+const OutputTab = ({
+    connectionMissing,
+    currentNode,
+    outputDefined = false,
+    outputFunctionDefined = false,
+    workflowId,
+}: OutputTabProps) => {
     const [webhookTestCancelEnabled, setWebhookTestCancelEnabled] = useState(false);
     const [showUploadDialog, setShowUploadDialog] = useState(false);
     const [startWebhookTest, setStartWebhookTest] = useState(false);
@@ -281,7 +288,7 @@ const OutputTab = ({connectionMissing, currentNode, outputDefined = false, workf
                                             Upload Sample Output Data
                                         </DropdownMenuItem>
 
-                                        {outputDefined && (
+                                        {outputDefined && !outputFunctionDefined && (
                                             <DropdownMenuItem
                                                 className="cursor-pointer"
                                                 onClick={handlePredefinedOutputSchemaClick}
