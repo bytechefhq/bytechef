@@ -50,21 +50,6 @@ export const useSettingsMenu = ({project, workflow}: {project: Project; workflow
         },
     });
 
-    const deleteWorkflowMutation = useDeleteWorkflowMutation({
-        onSuccess: () => {
-            navigate(
-                `/automation/projects/${project.id!}/project-workflows/${project?.projectWorkflowIds?.filter((projectWorkflowId) => projectWorkflowId !== (workflow as Workflow).projectWorkflowId)[0]}?${searchParams}`
-            );
-
-            queryClient.removeQueries({
-                queryKey: ProjectWorkflowKeys.projectWorkflow(project.id!, (workflow as Workflow).projectWorkflowId!),
-            });
-            queryClient.removeQueries({queryKey: WorkflowKeys.workflow(workflow.id!)});
-
-            queryClient.invalidateQueries({queryKey: ProjectKeys.projects});
-        },
-    });
-
     const duplicateProjectMutation = useDuplicateProjectMutation({
         onSuccess: () => {
             queryClient.invalidateQueries({queryKey: ProjectKeys.projects});
@@ -127,6 +112,33 @@ export const useSettingsMenu = ({project, workflow}: {project: Project; workflow
             navigate('/automation/projects');
         }
     };
+
+    const deleteWorkflowMutation = useDeleteWorkflowMutation({
+        onSuccess: () => {
+            const projectId = project.id;
+            const deletedWorkflowId = (workflow as Workflow).projectWorkflowId;
+
+            const firstRemainingWorkflowId = project?.projectWorkflowIds?.find(
+                (projectWorkflowId) => projectWorkflowId !== deletedWorkflowId
+            );
+
+            if (!projectId || !firstRemainingWorkflowId || !deletedWorkflowId) {
+                return;
+            }
+
+            queryClient.removeQueries({
+                queryKey: ProjectWorkflowKeys.projectWorkflow(projectId, deletedWorkflowId),
+            });
+
+            queryClient.removeQueries({queryKey: WorkflowKeys.workflow(workflow.id!)});
+
+            queryClient.invalidateQueries({
+                queryKey: ProjectWorkflowKeys.projectWorkflows(projectId),
+            });
+
+            navigate(`/automation/projects/${projectId}/project-workflows/${firstRemainingWorkflowId}?${searchParams}`);
+        },
+    });
 
     const handleDeleteWorkflowAlertDialogClick = () => {
         if (project.id && workflow.id) {
