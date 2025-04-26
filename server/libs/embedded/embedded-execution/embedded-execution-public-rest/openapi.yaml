@@ -261,6 +261,12 @@ paths:
           required: false
           schema:
             $ref: '#/components/schemas/Environment'
+        - name: "externalUserId"
+          description: "The external user id."
+          in: "query"
+          required: true
+          schema:
+            type: "string"
         - name: "categories"
           description: "Filter by specific integration categories, depending on the integrations the user has connected."
           in: "query"
