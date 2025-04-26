@@ -12,16 +12,16 @@ export interface WorkflowMutationProviderProps {
 
 const WorkflowMutationProviderContext = createContext<WorkflowMutationStateI | undefined>(undefined);
 
-export const WorkflowMutationProvider = ({children, value}: WorkflowMutationProviderProps) => {
-    return (
-        <WorkflowMutationProviderContext.Provider value={value}>{children}</WorkflowMutationProviderContext.Provider>
-    );
-};
+export const WorkflowMutationProvider = ({children, value}: WorkflowMutationProviderProps) => (
+    <WorkflowMutationProviderContext.Provider value={value}>{children}</WorkflowMutationProviderContext.Provider>
+);
 
 export const useWorkflowMutation = () => {
     const context = useContext(WorkflowMutationProviderContext);
 
-    if (context === undefined) throw new Error('useWorkflowMutation must be used within a WorkflowMutationProvider');
+    if (context === undefined) {
+        throw new Error('useWorkflowMutation must be used within a WorkflowMutationProvider');
+    }
 
     return context;
 };
