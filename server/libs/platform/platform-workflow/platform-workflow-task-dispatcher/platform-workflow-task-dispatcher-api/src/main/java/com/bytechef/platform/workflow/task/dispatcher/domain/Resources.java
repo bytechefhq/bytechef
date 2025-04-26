@@ -16,57 +16,19 @@
 
 package com.bytechef.platform.workflow.task.dispatcher.domain;
 
-import com.bytechef.commons.util.OptionalUtils;
+import com.bytechef.platform.domain.BaseResources;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import java.util.Map;
-import java.util.Objects;
-import org.apache.commons.lang3.Validate;
 
 /**
  * @author Ivica Cardic
  */
 @SuppressFBWarnings("EI")
-public class Resources {
+public class Resources extends BaseResources {
 
-    private Map<String, String> additionalUrls;
-    private String documentationUrl;
-
-    private Resources() {
+    protected Resources() {
     }
 
-    public Resources(com.bytechef.platform.workflow.task.dispatcher.definition.Resources resources) {
-        this.additionalUrls = OptionalUtils.orElse(resources.getAdditionalUrls(), Map.of());
-        this.documentationUrl = Validate.notNull(resources.documentationUrl(), "documentationUrl");
-    }
-
-    public Map<String, String> getAdditionalUrls() {
-        return additionalUrls;
-    }
-
-    public String getDocumentationUrl() {
-        return documentationUrl;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o)
-            return true;
-        if (!(o instanceof Resources that))
-            return false;
-        return Objects.equals(additionalUrls, that.additionalUrls) &&
-            Objects.equals(documentationUrl, that.documentationUrl);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(additionalUrls, documentationUrl);
-    }
-
-    @Override
-    public String toString() {
-        return "Resources{" +
-            "additionalUrls=" + additionalUrls +
-            ", documentationUrl='" + documentationUrl + '\'' +
-            '}';
+    protected Resources(com.bytechef.platform.workflow.task.dispatcher.definition.Resources resources) {
+        super(resources);
     }
 }

@@ -67,7 +67,7 @@ public abstract class BaseResources {
 
     @Override
     public String toString() {
-        return "Resources{" +
+        return "BaseResources{" +
             "additionalUrls=" + additionalUrls +
             ", documentationUrl='" + documentationUrl + '\'' +
             '}';
