@@ -7,9 +7,12 @@ import WorkflowTestConfigurationDialog from '@/pages/platform/workflow-editor/co
 import {useWorkflowMutation} from '@/pages/platform/workflow-editor/providers/workflowMutationProvider';
 import {Workflow, WorkflowTestConfiguration} from '@/shared/middleware/platform/configuration';
 import {WorkflowTestApi, WorkflowTestExecution} from '@/shared/middleware/platform/workflow/test';
+import {ProjectWorkflowKeys} from '@/shared/queries/automation/projectWorkflows.queries';
 import Editor from '@monaco-editor/react';
+import {useQueryClient} from '@tanstack/react-query';
 import {PlayIcon, RefreshCwIcon, SaveIcon, Settings2Icon, SquareIcon} from 'lucide-react';
 import {useState} from 'react';
+import {useParams} from 'react-router-dom';
 
 const workflowTestApi = new WorkflowTestApi();
 
@@ -37,6 +40,10 @@ const WorkflowCodeEditorSheet = ({
     const [showWorkflowTestConfigurationDialog, setShowWorkflowTestConfigurationDialog] = useState(false);
 
     const {updateWorkflowMutation} = useWorkflowMutation();
+
+    const {projectId, projectWorkflowId} = useParams();
+
+    const queryClient = useQueryClient();
 
     const handleRunClick = () => {
         setWorkflowTestExecution(undefined);
@@ -74,7 +81,13 @@ const WorkflowCodeEditorSheet = ({
                     },
                     {
                         onError: () => setDirty(true),
-                        onSuccess: () => setDirty(false),
+                        onSuccess: () => {
+                            setDirty(false);
+
+                            queryClient.invalidateQueries({
+                                queryKey: ProjectWorkflowKeys.projectWorkflow(+projectId!, +projectWorkflowId!),
+                            });
+                        },
                     }
                 );
                 /* eslint-disable @typescript-eslint/no-unused-vars */
