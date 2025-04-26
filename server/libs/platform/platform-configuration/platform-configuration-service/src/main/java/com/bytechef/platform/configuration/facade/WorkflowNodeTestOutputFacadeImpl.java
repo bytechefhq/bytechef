@@ -152,10 +152,23 @@ public class WorkflowNodeTestOutputFacadeImpl implements WorkflowNodeTestOutputF
 
             WorkflowNodeType triggerWorkflowNodeType = WorkflowNodeType.ofType(workflowTrigger.getType());
 
+            Long connectionId = null;
+
+            List<WorkflowTestConfigurationConnection> workflowTestConfigurationConnections =
+                workflowTestConfigurationService.getWorkflowTestConfigurationConnections(
+                    workflowId, workflowTrigger.getName());
+
+            if (!workflowTestConfigurationConnections.isEmpty()) {
+                WorkflowTestConfigurationConnection workflowTestConfigurationConnection =
+                    workflowTestConfigurationConnections.getFirst();
+
+                connectionId = workflowTestConfigurationConnection.getConnectionId();
+            }
+
             TriggerOutput triggerOutput = triggerDefinitionFacade.executeTrigger(
                 triggerWorkflowNodeType.name(), triggerWorkflowNodeType.version(),
                 triggerWorkflowNodeType.operation(), workflowExecutionId.getType(), null,
-                workflowExecutionId.getWorkflowReferenceCode(), Map.of(), Map.of(), webhookRequest, null, true);
+                workflowExecutionId.getWorkflowReferenceCode(), Map.of(), Map.of(), webhookRequest, connectionId, true);
 
             saveWorkflowNodeTestOutput(workflowId, workflowTrigger.getName(), triggerOutput.value());
         } finally {
