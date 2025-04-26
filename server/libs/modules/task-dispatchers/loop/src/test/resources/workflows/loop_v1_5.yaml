@@ -16,8 +16,8 @@ tasks:
             value2: 5
         combineOperation: "ANY"
         caseTrue:
-        - name: "loop-break_1"
-          type: "loop-break/v1"
+        - name: "loopBreak_1"
+          type: "loopBreak/v1"
         caseFalse:
         - name: "sumVar1"
           type: "var/v1/set"

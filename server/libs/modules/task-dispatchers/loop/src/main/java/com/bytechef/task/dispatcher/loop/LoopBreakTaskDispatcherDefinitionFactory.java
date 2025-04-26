@@ -32,7 +32,7 @@ public class LoopBreakTaskDispatcherDefinitionFactory implements TaskDispatcherD
     private static final TaskDispatcherDefinition TASK_DISPATCHER_DEFINITION = taskDispatcher(LOOP_BREAK)
         .title("Loop Break")
         .description("Breaks the loop execution.")
-        .icon("path:assets/loopbreak.svg");
+        .icon("path:assets/loop-break.svg");
 
     @Override
     public TaskDispatcherDefinition getDefinition() {
