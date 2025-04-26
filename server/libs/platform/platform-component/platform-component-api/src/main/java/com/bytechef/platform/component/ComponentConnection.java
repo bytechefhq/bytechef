@@ -23,6 +23,7 @@ import com.bytechef.component.definition.Authorization;
 import com.bytechef.component.definition.Authorization.AuthorizationType;
 import com.fasterxml.jackson.core.type.TypeReference;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 import org.springframework.lang.Nullable;
@@ -46,9 +47,13 @@ public record ComponentConnection(
     }
 
     public Map<String, ?> getConnectionParameters() {
-        return MapUtils.concatDifferentTypes(
-            getParameters(),
-            authorizationName() == null ? Map.of() : Map.of(Authorization.AUTHORIZATION_TYPE, authorizationName()));
+        Map<String, Object> parameters = new HashMap<>(getParameters());
+
+        if (authorizationName() != null) {
+            parameters.put(Authorization.AUTHORIZATION_TYPE, authorizationName());
+        }
+
+        return parameters;
     }
 
     public String getComponentName() {
