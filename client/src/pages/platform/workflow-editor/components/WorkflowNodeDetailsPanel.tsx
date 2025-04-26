@@ -638,6 +638,8 @@ const WorkflowNodeDetailsPanel = ({
     // Fetch current action definition when operation changes
     useEffect(() => {
         if (!currentOperationName || !currentComponentDefinition) {
+            setCurrentActionDefinition(undefined);
+
             return;
         }
 
@@ -662,6 +664,8 @@ const WorkflowNodeDetailsPanel = ({
 
         if (!!currentComponentDefinition?.actions && !currentNode?.trigger && !!matchingOperation) {
             fetchActionDefinition();
+        } else {
+            setCurrentActionDefinition(undefined);
         }
 
         // eslint-disable-next-line react-hooks/exhaustive-deps
