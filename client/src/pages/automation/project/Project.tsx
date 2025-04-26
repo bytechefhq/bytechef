@@ -35,6 +35,7 @@ const Project = () => {
         updateWorkflowNodeParameterMutation,
         useGetConnectionsQuery,
     } = useProject();
+
     const {runDisabled} = useWorkflowLayout();
 
     useEffect(() => {
