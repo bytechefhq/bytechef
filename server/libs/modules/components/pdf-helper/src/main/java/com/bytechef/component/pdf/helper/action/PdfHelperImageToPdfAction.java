@@ -84,6 +84,7 @@ public class PdfHelperImageToPdfAction {
         pdPageContentStream.close();
 
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+
         pdDocument.save(byteArrayOutputStream);
 
         String filename = inputParameters.getRequiredString(FILENAME) + ".pdf";

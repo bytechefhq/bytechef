@@ -68,6 +68,7 @@ public class PdfHelperTextToPdfAction {
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
 
         PdfWriter.getInstance(document, byteArrayOutputStream);
+
         document.open();
         document.add(new Paragraph(inputParameters.getRequiredString(TEXT)));
         document.close();
