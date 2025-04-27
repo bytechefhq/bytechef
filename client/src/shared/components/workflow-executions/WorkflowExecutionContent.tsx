@@ -110,12 +110,12 @@ const WorkflowExecutionContent = ({
                                     </DialogHeader>
 
                                     <div className="max-h-workflow-execution-content-height overflow-y-auto">
-                                        {output === undefined && <span className="text-sm">No output data.</span>}
-
-                                        {output && typeof output === 'object' ? (
+                                        {output === undefined ? (
+                                            <span className="text-sm">No output data.</span>
+                                        ) : output && typeof output === 'object' ? (
                                             <ReactJson enableClipboard={false} src={output as object} />
                                         ) : (
-                                            <span className="text-sm">{output!.toString()}</span>
+                                            <span className="text-sm">{output}</span>
                                         )}
                                     </div>
                                 </DialogContent>
@@ -126,12 +126,12 @@ const WorkflowExecutionContent = ({
                     </header>
 
                     <div className="overflow-x-auto text-nowrap">
-                        {output === undefined && <span className="text-sm">No output data.</span>}
-
-                        {output && typeof output === 'object' ? (
+                        {output === undefined ? (
+                            <span className="text-sm">No output data.</span>
+                        ) : output && typeof output === 'object' ? (
                             <ReactJson enableClipboard={false} src={output as object} />
                         ) : (
-                            <span className="text-sm">{output!.toString()}</span>
+                            <span className="text-sm">{output}</span>
                         )}
                     </div>
                 </div>
