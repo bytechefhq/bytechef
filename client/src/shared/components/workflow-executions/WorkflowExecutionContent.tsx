@@ -110,19 +110,12 @@ const WorkflowExecutionContent = ({
                                     </DialogHeader>
 
                                     <div className="max-h-workflow-execution-content-height overflow-y-auto">
-                                        {output !== undefined ? (
-                                            typeof output === 'object' ? (
-                                                <ReactJson
-                                                    collapsed={false}
-                                                    enableClipboard={false}
-                                                    src={output as object}
-                                                />
-                                            ) : (
-                                                /* eslint-disable @typescript-eslint/no-explicit-any */
-                                                (output as any).toString()
-                                            )
+                                        {output === undefined && <span className="text-sm">No output data.</span>}
+
+                                        {output && typeof output === 'object' ? (
+                                            <ReactJson enableClipboard={false} src={output as object} />
                                         ) : (
-                                            <span className="text-sm">No output data.</span>
+                                            <span className="text-sm">{output!.toString()}</span>
                                         )}
                                     </div>
                                 </DialogContent>
@@ -133,19 +126,12 @@ const WorkflowExecutionContent = ({
                     </header>
 
                     <div className="overflow-x-auto text-nowrap">
-                        {output !== undefined ? (
-                            typeof output === 'object' ? (
-                                <ReactJson enableClipboard={false} src={output as object} />
-                            ) : (
-                                <span className="text-sm">
-                                    {
-                                        /* eslint-disable @typescript-eslint/no-explicit-any */
-                                        (output as any).toString()
-                                    }
-                                </span>
-                            )
+                        {output === undefined && <span className="text-sm">No output data.</span>}
+
+                        {output && typeof output === 'object' ? (
+                            <ReactJson enableClipboard={false} src={output as object} />
                         ) : (
-                            <span className="text-sm">No output data.</span>
+                            <span className="text-sm">{output!.toString()}</span>
                         )}
                     </div>
                 </div>
@@ -193,7 +179,7 @@ const WorkflowExecutionContent = ({
 
                     <div className="overflow-x-auto">
                         <div className="flex flex-col space-y-1">
-                            <div className="text-sm">{error.message || 'No message.'}</div>
+                            <span className="text-sm">{error.message || 'No message.'}</span>
                         </div>
                     </div>
                 </div>

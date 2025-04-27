@@ -57,10 +57,11 @@ const OutputTab = ({
     const [startWebhookTestDate, setStartWebhookTestDate] = useState(new Date());
     const [webhookTestUrl, setWebhookTestUrl] = useState<string | undefined>(undefined);
 
-    const {currentType} = useModeTypeStore();
-
-    const [copiedValue, copyToClipboard] = useCopyToClipboard();
     const startWebhookTestRef = useRef(false);
+
+    const {currentType} = useModeTypeStore();
+    const [copiedValue, copyToClipboard] = useCopyToClipboard();
+    const queryClient = useQueryClient();
 
     const {
         data: workflowNodeOutput,
@@ -71,15 +72,13 @@ const OutputTab = ({
         workflowNodeName: currentNode?.name as string,
     });
 
+    const {outputSchema, placeholder, sampleOutput} = workflowNodeOutput || {};
+
     const {refetch: workflowNodeTestOutputExistsRefetch} = useCheckWorkflowNodeTestOutputExistsQuery({
         createdDate: startWebhookTestDate,
         id: workflowId!,
         workflowNodeName: currentNode?.name as string,
     });
-
-    const {outputSchema, placeholder, sampleOutput} = workflowNodeOutput || {};
-
-    const queryClient = useQueryClient();
 
     const deleteWorkflowNodeTestOutputMutation = useDeleteWorkflowNodeTestOutputMutation({
         onSuccess: () => {
@@ -209,6 +208,9 @@ const OutputTab = ({
 
     const testing = saveWorkflowNodeTestOutputMutation.isPending || startWebhookTest;
 
+    const hasProperties = Boolean(outputSchema && 'properties' in outputSchema && outputSchema.properties);
+    const hasItems = Boolean(outputSchema && 'items' in outputSchema && outputSchema.items);
+
     useEffect(() => {
         return () => {
             setStartWebhookTest(false);
@@ -221,35 +223,7 @@ const OutputTab = ({
     }, [startWebhookTest]);
 
     if (!testing && workflowNodeOutputIsFetching) {
-        return (
-            <div className="flex size-full flex-col gap-4 p-4">
-                <div className="flex w-full justify-between">
-                    <Skeleton className="h-6 w-32" />
-
-                    <Skeleton className="h-8 w-32" />
-                </div>
-
-                <div className="flex flex-col gap-2">
-                    <Skeleton className="h-6 w-32" />
-
-                    <Skeleton className="ml-4 h-6 w-48" />
-
-                    <Skeleton className="ml-8 h-6 w-32" />
-
-                    <Skeleton className="ml-12 h-6 w-48" />
-
-                    <Skeleton className="h-6 w-32" />
-
-                    <Skeleton className="ml-4 h-6 w-32" />
-
-                    <Skeleton className="h-6 w-48" />
-
-                    <Skeleton className="ml-4 h-6 w-32" />
-
-                    <Skeleton className="ml-8 h-6 w-48" />
-                </div>
-            </div>
-        );
+        return <LoadingSkeleton />;
     }
 
     return (
@@ -310,7 +284,7 @@ const OutputTab = ({
                                 workflowNodeName={currentNode.name}
                             />
 
-                            {(outputSchema as PropertyAllType)?.properties && sampleOutput && (
+                            {hasProperties && sampleOutput && (
                                 <SchemaProperties
                                     copiedValue={copiedValue}
                                     copyToClipboard={copyToClipboard}
@@ -320,7 +294,7 @@ const OutputTab = ({
                                 />
                             )}
 
-                            {(outputSchema as PropertyAllType)?.items && sampleOutput && (
+                            {hasItems && sampleOutput && (
                                 <div className="ml-3 flex flex-col overflow-y-auto border-l border-l-border/50 pl-1">
                                     <SchemaProperties
                                         copiedValue={copiedValue}
@@ -461,3 +435,33 @@ const OutputTab = ({
 };
 
 export default OutputTab;
+
+const LoadingSkeleton = () => (
+    <div className="flex size-full flex-col gap-4 p-4">
+        <div className="flex w-full justify-between">
+            <Skeleton className="h-6 w-32" />
+
+            <Skeleton className="h-8 w-32" />
+        </div>
+
+        <div className="flex flex-col gap-2">
+            <Skeleton className="h-6 w-32" />
+
+            <Skeleton className="ml-4 h-6 w-48" />
+
+            <Skeleton className="ml-8 h-6 w-32" />
+
+            <Skeleton className="ml-12 h-6 w-48" />
+
+            <Skeleton className="h-6 w-32" />
+
+            <Skeleton className="ml-4 h-6 w-32" />
+
+            <Skeleton className="h-6 w-48" />
+
+            <Skeleton className="ml-4 h-6 w-32" />
+
+            <Skeleton className="ml-8 h-6 w-48" />
+        </div>
+    </div>
+);
