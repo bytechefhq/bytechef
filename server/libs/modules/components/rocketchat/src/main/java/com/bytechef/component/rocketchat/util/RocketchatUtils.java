@@ -88,12 +88,11 @@ public class RocketchatUtils {
         return options;
     }
 
-    public static Object sendMessage(String roomdId, String text, Context context) {
-        return context
-            .http(http -> http.post("/chat.postMessage"))
+    public static Object sendMessage(String roomId, String text, Context context) {
+        return context.http(http -> http.post("/chat.postMessage"))
             .body(
                 Http.Body.of(
-                    ROOM_ID, roomdId,
+                    ROOM_ID, roomId,
                     TEXT, text))
             .configuration(responseType(Http.ResponseType.JSON))
             .execute()
