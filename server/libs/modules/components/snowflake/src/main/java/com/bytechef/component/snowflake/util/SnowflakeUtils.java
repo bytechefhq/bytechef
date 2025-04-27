@@ -78,8 +78,8 @@ public class SnowflakeUtils {
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
         String searchText, Context context) {
 
-        List<Map<String, Object>> result = context.http(http -> http.get(
-            "/databases/%s/schemas".formatted(inputParameters.getRequiredString(DATABASE))))
+        List<Map<String, Object>> result = context
+            .http(http -> http.get("/databases/%s/schemas".formatted(inputParameters.getRequiredString(DATABASE))))
             .configuration(responseType(ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});
@@ -120,9 +120,10 @@ public class SnowflakeUtils {
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
         String searchText, Context context) {
 
-        List<Map<String, Object>> result = context.http(http -> http.get(
-            "/databases/%s/schemas/%s/tables".formatted(
-                inputParameters.getRequiredString(DATABASE), inputParameters.getRequiredString(SCHEMA))))
+        List<Map<String, Object>> result = context
+            .http(http -> http.get(
+                "/databases/%s/schemas/%s/tables".formatted(
+                    inputParameters.getRequiredString(DATABASE), inputParameters.getRequiredString(SCHEMA))))
             .configuration(responseType(ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});
