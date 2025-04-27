@@ -126,7 +126,11 @@ type LoopDataType = {
     loopId: string;
 };
 
-export type TaskDispatcherDataType = BranchDataType & LoopDataType & ConditionDataType;
+type LoopBreakDataType = {
+    loopBreakId: string;
+};
+
+export type TaskDispatcherDataType = BranchDataType & LoopDataType & LoopBreakDataType & ConditionDataType;
 
 export type ClusterElementItemType = {
     label?: string;
@@ -161,6 +165,7 @@ export type NodeDataType = {
     };
     icon?: JSX.Element | ReactNode | string;
     label?: string;
+    loopBreakData?: LoopBreakDataType;
     loopData?: LoopDataType;
     loopId?: string;
     metadata?: {
@@ -291,6 +296,7 @@ export type TaskDispatcherContextType = {
     conditionCase?: 'caseTrue' | 'caseFalse';
     conditionId?: string;
     index?: number;
+    loopBreakId?: string;
     loopId?: string;
     taskDispatcherId: string;
 };

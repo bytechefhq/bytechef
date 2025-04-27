@@ -12,6 +12,7 @@ import createBranchEdges from '../utils/createBranchEdges';
 import createBranchNode from '../utils/createBranchNode';
 import createConditionEdges, {hasTaskInConditionBranches} from '../utils/createConditionEdges';
 import createConditionNode from '../utils/createConditionNode';
+import createLoopBreakEdges from '../utils/createLoopBreakEdges';
 import createLoopEdges from '../utils/createLoopEdges';
 import createLoopNode from '../utils/createLoopNode';
 import {
@@ -180,6 +181,7 @@ export default function useLayout({
 
         const isConditionNode = nodeData.componentName === 'condition';
         const isLoopNode = nodeData.componentName === 'loop';
+        const isLoopBreakNode = nodeData.componentName === 'loopBreak';
         const isBranchNode = nodeData.componentName === 'branch';
 
         const isConditionPlaceholderNode = nodeData.conditionId && node.type === 'placeholder';
@@ -203,6 +205,15 @@ export default function useLayout({
             const loopEdges = createLoopEdges(node);
 
             taskEdges.push(...loopEdges);
+
+            return;
+        }
+
+        // Create initial edges for the Loop Break node
+        if (isLoopBreakNode) {
+            const loopBreakEdges = createLoopBreakEdges(node, allNodes);
+
+            taskEdges.push(...loopBreakEdges);
 
             return;
         }

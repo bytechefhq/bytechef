@@ -87,7 +87,7 @@ export const TASK_DISPATCHER_NAMES = [
     'each',
     'fork-join',
     'loop',
-    'loop-break',
+    'loopBreak',
     'map',
     'parallel',
     'subflow',

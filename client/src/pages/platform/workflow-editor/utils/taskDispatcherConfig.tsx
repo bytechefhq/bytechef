@@ -46,6 +46,10 @@ export function buildGenericNodeData(
                     index: taskDispatcherContext.index ?? 0,
                     loopId: taskDispatcherId,
                 };
+            } else if (type === 'loopBreak') {
+                newNodeData.loopBreakData = {
+                    loopBreakId: taskDispatcherId,
+                };
             } else if (type === 'branch') {
                 newNodeData.branchData = {
                     branchId: taskDispatcherId,
@@ -294,6 +298,27 @@ export const TASK_DISPATCHER_CONFIG = {
                 iteratee: updatedSubtasks,
             },
         }),
+    },
+    loopBreak: {
+        buildNodeData: ({baseNodeData, taskDispatcherContext, taskDispatcherId}: BuildNodeDataType): NodeDataType =>
+            buildGenericNodeData(baseNodeData, taskDispatcherContext, taskDispatcherId, 'loopBreak'),
+
+        contextIdentifier: 'loopBreakId',
+        dataKey: 'loopBreakData',
+        extractContextFromPlaceholder: (placeholderId: string): TaskDispatcherContextType => {
+            const parts = placeholderId.split('-');
+            const index = parseInt(parts[parts.length - 1] || '-1');
+
+            return {index, taskDispatcherId: parts[0]};
+        },
+        getDispatcherId: (context: TaskDispatcherContextType) => context.loopBreakId,
+        getInitialParameters: (properties: Array<PropertyAllType>) => ({
+            ...getParametersWithDefaultValues({properties}),
+        }),
+        getSubtasks: () => [],
+        getTask: getTaskDispatcherTask,
+        initializeParameters: () => ({}),
+        updateTaskParameters: ({task}: UpdateTaskParametersType): WorkflowTask => task,
     },
 };
 
