@@ -54,6 +54,7 @@ public class Evaluator {
     private static final Map<String, MethodExecutor> METHOD_EXECUTOR_MAP = new HashMap<>();
     private static final String PREFIX = "${";
     private static final String SUFFIX = "}";
+    protected static final String FORMULA_PREFIX = "#{";
 
     static {
         METHOD_EXECUTOR_MAP.put("boolean", new Cast<>(Boolean.class));
@@ -116,9 +117,17 @@ public class Evaluator {
 
     @Nullable
     private static Object evaluate(Object value, Map<String, ?> context) {
-        if (value instanceof String) {
-            Expression expression = EXPRESSION_PARSER.parseExpression(
-                (String) value, new TemplateParserContext(PREFIX, SUFFIX));
+        if (value instanceof String string) {
+            Expression expression;
+
+            if (string.startsWith(FORMULA_PREFIX)) {
+                string = string.replace(PREFIX, "")
+                    .replace(SUFFIX, "") + "}";
+
+                expression = EXPRESSION_PARSER.parseExpression(string, new TemplateParserContext());
+            } else {
+                expression = EXPRESSION_PARSER.parseExpression(string, new TemplateParserContext(PREFIX, SUFFIX));
+            }
 
             if (expression instanceof CompositeStringExpression) { // attempt partial evaluation
                 return evaluate((CompositeStringExpression) expression, context);

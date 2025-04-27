@@ -410,6 +410,21 @@ public class EvaluatorTest {
         Assertions.assertEquals(localDateTime.minusDays(1), MapUtils.getLocalDateTime(map, "date"));
     }
 
+    @Test
+    public void test42() {
+        LocalDateTime localDateTime = LocalDateTime.now();
+
+        Map<String, Object> map = Evaluator.evaluate(
+            Map.of("hour", "#{${localDateTime}.hour}"), Map.of("localDateTime", localDateTime));
+
+        Assertions.assertEquals(localDateTime.getHour(), MapUtils.getInteger(map, "hour"));
+
+        map = Evaluator.evaluate(
+            Map.of("date", "#{${localDateTime}.minusDays(1)}"), Map.of("localDateTime", localDateTime));
+
+        Assertions.assertEquals(localDateTime.minusDays(1), MapUtils.getLocalDateTime(map, "date"));
+    }
+
 //    @Test
 //    public void test41() {
 //        Environment environment = mock(Environment.class);
