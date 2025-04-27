@@ -74,6 +74,10 @@ public class ClusterElementMap extends AbstractMap<String, Object> {
 
                     clusterElementSet.add(Map.entry(clusterElementsEntry.getKey(), clusterElements));
                 } else {
+                    if (clusterElementEntryValue == null) {
+                        continue;
+                    }
+
                     clusterElementSet.add(
                         Map.entry(
                             clusterElementsEntry.getKey(),
@@ -106,6 +110,7 @@ public class ClusterElementMap extends AbstractMap<String, Object> {
         return (ClusterElement) value;
     }
 
+    @SuppressWarnings("unchecked")
     public List<ClusterElement> getClusterElements(ClusterElementType clusterElementType) {
         List<ClusterElement> clusterElements = (List<ClusterElement>) super.get(clusterElementType.key());
 
