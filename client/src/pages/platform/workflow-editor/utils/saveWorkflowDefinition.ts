@@ -6,7 +6,7 @@ import {
 } from '@/shared/middleware/platform/configuration';
 import {ProjectWorkflowKeys} from '@/shared/queries/automation/projectWorkflows.queries';
 import {ComponentDefinitionKeys} from '@/shared/queries/platform/componentDefinitions.queries';
-import {BranchCaseType, NodeDataType, TaskDispatcherContextType} from '@/shared/types';
+import {BranchCaseType, NodeDataType, TaskDispatcherContextType, WorkflowDefinitionType} from '@/shared/types';
 import {QueryClient, UseMutationResult} from '@tanstack/react-query';
 
 import useWorkflowDataStore from '../stores/useWorkflowDataStore';
@@ -69,25 +69,15 @@ export default async function saveWorkflowDefinition({
             type,
         };
 
-        updateWorkflowMutation.mutate(
-            {
-                id: workflow.id!,
-                workflow: {
-                    definition: JSON.stringify(
-                        {
-                            ...workflowDefinition,
-                            triggers: [newTrigger],
-                        },
-                        null,
-                        SPACE
-                    ),
-                    version: workflow.version,
-                },
-            },
-            {
-                onSuccess,
-            }
-        );
+        executeWorkflowMutation({
+            definitionUpdate: {triggers: [newTrigger]},
+            onSuccess,
+            projectId,
+            queryClient,
+            updateWorkflowMutation,
+            workflow,
+            workflowDefinition,
+        });
 
         return;
     }
@@ -195,7 +185,11 @@ export default async function saveWorkflowDefinition({
                 parameters: combinedParameters,
             };
 
-            updatedWorkflowDefinitionTasks[existingTaskIndex] = combinedTask;
+            updatedWorkflowDefinitionTasks = [
+                ...updatedWorkflowDefinitionTasks.slice(0, existingTaskIndex),
+                combinedTask,
+                ...updatedWorkflowDefinitionTasks.slice(existingTaskIndex + 1),
+            ];
         } else {
             updatedWorkflowDefinitionTasks = [...(workflowDefinitionTasks || [])];
 
@@ -221,6 +215,39 @@ export default async function saveWorkflowDefinition({
         }
     }
 
+    executeWorkflowMutation({
+        definitionUpdate: {tasks: updatedWorkflowDefinitionTasks},
+        onSuccess,
+        projectId,
+        queryClient,
+        updateWorkflowMutation,
+        workflow,
+        workflowDefinition,
+    });
+}
+
+interface ExecuteWorkflowMutationProps {
+    workflow: Workflow;
+    workflowDefinition: WorkflowDefinitionType;
+    definitionUpdate: {
+        tasks?: Array<WorkflowTask>;
+        triggers?: Array<WorkflowTrigger>;
+    };
+    projectId: number;
+    onSuccess?: () => void;
+    queryClient: QueryClient;
+    updateWorkflowMutation: UseMutationResult<void, Error, UpdateWorkflowRequestType, unknown>;
+}
+
+function executeWorkflowMutation({
+    definitionUpdate,
+    onSuccess,
+    projectId,
+    queryClient,
+    updateWorkflowMutation,
+    workflow,
+    workflowDefinition,
+}: ExecuteWorkflowMutationProps) {
     updateWorkflowMutation.mutate(
         {
             id: workflow.id!,
@@ -228,7 +255,7 @@ export default async function saveWorkflowDefinition({
                 definition: JSON.stringify(
                     {
                         ...workflowDefinition,
-                        tasks: updatedWorkflowDefinitionTasks,
+                        ...definitionUpdate,
                     },
                     null,
                     SPACE
@@ -243,7 +270,6 @@ export default async function saveWorkflowDefinition({
                 }
 
                 queryClient.invalidateQueries({queryKey: ProjectWorkflowKeys.projectWorkflows(projectId)});
-
                 queryClient.invalidateQueries({queryKey: ProjectWorkflowKeys.workflows});
             },
         }
