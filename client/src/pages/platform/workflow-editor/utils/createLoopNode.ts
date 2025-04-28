@@ -35,6 +35,7 @@ function createPlaceholderNode(loopId: string): Node {
 function createTopGhostNode(loopId: string): Node {
     return {
         data: {
+            loopId,
             taskDispatcherId: loopId,
         },
         id: `${loopId}-loop-top-ghost`,
@@ -49,6 +50,7 @@ function createTopGhostNode(loopId: string): Node {
 function createLeftGhostNode(loopId: string): Node {
     return {
         data: {
+            loopId,
             taskDispatcherId: loopId,
         },
         id: `${loopId}-loop-left-ghost`,

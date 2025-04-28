@@ -20,7 +20,7 @@ function createPlaceholderNode(conditionId: string, conditionCase: string, suffi
     return {
         data: {
             conditionCase,
-            conditionId: conditionId,
+            conditionId,
             label: '+',
         },
         id: `${conditionId}-condition-${suffix}-placeholder-0`,
@@ -35,6 +35,7 @@ function createPlaceholderNode(conditionId: string, conditionCase: string, suffi
 function createTopGhostNode(conditionId: string): Node {
     return {
         data: {
+            conditionId,
             taskDispatcherId: conditionId,
         },
         id: `${conditionId}-condition-top-ghost`,
