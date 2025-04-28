@@ -152,6 +152,9 @@ public class WorkflowNodeTestOutputFacadeImpl implements WorkflowNodeTestOutputF
 
             WorkflowNodeType triggerWorkflowNodeType = WorkflowNodeType.ofType(workflowTrigger.getType());
 
+            Map<String, ?> triggerParameters = workflowTrigger.evaluateParameters(
+                workflowTestConfigurationService.getWorkflowTestConfigurationInputs(workflowId));
+
             Long connectionId = null;
 
             List<WorkflowTestConfigurationConnection> workflowTestConfigurationConnections =
@@ -168,7 +171,8 @@ public class WorkflowNodeTestOutputFacadeImpl implements WorkflowNodeTestOutputF
             TriggerOutput triggerOutput = triggerDefinitionFacade.executeTrigger(
                 triggerWorkflowNodeType.name(), triggerWorkflowNodeType.version(),
                 triggerWorkflowNodeType.operation(), workflowExecutionId.getType(), null,
-                workflowExecutionId.getWorkflowReferenceCode(), Map.of(), Map.of(), webhookRequest, connectionId, true);
+                workflowExecutionId.getWorkflowReferenceCode(), triggerParameters, Map.of(), webhookRequest,
+                connectionId, true);
 
             saveWorkflowNodeTestOutput(workflowId, workflowTrigger.getName(), triggerOutput.value());
         } finally {
