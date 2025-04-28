@@ -99,22 +99,6 @@ export const convertTaskToNode = (
     };
 };
 
-export const filterConditionCaseNodes = (nodes: Node[], node: Node) =>
-    nodes.filter((nodeItem) => {
-        if (nodeItem.id === node.id) {
-            return false;
-        }
-
-        if (!nodeItem.data.conditionId || !node.data.conditionCase) {
-            return false;
-        }
-
-        return (
-            nodeItem.data.conditionId === node.data.conditionId &&
-            nodeItem.data.conditionCase === node.data.conditionCase &&
-            nodeItem.id !== node.id
-        );
-    });
 
 export const getLayoutedElements = (nodes: Node[], edges: Edge[], canvasWidth: number) => {
     const dagreGraph = new dagre.graphlib.Graph().setDefaultEdgeLabel(() => ({}));
