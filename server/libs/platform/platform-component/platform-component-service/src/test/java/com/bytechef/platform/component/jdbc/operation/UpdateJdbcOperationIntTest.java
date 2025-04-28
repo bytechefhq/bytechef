@@ -17,17 +17,18 @@
 package com.bytechef.platform.component.jdbc.operation;
 
 import static com.bytechef.platform.component.jdbc.constant.JdbcConstants.COLUMNS;
+import static com.bytechef.platform.component.jdbc.constant.JdbcConstants.CONDITION;
 import static com.bytechef.platform.component.jdbc.constant.JdbcConstants.ROWS;
 import static com.bytechef.platform.component.jdbc.constant.JdbcConstants.SCHEMA;
 import static com.bytechef.platform.component.jdbc.constant.JdbcConstants.TABLE;
-import static com.bytechef.platform.component.jdbc.constant.JdbcConstants.UPDATE_KEY;
+import static com.bytechef.platform.component.jdbc.constant.JdbcConstants.VALUES;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import com.bytechef.platform.component.jdbc.operation.config.JdbcOperationIntTestConfiguration;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
 import javax.sql.DataSource;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -69,17 +70,16 @@ public class UpdateJdbcOperationIntTest {
     @Test
     public void testUpdate() throws SQLException {
         Map<String, ?> inputParameters = Map.of(
-            COLUMNS, List.of("name"),
-            ROWS, List.of(Map.of("id", "id2", "name", "name3")),
+            COLUMNS, List.of(Map.of("name", "name", "type", "STRING")),
+            VALUES, Map.of(ROWS, List.of(Map.of("name", "name111"))),
             SCHEMA, "public",
             TABLE, "test",
-            UPDATE_KEY, "id");
+            CONDITION, "name = name1");
 
         Map<String, Integer> result = new UpdateJdbcOperation().execute(
             inputParameters, new SingleConnectionDataSource(dataSource.getConnection(), false));
 
-        Assertions.assertEquals(1, result.get("rows"));
-        Assertions.assertEquals(
-            "name3", jdbcTemplate.queryForObject("SELECT name FROM test WHERE id='id2'", String.class));
+        assertEquals(1, result.get(ROWS));
+        assertEquals("name111", jdbcTemplate.queryForObject("SELECT name FROM test WHERE id='id1'", String.class));
     }
 }

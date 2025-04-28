@@ -16,45 +16,31 @@
 
 package com.bytechef.platform.component.jdbc.operation;
 
+import static com.bytechef.platform.component.jdbc.constant.JdbcConstants.CONDITION;
+import static com.bytechef.platform.component.jdbc.constant.JdbcConstants.ROWS;
+import static com.bytechef.platform.component.jdbc.constant.JdbcConstants.SCHEMA;
+import static com.bytechef.platform.component.jdbc.constant.JdbcConstants.TABLE;
+
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.platform.component.jdbc.JdbcExecutor;
-import com.bytechef.platform.component.jdbc.constant.JdbcConstants;
-import com.fasterxml.jackson.core.type.TypeReference;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
 import java.util.Map;
-import java.util.stream.IntStream;
 import javax.sql.DataSource;
-import org.springframework.jdbc.core.namedparam.SqlParameterSourceUtils;
 
 /**
  * @author Ivica Cardic
+ * @author Monika Kušter
  */
 public class DeleteJdbcOperation implements JdbcOperation<Map<String, Integer>> {
 
     @Override
     public Map<String, Integer> execute(Map<String, ?> inputParameters, DataSource dataSource) {
-        Map<String, Integer> result;
+        String schema = MapUtils.getString(inputParameters, SCHEMA, "public");
+        String table = MapUtils.getRequiredString(inputParameters, TABLE);
+        String condition = MapUtils.getRequiredString(inputParameters, CONDITION);
 
-        String deleteKey = MapUtils.getString(inputParameters, JdbcConstants.DELETE_KEY, "id");
-        List<Map<String, ?>> rows = MapUtils.getList(
-            inputParameters, JdbcConstants.ROWS, new TypeReference<>() {}, Collections.emptyList());
-        String schema = MapUtils.getString(inputParameters, JdbcConstants.SCHEMA, "public");
-        String table = MapUtils.getRequiredString(inputParameters, JdbcConstants.TABLE);
+        int rowsAffected = JdbcExecutor.update(
+            "DELETE FROM %s.%s WHERE %s".formatted(schema, table, condition), Map.of(), dataSource);
 
-        if (rows.isEmpty()) {
-            result = Map.of("rows", 0);
-        } else {
-            int[] rowsAffected = JdbcExecutor.batchUpdate(
-                "DELETE FROM %s.%s WHERE %s=:%s".formatted(schema, table, deleteKey, deleteKey),
-                SqlParameterSourceUtils.createBatch(rows.toArray()), dataSource);
-
-            IntStream stream = Arrays.stream(rowsAffected);
-
-            result = Map.of("rows", stream.sum());
-        }
-
-        return result;
+        return Map.of(ROWS, rowsAffected);
     }
 }

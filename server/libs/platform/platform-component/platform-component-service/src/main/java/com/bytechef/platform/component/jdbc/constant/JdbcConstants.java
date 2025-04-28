@@ -22,12 +22,10 @@ package com.bytechef.platform.component.jdbc.constant;
 public final class JdbcConstants {
 
     public static final String COLUMNS = "columns";
+    public static final String CONDITION = "condition";
     public static final String DATABASE = "database";
-    public static final String DELETE = "delete";
-    public static final String DELETE_KEY = "deleteKey";
     public static final String EXECUTE = "execute";
     public static final String HOST = "host";
-    public static final String INSERT = "insert";
     public static final String NAME = "name";
     public static final String PARAMETERS = "parameters";
     public static final String PASSWORD = "password";
@@ -37,8 +35,6 @@ public final class JdbcConstants {
     public static final String SCHEMA = "schema";
     public static final String TABLE = "table";
     public static final String TYPE = "type";
-    public static final String UPDATE = "update";
-    public static final String UPDATE_KEY = "updateKey";
     public static final String USERNAME = "username";
     public static final String VALUES = "values";
 
