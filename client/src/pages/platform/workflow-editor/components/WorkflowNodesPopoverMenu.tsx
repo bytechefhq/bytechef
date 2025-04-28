@@ -280,7 +280,6 @@ const WorkflowNodesPopoverMenu = ({
                             hideTaskDispatchers={hideTaskDispatchers}
                             hideTriggerComponents={hideTriggerComponents}
                             selectedComponentName={componentDefinitionToBeAdded?.name}
-                            sourceNodeId={sourceNodeId}
                         />
                     )}
 
