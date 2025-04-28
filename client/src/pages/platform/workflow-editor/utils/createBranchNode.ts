@@ -4,6 +4,7 @@ import {Node} from '@xyflow/react';
 function createTopGhostNode(branchId: string): Node {
     return {
         data: {
+            branchId,
             taskDispatcherId: branchId,
         },
         id: `${branchId}-branch-top-ghost`,
