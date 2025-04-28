@@ -11,19 +11,23 @@ import useWorkflowNodeDetailsPanelStore from '../stores/useWorkflowNodeDetailsPa
 import {TASK_DISPATCHER_CONFIG} from './taskDispatcherConfig';
 
 interface HandleDeleteTaskProps {
+    aiAgentOpen?: boolean;
     currentNode?: NodeDataType;
     data: NodeDataType;
     projectId: number;
     queryClient: QueryClient;
+    setCurrentNode?: (node: NodeDataType) => void;
     updateWorkflowMutation: UseMutationResult<void, unknown, {id: string; workflow: Workflow}>;
     workflow: Workflow & WorkflowTaskDataType;
 }
 
 export default function handleDeleteTask({
+    aiAgentOpen,
     currentNode,
     data,
     projectId,
     queryClient,
+    setCurrentNode,
     updateWorkflowMutation,
     workflow,
 }: HandleDeleteTaskProps) {
@@ -122,9 +126,46 @@ export default function handleDeleteTask({
 
             return parentBranchTask;
         }) as Array<WorkflowTaskType>;
-    } else {
-        updatedTasks = workflowTasks.filter((task: WorkflowTask) => task.name !== data.name);
+    } else if (aiAgentOpen && currentNode?.name.includes('aiAgent')) {
+        const currentClusterElementType = data?.clusterElementType;
+        const clusterElementName = data.name;
+        const parentAiAgentTask = workflowTasks.find((task) => task.name === currentNode?.name);
+
+        if (parentAiAgentTask?.clusterElements && setCurrentNode) {
+            let updatedClusterElements;
+
+            if (currentClusterElementType === 'tools' && Array.isArray(parentAiAgentTask.clusterElements.tools)) {
+                parentAiAgentTask.clusterElements.tools = parentAiAgentTask.clusterElements.tools.filter(
+                    (tool) => tool.name !== clusterElementName
+                );
+
+                updatedClusterElements = {
+                    ...currentNode.clusterElements,
+                    tools: parentAiAgentTask.clusterElements.tools,
+                };
+            } else if (currentClusterElementType) {
+                parentAiAgentTask.clusterElements[
+                    currentClusterElementType as keyof typeof parentAiAgentTask.clusterElements
+                ] = null;
+
+                updatedClusterElements = {
+                    ...currentNode.clusterElements,
+                    [currentClusterElementType]: null,
+                };
+            }
+
+            setCurrentNode({
+                ...currentNode,
+                clusterElements: updatedClusterElements,
+            });
+        }
+
+        updatedTasks = workflowTasks.map((task) =>
+            task.name === parentAiAgentTask?.name ? parentAiAgentTask : task
+        ) as Array<WorkflowTaskType>;
     }
+
+    updatedTasks = workflowTasks.filter((task: WorkflowTask) => task.name !== data.name);
 
     updateWorkflowMutation.mutate(
         {

@@ -12,7 +12,7 @@ import {HoverCardPortal} from '@radix-ui/react-hover-card';
 import {useQueryClient} from '@tanstack/react-query';
 import {Handle, Position} from '@xyflow/react';
 import {ComponentIcon, CpuIcon, DatabaseIcon, MemoryStick, PlusIcon, TrashIcon} from 'lucide-react';
-import {memo, useEffect, useMemo, useState} from 'react';
+import {memo, useMemo, useState} from 'react';
 import {useParams} from 'react-router-dom';
 import sanitize from 'sanitize-html';
 import {twMerge} from 'tailwind-merge';
@@ -27,12 +27,6 @@ import styles from './NodeTypes.module.css';
 
 const AiAgentNode = ({data, id}: {data: NodeDataType; id: string}) => {
     const [clusterElementDefinition, setClusterElementDefinition] = useState<ClusterElementDefinitionBasic[]>([]);
-    const [clusterElementsData, setClusterElementsData] = useState<ClusterElementsType>({
-        chatMemory: null,
-        model: null,
-        rag: null,
-        tools: [],
-    });
     const [isHovered, setIsHovered] = useState(false);
     const [hoveredNodeName, setHoveredNodeName] = useState<string | undefined>();
 
@@ -95,29 +89,40 @@ const AiAgentNode = ({data, id}: {data: NodeDataType; id: string}) => {
         fetchRootComponentClusterElementDefinition();
     };
 
-    useEffect(() => {
-        if (data.clusterElements) {
-            setClusterElementsData({
-                chatMemory: data.clusterElements.chatMemory || null,
-                model: data.clusterElements.model || null,
-                rag: data.clusterElements.rag || null,
-                tools: data.clusterElements.tools || [],
-            });
+    const clusterElementsData = useMemo(() => {
+        if (
+            !data.clusterElements ||
+            typeof data.clusterElements !== 'object' ||
+            Object.keys(data.clusterElements).length === 0
+        ) {
+            return {
+                chatMemory: null,
+                model: null,
+                rag: null,
+                tools: [],
+            };
         }
+
+        return data.clusterElements as ClusterElementsType;
     }, [data.clusterElements]);
 
     const getElementDisplayName = (element: ClusterElementItemType | null | undefined): string | undefined => {
-        if (!element) return undefined;
+        if (!element) {
+            return undefined;
+        }
 
-        return element.label ? element.label.split('_')[0] : element.name.split('_')[0];
+        const elementName = element.name.split('_')[0];
+        const elementLabel = element.label?.split('_')[0];
+
+        return element.label ? elementLabel : elementName;
     };
 
     const {agentMemoryName, agentModelName, agentRagName, agentToolNames} = useMemo(
         () => ({
-            agentMemoryName: getElementDisplayName(clusterElementsData?.chatMemory),
-            agentModelName: getElementDisplayName(clusterElementsData?.model),
-            agentRagName: getElementDisplayName(clusterElementsData?.rag),
-            agentToolNames: clusterElementsData?.tools?.map(getElementDisplayName).filter(Boolean),
+            agentMemoryName: getElementDisplayName(clusterElementsData?.chatMemory) || '',
+            agentModelName: getElementDisplayName(clusterElementsData?.model) || '',
+            agentRagName: getElementDisplayName(clusterElementsData?.rag) || '',
+            agentToolNames: clusterElementsData?.tools?.map(getElementDisplayName).filter(Boolean) || [],
         }),
         [clusterElementsData]
     );
@@ -161,24 +166,21 @@ const AiAgentNode = ({data, id}: {data: NodeDataType; id: string}) => {
                     onClick={handleNodeClick}
                 >
                     <div className="flex w-full flex-1 items-center justify-between">
-                        <HoverCardTrigger>
-                            <div> {data.icon!} </div>
-                        </HoverCardTrigger>
+                        <HoverCardTrigger>{data.icon!}</HoverCardTrigger>
 
                         <WorkflowNodesPopoverMenu
                             clusterElementsData={clusterElementsData}
-                            setClusterElementsData={setClusterElementsData}
                             sourceData={clusterElementDefinition}
                             sourceNodeId={id}
                         >
                             <Button
                                 className="[&>span]:line-clamp-0 w-1/2 border border-stroke-neutral-secondary bg-background px-3 py-2 text-content-neutral-primary shadow-none hover:bg-surface-neutral-primary-hover [&>span]:truncate [&>svg]:max-w-4"
-                                onClick={(e) => {
-                                    e.stopPropagation();
+                                onClick={(event) => {
+                                    event.stopPropagation();
                                     handlePopoverMenuClusterElementClick('MODEL');
                                 }}
                             >
-                                {clusterElementsData.model ? (
+                                {agentModelName ? (
                                     <>
                                         <ComponentIcon /> {agentModelName}
                                     </>
@@ -194,19 +196,18 @@ const AiAgentNode = ({data, id}: {data: NodeDataType; id: string}) => {
                     <div className="flex w-full justify-between gap-1">
                         <WorkflowNodesPopoverMenu
                             clusterElementsData={clusterElementsData}
-                            setClusterElementsData={setClusterElementsData}
                             sourceData={clusterElementDefinition}
                             sourceNodeId={id}
                         >
                             <Button
                                 className="rounded-full px-2 font-medium hover:bg-surface-neutral-secondary-hover [&>svg]:max-w-4"
-                                onClick={(e) => {
-                                    e.stopPropagation();
+                                onClick={(event) => {
+                                    event.stopPropagation();
                                     handlePopoverMenuClusterElementClick('RAG');
                                 }}
                                 variant="outline"
                             >
-                                {clusterElementsData?.rag ? (
+                                {agentRagName ? (
                                     <>
                                         <ComponentIcon /> {agentRagName}
                                     </>
@@ -220,19 +221,18 @@ const AiAgentNode = ({data, id}: {data: NodeDataType; id: string}) => {
 
                         <WorkflowNodesPopoverMenu
                             clusterElementsData={clusterElementsData}
-                            setClusterElementsData={setClusterElementsData}
                             sourceData={clusterElementDefinition}
                             sourceNodeId={id}
                         >
                             <Button
                                 className="rounded-full px-2 hover:bg-surface-neutral-secondary-hover [&>svg]:max-w-4"
-                                onClick={(e) => {
-                                    e.stopPropagation();
+                                onClick={(event) => {
+                                    event.stopPropagation();
                                     handlePopoverMenuClusterElementClick('CHAT_MEMORY');
                                 }}
                                 variant="outline"
                             >
-                                {clusterElementsData?.chatMemory ? (
+                                {agentMemoryName ? (
                                     <>
                                         <ComponentIcon /> {agentMemoryName}
                                     </>
@@ -248,14 +248,13 @@ const AiAgentNode = ({data, id}: {data: NodeDataType; id: string}) => {
                     <div className="flex w-full items-center">
                         {agentToolNames &&
                             agentToolNames.map((tool, index) => (
-                                <Button key={index} onClick={(e) => e.stopPropagation()} variant="ghost">
+                                <Button key={index} onClick={(event) => event.stopPropagation()} variant="ghost">
                                     {tool}
                                 </Button>
                             ))}
 
                         <WorkflowNodesPopoverMenu
                             clusterElementsData={clusterElementsData}
-                            setClusterElementsData={setClusterElementsData}
                             sourceData={clusterElementDefinition}
                             sourceNodeId={id}
                         >
@@ -264,8 +263,8 @@ const AiAgentNode = ({data, id}: {data: NodeDataType; id: string}) => {
                                     'rounded-full bg-surface-neutral-secondary px-3 hover:bg-surface-neutral-secondary-hover [&>svg]:max-w-4',
                                     !!agentToolNames?.length && 'rounded-full p-3'
                                 )}
-                                onClick={(e) => {
-                                    e.stopPropagation();
+                                onClick={(event) => {
+                                    event.stopPropagation();
                                     handlePopoverMenuClusterElementClick('TOOLS');
                                 }}
                                 variant="ghost"

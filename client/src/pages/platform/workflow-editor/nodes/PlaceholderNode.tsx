@@ -1,4 +1,11 @@
+import {
+    ClusterElementDefinitionApi,
+    ClusterElementDefinitionBasic,
+    GetRootComponentClusterElementDefinitionsRequest,
+} from '@/shared/middleware/platform/configuration';
+import {ClusterElementDefinitionKeys} from '@/shared/queries/platform/clusterElementDefinitions.queries';
 import {NodeDataType} from '@/shared/types';
+import {useQueryClient} from '@tanstack/react-query';
 import {Handle, Position} from '@xyflow/react';
 import {memo, useState} from 'react';
 import {twMerge} from 'tailwind-merge';
@@ -6,10 +13,16 @@ import {useShallow} from 'zustand/react/shallow';
 
 import WorkflowNodesPopoverMenu from '../components/WorkflowNodesPopoverMenu';
 import useWorkflowDataStore from '../stores/useWorkflowDataStore';
+import useWorkflowEditorStore from '../stores/useWorkflowEditorStore';
+import useWorkflowNodeDetailsPanelStore from '../stores/useWorkflowNodeDetailsPanelStore';
 import styles from './NodeTypes.module.css';
 
 const PlaceholderNode = ({data, id}: {data: NodeDataType; id: string}) => {
     const [isDropzoneActive, setDropzoneActive] = useState(false);
+    const [clusterElementDefinition, setClusterElementDefinition] = useState<ClusterElementDefinitionBasic[]>([]);
+
+    const {currentNode} = useWorkflowNodeDetailsPanelStore();
+    const {aiAgentNodeData} = useWorkflowEditorStore.getState();
 
     const {nodes} = useWorkflowDataStore(
         useShallow((state) => ({
@@ -17,14 +30,44 @@ const PlaceholderNode = ({data, id}: {data: NodeDataType; id: string}) => {
         }))
     );
 
+    const queryClient = useQueryClient();
+
     const nodeIndex = nodes.findIndex((node) => node.id === id);
+
+    const handlePopoverMenuClusterElementClick = (type: string) => {
+        const rootComponentClusterElementDefinitionRequest: GetRootComponentClusterElementDefinitionsRequest = {
+            clusterElementType: type,
+            rootComponentName: currentNode?.componentName || '',
+            rootComponentVersion: data.version || 1,
+        };
+
+        const fetchRootComponentClusterElementDefinition = async () => {
+            const rootComponentClusterElementDefinition = await queryClient.fetchQuery({
+                queryFn: () =>
+                    new ClusterElementDefinitionApi().getRootComponentClusterElementDefinitions(
+                        rootComponentClusterElementDefinitionRequest
+                    ),
+                queryKey: ClusterElementDefinitionKeys.filteredClusterElementDefinitions(
+                    rootComponentClusterElementDefinitionRequest
+                ),
+            });
+
+            setClusterElementDefinition(rootComponentClusterElementDefinition);
+        };
+
+        fetchRootComponentClusterElementDefinition();
+    };
+
+    const aiAgentSourceNodeId = id.split('-')[0];
 
     return (
         <WorkflowNodesPopoverMenu
+            clusterElementsData={aiAgentNodeData?.clusterElements}
             hideTriggerComponents
             key={`${id}-${nodeIndex}`}
             nodeIndex={nodeIndex}
-            sourceNodeId={id}
+            sourceData={data.clusterElementType ? clusterElementDefinition : undefined}
+            sourceNodeId={data.clusterElementType ? aiAgentSourceNodeId : id}
         >
             <div
                 className={twMerge(
@@ -33,6 +76,15 @@ const PlaceholderNode = ({data, id}: {data: NodeDataType; id: string}) => {
                         ? 'absolute ml-2 size-16 scale-150 cursor-pointer bg-blue-100'
                         : 'size-7 bg-gray-300'
                 )}
+                onClick={() => {
+                    if (data.clusterElementType) {
+                        if (data.clusterElementType !== 'chatMemory') {
+                            handlePopoverMenuClusterElementClick(data.clusterElementType.toUpperCase());
+                        } else if (data.clusterElementType === 'chatMemory') {
+                            handlePopoverMenuClusterElementClick('CHAT_MEMORY');
+                        }
+                    }
+                }}
                 onDragEnter={() => setDropzoneActive(true)}
                 onDragLeave={() => setDropzoneActive(false)}
                 onDragOver={(event) => event.preventDefault()}

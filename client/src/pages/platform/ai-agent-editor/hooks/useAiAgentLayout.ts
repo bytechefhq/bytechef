@@ -1,21 +1,28 @@
-import {FINAL_PLACEHOLDER_NODE_ID, SORTED_CLUSTER_ELEMENTS_KEYS} from '@/shared/constants';
+import {SORTED_CLUSTER_ELEMENTS_KEYS} from '@/shared/constants';
 import {Edge, Node} from '@xyflow/react';
 import {useEffect, useMemo} from 'react';
 import {useShallow} from 'zustand/react/shallow';
 
-import useWorkflowNodeDetailsPanelStore from '../../workflow-editor/stores/useWorkflowNodeDetailsPanelStore';
+import useWorkflowEditorStore from '../../workflow-editor/stores/useWorkflowEditorStore';
 import {getLayoutedElements} from '../../workflow-editor/utils/layoutUtils';
 import useAiAgentDataStore from '../stores/useAiAgentDataStore';
 import {
     createEdgeForClusterElementNode,
-    createEdgeForFinalToolPlaceholderNode,
-    createEdgeForNextToolNode,
     createEdgeForPlaceholderNode,
+    createEdgeForToolNode,
+    createEdgeForToolsGhostNode,
+    createEdgeForToolsPlaceholderNode,
 } from '../utils/createAiAgentEdges';
-import {createClusterElementNode, createPlaceholderNode, createToolNode} from '../utils/createAiAgentNodes';
+import {
+    createClusterElementNode,
+    createPlaceholderNode,
+    createToolNode,
+    createToolsGhostNode,
+} from '../utils/createAiAgentNodes';
 
 const useAiAgentLayout = () => {
-    const {currentNode} = useWorkflowNodeDetailsPanelStore();
+    const {aiAgentNodeData} = useWorkflowEditorStore();
+
     const {setEdges, setNodes} = useAiAgentDataStore(
         useShallow((state) => ({
             setEdges: state.setEdges,
@@ -29,12 +36,14 @@ const useAiAgentLayout = () => {
         const nodes: Array<Node> = [];
         const edges: Array<Edge> = [];
 
-        if (!currentNode) return {allNodes: nodes, taskEdges: edges};
+        if (!aiAgentNodeData) {
+            return {allNodes: nodes, taskEdges: edges};
+        }
 
-        if (currentNode) {
+        if (aiAgentNodeData) {
             const rootAiAgentNode = {
-                data: currentNode,
-                id: currentNode.workflowNodeName,
+                data: aiAgentNodeData,
+                id: aiAgentNodeData.workflowNodeName,
                 position: {x: 0, y: 0},
                 type: 'workflow',
             };
@@ -42,14 +51,7 @@ const useAiAgentLayout = () => {
             nodes.push(rootAiAgentNode);
         }
 
-        const finalToolPlaceholderNode = {
-            data: {label: '+'},
-            id: FINAL_PLACEHOLDER_NODE_ID,
-            position: {x: 0, y: 0},
-            type: 'placeholder',
-        };
-
-        const clusterElements = currentNode?.clusterElements || {
+        const clusterElements = aiAgentNodeData.clusterElements || {
             rag: null,
             // eslint-disable-next-line sort-keys
             chatMemory: null,
@@ -57,68 +59,105 @@ const useAiAgentLayout = () => {
             tools: [],
         };
 
-        SORTED_CLUSTER_ELEMENTS_KEYS.forEach((clusterElementType) => {
-            const clusterElementData = clusterElements[clusterElementType as keyof typeof clusterElements];
+        if (clusterElements) {
+            SORTED_CLUSTER_ELEMENTS_KEYS.forEach((clusterElementType) => {
+                const clusterElementData = clusterElements[clusterElementType as keyof typeof clusterElements];
+                const currentAiAgentNodeName = aiAgentNodeData.workflowNodeName;
 
-            if (clusterElementData === null || (Array.isArray(clusterElementData) && clusterElementData.length === 0)) {
-                nodes.push(createPlaceholderNode(currentNode, clusterElementType));
-            } else if (clusterElementType === 'tools' && Array.isArray(clusterElementData)) {
-                clusterElementData?.forEach((tool) => {
-                    nodes.push(createToolNode(tool));
-                });
-            } else if (clusterElementData && !Array.isArray(clusterElementData)) {
-                nodes.push(createClusterElementNode(clusterElementData));
-            }
-        });
+                if (clusterElementType === 'tools') {
+                    nodes.push(createToolsGhostNode(currentAiAgentNodeName));
 
-        const groupedClusterElementsTools = nodes.filter((node) => node.data.clusterElementType === 'tools');
+                    if (Array.isArray(clusterElementData) && clusterElementData.length) {
+                        clusterElementData.forEach((tool) => {
+                            nodes.push(createToolNode(tool));
+                        });
+                    }
 
-        if (groupedClusterElementsTools.length > 0) {
-            nodes.push(finalToolPlaceholderNode);
+                    nodes.push(createPlaceholderNode(currentAiAgentNodeName, clusterElementType));
+                } else {
+                    if (clusterElementData && !Array.isArray(clusterElementData)) {
+                        nodes.push(createClusterElementNode(clusterElementData));
+                    } else {
+                        nodes.push(createPlaceholderNode(currentAiAgentNodeName, clusterElementType));
+                    }
+                }
+            });
         }
+
+        const toolNodes = nodes.filter((node) => node.data.clusterElementType === 'tools' && node.type === 'workflow');
 
         nodes.forEach((node) => {
             if (node.data.componentName === 'aiAgent') {
                 SORTED_CLUSTER_ELEMENTS_KEYS.forEach((clusterElementType) => {
                     const clusterElementData = clusterElements[clusterElementType as keyof typeof clusterElements];
-                    const targetNode = nodes.find((node) => node.data.clusterElementType === clusterElementType);
+                    const nodeId = node.id;
 
-                    if (
-                        clusterElementData === null ||
-                        (Array.isArray(clusterElementData) && clusterElementData.length === 0)
-                    ) {
-                        edges.push(createEdgeForPlaceholderNode(node, clusterElementType));
-                    } else if (targetNode) {
-                        edges.push(createEdgeForClusterElementNode(node, targetNode));
+                    if (clusterElementType === 'tools') {
+                        const edgeFromAiAgentToToolsGhostNode = createEdgeForToolsGhostNode(nodeId);
+
+                        edges.push(edgeFromAiAgentToToolsGhostNode);
+                    } else {
+                        const targetNode = nodes.find((node) => node.data.clusterElementType === clusterElementType);
+
+                        if (clusterElementData && !Array.isArray(clusterElementData) && targetNode) {
+                            const edgeFromAiAgentToClusterElementNode = createEdgeForClusterElementNode(
+                                nodeId,
+                                targetNode
+                            );
+
+                            edges.push(edgeFromAiAgentToClusterElementNode);
+                        } else {
+                            const edgeFromAiAgentToPlaceholderNode = createEdgeForPlaceholderNode(
+                                nodeId,
+                                clusterElementType
+                            );
+
+                            edges.push(edgeFromAiAgentToPlaceholderNode);
+                        }
                     }
                 });
             }
 
-            if (node.data.clusterElementType === 'tools') {
-                const currentToolNode = groupedClusterElementsTools.findIndex((toolNode) => toolNode.id === node.id);
-                const nextToolNodeId = groupedClusterElementsTools[currentToolNode + 1]?.id;
+            if (node.type === 'aiAgentToolsGhostNode') {
+                const currentNodeId = node.id;
+                const aiAgentId = node.data.aiAgentId as string;
 
-                if (nextToolNodeId) {
-                    edges.push(createEdgeForNextToolNode(node, nextToolNodeId));
-                } else {
-                    edges.push(createEdgeForFinalToolPlaceholderNode(node, finalToolPlaceholderNode));
+                if (toolNodes.length) {
+                    toolNodes.forEach((toolNode) => {
+                        const toolNodeId = toolNode.id;
+
+                        const edgeFromToolsGhostNodeToToolNode = createEdgeForToolNode(
+                            aiAgentId,
+                            currentNodeId,
+                            toolNodeId
+                        );
+
+                        edges.push(edgeFromToolsGhostNodeToToolNode);
+                    });
                 }
+
+                const edgeFromToolsGhostNodeToToolsPlaceholderNode = createEdgeForToolsPlaceholderNode(
+                    currentNodeId,
+                    aiAgentId
+                );
+
+                edges.push(edgeFromToolsGhostNodeToToolsPlaceholderNode);
             }
         });
 
         return {allNodes: nodes, taskEdges: edges};
-    }, [currentNode]);
+    }, [aiAgentNodeData]);
 
     useEffect(() => {
         const layoutNodes = allNodes;
         const edges: Edge[] = taskEdges;
 
-        const elements = getLayoutedElements(layoutNodes, edges, canvasWidth);
+        const elements = getLayoutedElements({canvasWidth, edges, isAiAgentCanvas: true, nodes: layoutNodes});
 
         setNodes(elements.nodes);
         setEdges(elements.edges);
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [canvasWidth, currentNode]);
+    }, [canvasWidth, aiAgentNodeData]);
 };
 
 export default useAiAgentLayout;

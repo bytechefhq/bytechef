@@ -67,6 +67,11 @@ const WorkflowNodesPopoverMenuOperationList = ({
             const {componentLabel, componentName, icon, operationName, version} = operation;
 
             return {
+                ...(componentName === 'aiAgent'
+                    ? {
+                          clusterElements: {},
+                      }
+                    : {}),
                 componentName,
                 icon: icon ? (
                     <InlineSVG className="size-9 text-gray-700" src={icon} />
