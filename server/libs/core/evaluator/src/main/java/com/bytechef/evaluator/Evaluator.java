@@ -131,6 +131,8 @@ public class Evaluator {
 
             if (expression instanceof CompositeStringExpression) { // attempt partial evaluation
                 return evaluate((CompositeStringExpression) expression, context);
+            } else if (expression instanceof LiteralExpression) {
+                return expression.getValue();
             } else {
                 try {
                     return expression.getValue(createEvaluationContext(context));
@@ -168,6 +170,14 @@ public class Evaluator {
     }
 
     private static MethodResolver methodResolver() {
-        return (ctx, target, name, args) -> METHOD_EXECUTOR_MAP.get(name);
+        return (ctx, target, name, args) -> {
+            MethodExecutor executor = METHOD_EXECUTOR_MAP.get(name);
+
+            if (executor == null && target instanceof Class<?>) {
+                throw new UnsupportedOperationException("Static method invocation is not allowed: " + name);
+            }
+
+            return executor;
+        };
     }
 }
