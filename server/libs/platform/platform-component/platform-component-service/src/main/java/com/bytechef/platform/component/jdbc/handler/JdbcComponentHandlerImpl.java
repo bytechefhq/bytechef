@@ -343,11 +343,11 @@ public class JdbcComponentHandlerImpl implements ComponentHandler {
         ActionContext actionContext) {
 
         List<Column> columns = inputParameters.getRequiredList(COLUMNS, Column.class);
-
         List<ValueProperty<?>> properties = new ArrayList<>();
 
         for (Column column : columns) {
-            final String name = column.name();
+            String name = column.name();
+
             if (name != null) {
                 switch (Type.valueOf(column.type())) {
                     case ARRAY -> properties.add(
