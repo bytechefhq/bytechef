@@ -85,7 +85,7 @@ function createEdgesForSingleCase(
             return;
         }
 
-        if (TASK_DISPATCHER_NAMES.includes(sourceTaskComponentName)) {
+        if (TASK_DISPATCHER_NAMES.includes(sourceTaskComponentName) && sourceTaskComponentName !== 'loopBreak') {
             const nestedBottomGhostId = `${sourceTaskId}-${sourceTaskComponentName}-bottom-ghost`;
 
             const edgeFromNestedGhostToNextTask = {
@@ -113,7 +113,7 @@ function createEdgesForSingleCase(
     const lastTaskId = caseTasks[caseTasks.length - 1].name;
     const lastTaskComponentName = lastTaskId.split('_')[0];
 
-    if (TASK_DISPATCHER_NAMES.includes(lastTaskComponentName)) {
+    if (TASK_DISPATCHER_NAMES.includes(lastTaskComponentName) && lastTaskComponentName !== 'loopBreak') {
         const nestedBottomGhostId = `${lastTaskId}-${lastTaskComponentName}-bottom-ghost`;
 
         const edgeFromNestedGhostToBottomGhost = {
