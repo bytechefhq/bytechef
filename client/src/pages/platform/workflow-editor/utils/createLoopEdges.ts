@@ -98,6 +98,7 @@ function createLoopSubtaskEdges(loopId: string, loopChildTasks: Array<WorkflowTa
         const sourceTaskComponentName = task.name.split('_')[0];
 
         const isTaskDispatcher = TASK_DISPATCHER_NAMES.includes(sourceTaskComponentName);
+        const isLoopBreak = sourceTaskComponentName === 'loopBreak';
         const isLastTask = index === loopChildTasks.length - 1;
 
         let targetId;
@@ -111,29 +112,7 @@ function createLoopSubtaskEdges(loopId: string, loopChildTasks: Array<WorkflowTa
             targetHandleId = undefined;
         }
 
-        if (isTaskDispatcher) {
-            let bottomGhostId;
-
-            if (sourceTaskComponentName === 'condition') {
-                bottomGhostId = `${sourceTaskName}-condition-bottom-ghost`;
-            } else if (sourceTaskComponentName === 'loop') {
-                bottomGhostId = `${sourceTaskName}-loop-bottom-ghost`;
-            }
-
-            if (bottomGhostId) {
-                const edge = {
-                    id: `${bottomGhostId}=>${targetId}`,
-                    source: bottomGhostId,
-                    sourceHandle: isLastTask ? undefined : `${bottomGhostId}-bottom`,
-                    style: EDGE_STYLES,
-                    target: targetId,
-                    targetHandle: targetHandleId,
-                    type: 'workflow',
-                };
-
-                edges.push(edge);
-            }
-        } else {
+        if (!isTaskDispatcher || isLoopBreak) {
             const edgeBetweenSubtasks = {
                 id: `${sourceTaskName}=>${targetId}`,
                 source: sourceTaskName,

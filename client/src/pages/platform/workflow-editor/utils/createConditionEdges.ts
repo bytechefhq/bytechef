@@ -231,7 +231,7 @@ function createBranchExitEdge(
 
         const lastTaskComponentName = lastTaskNodeId.split('_')[0];
 
-        if (lastTaskNode?.data.taskDispatcher) {
+        if (lastTaskNode?.data.taskDispatcher && lastTaskComponentName !== 'loopBreak') {
             const nestedBottomGhostId = `${lastTaskNodeId}-${lastTaskComponentName}-bottom-ghost`;
 
             if (nestedBottomGhostId) {
