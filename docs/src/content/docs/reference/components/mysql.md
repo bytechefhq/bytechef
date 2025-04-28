@@ -81,8 +81,8 @@ Insert rows in database.
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | schema | Schema | STRING | Name of the schema the table belongs to. | true |
 | table | Table | STRING | Name of the table in which to insert data to. | true |
-| columns | Fields | ARRAY <details> <summary> Items </summary> [STRING] </details> | The list of the table field names where corresponding values would be inserted. | null |
-| rows | Values | ARRAY <details> <summary> Items </summary> [{}] </details> | List of field values for corresponding field names | null |
+| columns | Fields | ARRAY <details> <summary> Items </summary> [{STRING\(name), STRING\(type)}] </details> | The list of the table field names where corresponding values would be inserted. | null |
+| values | | DYNAMIC_PROPERTIES <details> <summary> Depends On </summary> columns </details> |  | null |
 
 #### Example JSON Structure
 ```json
@@ -92,8 +92,11 @@ Insert rows in database.
   "parameters" : {
     "schema" : "",
     "table" : "",
-    "columns" : [ "" ],
-    "rows" : [ { } ]
+    "columns" : [ {
+      "name" : "",
+      "type" : ""
+    } ],
+    "values" : { }
   },
   "type" : "mysql/v1/insert"
 }
@@ -117,9 +120,9 @@ Update rows in database.
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | schema | Schema | STRING | Name of the schema the table belongs to. | true |
 | table | Table | STRING | Name of the table in which to update data in. | true |
-| columns | Fields | ARRAY <details> <summary> Items </summary> [STRING] </details> | The list of the table field names whose values would be updated. | null |
-| updateKey | Update Key | STRING | The field name used as criteria to decide which rows in the database should be updated. | null |
-| rows | Values | ARRAY <details> <summary> Items </summary> [{}] </details> | List of field values for corresponding field names. | null |
+| condition | Condition | STRING | Condition that will be checked in the column. Example: column1=5 | true |
+| columns | Fields | ARRAY <details> <summary> Items </summary> [{STRING\(name), STRING\(type)}] </details> | The list of the table field names where corresponding values would be updated. | null |
+| values | | DYNAMIC_PROPERTIES <details> <summary> Depends On </summary> columns </details> |  | null |
 
 #### Example JSON Structure
 ```json
@@ -129,9 +132,12 @@ Update rows in database.
   "parameters" : {
     "schema" : "",
     "table" : "",
-    "columns" : [ "" ],
-    "updateKey" : "",
-    "rows" : [ { } ]
+    "condition" : "",
+    "columns" : [ {
+      "name" : "",
+      "type" : ""
+    } ],
+    "values" : { }
   },
   "type" : "mysql/v1/update"
 }
@@ -155,8 +161,7 @@ Delete rows from database.
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | schema | Schema | STRING | Name of the schema the table belongs to. | true |
 | table | Table | STRING | Name of the table in which to update data in. | true |
-| deleteKey | Delete Key | STRING | Name of the field which decides which rows in the database should be deleted. | null |
-| rows | Criteria Values | ARRAY <details> <summary> Items </summary> [{}] </details> | List of values that are used to test delete key. | null |
+| condition | Condition | STRING | Condition that will be checked in the column. Example: column1=5 | true |
 
 #### Example JSON Structure
 ```json
@@ -166,8 +171,7 @@ Delete rows from database.
   "parameters" : {
     "schema" : "",
     "table" : "",
-    "deleteKey" : "",
-    "rows" : [ { } ]
+    "condition" : ""
   },
   "type" : "mysql/v1/delete"
 }
