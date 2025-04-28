@@ -16,17 +16,16 @@
 
 package com.bytechef.platform.component.jdbc.operation;
 
-import static com.bytechef.platform.component.jdbc.constant.JdbcConstants.DELETE_KEY;
+import static com.bytechef.platform.component.jdbc.constant.JdbcConstants.CONDITION;
 import static com.bytechef.platform.component.jdbc.constant.JdbcConstants.ROWS;
 import static com.bytechef.platform.component.jdbc.constant.JdbcConstants.SCHEMA;
 import static com.bytechef.platform.component.jdbc.constant.JdbcConstants.TABLE;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import com.bytechef.platform.component.jdbc.operation.config.JdbcOperationIntTestConfiguration;
 import java.sql.SQLException;
-import java.util.List;
 import java.util.Map;
 import javax.sql.DataSource;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -59,7 +58,7 @@ public class DeleteJdbcOperationIntTest {
                         name varchar(256) not null
                     );
                     INSERT INTO test VALUES('id1', 'name1');
-                    INSERT INTO test VALUES('id2', 'name2');
+                    INSERT INTO test VALUES('id2', 'name1');
                     INSERT INTO test VALUES('id3', 'name3');
                     INSERT INTO test VALUES('id4', 'name4');
                 """);
@@ -68,14 +67,13 @@ public class DeleteJdbcOperationIntTest {
     @Test
     public void testDelete() throws SQLException {
         Map<String, ?> inputParameters = Map.of(
-            ROWS, List.of(Map.of("id", "id1"), Map.of("id", "id2")),
-            DELETE_KEY, "id",
             SCHEMA, "public",
-            TABLE, "test");
+            TABLE, "test",
+            CONDITION, "name = name1");
 
         Map<String, Integer> result = new DeleteJdbcOperation().execute(
             inputParameters, new SingleConnectionDataSource(dataSource.getConnection(), false));
 
-        Assertions.assertEquals(2, result.get("rows"));
+        assertEquals(2, result.get(ROWS));
     }
 }

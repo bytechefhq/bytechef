@@ -16,9 +16,16 @@
 
 package com.bytechef.platform.component.jdbc.operation;
 
+import static com.bytechef.platform.component.jdbc.constant.JdbcConstants.COLUMNS;
+import static com.bytechef.platform.component.jdbc.constant.JdbcConstants.CONDITION;
+import static com.bytechef.platform.component.jdbc.constant.JdbcConstants.NAME;
+import static com.bytechef.platform.component.jdbc.constant.JdbcConstants.ROWS;
+import static com.bytechef.platform.component.jdbc.constant.JdbcConstants.SCHEMA;
+import static com.bytechef.platform.component.jdbc.constant.JdbcConstants.TABLE;
+import static com.bytechef.platform.component.jdbc.constant.JdbcConstants.VALUES;
+
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.platform.component.jdbc.JdbcExecutor;
-import com.bytechef.platform.component.jdbc.constant.JdbcConstants;
 import com.bytechef.platform.component.util.SqlUtils;
 import com.fasterxml.jackson.core.type.TypeReference;
 import java.util.Arrays;
@@ -30,32 +37,33 @@ import org.springframework.jdbc.core.namedparam.SqlParameterSourceUtils;
 
 /**
  * @author Ivica Cardic
+ * @author Monika Kušter
  */
 public class UpdateJdbcOperation implements JdbcOperation<Map<String, Integer>> {
 
     @Override
     public Map<String, Integer> execute(Map<String, ?> inputParameters, DataSource dataSource) {
-        List<String> columns = MapUtils.getList(inputParameters, JdbcConstants.COLUMNS, String.class, List.of());
-        List<Map<String, Object>> rows = MapUtils.getList(
-            inputParameters, JdbcConstants.ROWS, new TypeReference<>() {}, List.of());
-        String schema = MapUtils.getString(inputParameters, JdbcConstants.SCHEMA, "public");
-        String table = MapUtils.getRequiredString(inputParameters, JdbcConstants.TABLE);
-        String updateKey = MapUtils.getString(inputParameters, JdbcConstants.UPDATE_KEY, "id");
+        List<Map<String, ?>> columns = MapUtils.getList(inputParameters, COLUMNS, new TypeReference<>() {}, List.of());
+        Map<Object, ?> valuesMap = MapUtils.getMap(inputParameters, VALUES);
+        List<Map<String, Object>> rows = MapUtils.getList(valuesMap, ROWS, new TypeReference<>() {}, List.of());
+        String schema = MapUtils.getString(inputParameters, SCHEMA, "public");
+        String table = MapUtils.getRequiredString(inputParameters, TABLE);
+        String condition = MapUtils.getRequiredString(inputParameters, CONDITION);
 
         String set = String.join(
             " AND ",
             columns.stream()
-                .map(column -> column + "=:" + column)
+                .map(column -> column.get(NAME) + "=:" + column.get(NAME))
                 .toList());
 
         SqlUtils.checkColumnTypes(schema, table, rows, dataSource);
 
         int[] rowsAffected = JdbcExecutor.batchUpdate(
-            "UPDATE " + schema + "." + table + " SET " + set + " WHERE " + updateKey + "=:" + updateKey,
+            String.format("UPDATE %s.%s SET %s WHERE %s", schema, table, set, condition),
             SqlParameterSourceUtils.createBatch(rows.toArray()), dataSource);
 
         IntStream stream = Arrays.stream(rowsAffected);
 
-        return Map.of("rows", stream.sum());
+        return Map.of(ROWS, stream.sum());
     }
 }

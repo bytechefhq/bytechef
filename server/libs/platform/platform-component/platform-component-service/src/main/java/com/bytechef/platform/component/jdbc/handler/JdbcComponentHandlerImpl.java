@@ -33,12 +33,10 @@ import static com.bytechef.component.definition.ComponentDsl.option;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.ComponentDsl.time;
 import static com.bytechef.platform.component.jdbc.constant.JdbcConstants.COLUMNS;
+import static com.bytechef.platform.component.jdbc.constant.JdbcConstants.CONDITION;
 import static com.bytechef.platform.component.jdbc.constant.JdbcConstants.DATABASE;
-import static com.bytechef.platform.component.jdbc.constant.JdbcConstants.DELETE;
-import static com.bytechef.platform.component.jdbc.constant.JdbcConstants.DELETE_KEY;
 import static com.bytechef.platform.component.jdbc.constant.JdbcConstants.EXECUTE;
 import static com.bytechef.platform.component.jdbc.constant.JdbcConstants.HOST;
-import static com.bytechef.platform.component.jdbc.constant.JdbcConstants.INSERT;
 import static com.bytechef.platform.component.jdbc.constant.JdbcConstants.NAME;
 import static com.bytechef.platform.component.jdbc.constant.JdbcConstants.PARAMETERS;
 import static com.bytechef.platform.component.jdbc.constant.JdbcConstants.PASSWORD;
@@ -48,8 +46,6 @@ import static com.bytechef.platform.component.jdbc.constant.JdbcConstants.ROWS;
 import static com.bytechef.platform.component.jdbc.constant.JdbcConstants.SCHEMA;
 import static com.bytechef.platform.component.jdbc.constant.JdbcConstants.TABLE;
 import static com.bytechef.platform.component.jdbc.constant.JdbcConstants.TYPE;
-import static com.bytechef.platform.component.jdbc.constant.JdbcConstants.UPDATE;
-import static com.bytechef.platform.component.jdbc.constant.JdbcConstants.UPDATE_KEY;
 import static com.bytechef.platform.component.jdbc.constant.JdbcConstants.USERNAME;
 import static com.bytechef.platform.component.jdbc.constant.JdbcConstants.VALUES;
 
@@ -67,7 +63,6 @@ import com.bytechef.component.definition.Property.Type;
 import com.bytechef.component.definition.Property.ValueProperty;
 import com.bytechef.platform.component.definition.JdbcComponentDefinition;
 import com.bytechef.platform.component.jdbc.DataSourceFactory;
-import com.bytechef.platform.component.jdbc.constant.JdbcConstants;
 import com.bytechef.platform.component.jdbc.datastream.JdbcItemWriter;
 import com.bytechef.platform.component.jdbc.operation.DeleteJdbcOperation;
 import com.bytechef.platform.component.jdbc.operation.ExecuteJdbcOperation;
@@ -128,7 +123,7 @@ public class JdbcComponentHandlerImpl implements ComponentHandler {
                     .additionalProperties(bool(), dateTime(), number(), string()))
             .output()
             .perform(this::performQuery),
-        action(INSERT)
+        action("insert")
             .title("Insert")
             .description("Insert rows in database.")
             .properties(
@@ -162,7 +157,7 @@ public class JdbcComponentHandlerImpl implements ComponentHandler {
                     .propertiesLookupDependsOn(COLUMNS))
             .output()
             .perform(this::performInsert),
-        action(UPDATE)
+        action("update")
             .title("Update")
             .description("Update rows in database.")
             .properties(
@@ -175,25 +170,32 @@ public class JdbcComponentHandlerImpl implements ComponentHandler {
                     .label("Table")
                     .description("Name of the table in which to update data in.")
                     .required(true),
+                string(CONDITION)
+                    .label("Condition")
+                    .description("Condition that will be checked in the column. Example: column1=5")
+                    .required(true),
                 array(COLUMNS)
                     .label("Fields")
-                    .description(
-                        "The list of the table field names whose values would be updated.")
-                    .items(string()),
-                string(UPDATE_KEY)
-                    .label("Update Key")
-                    .description(
-                        "The field name used as criteria to decide which rows in the database should be updated.")
-                    .placeholder("id"),
-                array(ROWS)
-                    .label("Values")
-                    .description("List of field values for corresponding field names.")
-                    .items(object().additionalProperties(
-                        array(), bool(), date(), dateTime(), integer(), nullable(), number(), object(),
-                        string(), time())))
+                    .description("The list of the table field names where corresponding values would be updated.")
+                    .items(
+                        object()
+                            .properties(
+                                string(NAME)
+                                    .label("Field Name")
+                                    .description("Name of the fields.")
+                                    .required(true),
+                                string(TYPE)
+                                    .label("Type")
+                                    .description("Type of the field.")
+                                    .options(getTypeOptions())
+                                    .defaultValue("STRING")
+                                    .required(true))),
+                dynamicProperties(VALUES)
+                    .properties(JdbcComponentHandlerImpl::createProperties)
+                    .propertiesLookupDependsOn(COLUMNS))
             .output()
             .perform(this::performUpdate),
-        action(DELETE)
+        action("delete")
             .title("Delete")
             .description("Delete rows from database.")
             .properties(
@@ -206,19 +208,13 @@ public class JdbcComponentHandlerImpl implements ComponentHandler {
                     .label("Table")
                     .description("Name of the table in which to update data in.")
                     .required(true),
-                string(DELETE_KEY)
-                    .label("Delete Key")
-                    .description("Name of the field which decides which rows in the database should be deleted.")
-                    .placeholder("id"),
-                array(JdbcConstants.ROWS)
-                    .label("Criteria Values")
-                    .description("List of values that are used to test delete key.")
-                    .items(object().additionalProperties(
-                        array(), bool(), date(), dateTime(), integer(), nullable(), number(), object(),
-                        string(), time())))
+                string(CONDITION)
+                    .label("Condition")
+                    .description("Condition that will be checked in the column. Example: column1=5")
+                    .required(true))
             .output()
             .perform(this::performDelete),
-        action(EXECUTE)
+        action("execute")
             .title("Execute")
             .description("Execute an SQL DML or DML statement.")
             .properties(
