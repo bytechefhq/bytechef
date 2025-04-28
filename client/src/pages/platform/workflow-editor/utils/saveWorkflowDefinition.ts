@@ -180,16 +180,27 @@ export default async function saveWorkflowDefinition({
                 combinedParameters = newTask.parameters ?? {};
             }
 
-            const combinedTask: WorkflowTask = {
-                ...newTask,
-                parameters: combinedParameters,
-            };
+            if (existingWorkflowTask.type.split('/')[0] === 'aiAgent') {
+                const aiAgentTask: WorkflowTask = {
+                    ...newTask,
+                    clusterElements: {
+                        ...(newTask.clusterElements || {}),
+                    },
+                };
 
-            updatedWorkflowDefinitionTasks = [
-                ...updatedWorkflowDefinitionTasks.slice(0, existingTaskIndex),
-                combinedTask,
-                ...updatedWorkflowDefinitionTasks.slice(existingTaskIndex + 1),
-            ];
+                updatedWorkflowDefinitionTasks[existingTaskIndex] = aiAgentTask;
+            } else {
+                const combinedTask: WorkflowTask = {
+                    ...newTask,
+                    parameters: combinedParameters,
+                };
+
+                updatedWorkflowDefinitionTasks = [
+                    ...updatedWorkflowDefinitionTasks.slice(0, existingTaskIndex),
+                    combinedTask,
+                    ...updatedWorkflowDefinitionTasks.slice(existingTaskIndex + 1),
+                ];
+            }
         } else {
             updatedWorkflowDefinitionTasks = [...(workflowDefinitionTasks || [])];
 

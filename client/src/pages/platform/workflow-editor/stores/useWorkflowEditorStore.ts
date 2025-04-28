@@ -1,11 +1,15 @@
 /* eslint-disable sort-keys */
 import {WorkflowTestExecution} from '@/shared/middleware/platform/workflow/test';
+import {NodeDataType} from '@/shared/types';
 import {create} from 'zustand';
 import {devtools} from 'zustand/middleware';
 
 interface WorkflowEditorI {
     aiAgentOpen: boolean;
     setAiAgentOpen: (aiAgentOpen: boolean) => void;
+
+    aiAgentNodeData: NodeDataType | undefined;
+    setAiAgentNodeData: (aiAgentNodeData: NodeDataType | undefined) => void;
 
     showBottomPanel: boolean;
     setShowBottomPanelOpen: (showBottomPanel: boolean) => void;
@@ -39,6 +43,12 @@ const useWorkflowEditorStore = create<WorkflowEditorI>()(
             setAiAgentOpen: (aiAgentOpen) =>
                 set(() => ({
                     aiAgentOpen: aiAgentOpen,
+                })),
+
+            aiAgentNodeData: undefined,
+            setAiAgentNodeData: (aiAgentNodeData) =>
+                set(() => ({
+                    aiAgentNodeData: aiAgentNodeData,
                 })),
 
             showBottomPanel: false,

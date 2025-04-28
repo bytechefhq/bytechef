@@ -83,10 +83,10 @@ const WorkflowNodeDetailsPanel = ({
     updateWorkflowMutation,
     workflowNodeOutputs,
 }: {
+    className?: string;
     previousComponentDefinitions: Array<ComponentDefinitionBasic>;
     updateWorkflowMutation: UpdateWorkflowMutationType;
     workflowNodeOutputs: WorkflowNodeOutput[];
-    className?: string;
 }) => {
     const [currentNodeName, setCurrentNodeName] = useState<string | undefined>();
     const [currentOperationName, setCurrentOperationName] = useState('');

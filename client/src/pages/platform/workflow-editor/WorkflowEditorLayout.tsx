@@ -20,6 +20,7 @@ import {useWorkflowMutation} from '@/pages/platform/workflow-editor/providers/wo
 import useRightSidebarStore from '@/pages/platform/workflow-editor/stores/useRightSidebarStore';
 import useWorkflowEditorStore from '@/pages/platform/workflow-editor/stores/useWorkflowEditorStore';
 import {useCopilotStore} from '@/shared/components/copilot/stores/useCopilotStore';
+import {useEffect} from 'react';
 import {twMerge} from 'tailwind-merge';
 
 import AiAgentWorkflowEditor from '../ai-agent-editor/components/AiAgentWorkflowEditor';
@@ -35,6 +36,7 @@ const WorkflowEditorLayout = () => {
     const {workflow} = useWorkflowDataStore();
     const {
         aiAgentOpen,
+        setAiAgentNodeData,
         setAiAgentOpen,
         setShowWorkflowCodeEditorSheet,
         setShowWorkflowInputsSheet,
@@ -43,7 +45,7 @@ const WorkflowEditorLayout = () => {
         showWorkflowInputsSheet,
         showWorkflowOutputsSheet,
     } = useWorkflowEditorStore();
-    const {currentComponent} = useWorkflowNodeDetailsPanelStore();
+    const {currentComponent, currentNode} = useWorkflowNodeDetailsPanelStore();
 
     const {
         componentDefinitions,
@@ -66,6 +68,12 @@ const WorkflowEditorLayout = () => {
     } = useWorkflowLayout();
 
     const {updateWorkflowMutation} = useWorkflowMutation();
+
+    useEffect(() => {
+        if (currentNode?.componentName === 'aiAgent') {
+            setAiAgentNodeData(currentNode);
+        }
+    }, [currentNode, setAiAgentNodeData]);
 
     return (
         <ReactFlowProvider>
@@ -114,6 +122,11 @@ const WorkflowEditorLayout = () => {
             <Dialog
                 onOpenChange={(open) => {
                     setAiAgentOpen(open);
+
+                    if (!open) {
+                        setAiAgentNodeData(undefined);
+                        useWorkflowNodeDetailsPanelStore.getState().reset();
+                    }
                 }}
                 open={aiAgentOpen}
             >

@@ -30,6 +30,8 @@ export default function handleComponentAddedSuccess({
             setCurrentNode({...currentNode, ...nodeData});
             setCurrentComponent({...currentComponent, ...nodeData});
         }
+    } else if (nodeData.componentName === 'aiAgent') {
+        return;
     } else {
         setCurrentNode({...nodeData, description: ''});
         setCurrentComponent({...nodeData, description: ''});
