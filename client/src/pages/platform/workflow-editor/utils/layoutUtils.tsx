@@ -99,7 +99,6 @@ export const convertTaskToNode = (
     };
 };
 
-
 export const getLayoutedElements = (nodes: Node[], edges: Edge[], canvasWidth: number) => {
     const dagreGraph = new dagre.graphlib.Graph().setDefaultEdgeLabel(() => ({}));
 

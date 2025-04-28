@@ -5,11 +5,9 @@ import CopilotButton from '@/shared/components/copilot/CopilotButton';
 import {Source} from '@/shared/components/copilot/stores/useCopilotStore';
 import {ComponentDefinitionBasic, TaskDispatcherDefinition} from '@/shared/middleware/platform/configuration';
 import {useFeatureFlagsStore} from '@/shared/stores/useFeatureFlagsStore';
-import {ClickedDefinitionType, NodeDataType} from '@/shared/types';
-import {Node} from '@xyflow/react';
+import {ClickedDefinitionType} from '@/shared/types';
 import {memo, useEffect, useState} from 'react';
 import {twMerge} from 'tailwind-merge';
-import {useShallow} from 'zustand/react/shallow';
 
 interface WorkflowNodesListProps {
     actionPanelOpen: boolean;
@@ -19,7 +17,6 @@ interface WorkflowNodesListProps {
     hideTriggerComponents?: boolean;
     hideTaskDispatchers?: boolean;
     selectedComponentName?: string;
-    sourceNodeId?: string;
 }
 
 const WorkflowNodesPopoverMenuComponentList = memo(
@@ -31,7 +28,6 @@ const WorkflowNodesPopoverMenuComponentList = memo(
         hideTaskDispatchers = false,
         hideTriggerComponents = false,
         selectedComponentName,
-        sourceNodeId,
     }: WorkflowNodesListProps) => {
         const [filter, setFilter] = useState('');
         const [filteredActionComponentDefinitions, setFilteredActionComponentDefinitions] = useState<
@@ -48,17 +44,19 @@ const WorkflowNodesPopoverMenuComponentList = memo(
 
         const {componentDefinitions, taskDispatcherDefinitions} = useWorkflowDataStore();
 
-        const {nodes} = useWorkflowDataStore(useShallow((state) => ({nodes: state.nodes})));
-
         const ff_797 = useFeatureFlagsStore()('ff-797');
 
-        useEffect(
-            () =>
+        useEffect(() => {
+            if (taskDispatcherDefinitions) {
                 setFilteredTaskDispatcherDefinitions(
-                    filterTaskDispatcherDefinitions(taskDispatcherDefinitions, filter, edgeId, sourceNodeId, nodes)
-                ),
-            [taskDispatcherDefinitions, filter, sourceNodeId, edgeId, nodes]
-        );
+                    taskDispatcherDefinitions.filter(
+                        ({name, title}) =>
+                            name?.toLowerCase().includes(filter.toLowerCase()) ||
+                            title?.toLowerCase().includes(filter.toLowerCase())
+                    )
+                );
+            }
+        }, [taskDispatcherDefinitions, filter]);
 
         useEffect(() => {
             if (componentDefinitions) {
@@ -117,45 +115,3 @@ const WorkflowNodesPopoverMenuComponentList = memo(
 WorkflowNodesPopoverMenuComponentList.displayName = 'WorkflowNodesPopoverMenuList';
 
 export default WorkflowNodesPopoverMenuComponentList;
-
-const filterTaskDispatcherDefinitions = (
-    taskDispatcherDefinitions: Array<TaskDispatcherDefinition> | null,
-    filter: string,
-    edgeId?: string,
-    sourceNodeId?: string,
-    nodes: Node[] = []
-) => {
-    if (!taskDispatcherDefinitions) {
-        return [];
-    }
-
-    const filteredBySearch = taskDispatcherDefinitions.filter(
-        ({name, title}) =>
-            name?.toLowerCase().includes(filter.toLowerCase()) || title?.toLowerCase().includes(filter.toLowerCase())
-    );
-
-    const result = [...filteredBySearch];
-
-    if (edgeId) {
-        const [sourceNodeId, targetNodeId] = edgeId.split('=>');
-        const isSourceTopLoopGhostNode = sourceNodeId.startsWith('loop_') && sourceNodeId.includes('ghost');
-        const isTargetBottomLoopGhostNode = targetNodeId.startsWith('loop_') && targetNodeId.includes('ghost');
-
-        if (isSourceTopLoopGhostNode || isTargetBottomLoopGhostNode) {
-            return result;
-        }
-
-        const sourceNode = nodes.find((node) => node.id === sourceNodeId);
-        const targetNode = nodes.find((node) => node.id === targetNodeId);
-
-        if ((sourceNode?.data as NodeDataType).loopData || (targetNode?.data as NodeDataType).loopData) {
-            return result;
-        }
-    }
-
-    if (!edgeId?.startsWith('loop_') && !sourceNodeId?.startsWith('loop_')) {
-        return result.filter(({name}) => name !== 'loopBreak');
-    }
-
-    return result;
-};
