@@ -5,9 +5,11 @@ import CopilotButton from '@/shared/components/copilot/CopilotButton';
 import {Source} from '@/shared/components/copilot/stores/useCopilotStore';
 import {ComponentDefinitionBasic, TaskDispatcherDefinition} from '@/shared/middleware/platform/configuration';
 import {useFeatureFlagsStore} from '@/shared/stores/useFeatureFlagsStore';
-import {ClickedDefinitionType} from '@/shared/types';
+import {ClickedDefinitionType, NodeDataType} from '@/shared/types';
+import {Node} from '@xyflow/react';
 import {memo, useEffect, useState} from 'react';
 import {twMerge} from 'tailwind-merge';
+import {useShallow} from 'zustand/react/shallow';
 
 interface WorkflowNodesListProps {
     actionPanelOpen: boolean;
@@ -17,6 +19,7 @@ interface WorkflowNodesListProps {
     hideTriggerComponents?: boolean;
     hideTaskDispatchers?: boolean;
     selectedComponentName?: string;
+    sourceNodeId?: string;
 }
 
 const WorkflowNodesPopoverMenuComponentList = memo(
@@ -28,6 +31,7 @@ const WorkflowNodesPopoverMenuComponentList = memo(
         hideTaskDispatchers = false,
         hideTriggerComponents = false,
         selectedComponentName,
+        sourceNodeId,
     }: WorkflowNodesListProps) => {
         const [filter, setFilter] = useState('');
         const [filteredActionComponentDefinitions, setFilteredActionComponentDefinitions] = useState<
@@ -44,19 +48,17 @@ const WorkflowNodesPopoverMenuComponentList = memo(
 
         const {componentDefinitions, taskDispatcherDefinitions} = useWorkflowDataStore();
 
+        const {nodes} = useWorkflowDataStore(useShallow((state) => ({nodes: state.nodes})));
+
         const ff_797 = useFeatureFlagsStore()('ff-797');
 
-        useEffect(() => {
-            if (taskDispatcherDefinitions) {
+        useEffect(
+            () =>
                 setFilteredTaskDispatcherDefinitions(
-                    taskDispatcherDefinitions.filter(
-                        ({name, title}) =>
-                            name?.toLowerCase().includes(filter.toLowerCase()) ||
-                            title?.toLowerCase().includes(filter.toLowerCase())
-                    )
-                );
-            }
-        }, [taskDispatcherDefinitions, filter]);
+                    filterTaskDispatcherDefinitions(taskDispatcherDefinitions, filter, edgeId, sourceNodeId, nodes)
+                ),
+            [taskDispatcherDefinitions, filter, sourceNodeId, edgeId, nodes]
+        );
 
         useEffect(() => {
             if (componentDefinitions) {
@@ -115,3 +117,85 @@ const WorkflowNodesPopoverMenuComponentList = memo(
 WorkflowNodesPopoverMenuComponentList.displayName = 'WorkflowNodesPopoverMenuList';
 
 export default WorkflowNodesPopoverMenuComponentList;
+
+const isLoopSubtask = (node?: Node) => !!node?.data?.loopData || !!node?.data.loopId;
+
+const isTaskDispatcherSubtask = (node?: Node) =>
+    !!node?.data?.loopData || !!node?.data?.conditionData || !!node?.data?.branchData;
+
+const filterTaskDispatcherDefinitions = (
+    taskDispatcherDefinitions: Array<TaskDispatcherDefinition> | null,
+    filter: string,
+    edgeId?: string,
+    sourceNodeId?: string,
+    nodes: Node[] = []
+) => {
+    if (!taskDispatcherDefinitions) {
+        return [];
+    }
+
+    const nodeId = sourceNodeId || edgeId?.split('=>')[0];
+
+    if (!nodeId) {
+        return taskDispatcherDefinitions;
+    }
+
+    const filteredBySearch = taskDispatcherDefinitions.filter(
+        ({name, title}) =>
+            name?.toLowerCase().includes(filter.toLowerCase()) || title?.toLowerCase().includes(filter.toLowerCase())
+    );
+
+    const result = [...filteredBySearch];
+
+    if (nodeId.startsWith('loop_') && nodeId.includes('placeholder')) {
+        return result;
+    }
+
+    // Find the source node
+    const sourceNode = nodes.find((node) => node.id === nodeId);
+
+    if (!sourceNode) {
+        return result.filter(({name}) => name !== 'loopBreak');
+    }
+
+    let hasLoopTaskDispatcher = false;
+
+    if (isLoopSubtask(sourceNode)) {
+        hasLoopTaskDispatcher = true;
+    } else {
+        let currentNode = sourceNode;
+
+        while (currentNode) {
+            let parentId;
+
+            const currentNodeData = currentNode.data as NodeDataType;
+
+            // If using edgeId (has full data), or using sourceNodeId (has restricted data)
+            if (currentNode.data.workflowNodeName) {
+                parentId = currentNodeData.conditionData?.conditionId || currentNodeData.branchData?.branchId;
+            } else {
+                parentId = currentNodeData.conditionId || currentNodeData.branchId;
+            }
+
+            const parentNode = nodes.find((node) => node.id === parentId);
+
+            if (!parentNode || !isTaskDispatcherSubtask(parentNode)) {
+                break;
+            }
+
+            if (isLoopSubtask(parentNode)) {
+                hasLoopTaskDispatcher = true;
+
+                break;
+            }
+
+            currentNode = parentNode;
+        }
+    }
+
+    if (!hasLoopTaskDispatcher) {
+        return result.filter(({name}) => name !== 'loopBreak');
+    }
+
+    return result;
+};
