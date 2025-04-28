@@ -553,7 +553,7 @@
     "description" : "The raw expression.",
     "exampleValue" : null,
     "label" : "Expression",
-    "placeholder" : null,
+    "placeholder" : "Write expression, e.g. #{1 + 1 == 2}",
     "options" : null,
     "controlType" : "TEXT_AREA",
     "maxLength" : null,
