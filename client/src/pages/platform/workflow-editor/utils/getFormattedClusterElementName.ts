@@ -9,13 +9,14 @@ export default function getFormattedClusterElementName(clusterElementName: strin
 
     const clusterElementNames = workflowDefinition.tasks.map((task: WorkflowTask) => {
         let elementName = [];
-        if (task.clusterElements && task.clusterElements[clusterElementType]) {
+
+        const {clusterElements} = task;
+
+        if (clusterElements && clusterElements[clusterElementType]) {
             if (clusterElementType === 'tools') {
-                elementName = task.clusterElements.tools.map((tool: WorkflowTask) => {
-                    return tool.name;
-                });
+                elementName = clusterElements.tools.map((tool: WorkflowTask) => tool.name);
             } else {
-                elementName = task.clusterElements[clusterElementType].name;
+                elementName = clusterElements[clusterElementType].name;
             }
         }
 
@@ -36,8 +37,9 @@ export default function getFormattedClusterElementName(clusterElementName: strin
 
     const existingClusterElementsNumbers = existingClusterElements.map((name: string) => {
         const nodeNameSplit = name.split('_');
+        const lastSegmentIndex = nodeNameSplit.length - 1;
 
-        return parseInt(nodeNameSplit[nodeNameSplit.length - 1]);
+        return parseInt(nodeNameSplit[lastSegmentIndex]);
     });
 
     const maxExistingClusterElementNumber = Math.max(...existingClusterElementsNumbers);

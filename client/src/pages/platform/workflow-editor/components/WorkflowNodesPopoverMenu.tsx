@@ -17,15 +17,11 @@ import {useShallow} from 'zustand/react/shallow';
 
 import {useWorkflowMutation} from '../providers/workflowMutationProvider';
 import useWorkflowDataStore from '../stores/useWorkflowDataStore';
-import getFormattedClusterElementName from '../utils/getFormattedClusterElementName';
 import getTaskDispatcherContext from '../utils/getTaskDispatcherContext';
+import handleClusterElementClick from '../utils/handleClusterElementClick';
 import handleTaskDispatcherClick from '../utils/handleTaskDispatcherClick';
-import saveWorkflowDefinition from '../utils/saveWorkflowDefinition';
 import WorkflowNodesPopoverMenuComponentList from './WorkflowNodesPopoverMenuComponentList';
 import WorkflowNodesPopoverMenuOperationList from './WorkflowNodesPopoverMenuOperationList';
-
-type ClusterElementsDefinitionType = 'CHAT_MEMORY' | 'MODEL' | 'RAG';
-type StoredClusterElementsType = 'chatMemory' | 'model' | 'rag';
 
 interface WorkflowNodesPopoverMenuProps extends PropsWithChildren {
     clusterElementsData?: ClusterElementsType;
@@ -34,7 +30,6 @@ interface WorkflowNodesPopoverMenuProps extends PropsWithChildren {
     hideTriggerComponents?: boolean;
     hideTaskDispatchers?: boolean;
     nodeIndex?: number;
-    setClusterElementsData?: (data: ClusterElementsType) => void;
     sourceData?: ClusterElementDefinitionBasic[];
     sourceNodeId: string;
 }
@@ -47,7 +42,6 @@ const WorkflowNodesPopoverMenu = ({
     hideTaskDispatchers = false,
     hideTriggerComponents = false,
     nodeIndex,
-    setClusterElementsData,
     sourceData,
     sourceNodeId,
 }: WorkflowNodesPopoverMenuProps) => {
@@ -133,65 +127,6 @@ const WorkflowNodesPopoverMenu = ({
         [sourceNodeId, nodeIndex]
     );
 
-    const handleClusterElementClick = useCallback(
-        (data: ClusterElementDefinitionBasic) => {
-            if (!clusterElementsData || !sourceNode) return;
-
-            const updatedClusterElementsData: ClusterElementsType = {
-                chatMemory: clusterElementsData.chatMemory,
-                model: clusterElementsData.model,
-                rag: clusterElementsData.rag,
-                tools: [...(clusterElementsData.tools || [])],
-            };
-
-            const propertyMap: Record<ClusterElementsDefinitionType, StoredClusterElementsType> = {
-                CHAT_MEMORY: 'chatMemory',
-                MODEL: 'model',
-                RAG: 'rag',
-            };
-
-            if (data.type === 'TOOLS') {
-                updatedClusterElementsData.tools = [
-                    ...(clusterElementsData.tools || []),
-                    {
-                        label: data.title,
-                        name: getFormattedClusterElementName(data.name, 'tools'),
-                        parameters: {},
-                        type: `${data.componentName}/v${data.componentVersion}/${data.name}`,
-                    },
-                ];
-            } else {
-                if (data.type in propertyMap) {
-                    updatedClusterElementsData[propertyMap[data.type as ClusterElementsDefinitionType]] = {
-                        label: data.title,
-                        name: getFormattedClusterElementName(
-                            data.componentName,
-                            propertyMap[data.type as ClusterElementsDefinitionType]
-                        ),
-                        parameters: {},
-                        type: `${data.componentName}/v${data.componentVersion}/${propertyMap[data.type as ClusterElementsDefinitionType]}`,
-                    };
-                }
-            }
-
-            setClusterElementsData?.(updatedClusterElementsData);
-
-            saveWorkflowDefinition({
-                nodeData: {
-                    ...sourceNode.data,
-                    clusterElements: updatedClusterElementsData,
-                    componentName: String(sourceNode.data.componentName),
-                    name: String(sourceNode.data.name),
-                    workflowNodeName: String(sourceNode.data.workflowNodeName),
-                },
-                projectId: +projectId!,
-                queryClient,
-                updateWorkflowMutation,
-            });
-        },
-        [clusterElementsData, projectId, queryClient, setClusterElementsData, sourceNode, updateWorkflowMutation]
-    );
-
     useEffect(() => {
         if (componentDefinitionToBeAdded?.name) {
             setActionPanelOpen(true);
@@ -247,7 +182,17 @@ const WorkflowNodesPopoverMenu = ({
                                         <li
                                             className="flex cursor-pointer items-center gap-2 space-y-1 rounded border-2 border-transparent bg-white px-2 py-1 hover:border-blue-200"
                                             key={index}
-                                            onClick={() => handleClusterElementClick(data)}
+                                            onClick={() =>
+                                                handleClusterElementClick({
+                                                    clusterElementsData,
+                                                    data,
+                                                    projectId,
+                                                    queryClient,
+                                                    setPopoverOpen,
+                                                    sourceNode,
+                                                    updateWorkflowMutation,
+                                                })
+                                            }
                                         >
                                             {data.icon ? data.icon : <ComponentIcon />}
 
