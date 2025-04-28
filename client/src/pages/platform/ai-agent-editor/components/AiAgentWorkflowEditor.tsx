@@ -3,10 +3,11 @@ import {Controls, ReactFlow, ReactFlowProvider} from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
 import {useShallow} from 'zustand/react/shallow';
 
-import PlaceholderEdge from '../../workflow-editor/edges/PlaceholderEdge';
 import PlaceholderNode from '../../workflow-editor/nodes/PlaceholderNode';
 import WorkflowNode from '../../workflow-editor/nodes/WorkflowNode';
+import LabeledAiAgentEdge from '../edges/LabeledAiAgentEdge';
 import useAiAgentLayout from '../hooks/useAiAgentLayout';
+import AiAgentToolsGhostNode from '../nodes/AiAgentToolsGhostNode';
 import useAiAgentDataStore from '../stores/useAiAgentDataStore';
 
 const AiAgentWorkflowEditor = () => {
@@ -20,10 +21,11 @@ const AiAgentWorkflowEditor = () => {
     );
 
     const aiAgentEdgeTypes = {
-        placeholder: PlaceholderEdge,
+        labeledAiAgentEdge: LabeledAiAgentEdge,
     };
 
     const aiAgentNodeTypes = {
+        aiAgentToolsGhostNode: AiAgentToolsGhostNode,
         placeholder: PlaceholderNode,
         workflow: WorkflowNode,
     };

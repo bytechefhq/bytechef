@@ -305,7 +305,7 @@ export default function useLayout({
         const layoutNodes = allNodes;
         const edges: Edge[] = taskEdges;
 
-        const elements = getLayoutedElements(layoutNodes, edges, canvasWidth);
+        const elements = getLayoutedElements({canvasWidth, edges, nodes: layoutNodes});
 
         setNodes(elements.nodes);
         setEdges(elements.edges);

@@ -26,7 +26,6 @@ import {Edge, Node} from '@xyflow/react';
 import {ComponentIcon} from 'lucide-react';
 import InlineSVG from 'react-inlinesvg';
 
-import useWorkflowDataStore from '../stores/useWorkflowDataStore';
 import {getConditionBranchSide} from './createConditionEdges';
 import {TASK_DISPATCHER_CONFIG, getParentTaskDispatcherTask} from './taskDispatcherConfig';
 
@@ -42,11 +41,7 @@ export const calculateNodeHeight = (node: Node) => {
     const aiAgentNodeHeight = 250;
 
     if (isPlaceholderNode || isGhostNode) {
-        if (node.id.includes('aiAgent')) {
-            height = 100;
-        } else {
-            height = PLACEHOLDER_NODE_HEIGHT;
-        }
+        height = PLACEHOLDER_NODE_HEIGHT;
 
         if (isBottomGhostNode) {
             height = NODE_HEIGHT;
@@ -55,6 +50,21 @@ export const calculateNodeHeight = (node: Node) => {
 
     if (isAIAgentNode) {
         height = aiAgentNodeHeight;
+    }
+
+    return height;
+};
+
+export const calculateAiAgentCanvasNodeHeight = (node: Node) => {
+    const isToolsPlaceholder = node.id.includes('tools') && node.type === 'placeholder';
+    const isToolsGhostNode = node.id.includes('tools') && node.type === 'aiAgentToolsGhostNode';
+
+    let height = 200;
+
+    if (isToolsGhostNode || isToolsPlaceholder) {
+        height = 50;
+    } else if (node.data.clusterElements) {
+        height = 100;
     }
 
     return height;
@@ -69,16 +79,9 @@ export const convertTaskToNode = (
 
     const isTaskDispatcher = TASK_DISPATCHER_NAMES.includes(componentName);
 
-    const {workflow} = useWorkflowDataStore.getState();
-
-    const workflowDefinition = JSON.parse(workflow.definition!);
-
-    const currentTask = workflowDefinition.tasks.find((workflowTask: WorkflowTask) => workflowTask.name === task.name);
-
     return {
         data: {
             ...task,
-            clusterElements: currentTask?.clusterElements,
             componentName,
             icon: (
                 <InlineSVG
@@ -99,13 +102,29 @@ export const convertTaskToNode = (
     };
 };
 
-export const getLayoutedElements = (nodes: Node[], edges: Edge[], canvasWidth: number) => {
+export const getLayoutedElements = ({
+    canvasWidth,
+    edges,
+    isAiAgentCanvas,
+    nodes,
+}: {
+    canvasWidth: number;
+    edges: Edge[];
+    isAiAgentCanvas?: boolean;
+    nodes: Node[];
+}) => {
     const dagreGraph = new dagre.graphlib.Graph().setDefaultEdgeLabel(() => ({}));
 
     dagreGraph.setGraph({rankdir: DIRECTION});
 
     nodes.forEach((node) => {
-        const height = calculateNodeHeight(node);
+        let height;
+
+        if (isAiAgentCanvas) {
+            height = calculateAiAgentCanvasNodeHeight(node);
+        } else {
+            height = calculateNodeHeight(node);
+        }
 
         dagreGraph.setNode(node.id, {height, width: node.type === 'aiAgentNode' ? 350 : NODE_WIDTH});
     });
@@ -178,6 +197,9 @@ export const getLayoutedElements = (nodes: Node[], edges: Edge[], canvasWidth: n
             },
             {
                 condition: sourceNode.data.componentName === 'aiAgent',
+            },
+            {
+                condition: sourceNode.type === 'aiAgentToolsGhostNode',
             },
             {
                 condition: sourceNode.data.componentName === 'branch',

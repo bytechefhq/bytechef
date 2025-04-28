@@ -1,45 +1,57 @@
 import {EDGE_STYLES} from '@/shared/constants';
 import {Node} from '@xyflow/react';
 
-const edgeFromAiAgentStyle = {
+const defaultLabeledEdgeStyle = {
     style: EDGE_STYLES,
-    type: 'smoothstep',
+    type: 'labeledAiAgentEdge',
 };
 
-export function createEdgeForPlaceholderNode(node: Node, type: string) {
+export function createEdgeForPlaceholderNode(nodeId: string, type: string) {
     return {
-        ...edgeFromAiAgentStyle,
-        id: `${node.id}=>${node.id}-${type}-placeholder-0`,
-        source: node.id,
-        target: `${node.id}-${type}-placeholder-0`,
+        ...defaultLabeledEdgeStyle,
+        id: `${nodeId}=>${nodeId}-${type}-placeholder-0`,
+        source: nodeId,
+        sourceHandle: `${type}-handle`,
+        target: `${nodeId}-${type}-placeholder-0`,
     };
 }
 
-export function createEdgeForClusterElementNode(node: Node, targetNode: Node) {
+export function createEdgeForToolsGhostNode(nodeId: string) {
     return {
-        ...edgeFromAiAgentStyle,
-        id: `${node.id}=>${node.id}-${targetNode.id}`,
-        source: node.id,
+        ...defaultLabeledEdgeStyle,
+        id: `${nodeId}=>${nodeId}-tools-ghost`,
+        source: nodeId,
+        sourceHandle: 'tools-handle',
+        target: `${nodeId}-tools-ghost`,
+    };
+}
+
+export function createEdgeForToolsPlaceholderNode(currentNodeId: string, aiAgentId: string) {
+    return {
+        id: `${currentNodeId}=>${aiAgentId}-tools-placeholder-0`,
+        source: currentNodeId,
+        style: EDGE_STYLES,
+        target: `${aiAgentId}-tools-placeholder-0`,
+        type: 'default',
+    };
+}
+
+export function createEdgeForToolNode(aiAgentId: string, currentNodeId: string, toolNodeId: string) {
+    return {
+        id: `${currentNodeId}=>${aiAgentId}-${toolNodeId}`,
+        source: currentNodeId,
+        style: EDGE_STYLES,
+        target: toolNodeId,
+        type: 'default',
+    };
+}
+
+export function createEdgeForClusterElementNode(nodeId: string, targetNode: Node) {
+    return {
+        ...defaultLabeledEdgeStyle,
+        id: `${nodeId}=>${nodeId}-${targetNode.id}`,
+        source: nodeId,
+        sourceHandle: `${targetNode.data.clusterElementType}-handle`,
         target: targetNode.id,
-    };
-}
-
-export function createEdgeForNextToolNode(node: Node, nextToolNodeId: string) {
-    return {
-        id: `${node.id}=>${nextToolNodeId}`,
-        source: node.id,
-        style: EDGE_STYLES,
-        target: `${nextToolNodeId}`,
-        type: 'smoothstep',
-    };
-}
-
-export function createEdgeForFinalToolPlaceholderNode(node: Node, finalToolPlaceholderNode: Node) {
-    return {
-        id: `${node.id}=>${finalToolPlaceholderNode.id}`,
-        source: node.id,
-        style: EDGE_STYLES,
-        target: `${finalToolPlaceholderNode.id}`,
-        type: 'smoothstep',
     };
 }

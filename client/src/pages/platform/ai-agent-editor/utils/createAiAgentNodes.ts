@@ -1,12 +1,24 @@
-import {ClusterElementItemType, NodeDataType} from '@/shared/types';
+import {ClusterElementItemType} from '@/shared/types';
 import {Node} from '@xyflow/react';
 
-export function createPlaceholderNode(currentNode: NodeDataType | undefined, type: string): Node {
+export function createPlaceholderNode(currentAiAgentNodeName: string | undefined, type: string): Node {
     return {
-        data: {label: '+'},
-        id: `${currentNode?.workflowNodeName}-${type}-placeholder-0`,
+        data: {clusterElementType: type, label: '+'},
+        id: `${currentAiAgentNodeName}-${type}-placeholder-0`,
         position: {x: 0, y: 0},
         type: 'placeholder',
+    };
+}
+
+export function createToolsGhostNode(currentAiAgentNodeName: string | undefined): Node {
+    return {
+        data: {
+            aiAgentId: currentAiAgentNodeName,
+            clusterElementType: 'tools',
+        },
+        id: `${currentAiAgentNodeName}-tools-ghost`,
+        position: {x: 0, y: 0},
+        type: 'aiAgentToolsGhostNode',
     };
 }
 
