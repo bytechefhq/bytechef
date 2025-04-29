@@ -58,7 +58,6 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
     ) => {
         const [editorValue, setEditorValue] = useState<string | number | undefined>(value);
         const [isLocalUpdate, setIsLocalUpdate] = useState(false);
-        const [mentionOccurences, setMentionOccurences] = useState(0);
 
         const {currentNode} = useWorkflowNodeDetailsPanelStore();
 
@@ -151,7 +150,12 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
 
             let value = editorValue;
 
-            if ((type === 'INTEGER' || type === 'NUMBER') && typeof value === 'string' && !value.startsWith('${')) {
+            if (
+                (type === 'INTEGER' || type === 'NUMBER') &&
+                typeof value === 'string' &&
+                !value.startsWith('${') &&
+                !value.startsWith('#{')
+            ) {
                 value = parseInt(value);
             }
 
@@ -204,10 +208,6 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
 
                 setEditorValue(value);
 
-                const propertyMentions = value.match(/property-mention/g);
-
-                setMentionOccurences(propertyMentions?.length || 0);
-
                 saveMentionInputValue();
             },
             [saveMentionInputValue]
@@ -248,6 +248,73 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
             return content;
         }, []);
 
+        const handleNonStringKeyPress = useCallback((event: KeyboardEvent) => {
+            const editorContent = editor?.state?.doc?.textContent || '';
+            const isEditorEmpty = !editorContent;
+            const hasFormula = editorContent.includes('#{');
+            const startsWithFormula = editorContent.startsWith('#{');
+
+            if (editorContent === '#' && event.key === '{') {
+                return;
+            }
+
+            // Empty editor - allow starting a formula
+            if (isEditorEmpty) {
+                if (event.key === '#') {
+                    return;
+                }
+                if (event.key === '{' || /[0-9\-+.]/.test(event.key)) {
+                    return;
+                }
+
+                event.preventDefault();
+
+                return;
+            }
+
+            // Has formula but doesn't start with it - invalid state
+            if (hasFormula && !startsWithFormula) {
+                event.preventDefault();
+
+                return;
+            }
+
+            // Content already starts with a formula
+            if (startsWithFormula) {
+                const openCount = (editorContent.match(/\{/g) || []).length;
+                const closeCount = (editorContent.match(/\}/g) || []).length;
+
+                if (openCount === closeCount && openCount > 0) {
+                    event.preventDefault();
+
+                    return;
+                }
+
+                return;
+            }
+
+            // Content doesn't have a formula yet, prevent starting a formula in the middle of text
+            if (event.key === '#' || event.key === '{') {
+                const selection = editor?.state.selection;
+
+                if (selection && selection.from !== 0) {
+                    event.preventDefault();
+
+                    return;
+                }
+
+                return;
+            }
+
+            // For non-string types, only allow numeric values when not in formula mode
+            if (!/[0-9\-+.]/.test(event.key) && event.key !== 'Backspace' && event.key !== 'Delete') {
+                event.preventDefault();
+
+                return;
+            }
+            // eslint-disable-next-line react-hooks/exhaustive-deps
+        }, []);
+
         const editor = useEditor({
             editorProps: {
                 attributes: {
@@ -260,11 +327,8 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
                     path: path ?? '',
                     type: type ?? '',
                 },
-                handleKeyPress: (_: EditorView, event: KeyboardEvent) => {
-                    if (type !== 'STRING' && (mentionOccurences || event.key !== '{')) {
-                        event.preventDefault();
-                    }
-                },
+                handleKeyPress: (_: EditorView, event: KeyboardEvent) =>
+                    type !== 'STRING' && handleNonStringKeyPress(event),
             },
             extensions,
             onFocus: () => {

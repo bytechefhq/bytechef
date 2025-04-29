@@ -484,12 +484,24 @@ const Property = ({
         if (propertyParameterValue) {
             setMentionInput(false);
 
-            if (
-                typeof propertyParameterValue === 'string' &&
-                controlType !== 'SELECT' &&
-                controlType !== 'JSON_SCHEMA_BUILDER' &&
-                (propertyParameterValue.includes('${') || type === 'STRING' || controlType === 'MULTI_SELECT')
-            ) {
+            const isNumericTypeWithNumericValue =
+                (type === 'INTEGER' || type === 'NUMBER') && typeof propertyParameterValue === 'number';
+
+            const isStringValue = typeof propertyParameterValue === 'string';
+            const isUnsupportedForMentionInput = controlType === 'SELECT' || controlType === 'JSON_SCHEMA_BUILDER';
+
+            const hasDataPill = isStringValue && propertyParameterValue.includes('${');
+            const hasFormula = isStringValue && propertyParameterValue.includes('#{');
+            const isStringType = type === 'STRING';
+            const isMultiSelect = controlType === 'MULTI_SELECT';
+
+            const shouldUseMentionInput =
+                isNumericTypeWithNumericValue ||
+                (isStringValue &&
+                    !isUnsupportedForMentionInput &&
+                    (hasDataPill || hasFormula || isStringType || isMultiSelect));
+
+            if (shouldUseMentionInput) {
                 setMentionInput(true);
             }
         }
