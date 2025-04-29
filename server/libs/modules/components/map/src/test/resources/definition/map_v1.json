@@ -3,12 +3,7 @@
   "help" : null,
   "icon" : "path:assets/map.svg",
   "name" : "map",
-  "outputDefinition" : {
-    "output" : { },
-    "outputResponse" : null,
-    "outputSchema" : null,
-    "sampleOutput" : null
-  },
+  "outputDefinition" : null,
   "properties" : [ {
     "advancedOption" : null,
     "displayCondition" : null,

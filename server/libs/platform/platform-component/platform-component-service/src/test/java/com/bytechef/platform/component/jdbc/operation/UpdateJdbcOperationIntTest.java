@@ -74,7 +74,7 @@ public class UpdateJdbcOperationIntTest {
             VALUES, Map.of(ROWS, List.of(Map.of("name", "name111"))),
             SCHEMA, "public",
             TABLE, "test",
-            CONDITION, "name = name1");
+            CONDITION, "name = 'name1'");
 
         Map<String, Integer> result = new UpdateJdbcOperation().execute(
             inputParameters, new SingleConnectionDataSource(dataSource.getConnection(), false));

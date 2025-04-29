@@ -30,6 +30,7 @@ import static com.bytechef.task.dispatcher.loop.constant.LoopTaskDispatcherConst
 import static com.bytechef.task.dispatcher.loop.constant.LoopTaskDispatcherConstants.LOOP_FOREVER;
 
 import com.bytechef.commons.util.MapUtils;
+import com.bytechef.definition.BaseOutputDefinition.OutputResponse;
 import com.bytechef.platform.util.SchemaUtils;
 import com.bytechef.platform.workflow.task.dispatcher.TaskDispatcherDefinitionFactory;
 import com.bytechef.platform.workflow.task.dispatcher.definition.Property.ObjectProperty;
@@ -61,14 +62,14 @@ public class LoopTaskDispatcherDefinitionFactory implements TaskDispatcherDefini
         .taskProperties(
             array(ITERATEE)
                 .items(task()))
-        .variableProperties(LoopTaskDispatcherDefinitionFactory::getVariableProperties);
+        .variableProperties(LoopTaskDispatcherDefinitionFactory::variableProperties);
 
     @Override
     public TaskDispatcherDefinition getDefinition() {
         return TASK_DISPATCHER_DEFINITION;
     }
 
-    private static ObjectProperty getVariableProperties(Map<String, ?> inputParameters) {
+    protected static OutputResponse variableProperties(Map<String, ?> inputParameters) {
         ObjectProperty variableProperties;
 
         List<?> list = MapUtils.getRequiredList(inputParameters, ITEMS);
@@ -82,6 +83,6 @@ public class LoopTaskDispatcherDefinitionFactory implements TaskDispatcherDefini
                 integer(INDEX));
         }
 
-        return variableProperties;
+        return new OutputResponse(variableProperties);
     }
 }

@@ -56,15 +56,32 @@ public class TaskDispatcherDefinitionServiceImpl implements TaskDispatcherDefini
             .map(f -> (OutputFunction) f)
             .map(outputFunction -> {
                 try {
-                    BaseOutputDefinition.OutputResponse outputDefinition = outputFunction.apply(inputParameters);
+                    BaseOutputDefinition.OutputResponse outputResponse = outputFunction.apply(inputParameters);
 
                     return SchemaUtils.toOutput(
-                        outputDefinition, PropertyFactory.OUTPUT_FACTORY_FUNCTION, PropertyFactory.PROPERTY_FACTORY);
+                        outputResponse, PropertyFactory.OUTPUT_FACTORY_FUNCTION, PropertyFactory.PROPERTY_FACTORY);
                 } catch (Exception e) {
                     throw new RuntimeException(e);
                 }
             })
-            .orElse(null);
+            .orElseGet(() -> {
+                BaseOutputDefinition.OutputResponse outputResponse = taskDispatcherDefinition.getVariableProperties()
+                    .map(f -> {
+                        try {
+                            return f.apply(inputParameters);
+                        } catch (Exception e) {
+                            throw new RuntimeException(e);
+                        }
+                    })
+                    .orElse(null);
+
+                if (outputResponse == null) {
+                    return null;
+                }
+
+                return SchemaUtils.toOutput(
+                    outputResponse, PropertyFactory.OUTPUT_FACTORY_FUNCTION, PropertyFactory.PROPERTY_FACTORY);
+            });
     }
 
     @Override

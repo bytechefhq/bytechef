@@ -14,6 +14,7 @@ import {
     ComponentDefinitionBasic,
     GetComponentActionDefinitionRequest,
     GetComponentTriggerDefinitionRequest,
+    TaskDispatcherDefinition,
     TriggerDefinitionApi,
     WorkflowNodeOutput,
     WorkflowTask,
@@ -212,7 +213,12 @@ const WorkflowNodeDetailsPanel = ({
         [previousComponentDefinitions, workflowNodeOutputs]
     );
 
-    const hasOutputData = useMemo(() => currentNodeDefinition?.outputDefined, [currentNodeDefinition]);
+    const hasOutputData = useMemo(
+        () =>
+            currentNodeDefinition?.outputDefined ||
+            (currentNodeDefinition as TaskDispatcherDefinition)?.variablePropertiesDefined,
+        [currentNodeDefinition]
+    );
 
     const currentWorkflowTrigger = useMemo(
         () => workflow.triggers?.find((trigger) => trigger.name === currentNode?.workflowNodeName),
@@ -835,17 +841,18 @@ const WorkflowNodeDetailsPanel = ({
                                         </div>
                                     ))}
 
-                                {activeTab === 'output' && currentNode && currentComponentDefinition && (
+                                {activeTab === 'output' && (
                                     <OutputTab
                                         connectionMissing={
-                                            currentComponentDefinition.connectionRequired &&
+                                            (currentComponentDefinition?.connectionRequired ?? false) &&
                                             !workflowTestConfigurationConnections?.length
                                         }
                                         currentNode={currentNode}
                                         key={`${currentNode?.workflowNodeName}_output`}
                                         outputDefined={
                                             (currentActionDefinition?.outputDefined ||
-                                                currentTriggerDefinition?.outputDefined) ??
+                                                currentTriggerDefinition?.outputDefined ||
+                                                currentTaskDispatcherDefinition?.outputDefined) ??
                                             false
                                         }
                                         outputFunctionDefined={

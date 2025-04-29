@@ -32,7 +32,12 @@ const DataPillPanel = ({
             return false;
         }
 
-        return actionDefinition?.outputDefined || triggerDefinition?.outputDefined || taskDispatcherDefinition;
+        return (
+            actionDefinition?.outputDefined ||
+            triggerDefinition?.outputDefined ||
+            taskDispatcherDefinition?.outputDefined ||
+            taskDispatcherDefinition?.variablePropertiesDefined
+        );
     });
 
     const componentOperations = validWorkflowNodeOutputs.map((workflowNodeOutput) => {

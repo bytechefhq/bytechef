@@ -16,7 +16,7 @@
 
 package com.bytechef.platform.workflow.task.dispatcher.definition;
 
-import com.bytechef.platform.workflow.task.dispatcher.definition.Property.ObjectProperty;
+import com.bytechef.definition.BaseOutputDefinition.OutputResponse;
 import java.util.Map;
 
 /**
@@ -29,5 +29,5 @@ public interface VariablePropertiesFunction {
      * @param inputParameters
      * @return
      */
-    ObjectProperty apply(Map<String, ?> inputParameters) throws Exception;
+    OutputResponse apply(Map<String, ?> inputParameters) throws Exception;
 }

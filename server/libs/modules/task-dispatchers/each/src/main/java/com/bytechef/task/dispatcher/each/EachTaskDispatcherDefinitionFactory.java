@@ -28,6 +28,7 @@ import static com.bytechef.task.dispatcher.each.constant.EachTaskDispatcherConst
 import static com.bytechef.task.dispatcher.each.constant.EachTaskDispatcherConstants.LIST;
 
 import com.bytechef.commons.util.MapUtils;
+import com.bytechef.definition.BaseOutputDefinition.OutputResponse;
 import com.bytechef.platform.util.SchemaUtils;
 import com.bytechef.platform.workflow.task.dispatcher.TaskDispatcherDefinitionFactory;
 import com.bytechef.platform.workflow.task.dispatcher.definition.Property.ObjectProperty;
@@ -54,14 +55,14 @@ public class EachTaskDispatcherDefinitionFactory implements TaskDispatcherDefini
                 .label("List of items")
                 .description("List of items to iterate over."))
         .taskProperties(task(ITERATEE))
-        .variableProperties(EachTaskDispatcherDefinitionFactory::getVariableProperties);
+        .variableProperties(EachTaskDispatcherDefinitionFactory::variableProperties);
 
     @Override
     public TaskDispatcherDefinition getDefinition() {
         return TASK_DISPATCHER_DEFINITION;
     }
 
-    private static ObjectProperty getVariableProperties(Map<String, ?> inputParameters) {
+    protected static OutputResponse variableProperties(Map<String, ?> inputParameters) {
         ObjectProperty variableProperties;
 
         List<?> list = MapUtils.getRequiredList(inputParameters, LIST);
@@ -75,6 +76,6 @@ public class EachTaskDispatcherDefinitionFactory implements TaskDispatcherDefini
                 integer(INDEX));
         }
 
-        return variableProperties;
+        return new OutputResponse(variableProperties);
     }
 }

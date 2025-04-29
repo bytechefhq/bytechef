@@ -41,6 +41,7 @@ import com.bytechef.platform.definition.WorkflowNodeType;
 import com.bytechef.platform.domain.OutputResponse;
 import com.bytechef.platform.util.SchemaUtils;
 import com.bytechef.platform.workflow.execution.WorkflowExecutionId;
+import com.bytechef.platform.workflow.task.dispatcher.service.TaskDispatcherDefinitionService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -58,6 +59,7 @@ public class WorkflowNodeTestOutputFacadeImpl implements WorkflowNodeTestOutputF
 
     private final ActionDefinitionFacade actionDefinitionFacade;
     private final JobPrincipalAccessorRegistry jobPrincipalAccessorRegistry;
+    private final TaskDispatcherDefinitionService taskDispatcherDefinitionService;
     private final TriggerDefinitionFacade triggerDefinitionFacade;
     private final WorkflowNodeOutputFacade workflowNodeOutputFacade;
     private final WorkflowNodeTestOutputService workflowNodeTestOutputService;
@@ -68,12 +70,14 @@ public class WorkflowNodeTestOutputFacadeImpl implements WorkflowNodeTestOutputF
     @SuppressFBWarnings("EI")
     public WorkflowNodeTestOutputFacadeImpl(
         ActionDefinitionFacade actionDefinitionFacade, JobPrincipalAccessorRegistry jobPrincipalAccessorRegistry,
+        TaskDispatcherDefinitionService taskDispatcherDefinitionService,
         TriggerDefinitionFacade triggerDefinitionFacade, WorkflowNodeTestOutputService workflowNodeTestOutputService,
         WorkflowNodeOutputFacade workflowNodeOutputFacade, WebhookTriggerTestFacade webhookTriggerTestFacade,
         WorkflowService workflowService, WorkflowTestConfigurationService workflowTestConfigurationService) {
 
         this.actionDefinitionFacade = actionDefinitionFacade;
         this.jobPrincipalAccessorRegistry = jobPrincipalAccessorRegistry;
+        this.taskDispatcherDefinitionService = taskDispatcherDefinitionService;
         this.triggerDefinitionFacade = triggerDefinitionFacade;
         this.workflowNodeOutputFacade = workflowNodeOutputFacade;
         this.workflowNodeTestOutputService = workflowNodeTestOutputService;
@@ -98,13 +102,21 @@ public class WorkflowNodeTestOutputFacadeImpl implements WorkflowNodeTestOutputF
                     .fetchWorkflowTestConfigurationConnectionId(workflowId, workflowNodeName)
                     .orElse(null));
         } else {
-            return saveActionWorkflowNodeTestOutput(
-                workflowNodeName, workflow,
-                MapUtils.toMap(
-                    workflowTestConfigurationService.getWorkflowTestConfigurationConnections(
-                        workflowId, workflowNodeName),
-                    WorkflowTestConfigurationConnection::getWorkflowConnectionKey,
-                    WorkflowTestConfigurationConnection::getConnectionId));
+            WorkflowTask workflowTask = workflow.getTask(workflowNodeName);
+
+            WorkflowNodeType workflowNodeType = WorkflowNodeType.ofType(workflowTask.getType());
+
+            if (workflowNodeType.operation() == null) {
+                return saveTaskDispatcherWorkflowNodeTestOutput(workflowNodeName, workflow);
+            } else {
+                return saveActionWorkflowNodeTestOutput(
+                    workflowNodeName, workflow,
+                    MapUtils.toMap(
+                        workflowTestConfigurationService.getWorkflowTestConfigurationConnections(
+                            workflowId, workflowNodeName),
+                        WorkflowTestConfigurationConnection::getWorkflowConnectionKey,
+                        WorkflowTestConfigurationConnection::getConnectionId));
+            }
         }
     }
 
@@ -178,6 +190,33 @@ public class WorkflowNodeTestOutputFacadeImpl implements WorkflowNodeTestOutputF
         } finally {
             webhookTriggerTestFacade.disableTrigger(workflowId, workflowExecutionId.getType());
         }
+    }
+
+    @SuppressWarnings("unchecked")
+    private WorkflowNodeTestOutput saveTaskDispatcherWorkflowNodeTestOutput(
+        String workflowNodeName, Workflow workflow) {
+
+        WorkflowTask workflowTask = workflow.getTask(workflowNodeName);
+
+        WorkflowNodeType workflowNodeType = WorkflowNodeType.ofType(workflowTask.getType());
+
+        Map<String, ?> inputs = workflowTestConfigurationService.getWorkflowTestConfigurationInputs(workflow.getId());
+        Map<String, ?> outputs = workflowNodeOutputFacade.getPreviousWorkflowNodeSampleOutputs(
+            workflow.getId(), workflowTask.getName());
+
+        Map<String, ?> inputParameters = workflowTask.evaluateParameters(
+            MapUtils.concat((Map<String, Object>) inputs, (Map<String, Object>) outputs));
+
+        OutputResponse outputResponse = taskDispatcherDefinitionService.executeOutput(
+            workflowNodeType.name(), workflowNodeType.version(), inputParameters);
+
+        if (outputResponse == null || outputResponse.outputSchema() instanceof NullProperty) {
+            return null;
+        }
+
+        // TODO implement saving task dispatcher test output
+
+        return null;
     }
 
     @SuppressWarnings("unchecked")

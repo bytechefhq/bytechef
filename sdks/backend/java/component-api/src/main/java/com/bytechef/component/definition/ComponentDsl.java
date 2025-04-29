@@ -361,9 +361,7 @@ public final class ComponentDsl {
             return this;
         }
 
-        public <P extends ValueProperty<?>> ModifiableActionDefinition output(
-            OutputSchema<P> outputSchema) {
-
+        public <P extends ValueProperty<?>> ModifiableActionDefinition output(OutputSchema<P> outputSchema) {
             this.outputDefinition = OutputDefinition.of(outputSchema.outputSchema());
 
             return this;

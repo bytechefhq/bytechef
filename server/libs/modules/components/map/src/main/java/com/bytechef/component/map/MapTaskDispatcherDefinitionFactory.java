@@ -28,9 +28,9 @@ import static com.bytechef.task.dispatcher.map.constant.MapTaskDispatcherConstan
 import static com.bytechef.task.dispatcher.map.constant.MapTaskDispatcherConstants.MAP;
 
 import com.bytechef.commons.util.MapUtils;
+import com.bytechef.definition.BaseOutputDefinition.OutputResponse;
 import com.bytechef.platform.util.SchemaUtils;
 import com.bytechef.platform.workflow.task.dispatcher.TaskDispatcherDefinitionFactory;
-import com.bytechef.platform.workflow.task.dispatcher.definition.OutputFunction;
 import com.bytechef.platform.workflow.task.dispatcher.definition.Property.ObjectProperty;
 import com.bytechef.platform.workflow.task.dispatcher.definition.PropertyFactory;
 import com.bytechef.platform.workflow.task.dispatcher.definition.TaskDispatcherDefinition;
@@ -53,21 +53,15 @@ public class MapTaskDispatcherDefinitionFactory implements TaskDispatcherDefinit
             array(LIST)
                 .label("List of items")
                 .description("List of items to iterate over."))
-        .output(getOutputFunction())
         .taskProperties(task(ITERATEE))
-        .variableProperties(MapTaskDispatcherDefinitionFactory::getVariableProperties);
+        .variableProperties(MapTaskDispatcherDefinitionFactory::variableProperties);
 
     @Override
     public TaskDispatcherDefinition getDefinition() {
         return TASK_DISPATCHER_DEFINITION;
     }
 
-    protected static OutputFunction getOutputFunction() {
-        // TODO
-        return (inputParameters) -> null;
-    }
-
-    private static ObjectProperty getVariableProperties(Map<String, ?> inputParameters) {
+    protected static OutputResponse variableProperties(Map<String, ?> inputParameters) {
         ObjectProperty variableProperties;
 
         List<?> list = MapUtils.getRequiredList(inputParameters, LIST);
@@ -82,6 +76,6 @@ public class MapTaskDispatcherDefinitionFactory implements TaskDispatcherDefinit
                     integer(INDEX));
         }
 
-        return variableProperties;
+        return new OutputResponse(variableProperties);
     }
 }
