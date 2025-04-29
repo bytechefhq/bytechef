@@ -21,7 +21,6 @@ import static com.bytechef.component.definition.ComponentDsl.option;
 import com.bytechef.component.OpenApiComponentHandler;
 import com.bytechef.component.definition.ActionDefinition;
 import com.bytechef.component.definition.ComponentCategory;
-import com.bytechef.component.definition.ComponentDsl.ModifiableArrayProperty;
 import com.bytechef.component.definition.ComponentDsl.ModifiableComponentDefinition;
 import com.bytechef.component.definition.ComponentDsl.ModifiableProperty;
 import com.bytechef.component.definition.ComponentDsl.ModifiableStringProperty;
@@ -29,7 +28,7 @@ import com.google.auto.service.AutoService;
 import java.util.Objects;
 
 /**
- * This class will not be overwritten on the subsequent calls of the generator.
+ * @author Marija Horvat
  */
 @AutoService(OpenApiComponentHandler.class)
 public class TavilyComponentHandler extends AbstractTavilyComponentHandler {
@@ -38,7 +37,8 @@ public class TavilyComponentHandler extends AbstractTavilyComponentHandler {
     public ModifiableComponentDefinition modifyComponent(ModifiableComponentDefinition modifiableComponentDefinition) {
         return modifiableComponentDefinition
             .icon("path:assets/tavily.svg")
-            .categories(ComponentCategory.ARTIFICIAL_INTELLIGENCE);
+            .categories(ComponentCategory.ARTIFICIAL_INTELLIGENCE)
+            .customAction(true);
     }
 
     @Override
@@ -48,28 +48,25 @@ public class TavilyComponentHandler extends AbstractTavilyComponentHandler {
         if (Objects.equals(modifiableProperty.getName(), "topic")) {
             ((ModifiableStringProperty) modifiableProperty)
                 .options(
-                    option("General", "general", "general-purpose searches that may include a wide range of sources"),
-                    option("News", "news", "real-time updates"));
+                    option("General", "general", "General-purpose searches that may include a wide range of sources."),
+                    option("News", "news", "Real-time updates."));
         } else if (Objects.equals(modifiableProperty.getName(), "search_depth")) {
             ((ModifiableStringProperty) modifiableProperty)
                 .options(
-                    option("Basic", "basic", "provides generic content snippets from each source"),
-                    option("Advanced", "advanced", "retrieves the most relevant sources"));
+                    option("Basic", "basic", "Provides generic content snippets from each source."),
+                    option("Advanced", "advanced", "Retrieves the most relevant sources."));
         } else if (Objects.equals(modifiableProperty.getName(), "time_range")) {
             ((ModifiableStringProperty) modifiableProperty)
                 .options(
-                    option("Day", "day", "returns results from the past 24 hours"),
-                    option("Week", "week", "returns results from the past 7 days"),
-                    option("Month", "month", "returns results from the past 30 days"),
-                    option("Year", "year", "returns results from the past 365 days"));
-        } else if (Objects.equals(modifiableProperty.getName(), "urls")) {
-            ((ModifiableArrayProperty) modifiableProperty)
-                .label("URLs");
+                    option("Day", "day", "Results from the past 24 hours"),
+                    option("Week", "week", "Results from the past 7 days"),
+                    option("Month", "month", "Results from the past 30 days"),
+                    option("Year", "year", "Results from the past 365 days"));
         } else if (Objects.equals(modifiableProperty.getName(), "extract_depth")) {
             ((ModifiableStringProperty) modifiableProperty)
                 .options(
-                    option("Basic", "basic", "retrieves basic data"),
-                    option("Advanced", "advanced", "retrieves more data, including tables and embedded content"));
+                    option("Basic", "basic", "Retrieves basic data."),
+                    option("Advanced", "advanced", "Retrieves more data, including tables and embedded content."));
         }
 
         return modifiableProperty;
