@@ -28,7 +28,7 @@ import com.google.auto.service.AutoService;
 import java.util.Objects;
 
 /**
- * This class will not be overwritten on the subsequent calls of the generator.
+ * @author Nikolina Špehar
  */
 @AutoService(OpenApiComponentHandler.class)
 public class ZoomComponentHandler extends AbstractZoomComponentHandler {
@@ -36,7 +36,8 @@ public class ZoomComponentHandler extends AbstractZoomComponentHandler {
     public ModifiableComponentDefinition modifyComponent(ModifiableComponentDefinition modifiableComponentDefinition) {
         return modifiableComponentDefinition
             .icon("path:assets/zoom.svg")
-            .categories(ComponentCategory.COMMUNICATION);
+            .categories(ComponentCategory.COMMUNICATION)
+            .customAction(true);
     }
 
     @Override

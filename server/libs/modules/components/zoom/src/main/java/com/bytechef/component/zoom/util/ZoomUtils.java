@@ -38,7 +38,7 @@ public class ZoomUtils extends AbstractZoomUtils {
         String searchText,
         Context context) {
 
-        Map<String, Object> result = context.http(http -> http.get("users/me/meetings"))
+        Map<String, Object> result = context.http(http -> http.get("/users/me/meetings"))
             .configuration(responseType(ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});
@@ -47,7 +47,7 @@ public class ZoomUtils extends AbstractZoomUtils {
 
         if (result.get("meetings") instanceof List<?> meetingsList) {
             for (Object meeting : meetingsList) {
-                if (meeting instanceof Map meetingMap) {
+                if (meeting instanceof Map<?, ?> meetingMap) {
                     meetingIdOptions.add(option((String) meetingMap.get("topic"), (long) meetingMap.get("id")));
                 }
             }

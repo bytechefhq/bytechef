@@ -49,7 +49,7 @@ public class ZoomAddMeetingRegistrantAction {
                 "application/json"
 
             ))
-        .properties(integer("meetingId").label("meeting ID")
+        .properties(integer("meetingId").label("Meeting ID")
             .description("ID of the meeting where the registrant will be added.")
             .required(true)
             .options((OptionsDataSource.ActionOptionsFunction<Long>) ZoomUtils::getMeetingIdOptions)
@@ -127,7 +127,7 @@ public class ZoomAddMeetingRegistrantAction {
             string("no_of_employees").metadata(
                 Map.of(
                     "type", PropertyType.BODY))
-                .label("No Of Employees")
+                .label("Number of Employees")
                 .options(option("1-20", "1-20"), option("21-50", "21-50"), option("51-100", "51-100"),
                     option("101-500", "101-500"), option("501-1,000", "501-1,000"),
                     option("1,001-5,000", "1,001-5,000"), option("5,001-10,000", "5,001-10,000"),
@@ -136,7 +136,7 @@ public class ZoomAddMeetingRegistrantAction {
             string("org").metadata(
                 Map.of(
                     "type", PropertyType.BODY))
-                .label("Org")
+                .label("Organization")
                 .required(false),
             string("purchasing_time_frame").metadata(
                 Map.of(
