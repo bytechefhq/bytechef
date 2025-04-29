@@ -53,9 +53,9 @@ import org.bouncycastle.openpgp.operator.jcajce.JcePublicKeyKeyEncryptionMethodG
 /**
  * @author Nikolina Spehar
  */
-public class CryptoHelperPGPEncryptAction {
+public class CryptoHelperPgpEncryptAction {
 
-    public static final ModifiableActionDefinition ACTION_DEFINITION = action("PGPencrypt")
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action("pgpEncrypt")
         .title("PGP Encrypt")
         .description("Encrypts the file using PGP public key.")
         .properties(
@@ -69,13 +69,10 @@ public class CryptoHelperPGPEncryptAction {
                 .label("File")
                 .description("File that will be encrypted.")
                 .required(true))
-        .output(
-            outputSchema(
-                fileEntry()
-                    .description("PGP encrypted file.")))
-        .perform(CryptoHelperPGPEncryptAction::perform);
+        .output(outputSchema(fileEntry().description("PGP encrypted file.")))
+        .perform(CryptoHelperPgpEncryptAction::perform);
 
-    private CryptoHelperPGPEncryptAction() {
+    private CryptoHelperPgpEncryptAction() {
     }
 
     public static FileEntry perform(Parameters inputParameters, Parameters connectionParameters, Context context)
@@ -83,38 +80,38 @@ public class CryptoHelperPGPEncryptAction {
 
         Security.addProvider(new BouncyCastleProvider());
 
-        String publicKeyString = inputParameters.getRequiredString(PUBLIC_KEY);
+        String publicKey = inputParameters.getRequiredString(PUBLIC_KEY);
 
-        InputStream publicKeyInputStream = PGPUtil.getDecoderStream(
-            new ByteArrayInputStream(publicKeyString.getBytes(StandardCharsets.UTF_8)));
+        InputStream inputStream = PGPUtil.getDecoderStream(
+            new ByteArrayInputStream(publicKey.getBytes(StandardCharsets.UTF_8)));
 
-        JcaPGPPublicKeyRingCollection pgpPublicKeyRingCollection = new JcaPGPPublicKeyRingCollection(
-            publicKeyInputStream);
+        JcaPGPPublicKeyRingCollection pgpPublicKeyRingCollection =
+            new JcaPGPPublicKeyRingCollection(inputStream);
 
-        publicKeyInputStream.close();
+        inputStream.close();
 
-        PGPPublicKey pgpPublicKey = getPublicKey(pgpPublicKeyRingCollection);
+        PGPPublicKey pgppublickey = getPublicKey(pgpPublicKeyRingCollection);
 
         byte[] inputFileBytes = context.file(file -> file.readAllBytes(inputParameters.getRequiredFileEntry(FILE)));
 
-        PGPDataEncryptorBuilder encryptorBuilder = new JcePGPDataEncryptorBuilder(PGPEncryptedData.CAST5)
+        PGPDataEncryptorBuilder pgpDataEncryptorBuilder = new JcePGPDataEncryptorBuilder(PGPEncryptedData.CAST5)
             .setProvider(BouncyCastleProvider.PROVIDER_NAME)
             .setSecureRandom(new SecureRandom())
             .setWithIntegrityPacket(true);
 
-        PGPEncryptedDataGenerator pgpEncryptedDataGenerator = new PGPEncryptedDataGenerator(encryptorBuilder);
+        PGPEncryptedDataGenerator pgpEncryptedDataGenerator = new PGPEncryptedDataGenerator(pgpDataEncryptorBuilder);
 
         pgpEncryptedDataGenerator.addMethod(
-            new JcePublicKeyKeyEncryptionMethodGenerator(pgpPublicKey)
+            new JcePublicKeyKeyEncryptionMethodGenerator(pgppublickey)
                 .setProvider(BouncyCastleProvider.PROVIDER_NAME));
 
-        ByteArrayOutputStream encryptedData = new ByteArrayOutputStream();
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
 
-        try (OutputStream cOut = pgpEncryptedDataGenerator.open(encryptedData, inputFileBytes.length)) {
-            cOut.write(inputFileBytes);
+        try (OutputStream outputStream = pgpEncryptedDataGenerator.open(byteArrayOutputStream, inputFileBytes.length)) {
+            outputStream.write(inputFileBytes);
         }
 
-        String armoredMessage = armorMessage(encryptedData.toByteArray());
+        String armoredMessage = armorMessage(byteArrayOutputStream.toByteArray());
 
         return context.file(
             file -> file.storeContent("encrypted.",
@@ -122,7 +119,7 @@ public class CryptoHelperPGPEncryptAction {
     }
 
     private static PGPPublicKey getPublicKey(JcaPGPPublicKeyRingCollection pgpPublicKeyRingCollection) {
-        PGPPublicKey publicKey = null;
+        PGPPublicKey pgpPublicKey = null;
         Iterator<PGPPublicKeyRing> keyRingIterator = pgpPublicKeyRingCollection.getKeyRings();
 
         while (keyRingIterator.hasNext()) {
@@ -133,14 +130,14 @@ public class CryptoHelperPGPEncryptAction {
                 PGPPublicKey key = keyIter.next();
 
                 if (key.isEncryptionKey()) {
-                    publicKey = key;
+                    pgpPublicKey = key;
 
                     break;
                 }
             }
         }
 
-        return publicKey;
+        return pgpPublicKey;
     }
 
     private static String armorMessage(byte[] encryptedData) throws IOException {

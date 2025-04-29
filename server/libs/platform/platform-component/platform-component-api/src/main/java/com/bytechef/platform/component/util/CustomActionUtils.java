@@ -16,6 +16,7 @@
 
 package com.bytechef.platform.component.util;
 
+import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.array;
 import static com.bytechef.component.definition.ComponentDsl.bool;
 import static com.bytechef.component.definition.ComponentDsl.date;
@@ -35,7 +36,6 @@ import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ActionDefinition;
 import com.bytechef.component.definition.ComponentDefinition;
-import com.bytechef.component.definition.ComponentDsl;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context.Http.Body;
 import com.bytechef.component.definition.Context.Http.BodyContentType;
@@ -53,8 +53,6 @@ import java.util.Map;
  */
 public class CustomActionUtils {
 
-    private static final String CUSTOM_ACTION = "customAction";
-
     private static final String BODY_CONTENT = "bodyContent";
     private static final String BODY_CONTENT_MIME_TYPE = "bodyContentMimeType";
     private static final String BODY_CONTENT_TYPE = "bodyContentType";
@@ -66,7 +64,7 @@ public class CustomActionUtils {
     public static final String RESPONSE_FORMAT = "responseType";
 
     public static ActionDefinition getCustomActionDefinition(ComponentDefinition componentDefinition) {
-        ModifiableActionDefinition customActionDefinition = ComponentDsl.action(CUSTOM_ACTION)
+        ModifiableActionDefinition customActionDefinition = action("customAction")
             .title("Custom Action")
             .description(
                 "By using custom actions, you can take advantage of the existing connector platform to create new actions.")
@@ -87,11 +85,6 @@ public class CustomActionUtils {
                         option(RequestMethod.PUT.name(), RequestMethod.PUT.name()))
                     .required(true)
                     .defaultValue(RequestMethod.GET.name()),
-
-                //
-                // Header parameters properties
-                //
-
                 object(HEADERS)
                     .label("Headers")
                     .description("Headers to send.")
@@ -100,11 +93,6 @@ public class CustomActionUtils {
                         array()
                             .items(
                                 string())),
-
-                //
-                // Query parameters properties
-                //
-
                 object(QUERY_PARAMETERS)
                     .label("Query Parameters")
                     .description("Query parameters to send.")
@@ -113,11 +101,6 @@ public class CustomActionUtils {
                         array()
                             .items(
                                 string())),
-
-                //
-                // Body properties
-                //
-
                 string(BODY_CONTENT_TYPE)
                     .label("Body Content Type")
                     .description("Content-Type to use when sending body parameters.")
@@ -134,7 +117,6 @@ public class CustomActionUtils {
                         option("Raw", BodyContentType.RAW.name()),
                         option("Binary", BodyContentType.BINARY.name()))
                     .defaultValue(""),
-
                 object(BODY_CONTENT)
                     .label("Body Content - JSON")
                     .description("Body Parameters to send.")
@@ -169,7 +151,6 @@ public class CustomActionUtils {
                     .description("The raw text to send.")
                     .displayCondition("%s == '%s'".formatted(BODY_CONTENT_TYPE, BodyContentType.RAW.name()))
                     .controlType(Property.ControlType.TEXT_AREA),
-
                 string(BODY_CONTENT_MIME_TYPE)
                     .label("Content Type")
                     .description("Mime-Type to use when sending raw body content.")
@@ -179,23 +160,17 @@ public class CustomActionUtils {
                             BodyContentType.RAW.name(), BODY_CONTENT_TYPE))
                     .defaultValue("text/plain")
                     .placeholder("text/plain"),
-
                 string(RESPONSE_FORMAT)
                     .label("Response Format")
                     .description("The format in which the data gets returned from the URL.")
                     .options(
                         option(
-                            "JSON",
-                            ResponseType.JSON.name(),
+                            "JSON", ResponseType.JSON.name(),
                             "The response is automatically converted to object/array."),
                         option(
-                            "XML",
-                            ResponseType.XML.name(),
-                            "The response is automatically converted to object/array."),
+                            "XML", ResponseType.XML.name(), "The response is automatically converted to object/array."),
                         option("Text", ResponseType.TEXT.name(), "The response is returned as a text."),
-                        option(
-                            "File", ResponseType.BINARY.name(),
-                            "The response is returned as a file object."))
+                        option("File", ResponseType.BINARY.name(), "The response is returned as a file object."))
                     .defaultValue(ResponseType.JSON.name()),
                 string(RESPONSE_FILENAME)
                     .label("Response Filename")

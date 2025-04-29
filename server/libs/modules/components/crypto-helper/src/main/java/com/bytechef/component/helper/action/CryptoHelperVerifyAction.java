@@ -54,10 +54,7 @@ public class CryptoHelperVerifyAction {
                 .label("Signature")
                 .description("Signature that will be verified.")
                 .required(true))
-        .output(
-            outputSchema(
-                bool()
-                    .description("Outcome of the verification of the signature.")))
+        .output(outputSchema(bool().description("Outcome of the verification of the signature.")))
         .perform(CryptoHelperVerifyAction::perform);
 
     private CryptoHelperVerifyAction() {

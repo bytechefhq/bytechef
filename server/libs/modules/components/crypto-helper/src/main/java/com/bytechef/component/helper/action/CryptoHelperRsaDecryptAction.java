@@ -21,8 +21,8 @@ import static com.bytechef.component.definition.ComponentDsl.fileEntry;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.helper.constant.CryptoHelperConstants.FILE;
-import static com.bytechef.component.helper.constant.CryptoHelperConstants.PUBLIC_KEY;
-import static com.bytechef.component.helper.util.CryptoHelperUtil.getPublicRSAKeyFromString;
+import static com.bytechef.component.helper.constant.CryptoHelperConstants.PRIVATE_KEY;
+import static com.bytechef.component.helper.util.CryptoHelperUtil.getPrivateRSAKeyFromString;
 
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context;
@@ -30,52 +30,57 @@ import com.bytechef.component.definition.FileEntry;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.Property.ControlType;
 import java.io.ByteArrayInputStream;
-import java.security.PublicKey;
+import java.io.ByteArrayOutputStream;
+import java.security.PrivateKey;
 import javax.crypto.Cipher;
 
 /**
  * @author Nikolina Spehar
  */
-public class CryptoHelperRSAEncryptAction {
+public class CryptoHelperRsaDecryptAction {
 
-    public static final ModifiableActionDefinition ACTION_DEFINITION = action("RSAencrypt")
-        .title("RSA Encrypt")
-        .description("Encrypts the file using the RSA public key.")
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action("rsaDecrypt")
+        .title("RSA Decrypt")
+        .description("Decrypts RSA encrypted file using RSA private key.")
         .properties(
-            string(PUBLIC_KEY)
-                .label("Public RSA Key")
-                .description("Public RSA key of the recipient of the encrypted file.")
+            string(PRIVATE_KEY)
+                .label("Private RSA Key")
+                .description("Private RSA key that will decrypt the file.")
                 .controlType(ControlType.TEXT_AREA)
                 .required(true),
             fileEntry(FILE)
                 .label("File")
-                .description("File that will be encrypted.")
+                .description("File that will be decrypted.")
                 .required(true))
-        .output(
-            outputSchema(
-                fileEntry()
-                    .description("RSA encrypted file.")))
-        .perform(CryptoHelperRSAEncryptAction::perform);
+        .output(outputSchema(fileEntry().description("Decrypted file.")))
+        .perform(CryptoHelperRsaDecryptAction::perform);
 
-    private CryptoHelperRSAEncryptAction() {
+    private CryptoHelperRsaDecryptAction() {
     }
 
     public static FileEntry perform(Parameters inputParameters, Parameters connectionParameters, Context context)
         throws Exception {
 
-        PublicKey publicKey = getPublicRSAKeyFromString(inputParameters.getRequiredString(PUBLIC_KEY));
+        FileEntry fileEntry = inputParameters.getRequiredFileEntry(FILE);
+        byte[] encryptedData = context.file(file -> file.readAllBytes(fileEntry));
+
+        PrivateKey privateKey = getPrivateRSAKeyFromString(inputParameters.getRequiredString(PRIVATE_KEY));
 
         Cipher cipher = Cipher.getInstance("RSA/ECB/PKCS1Padding");
-        cipher.init(Cipher.ENCRYPT_MODE, publicKey);
+        cipher.init(Cipher.DECRYPT_MODE, privateKey);
 
-        FileEntry fileEntry = inputParameters.getRequiredFileEntry(FILE);
+        int maxBlockSize = 256;
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
 
-        byte[] fileBytes = context.file(file -> file.readAllBytes(fileEntry));
-
-        byte[] encryptedBytes = cipher.doFinal(fileBytes);
+        int offset = 0;
+        while (offset < encryptedData.length) {
+            int chunkSize = Math.min(maxBlockSize, encryptedData.length - offset);
+            byte[] chunck = cipher.doFinal(encryptedData, offset, chunkSize);
+            byteArrayOutputStream.write(chunck);
+            offset += chunkSize;
+        }
 
         return context.file(
-            file -> file.storeContent("encrypted.",
-                new ByteArrayInputStream(encryptedBytes)));
+            file -> file.storeContent("decrypted.", new ByteArrayInputStream(byteArrayOutputStream.toByteArray())));
     }
 }
