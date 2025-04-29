@@ -223,6 +223,90 @@ Type: STRING
 
 
 
+### Is Business Hours?
+Name: isBusinessHours
+
+Check to see if it's business hours or not.
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| inputDate | Date | DATE_TIME | Date to check to see if it is business hours. | true |
+| businessWeekStart | Business Week Start | INTEGER <details> <summary> Options </summary> 1, 2, 3, 4, 5, 6, 7 </details> | First day of the business week. | true |
+| businessWeekEnd | Business Week End | INTEGER <details> <summary> Options </summary> 1, 2, 3, 4, 5, 6, 7 </details> | Last day of the business week. | true |
+| businessHoursStart | Business Hours Start | TIME | Time of the day that business hours start. | true |
+| businessHoursEnd | Business Hours End | TIME | Time of the day that business hours end. | true |
+| timeZone | Time Zone | STRING | Time zone to check business hours for. | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Is Business Hours?",
+  "name" : "isBusinessHours",
+  "parameters" : {
+    "inputDate" : "2021-01-01T00:00:00",
+    "businessWeekStart" : 1,
+    "businessWeekEnd" : 1,
+    "businessHoursStart" : "00:00:00",
+    "businessHoursEnd" : "00:00:00",
+    "timeZone" : ""
+  },
+  "type" : "dateHelper/v1/isBusinessHours"
+}
+```
+
+#### Output
+
+
+
+Type: BOOLEAN
+
+
+
+
+
+
+
+
+### Is Weekend?
+Name: isWeekend
+
+Check if the current date is a weekend.
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| inputDate | Date | DATE_TIME | Date to check to see if it is a weekend. | true |
+| timeZone | Time Zone | STRING | Time zone you are in. | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Is Weekend?",
+  "name" : "isWeekend",
+  "parameters" : {
+    "inputDate" : "2021-01-01T00:00:00",
+    "timeZone" : ""
+  },
+  "type" : "dateHelper/v1/isWeekend"
+}
+```
+
+#### Output
+
+
+
+Type: BOOLEAN
+
+
+
+
+
+
+
+
 ### Subtract Time
 Name: subtractTime
 

@@ -13,7 +13,6 @@
   "resources" : null,
   "version" : 1,
   "title" : "Date Helper",
-  "connection" : null,
   "actions" : [ {
     "batch" : null,
     "deprecated" : null,
@@ -842,6 +841,354 @@
   }, {
     "batch" : null,
     "deprecated" : null,
+    "description" : "Check to see if it's business hours or not.",
+    "help" : null,
+    "metadata" : null,
+    "name" : "isBusinessHours",
+    "outputDefinition" : {
+      "output" : null,
+      "outputResponse" : {
+        "outputSchema" : {
+          "advancedOption" : null,
+          "description" : "True if the date is a weekend, false otherwise.",
+          "displayCondition" : null,
+          "expressionEnabled" : null,
+          "hidden" : null,
+          "metadata" : { },
+          "required" : null,
+          "name" : null,
+          "type" : "BOOLEAN",
+          "defaultValue" : null,
+          "exampleValue" : null,
+          "label" : null,
+          "placeholder" : null,
+          "options" : [ {
+            "description" : null,
+            "label" : "True",
+            "value" : true
+          }, {
+            "description" : null,
+            "label" : "False",
+            "value" : false
+          } ],
+          "controlType" : "SELECT"
+        },
+        "sampleOutput" : null,
+        "placeholder" : null
+      },
+      "outputSchema" : {
+        "advancedOption" : null,
+        "description" : "True if the date is a weekend, false otherwise.",
+        "displayCondition" : null,
+        "expressionEnabled" : null,
+        "hidden" : null,
+        "metadata" : { },
+        "required" : null,
+        "name" : null,
+        "type" : "BOOLEAN",
+        "defaultValue" : null,
+        "exampleValue" : null,
+        "label" : null,
+        "placeholder" : null,
+        "options" : [ {
+          "description" : null,
+          "label" : "True",
+          "value" : true
+        }, {
+          "description" : null,
+          "label" : "False",
+          "value" : false
+        } ],
+        "controlType" : "SELECT"
+      },
+      "sampleOutput" : null
+    },
+    "properties" : [ {
+      "advancedOption" : null,
+      "description" : "Date to check to see if it is business hours.",
+      "displayCondition" : null,
+      "expressionEnabled" : null,
+      "hidden" : null,
+      "metadata" : { },
+      "required" : true,
+      "name" : "inputDate",
+      "type" : "DATE_TIME",
+      "defaultValue" : null,
+      "exampleValue" : null,
+      "label" : "Date",
+      "placeholder" : null,
+      "options" : null,
+      "controlType" : "DATE_TIME",
+      "optionsDataSource" : null
+    }, {
+      "advancedOption" : null,
+      "description" : "First day of the business week.",
+      "displayCondition" : null,
+      "expressionEnabled" : null,
+      "hidden" : null,
+      "metadata" : { },
+      "required" : true,
+      "name" : "businessWeekStart",
+      "type" : "INTEGER",
+      "defaultValue" : null,
+      "exampleValue" : null,
+      "label" : "Business Week Start",
+      "placeholder" : null,
+      "maxValue" : null,
+      "minValue" : null,
+      "options" : [ {
+        "description" : null,
+        "label" : "Monday",
+        "value" : 1
+      }, {
+        "description" : null,
+        "label" : "Tuesday",
+        "value" : 2
+      }, {
+        "description" : null,
+        "label" : "Wednesday",
+        "value" : 3
+      }, {
+        "description" : null,
+        "label" : "Thursday",
+        "value" : 4
+      }, {
+        "description" : null,
+        "label" : "Friday",
+        "value" : 5
+      }, {
+        "description" : null,
+        "label" : "Saturday",
+        "value" : 6
+      }, {
+        "description" : null,
+        "label" : "Sunday",
+        "value" : 7
+      } ],
+      "controlType" : "SELECT",
+      "optionsDataSource" : null
+    }, {
+      "advancedOption" : null,
+      "description" : "Last day of the business week.",
+      "displayCondition" : null,
+      "expressionEnabled" : null,
+      "hidden" : null,
+      "metadata" : { },
+      "required" : true,
+      "name" : "businessWeekEnd",
+      "type" : "INTEGER",
+      "defaultValue" : null,
+      "exampleValue" : null,
+      "label" : "Business Week End",
+      "placeholder" : null,
+      "maxValue" : null,
+      "minValue" : null,
+      "options" : [ {
+        "description" : null,
+        "label" : "Monday",
+        "value" : 1
+      }, {
+        "description" : null,
+        "label" : "Tuesday",
+        "value" : 2
+      }, {
+        "description" : null,
+        "label" : "Wednesday",
+        "value" : 3
+      }, {
+        "description" : null,
+        "label" : "Thursday",
+        "value" : 4
+      }, {
+        "description" : null,
+        "label" : "Friday",
+        "value" : 5
+      }, {
+        "description" : null,
+        "label" : "Saturday",
+        "value" : 6
+      }, {
+        "description" : null,
+        "label" : "Sunday",
+        "value" : 7
+      } ],
+      "controlType" : "SELECT",
+      "optionsDataSource" : null
+    }, {
+      "advancedOption" : null,
+      "description" : "Time of the day that business hours start.",
+      "displayCondition" : null,
+      "expressionEnabled" : null,
+      "hidden" : null,
+      "metadata" : { },
+      "required" : true,
+      "name" : "businessHoursStart",
+      "type" : "TIME",
+      "defaultValue" : null,
+      "exampleValue" : null,
+      "label" : "Business Hours Start",
+      "placeholder" : null,
+      "options" : null,
+      "controlType" : "TIME",
+      "optionsDataSource" : null
+    }, {
+      "advancedOption" : null,
+      "description" : "Time of the day that business hours end.",
+      "displayCondition" : null,
+      "expressionEnabled" : null,
+      "hidden" : null,
+      "metadata" : { },
+      "required" : true,
+      "name" : "businessHoursEnd",
+      "type" : "TIME",
+      "defaultValue" : null,
+      "exampleValue" : null,
+      "label" : "Business Hours End",
+      "placeholder" : null,
+      "options" : null,
+      "controlType" : "TIME",
+      "optionsDataSource" : null
+    }, {
+      "advancedOption" : null,
+      "description" : "Time zone to check business hours for.",
+      "displayCondition" : null,
+      "expressionEnabled" : null,
+      "hidden" : null,
+      "metadata" : { },
+      "required" : true,
+      "name" : "timeZone",
+      "type" : "STRING",
+      "defaultValue" : null,
+      "exampleValue" : null,
+      "label" : "Time Zone",
+      "placeholder" : null,
+      "controlType" : "SELECT",
+      "languageId" : null,
+      "maxLength" : null,
+      "minLength" : null,
+      "options" : null,
+      "optionsDataSource" : {
+        "optionsLookupDependsOn" : null,
+        "options" : { }
+      }
+    } ],
+    "title" : "Is Business Hours?",
+    "perform" : { },
+    "processErrorResponse" : null,
+    "workflowNodeDescription" : null
+  }, {
+    "batch" : null,
+    "deprecated" : null,
+    "description" : "Check if the current date is a weekend.",
+    "help" : null,
+    "metadata" : null,
+    "name" : "isWeekend",
+    "outputDefinition" : {
+      "output" : null,
+      "outputResponse" : {
+        "outputSchema" : {
+          "advancedOption" : null,
+          "description" : "True if the date is a weekend, false otherwise.",
+          "displayCondition" : null,
+          "expressionEnabled" : null,
+          "hidden" : null,
+          "metadata" : { },
+          "required" : null,
+          "name" : null,
+          "type" : "BOOLEAN",
+          "defaultValue" : null,
+          "exampleValue" : null,
+          "label" : null,
+          "placeholder" : null,
+          "options" : [ {
+            "description" : null,
+            "label" : "True",
+            "value" : true
+          }, {
+            "description" : null,
+            "label" : "False",
+            "value" : false
+          } ],
+          "controlType" : "SELECT"
+        },
+        "sampleOutput" : null,
+        "placeholder" : null
+      },
+      "outputSchema" : {
+        "advancedOption" : null,
+        "description" : "True if the date is a weekend, false otherwise.",
+        "displayCondition" : null,
+        "expressionEnabled" : null,
+        "hidden" : null,
+        "metadata" : { },
+        "required" : null,
+        "name" : null,
+        "type" : "BOOLEAN",
+        "defaultValue" : null,
+        "exampleValue" : null,
+        "label" : null,
+        "placeholder" : null,
+        "options" : [ {
+          "description" : null,
+          "label" : "True",
+          "value" : true
+        }, {
+          "description" : null,
+          "label" : "False",
+          "value" : false
+        } ],
+        "controlType" : "SELECT"
+      },
+      "sampleOutput" : null
+    },
+    "properties" : [ {
+      "advancedOption" : null,
+      "description" : "Date to check to see if it is a weekend.",
+      "displayCondition" : null,
+      "expressionEnabled" : null,
+      "hidden" : null,
+      "metadata" : { },
+      "required" : true,
+      "name" : "inputDate",
+      "type" : "DATE_TIME",
+      "defaultValue" : null,
+      "exampleValue" : null,
+      "label" : "Date",
+      "placeholder" : null,
+      "options" : null,
+      "controlType" : "DATE_TIME",
+      "optionsDataSource" : null
+    }, {
+      "advancedOption" : null,
+      "description" : "Time zone you are in.",
+      "displayCondition" : null,
+      "expressionEnabled" : null,
+      "hidden" : null,
+      "metadata" : { },
+      "required" : true,
+      "name" : "timeZone",
+      "type" : "STRING",
+      "defaultValue" : null,
+      "exampleValue" : null,
+      "label" : "Time Zone",
+      "placeholder" : null,
+      "controlType" : "SELECT",
+      "languageId" : null,
+      "maxLength" : null,
+      "minLength" : null,
+      "options" : null,
+      "optionsDataSource" : {
+        "optionsLookupDependsOn" : null,
+        "options" : { }
+      }
+    } ],
+    "title" : "Is Weekend?",
+    "perform" : { },
+    "processErrorResponse" : null,
+    "workflowNodeDescription" : null
+  }, {
+    "batch" : null,
+    "deprecated" : null,
     "description" : "Subtract time from date",
     "help" : null,
     "metadata" : null,
@@ -1107,7 +1454,8 @@
     "processErrorResponse" : null,
     "workflowNodeDescription" : null
   } ],
+  "clusterElements" : null,
   "unifiedApi" : null,
   "triggers" : null,
-  "clusterElements" : null
+  "connection" : null
 }
