@@ -53,7 +53,7 @@ public class TavilyExtractAction {
             .metadata(
                 Map.of(
                     "type", PropertyType.BODY))
-            .label("Urls")
+            .label("URLs")
             .description("A list of URLs to extract content from.")
             .required(true),
             bool("include_images").metadata(

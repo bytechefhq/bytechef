@@ -104,6 +104,7 @@ paths:
                 urls:
                   type: "array"
                   description: "A list of URLs to extract content from."
+                  title: "URLs"
                   items:
                     type: "string"
                 include_images:
@@ -154,7 +155,6 @@ paths:
                   response_time:
                     type: "number"
                     description: "Time in seconds it took to complete the request."
-
 components:
   securitySchemes:
     bearerAuth:
