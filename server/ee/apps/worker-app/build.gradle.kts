@@ -224,6 +224,7 @@ implementation(project(":server:libs:modules:components:graphql-client"))
     implementation(project(":server:libs:modules:components:zendesk-sell"))
     implementation(project(":server:libs:modules:components:zeplin"))
     implementation(project(":server:libs:modules:components:zoho:zoho-crm"))
+    implementation(project(":server:libs:modules:components:zoom"))
 
     testImplementation(project(":server:libs:test:test-int-support"))
 }

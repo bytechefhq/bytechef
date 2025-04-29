@@ -1,0 +1,329 @@
+---
+openapi: "3.0.2"
+info:
+  title: "Zoom"
+  description: "Zoom is a cloud-based video conferencing platform that enables virtual meetings, webinars, and collaboration through video, audio, and chat."
+  version: "v1"
+servers:
+  - url: "https://api.zoom.us/v2/"
+paths:
+  /users/me/meetings:
+    post:
+      summary: "Create Meeting"
+      description: "Creates a meeting."
+      operationId: "createMeeting"
+      x-ai-agent-tool: true
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: "object"
+              title: "meeting"
+              required:
+                - "topic"
+              properties:
+                topic:
+                  type: "string"
+                  description: "The meeting's topic."
+                duration:
+                  type: "number"
+                  description: "Duration of the meeting in minutes."
+                auto_recording:
+                  type: "string"
+                  enum:
+                    - "local"
+                    - "cloud"
+                    - "none"
+                audio:
+                  type: "string"
+                  description: "How participants join the audio portion of the meeting."
+                agenda:
+                  type: "string"
+                  description: "The meeting's agenda. This value has a maximum length of 2,000 characters."
+                  maxLength: "2000"
+                password:
+                  type: "string"
+                  description: "The password required to join the meeting. By default, a password can only have a maximum length of 10 characters and only contain alphanumeric characters and the @, -, _, and * characters."
+                  maxLength: "10"
+                settings:
+                  type: "object"
+                  properties:
+                    schedule_for:
+                      type: "string"
+                      description: "The email address or user ID of the user to schedule a meeting for."
+                    approval_type:
+                      type: "integer"
+                join_url:
+                  type: "string"
+                  description: "URL for participants to join the meeting."
+      responses:
+        201:
+          description: "Meeting registration created."
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  assistant_id:
+                    type: "string"
+                    description: "Unique ID of the assistant."
+                  host_email:
+                    type: "string"
+                    description: "Email of the host."
+                  id:
+                    type: "integer"
+                    description: "ID of the meeting."
+                  registration_url:
+                    type: "string"
+                    description: "URL for meeting registration."
+                  agenda:
+                    type: "string"
+                    description: "Agenda of the meeting."
+                  created_at:
+                    type: "string"
+                    description: "Creation time of the meeting."
+                  duration:
+                    type: "integer"
+                    description: "Duration of the meeting in minutes."
+                  encrypted_password:
+                    type: "string"
+                    description: "Encrypted meeting password."
+                  pstn_password:
+                    type: "string"
+                    description: "PSTN password for phone participants."
+                  h323_password:
+                    type: "string"
+                    description: "H.323/SIP room system password."
+                  join_url:
+                    type: "string"
+                    description: "URL to join the meeting."
+                  chat_join_url:
+                    type: "string"
+                    description: "Chat join URL for the meeting."
+                  occurrences:
+                    type: "array"
+                    items:
+                      type: "object"
+                      properties:
+                        duration:
+                          type: "integer"
+                          description: "Duration of the occurrence."
+                        occurrence_id:
+                          type: "string"
+                          description: "ID of the occurrence."
+                        start_time:
+                          type: "string"
+                          description: "Start time of the occurrence."
+                        status:
+                          type: "string"
+                          description: "Status of the occurrence."
+                  password:
+                    type: "string"
+                    description: "Password to join the meeting."
+                  pmi:
+                    type: "string"
+                    description: "Personal Meeting ID."
+                  pre_schedule:
+                    type: "boolean"
+                    description: "Indicates if meeting is prescheduled."
+                  recurrence:
+                    type: "object"
+                    properties:
+                      end_date_time:
+                        type: "string"
+                        description: "End date and time of recurrence."
+                      end_times:
+                        type: "integer"
+                        description: "Number of times the meeting occurs."
+                      monthly_day:
+                        type: "integer"
+                      monthly_week:
+                        type: "integer"
+                      monthly_week_day:
+                        type: "integer"
+                      repeat_interval:
+                        type: "integer"
+                      type:
+                        type: "integer"
+                        description: "Recurrence type."
+                      weekly_days:
+                        type: "string"
+                  settings:
+                    type: "object"
+                    description: "Meeting settings configuration."
+                    additionalProperties: true
+                  start_time:
+                    type: "string"
+                    description: "Scheduled start time."
+                  start_url:
+                    type: "string"
+                    description: "URL for host to start the meeting."
+                  timezone:
+                    type: "string"
+                    description: "Meeting timezone."
+                  topic:
+                    type: "string"
+                    description: "Meeting topic."
+                  tracking_fields:
+                    type: "array"
+                    items:
+                      type: "object"
+                      properties:
+                        field:
+                          type: "string"
+                        value:
+                          type: "string"
+                        visible:
+                          type: "boolean"
+                  type:
+                    type: "integer"
+                    description: "Type of meeting."
+                  dynamic_host_key:
+                    type: "string"
+                    description: "Dynamic host key for the meeting."
+                  creation_source:
+                    type: "string"
+                    description: "Source of creation (e.g., open_api)."
+  /meetings/{meetingId}/registrants:
+    post:
+      summary: "Add Meeting Registrant"
+      description: "Create and submit a user's registration to a meeting."
+      operationId: "addMeetingRegistrant"
+      x-ai-agent-tool: true
+      parameters:
+        - name: "meetingId"
+          description: "ID of the meeting where the registrant will be added."
+          in: "path"
+          required: true
+          schema:
+            title: "meeting ID"
+            type: "integer"
+            x-dynamic-options: true
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: "object"
+              title: "data"
+              required:
+                - "first_name"
+                - "email"
+              properties:
+                first_name:
+                  type: "string"
+                  description: "First name of the registrant."
+                last_name:
+                  type: "string"
+                  description: "Last name of the registrant."
+                email:
+                  type: "string"
+                  description: "Email of the registrant."
+                address:
+                  type: "string"
+                  description: "Address of the registrant."
+                city:
+                  type: "string"
+                  description: "City of the registrant."
+                state:
+                  type: "string"
+                zip:
+                  type: "string"
+                country:
+                  type: "string"
+                  description: "Country of the registrant."
+                phone:
+                  type: "string"
+                  description: "Phone number of the registrant."
+                comments:
+                  type: "string"
+                  description: "Additional comment about the registrant."
+                industry:
+                  type: "string"
+                job_title:
+                  type: "string"
+                no_of_employees:
+                  type: "string"
+                  enum:
+                    - "1-20"
+                    - "21-50"
+                    - "51-100"
+                    - "101-500"
+                    - "501-1,000"
+                    - "1,001-5,000"
+                    - "5,001-10,000"
+                    - "More than 10,000"
+                org:
+                  type: "string"
+                purchasing_time_frame:
+                  type: "string"
+                  enum:
+                    - "Within a month"
+                    - "1-3 months"
+                    - "4-6 months"
+                    - "More than 6 months"
+                    - "No timeframe"
+                role_in_purchase_process:
+                  type: "string"
+                  enum:
+                    - "Decision Maker"
+                    - "Evaluator/Recommender"
+                    - "Influencer"
+                    - "Not involved"
+                language:
+                  type: "string"
+                auto_approve:
+                  type: "boolean"
+      responses:
+        201:
+          description: "Meeting created."
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  id:
+                    type: "integer"
+                    description: "ID of the meeting."
+                  join_url:
+                    type: "string"
+                    description: "Join URL for the meeting."
+                  registrant_id:
+                    type: "string"
+                    description: "ID of the user that registered for the meeting."
+                  start_time:
+                    type: "string"
+                    description: "Start time of the meeting."
+                  topic:
+                    type: "string"
+                    description: "Topic of the meeting."
+                  occurrences:
+                    type: "array"
+                    items:
+                      type: "object"
+                      properties:
+                        duration:
+                          type: "integer"
+                          description: "Duration of the occurrence."
+                        occurrence_id:
+                          type: "string"
+                          description: "ID of the occurrence."
+                        start_time:
+                          type: "string"
+                          description: "Start time of the occurrence."
+                        status:
+                          type: "string"
+                          description: "Status of the occurrence."
+                  participant_pin_code:
+                    type: "integer"
+                    description: "Pin code for participation."
+components:
+  securitySchemes:
+    oauth2:
+      type: "oauth2"
+      flows:
+        authorizationCode:
+          authorizationUrl: "https://zoom.us/oauth/authorize"
+          tokenUrl: "https://zoom.us/oauth/token"
+          refreshUrl: "https://zoom.us/oauth/token"
