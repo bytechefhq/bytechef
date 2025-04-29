@@ -223,6 +223,8 @@ implementation(project(":server:libs:modules:components:graphql-client"))
     implementation(project(":server:libs:modules:components:xml-helper"))
     implementation(project(":server:libs:modules:components:zendesk-sell"))
     implementation(project(":server:libs:modules:components:zeplin"))
+    implementation(project(":server:libs:modules:components:zoho:zoho-books"))
+    implementation(project(":server:libs:modules:components:zoho:zoho-commons"))
     implementation(project(":server:libs:modules:components:zoho:zoho-crm"))
 
     testImplementation(project(":server:libs:test:test-int-support"))
