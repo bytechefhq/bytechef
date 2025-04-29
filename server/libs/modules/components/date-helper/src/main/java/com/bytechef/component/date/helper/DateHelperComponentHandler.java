@@ -24,6 +24,8 @@ import com.bytechef.component.date.helper.action.DateHelperConvertAction;
 import com.bytechef.component.date.helper.action.DateHelperDateDifferenceAction;
 import com.bytechef.component.date.helper.action.DateHelperExtractDateUnitsAction;
 import com.bytechef.component.date.helper.action.DateHelperGetCurrentDateAction;
+import com.bytechef.component.date.helper.action.DateHelperIsBusinessHoursAction;
+import com.bytechef.component.date.helper.action.DateHelperIsWeekendAction;
 import com.bytechef.component.date.helper.action.DateHelperSubtractTimeAction;
 import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDefinition;
@@ -47,6 +49,8 @@ public class DateHelperComponentHandler implements ComponentHandler {
             DateHelperDateDifferenceAction.ACTION_DEFINITION,
             DateHelperExtractDateUnitsAction.ACTION_DEFINITION,
             DateHelperGetCurrentDateAction.ACTION_DEFINITION,
+            DateHelperIsBusinessHoursAction.ACTION_DEFINITION,
+            DateHelperIsWeekendAction.ACTION_DEFINITION,
             DateHelperSubtractTimeAction.ACTION_DEFINITION);
 
     @Override
