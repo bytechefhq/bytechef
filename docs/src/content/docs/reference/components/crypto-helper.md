@@ -98,7 +98,7 @@ Type: STRING
 
 
 ### PGP Decrypt
-Name: PGPdecrypt
+Name: pgpDecrypt
 
 Decrypts PGP encrypted file using private key and passphrase.
 
@@ -114,7 +114,7 @@ Decrypts PGP encrypted file using private key and passphrase.
 ```json
 {
   "label" : "PGP Decrypt",
-  "name" : "PGPdecrypt",
+  "name" : "pgpDecrypt",
   "parameters" : {
     "privateKey" : "",
     "file" : {
@@ -125,7 +125,7 @@ Decrypts PGP encrypted file using private key and passphrase.
     },
     "passphrase" : ""
   },
-  "type" : "cryptoHelper/v1/PGPdecrypt"
+  "type" : "cryptoHelper/v1/pgpDecrypt"
 }
 ```
 
@@ -160,7 +160,7 @@ Type: FILE_ENTRY
 
 
 ### PGP Encrypt
-Name: PGPencrypt
+Name: pgpEncrypt
 
 Encrypts the file using PGP public key.
 
@@ -175,7 +175,7 @@ Encrypts the file using PGP public key.
 ```json
 {
   "label" : "PGP Encrypt",
-  "name" : "PGPencrypt",
+  "name" : "pgpEncrypt",
   "parameters" : {
     "publicKey" : "",
     "file" : {
@@ -185,7 +185,7 @@ Encrypts the file using PGP public key.
       "url" : ""
     }
   },
-  "type" : "cryptoHelper/v1/PGPencrypt"
+  "type" : "cryptoHelper/v1/pgpEncrypt"
 }
 ```
 
@@ -220,7 +220,7 @@ Type: FILE_ENTRY
 
 
 ### RSA Decrypt
-Name: RSAdecrypt
+Name: rsaDecrypt
 
 Decrypts RSA encrypted file using RSA private key.
 
@@ -235,7 +235,7 @@ Decrypts RSA encrypted file using RSA private key.
 ```json
 {
   "label" : "RSA Decrypt",
-  "name" : "RSAdecrypt",
+  "name" : "rsaDecrypt",
   "parameters" : {
     "privateKey" : "",
     "file" : {
@@ -245,7 +245,7 @@ Decrypts RSA encrypted file using RSA private key.
       "url" : ""
     }
   },
-  "type" : "cryptoHelper/v1/RSAdecrypt"
+  "type" : "cryptoHelper/v1/rsaDecrypt"
 }
 ```
 
@@ -280,7 +280,7 @@ Type: FILE_ENTRY
 
 
 ### RSA Encrypt
-Name: RSAencrypt
+Name: rsaEncrypt
 
 Encrypts the file using the RSA public key.
 
@@ -295,7 +295,7 @@ Encrypts the file using the RSA public key.
 ```json
 {
   "label" : "RSA Encrypt",
-  "name" : "RSAencrypt",
+  "name" : "rsaEncrypt",
   "parameters" : {
     "publicKey" : "",
     "file" : {
@@ -305,7 +305,7 @@ Encrypts the file using the RSA public key.
       "url" : ""
     }
   },
-  "type" : "cryptoHelper/v1/RSAencrypt"
+  "type" : "cryptoHelper/v1/rsaEncrypt"
 }
 ```
 
