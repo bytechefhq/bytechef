@@ -127,31 +127,26 @@ export default function handleDeleteTask({
             return parentBranchTask;
         }) as Array<WorkflowTaskType>;
     } else if (aiAgentOpen && currentNode?.name.includes('aiAgent')) {
-        const currentClusterElementType = data?.clusterElementType;
+        const currentClusterElementType = data.clusterElementType;
         const clusterElementName = data.name;
         const parentAiAgentTask = workflowTasks.find((task) => task.name === currentNode?.name);
 
-        if (parentAiAgentTask?.clusterElements && setCurrentNode) {
-            let updatedClusterElements;
+        if (parentAiAgentTask?.clusterElements && setCurrentNode && currentClusterElementType) {
+            const updatedClusterElements = {...currentNode.clusterElements};
 
-            if (currentClusterElementType === 'tools' && Array.isArray(parentAiAgentTask.clusterElements.tools)) {
-                parentAiAgentTask.clusterElements.tools = parentAiAgentTask.clusterElements.tools.filter(
+            if (currentClusterElementType === 'tools') {
+                updatedClusterElements.tools = (parentAiAgentTask.clusterElements.tools || []).filter(
                     (tool) => tool.name !== clusterElementName
                 );
 
-                updatedClusterElements = {
-                    ...currentNode.clusterElements,
-                    tools: parentAiAgentTask.clusterElements.tools,
-                };
-            } else if (currentClusterElementType) {
+                parentAiAgentTask.clusterElements.tools = [...updatedClusterElements.tools];
+            } else {
+                updatedClusterElements[currentClusterElementType as keyof typeof parentAiAgentTask.clusterElements] =
+                    null;
+
                 parentAiAgentTask.clusterElements[
                     currentClusterElementType as keyof typeof parentAiAgentTask.clusterElements
                 ] = null;
-
-                updatedClusterElements = {
-                    ...currentNode.clusterElements,
-                    [currentClusterElementType]: null,
-                };
             }
 
             setCurrentNode({
@@ -160,12 +155,16 @@ export default function handleDeleteTask({
             });
         }
 
-        updatedTasks = workflowTasks.map((task) =>
-            task.name === parentAiAgentTask?.name ? parentAiAgentTask : task
-        ) as Array<WorkflowTaskType>;
-    }
+        updatedTasks = workflowTasks.map((task) => {
+            if (task.name !== parentAiAgentTask?.name) {
+                return task;
+            }
 
-    updatedTasks = workflowTasks.filter((task: WorkflowTask) => task.name !== data.name);
+            return parentAiAgentTask;
+        }) as Array<WorkflowTaskType>;
+    } else {
+        updatedTasks = workflowTasks.filter((task: WorkflowTask) => task.name !== data.name);
+    }
 
     updateWorkflowMutation.mutate(
         {

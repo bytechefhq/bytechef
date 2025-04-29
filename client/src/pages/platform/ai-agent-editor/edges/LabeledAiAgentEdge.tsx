@@ -70,7 +70,7 @@ export default function LabeledAiAgentEdge({
                         transform: getEdgeLabelPosition(nodeType as string, targetX, targetY),
                     }}
                 >
-                    <span>{getEdgeLabel((nodeType as string) || '')}</span>
+                    {nodeType ? <span>{getEdgeLabel(nodeType as string)}</span> : ''}
                 </div>
             </EdgeLabelRenderer>
         </>

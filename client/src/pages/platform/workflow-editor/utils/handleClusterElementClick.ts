@@ -11,13 +11,13 @@ import saveWorkflowDefinition from './saveWorkflowDefinition';
 type ClusterElementsDefinitionType = 'CHAT_MEMORY' | 'MODEL' | 'RAG';
 type StoredClusterElementsType = 'chatMemory' | 'model' | 'rag';
 
-interface ClusterElementClickProps {
-    clusterElementsData: ClusterElementsType | undefined;
+interface HandleClusterElementClickProps {
+    clusterElementsData: ClusterElementsType;
     data: ClusterElementDefinitionBasic;
-    projectId: string | undefined;
+    projectId: string;
     queryClient: QueryClient;
     setPopoverOpen: (open: boolean) => void;
-    sourceNode: Node | undefined;
+    sourceNode: Node;
     updateWorkflowMutation: UpdateWorkflowMutationType;
 }
 
@@ -29,13 +29,9 @@ export default function handleClusterElementClick({
     setPopoverOpen,
     sourceNode,
     updateWorkflowMutation,
-}: ClusterElementClickProps) {
+}: HandleClusterElementClickProps) {
     const {aiAgentNodeData, setAiAgentNodeData} = useWorkflowEditorStore.getState();
     const {currentNode, setCurrentNode} = useWorkflowNodeDetailsPanelStore.getState();
-
-    if (!clusterElementsData || !sourceNode) {
-        return;
-    }
 
     const updatedClusterElementsData: ClusterElementsType = {
         rag: clusterElementsData.rag
@@ -111,8 +107,10 @@ export default function handleClusterElementClick({
             name: String(sourceNode.data.name),
             workflowNodeName: String(sourceNode.data.workflowNodeName),
         },
+
         onSuccess: () => {
             setPopoverOpen(false);
+
             setAiAgentNodeData({
                 ...aiAgentNodeData,
                 clusterElements: updatedClusterElementsData,
@@ -120,6 +118,7 @@ export default function handleClusterElementClick({
                 name: aiAgentNodeData?.name as string,
                 workflowNodeName: aiAgentNodeData?.workflowNodeName as string,
             });
+
             setCurrentNode({
                 ...currentNode,
                 clusterElements: updatedClusterElementsData,

@@ -100,9 +100,9 @@ const WorkflowNode = ({data, id}: {data: NodeDataType; id: string}) => {
     return (
         <div
             className={twMerge(
-                isAiAgentClusterElement ? '' : 'nodrag',
                 'relative flex min-w-60 cursor-pointer justify-center',
-                !data.taskDispatcher && 'items-center'
+                !data.taskDispatcher && 'items-center',
+                !isAiAgentClusterElement && 'nodrag'
             )}
             data-nodetype={data.trigger ? 'trigger' : 'task'}
             key={id}
