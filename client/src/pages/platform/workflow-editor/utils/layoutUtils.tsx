@@ -102,17 +102,14 @@ export const convertTaskToNode = (
     };
 };
 
-export const getLayoutedElements = ({
-    canvasWidth,
-    edges,
-    isAiAgentCanvas,
-    nodes,
-}: {
+interface GetLayoutedElementsProps {
     canvasWidth: number;
     edges: Edge[];
     isAiAgentCanvas?: boolean;
     nodes: Node[];
-}) => {
+}
+
+export const getLayoutedElements = ({canvasWidth, edges, isAiAgentCanvas, nodes}: GetLayoutedElementsProps) => {
     const dagreGraph = new dagre.graphlib.Graph().setDefaultEdgeLabel(() => ({}));
 
     dagreGraph.setGraph({rankdir: DIRECTION});

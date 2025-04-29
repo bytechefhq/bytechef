@@ -182,17 +182,19 @@ const WorkflowNodesPopoverMenu = ({
                                         <li
                                             className="flex cursor-pointer items-center gap-2 space-y-1 rounded border-2 border-transparent bg-white px-2 py-1 hover:border-blue-200"
                                             key={index}
-                                            onClick={() =>
-                                                handleClusterElementClick({
-                                                    clusterElementsData,
-                                                    data,
-                                                    projectId,
-                                                    queryClient,
-                                                    setPopoverOpen,
-                                                    sourceNode,
-                                                    updateWorkflowMutation,
-                                                })
-                                            }
+                                            onClick={() => {
+                                                if (clusterElementsData && projectId && sourceNode) {
+                                                    handleClusterElementClick({
+                                                        clusterElementsData,
+                                                        data,
+                                                        projectId,
+                                                        queryClient,
+                                                        setPopoverOpen,
+                                                        sourceNode,
+                                                        updateWorkflowMutation,
+                                                    });
+                                                }
+                                            }}
                                         >
                                             {data.icon ? data.icon : <ComponentIcon />}
 
