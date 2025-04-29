@@ -3,7 +3,7 @@
     "name" : "artificial-intelligence",
     "label" : "Artificial Intelligence"
   } ],
-  "customAction" : null,
+  "customAction" : true,
   "customActionHelp" : null,
   "description" : "Tavily is an AI-powered search tool designed to help users quickly find accurate, relevant, and up-to-date information from the web.",
   "icon" : "path:assets/tavily.svg",
@@ -574,11 +574,11 @@
       "maxLength" : null,
       "minLength" : null,
       "options" : [ {
-        "description" : "general-purpose searches that may include a wide range of sources",
+        "description" : "General-purpose searches that may include a wide range of sources.",
         "label" : "General",
         "value" : "general"
       }, {
-        "description" : "real-time updates",
+        "description" : "Real-time updates.",
         "label" : "News",
         "value" : "news"
       } ],
@@ -604,11 +604,11 @@
       "maxLength" : null,
       "minLength" : null,
       "options" : [ {
-        "description" : "provides generic content snippets from each source",
+        "description" : "Provides generic content snippets from each source.",
         "label" : "Basic",
         "value" : "basic"
       }, {
-        "description" : "retrieves the most relevant sources",
+        "description" : "Retrieves the most relevant sources.",
         "label" : "Advanced",
         "value" : "advanced"
       } ],
@@ -634,19 +634,19 @@
       "maxLength" : null,
       "minLength" : null,
       "options" : [ {
-        "description" : "returns results from the past 24 hours",
+        "description" : "Results from the past 24 hours",
         "label" : "Day",
         "value" : "day"
       }, {
-        "description" : "returns results from the past 7 days",
+        "description" : "Results from the past 7 days",
         "label" : "Week",
         "value" : "week"
       }, {
-        "description" : "returns results from the past 30 days",
+        "description" : "Results from the past 30 days",
         "label" : "Month",
         "value" : "month"
       }, {
-        "description" : "returns results from the past 365 days",
+        "description" : "Results from the past 365 days",
         "label" : "Year",
         "value" : "year"
       } ],
@@ -1337,11 +1337,11 @@
       "maxLength" : null,
       "minLength" : null,
       "options" : [ {
-        "description" : "retrieves basic data",
+        "description" : "Retrieves basic data.",
         "label" : "Basic",
         "value" : "basic"
       }, {
-        "description" : "retrieves more data, including tables and embedded content",
+        "description" : "Retrieves more data, including tables and embedded content.",
         "label" : "Advanced",
         "value" : "advanced"
       } ],
@@ -1352,55 +1352,6 @@
     "perform" : null,
     "processErrorResponse" : null
   } ],
-  "connection" : {
-    "authorizations" : [ {
-      "detectOn" : null,
-      "description" : null,
-      "name" : "bearer_token",
-      "properties" : [ {
-        "advancedOption" : null,
-        "description" : null,
-        "displayCondition" : null,
-        "expressionEnabled" : null,
-        "hidden" : null,
-        "metadata" : { },
-        "required" : true,
-        "name" : "token",
-        "type" : "STRING",
-        "defaultValue" : null,
-        "exampleValue" : null,
-        "label" : "Token",
-        "placeholder" : null,
-        "controlType" : "TEXT",
-        "languageId" : null,
-        "maxLength" : null,
-        "minLength" : null,
-        "options" : null,
-        "optionsDataSource" : null
-      } ],
-      "refreshOn" : null,
-      "title" : "Bearer Token",
-      "type" : "BEARER_TOKEN",
-      "acquire" : null,
-      "apply" : null,
-      "authorizationCallback" : null,
-      "authorizationUrl" : null,
-      "clientId" : null,
-      "clientSecret" : null,
-      "oauth2AuthorizationExtraQueryParameters" : null,
-      "pkce" : null,
-      "refresh" : null,
-      "refreshUrl" : null,
-      "scopes" : null,
-      "refreshToken" : null,
-      "tokenUrl" : null
-    } ],
-    "properties" : null,
-    "version" : 1,
-    "authorizationRequired" : null,
-    "baseUri" : { },
-    "test" : null
-  },
   "clusterElements" : [ {
     "description" : "Execute a search query.",
     "name" : "search",
@@ -1953,11 +1904,11 @@
       "maxLength" : null,
       "minLength" : null,
       "options" : [ {
-        "description" : "general-purpose searches that may include a wide range of sources",
+        "description" : "General-purpose searches that may include a wide range of sources.",
         "label" : "General",
         "value" : "general"
       }, {
-        "description" : "real-time updates",
+        "description" : "Real-time updates.",
         "label" : "News",
         "value" : "news"
       } ],
@@ -1983,11 +1934,11 @@
       "maxLength" : null,
       "minLength" : null,
       "options" : [ {
-        "description" : "provides generic content snippets from each source",
+        "description" : "Provides generic content snippets from each source.",
         "label" : "Basic",
         "value" : "basic"
       }, {
-        "description" : "retrieves the most relevant sources",
+        "description" : "Retrieves the most relevant sources.",
         "label" : "Advanced",
         "value" : "advanced"
       } ],
@@ -2013,19 +1964,19 @@
       "maxLength" : null,
       "minLength" : null,
       "options" : [ {
-        "description" : "returns results from the past 24 hours",
+        "description" : "Results from the past 24 hours",
         "label" : "Day",
         "value" : "day"
       }, {
-        "description" : "returns results from the past 7 days",
+        "description" : "Results from the past 7 days",
         "label" : "Week",
         "value" : "week"
       }, {
-        "description" : "returns results from the past 30 days",
+        "description" : "Results from the past 30 days",
         "label" : "Month",
         "value" : "month"
       }, {
-        "description" : "returns results from the past 365 days",
+        "description" : "Results from the past 365 days",
         "label" : "Year",
         "value" : "year"
       } ],
@@ -2712,11 +2663,11 @@
       "maxLength" : null,
       "minLength" : null,
       "options" : [ {
-        "description" : "retrieves basic data",
+        "description" : "Retrieves basic data.",
         "label" : "Basic",
         "value" : "basic"
       }, {
-        "description" : "retrieves more data, including tables and embedded content",
+        "description" : "Retrieves more data, including tables and embedded content.",
         "label" : "Advanced",
         "value" : "advanced"
       } ],
@@ -2733,5 +2684,54 @@
     "element" : { }
   } ],
   "triggers" : [ ],
-  "unifiedApi" : null
+  "unifiedApi" : null,
+  "connection" : {
+    "authorizations" : [ {
+      "detectOn" : null,
+      "description" : null,
+      "name" : "bearer_token",
+      "properties" : [ {
+        "advancedOption" : null,
+        "description" : null,
+        "displayCondition" : null,
+        "expressionEnabled" : null,
+        "hidden" : null,
+        "metadata" : { },
+        "required" : true,
+        "name" : "token",
+        "type" : "STRING",
+        "defaultValue" : null,
+        "exampleValue" : null,
+        "label" : "Token",
+        "placeholder" : null,
+        "controlType" : "TEXT",
+        "languageId" : null,
+        "maxLength" : null,
+        "minLength" : null,
+        "options" : null,
+        "optionsDataSource" : null
+      } ],
+      "refreshOn" : null,
+      "title" : "Bearer Token",
+      "type" : "BEARER_TOKEN",
+      "acquire" : null,
+      "apply" : null,
+      "authorizationCallback" : null,
+      "authorizationUrl" : null,
+      "clientId" : null,
+      "clientSecret" : null,
+      "oauth2AuthorizationExtraQueryParameters" : null,
+      "pkce" : null,
+      "refresh" : null,
+      "refreshUrl" : null,
+      "scopes" : null,
+      "refreshToken" : null,
+      "tokenUrl" : null
+    } ],
+    "properties" : null,
+    "version" : 1,
+    "authorizationRequired" : null,
+    "baseUri" : { },
+    "test" : null
+  }
 }
