@@ -376,6 +376,7 @@ include("server:libs:modules:components:zeplin")
 include("server:libs:modules:components:zoho:zoho-books")
 include("server:libs:modules:components:zoho:zoho-commons")
 include("server:libs:modules:components:zoho:zoho-crm")
+include("server:libs:modules:components:zoom")
 
 include("server:libs:modules:task-dispatchers:approval")
 include("server:libs:modules:task-dispatchers:branch")

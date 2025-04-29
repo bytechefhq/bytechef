@@ -304,6 +304,7 @@ implementation(project(":server:libs:modules:components:bolna"))
     implementation(project(":server:libs:modules:components:zoho:zoho-books"))
     implementation(project(":server:libs:modules:components:zoho:zoho-commons"))
     implementation(project(":server:libs:modules:components:zoho:zoho-crm"))
+    implementation(project(":server:libs:modules:components:zoom"))
 
     implementation(project(":server:libs:modules:task-dispatchers:approval"))
     implementation(project(":server:libs:modules:task-dispatchers:branch"))
