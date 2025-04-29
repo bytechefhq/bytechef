@@ -63,6 +63,7 @@ public class DateHelperIsWeekendAction {
         String timeZone = inputParameters.getRequiredString(TIME_ZONE);
 
         ZonedDateTime zonedDateTime = localDateTime.atZone(ZoneId.of(timeZone));
+
         DayOfWeek dayOfWeek = zonedDateTime.getDayOfWeek();
 
         return dayOfWeek == DayOfWeek.SATURDAY || dayOfWeek == DayOfWeek.SUNDAY;
