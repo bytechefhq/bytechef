@@ -49,18 +49,13 @@ public class CryptoHelperHashAction {
                 .label("Input")
                 .description("Calculates the hash of the provided input.")
                 .required(true))
-        .output(
-            outputSchema(
-                string()
-                    .description("Hashed value of the input")))
+        .output(outputSchema(string().description("Hashed value of the input")))
         .perform(CryptoHelperHashAction::perform);
 
     private CryptoHelperHashAction() {
     }
 
-    public static String perform(
-        Parameters inputParameters, Parameters connectionParameters, Context context) {
-
+    public static String perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
         try {
             MessageDigest digest = MessageDigest.getInstance(inputParameters.getRequiredString(ALGORITHM));
             String input = inputParameters.getRequiredString(INPUT);

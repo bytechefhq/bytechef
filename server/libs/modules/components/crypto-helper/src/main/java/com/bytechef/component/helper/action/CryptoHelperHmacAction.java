@@ -54,18 +54,13 @@ public class CryptoHelperHmacAction {
                 .label("Key")
                 .description("Key that will be used for the encryption.")
                 .required(true))
-        .output(
-            outputSchema(
-                string()
-                    .description("Hmac value of the input")))
+        .output(outputSchema(string().description("Hmac value of the input")))
         .perform(CryptoHelperHmacAction::perform);
 
     private CryptoHelperHmacAction() {
     }
 
-    public static String perform(
-        Parameters inputParameters, Parameters connectionParameters, Context context) {
-
+    public static String perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
         try {
             String key = inputParameters.getRequiredString(KEY);
             String algorithm = inputParameters.getRequiredString(ALGORITHM);

@@ -53,9 +53,9 @@ import org.bouncycastle.openpgp.operator.jcajce.JcePublicKeyDataDecryptorFactory
 /**
  * @author Nikolina Spehar
  */
-public class CryptoHelperPGPDecryptAction {
+public class CryptoHelperPgpDecryptAction {
 
-    public static final ModifiableActionDefinition ACTION_DEFINITION = action("PGPdecrypt")
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action("pgpDecrypt")
         .title("PGP Decrypt")
         .description("Decrypts PGP encrypted file using private key and passphrase.")
         .properties(
@@ -73,13 +73,10 @@ public class CryptoHelperPGPDecryptAction {
                 .label("Passphrase")
                 .description("Passphrase that was used for encryption.")
                 .required(true))
-        .output(
-            outputSchema(
-                fileEntry()
-                    .description("Decrypted file.")))
-        .perform(CryptoHelperPGPDecryptAction::perform);
+        .output(outputSchema(fileEntry().description("Decrypted file.")))
+        .perform(CryptoHelperPgpDecryptAction::perform);
 
-    private CryptoHelperPGPDecryptAction() {
+    private CryptoHelperPgpDecryptAction() {
     }
 
     public static FileEntry perform(Parameters inputParameters, Parameters connectionParameters, Context context)
@@ -87,13 +84,13 @@ public class CryptoHelperPGPDecryptAction {
 
         Security.addProvider(new BouncyCastleProvider());
 
-        FileEntry encryptedFileEntry = inputParameters.getRequiredFileEntry(FILE);
-        byte[] encryptedBytes = context.file(file -> file.readAllBytes(encryptedFileEntry));
+        FileEntry fileEntry = inputParameters.getRequiredFileEntry(FILE);
+        byte[] encryptedBytes = context.file(file -> file.readAllBytes(fileEntry));
 
-        ByteArrayInputStream encryptedInputStream = new ByteArrayInputStream(encryptedBytes);
+        ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(encryptedBytes);
 
         PGPObjectFactory pgpObjectFactory = new PGPObjectFactory(
-            PGPUtil.getDecoderStream(encryptedInputStream), new JcaKeyFingerprintCalculator());
+            PGPUtil.getDecoderStream(byteArrayInputStream), new JcaKeyFingerprintCalculator());
         PGPEncryptedDataList pgpEncryptedDataList = (PGPEncryptedDataList) pgpObjectFactory.nextObject();
 
         PGPPublicKeyEncryptedData pgpPublicKeyEncryptedData = (PGPPublicKeyEncryptedData) pgpEncryptedDataList.get(0);
@@ -102,54 +99,53 @@ public class CryptoHelperPGPDecryptAction {
             inputParameters.getRequiredString(PRIVATE_KEY), inputParameters.getRequiredString(PASSPHRASE),
             pgpEncryptedDataList);
 
-        InputStream decryptedDataStream =
-            pgpPublicKeyEncryptedData.getDataStream(
-                new JcePublicKeyDataDecryptorFactoryBuilder()
-                    .setProvider(BouncyCastleProvider.PROVIDER_NAME)
-                    .build(pgpPrivateKey));
+        InputStream inputStream = pgpPublicKeyEncryptedData.getDataStream(
+            new JcePublicKeyDataDecryptorFactoryBuilder()
+                .setProvider(BouncyCastleProvider.PROVIDER_NAME)
+                .build(pgpPrivateKey));
 
-        ByteArrayOutputStream decryptedOutputStream = getDecryptedDataFromStream(decryptedDataStream);
+        ByteArrayOutputStream byteArrayOutputStream = getDecryptedDataFromStream(inputStream);
 
         return context.file(
-            file -> file.storeContent("decrypted.", new ByteArrayInputStream(decryptedOutputStream.toByteArray())));
+            file -> file.storeContent("decrypted.", new ByteArrayInputStream(byteArrayOutputStream.toByteArray())));
     }
 
     private static PGPPrivateKey getPrivateKey(
         String privateKeyString, String passphrase, PGPEncryptedDataList encDataList)
         throws IOException, PGPException {
 
-        InputStream privateKeyInputStream = new ByteArrayInputStream(privateKeyString.getBytes(StandardCharsets.UTF_8));
+        InputStream inputStream = new ByteArrayInputStream(privateKeyString.getBytes(StandardCharsets.UTF_8));
 
         PGPSecretKeyRingCollection pgpSecretKeyRingCollection = new PGPSecretKeyRingCollection(
-            PGPUtil.getDecoderStream(privateKeyInputStream), new JcaKeyFingerprintCalculator());
+            PGPUtil.getDecoderStream(inputStream), new JcaKeyFingerprintCalculator());
 
-        PGPPrivateKey privateKey = null;
+        PGPPrivateKey pgpPrivateKey = null;
 
         Iterator<PGPEncryptedData> iterator = encDataList.getEncryptedDataObjects();
 
-        while (privateKey == null && iterator.hasNext()) {
+        while (pgpPrivateKey == null && iterator.hasNext()) {
             PGPPublicKeyEncryptedData pgpPublicKeyEncryptedData = (PGPPublicKeyEncryptedData) iterator.next();
             PGPSecretKey pgpSecKey = pgpSecretKeyRingCollection.getSecretKey(pgpPublicKeyEncryptedData.getKeyID());
 
-            privateKey = pgpSecKey == null ? null : pgpSecKey.extractPrivateKey(
+            pgpPrivateKey = pgpSecKey == null ? null : pgpSecKey.extractPrivateKey(
                 new JcePBESecretKeyDecryptorBuilder()
                     .setProvider(BouncyCastleProvider.PROVIDER_NAME)
                     .build(passphrase.toCharArray()));
         }
 
-        return privateKey;
+        return pgpPrivateKey;
     }
 
     private static ByteArrayOutputStream getDecryptedDataFromStream(InputStream decryptedDataStream)
         throws IOException {
-        ByteArrayOutputStream decryptedData = new ByteArrayOutputStream();
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
 
         int ch;
 
         while ((ch = decryptedDataStream.read()) >= 0) {
-            decryptedData.write(ch);
+            byteArrayOutputStream.write(ch);
         }
 
-        return decryptedData;
+        return byteArrayOutputStream;
     }
 }

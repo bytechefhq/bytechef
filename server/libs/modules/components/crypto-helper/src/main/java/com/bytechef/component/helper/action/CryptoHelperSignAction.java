@@ -51,10 +51,7 @@ public class CryptoHelperSignAction {
                 .label("File")
                 .description("File that will be signed")
                 .required(true))
-        .output(
-            outputSchema(
-                fileEntry()
-                    .description("Signature of the file.")))
+        .output(outputSchema(fileEntry().description("Signature of the file.")))
         .perform(CryptoHelperSignAction::perform);
 
     private CryptoHelperSignAction() {
@@ -74,8 +71,6 @@ public class CryptoHelperSignAction {
 
         byte[] signatureBytes = signature.sign();
 
-        return context.file(
-            file -> file.storeContent("signature.",
-                new ByteArrayInputStream(signatureBytes)));
+        return context.file(file -> file.storeContent("signature.", new ByteArrayInputStream(signatureBytes)));
     }
 }

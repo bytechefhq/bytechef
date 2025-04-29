@@ -35,8 +35,6 @@ import org.junit.jupiter.params.provider.CsvSource;
  */
 class CryptoHelperHmacActionTest {
 
-    private final Context mockedContext = mock(Context.class);
-
     @ParameterizedTest
     @CsvSource({
         "HmacMD5, 626d45975138d2543278261a81575f36",
@@ -44,10 +42,10 @@ class CryptoHelperHmacActionTest {
         "HmacSHA256, d6f01175dbe45290787c9b2d2832fb6b05765184643931a8898848a284958822"
     })
     void testPerform(String algorithm, String expected) {
-        Parameters mockedParameters =
-            MockParametersFactory.create(Map.of(ALGORITHM, algorithm, INPUT, "test input", KEY, "test key"));
+        Parameters mockedParameters = MockParametersFactory.create(
+            Map.of(ALGORITHM, algorithm, INPUT, "test input", KEY, "test key"));
 
-        String result = CryptoHelperHmacAction.perform(mockedParameters, mockedParameters, mockedContext);
+        String result = CryptoHelperHmacAction.perform(mockedParameters, mockedParameters, mock(Context.class));
 
         assertEquals(expected, result);
     }

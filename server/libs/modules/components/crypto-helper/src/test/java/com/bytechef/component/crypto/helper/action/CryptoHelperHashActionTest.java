@@ -34,8 +34,6 @@ import org.junit.jupiter.params.provider.CsvSource;
  */
 class CryptoHelperHashActionTest {
 
-    private final Context mockedContext = mock(Context.class);
-
     @ParameterizedTest
     @CsvSource({
         "MD5, 5eed650258ee02f6a77c87b748b764ec",
@@ -45,7 +43,7 @@ class CryptoHelperHashActionTest {
     void testPerform(String algorithm, String expected) {
         Parameters mockedParameters = MockParametersFactory.create(Map.of(ALGORITHM, algorithm, INPUT, "test input"));
 
-        String result = CryptoHelperHashAction.perform(mockedParameters, mockedParameters, mockedContext);
+        String result = CryptoHelperHashAction.perform(mockedParameters, mockedParameters, mock(Context.class));
 
         assertEquals(expected, result);
     }

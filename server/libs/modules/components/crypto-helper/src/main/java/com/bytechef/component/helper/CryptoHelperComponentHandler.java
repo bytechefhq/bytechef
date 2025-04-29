@@ -24,10 +24,10 @@ import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.component.helper.action.CryptoHelperHashAction;
 import com.bytechef.component.helper.action.CryptoHelperHmacAction;
-import com.bytechef.component.helper.action.CryptoHelperPGPDecryptAction;
-import com.bytechef.component.helper.action.CryptoHelperPGPEncryptAction;
-import com.bytechef.component.helper.action.CryptoHelperRSADecryptAction;
-import com.bytechef.component.helper.action.CryptoHelperRSAEncryptAction;
+import com.bytechef.component.helper.action.CryptoHelperPgpDecryptAction;
+import com.bytechef.component.helper.action.CryptoHelperPgpEncryptAction;
+import com.bytechef.component.helper.action.CryptoHelperRsaDecryptAction;
+import com.bytechef.component.helper.action.CryptoHelperRsaEncryptAction;
 import com.bytechef.component.helper.action.CryptoHelperSignAction;
 import com.bytechef.component.helper.action.CryptoHelperVerifyAction;
 import com.google.auto.service.AutoService;
@@ -46,19 +46,19 @@ public class CryptoHelperComponentHandler implements ComponentHandler {
         .actions(
             CryptoHelperHashAction.ACTION_DEFINITION,
             CryptoHelperHmacAction.ACTION_DEFINITION,
-            CryptoHelperPGPDecryptAction.ACTION_DEFINITION,
-            CryptoHelperPGPEncryptAction.ACTION_DEFINITION,
-            CryptoHelperRSADecryptAction.ACTION_DEFINITION,
-            CryptoHelperRSAEncryptAction.ACTION_DEFINITION,
+            CryptoHelperPgpDecryptAction.ACTION_DEFINITION,
+            CryptoHelperPgpEncryptAction.ACTION_DEFINITION,
+            CryptoHelperRsaDecryptAction.ACTION_DEFINITION,
+            CryptoHelperRsaEncryptAction.ACTION_DEFINITION,
             CryptoHelperSignAction.ACTION_DEFINITION,
             CryptoHelperVerifyAction.ACTION_DEFINITION)
         .clusterElements(
             tool(CryptoHelperHashAction.ACTION_DEFINITION),
             tool(CryptoHelperHmacAction.ACTION_DEFINITION),
-            tool(CryptoHelperPGPDecryptAction.ACTION_DEFINITION),
-            tool(CryptoHelperPGPEncryptAction.ACTION_DEFINITION),
-            tool(CryptoHelperRSADecryptAction.ACTION_DEFINITION),
-            tool(CryptoHelperRSAEncryptAction.ACTION_DEFINITION),
+            tool(CryptoHelperPgpDecryptAction.ACTION_DEFINITION),
+            tool(CryptoHelperPgpEncryptAction.ACTION_DEFINITION),
+            tool(CryptoHelperRsaDecryptAction.ACTION_DEFINITION),
+            tool(CryptoHelperRsaEncryptAction.ACTION_DEFINITION),
             tool(CryptoHelperSignAction.ACTION_DEFINITION),
             tool(CryptoHelperVerifyAction.ACTION_DEFINITION));
 
