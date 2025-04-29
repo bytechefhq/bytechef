@@ -88,6 +88,7 @@ public class DateHelperIsBusinessHoursAction {
         String timeZone = inputParameters.getRequiredString(TIME_ZONE);
 
         ZonedDateTime zonedDateTime = localDateTime.atZone(ZoneId.of(timeZone));
+
         DayOfWeek dayOfWeek = zonedDateTime.getDayOfWeek();
         LocalTime localTime = zonedDateTime.toLocalTime();
 
