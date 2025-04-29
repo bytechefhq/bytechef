@@ -27,6 +27,10 @@ import com.bytechef.component.definition.ComponentDsl.ModifiableStringProperty;
  */
 public class DateHelperConstants {
 
+    public static final String BUSINESS_HOURS_START = "businessHoursStart";
+    public static final String BUSINESS_HOURS_END = "businessHoursEnd";
+    public static final String BUSINESS_WEEK_START = "businessWeekStart";
+    public static final String BUSINESS_WEEK_END = "businessWeekEnd";
     public static final String DATE_FORMAT = "dateFormat";
     public static final String DATE_TIMESTAMP = "dateTimestamp";
     public static final String DAY = "day";

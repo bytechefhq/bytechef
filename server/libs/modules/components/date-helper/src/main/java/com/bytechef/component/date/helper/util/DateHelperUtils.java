@@ -22,11 +22,15 @@ import static com.bytechef.component.definition.ComponentDsl.option;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Parameters;
+import java.time.DayOfWeek;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
+import java.time.format.TextStyle;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -36,6 +40,13 @@ import java.util.stream.Collectors;
 public class DateHelperUtils {
 
     private DateHelperUtils() {
+    }
+
+    public static List<Option<Long>> getDayOfWeekOptions() {
+        return Arrays.stream(DayOfWeek.values())
+            .map(dayOfWeek -> option(dayOfWeek.getDisplayName(TextStyle.FULL, Locale.getDefault()),
+                dayOfWeek.getValue()))
+            .collect(Collectors.toList());
     }
 
     public static Object getFormattedDate(String dateFormat, LocalDateTime inputDate) {
