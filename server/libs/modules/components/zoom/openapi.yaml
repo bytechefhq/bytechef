@@ -5,7 +5,7 @@ info:
   description: "Zoom is a cloud-based video conferencing platform that enables virtual meetings, webinars, and collaboration through video, audio, and chat."
   version: "v1"
 servers:
-  - url: "https://api.zoom.us/v2/"
+  - url: "https://api.zoom.us/v2"
 paths:
   /users/me/meetings:
     post:
@@ -197,7 +197,7 @@ paths:
           in: "path"
           required: true
           schema:
-            title: "meeting ID"
+            title: "Meeting ID"
             type: "integer"
             x-dynamic-options: true
       requestBody:
@@ -245,6 +245,7 @@ paths:
                   type: "string"
                 no_of_employees:
                   type: "string"
+                  title: "Number of Employees"
                   enum:
                     - "1-20"
                     - "21-50"
@@ -256,6 +257,7 @@ paths:
                     - "More than 10,000"
                 org:
                   type: "string"
+                  title: "Organization"
                 purchasing_time_frame:
                   type: "string"
                   enum:
