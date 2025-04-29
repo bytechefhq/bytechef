@@ -26,6 +26,6 @@ class ZohoCrmComponentHandlerTest {
 
     @Test
     void testGetComponentDefinition() {
-        JsonFileAssert.assertEquals("definition/zoho_crm.json", new ZohoCrmComponentHandler().getDefinition());
+        JsonFileAssert.assertEquals("definition/zoho-crm_v1.json", new ZohoCrmComponentHandler().getDefinition());
     }
 }
