@@ -32,6 +32,7 @@ class StringFormat implements MethodExecutor {
     @Override
     public TypedValue execute(EvaluationContext context, Object target, Object... arguments) throws AccessException {
         Object[] args = new Object[arguments.length - 1];
+
         System.arraycopy(arguments, 1, args, 0, arguments.length - 1);
 
         return new TypedValue(String.format((String) arguments[0], args));

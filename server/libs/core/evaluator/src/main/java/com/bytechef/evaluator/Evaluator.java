@@ -19,6 +19,7 @@
 package com.bytechef.evaluator;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -26,10 +27,12 @@ import java.util.Map;
 import java.util.Map.Entry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.core.env.Environment;
 import org.springframework.expression.Expression;
 import org.springframework.expression.ExpressionParser;
 import org.springframework.expression.MethodExecutor;
 import org.springframework.expression.MethodResolver;
+import org.springframework.expression.ParseException;
 import org.springframework.expression.common.CompositeStringExpression;
 import org.springframework.expression.common.LiteralExpression;
 import org.springframework.expression.common.TemplateParserContext;
@@ -50,49 +53,66 @@ public class Evaluator {
 
     private static final Logger logger = LoggerFactory.getLogger(Evaluator.class);
 
-    private static final ExpressionParser EXPRESSION_PARSER = new SpelExpressionParser();
-    private static final Map<String, MethodExecutor> METHOD_EXECUTOR_MAP = new HashMap<>();
-    private static final String PREFIX = "${";
+    private static final String ACCESS_PREFIX = "${";
+    private static final String FORMULA_PREFIX = "#{";
     private static final String SUFFIX = "}";
-    protected static final String FORMULA_PREFIX = "#{";
 
-    static {
-        METHOD_EXECUTOR_MAP.put("boolean", new Cast<>(Boolean.class));
-        METHOD_EXECUTOR_MAP.put("byte", new Cast<>(Byte.class));
-        METHOD_EXECUTOR_MAP.put("char", new Cast<>(Character.class));
-        METHOD_EXECUTOR_MAP.put("concat", new Concat());
-        METHOD_EXECUTOR_MAP.put("dateFormat", new DateFormat());
-        METHOD_EXECUTOR_MAP.put("flatten", new Flatten());
-        METHOD_EXECUTOR_MAP.put("float", new Cast<>(Float.class));
-        METHOD_EXECUTOR_MAP.put("double", new Cast<>(Double.class));
-        METHOD_EXECUTOR_MAP.put("int", new Cast<>(Integer.class));
-        METHOD_EXECUTOR_MAP.put("join", new Join());
-        METHOD_EXECUTOR_MAP.put("long", new Cast<>(Long.class));
-        METHOD_EXECUTOR_MAP.put("now", new Now());
-        METHOD_EXECUTOR_MAP.put("range", new Range());
-        METHOD_EXECUTOR_MAP.put("short", new Cast<>(Short.class));
-        METHOD_EXECUTOR_MAP.put("sort", new Sort());
-        METHOD_EXECUTOR_MAP.put("stringf", new StringFormat());
-        METHOD_EXECUTOR_MAP.put("systemProperty", new SystemProperty());
-        METHOD_EXECUTOR_MAP.put("tempDir", new TempDir());
-        METHOD_EXECUTOR_MAP.put("timestamp", new Timestamp());
-        METHOD_EXECUTOR_MAP.put("uuid", new Uuid());
+    private final ExpressionParser expressionParser = new SpelExpressionParser();
+
+    private final Map<String, MethodExecutor> methodExecutorMap;
+
+    private Evaluator(Builder builder) {
+        Map<String, MethodExecutor> map = new HashMap<>();
+
+        map.put("boolean", new Cast<>(Boolean.class));
+        map.put("byte", new Cast<>(Byte.class));
+        map.put("char", new Cast<>(Character.class));
+        map.put("config", new Config(builder.environment));
+        map.put("concat", new Concat());
+        map.put("dateFormat", new DateFormat());
+        map.put("flatten", new Flatten());
+        map.put("float", new Cast<>(Float.class));
+        map.put("double", new Cast<>(Double.class));
+        map.put("int", new Cast<>(Integer.class));
+        map.put("join", new Join());
+        map.put("length", new Length());
+        map.put("long", new Cast<>(Long.class));
+        map.put("minusDays", new MinusDays());
+        map.put("now", new Now());
+        map.put("range", new Range());
+        map.put("size", new Size());
+        map.put("short", new Cast<>(Short.class));
+        map.put("sort", new Sort());
+        map.put("stringf", new StringFormat());
+        map.put("substring", new Substring());
+        map.put("systemProperty", new SystemProperty());
+        map.put("tempDir", new TempDir());
+        map.put("timestamp", new Timestamp());
+        map.put("uuid", new Uuid());
+        map.putAll(builder.methodExecutors);
+
+        methodExecutorMap = Collections.unmodifiableMap(map);
     }
 
-    public static Map<String, Object> evaluate(Map<String, ?> map, Map<String, ?> context) {
+    public Map<String, Object> evaluate(Map<String, ?> map, Map<String, ?> context) {
         return evaluateInternal(map, context);
     }
 
-    private static StandardEvaluationContext createEvaluationContext(Map<String, ?> context) {
+    private StandardEvaluationContext createEvaluationContext(
+        Map<String, ?> context, boolean formulaExpression) {
+
         StandardEvaluationContext evaluationContext = new StandardEvaluationContext(context);
 
         evaluationContext.addPropertyAccessor(new MapPropertyAccessor());
-        evaluationContext.addMethodResolver(methodResolver());
+
+        if (formulaExpression) {
+            evaluationContext.addMethodResolver(methodResolver());
+        }
 
         return evaluationContext;
     }
 
-    private static String evaluate(CompositeStringExpression compositeStringExpression, Map<String, ?> context) {
+    private String evaluate(CompositeStringExpression compositeStringExpression, Map<String, ?> context) {
         StringBuilder stringBuilder = new StringBuilder();
         Expression[] subExpressions = compositeStringExpression.getExpressions();
 
@@ -102,7 +122,7 @@ public class Evaluator {
 
                 continue;
             } else if (subExpression instanceof SpelExpression) {
-                stringBuilder.append(evaluate(PREFIX + subExpression.getExpressionString() + SUFFIX, context));
+                stringBuilder.append(evaluate(ACCESS_PREFIX + subExpression.getExpressionString() + SUFFIX, context));
 
                 continue;
             }
@@ -116,17 +136,29 @@ public class Evaluator {
     }
 
     @Nullable
-    private static Object evaluate(Object value, Map<String, ?> context) {
+    private Object evaluate(Object value, Map<String, ?> context) {
         if (value instanceof String string) {
             Expression expression;
+            boolean formulaExpression = false;
+
+            string = string.trim();
 
             if (string.startsWith(FORMULA_PREFIX)) {
-                string = string.replace(PREFIX, "")
-                    .replace(SUFFIX, "") + "}";
+                formulaExpression = true;
 
-                expression = EXPRESSION_PARSER.parseExpression(string, new TemplateParserContext());
+                try {
+                    expression = expressionParser.parseExpression(
+                        string.replaceAll("\\$\\{([^}]*)}", "$1"), new TemplateParserContext());
+                } catch (ParseException e) {
+                    if (logger.isTraceEnabled()) {
+                        logger.trace(e.getMessage());
+                    }
+
+                    return value;
+                }
             } else {
-                expression = EXPRESSION_PARSER.parseExpression(string, new TemplateParserContext(PREFIX, SUFFIX));
+                expression = expressionParser.parseExpression(
+                    string, new TemplateParserContext(ACCESS_PREFIX, SUFFIX));
             }
 
             if (expression instanceof CompositeStringExpression) { // attempt partial evaluation
@@ -135,7 +167,7 @@ public class Evaluator {
                 return expression.getValue();
             } else {
                 try {
-                    return expression.getValue(createEvaluationContext(context));
+                    return expression.getValue(createEvaluationContext(context, formulaExpression));
                 } catch (SpelEvaluationException e) {
                     if (logger.isTraceEnabled()) {
                         logger.trace(e.getMessage());
@@ -159,7 +191,7 @@ public class Evaluator {
         return value;
     }
 
-    private static Map<String, Object> evaluateInternal(Map<?, ?> map, Map<String, ?> context) {
+    private Map<String, Object> evaluateInternal(Map<?, ?> map, Map<String, ?> context) {
         Map<String, Object> newMap = new LinkedHashMap<>();
 
         for (Entry<?, ?> entry : map.entrySet()) {
@@ -169,15 +201,45 @@ public class Evaluator {
         return newMap;
     }
 
-    private static MethodResolver methodResolver() {
+    private MethodResolver methodResolver() {
         return (ctx, target, name, args) -> {
-            MethodExecutor executor = METHOD_EXECUTOR_MAP.get(name);
+            MethodExecutor executor = methodExecutorMap.get(name);
 
-            if (executor == null && target instanceof Class<?>) {
-                throw new UnsupportedOperationException("Static method invocation is not allowed: " + name);
+            if (executor == null) {
+                throw new UnsupportedOperationException("Method invocation is not allowed: " + name);
             }
 
             return executor;
         };
+    }
+
+    public static Builder builder() {
+        return new Builder();
+    }
+
+    public static Evaluator create() {
+        return builder().build();
+    }
+
+    public static class Builder {
+
+        private Environment environment = new EmptyEnvironment();
+        private final Map<String, MethodExecutor> methodExecutors = new HashMap<>();
+
+        public Builder environment(Environment environment) {
+            this.environment = environment;
+
+            return this;
+        }
+
+        public Builder methodExecutor(String aMethodName, MethodExecutor methodExecutor) {
+            methodExecutors.put(aMethodName, methodExecutor);
+
+            return this;
+        }
+
+        public Evaluator build() {
+            return new Evaluator(this);
+        }
     }
 }

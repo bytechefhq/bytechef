@@ -18,9 +18,7 @@
 
 package com.bytechef.evaluator;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.stream.Collectors;
+import java.time.LocalDateTime;
 import org.springframework.expression.AccessException;
 import org.springframework.expression.EvaluationContext;
 import org.springframework.expression.MethodExecutor;
@@ -28,18 +26,12 @@ import org.springframework.expression.TypedValue;
 
 /**
  * @author Arik Cohen
- * @since Feb, 25 2020
+ * @since Mar, 03 2020
  */
-class Sort implements MethodExecutor {
+class MinusDays implements MethodExecutor {
 
     @Override
     public TypedValue execute(EvaluationContext context, Object target, Object... arguments) throws AccessException {
-        Collection<?> list = (Collection<?>) arguments[0];
-
-        List<?> sorted = list.stream()
-            .sorted()
-            .collect(Collectors.toList());
-
-        return new TypedValue(sorted);
+        return new TypedValue(((LocalDateTime) arguments[0]).minusDays((Integer) arguments[1]));
     }
 }

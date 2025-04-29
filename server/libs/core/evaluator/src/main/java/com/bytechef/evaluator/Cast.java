@@ -42,6 +42,7 @@ class Cast<T> implements MethodExecutor {
     @Override
     public TypedValue execute(EvaluationContext aContext, Object aTarget, Object... aArguments) throws AccessException {
         T value = type.cast(conversionService.convert(aArguments[0], type));
+
         return new TypedValue(value);
     }
 }

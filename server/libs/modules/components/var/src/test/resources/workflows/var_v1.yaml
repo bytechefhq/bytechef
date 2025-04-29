@@ -13,4 +13,4 @@ tasks:
 - name: "intNumber"
   type: "var/v1/set"
   parameters:
-    value: "${int(stringNumber)}"
+    value: "#{int(stringNumber)}"

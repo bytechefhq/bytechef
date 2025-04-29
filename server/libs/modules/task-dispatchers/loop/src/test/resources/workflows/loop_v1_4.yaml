@@ -4,12 +4,12 @@ tasks:
 - name: "loop_1"
   type: "loop/v1"
   parameters:
-    items: "${range(1,10)}"
+    items: "#{range(1,10)}"
     iteratee:
     - name: "sumVar1"
       type: "var/v1/set"
       parameters:
-        value: "${1 + loop_1.item}"
+        value: "#{1 + loop_1.item}"
     - name: "condition_1"
       type: "condition/v1"
       parameters:

@@ -63,6 +63,7 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
     private static final Pattern ARRAY_INDEXES_PATTERN =
         Pattern.compile("^.*(\\b\\w+\\b)((\\[index])+)(\\.\\b\\w+\\b.*)|.*((\\[index])+)(\\.\\b\\w+\\b.*)$");
     private static final String DYNAMIC_PROPERTY_TYPES = "dynamicPropertyTypes";
+    private static final Evaluator EVALUATOR = Evaluator.create();
     private static final String METADATA = "metadata";
     private static final String UI = "ui";
 
@@ -212,7 +213,7 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
             MapUtils.concat(
                 MapUtils.concat(inputMap, outputs),
                 MapUtils.toMap(
-                    Evaluator.evaluate(parameterMap, outputs),
+                    EVALUATOR.evaluate(parameterMap, outputs),
                     Map.Entry::getKey, entry -> entry.getValue() == null ? "" : entry.getValue())));
     }
 
@@ -471,7 +472,7 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
     }
 
     private static boolean evaluate(String displayCondition, Map<String, ?> inputParameters) {
-        Map<String, Object> result = Evaluator.evaluate(
+        Map<String, Object> result = EVALUATOR.evaluate(
             Map.of("displayCondition", "${" + displayCondition + "}"), inputParameters);
 
         Object displayConditionResult = result.get("displayCondition");

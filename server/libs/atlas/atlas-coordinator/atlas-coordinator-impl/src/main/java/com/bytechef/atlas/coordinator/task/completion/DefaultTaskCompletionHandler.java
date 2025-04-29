@@ -55,6 +55,8 @@ public class DefaultTaskCompletionHandler implements TaskCompletionHandler {
 
     private static final Logger logger = LoggerFactory.getLogger(DefaultTaskCompletionHandler.class);
 
+    private static final Evaluator EVALUATOR = Evaluator.create();
+
     private final ApplicationEventPublisher eventPublisher;
     private final ContextService contextService;
     private final JobExecutor jobExecutor;
@@ -155,7 +157,7 @@ public class DefaultTaskCompletionHandler implements TaskCompletionHandler {
         job.setEndDate(Instant.now());
         job.setStatus(Job.Status.COMPLETED);
         job.setOutputs(
-            taskFileStorage.storeJobOutputs(Validate.notNull(job.getId(), "id"), Evaluator.evaluate(source, context)));
+            taskFileStorage.storeJobOutputs(Validate.notNull(job.getId(), "id"), EVALUATOR.evaluate(source, context)));
 
         job = jobService.update(job);
 

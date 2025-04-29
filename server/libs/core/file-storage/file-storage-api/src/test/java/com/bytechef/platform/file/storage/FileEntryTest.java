@@ -35,6 +35,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 @ExtendWith(ObjectMapperSetupExtension.class)
 public class FileEntryTest {
 
+    private static final Evaluator EVALUATOR = Evaluator.create();
+
     @Test
     public void testOf1() {
         Assertions.assertThat(new FileEntry("fileName.txt", "base64:///tmp/fileName.txt"))
@@ -55,7 +57,7 @@ public class FileEntryTest {
 
     @Test
     public void testSpelEvaluation() {
-        Map<String, Object> map = Evaluator.evaluate(
+        Map<String, Object> map = EVALUATOR.evaluate(
             Map.of(TYPE, "type", "result", "${fileEntry.name} ${fileEntry.url}"),
             Collections.singletonMap("fileEntry", new FileEntry("sample.txt", "base64:///tmp/fileName.txt")));
 

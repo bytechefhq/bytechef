@@ -69,8 +69,6 @@ import org.springframework.util.Assert;
 public final class TaskExecution
     implements Errorable, Cloneable, Persistable<Long>, Prioritizable, Progressable, Retryable, Task {
 
-    private static final int DEFAULT_TASK_NUMBER = -1;
-
     /**
      * Defines the various states that a {@link TaskExecution} can be in at any give moment in time.
      */
@@ -91,6 +89,9 @@ public final class TaskExecution
             return terminated;
         }
     }
+
+    private static final int DEFAULT_TASK_NUMBER = -1;
+    private static final Evaluator EVALUATOR = Evaluator.create();
 
     @CreatedBy
     @Column("created_by")
@@ -178,7 +179,7 @@ public final class TaskExecution
     public TaskExecution evaluate(Map<String, ?> context) {
         WorkflowTask workflowTask = getWorkflowTask();
 
-        Map<String, Object> map = Evaluator.evaluate(workflowTask.toMap(), context);
+        Map<String, Object> map = EVALUATOR.evaluate(workflowTask.toMap(), context);
 
         setWorkflowTask(new WorkflowTask(map));
 
