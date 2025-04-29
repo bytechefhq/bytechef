@@ -17,6 +17,7 @@
 package com.bytechef.component.helper;
 
 import static com.bytechef.component.definition.ComponentDsl.component;
+import static com.bytechef.component.definition.ComponentDsl.tool;
 
 import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.definition.ComponentCategory;
@@ -50,7 +51,16 @@ public class CryptoHelperComponentHandler implements ComponentHandler {
             CryptoHelperRSADecryptAction.ACTION_DEFINITION,
             CryptoHelperRSAEncryptAction.ACTION_DEFINITION,
             CryptoHelperSignAction.ACTION_DEFINITION,
-            CryptoHelperVerifyAction.ACTION_DEFINITION);
+            CryptoHelperVerifyAction.ACTION_DEFINITION)
+        .clusterElements(
+            tool(CryptoHelperHashAction.ACTION_DEFINITION),
+            tool(CryptoHelperHmacAction.ACTION_DEFINITION),
+            tool(CryptoHelperPGPDecryptAction.ACTION_DEFINITION),
+            tool(CryptoHelperPGPEncryptAction.ACTION_DEFINITION),
+            tool(CryptoHelperRSADecryptAction.ACTION_DEFINITION),
+            tool(CryptoHelperRSAEncryptAction.ACTION_DEFINITION),
+            tool(CryptoHelperSignAction.ACTION_DEFINITION),
+            tool(CryptoHelperVerifyAction.ACTION_DEFINITION));
 
     @Override
     public ComponentDefinition getDefinition() {
