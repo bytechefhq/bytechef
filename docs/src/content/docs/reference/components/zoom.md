@@ -181,7 +181,7 @@ Create and submit a user's registration to a meeting.
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| meetingId | meeting ID | INTEGER | ID of the meeting where the registrant will be added. | true |
+| meetingId | Meeting ID | INTEGER | ID of the meeting where the registrant will be added. | true |
 | first_name | First Name | STRING | First name of the registrant. | true |
 | last_name | Last Name | STRING | Last name of the registrant. | false |
 | email | Email | STRING | Email of the registrant. | true |
@@ -194,8 +194,8 @@ Create and submit a user's registration to a meeting.
 | comments | Comments | STRING | Additional comment about the registrant. | false |
 | industry | Industry | STRING |  | false |
 | job_title | Job Title | STRING |  | false |
-| no_of_employees | No Of Employees | STRING <details> <summary> Options </summary> 1-20, 21-50, 51-100, 101-500, 501-1,000, 1,001-5,000, 5,001-10,000, More than 10,000 </details> |  | false |
-| org | Org | STRING |  | false |
+| no_of_employees | Number of Employees | STRING <details> <summary> Options </summary> 1-20, 21-50, 51-100, 101-500, 501-1,000, 1,001-5,000, 5,001-10,000, More than 10,000 </details> |  | false |
+| org | Organization | STRING |  | false |
 | purchasing_time_frame | Purchasing Time Frame | STRING <details> <summary> Options </summary> Within a month, 1-3 months, 4-6 months, More than 6 months, No timeframe </details> |  | false |
 | role_in_purchase_process | Role In Purchase Process | STRING <details> <summary> Options </summary> Decision Maker, Evaluator/Recommender, Influencer, Not involved </details> |  | false |
 | language | Language | STRING |  | false |
