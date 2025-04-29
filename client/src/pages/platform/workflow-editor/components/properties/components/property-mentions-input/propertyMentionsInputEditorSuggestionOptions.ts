@@ -31,7 +31,26 @@ const DOM_RECT_FALLBACK: DOMRect = {
 
 export function getSuggestionOptions(dataPills: DataPillType[]): MentionOptions['suggestion'] {
     return {
+        allow: ({editor, range}) => {
+            const textBefore = editor.state.doc.textBetween(Math.max(0, range.from - 1), range.from);
+
+            return textBefore !== '#';
+        },
+        allowedPrefixes: null,
         char: '{',
+        // Prevent space insertion after adding mention
+        command: ({editor, props, range}) => {
+            editor
+                .chain()
+                .focus()
+                .insertContentAt(range, [
+                    {
+                        attrs: props,
+                        type: 'mention',
+                    },
+                ])
+                .run();
+        },
         items: ({query}: {query: string}): DataPillType[] => {
             return dataPills
                 .map((dataPill) => dataPill)
