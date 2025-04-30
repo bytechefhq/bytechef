@@ -16,99 +16,70 @@
 
 package com.bytechef.component.bamboohr.trigger;
 
-import static com.bytechef.component.bamboohr.constant.BambooHrConstants.FIELDS;
+import static com.bytechef.component.bamboohr.constant.BambooHrConstants.ALL_EMPLOYEES;
 import static com.bytechef.component.bamboohr.constant.BambooHrConstants.ID;
-import static com.bytechef.component.bamboohr.constant.BambooHrConstants.LAST_TIME_CHECKED;
-import static com.bytechef.component.definition.ComponentDsl.array;
+import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.ComponentDsl.trigger;
 import static com.bytechef.component.definition.Context.Http.responseType;
 
-import com.bytechef.component.bamboohr.util.BambooHrUtils;
-import com.bytechef.component.definition.ComponentDsl;
-import com.bytechef.component.definition.Context;
+import com.bytechef.component.definition.ComponentDsl.ModifiableTriggerDefinition;
 import com.bytechef.component.definition.Context.Http;
-import com.bytechef.component.definition.OptionsDataSource;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TriggerContext;
-import com.bytechef.component.definition.TriggerDefinition;
+import com.bytechef.component.definition.TriggerDefinition.PollOutput;
+import com.bytechef.component.definition.TriggerDefinition.TriggerType;
 import com.bytechef.component.definition.TypeReference;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 /**
  * @author Marija Horvat
+ * @author Monika Kušter
  */
 public class BambooHrNewEmployeeTrigger {
 
-    static final List<String> EMPLOYEE_LIST = new ArrayList<>();
-
-    public static final ComponentDsl.ModifiableTriggerDefinition TRIGGER_DEFINITION = trigger("newEmployee")
+    public static final ModifiableTriggerDefinition TRIGGER_DEFINITION = trigger("newEmployee")
         .title("New Employee")
         .description("Triggers when a new employee is created.")
-        .type(TriggerDefinition.TriggerType.POLLING)
-        .properties(
-            array(FIELDS)
-                .description("Fields you want to get from employee. See documentation for available fields.")
-                .items(string())
-                .options((OptionsDataSource.TriggerOptionsFunction<String>) BambooHrUtils::getFieldOptions)
-                .required(true))
-        .output()
+        .type(TriggerType.POLLING)
+        .output(outputSchema(string()))
         .poll(BambooHrNewEmployeeTrigger::poll);
 
     private BambooHrNewEmployeeTrigger() {
     }
 
-    protected static TriggerDefinition.PollOutput poll(
+    protected static PollOutput poll(
         Parameters inputParameters, Parameters connectionParameters, Parameters closureParameters,
         TriggerContext triggerContext) {
 
-        List<String> fields = inputParameters.getRequiredList(FIELDS, String.class);
-        String queryParameter = String.join(",", fields);
-
-        ZoneId zoneId = ZoneId.of("GMT");
-
-        LocalDateTime now = LocalDateTime.now(zoneId);
+        List<String> allEmployees = closureParameters.getList(ALL_EMPLOYEES, String.class, List.of());
+        List<String> allEmployeesUpdate = new ArrayList<>();
 
         Map<String, Object> body = triggerContext
             .http(http -> http.get("/employees/directory"))
             .header("accept", "application/json")
-            .configuration(responseType(Context.Http.ResponseType.JSON))
+            .configuration(responseType(Http.ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});
 
-        List<Map<?, ?>> maps = new ArrayList<>();
+        List<String> newEmployees = new ArrayList<>();
 
-        if (body.get("employees") instanceof List<?> list) {
-            if (EMPLOYEE_LIST.isEmpty()) {
-                for (Object o : list) {
-                    if (o instanceof Map<?, ?> map) {
-                        String id = (String) map.get(ID);
-                        EMPLOYEE_LIST.add(id);
-                    }
-                }
-            } else {
-                for (Object o : list) {
-                    if (o instanceof Map<?, ?> map) {
-                        String id = (String) map.get(ID);
+        if (body.get("employees") instanceof List<?> employees) {
+            for (Object employee : employees) {
+                if (employee instanceof Map<?, ?> map) {
+                    String id = (String) map.get(ID);
 
-                        if (!EMPLOYEE_LIST.contains(id)) {
-                            maps.add(
-                                triggerContext
-                                    .http(http -> http.get("/employees/" + id))
-                                    .queryParameter(FIELDS, queryParameter)
-                                    .header("accept", "application/json")
-                                    .configuration(responseType(Http.ResponseType.JSON))
-                                    .execute()
-                                    .getBody(new TypeReference<>() {}));
-                        }
+                    allEmployeesUpdate.add(id);
+
+                    if (!allEmployees.contains(id)) {
+                        newEmployees.add(id);
                     }
                 }
             }
         }
-        return new TriggerDefinition.PollOutput(maps, Map.of(LAST_TIME_CHECKED, now), false);
+
+        return new PollOutput(newEmployees, Map.of(ALL_EMPLOYEES, allEmployeesUpdate), false);
     }
 }
