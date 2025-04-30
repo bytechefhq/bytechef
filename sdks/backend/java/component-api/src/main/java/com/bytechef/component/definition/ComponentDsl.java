@@ -908,6 +908,14 @@ public final class ComponentDsl {
             return this;
         }
 
+        public <P extends Property> ModifiableAuthorization properties(List<P> properties) {
+            if (properties != null) {
+                this.properties = Collections.unmodifiableList(properties);
+            }
+
+            return this;
+        }
+
         public ModifiableAuthorization refresh(RefreshFunction refresh) {
             this.refreshFunction = refresh;
 
