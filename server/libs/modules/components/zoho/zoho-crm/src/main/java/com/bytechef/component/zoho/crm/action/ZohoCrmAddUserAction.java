@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.component.zoho.action;
+package com.bytechef.component.zoho.crm.action;
 
 import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.array;
@@ -23,11 +23,11 @@ import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.Context.Http.ResponseType;
 import static com.bytechef.component.definition.Context.Http.responseType;
-import static com.bytechef.component.zoho.constant.ZohoCrmConstants.EMAIL;
-import static com.bytechef.component.zoho.constant.ZohoCrmConstants.FIRST_NAME;
-import static com.bytechef.component.zoho.constant.ZohoCrmConstants.LAST_NAME;
-import static com.bytechef.component.zoho.constant.ZohoCrmConstants.PROFILE;
-import static com.bytechef.component.zoho.constant.ZohoCrmConstants.ROLE;
+import static com.bytechef.component.zoho.crm.constant.ZohoCrmConstants.EMAIL;
+import static com.bytechef.component.zoho.crm.constant.ZohoCrmConstants.FIRST_NAME;
+import static com.bytechef.component.zoho.crm.constant.ZohoCrmConstants.LAST_NAME;
+import static com.bytechef.component.zoho.crm.constant.ZohoCrmConstants.PROFILE;
+import static com.bytechef.component.zoho.crm.constant.ZohoCrmConstants.ROLE;
 
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context;
@@ -36,7 +36,7 @@ import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.Property.ControlType;
 import com.bytechef.component.definition.TypeReference;
-import com.bytechef.component.zoho.util.ZohoCrmUtils;
+import com.bytechef.component.zoho.crm.util.ZohoCrmUtils;
 import java.util.List;
 import java.util.Map;
 
