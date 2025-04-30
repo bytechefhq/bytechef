@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.component.zoho.action;
+package com.bytechef.component.zoho.crm.action;
 
 import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.array;
@@ -24,7 +24,7 @@ import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.Context.Http.ResponseType;
 import static com.bytechef.component.definition.Context.Http.responseType;
-import static com.bytechef.component.zoho.constant.ZohoCrmConstants.TYPE;
+import static com.bytechef.component.zoho.crm.constant.ZohoCrmConstants.TYPE;
 
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context;

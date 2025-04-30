@@ -14,18 +14,18 @@
  * limitations under the License.
  */
 
-package com.bytechef.component.zoho;
+package com.bytechef.component.zoho.crm;
 
 import static com.bytechef.component.definition.ComponentDsl.component;
 import static com.bytechef.component.definition.ComponentDsl.tool;
-import static com.bytechef.component.zoho.connection.ZohoCrmConnection.CONNECTION_DEFINITION;
+import static com.bytechef.component.zoho.crm.connection.ZohoCrmConnection.CONNECTION_DEFINITION;
 
 import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDefinition;
-import com.bytechef.component.zoho.action.ZohoCrmAddUserAction;
-import com.bytechef.component.zoho.action.ZohoCrmGetOrganizationAction;
-import com.bytechef.component.zoho.action.ZohoCrmListUsersAction;
+import com.bytechef.component.zoho.crm.action.ZohoCrmAddUserAction;
+import com.bytechef.component.zoho.crm.action.ZohoCrmGetOrganizationAction;
+import com.bytechef.component.zoho.crm.action.ZohoCrmListUsersAction;
 import com.google.auto.service.AutoService;
 
 /**

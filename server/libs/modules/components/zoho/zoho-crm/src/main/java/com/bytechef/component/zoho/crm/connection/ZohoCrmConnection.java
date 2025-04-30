@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.component.zoho.connection;
+package com.bytechef.component.zoho.crm.connection;
 
 import static com.bytechef.component.definition.Authorization.ACCESS_TOKEN;
 import static com.bytechef.component.definition.Authorization.AUTHORIZATION;
@@ -22,7 +22,7 @@ import static com.bytechef.component.definition.Authorization.CLIENT_ID;
 import static com.bytechef.component.definition.Authorization.CLIENT_SECRET;
 import static com.bytechef.component.definition.ComponentDsl.option;
 import static com.bytechef.component.definition.ComponentDsl.string;
-import static com.bytechef.component.zoho.constant.ZohoCrmConstants.REGION;
+import static com.bytechef.component.zoho.crm.constant.ZohoCrmConstants.REGION;
 
 import com.bytechef.component.definition.Authorization;
 import com.bytechef.component.definition.ComponentDsl.ModifiableConnectionDefinition;

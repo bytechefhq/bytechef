@@ -14,8 +14,9 @@
  * limitations under the License.
  */
 
-package com.bytechef.component.zoho.action;
+package com.bytechef.component.zoho.crm.action;
 
+import static com.bytechef.component.zoho.crm.constant.ZohoCrmConstants.TYPE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
@@ -25,23 +26,31 @@ import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
+import com.bytechef.component.test.definition.MockParametersFactory;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 
 /**
  * @author Luka Ljubić
  * @author Monika Kušter
  */
-class ZohoCrmGetOrganizationActionTest {
+class ZohoCrmListUsersActionTest {
 
     private final ActionContext mockedActionContext = mock(ActionContext.class);
     private final Http.Executor mockedExecutor = mock(Http.Executor.class);
     private final Object mockedObject = mock(Object.class);
-    private final Parameters mockedParameters = mock(Parameters.class);
+    private final Parameters mockedParameters = MockParametersFactory.create(Map.of(TYPE, "type"));
     private final Http.Response mockedResponse = mock(Http.Response.class);
+    private final ArgumentCaptor<Object[]> queryArgumentCaptor = ArgumentCaptor.forClass(Object[].class);
 
     @Test
     void testPerform() {
         when(mockedActionContext.http(any()))
+            .thenReturn(mockedExecutor);
+        when(mockedExecutor.queryParameters(queryArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
         when(mockedExecutor.configuration(any()))
             .thenReturn(mockedExecutor);
@@ -50,8 +59,12 @@ class ZohoCrmGetOrganizationActionTest {
         when(mockedResponse.getBody(any(TypeReference.class)))
             .thenReturn(mockedObject);
 
-        Object result = ZohoCrmGetOrganizationAction.perform(mockedParameters, mockedParameters, mockedActionContext);
+        Object result = ZohoCrmListUsersAction.perform(mockedParameters, mockedParameters, mockedActionContext);
 
         assertEquals(mockedObject, result);
+
+        Object[] query = queryArgumentCaptor.getValue();
+
+        assertEquals(List.of(TYPE, "type"), Arrays.asList(query));
     }
 }

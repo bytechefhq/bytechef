@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.component.zoho.util;
+package com.bytechef.component.zoho.crm.util;
 
 import static com.bytechef.component.definition.ComponentDsl.option;
 

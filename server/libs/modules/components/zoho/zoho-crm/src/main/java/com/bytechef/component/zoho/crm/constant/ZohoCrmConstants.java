@@ -14,18 +14,21 @@
  * limitations under the License.
  */
 
-package com.bytechef.component.zoho;
-
-import com.bytechef.test.jsonasssert.JsonFileAssert;
-import org.junit.jupiter.api.Test;
+package com.bytechef.component.zoho.crm.constant;
 
 /**
  * @author Luka Ljubić
  */
-class ZohoCrmComponentHandlerTest {
+public class ZohoCrmConstants {
 
-    @Test
-    void testGetComponentDefinition() {
-        JsonFileAssert.assertEquals("definition/zoho-crm_v1.json", new ZohoCrmComponentHandler().getDefinition());
+    public static final String EMAIL = "email";
+    public static final String FIRST_NAME = "first_name";
+    public static final String LAST_NAME = "last_name";
+    public static final String PROFILE = "profile";
+    public static final String REGION = "region";
+    public static final String ROLE = "role";
+    public static final String TYPE = "type";
+
+    private ZohoCrmConstants() {
     }
 }
