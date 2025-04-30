@@ -26,7 +26,7 @@ import static com.bytechef.component.zoho.books.constant.ZohoBooksConstants.USE_
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.when;
 
-import com.bytechef.component.definition.Parameters;
+import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.test.definition.MockParametersFactory;
 import java.util.List;
 import java.util.Map;
@@ -37,28 +37,32 @@ import org.mockito.ArgumentCaptor;
  * @author Marija Horvat
  */
 class ZohoBooksCreateInvoiceActionTest extends AbstractZohoBooksActionTest {
-    private final Parameters mockedParameters = MockParametersFactory.create(
-        Map.of(CUSTOMER_ID, "1",
-            USE_CUSTOM_INVOICE_NUMBER, "true",
-            INVOICE_NUMBER, Map.of(INVOICE_NUMBER, "1"),
-            LINE_ITEMS, List.of(Map.of("item_id", "1", " quantity", 1)),
-            CURRENCY_ID, "euro",
-            DATE, "2025-04-29",
-            PAYMENT_TERMS, "15"));
-    private final ArgumentCaptor<String> keyCaptor = ArgumentCaptor.forClass(String.class);
-    private final ArgumentCaptor<String> valueCaptor = ArgumentCaptor.forClass(String.class);
+
+    private final ArgumentCaptor<String> stringArgumentCaptor = ArgumentCaptor.forClass(String.class);
 
     @Test
     void testPerform() {
-        when(mockedExecutor.queryParameter(keyCaptor.capture(), valueCaptor.capture()))
+        mockedParameters = MockParametersFactory.create(
+            Map.of(
+                CUSTOMER_ID, "1", USE_CUSTOM_INVOICE_NUMBER, true, INVOICE_NUMBER, "1",
+                LINE_ITEMS, List.of(Map.of("item_id", "1", " quantity", 1)),
+                CURRENCY_ID, "euro", DATE, "2025-04-29", PAYMENT_TERMS, 15));
+
+        when(mockedExecutor.queryParameter(stringArgumentCaptor.capture(), stringArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
-        when(mockedResponse.getBody())
-            .thenReturn(responseList);
 
         Object result = ZohoBooksCreateInvoiceAction.perform(mockedParameters, mockedParameters, mockedContext);
 
-        assertEquals(responseList, result);
-        assertEquals("ignore_auto_number_generation", keyCaptor.getValue());
-        assertEquals("true", valueCaptor.getValue());
+        assertEquals(mockedObject, result);
+        assertEquals(List.of("ignore_auto_number_generation", "true"), stringArgumentCaptor.getAllValues());
+
+        Map<String, Object> expectedBodyMap = Map.of(
+            CUSTOMER_ID, "1", INVOICE_NUMBER, "1",
+            LINE_ITEMS, List.of(Map.of("item_id", "1", " quantity", 1)),
+            CURRENCY_ID, "euro", DATE, "2025-04-29", PAYMENT_TERMS, 15);
+
+        Http.Body body = bodyArgumentCaptor.getValue();
+
+        assertEquals(expectedBodyMap, body.getContent());
     }
 }

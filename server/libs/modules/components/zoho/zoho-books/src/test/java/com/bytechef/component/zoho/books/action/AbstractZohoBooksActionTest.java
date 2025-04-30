@@ -24,8 +24,7 @@ import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.Context.Http.Body;
 import com.bytechef.component.definition.Context.Http.Executor;
 import com.bytechef.component.definition.Context.Http.Response;
-import java.util.List;
-import java.util.Map;
+import com.bytechef.component.definition.Parameters;
 import org.junit.jupiter.api.BeforeEach;
 import org.mockito.ArgumentCaptor;
 
@@ -37,8 +36,9 @@ abstract class AbstractZohoBooksActionTest {
     protected ArgumentCaptor<Body> bodyArgumentCaptor = ArgumentCaptor.forClass(Body.class);
     protected ActionContext mockedContext = mock(ActionContext.class);
     protected Executor mockedExecutor = mock(Executor.class);
+    protected Parameters mockedParameters;
     protected Response mockedResponse = mock(Response.class);
-    protected List<Map<String, Object>> responseList = List.of(Map.of("result", List.of("123", "abc")));
+    protected Object mockedObject = mock(Object.class);
 
     @BeforeEach
     void beforeEach() {
@@ -50,5 +50,7 @@ abstract class AbstractZohoBooksActionTest {
             .thenReturn(mockedExecutor);
         when(mockedExecutor.execute())
             .thenReturn(mockedResponse);
+        when(mockedResponse.getBody())
+            .thenReturn(mockedObject);
     }
 }

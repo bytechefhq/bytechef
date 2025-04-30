@@ -24,7 +24,6 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http.Executor;
 import com.bytechef.component.definition.Context.Http.Response;
@@ -36,27 +35,22 @@ import java.util.Map;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.ArgumentCaptor;
 
 /**
  * @author Marija Horvat
  */
 class ZohoBooksUtilsTest {
+
     private final List<Option<String>> expectedOptions = List.of(
         option("List 1", "list1"), option("List 2", "list2"));
     private final Context mockedContext = mock(Context.class);
-    private final ActionContext mockedActionContext = mock(ActionContext.class);
     private final Executor mockedExecutor = mock(Executor.class);
     private final Parameters mockedParameters = mock(Parameters.class);
     private final Response mockedResponse = mock(Response.class);
-    private final ArgumentCaptor<Context.Http.Body> bodyArgumentCaptor =
-        ArgumentCaptor.forClass(Context.Http.Body.class);
 
     @BeforeEach
     void beforeEach() {
         when(mockedContext.http(any()))
-            .thenReturn(mockedExecutor);
-        when(mockedExecutor.body(bodyArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
         when(mockedExecutor.configuration(any()))
             .thenReturn(mockedExecutor);
