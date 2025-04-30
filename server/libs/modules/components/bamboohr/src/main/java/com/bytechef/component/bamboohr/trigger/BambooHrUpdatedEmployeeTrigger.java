@@ -44,7 +44,7 @@ import java.util.Map;
  * @author Marija Horvat
  * @author Monika Kušter
  */
-public class BambooHrUpdateEmployeeTrigger {
+public class BambooHrUpdatedEmployeeTrigger {
 
     public static final ModifiableTriggerDefinition TRIGGER_DEFINITION = trigger("updatedEmployee")
         .title("Updated Employee")
@@ -64,11 +64,11 @@ public class BambooHrUpdateEmployeeTrigger {
                 .options((TriggerOptionsFunction<String>) BambooHrUtils::getFieldOptions)
                 .required(true))
         .output()
-        .webhookEnable(BambooHrUpdateEmployeeTrigger::webhookEnable)
-        .webhookDisable(BambooHrUpdateEmployeeTrigger::webhookDisable)
-        .webhookRequest(BambooHrUpdateEmployeeTrigger::webhookRequest);
+        .webhookEnable(BambooHrUpdatedEmployeeTrigger::webhookEnable)
+        .webhookDisable(BambooHrUpdatedEmployeeTrigger::webhookDisable)
+        .webhookRequest(BambooHrUpdatedEmployeeTrigger::webhookRequest);
 
-    private BambooHrUpdateEmployeeTrigger() {
+    private BambooHrUpdatedEmployeeTrigger() {
     }
 
     protected static WebhookEnableOutput webhookEnable(

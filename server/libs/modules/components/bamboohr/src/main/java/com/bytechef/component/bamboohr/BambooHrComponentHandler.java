@@ -26,7 +26,7 @@ import com.bytechef.component.bamboohr.action.BambooHrUpdateEmployeeAction;
 import com.bytechef.component.bamboohr.action.BambooHrUpdateEmployeeFileAction;
 import com.bytechef.component.bamboohr.connection.BambooHrConnection;
 import com.bytechef.component.bamboohr.trigger.BambooHrNewEmployeeTrigger;
-import com.bytechef.component.bamboohr.trigger.BambooHrUpdateEmployeeTrigger;
+import com.bytechef.component.bamboohr.trigger.BambooHrUpdatedEmployeeTrigger;
 import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDefinition;
 import com.google.auto.service.AutoService;
@@ -51,7 +51,7 @@ public class BambooHrComponentHandler implements ComponentHandler {
             BambooHrGetEmployeeAction.ACTION_DEFINITION,
             BambooHrUpdateEmployeeFileAction.ACTION_DEFINITION)
         .triggers(
-            BambooHrUpdateEmployeeTrigger.TRIGGER_DEFINITION,
+            BambooHrUpdatedEmployeeTrigger.TRIGGER_DEFINITION,
             BambooHrNewEmployeeTrigger.TRIGGER_DEFINITION)
         .clusterElements(
             tool(BambooHrCreateEmployeeAction.ACTION_DEFINITION),

@@ -42,7 +42,7 @@ import org.mockito.ArgumentCaptor;
 /**
  * @author Marija Horvat
  */
-class BambooHrUpdateEmployeeTriggerTest {
+class BambooHrUpdatedEmployeeTriggerTest {
 
     private final WebhookEnableOutput mockedWebhookEnableOutput = mock(WebhookEnableOutput.class);
     private final WebhookBody mockedWebhookBody = mock(WebhookBody.class);
@@ -75,7 +75,7 @@ class BambooHrUpdateEmployeeTriggerTest {
         when(mockedResponse.getBody(any(TypeReference.class)))
             .thenReturn(Map.of(ID, "3"));
 
-        WebhookEnableOutput webhookEnableOutput = BambooHrUpdateEmployeeTrigger.webhookEnable(
+        WebhookEnableOutput webhookEnableOutput = BambooHrUpdatedEmployeeTrigger.webhookEnable(
             mockedParameters, mockedParameters, webhookUrl, "testWorkflowExecutionId", mockedTriggerContext);
 
         assertEquals(new WebhookEnableOutput(Map.of(ID, "3"), null), webhookEnableOutput);
@@ -103,7 +103,7 @@ class BambooHrUpdateEmployeeTriggerTest {
         when(mockedExecutor.execute())
             .thenReturn(mockedResponse);
 
-        BambooHrUpdateEmployeeTrigger.webhookDisable(
+        BambooHrUpdatedEmployeeTrigger.webhookDisable(
             mockedParameters, mockedParameters, mockedParameters, "testWorkflowExecutionId", mockedTriggerContext);
 
         assertEquals(List.of("accept", "application/json"), stringArgumentCaptor.getAllValues());
@@ -121,7 +121,7 @@ class BambooHrUpdateEmployeeTriggerTest {
         when(mockedWebhookBody.getContent(any(TypeReference.class)))
             .thenReturn(Map.of("employees", employees));
 
-        Object result = BambooHrUpdateEmployeeTrigger.webhookRequest(
+        Object result = BambooHrUpdatedEmployeeTrigger.webhookRequest(
             mockedParameters, mockedParameters, mockedHttpHeaders, mockedHttpParameters, mockedWebhookBody,
             mockedWebhookMethod, mockedWebhookEnableOutput, mockedTriggerContext);
 
