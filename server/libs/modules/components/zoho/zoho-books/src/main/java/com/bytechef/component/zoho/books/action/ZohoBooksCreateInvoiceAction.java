@@ -60,6 +60,7 @@ public class ZohoBooksCreateInvoiceAction {
             bool(USE_CUSTOM_INVOICE_NUMBER)
                 .label("Use Custom Invoice Number")
                 .description("If true, create custom invoice number, if false, use auto invoice number generation.")
+                .defaultValue(false)
                 .required(true),
             string(INVOICE_NUMBER)
                 .label("Invoice Number")
@@ -75,11 +76,13 @@ public class ZohoBooksCreateInvoiceAction {
                         .properties(
                             string("item_id")
                                 .label("Item ID")
-                                .description("ID of item."),
-//                                .options((ActionOptionsFunction<String>) ZohoBooksUtils::getItemsOptions),
+                                .description("ID of item.")
+                                .options((ActionOptionsFunction<String>) ZohoBooksUtils::getItemsOptions)
+                                .required(true),
                             number("quantity")
                                 .label("Quantity")
-                                .description("Quantity of item."))),
+                                .description("Quantity of item.")
+                                .required(false))),
             string(CURRENCY_ID)
                 .label("Currency ID")
                 .description("Currency ID of the customer's currency.")
@@ -100,7 +103,8 @@ public class ZohoBooksCreateInvoiceAction {
                     .properties(
                         number("code")
                             .description(
-                                "Zoho Books error code. This will be zero for a success response and non-zero in case of an error."),
+                                "Zoho Books error code. This will be zero for a success response and non-zero in " +
+                                    "case of an error."),
                         string("message")
                             .description("Message for the invoked API."),
                         object("invoice")
@@ -112,7 +116,8 @@ public class ZohoBooksCreateInvoiceAction {
 
     public static Object perform(Parameters inputParameters, Parameters conectionParameters, Context context) {
         return context.http(http -> http.post("/invoices"))
-            .queryParameter("ignore_auto_number_generation", inputParameters.getString(USE_CUSTOM_INVOICE_NUMBER))
+            .queryParameter(
+                "ignore_auto_number_generation", inputParameters.getRequiredString(USE_CUSTOM_INVOICE_NUMBER))
             .body(
                 Body.of(
                     CUSTOMER_ID, inputParameters.getRequiredString(CUSTOMER_ID),

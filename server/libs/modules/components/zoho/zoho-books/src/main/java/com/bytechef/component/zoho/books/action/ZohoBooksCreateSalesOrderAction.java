@@ -62,6 +62,7 @@ public class ZohoBooksCreateSalesOrderAction {
                 .label("Use Custom Sales Order Number")
                 .description(
                     "If true, create custom sales order number, if false, use auto sales order number generation.")
+                .defaultValue(false)
                 .required(true),
             string(SALES_ORDER_NUMBER)
                 .label("Sales Order Number")
@@ -77,11 +78,13 @@ public class ZohoBooksCreateSalesOrderAction {
                         .properties(
                             string("item_id")
                                 .label("Item ID")
-                                .description("ID of item."),
-//                                .options((ActionOptionsFunction<String>) ZohoBooksUtils::getItemsOptions),
+                                .description("ID of item.")
+                                .options((ActionOptionsFunction<String>) ZohoBooksUtils::getItemsOptions)
+                                .required(true),
                             number("quantity")
                                 .label("Quantity")
-                                .description("Quantity of item."))),
+                                .description("Quantity of item.")
+                                .required(false))),
             string(CURRENCY_ID)
                 .label("Currency ID")
                 .description("Currency ID of the customer's currency.")
@@ -106,7 +109,8 @@ public class ZohoBooksCreateSalesOrderAction {
                     .properties(
                         number("code")
                             .description(
-                                "Zoho Books error code. This will be zero for a success response and non-zero in case of an error."),
+                                "Zoho Books error code. This will be zero for a success response and non-zero in " +
+                                    "case of an error."),
                         string("message")
                             .description("Message for the invoked API."),
                         object("salesorder")
@@ -118,7 +122,9 @@ public class ZohoBooksCreateSalesOrderAction {
 
     public static Object perform(Parameters inputParameters, Parameters conectionParameters, Context context) {
         return context.http(http -> http.post("/salesorders"))
-            .queryParameter("ignore_auto_number_generation", inputParameters.getString(USE_CUSTOM_SALES_ORDER_NUMBER))
+            .queryParameter(
+                "ignore_auto_number_generation",
+                inputParameters.getRequiredString(USE_CUSTOM_SALES_ORDER_NUMBER))
             .body(
                 Body.of(
                     CUSTOMER_ID, inputParameters.getRequiredString(CUSTOMER_ID),

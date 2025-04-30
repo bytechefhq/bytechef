@@ -21,25 +21,23 @@ package com.bytechef.component.zoho.books.constant;
  */
 public class ZohoBooksConstants {
 
-    public static final String CONTACT_NAME = "contact_name";
+    public static final String BILLING_ADDRESS = "billing_address";
     public static final String COMPANY_NAME = "company_name";
-    public static final String WEBSITE = "website";
+    public static final String CONTACT_NAME = "contact_name";
     public static final String CONTACT_TYPE = "contact_type";
-    public static final String REGION = "region";
-    public static final String CUSTOMER_SUB_TYPE = "customer_sub_type";
     public static final String CURRENCY_ID = "currency_id";
     public static final String CUSTOMER_ID = "customer_id";
-    public static final String ORGANIZATION_ID = "organization_id";
-    public static final String BILLING_ADDRESS = "billing_address";
-    public static final String SHIPPING_ADDRESS = "shipping_address";
-    public static final String INVOICE_NUMBER = "invoice_number";
-    public static final String SALES_ORDER_NUMBER = "salesorder_number";
-    public static final String PAYMENT_TERMS = "payment_terms";
+    public static final String CUSTOMER_SUB_TYPE = "customer_sub_type";
     public static final String DATE = "date";
+    public static final String INVOICE_NUMBER = "invoice_number";
     public static final String LINE_ITEMS = "line_items";
+    public static final String PAYMENT_TERMS = "payment_terms";
+    public static final String SALES_ORDER_NUMBER = "salesorder_number";
+    public static final String SHIPMENT_DATE = "shipment_date";
+    public static final String SHIPPING_ADDRESS = "shipping_address";
     public static final String USE_CUSTOM_INVOICE_NUMBER = "use_custom_invoice_number";
     public static final String USE_CUSTOM_SALES_ORDER_NUMBER = "use_custom_sales_order_number";
-    public static final String SHIPMENT_DATE = "shipment_date";
+    public static final String WEBSITE = "website";
 
     private ZohoBooksConstants() {
     }

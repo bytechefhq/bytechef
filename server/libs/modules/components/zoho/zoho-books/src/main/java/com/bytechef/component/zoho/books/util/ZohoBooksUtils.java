@@ -50,13 +50,14 @@ public class ZohoBooksUtils {
             .execute()
             .getBody(new TypeReference<>() {});
 
-        if (body.get("currencies") instanceof List<?> list) {
-            for (Object item : list) {
-                if (item instanceof Map<?, ?> map) {
+        if (body.get("currencies") instanceof List<?> currencies) {
+            for (Object currency : currencies) {
+                if (currency instanceof Map<?, ?> map) {
                     options.add(option((String) map.get("currency_name"), (String) map.get("currency_id")));
                 }
             }
         }
+
         return options;
     }
 
@@ -72,10 +73,11 @@ public class ZohoBooksUtils {
             .execute()
             .getBody(new TypeReference<>() {});
 
-        if (body.get("contacts") instanceof List<?> list) {
-            for (Object item : list) {
-                if (item instanceof Map<?, ?> map && map.get(CONTACT_TYPE)
+        if (body.get("contacts") instanceof List<?> contacts) {
+            for (Object contact : contacts) {
+                if (contact instanceof Map<?, ?> map && map.get(CONTACT_TYPE)
                     .equals("customer")) {
+
                     options.add(option((String) map.get(CONTACT_NAME), (String) map.get("contact_id")));
                 }
             }
@@ -95,13 +97,14 @@ public class ZohoBooksUtils {
             .execute()
             .getBody(new TypeReference<>() {});
 
-        if (body.get("items") instanceof List<?> list) {
-            for (Object item : list) {
+        if (body.get("items") instanceof List<?> items) {
+            for (Object item : items) {
                 if (item instanceof Map<?, ?> map) {
                     options.add(option((String) map.get("name"), (String) map.get("item_id")));
                 }
             }
         }
+
         return options;
     }
 }
