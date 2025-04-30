@@ -218,41 +218,35 @@ This action does not produce any output.
 ## Triggers
 
 
-### Update Employee
-Name: updateEmployee
+### Updated Employee
+Name: updatedEmployee
 
 Triggers when specific employee fields are updated.
 
 Type: DYNAMIC_WEBHOOK
 
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| monitorFields | Fields to Monitor | ARRAY <details> <summary> Items </summary> [STRING] </details> | The fields to monitor for changes. | true |
+| postFields | Fields to include in the Output | ARRAY <details> <summary> Items </summary> [STRING] </details> | The fields to include in the output. | true |
+
 
 #### Output
 
-
-
-Type: ARRAY
-
-
-Items Type: OBJECT
-
-
-#### Properties
-|     Name     |     Type     |     Description     |
-|:------------:|:------------:|:-------------------:|
-| firstName | STRING |  |
-| lastName | STRING |  |
-| employeeNumber | STRING |  |
-
-
-
-
+The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
 
 #### JSON Example
 ```json
 {
-  "label" : "Update Employee",
-  "name" : "updateEmployee",
-  "type" : "bambooHr/v1/updateEmployee"
+  "label" : "Updated Employee",
+  "name" : "updatedEmployee",
+  "parameters" : {
+    "monitorFields" : [ "" ],
+    "postFields" : [ "" ]
+  },
+  "type" : "bambooHr/v1/updatedEmployee"
 }
 ```
 
@@ -264,25 +258,22 @@ Triggers when a new employee is created.
 
 Type: POLLING
 
-#### Properties
-
-|      Name       |      Label     |     Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| fields | null | ARRAY <details> <summary> Items </summary> [STRING] </details> | Fields you want to get from employee. See documentation for available fields. | true |
-
 
 #### Output
 
-The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
+
+
+Type: STRING
+
+
+
+
 
 #### JSON Example
 ```json
 {
   "label" : "New Employee",
   "name" : "newEmployee",
-  "parameters" : {
-    "fields" : [ "" ]
-  },
   "type" : "bambooHr/v1/newEmployee"
 }
 ```
