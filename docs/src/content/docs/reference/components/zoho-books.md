@@ -55,7 +55,7 @@ Create a contact.
 | company_name | Company Name | STRING | Company name of the contact. | false |
 | website | Website | STRING | Website of the contact. | false |
 | contact_type | Contact Type | STRING <details> <summary> Options </summary> customer, vendor </details> | Contact type of the contact. | true |
-| customer_sub_type | | DYNAMIC_PROPERTIES <details> <summary> Depends On </summary> contact_type </details> |  | true |
+| customer_sub_type | Customer Sub Type | STRING <details> <summary> Options </summary> business, individual </details> | Type of the customer. | true |
 | currency_id | Currency ID | STRING | Currency ID of the customer's currency. | false |
 | billing_address | Billing Address | OBJECT <details> <summary> Properties </summary> {STRING\(attention), STRING\(address), STRING\(street2), STRING\(state_code), STRING\(city), STRING\(state), STRING\(zip), STRING\(country), STRING\(fax), STRING\(phone)} </details> | Billing address of the contact. | false |
 | shipping_address | Shipping Address | OBJECT <details> <summary> Properties </summary> {STRING\(attention), STRING\(address), STRING\(street2), STRING\(state_code), STRING\(city), STRING\(state), STRING\(zip), STRING\(country), STRING\(fax), STRING\(phone)} </details> | Shipping address of the contact. | false |
@@ -70,7 +70,7 @@ Create a contact.
     "company_name" : "",
     "website" : "",
     "contact_type" : "",
-    "customer_sub_type" : { },
+    "customer_sub_type" : "",
     "currency_id" : "",
     "billing_address" : {
       "attention" : "",
@@ -140,7 +140,7 @@ Create an invoice for your customer.
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | customer_id | Customer ID | STRING | ID of the customer the invoice has to be created. | true |
 | use_custom_invoice_number | Use Custom Invoice Number | BOOLEAN <details> <summary> Options </summary> true, false </details> | If true, create custom invoice number, if false, use auto invoice number generation. | true |
-| invoice_number | | DYNAMIC_PROPERTIES <details> <summary> Depends On </summary> use_custom_invoice_number </details> |  | true |
+| invoice_number | Invoice Number | STRING | Number of invoice. | true |
 | line_items | Line Items | ARRAY <details> <summary> Items </summary> [{STRING\(item_id), NUMBER\(quantity)}] </details> | Items in invoice. | true |
 | currency_id | Currency ID | STRING | Currency ID of the customer's currency. | false |
 | date | Invoice Date | DATE | The date of the invoice. | false |
@@ -154,7 +154,7 @@ Create an invoice for your customer.
   "parameters" : {
     "customer_id" : "",
     "use_custom_invoice_number" : false,
-    "invoice_number" : { },
+    "invoice_number" : "",
     "line_items" : [ {
       "item_id" : "",
       "quantity" : 0.0
@@ -206,7 +206,7 @@ Create a sales order for your customer.
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | customer_id | Customer ID | STRING | ID of the customer the invoice has to be created. | true |
 | use_custom_sales_order_number | Use Custom Sales Order Number | BOOLEAN <details> <summary> Options </summary> true, false </details> | If true, create custom sales order number, if false, use auto sales order number generation. | true |
-| salesorder_number | | DYNAMIC_PROPERTIES <details> <summary> Depends On </summary> use_custom_sales_order_number </details> |  | true |
+| salesorder_number | Sales Order Number | STRING | Number of sales order. | true |
 | line_items | Line Items | ARRAY <details> <summary> Items </summary> [{STRING\(item_id), NUMBER\(quantity)}] </details> | Items in invoice. | true |
 | currency_id | Currency ID | STRING | Currency ID of the customer's currency. | false |
 | date | Sales Order Date | DATE | The date the sales order was created. | false |
@@ -221,7 +221,7 @@ Create a sales order for your customer.
   "parameters" : {
     "customer_id" : "",
     "use_custom_sales_order_number" : false,
-    "salesorder_number" : { },
+    "salesorder_number" : "",
     "line_items" : [ {
       "item_id" : "",
       "quantity" : 0.0
