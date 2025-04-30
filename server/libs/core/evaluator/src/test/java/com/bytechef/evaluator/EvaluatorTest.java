@@ -120,7 +120,7 @@ public class EvaluatorTest {
         context.put("n1", 5);
         context.put("n2", 3);
 
-        Map<String, Object> map = EVALUATOR.evaluate(Map.of("type", "type", "mult", "${n1*n2}"), context);
+        Map<String, Object> map = EVALUATOR.evaluate(Map.of("type", "type", "mult", "#{n1*n2}"), context);
 
         Assertions.assertEquals(Integer.valueOf(15), MapUtils.getInteger(map, "mult"));
     }
@@ -152,7 +152,7 @@ public class EvaluatorTest {
     @Test
     public void test12() {
         Map<String, Object> map = EVALUATOR.evaluate(
-            Map.of("type", "type", "thing", "${number*3}"), Collections.singletonMap("number", 1));
+            Map.of("type", "type", "thing", "#{number*3}"), Collections.singletonMap("number", 1));
 
         Assertions.assertEquals(3, MapUtils.get(map, "thing"));
     }
@@ -160,9 +160,9 @@ public class EvaluatorTest {
     @Test
     public void test13() {
         Map<String, Object> map = EVALUATOR.evaluate(
-            Map.of("type", "type", "thing", "${number*3}"), Collections.emptyMap());
+            Map.of("type", "type", "thing", "#{number*3}"), Collections.emptyMap());
 
-        Assertions.assertEquals("${number*3}", MapUtils.get(map, "thing"));
+        Assertions.assertEquals("#{number*3}", MapUtils.get(map, "thing"));
     }
 
     @Test
@@ -328,7 +328,7 @@ public class EvaluatorTest {
     @Test
     public void test33() {
         Map<String, Object> map = EVALUATOR.evaluate(
-            Map.of("type", "type", "uuid", "${uuid()}"), Collections.emptyMap());
+            Map.of("type", "type", "uuid", "#{uuid()}"), Collections.emptyMap());
 
         Assertions.assertNotNull(MapUtils.get(map, "uuid"));
     }
@@ -352,7 +352,7 @@ public class EvaluatorTest {
         context.put("num", 5.0);
         context.put("den", 10.0);
 
-        Map<String, Object> map = EVALUATOR.evaluate(Map.of("type", "type", "result", "${num/den}"), context);
+        Map<String, Object> map = EVALUATOR.evaluate(Map.of("type", "type", "result", "#{num/den}"), context);
 
         Assertions.assertEquals(0.5d, MapUtils.getDouble(map, "result"));
     }
@@ -409,7 +409,12 @@ public class EvaluatorTest {
         Assertions.assertEquals(localDateTime, MapUtils.getLocalDateTime(map, "date"));
 
         map = EVALUATOR.evaluate(
-            Map.of("date", "${localDateTime.minusDays(1)}"), Map.of("localDateTime", localDateTime));
+            Map.of("date", "#{minusDays(localDateTime, 1)}"), Map.of("localDateTime", localDateTime));
+
+        Assertions.assertEquals(localDateTime.minusDays(1), MapUtils.getLocalDateTime(map, "date"));
+
+        map = EVALUATOR.evaluate(
+            Map.of("date", "#{minusDays(${localDateTime}, 1)}"), Map.of("localDateTime", localDateTime));
 
         Assertions.assertEquals(localDateTime.minusDays(1), MapUtils.getLocalDateTime(map, "date"));
     }
