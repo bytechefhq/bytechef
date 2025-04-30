@@ -21,7 +21,6 @@ import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.array;
 import static com.bytechef.component.definition.ComponentDsl.bool;
 import static com.bytechef.component.definition.ComponentDsl.date;
-import static com.bytechef.component.definition.ComponentDsl.dynamicProperties;
 import static com.bytechef.component.definition.ComponentDsl.integer;
 import static com.bytechef.component.definition.ComponentDsl.number;
 import static com.bytechef.component.definition.ComponentDsl.object;
@@ -42,10 +41,10 @@ import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.zoho.books.util.ZohoBooksUtils;
-import java.util.Map;
 
 /**
  * @author Marija Horvat
+ * @author Monika Kušter
  */
 public class ZohoBooksCreateInvoiceAction {
 
@@ -62,9 +61,10 @@ public class ZohoBooksCreateInvoiceAction {
                 .label("Use Custom Invoice Number")
                 .description("If true, create custom invoice number, if false, use auto invoice number generation.")
                 .required(true),
-            dynamicProperties(INVOICE_NUMBER)
-                .propertiesLookupDependsOn(USE_CUSTOM_INVOICE_NUMBER)
-                .properties(ZohoBooksUtils::createPropertiesForInvoiceNumber)
+            string(INVOICE_NUMBER)
+                .label("Invoice Number")
+                .description("Number of invoice.")
+                .displayCondition("%s == true".formatted(USE_CUSTOM_INVOICE_NUMBER))
                 .required(true),
             array(LINE_ITEMS)
                 .label("Line Items")
@@ -111,14 +111,12 @@ public class ZohoBooksCreateInvoiceAction {
     }
 
     public static Object perform(Parameters inputParameters, Parameters conectionParameters, Context context) {
-        Map<String, String> invoiceNumber = inputParameters.getMap(INVOICE_NUMBER, String.class);
-
         return context.http(http -> http.post("/invoices"))
             .queryParameter("ignore_auto_number_generation", inputParameters.getString(USE_CUSTOM_INVOICE_NUMBER))
             .body(
                 Body.of(
                     CUSTOMER_ID, inputParameters.getRequiredString(CUSTOMER_ID),
-                    INVOICE_NUMBER, invoiceNumber == null ? null : invoiceNumber.get(INVOICE_NUMBER),
+                    INVOICE_NUMBER, inputParameters.getString(INVOICE_NUMBER),
                     CURRENCY_ID, inputParameters.getString(CURRENCY_ID),
                     DATE, inputParameters.getString(DATE),
                     PAYMENT_TERMS, inputParameters.getInteger(PAYMENT_TERMS),

@@ -21,7 +21,6 @@ import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.array;
 import static com.bytechef.component.definition.ComponentDsl.bool;
 import static com.bytechef.component.definition.ComponentDsl.date;
-import static com.bytechef.component.definition.ComponentDsl.dynamicProperties;
 import static com.bytechef.component.definition.ComponentDsl.integer;
 import static com.bytechef.component.definition.ComponentDsl.number;
 import static com.bytechef.component.definition.ComponentDsl.object;
@@ -43,10 +42,10 @@ import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.zoho.books.util.ZohoBooksUtils;
-import java.util.Map;
 
 /**
  * @author Marija Horvat
+ * @author Monika Kušter
  */
 public class ZohoBooksCreateSalesOrderAction {
 
@@ -64,9 +63,10 @@ public class ZohoBooksCreateSalesOrderAction {
                 .description(
                     "If true, create custom sales order number, if false, use auto sales order number generation.")
                 .required(true),
-            dynamicProperties(SALES_ORDER_NUMBER)
-                .propertiesLookupDependsOn(USE_CUSTOM_SALES_ORDER_NUMBER)
-                .properties(ZohoBooksUtils::createPropertiesForSalesOrderNumber)
+            string(SALES_ORDER_NUMBER)
+                .label("Sales Order Number")
+                .description("Number of sales order.")
+                .displayCondition("%s == true".formatted(USE_CUSTOM_SALES_ORDER_NUMBER))
                 .required(true),
             array(LINE_ITEMS)
                 .label("Line Items")
@@ -117,14 +117,12 @@ public class ZohoBooksCreateSalesOrderAction {
     }
 
     public static Object perform(Parameters inputParameters, Parameters conectionParameters, Context context) {
-        Map<String, String> salesOrderNumber = inputParameters.getMap(SALES_ORDER_NUMBER, String.class);
-
         return context.http(http -> http.post("/salesorders"))
             .queryParameter("ignore_auto_number_generation", inputParameters.getString(USE_CUSTOM_SALES_ORDER_NUMBER))
             .body(
                 Body.of(
                     CUSTOMER_ID, inputParameters.getRequiredString(CUSTOMER_ID),
-                    SALES_ORDER_NUMBER, salesOrderNumber == null ? null : salesOrderNumber.get(SALES_ORDER_NUMBER),
+                    SALES_ORDER_NUMBER, inputParameters.getString(SALES_ORDER_NUMBER),
                     CURRENCY_ID, inputParameters.getString(CURRENCY_ID),
                     SHIPMENT_DATE, inputParameters.getString(SHIPMENT_DATE),
                     DATE, inputParameters.getString(DATE),

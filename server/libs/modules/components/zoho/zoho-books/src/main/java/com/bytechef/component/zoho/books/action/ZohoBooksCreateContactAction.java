@@ -18,7 +18,6 @@ package com.bytechef.component.zoho.books.action;
 
 import static com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import static com.bytechef.component.definition.ComponentDsl.action;
-import static com.bytechef.component.definition.ComponentDsl.dynamicProperties;
 import static com.bytechef.component.definition.ComponentDsl.number;
 import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.option;
@@ -40,10 +39,10 @@ import com.bytechef.component.definition.Context.Http.Body;
 import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.zoho.books.util.ZohoBooksUtils;
-import java.util.Map;
 
 /**
  * @author Marija Horvat
+ * @author Monika Kušter
  */
 public class ZohoBooksCreateContactAction {
 
@@ -68,11 +67,13 @@ public class ZohoBooksCreateContactAction {
             string(CONTACT_TYPE)
                 .label("Contact Type")
                 .description("Contact type of the contact.")
-                .required(true)
-                .options(option("CUSTOMER", "customer"), option("VENDOR", "vendor")),
-            dynamicProperties(CUSTOMER_SUB_TYPE)
-                .propertiesLookupDependsOn(CONTACT_TYPE)
-                .properties(ZohoBooksUtils::createPropertiesForCustomerType)
+                .options(option("CUSTOMER", "customer"), option("VENDOR", "vendor"))
+                .required(true),
+            string(CUSTOMER_SUB_TYPE)
+                .label("Customer Sub Type")
+                .description("Type of the customer.")
+                .options(option("BUSINESS", "business"), option("INDIVIDUAL", "individual"))
+                .displayCondition("%s == '%s'".formatted(CONTACT_TYPE, "customer"))
                 .required(true),
             string(CURRENCY_ID)
                 .label("Currency ID")
@@ -132,8 +133,6 @@ public class ZohoBooksCreateContactAction {
     }
 
     public static Object perform(Parameters inputParameters, Parameters conectionParameters, Context context) {
-        Map<String, String> customer = inputParameters.getMap(CUSTOMER_SUB_TYPE, String.class);
-
         return context.http(http -> http.post("/contacts"))
             .body(
                 Body.of(
@@ -141,7 +140,7 @@ public class ZohoBooksCreateContactAction {
                     COMPANY_NAME, inputParameters.getString(COMPANY_NAME),
                     WEBSITE, inputParameters.getString(WEBSITE),
                     CONTACT_TYPE, inputParameters.getString(CONTACT_TYPE),
-                    CUSTOMER_SUB_TYPE, customer == null ? null : customer.get(CUSTOMER_SUB_TYPE),
+                    CUSTOMER_SUB_TYPE, inputParameters.getString(CUSTOMER_SUB_TYPE),
                     CURRENCY_ID, inputParameters.getString(CURRENCY_ID),
                     BILLING_ADDRESS, inputParameters.getMap(BILLING_ADDRESS),
                     SHIPPING_ADDRESS, inputParameters.getMap(SHIPPING_ADDRESS)))

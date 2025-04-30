@@ -16,24 +16,15 @@
 
 package com.bytechef.component.zoho.books.util;
 
-import static com.bytechef.component.definition.ComponentDsl.ModifiableStringProperty;
 import static com.bytechef.component.definition.ComponentDsl.option;
-import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.Context.Http.ResponseType;
 import static com.bytechef.component.definition.Context.Http.responseType;
 import static com.bytechef.component.zoho.books.constant.ZohoBooksConstants.CONTACT_NAME;
 import static com.bytechef.component.zoho.books.constant.ZohoBooksConstants.CONTACT_TYPE;
-import static com.bytechef.component.zoho.books.constant.ZohoBooksConstants.CUSTOMER_SUB_TYPE;
-import static com.bytechef.component.zoho.books.constant.ZohoBooksConstants.INVOICE_NUMBER;
-import static com.bytechef.component.zoho.books.constant.ZohoBooksConstants.SALES_ORDER_NUMBER;
-import static com.bytechef.component.zoho.books.constant.ZohoBooksConstants.USE_CUSTOM_INVOICE_NUMBER;
-import static com.bytechef.component.zoho.books.constant.ZohoBooksConstants.USE_CUSTOM_SALES_ORDER_NUMBER;
 
-import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.definition.Property;
 import com.bytechef.component.definition.TypeReference;
 import java.util.ArrayList;
 import java.util.List;
@@ -45,58 +36,6 @@ import java.util.Map;
 public class ZohoBooksUtils {
 
     private ZohoBooksUtils() {
-    }
-
-    public static List<Property.ValueProperty<?>> createPropertiesForCustomerType(
-        Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
-        ActionContext actionContext) {
-
-        String contentType = inputParameters.getRequiredString(CONTACT_TYPE);
-
-        if (contentType.equals("customer")) {
-            ModifiableStringProperty customerType = string(CUSTOMER_SUB_TYPE)
-                .label("Customer Sub Type")
-                .description("Type of the customer.")
-                .options(option("BUSINESS", "business"), option("INDIVIDUAL", "individual"))
-                .required(true);
-
-            return List.of(customerType);
-        }
-        return List.of();
-    }
-
-    public static List<Property.ValueProperty<?>> createPropertiesForInvoiceNumber(
-        Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
-        ActionContext actionContext) {
-
-        boolean customInvoiceNumber = inputParameters.getRequiredBoolean(USE_CUSTOM_INVOICE_NUMBER);
-
-        if (customInvoiceNumber) {
-            ModifiableStringProperty invoiceNumber = string(INVOICE_NUMBER)
-                .label("Invoice Number")
-                .description("Number of invoice.")
-                .required(true);
-
-            return List.of(invoiceNumber);
-        }
-        return List.of();
-    }
-
-    public static List<Property.ValueProperty<?>> createPropertiesForSalesOrderNumber(
-        Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
-        ActionContext actionContext) {
-
-        boolean customSalesOrderNumber = inputParameters.getRequiredBoolean(USE_CUSTOM_SALES_ORDER_NUMBER);
-
-        if (customSalesOrderNumber) {
-            ModifiableStringProperty salesOrderNumber = string(SALES_ORDER_NUMBER)
-                .label("Sales Order Number")
-                .description("Number of sales order.")
-                .required(true);
-
-            return List.of(salesOrderNumber);
-        }
-        return List.of();
     }
 
     public static List<Option<String>> getCurrencyOptions(

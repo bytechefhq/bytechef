@@ -19,25 +19,17 @@ package com.bytechef.component.zoho.books.util;
 import static com.bytechef.component.definition.ComponentDsl.option;
 import static com.bytechef.component.zoho.books.constant.ZohoBooksConstants.CONTACT_NAME;
 import static com.bytechef.component.zoho.books.constant.ZohoBooksConstants.CONTACT_TYPE;
-import static com.bytechef.component.zoho.books.constant.ZohoBooksConstants.CUSTOMER_SUB_TYPE;
-import static com.bytechef.component.zoho.books.constant.ZohoBooksConstants.INVOICE_NUMBER;
-import static com.bytechef.component.zoho.books.constant.ZohoBooksConstants.SALES_ORDER_NUMBER;
-import static com.bytechef.component.zoho.books.constant.ZohoBooksConstants.USE_CUSTOM_INVOICE_NUMBER;
-import static com.bytechef.component.zoho.books.constant.ZohoBooksConstants.USE_CUSTOM_SALES_ORDER_NUMBER;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.component.definition.ActionContext;
-import com.bytechef.component.definition.ComponentDsl.ModifiableStringProperty;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http.Executor;
 import com.bytechef.component.definition.Context.Http.Response;
 import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.definition.Property;
 import com.bytechef.component.definition.TypeReference;
 import java.util.List;
 import java.util.Map;
@@ -70,39 +62,6 @@ class ZohoBooksUtilsTest {
             .thenReturn(mockedExecutor);
         when(mockedExecutor.execute())
             .thenReturn(mockedResponse);
-    }
-
-    @Test
-    void testCreatePropertiesForCustomerType() {
-        when(mockedParameters.getRequiredString(CONTACT_TYPE)).thenReturn("customer");
-
-        List<Property.ValueProperty<?>> result = ZohoBooksUtils.createPropertiesForCustomerType(
-            mockedParameters, mockedParameters, Map.of(), mockedActionContext);
-
-        ModifiableStringProperty customer = (ModifiableStringProperty) result.getFirst();
-        assertEquals(CUSTOMER_SUB_TYPE, customer.getName());
-    }
-
-    @Test
-    void testCreatePropertiesForInvoiceNumber() {
-        when(mockedParameters.getRequiredBoolean(USE_CUSTOM_INVOICE_NUMBER)).thenReturn(true);
-
-        List<Property.ValueProperty<?>> result = ZohoBooksUtils.createPropertiesForInvoiceNumber(
-            mockedParameters, mockedParameters, Map.of(), mockedActionContext);
-
-        ModifiableStringProperty invoiceNumber = (ModifiableStringProperty) result.getFirst();
-        assertEquals(INVOICE_NUMBER, invoiceNumber.getName());
-    }
-
-    @Test
-    void testCreatePropertiesForSalesOrderNumber() {
-        when(mockedParameters.getRequiredBoolean(USE_CUSTOM_SALES_ORDER_NUMBER)).thenReturn(true);
-
-        List<Property.ValueProperty<?>> result = ZohoBooksUtils.createPropertiesForSalesOrderNumber(
-            mockedParameters, mockedParameters, Map.of(), mockedActionContext);
-
-        ModifiableStringProperty salesOrderNumber = (ModifiableStringProperty) result.getFirst();
-        assertEquals(SALES_ORDER_NUMBER, salesOrderNumber.getName());
     }
 
     @Test
