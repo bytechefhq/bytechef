@@ -17,94 +17,114 @@
 package com.bytechef.component.bamboohr.trigger;
 
 import static com.bytechef.component.bamboohr.constant.BambooHrConstants.ID;
+import static com.bytechef.component.bamboohr.constant.BambooHrConstants.MONITOR_FIELDS;
+import static com.bytechef.component.bamboohr.constant.BambooHrConstants.POST_FIELDS;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
 
-import com.bytechef.component.bamboohr.util.BambooHrUtils;
+import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TriggerContext;
-import com.bytechef.component.definition.TriggerDefinition;
+import com.bytechef.component.definition.TriggerDefinition.HttpHeaders;
+import com.bytechef.component.definition.TriggerDefinition.HttpParameters;
+import com.bytechef.component.definition.TriggerDefinition.WebhookBody;
+import com.bytechef.component.definition.TriggerDefinition.WebhookEnableOutput;
+import com.bytechef.component.definition.TriggerDefinition.WebhookMethod;
 import com.bytechef.component.definition.TypeReference;
-import java.time.LocalDateTime;
+import com.bytechef.component.test.definition.MockParametersFactory;
 import java.util.List;
 import java.util.Map;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.MockedStatic;
+import org.mockito.ArgumentCaptor;
 
 /**
  * @author Marija Horvat
  */
 class BambooHrUpdateEmployeeTriggerTest {
 
-    protected TriggerDefinition.WebhookEnableOutput mockedWebhookEnableOutput =
-        mock(TriggerDefinition.WebhookEnableOutput.class);
-    protected TriggerDefinition.WebhookBody mockedWebhookBody = mock(TriggerDefinition.WebhookBody.class);
-    protected TriggerDefinition.HttpHeaders mockedHttpHeaders = mock(TriggerDefinition.HttpHeaders.class);
-    protected TriggerDefinition.HttpParameters mockedHttpParameters = mock(TriggerDefinition.HttpParameters.class);
-    protected TriggerDefinition.WebhookMethod mockedWebhookMethod = mock(TriggerDefinition.WebhookMethod.class);
-    protected Parameters mockedParameters = mock(Parameters.class);
-    protected TriggerContext mockedTriggerContext = mock(TriggerContext.class);
-    protected MockedStatic<BambooHrUtils> bambooHrUtilsMockedStatic;
-    protected String workflowExecutionId = "testWorkflowExecutionId";
-
-    @BeforeEach
-    public void beforeEach() {
-        bambooHrUtilsMockedStatic = mockStatic(BambooHrUtils.class);
-    }
-
-    @AfterEach
-    public void afterEach() {
-        bambooHrUtilsMockedStatic.close();
-    }
+    private final WebhookEnableOutput mockedWebhookEnableOutput = mock(WebhookEnableOutput.class);
+    private final WebhookBody mockedWebhookBody = mock(WebhookBody.class);
+    private final HttpHeaders mockedHttpHeaders = mock(HttpHeaders.class);
+    private final HttpParameters mockedHttpParameters = mock(HttpParameters.class);
+    private final WebhookMethod mockedWebhookMethod = mock(WebhookMethod.class);
+    private Parameters mockedParameters;
+    private final TriggerContext mockedTriggerContext = mock(TriggerContext.class);
+    private final Http.Executor mockedExecutor = mock(Http.Executor.class);
+    private final Http.Response mockedResponse = mock(Http.Response.class);
+    private final ArgumentCaptor<String> stringArgumentCaptor = ArgumentCaptor.forClass(String.class);
+    private final ArgumentCaptor<Http.Body> bodyArgumentCaptor = ArgumentCaptor.forClass(Http.Body.class);
 
     @Test
     void testWebhookEnable() {
         String webhookUrl = "testWebhookUrl";
+        mockedParameters = MockParametersFactory
+            .create(Map.of(MONITOR_FIELDS, List.of("firstName"), POST_FIELDS, List.of("firstName", "lastName")));
 
-        when(mockedParameters.getRequiredString(ID))
-            .thenReturn("id");
+        when(mockedTriggerContext.http(any()))
+            .thenReturn(mockedExecutor);
+        when(mockedExecutor.header(stringArgumentCaptor.capture(), stringArgumentCaptor.capture()))
+            .thenReturn(mockedExecutor);
+        when(mockedExecutor.body(bodyArgumentCaptor.capture()))
+            .thenReturn(mockedExecutor);
+        when(mockedExecutor.configuration(any()))
+            .thenReturn(mockedExecutor);
+        when(mockedExecutor.execute())
+            .thenReturn(mockedResponse);
+        when(mockedResponse.getBody(any(TypeReference.class)))
+            .thenReturn(Map.of(ID, "3"));
 
-        bambooHrUtilsMockedStatic.when(
-            () -> BambooHrUtils.addWebhook(webhookUrl, mockedTriggerContext))
-            .thenReturn("123");
+        WebhookEnableOutput webhookEnableOutput = BambooHrUpdateEmployeeTrigger.webhookEnable(
+            mockedParameters, mockedParameters, webhookUrl, "testWorkflowExecutionId", mockedTriggerContext);
 
-        TriggerDefinition.WebhookEnableOutput webhookEnableOutput = BambooHrUpdateEmployeeTrigger.webhookEnable(
-            mockedParameters, mockedParameters, webhookUrl, workflowExecutionId, mockedTriggerContext);
+        assertEquals(new WebhookEnableOutput(Map.of(ID, "3"), null), webhookEnableOutput);
+        assertEquals(List.of("accept", "application/json"), stringArgumentCaptor.getAllValues());
 
-        Map<String, ?> parameters = webhookEnableOutput.parameters();
-        LocalDateTime webhookExpirationDate = webhookEnableOutput.webhookExpirationDate();
+        Http.Body body = bodyArgumentCaptor.getValue();
 
-        Map<String, Object> expectedParameters = Map.of(ID, "123");
+        Map<String, Object> expectedBody = Map.of(
+            "name", "bambooHRWebhook", MONITOR_FIELDS, List.of("firstName"),
+            POST_FIELDS, Map.of("firstName", "firstName", "lastName", "lastName"), "url", webhookUrl,
+            "format", "json");
 
-        assertEquals(expectedParameters, parameters);
-        assertNull(webhookExpirationDate);
+        assertEquals(expectedBody, body.getContent());
+    }
+
+    @Test
+    void testWebhookDisable() {
+        mockedParameters = MockParametersFactory.create(
+            Map.of(MONITOR_FIELDS, List.of("firstName"), POST_FIELDS, List.of("firstName", "lastName")));
+
+        when(mockedTriggerContext.http(any()))
+            .thenReturn(mockedExecutor);
+        when(mockedExecutor.header(stringArgumentCaptor.capture(), stringArgumentCaptor.capture()))
+            .thenReturn(mockedExecutor);
+        when(mockedExecutor.execute())
+            .thenReturn(mockedResponse);
+
+        BambooHrUpdateEmployeeTrigger.webhookDisable(
+            mockedParameters, mockedParameters, mockedParameters, "testWorkflowExecutionId", mockedTriggerContext);
+
+        assertEquals(List.of("accept", "application/json"), stringArgumentCaptor.getAllValues());
     }
 
     @Test
     void testWebhookRequest() {
-        Map<String, Object> bodyContent = Map.of("employees", List.of(
+        List<Map<String, Map<String, Map<String, String>>>> employees = List.of(
             Map.of(
                 "fields", Map.of(
                     "firstName", Map.of("value", "test"),
                     "lastName", Map.of("value", "test"),
-                    "employeeNumber", Map.of("value", "1")))));
+                    "employeeNumber", Map.of("value", "1"))));
 
         when(mockedWebhookBody.getContent(any(TypeReference.class)))
-            .thenReturn(bodyContent);
+            .thenReturn(Map.of("employees", employees));
 
         Object result = BambooHrUpdateEmployeeTrigger.webhookRequest(
             mockedParameters, mockedParameters, mockedHttpHeaders, mockedHttpParameters, mockedWebhookBody,
             mockedWebhookMethod, mockedWebhookEnableOutput, mockedTriggerContext);
 
-        List<Map<String, Object>> expectedOutput = List.of(
-            Map.of("firstName", "test", "lastName", "test", "employeeNumber", "1"));
-
-        assertEquals(expectedOutput, result);
+        assertEquals(employees, result);
     }
 }
