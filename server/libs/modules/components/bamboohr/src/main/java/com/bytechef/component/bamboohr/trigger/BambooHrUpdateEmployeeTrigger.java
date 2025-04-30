@@ -16,47 +16,54 @@
 
 package com.bytechef.component.bamboohr.trigger;
 
-import static com.bytechef.component.bamboohr.constant.BambooHrConstants.EMPLOYEE_NUMBER;
-import static com.bytechef.component.bamboohr.constant.BambooHrConstants.FIRST_NAME;
 import static com.bytechef.component.bamboohr.constant.BambooHrConstants.ID;
-import static com.bytechef.component.bamboohr.constant.BambooHrConstants.LAST_NAME;
+import static com.bytechef.component.bamboohr.constant.BambooHrConstants.MONITOR_FIELDS;
+import static com.bytechef.component.bamboohr.constant.BambooHrConstants.POST_FIELDS;
 import static com.bytechef.component.definition.ComponentDsl.array;
-import static com.bytechef.component.definition.ComponentDsl.object;
-import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.ComponentDsl.trigger;
 
 import com.bytechef.component.bamboohr.util.BambooHrUtils;
-import com.bytechef.component.definition.ComponentDsl;
+import com.bytechef.component.definition.ComponentDsl.ModifiableTriggerDefinition;
+import com.bytechef.component.definition.Context.Http;
+import com.bytechef.component.definition.OptionsDataSource.TriggerOptionsFunction;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TriggerContext;
-import com.bytechef.component.definition.TriggerDefinition;
+import com.bytechef.component.definition.TriggerDefinition.HttpHeaders;
+import com.bytechef.component.definition.TriggerDefinition.HttpParameters;
 import com.bytechef.component.definition.TriggerDefinition.TriggerType;
+import com.bytechef.component.definition.TriggerDefinition.WebhookBody;
 import com.bytechef.component.definition.TriggerDefinition.WebhookEnableOutput;
+import com.bytechef.component.definition.TriggerDefinition.WebhookMethod;
 import com.bytechef.component.definition.TypeReference;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 /**
  * @author Marija Horvat
+ * @author Monika Kušter
  */
 public class BambooHrUpdateEmployeeTrigger {
 
-    public static final ComponentDsl.ModifiableTriggerDefinition TRIGGER_DEFINITION = trigger("updateEmployee")
-        .title("Update Employee")
+    public static final ModifiableTriggerDefinition TRIGGER_DEFINITION = trigger("updatedEmployee")
+        .title("Updated Employee")
         .description("Triggers when specific employee fields are updated.")
         .type(TriggerType.DYNAMIC_WEBHOOK)
-        .properties()
-        .output(outputSchema(
-            array()
-                .items(
-                    object()
-                        .properties(
-                            string(FIRST_NAME),
-                            string(LAST_NAME),
-                            string(EMPLOYEE_NUMBER)))))
+        .properties(
+            array(MONITOR_FIELDS)
+                .label("Fields to Monitor")
+                .description("The fields to monitor for changes.")
+                .items(string())
+                .options((TriggerOptionsFunction<String>) BambooHrUtils::getFieldOptions)
+                .required(true),
+            array(POST_FIELDS)
+                .label("Fields to include in the Output")
+                .description("The fields to include in the output.")
+                .items(string())
+                .options((TriggerOptionsFunction<String>) BambooHrUtils::getFieldOptions)
+                .required(true))
+        .output()
         .webhookEnable(BambooHrUpdateEmployeeTrigger::webhookEnable)
         .webhookDisable(BambooHrUpdateEmployeeTrigger::webhookDisable)
         .webhookRequest(BambooHrUpdateEmployeeTrigger::webhookRequest);
@@ -68,47 +75,44 @@ public class BambooHrUpdateEmployeeTrigger {
         Parameters inputParameters, Parameters connectionParameters, String webhookUrl,
         String workflowExecutionId, TriggerContext context) {
 
-        return new WebhookEnableOutput(
-            Map.of(ID,
-                BambooHrUtils.addWebhook(webhookUrl, context)),
-            null);
+        List<String> postFields = inputParameters.getRequiredList(POST_FIELDS, String.class);
+
+        Map<String, String> options = new HashMap<>();
+        for (String postField : postFields) {
+            options.put(postField, postField);
+        }
+
+        Map<String, ?> body = context.http(http -> http.post("/webhooks"))
+            .body(
+                Http.Body.of(
+                    "name", "bambooHRWebhook",
+                    MONITOR_FIELDS, inputParameters.getRequiredList(MONITOR_FIELDS, String.class),
+                    POST_FIELDS, options,
+                    "url", webhookUrl,
+                    "format", "json"))
+            .header("accept", "application/json")
+            .configuration(Http.responseType(Http.ResponseType.JSON))
+            .execute()
+            .getBody(new TypeReference<>() {});
+
+        return new WebhookEnableOutput(Map.of(ID, (String) body.get(ID)), null);
     }
 
     protected static void webhookDisable(
         Parameters inputParameters, Parameters connectionParameters, Parameters outputParameters,
         String workflowExecutionId, TriggerContext context) {
 
-        BambooHrUtils.deleteWebhook(outputParameters, context);
+        context.http(http -> http.delete("/webhooks/" + outputParameters.getString(ID)))
+            .header("accept", "application/json")
+            .execute();
     }
 
     protected static Object webhookRequest(
-        Parameters inputParameters, Parameters connectionParameters, TriggerDefinition.HttpHeaders headers,
-        TriggerDefinition.HttpParameters parameters,
-        TriggerDefinition.WebhookBody body, TriggerDefinition.WebhookMethod method,
-        TriggerDefinition.WebhookEnableOutput output, TriggerContext context) {
+        Parameters inputParameters, Parameters connectionParameters, HttpHeaders headers, HttpParameters parameters,
+        WebhookBody body, WebhookMethod method, WebhookEnableOutput output, TriggerContext context) {
 
-        List<Map<String, ?>> outputObject = new ArrayList<>();
+        Map<String, ?> content = body.getContent(new TypeReference<>() {});
 
-        if (body.getContent(new TypeReference<Map<String, ?>>() {})
-            .get("employees") instanceof List<?> list) {
-            for (Object o : list) {
-                if (o instanceof Map<?, ?> map) {
-                    Map<String, Map<String, ?>> fields = (Map<String, Map<String, ?>>) map.get("fields");
-
-                    Map<String, Object> fieldMap = new HashMap<>();
-
-                    for (Map.Entry<String, Map<String, ?>> fieldEntry : fields.entrySet()) {
-                        String fieldName = fieldEntry.getKey();
-                        Map<String, ?> fieldValue = fieldEntry.getValue();
-
-                        if (fieldValue.containsKey("value")) {
-                            fieldMap.put(fieldName, fieldValue.get("value"));
-                        }
-                    }
-                    outputObject.add(fieldMap);
-                }
-            }
-        }
-        return outputObject;
+        return content.get("employees");
     }
 }

@@ -21,6 +21,7 @@ package com.bytechef.component.bamboohr.constant;
  */
 public class BambooHrConstants {
 
+    public static final String ALL_EMPLOYEES = "newEmployees";
     public static final String CATEGORY_ID = "categoryId";
     public static final String COMPANY_DOMAIN = "companyDomain";
     public static final String EMPLOYEE_NUMBER = "employeeNumber";
@@ -33,9 +34,10 @@ public class BambooHrConstants {
     public static final String JOB_TITLE = "jobTitle";
     public static final String LAST_NAME = "lastName";
     public static final String LOCATION = "location";
+    public static final String MONITOR_FIELDS = "monitorFields";
     public static final String NAME = "name";
+    public static final String POST_FIELDS = "postFields";
     public static final String SHARE_WITH_EMPLOYEE = "shareWithEmployee";
-    public static final String LAST_TIME_CHECKED = "lastTimeChecked";
 
     private BambooHrConstants() {
     }
