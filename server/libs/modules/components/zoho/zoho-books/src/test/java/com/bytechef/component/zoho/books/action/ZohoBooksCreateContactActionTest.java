@@ -25,9 +25,8 @@ import static com.bytechef.component.zoho.books.constant.ZohoBooksConstants.CUST
 import static com.bytechef.component.zoho.books.constant.ZohoBooksConstants.SHIPPING_ADDRESS;
 import static com.bytechef.component.zoho.books.constant.ZohoBooksConstants.WEBSITE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.when;
 
-import com.bytechef.component.definition.Parameters;
+import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.test.definition.MockParametersFactory;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
@@ -36,13 +35,13 @@ import org.junit.jupiter.api.Test;
  * @author Marija Horvat
  */
 class ZohoBooksCreateContactActionTest extends AbstractZohoBooksActionTest {
-    private final Parameters mockedParameters = MockParametersFactory.create(
-        Map.of(
-            CONTACT_NAME, "name",
-            COMPANY_NAME, "company",
-            WEBSITE, "www.test.com",
+
+    @Test
+    void testPerform() {
+        Map<String, Object> parametersMap = Map.of(
+            CONTACT_NAME, "name", COMPANY_NAME, "company", WEBSITE, "www.test.com",
             CONTACT_TYPE, "customer",
-            CUSTOMER_SUB_TYPE, Map.of(CUSTOMER_SUB_TYPE, "individual"),
+            CUSTOMER_SUB_TYPE, "individual",
             CURRENCY_ID, "euro",
             BILLING_ADDRESS,
             Map.of("attention", "test",
@@ -65,15 +64,16 @@ class ZohoBooksCreateContactActionTest extends AbstractZohoBooksActionTest {
                 "zip", "10000",
                 "country", "test country",
                 "fax", "123456",
-                "phone", "+123456789")));
+                "phone", "+123456789"));
 
-    @Test
-    void testPerform() {
-        when(mockedResponse.getBody())
-            .thenReturn(responseList);
+        mockedParameters = MockParametersFactory.create(parametersMap);
 
         Object result = ZohoBooksCreateContactAction.perform(mockedParameters, mockedParameters, mockedContext);
 
-        assertEquals(responseList, result);
+        assertEquals(mockedObject, result);
+
+        Http.Body body = bodyArgumentCaptor.getValue();
+
+        assertEquals(parametersMap, body.getContent());
     }
 }
