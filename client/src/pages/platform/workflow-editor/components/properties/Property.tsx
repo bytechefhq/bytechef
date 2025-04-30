@@ -477,37 +477,31 @@ const Property = ({
 
     // set default mentionInput state
     useEffect(() => {
-        if (control) {
+        if (control || mentionInput) {
             return;
         }
 
         if (propertyParameterValue) {
-            setMentionInput(false);
-
-            const isNumericTypeWithNumericValue =
-                (type === 'INTEGER' || type === 'NUMBER') && typeof propertyParameterValue === 'number';
-
             const isStringValue = typeof propertyParameterValue === 'string';
-            const isUnsupportedForMentionInput = controlType === 'SELECT' || controlType === 'JSON_SCHEMA_BUILDER';
 
             const hasDataPill = isStringValue && propertyParameterValue.includes('${');
             const hasFormula = isStringValue && propertyParameterValue.includes('#{');
-            const isStringType = type === 'STRING';
-            const isMultiSelect = controlType === 'MULTI_SELECT';
 
-            const shouldUseMentionInput =
-                isNumericTypeWithNumericValue ||
-                (isStringValue &&
-                    !isUnsupportedForMentionInput &&
-                    (hasDataPill || hasFormula || isStringType || isMultiSelect));
+            const shouldUseMentionInput = hasDataPill || hasFormula;
 
             if (shouldUseMentionInput) {
                 setMentionInput(true);
+
+                return;
+            } else {
+                setMentionInput(false);
             }
         }
 
         if (!formState && controlType !== 'SELECT' && controlType === 'FILE_ENTRY') {
             setMentionInput(true);
+
+            return;
         }
 
         if (
