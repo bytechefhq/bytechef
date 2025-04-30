@@ -284,19 +284,32 @@
       "optionsDataSource" : null
     }, {
       "advancedOption" : null,
-      "description" : null,
-      "displayCondition" : null,
+      "description" : "Type of the customer.",
+      "displayCondition" : "contact_type == 'customer'",
       "expressionEnabled" : null,
       "hidden" : null,
       "metadata" : { },
       "required" : true,
       "name" : "customer_sub_type",
-      "type" : "DYNAMIC_PROPERTIES",
-      "header" : null,
-      "dynamicPropertiesDataSource" : {
-        "propertiesLookupDependsOn" : [ "contact_type" ],
-        "properties" : { }
-      }
+      "type" : "STRING",
+      "defaultValue" : null,
+      "exampleValue" : null,
+      "label" : "Customer Sub Type",
+      "placeholder" : null,
+      "controlType" : "SELECT",
+      "languageId" : null,
+      "maxLength" : null,
+      "minLength" : null,
+      "options" : [ {
+        "description" : null,
+        "label" : "BUSINESS",
+        "value" : "business"
+      }, {
+        "description" : null,
+        "label" : "INDIVIDUAL",
+        "value" : "individual"
+      } ],
+      "optionsDataSource" : null
     }, {
       "advancedOption" : null,
       "description" : "Currency ID of the customer's currency.",
@@ -762,9 +775,9 @@
       "optionsDataSource" : null
     } ],
     "title" : "Create Contact",
-    "processErrorResponse" : null,
     "workflowNodeDescription" : null,
-    "perform" : { }
+    "perform" : { },
+    "processErrorResponse" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -979,7 +992,7 @@
       "required" : true,
       "name" : "use_custom_invoice_number",
       "type" : "BOOLEAN",
-      "defaultValue" : null,
+      "defaultValue" : false,
       "exampleValue" : null,
       "label" : "Use Custom Invoice Number",
       "placeholder" : null,
@@ -995,19 +1008,24 @@
       "controlType" : "SELECT"
     }, {
       "advancedOption" : null,
-      "description" : null,
-      "displayCondition" : null,
+      "description" : "Number of invoice.",
+      "displayCondition" : "use_custom_invoice_number == true",
       "expressionEnabled" : null,
       "hidden" : null,
       "metadata" : { },
       "required" : true,
       "name" : "invoice_number",
-      "type" : "DYNAMIC_PROPERTIES",
-      "header" : null,
-      "dynamicPropertiesDataSource" : {
-        "propertiesLookupDependsOn" : [ "use_custom_invoice_number" ],
-        "properties" : { }
-      }
+      "type" : "STRING",
+      "defaultValue" : null,
+      "exampleValue" : null,
+      "label" : "Invoice Number",
+      "placeholder" : null,
+      "controlType" : "TEXT",
+      "languageId" : null,
+      "maxLength" : null,
+      "minLength" : null,
+      "options" : null,
+      "optionsDataSource" : null
     }, {
       "advancedOption" : null,
       "description" : "Items in invoice.",
@@ -1046,19 +1064,22 @@
           "expressionEnabled" : null,
           "hidden" : null,
           "metadata" : { },
-          "required" : null,
+          "required" : true,
           "name" : "item_id",
           "type" : "STRING",
           "defaultValue" : null,
           "exampleValue" : null,
           "label" : "Item ID",
           "placeholder" : null,
-          "controlType" : "TEXT",
+          "controlType" : "SELECT",
           "languageId" : null,
           "maxLength" : null,
           "minLength" : null,
           "options" : null,
-          "optionsDataSource" : null
+          "optionsDataSource" : {
+            "optionsLookupDependsOn" : null,
+            "options" : { }
+          }
         }, {
           "advancedOption" : null,
           "description" : "Quantity of item.",
@@ -1066,7 +1087,7 @@
           "expressionEnabled" : null,
           "hidden" : null,
           "metadata" : { },
-          "required" : null,
+          "required" : false,
           "name" : "quantity",
           "type" : "NUMBER",
           "defaultValue" : null,
@@ -1152,9 +1173,9 @@
       "optionsDataSource" : null
     } ],
     "title" : "Create Invoice",
-    "processErrorResponse" : null,
     "workflowNodeDescription" : null,
-    "perform" : { }
+    "perform" : { },
+    "processErrorResponse" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -1369,7 +1390,7 @@
       "required" : true,
       "name" : "use_custom_sales_order_number",
       "type" : "BOOLEAN",
-      "defaultValue" : null,
+      "defaultValue" : false,
       "exampleValue" : null,
       "label" : "Use Custom Sales Order Number",
       "placeholder" : null,
@@ -1385,19 +1406,24 @@
       "controlType" : "SELECT"
     }, {
       "advancedOption" : null,
-      "description" : null,
-      "displayCondition" : null,
+      "description" : "Number of sales order.",
+      "displayCondition" : "use_custom_sales_order_number == true",
       "expressionEnabled" : null,
       "hidden" : null,
       "metadata" : { },
       "required" : true,
       "name" : "salesorder_number",
-      "type" : "DYNAMIC_PROPERTIES",
-      "header" : null,
-      "dynamicPropertiesDataSource" : {
-        "propertiesLookupDependsOn" : [ "use_custom_sales_order_number" ],
-        "properties" : { }
-      }
+      "type" : "STRING",
+      "defaultValue" : null,
+      "exampleValue" : null,
+      "label" : "Sales Order Number",
+      "placeholder" : null,
+      "controlType" : "TEXT",
+      "languageId" : null,
+      "maxLength" : null,
+      "minLength" : null,
+      "options" : null,
+      "optionsDataSource" : null
     }, {
       "advancedOption" : null,
       "description" : "Items in invoice.",
@@ -1436,19 +1462,22 @@
           "expressionEnabled" : null,
           "hidden" : null,
           "metadata" : { },
-          "required" : null,
+          "required" : true,
           "name" : "item_id",
           "type" : "STRING",
           "defaultValue" : null,
           "exampleValue" : null,
           "label" : "Item ID",
           "placeholder" : null,
-          "controlType" : "TEXT",
+          "controlType" : "SELECT",
           "languageId" : null,
           "maxLength" : null,
           "minLength" : null,
           "options" : null,
-          "optionsDataSource" : null
+          "optionsDataSource" : {
+            "optionsLookupDependsOn" : null,
+            "options" : { }
+          }
         }, {
           "advancedOption" : null,
           "description" : "Quantity of item.",
@@ -1456,7 +1485,7 @@
           "expressionEnabled" : null,
           "hidden" : null,
           "metadata" : { },
-          "required" : null,
+          "required" : false,
           "name" : "quantity",
           "type" : "NUMBER",
           "defaultValue" : null,
@@ -1559,10 +1588,143 @@
       "optionsDataSource" : null
     } ],
     "title" : "Create Sales Order",
-    "processErrorResponse" : null,
     "workflowNodeDescription" : null,
-    "perform" : { }
+    "perform" : { },
+    "processErrorResponse" : null
   } ],
+  "connection" : {
+    "authorizations" : [ {
+      "detectOn" : null,
+      "description" : null,
+      "name" : "oauth2_authorization_code",
+      "properties" : [ {
+        "advancedOption" : null,
+        "description" : null,
+        "displayCondition" : null,
+        "expressionEnabled" : null,
+        "hidden" : null,
+        "metadata" : { },
+        "required" : true,
+        "name" : "region",
+        "type" : "STRING",
+        "defaultValue" : null,
+        "exampleValue" : null,
+        "label" : "Region",
+        "placeholder" : null,
+        "controlType" : "SELECT",
+        "languageId" : null,
+        "maxLength" : null,
+        "minLength" : null,
+        "options" : [ {
+          "description" : null,
+          "label" : "zoho.eu (Europe)",
+          "value" : "zoho.eu"
+        }, {
+          "description" : null,
+          "label" : "zoho.com (United States)",
+          "value" : "zoho.com"
+        }, {
+          "description" : null,
+          "label" : "zoho.com.au (Australia)",
+          "value" : "zoho.com.au"
+        }, {
+          "description" : null,
+          "label" : "zoho.jp (Japan)",
+          "value" : "zoho.jp"
+        }, {
+          "description" : null,
+          "label" : "zoho.in (India)",
+          "value" : "zoho.in"
+        }, {
+          "description" : null,
+          "label" : "zohocloud.ca (Canada)",
+          "value" : "zohocloud.ca"
+        } ],
+        "optionsDataSource" : null
+      }, {
+        "advancedOption" : null,
+        "description" : null,
+        "displayCondition" : null,
+        "expressionEnabled" : null,
+        "hidden" : null,
+        "metadata" : { },
+        "required" : true,
+        "name" : "organization_id",
+        "type" : "STRING",
+        "defaultValue" : null,
+        "exampleValue" : null,
+        "label" : "Organization Id",
+        "placeholder" : null,
+        "controlType" : "TEXT",
+        "languageId" : null,
+        "maxLength" : null,
+        "minLength" : null,
+        "options" : null,
+        "optionsDataSource" : null
+      }, {
+        "advancedOption" : null,
+        "description" : null,
+        "displayCondition" : null,
+        "expressionEnabled" : null,
+        "hidden" : null,
+        "metadata" : { },
+        "required" : true,
+        "name" : "clientId",
+        "type" : "STRING",
+        "defaultValue" : null,
+        "exampleValue" : null,
+        "label" : "Client Id",
+        "placeholder" : null,
+        "controlType" : "TEXT",
+        "languageId" : null,
+        "maxLength" : null,
+        "minLength" : null,
+        "options" : null,
+        "optionsDataSource" : null
+      }, {
+        "advancedOption" : null,
+        "description" : null,
+        "displayCondition" : null,
+        "expressionEnabled" : null,
+        "hidden" : null,
+        "metadata" : { },
+        "required" : true,
+        "name" : "clientSecret",
+        "type" : "STRING",
+        "defaultValue" : null,
+        "exampleValue" : null,
+        "label" : "Client Secret",
+        "placeholder" : null,
+        "controlType" : "TEXT",
+        "languageId" : null,
+        "maxLength" : null,
+        "minLength" : null,
+        "options" : null,
+        "optionsDataSource" : null
+      } ],
+      "refreshOn" : null,
+      "title" : "OAuth2 Authorization Code",
+      "type" : "OAUTH2_AUTHORIZATION_CODE",
+      "acquire" : null,
+      "apply" : { },
+      "authorizationCallback" : null,
+      "authorizationUrl" : { },
+      "clientId" : null,
+      "clientSecret" : null,
+      "oauth2AuthorizationExtraQueryParameters" : null,
+      "pkce" : null,
+      "refresh" : null,
+      "refreshUrl" : { },
+      "scopes" : { },
+      "refreshToken" : null,
+      "tokenUrl" : { }
+    } ],
+    "properties" : null,
+    "version" : 1,
+    "authorizationRequired" : null,
+    "baseUri" : { },
+    "test" : null
+  },
   "clusterElements" : [ {
     "description" : "Create a contact.",
     "name" : "createContact",
@@ -1830,19 +1992,32 @@
       "optionsDataSource" : null
     }, {
       "advancedOption" : null,
-      "description" : null,
-      "displayCondition" : null,
+      "description" : "Type of the customer.",
+      "displayCondition" : "contact_type == 'customer'",
       "expressionEnabled" : null,
       "hidden" : null,
       "metadata" : { },
       "required" : true,
       "name" : "customer_sub_type",
-      "type" : "DYNAMIC_PROPERTIES",
-      "header" : null,
-      "dynamicPropertiesDataSource" : {
-        "propertiesLookupDependsOn" : [ "contact_type" ],
-        "properties" : { }
-      }
+      "type" : "STRING",
+      "defaultValue" : null,
+      "exampleValue" : null,
+      "label" : "Customer Sub Type",
+      "placeholder" : null,
+      "controlType" : "SELECT",
+      "languageId" : null,
+      "maxLength" : null,
+      "minLength" : null,
+      "options" : [ {
+        "description" : null,
+        "label" : "BUSINESS",
+        "value" : "business"
+      }, {
+        "description" : null,
+        "label" : "INDIVIDUAL",
+        "value" : "individual"
+      } ],
+      "optionsDataSource" : null
     }, {
       "advancedOption" : null,
       "description" : "Currency ID of the customer's currency.",
@@ -2526,7 +2701,7 @@
       "required" : true,
       "name" : "use_custom_invoice_number",
       "type" : "BOOLEAN",
-      "defaultValue" : null,
+      "defaultValue" : false,
       "exampleValue" : null,
       "label" : "Use Custom Invoice Number",
       "placeholder" : null,
@@ -2542,19 +2717,24 @@
       "controlType" : "SELECT"
     }, {
       "advancedOption" : null,
-      "description" : null,
-      "displayCondition" : null,
+      "description" : "Number of invoice.",
+      "displayCondition" : "use_custom_invoice_number == true",
       "expressionEnabled" : null,
       "hidden" : null,
       "metadata" : { },
       "required" : true,
       "name" : "invoice_number",
-      "type" : "DYNAMIC_PROPERTIES",
-      "header" : null,
-      "dynamicPropertiesDataSource" : {
-        "propertiesLookupDependsOn" : [ "use_custom_invoice_number" ],
-        "properties" : { }
-      }
+      "type" : "STRING",
+      "defaultValue" : null,
+      "exampleValue" : null,
+      "label" : "Invoice Number",
+      "placeholder" : null,
+      "controlType" : "TEXT",
+      "languageId" : null,
+      "maxLength" : null,
+      "minLength" : null,
+      "options" : null,
+      "optionsDataSource" : null
     }, {
       "advancedOption" : null,
       "description" : "Items in invoice.",
@@ -2593,19 +2773,22 @@
           "expressionEnabled" : null,
           "hidden" : null,
           "metadata" : { },
-          "required" : null,
+          "required" : true,
           "name" : "item_id",
           "type" : "STRING",
           "defaultValue" : null,
           "exampleValue" : null,
           "label" : "Item ID",
           "placeholder" : null,
-          "controlType" : "TEXT",
+          "controlType" : "SELECT",
           "languageId" : null,
           "maxLength" : null,
           "minLength" : null,
           "options" : null,
-          "optionsDataSource" : null
+          "optionsDataSource" : {
+            "optionsLookupDependsOn" : null,
+            "options" : { }
+          }
         }, {
           "advancedOption" : null,
           "description" : "Quantity of item.",
@@ -2613,7 +2796,7 @@
           "expressionEnabled" : null,
           "hidden" : null,
           "metadata" : { },
-          "required" : null,
+          "required" : false,
           "name" : "quantity",
           "type" : "NUMBER",
           "defaultValue" : null,
@@ -2917,7 +3100,7 @@
       "required" : true,
       "name" : "use_custom_sales_order_number",
       "type" : "BOOLEAN",
-      "defaultValue" : null,
+      "defaultValue" : false,
       "exampleValue" : null,
       "label" : "Use Custom Sales Order Number",
       "placeholder" : null,
@@ -2933,19 +3116,24 @@
       "controlType" : "SELECT"
     }, {
       "advancedOption" : null,
-      "description" : null,
-      "displayCondition" : null,
+      "description" : "Number of sales order.",
+      "displayCondition" : "use_custom_sales_order_number == true",
       "expressionEnabled" : null,
       "hidden" : null,
       "metadata" : { },
       "required" : true,
       "name" : "salesorder_number",
-      "type" : "DYNAMIC_PROPERTIES",
-      "header" : null,
-      "dynamicPropertiesDataSource" : {
-        "propertiesLookupDependsOn" : [ "use_custom_sales_order_number" ],
-        "properties" : { }
-      }
+      "type" : "STRING",
+      "defaultValue" : null,
+      "exampleValue" : null,
+      "label" : "Sales Order Number",
+      "placeholder" : null,
+      "controlType" : "TEXT",
+      "languageId" : null,
+      "maxLength" : null,
+      "minLength" : null,
+      "options" : null,
+      "optionsDataSource" : null
     }, {
       "advancedOption" : null,
       "description" : "Items in invoice.",
@@ -2984,19 +3172,22 @@
           "expressionEnabled" : null,
           "hidden" : null,
           "metadata" : { },
-          "required" : null,
+          "required" : true,
           "name" : "item_id",
           "type" : "STRING",
           "defaultValue" : null,
           "exampleValue" : null,
           "label" : "Item ID",
           "placeholder" : null,
-          "controlType" : "TEXT",
+          "controlType" : "SELECT",
           "languageId" : null,
           "maxLength" : null,
           "minLength" : null,
           "options" : null,
-          "optionsDataSource" : null
+          "optionsDataSource" : {
+            "optionsLookupDependsOn" : null,
+            "options" : { }
+          }
         }, {
           "advancedOption" : null,
           "description" : "Quantity of item.",
@@ -3004,7 +3195,7 @@
           "expressionEnabled" : null,
           "hidden" : null,
           "metadata" : { },
-          "required" : null,
+          "required" : false,
           "name" : "quantity",
           "type" : "NUMBER",
           "defaultValue" : null,
@@ -3117,138 +3308,5 @@
     "element" : { }
   } ],
   "unifiedApi" : null,
-  "triggers" : null,
-  "connection" : {
-    "authorizations" : [ {
-      "detectOn" : null,
-      "description" : null,
-      "name" : "oauth2_authorization_code",
-      "properties" : [ {
-        "advancedOption" : null,
-        "description" : null,
-        "displayCondition" : null,
-        "expressionEnabled" : null,
-        "hidden" : null,
-        "metadata" : { },
-        "required" : true,
-        "name" : "region",
-        "type" : "STRING",
-        "defaultValue" : null,
-        "exampleValue" : null,
-        "label" : "Region",
-        "placeholder" : null,
-        "controlType" : "SELECT",
-        "languageId" : null,
-        "maxLength" : null,
-        "minLength" : null,
-        "options" : [ {
-          "description" : null,
-          "label" : "zoho.eu (Europe)",
-          "value" : "zoho.eu"
-        }, {
-          "description" : null,
-          "label" : "zoho.com (United States)",
-          "value" : "zoho.com"
-        }, {
-          "description" : null,
-          "label" : "zoho.com.au (Australia)",
-          "value" : "zoho.com.au"
-        }, {
-          "description" : null,
-          "label" : "zoho.jp (Japan)",
-          "value" : "zoho.jp"
-        }, {
-          "description" : null,
-          "label" : "zoho.in (India)",
-          "value" : "zoho.in"
-        }, {
-          "description" : null,
-          "label" : "zohocloud.ca (Canada)",
-          "value" : "zohocloud.ca"
-        } ],
-        "optionsDataSource" : null
-      }, {
-        "advancedOption" : null,
-        "description" : null,
-        "displayCondition" : null,
-        "expressionEnabled" : null,
-        "hidden" : null,
-        "metadata" : { },
-        "required" : true,
-        "name" : "organization_id",
-        "type" : "STRING",
-        "defaultValue" : null,
-        "exampleValue" : null,
-        "label" : "Organization Id",
-        "placeholder" : null,
-        "controlType" : "TEXT",
-        "languageId" : null,
-        "maxLength" : null,
-        "minLength" : null,
-        "options" : null,
-        "optionsDataSource" : null
-      }, {
-        "advancedOption" : null,
-        "description" : null,
-        "displayCondition" : null,
-        "expressionEnabled" : null,
-        "hidden" : null,
-        "metadata" : { },
-        "required" : true,
-        "name" : "clientId",
-        "type" : "STRING",
-        "defaultValue" : null,
-        "exampleValue" : null,
-        "label" : "Client Id",
-        "placeholder" : null,
-        "controlType" : "TEXT",
-        "languageId" : null,
-        "maxLength" : null,
-        "minLength" : null,
-        "options" : null,
-        "optionsDataSource" : null
-      }, {
-        "advancedOption" : null,
-        "description" : null,
-        "displayCondition" : null,
-        "expressionEnabled" : null,
-        "hidden" : null,
-        "metadata" : { },
-        "required" : true,
-        "name" : "clientSecret",
-        "type" : "STRING",
-        "defaultValue" : null,
-        "exampleValue" : null,
-        "label" : "Client Secret",
-        "placeholder" : null,
-        "controlType" : "TEXT",
-        "languageId" : null,
-        "maxLength" : null,
-        "minLength" : null,
-        "options" : null,
-        "optionsDataSource" : null
-      } ],
-      "refreshOn" : null,
-      "title" : "OAuth2 Authorization Code",
-      "type" : "OAUTH2_AUTHORIZATION_CODE",
-      "acquire" : null,
-      "apply" : { },
-      "authorizationCallback" : null,
-      "authorizationUrl" : { },
-      "clientId" : null,
-      "clientSecret" : null,
-      "oauth2AuthorizationExtraQueryParameters" : null,
-      "pkce" : null,
-      "refresh" : null,
-      "refreshUrl" : { },
-      "scopes" : { },
-      "refreshToken" : null,
-      "tokenUrl" : { }
-    } ],
-    "properties" : null,
-    "version" : 1,
-    "authorizationRequired" : null,
-    "baseUri" : { },
-    "test" : null
-  }
+  "triggers" : null
 }
