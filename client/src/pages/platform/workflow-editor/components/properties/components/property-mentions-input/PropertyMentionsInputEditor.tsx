@@ -248,73 +248,6 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
             return content;
         }, []);
 
-        const handleNonStringKeyPress = useCallback((event: KeyboardEvent) => {
-            const editorContent = editor?.state?.doc?.textContent || '';
-            const isEditorEmpty = !editorContent;
-            const hasFormula = editorContent.includes('#{');
-            const startsWithFormula = editorContent.startsWith('#{');
-
-            if (editorContent === '#' && event.key === '{') {
-                return;
-            }
-
-            // Empty editor - allow starting a formula
-            if (isEditorEmpty) {
-                if (event.key === '#') {
-                    return;
-                }
-                if (event.key === '{' || /[0-9\-+.]/.test(event.key)) {
-                    return;
-                }
-
-                event.preventDefault();
-
-                return;
-            }
-
-            // Has formula but doesn't start with it - invalid state
-            if (hasFormula && !startsWithFormula) {
-                event.preventDefault();
-
-                return;
-            }
-
-            // Content already starts with a formula
-            if (startsWithFormula) {
-                const openCount = (editorContent.match(/\{/g) || []).length;
-                const closeCount = (editorContent.match(/\}/g) || []).length;
-
-                if (openCount === closeCount && openCount > 0) {
-                    event.preventDefault();
-
-                    return;
-                }
-
-                return;
-            }
-
-            // Content doesn't have a formula yet, prevent starting a formula in the middle of text
-            if (event.key === '#' || event.key === '{') {
-                const selection = editor?.state.selection;
-
-                if (selection && selection.from !== 0) {
-                    event.preventDefault();
-
-                    return;
-                }
-
-                return;
-            }
-
-            // For non-string types, only allow numeric values when not in formula mode
-            if (!/[0-9\-+.]/.test(event.key) && event.key !== 'Backspace' && event.key !== 'Delete') {
-                event.preventDefault();
-
-                return;
-            }
-            // eslint-disable-next-line react-hooks/exhaustive-deps
-        }, []);
-
         const editor = useEditor({
             editorProps: {
                 attributes: {
@@ -327,8 +260,86 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
                     path: path ?? '',
                     type: type ?? '',
                 },
-                handleKeyPress: (_: EditorView, event: KeyboardEvent) =>
-                    type !== 'STRING' && handleNonStringKeyPress(event),
+                handleKeyPress: (_: EditorView, event: KeyboardEvent) => {
+                    if (type !== 'STRING') {
+                        const content = typeof editorValue === 'string' ? editorValue : '';
+                        const isEditorEmpty = !content || content === '';
+                        const hasFormula = content.includes('#{');
+                        const startsWithFormula = content.startsWith('#{');
+                        const hasDataPill = content.includes('${');
+                        const cursorPosition = editor?.state.selection.from || 0;
+                        const hasSelection = editor?.state.selection.content().content.size ?? 0 > 0;
+                        const selectedText = hasSelection
+                            ? editor?.state.doc.textBetween(editor.state.selection.from, editor.state.selection.to)
+                            : '';
+
+                        // Function to determine if key should be allowed
+                        const isKeyAllowed = () => {
+                            // Selection contains datapills or formulas - only allow # or {
+                            if (hasSelection && (selectedText?.includes('${') || selectedText?.includes('#{'))) {
+                                return /[#{]/.test(event.key);
+                            }
+
+                            // Allow starting a formula with #{
+                            if (content === '#' && event.key === '{') {
+                                return true;
+                            }
+
+                            // Empty editor - only allow starting datapills or formulas
+                            if (isEditorEmpty) {
+                                return event.key === '#' || event.key === '{';
+                            }
+
+                            // Datapill/formula exists but not in formula context
+                            if (!startsWithFormula && (hasDataPill || hasFormula)) {
+                                return false;
+                            }
+
+                            // Handle formula input behavior
+                            if (startsWithFormula) {
+                                const openCount = (content.match(/\{/g) || []).length;
+                                const closeCount = (content.match(/\}/g) || []).length;
+
+                                // Prevent additional closing braces when formula is balanced
+                                if (openCount === closeCount && openCount > 0 && event.key === '}') {
+                                    return false;
+                                }
+
+                                // Check cursor position relative to closing brace
+                                if (openCount === closeCount && openCount > 0) {
+                                    const docText = editor?.state.doc.textContent || '';
+                                    const closingBracePos = docText.lastIndexOf('}');
+
+                                    // Prevent typing after closing brace
+                                    if (cursorPosition > closingBracePos) {
+                                        return false;
+                                    }
+                                }
+
+                                // Allow all other typing in formulas
+                                return true;
+                            }
+
+                            // For NUMBER/INTEGER types, only allow numeric input
+                            return /[0-9\-+.]/.test(event.key) || event.key === 'Backspace' || event.key === 'Delete';
+                        };
+
+                        const allowed = isKeyAllowed();
+
+                        if (!allowed) {
+                            event.preventDefault();
+
+                            // Only stop propagation for selection cases
+                            if (hasSelection && (selectedText?.includes('${') || selectedText?.includes('#{'))) {
+                                event.stopPropagation();
+                            }
+
+                            return true;
+                        }
+                    }
+
+                    return false;
+                },
             },
             extensions,
             onFocus: () => {
