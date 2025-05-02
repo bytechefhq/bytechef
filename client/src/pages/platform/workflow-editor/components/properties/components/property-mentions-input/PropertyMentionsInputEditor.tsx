@@ -4,7 +4,12 @@ import {useWorkflowNodeParameterMutation} from '@/pages/platform/workflow-editor
 import useWorkflowNodeDetailsPanelStore from '@/pages/platform/workflow-editor/stores/useWorkflowNodeDetailsPanelStore';
 import {encodeParameters, encodePath} from '@/pages/platform/workflow-editor/utils/encodingUtils';
 import saveProperty from '@/pages/platform/workflow-editor/utils/saveProperty';
-import {ComponentDefinitionBasic, Workflow} from '@/shared/middleware/platform/configuration';
+import {TASK_DISPATCHER_NAMES} from '@/shared/constants';
+import {
+    ComponentDefinitionBasic,
+    TaskDispatcherDefinitionBasic,
+    Workflow,
+} from '@/shared/middleware/platform/configuration';
 import {DataPillType} from '@/shared/types';
 import Document from '@tiptap/extension-document';
 import {Mention} from '@tiptap/extension-mention';
@@ -36,6 +41,7 @@ interface PropertyMentionsInputEditorProps {
     onClose?: () => void;
     onFocus?: (editor: Editor) => void;
     placeholder?: string;
+    taskDispatcherDefinitions: TaskDispatcherDefinitionBasic[];
     type: string;
     value?: string | number;
     workflow: Workflow;
@@ -52,6 +58,7 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
             onFocus,
             path,
             placeholder,
+            taskDispatcherDefinitions,
             type,
             value,
             workflow,
@@ -71,9 +78,16 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
                     componentName = workflow.workflowTriggerComponentNames?.[0] || '';
                 }
 
+                if (TASK_DISPATCHER_NAMES.includes(componentName)) {
+                    return (
+                        taskDispatcherDefinitions.find((component) => component.name === componentName)?.icon ||
+                        defaultIcon
+                    );
+                }
+
                 return componentDefinitions.find((component) => component.name === componentName)?.icon || defaultIcon;
             },
-            [componentDefinitions, workflow.workflowTriggerComponentNames]
+            [componentDefinitions, taskDispatcherDefinitions, workflow.workflowTriggerComponentNames]
         );
 
         const memoizedWorkflowTask = useMemo(() => {
