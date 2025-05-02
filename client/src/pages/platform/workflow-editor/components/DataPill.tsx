@@ -10,15 +10,7 @@ import {twMerge} from 'tailwind-merge';
 
 import {transformPathForObjectAccess, transformValueForObjectAccess} from '../utils/encodingUtils';
 
-const DataPill = ({
-    componentIcon,
-    parentProperty,
-    path,
-    property,
-    root = false,
-    sampleOutput,
-    workflowNodeName,
-}: {
+interface DataPillProps {
     componentIcon?: string;
     workflowNodeName: string;
     onClick?: (event: MouseEvent<HTMLDivElement>) => void;
@@ -28,7 +20,17 @@ const DataPill = ({
     root?: boolean;
     /* eslint-disable  @typescript-eslint/no-explicit-any */
     sampleOutput?: any;
-}) => {
+}
+
+const DataPill = ({
+    componentIcon,
+    parentProperty,
+    path,
+    property,
+    root = false,
+    sampleOutput,
+    workflowNodeName,
+}: DataPillProps) => {
     const {currentComponent, focusedInput} = useWorkflowNodeDetailsPanelStore();
 
     const mentionInput: Editor | null = focusedInput;

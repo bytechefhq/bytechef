@@ -26,17 +26,11 @@ const PropertyMentionsInputEditorSuggestionList = forwardRef<
         }
     };
 
-    const upHandler = () => {
-        setSelectedIndex((selectedIndex + props.items.length - 1) % props.items.length);
-    };
+    const upHandler = () => setSelectedIndex((selectedIndex + props.items.length - 1) % props.items.length);
 
-    const downHandler = () => {
-        setSelectedIndex((selectedIndex + 1) % props.items.length);
-    };
+    const downHandler = () => setSelectedIndex((selectedIndex + 1) % props.items.length);
 
-    const enterHandler = () => {
-        selectItem(selectedIndex);
-    };
+    const enterHandler = () => selectItem(selectedIndex);
 
     useEffect(() => setSelectedIndex(0), [props.items]);
 
