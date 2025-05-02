@@ -477,7 +477,7 @@ const WorkflowNodeDetailsPanel = ({
                 (task: WorkflowTask) => task.name
             );
 
-            filteredNodeNames = previousNodeNames.filter(
+            filteredNodeNames = filteredNodeNames.filter(
                 (nodeName) => !oppositeConditionCaseNodeNames?.includes(nodeName)
             );
         } else if (currentNode?.branchData) {
@@ -512,14 +512,14 @@ const WorkflowNodeDetailsPanel = ({
                 .map((caseItem) => caseItem.tasks.map((task: WorkflowTask) => task.name))
                 .flat(Infinity);
 
-            filteredNodeNames = previousNodeNames.filter((nodeName) => !otherCasesNodeNames?.includes(nodeName));
+            filteredNodeNames = filteredNodeNames.filter((nodeName) => !otherCasesNodeNames?.includes(nodeName));
         }
 
         const dataPills = getDataPillsFromProperties(previousComponentProperties!, filteredNodeNames);
 
         setDataPills(dataPills.flat(Infinity));
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [previousComponentProperties.length]);
+    }, [previousComponentProperties.length, previousNodeNames]);
 
     // Tab switching logic
     useEffect(() => {

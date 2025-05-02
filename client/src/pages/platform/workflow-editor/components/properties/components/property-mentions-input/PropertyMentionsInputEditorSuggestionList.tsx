@@ -4,6 +4,7 @@ import {DataPillType} from '@/shared/types';
 import {SuggestionKeyDownProps, SuggestionProps} from '@tiptap/suggestion';
 import React, {forwardRef, useEffect, useImperativeHandle, useState} from 'react';
 import InlineSVG from 'react-inlinesvg';
+import {twMerge} from 'tailwind-merge';
 
 export type PropertyMentionsInputListRefType = {
     onKeyDown: (props: SuggestionKeyDownProps) => boolean;
@@ -64,23 +65,24 @@ const PropertyMentionsInputEditorSuggestionList = forwardRef<
     }));
 
     return (
-        <div className="property-mentions-suggestion-menu max-h-96 overflow-y-auto">
+        <ul className="property-mentions-suggestion-menu max-h-96 gap-y-1 overflow-y-auto">
             {props.items.length ? (
                 props.items.map((item: DataPillType, index: number) => (
-                    <button
-                        className={index === selectedIndex ? 'is-selected' : ''}
-                        key={index}
-                        onClick={() => selectItem(index)}
-                    >
-                        <InlineSVG className="mr-2 size-4 flex-none" src={item.componentIcon!} />
+                    <li key={index}>
+                        <button
+                            className={twMerge(index === selectedIndex && 'is-selected')}
+                            onClick={() => selectItem(index)}
+                        >
+                            <InlineSVG className="mr-2 size-4 flex-none" src={item.componentIcon!} />
 
-                        {item.value}
-                    </button>
+                            {item.value}
+                        </button>
+                    </li>
                 ))
             ) : (
-                <p className="text-sm">No data pills found.</p>
+                <span className="text-sm">No data pills found.</span>
             )}
-        </div>
+        </ul>
     );
 });
 

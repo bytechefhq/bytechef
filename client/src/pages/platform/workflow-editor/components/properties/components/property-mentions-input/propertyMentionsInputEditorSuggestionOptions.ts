@@ -3,7 +3,7 @@ import PropertyMentionsInputEditorSuggestionList, {
 } from '@/pages/platform/workflow-editor/components/properties/components/property-mentions-input/PropertyMentionsInputEditorSuggestionList';
 import {DataPillType} from '@/shared/types';
 import {MentionOptions} from '@tiptap/extension-mention';
-import {ReactRenderer} from '@tiptap/react';
+import {Editor, ReactRenderer} from '@tiptap/react';
 import tippy, {type Instance as TippyInstance} from 'tippy.js';
 
 /**
@@ -29,12 +29,16 @@ const DOM_RECT_FALLBACK: DOMRect = {
     y: 0,
 };
 
-export function getSuggestionOptions(dataPills: DataPillType[]): MentionOptions['suggestion'] {
+export function getSuggestionOptions(): MentionOptions['suggestion'] {
     return {
         allow: ({editor, range}) => {
-            const textBefore = editor.state.doc.textBetween(Math.max(0, range.from - 1), range.from);
+            const editorContent = editor.state.doc.textContent;
 
-            return textBefore !== '#';
+            if (range.from === 2) {
+                return editorContent.charAt(0) !== '#';
+            }
+
+            return true;
         },
         allowedPrefixes: null,
         char: '{',
@@ -51,10 +55,10 @@ export function getSuggestionOptions(dataPills: DataPillType[]): MentionOptions[
                 ])
                 .run();
         },
-        items: ({query}: {query: string}): DataPillType[] => {
-            return dataPills
-                .map((dataPill) => dataPill)
-                .filter((item) => (!query ? item : item.value.toLowerCase().startsWith(query.toLowerCase())));
+        items: ({editor, query}: {editor: Editor; query: string}): DataPillType[] => {
+            const dataPills: DataPillType[] = editor.storage.MentionStorage.dataPills;
+
+            return dataPills.filter((dataPill) => dataPill.value.toLowerCase().startsWith(query.toLowerCase()));
         },
         render: () => {
             let component: ReactRenderer<PropertyMentionsInputListRefType> | undefined;

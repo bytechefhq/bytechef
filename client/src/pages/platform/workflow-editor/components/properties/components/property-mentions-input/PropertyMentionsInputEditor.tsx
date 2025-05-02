@@ -21,6 +21,8 @@ import sanitizeHtml from 'sanitize-html';
 import {twMerge} from 'tailwind-merge';
 import {useDebouncedCallback} from 'use-debounce';
 
+import {MentionStorage} from './MentionStorage.extension';
+
 const defaultIcon =
     '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V8Z"/><path d="M15 3v4a2 2 0 0 0 2 2h4"/></svg>';
 
@@ -83,6 +85,7 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
         const extensions = useMemo(() => {
             const extensions = [
                 ...(controlType === 'RICH_TEXT' ? [StarterKit] : [Document, Paragraph, Text]),
+                MentionStorage,
                 Mention.configure({
                     HTMLAttributes: {
                         class: 'property-mention',
@@ -117,7 +120,7 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
                     renderText({node}) {
                         return `\${${node.attrs.label ?? node.attrs.id}}`;
                     },
-                    suggestion: getSuggestionOptions(dataPills),
+                    suggestion: getSuggestionOptions(),
                 }),
                 Placeholder.configure({
                     placeholder: placeholder
@@ -139,7 +142,7 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
             }
 
             return extensions;
-        }, [controlType, dataPills, getComponentIcon, placeholder]);
+        }, [controlType, getComponentIcon, placeholder]);
 
         const {updateWorkflowNodeParameterMutation} = useWorkflowNodeParameterMutation();
 
@@ -353,6 +356,12 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
         if (ref) {
             (ref as MutableRefObject<Editor | null>).current = editor;
         }
+
+        useEffect(() => {
+            if (editor) {
+                editor.storage.MentionStorage.dataPills = dataPills;
+            }
+        }, [dataPills, editor]);
 
         useEffect(() => {
             if (editor && !isLocalUpdate) {
