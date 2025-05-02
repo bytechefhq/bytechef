@@ -5,6 +5,7 @@ import getNestedObject from '@/pages/platform/workflow-editor/utils/getNestedObj
 import {NodeDataType, PropertyAllType} from '@/shared/types';
 import {AccordionContent, AccordionTrigger} from '@radix-ui/react-accordion';
 import {ChevronDownIcon} from 'lucide-react';
+import {Fragment} from 'react';
 import InlineSVG from 'react-inlinesvg';
 import {useShallow} from 'zustand/react/shallow';
 
@@ -66,7 +67,7 @@ const DataPillPanelBodyPropertiesItem = ({
     );
 
     return (
-        <>
+        <Fragment key={`accordion-item-${workflowNodeName}`}>
             <AccordionTrigger
                 className="group flex w-full items-center justify-between border-border/50 bg-background p-4 group-data-[state=closed]:border-b"
                 key={`accordion-trigger-${workflowNodeName}`}
@@ -161,7 +162,7 @@ const DataPillPanelBodyPropertiesItem = ({
                     </div>
                 )}
             </AccordionContent>
-        </>
+        </Fragment>
     );
 };
 
