@@ -69,7 +69,7 @@ public class DeleteJdbcOperationIntTest {
         Map<String, ?> inputParameters = Map.of(
             SCHEMA, "public",
             TABLE, "test",
-            CONDITION, "name = name1");
+            CONDITION, "name = 'name1'");
 
         Map<String, Integer> result = new DeleteJdbcOperation().execute(
             inputParameters, new SingleConnectionDataSource(dataSource.getConnection(), false));
