@@ -1,7 +1,11 @@
 import {Button} from '@/components/ui/button';
 import {Sheet, SheetCloseButton, SheetContent, SheetHeader, SheetTitle, SheetTrigger} from '@/components/ui/sheet';
 import PropertyMentionsInputEditor from '@/pages/platform/workflow-editor/components/properties/components/property-mentions-input/PropertyMentionsInputEditor';
-import {ComponentDefinitionBasic, Workflow} from '@/shared/middleware/platform/configuration';
+import {
+    ComponentDefinitionBasic,
+    TaskDispatcherDefinitionBasic,
+    Workflow,
+} from '@/shared/middleware/platform/configuration';
 import {DataPillType} from '@/shared/types';
 import {Editor} from '@tiptap/react';
 import {MaximizeIcon} from 'lucide-react';
@@ -14,6 +18,7 @@ export interface PropertyMentionsInputEditorSheetProps {
     onClose?: () => void;
     onFocus?: (editor: Editor) => void;
     placeholder?: string;
+    taskDispatcherDefinitions: TaskDispatcherDefinitionBasic[];
     type: string;
     value?: string;
     title: string;
@@ -27,6 +32,7 @@ const PropertyMentionsInputEditorSheet = ({
     onClose,
     path,
     placeholder,
+    taskDispatcherDefinitions,
     title,
     type,
     value,
@@ -60,6 +66,7 @@ const PropertyMentionsInputEditorSheet = ({
                     dataPills={dataPills}
                     path={path}
                     placeholder={placeholder}
+                    taskDispatcherDefinitions={taskDispatcherDefinitions}
                     type={type}
                     value={value}
                     workflow={workflow}

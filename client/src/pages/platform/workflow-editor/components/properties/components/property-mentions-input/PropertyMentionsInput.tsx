@@ -56,7 +56,7 @@ const PropertyMentionsInput = forwardRef<Editor, PropertyMentionsInputProps>(
     ) => {
         const [isFocused, setIsFocused] = useState(false);
 
-        const {componentDefinitions, dataPills, workflow} = useWorkflowDataStore();
+        const {componentDefinitions, dataPills, taskDispatcherDefinitions, workflow} = useWorkflowDataStore();
         const {focusedInput, setFocusedInput, workflowNodeDetailsPanelOpen} = useWorkflowNodeDetailsPanelStore();
         const {setDataPillPanelOpen} = useDataPillPanelStore();
 
@@ -110,6 +110,7 @@ const PropertyMentionsInput = forwardRef<Editor, PropertyMentionsInputProps>(
                                     dataPills={dataPills}
                                     path={path}
                                     placeholder={placeholder}
+                                    taskDispatcherDefinitions={taskDispatcherDefinitions}
                                     title={label ?? ''}
                                     type={type}
                                     value={value}
@@ -158,6 +159,7 @@ const PropertyMentionsInput = forwardRef<Editor, PropertyMentionsInputProps>(
                             path={path}
                             placeholder={placeholder}
                             ref={ref}
+                            taskDispatcherDefinitions={taskDispatcherDefinitions}
                             type={type}
                             value={value || defaultValue}
                             workflow={workflow}
