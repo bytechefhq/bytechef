@@ -1,7 +1,9 @@
 import {
+    PATH_CLOSING_PARENTHESIS_REPLACEMENT,
     PATH_DASH_REPLACEMENT,
     PATH_DIGIT_PREFIX,
     PATH_HASH_REPLACEMENT,
+    PATH_OPENING_PARENTHESIS_REPLACEMENT,
     PATH_SPACE_REPLACEMENT,
 } from '@/shared/constants';
 import isObject from 'isobject';
@@ -53,6 +55,10 @@ export function encodeParameters(parameters: {[key: string]: unknown}): {[key: s
 
     encodedParameters = encodeParametersGeneric(encodedParameters, /#/g, PATH_HASH_REPLACEMENT);
 
+    encodedParameters = encodeParametersGeneric(encodedParameters, /\(/g, PATH_OPENING_PARENTHESIS_REPLACEMENT);
+
+    encodedParameters = encodeParametersGeneric(encodedParameters, /\)/g, PATH_CLOSING_PARENTHESIS_REPLACEMENT);
+
     return encodedParameters;
 }
 
@@ -75,6 +81,14 @@ export function decodePath(path: string): string {
         decodedPath = decodedPath.replace(new RegExp(PATH_HASH_REPLACEMENT, 'g'), '#');
     }
 
+    if (decodedPath.includes(PATH_OPENING_PARENTHESIS_REPLACEMENT)) {
+        decodedPath = decodedPath.replace(new RegExp(PATH_OPENING_PARENTHESIS_REPLACEMENT, 'g'), '(');
+    }
+
+    if (decodedPath.includes(PATH_CLOSING_PARENTHESIS_REPLACEMENT)) {
+        decodedPath = decodedPath.replace(new RegExp(PATH_CLOSING_PARENTHESIS_REPLACEMENT, 'g'), ')');
+    }
+
     return decodedPath;
 }
 
@@ -86,6 +100,10 @@ export function encodePath(path: string): string {
     encodedPath = encodePathGeneric(encodedPath, /-/g, PATH_DASH_REPLACEMENT);
 
     encodedPath = encodePathGeneric(encodedPath, /#/g, PATH_HASH_REPLACEMENT);
+
+    encodedPath = encodePathGeneric(encodedPath, /\(/g, PATH_OPENING_PARENTHESIS_REPLACEMENT);
+
+    encodedPath = encodePathGeneric(encodedPath, /\)/g, PATH_CLOSING_PARENTHESIS_REPLACEMENT);
 
     return encodedPath;
 }
