@@ -35,8 +35,7 @@ public class ZoomUtils extends AbstractZoomUtils {
 
     public static List<Option<Long>> getMeetingIdOptions(
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
-        String searchText,
-        Context context) {
+        String searchText, Context context) {
 
         Map<String, Object> result = context.http(http -> http.get("/users/me/meetings"))
             .configuration(responseType(ResponseType.JSON))
@@ -45,8 +44,8 @@ public class ZoomUtils extends AbstractZoomUtils {
 
         List<Option<Long>> meetingIdOptions = new ArrayList<>();
 
-        if (result.get("meetings") instanceof List<?> meetingsList) {
-            for (Object meeting : meetingsList) {
+        if (result.get("meetings") instanceof List<?> meetings) {
+            for (Object meeting : meetings) {
                 if (meeting instanceof Map<?, ?> meetingMap) {
                     meetingIdOptions.add(option((String) meetingMap.get("topic"), (long) meetingMap.get("id")));
                 }
