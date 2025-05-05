@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-package com.bytechef.component.zoho.books.util;
+package com.bytechef.zoho.commons;
 
 import static com.bytechef.component.definition.ComponentDsl.option;
-import static com.bytechef.component.zoho.books.constant.ZohoBooksConstants.CONTACT_NAME;
-import static com.bytechef.component.zoho.books.constant.ZohoBooksConstants.CONTACT_TYPE;
+import static com.bytechef.component.zoho.commons.ZohoConstants.CONTACT_NAME;
+import static com.bytechef.component.zoho.commons.ZohoConstants.CONTACT_TYPE;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
@@ -30,6 +30,7 @@ import com.bytechef.component.definition.Context.Http.Response;
 import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
+import com.bytechef.component.zoho.commons.ZohoUtils;
 import java.util.List;
 import java.util.Map;
 import org.hamcrest.Matchers;
@@ -39,7 +40,7 @@ import org.junit.jupiter.api.Test;
 /**
  * @author Marija Horvat
  */
-class ZohoBooksUtilsTest {
+class ZohoUtilsTest {
 
     private final List<Option<String>> expectedOptions = List.of(
         option("List 1", "list1"), option("List 2", "list2"));
@@ -68,7 +69,7 @@ class ZohoBooksUtilsTest {
         when(mockedResponse.getBody(any(TypeReference.class)))
             .thenReturn(mockedCurrencyMap);
 
-        List<Option<String>> result = ZohoBooksUtils.getCurrencyOptions(
+        List<Option<String>> result = ZohoUtils.getCurrencyOptions(
             mockedParameters, mockedParameters, Map.of(), "", mockedContext);
 
         assertThat(result, Matchers.containsInAnyOrder(expectedOptions.toArray()));
@@ -84,7 +85,7 @@ class ZohoBooksUtilsTest {
         when(mockedResponse.getBody(any(TypeReference.class)))
             .thenReturn(mockedCustomersMap);
 
-        List<Option<String>> result = ZohoBooksUtils.getCustomersOptions(
+        List<Option<String>> result = ZohoUtils.getCustomersOptions(
             mockedParameters, mockedParameters, Map.of(), "", mockedContext);
 
         assertThat(result, Matchers.containsInAnyOrder(expectedOptions.toArray()));
@@ -100,7 +101,7 @@ class ZohoBooksUtilsTest {
         when(mockedResponse.getBody(any(TypeReference.class)))
             .thenReturn(mockedItemsMap);
 
-        List<Option<String>> result = ZohoBooksUtils.getItemsOptions(
+        List<Option<String>> result = ZohoUtils.getItemsOptions(
             mockedParameters, mockedParameters, Map.of(), "", mockedContext);
 
         assertThat(result, Matchers.containsInAnyOrder(expectedOptions.toArray()));

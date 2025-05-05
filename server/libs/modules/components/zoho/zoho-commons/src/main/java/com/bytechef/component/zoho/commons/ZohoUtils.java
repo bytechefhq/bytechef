@@ -14,15 +14,15 @@
  * limitations under the License.
  */
 
-package com.bytechef.component.zoho.books.util;
+package com.bytechef.component.zoho.commons;
 
 import static com.bytechef.component.definition.ComponentDsl.option;
-import static com.bytechef.component.definition.Context.Http.ResponseType;
 import static com.bytechef.component.definition.Context.Http.responseType;
-import static com.bytechef.component.zoho.books.constant.ZohoBooksConstants.CONTACT_NAME;
-import static com.bytechef.component.zoho.books.constant.ZohoBooksConstants.CONTACT_TYPE;
+import static com.bytechef.component.zoho.commons.ZohoConstants.CONTACT_NAME;
+import static com.bytechef.component.zoho.commons.ZohoConstants.CONTACT_TYPE;
 
 import com.bytechef.component.definition.Context;
+import com.bytechef.component.definition.Context.Http.ResponseType;
 import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
@@ -33,9 +33,9 @@ import java.util.Map;
 /**
  * @author Marija Horvat
  */
-public class ZohoBooksUtils {
+public class ZohoUtils {
 
-    private ZohoBooksUtils() {
+    private ZohoUtils() {
     }
 
     public static List<Option<String>> getCurrencyOptions(
@@ -57,7 +57,6 @@ public class ZohoBooksUtils {
                 }
             }
         }
-
         return options;
     }
 
@@ -104,7 +103,6 @@ public class ZohoBooksUtils {
                 }
             }
         }
-
         return options;
     }
 }

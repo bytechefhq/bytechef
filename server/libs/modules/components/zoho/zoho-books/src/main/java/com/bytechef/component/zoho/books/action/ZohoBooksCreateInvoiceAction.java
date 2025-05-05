@@ -29,18 +29,18 @@ import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.Context.Http.Body;
 import static com.bytechef.component.definition.Context.Http.ResponseType;
 import static com.bytechef.component.definition.Context.Http.responseType;
-import static com.bytechef.component.zoho.books.constant.ZohoBooksConstants.CURRENCY_ID;
-import static com.bytechef.component.zoho.books.constant.ZohoBooksConstants.CUSTOMER_ID;
-import static com.bytechef.component.zoho.books.constant.ZohoBooksConstants.DATE;
-import static com.bytechef.component.zoho.books.constant.ZohoBooksConstants.INVOICE_NUMBER;
-import static com.bytechef.component.zoho.books.constant.ZohoBooksConstants.LINE_ITEMS;
-import static com.bytechef.component.zoho.books.constant.ZohoBooksConstants.PAYMENT_TERMS;
-import static com.bytechef.component.zoho.books.constant.ZohoBooksConstants.USE_CUSTOM_INVOICE_NUMBER;
+import static com.bytechef.component.zoho.commons.ZohoConstants.CURRENCY_ID;
+import static com.bytechef.component.zoho.commons.ZohoConstants.CUSTOMER_ID;
+import static com.bytechef.component.zoho.commons.ZohoConstants.DATE;
+import static com.bytechef.component.zoho.commons.ZohoConstants.INVOICE_NUMBER;
+import static com.bytechef.component.zoho.commons.ZohoConstants.LINE_ITEMS;
+import static com.bytechef.component.zoho.commons.ZohoConstants.PAYMENT_TERMS;
+import static com.bytechef.component.zoho.commons.ZohoConstants.USE_CUSTOM_INVOICE_NUMBER;
 
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.zoho.books.util.ZohoBooksUtils;
+import com.bytechef.component.zoho.commons.ZohoUtils;
 
 /**
  * @author Marija Horvat
@@ -56,7 +56,7 @@ public class ZohoBooksCreateInvoiceAction {
                 .label("Customer ID")
                 .description("ID of the customer the invoice has to be created.")
                 .required(true)
-                .options((ActionOptionsFunction<String>) ZohoBooksUtils::getCustomersOptions),
+                .options((ActionOptionsFunction<String>) ZohoUtils::getCustomersOptions),
             bool(USE_CUSTOM_INVOICE_NUMBER)
                 .label("Use Custom Invoice Number")
                 .description("If true, create custom invoice number, if false, use auto invoice number generation.")
@@ -77,7 +77,7 @@ public class ZohoBooksCreateInvoiceAction {
                             string("item_id")
                                 .label("Item ID")
                                 .description("ID of item.")
-                                .options((ActionOptionsFunction<String>) ZohoBooksUtils::getItemsOptions)
+                                .options((ActionOptionsFunction<String>) ZohoUtils::getItemsOptions)
                                 .required(true),
                             number("quantity")
                                 .label("Quantity")
@@ -86,7 +86,7 @@ public class ZohoBooksCreateInvoiceAction {
             string(CURRENCY_ID)
                 .label("Currency ID")
                 .description("Currency ID of the customer's currency.")
-                .options((ActionOptionsFunction<String>) ZohoBooksUtils::getCurrencyOptions)
+                .options((ActionOptionsFunction<String>) ZohoUtils::getCurrencyOptions)
                 .required(false),
             date(DATE)
                 .label("Invoice Date")
