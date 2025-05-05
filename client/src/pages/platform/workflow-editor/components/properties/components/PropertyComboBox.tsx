@@ -181,7 +181,7 @@ const PropertyComboBox = ({
     }, [lookupDependsOnValues, options]);
 
     const dependencyMissing = useMemo(
-        () => lookupDependsOnPaths?.length && lookupDependsOnValues?.every((value) => value === undefined),
+        () => lookupDependsOnPaths?.length && lookupDependsOnValues?.some((value) => value === undefined),
         [lookupDependsOnPaths, lookupDependsOnValues]
     );
 

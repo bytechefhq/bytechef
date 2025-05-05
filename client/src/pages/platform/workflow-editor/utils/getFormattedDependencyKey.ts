@@ -3,6 +3,10 @@ export default function getFormattedDependencyKey(values: unknown[] = []): strin
         return '';
     }
 
+    if (values.some((value) => value === undefined)) {
+        return '';
+    }
+
     return values
         .map((value) => {
             if (value && typeof value === 'object') {
