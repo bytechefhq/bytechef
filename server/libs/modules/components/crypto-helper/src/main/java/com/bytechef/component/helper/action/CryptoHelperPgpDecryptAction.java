@@ -84,10 +84,8 @@ public class CryptoHelperPgpDecryptAction {
 
         Security.addProvider(new BouncyCastleProvider());
 
-        FileEntry fileEntry = inputParameters.getRequiredFileEntry(FILE);
-        byte[] encryptedBytes = context.file(file -> file.readAllBytes(fileEntry));
-
-        ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(encryptedBytes);
+        ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(
+            context.file(file -> file.readAllBytes(inputParameters.getRequiredFileEntry(FILE))));
 
         PGPObjectFactory pgpObjectFactory = new PGPObjectFactory(
             PGPUtil.getDecoderStream(byteArrayInputStream), new JcaKeyFingerprintCalculator());
@@ -120,17 +118,18 @@ public class CryptoHelperPgpDecryptAction {
             PGPUtil.getDecoderStream(inputStream), new JcaKeyFingerprintCalculator());
 
         PGPPrivateKey pgpPrivateKey = null;
-
         Iterator<PGPEncryptedData> iterator = encDataList.getEncryptedDataObjects();
 
         while (pgpPrivateKey == null && iterator.hasNext()) {
             PGPPublicKeyEncryptedData pgpPublicKeyEncryptedData = (PGPPublicKeyEncryptedData) iterator.next();
             PGPSecretKey pgpSecKey = pgpSecretKeyRingCollection.getSecretKey(pgpPublicKeyEncryptedData.getKeyID());
 
-            pgpPrivateKey = pgpSecKey == null ? null : pgpSecKey.extractPrivateKey(
-                new JcePBESecretKeyDecryptorBuilder()
-                    .setProvider(BouncyCastleProvider.PROVIDER_NAME)
-                    .build(passphrase.toCharArray()));
+            if (pgpSecKey != null) {
+                pgpPrivateKey = pgpSecKey.extractPrivateKey(
+                    new JcePBESecretKeyDecryptorBuilder()
+                        .setProvider(BouncyCastleProvider.PROVIDER_NAME)
+                        .build(passphrase.toCharArray()));
+            }
         }
 
         return pgpPrivateKey;
@@ -138,6 +137,7 @@ public class CryptoHelperPgpDecryptAction {
 
     private static ByteArrayOutputStream getDecryptedDataFromStream(InputStream decryptedDataStream)
         throws IOException {
+
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
 
         int ch;

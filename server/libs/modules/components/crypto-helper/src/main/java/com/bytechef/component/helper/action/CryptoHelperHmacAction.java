@@ -73,9 +73,7 @@ public class CryptoHelperHmacAction {
 
             String input = inputParameters.getRequiredString(INPUT);
 
-            byte[] hmac = mac.doFinal(input.getBytes(StandardCharsets.UTF_8));
-
-            return convertBytesToHexString(hmac);
+            return convertBytesToHexString(mac.doFinal(input.getBytes(StandardCharsets.UTF_8)));
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

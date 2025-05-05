@@ -30,7 +30,6 @@ import com.bytechef.component.definition.FileEntry;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.Property.ControlType;
 import java.io.ByteArrayInputStream;
-import java.security.PrivateKey;
 import java.security.Signature;
 
 /**
@@ -60,17 +59,14 @@ public class CryptoHelperSignAction {
     protected static FileEntry perform(Parameters inputParameters, Parameters connectionParameters, Context context)
         throws Exception {
 
-        PrivateKey privateKey = getPrivateRSAKeyFromString(inputParameters.getRequiredString(PRIVATE_KEY));
-
-        FileEntry fileEntry = inputParameters.getRequiredFileEntry(FILE);
-        byte[] fileBytes = context.file(file -> file.readAllBytes(fileEntry));
-
         Signature signature = Signature.getInstance("SHA256withRSA");
-        signature.initSign(privateKey);
+
+        signature.initSign(getPrivateRSAKeyFromString(inputParameters.getRequiredString(PRIVATE_KEY)));
+
+        byte[] fileBytes = context.file(file -> file.readAllBytes(inputParameters.getRequiredFileEntry(FILE)));
+
         signature.update(fileBytes);
 
-        byte[] signatureBytes = signature.sign();
-
-        return context.file(file -> file.storeContent("signature.", new ByteArrayInputStream(signatureBytes)));
+        return context.file(file -> file.storeContent("signature.", new ByteArrayInputStream(signature.sign())));
     }
 }

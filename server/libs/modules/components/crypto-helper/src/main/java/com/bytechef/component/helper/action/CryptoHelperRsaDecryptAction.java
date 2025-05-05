@@ -31,7 +31,6 @@ import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.Property.ControlType;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.security.PrivateKey;
 import javax.crypto.Cipher;
 
 /**
@@ -61,22 +60,20 @@ public class CryptoHelperRsaDecryptAction {
     public static FileEntry perform(Parameters inputParameters, Parameters connectionParameters, Context context)
         throws Exception {
 
-        FileEntry fileEntry = inputParameters.getRequiredFileEntry(FILE);
-        byte[] encryptedData = context.file(file -> file.readAllBytes(fileEntry));
-
-        PrivateKey privateKey = getPrivateRSAKeyFromString(inputParameters.getRequiredString(PRIVATE_KEY));
-
         Cipher cipher = Cipher.getInstance("RSA/ECB/PKCS1Padding");
-        cipher.init(Cipher.DECRYPT_MODE, privateKey);
 
-        int maxBlockSize = 256;
+        cipher.init(Cipher.DECRYPT_MODE, getPrivateRSAKeyFromString(inputParameters.getRequiredString(PRIVATE_KEY)));
+
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-
+        int maxBlockSize = 256;
         int offset = 0;
+
+        byte[] encryptedData = context.file(file -> file.readAllBytes(inputParameters.getRequiredFileEntry(FILE)));
+
         while (offset < encryptedData.length) {
             int chunkSize = Math.min(maxBlockSize, encryptedData.length - offset);
-            byte[] chunck = cipher.doFinal(encryptedData, offset, chunkSize);
-            byteArrayOutputStream.write(chunck);
+            byte[] chunk = cipher.doFinal(encryptedData, offset, chunkSize);
+            byteArrayOutputStream.write(chunk);
             offset += chunkSize;
         }
 

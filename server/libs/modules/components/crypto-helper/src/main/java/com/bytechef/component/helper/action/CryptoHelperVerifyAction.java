@@ -28,9 +28,7 @@ import static com.bytechef.component.helper.util.CryptoHelperUtil.getPublicRSAKe
 
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context;
-import com.bytechef.component.definition.FileEntry;
 import com.bytechef.component.definition.Parameters;
-import java.security.PublicKey;
 import java.security.Signature;
 
 /**
@@ -63,16 +61,15 @@ public class CryptoHelperVerifyAction {
     protected static boolean perform(Parameters inputParameters, Parameters connectionParameters, Context context)
         throws Exception {
 
-        PublicKey publicKey = getPublicRSAKeyFromString(inputParameters.getRequiredString(PUBLIC_KEY));
-
-        FileEntry fileEntry = inputParameters.getRequiredFileEntry(FILE);
-        byte[] fileBytes = context.file(file -> file.readAllBytes(fileEntry));
-
-        FileEntry signatureEntry = inputParameters.getRequiredFileEntry(SIGNATURE);
-        byte[] signatureBytes = context.file(file -> file.readAllBytes(signatureEntry));
+        byte[] signatureBytes = context.file(
+            file -> file.readAllBytes(inputParameters.getRequiredFileEntry(SIGNATURE)));
 
         Signature signature = Signature.getInstance("SHA256withRSA");
-        signature.initVerify(publicKey);
+
+        signature.initVerify(getPublicRSAKeyFromString(inputParameters.getRequiredString(PUBLIC_KEY)));
+
+        byte[] fileBytes = context.file(file -> file.readAllBytes(inputParameters.getRequiredFileEntry(FILE)));
+
         signature.update(fileBytes);
 
         return signature.verify(signatureBytes);

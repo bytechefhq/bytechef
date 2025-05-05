@@ -114,8 +114,8 @@ public class CryptoHelperPgpEncryptAction {
         String armoredMessage = armorMessage(byteArrayOutputStream.toByteArray());
 
         return context.file(
-            file -> file.storeContent("encrypted.",
-                new ByteArrayInputStream(armoredMessage.getBytes(StandardCharsets.UTF_8))));
+            file -> file.storeContent(
+                "encrypted.", new ByteArrayInputStream(armoredMessage.getBytes(StandardCharsets.UTF_8))));
     }
 
     private static PGPPublicKey getPublicKey(JcaPGPPublicKeyRingCollection pgpPublicKeyRingCollection) {

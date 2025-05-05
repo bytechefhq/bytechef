@@ -19,24 +19,25 @@ package com.bytechef.component.helper.util;
 /**
  * @author Nikolina Spehar
  */
-public enum CryptographicAlgorithmsEnum {
+public enum CryptographicAlgorithm {
+
     MD5("MD5", "HmacMD5"),
     SHA_1("SHA-1", "HmacSHA1"),
     SHA_256("SHA-256", "HmacSHA256");
 
+    private final String name;
     private final String label;
-    private final String hmacLabel;
 
-    CryptographicAlgorithmsEnum(String label, String hmacLabel) {
+    CryptographicAlgorithm(String name, String label) {
+        this.name = name;
         this.label = label;
-        this.hmacLabel = hmacLabel;
+    }
+
+    public String getName() {
+        return name;
     }
 
     public String getLabel() {
         return label;
-    }
-
-    public String getHmacLabel() {
-        return hmacLabel;
     }
 }

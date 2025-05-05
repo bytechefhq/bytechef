@@ -30,7 +30,6 @@ import com.bytechef.component.definition.FileEntry;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.Property.ControlType;
 import java.io.ByteArrayInputStream;
-import java.security.PublicKey;
 import javax.crypto.Cipher;
 
 /**
@@ -60,16 +59,12 @@ public class CryptoHelperRsaEncryptAction {
     public static FileEntry perform(Parameters inputParameters, Parameters connectionParameters, Context context)
         throws Exception {
 
-        PublicKey publicKey = getPublicRSAKeyFromString(inputParameters.getRequiredString(PUBLIC_KEY));
-
         Cipher cipher = Cipher.getInstance("RSA/ECB/PKCS1Padding");
-        cipher.init(Cipher.ENCRYPT_MODE, publicKey);
 
-        FileEntry fileEntry = inputParameters.getRequiredFileEntry(FILE);
+        cipher.init(Cipher.ENCRYPT_MODE, getPublicRSAKeyFromString(inputParameters.getRequiredString(PUBLIC_KEY)));
 
-        byte[] fileBytes = context.file(file -> file.readAllBytes(fileEntry));
-
-        byte[] encryptedBytes = cipher.doFinal(fileBytes);
+        byte[] encryptedBytes = cipher.doFinal(
+            context.file(file -> file.readAllBytes(inputParameters.getRequiredFileEntry(FILE))));
 
         return context.file(
             file -> file.storeContent("encrypted.", new ByteArrayInputStream(encryptedBytes)));

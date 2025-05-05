@@ -34,6 +34,8 @@ import java.util.stream.Collectors;
  */
 public class CryptoHelperUtil {
 
+    private static final Base64.Decoder DECODER = Base64.getDecoder();
+
     private CryptoHelperUtil() {
     }
 
@@ -48,14 +50,14 @@ public class CryptoHelperUtil {
     }
 
     public static List<Option<String>> getHashAlgorithmOptions() {
-        return Arrays.stream(CryptographicAlgorithmsEnum.values())
-            .map(algorithm -> option(algorithm.getLabel(), algorithm.getLabel()))
+        return Arrays.stream(CryptographicAlgorithm.values())
+            .map(algorithm -> option(algorithm.getName(), algorithm.getName()))
             .collect(Collectors.toList());
     }
 
     public static List<Option<String>> getHmacAlgorithmOptions() {
-        return Arrays.stream(CryptographicAlgorithmsEnum.values())
-            .map(algorithm -> option(algorithm.getLabel(), algorithm.getHmacLabel()))
+        return Arrays.stream(CryptographicAlgorithm.values())
+            .map(algorithm -> option(algorithm.getName(), algorithm.getLabel()))
             .collect(Collectors.toList());
     }
 
@@ -65,11 +67,8 @@ public class CryptoHelperUtil {
             .replace("-----END PUBLIC KEY-----", "")
             .replaceAll("\\s", "");
 
-        byte[] encoded = Base64.getDecoder()
-            .decode(publicKeyPEM);
-
         KeyFactory keyFactory = KeyFactory.getInstance("RSA");
-        X509EncodedKeySpec keySpec = new X509EncodedKeySpec(encoded);
+        X509EncodedKeySpec keySpec = new X509EncodedKeySpec(DECODER.decode(publicKeyPEM));
 
         return keyFactory.generatePublic(keySpec);
     }
@@ -80,11 +79,8 @@ public class CryptoHelperUtil {
             .replace("-----END PRIVATE KEY-----", "")
             .replaceAll("\\s", ""); // Remove all whitespace
 
-        byte[] encoded = Base64.getDecoder()
-            .decode(privateKeyPEM);
-
         KeyFactory keyFactory = KeyFactory.getInstance("RSA");
-        PKCS8EncodedKeySpec keySpec = new PKCS8EncodedKeySpec(encoded);
+        PKCS8EncodedKeySpec keySpec = new PKCS8EncodedKeySpec(DECODER.decode(privateKeyPEM));
 
         return keyFactory.generatePrivate(keySpec);
     }
