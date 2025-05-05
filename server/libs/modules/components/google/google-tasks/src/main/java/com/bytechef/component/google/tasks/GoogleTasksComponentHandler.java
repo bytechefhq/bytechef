@@ -26,6 +26,7 @@ import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.component.google.tasks.action.GoogleTasksCreateTaskAction;
 import com.bytechef.component.google.tasks.action.GoogleTasksListTasksAction;
 import com.bytechef.component.google.tasks.action.GoogleTasksUpdateTaskAction;
+import com.bytechef.component.google.tasks.trigger.GoogleTasksNewTaskTrigger;
 import com.google.auto.service.AutoService;
 
 /**
@@ -47,6 +48,7 @@ public class GoogleTasksComponentHandler implements ComponentHandler {
             GoogleTasksCreateTaskAction.ACTION_DEFINITION,
             GoogleTasksListTasksAction.ACTION_DEFINITION,
             GoogleTasksUpdateTaskAction.ACTION_DEFINITION)
+        .triggers(GoogleTasksNewTaskTrigger.TRIGGER_DEFINITION)
         .clusterElements(
             tool(GoogleTasksCreateTaskAction.ACTION_DEFINITION),
             tool(GoogleTasksListTasksAction.ACTION_DEFINITION),
