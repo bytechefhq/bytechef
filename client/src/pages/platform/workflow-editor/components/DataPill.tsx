@@ -8,7 +8,7 @@ import resolvePath from 'object-resolve-path';
 import {MouseEvent} from 'react';
 import {twMerge} from 'tailwind-merge';
 
-import {transformPathForObjectAccess, transformValueForObjectAccess} from '../utils/encodingUtils';
+import {encodePath, transformPathForObjectAccess, transformValueForObjectAccess} from '../utils/encodingUtils';
 
 interface DataPillProps {
     componentIcon?: string;
@@ -64,7 +64,9 @@ const DataPill = ({
         if (Object.keys(parameters).length) {
             const attributes = mentionInput.view.props.attributes as {[name: string]: string};
 
-            const path = transformPathForObjectAccess(attributes.path);
+            const encodedPath = encodePath(attributes.path);
+
+            const path = transformPathForObjectAccess(encodedPath);
 
             const paramValue = resolvePath(parameters, path);
 
