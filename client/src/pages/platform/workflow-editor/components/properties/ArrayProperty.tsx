@@ -9,8 +9,11 @@ import {PlusIcon} from '@radix-ui/react-icons';
 import resolvePath from 'object-resolve-path';
 import {Fragment, useCallback, useEffect, useState} from 'react';
 
+import {useWorkflowNodeParameterMutation} from '../../providers/workflowNodeParameterMutationProvider';
+import useWorkflowDataStore from '../../stores/useWorkflowDataStore';
 import {encodeParameters, encodePath} from '../../utils/encodingUtils';
 import getParameterItemType from '../../utils/getParameterItemType';
+import saveProperty from '../../utils/saveProperty';
 
 interface ArrayPropertyProps {
     onDeleteClick: (path: string) => void;
@@ -31,6 +34,8 @@ const ArrayProperty = ({onDeleteClick, parentArrayItems, path, property}: ArrayP
     const [newPropertyType, setNewPropertyType] = useState<string>();
 
     const {currentComponent} = useWorkflowNodeDetailsPanelStore();
+    const {workflow} = useWorkflowDataStore();
+    const {updateWorkflowNodeParameterMutation} = useWorkflowNodeParameterMutation();
 
     const {additionalProperties, name} = property;
 
@@ -59,18 +64,40 @@ const ArrayProperty = ({onDeleteClick, parentArrayItems, path, property}: ArrayP
                 ] as ControlType)
               : ('STRING' as ControlType);
 
+        const newItemPath = `${path}[${arrayItems.length.toString()}]`;
+        const newItemType = (matchingItem?.type as PropertyType) || (newPropertyType as PropertyType) || 'STRING';
+
         const newItem = {
             ...matchingItem,
             controlType,
             custom: true,
             label: `${matchingItem?.label ?? 'Item'} ${arrayItems.length.toString()}`,
             name: `${matchingItem?.label ?? name}__${arrayItems.length.toString()}`,
-            path: `${path}[${arrayItems.length.toString()}]`,
-            type: (matchingItem?.type as PropertyType) || (newPropertyType as PropertyType) || 'STRING',
+            path: newItemPath,
+            type: newItemType,
         };
 
         setArrayItems([...arrayItems, newItem]);
-    }, [arrayItems, currentComponent, items, name, newPropertyType, path]);
+
+        if (updateWorkflowNodeParameterMutation) {
+            saveProperty({
+                includeInMetadata: true,
+                path: newItemPath,
+                type: newItemType,
+                updateWorkflowNodeParameterMutation,
+                workflowId: workflow.id!,
+            });
+        }
+    }, [
+        arrayItems,
+        currentComponent,
+        items,
+        name,
+        newPropertyType,
+        path,
+        updateWorkflowNodeParameterMutation,
+        workflow.id,
+    ]);
 
     const handleDeleteClick = useCallback(
         (path: string) => {

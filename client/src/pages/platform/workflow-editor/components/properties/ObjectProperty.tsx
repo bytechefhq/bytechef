@@ -91,7 +91,24 @@ const ObjectProperty = ({arrayIndex, arrayName, onDeleteClick, operationName, pa
         setSubProperties((previousSubProperties) => [...(previousSubProperties || []), newItem]);
 
         setNewPropertyName('');
-    }, [additionalProperties, newPropertyName, newPropertyType]);
+
+        if (updateWorkflowNodeParameterMutation) {
+            saveProperty({
+                includeInMetadata: true,
+                path: `${path}.${newPropertyName}`,
+                type: newPropertyType,
+                updateWorkflowNodeParameterMutation,
+                workflowId: workflow.id!,
+            });
+        }
+    }, [
+        additionalProperties,
+        newPropertyName,
+        newPropertyType,
+        path,
+        updateWorkflowNodeParameterMutation,
+        workflow.id,
+    ]);
 
     const handleDeleteClick = useCallback(
         (subProperty: SubPropertyType) => {
