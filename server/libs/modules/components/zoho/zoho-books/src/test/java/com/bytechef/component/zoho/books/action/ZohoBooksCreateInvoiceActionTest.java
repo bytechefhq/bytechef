@@ -16,13 +16,13 @@
 
 package com.bytechef.component.zoho.books.action;
 
-import static com.bytechef.component.zoho.books.constant.ZohoBooksConstants.CURRENCY_ID;
-import static com.bytechef.component.zoho.books.constant.ZohoBooksConstants.CUSTOMER_ID;
-import static com.bytechef.component.zoho.books.constant.ZohoBooksConstants.DATE;
-import static com.bytechef.component.zoho.books.constant.ZohoBooksConstants.INVOICE_NUMBER;
-import static com.bytechef.component.zoho.books.constant.ZohoBooksConstants.LINE_ITEMS;
-import static com.bytechef.component.zoho.books.constant.ZohoBooksConstants.PAYMENT_TERMS;
-import static com.bytechef.component.zoho.books.constant.ZohoBooksConstants.USE_CUSTOM_INVOICE_NUMBER;
+import static com.bytechef.component.zoho.commons.ZohoConstants.CURRENCY_ID;
+import static com.bytechef.component.zoho.commons.ZohoConstants.CUSTOMER_ID;
+import static com.bytechef.component.zoho.commons.ZohoConstants.DATE;
+import static com.bytechef.component.zoho.commons.ZohoConstants.INVOICE_NUMBER;
+import static com.bytechef.component.zoho.commons.ZohoConstants.LINE_ITEMS;
+import static com.bytechef.component.zoho.commons.ZohoConstants.PAYMENT_TERMS;
+import static com.bytechef.component.zoho.commons.ZohoConstants.USE_CUSTOM_INVOICE_NUMBER;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.when;
 

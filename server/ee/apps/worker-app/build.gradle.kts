@@ -225,6 +225,7 @@ implementation(project(":server:libs:modules:components:graphql-client"))
     implementation(project(":server:libs:modules:components:zoho:zoho-books"))
     implementation(project(":server:libs:modules:components:zoho:zoho-commons"))
     implementation(project(":server:libs:modules:components:zoho:zoho-crm"))
+    implementation(project(":server:libs:modules:components:zoho:zoho-invoice"))
     implementation(project(":server:libs:modules:components:zoom"))
 
     testImplementation(project(":server:libs:test:test-int-support"))

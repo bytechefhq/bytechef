@@ -14,20 +14,18 @@
  * limitations under the License.
  */
 
-package com.bytechef.component.zoho.books.action;
+package com.bytechef.component.zoho.invoice.action;
 
-import static com.bytechef.component.zoho.books.constant.ZohoBooksConstants.SALES_ORDER_NUMBER;
-import static com.bytechef.component.zoho.books.constant.ZohoBooksConstants.SHIPMENT_DATE;
-import static com.bytechef.component.zoho.books.constant.ZohoBooksConstants.USE_CUSTOM_SALES_ORDER_NUMBER;
-import static com.bytechef.component.zoho.commons.ZohoConstants.CURRENCY_ID;
 import static com.bytechef.component.zoho.commons.ZohoConstants.CUSTOMER_ID;
 import static com.bytechef.component.zoho.commons.ZohoConstants.DATE;
+import static com.bytechef.component.zoho.commons.ZohoConstants.INVOICE_NUMBER;
 import static com.bytechef.component.zoho.commons.ZohoConstants.LINE_ITEMS;
 import static com.bytechef.component.zoho.commons.ZohoConstants.PAYMENT_TERMS;
+import static com.bytechef.component.zoho.commons.ZohoConstants.USE_CUSTOM_INVOICE_NUMBER;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.when;
 
-import com.bytechef.component.definition.Context.Http;
+import com.bytechef.component.definition.Context.Http.Body;
 import com.bytechef.component.test.definition.MockParametersFactory;
 import java.util.List;
 import java.util.Map;
@@ -37,7 +35,7 @@ import org.mockito.ArgumentCaptor;
 /**
  * @author Marija Horvat
  */
-class ZohoBooksCreateSalesOrderActionTest extends AbstractZohoBooksActionTest {
+class ZohoInvoiceCreateInvoiceActionTest extends AbstractZohoInvoiceActionTest {
 
     private final ArgumentCaptor<String> stringArgumentCaptor = ArgumentCaptor.forClass(String.class);
 
@@ -45,24 +43,26 @@ class ZohoBooksCreateSalesOrderActionTest extends AbstractZohoBooksActionTest {
     void testPerform() {
         mockedParameters = MockParametersFactory.create(
             Map.of(
-                CUSTOMER_ID, "1", USE_CUSTOM_SALES_ORDER_NUMBER, "true", SALES_ORDER_NUMBER, "1",
-                LINE_ITEMS, List.of(Map.of("item_id", "1", " quantity", 1)), CURRENCY_ID, "euro",
-                DATE, "2025-04-29", SHIPMENT_DATE, "2025-05-29", PAYMENT_TERMS, 15));
-
+                CUSTOMER_ID, "1",
+                USE_CUSTOM_INVOICE_NUMBER, "true",
+                INVOICE_NUMBER, "1",
+                LINE_ITEMS, List.of(Map.of("item_id", "1", " quantity", 1)),
+                DATE, "2025-04-29",
+                PAYMENT_TERMS, 15));
         when(mockedExecutor.queryParameter(stringArgumentCaptor.capture(), stringArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
 
-        Object result = ZohoBooksCreateSalesOrderAction.perform(mockedParameters, mockedParameters, mockedContext);
+        Object result = ZohoInvoiceCreateInvoiceAction.perform(mockedParameters, mockedParameters, mockedContext);
 
         assertEquals(mockedObject, result);
         assertEquals(List.of("ignore_auto_number_generation", "true"), stringArgumentCaptor.getAllValues());
 
         Map<String, Object> expectedBodyMap = Map.of(
-            CUSTOMER_ID, "1", SALES_ORDER_NUMBER, "1",
-            LINE_ITEMS, List.of(Map.of("item_id", "1", " quantity", 1)), CURRENCY_ID, "euro",
-            DATE, "2025-04-29", SHIPMENT_DATE, "2025-05-29", PAYMENT_TERMS, 15);
+            CUSTOMER_ID, "1", INVOICE_NUMBER, "1",
+            LINE_ITEMS, List.of(Map.of("item_id", "1", " quantity", 1)),
+            DATE, "2025-04-29", PAYMENT_TERMS, 15);
 
-        Http.Body body = bodyArgumentCaptor.getValue();
+        Body body = bodyArgumentCaptor.getValue();
 
         assertEquals(expectedBodyMap, body.getContent());
     }

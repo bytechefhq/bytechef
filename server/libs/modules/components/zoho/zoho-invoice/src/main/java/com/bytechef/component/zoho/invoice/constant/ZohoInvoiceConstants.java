@@ -14,18 +14,14 @@
  * limitations under the License.
  */
 
-package com.bytechef.component.zoho.books.constant;
+package com.bytechef.component.zoho.invoice.constant;
 
 /**
  * @author Marija Horvat
  */
-public class ZohoBooksConstants {
-
-    public static final String CUSTOMER_SUB_TYPE = "customer_sub_type";
-    public static final String SALES_ORDER_NUMBER = "salesorder_number";
-    public static final String SHIPMENT_DATE = "shipment_date";
-    public static final String USE_CUSTOM_SALES_ORDER_NUMBER = "use_custom_sales_order_number";
-
-    private ZohoBooksConstants() {
-    }
+public class ZohoInvoiceConstants {
+    public static final String DESCRIPTION = "description";
+    public static final String NAME = "name";
+    public static final String PRODUCT_TYPE = "product_type";
+    public static final String RATE = "rate";
 }

@@ -14,18 +14,19 @@
  * limitations under the License.
  */
 
-package com.bytechef.component.zoho.books.constant;
+package com.bytechef.component.zoho.invoice;
+
+import com.bytechef.test.jsonasssert.JsonFileAssert;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Marija Horvat
  */
-public class ZohoBooksConstants {
+class ZohoInvoiceComponentHandlerTest {
 
-    public static final String CUSTOMER_SUB_TYPE = "customer_sub_type";
-    public static final String SALES_ORDER_NUMBER = "salesorder_number";
-    public static final String SHIPMENT_DATE = "shipment_date";
-    public static final String USE_CUSTOM_SALES_ORDER_NUMBER = "use_custom_sales_order_number";
-
-    private ZohoBooksConstants() {
+    @Test
+    void testGetComponentDefinition() {
+        JsonFileAssert.assertEquals("definition/zoho-invoice_v1.json",
+            new ZohoInvoiceComponentHandler().getDefinition());
     }
 }
