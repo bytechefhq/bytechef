@@ -33,8 +33,11 @@ import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.youtube.util.YoutubeUtils;
 
 import java.io.BufferedWriter;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.List;
 import java.util.Map;
@@ -61,43 +64,84 @@ public class YoutubeUploadVideoAction {
     private YoutubeUploadVideoAction() {
     }
 
-    public static Map<String, Object> perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
+    public static Map<String, Object> perform(Parameters inputParameters, Parameters connectionParameters, Context context) throws IOException {
         String boundary = "boundary_string";
         byte[] binaryFile =   context.file(file -> file.readAllBytes(inputParameters.getRequiredFileEntry(FILE)));
-        StringBuilder binaryVideoString = "";
+        StringBuilder binaryVideoStringBuilder = new StringBuilder();
 
         for (byte b : binaryFile) {
             // Convert byte to 8-bit binary string
             String bin = String.format("%8s", Integer.toBinaryString(b & 0xFF)).replace(' ', '0');
-            binaryVideoString.append(bin);
+            binaryVideoStringBuilder.append(bin);
         }
 
+        // Part 1: JSON metadata
+        String metadataPart =
+            "--" + boundary + "\r\n" +
+                "Content-Type: application/json; charset=UTF-8\r\n\r\n" +
+                "{\n" +
+                "  \"snippet\": {\n" +
+                "    \"title\": \"Test Upload via Bytechef\",\n" +
+                "    \"description\": \"This is a test video upload using Postman and the YouTube API\",\n" +
+                "    \"tags\": [\"test\", \"postman\", \"youtube\"],\n" +
+                "    \"categoryId\": \"22\"\n" +
+                "  },\n" +
+                "  \"status\": {\n" +
+                "    \"privacyStatus\": \"private\"\n" +
+                "  }\n" +
+                "}\r\n";
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+
+
+// Write metadata part
+        outputStream.write(metadataPart.getBytes(StandardCharsets.UTF_8));
+
+// Part 2: Video file
+        String videoHeader =
+            "--" + boundary + "\r\n" +
+                "Content-Type: video/mp4\r\n\r\n";
+
+        outputStream.write(videoHeader.getBytes(StandardCharsets.UTF_8));
+
+// Now write raw video bytes
+        outputStream.write(binaryFile);
+
+// Final boundary
+        String closing = "\r\n--" + boundary + "--";
+        outputStream.write(closing.getBytes(StandardCharsets.UTF_8));
+
+// Use outputStream.toByteArray() as your full request body
+
+
         return context.http(http -> http.post("https://www.googleapis.com/upload/youtube/v3/videos"))
-                .header("Content-Type", "multipart/form-data; boundary=" + boundary)
-            .queryParameters("part", "snippet,status")
+                .headers(Map.of("Content-Type", List.of("multipart/form-data; boundary=" + boundary)
+//                    ,"Authorization", List.of("Bearer " + connectionParameters.getString("access_token"))
+                    ))
+            .queryParameters("part", "snippet,status", "uploadType", "multipart")
                 .body(
                         Body.of(
-                                "--boundary_string\n" +
-                                        "Content-Type: application/json; charset=UTF-8\n" +
-                                        "\n" +
-                                        "{\n" +
-                                        "  \"snippet\": {\n" +
-                                        "    \"title\": \"Test Upload via Bytechef\",\n" +
-                                        "    \"description\": \"This is a test video upload using Postman and the YouTube API\",\n" +
-                                        "    \"tags\": [\"test\", \"postman\", \"youtube\"],\n" +
-                                        "    \"categoryId\": \"22\"\n" +
-                                        "  },\n" +
-                                        "  \"status\": {\n" +
-                                        "    \"privacyStatus\": \"private\"\n" +
-                                        "  }\n" +
-                                        "}\n" +
-                                        "\n" +
-                                        "--boundary_string\n" +
-                                        "Content-Type: video/*\n" +
-                                        "\n" +
-                                        binaryFile.toString() +
-                                        "\n" +
-                                        "--boundary_string--"
+                            outputStream.toByteArray()
+//                                "--boundary_string\n" +
+//                                        "Content-Type: application/json; charset=UTF-8\n" +
+//                                        "\n" +
+//                                        "{\n" +
+//                                        "  \"snippet\": {\n" +
+//                                        "    \"title\": \"Test Upload via Bytechef\",\n" +
+//                                        "    \"description\": \"This is a test video upload using Postman and the YouTube API\",\n" +
+//                                        "    \"tags\": [\"test\", \"postman\", \"youtube\"],\n" +
+//                                        "    \"categoryId\": \"22\"\n" +
+//                                        "  },\n" +
+//                                        "  \"status\": {\n" +
+//                                        "    \"privacyStatus\": \"private\"\n" +
+//                                        "  }\n" +
+//                                        "}\n" +
+//                                        "\n" +
+//                                        "--boundary_string\n" +
+//                                        "Content-Type: video/*\n" +
+//                                        "\n" +
+//                                        binaryVideoStringBuilder.toString() +
+//                                        "\n" +
+//                                        "--boundary_string--"
                         )
                 )
             .execute()
