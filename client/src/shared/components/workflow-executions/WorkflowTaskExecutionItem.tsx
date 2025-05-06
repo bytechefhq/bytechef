@@ -19,7 +19,7 @@ const WorkflowTaskExecutionItem = ({
     return (
         <li
             className={twMerge(
-                'flex w-full cursor-pointer items-center justify-between rounded-lg px-2 py-4 hover:bg-muted',
+                'flex w-full cursor-pointer items-center justify-between rounded-lg px-2 py-2 hover:bg-muted',
                 selected && 'bg-muted/50 font-semibold'
             )}
             onClick={() => onClick && onClick()}
@@ -30,14 +30,18 @@ const WorkflowTaskExecutionItem = ({
                 <div className="flex items-center gap-x-1">
                     {icon && <InlineSVG className="size-4" src={icon} />}
 
-                    <span>{title}</span>
+                    <div className="flex flex-col">
+                        <span>{title}</span>
 
-                    <span className="text-xs text-muted-foreground">({workflowTask?.name || workflowTask?.type})</span>
+                        <span className="text-xs text-muted-foreground">
+                            ({workflowTask?.name || workflowTask?.type})
+                        </span>
+                    </div>
                 </div>
             </div>
 
             <div className="flex items-center">
-                <span className="text-xs">{duration ?? 0}ms</span>
+                <span className="p-1 text-xs">{duration ?? 0}ms</span>
             </div>
         </li>
     );

@@ -123,7 +123,7 @@ const WorkflowExecutionContent = ({endDate, error, input, output, startDate}: Wo
                         (typeof output === 'object' ? (
                             <ReactJson enableClipboard={false} src={output as object} />
                         ) : (
-                            <span className="text-sm">{output.toString()}</span>
+                            <span className="text-sm">{(output as boolean).toString()}</span>
                         ))}
                 </div>
             </div>

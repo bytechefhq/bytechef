@@ -124,7 +124,7 @@ const WorkflowExecutionsTestOutput = ({
 
                     {!workflowIsRunning && (
                         <>
-                            {workflowTestExecution?.job ? (
+                            {workflowTestExecution?.job && (
                                 <ResizablePanelGroup direction="horizontal">
                                     <ResizablePanel className="overflow-y-auto py-4" defaultSize={resizablePanelSize}>
                                         <ul className="mx-2 space-y-0.5">
@@ -155,7 +155,9 @@ const WorkflowExecutionsTestOutput = ({
                                         <WorkflowExecutionContent {...content} />
                                     </ResizablePanel>
                                 </ResizablePanelGroup>
-                            ) : (
+                            )}
+
+                            {!workflowTestExecution?.job && (
                                 <div className="flex size-full items-center justify-center gap-x-1 p-3 text-muted-foreground">
                                     <RefreshCwOffIcon className="size-5" />
 
