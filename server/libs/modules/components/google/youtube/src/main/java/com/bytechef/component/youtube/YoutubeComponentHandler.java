@@ -21,6 +21,7 @@ import static com.bytechef.component.definition.ComponentDsl.component;
 import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDefinition;
+import com.bytechef.component.youtube.action.YoutubeTesting;
 import com.bytechef.component.youtube.action.YoutubeUploadVideoAction;
 import com.bytechef.component.youtube.connection.YoutubeConnection;
 import com.bytechef.component.youtube.trigger.YoutubeNewVideoTrigger;
@@ -35,7 +36,9 @@ public class YoutubeComponentHandler implements ComponentHandler {
         .icon("path:assets/youtube.svg")
         .categories(ComponentCategory.HELPERS)
         .connection(YoutubeConnection.CONNECTION_DEFINITION)
-        .actions(YoutubeUploadVideoAction.ACTION_DEFINITION)
+        .actions(
+            YoutubeUploadVideoAction.ACTION_DEFINITION,
+            YoutubeTesting.ACTION_DEFINITION)
         .triggers(YoutubeNewVideoTrigger.TRIGGER_DEFINITION);
 
     @Override
