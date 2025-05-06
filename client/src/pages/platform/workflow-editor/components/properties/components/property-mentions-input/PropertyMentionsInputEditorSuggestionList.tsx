@@ -15,24 +15,24 @@ type PropertyMentionsInputListPropsType = SuggestionProps<DataPillType>;
 const PropertyMentionsInputEditorSuggestionList = forwardRef<
     PropertyMentionsInputListRefType,
     PropertyMentionsInputListPropsType
->((props, ref) => {
+>(({command, items}, ref) => {
     const [selectedIndex, setSelectedIndex] = useState(0);
 
     const selectItem = (index: number) => {
-        const item: DataPillType = props.items[index];
+        const item: DataPillType = items[index];
 
         if (item) {
-            props.command({id: item.value.replace('[index]', '[0]')});
+            command({id: item.value.replace('[index]', '[0]')});
         }
     };
 
-    const upHandler = () => setSelectedIndex((selectedIndex + props.items.length - 1) % props.items.length);
+    const upHandler = () => setSelectedIndex((selectedIndex + items.length - 1) % items.length);
 
-    const downHandler = () => setSelectedIndex((selectedIndex + 1) % props.items.length);
+    const downHandler = () => setSelectedIndex((selectedIndex + 1) % items.length);
 
     const enterHandler = () => selectItem(selectedIndex);
 
-    useEffect(() => setSelectedIndex(0), [props.items]);
+    useEffect(() => setSelectedIndex(0), [items]);
 
     useImperativeHandle(ref, () => ({
         onKeyDown: ({event}: {event: KeyboardEvent}) => {
@@ -60,8 +60,8 @@ const PropertyMentionsInputEditorSuggestionList = forwardRef<
 
     return (
         <ul className="property-mentions-suggestion-menu max-h-96 gap-y-1 overflow-y-auto">
-            {props.items.length ? (
-                props.items.map((item: DataPillType, index: number) => (
+            {items.length ? (
+                items.map((item: DataPillType, index: number) => (
                     <li key={index}>
                         <button
                             className={twMerge(index === selectedIndex && 'is-selected')}
