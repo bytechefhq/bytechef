@@ -1,6 +1,5 @@
 import {ComponentPropertiesType, DataPillType, PropertyAllType} from '@/shared/types';
 
-import {transformValueForObjectAccess} from './encodingUtils';
 import getSubProperties from './getSubProperties';
 
 const getExistingProperties = (properties: Array<PropertyAllType>): Array<PropertyAllType> =>
@@ -37,7 +36,7 @@ export default function getDataPillsFromProperties(
             componentIcon: componentDefinition.icon,
             id: nodeName,
             nodeName,
-            value: transformValueForObjectAccess(nodeName),
+            value: nodeName,
         });
 
         const allPropertiesFlat: Array<DataPillType> = [];
@@ -62,7 +61,7 @@ export default function getDataPillsFromProperties(
                     componentIcon: componentDefinition.icon,
                     id: name ?? value,
                     nodeName,
-                    value: transformValueForObjectAccess(value),
+                    value,
                 });
             }
         });

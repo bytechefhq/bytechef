@@ -116,14 +116,19 @@ export function transformPathForObjectAccess(path: string): string {
 
     const segments = path.split('.').filter(Boolean);
 
-    if (segments.length === 0) return path;
+    if (segments.length === 0) {
+        return path;
+    }
 
     const firstSegment = segments[0];
 
     const formattedSegments = segments.slice(1).map((segment) => {
-        const hasHyphen = segment.includes('-');
+        const hasSpecialChars = /[^a-zA-Z0-9_$]/.test(segment);
+        const startsWithDigit = /^\d/.test(segment);
 
-        return hasHyphen ? `['${segment}']` : `.${segment}`;
+        const needsBrackets = hasSpecialChars || startsWithDigit;
+
+        return needsBrackets ? `['${segment}']` : `.${segment}`;
     });
 
     return `${firstSegment}${formattedSegments.join('')}`;
