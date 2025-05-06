@@ -14,19 +14,17 @@
  * limitations under the License.
  */
 
-package com.bytechef.component.zoho.books.action;
+package com.bytechef.component.zoho.invoice.action;
 
-import static com.bytechef.component.zoho.books.constant.ZohoBooksConstants.CUSTOMER_SUB_TYPE;
 import static com.bytechef.component.zoho.commons.ZohoConstants.BILLING_ADDRESS;
 import static com.bytechef.component.zoho.commons.ZohoConstants.COMPANY_NAME;
 import static com.bytechef.component.zoho.commons.ZohoConstants.CONTACT_NAME;
-import static com.bytechef.component.zoho.commons.ZohoConstants.CONTACT_TYPE;
 import static com.bytechef.component.zoho.commons.ZohoConstants.CURRENCY_ID;
 import static com.bytechef.component.zoho.commons.ZohoConstants.SHIPPING_ADDRESS;
 import static com.bytechef.component.zoho.commons.ZohoConstants.WEBSITE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import com.bytechef.component.definition.Context.Http;
+import com.bytechef.component.definition.Context.Http.Body;
 import com.bytechef.component.test.definition.MockParametersFactory;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
@@ -34,14 +32,14 @@ import org.junit.jupiter.api.Test;
 /**
  * @author Marija Horvat
  */
-class ZohoBooksCreateContactActionTest extends AbstractZohoBooksActionTest {
+class ZohoInvoiceCreateContactActionTest extends AbstractZohoInvoiceActionTest {
 
     @Test
     void testPerform() {
         Map<String, Object> parametersMap = Map.of(
-            CONTACT_NAME, "name", COMPANY_NAME, "company", WEBSITE, "www.test.com",
-            CONTACT_TYPE, "customer",
-            CUSTOMER_SUB_TYPE, "individual",
+            CONTACT_NAME, "name",
+            COMPANY_NAME, "company",
+            WEBSITE, "www.test.com",
             CURRENCY_ID, "euro",
             BILLING_ADDRESS,
             Map.of("attention", "test",
@@ -68,11 +66,11 @@ class ZohoBooksCreateContactActionTest extends AbstractZohoBooksActionTest {
 
         mockedParameters = MockParametersFactory.create(parametersMap);
 
-        Object result = ZohoBooksCreateContactAction.perform(mockedParameters, mockedParameters, mockedContext);
+        Object result = ZohoInvoiceCreateContactAction.perform(mockedParameters, mockedParameters, mockedContext);
 
         assertEquals(mockedObject, result);
 
-        Http.Body body = bodyArgumentCaptor.getValue();
+        Body body = bodyArgumentCaptor.getValue();
 
         assertEquals(parametersMap, body.getContent());
     }
