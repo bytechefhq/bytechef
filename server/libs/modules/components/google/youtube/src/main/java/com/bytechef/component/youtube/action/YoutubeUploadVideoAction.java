@@ -27,8 +27,10 @@ import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Context.Http.Body;
+import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
+import com.bytechef.component.youtube.util.YoutubeUtils;
 
 import java.io.BufferedWriter;
 import java.io.OutputStream;
@@ -48,7 +50,11 @@ public class YoutubeUploadVideoAction {
         .properties(
             fileEntry(FILE)
                 .label("Video File")
-                .required(true))
+                .required(true),
+            string("videoCategoryId")
+                    .label("Video Category ID")
+                    .options((ActionOptionsFunction<String>) YoutubeUtils::getVideoCategoryIdOptions)
+                    .required(true))
         .output(outputSchema(string()))
         .perform(YoutubeUploadVideoAction::perform);
 
@@ -58,15 +64,42 @@ public class YoutubeUploadVideoAction {
     public static Map<String, Object> perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
         String boundary = "boundary_string";
         byte[] binaryFile =   context.file(file -> file.readAllBytes(inputParameters.getRequiredFileEntry(FILE)));
+        StringBuilder binaryVideoString = "";
+
+        for (byte b : binaryFile) {
+            // Convert byte to 8-bit binary string
+            String bin = String.format("%8s", Integer.toBinaryString(b & 0xFF)).replace(' ', '0');
+            binaryVideoString.append(bin);
+        }
 
         return context.http(http -> http.post("https://www.googleapis.com/upload/youtube/v3/videos"))
-//            .header("X-Upload-Content-Type", "video/mp4")
-//        "Content-Length", String.valueOf(binaryFile.length)
-            .queryParameters("part", "snippet,status", "uploadType", "resumable")
-            .body(
-                Body.of(
-                    "snippet", Map.of("title","Test Upload")))
-//            .configuration(responseType(Http.ResponseType.JSON))
+                .header("Content-Type", "multipart/form-data; boundary=" + boundary)
+            .queryParameters("part", "snippet,status")
+                .body(
+                        Body.of(
+                                "--boundary_string\n" +
+                                        "Content-Type: application/json; charset=UTF-8\n" +
+                                        "\n" +
+                                        "{\n" +
+                                        "  \"snippet\": {\n" +
+                                        "    \"title\": \"Test Upload via Bytechef\",\n" +
+                                        "    \"description\": \"This is a test video upload using Postman and the YouTube API\",\n" +
+                                        "    \"tags\": [\"test\", \"postman\", \"youtube\"],\n" +
+                                        "    \"categoryId\": \"22\"\n" +
+                                        "  },\n" +
+                                        "  \"status\": {\n" +
+                                        "    \"privacyStatus\": \"private\"\n" +
+                                        "  }\n" +
+                                        "}\n" +
+                                        "\n" +
+                                        "--boundary_string\n" +
+                                        "Content-Type: video/*\n" +
+                                        "\n" +
+                                        binaryFile.toString() +
+                                        "\n" +
+                                        "--boundary_string--"
+                        )
+                )
             .execute()
             .getBody(new TypeReference<>() {});
     }
