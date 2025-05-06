@@ -17,4 +17,4 @@ tasks:
         - name: "var1"
           type: "var/v1/set"
           parameters:
-            value: "${loop_1.item + '_' + loop_2.item}"
+            value: "#{loop_1.item + '_' + loop_2.item}"

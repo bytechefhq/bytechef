@@ -72,6 +72,10 @@ public class LoopTaskDispatcherDefinitionFactory implements TaskDispatcherDefini
     protected static OutputResponse variableProperties(Map<String, ?> inputParameters) {
         ObjectProperty variableProperties;
 
+        if (!MapUtils.containsKey(inputParameters, ITEMS)) {
+            return null;
+        }
+
         List<?> list = MapUtils.getRequiredList(inputParameters, ITEMS);
 
         if (list.isEmpty()) {

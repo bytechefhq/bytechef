@@ -9,7 +9,7 @@ tasks:
     - name: "sumVar1"
       type: "var/v1/set"
       parameters:
-        value: "${1 + loop_1.index}"
+        value: "#{1 + loop_1.index}"
     - name: "condition_1"
       type: "condition/v1"
       parameters:
@@ -25,4 +25,4 @@ tasks:
         - name: "sumVar2"
           type: "var/v1/set"
           parameters:
-            value: "${sumVar1 + 2}"
+            value: "#{sumVar1 + 2}"
