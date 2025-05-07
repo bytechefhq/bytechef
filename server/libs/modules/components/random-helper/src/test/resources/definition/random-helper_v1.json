@@ -13,6 +13,7 @@
   "resources" : null,
   "version" : 1,
   "title" : "Random Helper",
+  "connection" : null,
   "actions" : [ {
     "batch" : null,
     "deprecated" : null,
@@ -114,9 +115,9 @@
       "optionsDataSource" : null
     } ],
     "title" : "Random Float",
-    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "perform" : { }
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -195,9 +196,9 @@
       "optionsDataSource" : null
     } ],
     "title" : "Random Hex",
-    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "perform" : { }
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -293,9 +294,9 @@
       "optionsDataSource" : null
     } ],
     "title" : "Random Integer",
-    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "perform" : { }
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -402,9 +403,9 @@
       "optionsDataSource" : null
     } ],
     "title" : "Random String",
-    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "perform" : { }
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -464,12 +465,11 @@
     },
     "properties" : null,
     "title" : "Random UUID",
-    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "perform" : { }
   } ],
-  "clusterElements" : null,
   "unifiedApi" : null,
   "triggers" : null,
-  "connection" : null
+  "clusterElements" : null
 }

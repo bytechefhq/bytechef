@@ -53,8 +53,8 @@
       "refreshUrl" : null,
       "scopes" : null,
       "tokenUrl" : null,
-      "oauth2AuthorizationExtraQueryParameters" : null,
-      "authorizationCallback" : null
+      "authorizationCallback" : null,
+      "oauth2AuthorizationExtraQueryParameters" : null
     } ],
     "properties" : null,
     "version" : 1,
@@ -381,6 +381,7 @@
   } ],
   "clusterElements" : [ {
     "description" : "Hugging Face model.",
+    "help" : null,
     "name" : "model",
     "outputDefinition" : null,
     "properties" : [ {

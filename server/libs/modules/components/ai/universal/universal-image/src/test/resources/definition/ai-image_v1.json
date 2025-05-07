@@ -220,8 +220,6 @@
     } ],
     "title" : "Generate Image",
     "perform" : { },
-    "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
     "outputDefinition" : {
       "output" : null,
       "outputResponse" : {
@@ -351,7 +349,9 @@
         "optionsDataSource" : null
       },
       "sampleOutput" : null
-    }
+    },
+    "processErrorResponse" : null,
+    "workflowNodeDescription" : null
   } ],
   "componentCategories" : [ {
     "name" : "artificial-intelligence",

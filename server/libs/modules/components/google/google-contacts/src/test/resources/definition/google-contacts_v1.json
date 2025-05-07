@@ -63,8 +63,6 @@
       "title" : "OAuth2 Authorization Code",
       "type" : "OAUTH2_AUTHORIZATION_CODE",
       "acquire" : null,
-      "oauth2AuthorizationExtraQueryParameters" : { },
-      "authorizationCallback" : null,
       "authorizationUrl" : { },
       "clientSecret" : null,
       "refreshToken" : null,
@@ -74,7 +72,9 @@
       "refresh" : null,
       "refreshUrl" : { },
       "scopes" : { },
-      "tokenUrl" : { }
+      "tokenUrl" : { },
+      "oauth2AuthorizationExtraQueryParameters" : { },
+      "authorizationCallback" : null
     } ],
     "properties" : null,
     "version" : 1,
@@ -889,9 +889,9 @@
       "optionsDataSource" : null
     } ],
     "title" : "Create Contact",
+    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
-    "perform" : { }
+    "workflowNodeDescription" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -1011,9 +1011,9 @@
       "optionsDataSource" : null
     } ],
     "title" : "Create Group",
+    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
-    "perform" : { }
+    "workflowNodeDescription" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -1841,9 +1841,9 @@
       "optionsDataSource" : null
     } ],
     "title" : "Update Contact",
+    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
-    "perform" : { }
+    "workflowNodeDescription" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -2749,12 +2749,13 @@
       "controlType" : "INTEGER"
     } ],
     "title" : "Search Contacts",
+    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
-    "perform" : { }
+    "workflowNodeDescription" : null
   } ],
   "clusterElements" : [ {
     "description" : "Creates a new contact.",
+    "help" : null,
     "name" : "createContact",
     "outputDefinition" : {
       "output" : null,
@@ -3566,6 +3567,7 @@
     "element" : { }
   }, {
     "description" : "Creates a new group.",
+    "help" : null,
     "name" : "createGroup",
     "outputDefinition" : {
       "output" : null,
@@ -3689,6 +3691,7 @@
     "element" : { }
   }, {
     "description" : "Modifies an existing contact.",
+    "help" : null,
     "name" : "updateContact",
     "outputDefinition" : {
       "output" : null,
@@ -4520,6 +4523,7 @@
     "element" : { }
   }, {
     "description" : "Searches the contacts in Google Contacts account.",
+    "help" : null,
     "name" : "searchContacts",
     "outputDefinition" : {
       "output" : null,
@@ -5428,6 +5432,6 @@
     },
     "element" : { }
   } ],
-  "triggers" : null,
-  "unifiedApi" : null
+  "unifiedApi" : null,
+  "triggers" : null
 }

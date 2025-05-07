@@ -53,8 +53,8 @@
       "refreshUrl" : null,
       "scopes" : null,
       "tokenUrl" : null,
-      "oauth2AuthorizationExtraQueryParameters" : null,
-      "authorizationCallback" : null
+      "authorizationCallback" : null,
+      "oauth2AuthorizationExtraQueryParameters" : null
     } ],
     "properties" : null,
     "version" : 1,
@@ -467,6 +467,7 @@
   } ],
   "clusterElements" : [ {
     "description" : "Creates a new row.",
+    "help" : null,
     "name" : "createRow",
     "outputDefinition" : {
       "output" : null,
@@ -544,6 +545,7 @@
     "element" : { }
   }, {
     "description" : "Deletes the specified row.",
+    "help" : null,
     "name" : "deleteRow",
     "outputDefinition" : null,
     "properties" : [ {
@@ -596,6 +598,7 @@
     "element" : { }
   }, {
     "description" : "Fetches a single table row.",
+    "help" : null,
     "name" : "getRow",
     "outputDefinition" : {
       "output" : null,
@@ -677,6 +680,7 @@
     "element" : { }
   }, {
     "description" : "Lists table rows.",
+    "help" : null,
     "name" : "listRows",
     "outputDefinition" : {
       "output" : null,
@@ -778,6 +782,7 @@
     "element" : { }
   }, {
     "description" : "Updates the specified row.",
+    "help" : null,
     "name" : "updateRow",
     "outputDefinition" : {
       "output" : null,

@@ -488,6 +488,6 @@
     "workflowNodeDescription" : null
   } ],
   "clusterElements" : null,
-  "triggers" : [ ],
-  "unifiedApi" : null
+  "unifiedApi" : null,
+  "triggers" : [ ]
 }

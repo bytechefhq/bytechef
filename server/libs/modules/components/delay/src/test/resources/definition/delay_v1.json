@@ -43,9 +43,9 @@
       "controlType" : "INTEGER"
     } ],
     "title" : "Sleep",
+    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
-    "perform" : { }
+    "workflowNodeDescription" : null
   } ],
   "clusterElements" : null,
   "unifiedApi" : null,

@@ -9,6 +9,7 @@
   "customActionHelp" : null,
   "clusterElements" : [ {
     "description" : "Context for the question is retrieved from a Vector Store and added to the prompt's user text.",
+    "help" : null,
     "name" : "rag",
     "outputDefinition" : null,
     "properties" : [ {
@@ -51,8 +52,8 @@
       "minValue" : 0.0,
       "numberPrecision" : null,
       "options" : null,
-      "optionsDataSource" : null,
-      "controlType" : "NUMBER"
+      "controlType" : "NUMBER",
+      "optionsDataSource" : null
     }, {
       "advancedOption" : null,
       "description" : "The top 'k' similar results to return.",
@@ -70,8 +71,8 @@
       "maxValue" : null,
       "minValue" : 0,
       "options" : null,
-      "optionsDataSource" : null,
-      "controlType" : "INTEGER"
+      "controlType" : "INTEGER",
+      "optionsDataSource" : null
     } ],
     "title" : "Question Answer RAG",
     "type" : {

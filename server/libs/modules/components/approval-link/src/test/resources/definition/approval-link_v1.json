@@ -32,11 +32,11 @@
     },
     "properties" : [ ],
     "title" : "Create Approval Links",
-    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "perform" : { }
   } ],
+  "clusterElements" : null,
   "unifiedApi" : null,
-  "triggers" : null,
-  "clusterElements" : null
+  "triggers" : null
 }

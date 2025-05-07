@@ -13,6 +13,7 @@
   "resources" : null,
   "version" : 1,
   "title" : "Crypto Helper",
+  "connection" : null,
   "actions" : [ {
     "batch" : null,
     "deprecated" : null,
@@ -124,9 +125,9 @@
       "optionsDataSource" : null
     } ],
     "title" : "Hash",
-    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "perform" : { }
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -258,9 +259,9 @@
       "optionsDataSource" : null
     } ],
     "title" : "Hmac",
-    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "perform" : { }
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -608,9 +609,9 @@
       "optionsDataSource" : null
     } ],
     "title" : "PGP Decrypt",
-    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "perform" : { }
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -938,9 +939,9 @@
       "controlType" : "FILE_ENTRY"
     } ],
     "title" : "PGP Encrypt",
-    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "perform" : { }
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -1268,9 +1269,9 @@
       "controlType" : "FILE_ENTRY"
     } ],
     "title" : "RSA Decrypt",
-    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "perform" : { }
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -1598,9 +1599,9 @@
       "controlType" : "FILE_ENTRY"
     } ],
     "title" : "RSA Encrypt",
-    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "perform" : { }
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -1928,9 +1929,9 @@
       "controlType" : "FILE_ENTRY"
     } ],
     "title" : "Sign",
-    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "perform" : { }
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -2210,12 +2211,13 @@
       "controlType" : "FILE_ENTRY"
     } ],
     "title" : "Verify",
-    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "perform" : { }
   } ],
   "clusterElements" : [ {
     "description" : "Computes and returns the hash of the input.",
+    "help" : null,
     "name" : "hash",
     "outputDefinition" : {
       "output" : null,
@@ -2331,6 +2333,7 @@
     "element" : { }
   }, {
     "description" : "Computes and returns the HMAC of the input.",
+    "help" : null,
     "name" : "hmac",
     "outputDefinition" : {
       "output" : null,
@@ -2466,6 +2469,7 @@
     "element" : { }
   }, {
     "description" : "Decrypts PGP encrypted file using private key and passphrase.",
+    "help" : null,
     "name" : "pgpDecrypt",
     "outputDefinition" : {
       "output" : null,
@@ -2817,6 +2821,7 @@
     "element" : { }
   }, {
     "description" : "Encrypts the file using PGP public key.",
+    "help" : null,
     "name" : "pgpEncrypt",
     "outputDefinition" : {
       "output" : null,
@@ -3148,6 +3153,7 @@
     "element" : { }
   }, {
     "description" : "Decrypts RSA encrypted file using RSA private key.",
+    "help" : null,
     "name" : "rsaDecrypt",
     "outputDefinition" : {
       "output" : null,
@@ -3479,6 +3485,7 @@
     "element" : { }
   }, {
     "description" : "Encrypts the file using the RSA public key.",
+    "help" : null,
     "name" : "rsaEncrypt",
     "outputDefinition" : {
       "output" : null,
@@ -3810,6 +3817,7 @@
     "element" : { }
   }, {
     "description" : "Cryptographically signs a file.",
+    "help" : null,
     "name" : "sign",
     "outputDefinition" : {
       "output" : null,
@@ -4141,6 +4149,7 @@
     "element" : { }
   }, {
     "description" : "Verify the signature using public RSA key.",
+    "help" : null,
     "name" : "verify",
     "outputDefinition" : {
       "output" : null,
@@ -4424,6 +4433,5 @@
     "element" : { }
   } ],
   "unifiedApi" : null,
-  "triggers" : null,
-  "connection" : null
+  "triggers" : null
 }

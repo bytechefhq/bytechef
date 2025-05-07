@@ -43,8 +43,6 @@
       "title" : "Bearer Token",
       "type" : "BEARER_TOKEN",
       "acquire" : null,
-      "oauth2AuthorizationExtraQueryParameters" : null,
-      "authorizationCallback" : null,
       "apply" : { },
       "clientId" : null,
       "pkce" : null,
@@ -54,7 +52,9 @@
       "tokenUrl" : null,
       "authorizationUrl" : null,
       "clientSecret" : null,
-      "refreshToken" : null
+      "refreshToken" : null,
+      "authorizationCallback" : null,
+      "oauth2AuthorizationExtraQueryParameters" : null
     } ],
     "properties" : null,
     "version" : 1,
@@ -354,9 +354,9 @@
       "controlType" : "SELECT"
     } ],
     "title" : "Send Channel Message",
+    "perform" : null,
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
-    "perform" : null
+    "workflowNodeDescription" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -623,9 +623,9 @@
       "optionsDataSource" : null
     } ],
     "title" : "Create Channel",
+    "perform" : null,
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
-    "perform" : null
+    "workflowNodeDescription" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -855,14 +855,15 @@
       "controlType" : "SELECT"
     } ],
     "title" : "Send Direct Message",
+    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
-    "perform" : { }
+    "workflowNodeDescription" : null
   } ],
   "triggers" : [ ],
   "unifiedApi" : null,
   "clusterElements" : [ {
     "description" : "Post a new message to a specific #channel you choose.",
+    "help" : null,
     "name" : "sendChannelMessage",
     "outputDefinition" : {
       "output" : null,
@@ -1154,6 +1155,7 @@
     "element" : { }
   }, {
     "description" : "Create a new channel",
+    "help" : null,
     "name" : "createChannel",
     "outputDefinition" : {
       "output" : null,
@@ -1419,6 +1421,7 @@
     "element" : { }
   }, {
     "description" : "Send direct message guild member.",
+    "help" : null,
     "name" : "sendDirectMessage",
     "outputDefinition" : {
       "output" : null,

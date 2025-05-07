@@ -153,6 +153,7 @@
   } ],
   "clusterElements" : [ {
     "description" : "Send a new RabbitMQ message.",
+    "help" : null,
     "name" : "sendMessage",
     "outputDefinition" : null,
     "properties" : [ {
@@ -206,7 +207,6 @@
     },
     "element" : { }
   } ],
-  "unifiedApi" : null,
   "triggers" : [ {
     "batch" : null,
     "deprecated" : null,
@@ -216,8 +216,8 @@
     "outputDefinition" : {
       "output" : null,
       "outputResponse" : null,
-      "outputSchema" : null,
-      "sampleOutput" : null
+      "sampleOutput" : null,
+      "outputSchema" : null
     },
     "properties" : [ {
       "advancedOption" : null,
@@ -256,5 +256,6 @@
     "workflowNodeDescription" : null,
     "dynamicWebhookRefresh" : null,
     "webhookValidateOnEnable" : null
-  } ]
+  } ],
+  "unifiedApi" : null
 }

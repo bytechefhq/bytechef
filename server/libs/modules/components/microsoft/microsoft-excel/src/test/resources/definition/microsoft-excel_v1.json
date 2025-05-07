@@ -83,8 +83,6 @@
       "title" : "OAuth2 Authorization Code",
       "type" : "OAUTH2_AUTHORIZATION_CODE",
       "acquire" : null,
-      "authorizationCallback" : null,
-      "oauth2AuthorizationExtraQueryParameters" : null,
       "authorizationUrl" : { },
       "clientSecret" : null,
       "refreshToken" : null,
@@ -94,7 +92,9 @@
       "refresh" : null,
       "refreshUrl" : { },
       "scopes" : { },
-      "tokenUrl" : { }
+      "tokenUrl" : { },
+      "authorizationCallback" : null,
+      "oauth2AuthorizationExtraQueryParameters" : null
     } ],
     "properties" : null,
     "version" : 1,
@@ -202,9 +202,9 @@
       }
     } ],
     "title" : "Append Row",
+    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
-    "perform" : { }
+    "workflowNodeDescription" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -285,9 +285,9 @@
       "controlType" : "SELECT"
     } ],
     "title" : "Clear Worksheet",
+    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
-    "perform" : { }
+    "workflowNodeDescription" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -363,9 +363,9 @@
       "controlType" : "INTEGER"
     } ],
     "title" : "Delete Row",
+    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
-    "perform" : { }
+    "workflowNodeDescription" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -470,9 +470,9 @@
       "controlType" : "INTEGER"
     } ],
     "title" : "Find Row by Number",
+    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
-    "perform" : { }
+    "workflowNodeDescription" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -616,12 +616,13 @@
       }
     } ],
     "title" : "Update Row",
+    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
-    "perform" : { }
+    "workflowNodeDescription" : null
   } ],
   "clusterElements" : [ {
     "description" : "Append a row of values to an existing worksheet.",
+    "help" : null,
     "name" : "appendRow",
     "outputDefinition" : {
       "output" : null,
@@ -726,6 +727,7 @@
     "element" : { }
   }, {
     "description" : "Clear a worksheet of all values.",
+    "help" : null,
     "name" : "clearWorksheet",
     "outputDefinition" : null,
     "properties" : [ {
@@ -810,6 +812,7 @@
     "element" : { }
   }, {
     "description" : "Delete row on an existing sheet.",
+    "help" : null,
     "name" : "deleteRow",
     "outputDefinition" : null,
     "properties" : [ {
@@ -889,6 +892,7 @@
     "element" : { }
   }, {
     "description" : "Get row values from the worksheet by the row number.",
+    "help" : null,
     "name" : "findRowByNum",
     "outputDefinition" : {
       "output" : null,
@@ -997,6 +1001,7 @@
     "element" : { }
   }, {
     "description" : "Update a row in a worksheet.",
+    "help" : null,
     "name" : "updateRow",
     "outputDefinition" : {
       "output" : null,
@@ -1143,6 +1148,6 @@
     },
     "element" : { }
   } ],
-  "unifiedApi" : null,
-  "triggers" : null
+  "triggers" : null,
+  "unifiedApi" : null
 }

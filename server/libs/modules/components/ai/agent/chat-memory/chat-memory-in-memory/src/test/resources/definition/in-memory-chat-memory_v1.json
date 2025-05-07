@@ -15,8 +15,11 @@
   "title" : "In Memory Chat Memory",
   "connection" : null,
   "actions" : null,
+  "unifiedApi" : null,
+  "triggers" : null,
   "clusterElements" : [ {
     "description" : "Memory is retrieved added into the prompt's system text.",
+    "help" : null,
     "name" : "chatMemory",
     "outputDefinition" : null,
     "properties" : null,
@@ -29,7 +32,5 @@
       "required" : false
     },
     "element" : { }
-  } ],
-  "unifiedApi" : null,
-  "triggers" : null
+  } ]
 }

@@ -93,8 +93,8 @@
       "refreshUrl" : null,
       "scopes" : null,
       "tokenUrl" : null,
-      "authorizationCallback" : null,
-      "oauth2AuthorizationExtraQueryParameters" : null
+      "oauth2AuthorizationExtraQueryParameters" : null,
+      "authorizationCallback" : null
     } ],
     "properties" : null,
     "version" : 1,
@@ -3415,6 +3415,7 @@
   } ],
   "clusterElements" : [ {
     "description" : "Adds an order into a Shopify store.",
+    "help" : null,
     "name" : "createOrder",
     "outputDefinition" : {
       "output" : null,
@@ -4384,6 +4385,7 @@
     "element" : { }
   }, {
     "description" : "Deletes an order. Orders that interact with an online gateway can't be deleted.",
+    "help" : null,
     "name" : "deleteOrder",
     "outputDefinition" : null,
     "properties" : [ {
@@ -4422,6 +4424,7 @@
     "element" : { }
   }, {
     "description" : "Cancels an order. Orders that are paid and have fulfillments can't be canceled.",
+    "help" : null,
     "name" : "cancelOrder",
     "outputDefinition" : {
       "output" : null,
@@ -5151,6 +5154,7 @@
     "element" : { }
   }, {
     "description" : "Update an existing order.",
+    "help" : null,
     "name" : "updateOrder",
     "outputDefinition" : {
       "output" : null,
@@ -5982,6 +5986,7 @@
     "element" : { }
   }, {
     "description" : "Closes an order. A closed order is one that has no more work to be done. All items have been fulfilled or refunded.",
+    "help" : null,
     "name" : "closeOrder",
     "outputDefinition" : {
       "output" : null,

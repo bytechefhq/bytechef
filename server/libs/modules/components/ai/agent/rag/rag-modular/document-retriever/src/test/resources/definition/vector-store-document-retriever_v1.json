@@ -9,6 +9,7 @@
   "customActionHelp" : null,
   "clusterElements" : [ {
     "description" : "Memory is retrieved added into the prompt's system text.",
+    "help" : null,
     "name" : "documentRetriever",
     "outputDefinition" : null,
     "properties" : [ {
@@ -51,8 +52,8 @@
       "minValue" : 0.0,
       "numberPrecision" : null,
       "options" : null,
-      "optionsDataSource" : null,
-      "controlType" : "NUMBER"
+      "controlType" : "NUMBER",
+      "optionsDataSource" : null
     }, {
       "advancedOption" : null,
       "description" : "The top 'k' similar results to return.",
@@ -70,8 +71,8 @@
       "maxValue" : null,
       "minValue" : 0,
       "options" : null,
-      "optionsDataSource" : null,
-      "controlType" : "INTEGER"
+      "controlType" : "INTEGER",
+      "optionsDataSource" : null
     } ],
     "title" : "Document Retriever",
     "type" : {

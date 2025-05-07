@@ -321,9 +321,9 @@
       "controlType" : "TIME"
     } ],
     "title" : "Add Value to the Object by Key",
-    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "perform" : { }
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -864,9 +864,9 @@
       "controlType" : "ARRAY_BUILDER"
     } ],
     "title" : "Add Key-Value Pairs",
-    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "perform" : { }
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -974,9 +974,9 @@
       "optionsDataSource" : null
     } ],
     "title" : "Contains",
-    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "perform" : { }
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -1032,9 +1032,9 @@
       "optionsDataSource" : null
     } ],
     "title" : "Delete Key-Value Pair",
-    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "perform" : { }
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -1142,9 +1142,9 @@
       "controlType" : "OBJECT_BUILDER"
     } ],
     "title" : "Equals",
-    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "perform" : { }
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -1200,9 +1200,9 @@
       "controlType" : "OBJECT_BUILDER"
     } ],
     "title" : "Merge Two Objects",
-    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "perform" : { }
   } ],
   "clusterElements" : null,
   "unifiedApi" : null,

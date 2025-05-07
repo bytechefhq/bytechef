@@ -63,8 +63,6 @@
       "title" : "OAuth2 Authorization Code",
       "type" : "OAUTH2_AUTHORIZATION_CODE",
       "acquire" : null,
-      "authorizationCallback" : null,
-      "oauth2AuthorizationExtraQueryParameters" : null,
       "authorizationUrl" : { },
       "clientSecret" : null,
       "refreshToken" : null,
@@ -74,7 +72,9 @@
       "refresh" : null,
       "refreshUrl" : { },
       "scopes" : null,
-      "tokenUrl" : { }
+      "tokenUrl" : { },
+      "authorizationCallback" : null,
+      "oauth2AuthorizationExtraQueryParameters" : null
     } ],
     "properties" : null,
     "version" : 1,
@@ -401,9 +401,9 @@
       "optionsDataSource" : null
     } ],
     "title" : "Copy",
+    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
-    "perform" : { }
+    "workflowNodeDescription" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -683,9 +683,9 @@
       "optionsDataSource" : null
     } ],
     "title" : "Create New Folder",
+    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
-    "perform" : { }
+    "workflowNodeDescription" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -1163,9 +1163,9 @@
       "controlType" : "SELECT"
     } ],
     "title" : "Create New Paper File",
+    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
-    "perform" : { }
+    "workflowNodeDescription" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -1465,9 +1465,9 @@
       "optionsDataSource" : null
     } ],
     "title" : "Delete",
+    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
-    "perform" : { }
+    "workflowNodeDescription" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -1807,9 +1807,9 @@
       "optionsDataSource" : null
     } ],
     "title" : "Get File Link",
+    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
-    "perform" : { }
+    "workflowNodeDescription" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -2131,9 +2131,9 @@
       "optionsDataSource" : null
     } ],
     "title" : "List Folder",
+    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
-    "perform" : { }
+    "workflowNodeDescription" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -2453,9 +2453,9 @@
       "optionsDataSource" : null
     } ],
     "title" : "Move",
+    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
-    "perform" : { }
+    "workflowNodeDescription" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -2817,9 +2817,9 @@
       "optionsDataSource" : null
     } ],
     "title" : "Search",
+    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
-    "perform" : { }
+    "workflowNodeDescription" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -3373,12 +3373,13 @@
       "controlType" : "SELECT"
     } ],
     "title" : "Upload File",
+    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
-    "perform" : { }
+    "workflowNodeDescription" : null
   } ],
   "clusterElements" : [ {
     "description" : "Copy a file or folder to a different location in the user's Dropbox. If the source path is a folder all its contents will be copied.",
+    "help" : null,
     "name" : "copy",
     "outputDefinition" : {
       "output" : null,
@@ -3702,6 +3703,7 @@
     "element" : { }
   }, {
     "description" : "Create a folder at a given path.",
+    "help" : null,
     "name" : "createFolder",
     "outputDefinition" : {
       "output" : null,
@@ -3985,6 +3987,7 @@
     "element" : { }
   }, {
     "description" : "Create a new .paper file on which you can write at a given path",
+    "help" : null,
     "name" : "createTextFile",
     "outputDefinition" : {
       "output" : null,
@@ -4466,6 +4469,7 @@
     "element" : { }
   }, {
     "description" : "Delete the file or folder at a given path. If the path is a folder, all its contents will be deleted too.",
+    "help" : null,
     "name" : "delete",
     "outputDefinition" : {
       "output" : null,
@@ -4769,6 +4773,7 @@
     "element" : { }
   }, {
     "description" : "Get a temporary link to stream content of a file. This link will expire in four hours and afterwards you will get 410 Gone. This URL should not be used to display content directly in the browser. The Content-Type of the link is determined automatically by the file's mime type.",
+    "help" : null,
     "name" : "getFileLink",
     "outputDefinition" : {
       "output" : null,
@@ -5112,6 +5117,7 @@
     "element" : { }
   }, {
     "description" : "List the contents of a folder.",
+    "help" : null,
     "name" : "listFolder",
     "outputDefinition" : {
       "output" : null,
@@ -5437,6 +5443,7 @@
     "element" : { }
   }, {
     "description" : "Move a file or folder to a different location in the user's Dropbox. If the source path is a folder all its contents will be moved. Note that we do not currently support case-only renaming.",
+    "help" : null,
     "name" : "move",
     "outputDefinition" : {
       "output" : null,
@@ -5760,6 +5767,7 @@
     "element" : { }
   }, {
     "description" : "Searches for files and folders. Can only be used to retrieve a maximum of 10,000 matches. Recent changes may not immediately be reflected in search results due to a short delay in indexing. Duplicate results may be returned across pages. Some results may not be returned.",
+    "help" : null,
     "name" : "search",
     "outputDefinition" : {
       "output" : null,
@@ -6125,6 +6133,7 @@
     "element" : { }
   }, {
     "description" : "Create a new file up to a size of 150MB with the contents provided in the request.",
+    "help" : null,
     "name" : "uploadFile",
     "outputDefinition" : {
       "output" : null,

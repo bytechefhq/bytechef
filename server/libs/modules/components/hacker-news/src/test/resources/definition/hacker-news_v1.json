@@ -13,6 +13,7 @@
   "resources" : null,
   "version" : 1,
   "title" : "Hacker News",
+  "connection" : null,
   "actions" : [ {
     "batch" : null,
     "deprecated" : null,
@@ -525,12 +526,15 @@
       "optionsDataSource" : null
     } ],
     "title" : "Fetch Top Stories",
-    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "perform" : { }
   } ],
+  "unifiedApi" : null,
+  "triggers" : null,
   "clusterElements" : [ {
     "description" : "Fetch top stories from Hacker News.",
+    "help" : null,
     "name" : "fetchTopStories",
     "outputDefinition" : {
       "output" : null,
@@ -1045,8 +1049,5 @@
       "required" : false
     },
     "element" : { }
-  } ],
-  "unifiedApi" : null,
-  "triggers" : null,
-  "connection" : null
+  } ]
 }

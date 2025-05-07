@@ -13,6 +13,7 @@
   "resources" : null,
   "version" : 1,
   "title" : "Binance",
+  "connection" : null,
   "actions" : [ {
     "batch" : null,
     "deprecated" : null,
@@ -175,12 +176,11 @@
       }
     } ],
     "title" : "Fetch Pair Price",
-    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "perform" : { }
   } ],
-  "clusterElements" : null,
   "unifiedApi" : null,
   "triggers" : null,
-  "connection" : null
+  "clusterElements" : null
 }

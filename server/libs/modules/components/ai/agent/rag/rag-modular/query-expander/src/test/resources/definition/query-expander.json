@@ -9,6 +9,7 @@
   "customActionHelp" : null,
   "clusterElements" : [ {
     "description" : "Uses a large language model to expand a query into multiple semantically diverse\nvariations to capture different perspectives, useful for retrieving additional\ncontextual information and increasing the chances of finding relevant results.\n",
+    "help" : null,
     "name" : "multiQueryExpander",
     "outputDefinition" : null,
     "properties" : [ {
@@ -52,8 +53,8 @@
       "maxValue" : null,
       "minValue" : null,
       "options" : null,
-      "optionsDataSource" : null,
-      "controlType" : "INTEGER"
+      "controlType" : "INTEGER",
+      "optionsDataSource" : null
     } ],
     "title" : "Multi Query Expander",
     "type" : {

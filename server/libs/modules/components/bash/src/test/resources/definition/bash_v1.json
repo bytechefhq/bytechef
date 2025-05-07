@@ -94,7 +94,7 @@
     "workflowNodeDescription" : null,
     "perform" : { }
   } ],
+  "clusterElements" : null,
   "unifiedApi" : null,
-  "triggers" : null,
-  "clusterElements" : null
+  "triggers" : null
 }

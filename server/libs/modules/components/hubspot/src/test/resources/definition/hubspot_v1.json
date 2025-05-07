@@ -2864,10 +2864,10 @@
     "listenerEnable" : null,
     "webhookRequest" : { },
     "webhookValidate" : null,
-    "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
     "dynamicWebhookRefresh" : null,
-    "webhookValidateOnEnable" : null
+    "webhookValidateOnEnable" : null,
+    "processErrorResponse" : null,
+    "workflowNodeDescription" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -3117,10 +3117,10 @@
     "listenerEnable" : null,
     "webhookRequest" : { },
     "webhookValidate" : null,
-    "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
     "dynamicWebhookRefresh" : null,
-    "webhookValidateOnEnable" : null
+    "webhookValidateOnEnable" : null,
+    "processErrorResponse" : null,
+    "workflowNodeDescription" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -3370,13 +3370,14 @@
     "listenerEnable" : null,
     "webhookRequest" : { },
     "webhookValidate" : null,
-    "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
     "dynamicWebhookRefresh" : null,
-    "webhookValidateOnEnable" : null
+    "webhookValidateOnEnable" : null,
+    "processErrorResponse" : null,
+    "workflowNodeDescription" : null
   } ],
   "clusterElements" : [ {
     "description" : "Move Contact to the recycling bin.",
+    "help" : null,
     "name" : "deleteContact",
     "outputDefinition" : null,
     "properties" : [ {
@@ -3416,6 +3417,7 @@
     "element" : { }
   }, {
     "description" : "Get contact details.",
+    "help" : null,
     "name" : "getContact",
     "outputDefinition" : {
       "output" : null,
@@ -3828,6 +3830,7 @@
     "element" : { }
   }, {
     "description" : "Update Contact properties.",
+    "help" : null,
     "name" : "updateContact",
     "outputDefinition" : {
       "output" : null,
@@ -4382,6 +4385,7 @@
     "element" : { }
   }, {
     "description" : "Create a contact with the given properties.",
+    "help" : null,
     "name" : "createContact",
     "outputDefinition" : {
       "output" : null,
@@ -4911,6 +4915,7 @@
     "element" : { }
   }, {
     "description" : "Creates a new deal.",
+    "help" : null,
     "name" : "createDeal",
     "outputDefinition" : {
       "output" : null,
@@ -5446,6 +5451,7 @@
     "element" : { }
   }, {
     "description" : "Gets ticket details.",
+    "help" : null,
     "name" : "getTicket",
     "outputDefinition" : {
       "output" : null,

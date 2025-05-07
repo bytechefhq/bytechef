@@ -9,6 +9,7 @@
   "customActionHelp" : null,
   "clusterElements" : [ {
     "description" : "Keyword extractor that uses generative to extract 'excerpt_keywords' metadata field.",
+    "help" : null,
     "name" : "keywordMetadataEnricher",
     "outputDefinition" : null,
     "properties" : [ {
@@ -45,11 +46,11 @@
         "maxValue" : null,
         "minValue" : null,
         "options" : null,
-        "controlType" : "INTEGER",
-        "optionsDataSource" : null
+        "optionsDataSource" : null,
+        "controlType" : "INTEGER"
       } ],
-      "controlType" : "OBJECT_BUILDER",
-      "optionsDataSource" : null
+      "optionsDataSource" : null,
+      "controlType" : "OBJECT_BUILDER"
     } ],
     "title" : "Keyword Metadata Enricher",
     "type" : {
@@ -62,6 +63,7 @@
     "element" : { }
   }, {
     "description" : "Title extractor with adjacent sharing that uses generative to extract 'section_summary', 'prev_section_summary', 'next_section_summary' metadata fields.",
+    "help" : null,
     "name" : "summaryMetadataEnricher",
     "outputDefinition" : null,
     "properties" : [ {
@@ -132,11 +134,11 @@
           "label" : "Next",
           "value" : "NEXT"
         } ],
-        "controlType" : "MULTI_SELECT",
-        "optionsDataSource" : null
+        "optionsDataSource" : null,
+        "controlType" : "MULTI_SELECT"
       } ],
-      "controlType" : "OBJECT_BUILDER",
-      "optionsDataSource" : null
+      "optionsDataSource" : null,
+      "controlType" : "OBJECT_BUILDER"
     } ],
     "title" : "Summary Metadata Enricher",
     "type" : {

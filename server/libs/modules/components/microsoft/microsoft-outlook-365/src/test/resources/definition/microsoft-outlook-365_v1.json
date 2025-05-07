@@ -86,8 +86,8 @@
       "title" : "OAuth2 Authorization Code",
       "type" : "OAUTH2_AUTHORIZATION_CODE",
       "acquire" : null,
-      "oauth2AuthorizationExtraQueryParameters" : null,
       "authorizationCallback" : null,
+      "oauth2AuthorizationExtraQueryParameters" : null,
       "apply" : null,
       "clientId" : null,
       "pkce" : null,
@@ -789,8 +789,8 @@
       "optionsDataSource" : null
     } ],
     "title" : "Create Event",
-    "workflowNodeDescription" : null,
     "processErrorResponse" : null,
+    "workflowNodeDescription" : null,
     "perform" : { }
   }, {
     "batch" : null,
@@ -848,8 +848,8 @@
       }
     } ],
     "title" : "Delete Event",
-    "workflowNodeDescription" : null,
     "processErrorResponse" : null,
+    "workflowNodeDescription" : null,
     "perform" : { }
   }, {
     "batch" : null,
@@ -1435,8 +1435,8 @@
       "optionsDataSource" : null
     } ],
     "title" : "Get Events",
-    "workflowNodeDescription" : null,
     "processErrorResponse" : null,
+    "workflowNodeDescription" : null,
     "perform" : { }
   }, {
     "batch" : null,
@@ -1684,8 +1684,8 @@
       "optionsDataSource" : null
     } ],
     "title" : "Get Free Time Slots",
-    "workflowNodeDescription" : null,
     "processErrorResponse" : null,
+    "workflowNodeDescription" : null,
     "perform" : { }
   }, {
     "batch" : null,
@@ -2169,8 +2169,8 @@
       }
     } ],
     "title" : "Get Mail",
-    "workflowNodeDescription" : null,
     "processErrorResponse" : null,
+    "workflowNodeDescription" : null,
     "perform" : { }
   }, {
     "batch" : null,
@@ -2225,8 +2225,8 @@
       "optionsDataSource" : null
     } ],
     "title" : "Reply to Email",
-    "workflowNodeDescription" : null,
     "processErrorResponse" : null,
+    "workflowNodeDescription" : null,
     "perform" : { }
   }, {
     "batch" : null,
@@ -2812,8 +2812,8 @@
       }
     } ],
     "title" : "Search Email",
-    "workflowNodeDescription" : null,
     "processErrorResponse" : null,
+    "workflowNodeDescription" : null,
     "perform" : { }
   }, {
     "batch" : null,
@@ -3097,8 +3097,8 @@
       "optionsDataSource" : null
     } ],
     "title" : "Send Email",
-    "workflowNodeDescription" : null,
     "processErrorResponse" : null,
+    "workflowNodeDescription" : null,
     "perform" : { }
   } ],
   "unifiedApi" : null,
@@ -3605,10 +3605,10 @@
     "type" : "POLLING",
     "webhookRawBody" : null,
     "workflowSyncExecution" : null,
+    "processErrorResponse" : null,
     "workflowNodeDescription" : null,
     "dynamicWebhookRefresh" : null,
     "webhookValidateOnEnable" : null,
-    "processErrorResponse" : null,
     "deduplicate" : null,
     "poll" : { },
     "webhookDisable" : null,
@@ -3620,6 +3620,7 @@
   } ],
   "clusterElements" : [ {
     "description" : "Creates an event in the specified calendar.",
+    "help" : null,
     "name" : "createEvent",
     "outputDefinition" : {
       "output" : null,
@@ -4308,6 +4309,7 @@
     "element" : { }
   }, {
     "description" : "Deletes an event from the specified calendar.",
+    "help" : null,
     "name" : "deleteEvent",
     "outputDefinition" : null,
     "properties" : [ {
@@ -4368,6 +4370,7 @@
     "element" : { }
   }, {
     "description" : "Gets a list of events in specified calendar.",
+    "help" : null,
     "name" : "getEvents",
     "outputDefinition" : {
       "output" : null,
@@ -4956,6 +4959,7 @@
     "element" : { }
   }, {
     "description" : "Get free time slots from the Microsoft Outlook 365 calendar.",
+    "help" : null,
     "name" : "getFreeTimeSlots",
     "outputDefinition" : {
       "output" : null,
@@ -5206,6 +5210,7 @@
     "element" : { }
   }, {
     "description" : "Get a specific message",
+    "help" : null,
     "name" : "getMail",
     "outputDefinition" : {
       "output" : null,
@@ -5692,6 +5697,7 @@
     "element" : { }
   }, {
     "description" : "Creates a new reply to email.",
+    "help" : null,
     "name" : "replyToEmail",
     "outputDefinition" : null,
     "properties" : [ {
@@ -5749,6 +5755,7 @@
     "element" : { }
   }, {
     "description" : "Get the messages in the signed-in user's mailbox",
+    "help" : null,
     "name" : "searchEmail",
     "outputDefinition" : {
       "output" : null,
@@ -6337,6 +6344,7 @@
     "element" : { }
   }, {
     "description" : "Send the message.",
+    "help" : null,
     "name" : "sendEmail",
     "outputDefinition" : null,
     "properties" : [ {

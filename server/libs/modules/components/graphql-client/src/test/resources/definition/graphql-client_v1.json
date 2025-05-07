@@ -13,6 +13,7 @@
   "resources" : null,
   "version" : 1,
   "title" : "GraphQL Client",
+  "connection" : null,
   "actions" : [ {
     "batch" : null,
     "deprecated" : null,
@@ -282,8 +283,7 @@
     "processErrorResponse" : null,
     "workflowNodeDescription" : null
   } ],
-  "clusterElements" : null,
-  "unifiedApi" : null,
   "triggers" : null,
-  "connection" : null
+  "unifiedApi" : null,
+  "clusterElements" : null
 }

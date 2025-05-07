@@ -610,6 +610,7 @@
   } ],
   "clusterElements" : [ {
     "description" : "Groq model.",
+    "help" : null,
     "name" : "model",
     "outputDefinition" : null,
     "properties" : [ {
@@ -872,6 +873,6 @@
     },
     "element" : { }
   } ],
-  "unifiedApi" : null,
-  "triggers" : null
+  "triggers" : null,
+  "unifiedApi" : null
 }

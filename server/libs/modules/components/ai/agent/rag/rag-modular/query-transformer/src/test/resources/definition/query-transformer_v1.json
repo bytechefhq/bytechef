@@ -9,6 +9,7 @@
   "customActionHelp" : null,
   "clusterElements" : [ {
     "description" : "Uses a large language model to compress a conversation history and a follow-up query\ninto a standalone query that captures the essence of the conversation.\nThis transformer is useful when the conversation history is long and the follow-up\nquery is related to the conversation context.\n",
+    "help" : null,
     "name" : "compressionQueryTransformer",
     "outputDefinition" : null,
     "properties" : null,
@@ -23,6 +24,7 @@
     "element" : { }
   }, {
     "description" : "Uses a large language model to rewrite a user query to provide better results when\nquerying a target system, such as a vector store or a web search engine.\nThis transformer is useful when the user query is verbose, ambiguous, or contains\nirrelevant information that may affect the quality of the search results.\n",
+    "help" : null,
     "name" : "rewriteQueryTransformer",
     "outputDefinition" : null,
     "properties" : null,
@@ -37,6 +39,7 @@
     "element" : { }
   }, {
     "description" : "Uses a large language model to translate a query to a target language that is supported\nby the embedding model used to generate the document embeddings. If the query is\nalready in the target language, it is returned unchanged. If the language of the query\nis unknown, it is also returned unchanged.\nThis transformer is useful when the embedding model is trained on a specific language\nand the user query is in a different language.\n",
+    "help" : null,
     "name" : "translationQueryTransformer",
     "outputDefinition" : null,
     "properties" : [ {

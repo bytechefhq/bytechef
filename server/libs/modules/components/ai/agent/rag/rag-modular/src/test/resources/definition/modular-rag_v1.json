@@ -9,6 +9,7 @@
   "customActionHelp" : null,
   "clusterElements" : [ {
     "description" : "Moduler RAG.",
+    "help" : null,
     "name" : "rag",
     "outputDefinition" : null,
     "properties" : null,

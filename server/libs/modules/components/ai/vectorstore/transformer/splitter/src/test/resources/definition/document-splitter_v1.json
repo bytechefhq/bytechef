@@ -15,8 +15,11 @@
   "title" : "Document Splitter",
   "connection" : null,
   "actions" : null,
+  "triggers" : null,
+  "unifiedApi" : null,
   "clusterElements" : [ {
     "description" : "Splitter that splits text into chunks of a target size in tokens.",
+    "help" : null,
     "name" : "tokenTextSplitter",
     "outputDefinition" : null,
     "properties" : [ {
@@ -53,8 +56,8 @@
         "maxValue" : null,
         "minValue" : null,
         "options" : null,
-        "optionsDataSource" : null,
-        "controlType" : "INTEGER"
+        "controlType" : "INTEGER",
+        "optionsDataSource" : null
       }, {
         "advancedOption" : null,
         "description" : "The minimum size of each text chunk in characters.",
@@ -72,8 +75,8 @@
         "maxValue" : null,
         "minValue" : null,
         "options" : null,
-        "optionsDataSource" : null,
-        "controlType" : "INTEGER"
+        "controlType" : "INTEGER",
+        "optionsDataSource" : null
       }, {
         "advancedOption" : null,
         "description" : "The minimum length of a chunk to be included.",
@@ -91,8 +94,8 @@
         "maxValue" : null,
         "minValue" : null,
         "options" : null,
-        "optionsDataSource" : null,
-        "controlType" : "INTEGER"
+        "controlType" : "INTEGER",
+        "optionsDataSource" : null
       }, {
         "advancedOption" : null,
         "description" : "The maximum number of chunks to generate from a text.",
@@ -110,8 +113,8 @@
         "maxValue" : null,
         "minValue" : null,
         "options" : null,
-        "optionsDataSource" : null,
-        "controlType" : "INTEGER"
+        "controlType" : "INTEGER",
+        "optionsDataSource" : null
       }, {
         "advancedOption" : null,
         "description" : "Whether to keep separators (like newlines) in the chunks.",
@@ -137,8 +140,8 @@
         } ],
         "controlType" : "SELECT"
       } ],
-      "optionsDataSource" : null,
-      "controlType" : "OBJECT_BUILDER"
+      "controlType" : "OBJECT_BUILDER",
+      "optionsDataSource" : null
     } ],
     "title" : "Token Text Splitter",
     "type" : {
@@ -149,7 +152,5 @@
       "required" : false
     },
     "element" : { }
-  } ],
-  "unifiedApi" : null,
-  "triggers" : null
+  } ]
 }

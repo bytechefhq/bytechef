@@ -63,6 +63,8 @@
       "title" : "OAuth2 Authorization Code",
       "type" : "OAUTH2_AUTHORIZATION_CODE",
       "acquire" : null,
+      "oauth2AuthorizationExtraQueryParameters" : null,
+      "authorizationCallback" : null,
       "apply" : null,
       "clientId" : null,
       "pkce" : null,
@@ -72,9 +74,7 @@
       "tokenUrl" : { },
       "authorizationUrl" : { },
       "clientSecret" : null,
-      "refreshToken" : null,
-      "authorizationCallback" : null,
-      "oauth2AuthorizationExtraQueryParameters" : null
+      "refreshToken" : null
     } ],
     "properties" : null,
     "version" : 1,
@@ -278,9 +278,9 @@
       }
     } ],
     "title" : "Fulfill Order",
-    "perform" : null,
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "perform" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -580,14 +580,15 @@
       }
     } ],
     "title" : "Get Collection Item",
-    "perform" : null,
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "perform" : null
   } ],
-  "unifiedApi" : null,
   "triggers" : [ ],
+  "unifiedApi" : null,
   "clusterElements" : [ {
     "description" : "Updates an order's status to fulfilled.",
+    "help" : null,
     "name" : "fulfillOrder",
     "outputDefinition" : {
       "output" : null,
@@ -785,6 +786,7 @@
     "element" : { }
   }, {
     "description" : "Get collection item in a collection.",
+    "help" : null,
     "name" : "getCollectionItem",
     "outputDefinition" : {
       "output" : null,

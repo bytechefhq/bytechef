@@ -73,8 +73,8 @@
       "authorizationUrl" : { },
       "clientSecret" : null,
       "refreshToken" : null,
-      "oauth2AuthorizationExtraQueryParameters" : null,
-      "authorizationCallback" : null
+      "authorizationCallback" : null,
+      "oauth2AuthorizationExtraQueryParameters" : null
     } ],
     "properties" : null,
     "version" : 1,
@@ -959,14 +959,15 @@
     "listenerEnable" : null,
     "webhookRequest" : { },
     "webhookValidate" : null,
+    "dynamicWebhookRefresh" : null,
     "processErrorResponse" : null,
     "workflowNodeDescription" : null,
-    "dynamicWebhookRefresh" : null,
     "webhookValidateOnEnable" : null
   } ],
   "unifiedApi" : null,
   "clusterElements" : [ {
     "description" : "Creates a new project issue.",
+    "help" : null,
     "name" : "createIssue",
     "outputDefinition" : {
       "output" : null,
@@ -1337,6 +1338,7 @@
     "element" : { }
   }, {
     "description" : "Adds a comment to the specified issue.",
+    "help" : null,
     "name" : "createCommentOnIssue",
     "outputDefinition" : {
       "output" : null,

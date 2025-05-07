@@ -920,10 +920,11 @@
     "workflowNodeDescription" : null,
     "perform" : null
   } ],
-  "unifiedApi" : null,
   "triggers" : [ ],
+  "unifiedApi" : null,
   "clusterElements" : [ {
     "description" : "Creates a new task.",
+    "help" : null,
     "name" : "createTask",
     "outputDefinition" : {
       "output" : null,
@@ -1295,6 +1296,7 @@
     "element" : { }
   }, {
     "description" : "Mark a tas as being completed.",
+    "help" : null,
     "name" : "markTaskCompleted",
     "outputDefinition" : null,
     "properties" : [ {
@@ -1334,6 +1336,7 @@
     "element" : { }
   }, {
     "description" : "Creates a new project.",
+    "help" : null,
     "name" : "createProject",
     "outputDefinition" : {
       "output" : null,

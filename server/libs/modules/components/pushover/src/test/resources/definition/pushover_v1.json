@@ -63,6 +63,8 @@
       "title" : null,
       "type" : "CUSTOM",
       "acquire" : null,
+      "authorizationCallback" : null,
+      "oauth2AuthorizationExtraQueryParameters" : null,
       "authorizationUrl" : null,
       "clientSecret" : null,
       "refreshToken" : null,
@@ -72,9 +74,7 @@
       "refresh" : null,
       "refreshUrl" : null,
       "scopes" : null,
-      "tokenUrl" : null,
-      "authorizationCallback" : null,
-      "oauth2AuthorizationExtraQueryParameters" : null
+      "tokenUrl" : null
     } ],
     "properties" : null,
     "version" : 1,
@@ -473,12 +473,13 @@
       "controlType" : "FILE_ENTRY"
     } ],
     "title" : "Send Notification",
-    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "perform" : { }
   } ],
   "clusterElements" : [ {
     "description" : "Sends a notification.",
+    "help" : null,
     "name" : "sendNotification",
     "outputDefinition" : {
       "output" : null,
@@ -873,6 +874,6 @@
     },
     "element" : { }
   } ],
-  "triggers" : null,
-  "unifiedApi" : null
+  "unifiedApi" : null,
+  "triggers" : null
 }

@@ -612,6 +612,7 @@
   "triggers" : null,
   "clusterElements" : [ {
     "description" : "DeepSeek model.",
+    "help" : null,
     "name" : "model",
     "outputDefinition" : null,
     "properties" : [ {

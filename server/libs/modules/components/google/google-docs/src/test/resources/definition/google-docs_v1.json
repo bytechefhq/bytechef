@@ -73,8 +73,8 @@
       "authorizationUrl" : { },
       "clientSecret" : null,
       "refreshToken" : null,
-      "authorizationCallback" : null,
-      "oauth2AuthorizationExtraQueryParameters" : { }
+      "oauth2AuthorizationExtraQueryParameters" : { },
+      "authorizationCallback" : null
     } ],
     "properties" : null,
     "version" : 1,
@@ -350,6 +350,7 @@
   "triggers" : null,
   "clusterElements" : [ {
     "description" : "Create a document on Google Docs.",
+    "help" : null,
     "name" : "createDocument",
     "outputDefinition" : {
       "output" : null,
@@ -409,6 +410,7 @@
     "element" : { }
   }, {
     "description" : "Creates a new document based on an existing one and can replace any placeholder variables found in your template document, like [[name]], [[email]], etc.",
+    "help" : null,
     "name" : "createDocumentFromTemplate",
     "outputDefinition" : {
       "output" : null,
@@ -574,6 +576,7 @@
     "element" : { }
   }, {
     "description" : "Retrieve a specified document from your Google Drive.",
+    "help" : null,
     "name" : "getDocument",
     "outputDefinition" : {
       "output" : null,

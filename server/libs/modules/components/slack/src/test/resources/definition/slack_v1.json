@@ -66,8 +66,8 @@
       "title" : "OAuth2 Authorization Code",
       "type" : "OAUTH2_AUTHORIZATION_CODE",
       "acquire" : null,
-      "oauth2AuthorizationExtraQueryParameters" : null,
       "authorizationCallback" : null,
+      "oauth2AuthorizationExtraQueryParameters" : null,
       "apply" : null,
       "clientId" : null,
       "pkce" : null,
@@ -2111,10 +2111,11 @@
     "workflowNodeDescription" : null,
     "perform" : { }
   } ],
-  "triggers" : null,
   "unifiedApi" : null,
+  "triggers" : null,
   "clusterElements" : [ {
     "description" : "Sends approval message to a channel.",
+    "help" : null,
     "name" : "sendApprovalMessage",
     "outputDefinition" : {
       "output" : null,
@@ -2791,6 +2792,7 @@
     "element" : { }
   }, {
     "description" : "Sends a message to a public channel, private channel, or existing direct message conversation.",
+    "help" : null,
     "name" : "sendMessage",
     "outputDefinition" : {
       "output" : null,
@@ -3467,6 +3469,7 @@
     "element" : { }
   }, {
     "description" : "Sends a direct message to another user in a workspace. If it hasn't already, a direct message conversation will be created.",
+    "help" : null,
     "name" : "sendDirectMessage",
     "outputDefinition" : {
       "output" : null,

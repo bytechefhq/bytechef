@@ -1119,6 +1119,7 @@
   } ],
   "clusterElements" : [ {
     "description" : "Creates a new channel within a team.",
+    "help" : null,
     "name" : "createChannel",
     "outputDefinition" : {
       "output" : null,
@@ -1365,6 +1366,7 @@
     "element" : { }
   }, {
     "description" : "Sends a message to a channel.",
+    "help" : null,
     "name" : "sendChannelMessage",
     "outputDefinition" : {
       "output" : null,
@@ -1802,6 +1804,7 @@
     "element" : { }
   }, {
     "description" : "Sends a message in an existing chat.",
+    "help" : null,
     "name" : "sendChatMessage",
     "outputDefinition" : {
       "output" : null,

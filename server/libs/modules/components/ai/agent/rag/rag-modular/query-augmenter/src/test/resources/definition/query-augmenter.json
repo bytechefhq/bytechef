@@ -15,8 +15,11 @@
   "title" : "Query Augmenter",
   "connection" : null,
   "actions" : null,
+  "unifiedApi" : null,
+  "triggers" : null,
   "clusterElements" : [ {
     "description" : "Augments the user query with contextual data from the content of the provided\ndocuments.\n",
+    "help" : null,
     "name" : "contextualQueryAugmenter",
     "outputDefinition" : null,
     "properties" : null,
@@ -29,7 +32,5 @@
       "required" : false
     },
     "element" : { }
-  } ],
-  "unifiedApi" : null,
-  "triggers" : null
+  } ]
 }

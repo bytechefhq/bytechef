@@ -9,6 +9,7 @@
   "customActionHelp" : null,
   "clusterElements" : [ {
     "description" : "Memory is retrieved from a VectorStore added into the prompt's system text. This only works for text based exchanges with the models, not multi-modal exchanges.",
+    "help" : null,
     "name" : "chatMemory",
     "outputDefinition" : null,
     "properties" : [ {
@@ -28,8 +29,8 @@
       "maxValue" : null,
       "minValue" : null,
       "options" : null,
-      "optionsDataSource" : null,
-      "controlType" : "INTEGER"
+      "controlType" : "INTEGER",
+      "optionsDataSource" : null
     } ],
     "title" : "Vector Store Chat Memory",
     "type" : {

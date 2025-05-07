@@ -111,6 +111,8 @@
       "title" : "OAuth2 Authorization Code",
       "type" : "OAUTH2_AUTHORIZATION_CODE",
       "acquire" : null,
+      "oauth2AuthorizationExtraQueryParameters" : null,
+      "authorizationCallback" : null,
       "apply" : null,
       "clientId" : null,
       "pkce" : null,
@@ -120,9 +122,7 @@
       "tokenUrl" : { },
       "authorizationUrl" : { },
       "clientSecret" : null,
-      "refreshToken" : null,
-      "oauth2AuthorizationExtraQueryParameters" : null,
-      "authorizationCallback" : null
+      "refreshToken" : null
     } ],
     "properties" : null,
     "version" : 1,
@@ -489,9 +489,9 @@
       "optionsDataSource" : null
     } ],
     "title" : "Create Category",
-    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "perform" : { }
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -1111,9 +1111,9 @@
       "optionsDataSource" : null
     } ],
     "title" : "Create Customer",
-    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "perform" : { }
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -1805,9 +1805,9 @@
       "optionsDataSource" : null
     } ],
     "title" : "Create Item",
-    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "perform" : { }
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -2232,9 +2232,9 @@
       "optionsDataSource" : null
     } ],
     "title" : "Create Payment",
-    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "perform" : { }
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -2757,9 +2757,9 @@
       }
     } ],
     "title" : "Get Customer",
-    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "perform" : { }
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -3122,9 +3122,9 @@
       }
     } ],
     "title" : "Get Invoice",
-    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "perform" : { }
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -3727,9 +3727,9 @@
       }
     } ],
     "title" : "Get Item",
-    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "perform" : { }
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -4132,14 +4132,15 @@
       }
     } ],
     "title" : "Get Payment",
-    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "perform" : { }
   } ],
   "unifiedApi" : null,
   "triggers" : null,
   "clusterElements" : [ {
     "description" : "Creates a new category.",
+    "help" : null,
     "name" : "createCategory",
     "outputDefinition" : {
       "output" : null,
@@ -4503,6 +4504,7 @@
     "element" : { }
   }, {
     "description" : "Creates a new customer.",
+    "help" : null,
     "name" : "createCustomer",
     "outputDefinition" : {
       "output" : null,
@@ -5126,6 +5128,7 @@
     "element" : { }
   }, {
     "description" : "Creates a new item.",
+    "help" : null,
     "name" : "createItem",
     "outputDefinition" : {
       "output" : null,
@@ -5821,6 +5824,7 @@
     "element" : { }
   }, {
     "description" : "Creates a new payment.",
+    "help" : null,
     "name" : "createPayment",
     "outputDefinition" : {
       "output" : null,
@@ -6249,6 +6253,7 @@
     "element" : { }
   }, {
     "description" : "Gets details about a specific customer.",
+    "help" : null,
     "name" : "getCustomer",
     "outputDefinition" : {
       "output" : null,
@@ -6775,6 +6780,7 @@
     "element" : { }
   }, {
     "description" : "Gets details about a specific invoice.",
+    "help" : null,
     "name" : "getInvoice",
     "outputDefinition" : {
       "output" : null,
@@ -7141,6 +7147,7 @@
     "element" : { }
   }, {
     "description" : "Gets details about a specific item.",
+    "help" : null,
     "name" : "getItem",
     "outputDefinition" : {
       "output" : null,
@@ -7747,6 +7754,7 @@
     "element" : { }
   }, {
     "description" : "Gets details about a specific payment.",
+    "help" : null,
     "name" : "getPayment",
     "outputDefinition" : {
       "output" : null,

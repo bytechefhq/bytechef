@@ -15,10 +15,9 @@
   "title" : "Document Reader",
   "connection" : null,
   "actions" : null,
-  "unifiedApi" : null,
-  "triggers" : null,
   "clusterElements" : [ {
     "description" : "Reads JSON documents and converts them into a list of Document objects.",
+    "help" : null,
     "name" : "json",
     "outputDefinition" : null,
     "properties" : [ {
@@ -156,8 +155,8 @@
       "minItems" : null,
       "multipleValues" : null,
       "options" : null,
-      "controlType" : "ARRAY_BUILDER",
-      "optionsDataSource" : null
+      "optionsDataSource" : null,
+      "controlType" : "ARRAY_BUILDER"
     } ],
     "title" : "JSON Document Reader",
     "type" : {
@@ -170,6 +169,7 @@
     "element" : { }
   }, {
     "description" : "Reads the given Markdown resource and groups headers, paragraphs, or text divided by horizontal lines into documents.",
+    "help" : null,
     "name" : "markdown",
     "outputDefinition" : null,
     "properties" : [ {
@@ -280,6 +280,7 @@
     "element" : { }
   }, {
     "description" : "Groups the parsed PDF pages into Documents.",
+    "help" : null,
     "name" : "pagePdf",
     "outputDefinition" : null,
     "properties" : [ {
@@ -390,6 +391,7 @@
     "element" : { }
   }, {
     "description" : "A document reader that leverages Apache Tika to extract text from a variety of document\nformats, such as PDF, DOC/DOCX, PPT/PPTX, and HTML. For a comprehensive list of\nsupported formats, refer to: https://tika.apache.org/3.0.0/formats.html.\nThis reader directly provides the extracted text without any additional formatting. All\nextracted texts are encapsulated within a Document object.\n",
+    "help" : null,
     "name" : "tika",
     "outputDefinition" : null,
     "properties" : [ {
@@ -500,6 +502,7 @@
     "element" : { }
   }, {
     "description" : "Reads text.",
+    "help" : null,
     "name" : "txt",
     "outputDefinition" : null,
     "properties" : [ {
@@ -608,5 +611,7 @@
       "required" : true
     },
     "element" : { }
-  } ]
+  } ],
+  "triggers" : null,
+  "unifiedApi" : null
 }

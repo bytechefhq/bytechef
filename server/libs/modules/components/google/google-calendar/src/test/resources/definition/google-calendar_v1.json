@@ -63,8 +63,8 @@
       "title" : "OAuth2 Authorization Code",
       "type" : "OAUTH2_AUTHORIZATION_CODE",
       "acquire" : null,
-      "authorizationCallback" : null,
       "oauth2AuthorizationExtraQueryParameters" : { },
+      "authorizationCallback" : null,
       "apply" : null,
       "clientId" : null,
       "pkce" : null,
@@ -10762,6 +10762,7 @@
   } ],
   "clusterElements" : [ {
     "description" : "Invites one or more person to an existing event.",
+    "help" : null,
     "name" : "addAttendeesToEvent",
     "outputDefinition" : {
       "output" : null,
@@ -12382,6 +12383,7 @@
     "element" : { }
   }, {
     "description" : "Creates a new event in Google Calendar.",
+    "help" : null,
     "name" : "createEvent",
     "outputDefinition" : {
       "output" : null,
@@ -14464,6 +14466,7 @@
     "element" : { }
   }, {
     "description" : "Creates a quick event in Google Calendar.",
+    "help" : null,
     "name" : "createQuickEvent",
     "outputDefinition" : {
       "output" : null,
@@ -16072,6 +16075,7 @@
     "element" : { }
   }, {
     "description" : "Deletes an event from Google Calendar.",
+    "help" : null,
     "name" : "deleteEvent",
     "outputDefinition" : null,
     "properties" : [ {
@@ -16132,6 +16136,7 @@
     "element" : { }
   }, {
     "description" : "List events from the specified Google Calendar.",
+    "help" : null,
     "name" : "getEvents",
     "outputDefinition" : {
       "output" : null,
@@ -17876,6 +17881,7 @@
     "element" : { }
   }, {
     "description" : "Get free time slots from Google Calendar.",
+    "help" : null,
     "name" : "getFreeTimeSlots",
     "outputDefinition" : {
       "output" : null,
@@ -18126,6 +18132,7 @@
     "element" : { }
   }, {
     "description" : "Updates event in Google Calendar.",
+    "help" : null,
     "name" : "updateEvent",
     "outputDefinition" : {
       "output" : null,

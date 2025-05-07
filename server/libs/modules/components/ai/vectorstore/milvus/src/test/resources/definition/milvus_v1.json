@@ -230,17 +230,17 @@
       "type" : "CUSTOM",
       "acquire" : null,
       "apply" : null,
-      "authorizationCallback" : null,
-      "authorizationUrl" : null,
       "clientId" : null,
-      "clientSecret" : null,
-      "oauth2AuthorizationExtraQueryParameters" : null,
       "pkce" : null,
       "refresh" : null,
       "refreshUrl" : null,
       "scopes" : null,
+      "tokenUrl" : null,
+      "authorizationUrl" : null,
+      "clientSecret" : null,
       "refreshToken" : null,
-      "tokenUrl" : null
+      "authorizationCallback" : null,
+      "oauth2AuthorizationExtraQueryParameters" : null
     } ],
     "properties" : null,
     "version" : 1,
@@ -252,6 +252,7 @@
   "customActionHelp" : null,
   "clusterElements" : [ {
     "description" : "Milvus VectorStore.",
+    "help" : null,
     "name" : "vectorStore",
     "outputDefinition" : null,
     "properties" : null,
@@ -275,10 +276,6 @@
   "triggers" : null,
   "unifiedApi" : null,
   "version" : 1,
-  "actionClusterElementTypes" : {
-    "load" : [ "EMBEDDING" ],
-    "search" : [ "DOCUMENT_READER", "DOCUMENT_TRANSFORMER", "EMBEDDING" ]
-  },
   "clusterElementType" : [ {
     "name" : "DOCUMENT_READER",
     "key" : "documentReader",
@@ -297,5 +294,9 @@
     "label" : "Embedding",
     "multipleElements" : false,
     "required" : true
-  } ]
+  } ],
+  "actionClusterElementTypes" : {
+    "search" : [ "DOCUMENT_READER", "DOCUMENT_TRANSFORMER", "EMBEDDING" ],
+    "load" : [ "EMBEDDING" ]
+  }
 }

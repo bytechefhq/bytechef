@@ -1970,6 +1970,7 @@
   "triggers" : null,
   "clusterElements" : [ {
     "description" : "Creates a new task.",
+    "help" : null,
     "name" : "createTask",
     "outputDefinition" : {
       "output" : null,
@@ -2740,6 +2741,7 @@
     "element" : { }
   }, {
     "description" : "Creates a new task list.",
+    "help" : null,
     "name" : "createTaskList",
     "outputDefinition" : {
       "output" : null,
@@ -3119,6 +3121,7 @@
     "element" : { }
   }, {
     "description" : "Gets task by ID.",
+    "help" : null,
     "name" : "getTask",
     "outputDefinition" : {
       "output" : null,
