@@ -25,7 +25,7 @@ import jakarta.annotation.Generated;
  */
 
 @JsonTypeName("executeWorkflows_400_response")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-04-24T13:42:07.993902+02:00[Europe/Zagreb]", comments = "Generator version: 7.12.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-05-06T16:39:12.209392+02:00[Europe/Zagreb]", comments = "Generator version: 7.12.0")
 public class ExecuteWorkflows400ResponseModel {
 
   @Valid

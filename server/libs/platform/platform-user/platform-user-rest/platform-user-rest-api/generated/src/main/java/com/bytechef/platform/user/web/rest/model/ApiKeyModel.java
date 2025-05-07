@@ -24,7 +24,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "ApiKey", description = "Contains generated key required for calling public API.")
 @JsonTypeName("ApiKey")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-04-03T22:34:22.834172+02:00[Europe/Zagreb]", comments = "Generator version: 7.12.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-05-06T16:39:16.016319+02:00[Europe/Zagreb]", comments = "Generator version: 7.12.0")
 public class ApiKeyModel {
 
   private @Nullable String createdBy;

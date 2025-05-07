@@ -33,7 +33,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-04-18T10:37:14.843005+02:00[Europe/Zagreb]", comments = "Generator version: 7.12.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-05-06T16:39:14.817096+02:00[Europe/Zagreb]", comments = "Generator version: 7.12.0")
 @Validated
 @Tag(name = "cluster-element-definition", description = "The Platform Cluster Element Definition Internal API")
 public interface ClusterElementDefinitionApi {
@@ -76,7 +76,7 @@ public interface ClusterElementDefinitionApi {
         getRequest().ifPresent(request -> {
             for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
                 if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
-                    String exampleString = "{ \"name\" : \"name\", \"icon\" : \"icon\", \"description\" : \"description\", \"outputDefined\" : true, \"componentName\" : \"componentName\", \"componentVersion\" : 0, \"title\" : \"title\", \"type\" : \"type\", \"properties\" : [ { \"displayCondition\" : \"displayCondition\", \"hidden\" : false, \"name\" : \"name\", \"description\" : \"description\", \"advancedOption\" : false, \"type\" : \"ARRAY\", \"required\" : false, \"expressionEnabled\" : true }, { \"displayCondition\" : \"displayCondition\", \"hidden\" : false, \"name\" : \"name\", \"description\" : \"description\", \"advancedOption\" : false, \"type\" : \"ARRAY\", \"required\" : false, \"expressionEnabled\" : true } ] }";
+                    String exampleString = "{ \"help\" : { \"body\" : \"body\", \"learnMoreUrl\" : \"learnMoreUrl\" }, \"name\" : \"name\", \"icon\" : \"icon\", \"description\" : \"description\", \"outputDefined\" : true, \"componentName\" : \"componentName\", \"componentVersion\" : 0, \"title\" : \"title\", \"type\" : \"type\", \"properties\" : [ { \"displayCondition\" : \"displayCondition\", \"hidden\" : false, \"name\" : \"name\", \"description\" : \"description\", \"advancedOption\" : false, \"type\" : \"ARRAY\", \"required\" : false, \"expressionEnabled\" : true }, { \"displayCondition\" : \"displayCondition\", \"hidden\" : false, \"name\" : \"name\", \"description\" : \"description\", \"advancedOption\" : false, \"type\" : \"ARRAY\", \"required\" : false, \"expressionEnabled\" : true } ] }";
                     ApiUtil.setExampleResponse(request, "application/json", exampleString);
                     break;
                 }
@@ -121,7 +121,7 @@ public interface ClusterElementDefinitionApi {
         getRequest().ifPresent(request -> {
             for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
                 if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
-                    String exampleString = "[ { \"name\" : \"name\", \"icon\" : \"icon\", \"description\" : \"description\", \"outputDefined\" : true, \"componentName\" : \"componentName\", \"componentVersion\" : 0, \"title\" : \"title\", \"type\" : \"type\" }, { \"name\" : \"name\", \"icon\" : \"icon\", \"description\" : \"description\", \"outputDefined\" : true, \"componentName\" : \"componentName\", \"componentVersion\" : 0, \"title\" : \"title\", \"type\" : \"type\" } ]";
+                    String exampleString = "[ { \"help\" : { \"body\" : \"body\", \"learnMoreUrl\" : \"learnMoreUrl\" }, \"name\" : \"name\", \"icon\" : \"icon\", \"description\" : \"description\", \"outputDefined\" : true, \"componentName\" : \"componentName\", \"componentVersion\" : 0, \"title\" : \"title\", \"type\" : \"type\" }, { \"help\" : { \"body\" : \"body\", \"learnMoreUrl\" : \"learnMoreUrl\" }, \"name\" : \"name\", \"icon\" : \"icon\", \"description\" : \"description\", \"outputDefined\" : true, \"componentName\" : \"componentName\", \"componentVersion\" : 0, \"title\" : \"title\", \"type\" : \"type\" } ]";
                     ApiUtil.setExampleResponse(request, "application/json", exampleString);
                     break;
                 }

@@ -21,7 +21,7 @@ import jakarta.annotation.Generated;
  */
 
 @JsonTypeName("createSigningKey_200_response")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-04-03T22:34:20.724397+02:00[Europe/Zagreb]", comments = "Generator version: 7.12.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-05-06T16:39:13.067708+02:00[Europe/Zagreb]", comments = "Generator version: 7.12.0")
 public class CreateSigningKey200ResponseModel {
 
   private @Nullable String privateKey;

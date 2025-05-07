@@ -2,6 +2,7 @@ package com.bytechef.platform.configuration.web.rest.model;
 
 import java.net.URI;
 import java.util.Objects;
+import com.bytechef.platform.configuration.web.rest.model.HelpModel;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonTypeName;
@@ -22,18 +23,20 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "ClusterElementDefinitionBasic", description = "A cluster element basic definition.")
 @JsonTypeName("ClusterElementDefinitionBasic")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-04-18T10:37:14.843005+02:00[Europe/Zagreb]", comments = "Generator version: 7.12.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-05-06T16:39:14.817096+02:00[Europe/Zagreb]", comments = "Generator version: 7.12.0")
 public class ClusterElementDefinitionBasicModel {
 
   private String componentName;
 
   private Integer componentVersion;
 
+  private @Nullable String description;
+
+  private @Nullable HelpModel help;
+
   private String name;
 
   private @Nullable String title;
-
-  private @Nullable String description;
 
   private String type;
 
@@ -96,6 +99,46 @@ public class ClusterElementDefinitionBasicModel {
     this.componentVersion = componentVersion;
   }
 
+  public ClusterElementDefinitionBasicModel description(String description) {
+    this.description = description;
+    return this;
+  }
+
+  /**
+   * The cluster element description.
+   * @return description
+   */
+  
+  @Schema(name = "description", description = "The cluster element description.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("description")
+  public String getDescription() {
+    return description;
+  }
+
+  public void setDescription(String description) {
+    this.description = description;
+  }
+
+  public ClusterElementDefinitionBasicModel help(HelpModel help) {
+    this.help = help;
+    return this;
+  }
+
+  /**
+   * Get help
+   * @return help
+   */
+  @Valid 
+  @Schema(name = "help", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("help")
+  public HelpModel getHelp() {
+    return help;
+  }
+
+  public void setHelp(HelpModel help) {
+    this.help = help;
+  }
+
   public ClusterElementDefinitionBasicModel name(String name) {
     this.name = name;
     return this;
@@ -134,26 +177,6 @@ public class ClusterElementDefinitionBasicModel {
 
   public void setTitle(String title) {
     this.title = title;
-  }
-
-  public ClusterElementDefinitionBasicModel description(String description) {
-    this.description = description;
-    return this;
-  }
-
-  /**
-   * The cluster element description.
-   * @return description
-   */
-  
-  @Schema(name = "description", description = "The cluster element description.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  @JsonProperty("description")
-  public String getDescription() {
-    return description;
-  }
-
-  public void setDescription(String description) {
-    this.description = description;
   }
 
   public ClusterElementDefinitionBasicModel type(String type) {
@@ -227,9 +250,10 @@ public class ClusterElementDefinitionBasicModel {
     ClusterElementDefinitionBasicModel clusterElementDefinitionBasic = (ClusterElementDefinitionBasicModel) o;
     return Objects.equals(this.componentName, clusterElementDefinitionBasic.componentName) &&
         Objects.equals(this.componentVersion, clusterElementDefinitionBasic.componentVersion) &&
+        Objects.equals(this.description, clusterElementDefinitionBasic.description) &&
+        Objects.equals(this.help, clusterElementDefinitionBasic.help) &&
         Objects.equals(this.name, clusterElementDefinitionBasic.name) &&
         Objects.equals(this.title, clusterElementDefinitionBasic.title) &&
-        Objects.equals(this.description, clusterElementDefinitionBasic.description) &&
         Objects.equals(this.type, clusterElementDefinitionBasic.type) &&
         Objects.equals(this.icon, clusterElementDefinitionBasic.icon) &&
         Objects.equals(this.outputDefined, clusterElementDefinitionBasic.outputDefined);
@@ -237,7 +261,7 @@ public class ClusterElementDefinitionBasicModel {
 
   @Override
   public int hashCode() {
-    return Objects.hash(componentName, componentVersion, name, title, description, type, icon, outputDefined);
+    return Objects.hash(componentName, componentVersion, description, help, name, title, type, icon, outputDefined);
   }
 
   @Override
@@ -246,9 +270,10 @@ public class ClusterElementDefinitionBasicModel {
     sb.append("class ClusterElementDefinitionBasicModel {\n");
     sb.append("    componentName: ").append(toIndentedString(componentName)).append("\n");
     sb.append("    componentVersion: ").append(toIndentedString(componentVersion)).append("\n");
+    sb.append("    description: ").append(toIndentedString(description)).append("\n");
+    sb.append("    help: ").append(toIndentedString(help)).append("\n");
     sb.append("    name: ").append(toIndentedString(name)).append("\n");
     sb.append("    title: ").append(toIndentedString(title)).append("\n");
-    sb.append("    description: ").append(toIndentedString(description)).append("\n");
     sb.append("    type: ").append(toIndentedString(type)).append("\n");
     sb.append("    icon: ").append(toIndentedString(icon)).append("\n");
     sb.append("    outputDefined: ").append(toIndentedString(outputDefined)).append("\n");

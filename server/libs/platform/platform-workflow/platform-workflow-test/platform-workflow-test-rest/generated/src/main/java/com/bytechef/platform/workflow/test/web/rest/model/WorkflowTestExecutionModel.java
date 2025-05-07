@@ -22,7 +22,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "WorkflowTestExecution", description = "Contains information about test execution of a workflow.")
 @JsonTypeName("WorkflowTestExecution")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-04-03T22:34:22.933881+02:00[Europe/Zagreb]", comments = "Generator version: 7.12.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-05-06T16:39:16.133340+02:00[Europe/Zagreb]", comments = "Generator version: 7.12.0")
 public class WorkflowTestExecutionModel {
 
   private @Nullable com.bytechef.platform.workflow.execution.web.rest.model.JobModel job;

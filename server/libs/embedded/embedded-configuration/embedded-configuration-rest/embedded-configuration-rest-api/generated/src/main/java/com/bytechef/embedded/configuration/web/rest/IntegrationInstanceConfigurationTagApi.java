@@ -32,7 +32,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-04-03T22:34:21.412818+02:00[Europe/Zagreb]", comments = "Generator version: 7.12.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-05-06T16:39:14.069270+02:00[Europe/Zagreb]", comments = "Generator version: 7.12.0")
 @Validated
 @Tag(name = "integration-instance-configuration-tag", description = "the integration-instance-configuration-tag API")
 public interface IntegrationInstanceConfigurationTagApi {

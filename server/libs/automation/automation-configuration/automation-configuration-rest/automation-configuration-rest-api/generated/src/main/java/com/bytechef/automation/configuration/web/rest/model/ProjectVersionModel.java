@@ -26,7 +26,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "ProjectVersion", description = "The project version.")
 @JsonTypeName("ProjectVersion")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-04-03T22:34:20.980933+02:00[Europe/Zagreb]", comments = "Generator version: 7.12.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-05-06T16:39:13.391545+02:00[Europe/Zagreb]", comments = "Generator version: 7.12.0")
 public class ProjectVersionModel {
 
   private @Nullable String description;

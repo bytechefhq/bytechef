@@ -33,7 +33,7 @@ import jakarta.annotation.Generated;
  */
 
 @JsonTypeName("lead")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-04-18T10:37:14.582277+02:00[Europe/Zagreb]", comments = "Generator version: 7.12.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-05-06T16:39:12.828145+02:00[Europe/Zagreb]", comments = "Generator version: 7.12.0")
 public class LeadModel {
 
   @Valid
