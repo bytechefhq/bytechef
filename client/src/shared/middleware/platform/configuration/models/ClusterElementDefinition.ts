@@ -13,6 +13,13 @@
  */
 
 import { mapValues } from '../runtime';
+import type { Help } from './Help';
+import {
+    HelpFromJSON,
+    HelpFromJSONTyped,
+    HelpToJSON,
+    HelpToJSONTyped,
+} from './Help';
 import type { Property } from './Property';
 import {
     PropertyFromJSON,
@@ -40,6 +47,18 @@ export interface ClusterElementDefinition {
      */
     componentVersion: number;
     /**
+     * The cluster element description.
+     * @type {string}
+     * @memberof ClusterElementDefinition
+     */
+    description?: string;
+    /**
+     * 
+     * @type {Help}
+     * @memberof ClusterElementDefinition
+     */
+    help?: Help;
+    /**
      * The cluster element name.
      * @type {string}
      * @memberof ClusterElementDefinition
@@ -51,12 +70,6 @@ export interface ClusterElementDefinition {
      * @memberof ClusterElementDefinition
      */
     title?: string;
-    /**
-     * The cluster element description.
-     * @type {string}
-     * @memberof ClusterElementDefinition
-     */
-    description?: string;
     /**
      * The cluster element type.
      * @type {string}
@@ -107,9 +120,10 @@ export function ClusterElementDefinitionFromJSONTyped(json: any, ignoreDiscrimin
         
         'componentName': json['componentName'],
         'componentVersion': json['componentVersion'],
+        'description': json['description'] == null ? undefined : json['description'],
+        'help': json['help'] == null ? undefined : HelpFromJSON(json['help']),
         'name': json['name'],
         'title': json['title'] == null ? undefined : json['title'],
-        'description': json['description'] == null ? undefined : json['description'],
         'type': json['type'],
         'icon': json['icon'] == null ? undefined : json['icon'],
         'outputDefined': json['outputDefined'],
@@ -130,9 +144,10 @@ export function ClusterElementDefinitionToJSONTyped(value?: ClusterElementDefini
         
         'componentName': value['componentName'],
         'componentVersion': value['componentVersion'],
+        'description': value['description'],
+        'help': HelpToJSON(value['help']),
         'name': value['name'],
         'title': value['title'],
-        'description': value['description'],
         'type': value['type'],
         'icon': value['icon'],
         'outputDefined': value['outputDefined'],
