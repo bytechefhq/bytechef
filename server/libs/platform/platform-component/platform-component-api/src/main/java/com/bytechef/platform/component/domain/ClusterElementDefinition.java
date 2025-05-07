@@ -36,6 +36,7 @@ public class ClusterElementDefinition {
     private String componentName;
     private int componentVersion;
     private String description;
+    private Help help;
     private String icon;
     private String name;
     private boolean outputDefined;
@@ -55,6 +56,7 @@ public class ClusterElementDefinition {
         this.componentName = componentName;
         this.componentVersion = componentVersion;
         this.description = OptionalUtils.orElse(clusterElementDefinition.getDescription(), null);
+        this.help = OptionalUtils.mapOrElse(clusterElementDefinition.getHelp(), Help::new, null);
         this.name = clusterElementDefinition.getName();
         this.icon = IconUtils.readIcon(icon);
         this.outputDefined = OptionalUtils.mapOrElse(
@@ -76,9 +78,10 @@ public class ClusterElementDefinition {
             return false;
         }
 
-        return componentVersion == that.componentVersion && Objects.equals(description, that.description) &&
-            Objects.equals(icon, that.icon) && Objects.equals(name, that.name) && outputDefined == that.outputDefined &&
-            outputFunctionDefined == that.outputFunctionDefined && Objects.equals(componentName, that.componentName) &&
+        return Objects.equals(componentName, that.componentName) && componentVersion == that.componentVersion &&
+            Objects.equals(description, that.description) && Objects.equals(help, that.help) &&
+            Objects.equals(icon, that.icon) && Objects.equals(name, that.name) &&
+            outputDefined == that.outputDefined && outputFunctionDefined == that.outputFunctionDefined &&
             Objects.equals(outputResponse, that.outputResponse) && Objects.equals(properties, that.properties) &&
             Objects.equals(title, that.title) && Objects.equals(type, that.type);
     }
@@ -101,6 +104,11 @@ public class ClusterElementDefinition {
     @Nullable
     public String getDescription() {
         return description;
+    }
+
+    @Nullable
+    public Help getHelp() {
+        return help;
     }
 
     public String getIcon() {

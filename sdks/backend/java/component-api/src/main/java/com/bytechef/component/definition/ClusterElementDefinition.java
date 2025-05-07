@@ -42,6 +42,12 @@ public interface ClusterElementDefinition<T> {
      *
      * @return
      */
+    Optional<Help> getHelp();
+
+    /**
+     *
+     * @return
+     */
     Optional<OutputDefinition> getOutputDefinition();
 
     /**

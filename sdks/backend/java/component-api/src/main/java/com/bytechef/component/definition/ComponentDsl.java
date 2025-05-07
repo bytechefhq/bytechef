@@ -1599,6 +1599,7 @@ public final class ComponentDsl {
         private Supplier<T> objectSupplier;
         private String description;
         private ClusterElementType clusterElementType;
+        private Help help;
         private final String name;
         private OutputDefinition outputDefinition;
         private List<? extends Property> properties;
@@ -1606,6 +1607,18 @@ public final class ComponentDsl {
 
         public ModifiableClusterElementDefinition(String name) {
             this.name = name;
+        }
+
+        public ModifiableClusterElementDefinition<T> help(String body) {
+            this.help = new HelpImpl(body, null);
+
+            return this;
+        }
+
+        public ModifiableClusterElementDefinition<T> help(String body, String learnMoreUrl) {
+            this.help = new HelpImpl(body, learnMoreUrl);
+
+            return this;
         }
 
         public ModifiableClusterElementDefinition<T> object(Supplier<T> supplier) {
@@ -1739,18 +1752,23 @@ public final class ComponentDsl {
         }
 
         @Override
+        public Optional<Help> getHelp() {
+            return Optional.ofNullable(help);
+        }
+
+        @Override
         public String getName() {
             return name;
         }
 
         @Override
-        public Optional<List<? extends Property>> getProperties() {
-            return Optional.ofNullable(properties);
+        public Optional<OutputDefinition> getOutputDefinition() {
+            return Optional.ofNullable(outputDefinition);
         }
 
         @Override
-        public Optional<OutputDefinition> getOutputDefinition() {
-            return Optional.ofNullable(outputDefinition);
+        public Optional<List<? extends Property>> getProperties() {
+            return Optional.ofNullable(properties);
         }
 
         @Override
