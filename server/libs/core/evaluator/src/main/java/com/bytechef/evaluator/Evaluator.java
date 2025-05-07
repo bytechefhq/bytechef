@@ -56,7 +56,7 @@ public class Evaluator {
     private static final Logger logger = LoggerFactory.getLogger(Evaluator.class);
 
     private static final String ACCESSOR_PREFIX = "${";
-    private static final String FORMULA_PREFIX = "#{";
+    private static final String FORMULA_PREFIX = "=";
     private static final String SUFFIX = "}";
     private static final Pattern TEXT_EXPRESSION_PATTERN = Pattern.compile("\\$\\{(.*?)}");
     private static final Pattern VALID_ACCESSOR_PATTERN = Pattern.compile(
@@ -153,8 +153,9 @@ public class Evaluator {
                 formulaExpression = true;
 
                 try {
-                    expression = expressionParser.parseExpression(
-                        string.replaceAll("\\$\\{([^}]*)}", "$1"), new TemplateParserContext());
+                    string = string.substring(1);
+
+                    expression = expressionParser.parseExpression(string.replaceAll("\\$\\{([^}]*)}", "$1"));
                 } catch (ParseException e) {
                     if (logger.isTraceEnabled()) {
                         logger.trace(e.getMessage());

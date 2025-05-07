@@ -200,7 +200,7 @@ public class ConditionTaskDispatcherDefinitionFactory implements TaskDispatcherD
                 .label("Expression")
                 .description("The raw expression.")
                 .controlType(Property.ControlType.TEXT_AREA)
-                .placeholder("Write expression, e.g. #{1 + 1 == 2}")
+                .placeholder("Write expression, e.g. =1 + 1 == 2")
                 .displayCondition("%s == true".formatted(RAW_EXPRESSION)))
         .taskProperties(
             array(CASE_TRUE)

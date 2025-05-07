@@ -12,7 +12,7 @@ tasks:
   type: "condition/v1"
   parameters:
     rawExpression: true
-    expression: "#{value1 == value2 or value1 gt value2}"
+    expression: "=value1 == value2 or value1 gt value2"
     caseTrue:
     - name: "equalsResult"
       type: "var/v1/set"

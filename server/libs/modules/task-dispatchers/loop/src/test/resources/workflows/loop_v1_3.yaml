@@ -4,13 +4,13 @@ tasks:
 - name: "loop_1"
   type: "loop/v1"
   parameters:
-    items: "#{range(1,10)}"
+    items: "=range(1,10)"
     iteratee:
     - name: "sumVar1"
       type: "var/v1/set"
       parameters:
-        value: "#{1 + loop_1.item}"
+        value: "=1 + loop_1.item"
     - name: "sumVar2"
       type: "var/v1/set"
       parameters:
-        value: "#{sumVar1 + 2}"
+        value: "=sumVar1 + 2"

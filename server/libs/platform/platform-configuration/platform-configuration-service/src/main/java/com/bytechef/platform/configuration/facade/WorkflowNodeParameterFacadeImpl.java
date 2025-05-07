@@ -473,7 +473,7 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
 
     private static boolean evaluate(String displayCondition, Map<String, ?> inputParameters) {
         Map<String, Object> result = EVALUATOR.evaluate(
-            Map.of("displayCondition", "#{" + displayCondition + "}"), inputParameters);
+            Map.of("displayCondition", "=" + displayCondition), inputParameters);
 
         Object displayConditionResult = result.get("displayCondition");
 

@@ -4,14 +4,14 @@ tasks:
 - name: "each_1"
   type: "each/v1"
   parameters:
-    list: "#{range(1,25)}"
+    list: "=range(1,25)"
     iteratee:
       name: "each_2"
       type: "each/v1"
       parameters:
-        list: "#{range(1,25)}"
+        list: "=range(1,25)"
         iteratee:
           name: "var1"
           type: "var/v1/set"
           parameters:
-            value: "#{each_1.item + '_' + each_2.item}"
+            value: "=each_1.item + '_' + each_2.item"
