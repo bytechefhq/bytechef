@@ -18,11 +18,13 @@ package com.bytechef.component.email.constant;
 
 /**
  * @author Ivica Cardic
+ * @author Igor Beslic
  */
 public class EmailConstants {
 
     public static final String EMAIL = "email";
     public static final String HOST = "host";
     public static final String PORT = "port";
+    public static final String PROTOCOL = "protocol";
     public static final String TLS = "tls";
 }
