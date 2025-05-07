@@ -492,7 +492,7 @@
           "minLength" : null
         }, {
           "advancedOption" : null,
-          "displayCondition" : "!{'EMPTY','REGEX'}.contains(conditions[index][index].operation)",
+          "displayCondition" : "!contains({'EMPTY','REGEX'}, conditions[index][index].operation)",
           "expressionEnabled" : null,
           "hidden" : null,
           "metadata" : { },

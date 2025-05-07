@@ -74,6 +74,7 @@ public class Evaluator {
         map.put("char", new Cast<>(Character.class));
         map.put("config", new Config(builder.environment));
         map.put("concat", new Concat());
+        map.put("contains", new Contains());
         map.put("dateFormat", new DateFormat());
         map.put("flatten", new Flatten());
         map.put("float", new Cast<>(Float.class));

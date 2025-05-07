@@ -52,7 +52,7 @@ public class AiImageConstants {
         .description("ID of the model to use.")
         .options((OptionsDataSource.ActionOptionsFunction<String>) AiImageUtils::getModelOptions)
         .optionsLookupDependsOn(PROVIDER)
-        .displayCondition("{'%s','%s'}.contains(provider)".formatted(AZURE_OPEN_AI, OPEN_AI))
+        .displayCondition("contains({'%s','%s'}, provider)".formatted(AZURE_OPEN_AI, OPEN_AI))
         .required(true);
 
     public static final ModifiableStringProperty MODEL_NO_OPTIONS_PROPERTY = string(MODEL)

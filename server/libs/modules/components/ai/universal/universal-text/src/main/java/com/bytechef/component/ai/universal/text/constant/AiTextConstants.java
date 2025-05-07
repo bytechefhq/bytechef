@@ -82,7 +82,7 @@ public class AiTextConstants {
         .options((ActionOptionsFunction<String>) AiTextUtils::getModelOptions)
         .optionsLookupDependsOn(PROVIDER)
         .displayCondition(
-            "{'%s','%s','%s','%s','%s','%s','%s','%s','%s','%s'}.contains(provider)".formatted(
+            "contains({'%s','%s','%s','%s','%s','%s','%s','%s','%s','%s'}, provider)".formatted(
                 AMAZON_BEDROCK_ANTHROPIC2, AMAZON_BEDROCK_ANTHROPIC3, AMAZON_BEDROCK_COHERE,
                 AMAZON_BEDROCK_JURASSIC2, AMAZON_BEDROCK_LLAMA, AMAZON_BEDROCK_TITAN, ANTHROPIC,
                 MISTRAL, OPEN_AI, VERTEX_GEMINI))
@@ -91,7 +91,7 @@ public class AiTextConstants {
     public static final ModifiableStringProperty MODEL_NO_OPTIONS_PROPERTY = string(MODEL)
         .label("Model")
         .description("ID of the model to use.")
-        .displayCondition("{'%s','%s','%s','%s','%s'}.contains(provider)".formatted(AZURE_OPEN_AI, GROQ, NVIDIA,
+        .displayCondition("contains({'%s','%s','%s','%s','%s'}, provider)".formatted(AZURE_OPEN_AI, GROQ, NVIDIA,
             DEEPSEEK, PERPLEXITY))
         .required(true);
 

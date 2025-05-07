@@ -185,7 +185,7 @@ public class ConditionTaskDispatcherDefinitionFactory implements TaskDispatcherD
                                         .required(true)
                                         .defaultValue("")
                                         .displayCondition(
-                                            "!{'%s','%s'}.contains(conditions[index][index].%s)".formatted(
+                                            "!contains({'%s','%s'}, conditions[index][index].%s)".formatted(
                                                 Operation.EMPTY.name(), Operation.REGEX.name(), OPERATION)),
                                     string(VALUE_2)
                                         .label("Regex")

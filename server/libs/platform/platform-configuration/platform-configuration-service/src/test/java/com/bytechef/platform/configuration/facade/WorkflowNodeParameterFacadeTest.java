@@ -82,12 +82,12 @@ public class WorkflowNodeParameterFacadeTest {
         displayConditionMap = new HashMap<>();
 
         WorkflowNodeParameterFacadeImpl.evaluateArray(
-            "name", "!{'EMPTY','REGEX'}.contains(conditions[index][index].operation)", displayConditionMap, Map.of(),
+            "name", "!contains({'EMPTY','REGEX'}, conditions[index][index].operation)", displayConditionMap, Map.of(),
             Map.of(), parametersMap);
 
         Assertions.assertEquals(1, displayConditionMap.size());
         Assertions.assertEquals(
-            Map.of("!{'EMPTY','REGEX'}.contains(conditions[1][0].operation)", "1_0_name"), displayConditionMap);
+            Map.of("!contains({'EMPTY','REGEX'}, conditions[1][0].operation)", "1_0_name"), displayConditionMap);
     }
 
     @Test

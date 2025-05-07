@@ -83,7 +83,7 @@ public class GenerateImageAction implements AiImageAction {
                             option("1024x1024", Size._1024x1024.name()),
                             option("Dall-e-3 1792x1024", Size.DALL_E_3_1792x1024.name()),
                             option("Dall-e-3 1024x1792", Size.DALL_E_3_1024x1792.name()))
-                        .displayCondition("{'%s','%s'}.contains(provider)".formatted(AZURE_OPEN_AI, OPEN_AI))
+                        .displayCondition("contains({'%s','%s'}, provider)".formatted(AZURE_OPEN_AI, OPEN_AI))
                         .required(true),
                     integer(HEIGHT)
                         .label("Height")
