@@ -70,7 +70,7 @@ public class ComponentDefinition {
     public ComponentDefinition(com.bytechef.component.definition.ComponentDefinition componentDefinition) {
         this.actions = getActions(componentDefinition);
 
-        this.clusterElement = OptionalUtils.orElse(componentDefinition.getClusterElements(), List.of())
+        this.clusterElement = !OptionalUtils.orElse(componentDefinition.getClusterElements(), List.of())
             .isEmpty();
         this.clusterElements = getClusterElements(componentDefinition);
 
