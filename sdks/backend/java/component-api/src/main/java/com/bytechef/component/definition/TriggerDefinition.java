@@ -75,11 +75,23 @@ public interface TriggerDefinition {
     Optional<String> getDescription();
 
     /**
+     *
+     * @return
+     */
+    Optional<DynamicWebhookRefreshFunction> getDynamicWebhookRefresh();
+
+    /**
      * TODO
      *
      * @return
      */
     Optional<DeduplicateFunction> getDeduplicate();
+
+    /**
+     *
+     * @return
+     */
+    Optional<Help> getHelp();
 
     /**
      *
@@ -97,19 +109,7 @@ public interface TriggerDefinition {
      *
      * @return
      */
-    Optional<DynamicWebhookRefreshFunction> getDynamicWebhookRefresh();
-
-    /**
-     *
-     * @return
-     */
     Optional<WebhookRequestFunction> getWebhookRequest();
-
-    /**
-     *
-     * @return
-     */
-    Optional<Help> getHelp();
 
     /**
      *

@@ -33,7 +33,7 @@ import static com.bytechef.component.var.constant.VarConstants.VALUE;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.definition.BaseOutputDefinition;
+import com.bytechef.definition.BaseOutputDefinition.OutputResponse;
 
 /**
  * @author Ivica Cardic
@@ -117,14 +117,14 @@ public class VarSetAction {
         .output(VarSetAction::output)
         .perform(VarSetAction::perform);
 
-    protected static BaseOutputDefinition.OutputResponse output(
+    protected static OutputResponse output(
         Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
 
         if (!inputParameters.containsKey(VALUE)) {
             return null;
         }
 
-        return new BaseOutputDefinition.OutputResponse(perform(inputParameters, connectionParameters, context));
+        return new OutputResponse(perform(inputParameters, connectionParameters, context));
     }
 
     protected static Object perform(

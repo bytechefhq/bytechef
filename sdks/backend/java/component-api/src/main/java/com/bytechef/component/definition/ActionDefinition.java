@@ -49,19 +49,6 @@ public interface ActionDefinition {
     Optional<String> getDescription();
 
     /**
-     * The code that should be executed when an action runs as a task inside the workflow engine.
-     *
-     * @return an optional execute function implementation
-     */
-    Optional<PerformFunction> getPerform();
-
-    /**
-     *
-     * @return
-     */
-    Optional<ProcessErrorResponseFunction> getProcessErrorResponse();
-
-    /**
      *
      * @return
      */
@@ -84,6 +71,19 @@ public interface ActionDefinition {
      * @return
      */
     Optional<OutputDefinition> getOutputDefinition();
+
+    /**
+     * The code that should be executed when an action runs as a task inside the workflow engine.
+     *
+     * @return an optional execute function implementation
+     */
+    Optional<PerformFunction> getPerform();
+
+    /**
+     *
+     * @return
+     */
+    Optional<ProcessErrorResponseFunction> getProcessErrorResponse();
 
     /**
      *

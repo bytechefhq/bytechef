@@ -3204,9 +3204,7 @@ public final class ComponentDsl {
             return this;
         }
 
-        public ModifiableTriggerDefinition output(
-            SampleOutput sampleOutput) {
-
+        public ModifiableTriggerDefinition output(SampleOutput sampleOutput) {
             this.outputDefinition = OutputDefinition.of(sampleOutput.sampleOutput());
 
             return this;

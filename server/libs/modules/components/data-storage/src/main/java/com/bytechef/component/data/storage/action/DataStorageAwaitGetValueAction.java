@@ -120,8 +120,7 @@ public class DataStorageAwaitGetValueAction {
         .perform(DataStorageAwaitGetValueAction::perform);
 
     protected static BaseOutputDefinition.OutputResponse output(
-        Parameters inputParameters, Parameters connectionParameters, ActionContext context)
-        throws ClassNotFoundException {
+        Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
 
         Property.ValueProperty<?> property = DataStorageUtils.getValueProperty(
             inputParameters.getRequired(TYPE, ValueType.class));
