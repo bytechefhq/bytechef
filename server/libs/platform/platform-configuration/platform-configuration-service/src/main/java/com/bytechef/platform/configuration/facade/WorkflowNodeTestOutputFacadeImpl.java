@@ -214,9 +214,8 @@ public class WorkflowNodeTestOutputFacadeImpl implements WorkflowNodeTestOutputF
             return null;
         }
 
-        // TODO implement saving task dispatcher test output
-
-        return null;
+        return workflowNodeTestOutputService.save(
+            Validate.notNull(workflow.getId(), "id"), workflowNodeName, workflowNodeType, outputResponse);
     }
 
     @SuppressWarnings("unchecked")

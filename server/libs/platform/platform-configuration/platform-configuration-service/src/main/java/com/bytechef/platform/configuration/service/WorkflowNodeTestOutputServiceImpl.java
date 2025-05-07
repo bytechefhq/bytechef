@@ -19,12 +19,12 @@ package com.bytechef.platform.configuration.service;
 import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.domain.WorkflowTask;
 import com.bytechef.commons.util.OptionalUtils;
-import com.bytechef.platform.component.domain.Property;
 import com.bytechef.platform.configuration.annotation.WorkflowCacheEvict;
 import com.bytechef.platform.configuration.domain.WorkflowNodeTestOutput;
 import com.bytechef.platform.configuration.domain.WorkflowTrigger;
 import com.bytechef.platform.configuration.repository.WorkflowNodeTestOutputRepository;
 import com.bytechef.platform.definition.WorkflowNodeType;
+import com.bytechef.platform.domain.BaseProperty;
 import com.bytechef.platform.domain.OutputResponse;
 import com.bytechef.tenant.util.TenantCacheKeyUtils;
 import java.time.Instant;
@@ -129,7 +129,7 @@ public class WorkflowNodeTestOutputServiceImpl implements WorkflowNodeTestOutput
 
                         if (!Objects.equals(
                             workflowNodeType.operation(),
-                            workflowNodeTestOutput.getComponentOperationName())) {
+                            workflowNodeTestOutput.getTypeOperationName())) {
 
                             workflowNodeTestOutputRepository.delete(workflowNodeTestOutput);
                         }
@@ -148,7 +148,7 @@ public class WorkflowNodeTestOutputServiceImpl implements WorkflowNodeTestOutput
 
         try {
             return save(
-                workflowId, workflowNodeName, workflowNodeType, (Property) outputResponse.outputSchema(),
+                workflowId, workflowNodeName, workflowNodeType, (BaseProperty) outputResponse.outputSchema(),
                 outputResponse.sampleOutput());
         } finally {
             clearWorkflowTestNodeOutputCache(workflowId, workflowNodeName);
@@ -161,16 +161,16 @@ public class WorkflowNodeTestOutputServiceImpl implements WorkflowNodeTestOutput
     }
 
     private WorkflowNodeTestOutput save(
-        String workflowId, String workflowNodeName, WorkflowNodeType workflowNodeType,
-        Property outputSchema, Object sampleOutput) {
+        String workflowId, String workflowNodeName, WorkflowNodeType workflowNodeType, BaseProperty outputSchema,
+        Object sampleOutput) {
 
         WorkflowNodeTestOutput workflowNodeTestOutput = OptionalUtils.orElse(
             workflowNodeTestOutputRepository.findByWorkflowIdAndWorkflowNodeName(workflowId, workflowNodeName),
             new WorkflowNodeTestOutput());
 
-        workflowNodeTestOutput.setComponentName(workflowNodeType.name());
-        workflowNodeTestOutput.setComponentOperationName(workflowNodeType.operation());
-        workflowNodeTestOutput.setComponentVersion(workflowNodeType.version());
+        workflowNodeTestOutput.setTypeName(workflowNodeType.name());
+        workflowNodeTestOutput.setTypeOperationName(workflowNodeType.operation());
+        workflowNodeTestOutput.setTypeVersion(workflowNodeType.version());
         workflowNodeTestOutput.setOutputSchema(outputSchema);
         workflowNodeTestOutput.setSampleOutput(sampleOutput);
         workflowNodeTestOutput.setWorkflowId(workflowId);

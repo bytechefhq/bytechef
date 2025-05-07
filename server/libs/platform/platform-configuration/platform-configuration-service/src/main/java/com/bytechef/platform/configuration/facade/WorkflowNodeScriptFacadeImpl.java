@@ -17,6 +17,7 @@
 package com.bytechef.platform.configuration.facade;
 
 import com.bytechef.error.ExecutionError;
+import com.bytechef.platform.component.domain.Property;
 import com.bytechef.platform.configuration.domain.WorkflowNodeTestOutput;
 import com.bytechef.platform.configuration.dto.ScriptTestExecutionDTO;
 import com.bytechef.platform.domain.OutputResponse;
@@ -68,7 +69,7 @@ public class WorkflowNodeScriptFacadeImpl implements WorkflowNodeScriptFacade {
         OutputResponse outputResponse = null;
 
         if (workflowNodeTestOutput != null) {
-            outputResponse = workflowNodeTestOutput.getOutput();
+            outputResponse = workflowNodeTestOutput.getOutput(Property.class);
         }
 
         return new ScriptTestExecutionDTO(

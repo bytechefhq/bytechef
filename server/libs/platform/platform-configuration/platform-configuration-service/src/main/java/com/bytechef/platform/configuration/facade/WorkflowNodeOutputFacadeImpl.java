@@ -19,35 +19,27 @@ package com.bytechef.platform.configuration.facade;
 import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.domain.WorkflowTask;
 import com.bytechef.atlas.configuration.service.WorkflowService;
-import com.bytechef.commons.util.MapUtils;
 import com.bytechef.platform.component.domain.ActionDefinition;
 import com.bytechef.platform.component.domain.ArrayProperty;
 import com.bytechef.platform.component.domain.FileEntryProperty;
 import com.bytechef.platform.component.domain.TriggerDefinition;
-import com.bytechef.platform.component.facade.TriggerDefinitionFacade;
 import com.bytechef.platform.component.service.ActionDefinitionService;
 import com.bytechef.platform.component.service.TriggerDefinitionService;
-import com.bytechef.platform.configuration.domain.WorkflowNodeTestOutput;
 import com.bytechef.platform.configuration.domain.WorkflowTrigger;
 import com.bytechef.platform.configuration.dto.WorkflowNodeOutputDTO;
 import com.bytechef.platform.configuration.service.WorkflowNodeTestOutputService;
-import com.bytechef.platform.configuration.service.WorkflowTestConfigurationService;
 import com.bytechef.platform.definition.WorkflowNodeType;
 import com.bytechef.platform.domain.BaseProperty;
 import com.bytechef.platform.domain.OutputResponse;
-import com.bytechef.platform.util.SchemaUtils;
-import com.bytechef.platform.workflow.task.dispatcher.definition.PropertyFactory;
+import com.bytechef.platform.workflow.task.dispatcher.domain.Property;
 import com.bytechef.platform.workflow.task.dispatcher.domain.TaskDispatcherDefinition;
 import com.bytechef.platform.workflow.task.dispatcher.service.TaskDispatcherDefinitionService;
-import com.fasterxml.jackson.core.type.TypeReference;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -59,31 +51,24 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class WorkflowNodeOutputFacadeImpl implements WorkflowNodeOutputFacade {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(WorkflowNodeOutputFacadeImpl.class);
-
     private final ActionDefinitionService actionDefinitionService;
     private final TaskDispatcherDefinitionService taskDispatcherDefinitionService;
-    private final TriggerDefinitionFacade triggerDefinitionFacade;
     private final TriggerDefinitionService triggerDefinitionService;
     private final WorkflowService workflowService;
     private final WorkflowNodeTestOutputService workflowNodeTestOutputService;
-    private final WorkflowTestConfigurationService workflowTestConfigurationService;
 
     @SuppressFBWarnings("EI")
     public WorkflowNodeOutputFacadeImpl(
         ActionDefinitionService actionDefinitionService,
         TaskDispatcherDefinitionService taskDispatcherDefinitionService,
-        TriggerDefinitionFacade triggerDefinitionFacade, TriggerDefinitionService triggerDefinitionService,
-        WorkflowService workflowService, WorkflowNodeTestOutputService workflowNodeTestOutputService,
-        WorkflowTestConfigurationService workflowTestConfigurationService) {
+        TriggerDefinitionService triggerDefinitionService, WorkflowService workflowService,
+        WorkflowNodeTestOutputService workflowNodeTestOutputService) {
 
         this.actionDefinitionService = actionDefinitionService;
         this.taskDispatcherDefinitionService = taskDispatcherDefinitionService;
-        this.triggerDefinitionFacade = triggerDefinitionFacade;
         this.workflowService = workflowService;
         this.triggerDefinitionService = triggerDefinitionService;
         this.workflowNodeTestOutputService = workflowNodeTestOutputService;
-        this.workflowTestConfigurationService = workflowTestConfigurationService;
     }
 
     @Override
@@ -106,7 +91,7 @@ public class WorkflowNodeOutputFacadeImpl implements WorkflowNodeOutputFacade {
 
             for (WorkflowTask workflowTask : workflowTasks) {
                 if (Objects.equals(workflowTask.getName(), workflowNodeName)) {
-                    workflowNodeOutputDTO = getWorkflowNodeOutputDTO(workflowId, workflowTask, workflowTasks);
+                    workflowNodeOutputDTO = getWorkflowNodeOutputDTO(workflowId, workflowTask);
 
                     break;
                 }
@@ -140,7 +125,7 @@ public class WorkflowNodeOutputFacadeImpl implements WorkflowNodeOutputFacade {
                 break;
             }
 
-            workflowNodeOutputDTOs.add(getWorkflowNodeOutputDTO(workflowId, workflowTask, workflowTasks));
+            workflowNodeOutputDTOs.add(getWorkflowNodeOutputDTO(workflowId, workflowTask));
         }
 
         return workflowNodeOutputDTOs;
@@ -155,11 +140,7 @@ public class WorkflowNodeOutputFacadeImpl implements WorkflowNodeOutputFacade {
             .collect(Collectors.toMap(WorkflowNodeOutputDTO::workflowNodeName, WorkflowNodeOutputDTO::sampleOutput));
     }
 
-    @SuppressWarnings("unchecked")
-    private OutputResponse checkOutput(
-        String workflowId, WorkflowTask workflowTask, WorkflowTrigger workflowTrigger, OutputResponse outputResponse,
-        List<WorkflowTask> workflowTasks) {
-
+    private OutputResponse checkOutput(OutputResponse outputResponse) {
         if (outputResponse != null) {
             // Force UI to test component to get the real fileEntry instance
 
@@ -168,68 +149,6 @@ public class WorkflowNodeOutputFacadeImpl implements WorkflowNodeOutputFacade {
             }
 
             return outputResponse;
-        }
-
-        Map<String, ?> inputs = workflowTestConfigurationService.getWorkflowTestConfigurationInputs(workflowId);
-
-        if (workflowTask == null) {
-            WorkflowNodeType workflowNodeType = WorkflowNodeType.ofType(workflowTrigger.getType());
-
-            Map<String, ?> inputParameters = workflowTrigger.evaluateParameters(inputs);
-
-            Long connectionId = workflowTestConfigurationService
-                .fetchWorkflowTestConfigurationConnectionId(workflowId, workflowTrigger.getName())
-                .orElse(null);
-
-            outputResponse = triggerDefinitionFacade.executeOutput(
-                workflowNodeType.name(), workflowNodeType.version(),
-                workflowNodeType.operation(), inputParameters, connectionId);
-        } else {
-            WorkflowNodeType workflowNodeType = WorkflowNodeType.ofType(workflowTask.getType());
-
-            Map<String, ?> outputs = getPreviousWorkflowNodeSampleOutputs(workflowId, workflowTask.getName());
-
-            Map<String, ?> inputParameters = workflowTask.evaluateParameters(
-                MapUtils.concat((Map<String, Object>) inputs, (Map<String, Object>) outputs));
-
-            if (workflowNodeType.operation() == null) {
-                // TODO
-                // Remove hardcodes values, use the ones defined in variable properties,
-                // check LoopTaskDispatcherDefinitionFactory
-
-                if (Objects.equals(workflowNodeType.name(), "loop")) {
-                    List<Map<String, ?>> childWorkflowTasks = MapUtils.getList(
-                        workflowTask.getParameters(), "iteratee", new TypeReference<>() {}, List.of());
-
-                    if (containsChildWorkflowTasks(workflowTasks, childWorkflowTasks)) {
-                        Map<String, ?> parameters = workflowTask.evaluateParameters(outputs);
-
-                        List<Object> items = List.of();
-
-                        try {
-                            items = MapUtils.getList(parameters, "items", Object.class, List.of());
-                        } catch (IllegalArgumentException e) {
-                            if (LOGGER.isTraceEnabled()) {
-                                LOGGER.trace("Failed to parse items from parameters: {}", parameters, e);
-                            }
-                        }
-
-                        if (!items.isEmpty()) {
-                            Object item = items.getFirst();
-
-                            outputResponse = SchemaUtils.toOutput(
-                                Map.of("item", item, "index", 0), PropertyFactory.OUTPUT_FACTORY_FUNCTION,
-                                PropertyFactory.PROPERTY_FACTORY);
-                        }
-                    } else {
-                        outputResponse = taskDispatcherDefinitionService.executeOutput(
-                            workflowNodeType.name(), workflowNodeType.version(), inputParameters);
-                    }
-                } else {
-                    outputResponse = taskDispatcherDefinitionService.executeOutput(
-                        workflowNodeType.name(), workflowNodeType.version(), inputParameters);
-                }
-            }
         }
 
         return outputResponse;
@@ -250,19 +169,18 @@ public class WorkflowNodeOutputFacadeImpl implements WorkflowNodeOutputFacade {
         return outputResponse;
     }
 
-    private static boolean containsChildWorkflowTasks(
-        List<WorkflowTask> workflowTasks, List<Map<String, ?>> childWorkflowTasks) {
+//    private static boolean containsChildWorkflowTasks(
+//        List<WorkflowTask> workflowTasks, List<Map<String, ?>> childWorkflowTasks) {
+//
+//        List<String> workflowTaskNames = workflowTasks.stream()
+//            .map(WorkflowTask::getName)
+//            .toList();
+//
+//        return childWorkflowTasks.stream()
+//            .anyMatch(childWorkflowTask -> workflowTaskNames.contains(MapUtils.getString(childWorkflowTask, "name")));
+//    }
 
-        List<String> workflowTaskNames = workflowTasks.stream()
-            .map(WorkflowTask::getName)
-            .toList();
-
-        return childWorkflowTasks.stream()
-            .anyMatch(childWorkflowTask -> workflowTaskNames.contains(MapUtils.getString(childWorkflowTask, "name")));
-    }
-
-    private WorkflowNodeOutputDTO getWorkflowNodeOutputDTO(
-        String workflowId, WorkflowTask workflowTask, List<WorkflowTask> workflowTasks) {
+    private WorkflowNodeOutputDTO getWorkflowNodeOutputDTO(String workflowId, WorkflowTask workflowTask) {
         WorkflowNodeType workflowNodeType = WorkflowNodeType.ofType(workflowTask.getType());
 
         ActionDefinition actionDefinition = null;
@@ -285,8 +203,10 @@ public class WorkflowNodeOutputFacadeImpl implements WorkflowNodeOutputFacade {
         OutputResponse finalOutputResponse = outputResponse;
 
         outputResponse = workflowNodeTestOutputService.fetchWorkflowTestNodeOutput(workflowId, workflowTask.getName())
-            .map(WorkflowNodeTestOutput::getOutput)
-            .orElseGet(() -> checkOutput(workflowId, workflowTask, null, finalOutputResponse, workflowTasks));
+            .map(workflowNodeTestOutput -> workflowNodeTestOutput.getOutput(
+                workflowNodeType.operation() == null ? Property.class
+                    : com.bytechef.platform.component.domain.Property.class))
+            .orElseGet(() -> checkOutput(finalOutputResponse));
 
         return new WorkflowNodeOutputDTO(
             workflowTask.getName(), outputResponse, null, actionDefinition, taskDispatcherDefinition);
@@ -301,9 +221,10 @@ public class WorkflowNodeOutputFacadeImpl implements WorkflowNodeOutputFacade {
 
         OutputResponse outputResponse = workflowNodeTestOutputService
             .fetchWorkflowTestNodeOutput(workflowId, workflowTrigger.getName())
-            .map(WorkflowNodeTestOutput::getOutput)
-            .orElseGet(() -> checkOutput(
-                workflowId, null, workflowTrigger, triggerDefinition.getOutputResponse(), List.of()));
+            .map(workflowNodeTestOutput -> workflowNodeTestOutput.getOutput(
+                workflowNodeType.operation() == null ? Property.class
+                    : com.bytechef.platform.component.domain.Property.class))
+            .orElseGet(() -> checkOutput(triggerDefinition.getOutputResponse()));
 
         outputResponse = checkTriggerOutput(outputResponse, triggerDefinition);
 

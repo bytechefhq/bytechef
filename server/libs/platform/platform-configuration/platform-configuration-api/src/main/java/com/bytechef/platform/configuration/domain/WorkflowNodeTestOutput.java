@@ -18,7 +18,7 @@ package com.bytechef.platform.configuration.domain;
 
 import com.bytechef.commons.data.jdbc.wrapper.MapWrapper;
 import com.bytechef.commons.util.MapUtils;
-import com.bytechef.platform.component.domain.Property;
+import com.bytechef.platform.domain.BaseProperty;
 import com.bytechef.platform.domain.OutputResponse;
 import java.time.Instant;
 import java.util.Map;
@@ -38,33 +38,17 @@ import org.springframework.data.relational.core.mapping.Table;
 @Table("workflow_node_test_output")
 public class WorkflowNodeTestOutput {
 
-    @Column("component_name")
-    private String componentName;
-
-    @Column("component_operation_name")
-    private String componentOperationName;
-
-    @Column("component_version")
-    private int componentVersion;
-
-    @CreatedBy
-    @Column("created_by")
-    private String createdBy;
-
-    @Column("created_date")
-    @CreatedDate
-    private Instant createdDate;
-
     @Id
     private Long id;
 
-    @Column("last_modified_by")
-    @LastModifiedBy
-    private String lastModifiedBy;
+    @Column("type_name")
+    private String typeName;
 
-    @Column("last_modified_date")
-    @LastModifiedDate
-    private Instant lastModifiedDate;
+    @Column("type_operation_name")
+    private String typeOperationName;
+
+    @Column("type_version")
+    private int typeVersion;
 
     @Column("output_schema")
     private MapWrapper outputSchema;
@@ -75,11 +59,27 @@ public class WorkflowNodeTestOutput {
     @Column("workflow_node_name")
     private String workflowNodeName;
 
-    @Version
-    private int version;
-
     @Column("workflow_id")
     private String workflowId;
+
+    @CreatedBy
+    @Column("created_by")
+    private String createdBy;
+
+    @Column("created_date")
+    @CreatedDate
+    private Instant createdDate;
+
+    @Column("last_modified_by")
+    @LastModifiedBy
+    private String lastModifiedBy;
+
+    @Column("last_modified_date")
+    @LastModifiedDate
+    private Instant lastModifiedDate;
+
+    @Version
+    private int version;
 
     @Override
     public boolean equals(Object o) {
@@ -100,16 +100,16 @@ public class WorkflowNodeTestOutput {
         return getClass().hashCode();
     }
 
-    public String getComponentName() {
-        return componentName;
+    public String getTypeName() {
+        return typeName;
     }
 
-    public String getComponentOperationName() {
-        return componentOperationName;
+    public String getTypeOperationName() {
+        return typeOperationName;
     }
 
-    public int getComponentVersion() {
-        return componentVersion;
+    public int getTypeVersion() {
+        return typeVersion;
     }
 
     public String getCreatedBy() {
@@ -132,12 +132,12 @@ public class WorkflowNodeTestOutput {
         return lastModifiedDate;
     }
 
-    public OutputResponse getOutput() {
-        return new OutputResponse(getOutputSchema(), getSampleOutput());
+    public OutputResponse getOutput(Class<? extends BaseProperty> type) {
+        return new OutputResponse(getOutputSchema(type), getSampleOutput());
     }
 
-    public Property getOutputSchema() {
-        return MapUtils.get(outputSchema.getMap(), "outputSchema", Property.class);
+    public BaseProperty getOutputSchema(Class<? extends BaseProperty> type) {
+        return MapUtils.get(outputSchema.getMap(), "outputSchema", type);
     }
 
     public Object getSampleOutput() {
@@ -156,23 +156,23 @@ public class WorkflowNodeTestOutput {
         return workflowNodeName;
     }
 
-    public void setComponentName(String componentName) {
-        this.componentName = componentName;
+    public void setTypeName(String typeName) {
+        this.typeName = typeName;
     }
 
-    public void setComponentOperationName(String componentOperationName) {
-        this.componentOperationName = componentOperationName;
+    public void setTypeOperationName(String typeOperationName) {
+        this.typeOperationName = typeOperationName;
     }
 
-    public void setComponentVersion(int componentVersion) {
-        this.componentVersion = componentVersion;
+    public void setTypeVersion(int typeVersion) {
+        this.typeVersion = typeVersion;
     }
 
     public void setId(Long id) {
         this.id = id;
     }
 
-    public void setOutputSchema(Property outputSchema) {
+    public void setOutputSchema(BaseProperty outputSchema) {
         this.outputSchema = new MapWrapper(Map.of("outputSchema", outputSchema));
     }
 
@@ -195,9 +195,9 @@ public class WorkflowNodeTestOutput {
     @Override
     public String toString() {
         return "WorkflowTestNodeOutput{" +
-            "componentName='" + componentName + '\'' +
-            ", componentOperationName='" + componentOperationName + '\'' +
-            ", componentVersion=" + componentVersion +
+            "typeName='" + typeName + '\'' +
+            ", typeOperationName='" + typeOperationName + '\'' +
+            ", typeVersion=" + typeVersion +
             ", createdBy='" + createdBy + '\'' +
             ", createdDate=" + createdDate +
             ", id=" + id +
