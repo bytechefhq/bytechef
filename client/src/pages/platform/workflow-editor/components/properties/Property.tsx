@@ -104,6 +104,7 @@ const Property = ({
 
         return property.defaultValue || '';
     });
+    const [isFormulaMode, setIsFormulaMode] = useState(false);
     const [lookupDependsOnValues, setLookupDependsOnValues] = useState<Array<unknown> | undefined>();
     const [mentionInputValue, setMentionInputValue] = useState(property.defaultValue || '');
     const [mentionInput, setMentionInput] = useState(
@@ -555,6 +556,11 @@ const Property = ({
 
             if (paramValue !== undefined || paramValue !== null) {
                 setPropertyParameterValue(paramValue);
+                if (typeof paramValue === 'string' && paramValue.startsWith('=')) {
+                    setMentionInput(true);
+
+                    setIsFormulaMode(true);
+                }
             } else {
                 setPropertyParameterValue(encodedParameters[name]);
             }
@@ -599,6 +605,10 @@ const Property = ({
 
                 setPropertyParameterValue('');
             }
+        }
+
+        if (typeof propertyParameterValue === 'string' && propertyParameterValue.startsWith('=')) {
+            setMentionInputValue(propertyParameterValue.substring(1));
         }
 
         if (
@@ -831,12 +841,14 @@ const Property = ({
                     deletePropertyButton={deletePropertyButton}
                     description={description}
                     handleInputTypeSwitchButtonClick={handleInputTypeSwitchButtonClick}
+                    isFormulaMode={isFormulaMode}
                     label={label || name}
                     leadingIcon={typeIcon}
                     path={path}
                     placeholder={placeholder}
                     ref={editorRef}
                     required={required}
+                    setIsFormulaMode={setIsFormulaMode}
                     showInputTypeSwitchButton={showInputTypeSwitchButton}
                     type={type}
                     value={mentionInputValue}

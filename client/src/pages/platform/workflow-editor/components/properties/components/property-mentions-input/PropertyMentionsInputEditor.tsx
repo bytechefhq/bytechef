@@ -30,6 +30,7 @@ import sanitizeHtml from 'sanitize-html';
 import {twMerge} from 'tailwind-merge';
 import {useDebouncedCallback} from 'use-debounce';
 
+import {FormulaMode} from './FormulaMode.extension';
 import {MentionStorage} from './MentionStorage.extension';
 
 const defaultIcon =
@@ -41,10 +42,12 @@ interface PropertyMentionsInputEditorProps {
     controlType?: string;
     dataPills: DataPillType[];
     elementId?: string;
+    isFormulaMode?: boolean;
     path?: string;
-    onClose?: () => void;
+    onChange?: (value: string) => void;
     onFocus?: (editor: Editor) => void;
     placeholder?: string;
+    setIsFormulaMode?: (isFormulaMode: boolean) => void;
     taskDispatcherDefinitions: TaskDispatcherDefinitionBasic[];
     type: string;
     value?: string | number;
@@ -59,9 +62,12 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
             controlType,
             dataPills,
             elementId,
+            isFormulaMode,
+            onChange,
             onFocus,
             path,
             placeholder,
+            setIsFormulaMode,
             taskDispatcherDefinitions,
             type,
             value,
@@ -71,6 +77,7 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
     ) => {
         const [editorValue, setEditorValue] = useState<string | number | undefined>(value);
         const [isLocalUpdate, setIsLocalUpdate] = useState(false);
+        const [mentionOccurences, setMentionOccurences] = useState(0);
 
         const {currentNode} = useWorkflowNodeDetailsPanelStore();
 
@@ -93,6 +100,7 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
             },
             [componentDefinitions, taskDispatcherDefinitions, workflow.workflowTriggerComponentNames]
         );
+        const {updateWorkflowNodeParameterMutation} = useWorkflowNodeParameterMutation();
 
         const memoizedWorkflowTask = useMemo(() => {
             return [...(workflow.triggers ?? []), ...(workflow.tasks ?? [])].find(
@@ -103,6 +111,23 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
         const extensions = useMemo(() => {
             const extensions = [
                 ...(controlType === 'RICH_TEXT' ? [StarterKit] : [Document, Paragraph, Text]),
+                FormulaMode.configure({
+                    saveNullValue: () => {
+                        if (!workflow.id || !updateWorkflowNodeParameterMutation || !path) {
+                            return;
+                        }
+
+                        saveProperty({
+                            includeInMetadata: true,
+                            path,
+                            type,
+                            updateWorkflowNodeParameterMutation,
+                            value: null,
+                            workflowId: workflow.id,
+                        });
+                    },
+                    setIsFormulaMode: setIsFormulaMode || (() => {}),
+                }),
                 MentionStorage,
                 Mention.configure({
                     HTMLAttributes: {
@@ -160,9 +185,16 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
             }
 
             return extensions;
-        }, [controlType, getComponentIcon, placeholder]);
-
-        const {updateWorkflowNodeParameterMutation} = useWorkflowNodeParameterMutation();
+        }, [
+            controlType,
+            getComponentIcon,
+            path,
+            placeholder,
+            setIsFormulaMode,
+            type,
+            updateWorkflowNodeParameterMutation,
+            workflow.id,
+        ]);
 
         const saveMentionInputValue = useDebouncedCallback(() => {
             if (!workflow.id || !updateWorkflowNodeParameterMutation || !path) {
@@ -171,12 +203,7 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
 
             let value = editorValue;
 
-            if (
-                (type === 'INTEGER' || type === 'NUMBER') &&
-                typeof value === 'string' &&
-                !value.startsWith('${') &&
-                !value.startsWith('#{')
-            ) {
+            if ((type === 'INTEGER' || type === 'NUMBER') && typeof value === 'string' && !value.startsWith('${')) {
                 value = parseInt(value);
             }
 
@@ -188,6 +215,10 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
                 }
 
                 value = transformValueForObjectAccess(value);
+
+                if (isFormulaMode && !value.startsWith('=')) {
+                    value = `=${value}`;
+                }
             }
 
             saveProperty({
@@ -231,9 +262,17 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
 
                 setEditorValue(value);
 
+                if (onChange) {
+                    onChange(value);
+                }
+
+                const propertyMentions = value.match(/property-mention/g);
+
+                setMentionOccurences(propertyMentions?.length || 0);
+
                 saveMentionInputValue();
             },
-            [saveMentionInputValue]
+            [onChange, saveMentionInputValue]
         );
 
         const getContent = useCallback((value?: string) => {
@@ -283,85 +322,16 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
                     path: path ?? '',
                     type: type ?? '',
                 },
-                handleKeyPress: (_: EditorView, event: KeyboardEvent) => {
-                    if (type !== 'STRING') {
-                        const content = typeof editorValue === 'string' ? editorValue : '';
-                        const isEditorEmpty = !content || content === '';
-                        const hasFormula = content.includes('#{');
-                        const startsWithFormula = content.startsWith('#{');
-                        const hasDataPill = content.includes('${');
-                        const cursorPosition = editor?.state.selection.from || 0;
-                        const hasSelection = editor?.state.selection.content().content.size ?? 0 > 0;
-                        const selectedText = hasSelection
-                            ? editor?.state.doc.textBetween(editor.state.selection.from, editor.state.selection.to)
-                            : '';
+                handleKeyPress: (editor: EditorView, event: KeyboardEvent) => {
+                    const isEditorEmpty = editor.state.doc.textContent.length === 0;
 
-                        // Function to determine if key should be allowed
-                        const isKeyAllowed = () => {
-                            // Selection contains datapills or formulas - only allow # or {
-                            if (hasSelection && (selectedText?.includes('${') || selectedText?.includes('#{'))) {
-                                return /[#{]/.test(event.key);
-                            }
-
-                            // Allow starting a formula with #{
-                            if (content === '#' && event.key === '{') {
-                                return true;
-                            }
-
-                            // Empty editor - only allow starting datapills or formulas
-                            if (isEditorEmpty) {
-                                return event.key === '#' || event.key === '{';
-                            }
-
-                            // Datapill/formula exists but not in formula context
-                            if (!startsWithFormula && (hasDataPill || hasFormula)) {
-                                return false;
-                            }
-
-                            // Handle formula input behavior
-                            if (startsWithFormula) {
-                                const openCount = (content.match(/\{/g) || []).length;
-                                const closeCount = (content.match(/\}/g) || []).length;
-
-                                // Prevent additional closing braces when formula is balanced
-                                if (openCount === closeCount && openCount > 0 && event.key === '}') {
-                                    return false;
-                                }
-
-                                // Check cursor position relative to closing brace
-                                if (openCount === closeCount && openCount > 0) {
-                                    const docText = editor?.state.doc.textContent || '';
-                                    const closingBracePos = docText.lastIndexOf('}');
-
-                                    // Prevent typing after closing brace
-                                    if (cursorPosition > closingBracePos) {
-                                        return false;
-                                    }
-                                }
-
-                                // Allow all other typing in formulas
-                                return true;
-                            }
-
-                            // For NUMBER/INTEGER types, only allow numeric input
-                            return /[0-9\-+.]/.test(event.key) || event.key === 'Backspace' || event.key === 'Delete';
-                        };
-
-                        const allowed = isKeyAllowed();
-
-                        if (!allowed) {
-                            event.preventDefault();
-
-                            // Only stop propagation for selection cases
-                            if (hasSelection && (selectedText?.includes('${') || selectedText?.includes('#{'))) {
-                                event.stopPropagation();
-                            }
-
-                            return true;
-                        }
+                    if ((event.key === '=' && isEditorEmpty) || isFormulaMode) {
+                        return;
                     }
 
-                    return false;
+                    if (type !== 'STRING' && (mentionOccurences || event.key !== '{')) {
+                        event.preventDefault();
+                    }
                 },
             },
             extensions,
@@ -402,8 +372,29 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
 
             const propertyValue = resolvePath(encodedParameters, encodedPath);
 
-            setEditorValue(propertyValue);
+            if (typeof propertyValue === 'string' && propertyValue.startsWith('=')) {
+                setEditorValue(propertyValue.substring(1));
+            } else {
+                setEditorValue(propertyValue);
+            }
         }, [currentNode?.name, memoizedWorkflowTask?.parameters, path, workflow.definition]);
+
+        // Set formula mode based on value and sync with editor storage
+        useEffect(() => {
+            if (!editor) return;
+
+            if (typeof value === 'string' && value.startsWith('=') && setIsFormulaMode) {
+                setIsFormulaMode(true);
+            }
+
+            if (isFormulaMode !== undefined) {
+                editor.commands.toggleFormulaMode(isFormulaMode);
+
+                if (editor.storage.formulaMode) {
+                    editor.storage.formulaMode.isFormulaMode = isFormulaMode;
+                }
+            }
+        }, [editor, value, isFormulaMode, setIsFormulaMode]);
 
         // Cleanup function to save mention input value on unmount
         useEffect(() => {

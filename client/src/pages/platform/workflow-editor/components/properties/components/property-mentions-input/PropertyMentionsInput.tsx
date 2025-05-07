@@ -1,6 +1,6 @@
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {getRandomId} from '@/shared/util/random-utils';
-import {ForwardedRef, ReactNode, forwardRef, memo, useEffect, useMemo, useState} from 'react';
+import {ForwardedRef, ReactNode, forwardRef, memo, useCallback, useEffect, useMemo, useRef, useState} from 'react';
 
 import './PropertyMentionsInput.css';
 
@@ -15,6 +15,7 @@ import useWorkflowNodeDetailsPanelStore from '@/pages/platform/workflow-editor/s
 import {ControlType} from '@/shared/middleware/platform/configuration';
 import {QuestionMarkCircledIcon} from '@radix-ui/react-icons';
 import {Editor} from '@tiptap/react';
+import {EqualIcon} from 'lucide-react';
 import {twMerge} from 'tailwind-merge';
 
 interface PropertyMentionsInputProps {
@@ -24,11 +25,13 @@ interface PropertyMentionsInputProps {
     deletePropertyButton?: ReactNode;
     description?: string;
     handleInputTypeSwitchButtonClick?: () => void;
+    isFormulaMode?: boolean;
     label?: string;
     leadingIcon?: ReactNode;
     path?: string;
     placeholder?: string;
     required?: boolean;
+    setIsFormulaMode?: (isFormulaMode: boolean) => void;
     showInputTypeSwitchButton?: boolean;
     type?: string;
     value?: string;
@@ -43,11 +46,13 @@ const PropertyMentionsInput = forwardRef<Editor, PropertyMentionsInputProps>(
             deletePropertyButton,
             description,
             handleInputTypeSwitchButtonClick,
+            isFormulaMode,
             label,
             leadingIcon,
             path,
             placeholder,
             required = false,
+            setIsFormulaMode,
             showInputTypeSwitchButton = false,
             type = 'STRING',
             value,
@@ -55,6 +60,7 @@ const PropertyMentionsInput = forwardRef<Editor, PropertyMentionsInputProps>(
         ref: ForwardedRef<Editor>
     ) => {
         const [isFocused, setIsFocused] = useState(false);
+        const isInitialLoadRef = useRef(true);
 
         const {componentDefinitions, dataPills, taskDispatcherDefinitions, workflow} = useWorkflowDataStore();
         const {focusedInput, setFocusedInput, workflowNodeDetailsPanelOpen} = useWorkflowNodeDetailsPanelStore();
@@ -70,6 +76,29 @@ const PropertyMentionsInput = forwardRef<Editor, PropertyMentionsInputProps>(
 
         const elementId = useMemo(() => `mentions-input-${getRandomId()}`, []);
 
+        const handleEditorValueChange = useCallback(
+            (newValue?: string | number) => {
+                if (typeof newValue === 'string') {
+                    const startsWithEquals = newValue.trim().startsWith('=');
+
+                    if (startsWithEquals && setIsFormulaMode) {
+                        setIsFormulaMode(true);
+
+                        const processedValue = newValue.trim().substring(1);
+
+                        if (ref && typeof ref === 'object' && 'current' in ref && ref.current?.commands) {
+                            ref.current.commands.setContent(processedValue);
+                        }
+
+                        return false;
+                    }
+                }
+
+                return true;
+            },
+            [ref, setIsFormulaMode]
+        );
+
         useEffect(() => {
             if (!focusedInput) {
                 return;
@@ -77,6 +106,19 @@ const PropertyMentionsInput = forwardRef<Editor, PropertyMentionsInputProps>(
 
             setIsFocused((focusedInput.view.props.attributes as {[name: string]: string}).id === elementId);
         }, [focusedInput, elementId]);
+
+        // Check initial value for formula mode
+        useEffect(() => {
+            if (isInitialLoadRef.current && setIsFormulaMode) {
+                const initialValue = value || defaultValue;
+
+                if (typeof initialValue === 'string' && initialValue.trim().startsWith('=')) {
+                    setIsFormulaMode(true);
+                }
+
+                isInitialLoadRef.current = false;
+            }
+        }, [value, defaultValue, setIsFormulaMode]);
 
         return (
             <fieldset className={twMerge('w-full', label && 'space-y-1')}>
@@ -138,7 +180,7 @@ const PropertyMentionsInput = forwardRef<Editor, PropertyMentionsInputProps>(
                 >
                     {leadingIcon && (
                         <span className="pointer-events-none absolute inset-y-0 left-0 flex items-center rounded-l-md border-r bg-gray-100 px-3">
-                            {leadingIcon}
+                            {isFormulaMode ? <EqualIcon className="size-4" /> : leadingIcon}
                         </span>
                     )}
 
@@ -155,10 +197,13 @@ const PropertyMentionsInput = forwardRef<Editor, PropertyMentionsInputProps>(
                             controlType={controlType}
                             dataPills={dataPills}
                             elementId={elementId}
+                            isFormulaMode={isFormulaMode}
+                            onChange={(value) => handleEditorValueChange(value)}
                             onFocus={onFocus}
                             path={path}
                             placeholder={placeholder}
                             ref={ref}
+                            setIsFormulaMode={setIsFormulaMode}
                             taskDispatcherDefinitions={taskDispatcherDefinitions}
                             type={type}
                             value={value || defaultValue}
