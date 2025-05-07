@@ -52,7 +52,7 @@ public class GoogleMailGetMailAction {
                 .required(true),
             FORMAT_PROPERTY,
             METADATA_HEADERS_PROPERTY)
-        .output(GoogleMailUtils::getMessageOutput)
+        .output()
         .perform(GoogleMailGetMailAction::perform);
 
     private GoogleMailGetMailAction() {
