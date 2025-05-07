@@ -21,12 +21,14 @@ import static com.bytechef.component.definition.ComponentDsl.component;
 import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDefinition;
+import com.bytechef.component.email.action.ReadEmailAction;
 import com.bytechef.component.email.action.SendEmailAction;
 import com.bytechef.component.email.connection.EmailConnection;
 import com.google.auto.service.AutoService;
 
 /**
  * @author Ivica Cardic
+ * @author Igor Beslic
  */
 @AutoService(ComponentHandler.class)
 public class EmailComponentHandler implements ComponentHandler {
@@ -37,7 +39,7 @@ public class EmailComponentHandler implements ComponentHandler {
         .connection(EmailConnection.CONNECTION_DEFINITION)
         .icon("path:assets/email.svg")
         .categories(ComponentCategory.COMMUNICATION, ComponentCategory.HELPERS)
-        .actions(SendEmailAction.ACTION_DEFINITION);
+        .actions(SendEmailAction.ACTION_DEFINITION, ReadEmailAction.ACTION_DEFINITION);
 
     @Override
     public ComponentDefinition getDefinition() {
