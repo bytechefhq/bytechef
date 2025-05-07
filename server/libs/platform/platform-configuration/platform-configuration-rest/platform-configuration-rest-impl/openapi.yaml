@@ -1495,14 +1495,16 @@ components:
         componentVersion:
           description: "The component version."
           type: "integer"
+        description:
+          description: "The cluster element description."
+          type: "string"
+        help:
+          $ref: "#/components/schemas/Help"
         name:
           description: "The cluster element name."
           type: "string"
         title:
           description: "The cluster element title."
-          type: "string"
-        description:
-          description: "The cluster element description."
           type: "string"
         type:
           description: "The cluster element type."
