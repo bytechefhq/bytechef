@@ -1,0 +1,436 @@
+---
+title: "Agile CRM"
+description: "All-in-One CRM. Automate your sales, marketing, and service in one platform. Avoid data leaks and enable consistent messaging."
+---
+
+All-in-One CRM. Automate your sales, marketing, and service in one platform. Avoid data leaks and enable consistent messaging.
+
+
+Categories: CRM
+
+
+Type: agileCrm/v1
+
+<hr />
+
+
+
+## Connections
+
+Version: 1
+
+
+### Basic Authentication
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| domain | Domain | STRING | `https://DOMAIN.agilecrm.com` | true |
+| username | Email | STRING | `Email address of Agile CRM account.` | true |
+| password | REST API Key | STRING | `Can be found in Admin settings -> Developers & API -> REST API Key.` | true |
+
+
+
+
+
+<hr />
+
+
+
+## Actions
+
+
+### Create Contact
+Name: createContact
+
+`Creates a new contact.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| first_name | First Name | STRING | `The first name of the contact.` | true |
+| last_name | Last Name | STRING | `The last name of the contact.` | false |
+| email | Email | STRING | `Email of the contact.` | true |
+| address | Address | STRING | `The address of the contact.` | false |
+| city | City | STRING | `The city where the contact lives.` | false |
+| state | State | STRING | `The state where the contact lives.` | false |
+| zip_code | Zip Code | STRING | `The zip code of the contact.` | false |
+| country | Country | STRING | `The country where the contact lives.` | false |
+| website | Website | STRING | `The website of the contact.` | false |
+| phone | Phone | STRING | `The phone number of the contact.` | false |
+| company | Company | STRING | `The company where the contact works.` | false |
+| tags | Tags | ARRAY <details> <summary> Items </summary> [STRING\($tag)] </details> | `Tags of the contact.` | false |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Create Contact",
+  "name" : "createContact",
+  "parameters" : {
+    "first_name" : "",
+    "last_name" : "",
+    "email" : "",
+    "address" : "",
+    "city" : "",
+    "state" : "",
+    "zip_code" : "",
+    "country" : "",
+    "website" : "",
+    "phone" : "",
+    "company" : "",
+    "tags" : [ "" ]
+  },
+  "type" : "agileCrm/v1/createContact"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| id | NUMBER | The id of the contact. |
+| type | STRING | The type of the contact. |
+| created_time | INTEGER | The time the contact was created. |
+| updated_time | INTEGER | The time the contact was updated. |
+| last_contacted | INTEGER | The time the contact was last contacted. |
+| last_emailed | INTEGER | The time the contact was last emailed. |
+| last_campaign_emailed | INTEGER | The time the contact was last emailed about the campaign. |
+| last_called | INTEGER | The time the contact was last called. |
+| viewed_time | INTEGER | The time the contact was last viewed. |
+| viewed | ARRAY <details> <summary> Items </summary> [INTEGER\($viewed_time)] </details> |  |
+| star_value | INTEGER | The star value of the contact. |
+| lead_score | INTEGER | The lead score of the contact. |
+| klout_score | STRING | The klout score of the contact. |
+| tags | ARRAY <details> <summary> Items </summary> [] </details> | Tags of the contact. |
+| tagsWithTime | ARRAY <details> <summary> Items </summary> [&#123;STRING\(tag), NUMBER\(createdTime), INTEGER\(availableCount), STRING\(entity_type)&#125;] </details> |  |
+| properties | ARRAY <details> <summary> Items </summary> [&#123;STRING\(type), STRING\(name), STRING\(value)&#125;] </details> | Properties of the contact. |
+| campaignStatus | ARRAY <details> <summary> Items </summary> [] </details> | The status of the campaign. |
+| entity_type | STRING | The entity type. |
+| source | STRING | The source that created the contact. |
+| contact_company_id | STRING | The company ID of the contact. |
+| unsubscribeStatus | ARRAY <details> <summary> Items </summary> [] </details> |  |
+| emailBounceStatus | ARRAY <details> <summary> Items </summary> [] </details> |  |
+| formId | INTEGER | The form ID of the contact. |
+| browserId | ARRAY <details> <summary> Items </summary> [] </details> | The browser ID of the contact. |
+| lead_source_id | INTEGER | The lead source ID of the contact. |
+| lead_status_id | INTEGER | The lead status ID of the contact. |
+| is_lead_converted | BOOLEAN <details> <summary> Options </summary> true, false </details> | Whether the lead converted the contact. |
+| lead_converted_time | INTEGER | The time when the lead converted the contact. |
+| is_duplicate_existed | BOOLEAN <details> <summary> Options </summary> true, false </details> | Whether the duplicate of the contact exists . |
+| trashed_time | INTEGER | The time when the contact was trashed. |
+| restored_time | INTEGER | The time when the contact was restored. |
+| is_duplicate_verification_failed | BOOLEAN <details> <summary> Options </summary> true, false </details> | Whether the duplicate of the contact verification failed. |
+| is_client_import | BOOLEAN <details> <summary> Options </summary> true, false </details> | Whether the contact was imported. |
+| concurrent_save_allowed | BOOLEAN <details> <summary> Options </summary> true, false </details> | Whether the contact was saved as concurrent. |
+| owner | OBJECT <details> <summary> Properties </summary> &#123;NUMBER\(id), STRING\(domain), STRING\(email), STRING\(phone), STRING\(name), STRING\(pic), STRING\(schedule_id), STRING\(calendar_url), STRING\(calendarURL)&#125; </details> | The owner of the contact. |
+
+
+
+
+#### Output Example
+```json
+{
+  "id" : 0.0,
+  "type" : "",
+  "created_time" : 1,
+  "updated_time" : 1,
+  "last_contacted" : 1,
+  "last_emailed" : 1,
+  "last_campaign_emailed" : 1,
+  "last_called" : 1,
+  "viewed_time" : 1,
+  "viewed" : [ 1 ],
+  "star_value" : 1,
+  "lead_score" : 1,
+  "klout_score" : "",
+  "tags" : [ ],
+  "tagsWithTime" : [ {
+    "tag" : "",
+    "createdTime" : 0.0,
+    "availableCount" : 1,
+    "entity_type" : ""
+  } ],
+  "properties" : [ {
+    "type" : "",
+    "name" : "",
+    "value" : ""
+  } ],
+  "campaignStatus" : [ ],
+  "entity_type" : "",
+  "source" : "",
+  "contact_company_id" : "",
+  "unsubscribeStatus" : [ ],
+  "emailBounceStatus" : [ ],
+  "formId" : 1,
+  "browserId" : [ ],
+  "lead_source_id" : 1,
+  "lead_status_id" : 1,
+  "is_lead_converted" : false,
+  "lead_converted_time" : 1,
+  "is_duplicate_existed" : false,
+  "trashed_time" : 1,
+  "restored_time" : 1,
+  "is_duplicate_verification_failed" : false,
+  "is_client_import" : false,
+  "concurrent_save_allowed" : false,
+  "owner" : {
+    "id" : 0.0,
+    "domain" : "",
+    "email" : "",
+    "phone" : "",
+    "name" : "",
+    "pic" : "",
+    "schedule_id" : "",
+    "calendar_url" : "",
+    "calendarURL" : ""
+  }
+}
+```
+
+
+### Create Deal
+Name: crateDeal
+
+`Creates a new deal.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| name | Name | STRING | `Name of the deal.` | true |
+| description | Description | STRING | `Brief description about deal.` | false |
+| expected_value | Expected Value | NUMBER | `Estimated value of a deal.` | true |
+| pipeline_id | Pipeline ID | NUMBER | `ID of the pipeline that the deal follows.` | true |
+| milestone | Milestone | STRING <details> <summary> Depends On </summary> pipeline_id </details> | `Milestone the deal is currently at.` | true |
+| probability | Probability | INTEGER | `Should be ranging between 0-100.` | true |
+| owner_id | Owner ID | STRING | `ID of the owner of the deal.` | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Create Deal",
+  "name" : "crateDeal",
+  "parameters" : {
+    "name" : "",
+    "description" : "",
+    "expected_value" : 0.0,
+    "pipeline_id" : 0.0,
+    "milestone" : "",
+    "probability" : 1,
+    "owner_id" : ""
+  },
+  "type" : "agileCrm/v1/crateDeal"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| colorName | STRING | Color of the deal in display. |
+| id | NUMBER | ID of the deal. |
+| apply_discount | BOOLEAN <details> <summary> Options </summary> true, false </details> | Whether the discount is applied. |
+| discount_value | NUMBER | The discount value of the deal. |
+| discount_amt | NUMBER | The discount amount of the deal. |
+| discount_type | STRING | The discount type of the deal. |
+| name | STRING | The name of the deal. |
+| contact_ids | ARRAY <details> <summary> Items </summary> [] </details> | The contacts that are part of the deal. |
+| custom_data | ARRAY <details> <summary> Items </summary> [] </details> | Custom data of the deal. |
+| products | ARRAY <details> <summary> Items </summary> [] </details> | The products that are part of the deal. |
+| description | STRING | The description of the deal. |
+| expected_value | NUMBER | The expected value of the deal. |
+| milestone | STRING | The milestone of the deal. |
+| probability | NUMBER | The probability of the deal being won. |
+| owner_id | STRING | The ID of the owner of the deal. |
+| created_time | INTEGER | The time when the deal was created. |
+| milestone_changed_time | INTEGER | The time when the deal milestone was changed. |
+| entity_type | STRING | The entity type. |
+| notes | ARRAY <details> <summary> Items </summary> [] </details> | The notes of the deal. |
+| notes_ids | ARRAY <details> <summary> Items </summary> [] </details> | The notes ID. |
+| note_created_time | INTEGER | The time when the deal note was created. |
+| pipeline_id | NUMBER | The ID of the pipeline. |
+| archived | BOOLEAN <details> <summary> Options </summary> true, false </details> | Whether the deal is archived. |
+| won_date | INTEGER | The date when the deal was won. |
+| lost_reason_id | INTEGER | The ID of the lost reason. |
+| deal_source_id | INTEGER | The ID of the deal source. |
+| total_deal_value | NUMBER | The total value of the deal. |
+| updated_time | INTEGER | The time when the deal was updated. |
+| isCurrencyUpdateRequired | BOOLEAN <details> <summary> Options </summary> true, false </details> | Whether the deal currency requires updating. |
+| currency_conversion_value | NUMBER | The currency conversion value. |
+| tags | ARRAY <details> <summary> Items </summary> [] </details> | Tags of the deal. |
+| tagsWithTime | ARRAY <details> <summary> Items </summary> [] </details> | Tags with time of the deal. |
+| owner | ARRAY <details> <summary> Items </summary> [&#123;NUMBER\(id), STRING\(domain), STRING\(email), STRING\(phone), STRING\(name), STRING\(pic), STRING\(schedule_id), STRING\(calendar_url), STRING\(calendarURL)&#125;] </details> | The owner of the deal. |
+| contacts | ARRAY <details> <summary> Items </summary> [] </details> | Contacts of the deal. |
+
+
+
+
+#### Output Example
+```json
+{
+  "colorName" : "",
+  "id" : 0.0,
+  "apply_discount" : false,
+  "discount_value" : 0.0,
+  "discount_amt" : 0.0,
+  "discount_type" : "",
+  "name" : "",
+  "contact_ids" : [ ],
+  "custom_data" : [ ],
+  "products" : [ ],
+  "description" : "",
+  "expected_value" : 0.0,
+  "milestone" : "",
+  "probability" : 0.0,
+  "owner_id" : "",
+  "created_time" : 1,
+  "milestone_changed_time" : 1,
+  "entity_type" : "",
+  "notes" : [ ],
+  "notes_ids" : [ ],
+  "note_created_time" : 1,
+  "pipeline_id" : 0.0,
+  "archived" : false,
+  "won_date" : 1,
+  "lost_reason_id" : 1,
+  "deal_source_id" : 1,
+  "total_deal_value" : 0.0,
+  "updated_time" : 1,
+  "isCurrencyUpdateRequired" : false,
+  "currency_conversion_value" : 0.0,
+  "tags" : [ ],
+  "tagsWithTime" : [ ],
+  "owner" : [ {
+    "id" : 0.0,
+    "domain" : "",
+    "email" : "",
+    "phone" : "",
+    "name" : "",
+    "pic" : "",
+    "schedule_id" : "",
+    "calendar_url" : "",
+    "calendarURL" : ""
+  } ],
+  "contacts" : [ ]
+}
+```
+
+
+### Create Task
+Name: createTask
+
+`Creates a new task.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| subject | Subject | STRING | `The subject of the task.` | true |
+| type | Task Type | STRING <details> <summary> Options </summary> CALL, EMAIL, FOLLOW_UP, MEETING, MILESTONE, SEND, TWEET, OTHER </details> | `The type of the task.` | true |
+| priority_type | Priority | STRING <details> <summary> Options </summary> HIGH, NORMAL, LOW </details> | `The priority of the task.` | true |
+| due | Due Date | DATE_TIME | `The due date of the task.` | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Create Task",
+  "name" : "createTask",
+  "parameters" : {
+    "subject" : "",
+    "type" : "",
+    "priority_type" : "",
+    "due" : "2021-01-01T00:00:00"
+  },
+  "type" : "agileCrm/v1/createTask"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| id | NUMBER | The ID of the task. |
+| type | STRING | The type of the task. |
+| priority_type | STRING | The priority of the task. |
+| due | INTEGER | The due date of the task. |
+| task_completed_time | INTEGER | The time when task was completed. |
+| task_start_time | INTEGER | The time when task was started. |
+| created_time | INTEGER | The time when task was created. |
+| is_complete | BOOLEAN <details> <summary> Options </summary> true, false </details> | Whether the task is completed. |
+| contacts | ARRAY <details> <summary> Items </summary> [&#123;NUMBER\(id), STRING\(type), INTEGER\(created_time), INTEGER\(updated_time)&#125;] </details> | Contacts that are connected to the task. |
+| subject | STRING | The subject of the task. |
+| entity_type | STRING | The entity type. |
+| notes | ARRAY <details> <summary> Items </summary> [] </details> | Notes of the task. |
+| note_ids | ARRAY <details> <summary> Items </summary> [] </details> | Notes ID. |
+| progress | INTEGER | The progress of the task. |
+| status | STRING | The status of the task. |
+| deal_ids | ARRAY <details> <summary> Items </summary> [] </details> | IDs of the deals that are connected to the task. |
+| taskOwner | OBJECT <details> <summary> Properties </summary> &#123;NUMBER\(id), STRING\(domain), STRING\(email), STRING\(phone), STRING\(name), STRING\(pic), STRING\(schedule_id), STRING\(calendar_url), STRING\(calendarURL)&#125; </details> | Owner of the task. |
+
+
+
+
+#### Output Example
+```json
+{
+  "id" : 0.0,
+  "type" : "",
+  "priority_type" : "",
+  "due" : 1,
+  "task_completed_time" : 1,
+  "task_start_time" : 1,
+  "created_time" : 1,
+  "is_complete" : false,
+  "contacts" : [ {
+    "id" : 0.0,
+    "type" : "",
+    "created_time" : 1,
+    "updated_time" : 1
+  } ],
+  "subject" : "",
+  "entity_type" : "",
+  "notes" : [ ],
+  "note_ids" : [ ],
+  "progress" : 1,
+  "status" : "",
+  "deal_ids" : [ ],
+  "taskOwner" : {
+    "id" : 0.0,
+    "domain" : "",
+    "email" : "",
+    "phone" : "",
+    "name" : "",
+    "pic" : "",
+    "schedule_id" : "",
+    "calendar_url" : "",
+    "calendarURL" : ""
+  }
+}
+```
+
+
+
+
