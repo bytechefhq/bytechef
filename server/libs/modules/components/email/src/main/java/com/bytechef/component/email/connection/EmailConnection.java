@@ -49,12 +49,13 @@ public class EmailConnection {
                 .controlType(Property.ControlType.SELECT)
                 .defaultValue(EmailProtocol.smtp.name())
                 .label("Protocol")
-                .description("Protocol defines communication procedure. SMTP allows sending emails, IMAP allows receiving emails. POP3 is older protocol for receiving emails.")
+                .description(
+                    "Protocol defines communication procedure. SMTP allows sending emails, IMAP allows receiving emails. POP3 is older protocol for receiving emails.")
                 .options(
                     option(EmailProtocol.smtp.name(), EmailProtocol.smtp.name(), "sending email"),
                     option(EmailProtocol.imap.name(), EmailProtocol.imap.name(), "receive email"),
-                    option(EmailProtocol.pop3.name(), EmailProtocol.pop3.name(), "receive email")
-                ).required(true),
+                    option(EmailProtocol.pop3.name(), EmailProtocol.pop3.name(), "receive email"))
+                .required(true),
             bool(EmailConstants.TLS)
                 .label("Use TLS")
                 .description("If selected the connection will use TLS when connecting to server."))

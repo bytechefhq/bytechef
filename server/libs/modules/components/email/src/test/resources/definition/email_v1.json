@@ -143,34 +143,34 @@
       } ],
       "controlType" : "SELECT"
     }, {
-        "advancedOption" : null,
-        "description" : "Protocol defines communication procedure. SMTP allows sending emails, IMAP allows receiving emails. POP3 is older protocol for receiving emails.",
-        "displayCondition" : null,
-        "expressionEnabled" : null,
-        "hidden" : null,
-        "metadata" : { },
-        "required" : true,
-        "name" : "protocol",
-        "type" : "STRING",
-        "defaultValue" : "smtp",
-        "exampleValue" : null,
-        "label" : "Protocol",
-        "placeholder" : null,
-        "options" : [ {
-          "description" : "sending email",
-          "label" : "smtp",
-          "value" : "smtp"
-        }, {
-          "description" : "receive email",
-          "label" : "imap",
-          "value" : "imap"
-        }, {
-          "description" : "receive email",
-          "label" : "pop3",
-          "value" : "pop3"
-        } ],
-        "controlType" : "SELECT"
+      "advancedOption" : null,
+      "description" : "Protocol defines communication procedure. SMTP allows sending emails, IMAP allows receiving emails. POP3 is older protocol for receiving emails.",
+      "displayCondition" : null,
+      "expressionEnabled" : null,
+      "hidden" : null,
+      "metadata" : { },
+      "required" : true,
+      "name" : "protocol",
+      "type" : "STRING",
+      "defaultValue" : "smtp",
+      "exampleValue" : null,
+      "label" : "Protocol",
+      "placeholder" : null,
+      "options" : [ {
+        "description" : "sending email",
+        "label" : "smtp",
+        "value" : "smtp"
+      }, {
+        "description" : "receive email",
+        "label" : "imap",
+        "value" : "imap"
+      }, {
+        "description" : "receive email",
+        "label" : "pop3",
+        "value" : "pop3"
       } ],
+      "controlType" : "SELECT"
+    } ],
     "version" : 1,
     "authorizationRequired" : false,
     "baseUri" : null,
