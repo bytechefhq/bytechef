@@ -148,7 +148,7 @@ public class WorkflowNodeTestOutputServiceImpl implements WorkflowNodeTestOutput
 
         try {
             return save(
-                workflowId, workflowNodeName, workflowNodeType, (BaseProperty) outputResponse.outputSchema(),
+                workflowId, workflowNodeName, workflowNodeType, outputResponse.outputSchema(),
                 outputResponse.sampleOutput());
         } finally {
             clearWorkflowTestNodeOutputCache(workflowId, workflowNodeName);
