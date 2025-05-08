@@ -27,4 +27,5 @@ public class EmailConstants {
     public static final String PORT = "port";
     public static final String PROTOCOL = "protocol";
     public static final String TLS = "tls";
+    public static final String SSL = "ssl";
 }
