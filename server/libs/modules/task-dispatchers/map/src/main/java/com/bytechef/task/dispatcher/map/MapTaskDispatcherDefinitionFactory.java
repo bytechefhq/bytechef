@@ -53,12 +53,17 @@ public class MapTaskDispatcherDefinitionFactory implements TaskDispatcherDefinit
             array(LIST)
                 .label("List of items")
                 .description("List of items to iterate over."))
+        .output(MapTaskDispatcherDefinitionFactory::output)
         .taskProperties(task(ITERATEE))
         .variableProperties(MapTaskDispatcherDefinitionFactory::variableProperties);
 
     @Override
     public TaskDispatcherDefinition getDefinition() {
         return TASK_DISPATCHER_DEFINITION;
+    }
+
+    protected static OutputResponse output(Map<String, ?> inputParameters) {
+        return null;
     }
 
     protected static OutputResponse variableProperties(Map<String, ?> inputParameters) {
@@ -76,6 +81,6 @@ public class MapTaskDispatcherDefinitionFactory implements TaskDispatcherDefinit
                     integer(INDEX));
         }
 
-        return new OutputResponse(variableProperties);
+        return OutputResponse.of(variableProperties);
     }
 }

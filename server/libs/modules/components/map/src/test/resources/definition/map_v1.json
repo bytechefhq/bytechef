@@ -3,7 +3,12 @@
   "help" : null,
   "icon" : "path:assets/map.svg",
   "name" : "map",
-  "outputDefinition" : null,
+  "outputDefinition" : {
+    "output" : { },
+    "outputResponse" : null,
+    "outputSchema" : null,
+    "sampleOutput" : null
+  },
   "properties" : [ {
     "advancedOption" : null,
     "displayCondition" : null,
@@ -11,8 +16,8 @@
     "hidden" : null,
     "metadata" : { },
     "required" : null,
-    "name" : "list",
     "type" : "ARRAY",
+    "name" : "list",
     "defaultValue" : null,
     "description" : "List of items to iterate over.",
     "exampleValue" : null,
@@ -33,8 +38,8 @@
     "hidden" : null,
     "metadata" : { },
     "required" : null,
-    "name" : "iteratee",
     "type" : "TASK",
+    "name" : "iteratee",
     "defaultValue" : null,
     "description" : null,
     "exampleValue" : null,
