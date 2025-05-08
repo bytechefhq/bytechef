@@ -825,9 +825,9 @@ public final class TaskDispatcherDsl {
         implements ObjectProperty {
 
         private List<Option<Object>> options;
-        private List<? extends ModifiableValueProperty<?, ?>> additionalProperties;
+        private List<? extends ValueProperty<?>> additionalProperties;
         private Boolean multipleValues;
-        private List<? extends ModifiableProperty<?>> properties;
+        private List<? extends Property> properties;
 
         private ModifiableObjectProperty() {
             this(null);
@@ -850,13 +850,13 @@ public final class TaskDispatcherDsl {
         }
 
         @SafeVarargs
-        public final <P extends ModifiableValueProperty<?, ?>> ModifiableObjectProperty additionalProperties(
+        public final <P extends ValueProperty<?>> ModifiableObjectProperty additionalProperties(
             P... properties) {
 
             return additionalProperties(properties == null ? List.of() : List.of(properties));
         }
 
-        public <P extends ModifiableValueProperty<?, ?>> ModifiableObjectProperty additionalProperties(
+        public <P extends ValueProperty<?>> ModifiableObjectProperty additionalProperties(
             List<? extends P> properties) {
 
             if (properties != null) {
@@ -882,13 +882,13 @@ public final class TaskDispatcherDsl {
         }
 
         @SafeVarargs
-        public final <P extends ModifiableValueProperty<?, ?>> ModifiableObjectProperty properties(
+        public final <P extends ValueProperty<?>> ModifiableObjectProperty properties(
             P... properties) {
 
             return properties(List.of(properties));
         }
 
-        public <P extends ModifiableValueProperty<?, ?>> ModifiableObjectProperty properties(List<P> properties) {
+        public <P extends ValueProperty<?>> ModifiableObjectProperty properties(List<P> properties) {
             if (properties != null) {
                 for (Property property : properties) {
                     String name = property.getName();
@@ -983,8 +983,9 @@ public final class TaskDispatcherDsl {
         private Boolean hidden;
         private Map<String, Object> metadata = new HashMap<>();
         private Boolean required;
-        private final String name;
         private final Type type;
+
+        protected String name;
 
         protected ModifiableProperty(String name, Type type) {
             this.name = name;
@@ -1486,6 +1487,13 @@ public final class TaskDispatcherDsl {
         @Override
         public Optional<String> getPlaceholder() {
             return Optional.ofNullable(placeholder);
+        }
+
+        @SuppressWarnings("unchecked")
+        public P setName(String name) {
+            this.name = name;
+
+            return (P) this;
         }
     }
 

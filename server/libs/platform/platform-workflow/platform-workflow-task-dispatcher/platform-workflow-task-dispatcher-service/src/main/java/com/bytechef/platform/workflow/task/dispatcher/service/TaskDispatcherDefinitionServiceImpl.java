@@ -16,16 +16,22 @@
 
 package com.bytechef.platform.workflow.task.dispatcher.service;
 
+import static com.bytechef.platform.workflow.task.dispatcher.definition.TaskDispatcherDsl.object;
+
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.definition.BaseOutputDefinition;
 import com.bytechef.platform.domain.OutputResponse;
 import com.bytechef.platform.util.SchemaUtils;
 import com.bytechef.platform.util.WorkflowNodeDescriptionUtils;
 import com.bytechef.platform.workflow.task.dispatcher.TaskDispatcherDefinitionRegistry;
+import com.bytechef.platform.workflow.task.dispatcher.definition.OutputDefinition;
 import com.bytechef.platform.workflow.task.dispatcher.definition.OutputFunction;
 import com.bytechef.platform.workflow.task.dispatcher.definition.PropertyFactory;
+import com.bytechef.platform.workflow.task.dispatcher.definition.TaskDispatcherDsl.ModifiableValueProperty;
 import com.bytechef.platform.workflow.task.dispatcher.domain.TaskDispatcherDefinition;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -50,38 +56,43 @@ public class TaskDispatcherDefinitionServiceImpl implements TaskDispatcherDefini
         com.bytechef.platform.workflow.task.dispatcher.definition.TaskDispatcherDefinition taskDispatcherDefinition =
             taskDispatcherDefinitionRegistry.getTaskDispatcherDefinition(name, version);
 
-        return taskDispatcherDefinition
-            .getOutputDefinition()
-            .flatMap(com.bytechef.platform.workflow.task.dispatcher.definition.OutputDefinition::getOutput)
+        List<ModifiableValueProperty<?, ?>> properties = new ArrayList<>();
+        Map<String, Object> sampleOutput = new HashMap<>();
+
+        taskDispatcherDefinition.getOutputDefinition()
+            .flatMap(OutputDefinition::getOutput)
             .map(f -> (OutputFunction) f)
             .map(outputFunction -> {
                 try {
-                    BaseOutputDefinition.OutputResponse outputResponse = outputFunction.apply(inputParameters);
-
-                    return SchemaUtils.toOutput(
-                        outputResponse, PropertyFactory.OUTPUT_FACTORY_FUNCTION, PropertyFactory.PROPERTY_FACTORY);
+                    return outputFunction.apply(inputParameters);
                 } catch (Exception e) {
                     throw new RuntimeException(e);
                 }
             })
-            .orElseGet(() -> {
-                BaseOutputDefinition.OutputResponse outputResponse = taskDispatcherDefinition.getVariableProperties()
-                    .map(f -> {
-                        try {
-                            return f.apply(inputParameters);
-                        } catch (Exception e) {
-                            throw new RuntimeException(e);
-                        }
-                    })
-                    .orElse(null);
-
-                if (outputResponse == null) {
-                    return null;
-                }
-
-                return SchemaUtils.toOutput(
-                    outputResponse, PropertyFactory.OUTPUT_FACTORY_FUNCTION, PropertyFactory.PROPERTY_FACTORY);
+            .ifPresent(outputOutputResponse -> {
+                properties.add(
+                    ((ModifiableValueProperty<?, ?>) outputOutputResponse.getOutputSchema()).setName("output"));
+                sampleOutput.put("output", outputOutputResponse.getSampleOutput());
             });
+
+        taskDispatcherDefinition.getVariableProperties()
+            .map(VariablePropertiesFunction -> {
+                try {
+                    return VariablePropertiesFunction.apply(inputParameters);
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
+                }
+            })
+            .ifPresent(outputOutputResponse -> {
+                properties.add(
+                    ((ModifiableValueProperty<?, ?>) outputOutputResponse.getOutputSchema())
+                        .setName("variableProperties"));
+                sampleOutput.put("variableProperties", outputOutputResponse.getSampleOutput());
+            });
+
+        return SchemaUtils.toOutput(
+            BaseOutputDefinition.OutputResponse.of(object().properties(properties), sampleOutput),
+            PropertyFactory.OUTPUT_FACTORY_FUNCTION, PropertyFactory.PROPERTY_FACTORY);
     }
 
     @Override
