@@ -19,6 +19,7 @@
 package com.bytechef.atlas.configuration.domain;
 
 import com.bytechef.atlas.configuration.constant.WorkflowConstants;
+import com.bytechef.atlas.configuration.util.WorkflowTaskUtils;
 import com.bytechef.atlas.configuration.workflow.mapper.WorkflowReader;
 import com.bytechef.atlas.configuration.workflow.mapper.WorkflowResource;
 import com.bytechef.commons.util.CollectionUtils;
@@ -26,7 +27,6 @@ import com.bytechef.commons.util.MapUtils;
 import java.io.Serializable;
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -304,7 +304,7 @@ public final class Workflow implements Persistable<String>, Serializable {
     }
 
     public WorkflowTask getTask(String workflowNodeName) {
-        for (WorkflowTask workflowTask : getTasks(tasks, null)) {
+        for (WorkflowTask workflowTask : WorkflowTaskUtils.getTasks(tasks, null)) {
             if (Objects.equals(workflowTask.getName(), workflowNodeName)) {
                 return workflowTask;
             }
@@ -320,14 +320,14 @@ public final class Workflow implements Persistable<String>, Serializable {
 
     public List<WorkflowTask> getTasks(boolean flatten) {
         if (flatten) {
-            return getTasks(tasks, null);
+            return WorkflowTaskUtils.getTasks(tasks, null);
         }
 
         return Collections.unmodifiableList(tasks);
     }
 
     public List<WorkflowTask> getTasks(String lastWorkflowNodeName) {
-        return getTasks(tasks, lastWorkflowNodeName);
+        return WorkflowTaskUtils.getTasks(tasks, lastWorkflowNodeName);
     }
 
     public int getVersion() {
@@ -386,93 +386,6 @@ public final class Workflow implements Persistable<String>, Serializable {
             ", lastModifiedBy='" + lastModifiedBy + '\'' +
             ", lastModifiedDate=" + lastModifiedDate +
             '}';
-    }
-
-    @SuppressWarnings("unchecked")
-    private static List<WorkflowTask> getTasks(List<WorkflowTask> workflowTasks, String lastWorkflowNodeName) {
-        List<WorkflowTask> resultWorkflowTasks = new ArrayList<>();
-
-        for (WorkflowTask workflowTask : workflowTasks) {
-            List<WorkflowTask> returnedWorkflowTasks = new ArrayList<>();
-            Map<String, ?> parameters = workflowTask.getParameters();
-
-            for (Map.Entry<String, ?> entry : parameters.entrySet()) {
-                if (entry.getValue() instanceof WorkflowTask curWorkflowTask) {
-                    returnedWorkflowTasks.addAll(getTasks(List.of(curWorkflowTask), lastWorkflowNodeName));
-                } else if (entry.getValue() instanceof List<?> curList) {
-                    if (!curList.isEmpty()) {
-                        Object firstItem = curList.getFirst();
-
-                        if (firstItem instanceof WorkflowTask) {
-                            List<WorkflowTask> curWorkflowTasks = curList.stream()
-                                .map(item -> (WorkflowTask) item)
-                                .toList();
-
-                            returnedWorkflowTasks.addAll(getTasks(curWorkflowTasks, lastWorkflowNodeName));
-                        }
-
-                        if (firstItem instanceof Map<?, ?> map && map.containsKey(WorkflowConstants.PARAMETERS) &&
-                            map.containsKey(WorkflowConstants.TYPE)) {
-
-                            List<WorkflowTask> curWorkflowTasks = curList.stream()
-                                .map(item -> new WorkflowTask((Map<String, ?>) item))
-                                .toList();
-
-                            returnedWorkflowTasks.addAll(getTasks(curWorkflowTasks, lastWorkflowNodeName));
-                        } else if (firstItem instanceof Map<?, ?> map &&
-                            map.containsKey(WorkflowConstants.TASKS)) {
-
-                            for (Object curItem : curList) {
-                                Map<String, ?> curMap = (Map<String, ?>) curItem;
-
-                                List<WorkflowTask> curWorkflowTasks = MapUtils.getList(
-                                    curMap, WorkflowConstants.TASKS, WorkflowTask.class, List.of());
-
-                                returnedWorkflowTasks.addAll(getTasks(curWorkflowTasks, lastWorkflowNodeName));
-                            }
-                        }
-                    }
-                } else if (entry.getValue() instanceof Map<?, ?> curMap) {
-                    for (Map.Entry<?, ?> curMapEntry : curMap.entrySet()) {
-                        if (curMapEntry.getValue() instanceof WorkflowTask curWorkflowTask) {
-                            returnedWorkflowTasks.addAll(getTasks(List.of(curWorkflowTask), lastWorkflowNodeName));
-                        }
-                    }
-                }
-            }
-
-            if (lastWorkflowNodeName == null) {
-                resultWorkflowTasks.add(workflowTask);
-                resultWorkflowTasks.addAll(returnedWorkflowTasks);
-            } else {
-                if (!returnedWorkflowTasks.isEmpty() ||
-                    Objects.equals(workflowTask.getName(), lastWorkflowNodeName)) {
-
-                    resultWorkflowTasks.addAll(getPrevious(workflowTasks, workflowTask.getName()));
-                    resultWorkflowTasks.addAll(returnedWorkflowTasks);
-                }
-
-                if (Objects.equals(workflowTask.getName(), lastWorkflowNodeName)) {
-                    return resultWorkflowTasks;
-                }
-            }
-        }
-
-        return resultWorkflowTasks;
-    }
-
-    private static List<WorkflowTask> getPrevious(List<WorkflowTask> workflowTasks, String workflowTaskName) {
-        List<WorkflowTask> previousWorkflowTasks = new ArrayList<>();
-
-        for (WorkflowTask curWorkflowTask : workflowTasks) {
-            previousWorkflowTasks.add(curWorkflowTask);
-
-            if (Objects.equals(curWorkflowTask.getName(), workflowTaskName)) {
-                break;
-            }
-        }
-
-        return previousWorkflowTasks;
     }
 
     private static Map<String, ?> readWorkflowMap(String definition, String id, Format format) {

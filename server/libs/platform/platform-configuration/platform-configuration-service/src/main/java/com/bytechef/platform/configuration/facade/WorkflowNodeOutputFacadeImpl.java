@@ -19,6 +19,8 @@ package com.bytechef.platform.configuration.facade;
 import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.domain.WorkflowTask;
 import com.bytechef.atlas.configuration.service.WorkflowService;
+import com.bytechef.commons.util.CollectionUtils;
+import com.bytechef.commons.util.MapUtils;
 import com.bytechef.platform.component.domain.ActionDefinition;
 import com.bytechef.platform.component.domain.ArrayProperty;
 import com.bytechef.platform.component.domain.FileEntryProperty;
@@ -31,9 +33,11 @@ import com.bytechef.platform.configuration.service.WorkflowNodeTestOutputService
 import com.bytechef.platform.definition.WorkflowNodeType;
 import com.bytechef.platform.domain.BaseProperty;
 import com.bytechef.platform.domain.OutputResponse;
+import com.bytechef.platform.workflow.task.dispatcher.domain.ObjectProperty;
 import com.bytechef.platform.workflow.task.dispatcher.domain.Property;
 import com.bytechef.platform.workflow.task.dispatcher.domain.TaskDispatcherDefinition;
 import com.bytechef.platform.workflow.task.dispatcher.service.TaskDispatcherDefinitionService;
+import com.fasterxml.jackson.core.type.TypeReference;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.ArrayList;
 import java.util.List;
@@ -125,7 +129,22 @@ public class WorkflowNodeOutputFacadeImpl implements WorkflowNodeOutputFacade {
                 break;
             }
 
-            workflowNodeOutputDTOs.add(getWorkflowNodeOutputDTO(workflowId, workflowTask));
+            WorkflowNodeType workflowNodeType = WorkflowNodeType.ofType(workflowTask.getType());
+
+            if (Objects.equals(workflowNodeType.name(), "loop")) {
+                List<WorkflowTask> childWorkflowTasks = MapUtils
+                    .getList(
+                        workflowTask.getParameters(), "iteratee", new TypeReference<Map<String, ?>>() {}, List.of())
+                    .stream()
+                    .map(WorkflowTask::new)
+                    .toList();
+
+                if (containsWorkflowTask(childWorkflowTasks, lastWorkflowNodeName)) {
+                    workflowNodeOutputDTOs.add(getWorkflowNodeOutputDTO(workflowId, workflowTask));
+                }
+            } else {
+                workflowNodeOutputDTOs.add(getWorkflowNodeOutputDTO(workflowId, workflowTask));
+            }
         }
 
         return workflowNodeOutputDTOs;
@@ -169,16 +188,14 @@ public class WorkflowNodeOutputFacadeImpl implements WorkflowNodeOutputFacade {
         return outputResponse;
     }
 
-//    private static boolean containsChildWorkflowTasks(
-//        List<WorkflowTask> workflowTasks, List<Map<String, ?>> childWorkflowTasks) {
-//
-//        List<String> workflowTaskNames = workflowTasks.stream()
-//            .map(WorkflowTask::getName)
-//            .toList();
-//
-//        return childWorkflowTasks.stream()
-//            .anyMatch(childWorkflowTask -> workflowTaskNames.contains(MapUtils.getString(childWorkflowTask, "name")));
-//    }
+    private static boolean containsWorkflowTask(List<WorkflowTask> workflowTasks, String workflowNodeName) {
+        List<WorkflowTask> allWorkflowTasks = workflowTasks.stream()
+            .flatMap(workflowTask -> CollectionUtils.stream(workflowTask.getTasks()))
+            .toList();
+
+        return allWorkflowTasks.stream()
+            .anyMatch(workflowTask -> Objects.equals(workflowTask.getName(), workflowNodeName));
+    }
 
     private WorkflowNodeOutputDTO getWorkflowNodeOutputDTO(String workflowId, WorkflowTask workflowTask) {
         WorkflowNodeType workflowNodeType = WorkflowNodeType.ofType(workflowTask.getType());
@@ -202,11 +219,21 @@ public class WorkflowNodeOutputFacadeImpl implements WorkflowNodeOutputFacade {
 
         OutputResponse finalOutputResponse = outputResponse;
 
+        Class<? extends BaseProperty> type = workflowNodeType.operation() == null
+            ? Property.class : com.bytechef.platform.component.domain.Property.class;
+
         outputResponse = workflowNodeTestOutputService.fetchWorkflowTestNodeOutput(workflowId, workflowTask.getName())
-            .map(workflowNodeTestOutput -> workflowNodeTestOutput.getOutput(
-                workflowNodeType.operation() == null ? Property.class
-                    : com.bytechef.platform.component.domain.Property.class))
+            .map(workflowNodeTestOutput -> workflowNodeTestOutput.getOutput(type))
             .orElseGet(() -> checkOutput(finalOutputResponse));
+
+        if (Objects.equals(workflowNodeType.name(), "loop") && outputResponse != null) {
+            ObjectProperty objectProperty = (ObjectProperty) outputResponse.outputSchema();
+
+            List<? extends Property> properties = objectProperty.getProperties();
+
+            outputResponse = new OutputResponse(
+                properties.getFirst(), outputResponse.sampleOutput(), outputResponse.placeholder());
+        }
 
         return new WorkflowNodeOutputDTO(
             workflowTask.getName(), outputResponse, null, actionDefinition, taskDispatcherDefinition);
@@ -219,11 +246,12 @@ public class WorkflowNodeOutputFacadeImpl implements WorkflowNodeOutputFacade {
             workflowNodeType.name(), workflowNodeType.version(),
             workflowNodeType.operation());
 
+        Class<? extends BaseProperty> type = workflowNodeType.operation() == null
+            ? Property.class : com.bytechef.platform.component.domain.Property.class;
+
         OutputResponse outputResponse = workflowNodeTestOutputService
             .fetchWorkflowTestNodeOutput(workflowId, workflowTrigger.getName())
-            .map(workflowNodeTestOutput -> workflowNodeTestOutput.getOutput(
-                workflowNodeType.operation() == null ? Property.class
-                    : com.bytechef.platform.component.domain.Property.class))
+            .map(workflowNodeTestOutput -> workflowNodeTestOutput.getOutput(type))
             .orElseGet(() -> checkOutput(triggerDefinition.getOutputResponse()));
 
         outputResponse = checkTriggerOutput(outputResponse, triggerDefinition);

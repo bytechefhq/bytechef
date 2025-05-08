@@ -19,9 +19,11 @@
 package com.bytechef.atlas.configuration.domain;
 
 import com.bytechef.atlas.configuration.constant.WorkflowConstants;
+import com.bytechef.atlas.configuration.util.WorkflowTaskUtils;
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.evaluator.Evaluator;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import java.io.Serializable;
 import java.util.Collections;
@@ -238,6 +240,11 @@ public class WorkflowTask implements Task, Serializable {
 
     public int getTaskNumber() {
         return taskNumber;
+    }
+
+    @JsonIgnore
+    public List<WorkflowTask> getTasks() {
+        return WorkflowTaskUtils.getTasks(Collections.singletonList(this), null);
     }
 
     /**
