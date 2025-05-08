@@ -10,10 +10,10 @@ import PageLoader from '@/components/PageLoader';
 import {Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle} from '@/components/ui/dialog';
 import useProjectsLeftSidebarStore from '@/pages/automation/project/stores/useProjectsLeftSidebarStore';
 import WorkflowCodeEditorSheet from '@/pages/platform/workflow-editor/components/WorkflowCodeEditorSheet';
-import WorkflowInputsSheet from '@/pages/platform/workflow-editor/components/WorkflowInputsSheet';
 import WorkflowNodesSidebar from '@/pages/platform/workflow-editor/components/WorkflowNodesSidebar';
 import WorkflowOutputsSheet from '@/pages/platform/workflow-editor/components/WorkflowOutputsSheet';
 import WorkflowRightSidebar from '@/pages/platform/workflow-editor/components/WorkflowRightSidebar';
+import WorkflowInputsSheet from '@/pages/platform/workflow-editor/components/workflow-inputs/WorkflowInputsSheet';
 import WorkflowTestChatPanel from '@/pages/platform/workflow-editor/components/workflow-test-chat/WorkflowTestChatPanel';
 import {useWorkflowLayout} from '@/pages/platform/workflow-editor/hooks/useWorkflowLayout';
 import {useWorkflowMutation} from '@/pages/platform/workflow-editor/providers/workflowMutationProvider';
@@ -159,7 +159,6 @@ const WorkflowEditorLayout = () => {
             <WorkflowInputsSheet
                 onSheetOpenChange={setShowWorkflowInputsSheet}
                 sheetOpen={showWorkflowInputsSheet}
-                workflow={workflow}
                 workflowTestConfiguration={workflowTestConfiguration}
             />
 

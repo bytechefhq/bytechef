@@ -23,6 +23,7 @@ import {
     TriggerDefinition,
     TriggerType,
     ValueProperty,
+    WorkflowInput,
     WorkflowTask,
 } from '@/shared/middleware/platform/configuration';
 import {UseMutationResult} from '@tanstack/react-query';
@@ -198,17 +199,10 @@ export type SubPropertyType = PropertyAllType & {custom: boolean};
 export type WorkflowDefinitionType = {
     description?: string;
     label?: string;
-    inputs?: Array<WorkflowInputType>;
+    inputs?: Array<WorkflowInput>;
     outputs?: Array<WorkflowOutputType>;
     tasks?: Array<WorkflowTaskType>;
     triggers?: Array<WorkflowTriggerType>;
-};
-
-export type WorkflowInputType = {
-    label?: string;
-    name: string;
-    required?: boolean;
-    type?: string;
 };
 
 export type WorkflowOutputType = {
@@ -317,3 +311,7 @@ export type UpdateTaskParametersType = {
 export type ConditionChildTasksType = {[conditionId: string]: {caseTrue: string[]; caseFalse: string[]}};
 export type LoopChildTasksType = {[loopId: string]: {iteratee: string[]}};
 export type BranchChildTasksType = {[branchId: string]: {cases: {[caseKey: string]: string[]}; default: string[]}};
+
+export type WorkflowInputType = WorkflowInput & {
+    testValue?: string;
+};
