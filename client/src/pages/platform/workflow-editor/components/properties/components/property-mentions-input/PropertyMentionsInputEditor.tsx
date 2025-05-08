@@ -203,7 +203,12 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
 
             let value = editorValue;
 
-            if ((type === 'INTEGER' || type === 'NUMBER') && typeof value === 'string' && !value.startsWith('${')) {
+            if (
+                !isFormulaMode &&
+                (type === 'INTEGER' || type === 'NUMBER') &&
+                typeof value === 'string' &&
+                !value.startsWith('${')
+            ) {
                 value = parseInt(value);
             }
 
