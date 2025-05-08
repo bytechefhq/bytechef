@@ -35,6 +35,9 @@ import java.util.HashMap;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 
+/**
+ * @author Igor Beslic
+ */
 public class EmailActionIntTest {
 
     @RegisterExtension

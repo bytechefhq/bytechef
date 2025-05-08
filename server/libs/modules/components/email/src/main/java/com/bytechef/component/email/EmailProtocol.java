@@ -16,6 +16,9 @@
 
 package com.bytechef.component.email;
 
+/**
+ * @author Igor Beslic
+ */
 public enum EmailProtocol {
     imap, pop3, smtp
 }
