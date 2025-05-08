@@ -43,6 +43,7 @@ import static com.bytechef.component.email.constant.EmailConstants.PROTOCOL;
 import static com.bytechef.component.email.constant.EmailConstants.HOST;
 import static com.bytechef.component.email.constant.EmailConstants.PORT;
 import static com.bytechef.component.email.constant.EmailConstants.TLS;
+import static com.bytechef.component.email.constant.EmailConstants.SSL;
 
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 
@@ -97,7 +98,9 @@ public class ReadEmailAction {
         }
 
         Store protocolStore = session.getStore(emailProtocol.name());
-        protocolStore.connect();
+        protocolStore.connect(
+          connectionParameters.getRequiredString(HOST), connectionParameters.getRequiredString(USERNAME),
+            connectionParameters.getRequiredString(PASSWORD));
 
         Folder folder = protocolStore.getFolder("INBOX");
 
@@ -139,14 +142,17 @@ public class ReadEmailAction {
             props.put(String.format("mail.%s.starttls.enable", protocol), "true");
         }
 
+        if (Objects.equals(connectionParameters.getBoolean(SSL), false)) {
+            props.put(String.format("mail.%s.ssl.enable", protocol), "true");
+        }
+
         if (connectionParameters.containsKey(USERNAME)) {
+            props.put(String.format("mail.%s.user", protocol), connectionParameters.getRequiredString(USERNAME));
             props.put(String.format("mail.%s.auth", protocol), true);
         }
 
         props.put(String.format("mail.%s.host", protocol), connectionParameters.getRequiredString(HOST));
         props.put(String.format("mail.%s.port", protocol), connectionParameters.getRequiredInteger(PORT));
-
-        props.setProperty(String.format("mail.%s.ssl.enable", protocol), "true");
 
         return props;
     }
