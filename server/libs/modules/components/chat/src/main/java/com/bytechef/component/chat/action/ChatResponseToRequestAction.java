@@ -26,7 +26,7 @@ import static com.bytechef.component.definition.ComponentDsl.string;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.definition.BaseOutputDefinition;
+import com.bytechef.definition.BaseOutputDefinition.OutputResponse;
 import com.bytechef.platform.component.definition.WebhookResponse;
 import java.util.List;
 import java.util.Map;
@@ -51,10 +51,10 @@ public class ChatResponseToRequestAction {
         .output(ChatResponseToRequestAction::output)
         .perform(ChatResponseToRequestAction::perform);
 
-    protected static BaseOutputDefinition.OutputResponse output(
+    protected static OutputResponse output(
         Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
 
-        return new BaseOutputDefinition.OutputResponse(
+        return OutputResponse.of(
             Map.of(
                 MESSAGE, inputParameters.getString(MESSAGE, ""),
                 ATTACHMENTS, inputParameters.getFileEntries(ATTACHMENTS, List.of())));

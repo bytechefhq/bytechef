@@ -35,7 +35,7 @@ import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.exception.ProviderException;
-import com.bytechef.definition.BaseOutputDefinition;
+import com.bytechef.definition.BaseOutputDefinition.OutputResponse;
 import com.bytechef.definition.BaseProperty;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.Duration;
@@ -142,7 +142,7 @@ public class ModelUtils {
             .requestFactory(requestFactory);
     }
 
-    public static BaseOutputDefinition.OutputResponse output(
+    public static OutputResponse output(
         Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) {
 
         BaseProperty.BaseValueProperty<?> outputSchemaProperty = string();
@@ -158,7 +158,7 @@ public class ModelUtils {
                 outputSchema -> outputSchema.getOutputSchema(responseSchema));
         }
 
-        return new BaseOutputDefinition.OutputResponse(outputSchemaProperty);
+        return OutputResponse.of(outputSchemaProperty);
     }
 
     private static Message createMessage(ChatModel.Message message, ActionContext actionContext) {

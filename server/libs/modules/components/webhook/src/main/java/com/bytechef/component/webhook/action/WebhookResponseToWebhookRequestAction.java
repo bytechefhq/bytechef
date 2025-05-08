@@ -21,7 +21,7 @@ import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
-import com.bytechef.definition.BaseOutputDefinition;
+import com.bytechef.definition.BaseOutputDefinition.OutputResponse;
 import com.bytechef.platform.component.definition.WebhookResponse;
 import java.util.Map;
 
@@ -89,10 +89,10 @@ public class WebhookResponseToWebhookRequestAction {
         .output(WebhookResponseToWebhookRequestAction::output)
         .perform(WebhookResponseToWebhookRequestAction::perform);
 
-    protected static BaseOutputDefinition.OutputResponse output(
+    protected static OutputResponse output(
         Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
 
-        return new BaseOutputDefinition.OutputResponse(
+        return OutputResponse.of(
             Map.of(
                 BODY, inputParameters.getMap(BODY, new TypeReference<>() {}, Map.of()),
                 HEADERS, inputParameters.getMap(HEADERS, new TypeReference<>() {}, Map.of()),

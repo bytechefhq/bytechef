@@ -41,7 +41,7 @@ public interface BaseOutputDefinition {
             .orElse(null);
     }
 
-    class OutputResponse {
+    final class OutputResponse {
 
         private BaseValueProperty<?> outputSchema;
         private Object sampleOutput;
@@ -50,17 +50,17 @@ public interface BaseOutputDefinition {
         private OutputResponse() {
         }
 
-        public OutputResponse(BaseValueProperty<?> outputSchema, Object sampleOutput, Object placeholder) {
+        private OutputResponse(BaseValueProperty<?> outputSchema, Object sampleOutput, Object placeholder) {
             this.outputSchema = outputSchema;
             this.sampleOutput = sampleOutput;
             this.placeholder = placeholder;
         }
 
-        public OutputResponse(BaseValueProperty<?> outputSchema) {
+        private OutputResponse(BaseValueProperty<?> outputSchema) {
             this(outputSchema, null, null);
         }
 
-        public OutputResponse(Object sampleOutput) {
+        private OutputResponse(Object sampleOutput) {
             this(null, sampleOutput, null);
         }
 

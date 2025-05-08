@@ -41,7 +41,7 @@ public final class OutputDefinition implements BaseOutputDefinition {
     }
 
     private OutputDefinition(ValueProperty<?> outputSchema, Object sampleOutput, Object placeholder) {
-        this.outputResponse = new OutputResponse(outputSchema, sampleOutput, placeholder);
+        this.outputResponse = OutputResponse.of(outputSchema, sampleOutput, placeholder);
     }
 
     public static OutputDefinition of() {

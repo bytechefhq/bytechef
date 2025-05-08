@@ -87,6 +87,6 @@ public class LoopTaskDispatcherDefinitionFactory implements TaskDispatcherDefini
                 integer(INDEX));
         }
 
-        return new OutputResponse(variableProperties);
+        return OutputResponse.of(variableProperties);
     }
 }

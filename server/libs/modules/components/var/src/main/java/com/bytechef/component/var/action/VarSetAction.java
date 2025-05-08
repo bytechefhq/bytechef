@@ -124,7 +124,7 @@ public class VarSetAction {
             return null;
         }
 
-        return new OutputResponse(perform(inputParameters, connectionParameters, context));
+        return OutputResponse.of(perform(inputParameters, connectionParameters, context));
     }
 
     protected static Object perform(

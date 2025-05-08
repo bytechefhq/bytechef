@@ -135,7 +135,7 @@ public class ObjectHelperAddKeyValuePairsAction {
     protected static OutputResponse output(
         Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
 
-        return new OutputResponse(perform(inputParameters, connectionParameters, context));
+        return OutputResponse.of(perform(inputParameters, connectionParameters, context));
     }
 
     protected static Object perform(

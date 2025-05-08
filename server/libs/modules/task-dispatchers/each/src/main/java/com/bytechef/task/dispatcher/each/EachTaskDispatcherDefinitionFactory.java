@@ -76,6 +76,6 @@ public class EachTaskDispatcherDefinitionFactory implements TaskDispatcherDefini
                 integer(INDEX));
         }
 
-        return new OutputResponse(variableProperties);
+        return OutputResponse.of(variableProperties);
     }
 }
