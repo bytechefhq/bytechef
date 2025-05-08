@@ -3,41 +3,45 @@
         "browser": true,
         "es2020": true,
         "jest": true,
-        "node": true
+        "node": true,
     },
     "settings": {
         "react": {
-            "version": "detect"
-        }
+            "version": "detect",
+        },
     },
     "extends": [
         "eslint:recommended",
         "plugin:react/recommended",
         "plugin:@typescript-eslint/eslint-recommended",
         "plugin:@typescript-eslint/recommended",
-        "plugin:tailwindcss/recommended"
+        "plugin:tailwindcss/recommended",
     ],
     "parser": "@typescript-eslint/parser",
     "parserOptions": {
         "ecmaFeatures": {
-            "jsx": true
+            "jsx": true,
         },
         "ecmaVersion": 11,
-        "sourceType": "module"
+        "sourceType": "module",
     },
     "plugins": ["@typescript-eslint", "bytechef", "react", "react-hooks", "sort-destructure-keys", "tailwindcss"],
     "rules": {
         "@typescript-eslint/explicit-module-boundary-types": "off",
         "@typescript-eslint/no-non-null-assertion": "off",
-        "@typescript-eslint/naming-convention": ["error", {
-            "selector": "typeAlias",
-            "format": ["PascalCase"],
-            "suffix": ["Type"]
-        }, {
-            "selector": "interface",
-            "format": ["PascalCase"],
-            "suffix": ["Props", "I"]
-        }],
+        "@typescript-eslint/naming-convention": [
+            "error",
+            {
+                "selector": "typeAlias",
+                "format": ["PascalCase"],
+                "suffix": ["Type"],
+            },
+            {
+                "selector": "interface",
+                "format": ["PascalCase"],
+                "suffix": ["Props", "I"],
+            },
+        ],
         "bytechef/empty-line-between-elements": "error",
         "bytechef/group-imports": "error",
         "bytechef/no-conditional-object-keys": "error",
@@ -67,6 +71,7 @@
                     "animate-slide-right-fade",
                     "bg-accent",
                     "bg-background",
+                    "bg-content-brand-primary",
                     "bg-destructive-foreground",
                     "bg-input",
                     "bg-muted",
@@ -149,6 +154,7 @@
                     "right-data-pill-panel-placement",
                     "right-minimap-placement",
                     "rounded-xs",
+                    "sm:max-w-workflow-inputs-sheet-width",
                     "stroke-destructive",
                     "text-accent-foreground",
                     "text-content-brand-primary",
@@ -169,10 +175,10 @@
                     "w-workflow-nodes-popover-actions-menu-width",
                     "w-workflow-nodes-popover-menu-width",
                     "w-workflow-outputs-sheet-dialog-width",
-                    "w-task-filter-dropdown-menu-width"
-                ]
-            }
+                    "w-task-filter-dropdown-menu-width",
+                ],
+            },
         ],
-        "tailwindcss/no-contradicting-classname": "error"
-    }
+        "tailwindcss/no-contradicting-classname": "error",
+    },
 }
