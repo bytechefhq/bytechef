@@ -56,11 +56,11 @@ public class Evaluator {
     private static final Logger logger = LoggerFactory.getLogger(Evaluator.class);
 
     private static final String ACCESSOR_PREFIX = "${";
+    private static final String ACCESSOR_SUFFIX = "}";
     private static final String FORMULA_PREFIX = "=";
-    private static final String SUFFIX = "}";
     private static final Pattern TEXT_EXPRESSION_PATTERN = Pattern.compile("\\$\\{(.*?)}");
     private static final Pattern VALID_ACCESSOR_PATTERN = Pattern.compile(
-        "^[a-zA-Z_][a-zA-Z0-9_]*(\\[(\\d+|'[a-zA-Z0-9_]+')])*(\\.[a-zA-Z_][a-zA-Z0-9_]*(\\[(\\d+|'[a-zA-Z0-9_]+')])*)*$");
+        "^[a-zA-Z_][a-zA-Z0-9_]*(\\[(\\d+|'[a-zA-Z0-9_]+')])*(\\.(([a-zA-Z_][a-zA-Z0-9_]*)|\\[(\\d+|'[a-zA-Z0-9_]+')]))*(\\.[a-zA-Z_][a-zA-Z0-9_]*(\\[(\\d+|'[a-zA-Z0-9_]+')])*)*$");
 
     private final ExpressionParser expressionParser = new SpelExpressionParser();
 
@@ -119,16 +119,16 @@ public class Evaluator {
     }
 
     private String evaluate(CompositeStringExpression compositeStringExpression, Map<String, ?> context) {
-        StringBuilder stringBuilder = new StringBuilder();
+        StringBuilder sb = new StringBuilder();
         Expression[] subExpressions = compositeStringExpression.getExpressions();
 
         for (Expression subExpression : subExpressions) {
             if (subExpression instanceof LiteralExpression) {
-                stringBuilder.append(subExpression.getValue());
+                sb.append(subExpression.getValue());
 
                 continue;
             } else if (subExpression instanceof SpelExpression) {
-                stringBuilder.append(evaluate(ACCESSOR_PREFIX + subExpression.getExpressionString() + SUFFIX, context));
+                sb.append(evaluate(ACCESSOR_PREFIX + subExpression.getExpressionString() + ACCESSOR_SUFFIX, context));
 
                 continue;
             }
@@ -138,7 +138,7 @@ public class Evaluator {
             throw new IllegalArgumentException("unknown expression type: " + subExpressionClass.getName());
         }
 
-        return stringBuilder.toString();
+        return sb.toString();
     }
 
     @Nullable
@@ -169,7 +169,7 @@ public class Evaluator {
                 }
 
                 expression = expressionParser.parseExpression(
-                    string, new TemplateParserContext(ACCESSOR_PREFIX, SUFFIX));
+                    string, new TemplateParserContext(ACCESSOR_PREFIX, ACCESSOR_SUFFIX));
             }
 
             if (expression instanceof CompositeStringExpression) { // attempt partial evaluation
@@ -225,13 +225,14 @@ public class Evaluator {
     }
 
     public static boolean validateTextExpression(String expression) {
-        Matcher placeholderMatcher = TEXT_EXPRESSION_PATTERN.matcher(expression);
+        Matcher accessorMatcher = TEXT_EXPRESSION_PATTERN.matcher(expression);
 
-        while (placeholderMatcher.find()) {
-            String placeholderContent = placeholderMatcher.group(1);
+        while (accessorMatcher.find()) {
+            String accessorContent = accessorMatcher.group(1);
 
-            if (!VALID_ACCESSOR_PATTERN.matcher(placeholderContent)
-                .matches()) {
+            Matcher validAccessorMatcher = VALID_ACCESSOR_PATTERN.matcher(accessorContent);
+
+            if (!validAccessorMatcher.matches()) {
                 return false;
             }
         }
