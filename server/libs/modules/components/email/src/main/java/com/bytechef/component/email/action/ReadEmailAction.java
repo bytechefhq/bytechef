@@ -16,9 +16,18 @@
 
 package com.bytechef.component.email.action;
 
-import com.bytechef.component.definition.ActionContext;
+import static com.bytechef.component.definition.Authorization.PASSWORD;
+import static com.bytechef.component.definition.Authorization.USERNAME;
 import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.string;
+import static com.bytechef.component.email.constant.EmailConstants.HOST;
+import static com.bytechef.component.email.constant.EmailConstants.PORT;
+import static com.bytechef.component.email.constant.EmailConstants.PROTOCOL;
+import static com.bytechef.component.email.constant.EmailConstants.SSL;
+import static com.bytechef.component.email.constant.EmailConstants.TLS;
+
+import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.email.EmailProtocol;
 import jakarta.mail.Authenticator;
@@ -29,23 +38,12 @@ import jakarta.mail.MessagingException;
 import jakarta.mail.PasswordAuthentication;
 import jakarta.mail.Session;
 import jakarta.mail.Store;
-
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Properties;
-
-import static com.bytechef.component.definition.Authorization.PASSWORD;
-import static com.bytechef.component.definition.Authorization.USERNAME;
-import static com.bytechef.component.email.constant.EmailConstants.PROTOCOL;
-import static com.bytechef.component.email.constant.EmailConstants.HOST;
-import static com.bytechef.component.email.constant.EmailConstants.PORT;
-import static com.bytechef.component.email.constant.EmailConstants.TLS;
-import static com.bytechef.component.email.constant.EmailConstants.SSL;
-
-import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 
 /**
  * @author Igor Beslic
@@ -71,7 +69,8 @@ public class ReadEmailAction {
                 .required(true),
             string(SUBJECT)
                 .label("Subject contains")
-                .description("Filters email messages where subject contains this keyword. Character matching is case insensitive.")
+                .description(
+                    "Filters email messages where subject contains this keyword. Character matching is case insensitive.")
                 .required(true))
         .perform(ReadEmailAction::perform);
 
@@ -92,14 +91,13 @@ public class ReadEmailAction {
                 }
             });
 
-
         } else {
             session = Session.getInstance(getProperties(emailProtocol, connectionParameters));
         }
 
         Store protocolStore = session.getStore(emailProtocol.name());
         protocolStore.connect(
-          connectionParameters.getRequiredString(HOST), connectionParameters.getRequiredString(USERNAME),
+            connectionParameters.getRequiredString(HOST), connectionParameters.getRequiredString(USERNAME),
             connectionParameters.getRequiredString(PASSWORD));
 
         Folder folder = protocolStore.getFolder("INBOX");
@@ -121,7 +119,8 @@ public class ReadEmailAction {
             filtered[i].put(CC, Arrays.toString(message.getRecipients(RecipientType.CC)));
             filtered[i].put(BCC, Arrays.toString(message.getRecipients(RecipientType.BCC)));
             filtered[i].put(SUBJECT, message.getSubject());
-            filtered[i].put(CONTENT, message.getContent().toString());
+            filtered[i].put(CONTENT, message.getContent()
+                .toString());
             filtered[i].put(CONTENT_TYPE, message.getContentType());
         }
 
@@ -135,7 +134,7 @@ public class ReadEmailAction {
     private static Properties getProperties(EmailProtocol protocol, Parameters connectionParameters) {
         Properties props = new Properties();
 
-        props.setProperty("mail.store.protocol",protocol.name());
+        props.setProperty("mail.store.protocol", protocol.name());
         props.setProperty("mail.debug", "true");
 
         if (Objects.equals(connectionParameters.getBoolean(TLS), false)) {
