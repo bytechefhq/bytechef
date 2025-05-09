@@ -110,8 +110,6 @@ public class ReadEmailAction {
         for (int i = 0; i < messages.length; i++) {
             Message message = messages[i];
 
-            Message msg = messages[i];
-
             filtered[i] = new HashMap<>();
 
             filtered[i].put(FROM, Arrays.toString(message.getFrom()));
