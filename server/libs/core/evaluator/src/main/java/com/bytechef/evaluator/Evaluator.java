@@ -149,6 +149,10 @@ public class Evaluator {
 
             string = string.trim();
 
+            if (string.equals(FORMULA_PREFIX)) {
+                return string;
+            }
+
             if (string.startsWith(FORMULA_PREFIX)) {
                 formulaExpression = true;
 
