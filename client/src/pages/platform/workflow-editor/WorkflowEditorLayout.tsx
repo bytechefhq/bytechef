@@ -29,7 +29,7 @@ import WorkflowEditor from './components/WorkflowEditor';
 import useWorkflowDataStore from './stores/useWorkflowDataStore';
 import useWorkflowNodeDetailsPanelStore from './stores/useWorkflowNodeDetailsPanelStore';
 
-const WorkflowEditorLayout = () => {
+const WorkflowEditorLayout = ({integrationId, projectId}: {integrationId?: number; projectId?: number}) => {
     const {copilotPanelOpen} = useCopilotStore();
     const {projectLeftSidebarOpen} = useProjectsLeftSidebarStore();
     const {rightSidebarOpen} = useRightSidebarStore();
@@ -157,7 +157,9 @@ const WorkflowEditorLayout = () => {
             />
 
             <WorkflowInputsSheet
+                integrationId={integrationId}
                 onSheetOpenChange={setShowWorkflowInputsSheet}
+                projectId={projectId}
                 sheetOpen={showWorkflowInputsSheet}
                 workflowTestConfiguration={workflowTestConfiguration}
             />
