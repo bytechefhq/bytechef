@@ -94,7 +94,7 @@ const Project = () => {
                                         updateWorkflowNodeParameterMutation,
                                     }}
                                 >
-                                    <WorkflowEditorLayout />
+                                    <WorkflowEditorLayout projectId={projectId} />
                                 </WorkflowNodeParameterMutationProvider>
                             </WorkflowMutationProvider>
                         </ConnectionReactQueryProvider>

@@ -9,12 +9,20 @@ import WorkflowInputsTable from './WorkflowInputsTable';
 import useWorkflowInputs from './hooks/useWorkflowInputs';
 
 interface WorkflowInputsSheetProps {
+    integrationId?: number;
     onSheetOpenChange: (open: boolean) => void;
+    projectId?: number;
     sheetOpen: boolean;
     workflowTestConfiguration?: WorkflowTestConfiguration;
 }
 
-const WorkflowInputsSheet = ({onSheetOpenChange, sheetOpen, workflowTestConfiguration}: WorkflowInputsSheetProps) => {
+const WorkflowInputsSheet = ({
+    integrationId,
+    onSheetOpenChange,
+    projectId,
+    sheetOpen,
+    workflowTestConfiguration,
+}: WorkflowInputsSheetProps) => {
     const {
         closeDeleteDialog,
         closeEditDialog,
@@ -27,7 +35,7 @@ const WorkflowInputsSheet = ({onSheetOpenChange, sheetOpen, workflowTestConfigur
         openEditDialog,
         saveWorkflowInput,
         workflow,
-    } = useWorkflowInputs(workflowTestConfiguration);
+    } = useWorkflowInputs({integrationId, projectId, workflowTestConfiguration});
 
     return (
         <Sheet onOpenChange={onSheetOpenChange} open={sheetOpen}>

@@ -2,7 +2,8 @@ import {useWorkflowMutation} from '@/pages/platform/workflow-editor/providers/wo
 import {SPACE} from '@/shared/constants';
 import {WorkflowInput, WorkflowTestConfiguration} from '@/shared/middleware/platform/configuration';
 import {useSaveWorkflowTestConfigurationInputsMutation} from '@/shared/mutations/platform/workflowTestConfigurations.mutations';
-import {WorkflowKeys} from '@/shared/queries/automation/workflows.queries';
+import {ProjectWorkflowKeys} from '@/shared/queries/automation/projectWorkflows.queries';
+import {IntegrationWorkflowKeys} from '@/shared/queries/embedded/integrationWorkflows.queries';
 import {WorkflowTestConfigurationKeys} from '@/shared/queries/platform/workflowTestConfigurations.queries';
 import {WorkflowDefinitionType, WorkflowInputType} from '@/shared/types';
 import {useQueryClient} from '@tanstack/react-query';
@@ -11,7 +12,17 @@ import {useForm} from 'react-hook-form';
 
 import useWorkflowDataStore from '../../../stores/useWorkflowDataStore';
 
-export default function useWorkflowInputs(workflowTestConfiguration?: WorkflowTestConfiguration) {
+interface UseWorkflowInputsProps {
+    integrationId?: number;
+    projectId?: number;
+    workflowTestConfiguration?: WorkflowTestConfiguration;
+}
+
+export default function useWorkflowInputs({
+    integrationId,
+    projectId,
+    workflowTestConfiguration,
+}: UseWorkflowInputsProps) {
     const [currentInputIndex, setCurrentInputIndex] = useState<number>(-1);
     const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
     const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
@@ -19,9 +30,9 @@ export default function useWorkflowInputs(workflowTestConfiguration?: WorkflowTe
     const queryClient = useQueryClient();
     const {updateWorkflowMutation} = useWorkflowMutation();
 
-    const {workflow} = useWorkflowDataStore();
+    const {setWorkflow, workflow} = useWorkflowDataStore();
 
-    const currentInput = workflow.inputs?.[currentInputIndex];
+    const currentInput = workflow?.inputs?.[currentInputIndex];
 
     let defaultValues: WorkflowInputType | undefined = undefined;
 
@@ -40,11 +51,11 @@ export default function useWorkflowInputs(workflowTestConfiguration?: WorkflowTe
 
     const saveWorkflowTestConfigurationInputsMutation = useSaveWorkflowTestConfigurationInputsMutation({
         onSuccess: () => {
+            closeEditDialog();
+
             queryClient.invalidateQueries({
                 queryKey: WorkflowTestConfigurationKeys.workflowTestConfiguration(workflow.id!),
             });
-
-            closeEditDialog();
         },
     });
 
@@ -124,7 +135,7 @@ export default function useWorkflowInputs(workflowTestConfiguration?: WorkflowTe
                 },
             },
             {
-                onSuccess: () => {
+                onSuccess: async () => {
                     if (!getValues().testValue) {
                         return;
                     }
@@ -138,6 +149,21 @@ export default function useWorkflowInputs(workflowTestConfiguration?: WorkflowTe
                         },
                         workflowId: workflow.id!,
                     });
+
+                    setWorkflow({
+                        ...workflow,
+                        inputs,
+                    });
+
+                    if (projectId) {
+                        queryClient.invalidateQueries({
+                            queryKey: ProjectWorkflowKeys.projectWorkflows(projectId),
+                        });
+                    } else if (integrationId) {
+                        queryClient.invalidateQueries({
+                            queryKey: IntegrationWorkflowKeys.integrationWorkflows(integrationId),
+                        });
+                    }
                 },
             }
         );
@@ -169,8 +195,17 @@ export default function useWorkflowInputs(workflowTestConfiguration?: WorkflowTe
             },
             {
                 onSuccess: () => {
-                    queryClient.invalidateQueries({
-                        queryKey: WorkflowKeys.workflow(workflow.id!),
+                    if (projectId) {
+                        queryClient.invalidateQueries({queryKey: ProjectWorkflowKeys.projectWorkflows(projectId)});
+                    } else if (integrationId) {
+                        queryClient.invalidateQueries({
+                            queryKey: IntegrationWorkflowKeys.integrationWorkflows(integrationId),
+                        });
+                    }
+
+                    setWorkflow({
+                        ...workflow,
+                        inputs,
                     });
 
                     setIsDeleteDialogOpen(false);
