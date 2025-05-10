@@ -1,0 +1,151 @@
+---
+title: "Webflow"
+description: "Webflow is a web design and development platform that allows users to build responsive websites visually without writing code."
+---
+
+Webflow is a web design and development platform that allows users to build responsive websites visually without writing code.
+
+
+Categories: Developer Tools
+
+
+Type: webflow/v1
+
+<hr />
+
+
+
+## Connections
+
+Version: 1
+
+
+### OAuth2 Authorization Code
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| clientId | Client Id | STRING |  | true |
+| clientSecret | Client Secret | STRING |  | true |
+
+
+
+
+
+<hr />
+
+
+
+## Actions
+
+
+### Fulfill Order
+Name: fulfillOrder
+
+Updates an order's status to fulfilled.
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| siteId | Site ID | STRING |  | true |
+| orderId | Order ID | STRING <details> <summary> Depends On </summary> siteId </details> |  | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Fulfill Order",
+  "name" : "fulfillOrder",
+  "parameters" : {
+    "siteId" : "",
+    "orderId" : ""
+  },
+  "type" : "webflow/v1/fulfillOrder"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| orderId | STRING | ID of the order. |
+| status | STRING | Status of the order. |
+
+
+
+
+#### Output Example
+```json
+{
+  "orderId" : "",
+  "status" : ""
+}
+```
+
+
+### Get Collection Item
+Name: getCollectionItem
+
+Get collection item in a collection.
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| siteId | Site ID | STRING |  | true |
+| collectionId | Collection ID | STRING <details> <summary> Depends On </summary> siteId </details> |  | true |
+| itemId | Item  ID | STRING <details> <summary> Depends On </summary> collectionId, siteId </details> |  | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Get Collection Item",
+  "name" : "getCollectionItem",
+  "parameters" : {
+    "siteId" : "",
+    "collectionId" : "",
+    "itemId" : ""
+  },
+  "type" : "webflow/v1/getCollectionItem"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| id | STRING | ID of the item. |
+| fieldData | OBJECT <details> <summary> Properties </summary> {STRING\(name), STRING\(slug)} </details> |  |
+
+
+
+
+#### Output Example
+```json
+{
+  "id" : "",
+  "fieldData" : {
+    "name" : "",
+    "slug" : ""
+  }
+}
+```
+
+
+
+

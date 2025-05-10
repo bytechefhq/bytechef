@@ -1,0 +1,9 @@
+{
+  "pages": [
+    "component",
+    "connection",
+    "action",
+    "trigger",
+    "property"
+  ]
+}

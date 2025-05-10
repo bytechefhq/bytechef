@@ -1,0 +1,167 @@
+---
+title: "Calendly"
+description: "Calendly is a scheduling tool that allows users to easily set up and manage appointments and meetings."
+---
+
+Calendly is a scheduling tool that allows users to easily set up and manage appointments and meetings.
+
+
+Categories: Productivity and Collaboration
+
+
+Type: calendly/v1
+
+<hr />
+
+
+
+## Connections
+
+Version: 1
+
+
+### OAuth2 Authorization Code
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| clientId | Client Id | STRING |  | true |
+| clientSecret | Client Secret | STRING |  | true |
+
+
+
+
+
+<hr />
+
+
+
+## Actions
+
+
+### Cancel Event
+Name: cancelEvent
+
+Cancels specified event.
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| eventId | Event | STRING | Event to be canceled. | true |
+| reason | Reason | STRING | Reason for cancellation. | false |
+| scope | Scope | STRING |  | false |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Cancel Event",
+  "name" : "cancelEvent",
+  "parameters" : {
+    "eventId" : "",
+    "reason" : "",
+    "scope" : ""
+  },
+  "type" : "calendly/v1/cancelEvent"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| body | OBJECT <details> <summary> Properties </summary> {STRING\(canceled_by), STRING\(reason), STRING\(canceler_type), DATE_TIME\(created_at)} </details> |  |
+
+
+
+
+#### Output Example
+```json
+{
+  "body" : {
+    "canceled_by" : "",
+    "reason" : "",
+    "canceler_type" : "",
+    "created_at" : "2021-01-01T00:00:00"
+  }
+}
+```
+
+
+
+
+## Triggers
+
+
+### Invitee Canceled
+Name: inviteeCanceled
+
+Triggers when an invitee cancels a scheduled event.
+
+Type: DYNAMIC_WEBHOOK
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| scope | Scope | STRING <details> <summary> Options </summary> user, organization </details> |  | true |
+
+
+#### Output
+
+The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
+
+#### JSON Example
+```json
+{
+  "label" : "Invitee Canceled",
+  "name" : "inviteeCanceled",
+  "parameters" : {
+    "scope" : ""
+  },
+  "type" : "calendly/v1/inviteeCanceled"
+}
+```
+
+
+### Invitee Created
+Name: inviteeCreated
+
+Triggers when an invitee schedules an event.
+
+Type: DYNAMIC_WEBHOOK
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| scope | Scope | STRING <details> <summary> Options </summary> user, organization </details> |  | true |
+
+
+#### Output
+
+The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
+
+#### JSON Example
+```json
+{
+  "label" : "Invitee Created",
+  "name" : "inviteeCreated",
+  "parameters" : {
+    "scope" : ""
+  },
+  "type" : "calendly/v1/inviteeCreated"
+}
+```
+
+
+<hr />
+

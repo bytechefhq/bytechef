@@ -1,0 +1,128 @@
+---
+title: "Resend"
+description: "Resend is the email API for developers."
+---
+
+Resend is the email API for developers.
+
+
+Categories: Marketing Automation
+
+
+Type: resend/v1
+
+<hr />
+
+
+
+## Connections
+
+Version: 1
+
+
+### Bearer Token
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| token | Token | STRING |  | true |
+
+
+
+
+
+<hr />
+
+
+
+## Actions
+
+
+### Send Email
+Name: sendEmail
+
+Send an email
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| from | From | STRING | Sender email address. | true |
+| to | To | ARRAY <details> <summary> Items </summary> [STRING\($email)] </details> | Recipients email addresses. | true |
+| subject | Subject | STRING | Email subject. | true |
+| bcc | Bcc | ARRAY <details> <summary> Items </summary> [STRING\($email)] </details> | Bcc recipients email addresses. | false |
+| cc | Cc | ARRAY <details> <summary> Items </summary> [STRING\($email)] </details> | Cc recipients email addresses. | false |
+| reply_to | Reply To | ARRAY <details> <summary> Items </summary> [STRING\($email)] </details> | Reply-to email addresses. | false |
+| contentType | Content Type | STRING <details> <summary> Options </summary> HTML, TEXT </details> |  | true |
+| html | HTML | STRING | The HTML version of the message. | false |
+| text | Text | STRING | The plain text version of the message. | false |
+| headers | Headers | OBJECT <details> <summary> Properties </summary> {} </details> | Custom headers to add to the email. | false |
+| attachments | Attachments | ARRAY <details> <summary> Items </summary> [FILE_ENTRY] </details> | A list of attachments to send with the email. | false |
+| tags | | ARRAY <details> <summary> Items </summary> [{STRING\(name), STRING\(value)}] </details> |  | false |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Send Email",
+  "name" : "sendEmail",
+  "parameters" : {
+    "from" : "",
+    "to" : [ "" ],
+    "subject" : "",
+    "bcc" : [ "" ],
+    "cc" : [ "" ],
+    "reply_to" : [ "" ],
+    "contentType" : "",
+    "html" : "",
+    "text" : "",
+    "headers" : { },
+    "attachments" : [ {
+      "extension" : "",
+      "mimeType" : "",
+      "name" : "",
+      "url" : ""
+    } ],
+    "tags" : [ {
+      "name" : "",
+      "value" : ""
+    } ]
+  },
+  "type" : "resend/v1/sendEmail"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| id | STRING |  |
+
+
+
+
+#### Output Example
+```json
+{
+  "id" : ""
+}
+```
+
+
+
+
+<hr />
+
+# Additional instructions
+<hr />
+
+## CONNECTION
+
+[API key location](https://resend.com/api-keys)

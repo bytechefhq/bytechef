@@ -1,0 +1,195 @@
+---
+title: "Salesflare"
+description: "Salesflare is a CRM software designed to help small businesses and startups manage their customer relationships efficiently."
+---
+
+Salesflare is a CRM software designed to help small businesses and startups manage their customer relationships efficiently.
+
+
+Categories: CRM
+
+
+Type: salesflare/v1
+
+<hr />
+
+
+
+## Connections
+
+Version: 1
+
+
+### Bearer Token
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| token | Token | STRING |  | true |
+
+
+
+
+
+<hr />
+
+
+
+## Actions
+
+
+### Create Account
+Name: createAccount
+
+Creates new account.
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| name | Name | STRING | Account name | true |
+| website | Website | STRING | Account website | false |
+| description | Description | STRING | Account description | false |
+| email | Email | STRING |  | false |
+| phone_number | Phone Number | STRING |  | false |
+| social_profiles | Social Profiles | ARRAY <details> <summary> Items </summary> [STRING] </details> | Social profile URL | false |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Create Account",
+  "name" : "createAccount",
+  "parameters" : {
+    "name" : "",
+    "website" : "",
+    "description" : "",
+    "email" : "",
+    "phone_number" : "",
+    "social_profiles" : [ "" ]
+  },
+  "type" : "salesflare/v1/createAccount"
+}
+```
+
+#### Output
+
+This action does not produce any output.
+
+
+
+
+### Create Contacts
+Name: createContacts
+
+Creates new contacts.
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| contacts | Contacts | ARRAY <details> <summary> Items </summary> [{STRING\(email), STRING\(firstname), STRING\(lastname), STRING\(phone_number), STRING\(mobile_phone_number), STRING\(home_phone_number), STRING\(fax_number), [STRING]\(social_profiles)}] </details> |  | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Create Contacts",
+  "name" : "createContacts",
+  "parameters" : {
+    "contacts" : [ {
+      "email" : "",
+      "firstname" : "",
+      "lastname" : "",
+      "phone_number" : "",
+      "mobile_phone_number" : "",
+      "home_phone_number" : "",
+      "fax_number" : "",
+      "social_profiles" : [ "" ]
+    } ]
+  },
+  "type" : "salesflare/v1/createContacts"
+}
+```
+
+#### Output
+
+
+
+Type: ARRAY
+
+
+Items Type: OBJECT
+
+
+#### Properties
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| id | INTEGER | ID of the contact. |
+
+
+
+
+
+#### Output Example
+```json
+[ {
+  "id" : 1
+} ]
+```
+
+
+### Create Tasks
+Name: createTasks
+
+Creates new tasks.
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| tasks | Tasks | ARRAY <details> <summary> Items </summary> [{STRING\(description), DATE\(reminder_date)}] </details> |  | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Create Tasks",
+  "name" : "createTasks",
+  "parameters" : {
+    "tasks" : [ {
+      "description" : "",
+      "reminder_date" : "2021-01-01"
+    } ]
+  },
+  "type" : "salesflare/v1/createTasks"
+}
+```
+
+#### Output
+
+
+
+Type: ARRAY
+
+
+Items Type: OBJECT
+
+
+#### Properties
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| id | INTEGER | ID of the task. |
+
+
+
+
+
+#### Output Example
+```json
+[ {
+  "id" : 1
+} ]
+```
+
+
+
+

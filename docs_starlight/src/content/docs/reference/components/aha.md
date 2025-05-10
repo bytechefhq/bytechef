@@ -1,0 +1,230 @@
+---
+title: "Aha!"
+description: "Aha! is a comprehensive product management software platform that helps teams set strategy, capture ideas, and plan, prioritize, and track work to build products customers love."
+---
+
+Aha! is a comprehensive product management software platform that helps teams set strategy, capture ideas, and plan, prioritize, and track work to build products customers love.
+
+
+Categories: Productivity and Collaboration
+
+
+Type: aha/v1
+
+<hr />
+
+
+
+## Connections
+
+Version: 1
+
+
+### OAuth2 Authorization Code
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| subdomain | Subdomain | STRING | The subdomain of your Aha! account. For example, if your Aha! URL is https://mycompany.aha.io, then the subdomain is mycompany. | true |
+| clientId | Client Id | STRING |  | true |
+| clientSecret | Client Secret | STRING |  | true |
+
+
+
+
+
+<hr />
+
+
+
+## Actions
+
+
+### Create Feature
+Name: createFeature
+
+Creates a new feature.
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| productId | Product ID | STRING | ID of the product to which the release belongs. | true |
+| releaseId | Release ID | STRING <details> <summary> Depends On </summary> productId </details> | Numeric ID or key of the release. | true |
+| name | Name | STRING | Name of the feature. | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Create Feature",
+  "name" : "createFeature",
+  "parameters" : {
+    "productId" : "",
+    "releaseId" : "",
+    "name" : ""
+  },
+  "type" : "aha/v1/createFeature"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| feature | OBJECT <details> <summary> Properties </summary> {STRING\(id), STRING\(name), STRING\(reference_num), STRING\(release_reference_num), INTEGER\(position), INTEGER\(score), DATE_TIME\(created_at), DATE_TIME\(updated_at), STRING\(product_id), INTEGER\(progress), STRING\(progress_source), DATE\(status_changed_on), {STRING\(id), STRING\(name), STRING\(email), DATE_TIME\(created_at), DATE_TIME\(updated_at)}\(created_by_user), {STRING\(id), STRING\(name)}\(workflow_kind), {STRING\(id), STRING\(name), INTEGER\(position), BOOLEAN\(complete), STRING\(color)}\(workflow_status)} </details> |  |
+
+
+
+
+#### Output Example
+```json
+{
+  "feature" : {
+    "id" : "",
+    "name" : "",
+    "reference_num" : "",
+    "release_reference_num" : "",
+    "position" : 1,
+    "score" : 1,
+    "created_at" : "2021-01-01T00:00:00",
+    "updated_at" : "2021-01-01T00:00:00",
+    "product_id" : "",
+    "progress" : 1,
+    "progress_source" : "",
+    "status_changed_on" : "2021-01-01",
+    "created_by_user" : {
+      "id" : "",
+      "name" : "",
+      "email" : "",
+      "created_at" : "2021-01-01T00:00:00",
+      "updated_at" : "2021-01-01T00:00:00"
+    },
+    "workflow_kind" : {
+      "id" : "",
+      "name" : ""
+    },
+    "workflow_status" : {
+      "id" : "",
+      "name" : "",
+      "position" : 1,
+      "complete" : false,
+      "color" : ""
+    }
+  }
+}
+```
+
+
+### Create Ides
+Name: createIdea
+
+Creates a new idea.
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| productId | Product ID | STRING | Numeric ID or key of the product. | true |
+| name | Name | STRING | Name of the idea. | true |
+| description | Description | STRING | Description of the idea. | false |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Create Ides",
+  "name" : "createIdea",
+  "parameters" : {
+    "productId" : "",
+    "name" : "",
+    "description" : ""
+  },
+  "type" : "aha/v1/createIdea"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| idea | OBJECT <details> <summary> Properties </summary> {STRING\(id), STRING\(name), STRING\(reference_number), INTEGER\(score), DATE_TIME\(created_at), DATE_TIME\(updated_at), STRING\(product_id), INTEGER\(votes), INTEGER\(initial_votes), DATE_TIME\(status_changed_at), {STRING\(id), STRING\(name), INTEGER\(position), BOOLEAN\(complete), STRING\(color)}\(workflow_status), {STRING\(id), STRING\(body), DATE_TIME\(created_at), DATE_TIME\(updated_at)}\(description), STRING\(visibility), STRING\(url), STRING\(resource), {STRING\(id), STRING\(reference_prefix), STRING\(name), BOOLEAN\(product_line), DATE_TIME\(created_at), STRING\(workspace_type), STRING\(url)}\(product), {STRING\(id), STRING\(name), STRING\(email), DATE_TIME\(created_at), DATE_TIME\(updated_at)}\(created_by_user), INTEGER\(endorsements_count), INTEGER\(comments_count), [{STRING\(status_id), STRING\(status_name), DATE_TIME\(started_at), DATE_TIME\(ended_at)}]\(workflow_status_times), STRING\(submitted_idea_portal_record_url)} </details> |  |
+
+
+
+
+#### Output Example
+```json
+{
+  "idea" : {
+    "id" : "",
+    "name" : "",
+    "reference_number" : "",
+    "score" : 1,
+    "created_at" : "2021-01-01T00:00:00",
+    "updated_at" : "2021-01-01T00:00:00",
+    "product_id" : "",
+    "votes" : 1,
+    "initial_votes" : 1,
+    "status_changed_at" : "2021-01-01T00:00:00",
+    "workflow_status" : {
+      "id" : "",
+      "name" : "",
+      "position" : 1,
+      "complete" : false,
+      "color" : ""
+    },
+    "description" : {
+      "id" : "",
+      "body" : "",
+      "created_at" : "2021-01-01T00:00:00",
+      "updated_at" : "2021-01-01T00:00:00"
+    },
+    "visibility" : "",
+    "url" : "",
+    "resource" : "",
+    "product" : {
+      "id" : "",
+      "reference_prefix" : "",
+      "name" : "",
+      "product_line" : false,
+      "created_at" : "2021-01-01T00:00:00",
+      "workspace_type" : "",
+      "url" : ""
+    },
+    "created_by_user" : {
+      "id" : "",
+      "name" : "",
+      "email" : "",
+      "created_at" : "2021-01-01T00:00:00",
+      "updated_at" : "2021-01-01T00:00:00"
+    },
+    "endorsements_count" : 1,
+    "comments_count" : 1,
+    "workflow_status_times" : [ {
+      "status_id" : "",
+      "status_name" : "",
+      "started_at" : "2021-01-01T00:00:00",
+      "ended_at" : "2021-01-01T00:00:00"
+    } ],
+    "submitted_idea_portal_record_url" : ""
+  }
+}
+```
+
+
+
+

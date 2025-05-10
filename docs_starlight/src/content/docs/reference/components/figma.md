@@ -1,0 +1,160 @@
+---
+title: "Figma"
+description: "Figma is a cloud-based design and prototyping tool that enables teams to collaborate in real-time on user interface and user experience projects."
+---
+
+Figma is a cloud-based design and prototyping tool that enables teams to collaborate in real-time on user interface and user experience projects.
+
+
+Categories: Productivity and Collaboration
+
+
+Type: figma/v1
+
+<hr />
+
+
+
+## Connections
+
+Version: 1
+
+
+### OAuth2 Authorization Code
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| clientId | Client Id | STRING |  | true |
+| clientSecret | Client Secret | STRING |  | true |
+
+
+
+
+
+<hr />
+
+
+
+## Actions
+
+
+### Get Comments
+Name: getComments
+
+Gets a list of comments left on the file.
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| fileKey | File Key | STRING | File to get comments from. Figma file key copy from Figma file URL. | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Get Comments",
+  "name" : "getComments",
+  "parameters" : {
+    "fileKey" : ""
+  },
+  "type" : "figma/v1/getComments"
+}
+```
+
+#### Output
+
+
+
+Type: ARRAY
+
+
+Items Type: OBJECT
+
+
+#### Properties
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| id | STRING | ID of the comment. |
+| file_key | STRING | File key of the file the comment is on. |
+| parent_id | STRING | ID of comment this comment is a reply to. |
+| user | OBJECT <details> <summary> Properties </summary> {STRING\(id), STRING\(handle), STRING\(img_url), STRING\(email)} </details> | User who posted the comment. |
+
+
+
+
+
+#### Output Example
+```json
+[ {
+  "id" : "",
+  "file_key" : "",
+  "parent_id" : "",
+  "user" : {
+    "id" : "",
+    "handle" : "",
+    "img_url" : "",
+    "email" : ""
+  }
+} ]
+```
+
+
+### Post Comment
+Name: postComment
+
+Posts a new comment on the file.
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| fileKey | File Key | STRING | File to add comments in. Figma file key copy from Figma file URL. | true |
+| message | Comment | STRING | Comment to post on the file. | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Post Comment",
+  "name" : "postComment",
+  "parameters" : {
+    "fileKey" : "",
+    "message" : ""
+  },
+  "type" : "figma/v1/postComment"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| id | STRING | ID of the comment. |
+| file_key | STRING | File key of the file the comment is on. |
+| parent_id | STRING | ID of comment this comment is a reply to. |
+| message | STRING | Message of the comment. |
+
+
+
+
+#### Output Example
+```json
+{
+  "id" : "",
+  "file_key" : "",
+  "parent_id" : "",
+  "message" : ""
+}
+```
+
+
+
+

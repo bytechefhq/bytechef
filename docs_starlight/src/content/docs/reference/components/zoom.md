@@ -1,0 +1,286 @@
+---
+title: "Zoom"
+description: "Zoom is a cloud-based video conferencing platform that enables virtual meetings, webinars, and collaboration through video, audio, and chat."
+---
+
+Zoom is a cloud-based video conferencing platform that enables virtual meetings, webinars, and collaboration through video, audio, and chat.
+
+
+Categories: Communication
+
+
+Type: zoom/v1
+
+<hr />
+
+
+
+## Connections
+
+Version: 1
+
+
+### OAuth2 Authorization Code
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| clientId | Client Id | STRING |  | true |
+| clientSecret | Client Secret | STRING |  | true |
+
+
+
+
+
+<hr />
+
+
+
+## Actions
+
+
+### Create Meeting
+Name: createMeeting
+
+Creates a meeting.
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| topic | Topic | STRING | The meeting's topic. | true |
+| duration | Duration | NUMBER | Duration of the meeting in minutes. | false |
+| auto_recording | Auto Recording | STRING <details> <summary> Options </summary> local, cloud, none </details> |  | false |
+| audio | Audio | STRING <details> <summary> Options </summary> both, telephony, voip, thirdParty </details> | How participants join the audio portion of the meeting. | false |
+| agenda | Agenda | STRING | The meeting's agenda. This value has a maximum length of 2,000 characters. | false |
+| password | Password | STRING | The password required to join the meeting. By default, a password can only have a maximum length of 10 characters and only contain alphanumeric characters and the @, -, _, and * characters. | false |
+| settings | Settings | OBJECT <details> <summary> Properties </summary> {STRING\(schedule_for), INTEGER\(approval_type)} </details> |  | false |
+| join_url | Join Url | STRING | URL for participants to join the meeting. | false |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Create Meeting",
+  "name" : "createMeeting",
+  "parameters" : {
+    "topic" : "",
+    "duration" : 0.0,
+    "auto_recording" : "",
+    "audio" : "",
+    "agenda" : "",
+    "password" : "",
+    "settings" : {
+      "schedule_for" : "",
+      "approval_type" : 1
+    },
+    "join_url" : ""
+  },
+  "type" : "zoom/v1/createMeeting"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| assistant_id | STRING | Unique ID of the assistant. |
+| host_email | STRING | Email of the host. |
+| id | INTEGER | ID of the meeting. |
+| registration_url | STRING | URL for meeting registration. |
+| agenda | STRING | Agenda of the meeting. |
+| created_at | STRING | Creation time of the meeting. |
+| duration | INTEGER | Duration of the meeting in minutes. |
+| encrypted_password | STRING | Encrypted meeting password. |
+| pstn_password | STRING | PSTN password for phone participants. |
+| h323_password | STRING | H.323/SIP room system password. |
+| join_url | STRING | URL to join the meeting. |
+| chat_join_url | STRING | Chat join URL for the meeting. |
+| occurrences | ARRAY <details> <summary> Items </summary> [{INTEGER\(duration), STRING\(occurrence_id), STRING\(start_time), STRING\(status)}] </details> |  |
+| password | STRING | Password to join the meeting. |
+| pmi | STRING | Personal Meeting ID. |
+| pre_schedule | BOOLEAN <details> <summary> Options </summary> true, false </details> | Indicates if meeting is prescheduled. |
+| recurrence | OBJECT <details> <summary> Properties </summary> {STRING\(end_date_time), INTEGER\(end_times), INTEGER\(monthly_day), INTEGER\(monthly_week), INTEGER\(monthly_week_day), INTEGER\(repeat_interval), INTEGER\(type), STRING\(weekly_days)} </details> |  |
+| settings | OBJECT <details> <summary> Properties </summary> {} </details> | Meeting settings configuration. |
+| start_time | STRING | Scheduled start time. |
+| start_url | STRING | URL for host to start the meeting. |
+| timezone | STRING | Meeting timezone. |
+| topic | STRING | Meeting topic. |
+| tracking_fields | ARRAY <details> <summary> Items </summary> [{STRING\(field), STRING\(value), BOOLEAN\(visible)}] </details> |  |
+| type | INTEGER | Type of meeting. |
+| dynamic_host_key | STRING | Dynamic host key for the meeting. |
+| creation_source | STRING | Source of creation (e.g., open_api). |
+
+
+
+
+#### Output Example
+```json
+{
+  "assistant_id" : "",
+  "host_email" : "",
+  "id" : 1,
+  "registration_url" : "",
+  "agenda" : "",
+  "created_at" : "",
+  "duration" : 1,
+  "encrypted_password" : "",
+  "pstn_password" : "",
+  "h323_password" : "",
+  "join_url" : "",
+  "chat_join_url" : "",
+  "occurrences" : [ {
+    "duration" : 1,
+    "occurrence_id" : "",
+    "start_time" : "",
+    "status" : ""
+  } ],
+  "password" : "",
+  "pmi" : "",
+  "pre_schedule" : false,
+  "recurrence" : {
+    "end_date_time" : "",
+    "end_times" : 1,
+    "monthly_day" : 1,
+    "monthly_week" : 1,
+    "monthly_week_day" : 1,
+    "repeat_interval" : 1,
+    "type" : 1,
+    "weekly_days" : ""
+  },
+  "settings" : { },
+  "start_time" : "",
+  "start_url" : "",
+  "timezone" : "",
+  "topic" : "",
+  "tracking_fields" : [ {
+    "field" : "",
+    "value" : "",
+    "visible" : false
+  } ],
+  "type" : 1,
+  "dynamic_host_key" : "",
+  "creation_source" : ""
+}
+```
+
+
+### Add Meeting Registrant
+Name: addMeetingRegistrant
+
+Create and submit a user's registration to a meeting.
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| meetingId | Meeting ID | INTEGER | ID of the meeting where the registrant will be added. | true |
+| first_name | First Name | STRING | First name of the registrant. | true |
+| last_name | Last Name | STRING | Last name of the registrant. | false |
+| email | Email | STRING | Email of the registrant. | true |
+| address | Address | STRING | Address of the registrant. | false |
+| city | City | STRING | City of the registrant. | false |
+| state | State | STRING |  | false |
+| zip | Zip | STRING |  | false |
+| country | Country | STRING | Country of the registrant. | false |
+| phone | Phone | STRING | Phone number of the registrant. | false |
+| comments | Comments | STRING | Additional comment about the registrant. | false |
+| industry | Industry | STRING |  | false |
+| job_title | Job Title | STRING |  | false |
+| no_of_employees | Number of Employees | STRING <details> <summary> Options </summary> 1-20, 21-50, 51-100, 101-500, 501-1,000, 1,001-5,000, 5,001-10,000, More than 10,000 </details> |  | false |
+| org | Organization | STRING |  | false |
+| purchasing_time_frame | Purchasing Time Frame | STRING <details> <summary> Options </summary> Within a month, 1-3 months, 4-6 months, More than 6 months, No timeframe </details> |  | false |
+| role_in_purchase_process | Role In Purchase Process | STRING <details> <summary> Options </summary> Decision Maker, Evaluator/Recommender, Influencer, Not involved </details> |  | false |
+| language | Language | STRING |  | false |
+| auto_approve | Auto Approve | BOOLEAN <details> <summary> Options </summary> true, false </details> |  | false |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Add Meeting Registrant",
+  "name" : "addMeetingRegistrant",
+  "parameters" : {
+    "meetingId" : 1,
+    "first_name" : "",
+    "last_name" : "",
+    "email" : "",
+    "address" : "",
+    "city" : "",
+    "state" : "",
+    "zip" : "",
+    "country" : "",
+    "phone" : "",
+    "comments" : "",
+    "industry" : "",
+    "job_title" : "",
+    "no_of_employees" : "",
+    "org" : "",
+    "purchasing_time_frame" : "",
+    "role_in_purchase_process" : "",
+    "language" : "",
+    "auto_approve" : false
+  },
+  "type" : "zoom/v1/addMeetingRegistrant"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| id | INTEGER | ID of the meeting. |
+| join_url | STRING | Join URL for the meeting. |
+| registrant_id | STRING | ID of the user that registered for the meeting. |
+| start_time | STRING | Start time of the meeting. |
+| topic | STRING | Topic of the meeting. |
+| occurrences | ARRAY <details> <summary> Items </summary> [{INTEGER\(duration), STRING\(occurrence_id), STRING\(start_time), STRING\(status)}] </details> |  |
+| participant_pin_code | INTEGER | Pin code for participation. |
+
+
+
+
+#### Output Example
+```json
+{
+  "id" : 1,
+  "join_url" : "",
+  "registrant_id" : "",
+  "start_time" : "",
+  "topic" : "",
+  "occurrences" : [ {
+    "duration" : 1,
+    "occurrence_id" : "",
+    "start_time" : "",
+    "status" : ""
+  } ],
+  "participant_pin_code" : 1
+}
+```
+
+
+
+
+<hr />
+
+# Additional instructions
+<hr />
+
+1. Go to [marketplace.zoom.us](https://marketplace.zoom.us/) and log in to your account.
+2. In the upper-right corner, click **Develop** then **Build App**.
+3. Select **General App**.
+4. Copy the Client ID and Client Secret.Add Redirect URL and press continue.
+5. Go to **Scopes** from left side bar and add **meeting:write:meeting** and **meeting:write:registrant** as scopes.`,

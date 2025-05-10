@@ -1,0 +1,202 @@
+---
+title: "Affinity"
+description: "Affinity is a customer relationship management (CRM) platform that leverages relationship intelligence to help businesses strengthen connections and drive engagement with client and prospects."
+---
+
+Affinity is a customer relationship management (CRM) platform that leverages relationship intelligence to help businesses strengthen connections and drive engagement with client and prospects.
+
+
+Categories: CRM
+
+
+Type: affinity/v1
+
+<hr />
+
+
+
+## Connections
+
+Version: 1
+
+
+### Bearer Token
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| token | Token | STRING |  | true |
+
+
+
+
+
+<hr />
+
+
+
+## Actions
+
+
+### Create Opportunity
+Name: createOpportunity
+
+Creates a new opportunity.
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| name | Name | STRING | The name of the opportunity. | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Create Opportunity",
+  "name" : "createOpportunity",
+  "parameters" : {
+    "name" : ""
+  },
+  "type" : "affinity/v1/createOpportunity"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| id | STRING | The ID of the newly created opportunity. |
+| name | STRING | The name of the newly created opportunity. |
+
+
+
+
+#### Output Example
+```json
+{
+  "id" : "",
+  "name" : ""
+}
+```
+
+
+### Create Organization
+Name: createOrganization
+
+Creates a new organization.
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| name | Name | STRING | The name of the organization. | true |
+| domain | Domain | STRING | The domain name of the organization. | false |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Create Organization",
+  "name" : "createOrganization",
+  "parameters" : {
+    "name" : "",
+    "domain" : ""
+  },
+  "type" : "affinity/v1/createOrganization"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| id | STRING | The ID of the organization. |
+| name | STRING | The name of the organization. |
+| domain | STRING | The domain name of the organization. |
+
+
+
+
+#### Output Example
+```json
+{
+  "id" : "",
+  "name" : "",
+  "domain" : ""
+}
+```
+
+
+### Create Person
+Name: createPerson
+
+Creates a new person.
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| first_name | First Name | STRING | The first name of the person. | true |
+| last_name | Last Name | STRING | The last name of the person. | true |
+| emails | Emails | ARRAY <details> <summary> Items </summary> [STRING] </details> | The email addresses of the person. | false |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Create Person",
+  "name" : "createPerson",
+  "parameters" : {
+    "first_name" : "",
+    "last_name" : "",
+    "emails" : [ "" ]
+  },
+  "type" : "affinity/v1/createPerson"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| id | STRING | The ID of the person. |
+| first_name | STRING | The first name of the person. |
+| last_name | STRING | The last name of the person. |
+| emails | ARRAY <details> <summary> Items </summary> [STRING] </details> | The email addresses of the person. |
+
+
+
+
+#### Output Example
+```json
+{
+  "id" : "",
+  "first_name" : "",
+  "last_name" : "",
+  "emails" : [ "" ]
+}
+```
+
+
+
+

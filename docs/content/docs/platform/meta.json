@@ -1,0 +1,14 @@
+{
+  "title": "Platform",
+  "description": "The platform overview",
+  "icon": "Building",
+  "root": true,
+  "pages": [
+    "---Getting Started---",
+    "index",
+    "what-is-bytechef",
+    "deployment",
+    "---Products---",
+    "automation",
+    "embedded"]
+}

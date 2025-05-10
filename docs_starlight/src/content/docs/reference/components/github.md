@@ -1,0 +1,712 @@
+---
+title: "GitHub"
+description: "GitHub is a web-based platform for version control and collaboration using Git."
+---
+
+GitHub is a web-based platform for version control and collaboration using Git.
+
+
+Categories: Developer Tools
+
+
+Type: github/v1
+
+<hr />
+
+
+
+## Connections
+
+Version: 1
+
+
+### OAuth2 Authorization Code
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| clientId | Client id | STRING |  | true |
+| clientSecret | Client secret | STRING |  | true |
+
+
+
+
+
+<hr />
+
+
+
+## Actions
+
+
+### Add Assignee to Issue
+Name: addAssigneesToIssue
+
+Adds an assignees to the specified issue.
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| repository | Repository | STRING |  | true |
+| issue | Issue Number | STRING <details> <summary> Depends On </summary> repository </details> | The number of the issue to add assignee to. | true |
+| assignees | Assignees | ARRAY <details> <summary> Items </summary> [STRING] </details> | The list of assignees to add to the issue. | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Add Assignee to Issue",
+  "name" : "addAssigneesToIssue",
+  "parameters" : {
+    "repository" : "",
+    "issue" : "",
+    "assignees" : [ "" ]
+  },
+  "type" : "github/v1/addAssigneesToIssue"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| url | STRING | The URL linking directly to the issue on GitHub. |
+| repository_url | STRING | The URL of the repository where the issue is located. |
+| id | NUMBER | ID of the issue. |
+| number | INTEGER | A unique number identifying the issue within its repository. |
+| title | STRING | The title or headline of the issue. |
+| state | STRING | The current state of the issue, such as open or closed. |
+| assignees | ARRAY <details> <summary> Items </summary> [{STRING\(login), STRING\(id), STRING\(html_url), STRING\(type)}] </details> | A list of users assigned to the issue. |
+| labels | ARRAY <details> <summary> Items </summary> [{STRING\(id), STRING\(name), STRING\(description)}] </details> | A collection of labels associated with the issue. |
+| body | STRING | The main content of the issue. |
+
+
+
+
+#### Output Example
+```json
+{
+  "url" : "",
+  "repository_url" : "",
+  "id" : 0.0,
+  "number" : 1,
+  "title" : "",
+  "state" : "",
+  "assignees" : [ {
+    "login" : "",
+    "id" : "",
+    "html_url" : "",
+    "type" : ""
+  } ],
+  "labels" : [ {
+    "id" : "",
+    "name" : "",
+    "description" : ""
+  } ],
+  "body" : ""
+}
+```
+
+
+### Add Labels to Issue
+Name: addLabelsToIssue
+
+Adds labels to the specified issue.
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| repository | Repository | STRING |  | true |
+| issue | Issue Number | STRING <details> <summary> Depends On </summary> repository </details> | The number of the issue to add labels to. | true |
+| labels | Labels | ARRAY <details> <summary> Items </summary> [STRING] </details> | The list of labels to add to the issue. | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Add Labels to Issue",
+  "name" : "addLabelsToIssue",
+  "parameters" : {
+    "repository" : "",
+    "issue" : "",
+    "labels" : [ "" ]
+  },
+  "type" : "github/v1/addLabelsToIssue"
+}
+```
+
+#### Output
+
+
+
+Type: ARRAY
+
+
+Items Type: OBJECT
+
+
+#### Properties
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| id | STRING | ID of the label |
+| name | STRING | Name of the label. |
+| description | STRING | Description of the label. |
+| color | STRING | The hexadecimal color code for the label, without the leading #. |
+
+
+
+
+
+#### Output Example
+```json
+[ {
+  "id" : "",
+  "name" : "",
+  "description" : "",
+  "color" : ""
+} ]
+```
+
+
+### Create Comment on Issue
+Name: createCommentOnIssue
+
+Adds a comment to the specified issue.
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| repository | Repository | STRING |  | true |
+| issue | Issue Number | STRING <details> <summary> Depends On </summary> repository </details> | The number of the issue to comment on. | true |
+| body | Comment | STRING | The comment to add to the issue. | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Create Comment on Issue",
+  "name" : "createCommentOnIssue",
+  "parameters" : {
+    "repository" : "",
+    "issue" : "",
+    "body" : ""
+  },
+  "type" : "github/v1/createCommentOnIssue"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| url | STRING | The URL linking directly to the issue on GitHub. |
+| repository_url | STRING | The URL of the repository where the issue is located. |
+| id | NUMBER | ID of the issue. |
+| number | INTEGER | A unique number identifying the issue within its repository. |
+| title | STRING | The title or headline of the issue. |
+| state | STRING | The current state of the issue, such as open or closed. |
+| assignees | ARRAY <details> <summary> Items </summary> [{STRING\(login), STRING\(id), STRING\(html_url), STRING\(type)}] </details> | A list of users assigned to the issue. |
+| labels | ARRAY <details> <summary> Items </summary> [{STRING\(id), STRING\(name), STRING\(description)}] </details> | A collection of labels associated with the issue. |
+| body | STRING | The main content of the issue. |
+
+
+
+
+#### Output Example
+```json
+{
+  "url" : "",
+  "repository_url" : "",
+  "id" : 0.0,
+  "number" : 1,
+  "title" : "",
+  "state" : "",
+  "assignees" : [ {
+    "login" : "",
+    "id" : "",
+    "html_url" : "",
+    "type" : ""
+  } ],
+  "labels" : [ {
+    "id" : "",
+    "name" : "",
+    "description" : ""
+  } ],
+  "body" : ""
+}
+```
+
+
+### Create Issue
+Name: createIssue
+
+Create Issue in GitHub Repository
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| repository | Repository | STRING | Repository where new issue will be created. | true |
+| title | Title | STRING | Title of the issue. | false |
+| body | Description | STRING | The description of the issue. | false |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Create Issue",
+  "name" : "createIssue",
+  "parameters" : {
+    "repository" : "",
+    "title" : "",
+    "body" : ""
+  },
+  "type" : "github/v1/createIssue"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| url | STRING | The URL linking directly to the issue on GitHub. |
+| repository_url | STRING | The URL of the repository where the issue is located. |
+| id | NUMBER | ID of the issue. |
+| number | INTEGER | A unique number identifying the issue within its repository. |
+| title | STRING | The title or headline of the issue. |
+| state | STRING | The current state of the issue, such as open or closed. |
+| assignees | ARRAY <details> <summary> Items </summary> [{STRING\(login), STRING\(id), STRING\(html_url), STRING\(type)}] </details> | A list of users assigned to the issue. |
+| labels | ARRAY <details> <summary> Items </summary> [{STRING\(id), STRING\(name), STRING\(description)}] </details> | A collection of labels associated with the issue. |
+| body | STRING | The main content of the issue. |
+
+
+
+
+#### Output Example
+```json
+{
+  "url" : "",
+  "repository_url" : "",
+  "id" : 0.0,
+  "number" : 1,
+  "title" : "",
+  "state" : "",
+  "assignees" : [ {
+    "login" : "",
+    "id" : "",
+    "html_url" : "",
+    "type" : ""
+  } ],
+  "labels" : [ {
+    "id" : "",
+    "name" : "",
+    "description" : ""
+  } ],
+  "body" : ""
+}
+```
+
+
+### Get Issue
+Name: getIssue
+
+Get information from a specific issue
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| repository | Repository | STRING |  | true |
+| issue | Issue Number | STRING <details> <summary> Depends On </summary> repository </details> | The number of the issue you want to get details from. | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Get Issue",
+  "name" : "getIssue",
+  "parameters" : {
+    "repository" : "",
+    "issue" : ""
+  },
+  "type" : "github/v1/getIssue"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| url | STRING | The URL linking directly to the issue on GitHub. |
+| repository_url | STRING | The URL of the repository where the issue is located. |
+| id | NUMBER | ID of the issue. |
+| number | INTEGER | A unique number identifying the issue within its repository. |
+| title | STRING | The title or headline of the issue. |
+| state | STRING | The current state of the issue, such as open or closed. |
+| assignees | ARRAY <details> <summary> Items </summary> [{STRING\(login), STRING\(id), STRING\(html_url), STRING\(type)}] </details> | A list of users assigned to the issue. |
+| labels | ARRAY <details> <summary> Items </summary> [{STRING\(id), STRING\(name), STRING\(description)}] </details> | A collection of labels associated with the issue. |
+| body | STRING | The main content of the issue. |
+
+
+
+
+#### Output Example
+```json
+{
+  "url" : "",
+  "repository_url" : "",
+  "id" : 0.0,
+  "number" : 1,
+  "title" : "",
+  "state" : "",
+  "assignees" : [ {
+    "login" : "",
+    "id" : "",
+    "html_url" : "",
+    "type" : ""
+  } ],
+  "labels" : [ {
+    "id" : "",
+    "name" : "",
+    "description" : ""
+  } ],
+  "body" : ""
+}
+```
+
+
+### List Issues
+Name: listIssues
+
+Retrieve issues assigned to the authenticated user across all accessible repositories.
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| filter | Filter | STRING <details> <summary> Options </summary> assigned, created, mentioned, subscribed, repos, all </details> | Specifies the types of issues to return. | true |
+| state | State | STRING <details> <summary> Options </summary> open, closed, all </details> | Indicates the state of the issues to return. | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "List Issues",
+  "name" : "listIssues",
+  "parameters" : {
+    "filter" : "",
+    "state" : ""
+  },
+  "type" : "github/v1/listIssues"
+}
+```
+
+#### Output
+
+
+
+Type: ARRAY
+
+
+Items Type: OBJECT
+
+
+#### Properties
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| url | STRING | The URL linking directly to the issue on GitHub. |
+| repository_url | STRING | The URL of the repository where the issue is located. |
+| id | NUMBER | ID of the issue. |
+| number | INTEGER | A unique number identifying the issue within its repository. |
+| title | STRING | The title or headline of the issue. |
+| state | STRING | The current state of the issue, such as open or closed. |
+| assignees | ARRAY <details> <summary> Items </summary> [{STRING\(login), STRING\(id), STRING\(html_url), STRING\(type)}] </details> | A list of users assigned to the issue. |
+| labels | ARRAY <details> <summary> Items </summary> [{STRING\(id), STRING\(name), STRING\(description)}] </details> | A collection of labels associated with the issue. |
+| body | STRING | The main content of the issue. |
+
+
+
+
+
+#### Output Example
+```json
+[ {
+  "url" : "",
+  "repository_url" : "",
+  "id" : 0.0,
+  "number" : 1,
+  "title" : "",
+  "state" : "",
+  "assignees" : [ {
+    "login" : "",
+    "id" : "",
+    "html_url" : "",
+    "type" : ""
+  } ],
+  "labels" : [ {
+    "id" : "",
+    "name" : "",
+    "description" : ""
+  } ],
+  "body" : ""
+} ]
+```
+
+
+### List Repository Issues
+Name: listRepositoryIssues
+
+Lists issues in a repository. Only open issues will be listed.
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| repository | Repository | STRING | The name of the repository | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "List Repository Issues",
+  "name" : "listRepositoryIssues",
+  "parameters" : {
+    "repository" : ""
+  },
+  "type" : "github/v1/listRepositoryIssues"
+}
+```
+
+#### Output
+
+
+
+Type: ARRAY
+
+
+Items Type: OBJECT
+
+
+#### Properties
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| url | STRING | The URL linking directly to the issue on GitHub. |
+| repository_url | STRING | The URL of the repository where the issue is located. |
+| id | NUMBER | ID of the issue. |
+| number | INTEGER | A unique number identifying the issue within its repository. |
+| title | STRING | The title or headline of the issue. |
+| state | STRING | The current state of the issue, such as open or closed. |
+| assignees | ARRAY <details> <summary> Items </summary> [{STRING\(login), STRING\(id), STRING\(html_url), STRING\(type)}] </details> | A list of users assigned to the issue. |
+| labels | ARRAY <details> <summary> Items </summary> [{STRING\(id), STRING\(name), STRING\(description)}] </details> | A collection of labels associated with the issue. |
+| body | STRING | The main content of the issue. |
+
+
+
+
+
+#### Output Example
+```json
+[ {
+  "url" : "",
+  "repository_url" : "",
+  "id" : 0.0,
+  "number" : 1,
+  "title" : "",
+  "state" : "",
+  "assignees" : [ {
+    "login" : "",
+    "id" : "",
+    "html_url" : "",
+    "type" : ""
+  } ],
+  "labels" : [ {
+    "id" : "",
+    "name" : "",
+    "description" : ""
+  } ],
+  "body" : ""
+} ]
+```
+
+
+### Star Repository
+Name: starRepository
+
+Stars a repository for the authenticated user.
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| owner | Owner | STRING | The account owner of the repository. The name is not case sensitive. | true |
+| repository | Repository | STRING | The name of the repository including owner without the .git extension. The name is not case sensitive. | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Star Repository",
+  "name" : "starRepository",
+  "parameters" : {
+    "owner" : "",
+    "repository" : ""
+  },
+  "type" : "github/v1/starRepository"
+}
+```
+
+#### Output
+
+This action does not produce any output.
+
+
+
+
+
+
+## Triggers
+
+
+### New Issue
+Name: newIssue
+
+Triggers when a new issue is created.
+
+Type: DYNAMIC_WEBHOOK
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| repository | Repository | STRING |  | true |
+
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| issue | OBJECT <details> <summary> Properties </summary> {STRING\(url), STRING\(repository_url), NUMBER\(id), INTEGER\(number), STRING\(title), STRING\(state), [{STRING\(login), STRING\(id), STRING\(html_url), STRING\(type)}]\(assignees), [{STRING\(id), STRING\(name), STRING\(description)}]\(labels), STRING\(body)} </details> |  |
+| sender | OBJECT <details> <summary> Properties </summary> {STRING\(login), INTEGER\(id)} </details> | Information about the author of the issue. |
+| action | STRING | The action performed on the issue, such as 'opened', 'closed', or 'reopened'. |
+| repository | OBJECT <details> <summary> Properties </summary> {INTEGER\(id), STRING\(name), STRING\(full_name), {STRING\(login), INTEGER\(id)}\(owner), STRING\(visibility), INTEGER\(forks), INTEGER\(open_issues), STRING\(default_branch)} </details> |  |
+
+
+
+
+#### JSON Example
+```json
+{
+  "label" : "New Issue",
+  "name" : "newIssue",
+  "parameters" : {
+    "repository" : ""
+  },
+  "type" : "github/v1/newIssue"
+}
+```
+
+
+### New Pull Request
+Name: newPullRequest
+
+Triggers when a new pull request is created.
+
+Type: DYNAMIC_WEBHOOK
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| repository | Repository | STRING |  | true |
+
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| number | INTEGER | Number uniquely identifying the pull request within its repository. |
+| pull_request | OBJECT <details> <summary> Properties </summary> {INTEGER\(id), STRING\(state), STRING\(title), STRING\(body), INTEGER\(commits)} </details> |  |
+| sender | OBJECT <details> <summary> Properties </summary> {STRING\(login), INTEGER\(id)} </details> | Information about the author of the pull request. |
+| action | STRING | The action performed on the pull request, such as opened, closed, or synchronized. |
+| repository | OBJECT <details> <summary> Properties </summary> {INTEGER\(id), STRING\(name), STRING\(full_name), {STRING\(login), INTEGER\(id)}\(owner), STRING\(visibility), INTEGER\(forks), INTEGER\(open_issues), STRING\(default_branch)} </details> |  |
+
+
+
+
+#### JSON Example
+```json
+{
+  "label" : "New Pull Request",
+  "name" : "newPullRequest",
+  "parameters" : {
+    "repository" : ""
+  },
+  "type" : "github/v1/newPullRequest"
+}
+```
+
+
+<hr />
+
+<hr />
+
+# Additional instructions
+<hr />
+
+## Connection Setup
+
+1. Login to your GitHub account.
+2. Click on your profile icon in the top right corner.
+3. Select **Settings** from the dropdown menu.
+4. In the left sidebar, click on **Developer settings**.
+5. In the left sidebar, click on **OAuth Apps**.
+6. Click on **New OAuth App**.
+7. Fill in the required fields:
+    - **Application name**: Enter a name for your application (e.g., `Test App`).
+    - **Homepage URL**: Provide the homepage URL for your application (e.g., `https://www.bytechef.io/`).
+    - **Authorization callback URL**: Specify the URL where users will be redirected after authorization (e.g., `http://127.0.0.1:5173/callback`).
+8. Click **Register application**.
+9. Click on **Generate a new client secret**.
+10. Copy the **Client ID** and **Client Secret** for later use.
+
+<div style="position:relative;height:0;width:100%;overflow:hidden;z-index:99999;box-sizing:border-box;padding-bottom:calc(53.02672956% + 32px)">
+<iframe src="https://www.guidejar.com/embed/bhsAUb5TGIexsFuLBica?type=1&controls=on" width="100%" height="100%" style="height:100%;position:absolute;inset:0" allowfullscreen frameborder="0"></iframe>
+</div>

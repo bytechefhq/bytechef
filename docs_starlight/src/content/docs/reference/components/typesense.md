@@ -1,0 +1,100 @@
+---
+title: "Typesense"
+description: "Typesense is an open-source, in-memory search engine designed for fast, typo-tolerant, and relevance-focused full-text search across large datasets."
+---
+
+Typesense is an open-source, in-memory search engine designed for fast, typo-tolerant, and relevance-focused full-text search across large datasets.
+
+
+Categories: Artificial Intelligence
+
+
+Type: typesense/v1
+
+<hr />
+
+
+
+## Connections
+
+Version: 1
+
+
+### custom
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| protocol | Protocol | STRING | HTTP Protocol | true |
+| host | Host | STRING | Hostname | true |
+| port | Port | STRING |  | true |
+| apiKey | Typesense API Key | STRING | The API key for the Typesense API. | true |
+| collection | Collection Name | STRING | The name of the collection to use. | true |
+| embeddingDimension | Embedding Dimension | INTEGER | The dimension of the embeddings. | true |
+| initializeSchema | Initialize Schema | BOOLEAN <details> <summary> Options </summary> true, false </details> | Whether to initialize the schema. | true |
+
+
+
+
+
+<hr />
+
+
+
+## Actions
+
+
+### Search Data
+Name: search
+
+Query data from the vector store using LLM embeddings.
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| query | Query | STRING | The query to be executed. | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Search Data",
+  "name" : "search",
+  "parameters" : {
+    "query" : ""
+  },
+  "type" : "typesense/v1/search"
+}
+```
+
+#### Output
+
+The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
+
+
+
+
+### Load Data
+Name: load
+
+Loads data into the vector store using LLM embeddings.
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Load Data",
+  "name" : "load",
+  "type" : "typesense/v1/load"
+}
+```
+
+#### Output
+
+This action does not produce any output.
+
+
+
+
+
+

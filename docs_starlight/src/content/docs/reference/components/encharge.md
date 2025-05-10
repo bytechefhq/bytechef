@@ -1,0 +1,205 @@
+---
+title: "Encharge"
+description: "Encharge is a marketing automation platform that helps businesses automate their customer communication and marketing campaigns."
+---
+
+Encharge is a marketing automation platform that helps businesses automate their customer communication and marketing campaigns.
+
+
+Categories: Marketing Automation
+
+
+Type: encharge/v1
+
+<hr />
+
+
+
+## Connections
+
+Version: 1
+
+
+### API Key
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| key | Key | STRING |  | true |
+| value | Value | STRING |  | true |
+
+
+
+
+
+<hr />
+
+
+
+## Actions
+
+
+### Create Email Template
+Name: createEmail
+
+Create email template
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| name | Name | STRING | Name of the email template | true |
+| subject | Subject | STRING | Subject of the email | true |
+| fromEmail | From Email | STRING | From address to send the email from | true |
+| replyEmail | Reply Email | STRING | Address that recipients will reply to by default. | false |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Create Email Template",
+  "name" : "createEmail",
+  "parameters" : {
+    "name" : "",
+    "subject" : "",
+    "fromEmail" : "",
+    "replyEmail" : ""
+  },
+  "type" : "encharge/v1/createEmail"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| email | OBJECT <details> <summary> Properties </summary> {INTEGER\(id), STRING\(name), STRING\(subject), STRING\(fromEmail), STRING\(replyEmail)} </details> |  |
+
+
+
+
+#### Output Example
+```json
+{
+  "email" : {
+    "id" : 1,
+    "name" : "",
+    "subject" : "",
+    "fromEmail" : "",
+    "replyEmail" : ""
+  }
+}
+```
+
+
+### Create People
+Name: createPeople
+
+Creates new People
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| people | People | ARRAY <details> <summary> Items </summary> [{STRING\(email), STRING\(firstName), STRING\(lastName), STRING\(website), STRING\(title), STRING\(phone)}] </details> |  | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Create People",
+  "name" : "createPeople",
+  "parameters" : {
+    "people" : [ {
+      "email" : "",
+      "firstName" : "",
+      "lastName" : "",
+      "website" : "",
+      "title" : "",
+      "phone" : ""
+    } ]
+  },
+  "type" : "encharge/v1/createPeople"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| users | ARRAY <details> <summary> Items </summary> [{STRING\(email), STRING\(firstName), STRING\(lastName), STRING\(website), STRING\(title), STRING\(id), STRING\(phone)}] </details> |  |
+
+
+
+
+#### Output Example
+```json
+{
+  "users" : [ {
+    "email" : "",
+    "firstName" : "",
+    "lastName" : "",
+    "website" : "",
+    "title" : "",
+    "id" : "",
+    "phone" : ""
+  } ]
+}
+```
+
+
+### Add Tag
+Name: addTag
+
+Add tag(s) to an existing user.
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| tag | Tag | STRING | Tag(s) to add. To add multiple tags, use a comma-separated list, e.g. tag1,tag2 | true |
+| email | Email | STRING | Email of the person. | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Add Tag",
+  "name" : "addTag",
+  "parameters" : {
+    "tag" : "",
+    "email" : ""
+  },
+  "type" : "encharge/v1/addTag"
+}
+```
+
+#### Output
+
+This action does not produce any output.
+
+
+
+
+
+
+<hr />
+
+# Additional instructions
+<hr />
+
+## CONNECTION
+
+[API Location](https://app.encharge.io/settings/account)

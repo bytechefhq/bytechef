@@ -1,0 +1,180 @@
+---
+title: "Asana"
+description: "Asana is a web and mobile application designed to help teams organize, track, and manage their work tasks and projects efficiently."
+---
+
+Asana is a web and mobile application designed to help teams organize, track, and manage their work tasks and projects efficiently.
+
+
+Categories: Project Management
+
+
+Type: asana/v1
+
+<hr />
+
+
+
+## Connections
+
+Version: 1
+
+
+### OAuth2 Authorization Code
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| clientId | Client Id | STRING |  | true |
+| clientSecret | Client Secret | STRING |  | true |
+
+
+
+
+
+<hr />
+
+
+
+## Actions
+
+
+### Create Project
+Name: createProject
+
+Creates a new project in a workspace or team.
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| data | Data | OBJECT <details> <summary> Properties </summary> {STRING\(workspace), STRING\(name), STRING\(notes), STRING\(team)} </details> |  | false |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Create Project",
+  "name" : "createProject",
+  "parameters" : {
+    "data" : {
+      "workspace" : "",
+      "name" : "",
+      "notes" : "",
+      "team" : ""
+    }
+  },
+  "type" : "asana/v1/createProject"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| data | OBJECT <details> <summary> Properties </summary> {STRING\(gid), STRING\(name), STRING\(notes), {STRING\(gid), STRING\(name)}\(team), {STRING\(gid), STRING\(name)}\(workspace)} </details> |  |
+
+
+
+
+#### Output Example
+```json
+{
+  "data" : {
+    "gid" : "",
+    "name" : "",
+    "notes" : "",
+    "team" : {
+      "gid" : "",
+      "name" : ""
+    },
+    "workspace" : {
+      "gid" : "",
+      "name" : ""
+    }
+  }
+}
+```
+
+
+### Create Task
+Name: createTask
+
+Creates a new task
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| data | Data | OBJECT <details> <summary> Properties </summary> {STRING\(workspace), STRING\(project), STRING\(name), STRING\(notes), DATE\(due_on), [STRING]\(tags), STRING\(assignee)} </details> |  | false |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Create Task",
+  "name" : "createTask",
+  "parameters" : {
+    "data" : {
+      "workspace" : "",
+      "project" : "",
+      "name" : "",
+      "notes" : "",
+      "due_on" : "2021-01-01",
+      "tags" : [ "" ],
+      "assignee" : ""
+    }
+  },
+  "type" : "asana/v1/createTask"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| data | OBJECT <details> <summary> Properties </summary> {STRING\(gid), DATE\(due_on), STRING\(notes), STRING\(name), {STRING\(gid), STRING\(name)}\(workspace), [{STRING\(gid), STRING\(name)}]\(tags), {STRING\(gid), STRING\(name)}\(assignee)} </details> |  |
+
+
+
+
+#### Output Example
+```json
+{
+  "data" : {
+    "gid" : "",
+    "due_on" : "2021-01-01",
+    "notes" : "",
+    "name" : "",
+    "workspace" : {
+      "gid" : "",
+      "name" : ""
+    },
+    "tags" : [ {
+      "gid" : "",
+      "name" : ""
+    } ],
+    "assignee" : {
+      "gid" : "",
+      "name" : ""
+    }
+  }
+}
+```
+
+
+
+

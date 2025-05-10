@@ -1,0 +1,346 @@
+---
+title: "Filesystem"
+description: "Allows multiple operations over files on the filesystem."
+---
+
+Allows multiple operations over files on the filesystem.
+
+
+Categories: Helpers
+
+
+Type: filesystem/v1
+
+<hr />
+
+
+
+
+## Actions
+
+
+### Create Temp Directory
+Name: createTempDir
+
+Creates a file in the temporary directory on the filesystem. Returns the created directory's full path.
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Create Temp Directory",
+  "name" : "createTempDir",
+  "type" : "filesystem/v1/createTempDir"
+}
+```
+
+#### Output
+
+
+___Sample Output:___
+
+```/sample_tmp_dir```
+
+
+
+Type: STRING
+
+
+
+
+
+
+
+
+### Create
+Name: mkdir
+
+Creates a directory.
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| path | Path | STRING | The path of a directory. | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Create",
+  "name" : "mkdir",
+  "parameters" : {
+    "path" : ""
+  },
+  "type" : "filesystem/v1/mkdir"
+}
+```
+
+#### Output
+
+
+___Sample Output:___
+
+```/sample_data```
+
+
+
+Type: STRING
+
+
+
+
+
+
+
+
+### Get Parent Folder
+Name: getFilePath
+
+Gets the path of the parent folder of the file. If the file doesn't exist, it throws an error.
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| filename | File path | STRING | The path to full filename. | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Get Parent Folder",
+  "name" : "getFilePath",
+  "parameters" : {
+    "filename" : ""
+  },
+  "type" : "filesystem/v1/getFilePath"
+}
+```
+
+#### Output
+
+
+___Sample Output:___
+
+```/sample_data```
+
+
+
+Type: STRING
+
+
+
+
+
+
+
+
+### List
+Name: ls
+
+Lists the content of a directory for the given path.
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| path | Path | STRING | The path of a directory. | true |
+| recursive | Recursive | BOOLEAN <details> <summary> Options </summary> true, false </details> | Should the subdirectories be included? | null |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "List",
+  "name" : "ls",
+  "parameters" : {
+    "path" : "",
+    "recursive" : false
+  },
+  "type" : "filesystem/v1/ls"
+}
+```
+
+#### Output
+
+
+
+Type: ARRAY
+
+
+Items Type: OBJECT
+
+
+#### Properties
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| filename | STRING | Name of the file. |
+| relativePath | STRING | Relative path of the file. |
+| size | INTEGER | Size of the file. |
+
+
+
+
+
+#### Output Example
+```json
+[ {
+  "filename" : "",
+  "relativePath" : "",
+  "size" : 1
+} ]
+```
+
+
+### Read File
+Name: readFile
+
+Reads all data from a specified file path and outputs it in file entry format.
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| filename | File path | STRING | The path of the file to read. | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Read File",
+  "name" : "readFile",
+  "parameters" : {
+    "filename" : ""
+  },
+  "type" : "filesystem/v1/readFile"
+}
+```
+
+#### Output
+
+
+
+Type: FILE_ENTRY
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| extension | STRING |  |
+| mimeType | STRING |  |
+| name | STRING |  |
+| url | STRING |  |
+
+
+
+
+#### Output Example
+```json
+{
+  "extension" : "",
+  "mimeType" : "",
+  "name" : "",
+  "url" : ""
+}
+```
+
+
+### Remove
+Name: rm
+
+Permanently removes the content of a directory.
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| path | Path | STRING | The path of a directory. | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Remove",
+  "name" : "rm",
+  "parameters" : {
+    "path" : ""
+  },
+  "type" : "filesystem/v1/rm"
+}
+```
+
+#### Output
+
+
+___Sample Output:___
+
+```true```
+
+
+
+Type: BOOLEAN
+
+
+
+
+
+
+
+
+### Write to File
+Name: writeFile
+
+null
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| fileEntry | File | FILE_ENTRY | File entry object to be written. | true |
+| filename | File path | STRING | The path to which the file should be written. | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Write to File",
+  "name" : "writeFile",
+  "parameters" : {
+    "fileEntry" : {
+      "extension" : "",
+      "mimeType" : "",
+      "name" : "",
+      "url" : ""
+    },
+    "filename" : ""
+  },
+  "type" : "filesystem/v1/writeFile"
+}
+```
+
+#### Output
+
+
+___Sample Output:___
+
+```{bytes=1024}```
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| bytes | INTEGER | Number of bytes written. |
+
+
+
+
+#### Output Example
+```json
+{
+  "bytes" : 1
+}
+```
+
+
+
+
