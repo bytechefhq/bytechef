@@ -113,7 +113,7 @@ public class SendEmailAction {
         properties.put("mail.smtp.host", connectionParameters.getRequiredString(HOST));
         properties.put("mail.smtp.port", connectionParameters.getRequiredInteger(PORT));
 
-        if (Objects.equals(connectionParameters.getBoolean(TLS), false)) {
+        if (Objects.equals(connectionParameters.getBoolean(TLS), true)) {
             properties.put("mail.smtp.starttls.enable", "true");
 //            prop.put("mail.smtp.ssl.trust", MapUtils.getRequiredString(context.getConnectionParameters(), HOST));
         }
