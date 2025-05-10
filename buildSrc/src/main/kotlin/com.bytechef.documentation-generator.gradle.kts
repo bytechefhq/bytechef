@@ -632,8 +632,8 @@ ${getTriggerString()}
     @TaskAction
     fun findJsonFiles() {
         val rootPath = project.rootDir.path
-        val componentsPath = "$rootPath/docs/src/content/docs/reference/components"
-        val taskDispatchersPath = "$rootPath/docs/src/content/docs/reference/task-dispatchers"
+        val componentsPath = "$rootPath/docs/content/docs/reference/components"
+        val taskDispatchersPath = "$rootPath/docs/content/docs/reference/flow-controls"
         val currentPath = project.projectDir.path
 
         if (currentPath.contains(Regex("/modules/.+/"))) {
