@@ -435,7 +435,7 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
                 return;
             }
 
-            if (parameterMap.get(key) instanceof List<?> subList && indexes != null) {
+            if (parameterMap.get(key) instanceof List<?> subList && indexes != null && !indexes.isEmpty()) {
                 int index = indexes.getFirst();
 
                 if (subList.size() <= index) {
