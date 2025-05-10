@@ -36,7 +36,7 @@ export default async function Page(props: {
         />
       </DocsBody>
       <div className="flex flex-row gap-2 items-center mb-4">
-        <LLMCopyButton slug={params.slug} />
+        <LLMCopyButton slug={params.slug??[]} />
         <EditOnGitHub
           url={`https://github.com/bytechefhq/bytechef/blob/master/${path}`}
         />

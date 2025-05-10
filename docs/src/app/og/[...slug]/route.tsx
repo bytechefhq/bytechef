@@ -3,8 +3,8 @@ import { generateOGImage } from '@/app/og/[...slug]/og';
 import { source } from '@/lib/source';
 import { notFound } from 'next/navigation';
 
-const font = readFileSync('./app/og/[...slug]/JetBrainsMono-Regular.ttf');
-const fontBold = readFileSync('./app/og/[...slug]/JetBrainsMono-Bold.ttf');
+const font = readFileSync('./src/app/og/[...slug]/JetBrainsMono-Regular.ttf');
+const fontBold = readFileSync('./src/app/og/[...slug]/JetBrainsMono-Bold.ttf');
 
 export async function GET(
   _req: Request,
