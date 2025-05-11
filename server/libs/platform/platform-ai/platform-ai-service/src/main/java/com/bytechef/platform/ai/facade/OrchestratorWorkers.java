@@ -21,15 +21,15 @@ public class OrchestratorWorkers {
 			"analysis": "Explain your understanding of the task broken down into subtasks.",
 			"tasks": [
 				\\{
-				"type": "Trigger",
+				"type": "trigger",
 			    "description": "The function of the trigger",
 				\\},
                 \\{
-                "type": "Flow",
+                "type": "flow",
                 "description": "The function of the flow",
                 \\},
 				\\{
-				"type": "Action",
+				"type": "action",
 				"description": "The function of the action",
 				\\}
 			]
@@ -53,6 +53,7 @@ public class OrchestratorWorkers {
                "type": "missing/v1/missing",
                "parameters": \\{\\}
                \\},
+            "type": "action",
             "output": \\{\\}
             \\}
 			""";

@@ -68,9 +68,9 @@ public class VectorStoreConfiguration {
     private static final String CATEGORY = "category";
     private static final int MAX_TOKENS = 1536;
     private static final String NAME = "name";
+    private static final String TYPE = "type";
     private static final String WORKFLOWS = "workflows";
     private static final String COMPONENTS = "components";
-    private static final String FLOWS = "flows";
 
     private final TokenCountBatchingStrategy strategy;
     private final VectorStore vectorStore;
@@ -109,9 +109,9 @@ public class VectorStoreConfiguration {
     }
 
     private static void addToDocuments(
-        List<Map<String, Object>> vectorStores, String name, String json, List<Document> documents, String category) {
+        List<Map<String, Object>> vectorStores, String name, String json, List<Document> documents) {
 
-        if (!containsFile(vectorStores, name, category)) {
+        if (!containsFile(vectorStores, name, WORKFLOWS)) {
             String cleanedDocument = preprocessDocument(json);
 
             if (!cleanedDocument.isEmpty()) {
@@ -119,7 +119,24 @@ public class VectorStoreConfiguration {
                 List<String> chunks = splitDocument(cleanedDocument.split("\\s+"));
 
                 for (String chunk : chunks) {
-                    documents.add(new Document(chunk, Map.of(CATEGORY, category, NAME, name)));
+                    documents.add(new Document(chunk, Map.of(CATEGORY, WORKFLOWS, NAME, name)));
+                }
+            }
+        }
+    }
+
+    private static void addToDocuments(
+        List<Map<String, Object>> vectorStores, String name, String json, List<Document> documents, String type) {
+
+        if (!containsFile(vectorStores, name, COMPONENTS)) {
+            String cleanedDocument = preprocessDocument(json);
+
+            if (!cleanedDocument.isEmpty()) {
+                // Split the document into chunks
+                List<String> chunks = splitDocument(cleanedDocument.split("\\s+"));
+
+                for (String chunk : chunks) {
+                    documents.add(new Document(chunk, Map.of(CATEGORY, COMPONENTS, NAME, name, TYPE, type)));
                 }
             }
         }
@@ -380,57 +397,57 @@ public class VectorStoreConfiguration {
             .append(componentDefinition.getDescription())
             .append(",\n");
 
-        List<TriggerDefinition> triggers = componentDefinition.getTriggers();
+        return definitionText.toString();
+    }
 
-        if (!triggers.isEmpty()) {
-            definitionText.append("Triggers:\n");
-            for (TriggerDefinition triggerDefinition : triggers) {
-                definitionText.append("Trigger Name: ")
-                    .append(triggerDefinition.getName())
-                    .append(",\n")
-                    .append("Description: ")
-                    .append(triggerDefinition.getDescription())
-                    .append(",\n")
-                    .append("Example JSON Structure: \n")
-                    .append(createJsonExample(triggerDefinition))
-                    .append(";\n");
+    private String toString(TriggerDefinition triggerDefinition) {
+        StringBuilder definitionText = new StringBuilder();
 
-                OutputResponse outputResponse = triggerDefinition.getOutputResponse();
 
-                if (triggerDefinition.isOutputDefined() && outputResponse != null && outputResponse.outputSchema() != null) {
-                    definitionText.append("Output JSON: \n")
-                        .append(getSampleValue(new PropertyDecorator(outputResponse.outputSchema())))
-                        .append(";\n");
-                }
-            }
+        definitionText.append("Trigger Name: ")
+            .append(triggerDefinition.getName())
+            .append(",\n")
+            .append("Description: ")
+            .append(triggerDefinition.getDescription())
+            .append(",\n")
+            .append("Example JSON Structure: \n")
+            .append(createJsonExample(triggerDefinition))
+            .append(";\n");
+
+        OutputResponse outputResponse = triggerDefinition.getOutputResponse();
+
+        if (triggerDefinition.isOutputDefined() && outputResponse != null && outputResponse.outputSchema() != null) {
+            definitionText.append("Output JSON: \n")
+                .append(getSampleValue(new PropertyDecorator(outputResponse.outputSchema())))
+                .append(";\n");
         }
 
-        List<ActionDefinition> actions = componentDefinition.getActions();
+        return definitionText.toString();
+    }
 
-        if (!actions.isEmpty()) {
-            definitionText.append("Actions:\n");
-            for (ActionDefinition actionDefinition : actions) {
-                String name = actionDefinition.getName();
+    private String toString(ActionDefinition actionDefinition) {
+        StringBuilder definitionText = new StringBuilder();
 
-                if (!name.equals("customAction")) {
-                    definitionText.append("Action Name: ")
-                        .append(name)
-                        .append(",\n")
-                        .append("Description: ")
-                        .append(actionDefinition.getDescription())
-                        .append(",\n")
-                        .append("Example JSON Structure: \n")
-                        .append(createJsonExample(actionDefinition))
-                        .append(";\n");
+        String name = actionDefinition.getName();
 
-                    OutputResponse outputResponse = actionDefinition.getOutputResponse();
+        if (!name.equals("customAction")) {
 
-                    if (actionDefinition.isOutputDefined() && outputResponse != null) {
-                        definitionText.append("Output JSON: \n")
-                            .append(getSampleValue(new PropertyDecorator(outputResponse.outputSchema())))
-                            .append(";\n");
-                    }
-                }
+            definitionText.append("Action Name: ")
+                .append(name)
+                .append(",\n")
+                .append("Description: ")
+                .append(actionDefinition.getDescription())
+                .append(",\n")
+                .append("Example JSON Structure: \n")
+                .append(createJsonExample(actionDefinition))
+                .append(";\n");
+
+            OutputResponse outputResponse = actionDefinition.getOutputResponse();
+
+            if (actionDefinition.isOutputDefined() && outputResponse != null) {
+                definitionText.append("Output JSON: \n")
+                    .append(getSampleValue(new PropertyDecorator(outputResponse.outputSchema())))
+                    .append(";\n");
             }
         }
 
@@ -473,14 +490,32 @@ public class VectorStoreConfiguration {
             if (!name.equals("waitForApproval")) {
                 String json = toString(taskDispatcherDefinition);
 
-                addToDocuments(vectorStores, name, json, documentList, FLOWS);
+                addToDocuments(vectorStores, name, json, documentList, "flow");
             }
         }
 
         for (ComponentDefinition componentDefinition : componentDefinitionService.getComponentDefinitions()) {
             String json = toString(componentDefinition);
 
-            addToDocuments(vectorStores, componentDefinition.getName(), json, documentList, COMPONENTS);
+            List<TriggerDefinition> triggers = componentDefinition.getTriggers();
+
+            if (!triggers.isEmpty()) {
+                for (TriggerDefinition triggerDefinition : triggers) {
+                    String triggerJson = json + toString(triggerDefinition);
+
+                    addToDocuments(vectorStores, triggerDefinition.getName(), triggerJson, documentList, "trigger");
+                }
+            }
+
+            List<ActionDefinition> actions = componentDefinition.getActions();
+
+            if (!actions.isEmpty()) {
+                for (ActionDefinition actionDefinition : actions) {
+                    String actionJson = json + toString(actionDefinition);
+
+                    addToDocuments(vectorStores, actionDefinition.getName(), actionJson, documentList, "action");
+                }
+            }
         }
 
         for (List<Document> batch : batchingStrategy.batch(documentList)) {
@@ -496,7 +531,7 @@ public class VectorStoreConfiguration {
     }
 
     private static void storeDocumentsFromPath(
-        String categoryName, Path path, String suffix, BatchingStrategy batchingStrategy,
+        Path path, String suffix, BatchingStrategy batchingStrategy,
         List<Map<String, Object>> vectorStoreList, VectorStore vectorStore) throws IOException {
 
         List<Document> documentList = new ArrayList<>();
@@ -515,7 +550,7 @@ public class VectorStoreConfiguration {
 
                     String document = Files.readString(filePath);
 
-                    addToDocuments(vectorStoreList, fileName, document, documentList, categoryName);
+                    addToDocuments(vectorStoreList, fileName, document, documentList);
                 }
 
                 return FileVisitResult.CONTINUE;
@@ -531,7 +566,7 @@ public class VectorStoreConfiguration {
         List<Map<String, Object>> vectorStoreList, Path workflowsPath) {
 
         try {
-            storeDocumentsFromPath(WORKFLOWS, workflowsPath, ".json", strategy, vectorStoreList, vectorStore);
+            storeDocumentsFromPath(workflowsPath, ".json", strategy, vectorStoreList, vectorStore);
             storeDocuments(strategy, vectorStoreList, vectorStore);
         } catch (IOException e) {
             throw new RuntimeException(e);
