@@ -41,7 +41,7 @@ export function getSuggestionOptions(): MentionOptions['suggestion'] {
             return true;
         },
         allowedPrefixes: null,
-        char: '{',
+        char: '$',
         // Prevent space insertion after adding mention
         command: ({editor, props, range}) => {
             editor

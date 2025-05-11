@@ -167,8 +167,8 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
                 }),
                 Placeholder.configure({
                     placeholder: placeholder
-                        ? `${placeholder} (Show data pills using '{')`
-                        : "Show data pills using '{'",
+                        ? placeholder
+                        : "Show data pills using '$' or write expression using '='",
                 }),
             ];
 
@@ -334,7 +334,7 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
                         return;
                     }
 
-                    if (type !== 'STRING' && (mentionOccurences || event.key !== '{')) {
+                    if (type !== 'STRING' && (mentionOccurences || event.key !== '$')) {
                         event.preventDefault();
                     }
                 },
