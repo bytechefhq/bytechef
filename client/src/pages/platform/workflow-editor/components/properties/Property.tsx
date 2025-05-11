@@ -246,7 +246,7 @@ const Property = ({
             value: isNumericalInput ? parseFloat(valueToSave as string) : valueToSave,
             workflowId: workflow.id!,
         });
-    }, 200);
+    }, 300);
 
     const handleCodeEditorChange = useDebouncedCallback((value?: string) => {
         if (!currentComponent || !name || !path || !updateWorkflowNodeParameterMutation || !workflow.id) {
@@ -261,7 +261,7 @@ const Property = ({
             value,
             workflowId: workflow.id,
         });
-    }, 200);
+    }, 300);
 
     const handleDeleteCustomPropertyClick = useCallback(
         (path: string) => {
@@ -284,7 +284,7 @@ const Property = ({
             value: JSON.stringify(value),
             workflowId: workflow.id,
         });
-    }, 200);
+    }, 300);
 
     const handleInputChange = (event: ChangeEvent<HTMLInputElement> | ChangeEvent<HTMLTextAreaElement>) => {
         const {value} = event.target;

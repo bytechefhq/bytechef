@@ -83,7 +83,7 @@ const DescriptionTab = ({
             queryClient,
             updateWorkflowMutation,
         });
-    }, 200);
+    }, 300);
 
     const handleNotesChange = useDebouncedCallback((event: ChangeEvent<HTMLTextAreaElement>) => {
         if (!currentNode) {
@@ -131,7 +131,7 @@ const DescriptionTab = ({
             queryClient,
             updateWorkflowMutation,
         });
-    }, 200);
+    }, 300);
 
     return (
         <div className="flex h-full flex-col gap-4 overflow-auto p-4">
