@@ -8,44 +8,40 @@ import useWorkflowDataStore from '../stores/useWorkflowDataStore';
 const DataPillPanelBodyInputsItem = () => {
     const {workflow} = useWorkflowDataStore();
 
-    return workflow.inputs && workflow.inputs.length > 0 ? (
+    if (!workflow.inputs || workflow.inputs.length === 0) {
+        return <p className="text-sm">No defined inputs.</p>;
+    }
+
+    return (
         <>
             <AccordionTrigger className="group flex w-full items-center justify-between border-border/50 bg-background p-4 group-data-[state=closed]:border-b">
                 <div className="flex items-center space-x-4">
-                    <div className="flex size-5 items-center">
-                        <FormInputIcon />
-                    </div>
+                    <FormInputIcon className="size-5" />
 
                     <span className="text-sm">Inputs</span>
                 </div>
 
                 <ChevronDownIcon className="size-5 text-gray-400 transition-transform duration-300 group-data-[state=open]:rotate-180" />
             </AccordionTrigger>
+
             <AccordionContent className="size-full space-y-2 border-b border-b-border/50 px-4 pb-4">
                 <ul className="flex w-full flex-col space-y-2 border-l border-l-border/50 pl-4 group-data-[state=open]:h-full">
-                    {workflow.inputs?.map((input) => {
-                        return (
-                            <div className="flex items-center space-x-3" key={input.name}>
-                                <DataPill
-                                    componentIcon={''}
-                                    property={{
-                                        name: input.name,
-                                        type: input.type?.toUpperCase() as PropertyType,
-                                    }}
-                                    root={true}
-                                    sampleOutput={undefined}
-                                    workflowNodeName={input.name}
-                                />
-                            </div>
-                        );
-                    })}
+                    {workflow.inputs.map((input, index) => (
+                        <li className="flex items-center space-x-3" key={`${input.name}-${index}`}>
+                            <DataPill
+                                property={{
+                                    name: input.name,
+                                    type: input.type?.toUpperCase() as PropertyType,
+                                }}
+                                root
+                                sampleOutput={undefined}
+                                workflowNodeName={input.name}
+                            />
+                        </li>
+                    ))}
                 </ul>
-
-                <p className="text-sm">No defined inputs.</p>
-            </AccordionContent>{' '}
+            </AccordionContent>
         </>
-    ) : (
-        <></>
     );
 };
 
