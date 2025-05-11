@@ -5,13 +5,16 @@ import {Edge, Node} from '@xyflow/react';
 /**
  * Creates context from a task node's dispatcher data
  */
-function getContextFromTaskNodeData(nodeData: NodeDataType, indexIncrement: number = 0): TaskDispatcherContextType {
+function getContextFromTaskNodeData(
+    nodeData: NodeDataType,
+    indexIncrement: number = 0
+): TaskDispatcherContextType | undefined {
     const context: TaskDispatcherContextType = {
         taskDispatcherId: nodeData.taskDispatcherId as string,
     };
 
     if (!nodeData) {
-        return context;
+        return undefined;
     }
 
     if (nodeData.conditionData) {
@@ -36,7 +39,7 @@ function getContextFromTaskNodeData(nodeData: NodeDataType, indexIncrement: numb
 /**
  * Creates context from a placeholder node
  */
-function getContextFromPlaceholderNode(placeholderNode: Node): TaskDispatcherContextType {
+function getContextFromPlaceholderNode(placeholderNode: Node): TaskDispatcherContextType | undefined {
     const isPlaceholder = placeholderNode.type === 'placeholder';
     const isLoopPlaceholder = placeholderNode.id.includes('loop') && isPlaceholder;
     const isConditionPlaceholder = placeholderNode.id.includes('condition') && isPlaceholder;
@@ -47,7 +50,7 @@ function getContextFromPlaceholderNode(placeholderNode: Node): TaskDispatcherCon
     };
 
     if (!placeholderNode) {
-        return context;
+        return undefined;
     }
 
     const placeholderIndex = parseInt(placeholderNode.id.split('-').pop() || '0');
@@ -76,15 +79,17 @@ function getContextFromPlaceholderNode(placeholderNode: Node): TaskDispatcherCon
     return context;
 }
 
+interface GetTaskDispatcherContextProps {
+    edge?: Edge;
+    node?: Node;
+    nodes?: Array<Node>;
+}
+
 export default function getTaskDispatcherContext({
     edge,
     node,
     nodes,
-}: {
-    edge?: Edge;
-    node?: Node;
-    nodes?: Array<Node>;
-}): TaskDispatcherContextType {
+}: GetTaskDispatcherContextProps): TaskDispatcherContextType | undefined {
     if (node) {
         return getContextFromPlaceholderNode(node);
     }
@@ -97,8 +102,8 @@ export default function getTaskDispatcherContext({
     const isSourceTaskDispatcher = TASK_DISPATCHER_NAMES.includes((sourceNode?.data as NodeDataType).componentName);
     const isTargetTaskDispatcher = TASK_DISPATCHER_NAMES.includes((targetNode?.data as NodeDataType).componentName);
 
-    const isSourceTask = sourceNode?.type === 'workflow';
-    const isTargetTask = targetNode?.type === 'workflow';
+    const isSourceTask = sourceNode?.type === 'workflow' && !isSourceTaskDispatcher;
+    const isTargetTask = targetNode?.type === 'workflow' && !isTargetTaskDispatcher;
 
     const isSourceGhost = source.includes('ghost');
     const isTargetGhost = target.includes('ghost');
@@ -110,13 +115,17 @@ export default function getTaskDispatcherContext({
     };
 
     if (!sourceNode || !targetNode) {
-        return context;
+        return undefined;
     }
 
     if (isSourceGhost && isTargetGhost) {
         const sourceTaskDispatcherNode = nodes!.find((node) => node.id === sourceNode.data.taskDispatcherId);
 
         return getContextFromTaskNodeData(sourceTaskDispatcherNode?.data as NodeDataType, 1);
+    }
+
+    if (isSourceGhost && isTargetTaskDispatcher) {
+        return getContextFromTaskNodeData(targetNode.data as NodeDataType, 0);
     }
 
     if (isSourceTaskDispatcher && isTargetTask) {
@@ -132,7 +141,11 @@ export default function getTaskDispatcherContext({
     }
 
     if (isSourceTask && isTargetTaskDispatcher) {
-        return getContextFromTaskNodeData(targetNode.data as NodeDataType, 1);
+        if (!sourceNode.data.conditionData && !sourceNode.data.loopData && !sourceNode.data.branchData) {
+            return undefined;
+        }
+
+        return getContextFromTaskNodeData(targetNode.data as NodeDataType, 0);
     }
 
     if (isSourceGhost && isTargetTask) {
