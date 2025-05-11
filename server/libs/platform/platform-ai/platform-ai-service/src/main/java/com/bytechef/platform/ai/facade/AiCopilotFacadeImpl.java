@@ -122,13 +122,7 @@ public class AiCopilotFacadeImpl implements AiCopilotFacade {
                 yield chatClientWorkflow.prompt()
                     .system("Return in a JSON format in a similar structure to the Workflows in the context.")
                     .user(user -> user.text("""
-                        Merge all the task structures according to instructions. Only use tasks that are provided in this prompt. If the action or trigger is not provided, provide 'missing' Component:
-                        \\{
-                        "label": "...",
-                        "name": "...",
-                        "type": "missing/v1/missing",
-                        "parameters": \\{\\}
-                        \\}
+                        Merge all the task.structure according to instructions. Only use tasks that are provided in this prompt. If the task.type is 'trigger' and task.structure.type is 'missing/v1/missing', don't put any trigger. If the task.type is 'action' and task.structure.type is 'missing/v1/missing', pass the 'missing' Component.
 
                         Return your response in a JSON format like the one in the context.
 
