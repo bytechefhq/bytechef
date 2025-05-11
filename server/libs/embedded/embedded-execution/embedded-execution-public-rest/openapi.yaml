@@ -125,7 +125,7 @@ paths:
           $ref: "#/components/responses/internalServerError"
         "501":
           $ref: "#/components/responses/notImplemented"
-  /components/{componentName}/versions/{componentVersion}/actions/{actionName}:
+  /{externalUserId}/components/{componentName}/versions/{componentVersion}/actions/{actionName}:
     post:
       description: "Executes an action of a component and returns the result as the response."
       summary: "Executes an action of a component and returns the result as the response"
@@ -147,6 +147,12 @@ paths:
           example: 1234
           description: The integration instance Id that uniquely identifies the connected user's specific integration instance
           required: false
+        - name: "externalUserId"
+          description: "The external user id."
+          in: "path"
+          required: true
+          schema:
+            type: "string"
         - name: "componentName"
           description: "The component name."
           in: "path"
@@ -183,11 +189,7 @@ paths:
           content:
             application/json:
               schema:
-                type: "object"
-                properties:
-                  output:
-                    description: The result of the action call.
-                    type: object
+                type: object
         "400":
           $ref: "#/components/responses/badRequest"
         "401":
@@ -247,7 +249,7 @@ paths:
 #          description: "Limit Exceeded"
 #        "500":
 #          description: "Internal Error"
-  /tools:
+  /{externalUserId}/tools:
     get:
       description: "Returns a list with all the available tools."
       summary: "Returns a list with all the available tools"
@@ -263,7 +265,7 @@ paths:
             $ref: '#/components/schemas/Environment'
         - name: "externalUserId"
           description: "The external user id."
-          in: "query"
+          in: "path"
           required: true
           schema:
             type: "string"
@@ -341,6 +343,12 @@ paths:
           example: 1234
           description: The integration instance Id that uniquely identifies the connected user's specific integration instance
           required: false
+        - name: "externalUserId"
+          description: "The external user id."
+          in: "path"
+          required: true
+          schema:
+            type: "string"
       requestBody:
         content:
           application/json:

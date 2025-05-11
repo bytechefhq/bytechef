@@ -21,14 +21,17 @@ import com.bytechef.platform.security.web.filter.AbstractPublicApiAuthentication
 import com.bytechef.tenant.domain.TenantKey;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import jakarta.servlet.http.HttpServletRequest;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.Authentication;
-import org.springframework.util.Assert;
 
 /**
  * @author Ivica Cardic
  */
 public class ConnectedUserAuthenticationFilter extends AbstractPublicApiAuthenticationFilter {
+
+    private static final Pattern EXTERNAL_USER_ID_PATTERN = Pattern.compile(".*/v\\d+/([^/]+)/.*");
 
     @SuppressFBWarnings("EI")
     public ConnectedUserAuthenticationFilter(AuthenticationManager authenticationManager) {
@@ -42,9 +45,16 @@ public class ConnectedUserAuthenticationFilter extends AbstractPublicApiAuthenti
 
         TenantKey tenantKey = TenantKey.parse(token);
 
-        Assert.notNull(request.getParameterValues("externalUserId"), "externalUserId parameter is required");
+        Matcher matcher = EXTERNAL_USER_ID_PATTERN.matcher(request.getRequestURI());
 
-        return new ConnectedUserAuthenticationToken(
-            request.getParameterValues("externalUserId")[0], getEnvironment(request), tenantKey.getTenantId());
+        String externalUserId;
+
+        if (matcher.matches()) {
+            externalUserId = matcher.group(1);
+        } else {
+            throw new IllegalArgumentException("externalUserId parameter is required");
+        }
+
+        return new ConnectedUserAuthenticationToken(externalUserId, getEnvironment(request), tenantKey.getTenantId());
     }
 }

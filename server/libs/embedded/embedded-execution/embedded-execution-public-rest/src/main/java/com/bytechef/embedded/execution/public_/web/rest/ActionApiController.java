@@ -24,7 +24,6 @@ import com.bytechef.component.definition.Context.Http;
 import com.bytechef.embedded.execution.facade.ActionFacade;
 import com.bytechef.embedded.execution.public_.web.rest.converter.CaseInsensitiveEnumPropertyEditorSupport;
 import com.bytechef.embedded.execution.public_.web.rest.model.EnvironmentModel;
-import com.bytechef.embedded.execution.public_.web.rest.model.ExecuteAction200ResponseModel;
 import com.bytechef.embedded.execution.public_.web.rest.model.ExecuteActionRequestModel;
 import com.bytechef.file.storage.domain.FileEntry;
 import com.bytechef.platform.constant.Environment;
@@ -58,9 +57,9 @@ public class ActionApiController implements ActionApi {
     }
 
     @Override
-    public ResponseEntity<ExecuteAction200ResponseModel> executeAction(
-        String componentName, Integer componentVersion, String actionName, EnvironmentModel xEnvironment,
-        Long xInstanceId, ExecuteActionRequestModel executeActionRequestModel) {
+    public ResponseEntity<Object> executeAction(
+        String externalUserId, String componentName, Integer componentVersion, String actionName,
+        EnvironmentModel xEnvironment, Long xInstanceId, ExecuteActionRequestModel executeActionRequestModel) {
 
         Environment environment = xEnvironment == null
             ? Environment.PRODUCTION : Environment.valueOf(StringUtils.upperCase(xEnvironment.name()));
@@ -103,9 +102,8 @@ public class ActionApiController implements ActionApi {
         }
 
         return ResponseEntity.ok(
-            new ExecuteAction200ResponseModel().output(
-                actionFacade.executeAction(
-                    componentName, componentVersion, actionName, inputParameters, environment, xInstanceId)));
+            actionFacade.executeAction(
+                componentName, componentVersion, actionName, inputParameters, environment, xInstanceId));
     }
 
     @InitBinder

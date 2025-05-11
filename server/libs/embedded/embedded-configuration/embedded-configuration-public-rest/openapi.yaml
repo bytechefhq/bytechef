@@ -99,7 +99,7 @@ paths:
           $ref: "#/components/responses/UnauthorizedError"
       security:
         - frontendBearerAuth: [ ]
-  /integrations:
+  /{externalUserId}/integrations:
     get:
       description: "Get active integrations."
       summary: "Get active integrations"
@@ -115,7 +115,7 @@ paths:
             $ref: '#/components/schemas/Environment'
         - name: "externalUserId"
           description: "The external user id."
-          in: "query"
+          in: "path"
           required: true
           schema:
             type: "string"

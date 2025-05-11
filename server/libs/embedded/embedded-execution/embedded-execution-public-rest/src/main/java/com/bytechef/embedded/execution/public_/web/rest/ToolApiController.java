@@ -48,7 +48,8 @@ public class ToolApiController implements ToolApi {
 
     @Override
     public ResponseEntity<Object> executeTool(
-        EnvironmentModel xEnvironment, Long xInstanceId, ExecuteToolRequestModel executeToolRequestModel) {
+        String externalUserId, EnvironmentModel xEnvironment, Long xInstanceId,
+        ExecuteToolRequestModel executeToolRequestModel) {
 
         Environment environment = xEnvironment == null
             ? Environment.PRODUCTION : Environment.valueOf(StringUtils.upperCase(xEnvironment.name()));
