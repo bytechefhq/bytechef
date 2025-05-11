@@ -58,7 +58,7 @@ public class AiCopilotFacadeImpl implements AiCopilotFacade {
         QuestionAnswerAdvisor questionAnswerAdvisorComponents = new QuestionAnswerAdvisor(
             vectorStore, SearchRequest.builder()
             .filterExpression("category == 'components' or category == 'flows'")
-            .topK(10)
+            .topK(15)
             .build());
 
         QuestionAnswerAdvisor questionAnswerAdvisorWorkflow = new QuestionAnswerAdvisor(
