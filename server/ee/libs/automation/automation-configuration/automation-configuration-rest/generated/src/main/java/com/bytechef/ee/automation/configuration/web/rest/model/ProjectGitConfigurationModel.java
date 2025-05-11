@@ -24,7 +24,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "ProjectGitConfiguration", description = "The git configuration.")
 @JsonTypeName("ProjectGitConfiguration")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-05-06T16:39:13.163780+02:00[Europe/Zagreb]", comments = "Generator version: 7.12.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-05-11T23:14:39.571150+02:00[Europe/Zagreb]", comments = "Generator version: 7.12.0")
 public class ProjectGitConfigurationModel {
 
   private Long projectId;

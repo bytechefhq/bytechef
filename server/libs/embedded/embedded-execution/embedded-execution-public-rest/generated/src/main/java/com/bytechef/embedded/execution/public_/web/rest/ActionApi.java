@@ -6,7 +6,6 @@
 package com.bytechef.embedded.execution.public_.web.rest;
 
 import com.bytechef.embedded.execution.public_.web.rest.model.EnvironmentModel;
-import com.bytechef.embedded.execution.public_.web.rest.model.ExecuteAction200ResponseModel;
 import com.bytechef.embedded.execution.public_.web.rest.model.ExecuteActionRequestModel;
 import com.bytechef.embedded.execution.public_.web.rest.model.ExecuteWorkflows400ResponseModel;
 import io.swagger.v3.oas.annotations.ExternalDocumentation;
@@ -35,7 +34,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-05-06T16:39:12.209392+02:00[Europe/Zagreb]", comments = "Generator version: 7.12.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-05-11T23:38:05.508120+02:00[Europe/Zagreb]", comments = "Generator version: 7.12.0")
 @Validated
 @Tag(name = "action", description = "The Embedded Component Action Public API")
 public interface ActionApi {
@@ -45,9 +44,10 @@ public interface ActionApi {
     }
 
     /**
-     * POST /components/{componentName}/versions/{componentVersion}/actions/{actionName} : Executes an action of a component and returns the result as the response
+     * POST /{externalUserId}/components/{componentName}/versions/{componentVersion}/actions/{actionName} : Executes an action of a component and returns the result as the response
      * Executes an action of a component and returns the result as the response.
      *
+     * @param externalUserId The external user id. (required)
      * @param componentName The component name. (required)
      * @param componentVersion The component version. (required)
      * @param actionName The name of the action to call. (required)
@@ -72,7 +72,7 @@ public interface ActionApi {
         tags = { "action" },
         responses = {
             @ApiResponse(responseCode = "200", description = "The list of component action objects.", content = {
-                @Content(mediaType = "application/json", schema = @Schema(implementation = ExecuteAction200ResponseModel.class))
+                @Content(mediaType = "application/json", schema = @Schema(implementation = Object.class))
             }),
             @ApiResponse(responseCode = "400", description = "Bad request", content = {
                 @Content(mediaType = "application/json", schema = @Schema(implementation = ExecuteWorkflows400ResponseModel.class))
@@ -105,12 +105,13 @@ public interface ActionApi {
     )
     @RequestMapping(
         method = RequestMethod.POST,
-        value = "/components/{componentName}/versions/{componentVersion}/actions/{actionName}",
+        value = "/{externalUserId}/components/{componentName}/versions/{componentVersion}/actions/{actionName}",
         produces = { "application/json" },
         consumes = { "application/json" }
     )
     
-    default ResponseEntity<ExecuteAction200ResponseModel> executeAction(
+    default ResponseEntity<Object> executeAction(
+        @Parameter(name = "externalUserId", description = "The external user id.", required = true, in = ParameterIn.PATH) @PathVariable("externalUserId") String externalUserId,
         @Parameter(name = "componentName", description = "The component name.", required = true, in = ParameterIn.PATH) @PathVariable("componentName") String componentName,
         @Parameter(name = "componentVersion", description = "The component version.", required = true, in = ParameterIn.PATH) @PathVariable("componentVersion") Integer componentVersion,
         @Parameter(name = "actionName", description = "The name of the action to call.", required = true, in = ParameterIn.PATH) @PathVariable("actionName") String actionName,
@@ -120,11 +121,6 @@ public interface ActionApi {
     ) {
         getRequest().ifPresent(request -> {
             for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
-                if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
-                    String exampleString = "{ \"output\" : \"{}\" }";
-                    ApiUtil.setExampleResponse(request, "application/json", exampleString);
-                    break;
-                }
                 if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
                     String exampleString = "{ \"errors\" : [ { \"code\" : \"MISSING_REQUIRED_FIELD\", \"meta\" : { \"application_name\" : \"MyCompany Production\", \"origin\" : \"remote-provider\", \"cause\" : \"{}\" }, \"problem_type\" : \"MISSING_REQUIRED_FIELD\", \"id\" : \"9366efb4-8fb1-4a28-bfb0-8d6f9cc6b5c5\", \"detail\" : \"detail\", \"title\" : \"Property values were not valid\n\", \"status\" : \"400\" }, { \"code\" : \"MISSING_REQUIRED_FIELD\", \"meta\" : { \"application_name\" : \"MyCompany Production\", \"origin\" : \"remote-provider\", \"cause\" : \"{}\" }, \"problem_type\" : \"MISSING_REQUIRED_FIELD\", \"id\" : \"9366efb4-8fb1-4a28-bfb0-8d6f9cc6b5c5\", \"detail\" : \"detail\", \"title\" : \"Property values were not valid\n\", \"status\" : \"400\" } ] }";
                     ApiUtil.setExampleResponse(request, "application/json", exampleString);

@@ -36,7 +36,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-05-06T16:39:12.209392+02:00[Europe/Zagreb]", comments = "Generator version: 7.12.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-05-11T23:38:05.508120+02:00[Europe/Zagreb]", comments = "Generator version: 7.12.0")
 @Validated
 @Tag(name = "tool", description = "The Embedded AI Tool Public API")
 public interface ToolApi {
@@ -46,9 +46,10 @@ public interface ToolApi {
     }
 
     /**
-     * POST /tools : Executes a tool and returns the result as the response
+     * POST /{externalUserId}/tools : Executes a tool and returns the result as the response
      * Executes a tool and returns the result as the response.
      *
+     * @param externalUserId The external user id. (required)
      * @param xEnvironment The environment. (optional)
      * @param xInstanceId The integration instance Id that uniquely identifies the connected user&#39;s specific integration instance (optional)
      * @param executeToolRequestModel  (optional)
@@ -103,12 +104,13 @@ public interface ToolApi {
     )
     @RequestMapping(
         method = RequestMethod.POST,
-        value = "/tools",
+        value = "/{externalUserId}/tools",
         produces = { "application/json" },
         consumes = { "application/json" }
     )
     
     default ResponseEntity<Object> executeTool(
+        @Parameter(name = "externalUserId", description = "The external user id.", required = true, in = ParameterIn.PATH) @PathVariable("externalUserId") String externalUserId,
         @Parameter(name = "X-Environment", description = "The environment.", in = ParameterIn.HEADER) @RequestHeader(value = "X-Environment", required = false) EnvironmentModel xEnvironment,
         @Parameter(name = "X-Instance-Id", description = "The integration instance Id that uniquely identifies the connected user's specific integration instance", in = ParameterIn.HEADER) @RequestHeader(value = "X-Instance-Id", required = false) Long xInstanceId,
         @Parameter(name = "ExecuteToolRequestModel", description = "") @Valid @RequestBody(required = false) ExecuteToolRequestModel executeToolRequestModel
@@ -168,7 +170,7 @@ public interface ToolApi {
 
 
     /**
-     * GET /tools : Returns a list with all the available tools
+     * GET /{externalUserId}/tools : Returns a list with all the available tools
      * Returns a list with all the available tools.
      *
      * @param externalUserId The external user id. (required)
@@ -227,12 +229,12 @@ public interface ToolApi {
     )
     @RequestMapping(
         method = RequestMethod.GET,
-        value = "/tools",
+        value = "/{externalUserId}/tools",
         produces = { "application/json" }
     )
     
     default ResponseEntity<Map<String, List<ToolModel>>> getTools(
-        @NotNull @Parameter(name = "externalUserId", description = "The external user id.", required = true, in = ParameterIn.QUERY) @Valid @RequestParam(value = "externalUserId", required = true) String externalUserId,
+        @Parameter(name = "externalUserId", description = "The external user id.", required = true, in = ParameterIn.PATH) @PathVariable("externalUserId") String externalUserId,
         @Parameter(name = "X-Environment", description = "The environment.", in = ParameterIn.HEADER) @RequestHeader(value = "X-Environment", required = false) EnvironmentModel xEnvironment,
         @Parameter(name = "categories", description = "Filter by specific integration categories, depending on the integrations the user has connected.", in = ParameterIn.QUERY) @Valid @RequestParam(value = "categories", required = false) List<String> categories,
         @Parameter(name = "components", description = "Filter by specific components, depending on the integrations the user has connected.", in = ParameterIn.QUERY) @Valid @RequestParam(value = "components", required = false) List<String> components,

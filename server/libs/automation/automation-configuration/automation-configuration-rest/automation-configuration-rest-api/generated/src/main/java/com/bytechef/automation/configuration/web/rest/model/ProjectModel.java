@@ -30,7 +30,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "Project", description = "A group of workflows that make one logical project.")
 @JsonTypeName("Project")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-05-06T16:39:13.391545+02:00[Europe/Zagreb]", comments = "Generator version: 7.12.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-05-11T23:14:39.806062+02:00[Europe/Zagreb]", comments = "Generator version: 7.12.0")
 public class ProjectModel {
 
   private @Nullable String createdBy;

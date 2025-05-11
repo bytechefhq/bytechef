@@ -33,7 +33,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-05-06T16:39:11.867945+02:00[Europe/Zagreb]", comments = "Generator version: 7.12.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-05-11T23:12:20.851038+02:00[Europe/Zagreb]", comments = "Generator version: 7.12.0")
 @Validated
 @Tag(name = "integration", description = "The Embedded Integration Public API")
 public interface IntegrationApi {
@@ -43,7 +43,7 @@ public interface IntegrationApi {
     }
 
     /**
-     * GET /integrations : Get active integrations
+     * GET /{externalUserId}/integrations : Get active integrations
      * Get active integrations.
      *
      * @param externalUserId The external user id. (required)
@@ -68,12 +68,12 @@ public interface IntegrationApi {
     )
     @RequestMapping(
         method = RequestMethod.GET,
-        value = "/integrations",
+        value = "/{externalUserId}/integrations",
         produces = { "application/json" }
     )
     
     default ResponseEntity<List<IntegrationModel>> getIntegrations(
-        @NotNull @Parameter(name = "externalUserId", description = "The external user id.", required = true, in = ParameterIn.QUERY) @Valid @RequestParam(value = "externalUserId", required = true) String externalUserId,
+        @Parameter(name = "externalUserId", description = "The external user id.", required = true, in = ParameterIn.PATH) @PathVariable("externalUserId") String externalUserId,
         @Parameter(name = "X-Environment", description = "The environment.", in = ParameterIn.HEADER) @RequestHeader(value = "X-Environment", required = false) EnvironmentModel xEnvironment
     ) {
         getRequest().ifPresent(request -> {

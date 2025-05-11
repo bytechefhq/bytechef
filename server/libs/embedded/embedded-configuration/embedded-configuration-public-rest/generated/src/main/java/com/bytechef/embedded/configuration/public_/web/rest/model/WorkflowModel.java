@@ -22,7 +22,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "Workflow", description = "A group of tasks that make one logical workflow.")
 @JsonTypeName("Workflow")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-05-06T16:39:11.867945+02:00[Europe/Zagreb]", comments = "Generator version: 7.12.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-05-11T23:12:20.851038+02:00[Europe/Zagreb]", comments = "Generator version: 7.12.0")
 public class WorkflowModel {
 
   private @Nullable String workflowReferenceCode;

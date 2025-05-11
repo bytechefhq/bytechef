@@ -29,7 +29,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "ApiCollection", description = "An API collection.")
 @JsonTypeName("ApiCollection")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-05-06T16:39:16.252508+02:00[Europe/Zagreb]", comments = "Generator version: 7.12.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-05-11T23:14:43.151477+02:00[Europe/Zagreb]", comments = "Generator version: 7.12.0")
 public class ApiCollectionModel {
 
   private @Nullable Integer collectionVersion;
