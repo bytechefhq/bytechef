@@ -1677,7 +1677,6 @@ public class ApplicationProperties {
 
         private boolean activationRequired;
         private boolean enabled = true;
-        private String tempDomainListUrl;
 
         public boolean isActivationRequired() {
             return activationRequired;
@@ -1687,20 +1686,12 @@ public class ApplicationProperties {
             return enabled;
         }
 
-        public String getTempDomainListUrl() {
-            return tempDomainListUrl;
-        }
-
         public void setActivationRequired(boolean activationRequired) {
             this.activationRequired = activationRequired;
         }
 
         public void setEnabled(boolean enabled) {
             this.enabled = enabled;
-        }
-
-        public void setTempDomainListUrl(String tempDomainListUrl) {
-            this.tempDomainListUrl = tempDomainListUrl;
         }
     }
 

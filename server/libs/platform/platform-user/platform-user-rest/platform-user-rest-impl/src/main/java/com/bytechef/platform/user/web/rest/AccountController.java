@@ -31,12 +31,12 @@ import com.bytechef.platform.user.exception.InvalidPasswordException;
 import com.bytechef.platform.user.exception.LoginAlreadyUsedException;
 import com.bytechef.platform.user.service.AuthorityService;
 import com.bytechef.platform.user.service.PersistentTokenService;
-import com.bytechef.platform.user.service.TempEmailService;
 import com.bytechef.platform.user.service.UserService;
 import com.bytechef.platform.user.web.rest.exception.AccountErrorType;
 import com.bytechef.platform.user.web.rest.exception.AccountResourceException;
 import com.bytechef.platform.user.web.rest.vm.KeyAndPasswordVM;
 import com.bytechef.platform.user.web.rest.vm.ManagedUserVM;
+import com.bytechef.platform.user.web.rest.webhook.SignUpWebhook;
 import com.bytechef.tenant.TenantContext;
 import com.bytechef.tenant.service.TenantService;
 import com.bytechef.tenant.util.TenantUtils;
@@ -79,21 +79,21 @@ public class AccountController {
     private final PersistentTokenService persistentTokenService;
     private final TenantService tenantService;
     private final UserService userService;
-    private final TempEmailService tempEmailService;
+    private final SignUpWebhook signUpWebhook;
 
     @SuppressFBWarnings("EI")
     public AccountController(
         ApplicationProperties applicationProperties, AuthorityService authorityService, MailService mailService,
-        PersistentTokenService persistentTokenService, TenantService tenantService, UserService userService,
-        TempEmailService tempEmailService) {
+        PersistentTokenService persistentTokenService, SignUpWebhook signUpWebhook, TenantService tenantService,
+        UserService userService) {
 
         this.applicationProperties = applicationProperties;
         this.authorityService = authorityService;
+        this.mailService = mailService;
         this.persistentTokenService = persistentTokenService;
         this.tenantService = tenantService;
+        this.signUpWebhook = signUpWebhook;
         this.userService = userService;
-        this.mailService = mailService;
-        this.tempEmailService = tempEmailService;
     }
 
     /**
@@ -107,7 +107,7 @@ public class AccountController {
     @PostMapping("/register")
     @ResponseStatus(HttpStatus.CREATED)
     public void registerAccount(@Valid @RequestBody ManagedUserVM managedUserVM) {
-        if (tempEmailService.isEmailDomainTemp(managedUserVM.getEmail())) {
+        if (!signUpWebhook.isEmailDomainValid(managedUserVM.getEmail())) {
             throw new EmailAlreadyUsedException();
         }
 
