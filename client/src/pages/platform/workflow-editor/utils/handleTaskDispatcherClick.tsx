@@ -63,7 +63,6 @@ export default async function handleTaskDispatcherClick({
         type: `${name}/v${version}`,
         workflowNodeName,
     };
-
     if (taskDispatcherContext) {
         if (taskDispatcherContext.conditionId) {
             newNodeData.conditionData = {
@@ -96,7 +95,9 @@ export default async function handleTaskDispatcherClick({
     }
 
     if (edge) {
-        nodeIndex = (workflow.tasks?.findIndex((task) => task.name === sourceNodeId) ?? 0) + 1;
+        const taskNodeName = sourceNodeId?.includes('-') ? sourceNodeId?.split('-')[0] : sourceNodeId;
+
+        nodeIndex = (workflow.tasks?.findIndex((task) => task.name === taskNodeName) ?? 0) + 1;
     }
 
     saveWorkflowDefinition({

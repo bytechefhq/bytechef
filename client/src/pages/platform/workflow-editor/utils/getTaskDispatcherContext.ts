@@ -125,7 +125,15 @@ export default function getTaskDispatcherContext({
     }
 
     if (isSourceGhost && isTargetTaskDispatcher) {
+        if (!sourceNode.data.conditionData && !sourceNode.data.loopData && !sourceNode.data.branchData) {
+            return undefined;
+        }
+
         return getContextFromTaskNodeData(targetNode.data as NodeDataType, 0);
+    }
+
+    if (isSourceGhost && isTargetTask) {
+        return getContextFromTaskNodeData(targetNode.data as NodeDataType);
     }
 
     if (isSourceTaskDispatcher && isTargetTask) {
@@ -146,10 +154,6 @@ export default function getTaskDispatcherContext({
         }
 
         return getContextFromTaskNodeData(targetNode.data as NodeDataType, 0);
-    }
-
-    if (isSourceGhost && isTargetTask) {
-        return getContextFromTaskNodeData(targetNode.data as NodeDataType);
     }
 
     return context;
