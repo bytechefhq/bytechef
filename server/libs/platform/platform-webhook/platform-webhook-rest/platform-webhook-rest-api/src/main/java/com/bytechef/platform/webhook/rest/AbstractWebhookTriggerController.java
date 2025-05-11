@@ -330,8 +330,8 @@ public abstract class AbstractWebhookTriggerController {
     }
 
     private String getWorkflowId(WorkflowExecutionId workflowExecutionId) {
-        JobPrincipalAccessor jobPrincipalAccessor =
-            jobPrincipalAccessorRegistry.getJobPrincipalAccessor(workflowExecutionId.getType());
+        JobPrincipalAccessor jobPrincipalAccessor = jobPrincipalAccessorRegistry.getJobPrincipalAccessor(
+            workflowExecutionId.getType());
 
         String workflowId;
 
