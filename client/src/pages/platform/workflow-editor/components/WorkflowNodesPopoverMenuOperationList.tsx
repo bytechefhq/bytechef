@@ -169,8 +169,12 @@ const WorkflowNodesPopoverMenuOperationList = ({
                 const loopTasks =
                     workflow.tasks?.slice(0, nextTaskIndex).filter((task) => task?.type.includes('loop/')) || [];
 
+                const branchTasks =
+                    workflow.tasks?.slice(0, nextTaskIndex).filter((task) => task?.type.includes('branch/')) || [];
+
                 let tasksInConditions = 0;
                 let tasksInLoops = 0;
+                let tasksInBranches = 0;
 
                 if (conditionTasks.length) {
                     tasksInConditions = conditionTasks.reduce((count, conditionTask) => {
@@ -188,7 +192,15 @@ const WorkflowNodesPopoverMenuOperationList = ({
                     );
                 }
 
-                return nextTaskIndex - tasksInConditions - tasksInLoops;
+                if (branchTasks.length) {
+                    tasksInBranches = branchTasks.reduce((count, branchTask) => {
+                        const caseKeys = ['default', Object.keys(branchTask.parameters?.cases || {})];
+
+                        return count + caseKeys.length;
+                    }, 0);
+                }
+
+                return nextTaskIndex - tasksInConditions - tasksInLoops - tasksInBranches;
             };
 
             const handleEdgeCase = () => {
