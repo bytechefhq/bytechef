@@ -79,8 +79,10 @@ public class Evaluator {
         map.put("flatten", new Flatten());
         map.put("float", new Cast<>(Float.class));
         map.put("double", new Cast<>(Double.class));
+        map.put("indexOf", new IndexOf());
         map.put("int", new Cast<>(Integer.class));
         map.put("join", new Join());
+        map.put("lastIndexOf", new LastIndexOf());
         map.put("length", new Length());
         map.put("long", new Cast<>(Long.class));
         map.put("minusDays", new MinusDays());
@@ -89,6 +91,7 @@ public class Evaluator {
         map.put("size", new Size());
         map.put("short", new Cast<>(Short.class));
         map.put("sort", new Sort());
+        map.put("split", new Split());
         map.put("stringf", new StringFormat());
         map.put("substring", new Substring());
         map.put("systemProperty", new SystemProperty());
@@ -104,9 +107,7 @@ public class Evaluator {
         return evaluateInternal(map, context);
     }
 
-    private StandardEvaluationContext createEvaluationContext(
-        Map<String, ?> context, boolean formulaExpression) {
-
+    private StandardEvaluationContext createEvaluationContext(Map<String, ?> context, boolean formulaExpression) {
         StandardEvaluationContext evaluationContext = new StandardEvaluationContext(context);
 
         evaluationContext.addPropertyAccessor(new MapPropertyAccessor());
@@ -161,11 +162,7 @@ public class Evaluator {
 
                     expression = expressionParser.parseExpression(string.replaceAll("\\$\\{([^}]*)}", "$1"));
                 } catch (ParseException e) {
-                    if (logger.isTraceEnabled()) {
-                        logger.trace(e.getMessage());
-                    }
-
-                    return value;
+                    throw new IllegalArgumentException("Invalid formula expression: " + string, e);
                 }
             } else {
                 if (!validateTextExpression(string)) {

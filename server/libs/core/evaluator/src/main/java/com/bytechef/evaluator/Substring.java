@@ -28,6 +28,10 @@ class Substring implements MethodExecutor {
 
     @Override
     public TypedValue execute(EvaluationContext context, Object target, Object... arguments) throws AccessException {
-        return new TypedValue(((String) arguments[0]).substring((Integer) arguments[1], (Integer) arguments[2]));
+        if (arguments.length == 2) {
+            return new TypedValue(((String) arguments[0]).substring((Integer) arguments[1]));
+        } else {
+            return new TypedValue(((String) arguments[0]).substring((Integer) arguments[1], (Integer) arguments[2]));
+        }
     }
 }
