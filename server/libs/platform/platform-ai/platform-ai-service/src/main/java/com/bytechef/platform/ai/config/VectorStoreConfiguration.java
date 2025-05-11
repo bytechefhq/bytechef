@@ -487,7 +487,7 @@ public class VectorStoreConfiguration {
 
             String name = taskDispatcherDefinition.getName();
 
-            if (!name.equals("waitForApproval")) {
+            if (name.equals("condition") || name.equals("loop")) {
                 String json = toString(taskDispatcherDefinition);
 
                 addToDocuments(vectorStores, name, json, documentList, "flow");

@@ -12,7 +12,7 @@ public class OrchestratorWorkers {
     private final String workerPrompt;
 
     public static final String DEFAULT_ORCHESTRATOR_PROMPT = """
-			Analyze this task and break it down into subtasks so that the first subtask is always a single Trigger, and each subsequent subtask is either an Action or a Flow (only do 'condition' flow for 'if' statements and 'loop' flow for 'for' statements...):
+			Analyze this task and break it down into subtasks so that the first subtask is always a single Trigger, and each subsequent subtask is either an Action or a Flow. Use the 'condition' flow for the 'if' function and 'loop' flow for the 'for each' function.
 
 			Task: {task}
 
@@ -44,8 +44,10 @@ public class OrchestratorWorkers {
 			Task Type: {task_type}
 			Task Description: {task_description}
 
-            Return your response in a JSON format like the one in the Component's context: 'Example JSON structure' and 'Output JSON' if it exists. Only use the properties and parameters described in the context with the task type and name.
-            If there is no such task, return the 'missing' Component with a custom label:
+            Return your response in a JSON format like the one in the Component's context: 'Example JSON structure' in 'structure', 'Output JSON' in 'output' if it exists and task type into 'type'. Only use the properties and parameters described in the context with the task type and name.
+            If there is no such task, return the 'missing' Component with a custom label.
+
+            Return your response in this JSON format:
             \\{
             "structure": \\{
                "label": "Name of missing action or trigger",
