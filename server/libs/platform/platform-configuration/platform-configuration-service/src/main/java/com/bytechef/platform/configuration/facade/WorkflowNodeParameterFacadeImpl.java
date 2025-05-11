@@ -51,6 +51,8 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 /**
@@ -58,6 +60,8 @@ import org.springframework.stereotype.Service;
  */
 @Service
 public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFacade {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(WorkflowNodeParameterFacadeImpl.class);
 
     protected static final Pattern ARRAY_INDEX_VALUE_PATTERN = Pattern.compile("\\[(\\d+)]");
     private static final Pattern ARRAY_INDEXES_PATTERN =
@@ -208,13 +212,24 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
         String displayCondition, Map<String, Object> inputMap, Map<String, Object> outputs,
         Map<String, ?> parameterMap) {
 
+        Map<String, Object> evaluate;
+
+        try {
+            evaluate = EVALUATOR.evaluate(parameterMap, outputs);
+        } catch (Exception e) {
+            if (LOGGER.isTraceEnabled()) {
+                LOGGER.trace(e.getMessage());
+            }
+
+            evaluate = new HashMap<>(parameterMap);
+        }
+
         return evaluate(
             displayCondition,
             MapUtils.concat(
                 MapUtils.concat(inputMap, outputs),
                 MapUtils.toMap(
-                    EVALUATOR.evaluate(parameterMap, outputs),
-                    Map.Entry::getKey, entry -> entry.getValue() == null ? "" : entry.getValue())));
+                    evaluate, Map.Entry::getKey, entry -> entry.getValue() == null ? "" : entry.getValue())));
     }
 
     protected static void evaluateArray(

@@ -27,6 +27,8 @@ import com.bytechef.platform.definition.WorkflowNodeType;
 import com.bytechef.platform.workflow.task.dispatcher.service.TaskDispatcherDefinitionService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Map;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 /**
@@ -34,6 +36,8 @@ import org.springframework.stereotype.Service;
  */
 @Service
 public class WorkflowNodeDescriptionFacadeImpl implements WorkflowNodeDescriptionFacade {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(WorkflowNodeDescriptionFacadeImpl.class);
 
     private final ActionDefinitionFacade actionDefinitionFacade;
     private final TaskDispatcherDefinitionService taksDispatcherDefinitionService;
@@ -78,14 +82,25 @@ public class WorkflowNodeDescriptionFacadeImpl implements WorkflowNodeDescriptio
 
                     WorkflowNodeType workflowNodeType = WorkflowNodeType.ofType(workflowTask.getType());
 
+                    Map<String, ?> inputParameters;
+
+                    try {
+                        inputParameters = workflowTask.evaluateParameters(inputs);
+                    } catch (Exception e) {
+                        if (LOGGER.isTraceEnabled()) {
+                            LOGGER.trace(e.getMessage());
+                        }
+
+                        inputParameters = workflowTask.getParameters();
+                    }
+
                     if (workflowNodeType.operation() == null) {
                         return taksDispatcherDefinitionService.executeWorkflowNodeDescription(
-                            workflowNodeType.name(), workflowNodeType.version(),
-                            workflowTask.evaluateParameters(inputs));
+                            workflowNodeType.name(), workflowNodeType.version(), inputParameters);
                     } else {
                         return actionDefinitionFacade.executeWorkflowNodeDescription(
-                            workflowNodeType.name(), workflowNodeType.version(),
-                            workflowNodeType.operation(), workflowTask.evaluateParameters(inputs));
+                            workflowNodeType.name(), workflowNodeType.version(), workflowNodeType.operation(),
+                            inputParameters);
                     }
                 });
         }
