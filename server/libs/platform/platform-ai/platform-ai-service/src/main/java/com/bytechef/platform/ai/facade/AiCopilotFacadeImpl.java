@@ -57,17 +57,18 @@ public class AiCopilotFacadeImpl implements AiCopilotFacade {
 
         QuestionAnswerAdvisor questionAnswerAdvisorComponents = new QuestionAnswerAdvisor(
             vectorStore, SearchRequest.builder()
-            .filterExpression("category == 'components' or category == 'flows'")
-            .topK(15)
-            .build());
+                .filterExpression("category == 'components' or category == 'flows'")
+                .topK(15)
+                .build());
 
         QuestionAnswerAdvisor questionAnswerAdvisorWorkflow = new QuestionAnswerAdvisor(
             vectorStore, SearchRequest.builder()
-            .filterExpression("category == 'workflows'")
-            .build());
+                .filterExpression("category == 'workflows'")
+                .build());
 
         SimpleLoggerAdvisor qaRetrievedDocuments = new SimpleLoggerAdvisor(
-            request -> "Retrieved documents: " + request.adviseContext().get("qa_retrieved_documents"),
+            request -> "Retrieved documents: " + request.adviseContext()
+                .get("qa_retrieved_documents"),
             response -> "Response: " + ModelOptionsUtils.toJsonStringPrettyPrinter(response),
             1 // Log level
         );
@@ -76,9 +77,7 @@ public class AiCopilotFacadeImpl implements AiCopilotFacade {
             // TODO add multiuser, multitenant history
             .defaultAdvisors(
 //                messageChatMemoryAdvisor,
-                questionAnswerAdvisorComponents
-                , qaRetrievedDocuments
-            )
+                questionAnswerAdvisorComponents, qaRetrievedDocuments)
             .build();
 
         this.chatClientWorkflow = chatClientBuilder.clone()
@@ -120,18 +119,19 @@ public class AiCopilotFacadeImpl implements AiCopilotFacade {
                 OrchestratorWorkers.FinalResponse process = orchestratorWorkers.process(message);
 
                 yield chatClientWorkflow.prompt()
-                    .system("Return in a JSON format in a similar structure to the Workflows in the context.")
-                    .user(user -> user.text("""
-                        Merge all the task.structure according to instructions. Only use tasks that are provided in this prompt. If the task.type is 'trigger' and task.structure.type is 'missing/v1/missing', don't put any trigger. If the task.type is 'action' and task.structure.type is 'missing/v1/missing', pass the 'missing' Component.
+                    .system(
+                        "Return your response in a JSON format in a similar structure to the Workflows in the context.")
+                    .user(user -> user
+                        .text(
+                            """
+                                Merge all the task.structure according to instructions. Only use tasks that are provided in this prompt. If the task.type is 'trigger' and task.structure.type is 'missing/v1/missing', don't put any trigger. If the task.type is 'action' and task.structure.type is 'missing/v1/missing', pass the 'missing' Component.
 
-                        Return your response in a JSON format like the one in the context.
+                                instructions:
+                                {task_analysis}
 
-                        instructions:
-                        {task_analysis}
-
-                        subtasks:
-                        {task_list}
-                        """)
+                                subtasks:
+                                {task_list}
+                                """)
                         .param("task_analysis", process.analysis())
                         .param("task_list", process.workerResponses()))
                     .advisors(advisor -> advisor.param(

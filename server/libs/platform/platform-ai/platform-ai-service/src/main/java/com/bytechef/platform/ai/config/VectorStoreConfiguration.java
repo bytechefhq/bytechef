@@ -403,7 +403,6 @@ public class VectorStoreConfiguration {
     private String toString(TriggerDefinition triggerDefinition) {
         StringBuilder definitionText = new StringBuilder();
 
-
         definitionText.append("Trigger Name: ")
             .append(triggerDefinition.getName())
             .append(",\n")
