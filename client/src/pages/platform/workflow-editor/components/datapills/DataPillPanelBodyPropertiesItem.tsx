@@ -1,5 +1,5 @@
 import {Button} from '@/components/ui/button';
-import DataPill from '@/pages/platform/workflow-editor/components/DataPill';
+import DataPill from '@/pages/platform/workflow-editor/components/datapills/DataPill';
 import getFilteredProperties from '@/pages/platform/workflow-editor/utils/getFilteredProperties';
 import getNestedObject from '@/pages/platform/workflow-editor/utils/getNestedObject';
 import {NodeDataType, PropertyAllType} from '@/shared/types';
@@ -9,20 +9,21 @@ import {Fragment} from 'react';
 import InlineSVG from 'react-inlinesvg';
 import {useShallow} from 'zustand/react/shallow';
 
-import useNodeClickHandler from '../hooks/useNodeClick';
-import useWorkflowDataStore from '../stores/useWorkflowDataStore';
+import useNodeClickHandler from '../../hooks/useNodeClick';
+import useWorkflowDataStore from '../../stores/useWorkflowDataStore';
 import {ComponentOperationType} from './DataPillPanelBody';
+
+interface DataPillPanelBodyPropertiesItemProps {
+    componentOperation: ComponentOperationType;
+    dataPillFilterQuery: string;
+    sampleOutput: string | number | boolean | object;
+}
 
 const DataPillPanelBodyPropertiesItem = ({
     componentOperation,
     dataPillFilterQuery,
     sampleOutput,
-}: {
-    componentOperation: ComponentOperationType;
-    dataPillFilterQuery: string;
-    /* eslint-disable  @typescript-eslint/no-explicit-any */
-    sampleOutput: any;
-}) => {
+}: DataPillPanelBodyPropertiesItemProps) => {
     const {componentActions} = useWorkflowDataStore();
 
     const {nodes} = useWorkflowDataStore(
@@ -128,9 +129,9 @@ const DataPillPanelBodyPropertiesItem = ({
                                             workflowNodeName={workflowNodeName}
                                         />
 
-                                        {(value || value === 0 || value === false) && typeof value !== 'object' && (
+                                        {value !== undefined && typeof value !== 'object' && (
                                             <div className="flex-1 overflow-hidden truncate text-xs text-muted-foreground">
-                                                {value === true ? 'true' : value === false ? false : value}
+                                                {String(value)}
                                             </div>
                                         )}
                                     </div>

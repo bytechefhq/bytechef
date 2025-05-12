@@ -1,14 +1,16 @@
 import {Input} from '@/components/ui/input';
 import {Skeleton} from '@/components/ui/skeleton';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
-import DataPillPanelBody, {ComponentOperationType} from '@/pages/platform/workflow-editor/components/DataPillPanelBody';
+import DataPillPanelBody, {
+    ComponentOperationType,
+} from '@/pages/platform/workflow-editor/components/datapills/DataPillPanelBody';
 import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWorkflowDataStore';
 import {ComponentDefinitionBasic, WorkflowNodeOutput} from '@/shared/middleware/platform/configuration';
 import {Cross2Icon, InfoCircledIcon} from '@radix-ui/react-icons';
 import {useEffect, useState} from 'react';
 
-import useDataPillPanelStore from '../stores/useDataPillPanelStore';
-import useWorkflowNodeDetailsPanelStore from '../stores/useWorkflowNodeDetailsPanelStore';
+import useDataPillPanelStore from '../../stores/useDataPillPanelStore';
+import useWorkflowNodeDetailsPanelStore from '../../stores/useWorkflowNodeDetailsPanelStore';
 
 const DataPillPanel = ({
     isLoading,

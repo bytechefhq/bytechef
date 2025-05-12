@@ -1,5 +1,5 @@
 import {ScrollArea} from '@/components/ui/scroll-area';
-import DataPillPanelBodyInputsItem from '@/pages/platform/workflow-editor/components/DataPillPanelBodyInputsItem';
+import DataPillPanelBodyInputsItem from '@/pages/platform/workflow-editor/components/datapills/DataPillPanelBodyInputsItem';
 import {
     ActionDefinition,
     ComponentDefinitionBasic,
@@ -45,7 +45,7 @@ interface DataPillPanelBodyProps {
 
 const DataPillPanelBody = ({componentOperations, dataPillFilterQuery, workflowInputs}: DataPillPanelBodyProps) => (
     <ScrollArea>
-        <Accordion className="h-full" collapsible type="single">
+        <Accordion className="size-full max-w-data-pill-panel-width" collapsible type="single">
             {!!workflowInputs?.length && (
                 <AccordionItem className="group" value="inputs">
                     <DataPillPanelBodyInputsItem />
