@@ -32,6 +32,7 @@ import {ProjectKeys} from '@/shared/queries/automation/projects.queries';
 import {useQueryClient} from '@tanstack/react-query';
 import {ReactNode, useEffect, useState} from 'react';
 import {useForm} from 'react-hook-form';
+import {useLocation, useNavigate} from 'react-router-dom';
 import {twMerge} from 'tailwind-merge';
 import {useShallow} from 'zustand/react/shallow';
 
@@ -88,6 +89,8 @@ const ProjectDeploymentDialog = ({
     );
 
     const queryClient = useQueryClient();
+    const navigate = useNavigate();
+    const location = useLocation();
 
     const onSuccess = () => {
         if (!projectDeployment?.id) {
@@ -112,6 +115,10 @@ const ProjectDeploymentDialog = ({
 
         closeDialog();
         setActiveStepIndex(0);
+
+        if (!location.pathname.includes('deployments')) {
+            navigate('/automation/deployments');
+        }
     };
 
     const createProjectDeploymentMutation = useCreateProjectDeploymentMutation({
