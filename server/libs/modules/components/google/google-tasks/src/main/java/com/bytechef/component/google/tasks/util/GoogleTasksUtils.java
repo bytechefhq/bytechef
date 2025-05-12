@@ -25,8 +25,6 @@ import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -78,42 +76,5 @@ public class GoogleTasksUtils {
         }
 
         return tasksId;
-    }
-
-    public static List<Map<?, ?>> getTasks(Context context, String listId, String timestamp) {
-        List<Map<?, ?>> tasks = new ArrayList<>();
-
-        Http.Executor executor = createHttpExecutor(listId, context, timestamp);
-
-        Map<String, Object> response = executor.execute()
-            .getBody(new TypeReference<>() {});
-
-        extractTasks(response, tasks);
-
-        return tasks;
-    }
-
-    private static Http.Executor createHttpExecutor(
-        String listId, Context context, String timestamp) {
-
-        Http.Executor executor = context
-            .http(http -> http.get("https://tasks.googleapis.com/tasks/v1/lists/" + listId + "/tasks"))
-            .configuration(Http.responseType(Http.ResponseType.JSON));
-
-        if (timestamp != null) {
-            String encode = URLEncoder.encode(timestamp, StandardCharsets.UTF_8);
-            executor.queryParameter("updatedMin", encode);
-        }
-        return executor;
-    }
-
-    private static void extractTasks(Map<String, Object> response, List<Map<?, ?>> tasks) {
-        if (response.get("items") instanceof List<?> list) {
-            for (Object o : list) {
-                if (o instanceof Map<?, ?> map) {
-                    tasks.add(map);
-                }
-            }
-        }
     }
 }

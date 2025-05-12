@@ -16,57 +16,59 @@
 
 package com.bytechef.component.google.tasks.trigger;
 
-import static com.bytechef.component.google.tasks.constant.GoogleTasksConstants.LIST_ID;
 import static com.bytechef.component.google.tasks.trigger.GoogleTasksNewTaskTrigger.LAST_TIME_CHECKED;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.mockStatic;
+import static org.mockito.Mockito.when;
 
-import com.bytechef.component.definition.Context;
+import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TriggerContext;
-import com.bytechef.component.definition.TriggerDefinition;
-import com.bytechef.component.google.tasks.util.GoogleTasksUtils;
+import com.bytechef.component.definition.TriggerDefinition.PollOutput;
+import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.test.definition.MockParametersFactory;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
-import org.mockito.MockedStatic;
 
 /**
  * @author Marija Horvat
  */
 class GoogleTasksNewTaskTriggerTest {
 
-    private final ArgumentCaptor<Context> contextArgumentCaptor = ArgumentCaptor.forClass(Context.class);
+    private final Http.Executor mockedExecutor = mock(Http.Executor.class);
+    private final Http.Response mockedResponse = mock(Http.Response.class);
     private final TriggerContext mockedTriggerContext = mock(TriggerContext.class);
     private final ArgumentCaptor<String> stringArgumentCaptor = ArgumentCaptor.forClass(String.class);
 
     @Test
     void testPoll() {
         LocalDateTime startDate = LocalDateTime.of(2000, 1, 1, 1, 1, 1);
+        Parameters mockedParameters = MockParametersFactory.create(Map.of(LAST_TIME_CHECKED, startDate));
 
-        Parameters mockedParameters =
-            MockParametersFactory.create(Map.of(LAST_TIME_CHECKED, startDate, LIST_ID, "listId"));
+        List<Map<String, String>> responseList = List.of(Map.of("id", "abc"));
 
-        try (MockedStatic<GoogleTasksUtils> googleTasksUtilsMockedStatic = mockStatic(GoogleTasksUtils.class)) {
-            List<Map<String, String>> responseList = List.of(Map.of("id", "abc"));
+        when(mockedTriggerContext.http(any()))
+            .thenReturn(mockedExecutor);
+        when(mockedExecutor.configuration(any()))
+            .thenReturn(mockedExecutor);
+        when(mockedExecutor.queryParameter(stringArgumentCaptor.capture(), stringArgumentCaptor.capture()))
+            .thenReturn(mockedExecutor);
+        when(mockedExecutor.execute())
+            .thenReturn(mockedResponse);
+        when(mockedResponse.getBody(any(TypeReference.class)))
+            .thenReturn(Map.of("items", responseList));
 
-            googleTasksUtilsMockedStatic.when(() -> GoogleTasksUtils.getTasks(
-                contextArgumentCaptor.capture(), stringArgumentCaptor.capture(), stringArgumentCaptor.capture()))
-                .thenReturn(responseList);
+        PollOutput pollOutput = GoogleTasksNewTaskTrigger.poll(
+            mockedParameters, mockedParameters, mockedParameters, mockedTriggerContext);
 
-            TriggerDefinition.PollOutput pollOutput = GoogleTasksNewTaskTrigger.poll(
-                mockedParameters, mockedParameters, mockedParameters, mockedTriggerContext);
+        assertEquals(responseList, pollOutput.records());
+        assertFalse(pollOutput.pollImmediately());
 
-            assertEquals(responseList, pollOutput.records());
-            assertFalse(pollOutput.pollImmediately());
-
-            assertEquals(mockedTriggerContext, contextArgumentCaptor.getValue());
-            assertEquals(List.of("listId", "2000-01-01T01:01:01.000Z"), stringArgumentCaptor.getAllValues());
-        }
+        assertEquals(List.of("updatedMin", "2000-01-01T01%3A01%3A01.000Z"), stringArgumentCaptor.getAllValues());
     }
 }
