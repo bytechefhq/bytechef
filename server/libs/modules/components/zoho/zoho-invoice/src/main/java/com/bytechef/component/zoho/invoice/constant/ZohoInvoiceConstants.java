@@ -20,8 +20,12 @@ package com.bytechef.component.zoho.invoice.constant;
  * @author Marija Horvat
  */
 public class ZohoInvoiceConstants {
+
     public static final String DESCRIPTION = "description";
     public static final String NAME = "name";
     public static final String PRODUCT_TYPE = "product_type";
     public static final String RATE = "rate";
+
+    private ZohoInvoiceConstants() {
+    }
 }

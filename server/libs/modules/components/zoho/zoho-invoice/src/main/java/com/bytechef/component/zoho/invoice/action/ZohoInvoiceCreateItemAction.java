@@ -80,7 +80,6 @@ public class ZohoInvoiceCreateItemAction {
     }
 
     public static Object perform(Parameters inputParameters, Parameters conectionParameters, Context context) {
-
         return context.http(http -> http.post("/items"))
             .body(
                 Body.of(

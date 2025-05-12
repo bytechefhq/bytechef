@@ -34,4 +34,7 @@ public class ZohoConstants {
     public static final String SHIPPING_ADDRESS = "shipping_address";
     public static final String USE_CUSTOM_INVOICE_NUMBER = "use_custom_invoice_number";
     public static final String WEBSITE = "website";
+
+    private ZohoConstants() {
+    }
 }
