@@ -63,7 +63,7 @@ public class KeywordMetadataEnricher extends AbstractMetadataEnricher {
 
         KeywordEnricher keywordEnricher = inputParameters.get(KEYWORD_METADATA_ENRICHER, KeywordEnricher.class);
 
-        return new org.springframework.ai.chat.transformer.KeywordMetadataEnricher(
+        return new org.springframework.ai.model.transformer.KeywordMetadataEnricher(
             getModel(extensions, componentConnections), keywordEnricher.keywordCount());
     }
 
