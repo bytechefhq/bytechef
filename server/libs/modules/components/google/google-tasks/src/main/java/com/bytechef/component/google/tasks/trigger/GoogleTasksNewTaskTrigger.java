@@ -17,20 +17,26 @@
 package com.bytechef.component.google.tasks.trigger;
 
 import static com.bytechef.component.definition.ComponentDsl.ModifiableTriggerDefinition;
+import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.ComponentDsl.trigger;
 import static com.bytechef.component.google.tasks.constant.GoogleTasksConstants.LIST_ID;
-import static com.bytechef.component.google.tasks.util.GoogleTasksUtils.getTasks;
+import static com.bytechef.component.google.tasks.constant.GoogleTasksConstants.TASK_OUTPUT_PROPERTY;
 
-import com.bytechef.component.definition.OptionsDataSource;
+import com.bytechef.component.definition.Context.Http;
+import com.bytechef.component.definition.OptionsDataSource.TriggerOptionsFunction;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TriggerContext;
 import com.bytechef.component.definition.TriggerDefinition.PollOutput;
 import com.bytechef.component.definition.TriggerDefinition.TriggerType;
+import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.google.tasks.util.GoogleTasksUtils;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -51,10 +57,10 @@ public class GoogleTasksNewTaskTrigger {
         .properties(
             string(LIST_ID)
                 .label("List ID")
-                .description("ID of the list where tasks are stored.")
-                .options((OptionsDataSource.TriggerOptionsFunction<String>) GoogleTasksUtils::getListsIdOptions)
+                .description("ID of the list where new task is added.")
+                .options((TriggerOptionsFunction<String>) GoogleTasksUtils::getListsIdOptions)
                 .required(true))
-        .output()
+        .output(outputSchema(TASK_OUTPUT_PROPERTY))
         .poll(GoogleTasksNewTaskTrigger::poll);
 
     private GoogleTasksNewTaskTrigger() {
@@ -69,11 +75,27 @@ public class GoogleTasksNewTaskTrigger {
         LocalDateTime now = LocalDateTime.now(zoneId);
 
         LocalDateTime startDate = closureParameters.getLocalDateTime(LAST_TIME_CHECKED, now.minusHours(3));
+        String encode = URLEncoder.encode(
+            startDate.format(DATE_TIME_FORMATTER.withZone(zoneId)), StandardCharsets.UTF_8);
 
-        List<Map<?, ?>> customTasks = getTasks(
-            triggerContext, inputParameters.getRequiredString(LIST_ID),
-            startDate.format(DATE_TIME_FORMATTER.withZone(zoneId)));
+        List<Map<?, ?>> tasks = new ArrayList<>();
 
-        return new PollOutput(customTasks, Map.of(LAST_TIME_CHECKED, now), false);
+        Map<String, Object> response = triggerContext
+            .http(http -> http.get(
+                "https://tasks.googleapis.com/tasks/v1/lists/" + inputParameters.getRequiredString(LIST_ID) + "/tasks"))
+            .configuration(Http.responseType(Http.ResponseType.JSON))
+            .queryParameter("updatedMin", encode)
+            .execute()
+            .getBody(new TypeReference<>() {});
+
+        if (response.get("items") instanceof List<?> items) {
+            for (Object item : items) {
+                if (item instanceof Map<?, ?> task) {
+                    tasks.add(task);
+                }
+            }
+        }
+
+        return new PollOutput(tasks, Map.of(LAST_TIME_CHECKED, now), false);
     }
 }
