@@ -42,7 +42,7 @@ const PropertyField = ({
 
     return (
         <div className="group inline-flex w-full items-center justify-between rounded-md p-1 text-sm hover:bg-surface-neutral-primary-hover">
-            <div className="flex items-center gap-2">
+            <div className="flex w-11/12 items-center gap-2">
                 {label !== '[index]' && (
                     <span title={property.type}>{TYPE_ICONS[property.type as keyof typeof TYPE_ICONS]}</span>
                 )}
@@ -51,17 +51,14 @@ const PropertyField = ({
 
                 <span>{label}</span>
 
-                <div className="flex truncate">
-                    {sampleValue === null && (
-                        <span className="flex-1 truncate text-xs text-content-neutral-secondary">null</span>
-                    )}
-
-                    {(sampleValue || sampleValue === 0 || sampleValue === false) && typeof sampleValue !== 'object' && (
-                        <span className="flex-1 truncate text-xs text-content-neutral-secondary">
-                            {sampleValue === true ? 'true' : sampleValue === false ? 'false' : sampleValue}
-                        </span>
-                    )}
-                </div>
+                {sampleValue !== undefined && typeof sampleValue !== 'object' && (
+                    <span
+                        className="flex-1 truncate text-xs text-content-neutral-secondary"
+                        title={String(sampleValue)}
+                    >
+                        {String(sampleValue)}
+                    </span>
+                )}
             </div>
 
             <div className="flex items-center">
