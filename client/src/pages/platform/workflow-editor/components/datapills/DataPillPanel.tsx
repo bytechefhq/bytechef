@@ -12,15 +12,49 @@ import {useEffect, useState} from 'react';
 import useDataPillPanelStore from '../../stores/useDataPillPanelStore';
 import useWorkflowNodeDetailsPanelStore from '../../stores/useWorkflowNodeDetailsPanelStore';
 
-const DataPillPanel = ({
-    isLoading,
-    previousComponentDefinitions,
-    workflowNodeOutputs,
-}: {
+const LoadingSkeleton = () => (
+    <ul className="flex flex-col">
+        <li className="flex items-center space-x-4 border-b border-border/50 p-4">
+            <Skeleton className="size-6" />
+
+            <Skeleton className="h-6 w-2/3" />
+
+            <Skeleton className="h-6 w-1/5" />
+        </li>
+
+        <li className="flex items-center space-x-4 border-b border-border/50 p-4">
+            <Skeleton className="size-6" />
+
+            <Skeleton className="h-6 w-2/3" />
+
+            <Skeleton className="h-6 w-1/5" />
+        </li>
+
+        <li className="flex items-center space-x-4 border-b border-border/50 p-4">
+            <Skeleton className="size-6" />
+
+            <Skeleton className="h-6 w-2/3" />
+
+            <Skeleton className="h-6 w-1/5" />
+        </li>
+
+        <li className="flex items-center space-x-4 border-b border-border/50 p-4">
+            <Skeleton className="size-6" />
+
+            <Skeleton className="h-6 w-2/3" />
+
+            <Skeleton className="h-6 w-1/5" />
+        </li>
+    </ul>
+);
+
+interface DataPillPanelProps {
     isLoading: boolean;
     previousComponentDefinitions: Array<ComponentDefinitionBasic>;
     workflowNodeOutputs: Array<WorkflowNodeOutput>;
-}) => {
+}
+
+const DataPillPanel = ({isLoading, previousComponentDefinitions, workflowNodeOutputs}: DataPillPanelProps) => {
     const [dataPillFilterQuery, setDataPillFilterQuery] = useState('');
 
     const {dataPillPanelOpen, setDataPillPanelOpen} = useDataPillPanelStore();
@@ -115,41 +149,7 @@ const DataPillPanel = ({
                         <span className="p-4 text-sm text-muted-foreground">No available data pills.</span>
                     )}
 
-                    {!currentNode?.trigger && isLoading && (
-                        <ul className="flex flex-col">
-                            <li className="flex items-center space-x-4 border-b border-border/50 p-4">
-                                <Skeleton className="size-6" />
-
-                                <Skeleton className="h-6 w-2/3" />
-
-                                <Skeleton className="h-6 w-1/5" />
-                            </li>
-
-                            <li className="flex items-center space-x-4 border-b border-border/50 p-4">
-                                <Skeleton className="size-6" />
-
-                                <Skeleton className="h-6 w-2/3" />
-
-                                <Skeleton className="h-6 w-1/5" />
-                            </li>
-
-                            <li className="flex items-center space-x-4 border-b border-border/50 p-4">
-                                <Skeleton className="size-6" />
-
-                                <Skeleton className="h-6 w-2/3" />
-
-                                <Skeleton className="h-6 w-1/5" />
-                            </li>
-
-                            <li className="flex items-center space-x-4 border-b border-border/50 p-4">
-                                <Skeleton className="size-6" />
-
-                                <Skeleton className="h-6 w-2/3" />
-
-                                <Skeleton className="h-6 w-1/5" />
-                            </li>
-                        </ul>
-                    )}
+                    {!currentNode?.trigger && isLoading && <LoadingSkeleton />}
 
                     <DataPillPanelBody
                         componentOperations={componentOperations}
