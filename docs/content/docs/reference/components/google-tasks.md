@@ -220,6 +220,57 @@ Type: OBJECT
 
 
 
+## Triggers
+
+
+### New Task
+Name: newTask
+
+Triggers when a new task is added.
+
+Type: POLLING
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| listId | List ID | STRING | ID of the list where new task is added. | true |
+
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| id | STRING | Task identifier. |
+| title | STRING | Title of the task. |
+| notes | STRING | Notes describing the task. |
+| status | STRING | Status of the task. |
+
+
+
+
+#### JSON Example
+```json
+{
+  "label" : "New Task",
+  "name" : "newTask",
+  "parameters" : {
+    "listId" : ""
+  },
+  "type" : "googleTasks/v1/newTask"
+}
+```
+
+
+<hr />
+
 <hr />
 
 # Additional instructions
