@@ -22,7 +22,7 @@ import com.bytechef.component.definition.ComponentDsl.ModifiableComponentDefinit
 import com.google.auto.service.AutoService;
 
 /**
- * This class will not be overwritten on the subsequent calls of the generator.
+ * @author Marija Horvat
  */
 @AutoService(OpenApiComponentHandler.class)
 public class ScrapeGraphAiComponentHandler extends AbstractScrapeGraphAiComponentHandler {
