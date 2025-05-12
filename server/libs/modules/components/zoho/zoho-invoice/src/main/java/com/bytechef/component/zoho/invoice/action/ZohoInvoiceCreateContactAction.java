@@ -119,7 +119,6 @@ public class ZohoInvoiceCreateContactAction {
     }
 
     public static Object perform(Parameters inputParameters, Parameters conectionParameters, Context context) {
-
         return context.http(http -> http.post("/contacts"))
             .body(
                 Body.of(
