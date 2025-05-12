@@ -27,6 +27,7 @@ import {
 import {ProjectGitConfigurationKeys} from '@/ee/queries/projectGit.queries';
 import {ProjectGitConfiguration} from '@/ee/shared/middleware/automation/configuration';
 import {useToast} from '@/hooks/use-toast';
+import ProjectDeploymentDialog from '@/pages/automation/project-deployments/components/project-deployment-dialog/ProjectDeploymentDialog';
 import ProjectGitConfigurationDialog from '@/pages/automation/project/components/ProjectGitConfigurationDialog';
 import ProjectPublishDialog from '@/pages/automation/projects/components/ProjectPublishDialog';
 import WorkflowDialog from '@/shared/components/workflow/WorkflowDialog';
@@ -51,6 +52,7 @@ import {
     GitBranchIcon,
     GitPullRequestArrowIcon,
     PlusIcon,
+    RocketIcon,
     SendIcon,
     Trash2Icon,
     WorkflowIcon,
@@ -260,19 +262,48 @@ const ProjectListItem = ({project, projectGitConfiguration, remainingTags}: Proj
 
                     <div className="flex items-center justify-end gap-x-6">
                         <div className="flex flex-col items-end gap-y-4">
-                            {project.lastPublishedDate && project.lastVersion ? (
-                                <Badge className="flex space-x-1" variant="success">
-                                    <span>V{project.lastVersion - 1}</span>
+                            <div className="flex items-center space-x-2">
+                                {project.lastPublishedDate && project.lastVersion ? (
+                                    <>
+                                        <Badge className="flex space-x-1" variant="success">
+                                            <span>V{project.lastVersion - 1}</span>
 
-                                    <span>PUBLISHED</span>
-                                </Badge>
-                            ) : (
-                                <Badge className="flex space-x-1" variant="secondary">
-                                    <span>V{project.lastVersion}</span>
+                                            <span>PUBLISHED</span>
+                                        </Badge>
 
-                                    <span>{project.lastStatus}</span>
-                                </Badge>
-                            )}
+                                        <ProjectDeploymentDialog
+                                            projectDeployment={{
+                                                name: project.name,
+                                                projectId: project.id,
+                                            }}
+                                            triggerNode={
+                                                <Button
+                                                    className="hover:bg-surface-neutral-primary-hover"
+                                                    size="sm"
+                                                    variant="ghost"
+                                                >
+                                                    <RocketIcon /> Deploy
+                                                </Button>
+                                            }
+                                        />
+                                    </>
+                                ) : (
+                                    <Badge className="flex space-x-1" variant="secondary">
+                                        <span>V{project.lastVersion}</span>
+
+                                        <span>{project.lastStatus}</span>
+                                    </Badge>
+                                )}
+
+                                <Button
+                                    className="hover:bg-surface-neutral-primary-hover"
+                                    onClick={() => setShowEditDialog(true)}
+                                    size="sm"
+                                    variant="ghost"
+                                >
+                                    <EditIcon />
+                                </Button>
+                            </div>
 
                             <Tooltip>
                                 <TooltipTrigger>
