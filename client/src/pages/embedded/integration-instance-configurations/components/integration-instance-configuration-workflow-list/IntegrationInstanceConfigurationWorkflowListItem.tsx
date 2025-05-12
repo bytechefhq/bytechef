@@ -3,7 +3,7 @@ import {Switch} from '@/components/ui/switch';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import IntegrationInstanceConfigurationEditWorkflowDialog from '@/pages/embedded/integration-instance-configurations/components/IntegrationInstanceConfigurationEditWorkflowDialog';
 import IntegrationInstanceConfigurationWorkflowListItemDropDownMenu from '@/pages/embedded/integration-instance-configurations/components/integration-instance-configuration-workflow-list/IntegrationInstanceConfigurationWorkflowListItemDropDownMenu';
-import useReadOnlyWorkflowEditorSheetStore from '@/shared/components/read-only-workflow-editor/stores/useReadOnlyWorkflowEditorSheetStore';
+import useReadOnlyWorkflow from '@/shared/components/read-only-workflow-editor/hooks/useReadOnlyWorkflow';
 import {IntegrationInstanceConfigurationWorkflow, Workflow} from '@/shared/middleware/embedded/configuration';
 import {ComponentDefinitionBasic} from '@/shared/middleware/platform/configuration';
 import {useEnableIntegrationInstanceConfigurationWorkflowMutation} from '@/shared/mutations/embedded/integrationInstanceConfigurations.mutations';
@@ -36,7 +36,7 @@ const IntegrationInstanceConfigurationWorkflowListItem = ({
 }) => {
     const [showEditWorkflowDialog, setShowEditWorkflowDialog] = useState(false);
 
-    const {setReadOnlyWorkflowEditorSheetOpen, setWorkflowId} = useReadOnlyWorkflowEditorSheetStore();
+    const {openReadOnlyWorkflowSheet} = useReadOnlyWorkflow();
 
     const queryClient = useQueryClient();
 
@@ -66,8 +66,9 @@ const IntegrationInstanceConfigurationWorkflowListItem = ({
     };
 
     const handleWorkflowClick = () => {
-        setWorkflowId(workflow.id!);
-        setReadOnlyWorkflowEditorSheetOpen(true);
+        if (workflow) {
+            openReadOnlyWorkflowSheet(workflow);
+        }
     };
 
     return (

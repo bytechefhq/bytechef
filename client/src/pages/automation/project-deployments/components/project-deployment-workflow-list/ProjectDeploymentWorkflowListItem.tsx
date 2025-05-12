@@ -5,7 +5,7 @@ import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {useToast} from '@/hooks/use-toast';
 import ProjectDeploymentEditWorkflowDialog from '@/pages/automation/project-deployments/components/ProjectDeploymentEditWorkflowDialog';
 import ProjectDeploymentWorkflowListItemDropdownMenu from '@/pages/automation/project-deployments/components/project-deployment-workflow-list/ProjectDeploymentWorkflowListItemDropdownMenu';
-import useReadOnlyWorkflowEditorSheetStore from '@/shared/components/read-only-workflow-editor/stores/useReadOnlyWorkflowEditorSheetStore';
+import useReadOnlyWorkflow from '@/shared/components/read-only-workflow-editor/hooks/useReadOnlyWorkflow';
 import {
     Environment,
     ProjectDeploymentApi,
@@ -50,7 +50,7 @@ const ProjectDeploymentWorkflowListItem = ({
 }) => {
     const [showEditWorkflowDialog, setShowEditWorkflowDialog] = useState(false);
 
-    const {setReadOnlyWorkflowEditorSheetOpen, setWorkflowId} = useReadOnlyWorkflowEditorSheetStore();
+    const {openReadOnlyWorkflowSheet} = useReadOnlyWorkflow();
 
     /* eslint-disable @typescript-eslint/no-unused-vars */
     const [_, copyToClipboard] = useCopyToClipboard();
@@ -72,8 +72,9 @@ const ProjectDeploymentWorkflowListItem = ({
         (workflow.triggers?.[0]?.parameters?.mode ?? 1) === 1;
 
     const handleWorkflowClick = () => {
-        setWorkflowId(workflow.id!);
-        setReadOnlyWorkflowEditorSheetOpen(true);
+        if (workflow) {
+            openReadOnlyWorkflowSheet(workflow);
+        }
     };
 
     const handleRunWorkflowClick = (event: React.MouseEvent<HTMLButtonElement>) => {

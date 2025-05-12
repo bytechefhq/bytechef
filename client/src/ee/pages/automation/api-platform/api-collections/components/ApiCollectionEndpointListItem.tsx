@@ -14,7 +14,7 @@ import ApiCollectionEndpointDialog from '@/ee/pages/automation/api-platform/api-
 import {ApiCollectionKeys} from '@/ee/queries/apiCollections.queries';
 import {ApiCollectionEndpoint} from '@/ee/shared/middleware/automation/api-platform';
 import ProjectDeploymentEditWorkflowDialog from '@/pages/automation/project-deployments/components/ProjectDeploymentEditWorkflowDialog';
-import useReadOnlyWorkflowEditorSheetStore from '@/shared/components/read-only-workflow-editor/stores/useReadOnlyWorkflowEditorSheetStore';
+import useReadOnlyWorkflow from '@/shared/components/read-only-workflow-editor/hooks/useReadOnlyWorkflow';
 import {ProjectDeploymentWorkflow, Workflow} from '@/shared/middleware/automation/configuration';
 import {useEnableProjectDeploymentWorkflowMutation} from '@/shared/mutations/automation/projectDeploymentWorkflows.mutations';
 import {DotsVerticalIcon} from '@radix-ui/react-icons';
@@ -45,7 +45,7 @@ const ApiCollectionEndpointListItem = ({
     const [showDeleteDialog, setShowDeleteDialog] = useState(false);
     const [showEditWorkflowDialog, setShowEditWorkflowDialog] = useState(false);
 
-    const {setReadOnlyWorkflowEditorSheetOpen, setWorkflowId} = useReadOnlyWorkflowEditorSheetStore();
+    const {openReadOnlyWorkflowSheet} = useReadOnlyWorkflow();
 
     const workflow = workflows.filter(
         (workflow) => workflow.workflowReferenceCode === apiCollectionEndpoint.workflowReferenceCode
@@ -88,8 +88,9 @@ const ApiCollectionEndpointListItem = ({
     };
 
     const handleWorkflowClick = () => {
-        setWorkflowId(workflow.id!);
-        setReadOnlyWorkflowEditorSheetOpen(true);
+        if (workflow) {
+            openReadOnlyWorkflowSheet(workflow);
+        }
     };
 
     return (
