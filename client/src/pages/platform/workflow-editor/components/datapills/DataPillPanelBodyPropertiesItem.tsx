@@ -1,6 +1,5 @@
 import {Button} from '@/components/ui/button';
 import DataPill from '@/pages/platform/workflow-editor/components/datapills/DataPill';
-import getFilteredProperties from '@/pages/platform/workflow-editor/utils/getFilteredProperties';
 import getNestedObject from '@/pages/platform/workflow-editor/utils/getNestedObject';
 import {NodeDataType, PropertyAllType} from '@/shared/types';
 import {AccordionContent, AccordionTrigger} from '@radix-ui/react-accordion';
@@ -12,6 +11,25 @@ import {useShallow} from 'zustand/react/shallow';
 import useNodeClickHandler from '../../hooks/useNodeClick';
 import useWorkflowDataStore from '../../stores/useWorkflowDataStore';
 import {ComponentOperationType} from './DataPillPanelBody';
+
+function getFilteredProperties({filterQuery, properties}: {filterQuery: string; properties?: Array<PropertyAllType>}) {
+    if (!properties || !properties.length) {
+        return [];
+    }
+
+    return properties.reduce((previousValue: Array<PropertyAllType>, currentValue) => {
+        const subProperties = getFilteredProperties({
+            filterQuery,
+            properties: currentValue.properties || currentValue.items || [],
+        });
+
+        if (currentValue.name?.toLowerCase().includes(filterQuery.toLowerCase()) || subProperties.length) {
+            previousValue.push(Object.assign({}, currentValue));
+        }
+
+        return previousValue;
+    }, []);
+}
 
 interface DataPillPanelBodyPropertiesItemProps {
     componentOperation: ComponentOperationType;
@@ -38,12 +56,10 @@ const DataPillPanelBodyPropertiesItem = ({
 
     const properties: Array<PropertyAllType> | undefined = outputSchema?.properties || outputSchema?.items;
 
-    const filteredProperties = properties?.length
-        ? getFilteredProperties({
-              filterQuery: dataPillFilterQuery,
-              properties,
-          })
-        : [];
+    const filteredProperties = getFilteredProperties({
+        filterQuery: dataPillFilterQuery,
+        properties,
+    });
 
     let icon: string | undefined, title: string | undefined;
 
