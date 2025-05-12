@@ -6,6 +6,7 @@ import {
     type Property,
     TaskDispatcherDefinitionBasic,
     TriggerDefinition,
+    WorkflowInput,
 } from '@/shared/middleware/platform/configuration';
 import {Accordion, AccordionItem} from '@radix-ui/react-accordion';
 
@@ -39,14 +40,17 @@ export type ComponentOperationType = ComponentActionOperationI | ComponentTrigge
 interface DataPillPanelBodyProps {
     componentOperations: Array<ComponentOperationType>;
     dataPillFilterQuery: string;
+    workflowInputs?: WorkflowInput[];
 }
 
-const DataPillPanelBody = ({componentOperations, dataPillFilterQuery}: DataPillPanelBodyProps) => (
+const DataPillPanelBody = ({componentOperations, dataPillFilterQuery, workflowInputs}: DataPillPanelBodyProps) => (
     <ScrollArea>
         <Accordion className="h-full" collapsible type="single">
-            <AccordionItem className="group" value="inputs">
-                <DataPillPanelBodyInputsItem />
-            </AccordionItem>
+            {!!workflowInputs?.length && (
+                <AccordionItem className="group" value="inputs">
+                    <DataPillPanelBodyInputsItem />
+                </AccordionItem>
+            )}
 
             {componentOperations.map((operation) => (
                 <AccordionItem

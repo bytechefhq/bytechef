@@ -152,6 +152,7 @@ const DataPillPanel = ({
                     <DataPillPanelBody
                         componentOperations={componentOperations}
                         dataPillFilterQuery={dataPillFilterQuery}
+                        workflowInputs={workflow.inputs}
                     />
                 </main>
             </div>
