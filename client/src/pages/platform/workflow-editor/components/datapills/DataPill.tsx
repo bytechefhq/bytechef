@@ -8,7 +8,7 @@ import resolvePath from 'object-resolve-path';
 import {MouseEvent} from 'react';
 import {twMerge} from 'tailwind-merge';
 
-import {encodePath, transformPathForObjectAccess, transformValueForObjectAccess} from '../utils/encodingUtils';
+import {encodePath, transformPathForObjectAccess, transformValueForObjectAccess} from '../../utils/encodingUtils';
 
 interface HandleDataPillClickProps {
     workflowNodeName: string;
@@ -28,6 +28,26 @@ interface DataPillProps {
     /* eslint-disable  @typescript-eslint/no-explicit-any */
     sampleOutput?: any;
 }
+
+const DataPillSampleValue = ({sampleOutput}: {sampleOutput: string | number | boolean | null}) => {
+    const sampleOutputString = String(sampleOutput);
+
+    if (sampleOutputString.length > 27) {
+        return (
+            <Tooltip>
+                <TooltipTrigger asChild>
+                    <span className="flex-1 truncate text-xs text-muted-foreground">{sampleOutputString}</span>
+                </TooltipTrigger>
+
+                <TooltipContent className="max-h-96 max-w-96 overflow-y-scroll whitespace-pre-wrap break-all">
+                    {sampleOutputString}
+                </TooltipContent>
+            </Tooltip>
+        );
+    }
+
+    return <span className="flex-1 text-xs text-muted-foreground">{sampleOutputString}</span>;
+};
 
 const DataPill = ({
     componentIcon,
@@ -100,7 +120,7 @@ const DataPill = ({
 
     if (root) {
         return (
-            <div className="flex items-center space-x-2">
+            <div className="flex w-full items-center space-x-2">
                 <div
                     className={twMerge(
                         'inline-flex cursor-pointer items-center space-x-2 rounded-full border bg-surface-neutral-secondary px-2 py-0.5 text-sm hover:bg-surface-main',
@@ -116,8 +136,8 @@ const DataPill = ({
                     <span>{workflowNodeName}</span>
                 </div>
 
-                {sampleOutput && typeof sampleOutput !== 'object' && (
-                    <div className="flex-1 text-xs text-muted-foreground">{sampleOutput}</div>
+                {sampleOutput !== undefined && typeof sampleOutput !== 'object' && (
+                    <DataPillSampleValue sampleOutput={sampleOutput} />
                 )}
             </div>
         );
@@ -207,20 +227,9 @@ const DataPill = ({
                                     workflowNodeName={workflowNodeName}
                                 />
 
-                                {sampleValue === null && (
-                                    <span className="flex-1 truncate text-xs text-muted-foreground">null</span>
+                                {sampleValue !== undefined && !Object.keys(sampleValue).length && (
+                                    <DataPillSampleValue sampleOutput={sampleValue} />
                                 )}
-
-                                {(sampleValue || sampleValue === 0 || sampleValue === false) &&
-                                    typeof sampleValue !== 'object' && (
-                                        <div className="flex-1 text-xs text-muted-foreground">
-                                            {sampleValue === true
-                                                ? 'true'
-                                                : sampleValue === false
-                                                  ? false
-                                                  : sampleValue}
-                                        </div>
-                                    )}
                             </div>
                         );
                     })}

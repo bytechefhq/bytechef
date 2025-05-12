@@ -24,8 +24,8 @@ import {useEffect} from 'react';
 import {twMerge} from 'tailwind-merge';
 
 import AiAgentWorkflowEditor from '../ai-agent-editor/components/AiAgentWorkflowEditor';
-import DataPillPanel from './components/DataPillPanel';
 import WorkflowEditor from './components/WorkflowEditor';
+import DataPillPanel from './components/datapills/DataPillPanel';
 import useWorkflowDataStore from './stores/useWorkflowDataStore';
 import useWorkflowNodeDetailsPanelStore from './stores/useWorkflowNodeDetailsPanelStore';
 

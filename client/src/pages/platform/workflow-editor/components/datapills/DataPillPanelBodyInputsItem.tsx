@@ -1,9 +1,9 @@
-import DataPill from '@/pages/platform/workflow-editor/components/DataPill';
+import DataPill from '@/pages/platform/workflow-editor/components/datapills/DataPill';
 import {PropertyType} from '@/shared/middleware/platform/configuration';
 import {AccordionContent, AccordionTrigger} from '@radix-ui/react-accordion';
 import {ChevronDownIcon, FormInputIcon} from 'lucide-react';
 
-import useWorkflowDataStore from '../stores/useWorkflowDataStore';
+import useWorkflowDataStore from '../../stores/useWorkflowDataStore';
 
 const DataPillPanelBodyInputsItem = () => {
     const {workflow} = useWorkflowDataStore();
@@ -27,7 +27,7 @@ const DataPillPanelBodyInputsItem = () => {
             <AccordionContent className="size-full space-y-2 border-b border-b-border/50 px-4 pb-4">
                 <ul className="flex w-full flex-col space-y-2 border-l border-l-border/50 pl-4 group-data-[state=open]:h-full">
                     {workflow.inputs.map((input, index) => (
-                        <li className="flex items-center space-x-3" key={`${input.name}-${index}`}>
+                        <li className="flex w-full items-center space-x-3" key={`${input.name}-${index}`}>
                             <DataPill
                                 property={{
                                     name: input.name,
