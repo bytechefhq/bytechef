@@ -35,7 +35,7 @@ import java.util.Map;
  */
 public class ScrapeGraphAiSearchScraperAction {
     public static final ComponentDsl.ModifiableActionDefinition ACTION_DEFINITION = action("searchScraper")
-        .title("SearchScraper")
+        .title("Search Scraper")
         .description("Start a AI-powered web search request.")
         .metadata(
             Map.of(

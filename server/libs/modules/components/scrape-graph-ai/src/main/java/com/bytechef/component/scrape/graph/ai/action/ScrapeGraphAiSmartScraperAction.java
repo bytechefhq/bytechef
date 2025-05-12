@@ -34,7 +34,7 @@ import java.util.Map;
  */
 public class ScrapeGraphAiSmartScraperAction {
     public static final ComponentDsl.ModifiableActionDefinition ACTION_DEFINITION = action("smartScraper")
-        .title("SmartScraper")
+        .title("Smart Scraper")
         .description("Extract content from a webpage using AI by providing a natural language prompt and a URL.")
         .metadata(
             Map.of(

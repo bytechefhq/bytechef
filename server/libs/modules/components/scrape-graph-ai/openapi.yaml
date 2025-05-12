@@ -9,7 +9,7 @@ servers:
 paths:
   /searchscraper:
     post:
-      summary: "SearchScraper"
+      summary: "Search Scraper"
       description: "Start a AI-powered web search request."
       operationId: "searchScraper"
       requestBody:
@@ -94,7 +94,7 @@ paths:
                     description: "Error message if the request failed. Empty string if successful."
   /smartscraper:
     post:
-      summary: "SmartScraper"
+      summary: "Smart Scraper"
       description: "Extract content from a webpage using AI by providing a natural language prompt and a URL."
       operationId: "smartScraper"
       requestBody:
