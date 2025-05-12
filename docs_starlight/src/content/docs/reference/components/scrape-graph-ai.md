@@ -40,7 +40,7 @@ Version: 1
 ## Actions
 
 
-### SearchScraper
+### Search Scraper
 Name: searchScraper
 
 Start a AI-powered web search request.
@@ -54,7 +54,7 @@ Start a AI-powered web search request.
 #### Example JSON Structure
 ```json
 {
-  "label" : "SearchScraper",
+  "label" : "Search Scraper",
   "name" : "searchScraper",
   "parameters" : {
     "user_prompt" : ""
@@ -152,7 +152,7 @@ Type: OBJECT
 ```
 
 
-### SmartScraper
+### Smart Scraper
 Name: smartScraper
 
 Extract content from a webpage using AI by providing a natural language prompt and a URL.
@@ -167,7 +167,7 @@ Extract content from a webpage using AI by providing a natural language prompt a
 #### Example JSON Structure
 ```json
 {
-  "label" : "SmartScraper",
+  "label" : "Smart Scraper",
   "name" : "smartScraper",
   "parameters" : {
     "user_prompt" : "",
