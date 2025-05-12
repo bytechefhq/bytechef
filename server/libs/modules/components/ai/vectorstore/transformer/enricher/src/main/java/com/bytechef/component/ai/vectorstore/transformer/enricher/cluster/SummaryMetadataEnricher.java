@@ -31,8 +31,8 @@ import com.bytechef.platform.component.service.ClusterElementDefinitionService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Map;
-import org.springframework.ai.chat.transformer.SummaryMetadataEnricher.SummaryType;
 import org.springframework.ai.document.DocumentTransformer;
+import org.springframework.ai.model.transformer.SummaryMetadataEnricher.SummaryType;
 
 /**
  * @author Monika Kušter
@@ -81,7 +81,7 @@ public class SummaryMetadataEnricher extends AbstractMetadataEnricher {
             .map(SummaryType::valueOf)
             .toList();
 
-        return new org.springframework.ai.chat.transformer.SummaryMetadataEnricher(
+        return new org.springframework.ai.model.transformer.SummaryMetadataEnricher(
             getModel(extensions, componentConnections), summaryTypes);
     }
 

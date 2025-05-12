@@ -68,12 +68,10 @@ public class VertexGeminiChatAction {
         .output(ModelUtils::output)
         .perform(VertexGeminiChatAction::perform);
 
-    public static final ChatModel CHAT_MODEL = (inputParameters, connectionParameters) -> {
-//        ResponseFormat responseFormat = inputParameters.getFromPath(
-//            RESPONSE + "." + RESPONSE_FORMAT, ResponseFormat.class, ResponseFormat.TEXT);
-
-        return new VertexAiGeminiChatModel(
-            new VertexAI(connectionParameters.getString(PROJECT_ID), connectionParameters.getString(LOCATION)),
+    public static final ChatModel CHAT_MODEL = (inputParameters, connectionParameters) -> VertexAiGeminiChatModel
+        .builder()
+        .vertexAI(new VertexAI(connectionParameters.getString(PROJECT_ID), connectionParameters.getString(LOCATION)))
+        .defaultOptions(
             VertexAiGeminiChatOptions.builder()
                 .model(inputParameters.getRequiredString(MODEL))
                 .temperature(inputParameters.getDouble(TEMPERATURE))
@@ -82,9 +80,9 @@ public class VertexGeminiChatAction {
                 .stopSequences(inputParameters.getList(STOP, new TypeReference<>() {}))
                 .topK(inputParameters.getInteger(TOP_K))
                 .candidateCount(inputParameters.getInteger(N))
-//                .responseMimeType(responseFormat == ResponseFormat.TEXT ? "text/plain" : "application/json")
-                .build());
-    };
+                // .responseMimeType(responseFormat == ResponseFormat.TEXT ? "text/plain" : "application/json")
+                .build())
+        .build();
 
     private VertexGeminiChatAction() {
     }
