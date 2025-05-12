@@ -10,6 +10,13 @@ import {twMerge} from 'tailwind-merge';
 
 import {encodePath, transformPathForObjectAccess, transformValueForObjectAccess} from '../utils/encodingUtils';
 
+interface HandleDataPillClickProps {
+    workflowNodeName: string;
+    propertyName?: string;
+    parentPropertyName?: string;
+    path?: string;
+}
+
 interface DataPillProps {
     componentIcon?: string;
     workflowNodeName: string;
@@ -41,12 +48,12 @@ const DataPill = ({
         property.name = '[index]';
     }
 
-    const handleDataPillClick = (
-        workflowNodeName: string,
-        propertyName?: string,
-        parentPropertyName?: string,
-        path?: string
-    ) => {
+    const handleDataPillClick = ({
+        parentPropertyName,
+        path,
+        propertyName,
+        workflowNodeName,
+    }: HandleDataPillClickProps) => {
         if (!mentionInput) {
             return;
         }
@@ -61,6 +68,7 @@ const DataPill = ({
 
         const parameters = currentComponent?.parameters || {};
 
+        // Prevents adding a 2nd datapill to a non-string property
         if (Object.keys(parameters).length) {
             const attributes = mentionInput.view.props.attributes as {[name: string]: string};
 
@@ -70,7 +78,7 @@ const DataPill = ({
 
             const paramValue = resolvePath(parameters, path);
 
-            if (attributes.type !== 'STRING' && paramValue) {
+            if (attributes.type !== 'STRING' && paramValue && !paramValue.startsWith('=')) {
                 return;
             }
         }
@@ -99,7 +107,7 @@ const DataPill = ({
                         !mentionInput && 'cursor-not-allowed'
                     )}
                     draggable
-                    onClick={() => handleDataPillClick(workflowNodeName)}
+                    onClick={() => handleDataPillClick({workflowNodeName})}
                 >
                     <span className="mr-2" title={property?.type}>
                         {TYPE_ICONS[property?.type as keyof typeof TYPE_ICONS]}
@@ -133,12 +141,12 @@ const DataPill = ({
                         data-name={property?.name || workflowNodeName}
                         draggable
                         onClick={() =>
-                            handleDataPillClick(
+                            handleDataPillClick({
+                                parentPropertyName: parentProperty?.name,
+                                path,
+                                propertyName: property?.name || '[index]',
                                 workflowNodeName,
-                                property?.name || '[index]',
-                                parentProperty?.name,
-                                path
-                            )
+                            })
                         }
                         onDragStart={(event) => event.dataTransfer.setData('name', property?.name || workflowNodeName)}
                     >
