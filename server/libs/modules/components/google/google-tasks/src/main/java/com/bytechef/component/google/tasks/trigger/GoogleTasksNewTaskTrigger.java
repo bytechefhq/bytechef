@@ -20,6 +20,7 @@ import static com.bytechef.component.definition.ComponentDsl.ModifiableTriggerDe
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.ComponentDsl.trigger;
+import static com.bytechef.component.google.tasks.constant.GoogleTasksConstants.ALL_TASKS;
 import static com.bytechef.component.google.tasks.constant.GoogleTasksConstants.LIST_ID;
 import static com.bytechef.component.google.tasks.constant.GoogleTasksConstants.TASK_OUTPUT_PROPERTY;
 
@@ -33,6 +34,7 @@ import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.google.tasks.util.GoogleTasksUtils;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
@@ -70,15 +72,19 @@ public class GoogleTasksNewTaskTrigger {
         Parameters inputParameters, Parameters connectionParameters, Parameters closureParameters,
         TriggerContext triggerContext) {
 
+        List<String> allTasks = closureParameters.getList(ALL_TASKS, String.class, List.of());
+        List<String> allTasksUpdate = new ArrayList<>();
+
         ZoneId zoneId = ZoneId.of("GMT");
 
         LocalDateTime now = LocalDateTime.now(zoneId);
 
-        LocalDateTime startDate = closureParameters.getLocalDateTime(LAST_TIME_CHECKED, now.minusHours(3));
+        LocalDateTime startDate = closureParameters.getLocalDateTime(
+            LAST_TIME_CHECKED, LocalDateTime.ofInstant(Instant.EPOCH, zoneId));
         String encode = URLEncoder.encode(
             startDate.format(DATE_TIME_FORMATTER.withZone(zoneId)), StandardCharsets.UTF_8);
 
-        List<Map<?, ?>> tasks = new ArrayList<>();
+        List<Map<?, ?>> newTasks = new ArrayList<>();
 
         Map<String, Object> response = triggerContext
             .http(http -> http.get(
@@ -91,11 +97,17 @@ public class GoogleTasksNewTaskTrigger {
         if (response.get("items") instanceof List<?> items) {
             for (Object item : items) {
                 if (item instanceof Map<?, ?> task) {
-                    tasks.add(task);
+                    String id = (String) task.get("id");
+
+                    allTasksUpdate.add(id);
+
+                    if (!allTasks.contains(id)) {
+                        newTasks.add(task);
+                    }
                 }
             }
         }
 
-        return new PollOutput(tasks, Map.of(LAST_TIME_CHECKED, now), false);
+        return new PollOutput(newTasks, Map.of(ALL_TASKS, allTasksUpdate, LAST_TIME_CHECKED, now), false);
     }
 }

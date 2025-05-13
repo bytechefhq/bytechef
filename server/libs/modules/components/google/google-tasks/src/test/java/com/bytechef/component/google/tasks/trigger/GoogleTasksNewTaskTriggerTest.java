@@ -16,6 +16,7 @@
 
 package com.bytechef.component.google.tasks.trigger;
 
+import static com.bytechef.component.google.tasks.constant.GoogleTasksConstants.ALL_TASKS;
 import static com.bytechef.component.google.tasks.trigger.GoogleTasksNewTaskTrigger.LAST_TIME_CHECKED;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -67,6 +68,8 @@ class GoogleTasksNewTaskTriggerTest {
             mockedParameters, mockedParameters, mockedParameters, mockedTriggerContext);
 
         assertEquals(responseList, pollOutput.records());
+        assertEquals(List.of("abc"), pollOutput.closureParameters()
+            .get(ALL_TASKS));
         assertFalse(pollOutput.pollImmediately());
 
         assertEquals(List.of("updatedMin", "2000-01-01T01%3A01%3A01.000Z"), stringArgumentCaptor.getAllValues());
