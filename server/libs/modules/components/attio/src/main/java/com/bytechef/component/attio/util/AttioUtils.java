@@ -38,58 +38,40 @@ import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http.Body;
 import com.bytechef.component.definition.Context.Http.ResponseType;
 import com.bytechef.component.definition.Option;
+import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TriggerDefinition.WebhookBody;
 import com.bytechef.component.definition.TypeReference;
+import com.bytechef.component.exception.ProviderException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * @author Nikolina Spehar
  */
 public class AttioUtils {
 
-    public static List<Option<String>> getCompanyArrIdOptions(
-        Parameters inputParameters, Parameters connectionParameters, Map<String, String> stringStringMap, String s,
-        Context context) {
+    public static ActionOptionsFunction<String> getCompanyIdOptions(String attribute) {
+        return (inputParameters, connectionParameters, lookupDependsOnPaths, searchText, context) -> {
+            Map<String, List<Map<String, Object>>> attributes = context.http(
+                http -> http.get("/objects/companies/attributes/%s/options".formatted(attribute)))
+                .configuration(responseType(ResponseType.JSON))
+                .execute()
+                .getBody(new TypeReference<>() {});
 
-        return getCompanyIdOptions(context, "estimated_arr_usd");
-    }
+            List<Option<String>> options = new ArrayList<>();
 
-    public static List<Option<String>> getCompanyCategoriesIdOptions(
-        Parameters inputParameters, Parameters connectionParameters, Map<String, String> stringStringMap, String s,
-        Context context) {
-
-        return getCompanyIdOptions(context, "categories");
-    }
-
-    public static List<Option<String>> getCompanyEmployeeRangeIdOptions(
-        Parameters inputParameters, Parameters connectionParameters, Map<String, String> stringStringMap, String s,
-        Context context) {
-
-        return getCompanyIdOptions(context, "employee_range");
-    }
-
-    private static List<Option<String>> getCompanyIdOptions(Context context, String attribute) {
-        Map<String, List<Object>> attributes = context.http(
-            http -> http.get("/objects/companies/attributes/%s/options".formatted(attribute)))
-            .configuration(responseType(ResponseType.JSON))
-            .execute()
-            .getBody(new TypeReference<>() {});
-
-        List<Option<String>> attributeIdOptions = new ArrayList<>();
-
-        for (Object object : attributes.get(DATA)) {
-            if (object instanceof Map<?, ?> attributeMap
-                && attributeMap.get("id") instanceof Map<?, ?> attributeId) {
-
-                attributeIdOptions
-                    .add(option((String) attributeMap.get("title"), (String) attributeId.get("option_id")));
+            for (Map<String, Object> attributeMap : attributes.get(DATA)) {
+                if (attributeMap.get(ID) instanceof Map<?, ?> idMap) {
+                    options.add(
+                        option((String) attributeMap.get("title"), (String) idMap.get("option_id")));
+                }
             }
-        }
 
-        return attributeIdOptions;
+            return options;
+        };
     }
 
     public static Object getContent(WebhookBody body) {
@@ -99,198 +81,148 @@ public class AttioUtils {
     }
 
     public static List<Option<String>> getDealStageIdOptions(
-        Parameters inputParameters, Parameters connectionParameters, Map<String, String> stringStringMap, String s,
-        Context context) {
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
+        String searchText, Context context) {
 
-        Map<String, List<Object>> stages = context.http(
+        Map<String, List<Map<String, Object>>> stages = context.http(
             http -> http.get("/objects/deals/attributes/stage/statuses"))
             .configuration(responseType(ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});
 
-        List<Option<String>> dealStageIdOptions = new ArrayList<>();
+        List<Option<String>> options = new ArrayList<>();
 
-        for (Object stage : stages.get(DATA)) {
-            if (stage instanceof Map<?, ?> stageMap
-                && stageMap.get("id") instanceof Map<?, ?> stageId) {
-
-                dealStageIdOptions
-                    .add(option((String) stageMap.get("title"), (String) stageId.get("status_id")));
+        for (Map<String, Object> stage : stages.get(DATA)) {
+            if (stage.get(ID) instanceof Map<?, ?> stageId) {
+                options.add(option((String) stage.get("title"), (String) stageId.get("status_id")));
             }
         }
 
-        return dealStageIdOptions;
+        return options;
     }
 
     public static List<ModifiableValueProperty<?, ?>> getRecordAttributes(
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
         Context context) {
 
-        switch (inputParameters.getRequiredString(RECORD_TYPE)) {
-            case USERS:
-                return List.of(USER_RECORD);
-            case WORKSPACES:
-                return List.of(WORKSPACE_RECORD);
-            case COMPANIES:
-                return List.of(COMPANY_RECORD);
-            case PEOPLE:
-                return List.of(PERSON_RECORD);
-            case DEALS:
-                return List.of(DEAL_RECORD);
-            default:
-                return List.of();
-        }
-
+        return switch (inputParameters.getRequiredString(RECORD_TYPE)) {
+            case USERS -> USER_RECORD;
+            case WORKSPACES -> WORKSPACE_RECORD;
+            case COMPANIES -> COMPANY_RECORD;
+            case PEOPLE -> PERSON_RECORD;
+            case DEALS -> DEAL_RECORD;
+            default -> List.of();
+        };
     }
 
     public static List<Option<String>> getTargetActorIdOptions(
-        Parameters inputParameters, Parameters connectionParameters, Map<String, String> stringStringMap, String s,
-        Context context) {
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
+        String searchText, Context context) {
 
-        Map<String, List<Object>> actors = context.http(
+        Map<String, List<Map<String, Object>>> actors = context.http(
             http -> http.post("/objects/users/records/query"))
             .configuration(responseType(ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});
 
-        List<Option<String>> actorIdOptions = new ArrayList<>();
+        List<Option<String>> options = new ArrayList<>();
 
-        for (Object actor : actors.get(DATA)) {
-            if (actor instanceof Map<?, ?> actordMap
-                && actordMap.get("id") instanceof Map<?, ?> actorId
-                && actordMap.get("values") instanceof Map<?, ?> actorValues
-                && actorValues.get("primary_email_address") instanceof List<?> actorValueEmailList
-                && actorValueEmailList.getFirst() instanceof Map<?, ?> actorValueEmail) {
+        for (Map<String, Object> actordMap : actors.get(DATA)) {
+            if (actordMap.get(ID) instanceof Map<?, ?> actorId &&
+                actordMap.get("values") instanceof Map<?, ?> actorValues &&
+                actorValues.get("primary_email_address") instanceof List<?> actorValueEmailList &&
+                actorValueEmailList.getFirst() instanceof Map<?, ?> actorValueEmail) {
 
-                actorIdOptions
-                    .add(option((String) actorValueEmail.get("email_address"), (String) actorId.get("record_id")));
+                options.add(
+                    option((String) actorValueEmail.get("email_address"), (String) actorId.get("record_id")));
             }
         }
 
-        return actorIdOptions;
+        return options;
     }
 
     public static List<Option<String>> getTargetObjectOptions(
-        Parameters inputParameters, Parameters connectionParameters, Map<String, String> stringStringMap, String s,
-        Context context) {
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
+        String searchText, Context context) {
 
-        Map<String, List<Object>> objects = context.http(http -> http.get("/objects"))
+        Map<String, List<Map<String, Object>>> objects = context.http(http -> http.get("/objects"))
             .configuration(responseType(ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});
 
-        List<Option<String>> objectOptions = new ArrayList<>();
+        List<Option<String>> options = new ArrayList<>();
 
-        for (Object object : objects.get(DATA)) {
-            if (object instanceof Map<?, ?> objectMap) {
-                objectOptions.add(
-                    option((String) objectMap.get("singular_noun"), (String) objectMap.get("api_slug")));
-            }
+        for (Map<String, Object> object : objects.get(DATA)) {
+            options.add(option((String) object.get("singular_noun"), (String) object.get("api_slug")));
         }
 
-        return objectOptions;
+        return options;
     }
 
-    public static List<Option<String>> getRecordIdOptions(
-        Parameters inputParameters, Parameters connectionParameters, Map<String, String> stringStringMap, String s,
-        Context context) {
+    public static ActionOptionsFunction<String> getTargetRecordIdOptions(String targetObject) {
+        return (inputParameters, connectionParameters, lookupDependsOnPaths, searchText, context) -> {
+            String object;
+            if (Objects.equals(targetObject, RECORD_TYPE)) {
+                object = inputParameters.getRequiredString(RECORD_TYPE);
+            } else if (Objects.equals(targetObject, TARGET_OBJECT)) {
+                object = inputParameters.getRequiredString(TARGET_OBJECT);
+            } else {
+                object = targetObject;
+            }
 
-        return getTargetRecordIdOptions(context, inputParameters.getRequiredString(RECORD_TYPE));
-    }
+            Map<String, List<Object>> records = context.http(
+                http -> http.post("/objects/%s/records/query".formatted(object)))
+                .configuration(responseType(ResponseType.JSON))
+                .execute()
+                .getBody(new TypeReference<>() {});
 
-    public static List<Option<String>> getTargetRecordCompanyOptions(
-        Parameters inputParameters, Parameters connectionParameters, Map<String, String> stringStringMap, String s,
-        Context context) {
+            List<Option<String>> recordIdOptions = new ArrayList<>();
 
-        return getTargetRecordIdOptions(context, COMPANIES);
-    }
+            for (Object record : records.get(DATA)) {
+                if (record instanceof Map<?, ?> recordMap &&
+                    recordMap.get(ID) instanceof Map<?, ?> recordId &&
+                    recordMap.get("values") instanceof Map<?, ?> recordValues) {
 
-    public static List<Option<String>> getTargetRecordDealOptions(
-        Parameters inputParameters, Parameters connectionParameters, Map<String, String> stringStringMap, String s,
-        Context context) {
+                    String recordName = null;
 
-        return getTargetRecordIdOptions(context, DEALS);
-    }
-
-    private static List<Option<String>> getTargetRecordIdOptions(Context context, String targetObject) {
-
-        Map<String, List<Object>> records = context.http(
-            http -> http.post("/objects/%s/records/query".formatted(
-                targetObject)))
-            .configuration(responseType(ResponseType.JSON))
-            .execute()
-            .getBody(new TypeReference<>() {});
-
-        List<Option<String>> recordIdOptions = new ArrayList<>();
-
-        for (Object record : records.get(DATA)) {
-            if (record instanceof Map<?, ?> recordMap
-                && recordMap.get("id") instanceof Map<?, ?> recordId
-                && recordMap.get("values") instanceof Map<?, ?> recordValues) {
-
-                String recordName = "Unnamed person";
-
-                if (recordValues.get("name") instanceof List<?> recordValueNameList &&
-                    !recordValueNameList.isEmpty() &&
-                    recordValueNameList.getFirst() instanceof Map<?, ?> recordValueName) {
-                    if (targetObject.equals("people")) {
-                        recordName = (String) recordValueName.get("full_name");
-                    } else {
-                        recordName = (String) recordValueName.get("value");
+                    if (recordValues.get("name") instanceof List<?> recordValueNameList &&
+                        !recordValueNameList.isEmpty() &&
+                        recordValueNameList.getFirst() instanceof Map<?, ?> recordValueName) {
+                        if (object.equals("people")) {
+                            recordName = (String) recordValueName.get("full_name");
+                        } else {
+                            recordName = (String) recordValueName.get("value");
+                        }
                     }
+
+                    recordIdOptions.add(option(recordName, (String) recordId.get("record_id")));
                 }
-                recordIdOptions.add(option(recordName, (String) recordId.get("record_id")));
             }
-        }
 
-        return recordIdOptions;
-    }
-
-    public static List<Option<String>> getTargetRecordIdOptions(
-        Parameters inputParameters, Parameters connectionParameters, Map<String, String> stringStringMap, String s,
-        Context context) {
-
-        return getTargetRecordIdOptions(context, inputParameters.getRequiredString(TARGET_OBJECT));
-    }
-
-    public static List<Option<String>> getTargetRecordPersonOptions(
-        Parameters inputParameters, Parameters connectionParameters, Map<String, String> stringStringMap, String s,
-        Context context) {
-
-        return getTargetRecordIdOptions(context, PEOPLE);
-    }
-
-    public static List<Option<String>> getTargetRecordWorkspaceOptions(
-        Parameters inputParameters, Parameters connectionParameters, Map<String, String> stringStringMap, String s,
-        Context context) {
-
-        return getTargetRecordIdOptions(context, WORKSPACES);
+            return recordIdOptions;
+        };
     }
 
     public static List<Option<String>> getWorkSpaceMemberIdOptions(
-        Parameters inputParameters, Parameters connectionParameters, Map<String, String> stringStringMap, String s,
-        Context context) {
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
+        String searchText, Context context) {
 
-        Map<String, List<Object>> actors = context.http(
-            http -> http.get("/workspace_members"))
+        Map<String, List<Map<String, Object>>> actors = context.http(http -> http.get("/workspace_members"))
             .configuration(responseType(ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});
 
-        List<Option<String>> actorIdOptions = new ArrayList<>();
+        List<Option<String>> options = new ArrayList<>();
 
-        for (Object actor : actors.get(DATA)) {
-            if (actor instanceof Map<?, ?> actordMap
-                && actordMap.get("id") instanceof Map<?, ?> actorId) {
+        for (Map<String, Object> actor : actors.get(DATA)) {
+            if (actor.get(ID) instanceof Map<?, ?> actorId) {
+                String fullName = actor.get("first_name") + " " + actor.get("last_name");
 
-                String fullName = actordMap.get("first_name") + " " + actordMap.get("last_name");
-
-                actorIdOptions
-                    .add(option(fullName, (String) actorId.get("workspace_member_id")));
+                options.add(option(fullName, (String) actorId.get("workspace_member_id")));
             }
         }
 
-        return actorIdOptions;
+        return options;
     }
 
     public static String subscribeWebhook(String eventType, Context context, String webhookUrl) {
@@ -299,22 +231,19 @@ public class AttioUtils {
                 Body.of(
                     DATA, Map.of(
                         "target_url", webhookUrl,
-                        "subscriptions", List.of(
-                            Map.of("event_type", eventType,
-                                "filter", Map.of("$and", List.of()))))))
+                        "subscriptions",
+                        List.of(Map.of("event_type", eventType, "filter", Map.of("$and", List.of()))))))
             .configuration(responseType(ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});
 
-        String webhookId = "";
+        Map<String, Object> data = body.get(DATA);
 
-        if (body.get(DATA)
-            .get(ID) instanceof Map<?, ?> idMap) {
-            webhookId = idMap.get("webhook_id")
-                .toString();
+        if (data.get(ID) instanceof Map<?, ?> map) {
+            return (String) map.get("webhook_id");
         }
 
-        return webhookId;
+        throw new ProviderException("Failed to subscribe to webhook");
     }
 
     public static void unsubscribeWebhook(Context context, String webhookId) {

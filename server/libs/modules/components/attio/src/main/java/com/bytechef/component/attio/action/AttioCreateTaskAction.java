@@ -82,7 +82,7 @@ public class AttioCreateTaskAction {
                             string(TARGET_RECORD_ID)
                                 .label("Target Record ID")
                                 .optionsLookupDependsOn(TARGET_OBJECT)
-                                .options((ActionOptionsFunction<String>) AttioUtils::getTargetRecordIdOptions)
+                                .options(AttioUtils.getTargetRecordIdOptions(TARGET_OBJECT))
                                 .required(true)))
                 .required(true),
             array(ASSIGNEES)

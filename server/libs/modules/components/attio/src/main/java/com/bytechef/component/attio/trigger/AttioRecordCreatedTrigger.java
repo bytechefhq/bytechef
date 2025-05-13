@@ -45,7 +45,6 @@ public class AttioRecordCreatedTrigger {
         .title("Record Created")
         .description("Triggers when new record is created.")
         .type(TriggerType.DYNAMIC_WEBHOOK)
-        .properties()
         .output(
             outputSchema(
                 object()
@@ -87,5 +86,4 @@ public class AttioRecordCreatedTrigger {
 
         return getContent(body);
     }
-
 }

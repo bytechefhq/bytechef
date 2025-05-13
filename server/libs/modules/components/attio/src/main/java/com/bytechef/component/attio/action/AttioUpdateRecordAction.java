@@ -54,7 +54,7 @@ public class AttioUpdateRecordAction {
                 .label("Record ID")
                 .description("ID of the record that will be updated.")
                 .optionsLookupDependsOn(RECORD_TYPE)
-                .options((ActionOptionsFunction<String>) AttioUtils::getRecordIdOptions)
+                .options(AttioUtils.getTargetRecordIdOptions(RECORD_TYPE))
                 .required(true),
             dynamicProperties(VALUE)
                 .propertiesLookupDependsOn(RECORD_TYPE)
@@ -71,13 +71,8 @@ public class AttioUpdateRecordAction {
 
         return context.http(http -> http.patch(
             "/objects/%s/records/%s".formatted(
-                inputParameters.getRequiredString(RECORD_TYPE),
-                inputParameters.getRequiredString(RECORD_ID))))
-            .body(
-                Body.of(
-                    DATA, Map.of(
-                        "values", inputParameters.getMap(VALUE)
-                            .get(VALUE))))
+                inputParameters.getRequiredString(RECORD_TYPE), inputParameters.getRequiredString(RECORD_ID))))
+            .body(Body.of(DATA, Map.of("values", inputParameters.getMap(VALUE))))
             .configuration(responseType(ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});

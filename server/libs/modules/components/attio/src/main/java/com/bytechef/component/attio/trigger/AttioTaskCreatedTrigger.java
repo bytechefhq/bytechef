@@ -45,7 +45,6 @@ public class AttioTaskCreatedTrigger {
         .title("Task Created")
         .description("Triggers when new task is created.")
         .type(TriggerType.DYNAMIC_WEBHOOK)
-        .properties()
         .output(
             outputSchema(
                 object()
@@ -87,5 +86,4 @@ public class AttioTaskCreatedTrigger {
 
         return getContent(body);
     }
-
 }
