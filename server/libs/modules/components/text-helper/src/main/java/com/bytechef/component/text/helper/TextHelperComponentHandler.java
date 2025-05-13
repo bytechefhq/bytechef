@@ -23,12 +23,19 @@ import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.component.text.helper.action.TextHelperBase64DecodeAction;
 import com.bytechef.component.text.helper.action.TextHelperConcatenateAction;
+import com.bytechef.component.text.helper.action.TextHelperContainsAction;
 import com.bytechef.component.text.helper.action.TextHelperExtractContentFromHtmlAction;
-import com.bytechef.component.text.helper.action.TextHelperFindAction;
+import com.bytechef.component.text.helper.action.TextHelperExtractUrlsAction;
+import com.bytechef.component.text.helper.action.TextHelperFormatCurrencyAction;
 import com.bytechef.component.text.helper.action.TextHelperHTMLToMarkdownAction;
+import com.bytechef.component.text.helper.action.TextHelperLowerCaseAction;
 import com.bytechef.component.text.helper.action.TextHelperMarkdownToHTMLAction;
 import com.bytechef.component.text.helper.action.TextHelperReplaceAction;
+import com.bytechef.component.text.helper.action.TextHelperSelectFirstNCharactersAction;
+import com.bytechef.component.text.helper.action.TextHelperSelectLastNCharactersAction;
 import com.bytechef.component.text.helper.action.TextHelperSplitAction;
+import com.bytechef.component.text.helper.action.TextHelperTrimWhitespaceAction;
+import com.bytechef.component.text.helper.action.TextHelperUpperCaseAction;
 import com.google.auto.service.AutoService;
 
 /**
@@ -45,12 +52,19 @@ public class TextHelperComponentHandler implements ComponentHandler {
         .actions(
             TextHelperBase64DecodeAction.ACTION_DEFINITION,
             TextHelperConcatenateAction.ACTION_DEFINITION,
+            TextHelperContainsAction.ACTION_DEFINITION,
             TextHelperExtractContentFromHtmlAction.ACTION_DEFINITION,
-            TextHelperFindAction.ACTION_DEFINITION,
+            TextHelperExtractUrlsAction.ACTION_DEFINITION,
+            TextHelperFormatCurrencyAction.ACTION_DEFINITION,
             TextHelperHTMLToMarkdownAction.ACTION_DEFINITION,
+            TextHelperLowerCaseAction.ACTION_DEFINITION,
             TextHelperMarkdownToHTMLAction.ACTION_DEFINITION,
             TextHelperReplaceAction.ACTION_DEFINITION,
-            TextHelperSplitAction.ACTION_DEFINITION);
+            TextHelperSelectFirstNCharactersAction.ACTION_DEFINITION,
+            TextHelperSelectLastNCharactersAction.ACTION_DEFINITION,
+            TextHelperSplitAction.ACTION_DEFINITION,
+            TextHelperTrimWhitespaceAction.ACTION_DEFINITION,
+            TextHelperUpperCaseAction.ACTION_DEFINITION);
 
     @Override
     public ComponentDefinition getDefinition() {
