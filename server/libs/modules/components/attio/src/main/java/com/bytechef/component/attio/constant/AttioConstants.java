@@ -17,16 +17,16 @@
 package com.bytechef.component.attio.constant;
 
 import static com.bytechef.component.definition.ComponentDsl.array;
+import static com.bytechef.component.definition.ComponentDsl.bool;
 import static com.bytechef.component.definition.ComponentDsl.date;
 import static com.bytechef.component.definition.ComponentDsl.number;
 import static com.bytechef.component.definition.ComponentDsl.object;
-import static com.bytechef.component.definition.ComponentDsl.option;
 import static com.bytechef.component.definition.ComponentDsl.string;
 
 import com.bytechef.component.attio.util.AttioUtils;
+import com.bytechef.component.definition.ComponentDsl.ModifiableObjectProperty;
 import com.bytechef.component.definition.ComponentDsl.ModifiableValueProperty;
 import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
-import java.util.List;
 
 /**
  * @author Nikolina Spehar
@@ -53,453 +53,783 @@ public class AttioConstants {
     public static final String USERS = "users";
     public static final String VALUE = "value";
     public static final String WORKSPACES = "workspaces";
+    public static final String WORKSPACE_MEMBER = "workspace-member";
+
+    public static final ModifiableObjectProperty ID_RECORD_OBJECT =
+        object("id")
+            .description("The id object of the user.")
+            .properties(
+                string("workspace_id")
+                    .description("UUID of the workspace."),
+                string("object_id")
+                    .description("UUID of the object type."),
+                string("record_id")
+                    .description("UUID of the record."));
+
+    public static final ModifiableValueProperty<?, ?> VALUE_BASIC_INFO = object()
+        .properties(
+            string("active_from")
+                .description("When this association became active."),
+            string("active_until")
+                .description("When this association ends (null if still active)."),
+            object("created_by_actor")
+                .properties(
+                    string("type")
+                        .description("Type of actor who created this."),
+                    string("id")
+                        .description("ID of the creating actor.")));
 
     private AttioConstants() {
     }
 
-    public static final List<ModifiableValueProperty<?, ?>> PERSON_RECORD = List.of(
-        array("name")
-            .label("Name")
-            .items(
-                object()
-                    .properties(
-                        string("first_name")
-                            .label("First Name")
-                            .description("The first name."),
-                        string("last_name")
-                            .label("Last Name")
-                            .description("The last name."),
-                        string("full_name")
-                            .label("Full Name")
-                            .description("The full name."))),
-        array("email_addresses")
-            .label("Email Addresses")
-            .items(
-                object()
-                    .properties(
-                        string("email_address")
-                            .label("Email Address"))),
-        array("description")
-            .label("Description")
-            .items(
-                object()
-                    .properties(
-                        string("value")
-                            .label("Value")
-                            .required(true))),
-        array("company")
-            .label("Company")
-            .items(
-                object()
-                    .properties(
-                        string(TARGET_OBJECT)
-                            .label("Target object")
-                            .options(option("Company", COMPANIES))
-                            .required(true),
-                        string(TARGET_RECORD_ID)
-                            .label("Target Record ID")
-                            .optionsLookupDependsOn(TARGET_OBJECT)
-                            .options(AttioUtils.getTargetRecordIdOptions(COMPANIES))
-                            .required(true))),
-        array("job_title")
-            .label("Job Title")
-            .items(
-                object()
-                    .properties(
-                        string("value")
-                            .label("Value")
-                            .required(true))),
-        array("phone_numbers")
-            .label("Phone Numbers")
-            .items(
-                object()
-                    .properties(
-                        string("original_phone_number")
-                            .label("Original Phone Number")
-                            .required(true))),
-        array("primary_location")
-            .label("Primary Location")
-            .items(
-                object()
-                    .properties(
-                        string("city")
-                            .label("City")
-                            .required(true),
-                        string("state")
-                            .label("State")
-                            .required(true),
-                        string("country")
-                            .label("Country")
-                            .required(true))),
-        array("angellist")
-            .label("AngelList")
-            .items(
-                object()
-                    .properties(
-                        string("value")
-                            .label("Value")
-                            .required(true))),
-        array("facebook")
-            .label("Facebook")
-            .items(
-                object()
-                    .properties(
-                        string("value")
-                            .label("Value")
-                            .required(true))),
-        array("instagram")
-            .label("Instagram")
-            .items(
-                object()
-                    .properties(
-                        string("value")
-                            .label("Value")
-                            .required(true))),
-        array("linkedin")
-            .label("LinkedIn")
-            .items(
-                object()
-                    .properties(
-                        string("value")
-                            .label("Value")
-                            .required(true))),
-        array("twitter")
-            .label("Twitter")
-            .items(
-                object()
-                    .properties(
-                        string("value")
-                            .label("Value")
-                            .required(true))),
-        array("associated_deals")
-            .label("Associated Deals")
-            .items(
-                object("")
-                    .properties(
-                        string(TARGET_OBJECT)
-                            .label("Target object")
-                            .options(option("Deal", DEALS))
-                            .required(true),
-                        string(TARGET_RECORD_ID)
-                            .label("Target Record ID")
-                            .optionsLookupDependsOn(TARGET_OBJECT)
-                            .options(AttioUtils.getTargetRecordIdOptions(DEALS))
-                            .required(true))),
-        array("associated_users")
-            .label("Associated Users")
-            .items(
-                object("")
-                    .properties(
-                        string(TARGET_OBJECT)
-                            .label("Target object")
-                            .options(option("User", USERS))
-                            .required(true),
-                        string(TARGET_RECORD_ID)
-                            .label("Target Record ID")
-                            .optionsLookupDependsOn(TARGET_OBJECT)
-                            .options((ActionOptionsFunction<String>) AttioUtils::getTargetActorIdOptions)
-                            .required(true))));
+    public static ModifiableValueProperty<?, ?> getDealRecord(boolean isNewRecord) {
+        return object(DEALS)
+            .properties(
+                string("name")
+                    .label("Deal Name")
+                    .description("The name of the deal.")
+                    .required(isNewRecord),
+                string("stage")
+                    .label("Deal Stage")
+                    .description("The stage of the deal.")
+                    .options((ActionOptionsFunction<String>) AttioUtils::getDealStageIdOptions)
+                    .required(isNewRecord),
+                string("owner")
+                    .label("Deal Owner")
+                    .description("The owner of the deal.")
+                    .options((ActionOptionsFunction<String>) AttioUtils::getWorkSpaceMemberIdOptions)
+                    .required(isNewRecord),
+                number("value")
+                    .label("Deal Value")
+                    .description("The value of the deal.")
+                    .required(false),
+                array("associated_people")
+                    .label("Associated People")
+                    .description("The people associated with the deal.")
+                    .options(AttioUtils.getTargetRecordIdOptions(PEOPLE))
+                    .required(false)
+                    .items(
+                        string(PEOPLE)
+                            .label("People"))
+                    .required(false),
+                string("associated_company")
+                    .label("Associated Company")
+                    .description("The company associated with the deal.")
+                    .options(AttioUtils.getTargetRecordIdOptions(COMPANIES))
+                    .required(false));
+    }
 
-    public static final List<ModifiableValueProperty<?, ?>> COMPANY_RECORD = List.of(
-        array("domains")
-            .label("Domains")
-            .items(
-                object()
-                    .properties(
-                        string("domain")
-                            .label("Domain"))),
-        array("name")
-            .label("Name")
-            .items(
-                object()
-                    .properties(
-                        string("value")
-                            .label("Value"))),
-        array("description")
-            .label("Description")
-            .items(
-                object()
-                    .properties(
-                        string("value")
-                            .label("Value")
-                            .required(true))),
-        array("categories")
-            .label("Categories")
-            .items(
-                object()
-                    .properties(
-                        string("option")
-                            .label("Option")
-                            .optionsLookupDependsOn(TARGET_OBJECT)
-                            .options(AttioUtils.getCompanyIdOptions("categories")),
-                        array("primary_location")
-                            .label("Primary Location")
-                            .items(
-                                object()
-                                    .properties(
-                                        string("city")
-                                            .label("City")
-                                            .required(true),
-                                        string("state")
-                                            .label("State")
-                                            .required(true),
-                                        string("country")
-                                            .label("Country")
-                                            .required(true))),
-                        array("angellist")
-                            .label("AngelList")
-                            .items(
-                                object()
-                                    .properties(
-                                        string("value")
-                                            .required(true))),
-                        array("facebook")
-                            .label("Facebook")
-                            .items(
-                                object()
-                                    .properties(
-                                        string("value")
-                                            .required(true))),
-                        array("instagram")
-                            .label("Instagram")
-                            .items(
-                                object()
-                                    .properties(
-                                        string("value")
-                                            .required(true))),
-                        array("linkedin")
-                            .label("LinkedIn")
-                            .items(
-                                object()
-                                    .properties(
-                                        string("value")
-                                            .required(true))),
-                        array("twitter")
-                            .label("Twitter")
-                            .items(
-                                object()
-                                    .properties(
-                                        string("value")
-                                            .required(true))),
-                        array("estimated_arr_usd")
-                            .label("Estimated ARR")
-                            .items(
-                                object()
-                                    .properties(
-                                        string("option")
-                                            .label("Option")
-                                            .options(AttioUtils.getCompanyIdOptions("estimated_arr_usd"))
-                                            .required(true))),
-                        array("foundation_date")
-                            .label("Foundation Date")
-                            .items(
-                                object()
-                                    .properties(
-                                        date("value")
-                                            .required(true))),
-                        array("employee_range")
-                            .label("Employee Range")
-                            .items(
-                                object()
-                                    .properties(
-                                        string("option")
-                                            .label("Option")
-                                            .options(AttioUtils.getCompanyIdOptions("employee_range"))
-                                            .required(true))),
-                        array("associated_deals")
-                            .label("Associated Deals")
-                            .items(
-                                object()
-                                    .properties(
-                                        string(TARGET_OBJECT)
-                                            .label("Target object")
-                                            .options(option("Deal", DEALS))
-                                            .required(true),
-                                        string(TARGET_RECORD_ID)
-                                            .label("Target Record ID")
-                                            .optionsLookupDependsOn(TARGET_OBJECT)
-                                            .options(AttioUtils.getTargetRecordIdOptions(DEALS))
-                                            .required(true))),
-                        array("associated_workspaces")
-                            .label("Associated Workspaces")
-                            .items(
-                                object()
-                                    .properties(
-                                        string(TARGET_OBJECT)
-                                            .label("Target object")
-                                            .options(option("Workspace", WORKSPACES))
-                                            .required(true),
-                                        string(TARGET_RECORD_ID)
-                                            .label("Target Record ID")
-                                            .optionsLookupDependsOn(TARGET_OBJECT)
-                                            .options(AttioUtils.getTargetRecordIdOptions(WORKSPACES))
-                                            .required(true))))));
+    public static ModifiableValueProperty<?, ?> getUserRecord(boolean isNewRecord) {
+        return object(USERS)
+            .properties(
+                string("person")
+                    .label("Person")
+                    .description("The person who will be the user.")
+                    .options(AttioUtils.getTargetRecordIdOptions(PEOPLE))
+                    .required(false),
+                string("email_address")
+                    .label("Email Address")
+                    .description("The email address of the user.")
+                    .required(isNewRecord),
+                string("user_id")
+                    .label("User ID")
+                    .description("The ID of the user.")
+                    .required(isNewRecord),
+                array("workspace")
+                    .label("Associated Workspaces")
+                    .description("The associated workspace of the company.")
+                    .options(AttioUtils.getTargetRecordIdOptions(WORKSPACES))
+                    .required(false)
+                    .items(
+                        string("workspace")
+                            .label("Workspace")
+                            .required(false)));
+    }
 
-    public static final List<ModifiableValueProperty<?, ?>> USER_RECORD = List.of(
-        array("person")
-            .label("Person")
-            .description("Person that will become a user.")
-            .items(
-                object()
-                    .properties(
-                        string(TARGET_OBJECT)
-                            .label("Target object")
-                            .options(option("Person", PEOPLE))
-                            .required(true),
-                        string(TARGET_RECORD_ID)
-                            .label("Target Record ID")
-                            .optionsLookupDependsOn(TARGET_OBJECT)
-                            .options(AttioUtils.getTargetRecordIdOptions(PEOPLE))
-                            .required(true))),
-        array("primary_email_address")
-            .label("Primary Email Address")
-            .items(
-                object()
-                    .properties(
-                        string("email_address")
-                            .label("Email Address")))
-            .required(true),
-        array("user_id")
-            .label("User ID")
-            .items(
-                object()
-                    .properties(
-                        string("value")
-                            .label("ID")))
-            .required(true),
-        array("workspace")
-            .label("Workspace")
-            .items(
-                object()
-                    .properties(
-                        string(TARGET_OBJECT)
-                            .label("Target object")
-                            .options(option("Workspace", WORKSPACES))
-                            .required(true),
-                        string(TARGET_RECORD_ID)
-                            .label("Target Record ID")
-                            .optionsLookupDependsOn(TARGET_OBJECT)
-                            .options(AttioUtils.getTargetRecordIdOptions(WORKSPACES))
-                            .required(true))));
+    public static ModifiableValueProperty<?, ?> getWorkspaceRecord(boolean isNewRecord) {
+        return object(WORKSPACES)
+            .properties(
+                string("workspace_id")
+                    .label("Workspace ID")
+                    .description("The ID of the workspace.")
+                    .required(isNewRecord),
+                string("name")
+                    .label("Name")
+                    .description("The name of the workspace.")
+                    .required(false),
+                array("users")
+                    .label("Users")
+                    .description("The users in the workspace.")
+                    .options((ActionOptionsFunction<String>) AttioUtils::getTargetActorIdOptions)
+                    .required(false)
+                    .items(
+                        string("user")
+                            .label("Users")
+                            .required(false)),
+                string("company")
+                    .label("Company")
+                    .description("The company of the workspace.")
+                    .options(AttioUtils.getTargetRecordIdOptions(COMPANIES))
+                    .required(false),
+                string("avatar_url")
+                    .label("Avatar URL")
+                    .description("The URL of the avatar of the workspace.")
+                    .required(false));
+    }
 
-    public static final List<ModifiableValueProperty<?, ?>> DEAL_RECORD = List.of(
-        array("name")
-            .label("Deal Name")
-            .items(
-                object()
+    public static final ModifiableObjectProperty COMPANY_OUTPUT =
+        object()
+            .properties(
+                object("data")
                     .properties(
-                        string("value")
-                            .label("Deal Name")))
-            .required(true),
-        array("stage")
-            .label("Deal Stage")
-            .items(
-                object()
-                    .properties(
-                        string("status")
-                            .options((ActionOptionsFunction<String>) AttioUtils::getDealStageIdOptions)
-                            .label("Status")))
-            .required(true),
-        array("owner")
-            .label("Deal Owner")
-            .items(
-                object()
-                    .properties(
-                        string(REFERENCED_ACTOR_TYPE)
-                            .label("Reference Actor Type")
-                            .options(option("Workspace Member", "workspace-member"))
-                            .required(true),
-                        string(REFERENCED_ACTOR_ID)
-                            .label("Reference Actor ID")
-                            .options((ActionOptionsFunction<String>) AttioUtils::getWorkSpaceMemberIdOptions)
-                            .required(true)))
-            .required(true),
-        array("value")
-            .label("Deal Value")
-            .items(
-                object()
-                    .properties(
-                        number("currency_value")
-                            .label("Currency Value"))),
-        array("associated_people")
-            .label("Associated People")
-            .items(
-                object()
-                    .properties(
-                        string(TARGET_OBJECT)
-                            .label("Target object")
-                            .options(option("Person", PEOPLE))
-                            .required(true),
-                        string(TARGET_RECORD_ID)
-                            .label("Target Record ID")
-                            .optionsLookupDependsOn(TARGET_OBJECT)
-                            .options(AttioUtils.getTargetRecordIdOptions(PEOPLE))
-                            .required(true))),
-        array("associated_company")
-            .label("Associated Company")
-            .items(
-                object()
-                    .properties(
-                        string(TARGET_OBJECT)
-                            .label("Target object")
-                            .options(option("Company", COMPANIES))
-                            .required(true),
-                        string(TARGET_RECORD_ID)
-                            .label("Target Record ID")
-                            .optionsLookupDependsOn(TARGET_OBJECT)
-                            .options(AttioUtils.getTargetRecordIdOptions(COMPANIES))
-                            .required(true))));
+                        ID_RECORD_OBJECT, string("created_at")
+                            .description("Timestamp when the record was created in ISO 8601 format."),
+                        string("web_url")
+                            .description("Web URL to access this record."),
+                        object("values")
+                            .properties(
+                                array("domains")
+                                    .description("Associated domains.")
+                                    .items(
+                                        object()
+                                            .properties(
+                                                VALUE_BASIC_INFO,
+                                                string("domain")
+                                                    .description("Domain part of the domain."),
+                                                string("root_domain")
+                                                    .description("Root domain of the domain."),
+                                                string("attribute_type")
+                                                    .description("The type of this reference attribute."))),
+                                array("name")
+                                    .description("Name values")
+                                    .items(
+                                        object()
+                                            .properties(
+                                                VALUE_BASIC_INFO,
+                                                string("value")
+                                                    .description("The value of the name."),
+                                                string("attribute_type")
+                                                    .description("The type of this reference attribute."))),
+                                array("description")
+                                    .description("Description values")
+                                    .items(
+                                        object()
+                                            .properties(
+                                                VALUE_BASIC_INFO,
+                                                string("value")
+                                                    .description("The value of the description."),
+                                                string("attribute_type")
+                                                    .description("The type of this reference attribute."))),
+                                array("created_at")
+                                    .description("Creation timestamps")
+                                    .items(
+                                        object()
+                                            .properties(
+                                                VALUE_BASIC_INFO,
+                                                string("value")
+                                                    .description(
+                                                        "Date when the record was created in ISO 8601 format."),
+                                                string("attribute_type")
+                                                    .description("The type of this reference attribute."))),
+                                array("created_by")
+                                    .description("Creator references")
+                                    .items(
+                                        object()
+                                            .properties(
+                                                VALUE_BASIC_INFO,
+                                                string("referenced_actor_type")
+                                                    .description("Type of referenced actor."),
+                                                string("referenced_actor_id")
+                                                    .description("ID of the referenced actor."),
+                                                string("attribute_type")
+                                                    .description("The type of this reference attribute."))),
+                                array("twitter")
+                                    .description("Twitter handles.")
+                                    .items(object()),
+                                array("team")
+                                    .description("Team members.")
+                                    .items(object()),
+                                array("primary_location")
+                                    .description("Primary locations.")
+                                    .items(object()),
+                                array("last_email_interaction")
+                                    .description("Timestamps of last email interactions.")
+                                    .items(object()),
+                                array("categories")
+                                    .description("Associated categories.")
+                                    .items(object()),
+                                array("logo_url")
+                                    .description("URLs of logos.")
+                                    .items(object()),
+                                array("twitter_follower_count")
+                                    .description("Twitter follower counts.")
+                                    .items(object()),
+                                array("last_calendar_interaction")
+                                    .description("Last calendar interaction timestamps.")
+                                    .items(object()),
+                                array("linkedin")
+                                    .description("LinkedIn information.")
+                                    .items(object()),
+                                array("foundation_date")
+                                    .description("Foundation dates.")
+                                    .items(object()),
+                                array("strongest_connection_user")
+                                    .description("Strongest connection user details.")
+                                    .items(object()),
+                                array("estimated_arr_usd")
+                                    .description("Estimated annual recurring revenue in USD.")
+                                    .items(object()),
+                                array("strongest_connection_strength_legacy")
+                                    .description("Legacy connection strength metrics.")
+                                    .items(object()),
+                                array("next_calendar_interaction")
+                                    .description("Next calendar interaction timestamps.")
+                                    .items(object()),
+                                array("employee_range")
+                                    .description("Employee count ranges.")
+                                    .items(object()),
+                                array("first_interaction")
+                                    .description("First interaction timestamps.")
+                                    .items(object()),
+                                array("angellist")
+                                    .description("AngelList information.")
+                                    .items(object()),
+                                array("facebook")
+                                    .description("Facebook information.")
+                                    .items(object()),
+                                array("first_email_interaction")
+                                    .description("First email interaction timestamps.")
+                                    .items(object()),
+                                array("strongest_connection_strength")
+                                    .description("Connection strength metrics.")
+                                    .items(object()),
+                                array("first_calendar_interaction")
+                                    .description("First calendar interaction timestamps.")
+                                    .items(object()),
+                                array("instagram")
+                                    .description("Instagram information.")
+                                    .items(object()),
+                                array("last_interaction")
+                                    .description("Last interaction timestamps.")
+                                    .items(object()))));
 
-    public static final List<ModifiableValueProperty<?, ?>> WORKSPACE_RECORD =
-        List.of(
-            array("workspace_id")
-                .label("Workspace ID")
-                .items(
-                    object()
-                        .properties(
-                            string("value")
-                                .label("ID")))
-                .required(true),
-            array("name")
+    public static final ModifiableValueProperty<?, ?> COMPANY_RECORD = object(COMPANIES)
+        .label("Company")
+        .properties(
+            string("domains")
+                .label("Domain")
+                .description("The full domain of the website.")
+                .required(false),
+            string("name")
                 .label("Name")
+                .description("The name of the company.")
+                .required(false),
+            string("description")
+                .label("Description")
+                .description("The description of the company.")
+                .required(false),
+            string("facebook")
+                .label("Facebook")
+                .description("The facebook profile of the company.")
+                .required(false),
+            string("instagram")
+                .label("instagram")
+                .description("The instagram profile of the company.")
+                .required(false),
+            string("linkedin")
+                .label("LinkedIn")
+                .description("The linkedin profile of the company.")
+                .required(false),
+            string("estimated_arr_usd")
+                .label("Estimated ARR")
+                .description("The annual recurring revenue (ARR) of the company.")
+                .options(AttioUtils.getCompanyIdOptions("estimated_arr_usd"))
+                .required(false),
+            date("foundation_date")
+                .label("Foundation Date")
+                .description("The date when the company was founded.")
+                .required(false),
+            string("employee_range")
+                .label("Employee Range")
+                .description("The employee range of the company.")
+                .options(AttioUtils.getCompanyIdOptions("employee_range"))
+                .required(false),
+            array("categories")
+                .label("Categories")
+                .description("Categories of the company.")
+                .options(AttioUtils.getCompanyIdOptions("categories"))
+                .required(false)
                 .items(
-                    object()
-                        .properties(
-                            string("value")
-                                .label("Name"))),
-            array("users")
-                .label("Users")
+                    string("category")
+                        .label("Category")
+                        .required(false)),
+            array("associated_deals")
+                .label("Associated Deals")
+                .description("The associated deals of the company.")
+                .options(AttioUtils.getTargetRecordIdOptions(DEALS))
+                .required(false)
                 .items(
-                    object()
-                        .properties(
-                            string(REFERENCED_ACTOR_TYPE)
-                                .label("Reference Actor Type")
-                                .options(option("Workspace Member", "workspace-member"))
-                                .required(true),
-                            string(REFERENCED_ACTOR_ID)
-                                .label("Reference Actor ID")
-                                .options((ActionOptionsFunction<String>) AttioUtils::getTargetActorIdOptions)
-                                .required(true))),
-            array("company")
+                    string("deal")
+                        .label("Deal")
+                        .required(false)),
+            array("associated_workspaces")
+                .label("Associated Workspace")
+                .description("The associated workspace of the company.")
+                .options(AttioUtils.getTargetRecordIdOptions(WORKSPACES))
+                .required(false)
+                .items(
+                    string("workspace")
+                        .label("Workspace")
+                        .required(false)));
+
+    public static final ModifiableObjectProperty DEAL_OUTPUT =
+        object()
+            .properties(
+                object("data")
+                    .properties(
+                        ID_RECORD_OBJECT,
+                        string("created_at")
+                            .description("When the record was created in ISO 8601 format."),
+                        string("web_url")
+                            .description("Web URL to access the record."),
+                        object("values")
+                            .properties(
+                                array("name")
+                                    .description("List of name values for the record.")
+                                    .items(
+                                        object()
+                                            .properties(
+                                                VALUE_BASIC_INFO,
+                                                string("value")
+                                                    .description("The value of the deal name."),
+                                                string("attribute_type")
+                                                    .description("The type of this reference attribute."))),
+                                array("stage")
+                                    .description("List of stage values for the record.")
+                                    .items(
+                                        object()
+                                            .properties(
+                                                VALUE_BASIC_INFO,
+                                                object("status")
+                                                    .description("Status of the deal.")
+                                                    .properties(
+                                                        string("title")
+                                                            .description("Title of the deal."),
+                                                        object("id")
+                                                            .description("ID object")
+                                                            .properties(
+                                                                string("workspace_id")
+                                                                    .description("ID of the workspace."),
+                                                                string("object_id")
+                                                                    .description("ID of the object."),
+                                                                string("attribute_id")
+                                                                    .description("ID of the attribute."),
+                                                                string("status_id")
+                                                                    .description("ID of the status.")),
+                                                        bool("is_archived")
+                                                            .description("Whether the status is archived."),
+                                                        bool("celebration_enabled")
+                                                            .description("Whether the celebration is enabled."),
+                                                        string("target_time_in_status")
+                                                            .description("Target time of the status.")),
+                                                string("attribute_type")
+                                                    .description("The type of this reference attribute."))),
+                                array("owner")
+                                    .description("List of owners for the record.")
+                                    .items(
+                                        object()
+                                            .properties(
+                                                VALUE_BASIC_INFO,
+                                                string("referenced_actor_type")
+                                                    .description("Type of referenced actor."),
+                                                string("referenced_actor_id")
+                                                    .description("ID of the referenced actor."),
+                                                string("attribute_type")
+                                                    .description("The type of this reference attribute."))),
+                                array("value")
+                                    .description("List of currency values for the record.")
+                                    .items(
+                                        object()
+                                            .properties(
+                                                VALUE_BASIC_INFO,
+                                                number("currency_value")
+                                                    .description("Value of the deal in currency."),
+                                                string("currency_code")
+                                                    .description("Currency code of the currency used in the deal."),
+                                                string("attribute_type")
+                                                    .description("The type of this reference attribute."))),
+                                array("associated_people")
+                                    .description("List of associated people records.")
+                                    .items(
+                                        object()
+                                            .properties(
+                                                VALUE_BASIC_INFO,
+                                                string("target_object")
+                                                    .description("Target object of the record."),
+                                                string("target_record_id")
+                                                    .description("ID of the record that created the deal."),
+                                                string("attribute_type")
+                                                    .description("The type of this reference attribute."))),
+                                array("associated_company")
+                                    .description("List of associated company records.")
+                                    .items(
+                                        object()
+                                            .properties(
+                                                VALUE_BASIC_INFO,
+                                                string("target_object")
+                                                    .description("Target object of the record."),
+                                                string("target_record_id")
+                                                    .description("ID of the record that created the deal."),
+                                                string("attribute_type")
+                                                    .description("The type of this reference attribute."))))));
+
+    public static final ModifiableObjectProperty PERSON_OUTPUT =
+        object()
+            .properties(
+                object("data")
+                    .properties(
+                        ID_RECORD_OBJECT,
+                        string("created_at")
+                            .description("Record creation timestamp in ISO 8601 format."),
+                        string("web_url")
+                            .description("Direct URL to access this record."),
+                        object("values")
+                            .properties(
+                                array("email_addresses")
+                                    .description("Associated email addresses.")
+                                    .items(
+                                        object()
+                                            .properties(
+                                                VALUE_BASIC_INFO,
+                                                string("original_email_address")
+                                                    .description(
+                                                        "The original, unprocessed email address as provided by the source."),
+                                                string("email_address")
+                                                    .description(
+                                                        "The normalized email address (lowercase, whitespace-trimmed)."),
+                                                string("email_domain")
+                                                    .description(
+                                                        "The domain part of the email address (e.g., 'example.com' from 'user@example.com')."),
+                                                string("email_root_domain")
+                                                    .description(
+                                                        "The root domain, excluding subdomains (e.g., 'company.com' from 'user@sub.company.com')."),
+                                                string("email_local_specifier")
+                                                    .description(
+                                                        "The local part of the email address (e.g., 'user' from 'user@example.com')."),
+                                                string("attribute_type")
+                                                    .description("The type of this reference attribute."))),
+                                array("name")
+                                    .description("Personal name information")
+                                    .items(
+                                        object()
+                                            .properties(
+                                                VALUE_BASIC_INFO,
+                                                string("first_name")
+                                                    .description("Given name of the individual."),
+                                                string("last_name")
+                                                    .description("Family name/surname of the individual."),
+                                                string("full_name")
+                                                    .description(
+                                                        "Complete name in display format (e.g., 'First Last')."),
+                                                string("attribute_type")
+                                                    .description("The type of this reference attribute."))),
+                                array("description")
+                                    .description("Descriptive text about the person.")
+                                    .items(
+                                        object()
+                                            .properties(
+                                                VALUE_BASIC_INFO,
+                                                string("value")
+                                                    .description("Description of the person."),
+                                                string("attribute_type")
+                                                    .description("The type of this reference attribute.")
+
+                                            )),
+                                array("created_at")
+                                    .description("Creation timestamps")
+                                    .items(
+                                        object()
+                                            .properties(
+                                                VALUE_BASIC_INFO,
+                                                string("value")
+                                                    .description("Timestamp of the creation date."),
+                                                string("attribute_type")
+                                                    .description("The type of this reference attribute.")
+
+                                            )),
+                                array("created_by")
+                                    .description("Actor who created this record")
+                                    .items(
+                                        object()
+                                            .properties(
+                                                VALUE_BASIC_INFO,
+                                                string("referenced_actor_type")
+                                                    .description("Type of referenced actor."),
+                                                string("referenced_actor_id")
+                                                    .description("ID of the referenced actor."),
+                                                string("attribute_type")
+                                                    .description("The type of this reference attribute."))),
+                                array("strongest_connection_strength_legacy")
+                                    .description("Legacy connection strength scores (deprecated).")
+                                    .items(object()),
+                                array("last_interaction")
+                                    .description("Most recent interaction timestamps.")
+                                    .items(object()),
+                                array("twitter")
+                                    .description("Twitter profile URLs or handles.")
+                                    .items(object()),
+                                array("avatar_url")
+                                    .description("Profile image URLs.")
+                                    .items(object()),
+                                array("job_title")
+                                    .description("Current/most recent job positions.")
+                                    .items(object()),
+                                array("next_calendar_interaction")
+                                    .description("Upcoming scheduled meeting dates.")
+                                    .items(object()),
+                                array("company")
+                                    .description("Current/most recent employers.")
+                                    .items(object()),
+                                array("primary_location")
+                                    .description("Primary geographic locations.")
+                                    .items(object()),
+                                array("angellist")
+                                    .description("AngelList profile URLs.")
+                                    .items(object()),
+                                array("strongest_connection_user")
+                                    .description("Users with strongest relationships.")
+                                    .items(object()),
+                                array("strongest_connection_strength")
+                                    .description("Current connection strength metrics.")
+                                    .items(object()),
+                                array("last_email_interaction")
+                                    .description("Timestamps of last email exchanges.")
+                                    .items(object()),
+                                array("first_interaction")
+                                    .description("Initial contact timestamps.")
+                                    .items(object()),
+                                array("last_calendar_interaction")
+                                    .description("Most recent meeting dates.")
+                                    .items(object()),
+                                array("linkedin")
+                                    .description("LinkedIn profile URLs.")
+                                    .items(object()),
+                                array("facebook")
+                                    .description("Facebook profile URLs.")
+                                    .items(object()),
+                                array("first_calendar_interaction")
+                                    .description("First meeting dates.")
+                                    .items(object()),
+                                array("twitter_follower_count")
+                                    .description("Twitter follower counts.")
+                                    .items(object()),
+                                array("instagram")
+                                    .description("Instagram profile URLs.")
+                                    .items(object()),
+                                array("first_email_interaction")
+                                    .description("First email contact timestamps.")
+                                    .items(object()),
+                                array("phone_numbers")
+                                    .description("Contact phone numbers.")
+                                    .items(object()))));
+
+    public static final ModifiableValueProperty<?, ?> PERSON_RECORD = object(PEOPLE)
+        .label("Person")
+        .properties(
+            string("first_name")
+                .label("First Name")
+                .description("The first name of the person.")
+                .required(false),
+            string("last_name")
+                .label("Last Name")
+                .description("The last name of the person.")
+                .required(false),
+            string("email_address")
+                .label("Email Address")
+                .description("Email address of the person.")
+                .required(false),
+            string("description")
+                .label("Description")
+                .description("The description of the person.")
+                .required(false),
+            string("company")
                 .label("Company")
-                .maxItems(1)
+                .description("The company where the person works.")
+                .options(AttioUtils.getTargetRecordIdOptions(COMPANIES))
+                .required(false),
+            string("job_title")
+                .label("Job Title")
+                .description("The job title of the person.")
+                .required(false),
+            string("facebook")
+                .label("Facebook")
+                .description("Facebook profile of the person.")
+                .required(false),
+            string("instagram")
+                .label("Instagram")
+                .description("Instagram profile of the person.")
+                .required(false),
+            string("linkedin")
+                .label("LinkedIn")
+                .description("LinkedIn profile of the person.")
+                .required(false),
+            array("associated_deals")
+                .label("Associated Deals")
+                .description("The associated deals of the person.")
+                .options(AttioUtils.getTargetRecordIdOptions(DEALS))
+                .required(false)
                 .items(
-                    object()
-                        .properties(
-                            string(TARGET_OBJECT)
-                                .label("Target object")
-                                .options(option("Company", COMPANIES))
-                                .required(true),
-                            string(TARGET_RECORD_ID)
-                                .label("Target Record ID")
-                                .optionsLookupDependsOn(TARGET_OBJECT)
-                                .options(AttioUtils.getTargetRecordIdOptions(COMPANIES))
-                                .required(true))),
-            array("avatar_url")
-                .label("Avatar URL")
+                    string("deal")
+                        .label("Deal")
+                        .required(false)),
+            array("associated_users")
+                .label("Associated Users")
+                .description("The associated users of the person.")
+                .options((ActionOptionsFunction<String>) AttioUtils::getTargetActorIdOptions)
+                .required(false)
                 .items(
-                    object()
+                    string("user")
+                        .label("Users")
+                        .required(false)));
+
+    public static final ModifiableObjectProperty USER_OUTPUT =
+        object()
+            .properties(
+                object("data")
+                    .properties(
+                        ID_RECORD_OBJECT,
+                        string("created_at")
+                            .description("Timestamp when the record was created in ISO 8601 format."),
+                        string("web_url")
+                            .description("Web URL to access this record."),
+                        object("values")
+                            .properties(
+                                array("person")
+                                    .description("Associated person records.")
+                                    .items(
+                                        object()
+                                            .properties(
+                                                VALUE_BASIC_INFO,
+                                                string("target_object")
+                                                    .description("Type of object being referenced."),
+                                                string("target_record_id")
+                                                    .description("ID of the referenced record."),
+                                                string("attribute_type")
+                                                    .description("The type of this reference attribute."))),
+                                array("primary_email_address")
+                                    .description("Primary email addresses for this record.")
+                                    .items(
+                                        object()
+                                            .properties(
+                                                VALUE_BASIC_INFO,
+                                                string("original_email_address")
+                                                    .description(
+                                                        "The original, unprocessed email address as provided by the source."),
+                                                string("email_address")
+                                                    .description(
+                                                        "The normalized email address (lowercase, whitespace-trimmed)."),
+                                                string("email_domain")
+                                                    .description(
+                                                        "The domain part of the email address (e.g., 'example.com' from 'user@example.com')."),
+                                                string("email_root_domain")
+                                                    .description(
+                                                        "The root domain, excluding subdomains (e.g., 'company.com' from 'user@sub.company.com')."),
+                                                string("email_local_specifier")
+                                                    .description(
+                                                        "The local part of the email address (e.g., 'user' from 'user@example.com')."),
+                                                string("attribute_type")
+                                                    .description("The type of this reference attribute."))),
+                                array("user_id")
+                                    .description("User identifiers for this record")
+                                    .items(
+                                        object()
+                                            .properties(
+                                                VALUE_BASIC_INFO,
+                                                string("value")
+                                                    .description("The user ID value"),
+                                                string("attribute_type")
+                                                    .description("The type of this reference attribute."))),
+                                array("workspace")
+                                    .description("Associated workspaces")
+                                    .items(
+                                        object()
+                                            .properties(
+                                                VALUE_BASIC_INFO,
+                                                string("target_object")
+                                                    .description("Type of object being referenced."),
+                                                string("target_record_id")
+                                                    .description("ID of the referenced workspace."),
+                                                string("attribute_type")
+                                                    .description("The type of this reference attribute."))))));
+
+    public static final ModifiableObjectProperty WORKSPACE_OUTPUT = object()
+        .properties(
+            object("data")
+                .properties(
+                    ID_RECORD_OBJECT,
+                    string("created_at")
+                        .description("Timestamp when the record was created in ISO 8601 format."),
+                    string("web_url")
+                        .description("Direct URL to access this record in the Attio application."),
+                    object("values")
                         .properties(
-                            string("value")
-                                .label("Avatar URL"))));
+                            array("workspace_id")
+                                .description("Workspace identifier information.")
+                                .items(
+                                    object()
+                                        .properties(
+                                            VALUE_BASIC_INFO,
+                                            string("value")
+                                                .description("The actual workspace ID value."),
+                                            string("attribute_type")
+                                                .description("The type of this reference attribute.")
+
+                                        )),
+                            array("name")
+                                .description("Name information for the record.")
+                                .items(
+                                    object()
+                                        .properties(
+                                            VALUE_BASIC_INFO,
+                                            string("value")
+                                                .description("The actual name value."),
+                                            string("attribute_type")
+                                                .description("The type of this reference attribute."))),
+                            array("users")
+                                .description("User references associated with this record.")
+                                .items(
+                                    object()
+                                        .properties(
+                                            VALUE_BASIC_INFO,
+                                            string("target_object")
+                                                .description(
+                                                    "The type of object being referenced (always 'users' in this case)."),
+                                            string("target_record_id")
+                                                .description("The ID of the user record being referenced."),
+                                            string("attribute_type")
+                                                .description("The type of this reference attribute."))),
+                            array("company")
+                                .description("Company references associated with this record.")
+                                .items(
+                                    object()
+                                        .properties(
+                                            VALUE_BASIC_INFO,
+                                            string("target_object")
+                                                .description(
+                                                    "The type of object being referenced (always 'companies' in this case)."),
+                                            string("target_record_id")
+                                                .description("The ID of the company record being referenced."),
+                                            string("attribute_type")
+                                                .description("The type of this reference attribute."))),
+                            array("avatar_url")
+                                .description("Avatar URL information for the record.")
+                                .description("Avatar URL information for the record.")
+                                .items(
+                                    object()
+                                        .properties(
+                                            VALUE_BASIC_INFO,
+                                            string("value")
+                                                .description("The actual URL of the avatar image."),
+                                            string("attribute_type")
+                                                .description("The type of this reference attribute."))))));
 }

@@ -53,7 +53,7 @@ class AttioCreateTaskActionTest {
     private final LocalDateTime localDateTime = LocalDateTime.of(2025, 5, 5, 10, 10, 0);
     private final Parameters mockedParameters = MockParametersFactory.create(
         Map.of(
-            DEADLINE_AT, localDateTime, CONTENT, "content", FORMAT, "format", IS_COMPLETED, true,
+            DEADLINE_AT, localDateTime, CONTENT, "content", IS_COMPLETED, true,
             LINKED_RECORDS, List.of(), ASSIGNEES, List.of()));
 
     @Test
@@ -77,8 +77,12 @@ class AttioCreateTaskActionTest {
 
         Map<String, Map<String, Object>> expectedBody = Map.of(
             DATA, Map.of(
-                CONTENT, "content", FORMAT, "format", DEADLINE_AT, localDateTime.toString(), IS_COMPLETED, true,
-                LINKED_RECORDS, List.of(), ASSIGNEES, List.of()));
+                CONTENT, "content",
+                FORMAT, "plaintext",
+                DEADLINE_AT, localDateTime.toString(),
+                IS_COMPLETED, true,
+                LINKED_RECORDS, List.of(),
+                ASSIGNEES, List.of()));
 
         assertEquals(expectedBody, body.getContent());
     }

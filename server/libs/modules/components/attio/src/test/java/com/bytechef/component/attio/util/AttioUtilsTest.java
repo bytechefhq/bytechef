@@ -17,18 +17,18 @@
 package com.bytechef.component.attio.util;
 
 import static com.bytechef.component.attio.constant.AttioConstants.COMPANIES;
-import static com.bytechef.component.attio.constant.AttioConstants.COMPANY_RECORD;
+import static com.bytechef.component.attio.constant.AttioConstants.COMPANY_OUTPUT;
 import static com.bytechef.component.attio.constant.AttioConstants.DATA;
 import static com.bytechef.component.attio.constant.AttioConstants.DEALS;
-import static com.bytechef.component.attio.constant.AttioConstants.DEAL_RECORD;
+import static com.bytechef.component.attio.constant.AttioConstants.DEAL_OUTPUT;
 import static com.bytechef.component.attio.constant.AttioConstants.ID;
 import static com.bytechef.component.attio.constant.AttioConstants.PEOPLE;
-import static com.bytechef.component.attio.constant.AttioConstants.PERSON_RECORD;
-import static com.bytechef.component.attio.constant.AttioConstants.RECORD_TYPE;
+import static com.bytechef.component.attio.constant.AttioConstants.PERSON_OUTPUT;
 import static com.bytechef.component.attio.constant.AttioConstants.USERS;
-import static com.bytechef.component.attio.constant.AttioConstants.USER_RECORD;
+import static com.bytechef.component.attio.constant.AttioConstants.USER_OUTPUT;
 import static com.bytechef.component.attio.constant.AttioConstants.WORKSPACES;
-import static com.bytechef.component.attio.constant.AttioConstants.WORKSPACE_RECORD;
+import static com.bytechef.component.attio.constant.AttioConstants.WORKSPACE_MEMBER;
+import static com.bytechef.component.attio.constant.AttioConstants.WORKSPACE_OUTPUT;
 import static com.bytechef.component.definition.ComponentDsl.option;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
@@ -38,7 +38,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.component.definition.ActionContext;
-import com.bytechef.component.definition.ComponentDsl.ModifiableValueProperty;
+import com.bytechef.component.definition.ComponentDsl.ModifiableObjectProperty;
 import com.bytechef.component.definition.Context.Http.Body;
 import com.bytechef.component.definition.Context.Http.Executor;
 import com.bytechef.component.definition.Context.Http.Response;
@@ -48,6 +48,8 @@ import com.bytechef.component.definition.TriggerContext;
 import com.bytechef.component.definition.TriggerDefinition.WebhookBody;
 import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.test.definition.MockParametersFactory;
+import java.time.LocalDate;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
@@ -121,57 +123,7 @@ class AttioUtilsTest {
     }
 
     @Test
-    void testGetRecordAttributesForUser() {
-        Parameters mockedParameters = MockParametersFactory.create(Map.of(RECORD_TYPE, USERS));
-
-        List<ModifiableValueProperty<?, ?>> result = AttioUtils.getRecordAttributes(
-            mockedParameters, mockedParameters, Map.of(), mockedActionContext);
-
-        assertEquals(USER_RECORD, result);
-    }
-
-    @Test
-    void testGetRecordAttributesForWorkspace() {
-        Parameters mockedParameters = MockParametersFactory.create(Map.of(RECORD_TYPE, WORKSPACES));
-
-        List<ModifiableValueProperty<?, ?>> result = AttioUtils.getRecordAttributes(
-            mockedParameters, mockedParameters, Map.of(), mockedActionContext);
-
-        assertEquals(WORKSPACE_RECORD, result);
-    }
-
-    @Test
-    void testGetRecordAttributesForCompany() {
-        Parameters mockedParameters = MockParametersFactory.create(Map.of(RECORD_TYPE, COMPANIES));
-
-        List<ModifiableValueProperty<?, ?>> result = AttioUtils.getRecordAttributes(
-            mockedParameters, mockedParameters, Map.of(), mockedActionContext);
-
-        assertEquals(COMPANY_RECORD, result);
-    }
-
-    @Test
-    void testGetRecordAttributesForPerson() {
-        Parameters mockedParameters = MockParametersFactory.create(Map.of(RECORD_TYPE, PEOPLE));
-
-        List<ModifiableValueProperty<?, ?>> result = AttioUtils.getRecordAttributes(
-            mockedParameters, mockedParameters, Map.of(), mockedActionContext);
-
-        assertEquals(PERSON_RECORD, result);
-    }
-
-    @Test
-    void testGetRecordAttributesForDeal() {
-        Parameters mockedParameters = MockParametersFactory.create(Map.of(RECORD_TYPE, DEALS));
-
-        List<ModifiableValueProperty<?, ?>> result = AttioUtils.getRecordAttributes(
-            mockedParameters, mockedParameters, Map.of(), mockedActionContext);
-
-        assertEquals(DEAL_RECORD, result);
-    }
-
-    @Test
-    void getTargetActorIdOptions() {
+    void testGetTargetActorIdOptions() {
         Map<String, List<Object>> mockedBody = Map.of(
             DATA, List.of(
                 Map.of(
@@ -199,7 +151,7 @@ class AttioUtilsTest {
     }
 
     @Test
-    void getTargetObjectOptions() {
+    void testGetTargetObjectOptions() {
         Map<String, List<Object>> mockedBody = Map.of(DATA, List.of(
             Map.of("singular_noun", "test1", "api_slug", "1"),
             Map.of("singular_noun", "test2", "api_slug", "2")));
@@ -224,7 +176,7 @@ class AttioUtilsTest {
     }
 
     @Test
-    void getTargetRecordIdOptions() throws Exception {
+    void testGetTargetRecordIdOptions() throws Exception {
         Map<String, List<Object>> mockedBody = Map.of(
             "data", List.of(
                 Map.of(
@@ -249,7 +201,7 @@ class AttioUtilsTest {
     }
 
     @Test
-    void getWorkSpaceMemberIdOptions() {
+    void testGetWorkSpaceMemberIdOptions() {
         Map<String, List<Object>> mockedBody = Map.of(
             "data", List.of(
                 Map.of("id", Map.of("workspace_member_id", "test_id"),
@@ -273,7 +225,7 @@ class AttioUtilsTest {
     }
 
     @Test
-    void subscribeWebhook() {
+    void testSubscribeWebhook() {
         when(mockedTriggerContext.http(any()))
             .thenReturn(mockedExecutor);
         when(mockedExecutor.body(bodyArgumentCaptor.capture()))
@@ -303,7 +255,7 @@ class AttioUtilsTest {
     }
 
     @Test
-    void unsubscribeWebhook() {
+    void testUnsubscribeWebhook() {
         when(mockedTriggerContext.http(any()))
             .thenReturn(mockedExecutor);
         when(mockedExecutor.execute())
@@ -314,4 +266,189 @@ class AttioUtilsTest {
         verify(mockedTriggerContext, times(1)).http(any());
         verify(mockedExecutor, times(1)).execute();
     }
+
+    @Test
+    void testGetRecordValuesForPerson() {
+        Map<String, Object> mockRecordMap = Map.of("first_name", "name", "last_name", "lastName",
+            "email_address", "email",
+            "description", "description",
+            "company", "company",
+            "job_title", "job_title",
+            "associated_deals", List.of("associated_deal"),
+            "associated_users", List.of("associated_user"));
+
+        Map<String, Object> result = AttioUtils.getRecordValues(mockRecordMap, PEOPLE);
+
+        Map<String, Object> expected = Map.of(
+            "name", List.of(Map.of("first_name", "name", "last_name", "lastName", "full_name", "name lastName")),
+            "email_addresses", List.of("email"),
+            "description", List.of(Map.of("value", "description")),
+            "company", List.of(Map.of("target_object", COMPANIES, "target_record_id", "company")),
+            "job_title", List.of(Map.of("value", "job_title")),
+            "associated_deals", List.of(Map.of("target_object", DEALS, "target_record_id", "associated_deal")),
+            "associated_users", List.of(Map.of("target_object", USERS, "target_record_id", "associated_user")));
+
+        assertEquals(expected, result);
+    }
+
+    @Test
+    void testGetRecordValuesForCompany() {
+        Map<String, Object> mockRecordMap = new HashMap<>();
+
+        mockRecordMap.put("domains", "domain");
+        mockRecordMap.put("name", "name");
+        mockRecordMap.put("description", "description");
+        mockRecordMap.put("facebook", "facebook");
+        mockRecordMap.put("instagram", "instagram");
+        mockRecordMap.put("linkedin", "linkedin");
+        mockRecordMap.put("employee_range", "employee_range");
+        mockRecordMap.put("associated_deals", List.of("associated_deal"));
+        mockRecordMap.put("associated_workspaces", List.of("associated_workspace"));
+        mockRecordMap.put("categories", List.of("category"));
+        mockRecordMap.put("estimated_arr_usd", "estimated_arr_usd");
+        mockRecordMap.put("foundation_date", LocalDate.of(2025, 5, 16));
+
+        Map<String, Object> result = AttioUtils.getRecordValues(mockRecordMap, COMPANIES);
+
+        Map<String, Object> expected = new HashMap<>();
+
+        expected.put("domains", List.of(Map.of("domain", "domain")));
+        expected.put("name", List.of(Map.of("value", "name")));
+        expected.put("description", List.of(Map.of("value", "description")));
+        expected.put("facebook", List.of(Map.of("value", "facebook")));
+        expected.put("instagram", List.of(Map.of("value", "instagram")));
+        expected.put("linkedin", List.of(Map.of("value", "linkedin")));
+        expected.put("employee_range", List.of(Map.of("option", "employee_range")));
+        expected.put("associated_deals",
+            List.of(Map.of("target_object", DEALS, "target_record_id", "associated_deal")));
+        expected.put("associated_workspaces",
+            List.of(Map.of("target_object", WORKSPACES, "target_record_id", "associated_workspace")));
+        expected.put("categories", List.of(Map.of("option", "category")));
+        expected.put("estimated_arr_usd", List.of(Map.of("option", "estimated_arr_usd")));
+        expected.put("foundation_date", List.of(Map.of("value", LocalDate.of(2025, 5, 16)
+            .toString())));
+
+        assertEquals(expected, result);
+    }
+
+    @Test
+    void testGetRecordValuesForUser() {
+        Map<String, Object> mockRecordMap = new HashMap<>();
+
+        mockRecordMap.put("person", "person");
+        mockRecordMap.put("email_address", "email_address");
+        mockRecordMap.put("user_id", "user_id");
+        mockRecordMap.put("workspace", List.of("workspace"));
+
+        Map<String, Object> result = AttioUtils.getRecordValues(mockRecordMap, USERS);
+
+        Map<String, Object> expected = new HashMap<>();
+
+        expected.put("person", Map.of("target_object", PEOPLE, "target_record_id", "person"));
+        expected.put("primary_email_address", "email_address");
+        expected.put("user_id", "user_id");
+        expected.put("workspace", List.of(Map.of("target_object", WORKSPACES, "target_record_id", "workspace")));
+
+        assertEquals(expected, result);
+    }
+
+    @Test
+    void testGetRecordValuesForDeal() {
+        Map<String, Object> mockRecordMap = new HashMap<>();
+
+        mockRecordMap.put("name", "name");
+        mockRecordMap.put("stage", "stage");
+        mockRecordMap.put("owner", "owner");
+        mockRecordMap.put("associated_company", "associated_company");
+        mockRecordMap.put("value", 32);
+        mockRecordMap.put("associated_people", List.of("associated_people"));
+
+        Map<String, Object> result = AttioUtils.getRecordValues(mockRecordMap, DEALS);
+
+        Map<String, Object> expected = new HashMap<>();
+
+        expected.put("name", "name");
+        expected.put("stage", "stage");
+        expected.put("value", List.of(Map.of("currency_value", 32)));
+        expected.put("associated_company", List.of(Map.of("target_object", COMPANIES,
+            "target_record_id", "associated_company")));
+        expected.put("owner", List.of(Map.of("referenced_actor_id", "owner",
+            "referenced_actor_type", "workspace-member")));
+        expected.put("associated_people",
+            List.of(Map.of("target_object", PEOPLE, "target_record_id", "associated_people")));
+
+        assertEquals(expected, result);
+    }
+
+    @Test
+    void testGetRecordValuesForWorkspace() {
+        Map<String, Object> mockRecordMap = new HashMap<>();
+
+        mockRecordMap.put("workspace_id", "workspace_id");
+        mockRecordMap.put("name", "name");
+        mockRecordMap.put("users", List.of("users"));
+        mockRecordMap.put("company", "company");
+        mockRecordMap.put("avatar_url", "avatar_url");
+
+        Map<String, Object> result = AttioUtils.getRecordValues(mockRecordMap, WORKSPACES);
+
+        Map<String, Object> expected = new HashMap<>();
+
+        expected.put("name", "name");
+        expected.put("workspace_id", "workspace_id");
+        expected.put("avatar_url", "avatar_url");
+        expected.put("company", Map.of("target_object", COMPANIES, "target_record_id", "company"));
+        expected.put("users", List.of(Map.of("target_object", USERS, "target_record_id", "users")));
+
+        assertEquals(expected, result);
+    }
+
+    @Test
+    void testGetAssigneesList() {
+        List<Object> mockAssignees = List.of("testAssignee", "testAssignee2");
+
+        List<Map<String, Object>> result = AttioUtils.getAssigneesList(mockAssignees);
+
+        List<Map<String, Object>> expected = List.of(
+            Map.of("referenced_actor_type", WORKSPACE_MEMBER, "referenced_actor_id", "testAssignee"),
+            Map.of("referenced_actor_type", WORKSPACE_MEMBER, "referenced_actor_id", "testAssignee2"));
+
+        assertEquals(expected, result);
+    }
+
+    @Test
+    void testGetOutputSchemaForCompany() {
+        ModifiableObjectProperty outputProperty = AttioUtils.getRecordOutput(COMPANIES);
+
+        assertEquals(COMPANY_OUTPUT, outputProperty);
+    }
+
+    @Test
+    void testGetOutputSchemaForWorkspace() {
+        ModifiableObjectProperty outputProperty = AttioUtils.getRecordOutput(WORKSPACES);
+
+        assertEquals(WORKSPACE_OUTPUT, outputProperty);
+    }
+
+    @Test
+    void testGetOutputSchemaForUser() {
+        ModifiableObjectProperty outputProperty = AttioUtils.getRecordOutput(USERS);
+
+        assertEquals(USER_OUTPUT, outputProperty);
+    }
+
+    @Test
+    void testGetOutputSchemaForPerson() {
+        ModifiableObjectProperty outputProperty = AttioUtils.getRecordOutput(PEOPLE);
+
+        assertEquals(PERSON_OUTPUT, outputProperty);
+    }
+
+    @Test
+    void testGetOutputSchemaForDeal() {
+        ModifiableObjectProperty outputProperty = AttioUtils.getRecordOutput(DEALS);
+
+        assertEquals(DEAL_OUTPUT, outputProperty);
+    }
+
 }

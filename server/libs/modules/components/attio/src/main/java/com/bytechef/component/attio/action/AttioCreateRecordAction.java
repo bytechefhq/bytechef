@@ -16,22 +16,31 @@
 
 package com.bytechef.component.attio.action;
 
+import static com.bytechef.component.attio.constant.AttioConstants.COMPANIES;
+import static com.bytechef.component.attio.constant.AttioConstants.COMPANY_RECORD;
 import static com.bytechef.component.attio.constant.AttioConstants.DATA;
+import static com.bytechef.component.attio.constant.AttioConstants.DEALS;
+import static com.bytechef.component.attio.constant.AttioConstants.PEOPLE;
+import static com.bytechef.component.attio.constant.AttioConstants.PERSON_RECORD;
 import static com.bytechef.component.attio.constant.AttioConstants.RECORD_TYPE;
-import static com.bytechef.component.attio.constant.AttioConstants.VALUE;
+import static com.bytechef.component.attio.constant.AttioConstants.USERS;
+import static com.bytechef.component.attio.constant.AttioConstants.WORKSPACES;
+import static com.bytechef.component.attio.constant.AttioConstants.getDealRecord;
+import static com.bytechef.component.attio.constant.AttioConstants.getUserRecord;
+import static com.bytechef.component.attio.constant.AttioConstants.getWorkspaceRecord;
+import static com.bytechef.component.attio.util.AttioUtils.getRecordValues;
 import static com.bytechef.component.definition.ComponentDsl.action;
-import static com.bytechef.component.definition.ComponentDsl.dynamicProperties;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.Context.Http.responseType;
 
 import com.bytechef.component.attio.util.AttioUtils;
+import com.bytechef.component.definition.ActionDefinition.OutputFunction;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http.Body;
 import com.bytechef.component.definition.Context.Http.ResponseType;
 import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.definition.PropertiesDataSource.ActionPropertiesFunction;
 import com.bytechef.component.definition.TypeReference;
 import java.util.Map;
 
@@ -49,11 +58,22 @@ public class AttioCreateRecordAction {
                 .description("Type of record that will be created.")
                 .options((ActionOptionsFunction<String>) AttioUtils::getTargetObjectOptions)
                 .required(true),
-            dynamicProperties(VALUE)
-                .propertiesLookupDependsOn(RECORD_TYPE)
-                .properties((ActionPropertiesFunction) AttioUtils::getRecordAttributes)
+            PERSON_RECORD
+                .displayCondition("%s == '%s'".formatted(RECORD_TYPE, PEOPLE))
+                .required(true),
+            COMPANY_RECORD
+                .displayCondition("%s == '%s'".formatted(RECORD_TYPE, COMPANIES))
+                .required(true),
+            getUserRecord(true)
+                .displayCondition("%s == '%s'".formatted(RECORD_TYPE, USERS))
+                .required(true),
+            getDealRecord(true)
+                .displayCondition("%s == '%s'".formatted(RECORD_TYPE, DEALS))
+                .required(true),
+            getWorkspaceRecord(true)
+                .displayCondition("%s == '%s'".formatted(RECORD_TYPE, WORKSPACES))
                 .required(true))
-        .output()
+        .output((OutputFunction) AttioUtils::getOutputSchema)
         .perform(AttioCreateRecordAction::perform);
 
     private AttioCreateRecordAction() {
@@ -62,9 +82,16 @@ public class AttioCreateRecordAction {
     public static Map<String, Object> perform(
         Parameters inputParameters, Parameters connectionParameters, Context context) {
 
+        String record = inputParameters.getRequiredString(RECORD_TYPE);
+        Map<String, Object> recordMap = inputParameters.getMap(record, Object.class, Map.of());
+
+        Map<String, Object> values = getRecordValues(recordMap, record);
+
+        Map<String, Object> body = Map.of("values", values);
+
         return context.http(http -> http.post(
             "/objects/%s/records".formatted(inputParameters.getRequiredString(RECORD_TYPE))))
-            .body(Body.of(DATA, Map.of("values", inputParameters.getMap(VALUE))))
+            .body(Body.of(DATA, body))
             .configuration(responseType(ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});
