@@ -141,7 +141,7 @@ const ConnectionTabConnectionSelect = ({
             <div className="space-y-1">
                 <div className="flex items-center gap-1">
                     {componentDefinition && (
-                        <Label className="font-normal">
+                        <Label className="text-sm font-medium">
                             {componentDefinition.title}
 
                             {required && <RequiredMark />}
@@ -210,6 +210,11 @@ const ConnectionTabConnectionSelect = ({
                     connectionTagsQueryKey={ConnectionKeys!.connectionTags}
                     connectionsQueryKey={ConnectionKeys!.connections}
                     onClose={() => setShowConnectionDialog(false)}
+                    onConnectionCreate={(newConnectionId) => {
+                        handleValueChange(newConnectionId, key);
+
+                        setConnectionId(newConnectionId);
+                    }}
                     useCreateConnectionMutation={useCreateConnectionMutation}
                     useGetConnectionTagsQuery={useGetConnectionTagsQuery!}
                 />

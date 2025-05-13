@@ -46,24 +46,6 @@ import {useForm} from 'react-hook-form';
 import ComponentSelectionInput from './ComponentSelectionInput';
 import OAuth2Button from './OAuth2Button';
 
-interface ConnectionDialogProps {
-    componentDefinition?: ComponentDefinition;
-    connection?: ConnectionI | undefined;
-    connectionTagsQueryKey: QueryKey;
-    connectionsQueryKey: QueryKey;
-    onClose?: () => void;
-    useCreateConnectionMutation?: (mutationProps: {
-        onSuccess?: (result: number, variables: ConnectionI) => void;
-        onError?: (error: Error, variables: ConnectionI) => void;
-    }) => UseMutationResult<number, Error, ConnectionI, unknown>;
-    useGetConnectionTagsQuery: () => UseQueryResult<Tag[], Error>;
-    useUpdateConnectionMutation?: (mutationProps: {
-        onSuccess?: (result: void, variables: ConnectionI) => void;
-        onError?: (error: Error, variables: ConnectionI) => void;
-    }) => UseMutationResult<void, Error, ConnectionI, unknown>;
-    triggerNode?: ReactNode;
-}
-
 export interface ConnectionDialogFormProps {
     authorizationName: string;
     environment: ConnectionEnvironment;
@@ -73,12 +55,32 @@ export interface ConnectionDialogFormProps {
     tags: Array<Tag | {label: string; value: string}>;
 }
 
+interface ConnectionDialogProps {
+    componentDefinition?: ComponentDefinition;
+    connection?: ConnectionI | undefined;
+    connectionTagsQueryKey: QueryKey;
+    connectionsQueryKey: QueryKey;
+    onClose?: () => void;
+    onConnectionCreate?: (connectionId: number) => void;
+    triggerNode?: ReactNode;
+    useCreateConnectionMutation?: (mutationProps: {
+        onSuccess?: (result: number, variables: ConnectionI) => void;
+        onError?: (error: Error, variables: ConnectionI) => void;
+    }) => UseMutationResult<number, Error, ConnectionI, unknown>;
+    useGetConnectionTagsQuery: () => UseQueryResult<Tag[], Error>;
+    useUpdateConnectionMutation?: (mutationProps: {
+        onSuccess?: (result: void, variables: ConnectionI) => void;
+        onError?: (error: Error, variables: ConnectionI) => void;
+    }) => UseMutationResult<void, Error, ConnectionI, unknown>;
+}
+
 const ConnectionDialog = ({
     componentDefinition,
     connection,
     connectionTagsQueryKey,
     connectionsQueryKey,
     onClose,
+    onConnectionCreate,
     triggerNode,
     useCreateConnectionMutation,
     useGetConnectionTagsQuery,
@@ -144,7 +146,7 @@ const ConnectionDialog = ({
     const queryClient = useQueryClient();
 
     const connectionMutation = (useUpdateConnectionMutation || useCreateConnectionMutation)!({
-        onSuccess: () => {
+        onSuccess: (connectionId) => {
             queryClient.invalidateQueries({
                 queryKey: ComponentDefinitionKeys.componentDefinitions,
             });
@@ -156,6 +158,10 @@ const ConnectionDialog = ({
             queryClient.invalidateQueries({
                 queryKey: connectionTagsQueryKey,
             });
+
+            if (connectionId && !connection?.id && onConnectionCreate) {
+                onConnectionCreate(connectionId);
+            }
 
             closeDialog();
         },
