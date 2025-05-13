@@ -60,22 +60,22 @@ public class CapsuleCRMCreateContactAction {
                 .description("Represents if this party is a person or an organisation.")
                 .options(
                     option("Person", PERSON.getValue()),
-                    option("Organization", ORGANIZATION.name()))
+                    option("Organization", ORGANIZATION.getValue()))
                 .required(true),
             string(FIRST_NAME)
                 .label("First Name")
                 .description("The first name of the person.")
-                .displayCondition("%s == '%s'".formatted(TYPE, PERSON))
+                .displayCondition("%s == '%s'".formatted(TYPE, PERSON.getValue()))
                 .required(true),
             string(LAST_NAME)
                 .label("Last Name")
                 .description("The last name of the person.")
-                .displayCondition("%s == '%s'".formatted(TYPE, PERSON))
+                .displayCondition("%s == '%s'".formatted(TYPE, PERSON.getValue()))
                 .required(true),
             string(NAME)
                 .label("Name")
                 .description("The name of the organisation.")
-                .displayCondition("%s == '%s'".formatted(TYPE, "organization"))
+                .displayCondition("%s == '%s'".formatted(TYPE, ORGANIZATION.getValue()))
                 .required(true),
             string(ABOUT)
                 .label("About")
