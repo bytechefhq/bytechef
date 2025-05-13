@@ -36,10 +36,11 @@ public class TextHelperConcatenateAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("concatenate")
         .title("Concatenate")
-        .description("Concatenate two or more texts.")
+        .description("Concatenate a list of texts.")
         .properties(
             array(TEXTS)
                 .label("Texts")
+                .description("A list of texts to concatenate.")
                 .items(TEXT_PROPERTY)
                 .required(true),
             string(SEPARATOR)

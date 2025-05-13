@@ -31,14 +31,14 @@ import org.junit.jupiter.api.Test;
 /**
  * @author Monika Kušter
  */
-class TextHelperFindActionTest {
+class TextHelperContainsActionTest {
 
     @Test
     void testPerformTextContainsExpression() {
         Parameters parameters = MockParametersFactory.create(
             Map.of(TEXT, "This is a sample text.", EXPRESSION, "sample"));
 
-        assertTrue(TextHelperFindAction.perform(parameters, parameters, mock(ActionContext.class)));
+        assertTrue(TextHelperContainsAction.perform(parameters, parameters, mock(ActionContext.class)));
     }
 
     @Test
@@ -46,6 +46,6 @@ class TextHelperFindActionTest {
         Parameters parameters = MockParametersFactory.create(
             Map.of(TEXT, "This is a sample text.", EXPRESSION, "missing"));
 
-        assertFalse(TextHelperFindAction.perform(parameters, parameters, mock(ActionContext.class)));
+        assertFalse(TextHelperContainsAction.perform(parameters, parameters, mock(ActionContext.class)));
     }
 }
