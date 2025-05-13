@@ -13,20 +13,19 @@
   "resources" : null,
   "version" : 1,
   "title" : "Text Helper",
-  "connection" : null,
   "actions" : [ {
     "batch" : null,
     "deprecated" : null,
-    "description" : "Decodes base64 encoded text into human readable plain text.",
+    "description" : "Encode/decode a specified string.",
     "help" : null,
     "metadata" : null,
-    "name" : "base64Decode",
+    "name" : "base64EncodeDecode",
     "outputDefinition" : {
       "output" : null,
       "outputResponse" : {
         "outputSchema" : {
           "advancedOption" : null,
-          "description" : "Decoded content.",
+          "description" : "Base64 encoded/decoded content.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -50,7 +49,7 @@
       },
       "outputSchema" : {
         "advancedOption" : null,
-        "description" : "Decoded content.",
+        "description" : "Base64 encoded/decoded content.",
         "displayCondition" : null,
         "expressionEnabled" : null,
         "hidden" : null,
@@ -73,45 +72,17 @@
     },
     "properties" : [ {
       "advancedOption" : null,
-      "description" : null,
+      "description" : "The text to be Base64 encode or decode.",
       "displayCondition" : null,
       "expressionEnabled" : null,
       "hidden" : null,
       "metadata" : { },
       "required" : true,
-      "name" : "encodingSchema",
-      "type" : "STRING",
-      "defaultValue" : "base64",
-      "exampleValue" : null,
-      "label" : "Encoding Scheme",
-      "placeholder" : null,
-      "controlType" : "SELECT",
-      "languageId" : null,
-      "maxLength" : null,
-      "minLength" : null,
-      "options" : [ {
-        "description" : null,
-        "label" : "Base64",
-        "value" : "base64"
-      }, {
-        "description" : null,
-        "label" : "Base64 URL",
-        "value" : "base64Url"
-      } ],
-      "optionsDataSource" : null
-    }, {
-      "advancedOption" : null,
-      "description" : "The Base64 encoded content that needs to be decoded.",
-      "displayCondition" : null,
-      "expressionEnabled" : null,
-      "hidden" : null,
-      "metadata" : { },
-      "required" : true,
-      "name" : "content",
+      "name" : "text",
       "type" : "STRING",
       "defaultValue" : null,
       "exampleValue" : null,
-      "label" : "Base64 Content",
+      "label" : "Text",
       "placeholder" : null,
       "controlType" : "TEXT_AREA",
       "languageId" : null,
@@ -119,15 +90,43 @@
       "minLength" : null,
       "options" : null,
       "optionsDataSource" : null
+    }, {
+      "advancedOption" : null,
+      "description" : "Select whether to encode or decode the text.",
+      "displayCondition" : null,
+      "expressionEnabled" : null,
+      "hidden" : null,
+      "metadata" : { },
+      "required" : true,
+      "name" : "operation",
+      "type" : "STRING",
+      "defaultValue" : null,
+      "exampleValue" : null,
+      "label" : "Encode or Decode",
+      "placeholder" : null,
+      "controlType" : "SELECT",
+      "languageId" : null,
+      "maxLength" : null,
+      "minLength" : null,
+      "options" : [ {
+        "description" : null,
+        "label" : "Encode",
+        "value" : "ENCODE"
+      }, {
+        "description" : null,
+        "label" : "Decode",
+        "value" : "DECODE"
+      } ],
+      "optionsDataSource" : null
     } ],
-    "title" : "Base64 Decode",
+    "title" : "Base64 Encode/Decode",
+    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
-    "perform" : { }
+    "workflowNodeDescription" : null
   }, {
     "batch" : null,
     "deprecated" : null,
-    "description" : "Concatenate two or more texts.",
+    "description" : "Concatenate a list of texts.",
     "help" : null,
     "metadata" : null,
     "name" : "concatenate",
@@ -183,7 +182,7 @@
     },
     "properties" : [ {
       "advancedOption" : null,
-      "description" : null,
+      "description" : "A list of texts to concatenate.",
       "displayCondition" : null,
       "expressionEnabled" : null,
       "hidden" : null,
@@ -220,8 +219,8 @@
       "minItems" : null,
       "multipleValues" : null,
       "options" : null,
-      "optionsDataSource" : null,
-      "controlType" : "ARRAY_BUILDER"
+      "controlType" : "ARRAY_BUILDER",
+      "optionsDataSource" : null
     }, {
       "advancedOption" : null,
       "description" : "The text that separates the texts you want to concatenate.",
@@ -244,9 +243,119 @@
       "optionsDataSource" : null
     } ],
     "title" : "Concatenate",
+    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
-    "perform" : { }
+    "workflowNodeDescription" : null
+  }, {
+    "batch" : null,
+    "deprecated" : null,
+    "description" : "Check if text contains the specified sequence of characters.",
+    "help" : null,
+    "metadata" : null,
+    "name" : "contains",
+    "outputDefinition" : {
+      "output" : null,
+      "outputResponse" : {
+        "outputSchema" : {
+          "advancedOption" : null,
+          "description" : "True if the text contains the expression, false otherwise.",
+          "displayCondition" : null,
+          "expressionEnabled" : null,
+          "hidden" : null,
+          "metadata" : { },
+          "required" : null,
+          "name" : null,
+          "type" : "BOOLEAN",
+          "defaultValue" : null,
+          "exampleValue" : null,
+          "label" : null,
+          "placeholder" : null,
+          "options" : [ {
+            "description" : null,
+            "label" : "True",
+            "value" : true
+          }, {
+            "description" : null,
+            "label" : "False",
+            "value" : false
+          } ],
+          "controlType" : "SELECT"
+        },
+        "sampleOutput" : null,
+        "placeholder" : null
+      },
+      "outputSchema" : {
+        "advancedOption" : null,
+        "description" : "True if the text contains the expression, false otherwise.",
+        "displayCondition" : null,
+        "expressionEnabled" : null,
+        "hidden" : null,
+        "metadata" : { },
+        "required" : null,
+        "name" : null,
+        "type" : "BOOLEAN",
+        "defaultValue" : null,
+        "exampleValue" : null,
+        "label" : null,
+        "placeholder" : null,
+        "options" : [ {
+          "description" : null,
+          "label" : "True",
+          "value" : true
+        }, {
+          "description" : null,
+          "label" : "False",
+          "value" : false
+        } ],
+        "controlType" : "SELECT"
+      },
+      "sampleOutput" : null
+    },
+    "properties" : [ {
+      "advancedOption" : null,
+      "description" : null,
+      "displayCondition" : null,
+      "expressionEnabled" : null,
+      "hidden" : null,
+      "metadata" : { },
+      "required" : true,
+      "name" : "text",
+      "type" : "STRING",
+      "defaultValue" : null,
+      "exampleValue" : null,
+      "label" : "Text",
+      "placeholder" : null,
+      "controlType" : "TEXT_AREA",
+      "languageId" : null,
+      "maxLength" : null,
+      "minLength" : null,
+      "options" : null,
+      "optionsDataSource" : null
+    }, {
+      "advancedOption" : null,
+      "description" : "Text to search for.",
+      "displayCondition" : null,
+      "expressionEnabled" : null,
+      "hidden" : null,
+      "metadata" : { },
+      "required" : true,
+      "name" : "expression",
+      "type" : "STRING",
+      "defaultValue" : null,
+      "exampleValue" : null,
+      "label" : "Expression",
+      "placeholder" : null,
+      "controlType" : "TEXT",
+      "languageId" : null,
+      "maxLength" : null,
+      "minLength" : null,
+      "options" : null,
+      "optionsDataSource" : null
+    } ],
+    "title" : "Contains",
+    "perform" : { },
+    "processErrorResponse" : null,
+    "workflowNodeDescription" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -378,77 +487,111 @@
       "controlType" : "SELECT"
     } ],
     "title" : "Extract Content from HTML",
+    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
-    "perform" : { }
+    "workflowNodeDescription" : null
   }, {
     "batch" : null,
     "deprecated" : null,
-    "description" : "Find substring",
+    "description" : "Extract all of the URLs from a given piece of text, returning them as a list.",
     "help" : null,
     "metadata" : null,
-    "name" : "find",
+    "name" : "extractUrls",
     "outputDefinition" : {
       "output" : null,
       "outputResponse" : {
         "outputSchema" : {
           "advancedOption" : null,
-          "description" : "True if the text contains the expression, false otherwise.",
+          "description" : "Extracted URLs.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
           "metadata" : { },
           "required" : null,
           "name" : null,
-          "type" : "BOOLEAN",
+          "type" : "ARRAY",
           "defaultValue" : null,
           "exampleValue" : null,
           "label" : null,
           "placeholder" : null,
-          "options" : [ {
+          "items" : [ {
+            "advancedOption" : null,
             "description" : null,
-            "label" : "True",
-            "value" : true
-          }, {
-            "description" : null,
-            "label" : "False",
-            "value" : false
+            "displayCondition" : null,
+            "expressionEnabled" : null,
+            "hidden" : null,
+            "metadata" : { },
+            "required" : null,
+            "name" : null,
+            "type" : "STRING",
+            "defaultValue" : null,
+            "exampleValue" : null,
+            "label" : null,
+            "placeholder" : null,
+            "controlType" : "TEXT",
+            "languageId" : null,
+            "maxLength" : null,
+            "minLength" : null,
+            "options" : null,
+            "optionsDataSource" : null
           } ],
-          "controlType" : "SELECT"
+          "maxItems" : null,
+          "minItems" : null,
+          "multipleValues" : null,
+          "options" : null,
+          "controlType" : "ARRAY_BUILDER",
+          "optionsDataSource" : null
         },
         "sampleOutput" : null,
         "placeholder" : null
       },
       "outputSchema" : {
         "advancedOption" : null,
-        "description" : "True if the text contains the expression, false otherwise.",
+        "description" : "Extracted URLs.",
         "displayCondition" : null,
         "expressionEnabled" : null,
         "hidden" : null,
         "metadata" : { },
         "required" : null,
         "name" : null,
-        "type" : "BOOLEAN",
+        "type" : "ARRAY",
         "defaultValue" : null,
         "exampleValue" : null,
         "label" : null,
         "placeholder" : null,
-        "options" : [ {
+        "items" : [ {
+          "advancedOption" : null,
           "description" : null,
-          "label" : "True",
-          "value" : true
-        }, {
-          "description" : null,
-          "label" : "False",
-          "value" : false
+          "displayCondition" : null,
+          "expressionEnabled" : null,
+          "hidden" : null,
+          "metadata" : { },
+          "required" : null,
+          "name" : null,
+          "type" : "STRING",
+          "defaultValue" : null,
+          "exampleValue" : null,
+          "label" : null,
+          "placeholder" : null,
+          "controlType" : "TEXT",
+          "languageId" : null,
+          "maxLength" : null,
+          "minLength" : null,
+          "options" : null,
+          "optionsDataSource" : null
         } ],
-        "controlType" : "SELECT"
+        "maxItems" : null,
+        "minItems" : null,
+        "multipleValues" : null,
+        "options" : null,
+        "controlType" : "ARRAY_BUILDER",
+        "optionsDataSource" : null
       },
       "sampleOutput" : null
     },
     "properties" : [ {
       "advancedOption" : null,
-      "description" : null,
+      "description" : "The text from which to extract URLs.",
       "displayCondition" : null,
       "expressionEnabled" : null,
       "hidden" : null,
@@ -466,19 +609,1086 @@
       "minLength" : null,
       "options" : null,
       "optionsDataSource" : null
-    }, {
+    } ],
+    "title" : "Extract URLs",
+    "perform" : { },
+    "processErrorResponse" : null,
+    "workflowNodeDescription" : null
+  }, {
+    "batch" : null,
+    "deprecated" : null,
+    "description" : "Format currency to the specified denomination.",
+    "help" : null,
+    "metadata" : null,
+    "name" : "formatCurrency",
+    "outputDefinition" : {
+      "output" : null,
+      "outputResponse" : {
+        "outputSchema" : {
+          "advancedOption" : null,
+          "description" : "Formatted currency.",
+          "displayCondition" : null,
+          "expressionEnabled" : null,
+          "hidden" : null,
+          "metadata" : { },
+          "required" : null,
+          "name" : null,
+          "type" : "STRING",
+          "defaultValue" : null,
+          "exampleValue" : null,
+          "label" : null,
+          "placeholder" : null,
+          "controlType" : "TEXT",
+          "languageId" : null,
+          "maxLength" : null,
+          "minLength" : null,
+          "options" : null,
+          "optionsDataSource" : null
+        },
+        "sampleOutput" : null,
+        "placeholder" : null
+      },
+      "outputSchema" : {
+        "advancedOption" : null,
+        "description" : "Formatted currency.",
+        "displayCondition" : null,
+        "expressionEnabled" : null,
+        "hidden" : null,
+        "metadata" : { },
+        "required" : null,
+        "name" : null,
+        "type" : "STRING",
+        "defaultValue" : null,
+        "exampleValue" : null,
+        "label" : null,
+        "placeholder" : null,
+        "controlType" : "TEXT",
+        "languageId" : null,
+        "maxLength" : null,
+        "minLength" : null,
+        "options" : null,
+        "optionsDataSource" : null
+      },
+      "sampleOutput" : null
+    },
+    "properties" : [ {
       "advancedOption" : null,
-      "description" : "Text to search for.",
+      "description" : "The type of currency you wish to use.",
       "displayCondition" : null,
       "expressionEnabled" : null,
       "hidden" : null,
       "metadata" : { },
       "required" : true,
-      "name" : "expression",
+      "name" : "currency",
       "type" : "STRING",
       "defaultValue" : null,
       "exampleValue" : null,
-      "label" : "Expression",
+      "label" : "Currency",
+      "placeholder" : null,
+      "controlType" : "SELECT",
+      "languageId" : null,
+      "maxLength" : null,
+      "minLength" : null,
+      "options" : [ {
+        "description" : null,
+        "label" : "ADP",
+        "value" : "ADP"
+      }, {
+        "description" : null,
+        "label" : "AED",
+        "value" : "AED"
+      }, {
+        "description" : null,
+        "label" : "AFA",
+        "value" : "AFA"
+      }, {
+        "description" : null,
+        "label" : "AFN",
+        "value" : "AFN"
+      }, {
+        "description" : null,
+        "label" : "ALL",
+        "value" : "ALL"
+      }, {
+        "description" : null,
+        "label" : "AMD",
+        "value" : "AMD"
+      }, {
+        "description" : null,
+        "label" : "ANG",
+        "value" : "ANG"
+      }, {
+        "description" : null,
+        "label" : "AOA",
+        "value" : "AOA"
+      }, {
+        "description" : null,
+        "label" : "ARS",
+        "value" : "ARS"
+      }, {
+        "description" : null,
+        "label" : "ATS",
+        "value" : "ATS"
+      }, {
+        "description" : null,
+        "label" : "AUD",
+        "value" : "AUD"
+      }, {
+        "description" : null,
+        "label" : "AWG",
+        "value" : "AWG"
+      }, {
+        "description" : null,
+        "label" : "AYM",
+        "value" : "AYM"
+      }, {
+        "description" : null,
+        "label" : "AZM",
+        "value" : "AZM"
+      }, {
+        "description" : null,
+        "label" : "AZN",
+        "value" : "AZN"
+      }, {
+        "description" : null,
+        "label" : "BAM",
+        "value" : "BAM"
+      }, {
+        "description" : null,
+        "label" : "BBD",
+        "value" : "BBD"
+      }, {
+        "description" : null,
+        "label" : "BDT",
+        "value" : "BDT"
+      }, {
+        "description" : null,
+        "label" : "BEF",
+        "value" : "BEF"
+      }, {
+        "description" : null,
+        "label" : "BGL",
+        "value" : "BGL"
+      }, {
+        "description" : null,
+        "label" : "BGN",
+        "value" : "BGN"
+      }, {
+        "description" : null,
+        "label" : "BHD",
+        "value" : "BHD"
+      }, {
+        "description" : null,
+        "label" : "BIF",
+        "value" : "BIF"
+      }, {
+        "description" : null,
+        "label" : "BMD",
+        "value" : "BMD"
+      }, {
+        "description" : null,
+        "label" : "BND",
+        "value" : "BND"
+      }, {
+        "description" : null,
+        "label" : "BOB",
+        "value" : "BOB"
+      }, {
+        "description" : null,
+        "label" : "BOV",
+        "value" : "BOV"
+      }, {
+        "description" : null,
+        "label" : "BRL",
+        "value" : "BRL"
+      }, {
+        "description" : null,
+        "label" : "BSD",
+        "value" : "BSD"
+      }, {
+        "description" : null,
+        "label" : "BTN",
+        "value" : "BTN"
+      }, {
+        "description" : null,
+        "label" : "BWP",
+        "value" : "BWP"
+      }, {
+        "description" : null,
+        "label" : "BYB",
+        "value" : "BYB"
+      }, {
+        "description" : null,
+        "label" : "BYN",
+        "value" : "BYN"
+      }, {
+        "description" : null,
+        "label" : "BYR",
+        "value" : "BYR"
+      }, {
+        "description" : null,
+        "label" : "BZD",
+        "value" : "BZD"
+      }, {
+        "description" : null,
+        "label" : "CAD",
+        "value" : "CAD"
+      }, {
+        "description" : null,
+        "label" : "CDF",
+        "value" : "CDF"
+      }, {
+        "description" : null,
+        "label" : "CHE",
+        "value" : "CHE"
+      }, {
+        "description" : null,
+        "label" : "CHF",
+        "value" : "CHF"
+      }, {
+        "description" : null,
+        "label" : "CHW",
+        "value" : "CHW"
+      }, {
+        "description" : null,
+        "label" : "CLF",
+        "value" : "CLF"
+      }, {
+        "description" : null,
+        "label" : "CLP",
+        "value" : "CLP"
+      }, {
+        "description" : null,
+        "label" : "CNY",
+        "value" : "CNY"
+      }, {
+        "description" : null,
+        "label" : "COP",
+        "value" : "COP"
+      }, {
+        "description" : null,
+        "label" : "COU",
+        "value" : "COU"
+      }, {
+        "description" : null,
+        "label" : "CRC",
+        "value" : "CRC"
+      }, {
+        "description" : null,
+        "label" : "CSD",
+        "value" : "CSD"
+      }, {
+        "description" : null,
+        "label" : "CUC",
+        "value" : "CUC"
+      }, {
+        "description" : null,
+        "label" : "CUP",
+        "value" : "CUP"
+      }, {
+        "description" : null,
+        "label" : "CVE",
+        "value" : "CVE"
+      }, {
+        "description" : null,
+        "label" : "CYP",
+        "value" : "CYP"
+      }, {
+        "description" : null,
+        "label" : "CZK",
+        "value" : "CZK"
+      }, {
+        "description" : null,
+        "label" : "DEM",
+        "value" : "DEM"
+      }, {
+        "description" : null,
+        "label" : "DJF",
+        "value" : "DJF"
+      }, {
+        "description" : null,
+        "label" : "DKK",
+        "value" : "DKK"
+      }, {
+        "description" : null,
+        "label" : "DOP",
+        "value" : "DOP"
+      }, {
+        "description" : null,
+        "label" : "DZD",
+        "value" : "DZD"
+      }, {
+        "description" : null,
+        "label" : "EEK",
+        "value" : "EEK"
+      }, {
+        "description" : null,
+        "label" : "EGP",
+        "value" : "EGP"
+      }, {
+        "description" : null,
+        "label" : "ERN",
+        "value" : "ERN"
+      }, {
+        "description" : null,
+        "label" : "ESP",
+        "value" : "ESP"
+      }, {
+        "description" : null,
+        "label" : "ETB",
+        "value" : "ETB"
+      }, {
+        "description" : null,
+        "label" : "EUR",
+        "value" : "EUR"
+      }, {
+        "description" : null,
+        "label" : "FIM",
+        "value" : "FIM"
+      }, {
+        "description" : null,
+        "label" : "FJD",
+        "value" : "FJD"
+      }, {
+        "description" : null,
+        "label" : "FKP",
+        "value" : "FKP"
+      }, {
+        "description" : null,
+        "label" : "FRF",
+        "value" : "FRF"
+      }, {
+        "description" : null,
+        "label" : "GBP",
+        "value" : "GBP"
+      }, {
+        "description" : null,
+        "label" : "GEL",
+        "value" : "GEL"
+      }, {
+        "description" : null,
+        "label" : "GHC",
+        "value" : "GHC"
+      }, {
+        "description" : null,
+        "label" : "GHS",
+        "value" : "GHS"
+      }, {
+        "description" : null,
+        "label" : "GIP",
+        "value" : "GIP"
+      }, {
+        "description" : null,
+        "label" : "GMD",
+        "value" : "GMD"
+      }, {
+        "description" : null,
+        "label" : "GNF",
+        "value" : "GNF"
+      }, {
+        "description" : null,
+        "label" : "GRD",
+        "value" : "GRD"
+      }, {
+        "description" : null,
+        "label" : "GTQ",
+        "value" : "GTQ"
+      }, {
+        "description" : null,
+        "label" : "GWP",
+        "value" : "GWP"
+      }, {
+        "description" : null,
+        "label" : "GYD",
+        "value" : "GYD"
+      }, {
+        "description" : null,
+        "label" : "HKD",
+        "value" : "HKD"
+      }, {
+        "description" : null,
+        "label" : "HNL",
+        "value" : "HNL"
+      }, {
+        "description" : null,
+        "label" : "HRK",
+        "value" : "HRK"
+      }, {
+        "description" : null,
+        "label" : "HTG",
+        "value" : "HTG"
+      }, {
+        "description" : null,
+        "label" : "HUF",
+        "value" : "HUF"
+      }, {
+        "description" : null,
+        "label" : "IDR",
+        "value" : "IDR"
+      }, {
+        "description" : null,
+        "label" : "IEP",
+        "value" : "IEP"
+      }, {
+        "description" : null,
+        "label" : "ILS",
+        "value" : "ILS"
+      }, {
+        "description" : null,
+        "label" : "INR",
+        "value" : "INR"
+      }, {
+        "description" : null,
+        "label" : "IQD",
+        "value" : "IQD"
+      }, {
+        "description" : null,
+        "label" : "IRR",
+        "value" : "IRR"
+      }, {
+        "description" : null,
+        "label" : "ISK",
+        "value" : "ISK"
+      }, {
+        "description" : null,
+        "label" : "ITL",
+        "value" : "ITL"
+      }, {
+        "description" : null,
+        "label" : "JMD",
+        "value" : "JMD"
+      }, {
+        "description" : null,
+        "label" : "JOD",
+        "value" : "JOD"
+      }, {
+        "description" : null,
+        "label" : "JPY",
+        "value" : "JPY"
+      }, {
+        "description" : null,
+        "label" : "KES",
+        "value" : "KES"
+      }, {
+        "description" : null,
+        "label" : "KGS",
+        "value" : "KGS"
+      }, {
+        "description" : null,
+        "label" : "KHR",
+        "value" : "KHR"
+      }, {
+        "description" : null,
+        "label" : "KMF",
+        "value" : "KMF"
+      }, {
+        "description" : null,
+        "label" : "KPW",
+        "value" : "KPW"
+      }, {
+        "description" : null,
+        "label" : "KRW",
+        "value" : "KRW"
+      }, {
+        "description" : null,
+        "label" : "KWD",
+        "value" : "KWD"
+      }, {
+        "description" : null,
+        "label" : "KYD",
+        "value" : "KYD"
+      }, {
+        "description" : null,
+        "label" : "KZT",
+        "value" : "KZT"
+      }, {
+        "description" : null,
+        "label" : "LAK",
+        "value" : "LAK"
+      }, {
+        "description" : null,
+        "label" : "LBP",
+        "value" : "LBP"
+      }, {
+        "description" : null,
+        "label" : "LKR",
+        "value" : "LKR"
+      }, {
+        "description" : null,
+        "label" : "LRD",
+        "value" : "LRD"
+      }, {
+        "description" : null,
+        "label" : "LSL",
+        "value" : "LSL"
+      }, {
+        "description" : null,
+        "label" : "LTL",
+        "value" : "LTL"
+      }, {
+        "description" : null,
+        "label" : "LUF",
+        "value" : "LUF"
+      }, {
+        "description" : null,
+        "label" : "LVL",
+        "value" : "LVL"
+      }, {
+        "description" : null,
+        "label" : "LYD",
+        "value" : "LYD"
+      }, {
+        "description" : null,
+        "label" : "MAD",
+        "value" : "MAD"
+      }, {
+        "description" : null,
+        "label" : "MDL",
+        "value" : "MDL"
+      }, {
+        "description" : null,
+        "label" : "MGA",
+        "value" : "MGA"
+      }, {
+        "description" : null,
+        "label" : "MGF",
+        "value" : "MGF"
+      }, {
+        "description" : null,
+        "label" : "MKD",
+        "value" : "MKD"
+      }, {
+        "description" : null,
+        "label" : "MMK",
+        "value" : "MMK"
+      }, {
+        "description" : null,
+        "label" : "MNT",
+        "value" : "MNT"
+      }, {
+        "description" : null,
+        "label" : "MOP",
+        "value" : "MOP"
+      }, {
+        "description" : null,
+        "label" : "MRO",
+        "value" : "MRO"
+      }, {
+        "description" : null,
+        "label" : "MRU",
+        "value" : "MRU"
+      }, {
+        "description" : null,
+        "label" : "MTL",
+        "value" : "MTL"
+      }, {
+        "description" : null,
+        "label" : "MUR",
+        "value" : "MUR"
+      }, {
+        "description" : null,
+        "label" : "MVR",
+        "value" : "MVR"
+      }, {
+        "description" : null,
+        "label" : "MWK",
+        "value" : "MWK"
+      }, {
+        "description" : null,
+        "label" : "MXN",
+        "value" : "MXN"
+      }, {
+        "description" : null,
+        "label" : "MXV",
+        "value" : "MXV"
+      }, {
+        "description" : null,
+        "label" : "MYR",
+        "value" : "MYR"
+      }, {
+        "description" : null,
+        "label" : "MZM",
+        "value" : "MZM"
+      }, {
+        "description" : null,
+        "label" : "MZN",
+        "value" : "MZN"
+      }, {
+        "description" : null,
+        "label" : "NAD",
+        "value" : "NAD"
+      }, {
+        "description" : null,
+        "label" : "NGN",
+        "value" : "NGN"
+      }, {
+        "description" : null,
+        "label" : "NIO",
+        "value" : "NIO"
+      }, {
+        "description" : null,
+        "label" : "NLG",
+        "value" : "NLG"
+      }, {
+        "description" : null,
+        "label" : "NOK",
+        "value" : "NOK"
+      }, {
+        "description" : null,
+        "label" : "NPR",
+        "value" : "NPR"
+      }, {
+        "description" : null,
+        "label" : "NZD",
+        "value" : "NZD"
+      }, {
+        "description" : null,
+        "label" : "OMR",
+        "value" : "OMR"
+      }, {
+        "description" : null,
+        "label" : "PAB",
+        "value" : "PAB"
+      }, {
+        "description" : null,
+        "label" : "PEN",
+        "value" : "PEN"
+      }, {
+        "description" : null,
+        "label" : "PGK",
+        "value" : "PGK"
+      }, {
+        "description" : null,
+        "label" : "PHP",
+        "value" : "PHP"
+      }, {
+        "description" : null,
+        "label" : "PKR",
+        "value" : "PKR"
+      }, {
+        "description" : null,
+        "label" : "PLN",
+        "value" : "PLN"
+      }, {
+        "description" : null,
+        "label" : "PTE",
+        "value" : "PTE"
+      }, {
+        "description" : null,
+        "label" : "PYG",
+        "value" : "PYG"
+      }, {
+        "description" : null,
+        "label" : "QAR",
+        "value" : "QAR"
+      }, {
+        "description" : null,
+        "label" : "ROL",
+        "value" : "ROL"
+      }, {
+        "description" : null,
+        "label" : "RON",
+        "value" : "RON"
+      }, {
+        "description" : null,
+        "label" : "RSD",
+        "value" : "RSD"
+      }, {
+        "description" : null,
+        "label" : "RUB",
+        "value" : "RUB"
+      }, {
+        "description" : null,
+        "label" : "RUR",
+        "value" : "RUR"
+      }, {
+        "description" : null,
+        "label" : "RWF",
+        "value" : "RWF"
+      }, {
+        "description" : null,
+        "label" : "SAR",
+        "value" : "SAR"
+      }, {
+        "description" : null,
+        "label" : "SBD",
+        "value" : "SBD"
+      }, {
+        "description" : null,
+        "label" : "SCR",
+        "value" : "SCR"
+      }, {
+        "description" : null,
+        "label" : "SDD",
+        "value" : "SDD"
+      }, {
+        "description" : null,
+        "label" : "SDG",
+        "value" : "SDG"
+      }, {
+        "description" : null,
+        "label" : "SEK",
+        "value" : "SEK"
+      }, {
+        "description" : null,
+        "label" : "SGD",
+        "value" : "SGD"
+      }, {
+        "description" : null,
+        "label" : "SHP",
+        "value" : "SHP"
+      }, {
+        "description" : null,
+        "label" : "SIT",
+        "value" : "SIT"
+      }, {
+        "description" : null,
+        "label" : "SKK",
+        "value" : "SKK"
+      }, {
+        "description" : null,
+        "label" : "SLE",
+        "value" : "SLE"
+      }, {
+        "description" : null,
+        "label" : "SLL",
+        "value" : "SLL"
+      }, {
+        "description" : null,
+        "label" : "SOS",
+        "value" : "SOS"
+      }, {
+        "description" : null,
+        "label" : "SRD",
+        "value" : "SRD"
+      }, {
+        "description" : null,
+        "label" : "SRG",
+        "value" : "SRG"
+      }, {
+        "description" : null,
+        "label" : "SSP",
+        "value" : "SSP"
+      }, {
+        "description" : null,
+        "label" : "STD",
+        "value" : "STD"
+      }, {
+        "description" : null,
+        "label" : "STN",
+        "value" : "STN"
+      }, {
+        "description" : null,
+        "label" : "SVC",
+        "value" : "SVC"
+      }, {
+        "description" : null,
+        "label" : "SYP",
+        "value" : "SYP"
+      }, {
+        "description" : null,
+        "label" : "SZL",
+        "value" : "SZL"
+      }, {
+        "description" : null,
+        "label" : "THB",
+        "value" : "THB"
+      }, {
+        "description" : null,
+        "label" : "TJS",
+        "value" : "TJS"
+      }, {
+        "description" : null,
+        "label" : "TMM",
+        "value" : "TMM"
+      }, {
+        "description" : null,
+        "label" : "TMT",
+        "value" : "TMT"
+      }, {
+        "description" : null,
+        "label" : "TND",
+        "value" : "TND"
+      }, {
+        "description" : null,
+        "label" : "TOP",
+        "value" : "TOP"
+      }, {
+        "description" : null,
+        "label" : "TPE",
+        "value" : "TPE"
+      }, {
+        "description" : null,
+        "label" : "TRL",
+        "value" : "TRL"
+      }, {
+        "description" : null,
+        "label" : "TRY",
+        "value" : "TRY"
+      }, {
+        "description" : null,
+        "label" : "TTD",
+        "value" : "TTD"
+      }, {
+        "description" : null,
+        "label" : "TWD",
+        "value" : "TWD"
+      }, {
+        "description" : null,
+        "label" : "TZS",
+        "value" : "TZS"
+      }, {
+        "description" : null,
+        "label" : "UAH",
+        "value" : "UAH"
+      }, {
+        "description" : null,
+        "label" : "UGX",
+        "value" : "UGX"
+      }, {
+        "description" : null,
+        "label" : "USD",
+        "value" : "USD"
+      }, {
+        "description" : null,
+        "label" : "USN",
+        "value" : "USN"
+      }, {
+        "description" : null,
+        "label" : "USS",
+        "value" : "USS"
+      }, {
+        "description" : null,
+        "label" : "UYI",
+        "value" : "UYI"
+      }, {
+        "description" : null,
+        "label" : "UYU",
+        "value" : "UYU"
+      }, {
+        "description" : null,
+        "label" : "UZS",
+        "value" : "UZS"
+      }, {
+        "description" : null,
+        "label" : "VEB",
+        "value" : "VEB"
+      }, {
+        "description" : null,
+        "label" : "VED",
+        "value" : "VED"
+      }, {
+        "description" : null,
+        "label" : "VEF",
+        "value" : "VEF"
+      }, {
+        "description" : null,
+        "label" : "VES",
+        "value" : "VES"
+      }, {
+        "description" : null,
+        "label" : "VND",
+        "value" : "VND"
+      }, {
+        "description" : null,
+        "label" : "VUV",
+        "value" : "VUV"
+      }, {
+        "description" : null,
+        "label" : "WST",
+        "value" : "WST"
+      }, {
+        "description" : null,
+        "label" : "XAF",
+        "value" : "XAF"
+      }, {
+        "description" : null,
+        "label" : "XAG",
+        "value" : "XAG"
+      }, {
+        "description" : null,
+        "label" : "XAU",
+        "value" : "XAU"
+      }, {
+        "description" : null,
+        "label" : "XBA",
+        "value" : "XBA"
+      }, {
+        "description" : null,
+        "label" : "XBB",
+        "value" : "XBB"
+      }, {
+        "description" : null,
+        "label" : "XBC",
+        "value" : "XBC"
+      }, {
+        "description" : null,
+        "label" : "XBD",
+        "value" : "XBD"
+      }, {
+        "description" : null,
+        "label" : "XCD",
+        "value" : "XCD"
+      }, {
+        "description" : null,
+        "label" : "XCG",
+        "value" : "XCG"
+      }, {
+        "description" : null,
+        "label" : "XDR",
+        "value" : "XDR"
+      }, {
+        "description" : null,
+        "label" : "XFO",
+        "value" : "XFO"
+      }, {
+        "description" : null,
+        "label" : "XFU",
+        "value" : "XFU"
+      }, {
+        "description" : null,
+        "label" : "XOF",
+        "value" : "XOF"
+      }, {
+        "description" : null,
+        "label" : "XPD",
+        "value" : "XPD"
+      }, {
+        "description" : null,
+        "label" : "XPF",
+        "value" : "XPF"
+      }, {
+        "description" : null,
+        "label" : "XPT",
+        "value" : "XPT"
+      }, {
+        "description" : null,
+        "label" : "XSU",
+        "value" : "XSU"
+      }, {
+        "description" : null,
+        "label" : "XTS",
+        "value" : "XTS"
+      }, {
+        "description" : null,
+        "label" : "XUA",
+        "value" : "XUA"
+      }, {
+        "description" : null,
+        "label" : "XXX",
+        "value" : "XXX"
+      }, {
+        "description" : null,
+        "label" : "YER",
+        "value" : "YER"
+      }, {
+        "description" : null,
+        "label" : "YUM",
+        "value" : "YUM"
+      }, {
+        "description" : null,
+        "label" : "ZAR",
+        "value" : "ZAR"
+      }, {
+        "description" : null,
+        "label" : "ZMK",
+        "value" : "ZMK"
+      }, {
+        "description" : null,
+        "label" : "ZMW",
+        "value" : "ZMW"
+      }, {
+        "description" : null,
+        "label" : "ZWD",
+        "value" : "ZWD"
+      }, {
+        "description" : null,
+        "label" : "ZWL",
+        "value" : "ZWL"
+      }, {
+        "description" : null,
+        "label" : "ZWN",
+        "value" : "ZWN"
+      }, {
+        "description" : null,
+        "label" : "ZWR",
+        "value" : "ZWR"
+      } ],
+      "optionsDataSource" : null
+    }, {
+      "advancedOption" : null,
+      "description" : "The amount to be formatted.",
+      "displayCondition" : null,
+      "expressionEnabled" : null,
+      "hidden" : null,
+      "metadata" : { },
+      "required" : true,
+      "name" : "amount",
+      "type" : "NUMBER",
+      "defaultValue" : null,
+      "exampleValue" : null,
+      "label" : "Amount",
+      "placeholder" : null,
+      "maxNumberPrecision" : null,
+      "maxValue" : null,
+      "minNumberPrecision" : null,
+      "minValue" : null,
+      "numberPrecision" : null,
+      "options" : null,
+      "controlType" : "NUMBER",
+      "optionsDataSource" : null
+    }, {
+      "advancedOption" : null,
+      "description" : "Digits you would like after your decimal.",
+      "displayCondition" : null,
+      "expressionEnabled" : null,
+      "hidden" : null,
+      "metadata" : { },
+      "required" : true,
+      "name" : "decimalDigits",
+      "type" : "INTEGER",
+      "defaultValue" : null,
+      "exampleValue" : null,
+      "label" : "Decimal Digits",
+      "placeholder" : null,
+      "maxValue" : null,
+      "minValue" : null,
+      "options" : null,
+      "controlType" : "INTEGER",
+      "optionsDataSource" : null
+    }, {
+      "advancedOption" : null,
+      "description" : "The character you would like to use as a decimal separator.",
+      "displayCondition" : null,
+      "expressionEnabled" : null,
+      "hidden" : null,
+      "metadata" : { },
+      "required" : true,
+      "name" : "decimalSeparator",
+      "type" : "STRING",
+      "defaultValue" : null,
+      "exampleValue" : null,
+      "label" : "Decimal Separator",
+      "placeholder" : null,
+      "controlType" : "TEXT",
+      "languageId" : null,
+      "maxLength" : null,
+      "minLength" : null,
+      "options" : null,
+      "optionsDataSource" : null
+    }, {
+      "advancedOption" : null,
+      "description" : "The character you would like to use as a thousands separator.",
+      "displayCondition" : null,
+      "expressionEnabled" : null,
+      "hidden" : null,
+      "metadata" : { },
+      "required" : true,
+      "name" : "thousandsSeparator",
+      "type" : "STRING",
+      "defaultValue" : null,
+      "exampleValue" : null,
+      "label" : "Thousands Separator",
       "placeholder" : null,
       "controlType" : "TEXT",
       "languageId" : null,
@@ -487,10 +1697,10 @@
       "options" : null,
       "optionsDataSource" : null
     } ],
-    "title" : "Find",
+    "title" : "Format Currency",
+    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
-    "perform" : { }
+    "workflowNodeDescription" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -570,9 +1780,91 @@
       "optionsDataSource" : null
     } ],
     "title" : "HTML to Markdown",
+    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
-    "perform" : { }
+    "workflowNodeDescription" : null
+  }, {
+    "batch" : null,
+    "deprecated" : null,
+    "description" : "Convert a string to lower case.",
+    "help" : null,
+    "metadata" : null,
+    "name" : "lowerCase",
+    "outputDefinition" : {
+      "output" : null,
+      "outputResponse" : {
+        "outputSchema" : {
+          "advancedOption" : null,
+          "description" : "Lower case string.",
+          "displayCondition" : null,
+          "expressionEnabled" : null,
+          "hidden" : null,
+          "metadata" : { },
+          "required" : null,
+          "name" : null,
+          "type" : "STRING",
+          "defaultValue" : null,
+          "exampleValue" : null,
+          "label" : null,
+          "placeholder" : null,
+          "controlType" : "TEXT",
+          "languageId" : null,
+          "maxLength" : null,
+          "minLength" : null,
+          "options" : null,
+          "optionsDataSource" : null
+        },
+        "sampleOutput" : null,
+        "placeholder" : null
+      },
+      "outputSchema" : {
+        "advancedOption" : null,
+        "description" : "Lower case string.",
+        "displayCondition" : null,
+        "expressionEnabled" : null,
+        "hidden" : null,
+        "metadata" : { },
+        "required" : null,
+        "name" : null,
+        "type" : "STRING",
+        "defaultValue" : null,
+        "exampleValue" : null,
+        "label" : null,
+        "placeholder" : null,
+        "controlType" : "TEXT",
+        "languageId" : null,
+        "maxLength" : null,
+        "minLength" : null,
+        "options" : null,
+        "optionsDataSource" : null
+      },
+      "sampleOutput" : null
+    },
+    "properties" : [ {
+      "advancedOption" : null,
+      "description" : null,
+      "displayCondition" : null,
+      "expressionEnabled" : null,
+      "hidden" : null,
+      "metadata" : { },
+      "required" : true,
+      "name" : "text",
+      "type" : "STRING",
+      "defaultValue" : null,
+      "exampleValue" : null,
+      "label" : "Text",
+      "placeholder" : null,
+      "controlType" : "TEXT_AREA",
+      "languageId" : null,
+      "maxLength" : null,
+      "minLength" : null,
+      "options" : null,
+      "optionsDataSource" : null
+    } ],
+    "title" : "Lower Case",
+    "perform" : { },
+    "processErrorResponse" : null,
+    "workflowNodeDescription" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -652,9 +1944,9 @@
       "optionsDataSource" : null
     } ],
     "title" : "Markdown to HTML",
+    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
-    "perform" : { }
+    "workflowNodeDescription" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -798,9 +2090,211 @@
       "controlType" : "SELECT"
     } ],
     "title" : "Replace",
+    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
-    "perform" : { }
+    "workflowNodeDescription" : null
+  }, {
+    "batch" : null,
+    "deprecated" : null,
+    "description" : "Select the first N characters from a string.",
+    "help" : null,
+    "metadata" : null,
+    "name" : "selectFirstNCharacters",
+    "outputDefinition" : {
+      "output" : null,
+      "outputResponse" : {
+        "outputSchema" : {
+          "advancedOption" : null,
+          "description" : "Lower case string.",
+          "displayCondition" : null,
+          "expressionEnabled" : null,
+          "hidden" : null,
+          "metadata" : { },
+          "required" : null,
+          "name" : null,
+          "type" : "STRING",
+          "defaultValue" : null,
+          "exampleValue" : null,
+          "label" : null,
+          "placeholder" : null,
+          "controlType" : "TEXT",
+          "languageId" : null,
+          "maxLength" : null,
+          "minLength" : null,
+          "options" : null,
+          "optionsDataSource" : null
+        },
+        "sampleOutput" : null,
+        "placeholder" : null
+      },
+      "outputSchema" : {
+        "advancedOption" : null,
+        "description" : "Lower case string.",
+        "displayCondition" : null,
+        "expressionEnabled" : null,
+        "hidden" : null,
+        "metadata" : { },
+        "required" : null,
+        "name" : null,
+        "type" : "STRING",
+        "defaultValue" : null,
+        "exampleValue" : null,
+        "label" : null,
+        "placeholder" : null,
+        "controlType" : "TEXT",
+        "languageId" : null,
+        "maxLength" : null,
+        "minLength" : null,
+        "options" : null,
+        "optionsDataSource" : null
+      },
+      "sampleOutput" : null
+    },
+    "properties" : [ {
+      "advancedOption" : null,
+      "description" : null,
+      "displayCondition" : null,
+      "expressionEnabled" : null,
+      "hidden" : null,
+      "metadata" : { },
+      "required" : true,
+      "name" : "text",
+      "type" : "STRING",
+      "defaultValue" : null,
+      "exampleValue" : null,
+      "label" : "Text",
+      "placeholder" : null,
+      "controlType" : "TEXT_AREA",
+      "languageId" : null,
+      "maxLength" : null,
+      "minLength" : null,
+      "options" : null,
+      "optionsDataSource" : null
+    }, {
+      "advancedOption" : null,
+      "description" : "The number of characters to select.",
+      "displayCondition" : null,
+      "expressionEnabled" : null,
+      "hidden" : null,
+      "metadata" : { },
+      "required" : true,
+      "name" : "numberOfCharacters",
+      "type" : "INTEGER",
+      "defaultValue" : null,
+      "exampleValue" : null,
+      "label" : "Number of Characters",
+      "placeholder" : null,
+      "maxValue" : null,
+      "minValue" : null,
+      "options" : null,
+      "controlType" : "INTEGER",
+      "optionsDataSource" : null
+    } ],
+    "title" : "Select First N Characters",
+    "perform" : { },
+    "processErrorResponse" : null,
+    "workflowNodeDescription" : null
+  }, {
+    "batch" : null,
+    "deprecated" : null,
+    "description" : "Select the last N characters from a string.",
+    "help" : null,
+    "metadata" : null,
+    "name" : "selectLastNCharacters",
+    "outputDefinition" : {
+      "output" : null,
+      "outputResponse" : {
+        "outputSchema" : {
+          "advancedOption" : null,
+          "description" : "Lower case string.",
+          "displayCondition" : null,
+          "expressionEnabled" : null,
+          "hidden" : null,
+          "metadata" : { },
+          "required" : null,
+          "name" : null,
+          "type" : "STRING",
+          "defaultValue" : null,
+          "exampleValue" : null,
+          "label" : null,
+          "placeholder" : null,
+          "controlType" : "TEXT",
+          "languageId" : null,
+          "maxLength" : null,
+          "minLength" : null,
+          "options" : null,
+          "optionsDataSource" : null
+        },
+        "sampleOutput" : null,
+        "placeholder" : null
+      },
+      "outputSchema" : {
+        "advancedOption" : null,
+        "description" : "Lower case string.",
+        "displayCondition" : null,
+        "expressionEnabled" : null,
+        "hidden" : null,
+        "metadata" : { },
+        "required" : null,
+        "name" : null,
+        "type" : "STRING",
+        "defaultValue" : null,
+        "exampleValue" : null,
+        "label" : null,
+        "placeholder" : null,
+        "controlType" : "TEXT",
+        "languageId" : null,
+        "maxLength" : null,
+        "minLength" : null,
+        "options" : null,
+        "optionsDataSource" : null
+      },
+      "sampleOutput" : null
+    },
+    "properties" : [ {
+      "advancedOption" : null,
+      "description" : null,
+      "displayCondition" : null,
+      "expressionEnabled" : null,
+      "hidden" : null,
+      "metadata" : { },
+      "required" : true,
+      "name" : "text",
+      "type" : "STRING",
+      "defaultValue" : null,
+      "exampleValue" : null,
+      "label" : "Text",
+      "placeholder" : null,
+      "controlType" : "TEXT_AREA",
+      "languageId" : null,
+      "maxLength" : null,
+      "minLength" : null,
+      "options" : null,
+      "optionsDataSource" : null
+    }, {
+      "advancedOption" : null,
+      "description" : "The number of characters to select.",
+      "displayCondition" : null,
+      "expressionEnabled" : null,
+      "hidden" : null,
+      "metadata" : { },
+      "required" : true,
+      "name" : "numberOfCharacters",
+      "type" : "INTEGER",
+      "defaultValue" : null,
+      "exampleValue" : null,
+      "label" : "Number of Characters",
+      "placeholder" : null,
+      "maxValue" : null,
+      "minValue" : null,
+      "options" : null,
+      "controlType" : "INTEGER",
+      "optionsDataSource" : null
+    } ],
+    "title" : "Select Last N Characters",
+    "perform" : { },
+    "processErrorResponse" : null,
+    "workflowNodeDescription" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -850,8 +2344,8 @@
           "minItems" : null,
           "multipleValues" : null,
           "options" : null,
-          "optionsDataSource" : null,
-          "controlType" : "ARRAY_BUILDER"
+          "controlType" : "ARRAY_BUILDER",
+          "optionsDataSource" : null
         },
         "sampleOutput" : null,
         "placeholder" : null
@@ -895,8 +2389,8 @@
         "minItems" : null,
         "multipleValues" : null,
         "options" : null,
-        "optionsDataSource" : null,
-        "controlType" : "ARRAY_BUILDER"
+        "controlType" : "ARRAY_BUILDER",
+        "optionsDataSource" : null
       },
       "sampleOutput" : null
     },
@@ -942,10 +2436,285 @@
       "optionsDataSource" : null
     } ],
     "title" : "Split",
+    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
-    "perform" : { }
+    "workflowNodeDescription" : null
+  }, {
+    "batch" : null,
+    "deprecated" : null,
+    "description" : "Trim whitespace from the beginning and end of a string.",
+    "help" : null,
+    "metadata" : null,
+    "name" : "trimWhitespace",
+    "outputDefinition" : {
+      "output" : null,
+      "outputResponse" : {
+        "outputSchema" : {
+          "advancedOption" : null,
+          "description" : "Trimmed string.",
+          "displayCondition" : null,
+          "expressionEnabled" : null,
+          "hidden" : null,
+          "metadata" : { },
+          "required" : null,
+          "name" : null,
+          "type" : "STRING",
+          "defaultValue" : null,
+          "exampleValue" : null,
+          "label" : null,
+          "placeholder" : null,
+          "controlType" : "TEXT",
+          "languageId" : null,
+          "maxLength" : null,
+          "minLength" : null,
+          "options" : null,
+          "optionsDataSource" : null
+        },
+        "sampleOutput" : null,
+        "placeholder" : null
+      },
+      "outputSchema" : {
+        "advancedOption" : null,
+        "description" : "Trimmed string.",
+        "displayCondition" : null,
+        "expressionEnabled" : null,
+        "hidden" : null,
+        "metadata" : { },
+        "required" : null,
+        "name" : null,
+        "type" : "STRING",
+        "defaultValue" : null,
+        "exampleValue" : null,
+        "label" : null,
+        "placeholder" : null,
+        "controlType" : "TEXT",
+        "languageId" : null,
+        "maxLength" : null,
+        "minLength" : null,
+        "options" : null,
+        "optionsDataSource" : null
+      },
+      "sampleOutput" : null
+    },
+    "properties" : [ {
+      "advancedOption" : null,
+      "description" : null,
+      "displayCondition" : null,
+      "expressionEnabled" : null,
+      "hidden" : null,
+      "metadata" : { },
+      "required" : true,
+      "name" : "text",
+      "type" : "STRING",
+      "defaultValue" : null,
+      "exampleValue" : null,
+      "label" : "Text",
+      "placeholder" : null,
+      "controlType" : "TEXT_AREA",
+      "languageId" : null,
+      "maxLength" : null,
+      "minLength" : null,
+      "options" : null,
+      "optionsDataSource" : null
+    } ],
+    "title" : "Trim Whitespace",
+    "perform" : { },
+    "processErrorResponse" : null,
+    "workflowNodeDescription" : null
+  }, {
+    "batch" : null,
+    "deprecated" : null,
+    "description" : "Convert a string to upper case.",
+    "help" : null,
+    "metadata" : null,
+    "name" : "upperCase",
+    "outputDefinition" : {
+      "output" : null,
+      "outputResponse" : {
+        "outputSchema" : {
+          "advancedOption" : null,
+          "description" : "Upper case string.",
+          "displayCondition" : null,
+          "expressionEnabled" : null,
+          "hidden" : null,
+          "metadata" : { },
+          "required" : null,
+          "name" : null,
+          "type" : "STRING",
+          "defaultValue" : null,
+          "exampleValue" : null,
+          "label" : null,
+          "placeholder" : null,
+          "controlType" : "TEXT",
+          "languageId" : null,
+          "maxLength" : null,
+          "minLength" : null,
+          "options" : null,
+          "optionsDataSource" : null
+        },
+        "sampleOutput" : null,
+        "placeholder" : null
+      },
+      "outputSchema" : {
+        "advancedOption" : null,
+        "description" : "Upper case string.",
+        "displayCondition" : null,
+        "expressionEnabled" : null,
+        "hidden" : null,
+        "metadata" : { },
+        "required" : null,
+        "name" : null,
+        "type" : "STRING",
+        "defaultValue" : null,
+        "exampleValue" : null,
+        "label" : null,
+        "placeholder" : null,
+        "controlType" : "TEXT",
+        "languageId" : null,
+        "maxLength" : null,
+        "minLength" : null,
+        "options" : null,
+        "optionsDataSource" : null
+      },
+      "sampleOutput" : null
+    },
+    "properties" : [ {
+      "advancedOption" : null,
+      "description" : null,
+      "displayCondition" : null,
+      "expressionEnabled" : null,
+      "hidden" : null,
+      "metadata" : { },
+      "required" : true,
+      "name" : "text",
+      "type" : "STRING",
+      "defaultValue" : null,
+      "exampleValue" : null,
+      "label" : "Text",
+      "placeholder" : null,
+      "controlType" : "TEXT_AREA",
+      "languageId" : null,
+      "maxLength" : null,
+      "minLength" : null,
+      "options" : null,
+      "optionsDataSource" : null
+    } ],
+    "title" : "Upper Case",
+    "perform" : { },
+    "processErrorResponse" : null,
+    "workflowNodeDescription" : null
+  }, {
+    "batch" : null,
+    "deprecated" : null,
+    "description" : "URL encode/decode a specified string.",
+    "help" : null,
+    "metadata" : null,
+    "name" : "urlEncodeDecode",
+    "outputDefinition" : {
+      "output" : null,
+      "outputResponse" : {
+        "outputSchema" : {
+          "advancedOption" : null,
+          "description" : "URL encoded/decoded content.",
+          "displayCondition" : null,
+          "expressionEnabled" : null,
+          "hidden" : null,
+          "metadata" : { },
+          "required" : null,
+          "name" : null,
+          "type" : "STRING",
+          "defaultValue" : null,
+          "exampleValue" : null,
+          "label" : null,
+          "placeholder" : null,
+          "controlType" : "TEXT",
+          "languageId" : null,
+          "maxLength" : null,
+          "minLength" : null,
+          "options" : null,
+          "optionsDataSource" : null
+        },
+        "sampleOutput" : null,
+        "placeholder" : null
+      },
+      "outputSchema" : {
+        "advancedOption" : null,
+        "description" : "URL encoded/decoded content.",
+        "displayCondition" : null,
+        "expressionEnabled" : null,
+        "hidden" : null,
+        "metadata" : { },
+        "required" : null,
+        "name" : null,
+        "type" : "STRING",
+        "defaultValue" : null,
+        "exampleValue" : null,
+        "label" : null,
+        "placeholder" : null,
+        "controlType" : "TEXT",
+        "languageId" : null,
+        "maxLength" : null,
+        "minLength" : null,
+        "options" : null,
+        "optionsDataSource" : null
+      },
+      "sampleOutput" : null
+    },
+    "properties" : [ {
+      "advancedOption" : null,
+      "description" : "The text to be URL encode or decode.",
+      "displayCondition" : null,
+      "expressionEnabled" : null,
+      "hidden" : null,
+      "metadata" : { },
+      "required" : true,
+      "name" : "text",
+      "type" : "STRING",
+      "defaultValue" : null,
+      "exampleValue" : null,
+      "label" : "Text",
+      "placeholder" : null,
+      "controlType" : "TEXT_AREA",
+      "languageId" : null,
+      "maxLength" : null,
+      "minLength" : null,
+      "options" : null,
+      "optionsDataSource" : null
+    }, {
+      "advancedOption" : null,
+      "description" : "Select whether to encode or decode the text.",
+      "displayCondition" : null,
+      "expressionEnabled" : null,
+      "hidden" : null,
+      "metadata" : { },
+      "required" : true,
+      "name" : "operation",
+      "type" : "STRING",
+      "defaultValue" : null,
+      "exampleValue" : null,
+      "label" : "Encode or Decode",
+      "placeholder" : null,
+      "controlType" : "SELECT",
+      "languageId" : null,
+      "maxLength" : null,
+      "minLength" : null,
+      "options" : [ {
+        "description" : null,
+        "label" : "Encode",
+        "value" : "ENCODE"
+      }, {
+        "description" : null,
+        "label" : "Decode",
+        "value" : "DECODE"
+      } ],
+      "optionsDataSource" : null
+    } ],
+    "title" : "URL Encode/Decode",
+    "perform" : { },
+    "processErrorResponse" : null,
+    "workflowNodeDescription" : null
   } ],
+  "connection" : null,
   "clusterElements" : null,
   "unifiedApi" : null,
   "triggers" : null
