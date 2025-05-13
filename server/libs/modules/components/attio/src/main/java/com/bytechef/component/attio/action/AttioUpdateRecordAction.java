@@ -16,12 +16,21 @@
 
 package com.bytechef.component.attio.action;
 
+import static com.bytechef.component.attio.constant.AttioConstants.COMPANIES;
+import static com.bytechef.component.attio.constant.AttioConstants.COMPANY_RECORD;
 import static com.bytechef.component.attio.constant.AttioConstants.DATA;
+import static com.bytechef.component.attio.constant.AttioConstants.DEALS;
+import static com.bytechef.component.attio.constant.AttioConstants.PEOPLE;
+import static com.bytechef.component.attio.constant.AttioConstants.PERSON_RECORD;
 import static com.bytechef.component.attio.constant.AttioConstants.RECORD_ID;
 import static com.bytechef.component.attio.constant.AttioConstants.RECORD_TYPE;
-import static com.bytechef.component.attio.constant.AttioConstants.VALUE;
+import static com.bytechef.component.attio.constant.AttioConstants.USERS;
+import static com.bytechef.component.attio.constant.AttioConstants.WORKSPACES;
+import static com.bytechef.component.attio.constant.AttioConstants.getDealRecord;
+import static com.bytechef.component.attio.constant.AttioConstants.getUserRecord;
+import static com.bytechef.component.attio.constant.AttioConstants.getWorkspaceRecord;
+import static com.bytechef.component.attio.util.AttioUtils.getRecordValues;
 import static com.bytechef.component.definition.ComponentDsl.action;
-import static com.bytechef.component.definition.ComponentDsl.dynamicProperties;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.Context.Http.responseType;
 
@@ -32,7 +41,6 @@ import com.bytechef.component.definition.Context.Http.Body;
 import com.bytechef.component.definition.Context.Http.ResponseType;
 import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.definition.PropertiesDataSource;
 import com.bytechef.component.definition.TypeReference;
 import java.util.Map;
 
@@ -56,11 +64,22 @@ public class AttioUpdateRecordAction {
                 .optionsLookupDependsOn(RECORD_TYPE)
                 .options(AttioUtils.getTargetRecordIdOptions(RECORD_TYPE))
                 .required(true),
-            dynamicProperties(VALUE)
-                .propertiesLookupDependsOn(RECORD_TYPE)
-                .properties((PropertiesDataSource.ActionPropertiesFunction) AttioUtils::getRecordAttributes)
+            PERSON_RECORD
+                .displayCondition("%s == '%s'".formatted(RECORD_TYPE, PEOPLE))
+                .required(true),
+            COMPANY_RECORD
+                .displayCondition("%s == '%s'".formatted(RECORD_TYPE, COMPANIES))
+                .required(true),
+            getUserRecord(false)
+                .displayCondition("%s == '%s'".formatted(RECORD_TYPE, USERS))
+                .required(true),
+            getDealRecord(false)
+                .displayCondition("%s == '%s'".formatted(RECORD_TYPE, DEALS))
+                .required(true),
+            getWorkspaceRecord(false)
+                .displayCondition("%s == '%s'".formatted(RECORD_TYPE, WORKSPACES))
                 .required(true))
-        .output()
+        .output(AttioUtils::getOutputSchema)
         .perform(AttioUpdateRecordAction::perform);
 
     private AttioUpdateRecordAction() {
@@ -69,10 +88,17 @@ public class AttioUpdateRecordAction {
     public static Map<String, Object> perform(
         Parameters inputParameters, Parameters connectionParameters, Context context) {
 
+        String record = inputParameters.getRequiredString(RECORD_TYPE);
+        Map<String, Object> recordMap = inputParameters.getMap(record, Object.class, Map.of());
+
+        Map<String, Object> values = getRecordValues(recordMap, record);
+
+        Map<String, Object> body = Map.of("values", values);
+
         return context.http(http -> http.patch(
             "/objects/%s/records/%s".formatted(
                 inputParameters.getRequiredString(RECORD_TYPE), inputParameters.getRequiredString(RECORD_ID))))
-            .body(Body.of(DATA, Map.of("values", inputParameters.getMap(VALUE))))
+            .body(Body.of(DATA, body))
             .configuration(responseType(ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});

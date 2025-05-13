@@ -28,12 +28,12 @@ import static com.bytechef.component.attio.constant.AttioConstants.REFERENCED_AC
 import static com.bytechef.component.attio.constant.AttioConstants.REFERENCED_ACTOR_TYPE;
 import static com.bytechef.component.attio.constant.AttioConstants.TARGET_OBJECT;
 import static com.bytechef.component.attio.constant.AttioConstants.TARGET_RECORD_ID;
+import static com.bytechef.component.attio.util.AttioUtils.getAssigneesList;
 import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.array;
 import static com.bytechef.component.definition.ComponentDsl.bool;
 import static com.bytechef.component.definition.ComponentDsl.dateTime;
 import static com.bytechef.component.definition.ComponentDsl.object;
-import static com.bytechef.component.definition.ComponentDsl.option;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.Context.Http.responseType;
@@ -46,6 +46,8 @@ import com.bytechef.component.definition.Context.Http.ResponseType;
 import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
+import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -59,19 +61,19 @@ public class AttioCreateTaskAction {
         .properties(
             string(CONTENT)
                 .label("Content")
-                .required(true),
-            string(FORMAT)
-                .label("Format")
-                .options(option("plaintext", "plaintext"))
+                .description("Content of the task.")
                 .required(true),
             dateTime(DEADLINE_AT)
                 .label("Deadline")
-                .required(true),
+                .description("Deadline of the task.")
+                .required(false),
             bool(IS_COMPLETED)
                 .label("Is Completed")
-                .required(true),
+                .description("Weather the task completed.")
+                .required(false),
             array(LINKED_RECORDS)
                 .label("Linked Records")
+                .description("Records linked to the task.")
                 .items(
                     object()
                         .properties(
@@ -84,21 +86,16 @@ public class AttioCreateTaskAction {
                                 .optionsLookupDependsOn(LINKED_RECORDS + "[index]." + TARGET_OBJECT)
                                 .options(AttioUtils.getTargetRecordIdOptions(TARGET_OBJECT))
                                 .required(true)))
-                .required(true),
+                .required(false),
             array(ASSIGNEES)
                 .label("Assignees")
+                .description("Assignees of the task.")
+                .options((ActionOptionsFunction<String>) AttioUtils::getWorkSpaceMemberIdOptions)
+                .required(false)
                 .items(
-                    object()
-                        .properties(
-                            string(REFERENCED_ACTOR_TYPE)
-                                .label("Reference Actor Type")
-                                .options(option("Workspace Member", "workspace-member"))
-                                .required(true),
-                            string(REFERENCED_ACTOR_ID)
-                                .label("Reference Actor ID")
-                                .options((ActionOptionsFunction<String>) AttioUtils::getTargetActorIdOptions)
-                                .required(true)))
-                .required(true))
+                    string("assignee")
+                        .label("Assignee")
+                        .required(true)))
         .output(
             outputSchema(
                 object()
@@ -120,13 +117,19 @@ public class AttioCreateTaskAction {
                                 array(LINKED_RECORDS)
                                     .description("List of records that are linked to the task.")
                                     .items(
-                                        string("target_object_id"),
-                                        string(TARGET_RECORD_ID)),
+                                        object()
+                                            .properties(
+                                                string("target_object_id"),
+                                                string(TARGET_RECORD_ID))),
                                 array(ASSIGNEES)
                                     .description("List of actors that are assigned to the task.")
                                     .items(
-                                        string(REFERENCED_ACTOR_TYPE),
-                                        string(REFERENCED_ACTOR_ID)),
+                                        object()
+                                            .properties(
+                                                string(REFERENCED_ACTOR_TYPE)
+                                                    .description("Type of referenced actor."),
+                                                string(REFERENCED_ACTOR_ID)
+                                                    .description("The type of this reference attribute."))),
                                 object("created_by_actor")
                                     .description("Information about the actor that created the task.")
                                     .properties(
@@ -144,17 +147,20 @@ public class AttioCreateTaskAction {
     public static Map<String, Object> perform(
         Parameters inputParameters, Parameters connectionParameters, Context context) {
 
+        List<Map<String, Object>> assignees =
+            getAssigneesList(inputParameters.getList(ASSIGNEES, Object.class, List.of()));
+
         return context.http(http -> http.post("/tasks"))
             .body(
                 Body.of(
                     DATA, Map.of(
                         CONTENT, inputParameters.getRequiredString(CONTENT),
-                        FORMAT, inputParameters.getRequiredString(FORMAT),
-                        DEADLINE_AT, inputParameters.getRequiredLocalDateTime(DEADLINE_AT)
+                        FORMAT, "plaintext",
+                        DEADLINE_AT, inputParameters.getLocalDateTime(DEADLINE_AT, LocalDateTime.now())
                             .toString(),
-                        IS_COMPLETED, inputParameters.getRequiredBoolean(IS_COMPLETED),
-                        LINKED_RECORDS, inputParameters.getRequiredList(LINKED_RECORDS),
-                        ASSIGNEES, inputParameters.getRequiredList(ASSIGNEES))))
+                        IS_COMPLETED, inputParameters.getBoolean(IS_COMPLETED, false),
+                        LINKED_RECORDS, inputParameters.getList(LINKED_RECORDS, List.of()),
+                        ASSIGNEES, assignees)))
             .configuration(responseType(ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});

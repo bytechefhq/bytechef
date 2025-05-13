@@ -25,6 +25,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import com.bytechef.component.attio.util.AttioUtils;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Context.Http.Body;
@@ -34,6 +35,8 @@ import com.bytechef.component.test.definition.MockParametersFactory;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
+import org.mockito.MockedStatic;
+import org.mockito.Mockito;
 
 /**
  * @author Nikolina Spehar
@@ -41,6 +44,8 @@ import org.mockito.ArgumentCaptor;
 class AttioUpdateRecordActionTest {
 
     private final ArgumentCaptor<Body> bodyArgumentCaptor = ArgumentCaptor.forClass(Body.class);
+    private final ArgumentCaptor<Map<String, Object>> mapArgumentCaptor = ArgumentCaptor.forClass(Map.class);
+    private final ArgumentCaptor<String> stringArgumentCaptor = ArgumentCaptor.forClass(String.class);
     private final Context mockedContext = mock(Context.class);
     private final Http.Executor mockedExecutor = mock(Http.Executor.class);
     private final Http.Response mockedResponse = mock(Http.Response.class);
@@ -61,14 +66,26 @@ class AttioUpdateRecordActionTest {
         when(mockedResponse.getBody(any(TypeReference.class)))
             .thenReturn(responseMap);
 
-        Map<String, Object> result = AttioUpdateRecordAction.perform(mockedParameters, mockedParameters, mockedContext);
+        try (MockedStatic<AttioUtils> mockedAttioUtils = Mockito.mockStatic(AttioUtils.class)) {
 
-        assertEquals(Map.of(), result);
+            mockedAttioUtils
+                .when(() -> AttioUtils.getRecordValues(mapArgumentCaptor.capture(), stringArgumentCaptor.capture()))
+                .thenReturn(responseMap);
 
-        Body body = bodyArgumentCaptor.getValue();
+            Map<String, Object> result =
+                AttioUpdateRecordAction.perform(mockedParameters, mockedParameters, mockedContext);
 
-        Map<String, Map<String, Object>> expectedBody = Map.of(DATA, Map.of("values", Map.of()));
+            assertEquals(responseMap, mapArgumentCaptor.getValue());
+            assertEquals("test", stringArgumentCaptor.getValue());
 
-        assertEquals(expectedBody, body.getContent());
+            assertEquals(Map.of(), result);
+
+            Body body = bodyArgumentCaptor.getValue();
+
+            Map<String, Map<String, Object>> expectedBody = Map.of(DATA, Map.of("values", Map.of()));
+
+            assertEquals(expectedBody, body.getContent());
+        }
+
     }
 }

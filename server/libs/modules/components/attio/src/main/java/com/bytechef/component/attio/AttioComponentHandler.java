@@ -48,7 +48,8 @@ public class AttioComponentHandler implements ComponentHandler {
             AttioUpdateRecordAction.ACTION_DEFINITION)
         .clusterElements(
             tool(AttioCreateRecordAction.ACTION_DEFINITION),
-            tool(AttioCreateTaskAction.ACTION_DEFINITION))
+            tool(AttioCreateTaskAction.ACTION_DEFINITION),
+            tool(AttioUpdateRecordAction.ACTION_DEFINITION))
         .triggers(
             AttioRecordCreatedTrigger.TRIGGER_DEFINITION,
             AttioTaskCreatedTrigger.TRIGGER_DEFINITION);

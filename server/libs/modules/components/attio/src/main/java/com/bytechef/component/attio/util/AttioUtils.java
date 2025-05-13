@@ -17,23 +17,24 @@
 package com.bytechef.component.attio.util;
 
 import static com.bytechef.component.attio.constant.AttioConstants.COMPANIES;
-import static com.bytechef.component.attio.constant.AttioConstants.COMPANY_RECORD;
+import static com.bytechef.component.attio.constant.AttioConstants.COMPANY_OUTPUT;
 import static com.bytechef.component.attio.constant.AttioConstants.DATA;
 import static com.bytechef.component.attio.constant.AttioConstants.DEALS;
-import static com.bytechef.component.attio.constant.AttioConstants.DEAL_RECORD;
+import static com.bytechef.component.attio.constant.AttioConstants.DEAL_OUTPUT;
 import static com.bytechef.component.attio.constant.AttioConstants.ID;
 import static com.bytechef.component.attio.constant.AttioConstants.PEOPLE;
-import static com.bytechef.component.attio.constant.AttioConstants.PERSON_RECORD;
+import static com.bytechef.component.attio.constant.AttioConstants.PERSON_OUTPUT;
 import static com.bytechef.component.attio.constant.AttioConstants.RECORD_TYPE;
 import static com.bytechef.component.attio.constant.AttioConstants.TARGET_OBJECT;
 import static com.bytechef.component.attio.constant.AttioConstants.USERS;
-import static com.bytechef.component.attio.constant.AttioConstants.USER_RECORD;
+import static com.bytechef.component.attio.constant.AttioConstants.USER_OUTPUT;
 import static com.bytechef.component.attio.constant.AttioConstants.WORKSPACES;
-import static com.bytechef.component.attio.constant.AttioConstants.WORKSPACE_RECORD;
+import static com.bytechef.component.attio.constant.AttioConstants.WORKSPACE_MEMBER;
+import static com.bytechef.component.attio.constant.AttioConstants.WORKSPACE_OUTPUT;
 import static com.bytechef.component.definition.ComponentDsl.option;
 import static com.bytechef.component.definition.Context.Http.responseType;
 
-import com.bytechef.component.definition.ComponentDsl.ModifiableValueProperty;
+import com.bytechef.component.definition.ComponentDsl.ModifiableObjectProperty;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http.Body;
 import com.bytechef.component.definition.Context.Http.ResponseType;
@@ -43,9 +44,13 @@ import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TriggerDefinition.WebhookBody;
 import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.exception.ProviderException;
+import com.bytechef.definition.BaseOutputDefinition.OutputResponse;
+import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Objects;
 
 /**
@@ -99,20 +104,6 @@ public class AttioUtils {
         }
 
         return options;
-    }
-
-    public static List<ModifiableValueProperty<?, ?>> getRecordAttributes(
-        Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
-        Context context) {
-
-        return switch (inputParameters.getRequiredString(RECORD_TYPE)) {
-            case USERS -> USER_RECORD;
-            case WORKSPACES -> WORKSPACE_RECORD;
-            case COMPANIES -> COMPANY_RECORD;
-            case PEOPLE -> PERSON_RECORD;
-            case DEALS -> DEAL_RECORD;
-            default -> List.of();
-        };
     }
 
     public static List<Option<String>> getTargetActorIdOptions(
@@ -188,11 +179,19 @@ public class AttioUtils {
                     if (recordValues.get("name") instanceof List<?> recordValueNameList &&
                         !recordValueNameList.isEmpty() &&
                         recordValueNameList.getFirst() instanceof Map<?, ?> recordValueName) {
-                        if (object.equals("people")) {
-                            recordName = (String) recordValueName.get("full_name");
+                        if (object.equals(PEOPLE)) {
+                            recordName = ((String) recordValueName.get("full_name")).isBlank() ? "Unnamed person"
+                                : (String) recordValueName.get("full_name");
                         } else {
                             recordName = (String) recordValueName.get("value");
                         }
+                    }
+
+                    if (object.equals(USERS) &&
+                        recordValues.get("primary_email_address") instanceof List<?> recordValueEmailList &&
+                        recordValueEmailList.getFirst() instanceof Map<?, ?> recordValueEmail) {
+
+                        recordName = (String) recordValueEmail.get("email_address");
                     }
 
                     recordIdOptions.add(option(recordName, (String) recordId.get("record_id")));
@@ -249,5 +248,145 @@ public class AttioUtils {
     public static void unsubscribeWebhook(Context context, String webhookId) {
         context.http(http -> http.delete("/webhooks/%s".formatted(webhookId)))
             .execute();
+    }
+
+    private static String ifStringValueNull(Object value) {
+        return value == null ? "" : value.toString();
+    }
+
+    public static Map<String, Object> getRecordValues(Map<String, Object> recordMap, String record) {
+        HashMap<String, Object> values = new HashMap<>();
+
+        for (Entry<String, Object> property : recordMap.entrySet()) {
+            String key = property.getKey();
+
+            if (recordMap.get(key) == null)
+                break;
+            switch (key) {
+                case "value":
+                    values.put(key, List.of(Map.of("currency_value", recordMap.get(key))));
+                    break;
+                case "domains":
+                    values.put(key, List.of(Map.of("domain", recordMap.get(key))));
+                    break;
+                case "workspace_id", "avatar_url":
+                    values.put(key, recordMap.get(key));
+                    break;
+                case "user_id", "stage", "owner":
+                    if (record.equals(DEALS) && key.equals("owner")) {
+                        values.put(key, List.of(Map.of("referenced_actor_id", recordMap.get(key),
+                            "referenced_actor_type", "workspace-member")));
+                    } else {
+                        values.put(key, recordMap.get(key));
+                    }
+                    break;
+                case "name", "description", "instagram", "facebook", "linkedin", "job_title":
+                    if (record.equals(DEALS) || record.equals(WORKSPACES)) {
+                        values.put(key, recordMap.get(key));
+                    } else {
+                        values.put(key, List.of(Map.of("value", recordMap.get(key))));
+                    }
+                    break;
+                case "foundation_date":
+                    LocalDate foundationDate = LocalDate.parse(recordMap.get(key)
+                        .toString());
+                    values.put(key, List.of(Map.of("value", foundationDate.toString())));
+                    break;
+                case "email_address":
+                    if (record.equals(USERS)) {
+                        values.put("primary_email_address", recordMap.get(key));
+                    } else {
+                        values.put("email_addresses", List.of(recordMap.get(key)));
+                    }
+                    break;
+
+                case "estimated_arr_usd", "employee_range":
+                    values.put(key, List.of(Map.of("option", recordMap.get(key))));
+                    break;
+                case "categories":
+                    if (recordMap.get(key) instanceof List<?> categoriesList)
+                        values.put(key, categoriesList.stream()
+                            .map(category -> Map.of("option", category))
+                            .toList());
+                    break;
+
+                case "associated_deals":
+                    if (recordMap.get(key) instanceof List<?> dealsList)
+                        values.put(key, dealsList.stream()
+                            .map(deal -> Map.of("target_object", DEALS, "target_record_id", deal))
+                            .toList());
+                    break;
+                case "associated_users", "users":
+                    if (recordMap.get(key) instanceof List<?> usersList)
+                        values.put(key, usersList.stream()
+                            .map(user -> Map.of("target_object", USERS, "target_record_id", user))
+                            .toList());
+                    break;
+                case "workspace", "associated_workspaces":
+                    if (recordMap.get(key) instanceof List<?> workspacesList)
+                        values.put(key, workspacesList.stream()
+                            .map(workspace -> Map.of("target_object", WORKSPACES, "target_record_id", workspace))
+                            .toList());
+                    break;
+                case "associated_people":
+                    if (recordMap.get(key) instanceof List<?> peopleList)
+                        values.put("associated_people", peopleList.stream()
+                            .map(person -> Map.of("target_object", PEOPLE, "target_record_id", person))
+                            .toList());
+                    break;
+                case "person":
+                    values.put(key, Map.of("target_object", PEOPLE, "target_record_id", recordMap.get(key)));
+                    break;
+                case "company", "associated_company":
+                    if (record.equals(WORKSPACES)) {
+                        values.put("company", Map.of("target_object", COMPANIES,
+                            "target_record_id", recordMap.get("company")));
+                    } else {
+                        values.put(key, List.of(Map.of("target_object", COMPANIES,
+                            "target_record_id", recordMap.get(key))));
+                    }
+                    break;
+                default:
+                    break;
+            }
+        }
+
+        if (record.equals(PEOPLE)) {
+            addNameToValues(recordMap, values);
+        }
+
+        return values;
+    }
+
+    private static void addNameToValues(Map<String, Object> recordMap, HashMap<String, Object> values) {
+        String firstName = ifStringValueNull(recordMap.get("first_name"));
+        String lastName = ifStringValueNull(recordMap.get("last_name"));
+        String fullName = firstName + " " + lastName;
+
+        values.put("name", List.of(Map.of("first_name", firstName, "last_name", lastName, "full_name", fullName)));
+    }
+
+    public static List<Map<String, Object>> getAssigneesList(List<Object> assignees) {
+
+        return assignees.stream()
+            .map(assignee -> Map.of("referenced_actor_type", WORKSPACE_MEMBER, "referenced_actor_id", assignee))
+            .toList();
+    }
+
+    public static OutputResponse getOutputSchema(
+        Parameters inputParameters, Parameters connectionParameters, Context context) {
+
+        return OutputResponse.of(getRecordOutput(inputParameters.getRequired(RECORD_TYPE, String.class)));
+    }
+
+    public static ModifiableObjectProperty getRecordOutput(String recordType) {
+        return switch (recordType) {
+            case PEOPLE -> PERSON_OUTPUT;
+            case COMPANIES -> COMPANY_OUTPUT;
+            case WORKSPACES -> WORKSPACE_OUTPUT;
+            case USERS -> USER_OUTPUT;
+            case DEALS -> DEAL_OUTPUT;
+            default -> null;
+        };
     }
 }
