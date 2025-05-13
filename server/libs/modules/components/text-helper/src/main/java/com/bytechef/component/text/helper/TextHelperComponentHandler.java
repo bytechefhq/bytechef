@@ -21,7 +21,7 @@ import static com.bytechef.component.definition.ComponentDsl.component;
 import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDefinition;
-import com.bytechef.component.text.helper.action.TextHelperBase64DecodeAction;
+import com.bytechef.component.text.helper.action.TextHelperBase64EncodeDecodeAction;
 import com.bytechef.component.text.helper.action.TextHelperConcatenateAction;
 import com.bytechef.component.text.helper.action.TextHelperContainsAction;
 import com.bytechef.component.text.helper.action.TextHelperExtractContentFromHtmlAction;
@@ -36,6 +36,7 @@ import com.bytechef.component.text.helper.action.TextHelperSelectLastNCharacters
 import com.bytechef.component.text.helper.action.TextHelperSplitAction;
 import com.bytechef.component.text.helper.action.TextHelperTrimWhitespaceAction;
 import com.bytechef.component.text.helper.action.TextHelperUpperCaseAction;
+import com.bytechef.component.text.helper.action.TextHelperUrlEncodeDecodeAction;
 import com.google.auto.service.AutoService;
 
 /**
@@ -50,7 +51,7 @@ public class TextHelperComponentHandler implements ComponentHandler {
         .icon("path:assets/text-helper.svg")
         .categories(ComponentCategory.HELPERS)
         .actions(
-            TextHelperBase64DecodeAction.ACTION_DEFINITION,
+            TextHelperBase64EncodeDecodeAction.ACTION_DEFINITION,
             TextHelperConcatenateAction.ACTION_DEFINITION,
             TextHelperContainsAction.ACTION_DEFINITION,
             TextHelperExtractContentFromHtmlAction.ACTION_DEFINITION,
@@ -64,7 +65,8 @@ public class TextHelperComponentHandler implements ComponentHandler {
             TextHelperSelectLastNCharactersAction.ACTION_DEFINITION,
             TextHelperSplitAction.ACTION_DEFINITION,
             TextHelperTrimWhitespaceAction.ACTION_DEFINITION,
-            TextHelperUpperCaseAction.ACTION_DEFINITION);
+            TextHelperUpperCaseAction.ACTION_DEFINITION,
+            TextHelperUrlEncodeDecodeAction.ACTION_DEFINITION);
 
     @Override
     public ComponentDefinition getDefinition() {
