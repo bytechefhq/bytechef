@@ -17,6 +17,7 @@ import {Input} from '@/components/ui/input';
 import {Label} from '@/components/ui/label';
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/ui/select';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
+import {useToast} from '@/hooks/use-toast';
 import Properties from '@/pages/platform/workflow-editor/components/properties/Properties';
 import ConnectionParameters from '@/shared/components/connection/ConnectionParameters';
 import {TokenPayloadI} from '@/shared/components/connection/oauth2/useOAuth2';
@@ -95,6 +96,8 @@ const ConnectionDialog = ({
     >(componentDefinition);
     const [usePredefinedOAuthApp, setUsePredefinedOAuthApp] = useState(true);
 
+    const {toast} = useToast();
+
     const form = useForm<ConnectionDialogFormProps>({
         defaultValues: {
             authorizationName: '',
@@ -159,8 +162,15 @@ const ConnectionDialog = ({
                 queryKey: connectionTagsQueryKey,
             });
 
-            if (connectionId && !connection?.id && onConnectionCreate) {
-                onConnectionCreate(connectionId);
+            if (!connection?.id) {
+                toast({
+                    description: `${getValues().name} connection was successfully created`,
+                    title: 'Connection created',
+                });
+
+                if (connectionId && onConnectionCreate) {
+                    onConnectionCreate(connectionId);
+                }
             }
 
             closeDialog();
