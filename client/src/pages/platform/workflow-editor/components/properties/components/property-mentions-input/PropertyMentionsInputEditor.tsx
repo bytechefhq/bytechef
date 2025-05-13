@@ -164,7 +164,7 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
                 Placeholder.configure({
                     placeholder: placeholder
                         ? placeholder
-                        : "Show data pills using '$' or write expression using '='",
+                        : "Show data pills using '$' or start an expression using '='",
                 }),
             ];
 
