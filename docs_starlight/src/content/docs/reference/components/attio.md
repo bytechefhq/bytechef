@@ -82,7 +82,7 @@ Creates a new task.
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | content | Content | STRING |  | true |
 | format | Format | STRING <details> <summary> Options </summary> plaintext </details> |  | true |
-| deadline_at | Deadline | DATE |  | true |
+| deadline_at | Deadline | DATE_TIME |  | true |
 | is_completed | Is Completed | BOOLEAN <details> <summary> Options </summary> true, false </details> |  | true |
 | linked_records | Linked Records | ARRAY <details> <summary> Items </summary> [{STRING\(target_object), STRING\(target_record_id)}] </details> |  | true |
 | assignees | Assignees | ARRAY <details> <summary> Items </summary> [{STRING\(referenced_actor_type), STRING\(referenced_actor_id)}] </details> |  | true |
@@ -95,7 +95,7 @@ Creates a new task.
   "parameters" : {
     "content" : "",
     "format" : "",
-    "deadline_at" : "2021-01-01",
+    "deadline_at" : "2021-01-01T00:00:00",
     "is_completed" : false,
     "linked_records" : [ {
       "target_object" : "",
