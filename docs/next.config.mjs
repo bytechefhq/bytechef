@@ -6,6 +6,16 @@ const withMDX = createMDX();
 const config = {
   reactStrictMode: true,
 
+  images: {
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'static.scarf.sh',
+        pathname: '/**',
+      },
+    ],
+  },
+
   async redirects() {
     return [
       {
