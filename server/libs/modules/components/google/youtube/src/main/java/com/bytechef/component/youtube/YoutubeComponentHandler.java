@@ -32,7 +32,7 @@ public class YoutubeComponentHandler implements ComponentHandler {
 
     private static final ComponentDefinition COMPONENT_DEFINITION = component("youtube")
         .title("Youtube")
-        .description("YouTube is an American social media and online video sharing platform owned by Google.")
+        .description("Enjoy the videos and music you love, upload original content, and share it all with friends, family, and the world on YouTube.")
         .icon("path:assets/youtube.svg")
         .categories(ComponentCategory.HELPERS)
         .connection(YoutubeConnection.CONNECTION_DEFINITION)
