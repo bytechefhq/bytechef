@@ -31,11 +31,11 @@ import com.bytechef.component.definition.Parameters;
 /**
  * @author Monika Kušter
  */
-public class TextHelperFindAction {
+public class TextHelperContainsAction {
 
-    public static final ModifiableActionDefinition ACTION_DEFINITION = action("find")
-        .title("Find")
-        .description("Find substring")
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action("contains")
+        .title("Contains")
+        .description("Check if text contains the specified sequence of characters.")
         .properties(
             TEXT_PROPERTY,
             string(EXPRESSION)
@@ -43,9 +43,9 @@ public class TextHelperFindAction {
                 .description("Text to search for.")
                 .required(true))
         .output(outputSchema(bool().description("True if the text contains the expression, false otherwise.")))
-        .perform(TextHelperFindAction::perform);
+        .perform(TextHelperContainsAction::perform);
 
-    private TextHelperFindAction() {
+    private TextHelperContainsAction() {
     }
 
     protected static boolean perform(
