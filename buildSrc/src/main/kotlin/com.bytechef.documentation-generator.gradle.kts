@@ -83,7 +83,7 @@ open class FindJsonFilesTask : DefaultTask() {
         }
 
         private fun getTypeDetails(): String {
-            val typeFull = getFullType(type)
+            val typeFull = getFullType(type)?.escapeHtml()
             return if (type == "OBJECT" || type == "ARRAY") {
                 val detailsSummary = if (type == "OBJECT") "Properties" else "Items"
                 "$type <details> <summary> $detailsSummary </summary> $typeFull </details>"
@@ -96,7 +96,7 @@ open class FindJsonFilesTask : DefaultTask() {
                     "$type <details> <summary> Depends On </summary> $propertiesLookupDependsOn </details>"
                 }
             } else if (!options.isNullOrEmpty()) {
-                val optionsString = options?.joinToString(", ") { it.value.toString() }
+                val optionsString = options?.joinToString(", ") { it.value.toString() }?.escapeHtml()
                 "$type <details> <summary> Options </summary> $optionsString </details>"
             } else if (!optionsDataSource?.optionsLookupDependsOn.isNullOrEmpty()) {
                 val optionsString = optionsDataSource?.optionsLookupDependsOn?.joinToString(", ")
@@ -104,6 +104,15 @@ open class FindJsonFilesTask : DefaultTask() {
             } else {
                 type.toString()
             }
+        }
+
+        fun String.escapeHtml(): String {
+            return this
+                .replace("&", "&amp;")
+                .replace("{", "&#123;")
+                .replace("}", "&#125;")
+                .replace("<", "&lt;")
+                .replace(">", "&gt;")
         }
 
         private fun formatWithoutDescription(name: String?, label: String?, typeDetails: String): String {
@@ -115,7 +124,7 @@ open class FindJsonFilesTask : DefaultTask() {
         }
 
         private fun formatFull(name: String?, label: String?, typeDetails: String, description: String?): String {
-            return "| $name | $label | $typeDetails | $description | $required |"
+            return "| $name | $label | $typeDetails | `$description` | $required |"
         }
 
         fun toJsonKeyValuePair(): String {
@@ -343,7 +352,7 @@ This action does not produce any output.
 ### $title
 Name: $name
 
-$description
+`$description`
 $propertiesSection
 #### Example JSON Structure
 ```json
@@ -438,7 +447,7 @@ This trigger does not produce any output.
 ### $title
 Name: $name
 
-$description
+`$description`
 
 Type: $type
 $propertiesSection
@@ -639,7 +648,7 @@ ${getTriggerString()}
         if (currentPath.contains(Regex("/modules/.+/"))) {
             val name = currentPath.substringAfterLast("/")
             val jsonFile = File("$currentPath/src/test/resources/definition/${name}_v1.json")
-            val readmeFile = File("$currentPath/src/main/resources/README.md")
+            val readmeFile = File("$currentPath/src/main/resources/README.mdx")
 
             if (jsonFile.exists()) {
                 val mapper = ObjectMapper()
@@ -656,7 +665,7 @@ ${getTriggerString()}
                     docsDir.mkdirs()
                 }
 
-                val mdFile = File(path, "$name.md")
+                val mdFile = File(path, "$name.mdx")
                 mdFile.writeText(json)
 
                 if (readmeFile.exists()) {
