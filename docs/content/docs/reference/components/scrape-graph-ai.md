@@ -1,0 +1,215 @@
+---
+title: "ScrapeGraphAI"
+description: "ScrapeGraphAI is a web scraping python library that uses LLM and direct graph logic to create scraping pipelines for websites and local documents."
+---
+
+ScrapeGraphAI is a web scraping python library that uses LLM and direct graph logic to create scraping pipelines for websites and local documents.
+
+
+Categories: Artificial Intelligence
+
+
+Type: scrape-graph-ai/v1
+
+<hr />
+
+
+
+## Connections
+
+Version: 1
+
+
+### API Key
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| key | Key | STRING |  | true |
+| value | Value | STRING |  | true |
+
+
+
+
+
+<hr />
+
+
+
+## Actions
+
+
+### Search Scraper
+Name: searchScraper
+
+Start a AI-powered web search request.
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| user_prompt | User Prompt | STRING | The search query or question you want to ask. | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Search Scraper",
+  "name" : "searchScraper",
+  "parameters" : {
+    "user_prompt" : ""
+  },
+  "type" : "scrape-graph-ai/v1/searchScraper"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| request_id | STRING | Unique identifier for the search request. |
+| status | STRING | Status of the request. One of: “queued”, “processing”, “completed”, “failed”. |
+| user_prompt | STRING | The original search query that was submitted. |
+| result | OBJECT <details> <summary> Properties </summary> {} </details> | The search results. |
+| reference_urls | ARRAY <details> <summary> Items </summary> [STRING] </details> | List of URLs that were used as references for the answer. |
+| error | STRING | Error message if the request failed. Empty string if successful. |
+
+
+
+
+#### Output Example
+```json
+{
+  "request_id" : "",
+  "status" : "",
+  "user_prompt" : "",
+  "result" : { },
+  "reference_urls" : [ "" ],
+  "error" : ""
+}
+```
+
+
+### Markdownify
+Name: markdownify
+
+Convert any webpage into clean, readable Markdown format.
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| website_url | Website URL | STRING | Website URL. | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Markdownify",
+  "name" : "markdownify",
+  "parameters" : {
+    "website_url" : ""
+  },
+  "type" : "scrape-graph-ai/v1/markdownify"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| request_id | STRING | Unique identifier for the request. |
+| status | STRING | Status of the request. One of: “queued”, “processing”, “completed”, “failed”. |
+| website_url | STRING | The original website URL that was submitted. |
+| result | STRING | The search results. |
+| error | STRING | Error message if the request failed. Empty string if successful. |
+
+
+
+
+#### Output Example
+```json
+{
+  "request_id" : "",
+  "status" : "",
+  "website_url" : "",
+  "result" : "",
+  "error" : ""
+}
+```
+
+
+### Smart Scraper
+Name: smartScraper
+
+Extract content from a webpage using AI by providing a natural language prompt and a URL.
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| user_prompt | User Prompt | STRING | The search query or question you want to ask. | true |
+| website_url | Website URL | STRING | Website URL. | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Smart Scraper",
+  "name" : "smartScraper",
+  "parameters" : {
+    "user_prompt" : "",
+    "website_url" : ""
+  },
+  "type" : "scrape-graph-ai/v1/smartScraper"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| request_id | STRING | Unique identifier for the search request. |
+| status | STRING | Status of the request. One of: “queued”, “processing”, “completed”, “failed”. |
+| website_url | STRING | The original website URL that was submitted. |
+| user_prompt | STRING | The original search query that was submitted. |
+| result | OBJECT <details> <summary> Properties </summary> {} </details> | The search results. |
+| error | STRING | Error message if the request failed. Empty string if successful. |
+
+
+
+
+#### Output Example
+```json
+{
+  "request_id" : "",
+  "status" : "",
+  "website_url" : "",
+  "user_prompt" : "",
+  "result" : { },
+  "error" : ""
+}
+```
+
+
+
+

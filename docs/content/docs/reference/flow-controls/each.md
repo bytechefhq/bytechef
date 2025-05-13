@@ -2,14 +2,12 @@
 title: "Each"
 description: "Iterates over each item in list, in parallel. Note, that since it iterates over each item in parallel, there is no guarantee of completion order."
 ---
-## Reference
-<hr />
 
 Iterates over each item in list, in parallel. Note, that since it iterates over each item in parallel, there is no guarantee of completion order.
 
 
 
-Version: 1
+Type: each/v1
 
 <hr />
 
