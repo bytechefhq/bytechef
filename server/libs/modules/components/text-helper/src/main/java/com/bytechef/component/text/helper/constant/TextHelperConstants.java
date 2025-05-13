@@ -50,4 +50,10 @@ public class TextHelperConstants {
         .controlType(ControlType.TEXT_AREA)
         .required(true);
 
+    public static final String CURRENCY = "currency";
+    public static final String AMOUNT = "amount";
+    public static final String DECIMAL_DIGITS = "decimalDigits";
+    public static final String DECIMAL_SEPARATOR = "decimalSeparator";
+    public static final String THOUSANDS_SEPARATOR = "thousandsSeparator";
+    public static final String NUMBER_OF_CHARACTERS = "numberOfCharacters";
 }
