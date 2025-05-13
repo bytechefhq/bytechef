@@ -13,55 +13,6 @@
   "resources" : null,
   "version" : 1,
   "title" : "Capsule CRM",
-  "connection" : {
-    "authorizations" : [ {
-      "detectOn" : null,
-      "description" : null,
-      "name" : "bearer_token",
-      "properties" : [ {
-        "advancedOption" : null,
-        "description" : null,
-        "displayCondition" : null,
-        "expressionEnabled" : null,
-        "hidden" : null,
-        "metadata" : { },
-        "required" : true,
-        "name" : "token",
-        "type" : "STRING",
-        "defaultValue" : null,
-        "exampleValue" : null,
-        "label" : "Token",
-        "placeholder" : null,
-        "controlType" : "TEXT",
-        "languageId" : null,
-        "maxLength" : null,
-        "minLength" : null,
-        "options" : null,
-        "optionsDataSource" : null
-      } ],
-      "refreshOn" : null,
-      "title" : "Bearer Token",
-      "type" : "BEARER_TOKEN",
-      "acquire" : null,
-      "authorizationCallback" : null,
-      "oauth2AuthorizationExtraQueryParameters" : null,
-      "authorizationUrl" : null,
-      "clientSecret" : null,
-      "refreshToken" : null,
-      "apply" : null,
-      "clientId" : null,
-      "pkce" : null,
-      "refresh" : null,
-      "refreshUrl" : null,
-      "scopes" : null,
-      "tokenUrl" : null
-    } ],
-    "properties" : null,
-    "version" : 1,
-    "authorizationRequired" : null,
-    "baseUri" : { },
-    "test" : null
-  },
   "actions" : [ {
     "batch" : null,
     "deprecated" : null,
@@ -100,13 +51,13 @@
       }, {
         "description" : null,
         "label" : "Organization",
-        "value" : "ORGANIZATION"
+        "value" : "organization"
       } ],
       "optionsDataSource" : null
     }, {
       "advancedOption" : null,
       "description" : "The first name of the person.",
-      "displayCondition" : "type == 'PERSON'",
+      "displayCondition" : "type == 'person'",
       "expressionEnabled" : null,
       "hidden" : null,
       "metadata" : { },
@@ -126,7 +77,7 @@
     }, {
       "advancedOption" : null,
       "description" : "The last name of the person.",
-      "displayCondition" : "type == 'PERSON'",
+      "displayCondition" : "type == 'person'",
       "expressionEnabled" : null,
       "hidden" : null,
       "metadata" : { },
@@ -263,15 +214,15 @@
           } ],
           "optionsDataSource" : null
         } ],
-        "optionsDataSource" : null,
-        "controlType" : "OBJECT_BUILDER"
+        "controlType" : "OBJECT_BUILDER",
+        "optionsDataSource" : null
       } ],
       "maxItems" : null,
       "minItems" : null,
       "multipleValues" : null,
       "options" : null,
-      "optionsDataSource" : null,
-      "controlType" : "ARRAY_BUILDER"
+      "controlType" : "ARRAY_BUILDER",
+      "optionsDataSource" : null
     }, {
       "advancedOption" : null,
       "description" : "An array of all the addresses associated with this party.",
@@ -447,15 +398,15 @@
           "options" : null,
           "optionsDataSource" : null
         } ],
-        "optionsDataSource" : null,
-        "controlType" : "OBJECT_BUILDER"
+        "controlType" : "OBJECT_BUILDER",
+        "optionsDataSource" : null
       } ],
       "maxItems" : null,
       "minItems" : null,
       "multipleValues" : null,
       "options" : null,
-      "optionsDataSource" : null,
-      "controlType" : "ARRAY_BUILDER"
+      "controlType" : "ARRAY_BUILDER",
+      "optionsDataSource" : null
     }, {
       "advancedOption" : null,
       "description" : "An array of all the phone numbers associated with this party.",
@@ -548,20 +499,20 @@
           "options" : null,
           "optionsDataSource" : null
         } ],
-        "optionsDataSource" : null,
-        "controlType" : "OBJECT_BUILDER"
+        "controlType" : "OBJECT_BUILDER",
+        "optionsDataSource" : null
       } ],
       "maxItems" : null,
       "minItems" : null,
       "multipleValues" : null,
       "options" : null,
-      "optionsDataSource" : null,
-      "controlType" : "ARRAY_BUILDER"
+      "controlType" : "ARRAY_BUILDER",
+      "optionsDataSource" : null
     } ],
     "title" : "Create Contact",
+    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
-    "perform" : { }
+    "workflowNodeDescription" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -606,8 +557,8 @@
             "maxValue" : null,
             "minValue" : null,
             "options" : null,
-            "optionsDataSource" : null,
-            "controlType" : "INTEGER"
+            "controlType" : "INTEGER",
+            "optionsDataSource" : null
           }, {
             "advancedOption" : null,
             "description" : "The description of the task.",
@@ -643,8 +594,8 @@
             "label" : null,
             "placeholder" : null,
             "options" : null,
-            "optionsDataSource" : null,
-            "controlType" : "DATE"
+            "controlType" : "DATE",
+            "optionsDataSource" : null
           }, {
             "advancedOption" : null,
             "description" : "Details of the new task.",
@@ -743,11 +694,11 @@
               "options" : null,
               "optionsDataSource" : null
             } ],
-            "optionsDataSource" : null,
-            "controlType" : "OBJECT_BUILDER"
+            "controlType" : "OBJECT_BUILDER",
+            "optionsDataSource" : null
           } ],
-          "optionsDataSource" : null,
-          "controlType" : "OBJECT_BUILDER"
+          "controlType" : "OBJECT_BUILDER",
+          "optionsDataSource" : null
         },
         "sampleOutput" : null,
         "placeholder" : null
@@ -786,8 +737,8 @@
           "maxValue" : null,
           "minValue" : null,
           "options" : null,
-          "optionsDataSource" : null,
-          "controlType" : "INTEGER"
+          "controlType" : "INTEGER",
+          "optionsDataSource" : null
         }, {
           "advancedOption" : null,
           "description" : "The description of the task.",
@@ -823,8 +774,8 @@
           "label" : null,
           "placeholder" : null,
           "options" : null,
-          "optionsDataSource" : null,
-          "controlType" : "DATE"
+          "controlType" : "DATE",
+          "optionsDataSource" : null
         }, {
           "advancedOption" : null,
           "description" : "Details of the new task.",
@@ -923,11 +874,11 @@
             "options" : null,
             "optionsDataSource" : null
           } ],
-          "optionsDataSource" : null,
-          "controlType" : "OBJECT_BUILDER"
+          "controlType" : "OBJECT_BUILDER",
+          "optionsDataSource" : null
         } ],
-        "optionsDataSource" : null,
-        "controlType" : "OBJECT_BUILDER"
+        "controlType" : "OBJECT_BUILDER",
+        "optionsDataSource" : null
       },
       "sampleOutput" : null
     },
@@ -966,8 +917,8 @@
       "label" : "Due Date",
       "placeholder" : null,
       "options" : null,
-      "optionsDataSource" : null,
-      "controlType" : "DATE"
+      "controlType" : "DATE",
+      "optionsDataSource" : null
     }, {
       "advancedOption" : null,
       "description" : "More details about the task.",
@@ -1046,15 +997,64 @@
         "options" : null,
         "optionsDataSource" : null
       } ],
-      "optionsDataSource" : null,
-      "controlType" : "OBJECT_BUILDER"
+      "controlType" : "OBJECT_BUILDER",
+      "optionsDataSource" : null
     } ],
     "title" : "Create Task",
+    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
-    "perform" : { }
+    "workflowNodeDescription" : null
   } ],
   "clusterElements" : null,
   "unifiedApi" : null,
-  "triggers" : null
+  "triggers" : null,
+  "connection" : {
+    "authorizations" : [ {
+      "detectOn" : null,
+      "description" : null,
+      "name" : "bearer_token",
+      "properties" : [ {
+        "advancedOption" : null,
+        "description" : null,
+        "displayCondition" : null,
+        "expressionEnabled" : null,
+        "hidden" : null,
+        "metadata" : { },
+        "required" : true,
+        "name" : "token",
+        "type" : "STRING",
+        "defaultValue" : null,
+        "exampleValue" : null,
+        "label" : "Token",
+        "placeholder" : null,
+        "controlType" : "TEXT",
+        "languageId" : null,
+        "maxLength" : null,
+        "minLength" : null,
+        "options" : null,
+        "optionsDataSource" : null
+      } ],
+      "refreshOn" : null,
+      "title" : "Bearer Token",
+      "type" : "BEARER_TOKEN",
+      "acquire" : null,
+      "apply" : null,
+      "authorizationCallback" : null,
+      "authorizationUrl" : null,
+      "clientId" : null,
+      "clientSecret" : null,
+      "oauth2AuthorizationExtraQueryParameters" : null,
+      "pkce" : null,
+      "refresh" : null,
+      "refreshUrl" : null,
+      "scopes" : null,
+      "refreshToken" : null,
+      "tokenUrl" : null
+    } ],
+    "properties" : null,
+    "version" : 1,
+    "authorizationRequired" : null,
+    "baseUri" : { },
+    "test" : null
+  }
 }
