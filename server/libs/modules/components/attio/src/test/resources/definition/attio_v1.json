@@ -977,7 +977,7 @@
           "minLength" : null,
           "options" : null,
           "optionsDataSource" : {
-            "optionsLookupDependsOn" : [ "target_object" ],
+            "optionsLookupDependsOn" : [ "linked_records[index].target_object" ],
             "options" : { }
           }
         } ],
@@ -2126,7 +2126,7 @@
           "minLength" : null,
           "options" : null,
           "optionsDataSource" : {
-            "optionsLookupDependsOn" : [ "target_object" ],
+            "optionsLookupDependsOn" : [ "linked_records[index].target_object" ],
             "options" : { }
           }
         } ],
@@ -2575,7 +2575,7 @@
       },
       "sampleOutput" : null
     },
-    "properties" : [ ],
+    "properties" : null,
     "title" : "Record Created",
     "type" : "DYNAMIC_WEBHOOK",
     "webhookRawBody" : null,
@@ -2585,9 +2585,9 @@
     "deduplicate" : null,
     "webhookDisable" : { },
     "webhookEnable" : { },
+    "webhookRequest" : { },
     "processErrorResponse" : null,
     "workflowNodeDescription" : null,
-    "webhookRequest" : { },
     "listenerDisable" : null,
     "listenerEnable" : null,
     "webhookValidate" : null,
@@ -2928,7 +2928,7 @@
       },
       "sampleOutput" : null
     },
-    "properties" : [ ],
+    "properties" : null,
     "title" : "Task Created",
     "type" : "DYNAMIC_WEBHOOK",
     "webhookRawBody" : null,
@@ -2938,9 +2938,9 @@
     "deduplicate" : null,
     "webhookDisable" : { },
     "webhookEnable" : { },
+    "webhookRequest" : { },
     "processErrorResponse" : null,
     "workflowNodeDescription" : null,
-    "webhookRequest" : { },
     "listenerDisable" : null,
     "listenerEnable" : null,
     "webhookValidate" : null,
@@ -2981,13 +2981,13 @@
       "authorizationUrl" : null,
       "clientId" : null,
       "clientSecret" : null,
+      "oauth2AuthorizationExtraQueryParameters" : null,
       "pkce" : null,
       "refresh" : null,
       "refreshUrl" : null,
       "scopes" : null,
       "refreshToken" : null,
-      "tokenUrl" : null,
-      "oauth2AuthorizationExtraQueryParameters" : null
+      "tokenUrl" : null
     } ],
     "properties" : null,
     "version" : 1,
