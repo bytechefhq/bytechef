@@ -31,7 +31,7 @@ import com.bytechef.component.definition.Context.Http.Body;
 import com.bytechef.component.definition.Context.Http.ResponseType;
 import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.definition.PropertiesDataSource;
+import com.bytechef.component.definition.PropertiesDataSource.ActionPropertiesFunction;
 import com.bytechef.component.definition.TypeReference;
 import java.util.Map;
 
@@ -51,7 +51,7 @@ public class AttioCreateRecordAction {
                 .required(true),
             dynamicProperties(VALUE)
                 .propertiesLookupDependsOn(RECORD_TYPE)
-                .properties((PropertiesDataSource.ActionPropertiesFunction) AttioUtils::getRecordAttributes)
+                .properties((ActionPropertiesFunction) AttioUtils::getRecordAttributes)
                 .required(true))
         .output()
         .perform(AttioCreateRecordAction::perform);
@@ -64,11 +64,7 @@ public class AttioCreateRecordAction {
 
         return context.http(http -> http.post(
             "/objects/%s/records".formatted(inputParameters.getRequiredString(RECORD_TYPE))))
-            .body(
-                Body.of(
-                    DATA, Map.of(
-                        "values", inputParameters.getMap(VALUE)
-                            .get(VALUE))))
+            .body(Body.of(DATA, Map.of("values", inputParameters.getMap(VALUE))))
             .configuration(responseType(ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});
