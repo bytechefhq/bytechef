@@ -89,5 +89,37 @@ This action does not produce any output.
 
 
 
+### Get Mail
+Name: get
+
+Get emails from inbox.
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| from | From Email | STRING | From who the email was sent. | true |
+| subject | Subject contains | STRING | Filters email messages where subject contains this keyword. Character matching is case insensitive. | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Get Mail",
+  "name" : "get",
+  "parameters" : {
+    "from" : "",
+    "subject" : ""
+  },
+  "type" : "email/v1/get"
+}
+```
+
+#### Output
+
+This action does not produce any output.
+
+
+
+
 
 
