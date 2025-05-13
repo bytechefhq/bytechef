@@ -141,8 +141,8 @@ export function transformValueForObjectAccess(value: string): string {
     }
 
     if (value.includes('${')) {
-        return value.replace(/\${([^}]*)}/g, (match, expression) => `\${${transformPathForObjectAccess(expression)}}`);
+        return value.replace(/\${([^}]*)}/g, (_match, expression) => `\${${transformPathForObjectAccess(expression)}}`);
     }
 
-    return transformPathForObjectAccess(value);
+    return value;
 }
