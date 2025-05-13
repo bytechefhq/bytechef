@@ -50,15 +50,11 @@ class AttioCreateTaskActionTest {
     private final Http.Executor mockedExecutor = mock(Http.Executor.class);
     private final Http.Response mockedResponse = mock(Http.Response.class);
     private final Map<String, Object> responseMap = Map.of();
-    private final LocalDateTime mockDate = LocalDateTime.of(2025, 5, 5, 10, 10, 0);
+    private final LocalDateTime localDateTime = LocalDateTime.of(2025, 5, 5, 10, 10, 0);
     private final Parameters mockedParameters = MockParametersFactory.create(
         Map.of(
-            DEADLINE_AT, mockDate,
-            CONTENT, "content",
-            FORMAT, "format",
-            IS_COMPLETED, true,
-            LINKED_RECORDS, List.of(),
-            ASSIGNEES, List.of()));
+            DEADLINE_AT, localDateTime, CONTENT, "content", FORMAT, "format", IS_COMPLETED, true,
+            LINKED_RECORDS, List.of(), ASSIGNEES, List.of()));
 
     @Test
     void testPerform() {
@@ -73,8 +69,7 @@ class AttioCreateTaskActionTest {
         when(mockedResponse.getBody(any(TypeReference.class)))
             .thenReturn(responseMap);
 
-        Map<String, Object> result = AttioCreateTaskAction.perform(
-            mockedParameters, mockedParameters, mockedContext);
+        Map<String, Object> result = AttioCreateTaskAction.perform(mockedParameters, mockedParameters, mockedContext);
 
         assertEquals(Map.of(), result);
 
@@ -82,14 +77,9 @@ class AttioCreateTaskActionTest {
 
         Map<String, Map<String, Object>> expectedBody = Map.of(
             DATA, Map.of(
-                CONTENT, "content",
-                FORMAT, "format",
-                DEADLINE_AT, mockDate.toString(),
-                IS_COMPLETED, true,
-                LINKED_RECORDS, List.of(),
-                ASSIGNEES, List.of()));
+                CONTENT, "content", FORMAT, "format", DEADLINE_AT, localDateTime.toString(), IS_COMPLETED, true,
+                LINKED_RECORDS, List.of(), ASSIGNEES, List.of()));
 
         assertEquals(expectedBody, body.getContent());
-
     }
 }

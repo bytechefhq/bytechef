@@ -46,11 +46,7 @@ class AttioTaskCreatedTriggerTest extends AbstractAttioTriggerTest {
         WebhookEnableOutput expectedWebhookEnableOutput = new WebhookEnableOutput(Map.of(ID, "123"), null);
 
         assertEquals(expectedWebhookEnableOutput, webhookEnableOutput);
-
-        assertEquals(
-            List.of("task.created", webhhookUrl),
-            stringArgumentCaptor.getAllValues());
-
+        assertEquals(List.of("task.created", webhhookUrl), stringArgumentCaptor.getAllValues());
         assertEquals(mockedTriggerContext, triggerContextArgumentCaptor.getValue());
     }
 
@@ -61,8 +57,7 @@ class AttioTaskCreatedTriggerTest extends AbstractAttioTriggerTest {
         AttioTaskCreatedTrigger.webhookDisable(
             mockedParameters, mockedParameters, mockedParameters, workflowExecutionId, mockedTriggerContext);
 
-        attioUtilsMockedStatic
-            .verify(() -> AttioUtils.unsubscribeWebhook(mockedTriggerContext, "123"));
+        attioUtilsMockedStatic.verify(() -> AttioUtils.unsubscribeWebhook(mockedTriggerContext, "123"));
     }
 
     @Test

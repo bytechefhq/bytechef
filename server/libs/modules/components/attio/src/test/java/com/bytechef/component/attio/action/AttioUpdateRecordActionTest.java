@@ -46,9 +46,7 @@ class AttioUpdateRecordActionTest {
     private final Http.Response mockedResponse = mock(Http.Response.class);
     private final Map<String, Object> responseMap = Map.of();
     private final Parameters mockedParameters = MockParametersFactory.create(
-        Map.of(VALUE, Map.of(VALUE, Map.of()),
-            RECORD_TYPE, "test",
-            RECORD_ID, "testId"));
+        Map.of(VALUE, Map.of(), RECORD_TYPE, "test", RECORD_ID, "testId"));
 
     @Test
     void perform() {
@@ -63,15 +61,13 @@ class AttioUpdateRecordActionTest {
         when(mockedResponse.getBody(any(TypeReference.class)))
             .thenReturn(responseMap);
 
-        Map<String, Object> result = AttioUpdateRecordAction.perform(
-            mockedParameters, mockedParameters, mockedContext);
+        Map<String, Object> result = AttioUpdateRecordAction.perform(mockedParameters, mockedParameters, mockedContext);
 
         assertEquals(Map.of(), result);
 
         Body body = bodyArgumentCaptor.getValue();
 
-        Map<String, Map<String, Object>> expectedBody = Map.of(
-            DATA, Map.of("values", Map.of()));
+        Map<String, Map<String, Object>> expectedBody = Map.of(DATA, Map.of("values", Map.of()));
 
         assertEquals(expectedBody, body.getContent());
     }
