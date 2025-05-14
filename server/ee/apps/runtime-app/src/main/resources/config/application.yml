@@ -40,8 +40,7 @@ spring:
       org.springframework.ai.autoconfigure.mistralai.MistralAiAutoConfiguration,
       org.springframework.ai.autoconfigure.ollama.OllamaAutoConfiguration,
       org.springframework.ai.autoconfigure.stabilityai.StabilityAiImageAutoConfiguration,
-      org.springframework.ai.autoconfigure.vertexai.gemini.VertexAiGeminiAutoConfiguration,
-      org.springframework.ai.autoconfigure.watsonxai.WatsonxAiAutoConfiguration
+      org.springframework.ai.autoconfigure.vertexai.gemini.VertexAiGeminiAutoConfiguration
   application:
     name: runtime-app
   cache:

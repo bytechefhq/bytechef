@@ -18,7 +18,6 @@ package com.bytechef.component.ai.chat.memory.cluster;
 
 import static com.bytechef.platform.component.definition.ai.agent.ChatMemoryFunction.CHAT_MEMORY;
 import static com.bytechef.platform.component.definition.ai.agent.VectorStoreFunction.VECTOR_STORE;
-import static org.springframework.ai.chat.client.advisor.AbstractChatMemoryAdvisor.DEFAULT_CHAT_MEMORY_RESPONSE_SIZE;
 
 import com.bytechef.component.definition.ClusterElementDefinition;
 import com.bytechef.component.definition.ComponentDsl;
@@ -52,7 +51,7 @@ public class VectorStoreChatMemory {
                 ComponentDsl.integer(CHAT_MEMORY_RETRIEVE_SIZE)
                     .label("Chat Memory Retrieve Size")
                     .description("The number of messages to retrieve from the vector store.")
-                    .defaultValue(DEFAULT_CHAT_MEMORY_RESPONSE_SIZE))
+                    .defaultValue(20))
             .object(() -> this::apply);
 
     private final ClusterElementDefinitionService clusterElementDefinitionService;
@@ -76,14 +75,14 @@ public class VectorStoreChatMemory {
 
         Map<String, ?> componentConnectionConnectionParameters = componentConnection.getParameters();
 
-        Builder builder = (Builder) VectorStoreChatMemoryAdvisor
+        Builder builder = VectorStoreChatMemoryAdvisor
             .builder(
                 vectorStoreFunction.apply(
                     ParametersFactory.createParameters(clusterElement.getParameters()),
                     ParametersFactory.createParameters(componentConnectionConnectionParameters),
                     ParametersFactory.createParameters(clusterElement.getExtensions()), componentConnections))
-            .chatMemoryRetrieveSize(
-                inputParameters.getInteger(CHAT_MEMORY_RETRIEVE_SIZE, DEFAULT_CHAT_MEMORY_RESPONSE_SIZE));
+            .defaultTopK(
+                inputParameters.getInteger(CHAT_MEMORY_RETRIEVE_SIZE, 20));
 
         return builder.build();
     }

@@ -25,7 +25,6 @@ import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.platform.component.definition.ai.agent.ChatMemoryFunction.CHAT_MEMORY;
 import static com.bytechef.platform.component.definition.ai.agent.ModelFunction.MODEL;
 import static com.bytechef.platform.component.definition.ai.agent.RagFunction.RAG;
-import static org.springframework.ai.chat.client.advisor.AbstractChatMemoryAdvisor.CHAT_MEMORY_CONVERSATION_ID_KEY;
 
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.component.ai.llm.util.ModelUtils;
@@ -58,6 +57,7 @@ import java.util.function.Function;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.client.advisor.SimpleLoggerAdvisor;
 import org.springframework.ai.chat.client.advisor.api.Advisor;
+import org.springframework.ai.chat.memory.ChatMemory;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.tool.ToolCallback;
 import org.springframework.ai.tool.function.FunctionToolCallback;
@@ -133,7 +133,7 @@ public class AiAgentChatAction {
                     String conversationId = inputParameters.getString(CONVERSATION_ID);
 
                     if (conversationId != null) {
-                        advisor.param(CHAT_MEMORY_CONVERSATION_ID_KEY, conversationId);
+                        advisor.param(ChatMemory.CONVERSATION_ID, conversationId);
                     }
                 })
                 .messages(ModelUtils.getMessages(inputParameters, actionContext))

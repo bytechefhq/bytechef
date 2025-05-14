@@ -66,7 +66,9 @@ public class AnthropicChatAction {
 
     public static final ChatModel CHAT_MODEL = (inputParameters, connectionParameters) -> AnthropicChatModel.builder()
         .anthropicApi(
-            new AnthropicApi(connectionParameters.getString(TOKEN)))
+            AnthropicApi.builder()
+                .apiKey(connectionParameters.getString(TOKEN))
+                .build())
         .defaultOptions(
             AnthropicChatOptions.builder()
                 .model(inputParameters.getRequiredString(MODEL))
