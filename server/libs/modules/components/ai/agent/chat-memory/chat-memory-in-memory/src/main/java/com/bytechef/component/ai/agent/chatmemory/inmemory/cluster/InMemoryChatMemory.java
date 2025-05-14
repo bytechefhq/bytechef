@@ -25,14 +25,18 @@ import com.bytechef.platform.component.ComponentConnection;
 import com.bytechef.platform.component.definition.ai.agent.ChatMemoryFunction;
 import java.util.Map;
 import org.springframework.ai.chat.client.advisor.PromptChatMemoryAdvisor;
+import org.springframework.ai.chat.memory.InMemoryChatMemoryRepository;
+import org.springframework.ai.chat.memory.MessageWindowChatMemory;
 
 /**
  * @author Ivica Cardic
  */
 public class InMemoryChatMemory {
 
-    private static final org.springframework.ai.chat.memory.InMemoryChatMemory inMemoryChatMemory =
-        new org.springframework.ai.chat.memory.InMemoryChatMemory();
+    private static final MessageWindowChatMemory inMemoryChatMemory =
+        MessageWindowChatMemory.builder()
+            .chatMemoryRepository(new InMemoryChatMemoryRepository())
+            .build();
 
     public static final ClusterElementDefinition<ChatMemoryFunction> CLUSTER_ELEMENT_DEFINITION =
         ComponentDsl.<ChatMemoryFunction>clusterElement("chatMemory")
@@ -45,6 +49,7 @@ public class InMemoryChatMemory {
         Parameters inputParameters, Parameters connectionParameters, Parameters extensions,
         Map<String, ComponentConnection> componentConnections) {
 
-        return new PromptChatMemoryAdvisor(inMemoryChatMemory);
+        return PromptChatMemoryAdvisor.builder(inMemoryChatMemory)
+            .build();
     }
 }

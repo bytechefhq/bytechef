@@ -22,11 +22,12 @@ import com.bytechef.platform.ai.facade.dto.ContextDTO;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Map;
 import org.springframework.ai.chat.client.ChatClient;
-import org.springframework.ai.chat.client.advisor.AbstractChatMemoryAdvisor;
 import org.springframework.ai.chat.client.advisor.MessageChatMemoryAdvisor;
 import org.springframework.ai.chat.client.advisor.SimpleLoggerAdvisor;
 import org.springframework.ai.chat.client.advisor.vectorstore.QuestionAnswerAdvisor;
-import org.springframework.ai.chat.memory.InMemoryChatMemory;
+import org.springframework.ai.chat.memory.ChatMemory;
+import org.springframework.ai.chat.memory.InMemoryChatMemoryRepository;
+import org.springframework.ai.chat.memory.MessageWindowChatMemory;
 import org.springframework.ai.model.ModelOptionsUtils;
 import org.springframework.ai.vectorstore.SearchRequest;
 import org.springframework.ai.vectorstore.VectorStore;
@@ -53,21 +54,30 @@ public class AiCopilotFacadeImpl implements AiCopilotFacade {
 
         this.workflowService = workflowService;
 
-        MessageChatMemoryAdvisor messageChatMemoryAdvisor = new MessageChatMemoryAdvisor(new InMemoryChatMemory());
+        MessageChatMemoryAdvisor messageChatMemoryAdvisor = MessageChatMemoryAdvisor
+            .builder(
+                MessageWindowChatMemory.builder()
+                    .chatMemoryRepository(new InMemoryChatMemoryRepository())
+                    .build())
+            .build();
 
-        QuestionAnswerAdvisor questionAnswerAdvisorComponents = new QuestionAnswerAdvisor(
-            vectorStore, SearchRequest.builder()
-                .filterExpression("category == 'components' or category == 'flows'")
-                .topK(15)
-                .build());
+        QuestionAnswerAdvisor questionAnswerAdvisorComponents = QuestionAnswerAdvisor.builder(vectorStore)
+            .searchRequest(
+                SearchRequest.builder()
+                    .filterExpression("category == 'components' or category == 'flows'")
+                    .topK(15)
+                    .build())
+            .build();
 
-        QuestionAnswerAdvisor questionAnswerAdvisorWorkflow = new QuestionAnswerAdvisor(
-            vectorStore, SearchRequest.builder()
-                .filterExpression("category == 'workflows'")
-                .build());
+        QuestionAnswerAdvisor questionAnswerAdvisorWorkflow = QuestionAnswerAdvisor.builder(vectorStore)
+            .searchRequest(
+                SearchRequest.builder()
+                    .filterExpression("category == 'workflows'")
+                    .build())
+            .build();
 
         SimpleLoggerAdvisor qaRetrievedDocuments = new SimpleLoggerAdvisor(
-            request -> "Retrieved documents: " + request.adviseContext()
+            request -> "Retrieved documents: " + request.context()
                 .get("qa_retrieved_documents"),
             response -> "Response: " + ModelOptionsUtils.toJsonStringPrettyPrinter(response),
             1 // Log level
@@ -135,7 +145,7 @@ public class AiCopilotFacadeImpl implements AiCopilotFacade {
                         .param("task_analysis", process.analysis())
                         .param("task_list", process.workerResponses()))
                     .advisors(advisor -> advisor.param(
-                        AbstractChatMemoryAdvisor.CHAT_MEMORY_CONVERSATION_ID_KEY, conversationId))
+                        ChatMemory.CONVERSATION_ID, conversationId))
                     .stream()
                     .content()
                     .map(content -> Map.of("text", content));
@@ -149,8 +159,7 @@ public class AiCopilotFacadeImpl implements AiCopilotFacade {
                         .user(user -> user.text(userPrompt)
                             .param(workflowString, workflow.getDefinition())
                             .param(messageString, message))
-                        .advisors(advisor -> advisor
-                            .param(AbstractChatMemoryAdvisor.CHAT_MEMORY_CONVERSATION_ID_KEY, conversationId))
+                        .advisors(advisor -> advisor.param(ChatMemory.CONVERSATION_ID, conversationId))
                         .stream()
                         .content()
                         .map(content -> Map.of("text", content));
@@ -159,8 +168,7 @@ public class AiCopilotFacadeImpl implements AiCopilotFacade {
                         .user(user -> user.text(userPrompt)
                             .param(workflowString, workflow.getDefinition())
                             .param(messageString, message))
-                        .advisors(advisor -> advisor.param(
-                            AbstractChatMemoryAdvisor.CHAT_MEMORY_CONVERSATION_ID_KEY, conversationId))
+                        .advisors(advisor -> advisor.param(ChatMemory.CONVERSATION_ID, conversationId))
                         .stream()
                         .content()
                         .map(content -> Map.of("text", content));
@@ -169,8 +177,7 @@ public class AiCopilotFacadeImpl implements AiCopilotFacade {
                         .user(user -> user.text(userPrompt)
                             .param(workflowString, workflow.getDefinition())
                             .param(messageString, message))
-                        .advisors(advisor -> advisor
-                            .param(AbstractChatMemoryAdvisor.CHAT_MEMORY_CONVERSATION_ID_KEY, conversationId))
+                        .advisors(advisor -> advisor.param(ChatMemory.CONVERSATION_ID, conversationId))
                         .stream()
                         .content()
                         .map(content -> Map.of("text", content));

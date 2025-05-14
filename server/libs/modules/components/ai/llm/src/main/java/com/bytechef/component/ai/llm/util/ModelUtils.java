@@ -194,7 +194,10 @@ public class ModelUtils {
                         }
                     }
 
-                    yield new UserMessage(content.toString(), media);
+                    yield UserMessage.builder()
+                        .text(content.toString())
+                        .media(media)
+                        .build();
                 }
             }
         };
