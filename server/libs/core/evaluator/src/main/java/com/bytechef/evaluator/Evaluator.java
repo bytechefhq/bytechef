@@ -60,7 +60,7 @@ public class Evaluator {
     private static final String FORMULA_PREFIX = "=";
     private static final Pattern TEXT_EXPRESSION_PATTERN = Pattern.compile("\\$\\{(.*?)}");
     private static final Pattern VALID_ACCESSOR_PATTERN = Pattern.compile(
-        "^[a-zA-Z_][a-zA-Z0-9_]*(\\[(\\d+|'[a-zA-Z0-9_]+')])*(\\.(([a-zA-Z_][a-zA-Z0-9_]*)|\\[(\\d+|'[a-zA-Z0-9_]+')]))*(\\.[a-zA-Z_][a-zA-Z0-9_]*(\\[(\\d+|'[a-zA-Z0-9_]+')])*)*$");
+        "^[a-zA-Z_][a-zA-Z0-9_]*(\\[(\\d+|'[a-zA-Z0-9_\\-]+')])*(\\.(([a-zA-Z_][a-zA-Z0-9_]*)|\\[(\\d+|'[a-zA-Z0-9_\\-]+')]))*(\\.[a-zA-Z_][a-zA-Z0-9_]*(\\[(\\d+|'[a-zA-Z0-9_\\-]+')])*)*$");
 
     private final ExpressionParser expressionParser = new SpelExpressionParser();
 
