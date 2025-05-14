@@ -116,10 +116,10 @@ public class AiCopilotFacadeImpl implements AiCopilotFacade {
         Workflow workflow = workflowService.getWorkflow(contextDTO.workflowId());
 
         final String userPrompt = """
-              Current workflow:
-              {workflow}
-              Instructions:
-              {message}
+            Current workflow:
+            {workflow}
+            Instructions:
+            {message}
             """;
         final String workflowString = "workflow";
         final String messageString = "message";
