@@ -38,6 +38,7 @@ const SchemaInput = ({label, onChange, placeholder, type = 'text', value = ''}: 
             <Label>{label}</Label>
 
             <Input
+                className="bg-white"
                 onBlur={onChangeValue}
                 onChange={(e) => setLocalVal(e.target.value)}
                 onKeyPress={handleEnterPress(onChangeValue)}

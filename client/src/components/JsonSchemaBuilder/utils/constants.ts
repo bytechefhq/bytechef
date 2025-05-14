@@ -20,27 +20,27 @@ import {
 
 export const SCHEMA_TYPES: SchemaTypeOptionType[] = [
     {
-        label: 'schemaTypes.text',
+        label: 'Text',
         value: 'string',
     },
     {
-        label: 'schemaTypes.integer',
+        label: 'Integer',
         value: 'integer',
     },
     {
-        label: 'schemaTypes.decimal',
+        label: 'Number',
         value: 'number',
     },
     {
-        label: 'schemaTypes.boolean',
+        label: 'Boolean',
         value: 'boolean',
     },
     {
-        label: 'schemaTypes.object',
+        label: 'Object',
         value: 'object',
     },
     {
-        label: 'schemaTypes.array',
+        label: 'Array',
         value: 'array',
     },
 ];

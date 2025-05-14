@@ -1,15 +1,13 @@
-import SchemaDeleteButton from '@/components/JsonSchemaBuilder/components/SchemaDeleteButton';
 import SchemaInput from '@/components/JsonSchemaBuilder/components/SchemaInput';
 import SchemaMenu from '@/components/JsonSchemaBuilder/components/SchemaMenu';
-import SchemaMenuModal from '@/components/JsonSchemaBuilder/components/SchemaMenuModal';
+import SchemaMenuDialog from '@/components/JsonSchemaBuilder/components/SchemaMenuDialog';
 import SchemaTypesSelect from '@/components/JsonSchemaBuilder/components/SchemaTypesSelect';
-import {ChevronDownIcon, ChevronRightIcon, EllipsisVerticalIcon, PlusIcon} from 'lucide-react';
+import {Button} from '@/components/ui/button';
+import {ChevronDownIcon, ChevronRightIcon, CircleEllipsisIcon, PlusIcon, TrashIcon} from 'lucide-react';
 import {useState} from 'react';
-import {useTranslation} from 'react-i18next';
 
 import * as helpers from '../utils/helpers';
 import {SchemaRecordType} from '../utils/types';
-import SchemaRoundedButton from './SchemaRoundedButton';
 
 interface SchemaControlsProps {
     schema: SchemaRecordType;
@@ -34,44 +32,71 @@ export const SchemaControls = ({
 }: SchemaControlsProps) => {
     const [isMenuOpen, setIsMenuOpen] = useState<boolean>(false);
 
-    const {t} = useTranslation();
-
     return (
-        <div className="flex flex-row items-end">
-            <div className="mr-2 grid grid-flow-col gap-2">
+        <div className="flex w-full flex-row items-end">
+            <div className="grid grid-flow-col gap-2">
                 <SchemaInput
-                    label={t('title')}
+                    label="Title"
                     onChange={(title) => onChange(helpers.setSchemaTitle(title, schema))}
-                    placeholder={t('title')}
+                    placeholder="Title"
                     value={helpers.getSchemaTitle(schema)}
                 />
 
                 <SchemaTypesSelect
-                    onChange={(t) => onChange(helpers.setSchemaTypeAndRemoveWrongFields(t, schema))}
+                    onChange={(translation) => onChange(helpers.setSchemaTypeAndRemoveWrongFields(translation, schema))}
                     type={helpers.getSchemaType(schema)}
                 />
 
-                {typeof onChangeKey === 'function' ? (
-                    <SchemaInput label={t('key')} onChange={onChangeKey} placeholder={t('key')} value={schemakey} />
-                ) : null}
+                {typeof onChangeKey === 'function' && (
+                    <SchemaInput label="Key" onChange={onChangeKey} placeholder="Key" value={schemakey} />
+                )}
             </div>
 
-            <div className="mb-0.5 grid grid-flow-col items-center gap-1">
-                {typeof onCollapse === 'function' ? (
-                    <SchemaCollapseButton isCollapsed={isCollapsed} onClick={onCollapse} title={t('collapse')} />
-                ) : null}
+            <div className="ml-auto grid grid-flow-col items-center gap-1">
+                {typeof onCollapse === 'function' && (
+                    <Button
+                        className="hover:bg-accent hover:text-accent-foreground"
+                        onClick={onCollapse}
+                        size="icon"
+                        title="Collapse"
+                        variant="ghost"
+                    >
+                        {isCollapsed ? <ChevronRightIcon /> : <ChevronDownIcon />}
+                    </Button>
+                )}
 
-                <SchemaMenuButton onClick={() => setIsMenuOpen((o) => !o)} title={t('extraOptions')} />
+                <Button
+                    onClick={() => setIsMenuOpen((open) => !open)}
+                    size="icon"
+                    title="Extra options"
+                    variant="ghost"
+                >
+                    <CircleEllipsisIcon />
+                </Button>
 
-                {typeof onDelete === 'function' ? <SchemaDeleteButton onClick={onDelete} title={t('delete')} /> : null}
+                {typeof onDelete === 'function' && (
+                    <Button
+                        className="text-content-destructive/50 hover:bg-surface-destructive-secondary hover:text-content-destructive"
+                        onClick={onDelete}
+                        size="icon"
+                        title="Delete"
+                        variant="ghost"
+                    >
+                        <TrashIcon />
+                    </Button>
+                )}
 
-                {typeof onAdd === 'function' ? <SchemaAddButton onClick={onAdd} title={t('add')} /> : null}
+                {typeof onAdd === 'function' && (
+                    <Button onClick={onAdd} size="icon" title="Add" variant="ghost">
+                        <PlusIcon />
+                    </Button>
+                )}
             </div>
 
             {isMenuOpen && (
-                <SchemaMenuModal onClose={() => setIsMenuOpen(false)} title={t('extraFields')}>
+                <SchemaMenuDialog onClose={() => setIsMenuOpen(false)} title="Extra fields">
                     <SchemaMenu onChange={onChange} schema={schema} />
-                </SchemaMenuModal>
+                </SchemaMenuDialog>
             )}
         </div>
     );
@@ -86,54 +111,35 @@ interface SchemaArrayControlsProps {
 export const SchemaArrayControls = ({onAdd, onChange, schema}: SchemaArrayControlsProps) => {
     const [isMenuOpen, setIsMenuOpen] = useState<boolean>(false);
 
-    const {t} = useTranslation();
-
     return (
         <div className="flex items-end">
             <SchemaTypesSelect
-                onChange={(t) => onChange(helpers.setSchemaTypeAndRemoveWrongFields(t, schema))}
+                onChange={(value) => onChange(helpers.setSchemaTypeAndRemoveWrongFields(value, schema))}
                 type={helpers.getSchemaType(schema)}
             />
 
             <div className="mb-0.5 ml-2 grid grid-flow-col gap-1">
-                <SchemaMenuButton onClick={() => setIsMenuOpen((o) => !o)} title={t('extraOptions')} />
+                <Button
+                    onClick={() => setIsMenuOpen((open) => !open)}
+                    size="icon"
+                    title="Extra options"
+                    variant="ghost"
+                >
+                    <CircleEllipsisIcon />
+                </Button>
 
-                {typeof onAdd === 'function' ? <SchemaAddButton onClick={onAdd} title={t('add')} /> : null}
+                {typeof onAdd === 'function' && (
+                    <Button onClick={onAdd} size="icon" title="Add" variant="ghost">
+                        <PlusIcon />
+                    </Button>
+                )}
             </div>
 
-            {isMenuOpen ? (
-                <SchemaMenuModal onClose={() => setIsMenuOpen(false)} title={t('extraFields')}>
+            {isMenuOpen && (
+                <SchemaMenuDialog onClose={() => setIsMenuOpen(false)} title="Extra fields">
                     <SchemaMenu onChange={onChange} schema={schema} />
-                </SchemaMenuModal>
-            ) : null}
+                </SchemaMenuDialog>
+            )}
         </div>
     );
 };
-
-const SchemaMenuButton = ({onClick = () => {}, title}: {onClick?: () => void; title?: string}) => (
-    <SchemaRoundedButton className="bg-white text-gray-800 hover:bg-gray-200" onClick={onClick} title={title}>
-        <EllipsisVerticalIcon className="h-4" />
-    </SchemaRoundedButton>
-);
-
-const SchemaAddButton = ({onClick = () => {}, title}: {onClick?: () => void; title?: string}) => (
-    <SchemaRoundedButton
-        className="text-primary hover:bg-accent hover:text-accent-foreground"
-        onClick={onClick}
-        title={title}
-    >
-        <PlusIcon className="h-4" />
-    </SchemaRoundedButton>
-);
-
-interface CollapseButtonProps {
-    onClick?: () => void;
-    isCollapsed?: boolean;
-    title?: string;
-}
-
-const SchemaCollapseButton = ({isCollapsed = false, onClick = () => {}, title}: CollapseButtonProps) => (
-    <SchemaRoundedButton className="hover:bg-accent hover:text-accent-foreground" onClick={onClick} title={title}>
-        {isCollapsed ? <ChevronRightIcon className="h-4" /> : <ChevronDownIcon className="h-4" />}
-    </SchemaRoundedButton>
-);

@@ -26,14 +26,12 @@ interface SchemaMenuListProps {
     schema: SchemaRecordType;
 }
 
-const SchemaMenuList = ({fields, onChange, schema}: SchemaMenuListProps) => {
-    return (
-        <ul className="mb-4 grid gap-2">
-            {fields.map((field) => (
-                <li key={field.value}>{typeToItem[field.type]({field, onChange, schema})}</li>
-            ))}
-        </ul>
-    );
-};
+const SchemaMenuList = ({fields, onChange, schema}: SchemaMenuListProps) => (
+    <ul className="mb-4 grid gap-2">
+        {fields.map((field) => (
+            <li key={field.value}>{typeToItem[field.type]({field, onChange, schema})}</li>
+        ))}
+    </ul>
+);
 
 export default SchemaMenuList;
