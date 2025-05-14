@@ -456,6 +456,51 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Notification"
+  /notifications/{notificationId}:
+    delete:
+      description: "Delete a notification."
+      summary: "Delete a notification"
+      tags:
+        - "notification"
+      operationId: "deleteNotification"
+      parameters:
+        - name: "notificationId"
+          description: "The id of a notification."
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
+      responses:
+        "204":
+          description: "Successful operation."
+    put:
+      description: "Update an existing notification."
+      summary: "Update an existing notification"
+      tags:
+        - "notification"
+      operationId: "updateNotification"
+      parameters:
+        - name: "notificationId"
+          description: "The id of a notification."
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Notification"
+        required: true
+      responses:
+        "200":
+          description: "The updated Notification object."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Notification"
   /notifications/events:
     get:
       description: "Get a list of possible notification events"
