@@ -41,8 +41,6 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.ai.document.Document;
 import org.springframework.ai.document.MetadataMode;
 import org.springframework.ai.embedding.BatchingStrategy;
@@ -63,14 +61,12 @@ import org.springframework.core.io.Resource;
 @ConditionalOnProperty(prefix = "bytechef.ai.copilot", name = "enabled", havingValue = "true")
 public class VectorStoreConfiguration {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(VectorStoreConfiguration.class);
-
     private static final String CATEGORY = "category";
+    private static final String COMPONENTS = "components";
     private static final int MAX_TOKENS = 1536;
     private static final String NAME = "name";
     private static final String TYPE = "type";
     private static final String WORKFLOWS = "workflows";
-    private static final String COMPONENTS = "components";
 
     private final TokenCountBatchingStrategy strategy;
     private final VectorStore vectorStore;

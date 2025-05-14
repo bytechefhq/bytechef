@@ -17,7 +17,6 @@
 package com.bytechef.platform.ai.config;
 
 import java.time.Duration;
-import java.util.function.Consumer;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.openai.OpenAiChatModel;
 import org.springframework.ai.openai.OpenAiChatOptions;
@@ -26,12 +25,14 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestClientException;
 
+/**
+ * @author Marko Kriskovic
+ */
 @Configuration
 @ConditionalOnProperty(prefix = "bytechef.ai.copilot", name = "enabled", havingValue = "true")
 public class AiCopilotConfiguration {
@@ -43,6 +44,7 @@ public class AiCopilotConfiguration {
     OpenAiApi openAiApi() {
         HttpComponentsClientHttpRequestFactory httpComponentsClientHttpRequestFactory =
             new HttpComponentsClientHttpRequestFactory();
+
         httpComponentsClientHttpRequestFactory.setConnectionRequestTimeout(Duration.ofSeconds(60));
         httpComponentsClientHttpRequestFactory.setConnectTimeout(Duration.ofSeconds(60));
         httpComponentsClientHttpRequestFactory.setReadTimeout(Duration.ofSeconds(60));
@@ -53,12 +55,7 @@ public class AiCopilotConfiguration {
                 throw new RestClientException(
                     "Error response: " + response.getStatusCode() + "; " + response.getStatusText());
             })
-            .defaultHeaders(new Consumer<HttpHeaders>() {
-                @Override
-                public void accept(HttpHeaders httpHeaders) {
-                    httpHeaders.set("Accept-Encoding", "gzip, deflate");
-                }
-            });
+            .defaultHeaders(httpHeaders -> httpHeaders.set("Accept-Encoding", "gzip, deflate"));
 
         return OpenAiApi.builder()
             .apiKey(openAiApiKey)

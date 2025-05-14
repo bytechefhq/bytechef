@@ -41,10 +41,10 @@ public class OrchestratorWorkers {
                 "type": "trigger",
                 "description": "The function of the trigger",
                 \\},
-                         \\{
-                         "type": "flow",
-                         "description": "The function of the flow",
-                         \\},
+                \\{
+                "type": "flow",
+                "description": "The function of the flow",
+                \\},
                 \\{
                 "type": "action",
                 "description": "The function of the action",
@@ -172,5 +172,4 @@ public class OrchestratorWorkers {
 
         return new FinalResponse(orchestratorResponse.analysis(), workerResponses);
     }
-
 }
