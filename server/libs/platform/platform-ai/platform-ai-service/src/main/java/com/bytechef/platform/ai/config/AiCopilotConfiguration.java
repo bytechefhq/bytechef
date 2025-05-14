@@ -40,6 +40,9 @@ public class AiCopilotConfiguration {
     @Value("${spring.ai.openai.api-key}")
     private String openAiApiKey;
 
+    @Value("${spring.ai.openai.chat.options.model}")
+    private String model;
+
     @Bean
     OpenAiApi openAiApi() {
         HttpComponentsClientHttpRequestFactory httpComponentsClientHttpRequestFactory =
@@ -69,7 +72,7 @@ public class AiCopilotConfiguration {
             .openAiApi(openAiApi)
             .defaultOptions(
                 OpenAiChatOptions.builder()
-                    .model(OpenAiApi.ChatModel.CHATGPT_4_O_LATEST)
+                    .model(model)
                     .temperature(0.7)
                     .build())
             .build();
