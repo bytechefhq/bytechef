@@ -1,9 +1,11 @@
 import JsonSchemaBuilder from '@/components/JsonSchemaBuilder/JsonSchemaBuilder';
 import {SchemaRecordType} from '@/components/JsonSchemaBuilder/utils/types';
+import {Note} from '@/components/Note';
 import {Sheet, SheetCloseButton, SheetContent, SheetDescription, SheetHeader, SheetTitle} from '@/components/ui/sheet';
 import {Tabs, TabsContent, TabsList, TabsTrigger} from '@/components/ui/tabs';
 import {SPACE} from '@/shared/constants';
 import Editor from '@monaco-editor/react';
+import {MessageCircleQuestionIcon} from 'lucide-react';
 import React from 'react';
 
 interface PropertyJsonSchemaBuilderSheetProps {
@@ -24,7 +26,7 @@ const PropertyJsonSchemaBuilderSheet = ({locale, onChange, onClose, schema}: Pro
                 <Tabs className="flex size-full flex-col" defaultValue="designer">
                     <SheetHeader className="flex flex-row items-center justify-between space-y-0 p-3">
                         <div className="flex flex-col">
-                            <SheetTitle>JSON Schema Builder</SheetTitle>
+                            <SheetTitle>Response template</SheetTitle>
 
                             <SheetDescription>Define desired response format for the output</SheetDescription>
                         </div>
@@ -37,14 +39,19 @@ const PropertyJsonSchemaBuilderSheet = ({locale, onChange, onClose, schema}: Pro
                             <TabsList>
                                 <TabsTrigger value="designer">Designer</TabsTrigger>
 
-                                <TabsTrigger value="editor">Editor</TabsTrigger>
+                                <TabsTrigger value="editor">Code Editor</TabsTrigger>
                             </TabsList>
 
                             <SheetCloseButton />
                         </div>
                     </SheetHeader>
 
-                    <div className="flex-1 overflow-y-auto px-4">
+                    <div className="flex-1 space-y-4 overflow-y-auto px-4">
+                        <Note
+                            content="Set up how you want OpenAI to format its replies — like a template for the response."
+                            icon={<MessageCircleQuestionIcon />}
+                        />
+
                         <TabsContent value="designer">
                             <JsonSchemaBuilder locale={locale} onChange={onChange} schema={schema} />
                         </TabsContent>

@@ -1,4 +1,3 @@
-import SchemaCheckbox from '@/components/JsonSchemaBuilder/components/SchemaCheckbox';
 import SchemaDeleteButton from '@/components/JsonSchemaBuilder/components/SchemaDeleteButton';
 import SchemaInput from '@/components/JsonSchemaBuilder/components/SchemaInput';
 import {Label} from '@/components/ui/label';
@@ -23,6 +22,8 @@ import {
 import {SchemaMenuOptionType, SchemaRecordType} from '../utils/types';
 
 import '../../CreatableSelect/CreatableSelect.css';
+
+import {Toggle} from '@/components/ui/toggle';
 
 interface ItemProps {
     onDelete: () => void;
@@ -180,5 +181,27 @@ export const RequiredMultiSelectItem: React.FunctionComponent<ItemTypeProps> = (
                 />
             </div>
         </Item>
+    );
+};
+
+interface SchemaCheckboxProps {
+    value: boolean;
+    onChange: (value: boolean) => void;
+    label?: string;
+}
+
+const SchemaCheckbox = ({label, onChange, value}: SchemaCheckboxProps) => {
+    const handleChange =
+        (handler: (value: boolean) => void) =>
+        (event: React.FormEvent<HTMLElement>): void => {
+            handler((event.target as HTMLInputElement).checked);
+        };
+
+    return (
+        <div className="flex flex-row">
+            <Label>{label}</Label>
+
+            <Toggle className="ml-2" defaultChecked={value} onChange={handleChange(onChange)} />
+        </div>
     );
 };
