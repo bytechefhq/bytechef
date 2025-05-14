@@ -1,6 +1,4 @@
 import {Label} from '@/components/ui/label';
-import React from 'react';
-import {useTranslation} from 'react-i18next';
 
 import {SCHEMA_TYPES} from '../utils/constants';
 import * as helpers from '../utils/helpers';
@@ -9,41 +7,38 @@ import {SchemaType} from '../utils/types';
 import '../../CreatableSelect/CreatableSelect.css';
 
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/ui/select';
+import {TYPE_ICONS} from '@/shared/typeIcons';
 
 interface SchemaTypesSelectProps {
     type: SchemaType;
     onChange: (type: SchemaType) => void;
 }
 
-const SchemaTypesSelect = ({onChange, type}: SchemaTypesSelectProps) => {
-    const {t} = useTranslation();
+const SchemaTypesSelect = ({onChange, type}: SchemaTypesSelectProps) => (
+    <div>
+        <Label>Type</Label>
 
-    const options = React.useMemo(() => helpers.translateLabels(t, SCHEMA_TYPES), [t]);
+        <Select
+            onValueChange={(option: SchemaType) => onChange(option)}
+            value={helpers.findOption(type)(SCHEMA_TYPES)?.value}
+        >
+            <SelectTrigger className="flex w-full min-w-48">
+                <SelectValue className="flex" placeholder="Type" />
+            </SelectTrigger>
 
-    return (
-        <div>
-            <Label>{t('type')}</Label>
+            <SelectContent>
+                {SCHEMA_TYPES.map((option) => (
+                    <SelectItem key={option.value} value={option.value}>
+                        <div className="flex w-full items-center space-x-2">
+                            <span>{TYPE_ICONS[option.value.toUpperCase() as keyof typeof TYPE_ICONS]}</span>
 
-            <Select
-                onValueChange={(option: SchemaType) => {
-                    onChange(option);
-                }}
-                value={helpers.findOption(type)(options)?.value}
-            >
-                <SelectTrigger className="w-full min-w-48">
-                    <SelectValue placeholder={t('type')} />
-                </SelectTrigger>
-
-                <SelectContent>
-                    {options.map((option) => (
-                        <SelectItem key={option.value} value={option.value}>
-                            {option.label}
-                        </SelectItem>
-                    ))}
-                </SelectContent>
-            </Select>
-        </div>
-    );
-};
+                            <span>{option.label}</span>
+                        </div>
+                    </SelectItem>
+                ))}
+            </SelectContent>
+        </Select>
+    </div>
+);
 
 export default SchemaTypesSelect;

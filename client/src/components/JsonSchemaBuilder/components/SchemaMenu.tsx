@@ -14,10 +14,13 @@ interface SchemaMenuProps {
 }
 
 const SchemaMenu = ({onChange, schema}: SchemaMenuProps) => {
-    const {t} = useTranslation();
+    const {t: translation} = useTranslation();
 
     const type = helpers.getSchemaType(schema);
-    const allOptions = useMemo(() => helpers.translateLabels(t, helpers.getSchemaMenuOptions(type)), [type, t]);
+    const allOptions = useMemo(
+        () => helpers.translateLabels(translation, helpers.getSchemaMenuOptions(type)),
+        [type, translation]
+    );
 
     const fields = helpers.getAllSchemaKeys(schema);
 
@@ -29,12 +32,11 @@ const SchemaMenu = ({onChange, schema}: SchemaMenuProps) => {
 
             <Select
                 className="w-full min-w-48"
-                // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                onChange={(option: any) =>
-                    onChange(helpers.setSchemaField((option as SchemaMenuOptionType).value, undefined, schema))
+                onChange={(option: SchemaMenuOptionType) =>
+                    onChange(helpers.setSchemaField(option.value, undefined, schema))
                 }
                 options={allOptions.filter((option) => !displayFields.some((field) => field.value === option.value))}
-                placeholder={t('addFields')}
+                placeholder={translation('addFields')}
                 value={null}
             />
         </div>
