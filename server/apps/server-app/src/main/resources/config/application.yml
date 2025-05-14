@@ -213,7 +213,7 @@ bytechef:
       openai:
         chat:
           options:
-            model: gpt-4o
+            model: chatgpt-4o-latest
             temperature: 0.4
   cache:
     # Cache provider (redis | caffeine) default: caffeine
