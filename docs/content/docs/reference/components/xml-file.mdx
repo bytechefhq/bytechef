@@ -1,0 +1,124 @@
+---
+title: "XML File"
+description: "Reads and writes data from a XML file."
+---
+
+Reads and writes data from a XML file.
+
+
+Categories: Helpers
+
+
+Type: xmlFile/v1
+
+<hr />
+
+
+
+
+## Actions
+
+
+### Read from File
+Name: read
+
+`Reads data from a XML file.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| fileEntry | File | FILE_ENTRY | `The object property which contains a reference to the XML file to read from.` | true |
+| isArray | Is Array | BOOLEAN <details> <summary> Options </summary> true, false </details> | `The object input is array?` | null |
+| path | Path | STRING | `The path where the array is e.g 'data'. Leave blank to use the top level object.` | null |
+| pageSize | Page Size | INTEGER | `The amount of child elements to return in a page.` | null |
+| pageNumber | Page Number | INTEGER | `The page number to get.` | null |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Read from File",
+  "name" : "read",
+  "parameters" : {
+    "fileEntry" : {
+      "extension" : "",
+      "mimeType" : "",
+      "name" : "",
+      "url" : ""
+    },
+    "isArray" : false,
+    "path" : "",
+    "pageSize" : 1,
+    "pageNumber" : 1
+  },
+  "type" : "xmlFile/v1/read"
+}
+```
+
+#### Output
+
+The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
+
+
+
+
+### Write to File
+Name: write
+
+`Writes the data to a XML file.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| type | Type | STRING <details> <summary> Options </summary> OBJECT, ARRAY </details> | `The value type.` | null |
+| source | Source | OBJECT <details> <summary> Properties </summary> &#123;&#125; </details> | `The object to write to the file.` | true |
+| source | Source | ARRAY <details> <summary> Items </summary> [] </details> | `The aray to write to the file.` | true |
+| filename | Filename | STRING | `Filename to set for binary data. By default, "file.xml" will be used.` | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Write to File",
+  "name" : "write",
+  "parameters" : {
+    "type" : "",
+    "source" : [ ],
+    "filename" : ""
+  },
+  "type" : "xmlFile/v1/write"
+}
+```
+
+#### Output
+
+
+
+Type: FILE_ENTRY
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| extension | STRING |  |
+| mimeType | STRING |  |
+| name | STRING |  |
+| url | STRING |  |
+
+
+
+
+#### Output Example
+```json
+{
+  "extension" : "",
+  "mimeType" : "",
+  "name" : "",
+  "url" : ""
+}
+```
+
+
+
+

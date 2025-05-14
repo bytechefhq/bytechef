@@ -1,0 +1,531 @@
+---
+title: "QuickBooks"
+description: "QuickBooks is an accounting software package developed and marketed by Intuit. It is geared mainly toward small and medium-sized businesses and offers on-premises accounting applications as well as cloud-based versions that accept business payments, manage and pay bills, and payroll functions."
+---
+
+QuickBooks is an accounting software package developed and marketed by Intuit. It is geared mainly toward small and medium-sized businesses and offers on-premises accounting applications as well as cloud-based versions that accept business payments, manage and pay bills, and payroll functions.
+
+
+Categories: Accounting
+
+
+Type: quickbooks/v1
+
+<hr />
+
+
+
+## Connections
+
+Version: 1
+
+
+### OAuth2 Authorization Code
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| base | Base | STRING <details> <summary> Options </summary> https://sandbox-quickbooks.api.intuit.com, https://quickbooks.api.intuit.com </details> | `The base URL for Quickbooks.` | true |
+| companyId | Company Id | STRING | `To get the company id, go to your dashboard. On the top right corner press the gear logo and click Additional information. There you will see your company ID.` | true |
+| clientId | Client Id | STRING |  | true |
+| clientSecret | Client Secret | STRING |  | true |
+
+
+
+
+
+<hr />
+
+
+
+## Actions
+
+
+### Create Category
+Name: createCategory
+
+`Creates a new category.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| name | Name | STRING | `Name of the category.` | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Create Category",
+  "name" : "createCategory",
+  "parameters" : {
+    "name" : ""
+  },
+  "type" : "quickbooks/v1/createCategory"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| item | OBJECT <details> <summary> Properties </summary> &#123;STRING\(domain), STRING\(id), STRING\(name), STRING\(active), STRING\(fullyQualifiedName), STRING\(type)&#125; </details> |  |
+
+
+
+
+#### Output Example
+```json
+{
+  "item" : {
+    "domain" : "",
+    "id" : "",
+    "name" : "",
+    "active" : "",
+    "fullyQualifiedName" : "",
+    "type" : ""
+  }
+}
+```
+
+
+### Create Customer
+Name: createCustomer
+
+`Creates a new customer.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| displayName | Display Name | STRING | `The name of the person or organization as displayed.` | true |
+| givenName | First Name | STRING | `Given name or first name of a person.` | false |
+| familyName | Last Name | STRING | `Family name or the last name of the person.` | false |
+| suffix | Suffix | STRING | `Suffix of the name.` | false |
+| title | Title | STRING | `Title of the person.` | false |
+| middleName | Middle Name | STRING | `Middle name of the person.` | false |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Create Customer",
+  "name" : "createCustomer",
+  "parameters" : {
+    "displayName" : "",
+    "givenName" : "",
+    "familyName" : "",
+    "suffix" : "",
+    "title" : "",
+    "middleName" : ""
+  },
+  "type" : "quickbooks/v1/createCustomer"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| customer | OBJECT <details> <summary> Properties </summary> &#123;STRING\(domain), STRING\(id), STRING\(title), STRING\(givenName), STRING\(middleName), STRING\(familyName), STRING\(suffix), STRING\(fullyQualifiedName), STRING\(displayName), STRING\(active)&#125; </details> |  |
+
+
+
+
+#### Output Example
+```json
+{
+  "customer" : {
+    "domain" : "",
+    "id" : "",
+    "title" : "",
+    "givenName" : "",
+    "middleName" : "",
+    "familyName" : "",
+    "suffix" : "",
+    "fullyQualifiedName" : "",
+    "displayName" : "",
+    "active" : ""
+  }
+}
+```
+
+
+### Create Item
+Name: createItem
+
+`Creates a new item.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| name | Name | STRING | `Name of the item.` | true |
+| type | Type | STRING <details> <summary> Options </summary> INVENTORY, SERVICE, NON_INVENTORY </details> | `Type of item.` | true |
+| account | | DYNAMIC_PROPERTIES <details> <summary> Depends On </summary> type </details> |  | null |
+| expenseAccountRef | Expense Account | STRING |  | true |
+| qtyOnHand | Quantity on Hand | NUMBER | `Current quantity of the inventory items available for sale.` | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Create Item",
+  "name" : "createItem",
+  "parameters" : {
+    "name" : "",
+    "type" : "",
+    "account" : { },
+    "expenseAccountRef" : "",
+    "qtyOnHand" : 0.0
+  },
+  "type" : "quickbooks/v1/createItem"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| item | OBJECT <details> <summary> Properties </summary> &#123;STRING\(domain), STRING\(id), STRING\(name), STRING\(active), STRING\(fullyQualifiedName), STRING\(type), &#123;STRING\(name)&#125;\(incomeAccountRef), &#123;STRING\(name)&#125;\(assetAccountRef), &#123;STRING\(name)&#125;\(expenseAccountRef)&#125; </details> |  |
+
+
+
+
+#### Output Example
+```json
+{
+  "item" : {
+    "domain" : "",
+    "id" : "",
+    "name" : "",
+    "active" : "",
+    "fullyQualifiedName" : "",
+    "type" : "",
+    "incomeAccountRef" : {
+      "name" : ""
+    },
+    "assetAccountRef" : {
+      "name" : ""
+    },
+    "expenseAccountRef" : {
+      "name" : ""
+    }
+  }
+}
+```
+
+
+### Create Payment
+Name: createPayment
+
+`Creates a new payment.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| customer | Customer | STRING |  | true |
+| totalAmt | Total Amount | NUMBER | `Total amount of the transaction.` | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Create Payment",
+  "name" : "createPayment",
+  "parameters" : {
+    "customer" : "",
+    "totalAmt" : 0.0
+  },
+  "type" : "quickbooks/v1/createPayment"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| payment | OBJECT <details> <summary> Properties </summary> &#123;STRING\(domain), STRING\(id), &#123;STRING\(name)&#125;\(CurrencyRef), &#123;STRING\(name)&#125;\(customerRef), STRING\(totalAmt)&#125; </details> |  |
+
+
+
+
+#### Output Example
+```json
+{
+  "payment" : {
+    "domain" : "",
+    "id" : "",
+    "CurrencyRef" : {
+      "name" : ""
+    },
+    "customerRef" : {
+      "name" : ""
+    },
+    "totalAmt" : ""
+  }
+}
+```
+
+
+### Get Customer
+Name: getCustomer
+
+`Gets details about a specific customer.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| customer | Customer ID | STRING | `ID of the customer to get.` | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Get Customer",
+  "name" : "getCustomer",
+  "parameters" : {
+    "customer" : ""
+  },
+  "type" : "quickbooks/v1/getCustomer"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| customer | OBJECT <details> <summary> Properties </summary> &#123;STRING\(domain), STRING\(id), STRING\(title), STRING\(givenName), STRING\(middleName), STRING\(familyName), STRING\(suffix), STRING\(fullyQualifiedName), STRING\(displayName), STRING\(active)&#125; </details> |  |
+
+
+
+
+#### Output Example
+```json
+{
+  "customer" : {
+    "domain" : "",
+    "id" : "",
+    "title" : "",
+    "givenName" : "",
+    "middleName" : "",
+    "familyName" : "",
+    "suffix" : "",
+    "fullyQualifiedName" : "",
+    "displayName" : "",
+    "active" : ""
+  }
+}
+```
+
+
+### Get Invoice
+Name: getInvoice
+
+`Gets details about a specific invoice.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| invoice | Invoice ID | STRING | `ID of the invoice to get.` | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Get Invoice",
+  "name" : "getInvoice",
+  "parameters" : {
+    "invoice" : ""
+  },
+  "type" : "quickbooks/v1/getInvoice"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| invoice | OBJECT <details> <summary> Properties </summary> &#123;STRING\(domain), STRING\(id), STRING\(DocNumber), &#123;STRING\(name)&#125;\(customerRef), STRING\(Balance)&#125; </details> |  |
+
+
+
+
+#### Output Example
+```json
+{
+  "invoice" : {
+    "domain" : "",
+    "id" : "",
+    "DocNumber" : "",
+    "customerRef" : {
+      "name" : ""
+    },
+    "Balance" : ""
+  }
+}
+```
+
+
+### Get Item
+Name: getItem
+
+`Gets details about a specific item.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| item | Item ID | STRING | `ID of the item to get.` | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Get Item",
+  "name" : "getItem",
+  "parameters" : {
+    "item" : ""
+  },
+  "type" : "quickbooks/v1/getItem"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| item | OBJECT <details> <summary> Properties </summary> &#123;STRING\(domain), STRING\(id), STRING\(name), STRING\(active), STRING\(fullyQualifiedName), STRING\(type), &#123;STRING\(name)&#125;\(incomeAccountRef), &#123;STRING\(name)&#125;\(assetAccountRef), &#123;STRING\(name)&#125;\(expenseAccountRef)&#125; </details> |  |
+
+
+
+
+#### Output Example
+```json
+{
+  "item" : {
+    "domain" : "",
+    "id" : "",
+    "name" : "",
+    "active" : "",
+    "fullyQualifiedName" : "",
+    "type" : "",
+    "incomeAccountRef" : {
+      "name" : ""
+    },
+    "assetAccountRef" : {
+      "name" : ""
+    },
+    "expenseAccountRef" : {
+      "name" : ""
+    }
+  }
+}
+```
+
+
+### Get Payment
+Name: getPayment
+
+`Gets details about a specific payment.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| payment | Payment ID | STRING | `ID of the payment to get.` | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Get Payment",
+  "name" : "getPayment",
+  "parameters" : {
+    "payment" : ""
+  },
+  "type" : "quickbooks/v1/getPayment"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| payment | OBJECT <details> <summary> Properties </summary> &#123;STRING\(domain), STRING\(id), &#123;STRING\(name)&#125;\(CurrencyRef), &#123;STRING\(name)&#125;\(customerRef), STRING\(totalAmt)&#125; </details> |  |
+
+
+
+
+#### Output Example
+```json
+{
+  "payment" : {
+    "domain" : "",
+    "id" : "",
+    "CurrencyRef" : {
+      "name" : ""
+    },
+    "customerRef" : {
+      "name" : ""
+    },
+    "totalAmt" : ""
+  }
+}
+```
+
+
+
+

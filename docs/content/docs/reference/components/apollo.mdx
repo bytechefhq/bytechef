@@ -1,0 +1,327 @@
+---
+title: "Apollo"
+description: "Apollo.io is a sales intelligence and engagement platform that provides tools for prospecting, lead generation, and sales automation to help businesses improve their sales processes and outreach efforts."
+---
+
+Apollo.io is a sales intelligence and engagement platform that provides tools for prospecting, lead generation, and sales automation to help businesses improve their sales processes and outreach efforts.
+
+
+Categories: CRM
+
+
+Type: apollo/v1
+
+<hr />
+
+
+
+## Connections
+
+Version: 1
+
+
+### API Key
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| key | Key | STRING |  | true |
+| value | Value | STRING |  | true |
+
+
+
+### OAuth2 Authorization Code
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| clientId | Client Id | STRING |  | true |
+| clientSecret | Client Secret | STRING |  | true |
+
+
+
+
+
+<hr />
+
+
+
+## Actions
+
+
+### Update Deal
+Name: updateDeal
+
+`Updates the details of existing deals within your team's Apollo account.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| opportunity_id | Opportunity Id | STRING | `The ID for the deal you want to update.` | true |
+| owner_id | Owner ID | STRING | `The ID for the deal owner within your team's Apollo account.` | false |
+| name | Name | STRING | `New name for the deal.` | false |
+| closed_date | Close Date | DATE | `Updated estimated close date for the deal. This can be a future or past date.` | false |
+| account_id | Account ID | STRING | `The ID for the account within your Apollo instance. This is the company that you are targeting as part of the deal being created.` | false |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Update Deal",
+  "name" : "updateDeal",
+  "parameters" : {
+    "opportunity_id" : "",
+    "owner_id" : "",
+    "name" : "",
+    "closed_date" : "2021-01-01",
+    "account_id" : ""
+  },
+  "type" : "apollo/v1/updateDeal"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| opportunity | OBJECT <details> <summary> Properties </summary> &#123;STRING\(id), STRING\(team_id), STRING\(owner_id), NUMBER\(amount), DATE\(closed_date), STRING\(account_id), STRING\(description), STRING\(name), &#123;STRING\(name), STRING\(iso_code), STRING\(symbol)&#125;\(currency)&#125; </details> |  |
+
+
+
+
+#### Output Example
+```json
+{
+  "opportunity" : {
+    "id" : "",
+    "team_id" : "",
+    "owner_id" : "",
+    "amount" : 0.0,
+    "closed_date" : "2021-01-01",
+    "account_id" : "",
+    "description" : "",
+    "name" : "",
+    "currency" : {
+      "name" : "",
+      "iso_code" : "",
+      "symbol" : ""
+    }
+  }
+}
+```
+
+
+### Create Deal
+Name: createDeal
+
+`Creates new deal for an Apollo account.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| name | Name | STRING | `Name the deal you are creating.` | true |
+| owner_id | Owner ID | STRING | `The ID for the deal owner within your team's Apollo account.` | false |
+| account_id | Account ID | STRING | `The ID for the account within your Apollo instance. This is the company that you are targeting as part of the deal being created.` | false |
+| amount | Amount | STRING | `The monetary value of the deal being created. Do not enter commas or currency symbols for the value. ` | false |
+| closed_date | Close Date | DATE | `The estimated close date for the deal. This can be a future or past date.` | false |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Create Deal",
+  "name" : "createDeal",
+  "parameters" : {
+    "name" : "",
+    "owner_id" : "",
+    "account_id" : "",
+    "amount" : "",
+    "closed_date" : "2021-01-01"
+  },
+  "type" : "apollo/v1/createDeal"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| opportunity | OBJECT <details> <summary> Properties </summary> &#123;STRING\(id), STRING\(team_id), STRING\(owner_id), NUMBER\(amount), DATE\(closed_date), STRING\(account_id), STRING\(description), STRING\(name), &#123;STRING\(name), STRING\(iso_code), STRING\(symbol)&#125;\(currency)&#125; </details> |  |
+
+
+
+
+#### Output Example
+```json
+{
+  "opportunity" : {
+    "id" : "",
+    "team_id" : "",
+    "owner_id" : "",
+    "amount" : 0.0,
+    "closed_date" : "2021-01-01",
+    "account_id" : "",
+    "description" : "",
+    "name" : "",
+    "currency" : {
+      "name" : "",
+      "iso_code" : "",
+      "symbol" : ""
+    }
+  }
+}
+```
+
+
+### Enrich Person
+Name: enrichPerson
+
+`Enriches data for a person.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| first_name | First Name | STRING | `The first name of the person.` | false |
+| last_name | Last Name | STRING | `The lst name of the person.` | false |
+| name | Name | STRING | `The full name of the person.` | false |
+| email | Email | STRING | `The email address of the person.` | false |
+| organization_name | Organization Name | STRING | `The name of the person's employer.` | false |
+| domain | Domain | STRING | `The domain name for the person's employer. This can be the current employer or a previous employer. Do not include www., the @ symbol, or similar.` | false |
+| linkedin_url | LinkedIn URL | STRING | `The URL for the person's LinkedIn profile.` | false |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Enrich Person",
+  "name" : "enrichPerson",
+  "parameters" : {
+    "first_name" : "",
+    "last_name" : "",
+    "name" : "",
+    "email" : "",
+    "organization_name" : "",
+    "domain" : "",
+    "linkedin_url" : ""
+  },
+  "type" : "apollo/v1/enrichPerson"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| person | OBJECT <details> <summary> Properties </summary> &#123;STRING\(id), STRING\(first_name), STRING\(last_name), STRING\(name), STRING\(linkedin_url), STRING\(title), STRING\(email_status), STRING\(photo_url), STRING\(twitter_url), STRING\(github_url), STRING\(facebook_url), STRING\(headline), STRING\(email), STRING\(organization_id)&#125; </details> |  |
+
+
+
+
+#### Output Example
+```json
+{
+  "person" : {
+    "id" : "",
+    "first_name" : "",
+    "last_name" : "",
+    "name" : "",
+    "linkedin_url" : "",
+    "title" : "",
+    "email_status" : "",
+    "photo_url" : "",
+    "twitter_url" : "",
+    "github_url" : "",
+    "facebook_url" : "",
+    "headline" : "",
+    "email" : "",
+    "organization_id" : ""
+  }
+}
+```
+
+
+### Enrich Company
+Name: enrichCompany
+
+`Enriches data for company.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| domain | Domain | STRING | `The domain of the company that you want to enrich. Do not include www., the @ symbol, or similar.` | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Enrich Company",
+  "name" : "enrichCompany",
+  "parameters" : {
+    "domain" : ""
+  },
+  "type" : "apollo/v1/enrichCompany"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| organization | OBJECT <details> <summary> Properties </summary> &#123;STRING\(id), STRING\(name), STRING\(website_url), STRING\(blog_url), STRING\(linkedin_url), STRING\(twitter_url), STRING\(facebook_url), STRING\(phone), STRING\(logo_url), STRING\(primary_domain), STRING\(industry), [STRING]\(keywords)&#125; </details> |  |
+
+
+
+
+#### Output Example
+```json
+{
+  "organization" : {
+    "id" : "",
+    "name" : "",
+    "website_url" : "",
+    "blog_url" : "",
+    "linkedin_url" : "",
+    "twitter_url" : "",
+    "facebook_url" : "",
+    "phone" : "",
+    "logo_url" : "",
+    "primary_domain" : "",
+    "industry" : "",
+    "keywords" : [ "" ]
+  }
+}
+```
+
+
+
+

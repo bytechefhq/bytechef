@@ -1,0 +1,643 @@
+---
+title: "Text Helper"
+description: "Helper component which contains operations to help you work with text."
+---
+
+Helper component which contains operations to help you work with text.
+
+
+Categories: Helpers
+
+
+Type: textHelper/v1
+
+<hr />
+
+
+
+
+## Actions
+
+
+### Base64 Encode/Decode
+Name: base64EncodeDecode
+
+`Encode/decode a specified string.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| text | Text | STRING | `The text to be Base64 encode or decode.` | true |
+| operation | Encode or Decode | STRING <details> <summary> Options </summary> ENCODE, DECODE </details> | `Select whether to encode or decode the text.` | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Base64 Encode/Decode",
+  "name" : "base64EncodeDecode",
+  "parameters" : {
+    "text" : "",
+    "operation" : ""
+  },
+  "type" : "textHelper/v1/base64EncodeDecode"
+}
+```
+
+#### Output
+
+
+
+Type: STRING
+
+
+
+
+
+
+
+
+### Concatenate
+Name: concatenate
+
+`Concatenate a list of texts.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| texts | Texts | ARRAY <details> <summary> Items </summary> [STRING\($text)] </details> | `A list of texts to concatenate.` | true |
+| separator | Separator | STRING | `The text that separates the texts you want to concatenate.` | false |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Concatenate",
+  "name" : "concatenate",
+  "parameters" : {
+    "texts" : [ "" ],
+    "separator" : ""
+  },
+  "type" : "textHelper/v1/concatenate"
+}
+```
+
+#### Output
+
+
+
+Type: STRING
+
+
+
+
+
+
+
+
+### Contains
+Name: contains
+
+`Check if text contains the specified sequence of characters.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| text | Text | STRING |  | true |
+| expression | Expression | STRING | `Text to search for.` | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Contains",
+  "name" : "contains",
+  "parameters" : {
+    "text" : "",
+    "expression" : ""
+  },
+  "type" : "textHelper/v1/contains"
+}
+```
+
+#### Output
+
+
+
+Type: BOOLEAN
+
+
+
+
+
+
+
+
+### Extract Content from HTML
+Name: extractContentFromHtml
+
+`Extract content from the HTML content.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| content | HTML Content | STRING | `HTML content to extract content from.` | true |
+| querySelector | CSS Selector | STRING | `The CSS selector to search for.` | true |
+| returnValue | Return Value | STRING <details> <summary> Options </summary> ATTRIBUTE, HTML, TEXT </details> | `The data to return.` | true |
+| attribute | Attribute | STRING | `The name of the attribute to return the value of` | true |
+| returnArray | Return Array | BOOLEAN <details> <summary> Options </summary> true, false </details> | `If selected, then extracted individual items are returned as an array. If you don't set this, all values are returned as a single string.` | null |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Extract Content from HTML",
+  "name" : "extractContentFromHtml",
+  "parameters" : {
+    "content" : "",
+    "querySelector" : "",
+    "returnValue" : "",
+    "attribute" : "",
+    "returnArray" : false
+  },
+  "type" : "textHelper/v1/extractContentFromHtml"
+}
+```
+
+#### Output
+
+The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
+
+
+
+
+### Extract URLs
+Name: extractUrls
+
+`Extract all of the URLs from a given piece of text, returning them as a list.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| text | Text | STRING | `The text from which to extract URLs.` | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Extract URLs",
+  "name" : "extractUrls",
+  "parameters" : {
+    "text" : ""
+  },
+  "type" : "textHelper/v1/extractUrls"
+}
+```
+
+#### Output
+
+
+
+Type: ARRAY
+
+
+Items Type: STRING
+
+
+
+
+
+
+#### Output Example
+```json
+[ "" ]
+```
+
+
+### Format Currency
+Name: formatCurrency
+
+`Format currency to the specified denomination.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| currency | Currency | STRING <details> <summary> Options </summary> ADP, AED, AFA, AFN, ALL, AMD, ANG, AOA, ARS, ATS, AUD, AWG, AYM, AZM, AZN, BAM, BBD, BDT, BEF, BGL, BGN, BHD, BIF, BMD, BND, BOB, BOV, BRL, BSD, BTN, BWP, BYB, BYN, BYR, BZD, CAD, CDF, CHE, CHF, CHW, CLF, CLP, CNY, COP, COU, CRC, CSD, CUC, CUP, CVE, CYP, CZK, DEM, DJF, DKK, DOP, DZD, EEK, EGP, ERN, ESP, ETB, EUR, FIM, FJD, FKP, FRF, GBP, GEL, GHC, GHS, GIP, GMD, GNF, GRD, GTQ, GWP, GYD, HKD, HNL, HRK, HTG, HUF, IDR, IEP, ILS, INR, IQD, IRR, ISK, ITL, JMD, JOD, JPY, KES, KGS, KHR, KMF, KPW, KRW, KWD, KYD, KZT, LAK, LBP, LKR, LRD, LSL, LTL, LUF, LVL, LYD, MAD, MDL, MGA, MGF, MKD, MMK, MNT, MOP, MRO, MRU, MTL, MUR, MVR, MWK, MXN, MXV, MYR, MZM, MZN, NAD, NGN, NIO, NLG, NOK, NPR, NZD, OMR, PAB, PEN, PGK, PHP, PKR, PLN, PTE, PYG, QAR, ROL, RON, RSD, RUB, RUR, RWF, SAR, SBD, SCR, SDD, SDG, SEK, SGD, SHP, SIT, SKK, SLE, SLL, SOS, SRD, SRG, SSP, STD, STN, SVC, SYP, SZL, THB, TJS, TMM, TMT, TND, TOP, TPE, TRL, TRY, TTD, TWD, TZS, UAH, UGX, USD, USN, USS, UYI, UYU, UZS, VEB, VED, VEF, VES, VND, VUV, WST, XAF, XAG, XAU, XBA, XBB, XBC, XBD, XCD, XCG, XDR, XFO, XFU, XOF, XPD, XPF, XPT, XSU, XTS, XUA, XXX, YER, YUM, ZAR, ZMK, ZMW, ZWD, ZWL, ZWN, ZWR </details> | `The type of currency you wish to use.` | true |
+| amount | Amount | NUMBER | `The amount to be formatted.` | true |
+| decimalDigits | Decimal Digits | INTEGER | `Digits you would like after your decimal.` | true |
+| decimalSeparator | Decimal Separator | STRING | `The character you would like to use as a decimal separator.` | true |
+| thousandsSeparator | Thousands Separator | STRING | `The character you would like to use as a thousands separator.` | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Format Currency",
+  "name" : "formatCurrency",
+  "parameters" : {
+    "currency" : "",
+    "amount" : 0.0,
+    "decimalDigits" : 1,
+    "decimalSeparator" : "",
+    "thousandsSeparator" : ""
+  },
+  "type" : "textHelper/v1/formatCurrency"
+}
+```
+
+#### Output
+
+
+
+Type: STRING
+
+
+
+
+
+
+
+
+### HTML to Markdown
+Name: HTMLToMarkdown
+
+`Converts HTML to markdown.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| html | HTML Content | STRING | `HTML content to be converted to markdown.` | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "HTML to Markdown",
+  "name" : "HTMLToMarkdown",
+  "parameters" : {
+    "html" : ""
+  },
+  "type" : "textHelper/v1/HTMLToMarkdown"
+}
+```
+
+#### Output
+
+
+
+Type: STRING
+
+
+
+
+
+
+
+
+### Lower Case
+Name: lowerCase
+
+`Convert a string to lower case.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| text | Text | STRING |  | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Lower Case",
+  "name" : "lowerCase",
+  "parameters" : {
+    "text" : ""
+  },
+  "type" : "textHelper/v1/lowerCase"
+}
+```
+
+#### Output
+
+
+
+Type: STRING
+
+
+
+
+
+
+
+
+### Markdown to HTML
+Name: markdownToHTML
+
+`Converts markdown to HTML.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| markdown | Markdown content | STRING | `Markdown content to convert to HTML.` | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Markdown to HTML",
+  "name" : "markdownToHTML",
+  "parameters" : {
+    "markdown" : ""
+  },
+  "type" : "textHelper/v1/markdownToHTML"
+}
+```
+
+#### Output
+
+
+
+Type: STRING
+
+
+
+
+
+
+
+
+### Replace
+Name: replace
+
+`Replace all instances of any word, character, or phrase in text with another.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| text | Text | STRING |  | true |
+| searchValue | Search Value | STRING | `Can be plain text or a regex expression.` | true |
+| replaceValue | Replace Value | STRING | `Leave blank to remove the search value.` | false |
+| replaceOnlyFirst | Replace Only First Match | BOOLEAN <details> <summary> Options </summary> true, false </details> |  | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Replace",
+  "name" : "replace",
+  "parameters" : {
+    "text" : "",
+    "searchValue" : "",
+    "replaceValue" : "",
+    "replaceOnlyFirst" : false
+  },
+  "type" : "textHelper/v1/replace"
+}
+```
+
+#### Output
+
+
+
+Type: STRING
+
+
+
+
+
+
+
+
+### Select First N Characters
+Name: selectFirstNCharacters
+
+`Select the first N characters from a string.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| text | Text | STRING |  | true |
+| numberOfCharacters | Number of Characters | INTEGER | `The number of characters to select.` | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Select First N Characters",
+  "name" : "selectFirstNCharacters",
+  "parameters" : {
+    "text" : "",
+    "numberOfCharacters" : 1
+  },
+  "type" : "textHelper/v1/selectFirstNCharacters"
+}
+```
+
+#### Output
+
+
+
+Type: STRING
+
+
+
+
+
+
+
+
+### Select Last N Characters
+Name: selectLastNCharacters
+
+`Select the last N characters from a string.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| text | Text | STRING |  | true |
+| numberOfCharacters | Number of Characters | INTEGER | `The number of characters to select.` | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Select Last N Characters",
+  "name" : "selectLastNCharacters",
+  "parameters" : {
+    "text" : "",
+    "numberOfCharacters" : 1
+  },
+  "type" : "textHelper/v1/selectLastNCharacters"
+}
+```
+
+#### Output
+
+
+
+Type: STRING
+
+
+
+
+
+
+
+
+### Split
+Name: split
+
+`Split the text by delimiter.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| text | Text | STRING |  | true |
+| delimiter | Delimiter | STRING | `Delimiter used for splitting the text.` | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Split",
+  "name" : "split",
+  "parameters" : {
+    "text" : "",
+    "delimiter" : ""
+  },
+  "type" : "textHelper/v1/split"
+}
+```
+
+#### Output
+
+
+
+Type: ARRAY
+
+
+Items Type: STRING
+
+
+
+
+
+
+#### Output Example
+```json
+[ "" ]
+```
+
+
+### Trim Whitespace
+Name: trimWhitespace
+
+`Trim whitespace from the beginning and end of a string.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| text | Text | STRING |  | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Trim Whitespace",
+  "name" : "trimWhitespace",
+  "parameters" : {
+    "text" : ""
+  },
+  "type" : "textHelper/v1/trimWhitespace"
+}
+```
+
+#### Output
+
+
+
+Type: STRING
+
+
+
+
+
+
+
+
+### Upper Case
+Name: upperCase
+
+`Convert a string to upper case.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| text | Text | STRING |  | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Upper Case",
+  "name" : "upperCase",
+  "parameters" : {
+    "text" : ""
+  },
+  "type" : "textHelper/v1/upperCase"
+}
+```
+
+#### Output
+
+
+
+Type: STRING
+
+
+
+
+
+
+
+
+### URL Encode/Decode
+Name: urlEncodeDecode
+
+`URL encode/decode a specified string.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| text | Text | STRING | `The text to be URL encode or decode.` | true |
+| operation | Encode or Decode | STRING <details> <summary> Options </summary> ENCODE, DECODE </details> | `Select whether to encode or decode the text.` | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "URL Encode/Decode",
+  "name" : "urlEncodeDecode",
+  "parameters" : {
+    "text" : "",
+    "operation" : ""
+  },
+  "type" : "textHelper/v1/urlEncodeDecode"
+}
+```
+
+#### Output
+
+
+
+Type: STRING
+
+
+
+
+
+
+
+
+
+

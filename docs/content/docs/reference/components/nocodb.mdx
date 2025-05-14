@@ -1,0 +1,250 @@
+---
+title: "NocoDB"
+description: "NocoDB is an open-source platform that transforms databases into smart spreadsheets, enabling users to manage and collaborate on data with a no-code interface."
+---
+
+NocoDB is an open-source platform that transforms databases into smart spreadsheets, enabling users to manage and collaborate on data with a no-code interface.
+
+
+Categories: File Storage
+
+
+Type: nocoDb/v1
+
+<hr />
+
+
+
+## Connections
+
+Version: 1
+
+
+### custom
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| baseUrl | NocoDB Base URL | STRING |  | true |
+| api_token | API Token | STRING |  | true |
+
+
+
+
+
+<hr />
+
+
+
+## Actions
+
+
+### Create Records
+Name: createRecords
+
+`Creates a new records in the specified table.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| workspaceId | Workspace ID | STRING | `ID of the workspace.` | true |
+| baseId | Base ID | STRING <details> <summary> Depends On </summary> workspaceId </details> | `ID of the base.` | true |
+| tableId | Table ID | STRING <details> <summary> Depends On </summary> baseId, workspaceId </details> | `ID of the table.` | true |
+| tableColumns | | DYNAMIC_PROPERTIES <details> <summary> Depends On </summary> tableId, baseId, workspaceId </details> |  | null |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Create Records",
+  "name" : "createRecords",
+  "parameters" : {
+    "workspaceId" : "",
+    "baseId" : "",
+    "tableId" : "",
+    "tableColumns" : { }
+  },
+  "type" : "nocoDb/v1/createRecords"
+}
+```
+
+#### Output
+
+
+
+Type: ARRAY
+
+
+Items Type: OBJECT
+
+
+#### Properties
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| Id | INTEGER | Id of the created record. |
+
+
+
+
+
+#### Output Example
+```json
+[ {
+  "Id" : 1
+} ]
+```
+
+
+### Delete Records
+Name: deleteRecords
+
+`Deletes existing records in the specified table.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| workspaceId | Workspace ID | STRING | `ID of the workspace.` | true |
+| baseId | Base ID | STRING <details> <summary> Depends On </summary> workspaceId </details> | `ID of the base.` | true |
+| tableId | Table ID | STRING <details> <summary> Depends On </summary> baseId, workspaceId </details> | `ID of the table.` | true |
+| recordId | Records ID | ARRAY <details> <summary> Items </summary> [INTEGER] </details> | `ID of the records to delete.` | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Delete Records",
+  "name" : "deleteRecords",
+  "parameters" : {
+    "workspaceId" : "",
+    "baseId" : "",
+    "tableId" : "",
+    "recordId" : [ 1 ]
+  },
+  "type" : "nocoDb/v1/deleteRecords"
+}
+```
+
+#### Output
+
+
+
+Type: ARRAY
+
+
+Items Type: OBJECT
+
+
+#### Properties
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| Id | INTEGER | Id of the deleted record. |
+
+
+
+
+
+#### Output Example
+```json
+[ {
+  "Id" : 1
+} ]
+```
+
+
+### Get Record
+Name: getRecord
+
+`Gets a record from the specified table.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| workspaceId | Workspace ID | STRING | `ID of the workspace.` | true |
+| baseId | Base ID | STRING <details> <summary> Depends On </summary> workspaceId </details> | `ID of the base.` | true |
+| tableId | Table ID | STRING <details> <summary> Depends On </summary> baseId, workspaceId </details> | `ID of the table.` | true |
+| recordId | Record ID | STRING <details> <summary> Depends On </summary> tableId, baseId, workspaceId </details> | `ID of the record to retrieve.` | true |
+| fields | Fields | ARRAY <details> <summary> Items </summary> [STRING] </details> | `Fields to include in the response. By default, all the fields are included in the response.` | false |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Get Record",
+  "name" : "getRecord",
+  "parameters" : {
+    "workspaceId" : "",
+    "baseId" : "",
+    "tableId" : "",
+    "recordId" : "",
+    "fields" : [ "" ]
+  },
+  "type" : "nocoDb/v1/getRecord"
+}
+```
+
+#### Output
+
+The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
+
+
+
+
+### Update Records
+Name: updateRecords
+
+`Updates existing records in the specified table.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| workspaceId | Workspace ID | STRING | `ID of the workspace.` | true |
+| baseId | Base ID | STRING <details> <summary> Depends On </summary> workspaceId </details> | `ID of the base.` | true |
+| tableId | Table ID | STRING <details> <summary> Depends On </summary> baseId, workspaceId </details> | `ID of the table.` | true |
+| tableColumns | | DYNAMIC_PROPERTIES <details> <summary> Depends On </summary> tableId, baseId, workspaceId </details> |  | null |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Update Records",
+  "name" : "updateRecords",
+  "parameters" : {
+    "workspaceId" : "",
+    "baseId" : "",
+    "tableId" : "",
+    "tableColumns" : { }
+  },
+  "type" : "nocoDb/v1/updateRecords"
+}
+```
+
+#### Output
+
+
+
+Type: ARRAY
+
+
+Items Type: OBJECT
+
+
+#### Properties
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| Id | INTEGER | Id of the updated record. |
+
+
+
+
+
+#### Output Example
+```json
+[ {
+  "Id" : 1
+} ]
+```
+
+
+
+

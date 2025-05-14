@@ -1,0 +1,248 @@
+---
+title: "Freshsales"
+description: "Freshsales is a customer relationship management (CRM) software designed to help businesses streamline sales processes and manage customer interactions effectively."
+---
+
+Freshsales is a customer relationship management (CRM) software designed to help businesses streamline sales processes and manage customer interactions effectively.
+
+
+Categories: CRM
+
+
+Type: freshsales/v1
+
+<hr />
+
+
+
+## Connections
+
+Version: 1
+
+
+### API Key
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| username | Bundle alias | STRING | `Your Freshsales bundle alias (e.g. https://<alias>.myfreshworks.com)` | true |
+| key | API Key | STRING | `The API Key supplied by Freshsales` | true |
+
+
+
+
+
+<hr />
+
+
+
+## Actions
+
+
+### Create Account
+Name: createAccount
+
+`Creates a new account.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| name | Name | STRING | `Name of the account.` | true |
+| website | Website | STRING | `Website of the account.` | false |
+| phone | Phone | STRING | `Phone number of the account.` | false |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Create Account",
+  "name" : "createAccount",
+  "parameters" : {
+    "name" : "",
+    "website" : "",
+    "phone" : ""
+  },
+  "type" : "freshsales/v1/createAccount"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| sales_account | OBJECT <details> <summary> Properties </summary> &#123;NUMBER\(id), STRING\(name), STRING\(website), STRING\(phone)&#125; </details> |  |
+
+
+
+
+#### Output Example
+```json
+{
+  "sales_account" : {
+    "id" : 0.0,
+    "name" : "",
+    "website" : "",
+    "phone" : ""
+  }
+}
+```
+
+
+### Create Contact
+Name: createContact
+
+`Add new contact in Freshsales CRM.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| first_name | First Name | STRING | `First name of the contact.` | false |
+| last_name | Last Name | STRING | `Last name of the contact.` | false |
+| job_title | Job Title | STRING | `Designation of the contact in the account they belong to.` | false |
+| email | Email | STRING | `Primary email address of the contact.` | true |
+| work_number | Work Number | STRING | `Work phone number of the contact.` | false |
+| mobile_number | Mobile Number | STRING | `Mobile phone number of the contact.` | false |
+| address | Address | STRING | `Address of the contact.` | false |
+| city | City | STRING | `City that the contact belongs to.` | false |
+| state | State | STRING | `State that the contact belongs to.` | false |
+| zipcode | Zip Code | STRING | `Zipcode of the region that the contact belongs to.` | false |
+| country | Country | STRING | `Country that the contact belongs to.` | false |
+| medium | Medium | STRING | `The medium that led your contact to your website/web ap.p` | false |
+| facebook | Facebook | STRING | `Facebook username of the contact.` | false |
+| twitter | Twitter | STRING | `Twitter username of the contact.` | false |
+| linkedin | LinkedIn | STRING | `LinkedIn account of the contact.` | false |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Create Contact",
+  "name" : "createContact",
+  "parameters" : {
+    "first_name" : "",
+    "last_name" : "",
+    "job_title" : "",
+    "email" : "",
+    "work_number" : "",
+    "mobile_number" : "",
+    "address" : "",
+    "city" : "",
+    "state" : "",
+    "zipcode" : "",
+    "country" : "",
+    "medium" : "",
+    "facebook" : "",
+    "twitter" : "",
+    "linkedin" : ""
+  },
+  "type" : "freshsales/v1/createContact"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| contact | OBJECT <details> <summary> Properties </summary> &#123;NUMBER\(id), STRING\(first_name), STRING\(last_name), STRING\(job_title), STRING\(city), STRING\(state), STRING\(zipcode), STRING\(country), STRING\(email), STRING\(work_number), STRING\(mobile_number), STRING\(address), STRING\(medium), STRING\(facebook), STRING\(twitter), STRING\(linkedin)&#125; </details> |  |
+
+
+
+
+#### Output Example
+```json
+{
+  "contact" : {
+    "id" : 0.0,
+    "first_name" : "",
+    "last_name" : "",
+    "job_title" : "",
+    "city" : "",
+    "state" : "",
+    "zipcode" : "",
+    "country" : "",
+    "email" : "",
+    "work_number" : "",
+    "mobile_number" : "",
+    "address" : "",
+    "medium" : "",
+    "facebook" : "",
+    "twitter" : "",
+    "linkedin" : ""
+  }
+}
+```
+
+
+### Create Lead
+Name: createLead
+
+`Creates a new lead.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| first_name | First Name | STRING | `First name of the lead.` | false |
+| last_name | Last Name | STRING | `Last name of the lead.` | false |
+| email | Email | STRING | `Primary email address of the lead.` | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Create Lead",
+  "name" : "createLead",
+  "parameters" : {
+    "first_name" : "",
+    "last_name" : "",
+    "email" : ""
+  },
+  "type" : "freshsales/v1/createLead"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| lead | OBJECT <details> <summary> Properties </summary> &#123;NUMBER\(id), STRING\(email), STRING\(first_name), STRING\(last_name)&#125; </details> |  |
+
+
+
+
+#### Output Example
+```json
+{
+  "lead" : {
+    "id" : 0.0,
+    "email" : "",
+    "first_name" : "",
+    "last_name" : ""
+  }
+}
+```
+
+
+
+
