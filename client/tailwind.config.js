@@ -134,6 +134,10 @@ module.exports = {
                     popover: {
                         canvas: 'hsl(var(--surface-popover-canvas))',
                     },
+                    warning: {
+                        primary: 'hsl(var(--surface-warning-primary))',
+                        secondary: 'hsl(var(--surface-warning-secondary))',
+                    },
                 },
             },
             height: {
