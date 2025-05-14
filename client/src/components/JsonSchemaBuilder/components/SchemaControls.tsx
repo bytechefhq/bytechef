@@ -1,16 +1,15 @@
-import SchemaAddButton from '@/components/JsonSchemaBuilder/components/SchemaAddButton';
-import SchemaCollapseButton from '@/components/JsonSchemaBuilder/components/SchemaCollapseButton';
 import SchemaDeleteButton from '@/components/JsonSchemaBuilder/components/SchemaDeleteButton';
 import SchemaInput from '@/components/JsonSchemaBuilder/components/SchemaInput';
 import SchemaMenu from '@/components/JsonSchemaBuilder/components/SchemaMenu';
-import SchemaMenuButton from '@/components/JsonSchemaBuilder/components/SchemaMenuButton';
 import SchemaMenuModal from '@/components/JsonSchemaBuilder/components/SchemaMenuModal';
 import SchemaTypesSelect from '@/components/JsonSchemaBuilder/components/SchemaTypesSelect';
-import React, {useState} from 'react';
+import {ChevronDownIcon, ChevronRightIcon, EllipsisVerticalIcon, PlusIcon} from 'lucide-react';
+import {useState} from 'react';
 import {useTranslation} from 'react-i18next';
 
 import * as helpers from '../utils/helpers';
 import {SchemaRecordType} from '../utils/types';
+import SchemaRoundedButton from './SchemaRoundedButton';
 
 interface SchemaControlsProps {
     schema: SchemaRecordType;
@@ -110,3 +109,31 @@ export const SchemaArrayControls = ({onAdd, onChange, schema}: SchemaArrayContro
         </div>
     );
 };
+
+const SchemaMenuButton = ({onClick = () => {}, title}: {onClick?: () => void; title?: string}) => (
+    <SchemaRoundedButton className="bg-white text-gray-800 hover:bg-gray-200" onClick={onClick} title={title}>
+        <EllipsisVerticalIcon className="h-4" />
+    </SchemaRoundedButton>
+);
+
+const SchemaAddButton = ({onClick = () => {}, title}: {onClick?: () => void; title?: string}) => (
+    <SchemaRoundedButton
+        className="text-primary hover:bg-accent hover:text-accent-foreground"
+        onClick={onClick}
+        title={title}
+    >
+        <PlusIcon className="h-4" />
+    </SchemaRoundedButton>
+);
+
+interface CollapseButtonProps {
+    onClick?: () => void;
+    isCollapsed?: boolean;
+    title?: string;
+}
+
+const SchemaCollapseButton = ({isCollapsed = false, onClick = () => {}, title}: CollapseButtonProps) => (
+    <SchemaRoundedButton className="hover:bg-accent hover:text-accent-foreground" onClick={onClick} title={title}>
+        {isCollapsed ? <ChevronRightIcon className="h-4" /> : <ChevronDownIcon className="h-4" />}
+    </SchemaRoundedButton>
+);

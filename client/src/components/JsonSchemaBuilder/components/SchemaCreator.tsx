@@ -1,6 +1,6 @@
-import SchemaBox from '@/components/JsonSchemaBuilder/components/SchemaBox';
 import {AsteriskIcon} from 'lucide-react';
-import React, {useState} from 'react';
+import {PropsWithChildren, useState} from 'react';
+import {twMerge} from 'tailwind-merge';
 
 import {
     addSchemaProperty,
@@ -56,7 +56,7 @@ const SchemaCreator = ({
                 />
             </div>
 
-            <div className={`${isCollapsed ? 'hidden' : 'block'}`}>
+            <div className={twMerge(isCollapsed ? 'hidden' : 'block')}>
                 {isSchemaObject(schema) && hasSchemaProperties(schema) && (
                     <SchemaBox>
                         <SchemaObjectProperties
@@ -145,3 +145,7 @@ const SchemaObjectProperties = ({onChange, onChangeKey, onDelete, schema}: Schem
 };
 
 export default SchemaCreator;
+
+const SchemaBox = ({children}: PropsWithChildren) => (
+    <div className="w-full rounded-bl border-b border-l border-blue-400 py-2 pl-2">{children}</div>
+);
